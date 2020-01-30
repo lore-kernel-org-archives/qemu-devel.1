@@ -6,67 +6,89 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0654C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36247C33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:39:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C7112082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:39:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 054542082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:39:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PpLG4Yxs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C7112082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ClGB7r53"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 054542082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixA32-0004VQ-Rb
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 08:39:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48153)
+	id 1ixA34-0004XQ-50
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 08:39:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ixA24-0003Tu-Q4
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:38:58 -0500
+ (envelope-from <mst@redhat.com>) id 1ixA27-0003VU-9R
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:39:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ixA23-0000P4-1X
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:38:56 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24100
+ (envelope-from <mst@redhat.com>) id 1ixA26-0000To-3I
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:38:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58054
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ixA22-0000Nj-Ue
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:38:54 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ixA25-0000RU-Uo
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:38:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580391534;
+ s=mimecast20190719; t=1580391537;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=9hFw3V75z5H+uxAmfwQHB6k024lOvinbMtbyNMB+btg=;
- b=PpLG4YxsGnRWT+8rb7SJOOz9Ko/JOny5HM7sH3h3sKgZV8f2IbGOTD8eFA+mUWlJDMkLuB
- b+GrK2uEebqv0wPPyRo5ZJnIDFKNEKPb+2JXBcOM6fv0qqTelKYhsu9aOZAN6+cWuPV1dI
- +EbRBbcp14lHwzUrpwpJtTSr5uQPP2g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-mnKwGWsPNpCvV-HEOVpj6w-1; Thu, 30 Jan 2020 08:38:51 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04B588F04E1;
- Thu, 30 Jan 2020 13:38:50 +0000 (UTC)
-Received: from thuth.com (ovpn-117-117.ams2.redhat.com [10.36.117.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E221060BE2;
- Thu, 30 Jan 2020 13:38:42 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] hw/*/Makefile.objs: Move many .o files to common-objs
-Date: Thu, 30 Jan 2020 14:38:41 +0100
-Message-Id: <20200130133841.10779-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: mnKwGWsPNpCvV-HEOVpj6w-1
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ApvsHQ46Z4leAMYdyTfd91cqsfgfCIbzOR9iSXX5oU0=;
+ b=ClGB7r5312Hff4rTtRaDIBJu+C9zs7aUWXqO5yl36mqnly1mr7K8ESD5y+os8Ta/wvdKvw
+ Kc+bQwpD9WtWZtjmlRUGs4VHj6c1YDLyvP3QBpofKUUxFpD2A+FPPPufiaOqdRLUz4I5gq
+ JeQ83K/yX2YzHKfx97luirSt9IQGSTE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-180-l53CCl_CPQKBGL6eWpUQig-1; Thu, 30 Jan 2020 08:38:55 -0500
+Received: by mail-wr1-f70.google.com with SMTP id f10so1729019wro.14
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 05:38:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Eh1tJCW7UJpAe8VpCuZzDiweV5bTarAjItj41HZHN2g=;
+ b=AJP6I77uPXt6wgmVfdue5eOX9Ry0OB/sEk+kXoYHoc8N5ImQVjYXYxfxLsvOxFg/61
+ 2ThLf1Bg1t/Juwr0d6eJFjfGEjKhdKeCOfbciQWAdX67jFV99JL1w+/0e2l3D22sv9Rb
+ R8eH6xbNlivVbfRHFlLqIAqtaRC+hWQifxfr37BRshB3U3Ud8MXM4+iQd2kSBJT3IlKv
+ +uLMRzeyiyVQLawru4qKpsJaTR6lsNE6MQMw37zST5g5d8tbW7eOn06Jaf8yF6a2i4a0
+ KRmTUmBzTFdRc/LVJiwDSKaY8AY8IvD9ExwT7tukYrjXWdYSOW9Ejm35gGByJX/Dkv/i
+ BAIw==
+X-Gm-Message-State: APjAAAW7rUIQaZnYDAyY13lTgYirx/jdD/oKHiXjKZW/orY0e8HTSM4j
+ C8dQx+BDgA/0sVZoKhi5l/JIMzMWfL9w2mKB+AL8vjAMCpyedLihOYGKuCHSddm6qaLWpscTtwd
+ naRQT9lsDCSw+byY=
+X-Received: by 2002:a1c:4857:: with SMTP id v84mr5763132wma.8.1580391532527;
+ Thu, 30 Jan 2020 05:38:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx2NHJQdKTP0N6Ml7YeiFLxT7w3lA/J/nc4VWSEvskVmOnrrcCKbYycmGR7VtUaNLF/dcM+7g==
+X-Received: by 2002:a1c:4857:: with SMTP id v84mr5763108wma.8.1580391532281;
+ Thu, 30 Jan 2020 05:38:52 -0800 (PST)
+Received: from redhat.com (bzq-109-64-11-187.red.bezeqint.net. [109.64.11.187])
+ by smtp.gmail.com with ESMTPSA id y139sm6489280wmd.24.2020.01.30.05.38.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Jan 2020 05:38:51 -0800 (PST)
+Date: Thu, 30 Jan 2020 08:38:48 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Subject: Re: [PATCH v1 1/4] virtio: introduce VIRTQUEUE_DEFUALT_SIZE instead
+ of hardcoded constants
+Message-ID: <20200130083800-mutt-send-email-mst@kernel.org>
+References: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
+ <20200129140702.5411-2-dplotnikov@virtuozzo.com>
+MIME-Version: 1.0
+In-Reply-To: <20200129140702.5411-2-dplotnikov@virtuozzo.com>
+X-MC-Unique: l53CCl_CPQKBGL6eWpUQig-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,291 +102,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-trivial@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com,
+ den@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have many files that apparently do not depend on the target CPU
-configuration, i.e. which can be put into common-obj-y instead of
-obj-y. This way, the code can be shared for example between
-qemu-system-arm and qemu-system-aarch64, or the various big and
-little endian variants like qemu-system-sh4 and qemu-system-sh4eb,
-so that we do not have to compile the code multiple times anymore.
+On Wed, Jan 29, 2020 at 05:06:59PM +0300, Denis Plotnikov wrote:
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Rebased to master
 
- hw/adc/Makefile.objs     |  2 +-
- hw/block/Makefile.objs   |  2 +-
- hw/char/Makefile.objs    | 16 ++++++++--------
- hw/core/Makefile.objs    |  2 +-
- hw/display/Makefile.objs |  2 +-
- hw/dma/Makefile.objs     |  6 +++---
- hw/gpio/Makefile.objs    | 10 +++++-----
- hw/i2c/Makefile.objs     |  4 ++--
- hw/i2c/ppc4xx_i2c.c      |  1 -
- hw/input/Makefile.objs   |  8 ++++----
- hw/net/Makefile.objs     |  6 +++---
- hw/nvram/Makefile.objs   |  2 +-
- hw/pcmcia/Makefile.objs  |  2 +-
- hw/sd/Makefile.objs      | 10 +++++-----
- hw/ssi/Makefile.objs     |  4 ++--
- hw/usb/Makefile.objs     |  4 ++--
- 16 files changed, 40 insertions(+), 41 deletions(-)
+I'm not sure what the point is. It's more or less an accident that
+these two devices share the queue size, this constance
+makes no sense to me.
 
-diff --git a/hw/adc/Makefile.objs b/hw/adc/Makefile.objs
-index 3f6dfdedae..2b9dc36c7f 100644
---- a/hw/adc/Makefile.objs
-+++ b/hw/adc/Makefile.objs
-@@ -1 +1 @@
--obj-$(CONFIG_STM32F2XX_ADC) +=3D stm32f2xx_adc.o
-+common-obj-$(CONFIG_STM32F2XX_ADC) +=3D stm32f2xx_adc.o
-diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-index 28c2495a00..4b4a2b338d 100644
---- a/hw/block/Makefile.objs
-+++ b/hw/block/Makefile.objs
-@@ -10,7 +10,7 @@ common-obj-$(CONFIG_ONENAND) +=3D onenand.o
- common-obj-$(CONFIG_NVME_PCI) +=3D nvme.o
- common-obj-$(CONFIG_SWIM) +=3D swim.o
-=20
--obj-$(CONFIG_SH4) +=3D tc58128.o
-+common-obj-$(CONFIG_SH4) +=3D tc58128.o
-=20
- obj-$(CONFIG_VIRTIO_BLK) +=3D virtio-blk.o
- obj-$(CONFIG_VHOST_USER_BLK) +=3D vhost-user-blk.o
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 02d8a66925..9e9a6c1aff 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -13,14 +13,13 @@ common-obj-$(CONFIG_XILINX) +=3D xilinx_uartlite.o
- common-obj-$(CONFIG_XEN) +=3D xen_console.o
- common-obj-$(CONFIG_CADENCE) +=3D cadence_uart.o
-=20
--obj-$(CONFIG_EXYNOS4) +=3D exynos4210_uart.o
--obj-$(CONFIG_COLDFIRE) +=3D mcf_uart.o
--obj-$(CONFIG_OMAP) +=3D omap_uart.o
--obj-$(CONFIG_SH4) +=3D sh_serial.o
--obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
--obj-$(CONFIG_DIGIC) +=3D digic-uart.o
--obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
--obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
-+common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_uart.o
-+common-obj-$(CONFIG_COLDFIRE) +=3D mcf_uart.o
-+common-obj-$(CONFIG_OMAP) +=3D omap_uart.o
-+common-obj-$(CONFIG_SH4) +=3D sh_serial.o
-+common-obj-$(CONFIG_DIGIC) +=3D digic-uart.o
-+common-obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
-+common-obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
-=20
- common-obj-$(CONFIG_CMSDK_APB_UART) +=3D cmsdk-apb-uart.o
- common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
-@@ -33,4 +32,5 @@ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-uart.o
- common-obj-$(CONFIG_SCLPCONSOLE) +=3D sclpconsole.o sclpconsole-lm.o
-=20
- obj-$(CONFIG_VIRTIO) +=3D virtio-serial-bus.o
-+obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
- obj-$(CONFIG_TERMINAL3270) +=3D terminal3270.o
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index a522b7297d..064a8f65e1 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -18,8 +18,8 @@ common-obj-$(CONFIG_SOFTMMU) +=3D machine.o
- common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
- common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
- common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
-+common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
- obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
--obj-$(CONFIG_SOFTMMU) +=3D numa.o
-=20
- common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
- common-obj-$(CONFIG_XILINX_AXI) +=3D stream.o
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 5f03dfdcc4..77a7d622bd 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -24,7 +24,7 @@ common-obj-$(CONFIG_BOCHS_DISPLAY) +=3D bochs-display.o
- common-obj-$(CONFIG_BLIZZARD) +=3D blizzard.o
- common-obj-$(CONFIG_EXYNOS4) +=3D exynos4210_fimd.o
- common-obj-$(CONFIG_FRAMEBUFFER) +=3D framebuffer.o
--obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
-+common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-vgafb.o
- common-obj-$(CONFIG_ZAURUS) +=3D tc6393xb.o
- common-obj-$(CONFIG_MACFB) +=3D macfb.o
-=20
-diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-index b672e7a522..f4b1cfe26d 100644
---- a/hw/dma/Makefile.objs
-+++ b/hw/dma/Makefile.objs
-@@ -8,9 +8,9 @@ common-obj-$(CONFIG_XILINX_AXI) +=3D xilinx_axidma.o
- common-obj-$(CONFIG_ZYNQ_DEVCFG) +=3D xlnx-zynq-devcfg.o
- common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_dma.o
- common-obj-$(CONFIG_STP2000) +=3D sparc32_dma.o
--obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx_dpdma.o
-+common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx_dpdma.o
- common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) +=3D xlnx-zdma.o
-=20
--obj-$(CONFIG_OMAP) +=3D omap_dma.o soc_dma.o
--obj-$(CONFIG_PXA2XX) +=3D pxa2xx_dma.o
-+common-obj-$(CONFIG_OMAP) +=3D omap_dma.o soc_dma.o
-+common-obj-$(CONFIG_PXA2XX) +=3D pxa2xx_dma.o
- common-obj-$(CONFIG_RASPI) +=3D bcm2835_dma.o
-diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
-index d305b3b24b..3cfc261f9b 100644
---- a/hw/gpio/Makefile.objs
-+++ b/hw/gpio/Makefile.objs
-@@ -5,8 +5,8 @@ common-obj-$(CONFIG_ZAURUS) +=3D zaurus.o
- common-obj-$(CONFIG_E500) +=3D mpc8xxx.o
- common-obj-$(CONFIG_GPIO_KEY) +=3D gpio_key.o
-=20
--obj-$(CONFIG_OMAP) +=3D omap_gpio.o
--obj-$(CONFIG_IMX) +=3D imx_gpio.o
--obj-$(CONFIG_RASPI) +=3D bcm2835_gpio.o
--obj-$(CONFIG_NRF51_SOC) +=3D nrf51_gpio.o
--obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_gpio.o
-+common-obj-$(CONFIG_OMAP) +=3D omap_gpio.o
-+common-obj-$(CONFIG_IMX) +=3D imx_gpio.o
-+common-obj-$(CONFIG_RASPI) +=3D bcm2835_gpio.o
-+common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_gpio.o
-+common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_gpio.o
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-index d7073a401f..6ba976b257 100644
---- a/hw/i2c/Makefile.objs
-+++ b/hw/i2c/Makefile.objs
-@@ -9,5 +9,5 @@ common-obj-$(CONFIG_IMX_I2C) +=3D imx_i2c.o
- common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_i2c.o
- common-obj-$(CONFIG_NRF51_SOC) +=3D microbit_i2c.o
- common-obj-$(CONFIG_MPC_I2C) +=3D mpc_i2c.o
--obj-$(CONFIG_OMAP) +=3D omap_i2c.o
--obj-$(CONFIG_PPC4XX) +=3D ppc4xx_i2c.o
-+common-obj-$(CONFIG_OMAP) +=3D omap_i2c.o
-+common-obj-$(CONFIG_PPC4XX) +=3D ppc4xx_i2c.o
-diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-index 3f015a1581..c0a8e04567 100644
---- a/hw/i2c/ppc4xx_i2c.c
-+++ b/hw/i2c/ppc4xx_i2c.c
-@@ -27,7 +27,6 @@
- #include "qemu/osdep.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
--#include "cpu.h"
- #include "hw/i2c/ppc4xx_i2c.h"
- #include "hw/irq.h"
-=20
-diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
-index f98f635685..abc1ff03c0 100644
---- a/hw/input/Makefile.objs
-+++ b/hw/input/Makefile.objs
-@@ -12,7 +12,7 @@ common-obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-hid.o
- common-obj-$(CONFIG_VIRTIO_INPUT_HOST) +=3D virtio-input-host.o
- common-obj-$(CONFIG_VHOST_USER_INPUT) +=3D vhost-user-input.o
-=20
--obj-$(CONFIG_MILKYMIST) +=3D milkymist-softusb.o
--obj-$(CONFIG_PXA2XX) +=3D pxa2xx_keypad.o
--obj-$(CONFIG_TSC210X) +=3D tsc210x.o
--obj-$(CONFIG_LASIPS2) +=3D lasips2.o
-+common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-softusb.o
-+common-obj-$(CONFIG_PXA2XX) +=3D pxa2xx_keypad.o
-+common-obj-$(CONFIG_TSC210X) +=3D tsc210x.o
-+common-obj-$(CONFIG_LASIPS2) +=3D lasips2.o
-diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-index 19f13e9fa5..991c46c773 100644
---- a/hw/net/Makefile.objs
-+++ b/hw/net/Makefile.objs
-@@ -34,8 +34,8 @@ common-obj-$(CONFIG_SUNHME) +=3D sunhme.o
- common-obj-$(CONFIG_FTGMAC100) +=3D ftgmac100.o
- common-obj-$(CONFIG_SUNGEM) +=3D sungem.o
-=20
--obj-$(CONFIG_ETRAXFS) +=3D etraxfs_eth.o
--obj-$(CONFIG_COLDFIRE) +=3D mcf_fec.o
-+common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_eth.o
-+common-obj-$(CONFIG_COLDFIRE) +=3D mcf_fec.o
- obj-$(CONFIG_MILKYMIST) +=3D milkymist-minimac2.o
- obj-$(CONFIG_PSERIES) +=3D spapr_llan.o
- obj-$(CONFIG_XILINX_ETHLITE) +=3D xilinx_ethlite.o
-@@ -45,7 +45,7 @@ common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOS=
-T_NET)) +=3D vhost_net.o
- common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET=
-))) +=3D vhost_net-stub.o
- common-obj-$(CONFIG_ALL) +=3D vhost_net-stub.o
-=20
--obj-$(CONFIG_ETSEC) +=3D fsl_etsec/etsec.o fsl_etsec/registers.o \
-+common-obj-$(CONFIG_ETSEC) +=3D fsl_etsec/etsec.o fsl_etsec/registers.o \
- =09=09=09fsl_etsec/rings.o fsl_etsec/miim.o
-=20
- common-obj-$(CONFIG_ROCKER) +=3D rocker/rocker.o rocker/rocker_fp.o \
-diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
-index 090df63fcd..f3ad921382 100644
---- a/hw/nvram/Makefile.objs
-+++ b/hw/nvram/Makefile.objs
-@@ -4,5 +4,5 @@ common-obj-$(CONFIG_AT24C) +=3D eeprom_at24c.o
- common-obj-y +=3D fw_cfg.o
- common-obj-$(CONFIG_CHRP_NVRAM) +=3D chrp_nvram.o
- common-obj-$(CONFIG_MAC_NVRAM) +=3D mac_nvram.o
-+common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_nvm.o
- obj-$(CONFIG_PSERIES) +=3D spapr_nvram.o
--obj-$(CONFIG_NRF51_SOC) +=3D nrf51_nvm.o
-diff --git a/hw/pcmcia/Makefile.objs b/hw/pcmcia/Makefile.objs
-index 4eac060c93..02cd986a2c 100644
---- a/hw/pcmcia/Makefile.objs
-+++ b/hw/pcmcia/Makefile.objs
-@@ -1,2 +1,2 @@
- common-obj-y +=3D pcmcia.o
--obj-$(CONFIG_PXA2XX) +=3D pxa2xx.o
-+common-obj-$(CONFIG_PXA2XX) +=3D pxa2xx.o
-diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-index a884c238df..e371281ac4 100644
---- a/hw/sd/Makefile.objs
-+++ b/hw/sd/Makefile.objs
-@@ -4,8 +4,8 @@ common-obj-$(CONFIG_SD) +=3D sd.o core.o sdmmc-internal.o
- common-obj-$(CONFIG_SDHCI) +=3D sdhci.o
- common-obj-$(CONFIG_SDHCI_PCI) +=3D sdhci-pci.o
-=20
--obj-$(CONFIG_MILKYMIST) +=3D milkymist-memcard.o
--obj-$(CONFIG_OMAP) +=3D omap_mmc.o
--obj-$(CONFIG_PXA2XX) +=3D pxa2xx_mmci.o
--obj-$(CONFIG_RASPI) +=3D bcm2835_sdhost.o
--obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_sdhci.o
-+common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-memcard.o
-+common-obj-$(CONFIG_OMAP) +=3D omap_mmc.o
-+common-obj-$(CONFIG_PXA2XX) +=3D pxa2xx_mmci.o
-+common-obj-$(CONFIG_RASPI) +=3D bcm2835_sdhost.o
-+common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_sdhci.o
-diff --git a/hw/ssi/Makefile.objs b/hw/ssi/Makefile.objs
-index f5bcc65fe7..07a85f1967 100644
---- a/hw/ssi/Makefile.objs
-+++ b/hw/ssi/Makefile.objs
-@@ -6,5 +6,5 @@ common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_smc.o
- common-obj-$(CONFIG_STM32F2XX_SPI) +=3D stm32f2xx_spi.o
- common-obj-$(CONFIG_MSF2) +=3D mss-spi.o
-=20
--obj-$(CONFIG_OMAP) +=3D omap_spi.o
--obj-$(CONFIG_IMX) +=3D imx_spi.o
-+common-obj-$(CONFIG_OMAP) +=3D omap_spi.o
-+common-obj-$(CONFIG_IMX) +=3D imx_spi.o
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index 0052d49ce1..2b10868937 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -13,8 +13,8 @@ common-obj-$(CONFIG_USB_XHCI) +=3D hcd-xhci.o
- common-obj-$(CONFIG_USB_XHCI_NEC) +=3D hcd-xhci-nec.o
- common-obj-$(CONFIG_USB_MUSB) +=3D hcd-musb.o
-=20
--obj-$(CONFIG_TUSB6010) +=3D tusb6010.o
--obj-$(CONFIG_IMX)      +=3D chipidea.o
-+common-obj-$(CONFIG_TUSB6010) +=3D tusb6010.o
-+common-obj-$(CONFIG_IMX)      +=3D chipidea.o
-=20
- # emulated usb devices
- common-obj-$(CONFIG_USB) +=3D dev-hub.o
---=20
-2.18.1
+> ---
+>  hw/block/virtio-blk.c      | 6 ++++--
+>  hw/scsi/virtio-scsi.c      | 5 +++--
+>  include/hw/virtio/virtio.h | 1 +
+>  3 files changed, 8 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 09f46ed85f..72f935033f 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -914,7 +914,8 @@ static void virtio_blk_update_config(VirtIODevice *vd=
+ev, uint8_t *config)
+>      memset(&blkcfg, 0, sizeof(blkcfg));
+>      virtio_stq_p(vdev, &blkcfg.capacity, capacity);
+>      virtio_stl_p(vdev, &blkcfg.seg_max,
+> -                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 : 128 -=
+ 2);
+> +                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 :
+> +                                          VIRTQUEUE_DEFAULT_SIZE - 2);
+>      virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
+>      virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
+>      virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size=
+);
+> @@ -1272,7 +1273,8 @@ static Property virtio_blk_properties[] =3D {
+>      DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging=
+, 0,
+>                      true),
+>      DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
+> -    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+> +    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size,
+> +                       VIRTQUEUE_DEFAULT_SIZE),
+>      DEFINE_PROP_BOOL("seg-max-adjust", VirtIOBlock, conf.seg_max_adjust,=
+ true),
+>      DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHRE=
+AD,
+>                       IOThread *),
+> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+> index 3b61563609..36f66046ae 100644
+> --- a/hw/scsi/virtio-scsi.c
+> +++ b/hw/scsi/virtio-scsi.c
+> @@ -660,7 +660,8 @@ static void virtio_scsi_get_config(VirtIODevice *vdev=
+,
+> =20
+>      virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
+>      virtio_stl_p(vdev, &scsiconf->seg_max,
+> -                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 : 1=
+28 - 2);
+> +                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 :
+> +                                          VIRTQUEUE_DEFAULT_SIZE - 2);
+>      virtio_stl_p(vdev, &scsiconf->max_sectors, s->conf.max_sectors);
+>      virtio_stl_p(vdev, &scsiconf->cmd_per_lun, s->conf.cmd_per_lun);
+>      virtio_stl_p(vdev, &scsiconf->event_info_size, sizeof(VirtIOSCSIEven=
+t));
+> @@ -965,7 +966,7 @@ static void virtio_scsi_device_unrealize(DeviceState =
+*dev, Error **errp)
+>  static Property virtio_scsi_properties[] =3D {
+>      DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_que=
+ues, 1),
+>      DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
+> -                                         parent_obj.conf.virtqueue_size,=
+ 128),
+> +                       parent_obj.conf.virtqueue_size, VIRTQUEUE_DEFAULT=
+_SIZE),
+>      DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSI,
+>                        parent_obj.conf.seg_max_adjust, true),
+>      DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_se=
+ctors,
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index b69d517496..a66ea2368b 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -48,6 +48,7 @@ size_t virtio_feature_get_config_size(VirtIOFeature *fe=
+atures,
+>  typedef struct VirtQueue VirtQueue;
+> =20
+>  #define VIRTQUEUE_MAX_SIZE 1024
+> +#define VIRTQUEUE_DEFAULT_SIZE 128
+> =20
+>  typedef struct VirtQueueElement
+>  {
+> --=20
+> 2.17.0
 
 
