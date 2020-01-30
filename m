@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7886C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D63FC33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:31:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71CFF206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:29:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 693D4206D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:31:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRaayDIZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71CFF206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vrk5yF2J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 693D4206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58949 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix81G-0002bt-Jj
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:29:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58817)
+	id 1ix82q-0004p9-FL
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:31:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ix7xk-0005lL-H7
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:21 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ix7xH-0004xd-Rn
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:25:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ix7xj-0004ef-4l
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44901
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1ix7xG-0004G2-Em
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:25:51 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41537
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ix7xj-0004eR-0X
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:19 -0500
+ id 1ix7xG-0004FO-Av
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:25:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580383578;
+ s=mimecast20190719; t=1580383550;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xlSr73pKSiopKdILGn5ZrLva3IOgBSdl74YTmPimHio=;
- b=PRaayDIZfj7m2sJLh6lfWU1Ev6vgd5VpL098R8bMuJqUTVBgvKBEcvRhos0nkyRA239Xyf
- vYjJhn9b/w6QDxUjit314YZsbhME/+F6uOE5o768ZABbE8O44xlJIyyH+zRCNJKC/osYsB
- 7FhmVBM0v/4XQGgGn5ECKYOd/ppmm/A=
+ bh=tZ8t/jvrMH9gmFlHWP1z+sDKBsuOrEE26InOIEyQnuA=;
+ b=Vrk5yF2JhghvBuVNi1SL9AyL6jAyRLXVTPD/gbo8PwedGrJAD5fRzlHRsUROUoZnU331LW
+ nlGXEz6BFz4nlbj3FCst5ERKMjfbzkVTcB/xgez79cZQoNpOn1+TdFTVQGsKyB8NW43PI0
+ nQw1a5+AWBuScIp8mBM/QiWjAHp7goY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-jz5A5r2LO1mGfIqljQT66A-1; Thu, 30 Jan 2020 06:26:16 -0500
-X-MC-Unique: jz5A5r2LO1mGfIqljQT66A-1
+ us-mta-329-5jvxqSYYPiuftcR82U1fbQ-1; Thu, 30 Jan 2020 06:25:48 -0500
+X-MC-Unique: 5jvxqSYYPiuftcR82U1fbQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C35FA800D4E;
- Thu, 30 Jan 2020 11:26:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACC221800D41;
+ Thu, 30 Jan 2020 11:25:46 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D73E71001B05;
- Thu, 30 Jan 2020 11:26:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E28AF1001B05;
+ Thu, 30 Jan 2020 11:25:41 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v2 8/9] arm: gic: Provide per-IRQ helper
- functions
-Date: Thu, 30 Jan 2020 12:25:09 +0100
-Message-Id: <20200130112510.15154-9-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 4/9] arm: pmu: Check Required Event Support
+Date: Thu, 30 Jan 2020 12:25:05 +0100
+Message-Id: <20200130112510.15154-5-eric.auger@redhat.com>
 In-Reply-To: <20200130112510.15154-1-eric.auger@redhat.com>
 References: <20200130112510.15154-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,172 +91,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andre Przywara <andre.przywara@arm.com>
+If event counters are implemented check the common events
+required by the PMUv3 are implemented.
 
-A common theme when accessing per-IRQ parameters in the GIC distributor
-is to set fields of a certain bit width in a range of MMIO registers.
-Examples are the enabled status (one bit per IRQ), the level/edge
-configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
+Some are unconditionally required (SW_INCR, CPU_CYCLES,
+either INST_RETIRED or INST_SPEC). Some others only are
+required if the implementation implements some other features.
 
-Add a generic helper function which is able to mask and set the
-respective number of bits, given the IRQ number and the MMIO offset.
-Provide wrappers using this function to easily allow configuring an IRQ.
+Check those wich are unconditionally required.
 
-For now assume that private IRQ numbers always refer to the current CPU.
-In a GICv2 accessing the "other" private IRQs is not easily doable (the
-registers are banked per CPU on the same MMIO address), so we impose the
-same limitation on GICv3, even though those registers are not banked
-there anymore.
+This test currently fails on TCG as neither INST_RETIRED
+or INST_SPEC are supported.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
-initialize reg
----
- lib/arm/asm/gic-v3.h |  2 +
- lib/arm/asm/gic.h    |  9 +++++
- lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 101 insertions(+)
+v1 -> v2:
+- fix is_event_supported()
+- fix boolean condition for PMU v4
+- fix PMCEID0 definition
 
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index 347be2f..4a445a5 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -23,6 +23,8 @@
- #define GICD_CTLR_ENABLE_G1A		(1U << 1)
- #define GICD_CTLR_ENABLE_G1		(1U << 0)
-=20
-+#define GICD_IROUTER			0x6000
-+
- /* Re-Distributor registers, offsets from RD_base */
- #define GICR_TYPER			0x0008
-=20
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 1fc10a0..21cdb58 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -15,6 +15,7 @@
- #define GICD_IIDR			0x0008
- #define GICD_IGROUPR			0x0080
- #define GICD_ISENABLER			0x0100
-+#define GICD_ICENABLER			0x0180
- #define GICD_ISPENDR			0x0200
- #define GICD_ICPENDR			0x0280
- #define GICD_ISACTIVER			0x0300
-@@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
- extern void gic_ipi_send_single(int irq, int cpu);
- extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
-=20
-+void gic_set_irq_bit(int irq, int offset);
-+void gic_enable_irq(int irq);
-+void gic_disable_irq(int irq);
-+void gic_set_irq_priority(int irq, u8 prio);
-+void gic_set_irq_target(int irq, int cpu);
-+void gic_set_irq_group(int irq, int group);
-+int gic_get_irq_group(int irq);
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 9430116..aa9cb86 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *des=
-t)
- 	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
- 	gic_common_ops->ipi_send_mask(irq, dest);
+RFC ->v1:
+- add a comment to explain the PMCEID0/1 splits
+---
+ arm/pmu.c         | 62 +++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg |  6 +++++
+ 2 files changed, 68 insertions(+)
+
+diff --git a/arm/pmu.c b/arm/pmu.c
+index d24857e..4a26a76 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -101,6 +101,10 @@ static inline void precise_instrs_loop(int loop, uin=
+t32_t pmcr)
+ 	: [pmcr] "r" (pmcr), [z] "r" (0)
+ 	: "cc");
  }
 +
-+enum gic_bit_access {
-+	ACCESS_READ,
-+	ACCESS_SET,
-+	ACCESS_RMW
-+};
++/* event counter tests only implemented for aarch64 */
++static void test_event_introspection(void) {}
 +
-+static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
-+			      enum gic_bit_access access)
+ #elif defined(__aarch64__)
+ #define ID_AA64DFR0_PERFMON_SHIFT 8
+ #define ID_AA64DFR0_PERFMON_MASK  0xf
+@@ -139,6 +143,61 @@ static inline void precise_instrs_loop(int loop, uin=
+t32_t pmcr)
+ 	: [pmcr] "r" (pmcr)
+ 	: "cc");
+ }
++
++#define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
++
++static bool is_event_supported(uint32_t n, bool warn)
 +{
-+	void *base;
-+	int split =3D 32 / bits;
-+	int shift =3D (irq % split) * bits;
-+	u32 reg =3D 0, mask =3D ((1U << bits) - 1) << shift;
++	uint64_t pmceid0 =3D read_sysreg(pmceid0_el0);
++	uint64_t pmceid1 =3D read_sysreg_s(PMCEID1_EL0);
++	bool supported;
++	uint64_t reg;
 +
-+	switch (gic_version()) {
-+	case 2:
-+		base =3D gicv2_dist_base();
-+		break;
-+	case 3:
-+		if (irq < 32)
-+			base =3D gicv3_sgi_base();
-+		else
-+			base =3D gicv3_dist_base();
-+		break;
-+	default:
-+		return 0;
-+	}
-+	base +=3D offset + (irq / split) * 4;
++	/*
++	 * The low 32-bits of PMCEID0/1 respectly describe
++	 * event support for events 0-31/32-63. Their High
++	 * 32-bits describe support for extended events
++	 * starting at 0x4000, using the same split.
++	 */
++	if (n >=3D 0x0  && n <=3D 0x3F)
++		reg =3D (pmceid0 & 0xFFFFFFFF) | ((pmceid1 & 0xFFFFFFFF) << 32);
++	else if  (n >=3D 0x4000 && n <=3D 0x403F)
++		reg =3D (pmceid0 >> 32) | ((pmceid1 >> 32) << 32);
++	else
++		abort();
 +
-+	switch (access) {
-+	case ACCESS_READ:
-+		return (readl(base) & mask) >> shift;
-+	case ACCESS_SET:
-+		reg =3D 0;
-+		break;
-+	case ACCESS_RMW:
-+		reg =3D readl(base) & ~mask;
-+		break;
-+	}
++	supported =3D  reg & (1UL << (n & 0x3F));
 +
-+	writel(reg | ((u32)value << shift), base);
-+
-+	return 0;
++	if (!supported && warn)
++		report_info("event %d is not supported", n);
++	return supported;
 +}
 +
-+void gic_set_irq_bit(int irq, int offset)
++static void test_event_introspection(void)
 +{
-+	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
-+}
++	bool required_events;
 +
-+void gic_enable_irq(int irq)
-+{
-+	gic_set_irq_bit(irq, GICD_ISENABLER);
-+}
-+
-+void gic_disable_irq(int irq)
-+{
-+	gic_set_irq_bit(irq, GICD_ICENABLER);
-+}
-+
-+void gic_set_irq_priority(int irq, u8 prio)
-+{
-+	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
-+}
-+
-+void gic_set_irq_target(int irq, int cpu)
-+{
-+	if (irq < 32)
-+		return;
-+
-+	if (gic_version() =3D=3D 2) {
-+		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
-+				    ACCESS_RMW);
-+
++	if (!pmu.nb_implemented_counters) {
++		report_skip("No event counter, skip ...");
 +		return;
 +	}
 +
-+	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
++	/* PMUv3 requires an implementation includes some common events */
++	required_events =3D is_event_supported(0x0, true) /* SW_INCR */ &&
++			  is_event_supported(0x11, true) /* CPU_CYCLES */ &&
++			  (is_event_supported(0x8, true) /* INST_RETIRED */ ||
++			   is_event_supported(0x1B, true) /* INST_PREC */);
++
++	if (pmu.version =3D=3D 0x4) {
++		/* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
++		required_events =3D required_events &&
++				  is_event_supported(0x23, true) &&
++				  is_event_supported(0x24, true);
++	}
++
++	report(required_events, "Check required events are implemented");
 +}
 +
-+void gic_set_irq_group(int irq, int group)
-+{
-+	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
-+}
+ #endif
+=20
+ /*
+@@ -326,6 +385,9 @@ int main(int argc, char *argv[])
+ 		       "Monotonically increasing cycle count");
+ 		report(check_cpi(cpi), "Cycle/instruction ratio");
+ 		pmccntr64_test();
++	} else if (strcmp(argv[1], "event-introspection") =3D=3D 0) {
++		report_prefix_push(argv[1]);
++		test_event_introspection();
+ 	} else {
+ 		report_abort("Unknown sub-test '%s'", argv[1]);
+ 	}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 79f0d7a..4433ef3 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -66,6 +66,12 @@ file =3D pmu.flat
+ groups =3D pmu
+ extra_params =3D -append 'cycle-counter 0'
+=20
++[pmu-event-introspection]
++file =3D pmu.flat
++groups =3D pmu
++arch =3D arm64
++extra_params =3D -append 'event-introspection'
 +
-+int gic_get_irq_group(int irq)
-+{
-+	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
-+}
+ # Test PMU support (TCG) with -icount IPC=3D1
+ #[pmu-tcg-icount-1]
+ #file =3D pmu.flat
 --=20
 2.20.1
 
