@@ -2,84 +2,77 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB1FAC35246
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 14:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10376C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 14:46:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89112206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 14:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D19F8206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 14:46:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iedqVjn3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89112206F0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="REN6LAhP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D19F8206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixB3y-0003bN-M7
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 09:44:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40654)
+	id 1ixB5C-0004kF-VD
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 09:46:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1ixB38-0002ar-Vp
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:08 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ixB3H-0002m3-C9
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1ixB37-0004bt-Pi
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:06 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55444
+ (envelope-from <stefanha@redhat.com>) id 1ixB3G-0004tF-DO
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:15 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44543
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ixB37-0004aS-MT
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:05 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ixB3G-0004qk-4e
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580395444;
+ s=mimecast20190719; t=1580395453;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VcwkawPc0Bk8cmCdkH/Z17eGA4dxe7XPTWhkSJ6R1mM=;
- b=iedqVjn3wOaXnno5gvtBvKS0jsOd4A9SfYmQz1Wx1rwLKVmIriBIc/N9WsxfVnkETJe7TE
- B4Tr1rANofOAGG8LHQku68V0sOHcCzGhW8Zqdzm5WHek5mbiQxmUu5xUBAncD2Y3K4t6DO
- Ogt9HVsUdERF8GUl3pEDKuE0YeYuA8g=
+ bh=Cvfs3X8OwcUTApJRIPg6yTXpurjde92mDinZ1AxhEws=;
+ b=REN6LAhPgsdUvJ+nmCXAoR4hBtPTSvfSKxGZRc69eQ6RHPNywroPxumbyI/b2c6XaiY9fI
+ 9EMtMzFWwAILpEHKVeo7x5im8mDsTJoGNua2KepFiz4m4VtuBRk+l+Y7ECaisCfQy9kVCq
+ MbbQ2zUgppXNDAiOvfGS/BbcNvhjV70=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-Bq59QaOFNkCCbJV8fJrSXQ-1; Thu, 30 Jan 2020 09:43:54 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-158-4lBEkybEN0mmzzlVOA7lTQ-1; Thu, 30 Jan 2020 09:44:09 -0500
+X-MC-Unique: 4lBEkybEN0mmzzlVOA7lTQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A4BC800D4C;
- Thu, 30 Jan 2020 14:43:53 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-40.gru2.redhat.com
- [10.97.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0D49077928;
- Thu, 30 Jan 2020 14:43:49 +0000 (UTC)
-Subject: Re: [RFC PATCH] tests/acceptance: Add a test for the N800 and N810
- arm machines
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20200129131920.22302-1-thuth@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <8afc6c04-f17b-27d8-968e-4d18b7ed6edb@redhat.com>
-Date: Thu, 30 Jan 2020 12:43:47 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 223831005510;
+ Thu, 30 Jan 2020 14:44:08 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1C69A48;
+ Thu, 30 Jan 2020 14:44:04 +0000 (UTC)
+Date: Thu, 30 Jan 2020 14:44:04 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Bulekov, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v8 00/21] Add virtual device fuzzing support
+Message-ID: <20200130144404.GE180311@stefanha-x1.localdomain>
+References: <20200129053357.27454-1-alxndr@bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <20200129131920.22302-1-thuth@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Bq59QaOFNkCCbJV8fJrSXQ-1
+In-Reply-To: <20200129053357.27454-1-alxndr@bu.edu>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="HnQK338I3UIa/qiP"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,101 +84,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Cleber Rosa <crosa@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "darren.kenny@oracle.com" <darren.kenny@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--HnQK338I3UIa/qiP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 1/29/20 11:19 AM, Thomas Huth wrote:
-> Old kernels from the Meego project can be used to check that Linux
-> is at least starting on these machines.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   The serial console is written to the second UART, so this needs Phil's
->   "Allow to use other serial consoles than default" patch as a prerequisite:
->   Based-on: <20200120235159.18510-5-f4bug@amsat.org>
->
->   MAINTAINERS                          |  1 +
->   tests/acceptance/machine_arm_n8x0.py | 49 ++++++++++++++++++++++++++++
->   2 files changed, 50 insertions(+)
->   create mode 100644 tests/acceptance/machine_arm_n8x0.py
+On Wed, Jan 29, 2020 at 05:34:11AM +0000, Bulekov, Alexander wrote:
+> This series adds a framework for coverage-guided fuzzing of
+> virtual-devices. Fuzzing targets are based on qtest and can make use of
+> the libqos abstractions.
+>=20
+> V8:
+>  * Small fixes to the virtio-net.
+>  * Keep rcu_atfork when not using qtest.
 
-LGTM.
+I'm happy with this series.  No doubt there will be changes but I think
+it's time to get this merged so others can more easily participate in
+the device fuzzing effort.
 
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Stefan
 
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index ddf6fe0794..560507e821 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -672,6 +672,7 @@ F: hw/rtc/twl92230.c
->   F: include/hw/display/blizzard.h
->   F: include/hw/input/tsc2xxx.h
->   F: include/hw/misc/cbus.h
-> +F: tests/acceptance/machine_arm_n8x0.py
->   
->   Palm
->   M: Andrzej Zaborowski <balrogg@gmail.com>
-> diff --git a/tests/acceptance/machine_arm_n8x0.py b/tests/acceptance/machine_arm_n8x0.py
-> new file mode 100644
-> index 0000000000..e5741f2d8d
-> --- /dev/null
-> +++ b/tests/acceptance/machine_arm_n8x0.py
-> @@ -0,0 +1,49 @@
-> +# Functional test that boots a Linux kernel and checks the console
-> +#
-> +# Copyright (c) 2020 Red Hat, Inc.
-> +#
-> +# Author:
-> +#  Thomas Huth <thuth@redhat.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> +# later.  See the COPYING file in the top-level directory.
-> +
-> +import os
-> +
-> +from avocado import skipUnless
-> +from avocado_qemu import Test
-> +from avocado_qemu import wait_for_console_pattern
-> +
-> +class N8x0Machine(Test):
-> +    """Boots the Linux kernel and checks that the console is operational"""
-> +
-> +    timeout = 90
-> +
-> +    def __do_test_n8x0(self):
-> +        kernel_url = ('http://stskeeps.subnetmask.net/meego-n8x0/'
-> +                      'meego-arm-n8x0-1.0.80.20100712.1431-'
-> +                      'vmlinuz-2.6.35~rc4-129.1-n8x0')
-> +        kernel_hash = 'e9d5ab8d7548923a0061b6fbf601465e479ed269'
-> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-> +
-> +        self.vm.set_console(console_index=1)
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-append', 'printk.time=0 console=ttyS1')
-> +        self.vm.launch()
-> +        wait_for_console_pattern(self, 'TSC2005 driver initializing')
-> +
-> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code')
-> +    def test_n800(self):
-> +        """
-> +        :avocado: tags=arch:arm
-> +        :avocado: tags=machine:n800
-> +        """
-> +        self.__do_test_n8x0()
-> +
-> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code')
-> +    def test_n810(self):
-> +        """
-> +        :avocado: tags=arch:arm
-> +        :avocado: tags=machine:n810
-> +        """
-> +        self.__do_test_n8x0()
+--HnQK338I3UIa/qiP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4y67MACgkQnKSrs4Gr
+c8jJUggAtEzSSWi57jpwxAhsOUNV6pIl0pZXPpB6OP6/5GoRbC+lUP9cb4TnZcyu
+BUVgMD9xVSKl8WoVeXrFXfIxt7ORgbhmJTOpVNxnEQjhZ+5GrPJcI0dKanqmOWP3
+YoTv3rMD0mxofJO3dbZg2U1v9LGVAVi6i5vvMd94muNKspcT9vQoMIDRwuHce2SI
+kgTgYCAmEF7dFnEaOb30nr995ZQVCUPpBj4yqrWgIkJXR1UTtEw/0YnaNKeR0I+e
+sB2dEorAc6H3slnysEI1J21X6/S3DV+sTH9iqTlC+Q4y4XwTI6sltPiQOHZJ2hcB
+WmfsyhkPVnjT0wDGU2lYveC+E+sNBw==
+=YOxk
+-----END PGP SIGNATURE-----
+
+--HnQK338I3UIa/qiP--
 
 
