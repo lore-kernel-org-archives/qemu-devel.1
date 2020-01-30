@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2960C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440C1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:19:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1A7E20707
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E00E20707
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:19:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UJ+jcONY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1A7E20707
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W2hlKuow"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E00E20707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixCXA-0001v8-Qm
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:19:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43022)
+	id 1ixCXE-00024L-6b
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:19:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43057)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ixCTn-0005Fn-OT
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:44 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ixCTp-0005JT-5H
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ixCTm-0002qh-Or
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:43 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:41021)
+ (envelope-from <peter.maydell@linaro.org>) id 1ixCTn-0002ri-QV
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:45 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46148)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ixCTm-0002pv-J1
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:42 -0500
-Received: by mail-wr1-x433.google.com with SMTP id c9so4774130wrw.8
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:15:42 -0800 (PST)
+ id 1ixCTn-0002qv-It
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:43 -0500
+Received: by mail-wr1-x443.google.com with SMTP id z7so4712099wrl.13
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:15:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=z+ASr97qRHWdGDkuW0JTlLEKSAPzhK7Fyg2RWeqPj4E=;
- b=UJ+jcONYjiFdetct/5mTdvSIUPUpfHoQ84c1AWZAal4xlRl5SiuhdwV4PnNXJMPiw2
- qdqquTRFpEQOLWp4krtuWKM6fnBIHt4IJQM7ZofohbFC+IwV2bPdC47eY850F3yi4eDG
- AXMmJOK7rwGC611zMlZQ46/AyNWiM7Cid/aK8pqYBi2s85N3Xv3sMCTQ9g0jlF2lHLY8
- vYjko7XXXphg+ne8pVHcjOAG0rRplCgwZsOTwlLVDYa1F/QXzhNKQO6HLcLuCt7n1iY2
- AYMUxyeny1g/ifOQC/HpoRkmxLOAXa6+mfylhSP68m82K1BL0gZ9t65ACoTx84vDmCT7
- FWGA==
+ bh=ZWmtOIpfdmdXcrfzwoUW/vZybX7QtXbShko2WRx4PHw=;
+ b=W2hlKuow0Pq4OuC0L4KTU6TjLvhiL+u7gym9QNc7UA/Jbj0oduCZ/2a+yklMW23rD8
+ MRdzCPqNbNZ5fJsXq3Z6Ms5S+Xvv8wA+a/gs8FbbyL/iD1/tEkqi4Czb7TM/N5l9tfY/
+ FxCtB6FgDLNpZcIKC0ymfN5dvygy0aXSxC9oIT6mT5CbrZ6/qNRGev2X9boSGYyb0/NH
+ GMsjTvpvNhEU5hRCVqbVSCkQ9QHNDYSXDP71jD68f4ohaZprMeiK9o+uEz2E7jqgEGfC
+ 9s9fY1CvfbkHEFEOmgYfWO1YzK7aB5qO7Qv9ZTD5T+J1K61NqEkdIlgOepTnbXQOwr4H
+ kqjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=z+ASr97qRHWdGDkuW0JTlLEKSAPzhK7Fyg2RWeqPj4E=;
- b=fcTETRVv33wTPfGdg0dylaYAvdKgFYNcqpOFsG5Har1leINhtQn3oUJqZs9aeRpItQ
- PuDJh2vufOOKB5qcOi3YHXAs/Wt8ByCnowxMEk5QbKNtbSAh4bwp9ApPSMnmZtNcO5wX
- Fz8uRQa8xdtsBiYz3J4FwzYzUMg2Iq3S0YoLwCjmspChnOpbS+AhKnx7nfgf+iP4+1FI
- IF4GSZjO4N6JJoB/B87FA7RyTpiPia6abCS0cicMx3FgjoYPNoRIdpNB7PMxRy981fIg
- YOEwxD6IYnsvnUDbvqCDSAdb7WHZm5qUd34Q/tNQ9/Vp2gWbe12Curn9pC4b201b36EW
- Xv8w==
-X-Gm-Message-State: APjAAAWkMEr2gTDToMHRfOp7reSP9OKRJfLt9YDPL/qwxUrAaidancOv
- duI4ry/q6iKegIJLKalB37lnK1v4OGYgew==
-X-Google-Smtp-Source: APXvYqx9d4NGVezLRdPDGBvrNTPvlTpcHuU1B14LaZPUBPp0OWur0Ueb7CIF7tNntnmgSKnjn/DeGg==
-X-Received: by 2002:adf:bc87:: with SMTP id g7mr6543503wrh.121.1580400941313; 
- Thu, 30 Jan 2020 08:15:41 -0800 (PST)
+ bh=ZWmtOIpfdmdXcrfzwoUW/vZybX7QtXbShko2WRx4PHw=;
+ b=A325niZFF6lAk5p0eiYdHK3WjSHaxrSg37saWRbfqFYbvVLC+B4Ewt6CArnSKVPPu6
+ Q+bWrZLxa4gHj38tasxpV7kmgagrR9PDzfr6Fi8fsIoeUriUCMOsp+L9h/h8FeuTXL1+
+ bPymNZ6Tvx8E3Lk/KFDmormcghgqaXrrSOAQdoZtlAzwvRFtBpSulZM8xWymJWQ0oRzj
+ rb+PuiwprbyOnWoaScVxZii+48CCmkMSKs6hM3Ww29PxA6JzYGdBLk0wq9l49tr3d6Ul
+ Nkt0PwNRvIFRZqx9a+75eB5iKr0VK54D5AgVwEFHY8OZEq01+GDug/dfPcNawINUwgr5
+ W3tQ==
+X-Gm-Message-State: APjAAAV661Om31d/wn5MAqw6AvRT2xulu4b4G4s5OpX/Q6Y0e7BMwK1m
+ nHbYPZkLpNWZfRRvav8F0wUvQ6WOX5IoBw==
+X-Google-Smtp-Source: APXvYqzsvymuBcAjsYEheDILVRzyQZ+0kJPpa5CaQo38t1GmvITPG7IQ5BXg74HlbXGsulZz5P9nbQ==
+X-Received: by 2002:a5d:45c4:: with SMTP id b4mr6274055wrs.303.1580400942292; 
+ Thu, 30 Jan 2020 08:15:42 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a22sm6994442wmd.20.2020.01.30.08.15.40
+ by smtp.gmail.com with ESMTPSA id a22sm6994442wmd.20.2020.01.30.08.15.41
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 08:15:40 -0800 (PST)
+ Thu, 30 Jan 2020 08:15:41 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/26] ftgmac100: check RX and TX buffer alignment
-Date: Thu, 30 Jan 2020 16:15:12 +0000
-Message-Id: <20200130161533.8180-6-peter.maydell@linaro.org>
+Subject: [PULL 06/26] hw/arm/aspeed: add a 'execute-in-place' property to boot
+ directly from CE0
+Date: Thu, 30 Jan 2020 16:15:13 +0000
+Message-Id: <20200130161533.8180-7-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200130161533.8180-1-peter.maydell@linaro.org>
 References: <20200130161533.8180-1-peter.maydell@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,58 +101,120 @@ Sender: "Qemu-devel"
 
 From: Cédric Le Goater <clg@kaod.org>
 
-These buffers should be aligned on 16 bytes.
+The overhead for the OpenBMC firmware images using the a custom U-Boot
+is around 2 seconds, which is fine, but with a U-Boot from mainline,
+it takes an extra 50 seconds or so to reach Linux. A quick survey on
+the number of reads performed on the flash memory region gives the
+following figures :
 
-Ignore invalid RX and TX buffer addresses and log an error. All
-incoming and outgoing traffic will be dropped because no valid RX or
-TX descriptors will be available.
+  OpenBMC U-Boot      922478 (~ 3.5 MBytes)
+  Mainline U-Boot   20569977 (~ 80  MBytes)
+
+QEMU must be trashing the TCG TBs and reloading text very often. Some
+addresses are read more than 250.000 times. Until we find a solution
+to improve boot time, execution from MMIO is not activated by default.
+
+Setting this option also breaks migration compatibility.
 
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20200114103433.30534-4-clg@kaod.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200114103433.30534-5-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/net/ftgmac100.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ include/hw/arm/aspeed.h |  2 ++
+ hw/arm/aspeed.c         | 44 ++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 41 insertions(+), 5 deletions(-)
 
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 4ad2594d3a6..2f92b65d4ef 100644
---- a/hw/net/ftgmac100.c
-+++ b/hw/net/ftgmac100.c
-@@ -198,6 +198,8 @@ typedef struct {
-     uint32_t        des3;
- } FTGMAC100Desc;
+diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
+index 4423cd0cda7..18521484b90 100644
+--- a/include/hw/arm/aspeed.h
++++ b/include/hw/arm/aspeed.h
+@@ -19,6 +19,8 @@ typedef struct AspeedBoardState AspeedBoardState;
  
-+#define FTGMAC100_DESC_ALIGNMENT 16
+ typedef struct AspeedMachine {
+     MachineState parent_obj;
 +
- /*
-  * Specific RTL8211E MII Registers
-  */
-@@ -722,6 +724,12 @@ static void ftgmac100_write(void *opaque, hwaddr addr,
-         s->itc = value;
-         break;
-     case FTGMAC100_RXR_BADR: /* Ring buffer address */
-+        if (!QEMU_IS_ALIGNED(value, FTGMAC100_DESC_ALIGNMENT)) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad RX buffer alignment 0x%"
-+                          HWADDR_PRIx "\n", __func__, value);
-+            return;
-+        }
-+
-         s->rx_ring = value;
-         s->rx_descriptor = s->rx_ring;
-         break;
-@@ -731,6 +739,11 @@ static void ftgmac100_write(void *opaque, hwaddr addr,
-         break;
++    bool mmio_exec;
+ } AspeedMachine;
  
-     case FTGMAC100_NPTXR_BADR: /* Transmit buffer address */
-+        if (!QEMU_IS_ALIGNED(value, FTGMAC100_DESC_ALIGNMENT)) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad TX buffer alignment 0x%"
-+                          HWADDR_PRIx "\n", __func__, value);
-+            return;
+ #define ASPEED_MACHINE_CLASS(klass) \
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 8702256af1b..a17843f0d3b 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -261,11 +261,18 @@ static void aspeed_machine_init(MachineState *machine)
+          * SoC and 128MB for the AST2500 SoC, which is twice as big as
+          * needed by the flash modules of the Aspeed machines.
+          */
+-        memory_region_init_rom(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
+-                               fl->size, &error_abort);
+-        memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
+-                                    boot_rom);
+-        write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort);
++        if (ASPEED_MACHINE(machine)->mmio_exec) {
++            memory_region_init_alias(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
++                                     &fl->mmio, 0, fl->size);
++            memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
++                                        boot_rom);
++        } else {
++            memory_region_init_rom(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
++                                   fl->size, &error_abort);
++            memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
++                                        boot_rom);
++            write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort);
 +        }
-         s->tx_ring = value;
-         s->tx_descriptor = s->tx_ring;
-         break;
+     }
+ 
+     aspeed_board_binfo.ram_size = ram_size;
+@@ -399,6 +406,30 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+     /* Bus 11: TODO ucd90160@64 */
+ }
+ 
++static bool aspeed_get_mmio_exec(Object *obj, Error **errp)
++{
++    return ASPEED_MACHINE(obj)->mmio_exec;
++}
++
++static void aspeed_set_mmio_exec(Object *obj, bool value, Error **errp)
++{
++    ASPEED_MACHINE(obj)->mmio_exec = value;
++}
++
++static void aspeed_machine_instance_init(Object *obj)
++{
++    ASPEED_MACHINE(obj)->mmio_exec = false;
++}
++
++static void aspeed_machine_class_props_init(ObjectClass *oc)
++{
++    object_class_property_add_bool(oc, "execute-in-place",
++                                   aspeed_get_mmio_exec,
++                                   aspeed_set_mmio_exec, &error_abort);
++    object_class_property_set_description(oc, "execute-in-place",
++                           "boot directly from CE0 flash device", &error_abort);
++}
++
+ static void aspeed_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -408,6 +439,8 @@ static void aspeed_machine_class_init(ObjectClass *oc, void *data)
+     mc->no_floppy = 1;
+     mc->no_cdrom = 1;
+     mc->no_parallel = 1;
++
++    aspeed_machine_class_props_init(oc);
+ }
+ 
+ static void aspeed_machine_palmetto_class_init(ObjectClass *oc, void *data)
+@@ -550,6 +583,7 @@ static const TypeInfo aspeed_machine_types[] = {
+         .name          = TYPE_ASPEED_MACHINE,
+         .parent        = TYPE_MACHINE,
+         .instance_size = sizeof(AspeedMachine),
++        .instance_init = aspeed_machine_instance_init,
+         .class_size    = sizeof(AspeedMachineClass),
+         .class_init    = aspeed_machine_class_init,
+         .abstract      = true,
 -- 
 2.20.1
 
