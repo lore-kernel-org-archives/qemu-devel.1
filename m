@@ -2,81 +2,126 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56AA0C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 818ABC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:47:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2086620707
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:44:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A09C20707
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 13:47:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qXMfA3Wp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2086620707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X7EHm0lF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A09C20707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixA7h-0000e5-Bn
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 08:44:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49960)
+	id 1ixAAH-0002HE-Fy
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 08:47:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ixA6n-0008OM-3c
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:43:50 -0500
+ (envelope-from <david@redhat.com>) id 1ixA91-0001H1-Pi
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:46:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ixA6l-0007oH-TU
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:43:49 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:32946)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ixA6l-0007mT-NP
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:43:47 -0500
-Received: by mail-oi1-x242.google.com with SMTP id q81so3563185oig.0
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 05:43:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=OkXZ5mBnjCBuyBuOnpbdspAfHsDoISRmIcMli/2QOx0=;
- b=qXMfA3Wp7sjcxcCi/q3pxYPbEG6nqjEuIuFBNPIKKMSBCPfK6U4kwgf82JxhUdtGpS
- 52jjpgyY2Jomh2jxk570ldcJohdIpcaarEhFdrScM4OztonoQ4IVOVFAZS9xNAwZ9bz+
- WRBftE22ncG0DVCci71T1+RFlfXY0J2jPV2SXrg4+MXy0TVu2gdOiHVlluE/UqKiNPB6
- k/sqLxn0zEEB+fhZCPmrsP5StuHAqYb+9oXCVQokU7bxfD3vea5hFVzYc+RMi90AtaM1
- ixWJWCIjBzfIZb9Iz3geSLO5hjpjWj5rkcpzzDI6TF1aPvtc9fegnjf01EBcQvvrtpOb
- ESUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=OkXZ5mBnjCBuyBuOnpbdspAfHsDoISRmIcMli/2QOx0=;
- b=VKF5P3WDKMhYIrd5Icv49B/uuS9nRx8y733YjMN0hcYP7iaeVd4JUxg/o1l75CzN6p
- FqXBsLMr5k2RO8yURvG/7Q8lQF50mKzeV4hDJW3/+1wub30hgnVH2lSQ20TPlisRWNDI
- aaCJNw/jEqJkMYVfbsgD8ajKwkU8jTy57EkhB+18lbENhKWvsd5Fi0k6Y4J+WbLa4DQF
- A/HAVlNzFouMPqOMP3y9zi8nyJpa7ueGVzbsk/+DmynoQaXDcSA9FepT9Jq/m/ilATik
- tOhQ7F7Ybbn2IDrUWvSX5bOMYAZX6xaXTqVS/ftyXhDUOIzGZw9v/pWztwYiiqba+gT8
- 8dWA==
-X-Gm-Message-State: APjAAAXQgePIlKkI0ZZ+CNA0tTjAAYfDcZmNwjjziULHgAhNuuRNc8Hg
- 4DuRcvXw1FYD9cVRCbDXJivNm8Fm5nmeCqHWxxkxUQ==
-X-Google-Smtp-Source: APXvYqwbjHFgg6QHD7tv2supcMcuGDng2PEI8s6G0yXayDNk4hv1SpxuCy022Qw2UulmiRNH2TCDR/LiZS4KkoW92H4=
-X-Received: by 2002:aca:b2c5:: with SMTP id b188mr2881404oif.163.1580391826827; 
- Thu, 30 Jan 2020 05:43:46 -0800 (PST)
+ (envelope-from <david@redhat.com>) id 1ixA8z-0002Hd-Ez
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:46:07 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26401
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1ixA8z-0002FL-AQ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 08:46:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580391959;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=0whsbsnG4Ks7A+GFqldvoFUR+HfwOR5I8d7pEdOKlF4=;
+ b=X7EHm0lFeInuLAc303iLPyAX+rj3NRJwS+H5lY+NYcQF+NjoOk4TtnW787fvGe6NLQrtWg
+ /Vi1NI0jYA6zfbJYUI45nWlJVKsXkD2itJiqj5w0maxpPLnBqdfyPgYkCDKC9BOeqB06Xt
+ eamwtlq8uvAVq0ns1LZUKfeOylgb3NE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-26-x0d8FK86NG6tFntGKywnAA-1; Thu, 30 Jan 2020 08:45:57 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 201B01922979;
+ Thu, 30 Jan 2020 13:45:56 +0000 (UTC)
+Received: from [10.36.117.219] (ovpn-117-219.ams2.redhat.com [10.36.117.219])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79C5D60BE2;
+ Thu, 30 Jan 2020 13:45:51 +0000 (UTC)
+Subject: Re: [PATCH] target/s390x/translate: Fix RNSBG instruction
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
+References: <20200130133417.10531-1-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <bed5fd79-4ac7-5064-c527-ef7457198eb3@redhat.com>
+Date: Thu, 30 Jan 2020 14:45:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-References: <20200120235159.18510-1-f4bug@amsat.org>
- <773d1201-17fc-40b1-fa9a-06ed03732e89@redhat.com>
-In-Reply-To: <773d1201-17fc-40b1-fa9a-06ed03732e89@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Jan 2020 13:43:35 +0000
-Message-ID: <CAFEAcA9+_Ok=CbvfBK5oOSPK04FJQi=ZCX7sjFeDwJ0erH1+Cg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/7] hw/arm/raspi: Run U-Boot on the raspi machines
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <20200130133417.10531-1-thuth@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: x0d8FK86NG6tFntGKywnAA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,66 +133,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jan 2020 at 06:53, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Hi Peter,
->
-> (Cc'ed Wainer from the Python part).
->
-> On 1/21/20 12:51 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Following Laurent report:
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg639950.html
-> >
-> > The SYS_timer is already merged, see:
-> > https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dd05be883fc
-> > "hw/timer/bcm2835: Add the BCM2835 SYS_timer"
-> >
-> > The first patch should fix Laurent other issue.
-> > Then few python patches are require to break into U-Boot console,
-> > and the last patches add U-Boot tests for Raspi2 and Raspi3.
-> >
-> > Laurent, if you successfully test U-Boot with this patchset again,
-> > do you mind replying with a "Tested-by:" tag?
-> >
-> > Regards,
-> >
-> > Phil.
-> >
-> > Since v3:
-> > - rewrote '-smp' fix.
-> > - tests use Debian 'trustable' u-boot.elf
-> >
-> > previous feedbacks from Peter on v3:
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg655415.html
-> >
-> > v3: https://www.mail-archive.com/qemu-devel@nongnu.org/msg653807.html
-> > Supersedes: <20191019234715.25750-1-f4bug@amsat.org>
-> >
-> > Philippe Mathieu-Daud=C3=A9 (7):
-> >    hw/arm/raspi: Remove obsolete use of -smp to set the soc 'enabled-cp=
-us'
->
-> While the first patch is reviewed by Alistair, the rest (acceptance
-> tests) still requires an eye from Cleber/Eduardo.
->
-> Can you queue the first patch via your qemu-arm tree?
+On 30.01.20 14:34, Thomas Huth wrote:
+> RNSBG is handled via the op_rosbg() helper function. But RNSBG has
+> the opcode 0xEC54, i.e. 0x54 as second byte, while op_rosbg() currently
+> checks for 0x55. This seems to be a typo, fix it to use 0x54 instead,
+> so that op_rosbg() does not abort() anymore if a program uses RNSBG.
+> 
+> I've checked with a simply test function that I now get the same results
+> with KVM and with TCG:
+> 
+>  static void test_rnsbg(void)
+>  {
+> 	uint64_t r1, r2;
+> 
+> 	r2 = 0xffff000000000000UL;
+> 	r1 = 0x123456789bdfaaaaUL;
+> 	asm volatile (" rnsbg %0,%1,12,61,16 " : "+r"(r1) : "r"(r2));
+> 
+> 	printf("r1 afterwards: 0x%lx\n", r1);
+>  }
 
-OK, I've queued patch 1 (and dropped the rest from my
-to-review queue on the assumption that somebody else will
-pick them up and/or you'll send a respin at some point).
+You could add a tcg test case for that :)
 
--- PMM
+> 
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1860920
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  target/s390x/translate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index 0bd2073718..4f6f1e31cd 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -3874,7 +3874,7 @@ static DisasJumpType op_rosbg(DisasContext *s, DisasOps *o)
+>  
+>      /* Operate.  */
+>      switch (s->fields.op2) {
+> -    case 0x55: /* AND */
+> +    case 0x54: /* AND */
+>          tcg_gen_ori_i64(o->in2, o->in2, ~mask);
+>          tcg_gen_and_i64(o->out, o->out, o->in2);
+>          break;
+> 
+
+Fixes: d6c6372e186e ("target-s390: Implement R[NOX]SBG")
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+Thanks!
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
