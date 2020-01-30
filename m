@@ -2,84 +2,102 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A37BFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 22:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB38C33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 22:52:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 678EA20708
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 22:47:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 654932063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 22:52:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ek3tr0vv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 678EA20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fHig2WOe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 654932063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixIat-0003um-Lt
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 17:47:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55891)
+	id 1ixIfb-0005VM-G0
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 17:52:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57146)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ixIZ5-0002id-5v
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:45:36 -0500
+ (envelope-from <philmd@redhat.com>) id 1ixIer-0004wm-Ju
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:51:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ixIZ3-0001se-1D
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:45:35 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42318)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ixIZ1-0001sI-Ra; Thu, 30 Jan 2020 17:45:31 -0500
-Received: by mail-oi1-x243.google.com with SMTP id j132so5316725oih.9;
- Thu, 30 Jan 2020 14:45:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=JcxfzZwec7GQoZhYXHotQZGjHeZuvdXMNcsjDRHzQRI=;
- b=ek3tr0vvn9V/J/OLNKou/mQVStwv2K8r61gu9wat6aMtoc+Fwj9tdkw66HKDIu8web
- 6Fk5fntVwFa1ikOSHGCqlVl4juF+DoVeLe8zV2M1jNfgTCtRd+7cLdzDX+CtMkyutPN1
- KiD6urOAsg39UGzix9PvrO3/Sbe9dxxePxHveM2u6PWSBdXKHbWDA0Iio2DDM8yBDlLj
- ShBtSnMYpp80IhI3ddxQBfDFeHNKZ5f8OfPNKcGV6/nZX0Cy+D+IsC2jlTv2wN8qXYej
- AUtRp8NIFo548J66+ms5gJ+h358cuERL6VUuKZ6U/CVk1hcy24xJNqfYAystyLXHmjaP
- c0GQ==
+ (envelope-from <philmd@redhat.com>) id 1ixIep-0006gb-Cf
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:51:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58472
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixIep-0006g9-9G
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:51:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580424690;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dH4tuU7ZeHs37QTcTeqNwkYooFaBP7DN1+4CQM3dXI8=;
+ b=fHig2WOeYSRqeL+nhkpojvcttj8xgWLnde8Pf9uibCdKpYrXg3EQnmjZVS1K1hvC5e1dQg
+ 2mfFYg0SBFLpjkPrFJ6xBZljNtpJkeSRxJhtH2itH4lXRN28caA62Cq198rDbdbEU93FiF
+ +a9OH2L7DQAZK3fc+qtSxAKrBWxEpEs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-LVr0Hp3NN4C-W9cnpRbYAg-1; Thu, 30 Jan 2020 17:51:26 -0500
+Received: by mail-wr1-f70.google.com with SMTP id z14so2412457wrs.4
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 14:51:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=JcxfzZwec7GQoZhYXHotQZGjHeZuvdXMNcsjDRHzQRI=;
- b=pAeRNn0nljke1/IyxPfp/Obe8YAhjCbUQxQtBDS4e/zebiz4N5w/hpgB6sVjEdzBut
- nqHBl/hwKaWtUH1fN6LCE10FjWrMrcS3k8Udc9+u8RIK7OQx++E+kFrHSGotfvv4O+Zl
- hgfwJkUyhpW6T3D6XtFPm5RkKZtCUp+frdaPHSM425Ucx7JW5pTQ4EqBH/eaQ5+JeRFV
- zcHqetQRuHjq9waGHl005T7V5QsLH89Bz0mP8VwWVSSjVpICKmf4K2kU+gEWYGjOB28G
- CrTJscL0FnhUBYQrDI52YdzPVeNpoHJmvT3OVzf5oz53yvN3Ml0hP6NdsRsMk+dh5Ubn
- /CmQ==
-X-Gm-Message-State: APjAAAVVwNGcIqbOlJdCW6S7r4h7s/WiEJu8yO+2QB27wrZB/qKTzT8d
- yFsP0pZV2HCWzZ8z8h8jlnJPAAAENOb2um9Bz28=
-X-Google-Smtp-Source: APXvYqz/g0N2ozMQ/syNCDJa3Bz/z3piF3ge1RCaByHqCBweTm8rn0NM+qwC/z5Z+LHaTmrs07iQUTKcsid9DSuLmmY=
-X-Received: by 2002:a05:6808:6c5:: with SMTP id
- m5mr4299657oih.106.1580424331083; 
- Thu, 30 Jan 2020 14:45:31 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=RhUyvQDo608GPzkmT0DzUov8MjblqTz3cyKEBuUoLI4=;
+ b=rFfCT0AAF3d3u+4Ac4JEEZEBwq7IjyYDGBKtjgViqQ/ugR2l03+UZbEDhG1l9CZgRX
+ gPptm0A4+Ydpf73QJwH/XHsQExu9vXBI3KjbEJWZDytOizQ47dPphQMA64bS9YA7wi/Z
+ dFmKvEAwtYAMOR7PUhtu4/OcKtkuL2JOm/ooWCYkFc8uY8YP9P6pzycYpTaNjoiKvGK0
+ tg8AqRhkv5yxyH/+l5oFVHjuDeMs726KEoBbn3IloAkdrW4vny2zcEvXiPzJpTK5RLBI
+ Unqqbv99E7jQDf5+jb1qgxQ5OgRvZG6DBKR5ce8WrV5eQ/aMaWcJmlVWKPsTmk+gL8np
+ ZPMQ==
+X-Gm-Message-State: APjAAAWrZOMaxfSSgqu7lWs7yGp3Jtiux5kcvw3LarK5/KqdEQkQdhdh
+ F+y0ncus5Lo3fA3a/m8E3U30kCyTXO0hFa299wKngnWlcDGv1CgUgFvV+YF8vZElnEJuDfDDV0h
+ PNW0YBdUGL9QEA+A=
+X-Received: by 2002:a1c:541b:: with SMTP id i27mr8515531wmb.137.1580424684886; 
+ Thu, 30 Jan 2020 14:51:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy/bpwPg2pfU7g967qhNTs710q/kyPPHhqfiHMsXGEnSX/whhNuAky8vmAToz/biJgsNRdMow==
+X-Received: by 2002:a1c:541b:: with SMTP id i27mr8515499wmb.137.1580424684537; 
+ Thu, 30 Jan 2020 14:51:24 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id w8sm8274996wmm.0.2020.01.30.14.51.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Jan 2020 14:51:23 -0800 (PST)
+Subject: Re: [PATCH v3 1/4] tests/acceptance: avocado_qemu: Introduce the
+ 'accel' test parameter
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+References: <20200122012753.9846-1-wainersm@redhat.com>
+ <20200122012753.9846-2-wainersm@redhat.com>
+ <49356b32-5530-a2dc-9c7a-5a86e74b8cb6@redhat.com>
+ <705772ab-9326-5dcb-20c6-37ab748bef4e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8e544dd9-4d0b-be56-382d-25fd413c476c@redhat.com>
+Date: Thu, 30 Jan 2020 23:51:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20200124005131.16276-1-f4bug@amsat.org>
- <20200124005131.16276-13-f4bug@amsat.org>
- <4f9a6d13-63b3-3df6-ecd9-def3908f90b3@redhat.com>
-In-Reply-To: <4f9a6d13-63b3-3df6-ecd9-def3908f90b3@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 30 Jan 2020 23:45:20 +0100
-Message-ID: <CAL1e-=jW5KCMCqK+4_sTT1-KdPGe7qh6O0Ve0rrNSQKmot=76w@mail.gmail.com>
-Subject: Re: [PATCH rc2 12/25] hw/timer: Add limited support for Atmel 16 bit
- timer peripheral
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <705772ab-9326-5dcb-20c6-37ab748bef4e@redhat.com>
+Content-Language: en-US
+X-MC-Unique: LVr0Hp3NN4C-W9cnpRbYAg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,106 +109,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
- Sarah Harris <S.E.Harris@kent.ac.uk>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Igor Mammedov <imammedo@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Michael Rolnik <mrolnik@gmail.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Markus Armbruster <armbru@redhat.com>
+Cc: thuth@redhat.com, alex.bennee@linaro.org, ehabkost@redhat.com,
+ crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 24, 2020 at 9:16 AM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 24/01/2020 01.51, Philippe Mathieu-Daud=C3=A9 wrote:
-> > From: Michael Rolnik <mrolnik@gmail.com>
-> >
-> > These were designed to facilitate testing but should provide enough
-> > function to be useful in other contexts.  Only a subset of the function=
-s
-> > of each peripheral is implemented, mainly due to the lack of a standard
-> > way to handle electrical connections (like GPIO pins).
-> >
-> > Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
-> > Message-Id: <20200118191416.19934-13-mrolnik@gmail.com>
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > [rth: Squash info mtree fixes and a file rename from f4bug, which was:]
-> > Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> > [PMD: Use qemu_log_mask(LOG_UNIMP), replace goto by return]
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> > rc2: Use qemu_log_mask(LOG_UNIMP), replace goto by return (thuth)
-> > ---
-> >  include/hw/timer/atmel_timer16.h |  94 +++++
-> >  hw/timer/atmel_timer16.c         | 605 +++++++++++++++++++++++++++++++
-> >  hw/timer/Kconfig                 |   3 +
-> >  hw/timer/Makefile.objs           |   2 +
-> >  4 files changed, 704 insertions(+)
-> >  create mode 100644 include/hw/timer/atmel_timer16.h
-> >  create mode 100644 hw/timer/atmel_timer16.c
-> [...]
-> > +static void avr_timer16_clksrc_update(AVRTimer16State *t16)
-> > +{
-> > +    uint16_t divider =3D 0;
-> > +    switch (CLKSRC(t16)) {
-> > +    case T16_CLKSRC_EXT_FALLING:
-> > +    case T16_CLKSRC_EXT_RISING:
-> > +        qemu_log_mask(LOG_UNIMP, "%s: external clock source unsupporte=
-d\n",
-> > +                      __func__);
-> > +        break;
-> > +    case T16_CLKSRC_STOPPED:
-> > +        break;
-> > +    case T16_CLKSRC_DIV1:
-> > +        divider =3D 1;
-> > +        break;
-> > +    case T16_CLKSRC_DIV8:
-> > +        divider =3D 8;
-> > +        break;
-> > +    case T16_CLKSRC_DIV64:
-> > +        divider =3D 64;
-> > +        break;
-> > +    case T16_CLKSRC_DIV256:
-> > +        divider =3D 256;
-> > +        break;
-> > +    case T16_CLKSRC_DIV1024:
-> > +        divider =3D 1024;
-> > +        break;
-> > +    default:
-> > +        break;
-> > +    }
-> > +    if (divider) {
-> > +        t16->freq_hz =3D t16->cpu_freq_hz / divider;
-> > +        t16->period_ns =3D NANOSECONDS_PER_SECOND / t16->freq_hz;
-> > +        DB_PRINT("Timer frequency %" PRIu64 " hz, period %" PRIu64 " n=
-s (%f s)",
-> > +                 t16->freq_hz, t16->period_ns, 1 / (double)t16->freq_h=
-z);
-> > +    }
-> > +    return;
-> > +}
->
-> You can remove the "return;" at the end of the function now, too.
->
+On 1/27/20 8:28 PM, Wainer dos Santos Moschetta wrote:
+> On 1/24/20 7:36 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 1/22/20 2:27 AM, Wainer dos Santos Moschetta wrote:
+>>> The test case may need to boot the VM with an accelerator that
+>>> isn't actually enabled on the QEMU binary and/or present in the host. I=
+n
+>>> this case the test behavior is undefined, and the best course of
+>>> action is to skip its execution.
+>>>
+>>> This change introduced the 'accel' parameter (and the handler of
+>>> tag with same name) used to indicate the test case requires a
+>>> given accelerator available. It was implemented a mechanism to
+>>> skip the test case if the accelerator is not available. Moreover,
+>>> =C2=A0 the QEMU -accel argument is set automatically to any VM
+>>> launched if the parameter is present.
+>>>
+>>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>>> ---
+>>> =C2=A0 docs/devel/testing.rst=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
+16 ++++++++++++++++
+>>> =C2=A0 tests/acceptance/avocado_qemu/__init__.py | 23 +++++++++++++++++=
+++++++
+>>> =C2=A0 2 files changed, 39 insertions(+)
+>>>
+>>> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+>>> index ab5be0c729..d17d0e90aa 100644
+>>> --- a/docs/devel/testing.rst
+>>> +++ b/docs/devel/testing.rst
+>>> @@ -759,6 +759,17 @@ name.=C2=A0 If one is not given explicitly, it wil=
+l=20
+>>> either be set to
+>>> =C2=A0 ``None``, or, if the test is tagged with one (and only one)
+>>> =C2=A0 ``:avocado: tags=3Dmachine:VALUE`` tag, it will be set to ``VALU=
+E``.
+>>> =C2=A0 +accel
+>>> +~~~~~
+>>> +The accelerator that will be set to all QEMUMachine instances created
+>>> +by the test.
+>>> +
+>>> +The ``accel`` attribute will be set to the test parameter of the same
+>>> +name.=C2=A0 If one is not given explicitly, it will either be set to
+>>> +``None``, or, if the test is tagged with one (and only one)
+>>> +``:avocado: tags=3Daccel:VALUE`` tag, it will be set to ``VALUE``.=20
+>>> Currently
+>>> +``VALUE`` should be either ``kvm`` or ``tcg``.
+>>> +
+>>> =C2=A0 qemu_bin
+>>> =C2=A0 ~~~~~~~~
+>>> =C2=A0 @@ -800,6 +811,11 @@ machine
+>>> =C2=A0 The machine type that will be set to all QEMUMachine instances c=
+reated
+>>> =C2=A0 by the test.
+>>> =C2=A0 +accel
+>>> +~~~~~
+>>> +The accelerator that will be set to all QEMUMachine instances created
+>>> +by the test. In case the accelerator is not available (both QEMU
+>>> +binary and the host system are checked) then the test is canceled.
+>>> =C2=A0 =C2=A0 qemu_bin
+>>> =C2=A0 ~~~~~~~~
+>>> diff --git a/tests/acceptance/avocado_qemu/__init__.py=20
+>>> b/tests/acceptance/avocado_qemu/__init__.py
+>>> index 6618ea67c1..c83a75ccbc 100644
+>>> --- a/tests/acceptance/avocado_qemu/__init__.py
+>>> +++ b/tests/acceptance/avocado_qemu/__init__.py
+>>> @@ -20,6 +20,7 @@ SRC_ROOT_DIR =3D=20
+>>> os.path.join(os.path.dirname(__file__), '..', '..', '..')
+>>> =C2=A0 sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+>>> =C2=A0 =C2=A0 from qemu.machine import QEMUMachine
+>>> +from qemu.accel import kvm_available, tcg_available
+>>> =C2=A0 =C2=A0 def is_readable_executable_file(path):
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return os.path.isfile(path) and os.acces=
+s(path, os.R_OK | os.X_OK)
+>>> @@ -111,6 +112,8 @@ class Test(avocado.Test):
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def setUp(self):
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self._vms =3D {}
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # VM argumments that are ma=
+pped from parameters
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self._param_to_vm_args =3D =
+[]
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.arch=
+ =3D self.params.get('arch',
+>>> default=3Dself._get_unique_tag_val('arch'))
+>>> @@ -124,10 +127,30 @@ class Test(avocado.Test):
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.qemu_bin=
+ is None:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 self.cancel("No QEMU binary defined or found in the=20
+>>> source tree")
+>>> =C2=A0 +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.accel =3D self.=
+params.get('accel',
+>>> + default=3Dself._get_unique_tag_val('accel'))
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.accel:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ava=
+il =3D False
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
+self.accel =3D=3D 'kvm':
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if kvm_available(self.arch, self.qemu_bin):
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 avail =3D True
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eli=
+f self.accel =3D=3D 'tcg':
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if tcg_available(self.qemu_bin):
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 avail =3D True
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 els=
+e:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 self.cancel("Unknown accelerator: %s" % self.accel)
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
+avail:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 self._param_to_vm_args.extend(['-accel', self.accel])
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 els=
+e:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 self.cancel("%s is not available" % self.accel)
+>>
+>> Why refuse to test the other accelerators?
+>>
+>> Isn't it better to QMP-ask QEMU which accelerator it supports, and=20
+>> SKIP if it isn't available?
+>=20
+>=20
+> python/qemu/accel.py:list_accel(qemu_bin) can be used for that end. For=
+=20
+> example:
+>=20
+> if self.accel not in list_accel(self.qemu_bin):
+>=20
+>  =C2=A0=C2=A0=C2=A0 self.cancel("%s is not available" % self.accel)
+>=20
+> However checking the support only on QEMU's binary may be very weak=20
+> (take KVM as an example). I implemented checkers for kvm and tcg on=20
+> python/qemu/accel.py. Given that I have zero knowledge on the other=20
+> accelerators,=C2=A0 I simply did not touch on them.
+>=20
+> That said, IMHO it needs to implement checkers for those others=20
+> accelerator before they get reliably handled by avocado_qemu=20
+> automatically. And test writers can still run tests with those=20
+> accelerators as long as 'accel' tag is not used.
+>=20
+> What do you think Philippe?
 
-Will be fixed in rc4.
+Can you have a look at the binary_get_accels() method which aims to be=20
+more generic?
 
-Aleksandar
+https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg07312.html
+"python/qemu: Add binutils::binary_get_accels()"
 
->  Thomas
->
+https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg07313.html
+"python/qemu/accel: Use binutils::binary_get_accels()"
+
+>=20
+> Thanks, good point!
+>=20
+> - Wainer
+>=20
+>=20
+>>
+>>
+>>> +
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def _new_vm(self, *args):
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm =3D QEMUMachi=
+ne(self.qemu_bin, sock_dir=3Dtempfile.mkdtemp())
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if args:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 vm.add_args(*args)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self._param_to_vm_args:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm.=
+add_args(*self._param_to_vm_args)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return vm
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 @property
+>>>
+>>
+>=20
+
 
