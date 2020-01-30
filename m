@@ -2,72 +2,102 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B0F9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CDFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:47:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAC2820708
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC2820708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=tum.de
+	by mail.kernel.org (Postfix) with ESMTPS id 4B0D020661
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:47:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGAl9LD+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B0D020661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJF0-0004Te-WD
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 18:28:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40481)
+	id 1ixJXM-0007rn-FF
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 18:47:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53007)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ixHwS-00019b-GW
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:05:41 -0500
+ (envelope-from <philmd@redhat.com>) id 1ixJWO-0007IG-CN
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:46:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ixHwR-00046v-1Y
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:05:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35572)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ixHwQ-00045S-ST
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:05:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ixHwP-0006rE-F9
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 22:05:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6AE622E80C0
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 22:05:37 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1ixJWL-0002rL-Pb
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:46:51 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25894
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixJWK-0002pE-5S
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:46:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580428006;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E/1/fpM+uIvTTGLaInPwc2lQDzHE5KcORyzhWhPzClE=;
+ b=dGAl9LD+rJQDaaweNX/STkFFRHG7807PCBVddImyLBIstF2+wm9qJW50gu9uc20MmbTwoJ
+ RSQqmXTsp4qnoI9DOvOEsyOKcrLiHrBeWcX4wxEXqK+IoWFVAHx4YMWFAUrVV+gcby2U7q
+ yO+/bwkUDJ7oWTdn42Ga2QCiyqrJU7M=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320--XTC4gocMYyXTIQxkOxTOw-1; Thu, 30 Jan 2020 18:46:42 -0500
+Received: by mail-wm1-f70.google.com with SMTP id m21so1366699wmg.6
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 15:46:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dLEGO8KYRWQaQYVfnRG/qPNSgEXfE58ncEinyGY2FMY=;
+ b=aIOoVMxXw+zUD2h8uYxAM0/0mZxOtYxV57hVeOqvuq0U3WwCz8KumiAGEoIckLwwqH
+ wDSXgi4g7Xp5xVMgBEMFjUCCHhVpW1inDAA8EVShS+oqmBeZe2yomsMfSF5iSiGfLzJe
+ wEhsrloRH/c62k36aSHq+1mJEiOWFAo/bw3gh87xmUot738cNsQi2W/WElqbraxuTP9e
+ xNX340teZcFaOc8WnGeZToYfLo+bRXJtoFkvc47dHfDqbmDr240/ckCtlmC2j+v/8T0r
+ 01MkQQqO4cvFeksfpJomHTMqVK/QY/sVrOYaqSx1bEMHVZfr1SG2eHPskDm3cdTaMmDO
+ qb3Q==
+X-Gm-Message-State: APjAAAXlAK5ULCcTA4ZyXBHBBUY+RgfqnJ2xioA1EbABYLuBzSZZZfzF
+ WNbk8684EbJ0YggdHpwvHGJFXZ8CCPeFy8EDiCSNwjKuPJ7dzL/YIjPS8utixy2Aj4ValilCf2s
+ R6BKFO7fPxXjA0nk=
+X-Received: by 2002:a5d:6a88:: with SMTP id s8mr8094145wru.173.1580428001386; 
+ Thu, 30 Jan 2020 15:46:41 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxyFYKC/hs/Am1qtbd8bupOTLdbsnaW1UdF3fE/g1goEp1qLjjPr5oI2ViFYCzXFzZhk1jKFQ==
+X-Received: by 2002:a5d:6a88:: with SMTP id s8mr8094123wru.173.1580428001129; 
+ Thu, 30 Jan 2020 15:46:41 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id t9sm7884427wmj.28.2020.01.30.15.46.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Jan 2020 15:46:40 -0800 (PST)
+Subject: Re: [RFC PATCH] tests/acceptance: Add a test for the N800 and N810
+ arm machines
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200129131920.22302-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <647b2004-4b56-7322-72ba-abb0309938de@redhat.com>
+Date: Fri, 31 Jan 2020 00:46:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200129131920.22302-1-thuth@redhat.com>
+Content-Language: en-US
+X-MC-Unique: -XTC4gocMYyXTIQxkOxTOw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jan 2020 21:59:21 -0000
-From: Noah Bergbauer <noah.bergbauer@tum.de>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: noah-bergbauer
-X-Launchpad-Bug-Reporter: Noah Bergbauer (noah-bergbauer)
-X-Launchpad-Bug-Modifier: Noah Bergbauer (noah-bergbauer)
-Message-Id: <158042156192.19296.13362308580628501069.malonedeb@gac.canonical.com>
-Subject: [Bug 1861458] [NEW] Clock drift issue with -soundhw hda
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b77550c681cfc6d388ecf16cda8ce5f67b8f5446
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Thu, 30 Jan 2020 18:27:55 -0500
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,96 +106,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1861458 <1861458@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 1/29/20 2:19 PM, Thomas Huth wrote:
+> Old kernels from the Meego project can be used to check that Linux
+> is at least starting on these machines.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   The serial console is written to the second UART, so this needs Phil's
+>   "Allow to use other serial consoles than default" patch as a prerequisi=
+te:
+>   Based-on: <20200120235159.18510-5-f4bug@amsat.org>
+>=20
+>   MAINTAINERS                          |  1 +
+>   tests/acceptance/machine_arm_n8x0.py | 49 ++++++++++++++++++++++++++++
+>   2 files changed, 50 insertions(+)
+>   create mode 100644 tests/acceptance/machine_arm_n8x0.py
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ddf6fe0794..560507e821 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -672,6 +672,7 @@ F: hw/rtc/twl92230.c
+>   F: include/hw/display/blizzard.h
+>   F: include/hw/input/tsc2xxx.h
+>   F: include/hw/misc/cbus.h
+> +F: tests/acceptance/machine_arm_n8x0.py
+>  =20
+>   Palm
+>   M: Andrzej Zaborowski <balrogg@gmail.com>
+> diff --git a/tests/acceptance/machine_arm_n8x0.py b/tests/acceptance/mach=
+ine_arm_n8x0.py
+> new file mode 100644
+> index 0000000000..e5741f2d8d
+> --- /dev/null
+> +++ b/tests/acceptance/machine_arm_n8x0.py
+> @@ -0,0 +1,49 @@
+> +# Functional test that boots a Linux kernel and checks the console
+> +#
+> +# Copyright (c) 2020 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Thomas Huth <thuth@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +import os
+> +
+> +from avocado import skipUnless
+> +from avocado_qemu import Test
+> +from avocado_qemu import wait_for_console_pattern
+> +
+> +class N8x0Machine(Test):
+> +    """Boots the Linux kernel and checks that the console is operational=
+"""
+> +
+> +    timeout =3D 90
+> +
+> +    def __do_test_n8x0(self):
+> +        kernel_url =3D ('http://stskeeps.subnetmask.net/meego-n8x0/'
+> +                      'meego-arm-n8x0-1.0.80.20100712.1431-'
+> +                      'vmlinuz-2.6.35~rc4-129.1-n8x0')
+> +        kernel_hash =3D 'e9d5ab8d7548923a0061b6fbf601465e479ed269'
+> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
+> +
+> +        self.vm.set_console(console_index=3D1)
+> +        self.vm.add_args('-kernel', kernel_path,
+> +                         '-append', 'printk.time=3D0 console=3DttyS1')
+> +        self.vm.launch()
+> +        wait_for_console_pattern(self, 'TSC2005 driver initializing')
+> +
+> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted co=
+de')
+> +    def test_n800(self):
+> +        """
+> +        :avocado: tags=3Darch:arm
+> +        :avocado: tags=3Dmachine:n800
+> +        """
+> +        self.__do_test_n8x0()
+> +
+> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted co=
+de')
+> +    def test_n810(self):
+> +        """
+> +        :avocado: tags=3Darch:arm
+> +        :avocado: tags=3Dmachine:n810
+> +        """
+> +        self.__do_test_n8x0()
+>=20
 
-Here's the scenario: I'm working on code for loopback audio recording
-(i.e. recording what you're hearing) using WASAPI on Windows. As I
-usually develop on Linux, I'm using qemu to test this on a Windows 10
-VM. The heart of WASAPI audio recording is the
-IAudioCaptureClient::GetBuffer function (https://docs.microsoft.com/en-
-us/windows/win32/api/audioclient/nf-audioclient-iaudiocaptureclient-
-getbuffer). Among other things, this function produces a timestamp for
-when the audio buffer it returned is supposed to be played.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-When the audio device in question is the qemu hda device, this timestamp
-is wrong.
-
-There is a clock drift error (I measured it to be about 0.1%, i.e. 1ms
-drift every second =3D a full second after 16 minutes) that causes the
-audio clock to advance faster than the system clock. Paradoxically, this
-does not affect audio playback through qemu at all, no delay there. Only
-the timestamps returned to recording applications are completely bogus.
-
-Unfortunately I'm not intimately familiar with the inner workings of
-Intel HD Audio. All I can tell you is that this timestamp is supposedly
-obtained directly from the hardware (which would be qemu in this case),
-which is also why e.g. chromium implements a workaround for buggy
-hardware that returns incorrect timestamps.
-
-Here are the relevant parts of my command line (version 4.2.0):
--enable-kvm -machine pc-q35-3.1,kernel-irqchip=3Don -cpu host,kvm=3Doff,hv_=
-time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vendor_id=3DNvidiaFuckU -=
-rtc base=3Dlocaltime -nodefaults -soundhw hda
-
-Just wanted to let you know about this because it took me three days of
-utter confusion and frustration to figure this out.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1861458
-
-Title:
-  Clock drift issue with -soundhw hda
-
-Status in QEMU:
-  New
-
-Bug description:
-  Here's the scenario: I'm working on code for loopback audio recording
-  (i.e. recording what you're hearing) using WASAPI on Windows. As I
-  usually develop on Linux, I'm using qemu to test this on a Windows 10
-  VM. The heart of WASAPI audio recording is the
-  IAudioCaptureClient::GetBuffer function (https://docs.microsoft.com
-  /en-us/windows/win32/api/audioclient/nf-audioclient-
-  iaudiocaptureclient-getbuffer). Among other things, this function
-  produces a timestamp for when the audio buffer it returned is supposed
-  to be played.
-
-  When the audio device in question is the qemu hda device, this
-  timestamp is wrong.
-
-  There is a clock drift error (I measured it to be about 0.1%, i.e. 1ms
-  drift every second =3D a full second after 16 minutes) that causes the
-  audio clock to advance faster than the system clock. Paradoxically,
-  this does not affect audio playback through qemu at all, no delay
-  there. Only the timestamps returned to recording applications are
-  completely bogus.
-
-  Unfortunately I'm not intimately familiar with the inner workings of
-  Intel HD Audio. All I can tell you is that this timestamp is
-  supposedly obtained directly from the hardware (which would be qemu in
-  this case), which is also why e.g. chromium implements a workaround
-  for buggy hardware that returns incorrect timestamps.
-
-  Here are the relevant parts of my command line (version 4.2.0):
-  -enable-kvm -machine pc-q35-3.1,kernel-irqchip=3Don -cpu host,kvm=3Doff,h=
-v_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff,hv_vendor_id=3DNvidiaFuckU=
- -rtc base=3Dlocaltime -nodefaults -soundhw hda
-
-  Just wanted to let you know about this because it took me three days
-  of utter confusion and frustration to figure this out.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1861458/+subscriptions
 
