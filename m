@@ -2,72 +2,69 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0AF8C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 08:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED5AC33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 08:42:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A73D5206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 08:27:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A73D5206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 95382206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 08:42:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95382206D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix5AW-0004cc-Rg
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 03:27:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57486)
+	id 1ix5Ou-0006jU-Pq
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 03:42:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34176)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ix596-0002bd-RH
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:25:54 -0500
+ (envelope-from <bounces@canonical.com>) id 1ix5Ny-0006IP-NL
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:41:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ix595-00072T-OJ
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:25:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55706)
+ (envelope-from <bounces@canonical.com>) id 1ix5Nx-0006fT-Go
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:41:14 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58500)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ix595-00072N-Iw
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:25:51 -0500
+ id 1ix5Nx-0006ej-BJ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:41:13 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ix594-0005cW-Tg
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:25:50 +0000
+ id 1ix5Nv-0007Br-Ju
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:41:11 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D86F62E8030
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:25:50 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 876A62E80C9
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:41:11 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jan 2020 08:20:18 -0000
-From: Philippe Vaucher <philippe.vaucher@gmail.com>
+Date: Thu, 30 Jan 2020 08:30:59 -0000
+From: Thomas Huth <1860920@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user syscall-abi
-X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public Security
 X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dflogeras2 liuke philippe-vaucher pmaydell
- schneiderit
-X-Launchpad-Bug-Reporter: Kan Li (liuke)
-X-Launchpad-Bug-Modifier: Philippe Vaucher (philippe-vaucher)
-References: <154353638253.10384.17899256838547579767.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158037241886.5216.2510233085899630280.malone@wampee.canonical.com>
-Subject: [Bug 1805913] Re: readdir() returns NULL (errno=EOVERFLOW) for 32-bit
- user-static qemu on 64-bit host
+X-Launchpad-Bug-Security-Vulnerability: yes
+X-Launchpad-Bug-Commenters: jgkammerer th-huth
+X-Launchpad-Bug-Reporter: Jean-Gabriel Kammerer (jgkammerer)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <158005183659.18916.14986952783973408797.malonedeb@gac.canonical.com>
+Message-Id: <158037305944.4686.16463523022409859613.malone@chaenomeles.canonical.com>
+Subject: [Bug 1860920] Re: qemu-s390x-softmmu: crash 
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 913d7b7ef4f24cb79e8744ec5c590f724ce83e9d
+X-Launchpad-Hash: 7005e2892eae010c2c4de54585d2412a7b2cc20d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,70 +77,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805913 <1805913@bugs.launchpad.net>
+Reply-To: Bug 1860920 <1860920@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sorry, meant `< 2.28` above.
+There is definitely something wrong here ;-) According to the
+"Principles of Operations" ISA document, opcode 0xEC54 is the RNSBG
+instruction (ROTATE THEN AND SELECTED BITS). But op_rosbg() apparently
+currently handles 0xEC55, 0xEC56 and 0xEC57. 0xEC55 seems wrong there,
+since this opcode should be handled by op_risbg() instead (according to
+target/s390x/insn-data.def). So the "case 0x55" seems to be a typo. Does
+it work if you replace "case 0x55" with "case 0x54" ?
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805913
+https://bugs.launchpad.net/bugs/1860920
 
 Title:
-  readdir() returns NULL (errno=3DEOVERFLOW) for 32-bit user-static qemu
-  on 64-bit host
+  qemu-s390x-softmmu: crash
 
 Status in QEMU:
   New
 
 Bug description:
-  This can be simply reproduced by compiling and running the attached C
-  code (readdir-bug.c) under 32-bit user-static qemu, such as qemu-arm-
-  static:
+  Trying to compile and use rust programs on an s390x emulated machine,
+  crash in qemu/target/s390x/translate.c line 3894
 
-  # Setup docker for user-static binfmt
-  docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  # Compile the code and run (readdir for / is fine, so create a new direct=
-ory /test).
-  docker run -v /path/to/qemu-arm-static:/usr/bin/qemu-arm-static -v /path/=
-to/readdir-bug.c:/tmp/readdir-bug.c -it --rm arm32v7/ubuntu:18.10 bash -c '=
-{ apt update && apt install -y gcc; } >&/dev/null && mkdir -p /test && cd /=
-test && gcc /tmp/readdir-bug.c && ./a.out'
-  dir=3D0xff5b4150
-  readdir(dir)=3D(nil)
-  errno=3D75: Value too large for defined data type
+  Steps to reproduce:
+  on a amd64 PC, installed debian on s390x emulated by qemu, seems to work =
+fine (installed some packages, etc.)
+  installed rust cargo (either from rustup or from debian)
+  cargo install anything makes *qemu* crash when beginning to compile
 
-  Do remember to replace the /path/to/qemu-arm-static and /path/to
-  /readdir-bug.c to the actual paths of the files.
+  Technical details:
+  * host: amd64 Linux
+  * qemu v4.2.0 (recompiled from git with debug options using configure --t=
+arget-list=3Ds390x-softmmu --enable-debug) (problem appears also with older=
+ versions of qemu from git, with default compilation options, with qemu fro=
+m debian, etc.)
+  * compiled with gcc 9.2
+  * command line, relevant part: qemu-system-s390x -snapshot -machine s390-=
+ccw-virtio -cpu max,zpci=3Don -serial mon:stdio -display none -m 512
+  (tested with -smp 4  -m 4096 as well and without snapshotting)
+  * command line, less relevant part: -drive file=3D./debian.qcow2,if=3Dnon=
+e,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone    -device virtio-blk=
+-ccw,devno=3Dfe.0.0001,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootind=
+ex=3D1,scsi=3Doff    -netdev user,id=3Dmynet0,hostfwd=3Dtcp::2223-:22 -devi=
+ce virtio-net-pci,netdev=3Dmynet0
+  * core dump: abort in qemu/target/s390x/translate.c line 3894 ; s->field:=
+ op has value 0xEC and op2 has value 0x54
+  (more info available if needed)
 
-  The root cause is in glibc:
-  https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/=
-linux/getdents.c;h=3D6d09a5be7057e2792be9150d3a2c7b293cf6fc34;hb=3Da5275ba5=
-378c9256d18e582572b4315e8edfcbfb#l87
+  Tried to patch source to add 0x54 case to no avail.
+  Tried other cpu variants to no avail as well.
 
-  By C standard, the return type of readdir() is DIR*, in which the
-  inode number and offset are 32-bit integers, therefore, glibc calls
-  getdents64() and check if the inode number and offset fits the 32-bit
-  range, and reports EOVERFLOW if not.
-
-  The problem here is for 32-bit user-static qemu running on 64-bit
-  host, getdents64 simply passing through the inode number and offset
-  from underlying getdents64 syscall (from 64-bit kernel), which is very
-  likely to not fit into 32-bit range. On real hardware, the 32-bit
-  kernel creates 32-bit inode numbers, therefore works properly.
-
-  The glibc code makes sense to do the check to be conformant with C
-  standard, therefore ideally it should be a fix on qemu side. I admit
-  this is difficult because qemu has to maintain a mapping between
-  underlying 64-bit inode numbers and 32-bit inode numbers, which would
-  severely hurt the performance. I don't expect this could be fix
-  anytime soon (or even there would be a fix), but it would be
-  worthwhile to surface this issue.
+  Reporting this in security as well since it also looks very much like
+  a DoS (albeit somewhat minor), feel free to tell me to report the bug
+  somewhere else.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805913/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1860920/+subscriptions
 
