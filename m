@@ -2,99 +2,96 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E18C33CB3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE3FC33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:50:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F614206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:49:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F614206F0
+	by mail.kernel.org (Postfix) with ESMTPS id 825B0206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:50:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825B0206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix8K3-0007nm-4O
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:49:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38872)
+	id 1ix8Kj-0000km-NB
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:50:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sbhat@linux.ibm.com>) id 1ix8Fd-0002Hh-OD
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:44:50 -0500
+ (envelope-from <sbhat@linux.ibm.com>) id 1ix8J9-0007B2-MO
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:48:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sbhat@linux.ibm.com>) id 1ix8Fc-0000l3-Cw
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:44:49 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44044)
+ (envelope-from <sbhat@linux.ibm.com>) id 1ix8J7-0000zX-Kt
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:48:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4084)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1ix8Fc-0000hG-3n
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:44:48 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1ix8J7-0000wv-2c
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:48:25 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 00UBe2xO082502
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 06:44:46 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xueh73pk6-1
+ 00UBgpHb074234
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 06:48:24 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xrvw9x7sm-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 06:44:45 -0500
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 06:48:24 -0500
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
- Thu, 30 Jan 2020 11:44:43 -0000
+ Thu, 30 Jan 2020 11:48:06 -0000
 Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 30 Jan 2020 11:44:40 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ Thu, 30 Jan 2020 11:48:02 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
  by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 00UBieKs48627958
+ 00UBm1sA51511438
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jan 2020 11:44:40 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id F1FEBA4054;
- Thu, 30 Jan 2020 11:44:39 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 97C27A405F;
- Thu, 30 Jan 2020 11:44:38 +0000 (GMT)
-Received: from [9.199.196.67] (unknown [9.199.196.67])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 30 Jan 2020 11:44:38 +0000 (GMT)
-Subject: Re: [PATCH v4 3/4] spapr: Add NVDIMM device support
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <157657241446.53829.7078678659499762596.stgit@lep8c.aus.stglabs.ibm.com>
- <157657253645.53829.168353921681383728.stgit@lep8c.aus.stglabs.ibm.com>
- <20200103012015.GP2098@umbus>
+ Thu, 30 Jan 2020 11:48:01 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8BD17A4053;
+ Thu, 30 Jan 2020 11:48:01 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8EA77A4051;
+ Thu, 30 Jan 2020 11:48:00 +0000 (GMT)
+Received: from lep8c.aus.stglabs.ibm.com (unknown [9.40.192.207])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 30 Jan 2020 11:48:00 +0000 (GMT)
+Subject: [PATCH v5 2/4] nvdimm: add uuid property to nvdimm
 From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Date: Thu, 30 Jan 2020 17:14:37 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.5.2
+To: imammedo@redhat.com, david@gibson.dropbear.id.au,
+ xiaoguangrong.eric@gmail.com, mst@redhat.com
+Date: Thu, 30 Jan 2020 05:47:59 -0600
+In-Reply-To: <158038485571.16440.14734905006978949612.stgit@lep8c.aus.stglabs.ibm.com>
+References: <158038485571.16440.14734905006978949612.stgit@lep8c.aus.stglabs.ibm.com>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <20200103012015.GP2098@umbus>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
 X-TM-AS-GCONF: 00
-x-cbid: 20013011-0008-0000-0000-0000034E2C80
+x-cbid: 20013011-0028-0000-0000-000003D5E01B
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20013011-0009-0000-0000-00004A6EAC80
-Message-Id: <f72750e4-1f70-b7d4-ac65-fd03ac56004d@linux.ibm.com>
+x-cbparentid: 20013011-0029-0000-0000-0000249A2E9B
+Message-Id: <158038487514.16440.10078356123772690069.stgit@lep8c.aus.stglabs.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-01-30_03:2020-01-28,
  2020-01-30 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 mlxscore=0
- clxscore=1015 lowpriorityscore=0 suspectscore=0 impostorscore=0
- adultscore=0 malwarescore=0 bulkscore=0 phishscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ suspectscore=2 adultscore=0
+ malwarescore=0 phishscore=0 spamscore=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 mlxscore=0 mlxlogscore=999 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1911200001 definitions=main-2001300086
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,120 +103,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, qemu-ppc@nongnu.org,
- xiaoguangrong.eric@gmail.com, mst@redhat.com
+Cc: qemu-ppc@nongnu.org, sbhat@linux.vnet.ibm.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+For ppc64, PAPR requires the nvdimm device to have UUID property
+set in the device tree. Add an option to get it from the user.
 
+Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/mem/nvdimm.c         |   40 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/mem/nvdimm.h |    7 +++++++
+ 2 files changed, 47 insertions(+)
 
-On 01/03/2020 06:50 AM, David Gibson wrote:
-> On Tue, Dec 17, 2019 at 02:49:14AM -0600, Shivaprasad G Bhat wrote:
->> Add support for NVDIMM devices for sPAPR. Piggyback on existing nvdimm
->> device interface in QEMU to support virtual NVDIMM devices for Power.
->> Create the required DT entries for the device (some entries have
->> dummy values right now).
->>
->> The patch creates the required DT node and sends a hotplug
->> interrupt to the guest. Guest is expected to undertake the normal
->> DR resource add path in response and start issuing PAPR SCM hcalls.
->>
->> The device support is verified based on the machine version unlike x86.
->>
->> This is how it can be used ..
->> Ex :
->> For coldplug, the device to be added in qemu command line as shown below
->> -object memory-backend-file,id=memnvdimm0,prealloc=yes,mem-path=/tmp/nvdimm0,share=yes,size=1073872896
->> -device nvdimm,label-size=128k,uuid=75a3cdd7-6a2f-4791-8d15-fe0a920e8e9e,memdev=memnvdimm0,id=nvdimm0,slot=0
->>
->> For hotplug, the device to be added from monitor as below
->> object_add memory-backend-file,id=memnvdimm0,prealloc=yes,mem-path=/tmp/nvdimm0,share=yes,size=1073872896
->> device_add nvdimm,label-size=128k,uuid=75a3cdd7-6a2f-4791-8d15-fe0a920e8e9e,memdev=memnvdimm0,id=nvdimm0,slot=0
->>
->> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
->> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
->>                 [Early implementation]
->> ---
->>   default-configs/ppc64-softmmu.mak |    1
->>   hw/mem/Kconfig                    |    2
->>   hw/ppc/spapr.c                    |  216 ++++++++++++++++++++++++++++++++++---
->>   hw/ppc/spapr_drc.c                |   18 +++
->>   hw/ppc/spapr_events.c             |    4 +
->>   include/hw/ppc/spapr.h            |   11 ++
->>   include/hw/ppc/spapr_drc.h        |    9 ++
->>   7 files changed, 245 insertions(+), 16 deletions(-)
->>
->> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
->> index cca52665d9..ae0841fa3a 100644
->> --- a/default-configs/ppc64-softmmu.mak
->> +++ b/default-configs/ppc64-softmmu.mak
->> @@ -8,3 +8,4 @@ CONFIG_POWERNV=y
->>   
->>   # For pSeries
->>   CONFIG_PSERIES=y
->> +CONFIG_NVDIMM=y
->> diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
->> index 620fd4cb59..2ad052a536 100644
->> --- a/hw/mem/Kconfig
->> +++ b/hw/mem/Kconfig
->> @@ -8,4 +8,4 @@ config MEM_DEVICE
->>   config NVDIMM
->>       bool
->>       default y
->> -    depends on PC
->> +    depends on (PC || PSERIES)
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 3ae7db1563..921d8d7c8e 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -80,6 +80,8 @@
->>   #include "hw/ppc/spapr_cpu_core.h"
->>   #include "hw/mem/memory-device.h"
->>   #include "hw/ppc/spapr_tpm_proxy.h"
->> +#include "hw/mem/nvdimm.h"
->> +#include "qemu/nvdimm-utils.h"
->>   
->>   #include "monitor/monitor.h"
->>   
->> @@ -685,12 +687,22 @@ static int spapr_populate_drmem_v2(SpaprMachineState *spapr, void *fdt,
->>               nr_entries++;
->>           }
->>   
->> -        /* Entry for DIMM */
->> -        drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB, addr / lmb_size);
->> -        g_assert(drc);
->> -        elem = spapr_get_drconf_cell(size / lmb_size, addr,
->> -                                     spapr_drc_index(drc), node,
->> -                                     SPAPR_LMB_FLAGS_ASSIGNED);
->> +        if (info->value->type == MEMORY_DEVICE_INFO_KIND_DIMM) {
->> +            /* Entry for DIMM */
->> +            drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB, addr / lmb_size);
->> +            g_assert(drc);
->> +            elem = spapr_get_drconf_cell(size / lmb_size, addr,
->> +                                         spapr_drc_index(drc), node,
->> +                                         SPAPR_LMB_FLAGS_ASSIGNED);
->> +        } else if (info->value->type == MEMORY_DEVICE_INFO_KIND_NVDIMM) {
->> +            /*
->> +             * NVDIMM sits here, let the DIMM LMBs be unusable here in the
->> +             * whole range
->> +             */
->> +            elem = spapr_get_drconf_cell(size / lmb_size, addr, 0, -1,
->> +                                         SPAPR_LMB_FLAGS_RESERVED |
->> +                                         SPAPR_LMB_FLAGS_DRC_INVALID);
->> +        }
-> As discussed in reply to an earlier thread, this whole scheme
-> basically breaks down in the presence of hotplug - it relies on which
-> GPAs are DIMMs and which are NVDIMMs not changing.
->
-> Other than that significant problem, the rest of this looks
-> reasonable.
-
-As discussed, I verified not marking the NVDIMM occupied area as reserved,
-and it seems to work fine. The malicious attempts to claim
-the drcs on the those areas fail as there wont be a valid dimm devices
-asscociated with those drcs.
-
-Sending the next version fixing this part.
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 39f1426d1f..8e426d24bb 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -69,11 +69,51 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
++static void nvdimm_get_uuid(Object *obj, Visitor *v, const char *name,
++                                  void *opaque, Error **errp)
++{
++    NVDIMMDevice *nvdimm = NVDIMM(obj);
++    char *value = NULL;
++
++    value = qemu_uuid_unparse_strdup(&nvdimm->uuid);
++
++    visit_type_str(v, name, &value, errp);
++    g_free(value);
++}
++
++
++static void nvdimm_set_uuid(Object *obj, Visitor *v, const char *name,
++                                  void *opaque, Error **errp)
++{
++    NVDIMMDevice *nvdimm = NVDIMM(obj);
++    Error *local_err = NULL;
++    char *value;
++
++    visit_type_str(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++
++    if (qemu_uuid_parse(value, &nvdimm->uuid) != 0) {
++        error_setg(errp, "Property '%s.%s' has invalid value",
++                   object_get_typename(obj), name);
++        goto out;
++    }
++    g_free(value);
++
++out:
++    error_propagate(errp, local_err);
++}
++
++
+ static void nvdimm_init(Object *obj)
+ {
+     object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
+                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
+                         NULL, NULL);
++
++    object_property_add(obj, NVDIMM_UUID_PROP, "QemuUUID", nvdimm_get_uuid,
++                        nvdimm_set_uuid, NULL, NULL, NULL);
+ }
+ 
+ static void nvdimm_finalize(Object *obj)
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 523a9b3d4a..4807ca615b 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -25,6 +25,7 @@
+ 
+ #include "hw/mem/pc-dimm.h"
+ #include "hw/acpi/bios-linker-loader.h"
++#include "qemu/uuid.h"
+ 
+ #define NVDIMM_DEBUG 0
+ #define nvdimm_debug(fmt, ...)                                \
+@@ -49,6 +50,7 @@
+                                                TYPE_NVDIMM)
+ 
+ #define NVDIMM_LABEL_SIZE_PROP "label-size"
++#define NVDIMM_UUID_PROP       "uuid"
+ #define NVDIMM_UNARMED_PROP    "unarmed"
+ 
+ struct NVDIMMDevice {
+@@ -83,6 +85,11 @@ struct NVDIMMDevice {
+      * the guest write persistence.
+      */
+     bool unarmed;
++
++    /*
++     * The PPC64 - spapr requires each nvdimm device have a uuid.
++     */
++    QemuUUID uuid;
+ };
+ typedef struct NVDIMMDevice NVDIMMDevice;
+ 
 
 
