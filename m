@@ -2,100 +2,85 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6819CC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 19:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF25FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 19:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34EC42082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 19:34:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77FEA20707
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 19:44:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DiGrD5zu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34EC42082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M9aISAfv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77FEA20707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixFaG-000634-AW
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 14:34:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43187)
+	id 1ixFk2-0000c4-ME
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 14:44:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixFZS-0005bk-5K
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 14:33:48 -0500
+ (envelope-from <thuth@redhat.com>) id 1ixFjR-00005n-E3
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 14:44:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixFZP-0007vz-P5
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 14:33:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26489
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1ixFjP-00035K-V8
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 14:44:04 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40629
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixFZP-0007ut-Lg
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 14:33:43 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ixFjP-000341-I2
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 14:44:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580412822;
+ s=mimecast20190719; t=1580413442;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/Ih0Xt/lNc3Sb83+N7/A5K3Je4+BthAhgIf9Y+vsgkc=;
- b=DiGrD5zu1X09S3pn7bU/Mzr9PzDzdR+XxtV6zIG4b/tOyiCwC+PXDIIdINghO35uPh8Zmn
- TxCMQuvm/k9i2mu2HOOXNuHCOuOKSbiN92JEJ4lubGBqDoskhuMCyXL0B62G/xfzZP8yW4
- FwHlwrKQbg3RL/NHyxCA7mWdqPYPtV8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-_T2OMfxqM8GGiM_EqTjRYg-1; Thu, 30 Jan 2020 14:33:39 -0500
-Received: by mail-wr1-f69.google.com with SMTP id j4so2175007wrs.13
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 11:33:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iTh3S7B6OIc70IUnfml1D4BS+yZ9oXS4akyRyrJzR4U=;
- b=EssIwXV0gaB9/EwvybqVVFL1gJAf/eDbwW85+3DJvFnfhajDWLdw1IVi1azSB0GQBH
- dgW+OlDowuh0c85qhhG1X1OI/wjbIU/6LIHmqYH46jPP7pgX0wHDJjkrR+WS9E1ubZRm
- /khgovAmkgAEzmW98lfgfevcFzjJkRHDEfXYyIgHTeyungCVR8udBPA3KWw9UOrQGBRY
- ivH0Z4DASezDtgGJZg/j2s/HahsYqEHfdZEMwX9s8fYC/pModo0ANjvz1vvGw1cWOmqs
- 0cI0hVHvpkoUWLXoqQH2nTJugMvVdLly3NLS1JRyoK7r/KkguAtZOd3O4I+GiYxjtiT1
- 47+A==
-X-Gm-Message-State: APjAAAWesj85bwSoaqV1W/dY0lS0xXygdkEN99nMiki7O7bXCDHkUQDg
- tTNnuoKw81/Q0EON/bjuj4ydwKzW+NU8hwSomacpllSKzZ+lmEpEByxyxD1naeax/LZQH4DFlVa
- PxbApBfMIr/AUjQ8=
-X-Received: by 2002:a5d:5267:: with SMTP id l7mr7137715wrc.84.1580412817788;
- Thu, 30 Jan 2020 11:33:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw3pqJnuneyI9vLnB3Ta4tfvtZZfGqqpoxn6BQl/HTprWI8xbT7SU/PUXD+zJHHawszdd08KA==
-X-Received: by 2002:a5d:5267:: with SMTP id l7mr7137697wrc.84.1580412817564;
- Thu, 30 Jan 2020 11:33:37 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z3sm8689296wrs.94.2020.01.30.11.33.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jan 2020 11:33:37 -0800 (PST)
-Subject: Re: [PATCH] machine/memory encryption: Disable mem merge
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, ehabkost@redhat.com, marcel.apfelbaum@gmail.com,
- brijesh.singh@amd.com
-References: <20200130175046.85850-1-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2596f4f2-fb41-d8a1-a3e8-043f4edd88e0@redhat.com>
-Date: Thu, 30 Jan 2020 20:33:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=tHR4iOC+PQVjoqHhZzueiYxVpdB2UATxhzn2PP7//Ns=;
+ b=M9aISAfvIaIR/+uK8+mJWGbxpmgJ04NF9vz0hZP593ayzL4KpoyQt+blkdXSwBQnaNpnV3
+ ECGS9+tny+WRrrEnxpybp1kRg/0TwXaK51QWKLpESpw/vm3/C60gUDhUJAUbdNQzQcC1BG
+ iucLC3NEDJ4ACkBMPzjQ7Gw5Q6oglJs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-FRRvP1PmPA-P8lZc19WGOQ-1; Thu, 30 Jan 2020 14:44:00 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A493107ACCC;
+ Thu, 30 Jan 2020 19:43:59 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-117.ams2.redhat.com [10.36.117.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C9A560BE1;
+ Thu, 30 Jan 2020 19:43:48 +0000 (UTC)
+Subject: Re: [PATCH v2 12/12] .travis.yml: limit the arm64 target list
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200130113223.31046-1-alex.bennee@linaro.org>
+ <20200130113223.31046-13-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <cec32483-f133-f40b-a89d-29d8f3ec7980@redhat.com>
+Date: Thu, 30 Jan 2020 20:43:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200130175046.85850-1-dgilbert@redhat.com>
+In-Reply-To: <20200130113223.31046-13-alex.bennee@linaro.org>
 Content-Language: en-US
-X-MC-Unique: _T2OMfxqM8GGiM_EqTjRYg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: FRRvP1PmPA-P8lZc19WGOQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,53 +92,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aarcange@redhat.com
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/30/20 6:50 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 30/01/2020 12.32, Alex Benn=C3=A9e wrote:
+> Even though we can do a good multi-threaded build we are still
+> exceeding the 50 minute build time while running the tests.
 >=20
-> When a host is running with memory encryption, the memory isn't visible
-> to the host kernel; attempts to merge that memory are futile because
-> what it's really comparing is encrypted memory, usually encrypted
-> with different keys.
->=20
-> Automatically turn mem-merge off when memory encryption is specified.
->=20
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1796356
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->   hw/core/machine.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>  .travis.yml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 3e288bfceb..029e1f85b8 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -419,6 +419,14 @@ static void machine_set_memory_encryption(Object *ob=
-j, const char *value,
->  =20
->       g_free(ms->memory_encryption);
->       ms->memory_encryption =3D g_strdup(value);
-> +
-> +    /*
-> +     * With memory encryption, the host can't see the real contents of R=
-AM,
-> +     * so there's no point in it trying to merge areas.
-> +     */
-> +    if (value) {
-> +        machine_set_mem_merge(obj, false, errp);
+> diff --git a/.travis.yml b/.travis.yml
+> index a600f508b0..71bf650b1d 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -426,7 +426,7 @@ matrix:
+>            - genisoimage
+>        env:
+>          - TEST_CMD=3D"make check check-tcg V=3D1"
+> -        - CONFIG=3D"--disable-containers --target-list=3D${MAIN_SOFTMMU_=
+TARGETS}"
+> +        - CONFIG=3D"--disable-containers --target-list=3Daarch64-softmmu=
+,aarch64-linux-user,arm-softmmu,arm-linux-user"
 
-Using the helper is cleaner than accessing ms->mem_merge.
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Maybe still include x86_64-softmmu? (I assume arm folks might be
+interested in that?)
 
-> +    }
->   }
->  =20
->   static bool machine_get_nvdimm(Object *obj, Error **errp)
->=20
+ Thomas
 
 
