@@ -2,100 +2,100 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B26C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 22:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9883DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 22:20:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A4812082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 22:18:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F8E02082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 22:20:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OS7V1ZCi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A4812082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZcOdofZb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F8E02082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixI8P-0007DX-LN
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 17:18:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43360)
+	id 1ixIAb-000100-Gg
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 17:20:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixI7B-0006LT-Kd
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:16:50 -0500
+ (envelope-from <philmd@redhat.com>) id 1ixI9Q-0008Ij-KZ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:19:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixI7A-00083o-H3
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:16:45 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56546
+ (envelope-from <philmd@redhat.com>) id 1ixI9P-0004Fj-92
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:19:04 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33597
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixI7A-00081i-DP
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:16:44 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixI9P-0004FV-57
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 17:19:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580422603;
+ s=mimecast20190719; t=1580422742;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0VYp8Vwrnws+BCkjgdtPHL+9TaFuNbHiVruCnfLGOk8=;
- b=OS7V1ZCi8XlEhii/kjvIDFgt8X/SanvcbUY5OsvJokjO/6EtOkQy+viFwlcrTIGOvASTHu
- sMJVzRzqciA1I7/Fu8D+RL2lpfKWbRsXlaDaohagj7+YAxhMdk6CobLdTZipzFfkskKPH3
- dhJVC+izLbJOcpQLAIkIkHF0Wg1Eks0=
+ bh=1bbijX/5mpejZEmEAhJQI3cWJJJgBAOpvoXXXibcMYU=;
+ b=ZcOdofZbyF7w3WIwxrRR8+pi2yAfDItbbJDHsFqdxELOhX6O0cjkb0yi0bJiUUA2lSo23y
+ 60EHfGEWtZTNZcpyODMa1HwcMo7GhbHwYsxmwctlWO78ouHh8X0tCupYJJ2r6piCpDKMMI
+ nq5bM3IsR9V8aJilcoc2CKETTVdYKNQ=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-06pA6NPRPemCxlF4IjBuBw-1; Thu, 30 Jan 2020 17:16:33 -0500
-Received: by mail-wr1-f72.google.com with SMTP id w6so2345833wrm.16
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 14:16:33 -0800 (PST)
+ us-mta-390-Orf5AkW7NG2qAmElSztKrQ-1; Thu, 30 Jan 2020 17:19:00 -0500
+Received: by mail-wr1-f72.google.com with SMTP id c6so2334559wrm.18
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 14:19:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=aH7bLoi5Ya3LW8Bh8gNO2GEkMHuhNUBJ0pX3+B82MMY=;
- b=eJkJgXQdyEoK2kQ/i+Ox+JUMjtjYgGyPhrV0WH1tYQj7a+PnVGDmgultxFB8JQZetb
- ye1j/RWcP9lmwAH2QFbY2x0gNnQKGL9I+GG5bx/yrOXCNYyuRA1K+z5nhfXFtHDtNkfR
- c1snQBYqufMObAyawedak/TpaB+GdhdNaUOqYltwaUd0gtHbQ5UiMbSXjAmG78ZtVlR3
- KMkaHYevfMC25NIdDKxFUQPm8qOh9cZ33kenA9KoeA0ghuXcUVYsy3opTdY3Eu5hYQ0L
- n22mWSCfSFoPbOQ55FD2L5emdmamjWgA0o3dsLrjqGeFdBWmxQKW4rz8Wbwkw0qXy9vQ
- Ujqg==
-X-Gm-Message-State: APjAAAUx3NYFf0x9eH6vZAHUgXkmMST6a5PCfXwPjnorYgkJKiIyyk1i
- CDhilH0+3vRDOqclEytyTDBXG8QaM5mfF/Z230edgfOy2xbAO0yKj+cQjdVVTidVCGqwua5jZf0
- 8qwAQixARWM8Xc5o=
-X-Received: by 2002:a5d:56ca:: with SMTP id m10mr8122107wrw.313.1580422592293; 
- Thu, 30 Jan 2020 14:16:32 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz95jB9ML5t8xhs3TbUl4JcJSv/fTcWY7fwHh2pImc+wP4Nmb+yq7OMzKSJU644Ejo6o3MgKw==
-X-Received: by 2002:a5d:56ca:: with SMTP id m10mr8122091wrw.313.1580422592043; 
- Thu, 30 Jan 2020 14:16:32 -0800 (PST)
+ bh=wBD9r5igCEYXX1Zd/yQCCldg83MJcLH+8L6Hgk4lI4Q=;
+ b=fN3OWB9H/EDzAhZItXLQV/Zz4/jpOsRYnQE7vgXvreXGqi1MbBvZicETNWtCZ4ktQ3
+ en1JjJNQ7jjEFWBT3Stz3ItdWfFlHtpA3Ddx2TQcXUojQWU7fJuwXJ/8tgnokINZyxPh
+ dnjYBaOwPA7kzOMb5qN77Bpb2b2x1n8g9zEJTTQk4LDa59B6ZeqvnJgl4v7Xv3fZgme6
+ FqK5Xnq8NpIRrqzc2fjRyZWpGwGJL1yIzHmim/KIYHc1hhWtfnIrHEUG9AqeNk+gD8lp
+ YcofImD9IyNgRRzt7k2Nkwe//bmEpCLpAauxPA/Eryu67hR799XRipC16VFtg8RhpvbW
+ B3Rg==
+X-Gm-Message-State: APjAAAUn3/nlLWszkba3eXwyom9v6Y+aCmPmlCQYiDCQfQJR13mS6qzQ
+ R2/BXociIKZPoxMI9Sg1IrHvPC8d+sufW3CmJuD3pbwIeAcBqrrqxjr1G+uNB4gIrHLNRTIlIQ+
+ Dcsd7LCE/2mi3ZAA=
+X-Received: by 2002:a7b:ce94:: with SMTP id q20mr8058555wmj.4.1580422739483;
+ Thu, 30 Jan 2020 14:18:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy1ivo4z4cGLoCzQbZUWz9tLKVRm5yUKHG5CXj4l9lFEzSblS1zsEs5lB1cZKzEohGs/7jypg==
+X-Received: by 2002:a7b:ce94:: with SMTP id q20mr8058533wmj.4.1580422739229;
+ Thu, 30 Jan 2020 14:18:59 -0800 (PST)
 Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id a5sm8122747wmb.37.2020.01.30.14.16.31
+ by smtp.gmail.com with ESMTPSA id a9sm7985110wmm.15.2020.01.30.14.18.57
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jan 2020 14:16:31 -0800 (PST)
-Subject: Re: [PATCH] python: Treat None-return of greeting cmd
-To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Thu, 30 Jan 2020 14:18:58 -0800 (PST)
+Subject: Re: [PATCH v4 2/7] Acceptance tests: Extract _console_interaction()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
-References: <20200120071202.30646-1-ldoktor@redhat.com>
+References: <20200120235159.18510-1-f4bug@amsat.org>
+ <20200120235159.18510-3-f4bug@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a9c347a1-6ee5-af0c-c1e5-6b5883fbd787@redhat.com>
-Date: Thu, 30 Jan 2020 23:16:30 +0100
+Message-ID: <57469393-0d7d-a4f8-d37e-2144ac6b67e9@redhat.com>
+Date: Thu, 30 Jan 2020 23:18:57 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200120071202.30646-1-ldoktor@redhat.com>
+In-Reply-To: <20200120235159.18510-3-f4bug@amsat.org>
 Content-Language: en-US
-X-MC-Unique: 06pA6NPRPemCxlF4IjBuBw-1
+X-MC-Unique: Orf5AkW7NG2qAmElSztKrQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,34 +107,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, crosa@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>, Laurent Bonnans <laurent.bonnans@here.com>,
+ Cheng Xiang <ext-cheng.xiang@here.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/20/20 8:12 AM, Luk=C3=A1=C5=A1 Doktor wrote:
-> In case qemu process dies the "monitor.cmd" returns None which gets
-> passed to the "__negotiate_capabilities" and leads to unhandled
-> exception. Let's only check the resp in case it has a value.
+On 1/21/20 12:51 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Since we are going to re-use the code shared between
+> wait_for_console_pattern() and exec_command_and_wait_for_pattern(),
+> extract the common part into a local function.
 >=20
-> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->   python/qemu/qmp.py | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   tests/acceptance/avocado_qemu/__init__.py | 31 +++++++++++++----------
+>   1 file changed, 17 insertions(+), 14 deletions(-)
 >=20
-> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-> index 5c8cf6a056..a3e5de718a 100644
-> --- a/python/qemu/qmp.py
-> +++ b/python/qemu/qmp.py
-> @@ -73,7 +73,7 @@ class QEMUMonitorProtocol(object):
->               raise QMPConnectError
->           # Greeting seems ok, negotiate capabilities
->           resp =3D self.cmd('qmp_capabilities')
-> -        if "return" in resp:
-> +        if resp and "return" in resp:
->               return greeting
->           raise QMPCapabilitiesError
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
+/avocado_qemu/__init__.py
+> index 6618ea67c1..0a50fcf2be 100644
+> --- a/tests/acceptance/avocado_qemu/__init__.py
+> +++ b/tests/acceptance/avocado_qemu/__init__.py
+> @@ -55,19 +55,14 @@ def pick_default_qemu_bin(arch=3DNone):
+>           return qemu_bin_from_src_dir_path
 >  =20
+>  =20
+> -def wait_for_console_pattern(test, success_message, failure_message=3DNo=
+ne):
+> -    """
+> -    Waits for messages to appear on the console, while logging the conte=
+nt
+> -
+> -    :param test: an Avocado test containing a VM that will have its cons=
+ole
+> -                 read and probed for a success or failure message
+> -    :type test: :class:`avocado_qemu.Test`
+> -    :param success_message: if this message appears, test succeeds
+> -    :param failure_message: if this message appears, test fails
+> -    """
+> +def _console_interaction(test, success_message, failure_message,
+> +                         send_string):
+>       console =3D test.vm.console_socket.makefile()
+>       console_logger =3D logging.getLogger('console')
+>       while True:
+> +        if send_string:
+> +            test.vm.console_socket.sendall(send_string.encode())
+> +            send_string =3D None # send only once
+>           msg =3D console.readline().strip()
+>           if not msg:
+>               continue
+> @@ -79,6 +74,17 @@ def wait_for_console_pattern(test, success_message, fa=
+ilure_message=3DNone):
+>               fail =3D 'Failure message found in console: %s' % failure_m=
+essage
+>               test.fail(fail)
+>  =20
+> +def wait_for_console_pattern(test, success_message, failure_message=3DNo=
+ne):
+> +    """
+> +    Waits for messages to appear on the console, while logging the conte=
+nt
+> +
+> +    :param test: an Avocado test containing a VM that will have its cons=
+ole
+> +                 read and probed for a success or failure message
+> +    :type test: :class:`avocado_qemu.Test`
+> +    :param success_message: if this message appears, test succeeds
+> +    :param failure_message: if this message appears, test fails
+> +    """
+> +    _console_interaction(test, success_message, failure_message, None)
+>  =20
+>   def exec_command_and_wait_for_pattern(test, command,
+>                                         success_message, failure_message=
+=3DNone):
+> @@ -94,10 +100,7 @@ def exec_command_and_wait_for_pattern(test, command,
+>       :param success_message: if this message appears, test succeeds
+>       :param failure_message: if this message appears, test fails
+>       """
+> -    command +=3D '\r'
+> -    test.vm.console_socket.sendall(command.encode())
+> -    wait_for_console_pattern(test, success_message, failure_message)
+> -
+> +    _console_interaction(test, success_message, failure_message, command=
+ + '\r')
+>  =20
+>   class Test(avocado.Test):
+>       def _get_unique_tag_val(self, tag_name):
 >=20
 
 Thanks, applied to my python-next tree:
