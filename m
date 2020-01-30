@@ -2,62 +2,79 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F7BDC33CB2
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 01:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4966C33CB2
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 01:36:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6C36206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 01:27:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F03F206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 01:36:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f/QrLsvV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6C36206F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F5ORJxZ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F03F206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54713 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwybx-0003GN-12
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 20:27:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41450)
+	id 1iwykp-0004vw-Nb
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 20:36:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43958)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iwybL-0002l1-Qo
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 20:26:37 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iwykC-0004Rh-5y
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 20:35:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iwybK-0002Hu-BC
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 20:26:35 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:49905)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iwybJ-00027K-Is; Wed, 29 Jan 2020 20:26:34 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 487N3l3n1sz9sPJ; Thu, 30 Jan 2020 12:26:27 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580347587;
- bh=D1ZHqnZx6ANpXdyIlh22ap4pXL4wkhwKxKN2Dpgovb8=;
- h=From:To:Cc:Subject:Date:From;
- b=f/QrLsvVP6hGCLgFyHl2uK/fZ5hE3BC5OW5NAO+Or/kpBqyJ47+LAh9Qi1oinCaBk
- EL+zFpoQrN36L1qwNiI+lOw+e/VzH0sY4lQpGvAkwKmpckUVjNf9c52x0+0Ap/wqHP
- Y5VPVMYfre3nIIAtfrMacUc9x7SSxd/FztqY3BT4=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: mpe@ellerman.id.au,
-	groug@kaod.org,
-	clg@kaod.org
-Subject: [PATCH] spapr: Enable DD2.3 accelerated count cache flush in
- pseries-5.0 machine
-Date: Thu, 30 Jan 2020 12:26:22 +1100
-Message-Id: <20200130012622.8564-1-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iwykB-0008Gj-1R
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 20:35:43 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35022)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iwykA-0008Cr-Qh; Wed, 29 Jan 2020 20:35:42 -0500
+Received: by mail-ot1-x343.google.com with SMTP id r16so1644773otd.2;
+ Wed, 29 Jan 2020 17:35:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=CwlJMsYFI+TiLEnDgAzX0LeVjXyN4utWw1TTBvdaaAE=;
+ b=F5ORJxZ4mui8UKXnJS0F5rMc9dHZJJhUDMarOeIPyojT+yKECqNjc0tuch8FMruGbc
+ 4E2CaQIC92K4hmuq0W8TWZNlFgao9mKEL5ZYEDFPsHtps/dqM5UqpBQMxyQJhUVtJC77
+ +Pu40CSpNEkipxNToX9nSw+xCuy3zGKUutZ6+ckzZEtkBkykM4v3ZMnTYhPmnbZzOF/C
+ eArYsP1Rqbzee8GxhQlHbhaq9/nOiswKASfcArnL4h9aYceLIz3quYPAUY16RXECJEoT
+ 2U6aZNRt+LPuR26XQzzzfdpRoJZ1T0Xi1nwM34/oL6xH7lNL1TrfSEDLIw/YQ//tBRfQ
+ viEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=CwlJMsYFI+TiLEnDgAzX0LeVjXyN4utWw1TTBvdaaAE=;
+ b=SZ7IYaNL/t0rAyNGDY8FXqKRGQxLHQQ3hJzfTQykFCfHZSvE22FnEjj3nAlwPMOD25
+ 85weHwXeZZuAuYK7A+8r01IoaFu6mCN5YH7gCDsD9oAKbqWc1sa7p1SFwOHBUHr3MFGB
+ pRwD7sjLMzO/L+LemcD4ywohn4zNY0ncHj1/iSnJuQF9Yk7Mi9Ut6zFQ4nFMZfcuGLrj
+ xY6VfuXbca6tO2QRkka8G3e91DEu/W+C0dzz2ikYlP9kahUunWZZzpVyB9Ns27sERU+r
+ yrPzFyVDxPQGonvMovWnQ+uqsmc6XwXiIit5yMAA4k9SNR6p1kgXQ3JhXWC3ZD1Uys8Z
+ wIig==
+X-Gm-Message-State: APjAAAV3sl2BL2QvHVigHSqVeOU70rnwohm5oR6DirmFEfbQvf8Rhnt6
+ MfBtSTffx/77jk+Iu+2bMdn5oZ3wfPHHKAXhZ98=
+X-Google-Smtp-Source: APXvYqzlYlDRT+8Z1G6OcVaUsTu1GkE3iUtZSFeKLqhyLFN9ULU9rwnZJO5kEqV0v54PzHrJZ3+XtwbsxPVXBz8pOII=
+X-Received: by 2002:a05:6830:1042:: with SMTP id
+ b2mr1702436otp.306.1580348141478; 
+ Wed, 29 Jan 2020 17:35:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+References: <20200129235040.24022-1-richard.henderson@linaro.org>
+In-Reply-To: <20200129235040.24022-1-richard.henderson@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 30 Jan 2020 02:35:22 +0100
+Message-ID: <CAL1e-=jbTY6a-B4RkoR9hL_h5LiOwio=A6pp3=KqqjUu7bEWUQ@mail.gmail.com>
+Subject: Re: [PATCH 0/4] target/ppc: Use probe_access
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000009826b6059d517979"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,142 +86,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, paulus@samba.org,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org,
+ QEMU Developers <qemu-devel@nongnu.org>, Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For POWER9 DD2.2 cpus, the best current Spectre v2 indirect branch
-mitigation is "count cache disabled", which is configured with:
-    -machine cap-ibs=3Dfixed-ccd
-However, this option isn't available on DD2.3 CPUs with KVM, because they
-don't have the count cache disabled.
+--0000000000009826b6059d517979
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-For POWER9 DD2.3 cpus, it is "count cache flush with assist", configured
-with:
-    -machine cap-ibs=3Dworkaround,cap-ccf-assist=3Don
-However this option isn't available on DD2.2 CPUs with KVM, because they
-don't have the special CCF assist instruction this relies on.
+00:51 =C4=8Cet, 30.01.2020. Richard Henderson <richard.henderson@linaro.org=
+> =D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> The first two address the performance regression noticed
+> by Howard Spoelstra.  The last two are just something I
+> noticed at the same time.
+>
 
-On current machine types, we default to "count cache flush w/o assist",
-that is:
-    -machine cap-ibs=3Dworkaround,cap-ccf-assist=3Doff
-This runs, with mitigation on both DD2.2 and DD2.3 host cpus, but has a
-fairly significant performance impact.
+But, performance regression, according to Howard bisect analysis, happened
+because of the change in target-independant code, and the fix presented
+here is in target-specific code. This defies basic logic and deserves clear
+and detailed explanation.
 
-It turns out we can do better.  The special instruction that CCF assist
-uses to trigger a count cache flush is a no-op on earlier CPUs, rather th=
-an
-trapping or causing other badness.  It doesn't, of itself, implement the
-mitigation, but *if* we have count-cache-disabled, then the count cache
-flush is unnecessary, and so using the count cache flush mitigation is
-harmless.
+My additional concern, of course, is: Are other targets exposed to
+performance degradation, and why?
 
-Therefore for the new pseries-5.0 machine type, enable cap-ccf-assist by
-default.  Along with that, suppress throwing an error if cap-ccf-assist
-is selected but KVM doesn't support it, as long as KVM *is* giving us
-count-cache-disabled.  To allow TCG to work out of the box, even though i=
-t
-doesn't implement the ccf flush assist, downgrade the error in that case =
-to
-a warning.  This matches several Spectre mitigations where we allow TCG
-to operate for debugging, since we don't really make guarantees about TCG
-security properties anyway.
+Thanks,
+Aleksandar
 
-While we're there, make the TCG warning for this case match that for othe=
-r
-mitigations.
+>
+> r~
+>
+>
+> Richard Henderson (4):
+>   target/ppc: Use probe_access for LSW, STSW
+>   target/ppc: Use probe_access for LMW, STMW
+>   target/ppc: Remove redundant mask in DCBZ
+>   target/ppc: Use probe_write for DCBZ
+>
+>  target/ppc/mem_helper.c | 197 +++++++++++++++++++++++++++++++++-------
+>  1 file changed, 162 insertions(+), 35 deletions(-)
+>
+> --
+> 2.20.1
+>
+>
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c      |  5 ++++-
- hw/ppc/spapr_caps.c | 26 ++++++++++++++++++++++----
- 2 files changed, 26 insertions(+), 5 deletions(-)
+--0000000000009826b6059d517979
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I have put this into my ppc-for-5.0 tree already, and hope to send a
-pull request tomorrow (Jan 31).
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">00:51 =C4=8Cet, 30.01.2020. Richard Henderson &lt;<a href=3D=
+"mailto:richard.henderson@linaro.org">richard.henderson@linaro.org</a>&gt; =
+=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; The first two address the performance regression noticed<br>
+&gt; by Howard Spoelstra.=C2=A0 The last two are just something I<br>
+&gt; noticed at the same time.<br>
+&gt;</p>
+<p dir=3D"ltr">But, performance regression, according to Howard bisect anal=
+ysis, happened because of the change in target-independant code, and the fi=
+x presented here is in target-specific code. This defies basic logic and de=
+serves clear and detailed explanation.</p>
+<p dir=3D"ltr">My additional concern, of course, is: Are other targets expo=
+sed to performance degradation, and why? </p>
+<p dir=3D"ltr">Thanks,<br>
+Aleksandar<br><br></p>
+<p dir=3D"ltr">&gt;<br>
+&gt; r~<br>
+&gt;<br>
+&gt;<br>
+&gt; Richard Henderson (4):<br>
+&gt; =C2=A0 target/ppc: Use probe_access for LSW, STSW<br>
+&gt; =C2=A0 target/ppc: Use probe_access for LMW, STMW<br>
+&gt; =C2=A0 target/ppc: Remove redundant mask in DCBZ<br>
+&gt; =C2=A0 target/ppc: Use probe_write for DCBZ<br>
+&gt;<br>
+&gt; =C2=A0target/ppc/mem_helper.c | 197 +++++++++++++++++++++++++++++++++-=
+------<br>
+&gt; =C2=A01 file changed, 162 insertions(+), 35 deletions(-)<br>
+&gt;<br>
+&gt; -- <br>
+&gt; 2.20.1<br>
+&gt;<br>
+&gt;<br>
+</p>
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 02cf53fc5b..deaa44f1ab 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4397,7 +4397,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB *=
-/
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON=
-;
--    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
-+    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_ON;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq =3D &spapr_irq_dual;
-     smc->dr_phb_enabled =3D true;
-@@ -4465,8 +4465,11 @@ DEFINE_SPAPR_MACHINE(5_0, "5.0", true);
-  */
- static void spapr_machine_4_2_class_options(MachineClass *mc)
- {
-+    SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+
-     spapr_machine_5_0_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len)=
-;
-+    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
- }
-=20
- DEFINE_SPAPR_MACHINE(4_2, "4.2", false);
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 481dfd2a27..d0d4b32a40 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -482,18 +482,36 @@ static void cap_large_decr_cpu_apply(SpaprMachineSt=
-ate *spapr,
- static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
-                                  Error **errp)
- {
-+    Error *local_err =3D NULL;
-     uint8_t kvm_val =3D kvmppc_get_cap_count_cache_flush_assist();
-=20
-     if (tcg_enabled() && val) {
--        /* TODO - for now only allow broken for TCG */
--        error_setg(errp,
--"Requested count cache flush assist capability level not supported by tc=
-g,"
--                   " try appending -machine cap-ccf-assist=3Doff");
-+        /* TCG doesn't implement anything here, but allow with a warning=
- */
-+        error_setg(&local_err,
-+                   "TCG doesn't support requested feature, cap-ccf-assis=
-t=3Don");
-     } else if (kvm_enabled() && (val > kvm_val)) {
-+        uint8_t kvm_ibs =3D kvmppc_get_cap_safe_indirect_branch();
-+
-+        if (kvm_ibs =3D=3D SPAPR_CAP_FIXED_CCD) {
-+            /*
-+             * If we don't have CCF assist on the host, the assist
-+             * instruction is a harmless no-op.  It won't correctly
-+             * implement the cache count flush *but* if we have
-+             * count-cache-disabled in the host, that flush is
-+             * unnnecessary.  So, specifically allow this case.  This
-+             * allows us to have better performance on POWER9 DD2.3,
-+             * while still working on POWER9 DD2.2 and POWER8 host
-+             * cpus.
-+             */
-+            return;
-+        }
-         error_setg(errp,
- "Requested count cache flush assist capability level not supported by kv=
-m,"
-                    " try appending -machine cap-ccf-assist=3Doff");
-     }
-+
-+    if (local_err !=3D NULL)
-+        warn_report_err(local_err);
- }
-=20
- SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
---=20
-2.24.1
-
+--0000000000009826b6059d517979--
 
