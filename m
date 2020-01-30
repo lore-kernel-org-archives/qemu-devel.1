@@ -6,76 +6,78 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08FF1C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C03C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:54:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCB00206D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29D7520702
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:54:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0T04jr0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB00206D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hmizm+s5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29D7520702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix9B4-00035R-Uu
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 07:44:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56721)
+	id 1ix9Kr-00058G-Dc
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 07:54:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ix961-0005QG-50
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:38:58 -0500
+ (envelope-from <berrange@redhat.com>) id 1ix9KI-0004f7-Br
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:53:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ix95z-0002CQ-No
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:38:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44389
+ (envelope-from <berrange@redhat.com>) id 1ix9KF-0000M5-OA
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:53:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59490
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ix95z-0002Am-It
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:38:55 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ix9KF-0000Ll-Jv
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:53:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580387935;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1580388818;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+GnB+cXdmokeSMQBdd0RXqARS2wmP6c0ELCqi+s3ZXw=;
- b=f0T04jr06TKVU/4of4V1KZ8+ccKjtwSHyfvbLRQUJEsa+BB87G8cQDQaVvRlJzklO9ApR2
- pZBDk1ZRlSZLyAGl84TF/+pgQ1NmAWM/XsZGfFmwORlLhafg85p7Rh4sZ+qKfPmuux6/Aj
- JwedbF9q2hwk1du5RUrZwu3GVxeJQZo=
+ bh=aPWEkAOnYYajQ4BI3QfXUmtTSwidKDEiL1+fRwqYAPw=;
+ b=Hmizm+s5Ut4FWFiSxBb/wCGiCo636mu8CBY8p87P5vZJCL6/L+XWpKpqYrzdfCTdnkhKYo
+ 1rTwsxi9UtRTW3kIiLYLrl3gyxrHAfSLQx6LJAy+PcayvXgOqtyUen0CKdLoctrOvgFBVv
+ uKOD9A3FramdFuaSY6IKgO3cp7YlEuo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-6O42ln5mP-2HYkY_Y9mkrA-1; Thu, 30 Jan 2020 07:38:53 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-219-Ain8VMxLMdKzMWeiTmWGuA-1; Thu, 30 Jan 2020 07:53:28 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89D021005510;
- Thu, 30 Jan 2020 12:38:52 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-25.ams2.redhat.com [10.36.117.25])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 736F677927;
- Thu, 30 Jan 2020 12:38:48 +0000 (UTC)
-Date: Thu, 30 Jan 2020 13:38:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1672800D5B;
+ Thu, 30 Jan 2020 12:53:27 +0000 (UTC)
+Received: from redhat.com (ovpn-112-54.ams2.redhat.com [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C37261001B07;
+ Thu, 30 Jan 2020 12:53:22 +0000 (UTC)
+Date: Thu, 30 Jan 2020 12:53:19 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
 Subject: Re: [PATCH 02/13] qcrypto-luks: implement encryption key management
-Message-ID: <20200130123847.GE6438@linux.fritz.box>
+Message-ID: <20200130125319.GD1891831@redhat.com>
 References: <20200114193350.10830-1-mlevitsk@redhat.com>
  <20200114193350.10830-3-mlevitsk@redhat.com>
  <87r1zti6r8.fsf@dusky.pond.sub.org>
  <dc902f2ba314b63da7ae7a003463f9268e7b3535.camel@redhat.com>
  <20200128171116.GU1446339@redhat.com>
  <20200128173251.GZ1446339@redhat.com>
+ <20200130123847.GE6438@linux.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20200128173251.GZ1446339@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 6O42ln5mP-2HYkY_Y9mkrA-1
+In-Reply-To: <20200130123847.GE6438@linux.fritz.box>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: Ain8VMxLMdKzMWeiTmWGuA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -92,126 +94,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.01.2020 um 18:32 hat Daniel P. Berrang=E9 geschrieben:
-> On Tue, Jan 28, 2020 at 05:11:16PM +0000, Daniel P. Berrang=E9 wrote:
-> > On Tue, Jan 21, 2020 at 03:13:01PM +0200, Maxim Levitsky wrote:
-> > > On Tue, 2020-01-21 at 08:54 +0100, Markus Armbruster wrote:
-> > >=20
-> > > <trimmed>
-> > >=20
-> > > > > +##
-> > > > > +# @LUKSKeyslotUpdate:
-> > > > > +#
-> > > > > +# @keyslot:         If specified, will update only keyslot with =
-this index
-> > > > > +#
-> > > > > +# @old-secret:      If specified, will only update keyslots that
-> > > > > +#                   can be opened with password which is contain=
-ed in
-> > > > > +#                   QCryptoSecret with @old-secret ID
-> > > > > +#
-> > > > > +#                   If neither @keyslot nor @old-secret is speci=
-fied,
-> > > > > +#                   first empty keyslot is selected for the upda=
-te
-> > > > > +#
-> > > > > +# @new-secret:      The ID of a QCryptoSecret object providing a=
- new decryption
-> > > > > +#                   key to place in all matching keyslots.
-> > > > > +#                   null/empty string erases all matching keyslo=
-ts
+On Thu, Jan 30, 2020 at 01:38:47PM +0100, Kevin Wolf wrote:
+> Am 28.01.2020 um 18:32 hat Daniel P. Berrang=C3=A9 geschrieben:
+> > On Tue, Jan 28, 2020 at 05:11:16PM +0000, Daniel P. Berrang=C3=A9 wrote=
+:
+> > > On Tue, Jan 21, 2020 at 03:13:01PM +0200, Maxim Levitsky wrote:
+> > > > On Tue, 2020-01-21 at 08:54 +0100, Markus Armbruster wrote:
 > > > >=20
-> > > > I hate making the empty string do something completely different th=
-an a
-> > > > non-empty string.
+> > > > <trimmed>
 > > > >=20
-> > > > What about making @new-secret optional, and have absent @new-secret
-> > > > erase?
+> > > > > > +##
+> > > > > > +# @LUKSKeyslotUpdate:
+> > > > > > +#
+> > > > > > +# @keyslot:         If specified, will update only keyslot wit=
+h this index
+> > > > > > +#
+> > > > > > +# @old-secret:      If specified, will only update keyslots th=
+at
+> > > > > > +#                   can be opened with password which is conta=
+ined in
+> > > > > > +#                   QCryptoSecret with @old-secret ID
+> > > > > > +#
+> > > > > > +#                   If neither @keyslot nor @old-secret is spe=
+cified,
+> > > > > > +#                   first empty keyslot is selected for the up=
+date
+> > > > > > +#
+> > > > > > +# @new-secret:      The ID of a QCryptoSecret object providing=
+ a new decryption
+> > > > > > +#                   key to place in all matching keyslots.
+> > > > > > +#                   null/empty string erases all matching keys=
+lots
+> > > > >=20
+> > > > > I hate making the empty string do something completely different =
+than a
+> > > > > non-empty string.
+> > > > >=20
+> > > > > What about making @new-secret optional, and have absent @new-secr=
+et
+> > > > > erase?
+> > > >=20
+> > > > I don't remember already why I and Keven Wolf decided to do this th=
+is way, but I think that you are right here.
+> > > > I don't mind personally to do this this way.
+> > > > empty string though is my addition, since its not possible to pass =
+null on command line.
 > > >=20
-> > > I don't remember already why I and Keven Wolf decided to do this this=
- way, but I think that you are right here.
-> > > I don't mind personally to do this this way.
-> > > empty string though is my addition, since its not possible to pass nu=
-ll on command line.
-> >=20
-> > IIUC this a result of using  "StrOrNull" for this one field...
-> >=20
-> >=20
-> > > > > +# Since: 5.0
-> > > > > +##
-> > > > > +{ 'struct': 'LUKSKeyslotUpdate',
-> > > > > +  'data': {
-> > > > > +           '*keyslot': 'int',
-> > > > > +           '*old-secret': 'str',
-> > > > > +           'new-secret' : 'StrOrNull',
-> > > > > +           '*iter-time' : 'int' } }
-> >=20
-> > It looks wierd here to be special casing "new-secret" to "StrOrNull"
-> > instead of just marking it as an optional string field
-> >=20
-> >    "*new-secret": "str"
-> >=20
-> > which would be possible to use from the command line, as you simply
-> > omit the field.
-> >=20
-> > I guess the main danger here is that we're using this as a trigger
-> > to erase keyslots. So simply omitting "new-secret" can result
-> > in damage to the volume by accident which is not an attractive
-> > mode.
-
-Right. It's been a while since I discussed this with Maxim, but I think
-this was the motivation for me to suggest an explicit null value.
-
-As long as we don't support passing null from the command line, I see
-the problem with it, though. Empty string (which I think we didn't
-discuss before) looks like a reasonable enough workaround to me, but if
-you think this is too much magic, then maybe not.
-
-> Thinking about this again, I really believe we ought to be moire
-> explicit about disabling the keyslot by having the "active" field.
-> eg
+> > > IIUC this a result of using  "StrOrNull" for this one field...
+> > >=20
+> > >=20
+> > > > > > +# Since: 5.0
+> > > > > > +##
+> > > > > > +{ 'struct': 'LUKSKeyslotUpdate',
+> > > > > > +  'data': {
+> > > > > > +           '*keyslot': 'int',
+> > > > > > +           '*old-secret': 'str',
+> > > > > > +           'new-secret' : 'StrOrNull',
+> > > > > > +           '*iter-time' : 'int' } }
+> > >=20
+> > > It looks wierd here to be special casing "new-secret" to "StrOrNull"
+> > > instead of just marking it as an optional string field
+> > >=20
+> > >    "*new-secret": "str"
+> > >=20
+> > > which would be possible to use from the command line, as you simply
+> > > omit the field.
+> > >=20
+> > > I guess the main danger here is that we're using this as a trigger
+> > > to erase keyslots. So simply omitting "new-secret" can result
+> > > in damage to the volume by accident which is not an attractive
+> > > mode.
 >=20
-> { 'struct': 'LUKSKeyslotUpdate',
->   'data': {
->           'active': 'bool',
->           '*keyslot': 'int',
->           '*old-secret': 'str',
->           '*new-secret' : 'str',
->           '*iter-time' : 'int' } }
+> Right. It's been a while since I discussed this with Maxim, but I think
+> this was the motivation for me to suggest an explicit null value.
 >=20
-> "new-secret" is thus only needed when "active" =3D=3D true.
+> As long as we don't support passing null from the command line, I see
+> the problem with it, though. Empty string (which I think we didn't
+> discuss before) looks like a reasonable enough workaround to me, but if
+> you think this is too much magic, then maybe not.
+>=20
+> > Thinking about this again, I really believe we ought to be moire
+> > explicit about disabling the keyslot by having the "active" field.
+> > eg
+> >=20
+> > { 'struct': 'LUKSKeyslotUpdate',
+> >   'data': {
+> >           'active': 'bool',
+> >           '*keyslot': 'int',
+> >           '*old-secret': 'str',
+> >           '*new-secret' : 'str',
+> >           '*iter-time' : 'int' } }
+> >=20
+> > "new-secret" is thus only needed when "active" =3D=3D true.
+>=20
+> Hm. At the very least, I would make 'active' optional and default to
+> true, so that for adding or updating you must only specify 'new-secret'
+> and for deleting only 'active'.
 
-Hm. At the very least, I would make 'active' optional and default to
-true, so that for adding or updating you must only specify 'new-secret'
-and for deleting only 'active'.
+Is that asymmetry really worth while ? It merely saves a few
+characters of typing by omitting "active: true", so I'm not
+really convinced.
 
-> This avoids the problem with being unable to specify a null for
-> StrOrNull on the command line too.
+>=20
+> > This avoids the problem with being unable to specify a null for
+> > StrOrNull on the command line too.
+>=20
+> If we ever get a way to pass null on the command line, how would we
+> think about a struct like this? Will it still feel right, or will it
+> feel like we feel about simple unions today (they exist, we would like
+> to get rid of them, but we can't because compatibility)?
 
-If we ever get a way to pass null on the command line, how would we
-think about a struct like this? Will it still feel right, or will it
-feel like we feel about simple unions today (they exist, we would like
-to get rid of them, but we can't because compatibility)?
+Personally I really don't like the idea of using "new-secret:null"
+as a way to request deletion of a keyslot. That's too magical
+for an action that is so dangerous to data IMhO.
 
-Instead of keeping talking about potential future extensions, would it
-make more sense to just extend the grammar of the keyval parser now so
-that you can specify a type, including null?
+I think of these operations as activating & deactivating keyslots,
+hence my suggestion to use an explicit "active: true|false" to
+associate the core action being performed, instead of inferring
+the action indirectly from the secret.
 
-We already wanted to use an alternate for keyslot (int) and old-secret
-(str) initially, which makes it clear on the schema level that you can
-only specify one of both. It would have worked fine for QMP, but not on
-the command line because we can't tell integers from strings there. If
-we can distinguish them as foo:int=3D2 and foo:str=3D2 then that wouldn't b=
-e
-a problem any more either.
+I think this could lend itself better to future extensions too.
+eg currently we're just activating or deactivating a keyslot.
+it is conceivable in future (LUKS2) we might want to modify an
+existing keyslot in some way. In that scenario, "active" can
+be updated to be allowed to be optional such that:
 
-Kevin
+ - active: true ->  activate a currently inactive keyslot
+ - active: false -> deactivate a currently active keyslot
+ - active omitted -> modify a currently active keyslot
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
