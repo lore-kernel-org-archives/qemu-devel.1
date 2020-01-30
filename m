@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDE1C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8D9C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:50:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34E7D2083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:49:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 459872083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:50:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDCVml6q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34E7D2083E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KEORGVD+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 459872083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixHgS-0002pu-CC
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:49:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59102)
+	id 1ixHhd-0004PR-D2
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:50:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ixHWc-0002Oy-Nf
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:59 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ixHcC-0004JT-1E
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ixHWb-0000sd-18
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:58 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36834
+ (envelope-from <mreitz@redhat.com>) id 1ixHcA-00034M-Ty
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:43 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44110
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ixHWa-0000op-D3
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:56 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ixHcA-00031B-Ok
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580420323;
+ s=mimecast20190719; t=1580420682;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4bJ8TzHQALlGcsbo6CfAHKgxLT0lBqzcK+7zzlvq1Zs=;
- b=bDCVml6qB/VWmaMTxLWCwfTAYcFeU2ZvmqpIg3BB8xo5mgKsoa2DPxBG9NIpq8idw5o2Iy
- U8QTasgG0fqAl/uSwkjtb3MwzLJ2GNXK1nAeMDR173dFTwUMLlFnGqgbliT/AHxgDhDnwv
- XWPWsU8k/lb6+lHdoOvuM3uaa8bqBbc=
+ bh=kNANRqxDaNAbjw3RnwVG76NgDmT98rBThz+qB88J5uY=;
+ b=KEORGVD+fyBBD8fEbBHmUwFld6q7alroLwA9VxXfwUmsitaKi+np4iY9Yn2TcG/lfPkek4
+ MZ8pnRIwwkxLVge4AeyIxOSK8w3ibmfrFET4mkvPTw0kCEsVLjjZZkwjWepe8kUfrrLfPv
+ BPHageZdn29alug0wDBzov/I5Fmj/AI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-kCCDpSp0M3aETlBpPT3fLg-1; Thu, 30 Jan 2020 16:38:40 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-252-blDjVaPEPtmcFeOqCsl9_A-1; Thu, 30 Jan 2020 16:44:39 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9443118A6EC1;
- Thu, 30 Jan 2020 21:38:39 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C141960BE0;
- Thu, 30 Jan 2020 21:38:33 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 3/5] memory.c: Use trace_event_get_state_backends()
-Date: Thu, 30 Jan 2020 21:38:12 +0000
-Message-Id: <20200130213814.334195-4-stefanha@redhat.com>
-In-Reply-To: <20200130213814.334195-1-stefanha@redhat.com>
-References: <20200130213814.334195-1-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 835039A879;
+ Thu, 30 Jan 2020 21:44:38 +0000 (UTC)
+Received: from localhost (ovpn-204-145.brq.redhat.com [10.40.204.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C6E777939;
+ Thu, 30 Jan 2020 21:44:37 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v3 02/21] blockdev: Allow resizing everywhere
+Date: Thu, 30 Jan 2020 22:44:12 +0100
+Message-Id: <20200130214431.333510-3-mreitz@redhat.com>
+In-Reply-To: <20200130214431.333510-1-mreitz@redhat.com>
+References: <20200130214431.333510-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: kCCDpSp0M3aETlBpPT3fLg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: blDjVaPEPtmcFeOqCsl9_A-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,85 +84,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+Block nodes that do not allow resizing should not share BLK_PERM_RESIZE.
+It does not matter whether they are the first non-filter in their chain
+or not.
 
-The preferred way to test whether a trace event is enabled is to
-use trace_event_get_state_backends(), because this will give the
-correct answer (allowing expensive computations to be skipped)
-whether the trace event is compile-time or run-time disabled.
-Convert the four old-style direct uses of TRACE_FOO_ENABLED in
-memory.c.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200120151142.18954-3-peter.maydell@linaro.org
-Message-Id: <20200120151142.18954-3-peter.maydell@linaro.org>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- memory.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ blockdev.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/memory.c b/memory.c
-index 854798791e..aeaa8dcc9e 100644
---- a/memory.c
-+++ b/memory.c
-@@ -434,7 +434,7 @@ static MemTxResult  memory_region_read_accessor(MemoryR=
-egion *mr,
-     tmp =3D mr->ops->read(mr->opaque, addr, size);
-     if (mr->subpage) {
-         trace_memory_region_subpage_read(get_cpu_index(), mr, addr, tmp, s=
-ize);
--    } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
-+    } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_READ=
-)) {
-         hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, s=
-ize);
-     }
-@@ -456,7 +456,7 @@ static MemTxResult memory_region_read_with_attrs_access=
-or(MemoryRegion *mr,
-     r =3D mr->ops->read_with_attrs(mr->opaque, addr, &tmp, size, attrs);
-     if (mr->subpage) {
-         trace_memory_region_subpage_read(get_cpu_index(), mr, addr, tmp, s=
-ize);
--    } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
-+    } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_READ=
-)) {
-         hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, s=
-ize);
-     }
-@@ -476,7 +476,7 @@ static MemTxResult memory_region_write_accessor(MemoryR=
-egion *mr,
+diff --git a/blockdev.c b/blockdev.c
+index d47ed8e569..bdd66d6c48 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3335,11 +3335,6 @@ void qmp_block_resize(bool has_device, const char *d=
+evice,
+     aio_context =3D bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
 =20
-     if (mr->subpage) {
-         trace_memory_region_subpage_write(get_cpu_index(), mr, addr, tmp, =
-size);
--    } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
-+    } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_WRIT=
-E)) {
-         hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, =
-size);
-     }
-@@ -496,7 +496,7 @@ static MemTxResult memory_region_write_with_attrs_acces=
-sor(MemoryRegion *mr,
-=20
-     if (mr->subpage) {
-         trace_memory_region_subpage_write(get_cpu_index(), mr, addr, tmp, =
-size);
--    } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
-+    } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_WRIT=
-E)) {
-         hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
-         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, =
-size);
-     }
+-    if (!bdrv_is_first_non_filter(bs)) {
+-        error_setg(errp, QERR_FEATURE_DISABLED, "resize");
+-        goto out;
+-    }
+-
+     if (size < 0) {
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "size", "a >0 size"=
+);
+         goto out;
 --=20
 2.24.1
 
