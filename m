@@ -2,77 +2,75 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3BBC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C051C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:56:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1878320708
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA3EC20708
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:56:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LtoxdsnW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1878320708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SyuAQt2I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA3EC20708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixHn9-0005lC-A1
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:56:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33405)
+	id 1ixHnZ-00069L-3t
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:56:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ixHcW-0004xd-PU
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:45:06 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ixHcM-0004cI-8U
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ixHcU-0004BZ-FQ
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:45:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42073
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1ixHcK-0003fC-GH
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:54 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51067
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ixHcU-0004A4-AJ
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:45:02 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ixHcK-0003c5-Ad
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580420701;
+ s=mimecast20190719; t=1580420692;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x/ebeROUpozO9G18Nn37Qclo1gAsS3p1IXwOd05lc8I=;
- b=LtoxdsnWH63ctD4RZwlbv4lExr6sjxIOBB7LIPI1M+1XgF5ySpd92R3uXl2R6zRlts7SX6
- zJS5eoeIDxU7ZO7KQycLTomnpCZJKxhHs3yOE8J+ZzzQLkOqm6LwE4sKJXaNS5a+W38M/w
- WR7D0x88rhddcZk06gdP821PBkhl4Ls=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=EcqaxMqEMxQzt/D3+IxWTW0CvvEpGGrBmPyEZ7IDHOQ=;
+ b=SyuAQt2ITsNRo+mxUUn5hEVVokraOMEcss11R1Y/MlwPjJN98pf1Uk1KKDoXXK61Rkmfm3
+ QVMmCNWCuqCvQbaHP5eXnlvSxFH3yPIUYp2VSOwJZ6WDouqpeGhp1kgNRrUzsjiejOLxmz
+ DYVvJHfRnw+04ak8YzAomZLYad61EZQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-eHk9S9_ONHazVFui3XAe4g-1; Thu, 30 Jan 2020 16:44:58 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-27-VnW5T_20OZC3KEpcVTvGGw-1; Thu, 30 Jan 2020 16:44:34 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B98B800E21;
- Thu, 30 Jan 2020 21:44:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6B826C3F2;
+ Thu, 30 Jan 2020 21:44:33 +0000 (UTC)
 Received: from localhost (ovpn-204-145.brq.redhat.com [10.40.204.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C6BEB19756;
- Thu, 30 Jan 2020 21:44:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F61887B00;
+ Thu, 30 Jan 2020 21:44:33 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 10/21] quorum: Implement .bdrv_recurse_can_replace()
-Date: Thu, 30 Jan 2020 22:44:20 +0100
-Message-Id: <20200130214431.333510-11-mreitz@redhat.com>
-In-Reply-To: <20200130214431.333510-1-mreitz@redhat.com>
-References: <20200130214431.333510-1-mreitz@redhat.com>
+Subject: [PATCH v3 00/21] block: Fix check_to_replace_node()
+Date: Thu, 30 Jan 2020 22:44:10 +0100
+Message-Id: <20200130214431.333510-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: eHk9S9_ONHazVFui3XAe4g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: VnW5T_20OZC3KEpcVTvGGw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,91 +89,139 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/quorum.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+Branch: https://github.com/XanClic/qemu.git fix-can-replace-v3
+Branch: https://git.xanclic.moe/XanClic/qemu.git fix-can-replace-v3
 
-diff --git a/block/quorum.c b/block/quorum.c
-index 6a7224c9e4..22c1060b42 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -825,6 +825,62 @@ static bool quorum_recurse_is_first_non_filter(BlockDr=
-iverState *bs,
-     return false;
- }
-=20
-+static bool quorum_recurse_can_replace(BlockDriverState *bs,
-+                                       BlockDriverState *to_replace)
-+{
-+    BDRVQuorumState *s =3D bs->opaque;
-+    int i;
-+
-+    for (i =3D 0; i < s->num_children; i++) {
-+        /*
-+         * We have no idea whether our children show the same data as
-+         * this node (@bs).  It is actually highly likely that
-+         * @to_replace does not, because replacing a broken child is
-+         * one of the main use cases here.
-+         *
-+         * We do know that the new BDS will match @bs, so replacing
-+         * any of our children by it will be safe.  It cannot change
-+         * the data this quorum node presents to its parents.
-+         *
-+         * However, replacing @to_replace by @bs in any of our
-+         * children's chains may change visible data somewhere in
-+         * there.  We therefore cannot recurse down those chains with
-+         * bdrv_recurse_can_replace().
-+         * (More formally, bdrv_recurse_can_replace() requires that
-+         * @to_replace will be replaced by something matching the @bs
-+         * passed to it.  We cannot guarantee that.)
-+         *
-+         * Thus, we can only check whether any of our immediate
-+         * children matches @to_replace.
-+         *
-+         * (In the future, we might add a function to recurse down a
-+         * chain that checks that nothing there cares about a change
-+         * in data from the respective child in question.  For
-+         * example, most filters do not care when their child's data
-+         * suddenly changes, as long as their parents do not care.)
-+         */
-+        if (s->children[i].child->bs =3D=3D to_replace) {
-+            int ret;
-+
-+            /*
-+             * We now have to ensure that there is no other parent
-+             * that cares about replacing this child by a node with
-+             * potentially different data.
-+             */
-+            s->children[i].to_be_replaced =3D true;
-+            ret =3D bdrv_child_refresh_perms(bs, s->children[i].child, NUL=
-L);
-+
-+            /* Revert permissions */
-+            s->children[i].to_be_replaced =3D false;
-+            bdrv_child_refresh_perms(bs, s->children[i].child, &error_abor=
-t);
-+
-+            return ret =3D=3D 0;
-+        }
-+    }
-+
-+    return false;
-+}
-+
- static int quorum_valid_threshold(int threshold, int num_children, Error *=
-*errp)
- {
-=20
-@@ -1197,6 +1253,7 @@ static BlockDriver bdrv_quorum =3D {
-=20
-     .is_filter                          =3D true,
-     .bdrv_recurse_is_first_non_filter   =3D quorum_recurse_is_first_non_fi=
-lter,
-+    .bdrv_recurse_can_replace           =3D quorum_recurse_can_replace,
-=20
-     .strong_runtime_opts                =3D quorum_strong_runtime_opts,
- };
+v1: https://lists.nongnu.org/archive/html/qemu-block/2019-09/msg01027.html
+v2: https://lists.nongnu.org/archive/html/qemu-block/2019-11/msg00370.html
+
+
+Hi,
+
+For what this series does, see the cover letter of v1 (linked above).
+
+
+In v3 I=E2=80=99ve addressed Vladimir=E2=80=99s further comments:
+- Patch 9: Skip the loop if c =3D=3D NULL (and also renamed @i to @child_i)
+
+- Patch 10: Drop local_err, check bdrv_child_refresh_perm()=E2=80=99s retur=
+n
+            value instead
+
+- Patch 11: Amended commit message and comment
+
+- Patch 12: Extended to cover the =E2=80=9Cnew=E2=80=9D compress filter dri=
+ver
+
+- Patch 15: Dropped; considering qemu never actually creates loops,
+            there is never an unsafe configuration.  Sometimes the user
+            may not get what they want, but then maybe this was actually
+            what they wanted.  I think the discussion I had with
+            Vladimir shows that this issue isn=E2=80=99t as clear-cut as I
+            thought, so let=E2=80=99s wait with a =E2=80=9Cfix=E2=80=9D unt=
+il someone actually
+            has a problem with the current behavior.
+
+- Patch 17: Dropped; was superseded by a patch from Thomas.
+
+- Patch 16 (was 18):
+  - Moved doc string under def
+  - Pointed out that @expected_node may be None, but this only means
+    that the leaf must not exist.
+  - Contracted asserts
+  - %s/path_node/child_name/
+  - Kept the prefix /, because, well, why not
+  - Kept % for formatting, because I don=E2=80=99t see the advantage of
+    .format() =E2=80=93 I would have liked to use f strings, but those were=
+ only
+    introduced in 3.6, and our minimum version is 3.5.
+
+- Patch 17: Added
+
+- Patch 18 (was 19): Dropped removal of self.vm.shutdown(), because
+                     that=E2=80=99s done by patch 17 now
+
+- Patch 20 (was 21): Moved doc strings under defs (kept R-b, because
+                     that seemed right to do)
+
+- Patch 21 (was 22): Moved doc string under def
+
+- Patch 23: Dropped, because it only tested things changed by the old
+            patch 17 (which I dropped, too)
+
+
+git backport-diff against v2:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respecti=
+vely
+
+001/21:[----] [--] 'blockdev: Allow external snapshots everywhere'
+002/21:[----] [--] 'blockdev: Allow resizing everywhere'
+003/21:[----] [--] 'block: Drop bdrv_is_first_non_filter()'
+004/21:[----] [--] 'iotests: Let 041 use -blockdev for quorum children'
+005/21:[----] [--] 'quorum: Fix child permissions'
+006/21:[----] [--] 'block: Add bdrv_recurse_can_replace()'
+007/21:[----] [--] 'blkverify: Implement .bdrv_recurse_can_replace()'
+008/21:[----] [--] 'quorum: Store children in own structure'
+009/21:[0014] [FC] 'quorum: Add QuorumChild.to_be_replaced'
+010/21:[0011] [FC] 'quorum: Implement .bdrv_recurse_can_replace()'
+011/21:[0002] [FC] 'block: Use bdrv_recurse_can_replace()'
+012/21:[0009] [FC] 'block: Remove bdrv_recurse_is_first_non_filter()'
+013/21:[----] [--] 'mirror: Double-check immediately before replacing'
+014/21:[----] [--] 'quorum: Stop marking it as a filter'
+015/21:[----] [--] 'iotests: Use complete_and_wait() in 155'
+016/21:[0053] [FC] 'iotests: Add VM.assert_block_path()'
+017/21:[down] 'iotests/041: Drop superfluous shutdowns'
+018/21:[0001] [FC] 'iotests: Resolve TODOs in 041'
+019/21:[----] [--] 'iotests: Use self.image_len in TestRepairQuorum'
+020/21:[0016] [FC] 'iotests: Add tests for invalid Quorum @replaces'
+021/21:[0006] [FC] 'iotests: Check that @replaces can replace filters'
+
+
+Max Reitz (21):
+  blockdev: Allow external snapshots everywhere
+  blockdev: Allow resizing everywhere
+  block: Drop bdrv_is_first_non_filter()
+  iotests: Let 041 use -blockdev for quorum children
+  quorum: Fix child permissions
+  block: Add bdrv_recurse_can_replace()
+  blkverify: Implement .bdrv_recurse_can_replace()
+  quorum: Store children in own structure
+  quorum: Add QuorumChild.to_be_replaced
+  quorum: Implement .bdrv_recurse_can_replace()
+  block: Use bdrv_recurse_can_replace()
+  block: Remove bdrv_recurse_is_first_non_filter()
+  mirror: Double-check immediately before replacing
+  quorum: Stop marking it as a filter
+  iotests: Use complete_and_wait() in 155
+  iotests: Add VM.assert_block_path()
+  iotests/041: Drop superfluous shutdowns
+  iotests: Resolve TODOs in 041
+  iotests: Use self.image_len in TestRepairQuorum
+  iotests: Add tests for invalid Quorum @replaces
+  iotests: Check that @replaces can replace filters
+
+ block.c                       |  85 +++++++++---------
+ block/blkverify.c             |  20 ++---
+ block/copy-on-read.c          |   9 --
+ block/filter-compress.c       |   9 --
+ block/mirror.c                |  14 ++-
+ block/quorum.c                | 160 ++++++++++++++++++++++++++--------
+ block/replication.c           |   7 --
+ block/throttle.c              |   8 --
+ blockdev.c                    |  10 ---
+ include/block/block.h         |   5 --
+ include/block/block_int.h     |  16 ++--
+ tests/qemu-iotests/041        | 138 +++++++++++++++++++++++++----
+ tests/qemu-iotests/041.out    |   4 +-
+ tests/qemu-iotests/155        |   7 +-
+ tests/qemu-iotests/iotests.py |  56 ++++++++++++
+ 15 files changed, 375 insertions(+), 173 deletions(-)
+
 --=20
 2.24.1
 
