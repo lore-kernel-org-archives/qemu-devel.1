@@ -2,94 +2,90 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C103C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 14:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BAEEC35240
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 14:49:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6636A20707
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 14:46:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD2DF206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 14:49:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kyec8s6W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6636A20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="foNWFr3W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD2DF206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixB5o-0005RU-Gf
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 09:46:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40820)
+	id 1ixB8J-0007rK-Vo
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 09:49:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1ixB3a-0003Hy-F8
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:36 -0500
+ (envelope-from <armbru@redhat.com>) id 1ixB69-00061r-Qx
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:47:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1ixB3Y-0005sq-RM
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:34 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50470)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1ixB3Y-0005pG-Hu
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:44:32 -0500
-Received: by mail-wm1-x343.google.com with SMTP id a5so4054587wmb.0
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 06:44:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:subject:cc:to:in-reply-to:references:message-id
- :mime-version:content-transfer-encoding;
- bh=qvdK5B4XKOkiToFAYkkk7yFU/MqqgXAYKVstcPizdMc=;
- b=kyec8s6Wbznncts8jntQA9U0nIdIa1CtUBICr4rB9cZkeAnKfqxDgGlUTa7jgZGN/d
- eXUqPnW0MiYTL0KgzUDu+EroeW426tdTTKrLH7fFemRY+xBtPYmVZrxzCFWunOQQKWbL
- XZdlszD0fLqojz9fNPOw4kiA8xot8Udn804bLKZ8IE3jtOzp2hcNeBRxlnSfbi85lRyr
- ZsfP1+UT3Uc9jmQOzEHNwiJRujj4S4FflKv4Xito7VePo1h0f5CsdXTIkS/7Nu7WQeil
- 9ROvTM/zowYKSlCWBXiUUbyU0T45O3+xez2EYNRZE8EUcXYUNIE/0uUzOh9d3WA09OmP
- wInA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
- :message-id:mime-version:content-transfer-encoding;
- bh=qvdK5B4XKOkiToFAYkkk7yFU/MqqgXAYKVstcPizdMc=;
- b=VGy22exnUCbp8xz3v7Y7qv/flZxXc87yjo073uScDNRHJCPsqSFqI3IMDrLtlC3pdu
- 3OHpPFDSsOg5b+5sOp5JRELJiZMuW7x3mb/2xDdQQMmBBYXNshU6Ogrxveh3js65uc8t
- 3iHUO5So3m6Vj5N0c7XTsgg6SC3cX+OzSL3HmRGa3cTbjxdKs3y/mO10dEs8ODhuojLL
- l6Px62r6PPkMm4y67wvG+gDRpgE2sKqDvmMjMuB8H0Ruy8ubXKac67D2Gh3S7skFX6qF
- ug7y+kG8vldmUmYlYt0kbYn3UTPfzDl8haGabsn4KceUWV0/1hJadbGw04r0UHukW8vW
- NfPg==
-X-Gm-Message-State: APjAAAW6tOX7KJLnZrZfZdAdv6GmF78IBQ+eMoxW/UMn/HhSMnHWmc0M
- KuesUilJkW9DaVRHdCQgwySgQQ==
-X-Google-Smtp-Source: APXvYqxS1e6rD0p1CkgzDDXA9E1qXpOYwk0lDnmbZzy9eJZ3pH7p1r+48Rw7VItL4CnZByqmb/sWxQ==
-X-Received: by 2002:a05:600c:20e:: with SMTP id
- 14mr6090548wmi.104.1580395470839; 
- Thu, 30 Jan 2020 06:44:30 -0800 (PST)
-Received: from localhost ([2a00:79e0:d:11:1da2:3fd4:a302:4fff])
- by smtp.gmail.com with ESMTPSA id z21sm6590494wml.5.2020.01.30.06.44.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 06:44:30 -0800 (PST)
-Date: Thu, 30 Jan 2020 06:44:30 -0800 (PST)
-X-Google-Original-Date: Thu, 30 Jan 2020 14:44:24 GMT (+0000)
-From: Palmer Dabbelt <palmerdabbelt@google.com>
-X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
-Subject: Re: [PATCH v2 1/2] target/riscv: Emulate TIME CSRs for privileged mode
-CC: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, sagark@eecs.berkeley.edu,
- Atish Patra <Atish.Patra@wdc.com>, 
- anup@brainfault.org, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- Anup Patel <Anup.Patel@wdc.com>
-To: Anup Patel <Anup.Patel@wdc.com>
-In-Reply-To: <20200122112952.94284-2-anup.patel@wdc.com>
-References: <20200122112952.94284-2-anup.patel@wdc.com>
- <20200122112952.94284-1-anup.patel@wdc.com>
-Message-ID: <mhng-917b8eb4-84ed-4b93-836d-186c70d302e0@palmerdabbelt-glaptop1>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+ (envelope-from <armbru@redhat.com>) id 1ixB66-0004AV-VA
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:47:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53761
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ixB66-00046h-Rq
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 09:47:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580395629;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+WOuojqhG3Knbh0/cyr8zEdG89BbXDN/3MUWOCMAzB8=;
+ b=foNWFr3WZeuKY+D6DJe5PKVz+4T5mIGZgmirbfp5gZ+FTpo7SftqCx3RthuZ8xNrol5iAR
+ ua8SkOc3DgTgSYydg+VB0h8tpnmpfiHIrSzbd8ASY+jxjCBOzbRaq3SchtRj8M2Frlk9j/
+ ifRPxLmQXbruketlXxS/9QtFgaErMqE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-xOuNnqq5Nf6bEjZ-r6Z5EA-1; Thu, 30 Jan 2020 09:47:05 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C5A68010DD;
+ Thu, 30 Jan 2020 14:47:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A4D3048;
+ Thu, 30 Jan 2020 14:47:01 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3587F1138404; Thu, 30 Jan 2020 15:47:00 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH 02/13] qcrypto-luks: implement encryption key management
+References: <20200114193350.10830-1-mlevitsk@redhat.com>
+ <20200114193350.10830-3-mlevitsk@redhat.com>
+ <87r1zti6r8.fsf@dusky.pond.sub.org>
+ <dc902f2ba314b63da7ae7a003463f9268e7b3535.camel@redhat.com>
+ <20200128171116.GU1446339@redhat.com>
+ <20200128173251.GZ1446339@redhat.com>
+ <20200130123847.GE6438@linux.fritz.box>
+ <20200130125319.GD1891831@redhat.com>
+Date: Thu, 30 Jan 2020 15:47:00 +0100
+In-Reply-To: <20200130125319.GD1891831@redhat.com> ("Daniel P. =?utf-8?Q?B?=
+ =?utf-8?Q?errang=C3=A9=22's?=
+ message of "Thu, 30 Jan 2020 12:53:19 +0000")
+Message-ID: <87zhe5ovbv.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: xOuNnqq5Nf6bEjZ-r6Z5EA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,206 +97,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 Jan 2020 11:30:31 GMT (+0000), Anup Patel wrote:
-> Currently, TIME CSRs are emulated only for user-only mode. This
-> patch add TIME CSRs emulation for privileged mode.
->
-> For privileged mode, the TIME CSRs will return value provided
-> by rdtime callback which is registered by QEMU machine/platform
-> emulation (i.e. CLINT emulation). If rdtime callback is not
-> available then the monitor (i.e. OpenSBI) will trap-n-emulate
-> TIME CSRs in software.
->
-> We see 25+% performance improvement in hackbench numbers when
-> TIME CSRs are not trap-n-emulated.
->
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/cpu.h        |  5 +++
->  target/riscv/cpu_helper.c |  5 +++
->  target/riscv/csr.c        | 86 +++++++++++++++++++++++++++++++++++++--
->  3 files changed, 92 insertions(+), 4 deletions(-)
->
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 53bc6af5f7..473e01da6c 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -169,6 +169,7 @@ struct CPURISCVState {
->      target_ulong htval;
->      target_ulong htinst;
->      target_ulong hgatp;
-> +    uint64_t htimedelta;
->  
->      /* Virtual CSRs */
->      target_ulong vsstatus;
-> @@ -204,6 +205,9 @@ struct CPURISCVState {
->      /* physical memory protection */
->      pmp_table_t pmp_state;
->  
-> +    /* machine specific rdtime callback */
-> +    uint64_t (*rdtime_fn)(void);
-> +
->      /* True if in debugger mode.  */
->      bool debugger;
->  #endif
-> @@ -325,6 +329,7 @@ void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env);
->  int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts);
->  uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value);
->  #define BOOL_TO_MASK(x) (-!!(x)) /* helper for riscv_cpu_update_mip value */
-> +void riscv_cpu_set_rdtime_fn(CPURISCVState *env, uint64_t (*fn)(void));
->  #endif
->  void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv);
->  
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 7166e6199e..c85f44d933 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -250,6 +250,11 @@ uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
->      return old;
->  }
->  
-> +void riscv_cpu_set_rdtime_fn(CPURISCVState *env, uint64_t (*fn)(void))
-> +{
-> +    env->rdtime_fn = fn;
-> +}
-> +
->  void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
->  {
->      if (newpriv > PRV_M) {
-> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> index b28058f9d5..44ff1d80ec 100644
-> --- a/target/riscv/csr.c
-> +++ b/target/riscv/csr.c
-> @@ -238,6 +238,32 @@ static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
->  
->  #else /* CONFIG_USER_ONLY */
->  
-> +static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
-> +{
-> +    uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
-> +
-> +    if (!env->rdtime_fn) {
-> +        return -1;
-> +    }
-> +
-> +    *val = env->rdtime_fn() + delta;
-> +    return 0;
-> +}
-> +
-> +#if defined(TARGET_RISCV32)
-> +static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
-> +{
-> +    uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
-> +
-> +    if (!env->rdtime_fn) {
-> +        return -1;
-> +    }
-> +
-> +    *val = (env->rdtime_fn() + delta) >> 32;
-> +    return 0;
-> +}
-> +#endif
-> +
->  /* Machine constants */
->  
->  #define M_MODE_INTERRUPTS  (MIP_MSIP | MIP_MTIP | MIP_MEIP)
-> @@ -931,6 +957,56 @@ static int write_hgatp(CPURISCVState *env, int csrno, target_ulong val)
->      return 0;
->  }
->  
-> +static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *val)
-> +{
-> +    if (!env->rdtime_fn) {
-> +        return -1;
-> +    }
-> +
-> +#if defined(TARGET_RISCV32)
-> +    *val = env->htimedelta & 0xffffffff;
-> +#else
-> +    *val = env->htimedelta;
-> +#endif
-> +    return 0;
-> +}
-> +
-> +static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong val)
-> +{
-> +    if (!env->rdtime_fn) {
-> +        return -1;
-> +    }
-> +
-> +#if defined(TARGET_RISCV32)
-> +    env->htimedelta = deposit64(env->htimedelta, 0, 32, (uint64_t)val);
-> +#else
-> +    env->htimedelta = val;
-> +#endif
-> +    return 0;
-> +}
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Oh, I guess I missed this when reading Alistair's H extension patches, but it
-looks like htimedelta is mandatory.  In other words, these writes should
-succeed regardless of whether or not rdtime is implemented.  I opened a
-question on the spec to make sure, but if that's the case then it should always
-be implemented: https://github.com/riscv/riscv-isa-manual/issues/481
+> On Thu, Jan 30, 2020 at 01:38:47PM +0100, Kevin Wolf wrote:
+>> Am 28.01.2020 um 18:32 hat Daniel P. Berrang=C3=A9 geschrieben:
+>> > On Tue, Jan 28, 2020 at 05:11:16PM +0000, Daniel P. Berrang=C3=A9 wrot=
+e:
+>> > > On Tue, Jan 21, 2020 at 03:13:01PM +0200, Maxim Levitsky wrote:
+>> > > > On Tue, 2020-01-21 at 08:54 +0100, Markus Armbruster wrote:
+>> > > >=20
+>> > > > <trimmed>
+>> > > >=20
+>> > > > > > +##
+>> > > > > > +# @LUKSKeyslotUpdate:
+>> > > > > > +#
+>> > > > > > +# @keyslot:         If specified, will update only keyslot wi=
+th this index
+>> > > > > > +#
+>> > > > > > +# @old-secret:      If specified, will only update keyslots t=
+hat
+>> > > > > > +#                   can be opened with password which is cont=
+ained in
+>> > > > > > +#                   QCryptoSecret with @old-secret ID
+>> > > > > > +#
+>> > > > > > +#                   If neither @keyslot nor @old-secret is sp=
+ecified,
+>> > > > > > +#                   first empty keyslot is selected for the u=
+pdate
+>> > > > > > +#
+>> > > > > > +# @new-secret:      The ID of a QCryptoSecret object providin=
+g a new decryption
+>> > > > > > +#                   key to place in all matching keyslots.
+>> > > > > > +#                   null/empty string erases all matching key=
+slots
+>> > > > >=20
+>> > > > > I hate making the empty string do something completely different=
+ than a
+>> > > > > non-empty string.
+>> > > > >=20
+>> > > > > What about making @new-secret optional, and have absent @new-sec=
+ret
+>> > > > > erase?
+>> > > >=20
+>> > > > I don't remember already why I and Keven Wolf decided to do this t=
+his way, but I think that you are right here.
+>> > > > I don't mind personally to do this this way.
+>> > > > empty string though is my addition, since its not possible to pass=
+ null on command line.
+>> > >=20
+>> > > IIUC this a result of using  "StrOrNull" for this one field...
+>> > >=20
+>> > >=20
+>> > > > > > +# Since: 5.0
+>> > > > > > +##
+>> > > > > > +{ 'struct': 'LUKSKeyslotUpdate',
+>> > > > > > +  'data': {
+>> > > > > > +           '*keyslot': 'int',
+>> > > > > > +           '*old-secret': 'str',
+>> > > > > > +           'new-secret' : 'StrOrNull',
+>> > > > > > +           '*iter-time' : 'int' } }
+>> > >=20
+>> > > It looks wierd here to be special casing "new-secret" to "StrOrNull"
+>> > > instead of just marking it as an optional string field
+>> > >=20
+>> > >    "*new-secret": "str"
+>> > >=20
+>> > > which would be possible to use from the command line, as you simply
+>> > > omit the field.
+>> > >=20
+>> > > I guess the main danger here is that we're using this as a trigger
+>> > > to erase keyslots. So simply omitting "new-secret" can result
+>> > > in damage to the volume by accident which is not an attractive
+>> > > mode.
+>>=20
+>> Right. It's been a while since I discussed this with Maxim, but I think
+>> this was the motivation for me to suggest an explicit null value.
 
-> +
-> +#if defined(TARGET_RISCV32)
-> +static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *val)
-> +{
-> +    if (!env->rdtime_fn) {
-> +        return -1;
-> +    }
-> +
-> +    *val = env->htimedelta >> 32;
-> +    return 0;
-> +}
-> +
-> +static int write_htimedeltah(CPURISCVState *env, int csrno, target_ulong val)
-> +{
-> +    if (!env->rdtime_fn) {
-> +        return -1;
-> +    }
-> +
-> +    env->htimedelta = deposit64(env->htimedelta, 32, 32, (uint64_t)val);
-> +    return 0;
-> +}
-> +#endif
-> +
->  /* Virtual CSR Registers */
->  static int read_vsstatus(CPURISCVState *env, int csrno, target_ulong *val)
->  {
-> @@ -1203,14 +1279,12 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
->      [CSR_INSTRETH] =            { ctr,  read_instreth                       },
->  #endif
->  
-> -    /* User-level time CSRs are only available in linux-user
-> -     * In privileged mode, the monitor emulates these CSRs */
-> -#if defined(CONFIG_USER_ONLY)
-> +    /* In privileged mode, the monitor will have to emulate TIME CSRs only if
-> +     * rdtime callback is not provided by machine/platform emulation */
->      [CSR_TIME] =                { ctr,  read_time                           },
->  #if defined(TARGET_RISCV32)
->      [CSR_TIMEH] =               { ctr,  read_timeh                          },
->  #endif
-> -#endif
->  
->  #if !defined(CONFIG_USER_ONLY)
->      /* Machine Timers and Counters */
-> @@ -1276,6 +1350,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
->      [CSR_HTVAL] =               { hmode,   read_htval,       write_htval      },
->      [CSR_HTINST] =              { hmode,   read_htinst,      write_htinst     },
->      [CSR_HGATP] =               { hmode,   read_hgatp,       write_hgatp      },
-> +    [CSR_HTIMEDELTA] =          { hmode,   read_htimedelta,  write_htimedelta },
-> +#if defined(TARGET_RISCV32)
-> +    [CSR_HTIMEDELTAH] =         { hmode,   read_htimedeltah, write_htimedeltah},
-> +#endif
->  
->      [CSR_VSSTATUS] =            { hmode,   read_vsstatus,    write_vsstatus   },
->      [CSR_VSIP] =                { hmode,   NULL,     NULL,     rmw_vsip       },
-> -- 
-> 2.17.1
+A bit of redundancy to guard against catastrophic accidents makes sense.
+We can discuss its shape.
+
+>> As long as we don't support passing null from the command line, I see
+>> the problem with it, though. Empty string (which I think we didn't
+>> discuss before) looks like a reasonable enough workaround to me, but if
+>> you think this is too much magic, then maybe not.
+>>=20
+>> > Thinking about this again, I really believe we ought to be moire
+>> > explicit about disabling the keyslot by having the "active" field.
+>> > eg
+>> >=20
+>> > { 'struct': 'LUKSKeyslotUpdate',
+>> >   'data': {
+>> >           'active': 'bool',
+>> >           '*keyslot': 'int',
+>> >           '*old-secret': 'str',
+>> >           '*new-secret' : 'str',
+>> >           '*iter-time' : 'int' } }
+>> >=20
+>> > "new-secret" is thus only needed when "active" =3D=3D true.
+
+I figure @iter-time, too.
+
+>> Hm. At the very least, I would make 'active' optional and default to
+>> true, so that for adding or updating you must only specify 'new-secret'
+>> and for deleting only 'active'.
+>
+> Is that asymmetry really worth while ? It merely saves a few
+> characters of typing by omitting "active: true", so I'm not
+> really convinced.
+>
+>> > This avoids the problem with being unable to specify a null for
+>> > StrOrNull on the command line too.
+>>=20
+>> If we ever get a way to pass null on the command line, how would we
+>> think about a struct like this? Will it still feel right, or will it
+>> feel like we feel about simple unions today (they exist, we would like
+>> to get rid of them, but we can't because compatibility)?
+>
+> Personally I really don't like the idea of using "new-secret:null"
+> as a way to request deletion of a keyslot. That's too magical
+> for an action that is so dangerous to data IMhO.
+
+I tend to agree.  Expressing "zap the secret" as '"new-secret": null' is
+clever and kind of cute, but "clever" and "cute" have no place next to
+"irrevocably destroy data".
+
+> I think of these operations as activating & deactivating keyslots,
+> hence my suggestion to use an explicit "active: true|false" to
+> associate the core action being performed, instead of inferring
+> the action indirectly from the secret.
+>
+> I think this could lend itself better to future extensions too.
+> eg currently we're just activating or deactivating a keyslot.
+> it is conceivable in future (LUKS2) we might want to modify an
+> existing keyslot in some way. In that scenario, "active" can
+> be updated to be allowed to be optional such that:
+>
+>  - active: true ->  activate a currently inactive keyslot
+>  - active: false -> deactivate a currently active keyslot
+>  - active omitted -> modify a currently active keyslot
+
+A boolean provides two actions.  By making it optional, we can squeeze
+out a third, at the price of making the interface unintuitive: how would
+you know what "@active absent" means without looking it up?
+
+Why not have an @action of enum type instead?  Values "add" and "delete"
+now (or "activate" and "deactivate", whatever makes the most sense when
+writing the docs), leaving us room to later add whatever comes up.
+
+This also lets us turn LUKSKeyslotUpdate into a union.
+
+Brief detour before I sketch that: update safety.
+
+Unless writing a keyslot is atomic, i.e. always either succeeds
+completely, or fails without changing anything, updating a slot in place
+is dangerous: you may destroy the old key without getting your new one
+in place.
+
+To safely replace an existing secret, you first write the new secret to
+a free slot, and only when that succeeded, you delete the old one.
+
+This leads to the following safe operations:
+
+* "Activate": write a secret to a free keyslot (chosen by the system)
+
+* "Deactivate": delete an existing secret from all keyslots containing
+  it (commonly just one)
+
+Dangerous and unwanted:
+
+* Replace existing secret in place
+
+Low-level operations we may or may not want to support:
+
+* Write a secret to specific keyslot (dangerous unless it's free)
+
+* Zap a specific keyslot (hope it contains the secret you think it does)
+
+Now let me sketch LUKSKeyslotUpdate as union.  First without support for
+the low-level operations:
+
+    { state: 'LUKSKeyslotUpdateAction',
+      'data': [ 'add', 'delete' ] }
+    { 'struct': 'LUKSKeyslotAdd',
+      'data': { 'secret': 'str',
+                '*iter-time': 'int' } }
+    { 'struct': 'LUKSKeyslotDelete',
+      'data': { 'secret': 'str' }
+    { 'union: 'LUKSKeyslotUpdate',
+      'base': { 'action': 'LUKSKeyslotUpdateAction' }
+      'discriminator': 'action',
+      'data': { 'add': 'LUKSKeyslotAdd' },
+              { 'delete': 'LUKSKeyslotDelete' } }
+
+Since @secret occurs in all variants, we could also put it in @base
+instead.  Matter of taste.  I think this way is clearer.  Lets us easily
+add a variant that doesn't want @secret later on (although moving it
+from @base to variants then would be possible).
+
+Compare:
+
+* Activate free keyslot to hold a secret
+
+  { "new-secret": "CIA/GRU/MI6" }
+
+  vs.
+
+  { "active": true, "new-secret": "CIA/GRU/MI6" }
+
+  vs.
+
+  { "action": "add", "secret": "CIA/GRU/MI6" }
+
+* Deactivate keyslots holding a secret
+
+  { "old-secret": "CIA/GRU/MI6", "new-secret": null }
+
+  vs.
+
+  { "active": false, "old-secret": "CIA/GRU/MI6" }
+
+  vs.
+
+  { "action": "delete", "secret": "CIA/GRU/MI6" }
+
+* Replace existing secret in-place (unsafe!)
+
+  { "old-secret": "OSS/NKVD/MI6", "new-secret": "CIA/GRU/MI6" }
+
+  vs.
+
+  Can't do.
+
+Now let's add support for the low-level operations.  To "write specific
+slot" to "add", we add optional LUKSKeyslotAdd member @keyslot to direct
+the write to that keyslot instead of the first free one:
+
+    { 'struct': 'LUKSKeyslotAdd',
+      'data': { 'secret': 'str',
+                '*keyslot': 'int',
+                '*iter-time': 'int' } }
+
+To add "zap specific slot" to delete, we need to pass a slot number
+instead of the old secret.  We could add member @keyslot, make both
+optional, and require users to specify exactly one of them:
+
+    { 'struct': 'LUKSKeyslotDelete',
+      'data': { '*secret': 'str',       # must pass either @secret
+                '*keyslot': 'int' } }   # or @keyslot
+
+Or we use an alternate:
+
+    { 'alternate': 'LUKSKeyslotMatch',
+      'data': { 'secret': 'str',
+                'keyslot': 'int' } }
+    { 'struct': 'LUKSKeyslotDelete',
+      'data': { 'match': 'LUKSKeyslotMatch' } }
+
+Hmm, that gets us into trouble with dotted keys, because match=3D1 could
+be keyslot#1 or the (truly bad) secret "1".  Nevermind.
+
+Or we add a separate "zap" action:
+
+    { state: 'LUKSKeyslotUpdateAction',
+      'data': [ 'add', 'delete', 'zap' ] }
+    { 'struct': 'LUKSKeyslotZap',
+      'data': { 'keyslot': 'int' } }
+    { 'union: 'LUKSKeyslotUpdate',
+      'base': { 'action': 'LUKSKeyslotUpdateAction' }
+      'discriminator': 'action',
+      'data': { 'add': 'LUKSKeyslotAdd' },
+              { 'delete': 'LUKSKeyslotDelete' },
+              { 'zap': 'LUKSKeyslotZap' } }
+
+Compare:
+
+* Write to keyslot#1
+
+  { "new-secret": "CIA/GRU/MI6", "keyslot": 1 }
+
+  vs.
+
+  { "active": true, "new-secret": "CIA/GRU/MI6", "keyslot": 1 }
+
+  vs.
+
+  { "action": "add", "secret": "CIA/GRU/MI6", "keyslot": 1 }
+
+* Zap keyslot#1
+
+  { "keyslot": 1, "new-secret": null }
+
+  vs.
+
+  { "active": false, "keyslot": 1 }
+
+  vs.
+
+  { "action": "delete", "keyslot": 1 }
+
+  vs.
+
+  { "action": "zap", "keyslot": 1 }
+
 
