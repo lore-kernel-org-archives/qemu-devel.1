@@ -2,96 +2,82 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7191C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0599C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A56D2206D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 897EB206D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:13:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgBjjCSR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A56D2206D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BTeKRohg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 897EB206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix8dW-0004yD-SG
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 07:09:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47815)
+	id 1ix8hc-0006GE-O5
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 07:13:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1ix8cr-0004XC-4m
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:08:50 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ix8gt-0005km-39
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:13:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1ix8cp-0001MB-ST
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:08:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34780
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1ix8gr-0005tg-QS
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:12:58 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38039
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ix8cp-0001LS-OY
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:08:47 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ix8gr-0005t5-MD
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:12:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580386127;
+ s=mimecast20190719; t=1580386376;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PQkr37P3wT+j2zb7nIW/ZpplqJYLktcWdljU7AwQJOU=;
- b=UgBjjCSRIF57SzYCTyPKrhwkHONQfLIWx6TC92ZpeIy4OCxBWQP+KCxL7gidR5wmGU8M8x
- x971AWLRO1+2FYs8EIBOFLkO+2HYg4cue84K/j4aURDppuN3pmLme0Pc4462/GlWT4CWcd
- bzX+dlYu8F/gqxE5DT2VmX3TnIKpEMI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-tV-N2bp9OyK3Romt-qrFnw-1; Thu, 30 Jan 2020 07:08:37 -0500
-Received: by mail-wr1-f69.google.com with SMTP id f17so1608565wrt.19
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 04:08:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=p5BBHU2C9JsaGC0vMppc6DoQVK9NNkJWp8wx/IxGIW4=;
- b=SfKtbghsvLwv35LWhNkht1rJi2OG5znJPIsxPJ+j+d+IZKTvyfdGHJEb5uuQIoWLtn
- /ccEcWnQ8BudgMPfDJpHFlXWqJirzldsrPy5l5fFZoisKY3ompo5sWCGSZTJh0owvLBF
- swEPAuoinQhvdTBE2Bu1RdS4FVBN2Q3VdJM4NMVBcxX9o11eV8fWSYKNwzDZCIwti1Pv
- xscmlok4h4x3vog+VRE9xmbRsAg9dCQDGy1n33Zgn2X1qqlGAjGGZUska95UFwg6D+L4
- m6NTyjkllRSFTdRVs0OHQF94gsmv0ims7wqLkYqAGmR0WO0ZT/bdd9/iNrIWGJYrLHM4
- 38rA==
-X-Gm-Message-State: APjAAAUcagJ4igmgAwCmHuqpVAdLXfB+sMDIPKeDnKe7YMBHF6pTpvXP
- cIlBM8ypBtIxNfbMT0bVxvR3WAv3DNRNox15m94gxPSH5ckfPobk9ACpg0NnpyqylKxw68yULhg
- x2gOKUAnbQ6X0NZs=
-X-Received: by 2002:adf:e38f:: with SMTP id e15mr884833wrm.271.1580386115711; 
- Thu, 30 Jan 2020 04:08:35 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxxHfHFrhPfmdrc3sj16YfulZd36P0gtJL/9Q2as2xbptWQ7snAMWTGs1uyrk0QNAz+4u7naQ==
-X-Received: by 2002:adf:e38f:: with SMTP id e15mr884795wrm.271.1580386115394; 
- Thu, 30 Jan 2020 04:08:35 -0800 (PST)
-Received: from steredhat (host209-4-dynamic.27-79-r.retail.telecomitalia.it.
- [79.27.4.209])
- by smtp.gmail.com with ESMTPSA id r15sm6065061wmh.21.2020.01.30.04.08.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 04:08:34 -0800 (PST)
-Date: Thu, 30 Jan 2020 13:08:32 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Liam Merwick <liam.merwick@oracle.com>
-Subject: Re: [PATCH 6/6] tests/boot_linux_console: add PVH acceptance tests
-Message-ID: <20200130120832.hlltgk26u5h3ddrz@steredhat>
-References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-7-git-send-email-liam.merwick@oracle.com>
+ bh=MrdBeCdq6d+adJxZVg9QAVq3KRP+KsZyWI9f08e5oRM=;
+ b=BTeKRohgTaJC2La7tlLXIv3NetgTFcMIXPj9UkiXRV6TTsbLIeTckzS1rejBPZqep6IpZz
+ ldazbpEWr8TJVG3gw31++2Cq2UuwlYtuCqyRPlfN51RLRK5+t58VhyRkw3I0ymwwqakLyU
+ 1w1/HPdBY2GyCSxpTXG1uBJYM85Snjs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-j4bOS8UwOU6djpanWu7Ldg-1; Thu, 30 Jan 2020 07:12:55 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B272E10054E3;
+ Thu, 30 Jan 2020 12:12:53 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-25.ams2.redhat.com [10.36.117.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B11087B00;
+ Thu, 30 Jan 2020 12:12:52 +0000 (UTC)
+Date: Thu, 30 Jan 2020 13:12:50 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: request_alignment vs file size, how to fix crash?
+Message-ID: <20200130121250.GD6438@linux.fritz.box>
+References: <2ca46523-44a2-1a48-dfa3-11bda9eef8e8@virtuozzo.com>
+ <24d1a5f8-1f01-ec64-778d-5bab440714c7@virtuozzo.com>
+ <20200130111144.GC6438@linux.fritz.box>
+ <72b2fae2-dcd6-e2f2-c497-300302559ca4@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1580142994-1836-7-git-send-email-liam.merwick@oracle.com>
-X-MC-Unique: tV-N2bp9OyK3Romt-qrFnw-1
+In-Reply-To: <72b2fae2-dcd6-e2f2-c497-300302559ca4@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: j4bOS8UwOU6djpanWu7Ldg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,115 +89,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, slp@redhat.com, alex.bennee@linaro.org,
- qemu-devel@nongnu.org, wainersm@redhat.com, pbonzini@redhat.com,
- philmd@redhat.com
+Cc: Nir Soffer <nsoffer@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 27, 2020 at 04:36:34PM +0000, Liam Merwick wrote:
-> Add tests to boot an uncompressed kernel using the x86/HVM direct boot AB=
-I.
-> The vmlinux binary is obtained from a small RPM for Kata containers and
-> extracted using the new extract_from_rpm() method.
+Am 30.01.2020 um 12:30 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 30.01.2020 14:11, Kevin Wolf wrote:
+> > Am 30.01.2020 um 11:40 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > 29.01.2020 21:01, Vladimir Sementsov-Ogievskiy wrote:
+> > > > Hi!
+> > > >=20
+> > > > I found a crash, which may be simply triggered for images unaligned=
+ to request_alignment:
+> > > >=20
+> > > > # ./qemu-io --image-opts -c 'write 0 512' driver=3Dblkdebug,align=
+=3D4096,image.driver=3Dnull-co,image.size=3D512
+> > > > qemu-io: block/io.c:1505: bdrv_aligned_pwritev: Assertion `end_sect=
+or <=3D bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
+> > > > Aborted (core dumped)
+> > > >=20
+> > > > The problem is obvious: 512 is aligned to 4096 and becomes larger t=
+han file size.
+> > > >=20
+> > > > I faced it after rebasing our downstream branches to newer Rhel ver=
+sions. Seems that after some updates of alignment detection in file-posix.c=
+, it started to detect 4096 alignment in our build environment, and iotest =
+152 started to crash (as it operates on file of 512 bytes).
+> > > >=20
+> > > > My question is:
+> > > >=20
+> > > > What is wrong? Should we restrict images to be aligned to request_a=
+lignment, or allow unaligned operations at EOF, if file is unaligned itself=
+?
+> > > >=20
+> > >=20
+> > >=20
+> > > The problem started with commit
+> > >=20
+> > > commit a6b257a08e3d72219f03e461a52152672fec0612
+> > > Author: Nir Soffer <nirsof@gmail.com>
+> > > Date:   Tue Aug 13 21:21:03 2019 +0300
+> > >=20
+> > >      file-posix: Handle undetectable alignment
+> > >=20
+> > >=20
+> > > It sets request_alignment to 4k, if probing of align=3D1 succeeded.. =
+I think it's wrong logic. It leads to crashes for images unaligned to 4k.
+> > >=20
+> > > If we force alignment to be 4k, we at least should check that file si=
+ze is aligned to 4k. Otherwise our assumption is definitely wrong.
+> > >=20
+> > > And still, I doubt that it's correct to force alignment to 4k, for de=
+vices which doesn't request any alignment..
+> >=20
+> > What backend is this? O_DIRECT with byte alignment sounds wrong, so I
+> > wonder if your storage really can do this or whether we just failed to
+> > detect the actual alignment.
 >=20
-> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
-> ---
->  tests/acceptance/boot_linux_console.py | 49 ++++++++++++++++++++++++++++=
-+-----
->  1 file changed, 43 insertions(+), 6 deletions(-)
+> The problem was disabled odirect in virtuozzo container which lead to byt=
+e alignment. So, yes, it's on our part.
+
+Oh, I see, so to QEMU it looked like it would do O_DIRECT and probing
+was done, but what was actually opened was non-direct. Not sure if we
+could possibly distinguish a situation like this from one where O_DIRECT
+succeeds with byte alignment because the block was unallocated, but
+would require larger alignment later.
+
+> > I guess we could change the default to pick the largest size so that th=
+e
+> > image size is still a multiple of it. But if the image size isn't even
+> > aligned to 512 bytes, I think refusing to open the image with O_DIRECT
+> > feels more correct (I would be okay with doing the same with > 512 byte
+> > images, too, if the image size isn't a multiple of the alignment).
+> >=20
 >=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index 6af19ae3b14a..ab2200aa0e47 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -65,15 +65,26 @@ class BootLinuxConsole(Test):
->          os.chdir(cwd)
->          return self.workdir + '/' + path
-> =20
-> -    def do_test_x86_64_machine(self):
-> +    def do_test_x86_64_machine(self, pvh=3DFalse):
->          """
->          :avocado: tags=3Darch:x86_64
->          """
-> -        kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
-fedora'
-> -                      '/linux/releases/29/Everything/x86_64/os/images/px=
-eboot'
-> -                      '/vmlinuz')
-> -        kernel_hash =3D '23bebd2680757891cf7adedb033532163a792495'
-> -        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-> +        if pvh:
-> +            rpm_url =3D ('https://yum.oracle.com/repo/OracleLinux/'
-> +                       'OL7/olcne/x86_64/getPackage/'
-> +                       'kernel-uek-container-4.14.35-1902.6.6.1.el7.x86_=
-64.rpm')
-> +            rpm_hash =3D '4c781711a9d32dcb8e81da2b397cb98926744e23'
-> +            rpm_path =3D self.fetch_asset(rpm_url, asset_hash=3Drpm_hash=
-)
-> +            kernel_path =3D self.extract_from_rpm(rpm_path,
-> +                                                './usr/share/kata-contai=
-ners/'
-> +                                    'vmlinux-4.14.35-1902.6.6.1.el7.cont=
-ainer')
-> +        else:
-> +            kernel_url =3D ('https://archives.fedoraproject.org/pub/arch=
-ive/'
-> +                          'fedora/linux/releases/29/Everything/x86_64/os=
-/'
-> +                          'images/pxeboot/vmlinuz')
-> +            kernel_hash =3D '23bebd2680757891cf7adedb033532163a792495'
-> +            kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dke=
-rnel_hash)
-> +
->          self.vm.set_console()
->          kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'conso=
-le=3DttyS0'
->          self.vm.add_args('-kernel', kernel_path,
-> @@ -95,6 +106,19 @@ class BootLinuxConsole(Test):
->          self.vm.add_args('-bios', 'pc-bios/bios-microvm.bin')
->          self.do_test_x86_64_machine()
-> =20
-> +    def test_x86_64_pc_pvh(self):
-> +        """
-> +        :avocado: tags=3Dmachine:pc
-> +        """
-> +        self.do_test_x86_64_machine(pvh=3DTrue)
-> +
-> +    def test_x86_64_pc_qboot_pvh(self):
-> +        """
-> +        :avocado: tags=3Dmachine:pc
-> +        """
-> +        self.vm.add_args('-bios', 'pc-bios/bios-microvm.bin')
-> +        self.do_test_x86_64_machine(pvh=3DTrue)
-> +
->      def test_x86_64_microvm(self):
->          """
->          :avocado: tags=3Dmachine:microvm
-> @@ -108,6 +132,19 @@ class BootLinuxConsole(Test):
->          self.vm.add_args('-bios', 'pc-bios/bios-microvm.bin')
->          self.do_test_x86_64_machine()
-> =20
-> +    def test_x86_64_microvm_pvh(self):
-> +        """
-> +        :avocado: tags=3Dmachine:microvm
-> +        """
-> +        self.do_test_x86_64_machine(pvh=3DTrue)
-> +
-> +    def test_x86_64_microvm_qboot_pvh(self):
-> +        """
-> +        :avocado: tags=3Dmachine:microvm
-> +        """
-> +        self.vm.add_args('-bios', 'pc-bios/bios-microvm.bin')
-> +        self.do_test_x86_64_machine(pvh=3DTrue)
+> OK, I'll think about a patch for file-posix.c, and may be blkdebug too.
+>=20
+> Also, we need to check it somewhere in generic layer too, to fail earlier=
+ than assertion above.
 
-Also in this case I think we are using qboot in both tests.
-Maybe we can remove one of them.
+Yes, I agree, it should be checked while opening the image.
 
-Thanks,
-Stefano
+Kevin
 
 
