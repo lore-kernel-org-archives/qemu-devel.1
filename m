@@ -2,79 +2,87 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 634A5C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 07:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88845C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 07:32:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E8072083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 07:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CB4F206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 07:32:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o+PxyYQ+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E8072083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i0BUJX/A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CB4F206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix3xU-0000NU-BF
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 02:09:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36712)
+	id 1ix4Jl-0004y4-ES
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 02:32:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hsp.cat7@gmail.com>) id 1ix3wo-0008HZ-5s
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 02:09:07 -0500
+ (envelope-from <armbru@redhat.com>) id 1ix4Ix-0004SS-Ag
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 02:32:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1ix3wm-0007mH-WB
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 02:09:05 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46636)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>)
- id 1ix3wm-0007gf-PW; Thu, 30 Jan 2020 02:09:04 -0500
-Received: by mail-ot1-x342.google.com with SMTP id g64so2130919otb.13;
- Wed, 29 Jan 2020 23:09:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/ZL3yrFImByXTRvvSQXEo/9Z3roN9PdOZ3/H9+MjK0w=;
- b=o+PxyYQ+6cNm8q/UtXMENC5UAXJa4NcAfLAEJl0PuIQk+DrEYJAsOdm0KvLilWNnh7
- 7OAreNvmJ9vh21U4j4UXcU7TaTgCTdtYavF2YYWKRpfBeh1+Pr/TGVnF1gs5l7aEvIj1
- ug1trJ3OKNxU+v9sqND61mrrsz5KmS53JfFMzd92km2OIXB3LEta3E29obU3IWgFl2aD
- /9hzAQx4WZOBIqya5zJKNBeGwKE32GtvZTEIVSteZx/zuG8O9nI9hdXfAPxrQB76LoBK
- RiHBhCXpcwpm885LjwwOpjv5MizFvVXTkLscsJA5RtqD9pjS576Uu0EPn3y9dWwc1Ysa
- bJaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/ZL3yrFImByXTRvvSQXEo/9Z3roN9PdOZ3/H9+MjK0w=;
- b=HkPgdTCKL5JU+FJw05bo6qqVRGg4PS5qz8CPfN3qa5K33bXTf+Iu3vEX06E+A5bf4R
- ItP4TiIjPEqT5UDRgg2bPw2flZVPjVLNEYP6KtHn7P5Y9bGY18J251aV97pd/GSUnBzX
- V21+4wpnun5aVn/1iU11pu0qiD1lQACIwmN0QMF0xvaH+JBioKEYh1yQ7X47ebKTS3tw
- O/KclQgWDbjrptN6EqCZKArEmfgujG9NV5VB/OWh65LsJS1MERcpiSfBLihshN5GOAAf
- SLAydkErqrfO6Q81In4FHX5RmSxfs+jS8FKotkv3ysJSTSKwD2AQP0ptLN/HAIKmrZ8k
- IEQg==
-X-Gm-Message-State: APjAAAVeDywc32tBOXS1eEnZBKmtTFPrXR/b/jTzahBllMKxh8EDTfV7
- Y83N1ujlQsBJt5m/7n55BIWHpsdHwD6dzLH9dsA=
-X-Google-Smtp-Source: APXvYqyU+XPBRk7CIczGYvDnn+95GfO+NWQ8Ab+4YKzXnrdRYOuJxbqVt1v7gta5mGJ+YS89t8Q6Rm5VwAi+j2ujuk8=
-X-Received: by 2002:a05:6830:139a:: with SMTP id
- d26mr2545819otq.75.1580368141292; 
- Wed, 29 Jan 2020 23:09:01 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1ix4Iw-0006Cq-Fa
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 02:31:59 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53625
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ix4Iw-0006BO-Cp
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 02:31:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580369516;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dqpZwgy76lJlajUnOqccq1LF7SPB6GLnk8PV5lVbPFA=;
+ b=i0BUJX/AJQQcIyLel5iic/nokYuh0P2tsfjQCnzfnQSaMt/zSrPvTnic6r5gWZLYduMd2z
+ Np9Me21r8PyzcwDaQXyMpelsaBaUFEGcm3K8FCyQUatM7qJO2YG6E1bO2R7+BvW+pq1XLI
+ fG58jqmvWqfRg2LBKJ0N4xWw/t4Tv8k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-TQoHnpoENRajsKTvNJAt9Q-1; Thu, 30 Jan 2020 02:31:52 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD26918B9F54;
+ Thu, 30 Jan 2020 07:31:51 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FD6519488;
+ Thu, 30 Jan 2020 07:31:51 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0C3781138404; Thu, 30 Jan 2020 08:31:50 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v3 2/4] qapi: Create module 'control'
+References: <20200129102239.31435-1-kwolf@redhat.com>
+ <20200129102239.31435-3-kwolf@redhat.com>
+ <871rri2pb6.fsf@dusky.pond.sub.org>
+ <20200129165810.GD5690@linux.fritz.box>
+Date: Thu, 30 Jan 2020 08:31:50 +0100
+In-Reply-To: <20200129165810.GD5690@linux.fritz.box> (Kevin Wolf's message of
+ "Wed, 29 Jan 2020 17:58:10 +0100")
+Message-ID: <8736bxz9g9.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200129235040.24022-1-richard.henderson@linaro.org>
-In-Reply-To: <20200129235040.24022-1-richard.henderson@linaro.org>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Thu, 30 Jan 2020 08:08:50 +0100
-Message-ID: <CABLmASGt_mSiqZYNWu3DLK6DDhRZs+WD4Ch+EphgVh6TFPW+xA@mail.gmail.com>
-Subject: Re: [PATCH 0/4] target/ppc: Use probe_access
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000ad192d059d5621e1"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: TQoHnpoENRajsKTvNJAt9Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,79 +94,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ad192d059d5621e1
-Content-Type: text/plain; charset="UTF-8"
+Kevin Wolf <kwolf@redhat.com> writes:
 
-On Thu, Jan 30, 2020 at 12:50 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+> Am 29.01.2020 um 17:35 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>>=20
+>> > misc.json contains definitions that are related to the system emulator=
+,
+>> > so it can't be used for other tools like the storage daemon. This patc=
+h
+>> > moves basic functionality that is shared between all tools (and mostly
+>> > related to the monitor itself) into a new control.json, which could be
+>> > used in tools as well.
+>> >
+>> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>=20
+>> I'd like to retitle this patch and the next one:
+>>=20
+>>     qapi: Split control.json off misc.json
+>>     monitor: Collect "control" command handlers in qmp-cmds.control.c
+>>=20
+>> Okay?
+>
+> Sure, why not.
 
-> The first two address the performance regression noticed
-> by Howard Spoelstra.  The last two are just something I
-> noticed at the same time.
->
->
-> r~
->
->
-> Richard Henderson (4):
->   target/ppc: Use probe_access for LSW, STSW
->   target/ppc: Use probe_access for LMW, STMW
->   target/ppc: Remove redundant mask in DCBZ
->   target/ppc: Use probe_write for DCBZ
->
->  target/ppc/mem_helper.c | 197 +++++++++++++++++++++++++++++++++-------
->  1 file changed, 162 insertions(+), 35 deletions(-)
->
-> --
-> 2.20.1
->
-> Hi,
+Queued, thanks!
 
-I can confirm these patches fix the performance issue I reported.
-
-Thanks,
-Howard
-
---000000000000ad192d059d5621e1
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jan 30, 2020 at 12:50 AM Rich=
-ard Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.h=
-enderson@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
-;padding-left:1ex">The first two address the performance regression noticed=
-<br>
-by Howard Spoelstra.=C2=A0 The last two are just something I<br>
-noticed at the same time.<br>
-<br>
-<br>
-r~<br>
-<br>
-<br>
-Richard Henderson (4):<br>
-=C2=A0 target/ppc: Use probe_access for LSW, STSW<br>
-=C2=A0 target/ppc: Use probe_access for LMW, STMW<br>
-=C2=A0 target/ppc: Remove redundant mask in DCBZ<br>
-=C2=A0 target/ppc: Use probe_write for DCBZ<br>
-<br>
-=C2=A0target/ppc/mem_helper.c | 197 +++++++++++++++++++++++++++++++++------=
--<br>
-=C2=A01 file changed, 162 insertions(+), 35 deletions(-)<br>
-<br>
--- <br>
-2.20.1<br>
-<br></blockquote><div>Hi, <br></div><div><br></div><div>I can confirm these=
- patches fix the performance issue I reported.</div><div><br></div><div>Tha=
-nks,</div><div>Howard<br></div><div>=C2=A0</div></div></div>
-
---000000000000ad192d059d5621e1--
 
