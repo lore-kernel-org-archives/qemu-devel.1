@@ -2,99 +2,89 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47286C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 15:05:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C46C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 15:07:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1055C2051A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 15:05:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1113420678
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 15:07:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3kqiepp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1055C2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kcL0N+Kc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1113420678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixBNg-0001rF-8n
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 10:05:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48213)
+	id 1ixBPp-000332-8q
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 10:07:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49054)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixBMp-0000wC-Lh
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:04:28 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ixBPB-0002aT-HN
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:06:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixBMo-0001H3-Fa
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:04:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38026
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixBMo-0001Ga-CD
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:04:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580396666;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yrZYG2dU+7Yy44Yg9ZBQmtVS8OaS6IWm8G+/XSMFDkE=;
- b=H3kqiepp2WZsPuwxkL7JGYlYWwcl1z8SLaOvDgT99hhjOQyYz0RB2SZtyfVYmc323Ekt5J
- zufzyCjs7SJ32hzKf6lHoqPX8vG65CsmOJzAWcDmXcP2BsUfwRd/nKFS/32/SwO1nVdVoy
- pscmAOASdfyWwVPqOEkl1ujRHR4x7Xw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-au6ystr0MUCnTr9A-7v6TQ-1; Thu, 30 Jan 2020 10:04:08 -0500
-Received: by mail-wm1-f70.google.com with SMTP id b133so1127792wmb.2
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 07:04:08 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1ixBPA-00042W-7D
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:06:53 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40832)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ixBP9-0003zp-V0
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:06:52 -0500
+Received: by mail-wr1-x441.google.com with SMTP id j104so4440952wrj.7
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 07:06:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=rq8xFcDZaCjgbxAJDzFhCRvg9c8iLPDpSIerCOhzM10=;
+ b=kcL0N+KcpLKYATKR5/J3Tr8Ve+yPNUopXBR5Rzbk9O1HWi/dchC5yrF+IDex6Uj0EM
+ jHDrxNI9NLT9yGidzbHIFjY4Swp9ezGJDy2uk7v1R3ql6DTPjLjzgvBsDvvC6TUHOLnt
+ iT0nJjL0L6MrZDQX5mnVB6zhwKrYOnCRWHuku0QRpOeUtZLEKQJccFdoWvStkUE3Jwyb
+ MwsAWFAwtSVA3RPHhQBkNHT14TRyq0uvyzusdQJTd8VVmu+V0dYG0M7AZ4OYUmG+ws8r
+ DgyPNFKzw7Nnvmx414vHO/FvTw3DKgQE8vxDZbt8DVxRGCFJK05w4COKcZHyIB3YRx/u
+ R2ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=H+pA3NLtlRLp/xXGeaDKzY9dGlJ8lliR+4HjYXaDfcw=;
- b=JlKXUF1hCL/pV4htY1aMO9QwDxUcieevhZTwS2GS2B64A33xQs23Idnpimju1KDV6e
- dldX50GfS5YmMRkmyN2G209wtYK5/X6pgOru+1RSaUnFJ9tPEaAsnJxzOxS5NGY/MGhh
- u+rvO0H0AFzijoGdn/rIVeJzeVesMWdJhTZGm/mMuz/Eewp7oAnRVzVk6Zc7fGLxglwe
- I1KYLGBQgVLOTTPvTiX893MDkdSXH1qxzL9rbIuqcnqUNGLGwCfSK4sNT+v9HUVnTVMg
- ks5fpbE33328W2OKle4F2n5XCMReoJKLfEAiX0p9R2Dndin+193qa3pBo98UNMAGjN1Z
- 8nKA==
-X-Gm-Message-State: APjAAAVuZpz8S8Drgn320dhqomSk+579Ke2s0qk3ddDT6ZHD836nZT8g
- qCw9FMSblQjEzCFWNNEh3LTvVYFsnNqxxlNi0gUTb4l2qyRqFqssFXDvcRn/6W9dl6F/G/b3Nx2
- ri8D6EAELg3L5T68=
-X-Received: by 2002:a5d:610a:: with SMTP id v10mr5959393wrt.267.1580396647549; 
- Thu, 30 Jan 2020 07:04:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyKd8yaN6Raqr8KT6xqQ2scRw/p2O+KF9xHnhwrBF0+vxeB4t7HGXk3dHQMXFcRtXNZS03LOw==
-X-Received: by 2002:a5d:610a:: with SMTP id v10mr5959349wrt.267.1580396647092; 
- Thu, 30 Jan 2020 07:04:07 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id v14sm7826521wrm.28.2020.01.30.07.04.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jan 2020 07:04:06 -0800 (PST)
-Subject: Re: [PATCH 00/10] python: Explicit usage of Python 3
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200129231402.23384-1-philmd@redhat.com>
- <0a858225-685d-3ffd-845c-6c1f8a438307@virtuozzo.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c90ce40e-428a-ed5e-531f-b2ca99121dfc@redhat.com>
-Date: Thu, 30 Jan 2020 16:04:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=rq8xFcDZaCjgbxAJDzFhCRvg9c8iLPDpSIerCOhzM10=;
+ b=JceHVOI1Xjh9vcB8gn37ukCFrk4YYB6N8Cbg7B5JEGxweW4zymLBajDF7zdHzluWRF
+ YetLAEtWtgl1uZLFrOQWnLWZa4qmq5FszVWE+03LYjG/2fas/Bu6THJGAgZiNXgiibYO
+ NcTF8tDXKpeyxP2DoXvQoTXRj6mC/C9JsELl0MiESBpC/hAhkDi6K9y9zY45PNPLENMR
+ WqQVAyE1WLnf4gWJe996gEEgeijOkykNwnZi7ayk2n8zpxqAXlPgUW3it3yO7HeUF/Eq
+ UQMOPTRb54t7i7qC4E1nG4jqMbW/8IxiG8A7Cbu6XA82uKWJ0y8/C/xpank1/IO5NJX9
+ dMAw==
+X-Gm-Message-State: APjAAAWkG28cnN7NpYdvQEIq1qvzAwgjgT7b/2rUfXSzc0hmLaeSwmzQ
+ Wh8v66ge1fxD3C5DCNQbzwepkw==
+X-Google-Smtp-Source: APXvYqxtTp3sfQ6fynsWDID2/5Zy4QeN9j2H37PZbNzCut91LzURMTq8gJaK2uAmogoqe+2/iGGYDw==
+X-Received: by 2002:adf:fd0f:: with SMTP id e15mr6176868wrr.241.1580396810439; 
+ Thu, 30 Jan 2020 07:06:50 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h10sm5765612wre.3.2020.01.30.07.06.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Jan 2020 07:06:49 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6250C1FF87;
+ Thu, 30 Jan 2020 15:06:48 +0000 (GMT)
+References: <20200129053357.27454-1-alxndr@bu.edu>
+ <20200129053357.27454-2-alxndr@bu.edu>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Bulekov, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v8 01/21] softmmu: split off vl.c:main() into main.c
+In-reply-to: <20200129053357.27454-2-alxndr@bu.edu>
+Date: Thu, 30 Jan 2020 15:06:48 +0000
+Message-ID: <87y2tp7zlj.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <0a858225-685d-3ffd-845c-6c1f8a438307@virtuozzo.com>
-Content-Language: en-US
-X-MC-Unique: au6ystr0MUCnTr9A-7v6TQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,58 +96,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>, qemu-devel@nongnu.org,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/30/20 3:02 PM, Vladimir Sementsov-Ogievskiy wrote:
-> First, thanks for handling this!
->=20
-> 30.01.2020 2:13, Philippe Mathieu-Daud=C3=A9 wrote:
->> Hello,
->>
->> These are mechanical sed patches used to convert the
->> code base to Python 3, as suggested on this thread:
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675024.html
->>
->> Regards,
->>
->> Phil.
->>
->> Philippe Mathieu-Daud=C3=A9 (10):
->> =C2=A0=C2=A0 scripts: Explicit usage of Python 3
->> =C2=A0=C2=A0 tests/qemu-iotests: Explicit usage of Python 3
->> =C2=A0=C2=A0 tests: Explicit usage of Python 3
->> =C2=A0=C2=A0 scripts/minikconf: Explicit usage of Python 3
->> =C2=A0=C2=A0 tests/acceptance: Remove shebang header
->> =C2=A0=C2=A0 scripts/tracetool: Remove shebang header
->> =C2=A0=C2=A0 tests/vm: Remove shebang header
->> =C2=A0=C2=A0 tests/qemu-iotests: Explicit usage of Python 3
->> =C2=A0=C2=A0 scripts: Explicit usage of Python 3
->> =C2=A0=C2=A0 tests/qemu-iotests/check: Update to match Python 3 interpre=
-ter
->>
->=20
-> Could you please not use same subject for different patches? Such things=
-=20
-> are hard to manage during patch porting from version to version.
 
-I can change but I'm not understanding what you want.
+Bulekov, Alexander <alxndr@bu.edu> writes:
 
->=20
-> Also, will you update checkpatch.pl, to avoid appearing unversioned=20
-> python again?
+> A program might rely on functions implemented in vl.c, but implement its
+> own main(). By placing main into a separate source file, there are no
+> complaints about duplicate main()s when linking against vl.o. For
+> example, the virtual-device fuzzer uses a main() provided by libfuzzer,
+> and needs to perform some initialization before running the softmmu
+> initialization. Now, main simply calls three vl.c functions which
+> handle the guest initialization, main loop and cleanup.
+>
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> ---
+<snip>
+>  main.c                  | 53 +++++++++++++++++++++++++++++++++++++++++
+<snip>
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -84,6 +84,8 @@ common-obj-$(CONFIG_FDT) +=3D device_tree.o
+>  # qapi
+>=20=20
+>  common-obj-y +=3D qapi/
+> +
+> +softmmu-obj-y =3D main.o
+>  endif
+>=20=20
+<snip>
+> diff --git a/main.c b/main.c
+> new file mode 100644
+> index 0000000000..f10ceda541
+> --- /dev/null
+> +++ b/main.c
+> @@ -0,0 +1,53 @@
+> +/*
+> + * QEMU System Emulator
+> + *
+> + * Copyright (c) 2003-2008 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+> + * of this software and associated documentation files (the "Software"),=
+ to deal
+> + * in the Software without restriction, including without limitation the=
+ rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be includ=
+ed in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "sysemu/sysemu.h"
+> +
+> +#ifdef CONFIG_SDL
+> +#if defined(__APPLE__) || defined(main)
+> +#include <SDL.h>
+> +int main(int argc, char **argv)
+> +{
+> +    return qemu_main(argc, argv, NULL);
+> +}
+> +#undef main
+> +#define main qemu_main
+> +#endif
+> +#endif /* CONFIG_SDL */
+> +
+> +#ifdef CONFIG_COCOA
+> +#undef main
+> +#define main qemu_main
+> +#endif /* CONFIG_COCOA */
+> +
+> +int main(int argc, char **argv, char **envp)
+> +{
+> +    qemu_init(argc, argv, envp);
+> +    qemu_main_loop();
+> +    qemu_cleanup();
+> +
+> +    return 0;
+> +}
+<snip>
 
-I'm not sure I can because checkpatch.pl is written in Perl, but I'll try.
+Can we put the main in a project appropriate sub-directory so it's on
+the same order as linux-user/main.c?
 
+I guess the new directory could be "softmmu" which matches the directory
+or "system" which matches the binary name. I'd lean towards the latter
+as softmmu is very specifically not this bit.
+
+--=20
+Alex Benn=C3=A9e
 
