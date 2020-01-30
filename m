@@ -2,90 +2,94 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B120C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 18:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE3EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 18:46:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2825D2082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 18:42:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AAGgIDSP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2825D2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 11D2520CC7
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 18:46:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11D2520CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixElr-0005NI-80
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 13:42:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46534)
+	id 1ixEpU-0007bv-91
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 13:46:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ixEkr-0004m5-3w
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 13:41:30 -0500
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1ixEoI-0006TR-KK
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 13:45:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ixEkp-0002xM-LC
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 13:41:28 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45550)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ixEkp-0002wF-DJ
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 13:41:27 -0500
-Received: by mail-wr1-x444.google.com with SMTP id a6so5350121wrx.12
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 10:41:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ZeJC8uBJTeGgO4mOxMovMUtB83qqIdATcRRjBe0c7Ek=;
- b=AAGgIDSPPlNaGIKNJivRRNmFn2Lp1fMjlqYn4Gd++2qfdEeYz3FXnX+5xfzgw90fCG
- bDaqSh1gW39EcxRBF0aUk67hXxgkg3kAV12P9YxbwCpXsSLfMOKtAcZ6muxA3BeGruzg
- 8AUnc/zdT/HSZUGSgFs4fwH9R0nX9Y7d6uUj5aiDyiclLc4haI/rT3lJ2MCRw4b7H5WP
- dqOqvl0xLdGGxX+X0YCIRuvKGDgD2xMZQMTrd2VQjU20Zm0d/wry6YSl7rPD5SuOA8RO
- sY/heVomVpQNNPEdGKn6DzOUe6nvAFwgaIF3e+k4+e91UmdBkefzDoQI0heTk1rgXYhD
- tB0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ZeJC8uBJTeGgO4mOxMovMUtB83qqIdATcRRjBe0c7Ek=;
- b=qn5jI4pn54Zvd0CFZWz9RejChkeX50D2g87rucUxcXhUSe0vxaQdxIxIh0CDerIJFA
- kR9K8V+cLNj4IZT2Om1zAUyJhtYOPA1lmElCyDwLfc+Hd1Ndjl1bRg/V/lY8pdtxddgz
- LdRGOAECS5TvRsS2f5Uv18M2bDMswG7VqBhqYig0Bjyzs/DorVhy/Pu8upUARygU6LMA
- n0re6Kzszr0Nk8mPJBC6vD503T41Uv973arGLn/29HrhdsA5KAzsJc3KxxQEtQbgoKAZ
- HcQDzcCbjilryFSB98pR2/QEHEJH+6ngMQ+zlAeRuJLlqiw2rGjUYPs9mm/vHgzicfUz
- K5jA==
-X-Gm-Message-State: APjAAAU5MloYHsU3dx3drpBpgzmAIJ/hEjSpWhUBM3PaT1NLBl//z8mL
- 4NiCDBS/0Tc774lcsw3Z8+iZZw==
-X-Google-Smtp-Source: APXvYqzJoQsKOeKPcHToaYXR2D5OmOAP4p11YnCm4gxNkWo8Q6qdQshKvhn/0PuM8GV6U7xPeD8PQg==
-X-Received: by 2002:a5d:6411:: with SMTP id z17mr7435224wru.57.1580409685153; 
- Thu, 30 Jan 2020 10:41:25 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y10sm8281276wrw.68.2020.01.30.10.41.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 10:41:23 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 31B231FF87;
- Thu, 30 Jan 2020 18:41:23 +0000 (GMT)
-References: <20200129053357.27454-1-alxndr@bu.edu>
- <20200129053357.27454-2-alxndr@bu.edu> <87y2tp7zlj.fsf@linaro.org>
- <20200130174401.xgdzeq4we2cqry4a@mozz.bu.edu>
-User-agent: mu4e 1.3.7; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v8 01/21] softmmu: split off vl.c:main() into main.c
-In-reply-to: <20200130174401.xgdzeq4we2cqry4a@mozz.bu.edu>
-Date: Thu, 30 Jan 2020 18:41:23 +0000
-Message-ID: <87v9os948c.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1ixEoH-0004tl-6L
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 13:45:02 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3510
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
+ id 1ixEoG-0004rt-HJ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 13:45:01 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 00UIinP8142024
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 13:44:59 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2xuvd5sdgd-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 13:44:59 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
+ Thu, 30 Jan 2020 18:44:57 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 30 Jan 2020 18:44:54 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 00UIirYU65339452
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 30 Jan 2020 18:44:53 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 23B6C4C04A;
+ Thu, 30 Jan 2020 18:44:53 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BF3244C040;
+ Thu, 30 Jan 2020 18:44:46 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.102.3.98])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 30 Jan 2020 18:44:46 +0000 (GMT)
+From: Ganesh Goudar <ganeshgr@linux.ibm.com>
+To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
+Subject: [PATCH v21 0/7]target-ppc/spapr: Add FWNMI support in QEMU for
+ PowerKVM guests
+Date: Fri, 31 Jan 2020 00:14:16 +0530
+X-Mailer: git-send-email 2.17.2
+X-TM-AS-GCONF: 00
+x-cbid: 20013018-4275-0000-0000-0000039C8856
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20013018-4276-0000-0000-000038B0A70D
+Message-Id: <20200130184423.20519-1-ganeshgr@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-30_06:2020-01-30,
+ 2020-01-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 lowpriorityscore=0
+ adultscore=0 priorityscore=1501 phishscore=0 suspectscore=0
+ impostorscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2001300127
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,138 +101,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>, qemu-devel@nongnu.org,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: paulus@ozlabs.org, Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ arawinda.p@gmail.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch set adds support for FWNMI in PowerKVM guests.
 
-Alexander Bulekov <alxndr@bu.edu> writes:
+System errors such as SLB multihit and memory errors
+that cannot be corrected by hardware is passed on to
+the kernel for handling by raising machine check
+exception (an NMI). Upon such machine check exceptions,
+if the address in error belongs to guest then KVM
+invokes guests' 0x200 interrupt vector if the guest
+is not FWNMI capable. For FWNMI capable guest
+KVM passes the control to QEMU by exiting the guest.
 
-> On 200130 1506, Alex Benn=C3=A9e wrote:
->>=20
->> Bulekov, Alexander <alxndr@bu.edu> writes:
->>=20
->> > A program might rely on functions implemented in vl.c, but implement i=
-ts
->> > own main(). By placing main into a separate source file, there are no
->> > complaints about duplicate main()s when linking against vl.o. For
->> > example, the virtual-device fuzzer uses a main() provided by libfuzzer,
->> > and needs to perform some initialization before running the softmmu
->> > initialization. Now, main simply calls three vl.c functions which
->> > handle the guest initialization, main loop and cleanup.
->> >
->> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
->> > ---
->> <snip>
->> >  main.c                  | 53 +++++++++++++++++++++++++++++++++++++++++
->> <snip>
->> > --- a/Makefile.objs
->> > +++ b/Makefile.objs
->> > @@ -84,6 +84,8 @@ common-obj-$(CONFIG_FDT) +=3D device_tree.o
->> >  # qapi
->> >=20=20
->> >  common-obj-y +=3D qapi/
->> > +
->> > +softmmu-obj-y =3D main.o
->> >  endif
->> >=20=20
->> <snip>
->> > diff --git a/main.c b/main.c
->> > new file mode 100644
->> > index 0000000000..f10ceda541
->> > --- /dev/null
->> > +++ b/main.c
->> > @@ -0,0 +1,53 @@
->> > +/*
->> > + * QEMU System Emulator
->> > + *
->> > + * Copyright (c) 2003-2008 Fabrice Bellard
->> > + *
->> > + * Permission is hereby granted, free of charge, to any person obtain=
-ing a copy
->> > + * of this software and associated documentation files (the "Software=
-"), to deal
->> > + * in the Software without restriction, including without limitation =
-the rights
->> > + * to use, copy, modify, merge, publish, distribute, sublicense, and/=
-or sell
->> > + * copies of the Software, and to permit persons to whom the Software=
- is
->> > + * furnished to do so, subject to the following conditions:
->> > + *
->> > + * The above copyright notice and this permission notice shall be inc=
-luded in
->> > + * all copies or substantial portions of the Software.
->> > + *
->> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EX=
-PRESS OR
->> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTAB=
-ILITY,
->> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT =
-SHALL
->> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES =
-OR OTHER
->> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, AR=
-ISING FROM,
->> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL=
-INGS IN
->> > + * THE SOFTWARE.
->> > + */
->> > +
->> > +#include "qemu/osdep.h"
->> > +#include "qemu-common.h"
->> > +#include "sysemu/sysemu.h"
->> > +
->> > +#ifdef CONFIG_SDL
->> > +#if defined(__APPLE__) || defined(main)
->> > +#include <SDL.h>
->> > +int main(int argc, char **argv)
->> > +{
->> > +    return qemu_main(argc, argv, NULL);
->> > +}
->> > +#undef main
->> > +#define main qemu_main
->> > +#endif
->> > +#endif /* CONFIG_SDL */
->> > +
->> > +#ifdef CONFIG_COCOA
->> > +#undef main
->> > +#define main qemu_main
->> > +#endif /* CONFIG_COCOA */
->> > +
->> > +int main(int argc, char **argv, char **envp)
->> > +{
->> > +    qemu_init(argc, argv, envp);
->> > +    qemu_main_loop();
->> > +    qemu_cleanup();
->> > +
->> > +    return 0;
->> > +}
->> <snip>
->>=20
->> Can we put the main in a project appropriate sub-directory so it's on
->> the same order as linux-user/main.c?
->>=20
->> I guess the new directory could be "softmmu" which matches the directory
->> or "system" which matches the binary name. I'd lean towards the latter
->> as softmmu is very specifically not this bit.
-> Will do - should vl.c move into this directory, as well?
-> -Alex
+This patch series adds functionality to QEMU to pass
+on such machine check exceptions to the FWNMI capable
+guest kernel by building an error log and invoking
+the guest registered machine check handling routine.
 
-Might as well so it doesn't get lonely ;-)
+The KVM changes are now part of the upstream kernel
+(commit e20bbd3d). This series contain QEMU changes.
 
-There has been a slow process of moving bits and pieces of the root
-directory into a respective sub-directories over the years (decades?) so
-this is a good opportunity to clean this bit up.
+Change Log v21:
+  - Use error_setg() for failure handling in apply hook.
+  - Report warning if FWNMI enabled for TCG.
+  - Enable FWNMI by default for machine type 5.0.
 
->
->> --=20
->> Alex Benn=C3=A9e
+Change Log v20:
+  - Remove code left over from previous version.
 
+Change Log v19:
+  - Create error object for migration blocker in machine_init().
+  - Remove the check to see fwnmi calls are already registered,
+    which is no longer needed.
+  - Register fwnmi RTAS calls in core_rtas_register_types() where
+    other RTAS calls are registered.
+  - Bail out from interlock call if the cap is not set.
+  - Reorder and add missing S-O-Bs.
 
---=20
-Alex Benn=C3=A9e
+Change Log v18:
+  - Dynamically create the Error object before adding it as blocker
+  - In apply hook check if the fwnmi calls are already registered and
+    if kvm supports fwnmi before registering the fwnmi calls.
+  - In rtas_ibm_nmi_register() test the feature flag before attempting
+    to get the RTAS address
+  - Introduce a bool member "fwnmi_calls_registered" to check if the
+    fwnmi calls are registered and use the same in needed hook to save
+    the state during migration. 
+
+Change Log v17:
+  - Add fwnmi cap to migration state
+  - Reprhase the commit message in patch 2/7
+
+Change Log v16:
+  - Fixed coding style problems
+
+Change Log v15:
+  - Removed cap_ppc_fwnmi
+  - Moved fwnmi registeration to .apply hook
+  - Assume SLOF has allocated enough room for rtas error log
+  - Using ARRAY_SIZE to end the loop
+  - Do not set FWNMI cap in post_load, now its done in .apply hook
+
+Change Log v14:
+  - Feature activation moved to a separate patch
+  - Fixed issues with migration blocker
+
+Change Log v13:
+  - Minor fixes (mostly nits)
+  - Moved FWNMI guest registration check from patch 4 to 3.
+
+Change Log v12:
+  - Rebased to latest ppc-for-4.2 (SHA b1e8156743)
+
+Change Log v11:
+  - Moved FWNMI SPAPR cap defaults to 4.2 class option
+  - Fixed issues with handling fwnmi KVM capability
+
+---
+
+Aravinda Prasad (7):
+  Wrapper function to wait on condition for the main loop mutex
+  ppc: spapr: Introduce FWNMI capability
+  target/ppc: Handle NMI guest exit
+  target/ppc: Build rtas error log upon an MCE
+  ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS
+    calls
+  migration: Include migration support for machine check handling
+  ppc: spapr: Activate the FWNMI functionality
+
+ cpus.c                   |   5 +
+ hw/ppc/spapr.c           |  60 +++++++++
+ hw/ppc/spapr_caps.c      |  28 ++++
+ hw/ppc/spapr_events.c    | 269 +++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c      |  87 +++++++++++++
+ include/hw/ppc/spapr.h   |  25 +++-
+ include/qemu/main-loop.h |   8 ++
+ target/ppc/kvm.c         |  24 ++++
+ target/ppc/kvm_ppc.h     |   8 ++
+ target/ppc/trace-events  |   1 +
+ 10 files changed, 513 insertions(+), 2 deletions(-)
+
+-- 
+2.17.2
+
 
