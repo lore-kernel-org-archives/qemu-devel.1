@@ -2,115 +2,77 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 063EDC33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 184EDC33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:38:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4513206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4836206D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:38:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="eO9gpqJ4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4513206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BTphY3z9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4836206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix95I-0003It-Qe
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 07:38:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55762)
+	id 1ix95X-0003tM-WF
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 07:38:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ix94I-0001aB-CF
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:37:12 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1ix92g-0006Ml-QA
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:35:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ix94F-0007GR-LW
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:37:09 -0500
-Received: from mail-eopbgr50109.outbound.protection.outlook.com
- ([40.107.5.109]:39650 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ix94A-00073X-92; Thu, 30 Jan 2020 07:37:03 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RkLRJNyEcEvz6cQBPpjG2t3G9ijsnHP+AYQPXiZx9zZ/P1rrEOSMbMI4FnAEENIB6uBkRPojpaOlEq4qwPk4nGt2XQyKwqLa2O97WtM2wyDAcpXPsM8gN77fcjpVJYsN3cCMGL4X3ePdimPIPfOjaAuctmHKf+EsFU7NNr43xU7g1/SftgYBqqoPo3eoR7+F7fzmyV5VbgSvhVFCLe1V7YdGqxg2jBeRrTFe6jW4crsn0CN5YUe1esMAUiEHrv6l7ReHdYlG7PMaa2dR9z8YQ0mcLaAMPNmXAppr5vsdinM1KqXGlrMSFN008cHRPVVNEpBYZ5w9P4k0umakr8koLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TASeDtrRQB4DG+rVrEMe/FHM4VsQd3A4+c/ktE0VF6A=;
- b=RvEoaLxl8HNIgVJBhKblQQhPerZC8Uu6KOkK29nI1CAocn11guHO6ZdTnpciH8h9faCu0GVEfo9l/siUUeK278udUMi1ggjhRVQKLIRlrkRsqDYBTH281mZbqNKlNOkvodPifaUJYeIhRLC1nyYnUKBsgzq6lx0EZIwHLE6kMqxzT9OxcxzrBs7cTQpzLosZwz46eqv0T4sHwq6pIqp/RCy7Sb3fWTXs95aoV9fkwG+hssA7fFY39JoSSZDOIX6bsqYWLXLWRLWcANPZV61CIwXlkLIv8Q1v1oGkdImgB60rK7LdHN0vqHVOhM52bpEGFAJiNXkqKEC/24/8v0Ny8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TASeDtrRQB4DG+rVrEMe/FHM4VsQd3A4+c/ktE0VF6A=;
- b=eO9gpqJ4JzFmFQVWDeOZ4B2eyVxrVpyF02/oWR7aVcDDviAsPgT9KEhTMzMROLhQI6ty6b5bP3+iKG0pZWsHvCIpqflgpNb4HoKQ71dQu3nZ+r7hmEN2WYZLYq7YuXTR7ZbN2A/T6b2vkXyFWmm2OzeTfT//3QOvnq8JfZIWjvQ=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3509.eurprd08.prod.outlook.com (20.177.115.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2665.24; Thu, 30 Jan 2020 12:36:58 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.025; Thu, 30 Jan 2020
- 12:36:58 +0000
-Subject: Re: [PATCH v6 00/11] error: auto propagated local_err part I
+ (envelope-from <mlevitsk@redhat.com>) id 1ix92e-00055x-95
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:35:30 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59251
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1ix92e-000552-4t
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:35:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580387727;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UvYNkohCd3m/eEBdExljAj3+OmHolEEu7gFb5aHvbsY=;
+ b=BTphY3z9cPEDwrSe2mOd9Rc9QYlaNxVgrzn/ja1XO8ZrcJyWlkeg038vICfYnQJhzjhB7M
+ ph1/OIpKFAov1cBJAuJ0C1HzihZKDzhlqXHNigtTrbfYkPjuxPAAspKQaOYDQUdWYpGojO
+ T5IL03drBT4/hQ3hdDF9sTI3Bs9xy1c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-0OwxYeHcMX2o8Zk4U0s7fA-1; Thu, 30 Jan 2020 07:35:23 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAFCD801E67;
+ Thu, 30 Jan 2020 12:35:22 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA697166A9;
+ Thu, 30 Jan 2020 12:35:20 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200130153654995
-Message-ID: <95d4bf85-b52d-b076-e1fe-8237a28c9d25@virtuozzo.com>
-Date: Thu, 30 Jan 2020 15:36:55 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200110194158.14190-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Subject: [PATCH v4 09/11] monitor/hmp: move remaining hmp_block* functions to
+ block-hmp-cmds.c
+Date: Thu, 30 Jan 2020 14:34:46 +0200
+Message-Id: <20200130123448.21093-10-mlevitsk@redhat.com>
+In-Reply-To: <20200130123448.21093-1-mlevitsk@redhat.com>
+References: <20200130123448.21093-1-mlevitsk@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 0OwxYeHcMX2o8Zk4U0s7fA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1PR05CA0357.eurprd05.prod.outlook.com
- (2603:10a6:7:94::16) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-MIME-Version: 1.0
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR05CA0357.eurprd05.prod.outlook.com (2603:10a6:7:94::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.27 via Frontend Transport; Thu, 30 Jan 2020 12:36:56 +0000
-X-Tagtoolbar-Keys: D20200130153654995
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 960eee75-dbd8-4282-c357-08d7a581187c
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3509:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3509BBFA7AAF6BD6F287F94FC1040@AM6PR08MB3509.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1169;
-X-Forefront-PRVS: 02981BE340
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(39850400004)(346002)(376002)(136003)(396003)(366004)(189003)(199004)(66476007)(16526019)(66556008)(316002)(86362001)(26005)(956004)(2616005)(66946007)(6916009)(54906003)(16576012)(36756003)(966005)(5660300002)(52116002)(478600001)(31696002)(186003)(31686004)(8676002)(81156014)(8936002)(7416002)(81166006)(2906002)(6486002)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3509;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zz6FUXWCbVEfWT16sFCJA3hFtPjd2bA6a/+dmyoNB2UjLWadDLpr7VboDtEdxxiI4EKUCroEels0zAjvrfMdi00l1oAHoPE272Qt6G92zRfv6UT9CUd7+IKmQnfk12aUAD/k25njYcPBiR0UhTwVCRR/dOTQYTRtnCjVW4C5T1lQN4sTbD2c6lGiwBs0B5HV7pRoxwUbUnuFju8DfS/+DbAPkeggAkoi5wFOkzPoFRx+/LIM03fenxKEzYHWCkHF2VeafNh/l3GCBdB2Q2S99V+BhtJ3FwccCZQkm+igpWYQwPHZncZcyFxUQHUeS7Zk0XdGqZVsWzaG7I3TeSOYzIKd4yiko0XdsBhr3T5SVsqGcDIvyZdSdW4wjIkX3OSWaLO0jyYJG52IUQ2sfdYJu26F7ew1bx7zzPcglehL/PlxMK601KLC+iVAhDye5sRzWEBD6+h4SHx8hr8JuThAifkUXcQEEEd30n2HmyMR9HSN/67pWE0qdAnaekH63rhbpKlYq1wzy9t3IPEEmB2JMQ==
-X-MS-Exchange-AntiSpam-MessageData: EXQc4pAdkIqS46H4WZ/uZxcj7g8ujYm/y3Ffj+4nw0uimZgZl7RDQ31g4aE//btzOr/syPVWJMBQ7Or+tFMbNBiyUJTxdd+rstTDItmUiOAWvmeBvINrgtoucX9SpMGzNM1EibgjUSnAmxeV2EWsBg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 960eee75-dbd8-4282-c357-08d7a581187c
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jan 2020 12:36:58.0426 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: er1wF4R2KJGpmNb9VNaClya1SBZGx4upxMsbbcp4V0DwxlyWROwV9bCaCXh9YxcJFxZYqJHAE1dgdN9FaoKlKHnuzlFlcXv2aibMgL9oegA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3509
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.109
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,161 +84,452 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus, what about this? Should I respin?
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ block/monitor/block-hmp-cmds.c | 140 +++++++++++++++++++++++++++++++++
+ include/block/block-hmp-cmds.h |   9 +++
+ include/monitor/hmp.h          |   6 --
+ monitor/hmp-cmds.c             | 137 --------------------------------
+ 4 files changed, 149 insertions(+), 143 deletions(-)
 
-10.01.2020 22:41, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
->=20
-> Now, when preparations from
->   [RFC v5 000/126] error: auto propagated local_err
->   https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg02771.html
->   https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-=
-v5
-> , after some iterations, are finally merged, let's proceed with the
-> rest. Sorry for a big delay on my part.
->=20
-> As a first step, I decided to take subsystems, each of them covered by
-> one patch, which get r-b/a-b marks by maintainer of the subsystem in v5.
->=20
-> v6 is available at
->   https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-=
-partI-v6
->=20
-> Changes v5->v6:
-> 01: use errp name for the parameter, add assertion
-> 02: add a lot of text information, drop Eric's r-b.
->      no semantic changes.
-> 03: add more comments
->      skip functions with pattern error_append_.*_hint in name
->      make errp identifier, to match any name of Error ** paramter
->      some other improvements
-> 04: only commit message changed,
->      keep Philippe's r-b
-> 05: new, manual update for hw/sd/ssi-sd
-> 06: only commit message changed,
->      keep Philippe's r-b
-> 07: only commit message changed,
->      keep Philippe's r-b
-> 08: local_parse_opts() changed, so patch changed in this
->      function, drop a-b mark
->      also, indentation fixed, by improvement in coccinelle script
-> 09: only commit message changed,
->      keep Stefan's r-b
-> 10: commit message and a bit of context changed, still seems
->      valid to keep Eric's r-b
-> 11: add new hunk: hw/pci-host/xen_igd_pt.c, so, drop r-b
->      also, indentation fixed, by improvement in coccinelle script
->=20
-> In these series, there is no commit-per-subsystem script, each generated
-> commit is generated in separate.
->=20
-> Still, generating commands are very similar, and looks like
->=20
->      sed -n '/^<Subsystem name>$/,/^$/{s/^F: //p}' MAINTAINERS | \
->      xargs git ls-files | grep '\.[hc]$' | \
->      xargs spatch \
->          --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->          --macro-file scripts/cocci-macro-file.h \
->          --in-place --no-show-diff --max-width 80
->=20
-> Note, that in each generated commit, generation command is the only
-> text, indented by 8 spaces in 'git log -1' output, so, to regenerate all
-> commits (for example, after rebase, or change in coccinelle script), you
-> may use the following command:
->=20
-> git rebase -x "sh -c \"git show --pretty=3D --name-only | xargs git check=
-out HEAD^ -- ; git reset; git log -1 | grep '^        ' | sh\"" HEAD~7
->=20
-> Which will start automated interactive rebase for generated patches,
-> which will stop if generated patch changed
-> (you may do git commit --amend to apply updated generated changes).
->=20
-> Note:
->    git show --pretty=3D --name-only   - lists files, changed in HEAD
->    git log -1 | grep '^        ' | sh   - rerun generation command of HEA=
-D
->=20
->=20
-> Check for compilation of changed .c files
-> git rebase -x "sh -c \"git show --pretty=3D --name-only | sed -n 's/\.c$/=
-.o/p' | xargs make -j9\"" HEAD~7
->   =20
->=20
-> Vladimir Sementsov-Ogievskiy (11):
->    qapi/error: add (Error **errp) cleaning APIs
->    error: auto propagated local_err
->    scripts: add coccinelle script to use auto propagated errp
->    hw/sd/ssi-sd: fix error handling in ssi_sd_realize
->    SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
->    pflash: introduce ERRP_AUTO_PROPAGATE
->    fw_cfg: introduce ERRP_AUTO_PROPAGATE
->    virtio-9p: introduce ERRP_AUTO_PROPAGATE
->    TPM: introduce ERRP_AUTO_PROPAGATE
->    nbd: introduce ERRP_AUTO_PROPAGATE
->    xen: introduce ERRP_AUTO_PROPAGATE
->=20
->   include/block/nbd.h                           |   1 +
->   include/qapi/error.h                          | 113 +++++++++++++-
->   block/nbd.c                                   |  49 +++---
->   hw/9pfs/9p-local.c                            |  12 +-
->   hw/9pfs/9p.c                                  |   1 +
->   hw/block/dataplane/xen-block.c                |  17 +--
->   hw/block/pflash_cfi01.c                       |   7 +-
->   hw/block/pflash_cfi02.c                       |   7 +-
->   hw/block/xen-block.c                          | 125 +++++++---------
->   hw/nvram/fw_cfg.c                             |  14 +-
->   hw/pci-host/xen_igd_pt.c                      |   7 +-
->   hw/sd/sdhci-pci.c                             |   7 +-
->   hw/sd/sdhci.c                                 |  21 ++-
->   hw/sd/ssi-sd.c                                |  26 +++-
->   hw/tpm/tpm_util.c                             |   7 +-
->   hw/xen/xen-backend.c                          |   7 +-
->   hw/xen/xen-bus.c                              | 100 ++++++-------
->   hw/xen/xen-host-pci-device.c                  |  27 ++--
->   hw/xen/xen_pt.c                               |  25 ++--
->   hw/xen/xen_pt_config_init.c                   |  20 +--
->   nbd/client.c                                  |   5 +
->   nbd/server.c                                  |   5 +
->   tpm.c                                         |   7 +-
->   scripts/coccinelle/auto-propagated-errp.cocci | 139 ++++++++++++++++++
->   24 files changed, 482 insertions(+), 267 deletions(-)
->   create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
->=20
-> CC: Cornelia Huck <cohuck@redhat.com>
-> CC: Eric Blake <eblake@redhat.com>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> CC: Greg Kurz <groug@kaod.org>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: Stefano Stabellini <sstabellini@kernel.org>
-> CC: Anthony Perard <anthony.perard@citrix.com>
-> CC: Paul Durrant <paul@xen.org>
-> CC: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
-> CC: Laszlo Ersek <lersek@redhat.com>
-> CC: Gerd Hoffmann <kraxel@redhat.com>
-> CC: Stefan Berger <stefanb@linux.ibm.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Michael Roth <mdroth@linux.vnet.ibm.com>
-> CC: qemu-block@nongnu.org
-> CC: xen-devel@lists.xenproject.org
->=20
-
-
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.=
+c
+index d72e2164fe..15bc565527 100644
+--- a/block/monitor/block-hmp-cmds.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -50,6 +50,7 @@
+ #include "block/nbd.h"
+ #include "block/block_int.h"
+ #include "block/block-hmp-cmds.h"
++#include "qemu-io.h"
+=20
+ void hmp_drive_add(Monitor *mon, const QDict *qdict)
+ {
+@@ -440,3 +441,142 @@ void hmp_nbd_server_stop(Monitor *mon, const QDict *q=
+dict)
+     qmp_nbd_server_stop(&err);
+     hmp_handle_error(mon, err);
+ }
++
++void hmp_block_resize(Monitor *mon, const QDict *qdict)
++{
++    const char *device =3D qdict_get_str(qdict, "device");
++    int64_t size =3D qdict_get_int(qdict, "size");
++    Error *err =3D NULL;
++
++    qmp_block_resize(true, device, false, NULL, size, &err);
++    hmp_handle_error(mon, err);
++}
++
++void hmp_block_stream(Monitor *mon, const QDict *qdict)
++{
++    Error *error =3D NULL;
++    const char *device =3D qdict_get_str(qdict, "device");
++    const char *base =3D qdict_get_try_str(qdict, "base");
++    int64_t speed =3D qdict_get_try_int(qdict, "speed", 0);
++
++    qmp_block_stream(true, device, device, base !=3D NULL, base, false, NU=
+LL,
++                     false, NULL, qdict_haskey(qdict, "speed"), speed, tru=
+e,
++                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
++                     &error);
++
++    hmp_handle_error(mon, error);
++}
++
++void hmp_block_passwd(Monitor *mon, const QDict *qdict)
++{
++    const char *device =3D qdict_get_str(qdict, "device");
++    const char *password =3D qdict_get_str(qdict, "password");
++    Error *err =3D NULL;
++
++    qmp_block_passwd(true, device, false, NULL, password, &err);
++    hmp_handle_error(mon, err);
++}
++
++void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
++{
++    Error *err =3D NULL;
++    char *device =3D (char *) qdict_get_str(qdict, "device");
++    BlockIOThrottle throttle =3D {
++        .bps =3D qdict_get_int(qdict, "bps"),
++        .bps_rd =3D qdict_get_int(qdict, "bps_rd"),
++        .bps_wr =3D qdict_get_int(qdict, "bps_wr"),
++        .iops =3D qdict_get_int(qdict, "iops"),
++        .iops_rd =3D qdict_get_int(qdict, "iops_rd"),
++        .iops_wr =3D qdict_get_int(qdict, "iops_wr"),
++    };
++
++    /*
++     * qmp_block_set_io_throttle has separate parameters for the
++     * (deprecated) block device name and the qdev ID but the HMP
++     * version has only one, so we must decide which one to pass.
++     */
++    if (blk_by_name(device)) {
++        throttle.has_device =3D true;
++        throttle.device =3D device;
++    } else {
++        throttle.has_id =3D true;
++        throttle.id =3D device;
++    }
++
++    qmp_block_set_io_throttle(&throttle, &err);
++    hmp_handle_error(mon, err);
++}
++
++void hmp_eject(Monitor *mon, const QDict *qdict)
++{
++    bool force =3D qdict_get_try_bool(qdict, "force", false);
++    const char *device =3D qdict_get_str(qdict, "device");
++    Error *err =3D NULL;
++
++    qmp_eject(true, device, false, NULL, true, force, &err);
++    hmp_handle_error(mon, err);
++}
++
++void hmp_qemu_io(Monitor *mon, const QDict *qdict)
++{
++    BlockBackend *blk;
++    BlockBackend *local_blk =3D NULL;
++    bool qdev =3D qdict_get_try_bool(qdict, "qdev", false);
++    const char *device =3D qdict_get_str(qdict, "device");
++    const char *command =3D qdict_get_str(qdict, "command");
++    Error *err =3D NULL;
++    int ret;
++
++    if (qdev) {
++        blk =3D blk_by_qdev_id(device, &err);
++        if (!blk) {
++            goto fail;
++        }
++    } else {
++        blk =3D blk_by_name(device);
++        if (!blk) {
++            BlockDriverState *bs =3D bdrv_lookup_bs(NULL, device, &err);
++            if (bs) {
++                blk =3D local_blk =3D blk_new(bdrv_get_aio_context(bs),
++                                          0, BLK_PERM_ALL);
++                ret =3D blk_insert_bs(blk, bs, &err);
++                if (ret < 0) {
++                    goto fail;
++                }
++            } else {
++                goto fail;
++            }
++        }
++    }
++
++    /*
++     * Notably absent: Proper permission management. This is sad, but it s=
+eems
++     * almost impossible to achieve without changing the semantics and the=
+reby
++     * limiting the use cases of the qemu-io HMP command.
++     *
++     * In an ideal world we would unconditionally create a new BlockBacken=
+d for
++     * qemuio_command(), but we have commands like 'reopen' and want them =
+to
++     * take effect on the exact BlockBackend whose name the user passed in=
+stead
++     * of just on a temporary copy of it.
++     *
++     * Another problem is that deleting the temporary BlockBackend involve=
+s
++     * draining all requests on it first, but some qemu-iotests cases want=
+ to
++     * issue multiple aio_read/write requests and expect them to complete =
+in
++     * the background while the monitor has already returned.
++     *
++     * This is also what prevents us from saving the original permissions =
+and
++     * restoring them later: We can't revoke permissions until all request=
+s
++     * have completed, and we don't know when that is nor can we really le=
+t
++     * anything else run before we have revoken them to avoid race conditi=
+ons.
++     *
++     * What happens now is that command() in qemu-io-cmds.c can extend the
++     * permissions if necessary for the qemu-io command. And they simply s=
+tay
++     * extended, possibly resulting in a read-only guest device keeping wr=
+ite
++     * permissions. Ugly, but it appears to be the lesser evil.
++     */
++    qemuio_command(blk, command);
++
++fail:
++    blk_unref(local_blk);
++    hmp_handle_error(mon, err);
++}
+diff --git a/include/block/block-hmp-cmds.h b/include/block/block-hmp-cmds.=
+h
+index 50ff802598..c2d18fba06 100644
+--- a/include/block/block-hmp-cmds.h
++++ b/include/block/block-hmp-cmds.h
+@@ -38,4 +38,13 @@ void hmp_nbd_server_add(Monitor *mon, const QDict *qdict=
+);
+ void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict);
+ void hmp_nbd_server_stop(Monitor *mon, const QDict *qdict);
+=20
++void hmp_block_resize(Monitor *mon, const QDict *qdict);
++void hmp_block_stream(Monitor *mon, const QDict *qdict);
++void hmp_block_passwd(Monitor *mon, const QDict *qdict);
++void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
++void hmp_eject(Monitor *mon, const QDict *qdict);
++
++void hmp_qemu_io(Monitor *mon, const QDict *qdict);
++
++
+ #endif
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index 736a969131..47a7cad734 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -58,9 +58,7 @@ void hmp_cont(Monitor *mon, const QDict *qdict);
+ void hmp_system_wakeup(Monitor *mon, const QDict *qdict);
+ void hmp_nmi(Monitor *mon, const QDict *qdict);
+ void hmp_set_link(Monitor *mon, const QDict *qdict);
+-void hmp_block_passwd(Monitor *mon, const QDict *qdict);
+ void hmp_balloon(Monitor *mon, const QDict *qdict);
+-void hmp_block_resize(Monitor *mon, const QDict *qdict);
+ void hmp_loadvm(Monitor *mon, const QDict *qdict);
+ void hmp_savevm(Monitor *mon, const QDict *qdict);
+ void hmp_delvm(Monitor *mon, const QDict *qdict);
+@@ -80,10 +78,7 @@ void hmp_migrate_start_postcopy(Monitor *mon, const QDic=
+t *qdict);
+ void hmp_x_colo_lost_heartbeat(Monitor *mon, const QDict *qdict);
+ void hmp_set_password(Monitor *mon, const QDict *qdict);
+ void hmp_expire_password(Monitor *mon, const QDict *qdict);
+-void hmp_eject(Monitor *mon, const QDict *qdict);
+ void hmp_change(Monitor *mon, const QDict *qdict);
+-void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
+-void hmp_block_stream(Monitor *mon, const QDict *qdict);
+ void hmp_migrate(Monitor *mon, const QDict *qdict);
+ void hmp_device_add(Monitor *mon, const QDict *qdict);
+ void hmp_device_del(Monitor *mon, const QDict *qdict);
+@@ -98,7 +93,6 @@ void hmp_chardev_add(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_change(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_remove(Monitor *mon, const QDict *qdict);
+ void hmp_chardev_send_break(Monitor *mon, const QDict *qdict);
+-void hmp_qemu_io(Monitor *mon, const QDict *qdict);
+ void hmp_cpu_add(Monitor *mon, const QDict *qdict);
+ void hmp_object_add(Monitor *mon, const QDict *qdict);
+ void hmp_object_del(Monitor *mon, const QDict *qdict);
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 67d2ca8a4c..c224e0f338 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -46,7 +46,6 @@
+ #include "qom/object_interfaces.h"
+ #include "ui/console.h"
+ #include "block/qapi.h"
+-#include "qemu-io.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ #include "exec/ramlist.h"
+@@ -1307,16 +1306,6 @@ void hmp_set_link(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, err);
+ }
+=20
+-void hmp_block_passwd(Monitor *mon, const QDict *qdict)
+-{
+-    const char *device =3D qdict_get_str(qdict, "device");
+-    const char *password =3D qdict_get_str(qdict, "password");
+-    Error *err =3D NULL;
+-
+-    qmp_block_passwd(true, device, false, NULL, password, &err);
+-    hmp_handle_error(mon, err);
+-}
+-
+ void hmp_balloon(Monitor *mon, const QDict *qdict)
+ {
+     int64_t value =3D qdict_get_int(qdict, "value");
+@@ -1326,16 +1315,6 @@ void hmp_balloon(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, err);
+ }
+=20
+-void hmp_block_resize(Monitor *mon, const QDict *qdict)
+-{
+-    const char *device =3D qdict_get_str(qdict, "device");
+-    int64_t size =3D qdict_get_int(qdict, "size");
+-    Error *err =3D NULL;
+-
+-    qmp_block_resize(true, device, false, NULL, size, &err);
+-    hmp_handle_error(mon, err);
+-}
+-
+ void hmp_loadvm(Monitor *mon, const QDict *qdict)
+ {
+     int saved_vm_running  =3D runstate_is_running();
+@@ -1818,15 +1797,6 @@ void hmp_expire_password(Monitor *mon, const QDict *=
+qdict)
+     hmp_handle_error(mon, err);
+ }
+=20
+-void hmp_eject(Monitor *mon, const QDict *qdict)
+-{
+-    bool force =3D qdict_get_try_bool(qdict, "force", false);
+-    const char *device =3D qdict_get_str(qdict, "device");
+-    Error *err =3D NULL;
+-
+-    qmp_eject(true, device, false, NULL, true, force, &err);
+-    hmp_handle_error(mon, err);
+-}
+=20
+ #ifdef CONFIG_VNC
+ static void hmp_change_read_arg(void *opaque, const char *password,
+@@ -1884,49 +1854,6 @@ void hmp_change(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, err);
+ }
+=20
+-void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+-{
+-    Error *err =3D NULL;
+-    char *device =3D (char *) qdict_get_str(qdict, "device");
+-    BlockIOThrottle throttle =3D {
+-        .bps =3D qdict_get_int(qdict, "bps"),
+-        .bps_rd =3D qdict_get_int(qdict, "bps_rd"),
+-        .bps_wr =3D qdict_get_int(qdict, "bps_wr"),
+-        .iops =3D qdict_get_int(qdict, "iops"),
+-        .iops_rd =3D qdict_get_int(qdict, "iops_rd"),
+-        .iops_wr =3D qdict_get_int(qdict, "iops_wr"),
+-    };
+-
+-    /* qmp_block_set_io_throttle has separate parameters for the
+-     * (deprecated) block device name and the qdev ID but the HMP
+-     * version has only one, so we must decide which one to pass. */
+-    if (blk_by_name(device)) {
+-        throttle.has_device =3D true;
+-        throttle.device =3D device;
+-    } else {
+-        throttle.has_id =3D true;
+-        throttle.id =3D device;
+-    }
+-
+-    qmp_block_set_io_throttle(&throttle, &err);
+-    hmp_handle_error(mon, err);
+-}
+-
+-void hmp_block_stream(Monitor *mon, const QDict *qdict)
+-{
+-    Error *error =3D NULL;
+-    const char *device =3D qdict_get_str(qdict, "device");
+-    const char *base =3D qdict_get_try_str(qdict, "base");
+-    int64_t speed =3D qdict_get_try_int(qdict, "speed", 0);
+-
+-    qmp_block_stream(true, device, device, base !=3D NULL, base, false, NU=
+LL,
+-                     false, NULL, qdict_haskey(qdict, "speed"), speed, tru=
+e,
+-                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
+-                     &error);
+-
+-    hmp_handle_error(mon, error);
+-}
+-
+ typedef struct HMPMigrationStatus
+ {
+     QEMUTimer *timer;
+@@ -2219,70 +2146,6 @@ void hmp_chardev_send_break(Monitor *mon, const QDic=
+t *qdict)
+     hmp_handle_error(mon, local_err);
+ }
+=20
+-void hmp_qemu_io(Monitor *mon, const QDict *qdict)
+-{
+-    BlockBackend *blk;
+-    BlockBackend *local_blk =3D NULL;
+-    bool qdev =3D qdict_get_try_bool(qdict, "qdev", false);
+-    const char* device =3D qdict_get_str(qdict, "device");
+-    const char* command =3D qdict_get_str(qdict, "command");
+-    Error *err =3D NULL;
+-    int ret;
+-
+-    if (qdev) {
+-        blk =3D blk_by_qdev_id(device, &err);
+-        if (!blk) {
+-            goto fail;
+-        }
+-    } else {
+-        blk =3D blk_by_name(device);
+-        if (!blk) {
+-            BlockDriverState *bs =3D bdrv_lookup_bs(NULL, device, &err);
+-            if (bs) {
+-                blk =3D local_blk =3D blk_new(bdrv_get_aio_context(bs),
+-                                          0, BLK_PERM_ALL);
+-                ret =3D blk_insert_bs(blk, bs, &err);
+-                if (ret < 0) {
+-                    goto fail;
+-                }
+-            } else {
+-                goto fail;
+-            }
+-        }
+-    }
+-
+-    /*
+-     * Notably absent: Proper permission management. This is sad, but it s=
+eems
+-     * almost impossible to achieve without changing the semantics and the=
+reby
+-     * limiting the use cases of the qemu-io HMP command.
+-     *
+-     * In an ideal world we would unconditionally create a new BlockBacken=
+d for
+-     * qemuio_command(), but we have commands like 'reopen' and want them =
+to
+-     * take effect on the exact BlockBackend whose name the user passed in=
+stead
+-     * of just on a temporary copy of it.
+-     *
+-     * Another problem is that deleting the temporary BlockBackend involve=
+s
+-     * draining all requests on it first, but some qemu-iotests cases want=
+ to
+-     * issue multiple aio_read/write requests and expect them to complete =
+in
+-     * the background while the monitor has already returned.
+-     *
+-     * This is also what prevents us from saving the original permissions =
+and
+-     * restoring them later: We can't revoke permissions until all request=
+s
+-     * have completed, and we don't know when that is nor can we really le=
+t
+-     * anything else run before we have revoken them to avoid race conditi=
+ons.
+-     *
+-     * What happens now is that command() in qemu-io-cmds.c can extend the
+-     * permissions if necessary for the qemu-io command. And they simply s=
+tay
+-     * extended, possibly resulting in a read-only guest device keeping wr=
+ite
+-     * permissions. Ugly, but it appears to be the lesser evil.
+-     */
+-    qemuio_command(blk, command);
+-
+-fail:
+-    blk_unref(local_blk);
+-    hmp_handle_error(mon, err);
+-}
+-
+ void hmp_object_del(Monitor *mon, const QDict *qdict)
+ {
+     const char *id =3D qdict_get_str(qdict, "id");
 --=20
-Best regards,
-Vladimir
+2.17.2
+
 
