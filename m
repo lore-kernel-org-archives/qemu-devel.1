@@ -4,94 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 823A5C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7886C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:29:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CC0D206D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:29:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71CFF206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:29:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LK9jbbuD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CC0D206D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRaayDIZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71CFF206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58949 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix810-00029Q-GV
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:29:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59410)
+	id 1ix81G-0002bt-Jj
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:29:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1ix7yr-0007ec-Sy
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:27:30 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ix7xk-0005lL-H7
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1ix7yq-0005p5-SA
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:27:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53862
+ (envelope-from <eric.auger@redhat.com>) id 1ix7xj-0004ef-4l
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44901
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ix7yq-0005or-NT
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:27:28 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1ix7xj-0004eR-0X
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580383648;
+ s=mimecast20190719; t=1580383578;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rbFkGSbP4v9su3dr8zIFRQHEnDKlGt6WODekK1AFCT4=;
- b=LK9jbbuD2ZRhRnVHoD6EVGFDld9b2bqVV5NEBo8B5Fw0BEWemh+wPbWIHz28oNovmu2Y+S
- 6/XgdfB8g9GS08LBhkKGaMiMJ8krAVHSfvUDeIGcfQec20hg6/N67EtUVhtdCv0+JgQ/FM
- wbp+TlDeNI5EN+G+ijNuPcOvBHUsico=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-LafuDznWPdqW19ElsjW4WQ-1; Thu, 30 Jan 2020 06:27:26 -0500
-Received: by mail-wr1-f69.google.com with SMTP id y7so1579050wrm.3
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 03:27:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=7vsQc/iAUG4jzCzBp6+/NlJC2k5WdnAqONCb+kmFKaQ=;
- b=YTPXizkabxtcvhePh8+mPLilkE82ncCAwTg+fDW2P64DzOUpuTLaWGa3SB11Pn8fc4
- XU/EJNy/ydOXXosrjZL6tzFSgkwVIh/Tj4FkFPJqPTXcitKxmofWgYy3VjQPqOraITwS
- oqOXE/lbOazoDkBNGKIhoroOgumdXamEHr+jLRJ1z53Dwiup1vKSx5d8i9KYcqWvLvJK
- EE99Bq+h29oUEsawYMeSF0Yucamm/+sSMBsc2KxzbqQJsGsgSg07gPQuPn2frughFXF8
- mKgsBjSlUfye5RmJYYsft5L6IpJuFTVoGsN2OTCsuTFtm+ILJCg0cH9rg9UPvEVEYo4E
- e5WQ==
-X-Gm-Message-State: APjAAAUSALKyuk9zXcKTvwvkTetue/GM+lDNYxiukbNMF9k0OKd6FWCy
- 49ZYf9930tUUEAuv6pTFiXWeRFgbEJWmg8r5KtPFiT67o0BAqhqgU5XoSo+AdRE9DwqEuHhaY8y
- uqDjwUUjp0BnO940=
-X-Received: by 2002:a7b:cf01:: with SMTP id l1mr5034173wmg.86.1580383645471;
- Thu, 30 Jan 2020 03:27:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz9iSnl8LWhTQXDLKu+y1pasva7oY9i+xJQQkpTk+kwaI/wECbnI8JiGyH1qBnQxnWR6Z06uQ==
-X-Received: by 2002:a7b:cf01:: with SMTP id l1mr5034157wmg.86.1580383645247;
- Thu, 30 Jan 2020 03:27:25 -0800 (PST)
-Received: from steredhat (host209-4-dynamic.27-79-r.retail.telecomitalia.it.
- [79.27.4.209])
- by smtp.gmail.com with ESMTPSA id k13sm6752098wrx.59.2020.01.30.03.27.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 03:27:23 -0800 (PST)
-Date: Thu, 30 Jan 2020 12:27:21 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Liam Merwick <liam.merwick@oracle.com>
-Subject: Re: [PATCH 2/6] tests/boot_linux_console: add BIOS acceptance test
-Message-ID: <20200130112721.vm5u5zv7bifjremw@steredhat>
-References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-3-git-send-email-liam.merwick@oracle.com>
+ bh=xlSr73pKSiopKdILGn5ZrLva3IOgBSdl74YTmPimHio=;
+ b=PRaayDIZfj7m2sJLh6lfWU1Ev6vgd5VpL098R8bMuJqUTVBgvKBEcvRhos0nkyRA239Xyf
+ vYjJhn9b/w6QDxUjit314YZsbhME/+F6uOE5o768ZABbE8O44xlJIyyH+zRCNJKC/osYsB
+ 7FhmVBM0v/4XQGgGn5ECKYOd/ppmm/A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-jz5A5r2LO1mGfIqljQT66A-1; Thu, 30 Jan 2020 06:26:16 -0500
+X-MC-Unique: jz5A5r2LO1mGfIqljQT66A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C35FA800D4E;
+ Thu, 30 Jan 2020 11:26:14 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D73E71001B05;
+ Thu, 30 Jan 2020 11:26:07 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+Subject: [kvm-unit-tests PATCH v2 8/9] arm: gic: Provide per-IRQ helper
+ functions
+Date: Thu, 30 Jan 2020 12:25:09 +0100
+Message-Id: <20200130112510.15154-9-eric.auger@redhat.com>
+In-Reply-To: <20200130112510.15154-1-eric.auger@redhat.com>
+References: <20200130112510.15154-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1580142994-1836-3-git-send-email-liam.merwick@oracle.com>
-X-MC-Unique: LafuDznWPdqW19ElsjW4WQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,74 +85,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, slp@redhat.com, alex.bennee@linaro.org,
- qemu-devel@nongnu.org, wainersm@redhat.com, pbonzini@redhat.com,
- philmd@redhat.com
+Cc: peter.maydell@linaro.org, andrew.murray@arm.com, drjones@redhat.com,
+ alexandru.elisei@arm.com, andre.przywara@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Liam,
+From: Andre Przywara <andre.przywara@arm.com>
 
-On Mon, Jan 27, 2020 at 04:36:30PM +0000, Liam Merwick wrote:
-> Add tests to use qboot with the 'pc' and 'microvm' machine classes
-> by adding the '-bios' option via self.vm.add_args() before calling
-> do_test_x86_64_machine().
->=20
-> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
-> ---
->  tests/acceptance/boot_linux_console.py | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index aa5b07b1c609..8daf6461ffac 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -60,7 +60,6 @@ class BootLinuxConsole(Test):
->                        '/vmlinuz')
->          kernel_hash =3D '23bebd2680757891cf7adedb033532163a792495'
->          kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-> -
->          self.vm.set_console()
->          kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'conso=
-le=3DttyS0'
->          self.vm.add_args('-kernel', kernel_path,
-> @@ -75,12 +74,26 @@ class BootLinuxConsole(Test):
->          """
->          self.do_test_x86_64_machine()
-> =20
-> +    def test_x86_64_pc_qboot(self):
-> +        """
-> +        :avocado: tags=3Dmachine:pc
-> +        """
-> +        self.vm.add_args('-bios', 'pc-bios/bios-microvm.bin')
-> +        self.do_test_x86_64_machine()
-> +
->      def test_x86_64_microvm(self):
->          """
->          :avocado: tags=3Dmachine:microvm
->          """
->          self.do_test_x86_64_machine()
-> =20
-> +    def test_x86_64_microvm_qboot(self):
-> +        """
-> +        :avocado: tags=3Dmachine:microvm
-> +        """
-> +        self.vm.add_args('-bios', 'pc-bios/bios-microvm.bin')
-> +        self.do_test_x86_64_machine()
-> +
+A common theme when accessing per-IRQ parameters in the GIC distributor
+is to set fields of a certain bit width in a range of MMIO registers.
+Examples are the enabled status (one bit per IRQ), the level/edge
+configuration (2 bits per IRQ) or the priority (8 bits per IRQ).
 
-Reading the docs/microvm.rst, microvm should use qboot as default, so
-the test_x86_64_microvm() and test_x86_64_microvm_qboot() maybe are the
-same (I didn't test them).
+Add a generic helper function which is able to mask and set the
+respective number of bits, given the IRQ number and the MMIO offset.
+Provide wrappers using this function to easily allow configuring an IRQ.
 
->      def test_mips_malta(self):
->          """
->          :avocado: tags=3Darch:mips
+For now assume that private IRQ numbers always refer to the current CPU.
+In a GICv2 accessing the "other" private IRQs is not easily doable (the
+registers are banked per CPU on the same MMIO address), so we impose the
+same limitation on GICv3, even though those registers are not banked
+there anymore.
 
-Thanks for doing these tests!
-Stefano
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+
+---
+
+initialize reg
+---
+ lib/arm/asm/gic-v3.h |  2 +
+ lib/arm/asm/gic.h    |  9 +++++
+ lib/arm/gic.c        | 90 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 101 insertions(+)
+
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index 347be2f..4a445a5 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -23,6 +23,8 @@
+ #define GICD_CTLR_ENABLE_G1A		(1U << 1)
+ #define GICD_CTLR_ENABLE_G1		(1U << 0)
+=20
++#define GICD_IROUTER			0x6000
++
+ /* Re-Distributor registers, offsets from RD_base */
+ #define GICR_TYPER			0x0008
+=20
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index 1fc10a0..21cdb58 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -15,6 +15,7 @@
+ #define GICD_IIDR			0x0008
+ #define GICD_IGROUPR			0x0080
+ #define GICD_ISENABLER			0x0100
++#define GICD_ICENABLER			0x0180
+ #define GICD_ISPENDR			0x0200
+ #define GICD_ICPENDR			0x0280
+ #define GICD_ISACTIVER			0x0300
+@@ -73,5 +74,13 @@ extern void gic_write_eoir(u32 irqstat);
+ extern void gic_ipi_send_single(int irq, int cpu);
+ extern void gic_ipi_send_mask(int irq, const cpumask_t *dest);
+=20
++void gic_set_irq_bit(int irq, int offset);
++void gic_enable_irq(int irq);
++void gic_disable_irq(int irq);
++void gic_set_irq_priority(int irq, u8 prio);
++void gic_set_irq_target(int irq, int cpu);
++void gic_set_irq_group(int irq, int group);
++int gic_get_irq_group(int irq);
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_H_ */
+diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+index 9430116..aa9cb86 100644
+--- a/lib/arm/gic.c
++++ b/lib/arm/gic.c
+@@ -146,3 +146,93 @@ void gic_ipi_send_mask(int irq, const cpumask_t *des=
+t)
+ 	assert(gic_common_ops && gic_common_ops->ipi_send_mask);
+ 	gic_common_ops->ipi_send_mask(irq, dest);
+ }
++
++enum gic_bit_access {
++	ACCESS_READ,
++	ACCESS_SET,
++	ACCESS_RMW
++};
++
++static u8 gic_masked_irq_bits(int irq, int offset, int bits, u8 value,
++			      enum gic_bit_access access)
++{
++	void *base;
++	int split =3D 32 / bits;
++	int shift =3D (irq % split) * bits;
++	u32 reg =3D 0, mask =3D ((1U << bits) - 1) << shift;
++
++	switch (gic_version()) {
++	case 2:
++		base =3D gicv2_dist_base();
++		break;
++	case 3:
++		if (irq < 32)
++			base =3D gicv3_sgi_base();
++		else
++			base =3D gicv3_dist_base();
++		break;
++	default:
++		return 0;
++	}
++	base +=3D offset + (irq / split) * 4;
++
++	switch (access) {
++	case ACCESS_READ:
++		return (readl(base) & mask) >> shift;
++	case ACCESS_SET:
++		reg =3D 0;
++		break;
++	case ACCESS_RMW:
++		reg =3D readl(base) & ~mask;
++		break;
++	}
++
++	writel(reg | ((u32)value << shift), base);
++
++	return 0;
++}
++
++void gic_set_irq_bit(int irq, int offset)
++{
++	gic_masked_irq_bits(irq, offset, 1, 1, ACCESS_SET);
++}
++
++void gic_enable_irq(int irq)
++{
++	gic_set_irq_bit(irq, GICD_ISENABLER);
++}
++
++void gic_disable_irq(int irq)
++{
++	gic_set_irq_bit(irq, GICD_ICENABLER);
++}
++
++void gic_set_irq_priority(int irq, u8 prio)
++{
++	gic_masked_irq_bits(irq, GICD_IPRIORITYR, 8, prio, ACCESS_RMW);
++}
++
++void gic_set_irq_target(int irq, int cpu)
++{
++	if (irq < 32)
++		return;
++
++	if (gic_version() =3D=3D 2) {
++		gic_masked_irq_bits(irq, GICD_ITARGETSR, 8, 1U << cpu,
++				    ACCESS_RMW);
++
++		return;
++	}
++
++	writeq(cpus[cpu], gicv3_dist_base() + GICD_IROUTER + irq * 8);
++}
++
++void gic_set_irq_group(int irq, int group)
++{
++	gic_masked_irq_bits(irq, GICD_IGROUPR, 1, group, ACCESS_RMW);
++}
++
++int gic_get_irq_group(int irq)
++{
++	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
++}
+--=20
+2.20.1
 
 
