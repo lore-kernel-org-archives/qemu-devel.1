@@ -2,88 +2,73 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF48C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 08:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEED4C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 08:26:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3176C206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 08:17:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gT7Jxph7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3176C206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2473206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 08:26:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2473206D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix513-0001E1-Ee
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 03:17:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54290)
+	id 1ix59e-0003F6-Rz
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 03:26:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57437)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ix50J-0000Yg-7V
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:16:48 -0500
+ (envelope-from <bounces@canonical.com>) id 1ix58z-0002XO-Cp
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ix50I-00021L-1g
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:16:47 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30180
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ix50H-0001vF-U3
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:16:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580372203;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=55gRiVY249a8gB9tdbRJgB2G1/jbeYVGA9wu95vEH0Y=;
- b=gT7Jxph7jpMTlTxTDEqdkLRX1fLcV3u8TTdm+9wjzbcV/WlT0xEJ758+z94Xis0ecFTC1T
- yDlR84Jk6hkcdDeb1zwYLjKoVslBW5Q/RWpqzbnWjPytuhjnoWfEBaCji7AfgPg7OfUGOP
- 19cydjSnI2sC2vAscZB+v0fAJxVBR48=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-saG3oYp5N4uvT29pJ-ZbnA-1; Thu, 30 Jan 2020 03:16:39 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 939C2DBAE;
- Thu, 30 Jan 2020 08:16:38 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-117.ams2.redhat.com [10.36.117.117])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E31687B00;
- Thu, 30 Jan 2020 08:16:33 +0000 (UTC)
-Subject: Re: [PATCH] tests/acceptance: Add boot tests for some of the QEMU
- advent calendar images
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <20200124170325.30072-1-thuth@redhat.com>
- <555bf60c-0d72-3ea3-f095-8c6c7a621deb@redhat.com>
- <300bbdee-004a-9d1a-3692-f32793d44523@redhat.com>
- <alpine.BSF.2.22.395.2001291841260.40686@zero.eik.bme.hu>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <133b09ed-78f7-e280-f603-18e616a00979@redhat.com>
-Date: Thu, 30 Jan 2020 09:16:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <bounces@canonical.com>) id 1ix58y-00070p-5d
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:25:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55394)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ix58y-00070W-0h
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 03:25:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ix58w-0005Pc-C3
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:25:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5652B2E80C0
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:25:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.22.395.2001291841260.40686@zero.eik.bme.hu>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: saG3oYp5N4uvT29pJ-ZbnA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 30 Jan 2020 08:18:06 -0000
+From: Thomas Huth <1860920@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public Security
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: yes
+X-Launchpad-Bug-Commenters: jgkammerer
+X-Launchpad-Bug-Reporter: Jean-Gabriel Kammerer (jgkammerer)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <158005183659.18916.14986952783973408797.malonedeb@gac.canonical.com>
+Message-Id: <158037228723.18764.4489127563146894619.launchpad@gac.canonical.com>
+Subject: [Bug 1860920] Re: qemu-s390x-softmmu: crash 
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 13e7351d6bec24eb183b10d6cacc69866ed4256a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,98 +77,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1860920 <1860920@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/01/2020 18.48, BALATON Zoltan wrote:
-> On Wed, 29 Jan 2020, Thomas Huth wrote:
->> On 27/01/2020 18.31, Wainer dos Santos Moschetta wrote:
->>> On 1/24/20 3:03 PM, Thomas Huth wrote:
->>>> The 2018 edition of the QEMU advent calendar 2018 featured Linux image=
-s
->>>> for various non-x86 machines. We can use them for a boot tests in our
->>>> acceptance test suite.
->>>>
->>>> Let's also make sure that we build the corresponding machines in
->>>> Travis,
->>>> and while we're there, drop the superfluous --python parameter (python=
-3
->>>> is now the only supported version anyway).
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->> [...]
->>>> +=C2=A0=C2=A0=C2=A0 def test_ppc_g3beige(self):
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Darch:ppc
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Dmachine:g=
-3beige
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tar_hash =3D 'e0b872a5eb8f=
-dc5bed19bd43ffe863900ebcedfc'
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.add_args('-M', 'gr=
-aphics=3Doff')
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.do_test_advcal_2018('=
-15', tar_hash, 'invaders.elf')
->>>
->>> Hi Thomas, let me check one thing...
->>>
->>> The VM will be launched as:
->>>
->>> ----
->>>
->>> ppc-softmmu/qemu-system-ppc -display none -vga none -chardev
->>> socket,id=3Dmon,path=3D/tmp/tmpvdokyvs3/qemu-41146-monitor.sock -mon
->>> chardev=3Dmon,mode=3Dcontrol -machine g3beige -chardev
->>> socket,id=3Dconsole,path=3D/tmp/tmpvdokyvs3/qemu-41146-console.sock,ser=
-ver,nowait
->>>
->>> -serial chardev:console -M graphics=3Doff -kernel
->>> /tmp/avocado_g3uccfo5/avocado_job_61gglyz3/02-tests_acceptance_boot_lin=
-ux_console.py_BootLinuxConsole.test_ppc_g3beige/day15/invaders.elf
->>>
->>>
->>>
->>> ----
->>>
->>> Note that it passes '[..] -machine g3beige [...] -M graphics=3Doff [...=
-]'.
->>> I suspect you wanted '-machine g3beige,graphics=3Doff'. am I right?
->>
->> No, the -M graphics=3Doff was intended.
->>
->>> or
->>> QEMU will interpret the -M option as a parameter of the already set
->>> machine type?
->>
->> That's exactly the case.
->>
->>> or the -M overwrites -machine, and because=C2=A0 g3beige is the
->>> default type it just works?
->>
->> No, the default machine of qemu-system-ppc is mac99.
->=20
-> I think you're wrong about the default machine type:
->=20
-> $ qemu-system-ppc -M help
-> Supported machines are:
-> 40p=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 IBM RS/6000 7020 (40p)
-> bamboo=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 bamboo
-> g3beige=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 Heathrow based PowerMAC (default)
->=20
-> g3beige is marked as default and seems to be created without any -M
-> option
+** Information type changed from Private Security to Public Security
 
-Oops, thanks, I stand corrected.
+-- =
 
- Thomas
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1860920
 
+Title:
+  qemu-s390x-softmmu: crash
+
+Status in QEMU:
+  New
+
+Bug description:
+  Trying to compile and use rust programs on an s390x emulated machine,
+  crash in qemu/target/s390x/translate.c line 3894
+
+  Steps to reproduce:
+  on a amd64 PC, installed debian on s390x emulated by qemu, seems to work =
+fine (installed some packages, etc.)
+  installed rust cargo (either from rustup or from debian)
+  cargo install anything makes *qemu* crash when beginning to compile
+
+  Technical details:
+  * host: amd64 Linux
+  * qemu v4.2.0 (recompiled from git with debug options using configure --t=
+arget-list=3Ds390x-softmmu --enable-debug) (problem appears also with older=
+ versions of qemu from git, with default compilation options, with qemu fro=
+m debian, etc.)
+  * compiled with gcc 9.2
+  * command line, relevant part: qemu-system-s390x -snapshot -machine s390-=
+ccw-virtio -cpu max,zpci=3Don -serial mon:stdio -display none -m 512
+  (tested with -smp 4  -m 4096 as well and without snapshotting)
+  * command line, less relevant part: -drive file=3D./debian.qcow2,if=3Dnon=
+e,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone    -device virtio-blk=
+-ccw,devno=3Dfe.0.0001,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootind=
+ex=3D1,scsi=3Doff    -netdev user,id=3Dmynet0,hostfwd=3Dtcp::2223-:22 -devi=
+ce virtio-net-pci,netdev=3Dmynet0
+  * core dump: abort in qemu/target/s390x/translate.c line 3894 ; s->field:=
+ op has value 0xEC and op2 has value 0x54
+  (more info available if needed)
+
+  Tried to patch source to add 0x54 case to no avail.
+  Tried other cpu variants to no avail as well.
+
+  Reporting this in security as well since it also looks very much like
+  a DoS (albeit somewhat minor), feel free to tell me to report the bug
+  somewhere else.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1860920/+subscriptions
 
