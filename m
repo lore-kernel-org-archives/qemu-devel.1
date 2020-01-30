@@ -2,89 +2,97 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F9ECC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D432BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:28:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29225206A2
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:20:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DAB7206A2
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 00:28:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I0PMN74Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29225206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TbkyKb2u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DAB7206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iwxZ7-0000KW-D2
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 19:20:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45688)
+	id 1iwxgj-0002Fj-Ce
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jan 2020 19:28:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iwxCk-0004XN-0C
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:06 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iwxg2-0001q0-Dq
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 19:27:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iwxCi-0000N6-J3
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:05 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:42928)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iwxCi-0000Hf-C3
- for qemu-devel@nongnu.org; Wed, 29 Jan 2020 18:57:04 -0500
-Received: by mail-pl1-x641.google.com with SMTP id p9so586159plk.9
- for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 15:57:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=47cVy0hqEAMv3Vw0sowdk1lwNWBNZcow7HnX+kqWQog=;
- b=I0PMN74QX8YKAideovtud78B/mmx1V0afCiAs48L0qR3IhdK/tg6zIt9HK28LyMTot
- adiLSME/LqU73M2qDlZ05swbc9yo2bq8E3M6FegykSd5U+Rw1JYtW5Bhi9Hyz8MZBwyY
- M7Goyv59WAnIpkWV7Ib2KL3uLvEdD/cmxXGVvighOtKn3Bqj2TIwRWoZRJBnIWrLoXKS
- LNgBIK8hheI6/RHPuIHcCxgvUphAP3YlV972LTLSxPtIuaYVHITf99mk4ikn95h5WH0w
- pTK7T5J5eL8v3EAMy5dwgw5T4K2qBfz77NbgC+BQnitK6Y0UT4fJSbo+/6lVsVvYoSSj
- JLeQ==
+ (envelope-from <pbonzini@redhat.com>) id 1iwxg0-000669-2G
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 19:27:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27842
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iwxfz-00064B-Ui
+ for qemu-devel@nongnu.org; Wed, 29 Jan 2020 19:27:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580344038;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j/PQsF/oROczdcK8m7w5nKbXVN9HKW2hoUw3TuMQc2E=;
+ b=TbkyKb2u9zg4NtgqOo7nC7OyGWCptzxqrowMyeG77NVRQXu6Q5xheUohc6gq2ILuhrvtQt
+ rN7H87tquHbH0mxcuuuLgEhPT0jO1GlH1/reJCtbmLjJ9SqpZxkDJhwkk+lzt+vmwoWCux
+ EeZzmFJEqjUNAn3SCak3Fa7OdVa++KI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-WmlbH06WOBCrJt3jla45kA-1; Wed, 29 Jan 2020 19:27:17 -0500
+Received: by mail-wr1-f69.google.com with SMTP id c17so859251wrp.10
+ for <qemu-devel@nongnu.org>; Wed, 29 Jan 2020 16:27:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=47cVy0hqEAMv3Vw0sowdk1lwNWBNZcow7HnX+kqWQog=;
- b=LoJrngawNvYzHFE00KsGjkQP1rbLfUdjsOuMqlQcbUPVuR2upH8HGeK7lwHciUqfXj
- GR8xnL61qQHLGXEGDkIap2hZiLPh8j5DkplvGTABC9NIQ+XdBbMd97d7smvnFBSCMmhw
- R/lOaMrVPMrCUZOYdm9D+7q77wUKM9xp1BHyNAK3qxkxVYdeNP0Exc3wSO+OTnUvCm+z
- lyMt4WR13Z0+dGNes+MT447DHeyv3Ldiohlf2uL6Zo2Dtcvt+zkxvsC58U5KFoqPuQFO
- qV6hhe9YTCHlAFl7gCSkFtTQ7tZ1nACXLFfnSN/PNVpJnZphp/h8+qNO4mTOpU7vkeyX
- apPw==
-X-Gm-Message-State: APjAAAVH1dMdPf4XmnfQqI84lgkZ5ezhOQ8oPdO4kkIOTOhneS46tgHz
- 9S/VYczp7amxLtmzeS6wSOJ5NTkfDVc=
-X-Google-Smtp-Source: APXvYqx0WzVeEPGXCOSLCQN9kzyNAKxA7W5BlqufqhHIMQ6o9+LJLSUpkmfCA6DZMO/HrtUxxDAWKQ==
-X-Received: by 2002:a17:902:680c:: with SMTP id
- h12mr1939230plk.102.1580342219398; 
- Wed, 29 Jan 2020 15:56:59 -0800 (PST)
-Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
- [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id r3sm3953626pfg.145.2020.01.29.15.56.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jan 2020 15:56:58 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 34/41] target/arm: check TGE and E2H flags for EL0 pauth
- traps
-Date: Wed, 29 Jan 2020 15:56:07 -0800
-Message-Id: <20200129235614.29829-35-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200129235614.29829-1-richard.henderson@linaro.org>
-References: <20200129235614.29829-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j/PQsF/oROczdcK8m7w5nKbXVN9HKW2hoUw3TuMQc2E=;
+ b=dAvTqunVJf6X6YyP4zcm/jnbsxQZUuIc5f0CMcFwznXOY6TVyXZNvjfom8GDjmf6mr
+ Mu9Jt/w3lA/FmKacbWG2wG7Ew5QV4p9K/qzAvROf26EuNs6+8QO5zRSOub7lHAjyENaB
+ iLXqZcJK1TsTCGUdFfXv0t4FpW4e53H8XRRe3DLRd6CguYJqaFqc4DeCdbI4rzxmOqTh
+ LAFEFygAebTfRzPk0+wlYbDZSLR3Rp9FX9ptqEH99Cl8lrRM6ZP99sioVsxJuyBGKA57
+ b1pQXX3dYs2ATypeMoO1EPHT3KZ0Qkcng4pgP4Ea00SaudsAWifYwcW2BoNE2ZXJx7Ms
+ nJFg==
+X-Gm-Message-State: APjAAAUnStrrZewnpYcXCVVpbmO/LeN10xxzJ1ACcoWJHMHhuEPer2P0
+ Ej/s50EO2JpGhxgP+o5z/GjVgjjmasndSuC2F5ljnOmZQrivB9pvXkejp6gfSxnRDQOJOfPImRc
+ DqqoyRY5zHAy4ehg=
+X-Received: by 2002:adf:e686:: with SMTP id r6mr1570655wrm.177.1580344035677; 
+ Wed, 29 Jan 2020 16:27:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw8tq/+TuB40OdRWKnY2W934BNpbg33IQGF3MZB7n6LdNmnvQfTUYOZhMrDut/QRYd/hPLqwQ==
+X-Received: by 2002:adf:e686:: with SMTP id r6mr1570624wrm.177.1580344035315; 
+ Wed, 29 Jan 2020 16:27:15 -0800 (PST)
+Received: from [10.1.251.141] ([80.188.125.198])
+ by smtp.gmail.com with ESMTPSA id s22sm4065964wmh.4.2020.01.29.16.27.14
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 29 Jan 2020 16:27:14 -0800 (PST)
+Subject: Re: [PATCH] seqlock: fix seqlock_write_unlock_impl function
+To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
+References: <20200129144948.2161551-1-luc.michel@greensocs.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b1ce57c0-7947-e569-cbcb-f47e5b5b3aff@redhat.com>
+Date: Thu, 30 Jan 2020 01:27:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+In-Reply-To: <20200129144948.2161551-1-luc.michel@greensocs.com>
+Content-Language: en-US
+X-MC-Unique: WmlbH06WOBCrJt3jla45kA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,39 +104,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+On 29/01/20 15:49, Luc Michel wrote:
+> The seqlock write unlock function was incorrectly calling
+> seqlock_write_begin() instead of seqlock_write_end(), and was releasing
+> the lock before incrementing the sequence. This could lead to a race
+> condition and a corrupted sequence number becoming odd even though the
+> lock is not held.
+> 
+> Signed-off-by: Luc Michel <luc.michel@greensocs.com>
+> ---
+>  include/qemu/seqlock.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/qemu/seqlock.h b/include/qemu/seqlock.h
+> index fd408b7ec5..8b6b4ee4bb 100644
+> --- a/include/qemu/seqlock.h
+> +++ b/include/qemu/seqlock.h
+> @@ -53,15 +53,15 @@ static inline void seqlock_write_lock_impl(QemuSeqLock *sl, QemuLockable *lock)
+>      seqlock_write_begin(sl);
+>  }
+>  #define seqlock_write_lock(sl, lock) \
+>      seqlock_write_lock_impl(sl, QEMU_MAKE_LOCKABLE(lock))
+>  
+> -/* Lock out other writers and update the count.  */
+> +/* Update the count and release the lock.  */
+>  static inline void seqlock_write_unlock_impl(QemuSeqLock *sl, QemuLockable *lock)
+>  {
+> +    seqlock_write_end(sl);
+>      qemu_lockable_unlock(lock);
+> -    seqlock_write_begin(sl);
+>  }
+>  #define seqlock_write_unlock(sl, lock) \
+>      seqlock_write_unlock_impl(sl, QEMU_MAKE_LOCKABLE(lock))
+>  
+>  
+> 
 
-According to ARM ARM we should only trap from the EL1&0 regime.
+Queued, thanks very much.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/pauth_helper.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/target/arm/pauth_helper.c b/target/arm/pauth_helper.c
-index e0c401c4a9..9746e32bf8 100644
---- a/target/arm/pauth_helper.c
-+++ b/target/arm/pauth_helper.c
-@@ -371,7 +371,10 @@ static void pauth_check_trap(CPUARMState *env, int el, uintptr_t ra)
-     if (el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
-         uint64_t hcr = arm_hcr_el2_eff(env);
-         bool trap = !(hcr & HCR_API);
--        /* FIXME: ARMv8.1-VHE: trap only applies to EL1&0 regime.  */
-+        if (el == 0) {
-+            /* Trap only applies to EL1&0 regime.  */
-+            trap &= (hcr & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE);
-+        }
-         /* FIXME: ARMv8.3-NV: HCR_NV trap takes precedence for ERETA[AB].  */
-         if (trap) {
-             pauth_trap(env, 2, ra);
--- 
-2.20.1
+Paolo
 
 
