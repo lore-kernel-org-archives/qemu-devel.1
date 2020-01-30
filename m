@@ -2,115 +2,116 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3A5C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD08CC33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:41:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20DE5206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:26:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20DE5206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 87B1C2067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:41:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="PtaiWAIl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87B1C2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix71q-0004Vm-CR
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 05:26:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36867)
+	id 1ix7GD-0006ra-PX
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 05:41:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41728)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ix71A-00044f-Qs
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:25:49 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ix7FX-0006Lv-Kf
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:40:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ix719-0001lu-Hc
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:25:48 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:49901)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ix719-0001ki-8J
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:25:47 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MfYgC-1jTyvs30NU-00fxBw; Thu, 30 Jan 2020 11:25:40 +0100
-Subject: Re: [PATCH] Handling SIGSETXID used by glibc NPTL setuid/setgid
-From: Laurent Vivier <laurent@vivier.eu>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200116115700.127951-1-mkysel@tachyum.com>
- <CAFEAcA_pOAX=pCk0TfbwwUPHUX2YhLtxMonYVazMrGZBvPJkPw@mail.gmail.com>
- <b4ca6094-28a4-28a9-4e6f-315cfad2cf49@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <f753ee66-f9e6-e196-9915-a0a875982999@vivier.eu>
-Date: Thu, 30 Jan 2020 11:25:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ix7FV-00052d-Ud
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:40:38 -0500
+Received: from mail-eopbgr60101.outbound.protection.outlook.com
+ ([40.107.6.101]:14080 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ix7FT-0004tG-Hx; Thu, 30 Jan 2020 05:40:37 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=On50U0iyOHLKWtvRbVRli25IGEqaMc7elkD72yzSC/pvawpFwOY/QJPtlFa4aVwBAMEq/1xQ8W6qJw6q6UbC+8kPGoS/7edYRDfyH4w0QRkTzClzNeI2vSwCiTzsWzqAlpbeYE/re545P13aBUUwMXOAPVtM92hDCokXe1WLuFK16PNtHwYWEOMbagejwHzZMHkaLttqVW35tlWMnnqDpPFlHufQP+l113U48Z8UoGqC5rwlh0qPeDH/R1ojMBsncgyGHjeI9q+QdkRRntIxUKlGWx/d54D5Upym9vIQRoTEmuZQMDRidLJ39HxtoW83CETtOu3Yt2BSgAtZMf7ykQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=D+ho8by56Y5ZDGK1LjcDmzzzgMqnHjS7LoBm3Tfk9j0=;
+ b=Ga88SOBNgYdXphyRT1dPrwy7mVOAjk0uKzJdCHytfpdtF6c37TkJb2jid48Bh7b6g2H4XUSJ++ewr6a5uGtP5u2or8aijI8cDeo2iHnU9er8YupviglScVu187fgsNjU1oRggJs1m9A8U0592jkk58ZX+cJpm5w3lt4bfc7eZQCfBuR/7j2dAOVk2/p7g4/yuosqmm4kfZYgxgWDv3ciq/v/uFAn8JF1y+fCoAz3SIPeQY3QiHwkxGMGHudGxzf2qZm2WKPTKMsO/n0uPyiIeqQivW7zpRreH9cv2UE+M5HuNEj+365Hiuym2yduajobXbHdVUsTCmefSXHalhQJ/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=D+ho8by56Y5ZDGK1LjcDmzzzgMqnHjS7LoBm3Tfk9j0=;
+ b=PtaiWAIlIwv/zweH+13vpPWzoFKTInkjkk1njagHUPF8sSKoCdanh+eLoRZ4EmDGV7oUu1uu1+0pbnxtAs1gV2OxO6MUZ+s6rVwgOWT8F8Q1LuA2Kc4I4RwLVsiUi+ASMFly0CZCR6xR5DxOFpn3qPA4qEOWl1z5zbvxiLUxA8o=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3382.eurprd08.prod.outlook.com (20.177.113.221) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.26; Thu, 30 Jan 2020 10:40:33 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.025; Thu, 30 Jan 2020
+ 10:40:32 +0000
+Subject: Re: request_alignment vs file size, how to fix crash?
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu block <qemu-block@nongnu.org>
+References: <2ca46523-44a2-1a48-dfa3-11bda9eef8e8@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200130134030916
+Message-ID: <24d1a5f8-1f01-ec64-778d-5bab440714c7@virtuozzo.com>
+Date: Thu, 30 Jan 2020 13:40:30 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <2ca46523-44a2-1a48-dfa3-11bda9eef8e8@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1P195CA0020.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::30)
+ To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
-In-Reply-To: <b4ca6094-28a4-28a9-4e6f-315cfad2cf49@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:3E8vcZcoEIHhm7WNhCMilbGRGrHbYsBVeg1RgpjvQ0WpaF0GW14
- nPiXldczeunV45+YfRqMGAjfAHHx7GG2JTHosKM27bVzc2eSMT4sug4ylAdmGhgTCG90Xjz
- RdrlO1ru0VgdzQaxdQKxtueCB2wHNBJM0N7jgMFgp44sW14d75MR9nC8G8qZU/msw15dVWN
- 2Q9CUdJaidct6ZZ3UFpaA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7eo6jye3MOo=:pcB0Xp+tm8dRqq3aJH19z9
- Db3604PVb/W4C3ZcHR4TrETR6G8ZJTVMCcaYT5VPPz+Pplhf/TaVSRpfF3lcGc8b/m2NXEZL5
- pNbC3P66dwTg/W2earljipV8AkviMTcviNh9ZUeeiApLhkEAx68GuHY7U8ZgI3d162egdS26m
- tM1BcNsbrwF71+EJ8ik6a/gJU9aLWlm2apqnPifn33MjK1ocUd7YWO81gkrPTawHgfIhDkFQO
- 3FODQ31HzMGDGPkz+1j+11ArerkO13k1qVsdwQOrUuT+NyUvTx6zptx4KXnH0cglFN2JZegwS
- /R+KGgYoUq383k/NbFMmhIiQOe5wu6D5OYyOvHoYkzXgvneP15fRTuyMHgxtK26xuXwY5avjw
- BrUR/+I9+IRxu2dTdR/h9gPRni9vhy6BMCi2VepaVnPkclb5jpRiPZySfS0KaG4u5NgYm9+Rw
- HyNcGxSK+wrWz50kzVf6asU3IvZkN84ntBR2fW9d1D6JagOX6049groMwJW9OkNUSOJ04LZad
- qOPxZ7teLV4/vNnsqR5pLIk/pXf1FHcXAqkYkeIMvsYG/co5Y8nGweKbMJ/ZS8DOohRlaYz++
- r89I0DptpKadEzzOs7A49MMJnEafRBv4g2NbkSbZUpI3O7M9OFN7l/9Gde05myExXstRM/H21
- 2/Mzuyq/lLS8XqWGMOi9vHMKxxCnIMOTPAM2ErTHYFnK6wRjD/tp4FjB14Dji5FDl1Lhchv3j
- 24UYJP9byL4kjccvN4IBIFuGjV5FycdcQnc7C7XB8QEPMjkgKajHnpn6a4ZF4xy6uWfuypdk8
- ST5suXDyTMHdurBrVnxQfWHRZDe/bWXjvoK32vbC4bhi/85WrqR1upf5gkD+MTJAHSyjREn
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1P195CA0020.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::30) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.22 via Frontend Transport; Thu, 30 Jan 2020 10:40:32 +0000
+X-Tagtoolbar-Keys: D20200130134030916
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fa81514b-1f2f-428e-3b50-08d7a570d526
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3382:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB338220B658DB57388FCE3F2EC1040@AM6PR08MB3382.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1417;
+X-Forefront-PRVS: 02981BE340
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(396003)(39850400004)(366004)(136003)(376002)(346002)(189003)(199004)(54906003)(4326008)(81166006)(66946007)(66556008)(81156014)(6916009)(66476007)(26005)(8936002)(186003)(16526019)(31686004)(8676002)(52116002)(478600001)(2906002)(2616005)(956004)(36756003)(16576012)(86362001)(31696002)(5660300002)(6486002)(316002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3382;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6ka7YoIkQE7Ik2pDV9G79r3ZEqKtpPIRXPQt89JVbRukaVvqnNI23ouXolE4S9YirEEW9S+njCeULyLXk/Uc49PbEGkFkjFEn/VVNMJUGh+rSo/N1TmeUuq9uF9NGnAkOq4nnZgepg9V8P5pvFeBRGqeX4Lu9AHj35jyvceotuVrJyaZIikFdIobOQAs3Vu4URqpUeYwImrOmEHTZ/MeB9blYqEkQM9gnxOBZCRcznEhSA5utshQbCJqn3MMnNMa3bIxL+BTKrZ2WcFsCRuJF4Zyl2DYXEupeHaeN3sZZmj71LmILlTgFDQceWBTPOyxzFkFh3uWHrxgYkct/gOo1V27ErY869HIoQHSwmePVMpws0Zg3nlhizkyRkMYfnjpLqC/I56DM8UtZFUh71PlMuiZIWoR0814ZF9mIRwBfYaMOI0mmC4kqAL1g+G1/9uk
+X-MS-Exchange-AntiSpam-MessageData: ulV9Yh+EyUxTHzUt7hh4LO/tAcs1el0BTM7QXksyy56FcC8983CkEkA5D6b1BzUzd2APHCkoE+j5VLngJHFKY4PlZhYYUgt2LeKx1tGe3MHLhFe9tzLgxRU+VYQ09ER6fM9SD4v/g+l2oo5N5z+fNw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa81514b-1f2f-428e-3b50-08d7a570d526
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jan 2020 10:40:32.8466 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ftvRekmwFAmZcP4JVUxnJWzol1g0oUu1rEsXioZo95d+F/3B3AmvnbUg/9zoQ8+czK1qDFTsoQGLFRdGBbh0owO1NG8mOfSlZC1TUg/AofU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3382
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.101
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,76 +123,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Matus Kysel <mkysel@tachyum.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Nir Soffer <nsoffer@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/01/2020 à 17:12, Laurent Vivier a écrit :
-> Le 28/01/2020 à 10:26, Peter Maydell a écrit :
->> On Thu, 16 Jan 2020 at 11:58, Matus Kysel <mkysel@tachyum.com> wrote:
->>>
->>> Used same style to handle another glibc reserved signal SIGSETXID (33),
->>> that is used by glibc NPTL setuid/setgid functions. This should fix problems
->>> with application using those functions and failing with error
->>> "qemu:handle_cpu_signal received signal outside vCPU context".
->>>
->>> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
->>> ---
->>>  linux-user/signal.c | 13 +++++++++----
->>>  1 file changed, 9 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/linux-user/signal.c b/linux-user/signal.c
->>> index 0128bde4d2..c59221fd0a 100644
->>> --- a/linux-user/signal.c
->>> +++ b/linux-user/signal.c
->>> @@ -66,11 +66,16 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
->>>      [SIGPWR] = TARGET_SIGPWR,
->>>      [SIGSYS] = TARGET_SIGSYS,
->>>      /* next signals stay the same */
->>> -    /* Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
->>> -       host libpthread signals.  This assumes no one actually uses SIGRTMAX :-/
->>> -       To fix this properly we need to do manual signal delivery multiplexed
->>> -       over a single host signal.  */
->>> +    /*
->>> +     * Nasty hack: Swap SIGRTMIN and SIGRTMIN + 1 with SIGRTMAX and SIGRTMAX - 1
->>> +     * to avoid overlap with host libpthread (NPTL glibc) signals.
->>> +     * This assumes no one actually uses SIGRTMAX and SIGRTMAX - 1 :-/
->>> +     * To fix this properly we need to do manual signal delivery multiplexed
->>> +     * over a single host signal.
->>> +     */
->>>      [__SIGRTMIN] = __SIGRTMAX,
->>> +    [__SIGRTMIN + 1] = __SIGRTMAX - 1,
->>> +    [__SIGRTMAX - 1] = __SIGRTMIN + 1,
->>>      [__SIGRTMAX] = __SIGRTMIN,
->>>  };
->>>  static uint8_t target_to_host_signal_table[_NSIG];
->>> --
->>> 2.17.1
->>
->> This is a long-standing known problem, but doing this is likely
->> to break currently-working guest binaries (notably things written
->> in Go). See for example the discussion on this thread:
->> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg03804.html
+29.01.2020 21:01, Vladimir Sementsov-Ogievskiy wrote:
+> Hi!
 > 
-> Peter,
+> I found a crash, which may be simply triggered for images unaligned to request_alignment:
 > 
-> I try to fix this problem and I'd like to find a reproducer for the Go
-> problem.
+> # ./qemu-io --image-opts -c 'write 0 512' driver=blkdebug,align=4096,image.driver=null-co,image.size=512
+> qemu-io: block/io.c:1505: bdrv_aligned_pwritev: Assertion `end_sector <= bs->total_sectors || child->perm & BLK_PERM_RESIZE' failed.
+> Aborted (core dumped)
 > 
-> I tried to write an "hello world" program and run it in an arm64/bionic
-> chroot but there is no problem (with and without this patch).
+> The problem is obvious: 512 is aligned to 4096 and becomes larger than file size.
 > 
-> Any hints?
+> I faced it after rebasing our downstream branches to newer Rhel versions. Seems that after some updates of alignment detection in file-posix.c, it started to detect 4096 alignment in our build environment, and iotest 152 started to crash (as it operates on file of 512 bytes).
+> 
+> My question is:
+> 
+> What is wrong? Should we restrict images to be aligned to request_alignment, or allow unaligned operations at EOF, if file is unaligned itself?
+> 
 
-Markus has sent me the information.
 
-I'm able to reproduce the problem with an "Hello World" go program and
-go 1.10 (basically ubuntu bionic/arm64).
+The problem started with commit
 
-Thanks,
-Laurent
+commit a6b257a08e3d72219f03e461a52152672fec0612
+Author: Nir Soffer <nirsof@gmail.com>
+Date:   Tue Aug 13 21:21:03 2019 +0300
 
+     file-posix: Handle undetectable alignment
+
+
+It sets request_alignment to 4k, if probing of align=1 succeeded.. I think it's wrong logic. It leads to crashes for images unaligned to 4k.
+
+If we force alignment to be 4k, we at least should check that file size is aligned to 4k. Otherwise our assumption is definitely wrong.
+
+And still, I doubt that it's correct to force alignment to 4k, for devices which doesn't request any alignment..
+
+
+-- 
+Best regards,
+Vladimir
 
