@@ -2,86 +2,98 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF4CC33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1235C33CB3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:56:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 973DC2082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:55:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AEFB2083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:56:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j9B8AGTK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973DC2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fi3/7nBT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AEFB2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix8Pi-00074c-R7
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:55:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40552)
+	id 1ix8RO-0008MC-Dk
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:56:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40955)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ix8JU-0007c4-8y
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:48:49 -0500
+ (envelope-from <sgarzare@redhat.com>) id 1ix8Ki-0001CK-TZ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:50:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ix8JS-0001RY-Sf
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:48:48 -0500
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:55680)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ix8JS-0001QT-Ks
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:48:46 -0500
-Received: by mail-wm1-x32c.google.com with SMTP id q9so3427097wmj.5
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 03:48:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=j5w4Pj6Ii5lOk2XwHikFhDCSX9sBpUJLfRoy/bCyMb8=;
- b=j9B8AGTKtTy+JutA3lk0uya032Iez4UpRDtcadq6q3EIWBGTE7S3DyrEtq9kn5JOfU
- i2QxARmBF/ZObJxR0d9u5ZUd3oQm5xMew2nYrO6i8W8xOeUeP9tQs59tNbD0G5FxZbNT
- 7qp8dFQi3YNvEJqe7shQlkFH2hYsuboA0dgfgOwqgqkBIoWG7Xpx0KsfjjvEca8tsyX+
- oNaaMb8zZT3FsXlKjUGUu10wMnYoUkO3Fz+Y70i8bK5I2UwdZ8hfyzTks7Z69BMwE9Ju
- jl7fLn/Ba7V1eUC29lWqbUKV23qEVPbof8XNkC/hj2UVxA021/RluVelstlbB1+WhfLP
- 77QQ==
+ (envelope-from <sgarzare@redhat.com>) id 1ix8Kg-0002Yu-I9
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:50:03 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60200
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ix8Kg-0002YO-DQ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:50:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580385001;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UUv1P2Iq01vNmZUT9bkkpZDZe2kSMid6fMyKsFYFcaE=;
+ b=Fi3/7nBTjoLYSx54Qn9Mhp4DIIWqdPEuK3HvZN18dYxhQOM+c/aXQeBKXBziCTExlz6PVF
+ UyXOw7o7Bq6aQ7cD8Q35GrE+ytU42RkPz/RPKnzHRYsvcdSVnAbyNXmcdss51iZhBWM3hW
+ x9ej5L1v/J3BbYZKZ1pPjBvLbn0aMb4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-169-JWVvGaRxP5-oqPqGfUbT1Q-1; Thu, 30 Jan 2020 06:49:55 -0500
+Received: by mail-wr1-f70.google.com with SMTP id b13so1565453wrx.22
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 03:49:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=j5w4Pj6Ii5lOk2XwHikFhDCSX9sBpUJLfRoy/bCyMb8=;
- b=SK2HSnvI6qzoEJCRN9Gm+Skv5LWOE+lBo5Zur2oJ/5XKqDhE9NfhrrOMR7BPOwIpxi
- 8hLtt8bQ+ou4Y9yLiW0l0WKSWM+KHw5SmyxPQT7lTu7MWt+N1Sx7ACWjkN7yV8ddUI5D
- UFMga3hxetkPg8wECkHHnvToB0yJL+mqpJ0ntOMDLI8rcTUygnQ+t1HPGLRvCxb78MSl
- TtRbOK8OKrgFA99rVPkm0hX3RMCfU3ipvFMqjnuxUEMM1lFKKjzF6xmSuhFotH5gF7/I
- mhLMVjVniBZ/a46Dh731ysnmq97IB6rhYwm52ARTaXBJuOdyjbuZhHa10Q3d48ENCohK
- oGaQ==
-X-Gm-Message-State: APjAAAVL9RFAtGY6kw6CM8BbFREhYusIP1OtLaP5AZrGHSQixwPR0Y40
- zGgs6jUiq/ns0OK+kCaMSb0fgA==
-X-Google-Smtp-Source: APXvYqwSQoaKELXpTV0RojyxPBiNMlTRDKnakbK15fvEEK8OrgFd1rJPAFO1VhTMhtNW+hNkwX7QDA==
-X-Received: by 2002:a1c:2358:: with SMTP id j85mr5316023wmj.28.1580384925219; 
- Thu, 30 Jan 2020 03:48:45 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b21sm6374356wmd.37.2020.01.30.03.48.44
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=F01aSopn8U1FsiaKf3EfBYdzuSa6/mxsOmTh+Ri5bHo=;
+ b=czNx9R0sHbFxQv+JdKxQEJGNNLjgjzzNbxcqAWq9tL57nReBYIcBxqt4d8qWD3UoCs
+ dntQ0TiJ+9zcXQO7tvyJEyoeWeQXcq76ZwlnF3hZRZXB789PJEx8ud22J+ZCozUE9cO8
+ NHKO6Qop22kA2jqQEm65GGB78i0uIOIUjeZVdTa6iDMMmwLnIbIxt73AHzc4ZJvDlbPz
+ mqvtaKjn8NmmAkcmQRbUoz1kAESvq1pzrKYIrvkMdqx8spcpAkU/2NuYjEdtQ+ow+kIX
+ +s+tKqRkHuXrJWaPYxBPNuI8Zc6kkkzy53A5YwFoZFrrFKxBSM0Q+E62ObbpT3yAux1C
+ rIPw==
+X-Gm-Message-State: APjAAAWN8Ne4Zc68zhCCEkA8/beTyeAqI5fOgeW35oEd3GKU1sLNDHzt
+ bu3heu6SHwXN4cdU9CDAT5fwVpWNuLjDAonVhFn4LfRkXIHmBVUKiKHaavGxQhsSZC+9QsWhh2x
+ 0dHXkfX9l47A06FU=
+X-Received: by 2002:a05:600c:23ce:: with SMTP id
+ p14mr5037391wmb.114.1580384994040; 
+ Thu, 30 Jan 2020 03:49:54 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxxFo4Pa9XX5/agT6DXSJc2EFrvn7Ct2xO2k5ohrEYrSpH69qTKBe7dYigCCkjUzNLECT1TqQ==
+X-Received: by 2002:a05:600c:23ce:: with SMTP id
+ p14mr5037352wmb.114.1580384993734; 
+ Thu, 30 Jan 2020 03:49:53 -0800 (PST)
+Received: from steredhat (host209-4-dynamic.27-79-r.retail.telecomitalia.it.
+ [79.27.4.209])
+ by smtp.gmail.com with ESMTPSA id m21sm6226441wmi.27.2020.01.30.03.49.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 03:48:44 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2C1B01FF87;
- Thu, 30 Jan 2020 11:32:23 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 00/12] testing/next (with build fixes!)
-Date: Thu, 30 Jan 2020 11:32:11 +0000
-Message-Id: <20200130113223.31046-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ Thu, 30 Jan 2020 03:49:53 -0800 (PST)
+Date: Thu, 30 Jan 2020 12:49:50 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Liam Merwick <liam.merwick@oracle.com>
+Subject: Re: [PATCH 1/6] tests/boot_linux_console: add microvm acceptance test
+Message-ID: <20200130114950.mudigrwt3n7rpffm@steredhat>
+References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
+ <1580142994-1836-2-git-send-email-liam.merwick@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32c
+In-Reply-To: <1580142994-1836-2-git-send-email-liam.merwick@oracle.com>
+X-MC-Unique: JWVvGaRxP5-oqPqGfUbT1Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,76 +105,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: fam@euphon.net, slp@redhat.com, alex.bennee@linaro.org,
+ qemu-devel@nongnu.org, wainersm@redhat.com, pbonzini@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Mon, Jan 27, 2020 at 04:36:29PM +0000, Liam Merwick wrote:
+> Refactor test_x86_64_pc() to test_x86_64_machine() so that separate
+> functions which specify the Avocado tag of ':avocado: tags=3Dmachine:'
+> as being either 'pc' or 'microvm' can be used to test booting a
+> compressed kernel using either machine class.
+>=20
+> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+> ---
+>  tests/acceptance/boot_linux_console.py | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
 
-It seemed the CI degraded while I wasn't looking so I've rolled up a
-bunch of fixes to try and get things working again.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-There is some messing around for documentation builds (disabling on
-shippable, moving to bionic on Travis), a build fix for hppa +
-no-default-configs and some attempts to squash timeouts on our new
-multiple architecture builds.
+>=20
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+> index e40b84651b0b..aa5b07b1c609 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -51,10 +51,9 @@ class BootLinuxConsole(Test):
+>          os.chdir(cwd)
+>          return self.workdir + path
+> =20
+> -    def test_x86_64_pc(self):
+> +    def do_test_x86_64_machine(self):
+>          """
+>          :avocado: tags=3Darch:x86_64
+> -        :avocado: tags=3Dmachine:pc
+>          """
+>          kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
+fedora'
+>                        '/linux/releases/29/Everything/x86_64/os/images/px=
+eboot'
+> @@ -70,6 +69,18 @@ class BootLinuxConsole(Test):
+>          console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+>          self.wait_for_console_pattern(console_pattern)
+> =20
+> +    def test_x86_64_pc(self):
+> +        """
+> +        :avocado: tags=3Dmachine:pc
+> +        """
+> +        self.do_test_x86_64_machine()
+> +
+> +    def test_x86_64_microvm(self):
+> +        """
+> +        :avocado: tags=3Dmachine:microvm
+> +        """
+> +        self.do_test_x86_64_machine()
+> +
+>      def test_mips_malta(self):
+>          """
+>          :avocado: tags=3Darch:mips
+> --=20
+> 1.8.3.1
+>=20
 
-I shall build the forthcoming PR directly from this posted series.
-
-The following patches need review:
-  01 - tests docker move most cross compilers to buster 
-  02 - tests docker better handle symlinked libs
-  03 - gitlab ci Refresh the list of iotests
-  04 - travis.yml Install genisoimage package
-  05 - .shippable disable docs for cross compile tests
-  07 - .travis.yml Drop superfluous use of python python
-  08 - .travis.yml Add description to each job
-  09 - .travis.yml build documents under bionic
-  10 - .travis.yml move cache flushing to early common p
-  11 - .travis.yml probe for number of available process
-  12 - .travis.yml limit the arm64 target list
-
-Alex Bennée (7):
-  tests/docker: move most cross compilers to buster base
-  tests/docker: better handle symlinked libs
-  .shippable: --disable-docs for cross-compile tests
-  .travis.yml: build documents under bionic
-  .travis.yml: move cache flushing to early common phase
-  .travis.yml: probe for number of available processors
-  .travis.yml: limit the arm64 target list
-
-Philippe Mathieu-Daudé (3):
-  hw/hppa/Kconfig: LASI chipset requires PARALLEL port
-  .travis.yml: Drop superfluous use of --python=python3 parameter
-  .travis.yml: Add description to each job
-
-Thomas Huth (1):
-  gitlab-ci: Refresh the list of iotests
-
-Wainer dos Santos Moschetta (1):
-  travis.yml: Install genisoimage package
-
- .gitlab-ci.yml                                |  12 +-
- .shippable.yml                                |   2 +-
- .travis.yml                                   | 145 ++++++++++++------
- hw/hppa/Kconfig                               |   1 +
- tests/docker/Makefile.include                 |  16 +-
- tests/docker/docker.py                        |   5 +-
- tests/docker/dockerfiles/debian-amd64.docker  |   2 +-
- .../dockerfiles/debian-armel-cross.docker     |   2 +-
- .../dockerfiles/debian-armhf-cross.docker     |   2 +-
- .../dockerfiles/debian-mips64el-cross.docker  |   2 +-
- .../dockerfiles/debian-mipsel-cross.docker    |   2 +-
- .../dockerfiles/debian-ppc64el-cross.docker   |   2 +-
- .../dockerfiles/debian-s390x-cross.docker     |   2 +-
- 13 files changed, 121 insertions(+), 74 deletions(-)
-
--- 
-2.20.1
+--=20
 
 
