@@ -2,77 +2,87 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E357C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A4FDC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:46:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CACE62083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:45:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 271DA2083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:46:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elL0X1Yb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CACE62083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhCyK3jw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 271DA2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixHcz-0004tF-VU
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:45:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56795)
+	id 1ixHdR-0005wr-At
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:46:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ixHR5-0000e1-DF
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:33:17 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1ixHX2-0003S1-Jl
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:39:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ixHQz-0007IA-Sl
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:33:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58223
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ixHQw-0007GF-Sq
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:33:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580419985;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/HGmUHjCPxCFbKBVxQL3WgeKYD6TdAhjbnQqC/l5sfA=;
- b=elL0X1YbNcjpmcsuwiKGI33lNc0zrWBC2YqD84NxXk7gP+4Y5gAv/Hl18eTILU1JNe/p0o
- uyulF1TlNoBc0w3wim/jJH2/mQe43G3YS9v4kvJhhBEf1JLimbFIqGcsHU9ZVaaEhO9k7Z
- vyPBNBTxcNkS1GkqfJDJm7dckDrCilw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-vGnvEmcJP1Wnz7GY_Ps10g-1; Thu, 30 Jan 2020 16:33:03 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 498E2100550E;
- Thu, 30 Jan 2020 21:33:02 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 85B6460BE0;
- Thu, 30 Jan 2020 21:32:56 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
+ (envelope-from <danielhb413@gmail.com>) id 1ixHX1-0001WI-FF
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:39:24 -0500
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:43062)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+ id 1ixHX1-0001Sn-B2; Thu, 30 Jan 2020 16:39:23 -0500
+Received: by mail-qk1-x744.google.com with SMTP id j20so4499590qka.10;
+ Thu, 30 Jan 2020 13:39:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=aYZBLLNRu3YFcgNICbDH2tSO88Vv+b9q9C7iEzpwyPc=;
+ b=dhCyK3jwn9dwQsm71wGRlprzheln3ZoEJ+9qPRaBln8b3WSe5BcJps/28qjyjbLXL1
+ +FCDLF5SzAZ8KKDhqIIcclUATgLVL5cs4XS5S9YkPhZ01GzH1/41Sfm6rzYtgVCLSYrZ
+ /Uwmgoew1zZuraWdxiDtskg9C0QfZpSD+LhQas8bFk+s10eHqeU/o/EpD/QWuKtG5wdG
+ f/ohCdBsU7gG5k64IpM3wM6nnEl3sIQwnCBDryPvRiAt7eGoUMNmVr+Txipx7Riqcwa7
+ hP52AmXlb1pv5CJ3vh87KdrgNbAhzHlmh+3YRcc0rHNzdRfikB9iKWN4s82QkEjvv1y/
+ N3fA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=aYZBLLNRu3YFcgNICbDH2tSO88Vv+b9q9C7iEzpwyPc=;
+ b=iOcyx8Eluns00a1zTC0wp0xabSMqVTW87vQ5l0fGSyPtFH4ASivTFR0d4wnRNiWN5b
+ dITAvc8/wJW5JWoFaLgfx/pUBYzgg4GAla9d2V0IiX2/cjKOca2qjpriDfL3ad3kXXwj
+ KvA1xdd28xIf/QOEmhwpsFngd/lKMJ4to6jebcwkzLIhOHjUgAI2BAxKarbvazWpoZTd
+ iPwXgvD68d0m2K7AV+bMH91yVAJWwPR3WiCe3+zeFEQR/ZHQsY1q1Z+Wp5NcsgWVcald
+ Xc8DIFRiMhZI2YBwV7qq5vsmmN7PczdUrrTDtksaJEUCODVLgwer2bgMUbkbPI8GpECj
+ rkTQ==
+X-Gm-Message-State: APjAAAXmX5f6n0LyHW0R56itneJV3ljf43mk1OW9YvOYBmRnCq2QLPsN
+ RxcuHFshUUr3+NI2gN2cWgTTzcnN
+X-Google-Smtp-Source: APXvYqyOvaVUzhwczteurBygaAyKmE2jxlOFbgzeJEwPFg7jPyeaoi2jDI9nkoysstRh8+LVfncnHw==
+X-Received: by 2002:a05:620a:2010:: with SMTP id
+ c16mr7338388qka.386.1580420361631; 
+ Thu, 30 Jan 2020 13:39:21 -0800 (PST)
+Received: from rekt.ibmuc.com ([2804:431:c7c7:c177:887c:ce1b:6a44:15ec])
+ by smtp.gmail.com with ESMTPSA id f26sm3650597qtv.77.2020.01.30.13.39.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Jan 2020 13:39:21 -0800 (PST)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/18] tests/qemu-iotests: enable testing with aio options
-Date: Thu, 30 Jan 2020 21:31:13 +0000
-Message-Id: <20200130213114.325157-18-stefanha@redhat.com>
-In-Reply-To: <20200130213114.325157-1-stefanha@redhat.com>
-References: <20200130213114.325157-1-stefanha@redhat.com>
+Subject: [PATCH v9 3/4] crypto.c: cleanup created file when
+ block_crypto_co_create_opts_luks fails
+Date: Thu, 30 Jan 2020 18:39:06 -0300
+Message-Id: <20200130213907.2830642-4-danielhb413@gmail.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200130213907.2830642-1-danielhb413@gmail.com>
+References: <20200130213907.2830642-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: vGnvEmcJP1Wnz7GY_Ps10g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,172 +94,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Julia Suvorova <jusual@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <fam@euphon.net>, Aarushi Mehta <mehta.aaru20@gmail.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: kwolf@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Srikanth Aithal <bssrikanth@in.ibm.com>, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
+When using a non-UTF8 secret to create a volume using qemu-img, the
+following error happens:
 
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20200120141858.587874-15-stefanha@redhat.com
-Message-Id: <20200120141858.587874-15-stefanha@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+$ qemu-img create -f luks --object secret,id=vol_1_encrypt0,file=vol_resize_pool.vol_1.secret.qzVQrI -o key-secret=vol_1_encrypt0 /var/tmp/pool_target/vol_1 10240K
+
+Formatting '/var/tmp/pool_target/vol_1', fmt=luks size=10485760 key-secret=vol_1_encrypt0
+qemu-img: /var/tmp/pool_target/vol_1: Data from secret vol_1_encrypt0 is not valid UTF-8
+
+However, the created file '/var/tmp/pool_target/vol_1' is left behind in the
+file system after the failure. This behavior can be observed when creating
+the volume using Libvirt, via 'virsh vol-create', and then getting "volume
+target path already exist" errors when trying to re-create the volume.
+
+The volume file is created inside block_crypto_co_create_opts_luks(), in
+block/crypto.c. If the bdrv_create_file() call is successful but any
+succeeding step fails*, the existing 'fail' label does not take into
+account the created file, leaving it behind.
+
+This patch changes block_crypto_co_create_opts_luks() to delete
+'filename' in case of failure. A failure in this point means that
+the volume is now truncated/corrupted, so even if 'filename' was an
+existing volume before calling qemu-img, it is now unusable. Deleting
+the file it is not much worse than leaving it in the filesystem in
+this scenario, and we don't have to deal with checking the file
+pre-existence in the code.
+
+* in our case, block_crypto_co_create_generic calls qcrypto_block_create,
+which calls qcrypto_block_luks_create, and this function fails when
+calling qcrypto_secret_lookup_as_utf8.
+
+Reported-by: Srikanth Aithal <bssrikanth@in.ibm.com>
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- tests/qemu-iotests/check      | 15 ++++++++++++++-
- tests/qemu-iotests/common.rc  | 14 ++++++++++++++
- tests/qemu-iotests/iotests.py | 12 ++++++++++--
- 3 files changed, 38 insertions(+), 3 deletions(-)
+ block/crypto.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 2890785a10..39ed5bc1be 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -137,6 +137,7 @@ sortme=3Dfalse
- expunge=3Dtrue
- have_test_arg=3Dfalse
- cachemode=3Dfalse
-+aiomode=3Dfalse
-=20
- tmp=3D"${TEST_DIR}"/$$
- rm -f $tmp.list $tmp.tmp $tmp.sed
-@@ -146,6 +147,7 @@ export IMGFMT_GENERIC=3Dtrue
- export IMGPROTO=3Dfile
- export IMGOPTS=3D""
- export CACHEMODE=3D"writeback"
-+export AIOMODE=3D"threads"
- export QEMU_IO_OPTIONS=3D""
- export QEMU_IO_OPTIONS_NO_FMT=3D""
- export CACHEMODE_IS_DEFAULT=3Dtrue
-@@ -230,6 +232,11 @@ s/ .*//p
-         CACHEMODE_IS_DEFAULT=3Dfalse
-         cachemode=3Dfalse
-         continue
-+    elif $aiomode
-+    then
-+        AIOMODE=3D"$r"
-+        aiomode=3Dfalse
-+        continue
-     fi
-=20
-     xpand=3Dtrue
-@@ -274,6 +281,7 @@ other options
-     -n                  show me, do not run tests
-     -o options          -o options to pass to qemu-img create/convert
-     -c mode             cache mode
-+    -i mode             AIO mode
-     -makecheck          pretty print output for make check
-=20
- testlist options
-@@ -438,10 +446,13 @@ testlist options
-             cachemode=3Dtrue
-             xpand=3Dfalse
-             ;;
-+        -i)
-+            aiomode=3Dtrue
-+            xpand=3Dfalse
-+            ;;
-         -T)        # deprecated timestamp option
-             xpand=3Dfalse
-             ;;
--
-         -v)
-             verbose=3Dtrue
-             xpand=3Dfalse
-@@ -520,6 +531,8 @@ done
-=20
- # Set qemu-io cache mode with $CACHEMODE we have
- QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --cache $CACHEMODE"
-+# Set qemu-io aio mode with $AIOMODE we have
-+QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --aio $AIOMODE"
-=20
- QEMU_IO_OPTIONS_NO_FMT=3D"$QEMU_IO_OPTIONS"
- if [ "$IMGOPTSSYNTAX" !=3D "true" ]; then
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index d088392ab6..9ccde32634 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -645,6 +645,20 @@ _default_cache_mode()
-         return
-     fi
- }
-+_supported_aio_modes()
-+{
-+    for mode; do
-+        if [ "$mode" =3D "$AIOMODE" ]; then
-+            return
-+        fi
-+    done
-+    _notrun "not suitable for aio mode: $AIOMODE"
-+}
-+_default_aio_mode()
-+{
-+    AIOMODE=3D"$1"
-+    QEMU_IO=3D"$QEMU_IO --aio $1"
-+}
-=20
- _unsupported_imgopts()
- {
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 0b62c42851..89aa2df2f3 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -65,6 +65,7 @@ test_dir =3D os.environ.get('TEST_DIR')
- sock_dir =3D os.environ.get('SOCK_DIR')
- output_dir =3D os.environ.get('OUTPUT_DIR', '.')
- cachemode =3D os.environ.get('CACHEMODE')
-+aiomode =3D os.environ.get('AIOMODE')
- qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
-=20
- socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_help=
-er')
-@@ -495,6 +496,7 @@ class VM(qtest.QEMUQtestMachine):
-             options.append('file=3D%s' % path)
-             options.append('format=3D%s' % format)
-             options.append('cache=3D%s' % cachemode)
-+            options.append('aio=3D%s' % aiomode)
-=20
-         if opts:
-             options.append(opts)
-@@ -937,6 +939,10 @@ def verify_cache_mode(supported_cache_modes=3D[]):
-     if supported_cache_modes and (cachemode not in supported_cache_modes):
-         notrun('not suitable for this cache mode: %s' % cachemode)
-=20
-+def verify_aio_mode(supported_aio_modes=3D[]):
-+    if supported_aio_modes and (aiomode not in supported_aio_modes):
-+        notrun('not suitable for this aio mode: %s' % aiomode)
+diff --git a/block/crypto.c b/block/crypto.c
+index 24823835c1..00e8ec537d 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -30,6 +30,7 @@
+ #include "qapi/error.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
++#include "qemu/cutils.h"
+ #include "crypto.h"
+ 
+ typedef struct BlockCrypto BlockCrypto;
+@@ -596,6 +597,23 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+ 
+     ret = 0;
+ fail:
++    /*
++     * If an error occurred, delete 'filename'. Even if the file existed
++     * beforehand, it has been truncated and corrupted in the process.
++     */
++    if (ret && bs) {
++        Error *local_delete_err = NULL;
++        int r_del = bdrv_co_delete_file(bs, &local_delete_err);
++        /*
++         * ENOTSUP will happen if the block driver doesn't support
++         * the 'bdrv_co_delete_file' interface. This is a predictable
++         * scenario and shouldn't be reported back to the user.
++         */
++        if ((r_del < 0) && (r_del != -ENOTSUP)) {
++            error_report_err(local_delete_err);
++        }
++    }
 +
- def supports_quorum():
-     return 'quorum' in qemu_img_pipe('--help')
-=20
-@@ -1023,8 +1029,9 @@ def execute_unittest(output, verbosity, debug):
-=20
- def execute_test(test_function=3DNone,
-                  supported_fmts=3D[], supported_oses=3D['linux'],
--                 supported_cache_modes=3D[], unsupported_fmts=3D[],
--                 supported_protocols=3D[], unsupported_protocols=3D[]):
-+                 supported_cache_modes=3D[], supported_aio_modes=3D{},
-+                 unsupported_fmts=3D[], supported_protocols=3D[],
-+                 unsupported_protocols=3D[]):
-     """Run either unittest or script-style tests."""
-=20
-     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
-@@ -1041,6 +1048,7 @@ def execute_test(test_function=3DNone,
-     verify_protocol(supported_protocols, unsupported_protocols)
-     verify_platform(supported_oses)
-     verify_cache_mode(supported_cache_modes)
-+    verify_aio_mode(supported_aio_modes)
-=20
-     if debug:
-         output =3D sys.stdout
---=20
+     bdrv_unref(bs);
+     qapi_free_QCryptoBlockCreateOptions(create_opts);
+     qobject_unref(cryptoopts);
+-- 
 2.24.1
 
 
