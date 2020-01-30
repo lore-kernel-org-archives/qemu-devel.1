@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8D9C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6154C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:50:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 459872083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F1472083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:50:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KEORGVD+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 459872083E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c1PML+xU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F1472083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixHhd-0004PR-D2
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:50:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33022)
+	id 1ixHhq-0004mA-Jy
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:50:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33207)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ixHcC-0004JT-1E
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:45 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ixHcM-0004cZ-Cc
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ixHcA-00034M-Ty
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:43 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44110
+ (envelope-from <mreitz@redhat.com>) id 1ixHcL-0003jK-8J
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28057
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ixHcA-00031B-Ok
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:42 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ixHcL-0003hQ-3u
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:44:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580420682;
+ s=mimecast20190719; t=1580420692;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kNANRqxDaNAbjw3RnwVG76NgDmT98rBThz+qB88J5uY=;
- b=KEORGVD+fyBBD8fEbBHmUwFld6q7alroLwA9VxXfwUmsitaKi+np4iY9Yn2TcG/lfPkek4
- MZ8pnRIwwkxLVge4AeyIxOSK8w3ibmfrFET4mkvPTw0kCEsVLjjZZkwjWepe8kUfrrLfPv
- BPHageZdn29alug0wDBzov/I5Fmj/AI=
+ bh=lyBO0LHcnSgut5s8ijX92IhUO31aC59wxCEUTOSlOFo=;
+ b=c1PML+xUcLJRn6lieD/iP8OlbEV3WYTPtbpXr9R7iYaFVXFwRLwH7bzBsBikrPdmWdzJP0
+ XhwP9TzSPD5FamcTnkvQQrqzhKcv0ldIKOWXKfTAj0uRoLSAx1yAzMNMfWr1NO4zexcNTe
+ M9gJQf3rMf47FDlUpemgf/8M6mDwXzo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-blDjVaPEPtmcFeOqCsl9_A-1; Thu, 30 Jan 2020 16:44:39 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-30-Q5sZa6z6PLiJ-7bKOj1P9g-1; Thu, 30 Jan 2020 16:44:51 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 835039A879;
- Thu, 30 Jan 2020 21:44:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CE8773418;
+ Thu, 30 Jan 2020 21:44:50 +0000 (UTC)
 Received: from localhost (ovpn-204-145.brq.redhat.com [10.40.204.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C6E777939;
- Thu, 30 Jan 2020 21:44:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A7BBD84BCE;
+ Thu, 30 Jan 2020 21:44:49 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 02/21] blockdev: Allow resizing everywhere
-Date: Thu, 30 Jan 2020 22:44:12 +0100
-Message-Id: <20200130214431.333510-3-mreitz@redhat.com>
+Subject: [PATCH v3 07/21] blkverify: Implement .bdrv_recurse_can_replace()
+Date: Thu, 30 Jan 2020 22:44:17 +0100
+Message-Id: <20200130214431.333510-8-mreitz@redhat.com>
 In-Reply-To: <20200130214431.333510-1-mreitz@redhat.com>
 References: <20200130214431.333510-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: blDjVaPEPtmcFeOqCsl9_A-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Q5sZa6z6PLiJ-7bKOj1P9g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -91,34 +91,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Block nodes that do not allow resizing should not share BLK_PERM_RESIZE.
-It does not matter whether they are the first non-filter in their chain
-or not.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- blockdev.c | 5 -----
- 1 file changed, 5 deletions(-)
+ block/blkverify.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index d47ed8e569..bdd66d6c48 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3335,11 +3335,6 @@ void qmp_block_resize(bool has_device, const char *d=
-evice,
-     aio_context =3D bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 304b0a1368..0add3ab483 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -282,6 +282,20 @@ static bool blkverify_recurse_is_first_non_filter(Bloc=
+kDriverState *bs,
+     return bdrv_recurse_is_first_non_filter(s->test_file->bs, candidate);
+ }
 =20
--    if (!bdrv_is_first_non_filter(bs)) {
--        error_setg(errp, QERR_FEATURE_DISABLED, "resize");
--        goto out;
--    }
--
-     if (size < 0) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "size", "a >0 size"=
-);
-         goto out;
++static bool blkverify_recurse_can_replace(BlockDriverState *bs,
++                                          BlockDriverState *to_replace)
++{
++    BDRVBlkverifyState *s =3D bs->opaque;
++
++    /*
++     * blkverify quits the whole qemu process if there is a mismatch
++     * between bs->file->bs and s->test_file->bs.  Therefore, we know
++     * know that both must match bs and we can recurse down to either.
++     */
++    return bdrv_recurse_can_replace(bs->file->bs, to_replace) ||
++           bdrv_recurse_can_replace(s->test_file->bs, to_replace);
++}
++
+ static void blkverify_refresh_filename(BlockDriverState *bs)
+ {
+     BDRVBlkverifyState *s =3D bs->opaque;
+@@ -328,6 +342,7 @@ static BlockDriver bdrv_blkverify =3D {
+=20
+     .is_filter                        =3D true,
+     .bdrv_recurse_is_first_non_filter =3D blkverify_recurse_is_first_non_f=
+ilter,
++    .bdrv_recurse_can_replace         =3D blkverify_recurse_can_replace,
+ };
+=20
+ static void bdrv_blkverify_init(void)
 --=20
 2.24.1
 
