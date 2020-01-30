@@ -2,103 +2,62 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DD7C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD0AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:52:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 903562083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:52:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76955214D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 23:52:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xe8CIV7D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 903562083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZDxgQrsP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76955214D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJc0-0002Ot-PX
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 18:52:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54577)
+	id 1ixJc7-0002du-ID
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 18:52:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixJb4-0001Ih-TC
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:51:44 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ixJb8-0001Kl-UZ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:51:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixJb3-00006w-L8
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:51:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45656
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1ixJb7-0000BT-6V
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:51:46 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:46965 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixJb3-00006O-Hl
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 18:51:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580428301;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5yCtMZcyX9Djv30AsmdBHLUXdoYgOcgW/+zWzxA0Zts=;
- b=Xe8CIV7DV+6eKMiZwbZsdYq2ddUtaZrz7D0nEEXW7D0Bkrwp25gm3PpETwASqr6DRm2TfX
- dZ3QFc6eaknZFyiizfXocuX69zxZbbsTZv7Z5xxdlGTeWYcmbcz9rKkdwvs06vbV2Dg3Fu
- f7Z6Dr3SYzAzNh04Wp/tkEsZ4HY4E/E=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327--4DJYbPAPSSgqllPKS24Jw-1; Thu, 30 Jan 2020 18:51:35 -0500
-Received: by mail-wr1-f69.google.com with SMTP id 50so1569827wrc.2
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 15:51:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Ged53cFAht+PtfTblqzo8LwvBg2MQiuAS2/Zloms4ek=;
- b=M8exen+XiZwhd/2xYs4bNixMzbFbevDzLrlX1aV4HjR29ng2Wy858FeXvK+UjdMrjb
- 8H9bawWePPnZHopwJpzl39sIsvHjSrR9BfHb3fLGsdZHwrjXnw2TsPvaceoC2kufcDYY
- T03p7fsRf1h6bXJoWhoU26HGEcigHAIavxqfOmDb33nH4Omt4FPpnM0gVPIuXgdP8YMs
- oWeSYslYTe9g2l/XKuwRv2Sb5BX0Kj4p6QSTSvCGfaO/+42C3igFHwoMskTjeaylyFGp
- cVarUjJwBBbcPWdBmC0/Mr6Z+IG+MIsf0bl76mK3c1/oVb6x+nW2LRS/2F1XFpa0D64l
- mukw==
-X-Gm-Message-State: APjAAAWZ3a5f0okHaGJAL5hpVYlzbUV1KLM6wRYM3eUwlh7OLZ6tah/O
- E5h7oi4JaQWFiwq5A22C28WDPhhl7o4977ssGypXMVmLRL1a81ZrrS/zppxGfumHlvP1m4suB+m
- HP2wO5xOcEW0YQHM=
-X-Received: by 2002:a1c:1b93:: with SMTP id b141mr8576372wmb.114.1580428294084; 
- Thu, 30 Jan 2020 15:51:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwbryRKNbG6FemM4l6gxbEi3RfIx9HUT+7e4VFUlvyYKUeOL4eDdvzugDCZ1pSAqB18TK+O7g==
-X-Received: by 2002:a1c:1b93:: with SMTP id b141mr8576351wmb.114.1580428293799; 
- Thu, 30 Jan 2020 15:51:33 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id k16sm9999660wru.0.2020.01.30.15.51.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jan 2020 15:51:33 -0800 (PST)
-Subject: Re: [PATCH 1/6] tests/boot_linux_console: add microvm acceptance test
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Liam Merwick <liam.merwick@oracle.com>, alex.bennee@linaro.org,
- fam@euphon.net
-References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-2-git-send-email-liam.merwick@oracle.com>
- <a968cbba-911c-ac0b-6b7e-d50e83e877e3@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <acf418d0-a002-4ae0-06cc-c26bf495f3f8@redhat.com>
-Date: Fri, 31 Jan 2020 00:51:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ixJb6-00006Q-8i; Thu, 30 Jan 2020 18:51:45 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 487xvw5vhFz9sPW; Fri, 31 Jan 2020 10:51:40 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1580428300;
+ bh=V5H4XMQoUqe+XDP5P4Tl83JigQAeZX4iXaO1VkHJa/Y=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ZDxgQrsPoJ5C5XNDbRL5rbgbepoFeXxbIjfdQRbkX8aZA1vFBtL9q5CXm/hYVeRUS
+ Q6og5Q5VxN9lmyb1UEPO8Jp7aqNGFgFKkjacEHnGMwtfq+bIHC3H0JwMpqXCNeWwi/
+ dyKEjmdby1g0PIDYvyahcToQcg+z6krE69eORN5w=
+Date: Fri, 31 Jan 2020 10:39:06 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Ganesh Goudar <ganeshgr@linux.ibm.com>
+Subject: Re: [PATCH v21 0/7]target-ppc/spapr: Add FWNMI support in QEMU for
+ PowerKVM guests
+Message-ID: <20200130233906.GA15210@umbus.fritz.box>
+References: <20200130184423.20519-1-ganeshgr@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <a968cbba-911c-ac0b-6b7e-d50e83e877e3@redhat.com>
-Content-Language: en-US
-X-MC-Unique: -4DJYbPAPSSgqllPKS24Jw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
+Content-Disposition: inline
+In-Reply-To: <20200130184423.20519-1-ganeshgr@linux.ibm.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,101 +69,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, slp@redhat.com,
- sgarzare@redhat.com
+Cc: arawinda.p@gmail.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ paulus@ozlabs.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/30/20 6:41 PM, Wainer dos Santos Moschetta wrote:
-> On 1/27/20 2:36 PM, Liam Merwick wrote:
->> Refactor test_x86_64_pc() to test_x86_64_machine() so that separate
->> functions which specify the Avocado tag of ':avocado: tags=3Dmachine:'
->> as being either 'pc' or 'microvm' can be used to test booting a
->> compressed kernel using either machine class.
->>
->> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
->> ---
->> =A0 tests/acceptance/boot_linux_console.py | 15 +++++++++++++--
->> =A0 1 file changed, 13 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py=20
->> b/tests/acceptance/boot_linux_console.py
->> index e40b84651b0b..aa5b07b1c609 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -51,10 +51,9 @@ class BootLinuxConsole(Test):
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 os.chdir(cwd)
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return self.workdir + path
->> -=A0=A0=A0 def test_x86_64_pc(self):
->> +=A0=A0=A0 def do_test_x86_64_machine(self):
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:x86_64
->> -=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:pc
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_url =3D=20
->> ('https://archives.fedoraproject.org/pub/archive/fedora'
->>                        =20
->> '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
->> @@ -70,6 +69,18 @@ class BootLinuxConsole(Test):
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 console_pattern =3D 'Kernel command line: %s=
-' %=20
->> kernel_command_line
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 self.wait_for_console_pattern(console_patter=
-n)
->> +=A0=A0=A0 def test_x86_64_pc(self):
->> +=A0=A0=A0=A0=A0=A0=A0 """
->> +=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:pc
->> +=A0=A0=A0=A0=A0=A0=A0 """
->=20
-> The test method won't inherit the 'arch' tag from=20
-> `do_test_x86_64_machine()`, so you need to explicitly 'arch' tag each=20
-> test you created in this series. If you don't do so, Avocado won't=20
-> filter out those x86_64 tests in case QEMU is built with non-x86_64=20
-> targets.
->=20
-> Follows an example, I built QEMU with '--target-list=3Darm-softmmu'. I go=
-t:
->=20
-> ```
->=20
-> (02/18)=20
-> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:=
-=20
-> CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
->  =A0(03/18)=20
-> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_micro=
-vm:=20
-> CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
->  =A0(04/18)=20
-> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_virt:=20
-> PASS (1.25 s)
->=20
-> ```
->=20
-> OK, avocado_qemu was smart enough to skip the tests, but ideally it=20
-> should not even consider running them in the first place.
 
-This should be solved by this patch:
-https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg07311.html
-"tests/acceptance: Use 'machine' tag to check if available in QEMU binary"
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jan 31, 2020 at 12:14:16AM +0530, Ganesh Goudar wrote:
+> This patch set adds support for FWNMI in PowerKVM guests.
+>=20
+> System errors such as SLB multihit and memory errors
+> that cannot be corrected by hardware is passed on to
+> the kernel for handling by raising machine check
+> exception (an NMI). Upon such machine check exceptions,
+> if the address in error belongs to guest then KVM
+> invokes guests' 0x200 interrupt vector if the guest
+> is not FWNMI capable. For FWNMI capable guest
+> KVM passes the control to QEMU by exiting the guest.
+>=20
+> This patch series adds functionality to QEMU to pass
+> on such machine check exceptions to the FWNMI capable
+> guest kernel by building an error log and invoking
+> the guest registered machine check handling routine.
+>=20
+> The KVM changes are now part of the upstream kernel
+> (commit e20bbd3d). This series contain QEMU changes.
+
+Applied to ppc-for-5.0.
 
 >=20
-> Thanks!
+> Change Log v21:
+>   - Use error_setg() for failure handling in apply hook.
+>   - Report warning if FWNMI enabled for TCG.
+>   - Enable FWNMI by default for machine type 5.0.
 >=20
-> - Wainer
+> Change Log v20:
+>   - Remove code left over from previous version.
 >=20
->> +=A0=A0=A0=A0=A0=A0=A0 self.do_test_x86_64_machine()
->> +
->> +=A0=A0=A0 def test_x86_64_microvm(self):
->> +=A0=A0=A0=A0=A0=A0=A0 """
->> +=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:microvm
->> +=A0=A0=A0=A0=A0=A0=A0 """
->> +=A0=A0=A0=A0=A0=A0=A0 self.do_test_x86_64_machine()
->> +
->> =A0=A0=A0=A0=A0 def test_mips_malta(self):
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:mips
+> Change Log v19:
+>   - Create error object for migration blocker in machine_init().
+>   - Remove the check to see fwnmi calls are already registered,
+>     which is no longer needed.
+>   - Register fwnmi RTAS calls in core_rtas_register_types() where
+>     other RTAS calls are registered.
+>   - Bail out from interlock call if the cap is not set.
+>   - Reorder and add missing S-O-Bs.
+>=20
+> Change Log v18:
+>   - Dynamically create the Error object before adding it as blocker
+>   - In apply hook check if the fwnmi calls are already registered and
+>     if kvm supports fwnmi before registering the fwnmi calls.
+>   - In rtas_ibm_nmi_register() test the feature flag before attempting
+>     to get the RTAS address
+>   - Introduce a bool member "fwnmi_calls_registered" to check if the
+>     fwnmi calls are registered and use the same in needed hook to save
+>     the state during migration.=20
+>=20
+> Change Log v17:
+>   - Add fwnmi cap to migration state
+>   - Reprhase the commit message in patch 2/7
+>=20
+> Change Log v16:
+>   - Fixed coding style problems
+>=20
+> Change Log v15:
+>   - Removed cap_ppc_fwnmi
+>   - Moved fwnmi registeration to .apply hook
+>   - Assume SLOF has allocated enough room for rtas error log
+>   - Using ARRAY_SIZE to end the loop
+>   - Do not set FWNMI cap in post_load, now its done in .apply hook
+>=20
+> Change Log v14:
+>   - Feature activation moved to a separate patch
+>   - Fixed issues with migration blocker
+>=20
+> Change Log v13:
+>   - Minor fixes (mostly nits)
+>   - Moved FWNMI guest registration check from patch 4 to 3.
+>=20
+> Change Log v12:
+>   - Rebased to latest ppc-for-4.2 (SHA b1e8156743)
+>=20
+> Change Log v11:
+>   - Moved FWNMI SPAPR cap defaults to 4.2 class option
+>   - Fixed issues with handling fwnmi KVM capability
+>=20
+> ---
+>=20
+> Aravinda Prasad (7):
+>   Wrapper function to wait on condition for the main loop mutex
+>   ppc: spapr: Introduce FWNMI capability
+>   target/ppc: Handle NMI guest exit
+>   target/ppc: Build rtas error log upon an MCE
+>   ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS
+>     calls
+>   migration: Include migration support for machine check handling
+>   ppc: spapr: Activate the FWNMI functionality
+>=20
+>  cpus.c                   |   5 +
+>  hw/ppc/spapr.c           |  60 +++++++++
+>  hw/ppc/spapr_caps.c      |  28 ++++
+>  hw/ppc/spapr_events.c    | 269 +++++++++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_rtas.c      |  87 +++++++++++++
+>  include/hw/ppc/spapr.h   |  25 +++-
+>  include/qemu/main-loop.h |   8 ++
+>  target/ppc/kvm.c         |  24 ++++
+>  target/ppc/kvm_ppc.h     |   8 ++
+>  target/ppc/trace-events  |   1 +
+>  10 files changed, 513 insertions(+), 2 deletions(-)
 >=20
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--BOKacYhQ+x31HxR3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4zaRUACgkQbDjKyiDZ
+s5KDfhAAhwQF7Kdx95uWFF5sStrjcluD08f0X1bs/i4Ib1VcKwUCFVEmNcWSMYHH
+oxamdP0fgO/Ct/iCT9cUon2x9nAdfh/pB35qSv7qjLVeObfrpo48ToVX7VfeRTui
+ZGAxFUb1rR0rjRZK4s061oC88loAVg87v1AchruHP2+XwSIUMgaEdfDylKuWXiLT
+zCp7eJrBQ1UHipGV+GMjBYDYpdxgUzQfVlZ0bE5ynErh/tq6U/UpivXsLTETWcuT
+Utbc7ruZKTaBONsPSfVTYolXzQ1p5AainyTl5f8XmWsz3Ria9zsfnbSDdTC98dml
+85uLPkWLOPnkKUAMipA57tQAFTOS9qhrRzwtUVEISgscPd0FloOVDCf/4Cm70et1
+/I+YIXQ+G0XyzuAYhrL1wPcaN9vaLBR0tQuNcRFszZN70dfQXqcXFEuJSj8kZAQB
+0Ty9HIHtPfLOx8glniEc4Cs8M+xkcqXy4yEpK557uqmAUzzX1bFh96XQ8+mQmSN9
++OEumRUFaIEcZiPGA7Sqm3IchjEtyRhOBFtX1EB7VVNI4owXqgGlxup+/Z73U0Iu
+ZG7i/yQerhWI72Ncp9XquJmivb7XamAOJTDcjw47yjoSYehXZVyETn3lK3llGgGa
+0rtoN87olmD2gfjBUQ45p8Df03CEUU3UBosYTIYMp9B5bD3Du9s=
+=sYJV
+-----END PGP SIGNATURE-----
+
+--BOKacYhQ+x31HxR3--
 
