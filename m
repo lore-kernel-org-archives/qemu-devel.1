@@ -2,88 +2,84 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5263BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 15:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A75C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 15:04:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A7022051A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 15:02:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CAF1206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 15:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jGLOPTxS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A7022051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dF6bKTXx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CAF1206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixBKl-0007tR-92
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 10:02:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47088)
+	id 1ixBND-0001A7-O3
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 10:04:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ixBJs-0007Fd-Ho
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:01:26 -0500
+ (envelope-from <hsp.cat7@gmail.com>) id 1ixBMT-0000bv-DC
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:04:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ixBJq-0006IX-FD
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:01:24 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48156
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ixBJp-0006I5-PN
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:01:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580396481;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=43e6/2Os/YwlrrfEHMY0c+1A7g89zjHPj8Lk/iqwXt0=;
- b=jGLOPTxSmoYwWTQpcaE2za4z2cntxw46UohYwvljmbgKb9fk+dtzsU3TqpUKPPMybKNXK9
- 6ESuZBGyx9kfaiNuiQqJqJbzWoenLMUt8ilALgfjwsvK6DYv9CZ2vuvv+SPIAWAZtkyyPI
- VW8xHp2DbHDD9syvHjHcSRRAWyf9YY0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-4nrLpPS4NWaBWZBG3t4Gsw-1; Thu, 30 Jan 2020 10:01:17 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29FB510509AB;
- Thu, 30 Jan 2020 15:01:16 +0000 (UTC)
-Received: from redhat.com (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A4FE1C947;
- Thu, 30 Jan 2020 15:01:11 +0000 (UTC)
-Date: Thu, 30 Jan 2020 15:01:08 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 02/13] qcrypto-luks: implement encryption key management
-Message-ID: <20200130150108.GM1891831@redhat.com>
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-3-mlevitsk@redhat.com>
- <87r1zti6r8.fsf@dusky.pond.sub.org>
- <dc902f2ba314b63da7ae7a003463f9268e7b3535.camel@redhat.com>
- <20200128171116.GU1446339@redhat.com>
- <20200128173251.GZ1446339@redhat.com>
- <20200130123847.GE6438@linux.fritz.box>
- <20200130125319.GD1891831@redhat.com>
- <87zhe5ovbv.fsf@dusky.pond.sub.org>
+ (envelope-from <hsp.cat7@gmail.com>) id 1ixBMR-0000lc-TI
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:04:05 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40000)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1ixBMR-0000kx-NK
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 10:04:03 -0500
+Received: by mail-ot1-x343.google.com with SMTP id i6so3392967otr.7
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 07:04:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EWuV2SxF0zyNRr9pbMx3m9yuxh/CblPB6RGRuIoZ7ss=;
+ b=dF6bKTXxS6DnlHZzvh2rNFwnkB2WKt5xtqg8nnC5ktAUDUGBssdX3dchdrpWZO2kNZ
+ LKtN1um5EcHszlHrbjJUJkVROjhrn0a9BKBlpdWG4ZQqLiqdSGZGv1Hs2EmYbJaEi722
+ J0d11TwV9113amFp4LeSxm1HW7K+GIOEFAyxjF95Im8+87y/8pJmUF0SlYIczxWSqHQv
+ ZFPBGUG6FX4Zl5CYits6gIEJCk3cgDEUI15jjyDjxU3fjbnn8skfJd+Y+O2vKQwY780M
+ F0N+3C+aEZuTYffHGGx6nK1PbfpEsOiZlQoj+9QYBbsVBegzWNXnXjSND7KiY/fX83kd
+ +WpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EWuV2SxF0zyNRr9pbMx3m9yuxh/CblPB6RGRuIoZ7ss=;
+ b=BcGck0TksUEIvg8+WmQ75Va1ZemHQeypWyjy5duao2SEEpg59qzY1JDel92DhkVtF5
+ gg3Y+o1ke69/EtsujTWZDm034H8pn5yN1zWxySgCf8ZZ8eEsLbWEkqZBvxufzkeQ3u5a
+ qytXiCMZpGwmCTW9xJc9Lr5Mfw1mXaSKIXxQM8oehjavKlWvszhj5+eUoWnE4QxvxXq6
+ j/MBItPju/8UD6fR0XcKaPmrFx68XDCy1ou81QkUKwsj0EZlKORXn3J5NCfNTDHRARQY
+ xO3j+OBDgp02KWYQP1S4CZyHJHmU1fVZygDLv7iwwNwHNDo8UXN4Ha2Cog+vVxFitBnD
+ BfHA==
+X-Gm-Message-State: APjAAAWvGXDvMxDzN+h0hO7BnbhhUeroIePuFIGFClcn35ktik1K21Dl
+ 9/gdrFuAV/4PUafzA5/6wnVgWKCcdf/g2vpLg1s=
+X-Google-Smtp-Source: APXvYqz6yonCKsJmmV2GJ6yHfffaGqr1DU2AY7POHJf91muquPVA+m/SfJnKwrBhG1eppmxQzsq8dKxPyz2kuc8XCiU=
+X-Received: by 2002:a9d:831:: with SMTP id 46mr3937921oty.295.1580396642797;
+ Thu, 30 Jan 2020 07:04:02 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87zhe5ovbv.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 4nrLpPS4NWaBWZBG3t4Gsw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <43D423C6-78D4-4DCE-B97C-0658D3D2E3BD@gmail.com>
+ <4021690b-2380-3925-209e-d4cc66928773@gmail.com>
+ <5314e860-dffe-3bc0-209f-bd2b937cd0c6@t-online.de>
+ <CABLmASGcUVyASudNizcgPshEqahwYt-4m9Z1DXEhVe2vdko9cQ@mail.gmail.com>
+ <54f5ddf3-5ea9-bd6d-8c71-edf4db527463@t-online.de>
+ <f03b7ae9-344c-5a7f-414c-6250a9c5ec2f@t-online.de>
+In-Reply-To: <f03b7ae9-344c-5a7f-414c-6250a9c5ec2f@t-online.de>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Thu, 30 Jan 2020 16:03:51 +0100
+Message-ID: <CABLmASGkSnG4+vfykBnEznX=kCAcSaiW20nf-wT9Cne4Cj9+LQ@mail.gmail.com>
+Subject: Re: [RFC] coreaudio: fix coreaudio_test.diff
+To: =?UTF-8?Q?Volker_R=C3=BCmelin?= <vr_qemu@t-online.de>
+Content-Type: multipart/alternative; boundary="0000000000007f8dcb059d5cc4c2"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,247 +91,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Programmingkid <programmingkidx@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 30, 2020 at 03:47:00PM +0100, Markus Armbruster wrote:
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->=20
-> > On Thu, Jan 30, 2020 at 01:38:47PM +0100, Kevin Wolf wrote:
-> >> Am 28.01.2020 um 18:32 hat Daniel P. Berrang=C3=A9 geschrieben:
-> >> > On Tue, Jan 28, 2020 at 05:11:16PM +0000, Daniel P. Berrang=C3=A9 wr=
-ote:
-> >> > > On Tue, Jan 21, 2020 at 03:13:01PM +0200, Maxim Levitsky wrote:
-> >> > > > On Tue, 2020-01-21 at 08:54 +0100, Markus Armbruster wrote:
-> >> > > >=20
-> >> > > > <trimmed>
-> >> > > >=20
-> >> > > > > > +##
-> >> > > > > > +# @LUKSKeyslotUpdate:
-> >> > > > > > +#
-> >> > > > > > +# @keyslot:         If specified, will update only keyslot =
-with this index
-> >> > > > > > +#
-> >> > > > > > +# @old-secret:      If specified, will only update keyslots=
- that
-> >> > > > > > +#                   can be opened with password which is co=
-ntained in
-> >> > > > > > +#                   QCryptoSecret with @old-secret ID
-> >> > > > > > +#
-> >> > > > > > +#                   If neither @keyslot nor @old-secret is =
-specified,
-> >> > > > > > +#                   first empty keyslot is selected for the=
- update
-> >> > > > > > +#
-> >> > > > > > +# @new-secret:      The ID of a QCryptoSecret object provid=
-ing a new decryption
-> >> > > > > > +#                   key to place in all matching keyslots.
-> >> > > > > > +#                   null/empty string erases all matching k=
-eyslots
-> >> > > > >=20
-> >> > > > > I hate making the empty string do something completely differe=
-nt than a
-> >> > > > > non-empty string.
-> >> > > > >=20
-> >> > > > > What about making @new-secret optional, and have absent @new-s=
-ecret
-> >> > > > > erase?
-> >> > > >=20
-> >> > > > I don't remember already why I and Keven Wolf decided to do this=
- this way, but I think that you are right here.
-> >> > > > I don't mind personally to do this this way.
-> >> > > > empty string though is my addition, since its not possible to pa=
-ss null on command line.
-> >> > >=20
-> >> > > IIUC this a result of using  "StrOrNull" for this one field...
-> >> > >=20
-> >> > >=20
-> >> > > > > > +# Since: 5.0
-> >> > > > > > +##
-> >> > > > > > +{ 'struct': 'LUKSKeyslotUpdate',
-> >> > > > > > +  'data': {
-> >> > > > > > +           '*keyslot': 'int',
-> >> > > > > > +           '*old-secret': 'str',
-> >> > > > > > +           'new-secret' : 'StrOrNull',
-> >> > > > > > +           '*iter-time' : 'int' } }
-> >> > >=20
-> >> > > It looks wierd here to be special casing "new-secret" to "StrOrNul=
-l"
-> >> > > instead of just marking it as an optional string field
-> >> > >=20
-> >> > >    "*new-secret": "str"
-> >> > >=20
-> >> > > which would be possible to use from the command line, as you simpl=
-y
-> >> > > omit the field.
-> >> > >=20
-> >> > > I guess the main danger here is that we're using this as a trigger
-> >> > > to erase keyslots. So simply omitting "new-secret" can result
-> >> > > in damage to the volume by accident which is not an attractive
-> >> > > mode.
-> >>=20
-> >> Right. It's been a while since I discussed this with Maxim, but I thin=
-k
-> >> this was the motivation for me to suggest an explicit null value.
->=20
-> A bit of redundancy to guard against catastrophic accidents makes sense.
-> We can discuss its shape.
->=20
-> >> As long as we don't support passing null from the command line, I see
-> >> the problem with it, though. Empty string (which I think we didn't
-> >> discuss before) looks like a reasonable enough workaround to me, but i=
-f
-> >> you think this is too much magic, then maybe not.
-> >>=20
-> >> > Thinking about this again, I really believe we ought to be moire
-> >> > explicit about disabling the keyslot by having the "active" field.
-> >> > eg
-> >> >=20
-> >> > { 'struct': 'LUKSKeyslotUpdate',
-> >> >   'data': {
-> >> >           'active': 'bool',
-> >> >           '*keyslot': 'int',
-> >> >           '*old-secret': 'str',
-> >> >           '*new-secret' : 'str',
-> >> >           '*iter-time' : 'int' } }
-> >> >=20
-> >> > "new-secret" is thus only needed when "active" =3D=3D true.
->=20
-> I figure @iter-time, too.
->=20
-> >> Hm. At the very least, I would make 'active' optional and default to
-> >> true, so that for adding or updating you must only specify 'new-secret=
-'
-> >> and for deleting only 'active'.
-> >
-> > Is that asymmetry really worth while ? It merely saves a few
-> > characters of typing by omitting "active: true", so I'm not
-> > really convinced.
-> >
-> >> > This avoids the problem with being unable to specify a null for
-> >> > StrOrNull on the command line too.
-> >>=20
-> >> If we ever get a way to pass null on the command line, how would we
-> >> think about a struct like this? Will it still feel right, or will it
-> >> feel like we feel about simple unions today (they exist, we would like
-> >> to get rid of them, but we can't because compatibility)?
-> >
-> > Personally I really don't like the idea of using "new-secret:null"
-> > as a way to request deletion of a keyslot. That's too magical
-> > for an action that is so dangerous to data IMhO.
->=20
-> I tend to agree.  Expressing "zap the secret" as '"new-secret": null' is
-> clever and kind of cute, but "clever" and "cute" have no place next to
-> "irrevocably destroy data".
->=20
-> > I think of these operations as activating & deactivating keyslots,
-> > hence my suggestion to use an explicit "active: true|false" to
-> > associate the core action being performed, instead of inferring
-> > the action indirectly from the secret.
-> >
-> > I think this could lend itself better to future extensions too.
-> > eg currently we're just activating or deactivating a keyslot.
-> > it is conceivable in future (LUKS2) we might want to modify an
-> > existing keyslot in some way. In that scenario, "active" can
-> > be updated to be allowed to be optional such that:
-> >
-> >  - active: true ->  activate a currently inactive keyslot
-> >  - active: false -> deactivate a currently active keyslot
-> >  - active omitted -> modify a currently active keyslot
->=20
-> A boolean provides two actions.  By making it optional, we can squeeze
-> out a third, at the price of making the interface unintuitive: how would
-> you know what "@active absent" means without looking it up?
->=20
-> Why not have an @action of enum type instead?  Values "add" and "delete"
-> now (or "activate" and "deactivate", whatever makes the most sense when
-> writing the docs), leaving us room to later add whatever comes up.
+--0000000000007f8dcb059d5cc4c2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I probably worded my suggestion badly - "active" should not be
-thought of as expressing an operation type; it should be considered
-a direct reflection of the "active" metadat field in a LUKS keyslot
-on disk.
+On Wed, Jan 29, 2020 at 8:13 AM Volker R=C3=BCmelin <vr_qemu@t-online.de> w=
+rote:
 
-So I should have described it as:
+> This is an untested patch that tries to fix the problems in the
+> patch found at
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg02142.html.
+>
+> Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
+> ---
+>  audio/audio_template.h | 16 ++++++++--------
+>  audio/coreaudio.c      |  5 +++++
+>  2 files changed, 13 insertions(+), 8 deletions(-)
+>
+> diff --git a/audio/audio_template.h b/audio/audio_template.h
+> index a7b46b8363..e6724c5d68 100644
+> --- a/audio/audio_template.h
+> +++ b/audio/audio_template.h
+> @@ -153,13 +153,6 @@ static int glue (audio_pcm_sw_init_, TYPE) (
+>      sw->ratio =3D ((int64_t) sw->info.freq << 32) / sw->hw->info.freq;
+>  #endif
+>
+> -#ifdef FLOAT_MIXENG
+> -#ifdef DAC
+> -    sw->conv =3D mixeng_conv_float;
+> -#else
+> -    sw->clip =3D mixeng_clip_float;
+> -#endif
+> -#else
+>  #ifdef DAC
+>      sw->conv =3D mixeng_conv
+>  #else
+> @@ -169,7 +162,6 @@ static int glue (audio_pcm_sw_init_, TYPE) (
+>          [sw->info.sign]
+>          [sw->info.swap_endianness]
+>          [audio_bits_to_index (sw->info.bits)];
+> -#endif
+>
+>      sw->name =3D g_strdup (name);
+>      err =3D glue (audio_pcm_sw_alloc_resources_, TYPE) (sw);
+> @@ -284,6 +276,13 @@ static HW *glue(audio_pcm_hw_add_new_,
+> TYPE)(AudioState *s,
+>          goto err1;
+>      }
+>
+> +#ifdef FLOAT_MIXENG
+> +#ifdef DAC
+> +    hw->clip =3D mixeng_clip_float;
+> +#else
+> +    hw->conv =3D mixeng_conv_float;
+> +#endif
+> +#else
+>  #ifdef DAC
+>      hw->clip =3D mixeng_clip
+>  #else
+> @@ -293,6 +292,7 @@ static HW *glue(audio_pcm_hw_add_new_,
+> TYPE)(AudioState *s,
+>          [hw->info.sign]
+>          [hw->info.swap_endianness]
+>          [audio_bits_to_index (hw->info.bits)];
+> +#endif
+>
+>      glue(audio_pcm_hw_alloc_resources_, TYPE)(hw);
+>
+> diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+> index 4e7e509ad0..ff0d23fd7d 100644
+> --- a/audio/coreaudio.c
+> +++ b/audio/coreaudio.c
+> @@ -482,6 +482,7 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct
+> audsettings *as,
+>      Audiodev *dev =3D drv_opaque;
+>      AudiodevCoreaudioPerDirectionOptions *cpdo =3D dev->u.coreaudio.out;
+>      int frames;
+> +    struct audsettings fake_as;
+>
+>      /* create mutex */
+>      err =3D pthread_mutex_init(&core->mutex, NULL);
+> @@ -490,6 +491,10 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct
+> audsettings *as,
+>          return -1;
+>      }
+>
+> +    memcpy(&fake_as, as, sizeof(struct audsettings));
+> +    as =3D &fake_as;
+> +    /* size of float is 32bits */
+> +    as->fmt =3D AUDIO_FORMAT_S32;
+>      audio_pcm_init_info (&hw->info, as);
+>
+>      status =3D coreaudio_get_voice(&core->outputDeviceID);
+> --
+> 2.16.4
+>
+> Hi all,
 
- - active: true|false ->  set the keyslot active state to this value
- - active omitted -> don't change the keyslot active state
+Thanks to the generous help from Mark, I can now report that it is good to
+hear coreaudio has been restored into a working state with this patch! I
+tested qemu-system-ppc running MacOS and OSX.
 
-The three possible states of the "active" field then happen to
-provide the way to express the desired operations.
+Best,
+Howard
 
->=20
-> This also lets us turn LUKSKeyslotUpdate into a union.
->=20
-> Brief detour before I sketch that: update safety.
->=20
-> Unless writing a keyslot is atomic, i.e. always either succeeds
-> completely, or fails without changing anything, updating a slot in place
-> is dangerous: you may destroy the old key without getting your new one
-> in place.
->=20
-> To safely replace an existing secret, you first write the new secret to
-> a free slot, and only when that succeeded, you delete the old one.
->=20
-> This leads to the following safe operations:
->=20
-> * "Activate": write a secret to a free keyslot (chosen by the system)
->=20
-> * "Deactivate": delete an existing secret from all keyslots containing
->   it (commonly just one)
->=20
-> Dangerous and unwanted:
->=20
-> * Replace existing secret in place
->=20
-> Low-level operations we may or may not want to support:
->=20
-> * Write a secret to specific keyslot (dangerous unless it's free)
->=20
-> * Zap a specific keyslot (hope it contains the secret you think it does)
->=20
-> Now let me sketch LUKSKeyslotUpdate as union.  First without support for
-> the low-level operations:
->=20
->     { state: 'LUKSKeyslotUpdateAction',
->       'data': [ 'add', 'delete' ] }
->     { 'struct': 'LUKSKeyslotAdd',
->       'data': { 'secret': 'str',
->                 '*iter-time': 'int' } }
->     { 'struct': 'LUKSKeyslotDelete',
->       'data': { 'secret': 'str' }
->     { 'union: 'LUKSKeyslotUpdate',
->       'base': { 'action': 'LUKSKeyslotUpdateAction' }
->       'discriminator': 'action',
->       'data': { 'add': 'LUKSKeyslotAdd' },
->               { 'delete': 'LUKSKeyslotDelete' } }
->=20
-> Since @secret occurs in all variants, we could also put it in @base
-> instead.  Matter of taste.  I think this way is clearer.  Lets us easily
-> add a variant that doesn't want @secret later on (although moving it
-> from @base to variants then would be possible).
+--0000000000007f8dcb059d5cc4c2
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Jan 29, 2020 at 8:13 AM Volke=
+r R=C3=BCmelin &lt;<a href=3D"mailto:vr_qemu@t-online.de">vr_qemu@t-online.=
+de</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
+n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
+">This is an untested patch that tries to fix the problems in the<br>
+patch found at<br>
+<a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg0214=
+2.html" rel=3D"noreferrer" target=3D"_blank">https://lists.nongnu.org/archi=
+ve/html/qemu-devel/2020-01/msg02142.html</a>. <br>
+<br>
+Signed-off-by: Volker R=C3=BCmelin &lt;<a href=3D"mailto:vr_qemu@t-online.d=
+e" target=3D"_blank">vr_qemu@t-online.de</a>&gt;<br>
+---<br>
+=C2=A0audio/audio_template.h | 16 ++++++++--------<br>
+=C2=A0audio/coreaudio.c=C2=A0 =C2=A0 =C2=A0 |=C2=A0 5 +++++<br>
+=C2=A02 files changed, 13 insertions(+), 8 deletions(-)<br>
+<br>
+diff --git a/audio/audio_template.h b/audio/audio_template.h<br>
+index a7b46b8363..e6724c5d68 100644<br>
+--- a/audio/audio_template.h<br>
++++ b/audio/audio_template.h<br>
+@@ -153,13 +153,6 @@ static int glue (audio_pcm_sw_init_, TYPE) (<br>
+=C2=A0 =C2=A0 =C2=A0sw-&gt;ratio =3D ((int64_t) sw-&gt;info.freq &lt;&lt; 3=
+2) / sw-&gt;hw-&gt;info.freq;<br>
+=C2=A0#endif<br>
+<br>
+-#ifdef FLOAT_MIXENG<br>
+-#ifdef DAC<br>
+-=C2=A0 =C2=A0 sw-&gt;conv =3D mixeng_conv_float;<br>
+-#else<br>
+-=C2=A0 =C2=A0 sw-&gt;clip =3D mixeng_clip_float;<br>
+-#endif<br>
+-#else<br>
+=C2=A0#ifdef DAC<br>
+=C2=A0 =C2=A0 =C2=A0sw-&gt;conv =3D mixeng_conv<br>
+=C2=A0#else<br>
+@@ -169,7 +162,6 @@ static int glue (audio_pcm_sw_init_, TYPE) (<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[sw-&gt;info.sign]<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[sw-&gt;info.swap_endianness]<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[audio_bits_to_index (sw-&gt;info.bits)];=
+<br>
+-#endif<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0sw-&gt;name =3D g_strdup (name);<br>
+=C2=A0 =C2=A0 =C2=A0err =3D glue (audio_pcm_sw_alloc_resources_, TYPE) (sw)=
+;<br>
+@@ -284,6 +276,13 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioStat=
+e *s,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto err1;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
++#ifdef FLOAT_MIXENG<br>
++#ifdef DAC<br>
++=C2=A0 =C2=A0 hw-&gt;clip =3D mixeng_clip_float;<br>
++#else<br>
++=C2=A0 =C2=A0 hw-&gt;conv =3D mixeng_conv_float;<br>
++#endif<br>
++#else<br>
+=C2=A0#ifdef DAC<br>
+=C2=A0 =C2=A0 =C2=A0hw-&gt;clip =3D mixeng_clip<br>
+=C2=A0#else<br>
+@@ -293,6 +292,7 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioState=
+ *s,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[hw-&gt;info.sign]<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[hw-&gt;info.swap_endianness]<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[audio_bits_to_index (hw-&gt;info.bits)];=
+<br>
++#endif<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0glue(audio_pcm_hw_alloc_resources_, TYPE)(hw);<br>
+<br>
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c<br>
+index 4e7e509ad0..ff0d23fd7d 100644<br>
+--- a/audio/coreaudio.c<br>
++++ b/audio/coreaudio.c<br>
+@@ -482,6 +482,7 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct au=
+dsettings *as,<br>
+=C2=A0 =C2=A0 =C2=A0Audiodev *dev =3D drv_opaque;<br>
+=C2=A0 =C2=A0 =C2=A0AudiodevCoreaudioPerDirectionOptions *cpdo =3D dev-&gt;=
+u.coreaudio.out;<br>
+=C2=A0 =C2=A0 =C2=A0int frames;<br>
++=C2=A0 =C2=A0 struct audsettings fake_as;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0/* create mutex */<br>
+=C2=A0 =C2=A0 =C2=A0err =3D pthread_mutex_init(&amp;core-&gt;mutex, NULL);<=
+br>
+@@ -490,6 +491,10 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct a=
+udsettings *as,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -1;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
++=C2=A0 =C2=A0 memcpy(&amp;fake_as, as, sizeof(struct audsettings));<br>
++=C2=A0 =C2=A0 as =3D &amp;fake_as;<br>
++=C2=A0 =C2=A0 /* size of float is 32bits */<br>
++=C2=A0 =C2=A0 as-&gt;fmt =3D AUDIO_FORMAT_S32;<br>
+=C2=A0 =C2=A0 =C2=A0audio_pcm_init_info (&amp;hw-&gt;info, as);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0status =3D coreaudio_get_voice(&amp;core-&gt;outputDevi=
+ceID);<br>
+-- <br>
+2.16.4<br>
+<br></blockquote><div>Hi all,</div><div><br></div><div>Thanks to the genero=
+us help from Mark, I can now report that it is good to hear coreaudio has b=
+een restored into a working state with this patch! I tested qemu-system-ppc=
+ running MacOS and OSX.<br></div><div><br></div><div>Best,</div><div>Howard=
+<br></div></div></div>
 
-This kind of approach is what I originally believed we
-should do, but it is contrary to the design expectations
-of the "amend" operation. That is not supposed to be
-expressing operations, rather expressing the desired
-state of the resulting disk.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+--0000000000007f8dcb059d5cc4c2--
 
