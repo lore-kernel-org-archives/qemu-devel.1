@@ -2,87 +2,78 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2328EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDE1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:49:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFF3C2083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34E7D2083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:49:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tFU/Jko4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFF3C2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDCVml6q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34E7D2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixHg4-00023q-Vj
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:48:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59298)
+	id 1ixHgS-0002pu-CC
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:49:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59102)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1ixHX4-0003Xy-NA
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:39:29 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ixHWc-0002Oy-Nf
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1ixHX3-0001ZO-AE
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:39:26 -0500
-Received: from mail-qk1-x72f.google.com ([2607:f8b0:4864:20::72f]:41260)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1ixHX3-0001XJ-66; Thu, 30 Jan 2020 16:39:25 -0500
-Received: by mail-qk1-x72f.google.com with SMTP id s187so4510666qke.8;
- Thu, 30 Jan 2020 13:39:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=r4T6tb7o7Rg9yHUzyw3ObbNCSy+JF9iuvJwNjdgekxA=;
- b=tFU/Jko4NOE4ZNsx1pnEfWMG1+875neVX3l5wsuVfc0IvWPdGQgdJSAaw04WmregAl
- 7Dv/aFjNqlhD3aLmCKsGZFc3QOjfCLv79RFrMIJTsvtnv9cvq+BOWn4rsSE2VUhtbQD/
- wJkp4b4uzWr1atS18KuFPzqFMvyRJbaHyF6v0bqPsLQ7ZKIb02okmZlMroqpub2AXBxT
- h34LviDaD6aT6e2cm4n/z36UzMUEB+i2Ot2VGhCGsCvAt2K9oSkLLcrigKZsvA7dAbfX
- 6CwS0vmO435bUV2fmTfmZqFITY2AhFkYN/YnANtJjQ4UZ9JUvJfzzqUlf2ZcZ+wdmvwK
- ffBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=r4T6tb7o7Rg9yHUzyw3ObbNCSy+JF9iuvJwNjdgekxA=;
- b=nvX544RR47CaM0mH1SsAYHe3MIZWS6FiUxtTE5Txw0oIl8UnxC/3trsAkqHV1sx4uW
- 6hL8VfFkELfKKWjswKO0rPrBkS4uR4pJ/F5WM1e2T7HFhH0ArL5kiWtODBp1NCviYBm6
- /QhA86lM+91JDc7/VsvS1JbZvF5H1zp9QoD26ue6qAzQO3bMPXCF4nZJ6bkESZtkyrdh
- D9fgad7dH5pexBTytLLTpZ9U8Teei9Sy36T2dJFjY2s9FXBiCmMGBlTiJDQaofVxdLXc
- ZjQ1jbiHb3OLpzTpeUj6iKFy9UE2ouNdtGBYsFPn/Z9XnhFEetIa85/dltxRQXH6g1c5
- OOrw==
-X-Gm-Message-State: APjAAAXCKk5u46OuaPXxgm7E3+d0lEEn5zcTGbXWPrxjv7IDhVebHCEg
- 6K6bQMlYA9UiWFM8c8AOfB1cR0uU
-X-Google-Smtp-Source: APXvYqyHDTMcNGSizsiAepjDnye+5V39bwaVkN+tw4nMHOOyfKUfj4EeSOWGiHJBiq5FEsSJlHm7AA==
-X-Received: by 2002:a05:620a:ce5:: with SMTP id
- c5mr7335365qkj.49.1580420363506; 
- Thu, 30 Jan 2020 13:39:23 -0800 (PST)
-Received: from rekt.ibmuc.com ([2804:431:c7c7:c177:887c:ce1b:6a44:15ec])
- by smtp.gmail.com with ESMTPSA id f26sm3650597qtv.77.2020.01.30.13.39.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 13:39:23 -0800 (PST)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+ (envelope-from <stefanha@redhat.com>) id 1ixHWb-0000sd-18
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:58 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36834
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ixHWa-0000op-D3
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:38:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580420323;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4bJ8TzHQALlGcsbo6CfAHKgxLT0lBqzcK+7zzlvq1Zs=;
+ b=bDCVml6qB/VWmaMTxLWCwfTAYcFeU2ZvmqpIg3BB8xo5mgKsoa2DPxBG9NIpq8idw5o2Iy
+ U8QTasgG0fqAl/uSwkjtb3MwzLJ2GNXK1nAeMDR173dFTwUMLlFnGqgbliT/AHxgDhDnwv
+ XWPWsU8k/lb6+lHdoOvuM3uaa8bqBbc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-kCCDpSp0M3aETlBpPT3fLg-1; Thu, 30 Jan 2020 16:38:40 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9443118A6EC1;
+ Thu, 30 Jan 2020 21:38:39 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C141960BE0;
+ Thu, 30 Jan 2020 21:38:33 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 4/4] qemu-iotests: adding LUKS cleanup for non-UTF8 secret
- error
-Date: Thu, 30 Jan 2020 18:39:07 -0300
-Message-Id: <20200130213907.2830642-5-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200130213907.2830642-1-danielhb413@gmail.com>
-References: <20200130213907.2830642-1-danielhb413@gmail.com>
+Subject: [PULL 3/5] memory.c: Use trace_event_get_state_backends()
+Date: Thu, 30 Jan 2020 21:38:12 +0000
+Message-Id: <20200130213814.334195-4-stefanha@redhat.com>
+In-Reply-To: <20200130213814.334195-1-stefanha@redhat.com>
+References: <20200130213814.334195-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::72f
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: kCCDpSp0M3aETlBpPT3fLg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,125 +85,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Daniel Henrique Barboza <danielhb413@gmail.com>,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a new test file to exercise the case where
-qemu-img fails to complete for the LUKS format when a non-UTF8
-secret is used.
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+The preferred way to test whether a trace event is enabled is to
+use trace_event_get_state_backends(), because this will give the
+correct answer (allowing expensive computations to be skipped)
+whether the trace event is compile-time or run-time disabled.
+Convert the four old-style direct uses of TRACE_FOO_ENABLED in
+memory.c.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20200120151142.18954-3-peter.maydell@linaro.org
+Message-Id: <20200120151142.18954-3-peter.maydell@linaro.org>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/282     | 67 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/282.out | 11 +++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 79 insertions(+)
- create mode 100755 tests/qemu-iotests/282
- create mode 100644 tests/qemu-iotests/282.out
+ memory.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/282 b/tests/qemu-iotests/282
-new file mode 100755
-index 0000000000..081eb12080
---- /dev/null
-+++ b/tests/qemu-iotests/282
-@@ -0,0 +1,67 @@
-+#!/usr/bin/env bash
-+#
-+# Test qemu-img file cleanup for LUKS when using a non-UTF8 secret
-+#
-+# Copyright (C) 2020, IBM Corporation.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+TEST_IMAGE_FILE='vol.img'
-+
-+_cleanup()
-+{
-+  _cleanup_test_img
-+  rm non_utf8_secret
-+  rm -f $TEST_IMAGE_FILE
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt luks
-+_supported_proto generic
-+_unsupported_proto vxhs
-+
-+echo "== Create non-UTF8 secret =="
-+echo -n -e '\x3a\x3c\x3b\xff' > non_utf8_secret
-+SECRET="secret,id=sec0,file=non_utf8_secret"
-+
-+echo "== Throws an error because of invalid UTF-8 secret =="
-+$QEMU_IMG create -f $IMGFMT --object $SECRET -o "key-secret=sec0" $TEST_IMAGE_FILE 4M
-+
-+echo "== Image file should not exist after the error =="
-+if test -f "$TEST_IMAGE_FILE"; then
-+    exit 1
-+fi
-+
-+echo "== Create a stub image file and run qemu-img again =="
-+touch $TEST_IMAGE_FILE
-+$QEMU_IMG create -f $IMGFMT --object $SECRET -o "key-secret=sec0" $TEST_IMAGE_FILE 4M
-+
-+echo "== Pre-existing image file should also be deleted after the error =="
-+if test -f "$TEST_IMAGE_FILE"; then
-+    exit 1
-+fi
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/282.out b/tests/qemu-iotests/282.out
-new file mode 100644
-index 0000000000..5d079dabce
---- /dev/null
-+++ b/tests/qemu-iotests/282.out
-@@ -0,0 +1,11 @@
-+QA output created by 282
-+== Create non-UTF8 secret ==
-+== Throws an error because of invalid UTF-8 secret ==
-+qemu-img: vol.img: Data from secret sec0 is not valid UTF-8
-+Formatting 'vol.img', fmt=luks size=4194304 key-secret=sec0
-+== Image file should not exist after the error ==
-+== Create a stub image file and run qemu-img again ==
-+qemu-img: vol.img: Data from secret sec0 is not valid UTF-8
-+Formatting 'vol.img', fmt=luks size=4194304 key-secret=sec0
-+== Pre-existing image file should also be deleted after the error ==
-+ *** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index e041cc1ee3..9d8bf8f783 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -289,3 +289,4 @@
- 279 rw backing quick
- 280 rw migration quick
- 281 rw quick
-+282 rw img quick
--- 
+diff --git a/memory.c b/memory.c
+index 854798791e..aeaa8dcc9e 100644
+--- a/memory.c
++++ b/memory.c
+@@ -434,7 +434,7 @@ static MemTxResult  memory_region_read_accessor(MemoryR=
+egion *mr,
+     tmp =3D mr->ops->read(mr->opaque, addr, size);
+     if (mr->subpage) {
+         trace_memory_region_subpage_read(get_cpu_index(), mr, addr, tmp, s=
+ize);
+-    } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
++    } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_READ=
+)) {
+         hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
+         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, s=
+ize);
+     }
+@@ -456,7 +456,7 @@ static MemTxResult memory_region_read_with_attrs_access=
+or(MemoryRegion *mr,
+     r =3D mr->ops->read_with_attrs(mr->opaque, addr, &tmp, size, attrs);
+     if (mr->subpage) {
+         trace_memory_region_subpage_read(get_cpu_index(), mr, addr, tmp, s=
+ize);
+-    } else if (TRACE_MEMORY_REGION_OPS_READ_ENABLED) {
++    } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_READ=
+)) {
+         hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
+         trace_memory_region_ops_read(get_cpu_index(), mr, abs_addr, tmp, s=
+ize);
+     }
+@@ -476,7 +476,7 @@ static MemTxResult memory_region_write_accessor(MemoryR=
+egion *mr,
+=20
+     if (mr->subpage) {
+         trace_memory_region_subpage_write(get_cpu_index(), mr, addr, tmp, =
+size);
+-    } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
++    } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_WRIT=
+E)) {
+         hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
+         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, =
+size);
+     }
+@@ -496,7 +496,7 @@ static MemTxResult memory_region_write_with_attrs_acces=
+sor(MemoryRegion *mr,
+=20
+     if (mr->subpage) {
+         trace_memory_region_subpage_write(get_cpu_index(), mr, addr, tmp, =
+size);
+-    } else if (TRACE_MEMORY_REGION_OPS_WRITE_ENABLED) {
++    } else if (trace_event_get_state_backends(TRACE_MEMORY_REGION_OPS_WRIT=
+E)) {
+         hwaddr abs_addr =3D memory_region_to_absolute_addr(mr, addr);
+         trace_memory_region_ops_write(get_cpu_index(), mr, abs_addr, tmp, =
+size);
+     }
+--=20
 2.24.1
 
 
