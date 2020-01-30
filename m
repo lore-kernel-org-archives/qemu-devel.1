@@ -6,86 +6,84 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1235C33CB3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A72C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:01:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AEFB2083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAA3820702
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 12:01:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fi3/7nBT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AEFB2083E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ENODQFQU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAA3820702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix8RO-0008MC-Dk
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:56:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40955)
+	id 1ix8Vi-0001bn-Vj
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 07:01:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43729)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1ix8Ki-0001CK-TZ
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:50:06 -0500
+ (envelope-from <sgarzare@redhat.com>) id 1ix8Uv-00013F-VS
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:00:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1ix8Kg-0002Yu-I9
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:50:03 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60200
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <sgarzare@redhat.com>) id 1ix8Ut-000675-RB
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:00:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34408
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ix8Kg-0002YO-DQ
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:50:02 -0500
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ix8Ur-00060u-Tm
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 07:00:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580385001;
+ s=mimecast20190719; t=1580385630;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UUv1P2Iq01vNmZUT9bkkpZDZe2kSMid6fMyKsFYFcaE=;
- b=Fi3/7nBTjoLYSx54Qn9Mhp4DIIWqdPEuK3HvZN18dYxhQOM+c/aXQeBKXBziCTExlz6PVF
- UyXOw7o7Bq6aQ7cD8Q35GrE+ytU42RkPz/RPKnzHRYsvcdSVnAbyNXmcdss51iZhBWM3hW
- x9ej5L1v/J3BbYZKZ1pPjBvLbn0aMb4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-JWVvGaRxP5-oqPqGfUbT1Q-1; Thu, 30 Jan 2020 06:49:55 -0500
-Received: by mail-wr1-f70.google.com with SMTP id b13so1565453wrx.22
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 03:49:54 -0800 (PST)
+ bh=vy7u4q8TR2GGJyzKwVBCUpKv0DoP8t5DqGXYDBRGGYw=;
+ b=ENODQFQUiUmy2E0uJEkWD0i5TwucIiz5HvJ/1TJfqzmgI1IshyGNyHAHWKzti5rNO9qQgj
+ ZujRGb+Oj8XKLyFuI1ywAEv5G+JnbVGhK2EKMw1SUyLK4xO6zHb2t2fSYoDkQsEgb9d1r9
+ +Gx86s+Y4ydolNs+sjeeJQiJG/LcQaQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-6qec5vt6NeqS9Bp3mE4duQ-1; Thu, 30 Jan 2020 07:00:26 -0500
+Received: by mail-wm1-f70.google.com with SMTP id q125so420446wme.1
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 04:00:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=F01aSopn8U1FsiaKf3EfBYdzuSa6/mxsOmTh+Ri5bHo=;
- b=czNx9R0sHbFxQv+JdKxQEJGNNLjgjzzNbxcqAWq9tL57nReBYIcBxqt4d8qWD3UoCs
- dntQ0TiJ+9zcXQO7tvyJEyoeWeQXcq76ZwlnF3hZRZXB789PJEx8ud22J+ZCozUE9cO8
- NHKO6Qop22kA2jqQEm65GGB78i0uIOIUjeZVdTa6iDMMmwLnIbIxt73AHzc4ZJvDlbPz
- mqvtaKjn8NmmAkcmQRbUoz1kAESvq1pzrKYIrvkMdqx8spcpAkU/2NuYjEdtQ+ow+kIX
- +s+tKqRkHuXrJWaPYxBPNuI8Zc6kkkzy53A5YwFoZFrrFKxBSM0Q+E62ObbpT3yAux1C
- rIPw==
-X-Gm-Message-State: APjAAAWN8Ne4Zc68zhCCEkA8/beTyeAqI5fOgeW35oEd3GKU1sLNDHzt
- bu3heu6SHwXN4cdU9CDAT5fwVpWNuLjDAonVhFn4LfRkXIHmBVUKiKHaavGxQhsSZC+9QsWhh2x
- 0dHXkfX9l47A06FU=
-X-Received: by 2002:a05:600c:23ce:: with SMTP id
- p14mr5037391wmb.114.1580384994040; 
- Thu, 30 Jan 2020 03:49:54 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxxFo4Pa9XX5/agT6DXSJc2EFrvn7Ct2xO2k5ohrEYrSpH69qTKBe7dYigCCkjUzNLECT1TqQ==
-X-Received: by 2002:a05:600c:23ce:: with SMTP id
- p14mr5037352wmb.114.1580384993734; 
- Thu, 30 Jan 2020 03:49:53 -0800 (PST)
+ bh=PdXaGxr33UPSeEOHnRK6scKFehznpwVs8y8hfQVkGXo=;
+ b=gNXqDyCeJxfdw3Eyoy2VjUuq6XcQTU23xpP2wwEMbQnzfUSH5B6/380ceb3tUs8E4B
+ sV9g0MFDRVzyrgXSkJzor+T2Idh7YCmXoEZgIvIv8StgEzbrL04gWlGj9KorPvdAQ24g
+ 3DI+wIWd7VTwlwE0K7CkWyO821eavKWdXp40l0PzdVv9Dmc9DTVQwDVRQLigMDaVC4Vy
+ GLlaPq+yNm/UcacVUfiPovXSrgzVIY+o6Onrz9pJErL3kIKrVC/AAuuQiqzAseKc43aH
+ yAxZXSoE9+g+3x18nJX5Ps4gBWrfeOTaIfm+xal28syYP5EkQcCZQr+q6R6vZo8TQ0dh
+ kxzw==
+X-Gm-Message-State: APjAAAWQO9v1bfh9h7FNAbZk1nBJb/ZNFCSvCfGjoHWrYVWLSDsmnHZT
+ 9l1UIxlE3++ZDMhcMyydB2VxeQKPtntSz+LXlW94c5QwgN9Cbni49ogB5FhhR7m86oFjM8RWWEn
+ cp15vFCJbuQVCXFA=
+X-Received: by 2002:adf:dc86:: with SMTP id r6mr5219738wrj.68.1580385624818;
+ Thu, 30 Jan 2020 04:00:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqygMETwCUYB1S4kAngxqSPkczt7NWlqpLIOzeyjKgWYfItGHpG2RzoTj577/Eq3YyhYsHTVcA==
+X-Received: by 2002:adf:dc86:: with SMTP id r6mr5219672wrj.68.1580385624261;
+ Thu, 30 Jan 2020 04:00:24 -0800 (PST)
 Received: from steredhat (host209-4-dynamic.27-79-r.retail.telecomitalia.it.
  [79.27.4.209])
- by smtp.gmail.com with ESMTPSA id m21sm6226441wmi.27.2020.01.30.03.49.52
+ by smtp.gmail.com with ESMTPSA id d23sm7092160wra.30.2020.01.30.04.00.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 03:49:53 -0800 (PST)
-Date: Thu, 30 Jan 2020 12:49:50 +0100
+ Thu, 30 Jan 2020 04:00:23 -0800 (PST)
+Date: Thu, 30 Jan 2020 13:00:20 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Liam Merwick <liam.merwick@oracle.com>
-Subject: Re: [PATCH 1/6] tests/boot_linux_console: add microvm acceptance test
-Message-ID: <20200130114950.mudigrwt3n7rpffm@steredhat>
+Subject: Re: [PATCH 4/6] travis.yml: install rpm2cpio for acceptance tests
+Message-ID: <20200130120020.zawcwbrvqncjgynj@steredhat>
 References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-2-git-send-email-liam.merwick@oracle.com>
+ <1580142994-1836-5-git-send-email-liam.merwick@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <1580142994-1836-2-git-send-email-liam.merwick@oracle.com>
-X-MC-Unique: JWVvGaRxP5-oqPqGfUbT1Q-1
+In-Reply-To: <1580142994-1836-5-git-send-email-liam.merwick@oracle.com>
+X-MC-Unique: 6qec5vt6NeqS9Bp3mE4duQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -93,7 +91,7 @@ Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,63 +110,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 27, 2020 at 04:36:29PM +0000, Liam Merwick wrote:
-> Refactor test_x86_64_pc() to test_x86_64_machine() so that separate
-> functions which specify the Avocado tag of ':avocado: tags=3Dmachine:'
-> as being either 'pc' or 'microvm' can be used to test booting a
-> compressed kernel using either machine class.
+On Mon, Jan 27, 2020 at 04:36:32PM +0000, Liam Merwick wrote:
+> The extract_from_rpm() method added for the PVH acceptance tests needs
+> rpm2cpio to extract a vmlinux binary from an RPM.
 >=20
 > Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
 > ---
->  tests/acceptance/boot_linux_console.py | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
+>  .travis.yml | 1 +
+>  1 file changed, 1 insertion(+)
 
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 >=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index e40b84651b0b..aa5b07b1c609 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -51,10 +51,9 @@ class BootLinuxConsole(Test):
->          os.chdir(cwd)
->          return self.workdir + path
+> diff --git a/.travis.yml b/.travis.yml
+> index 1ae645e9fcec..3d8c2a38e679 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -278,6 +278,7 @@ matrix:
+>              - python3-pil
+>              - python3-pip
+>              - python3.5-venv
+> +            - rpm2cpio
+>              - tesseract-ocr
+>              - tesseract-ocr-eng
 > =20
-> -    def test_x86_64_pc(self):
-> +    def do_test_x86_64_machine(self):
->          """
->          :avocado: tags=3Darch:x86_64
-> -        :avocado: tags=3Dmachine:pc
->          """
->          kernel_url =3D ('https://archives.fedoraproject.org/pub/archive/=
-fedora'
->                        '/linux/releases/29/Everything/x86_64/os/images/px=
-eboot'
-> @@ -70,6 +69,18 @@ class BootLinuxConsole(Test):
->          console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
->          self.wait_for_console_pattern(console_pattern)
-> =20
-> +    def test_x86_64_pc(self):
-> +        """
-> +        :avocado: tags=3Dmachine:pc
-> +        """
-> +        self.do_test_x86_64_machine()
-> +
-> +    def test_x86_64_microvm(self):
-> +        """
-> +        :avocado: tags=3Dmachine:microvm
-> +        """
-> +        self.do_test_x86_64_machine()
-> +
->      def test_mips_malta(self):
->          """
->          :avocado: tags=3Darch:mips
 > --=20
 > 1.8.3.1
 >=20
-
---=20
 
 
