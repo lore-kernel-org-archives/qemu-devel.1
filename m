@@ -2,91 +2,90 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE0FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 20:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8626BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:09:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6468F20674
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 20:50:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50AAA20708
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 21:09:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aJfcM6pr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6468F20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AE0dUo0i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50AAA20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixGlj-0006vW-HU
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 15:50:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42216)
+	id 1ixH4Y-0002ZB-FQ
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 16:09:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1ixGl2-0006Nx-TW
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 15:49:50 -0500
+ (envelope-from <kchamart@redhat.com>) id 1ixH3x-00027s-Q0
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:09:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1ixGl1-0001EG-HW
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 15:49:48 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44712)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1ixGl1-00018j-8o
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 15:49:47 -0500
-Received: by mail-wr1-x443.google.com with SMTP id m16so5802911wrx.11
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 12:49:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:subject:cc:to:in-reply-to:references:message-id
- :mime-version:content-transfer-encoding;
- bh=TSb+wND/Xpa3iUFZUZ8sCCdVA9tmAo+BY5u9Yah8CqU=;
- b=aJfcM6przZBsr3JTNRfEdVufp0bcpkKMs/IeqiK9JBgL9YevpAvGwQ30FVmRBHZQzn
- 1wJrFqfTjpNRaSUxrEG7USxCVvATr/Djcu0RelpIjIJ6MlxmX9cEbsQgGiWiXa82ZDGZ
- Z7wbwc2jFDealzURym2fJJC5toaImkvAYDaz1jqenlttqhL93chvexj7s7gtaF/cBfNX
- /GBaPKOu2WH0aUfckjqU9H3gJHRbBD9BBRWrgU8UMdKSdh/1fW6ToAIlCuX0ZA/GVKVu
- 7EKbUoAkqtUwxtssMG0hM9m6fkxURG7DrjZhnsdTuUG0/SVijikTz5RMWWlkkhkJfaDe
- k4bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
- :message-id:mime-version:content-transfer-encoding;
- bh=TSb+wND/Xpa3iUFZUZ8sCCdVA9tmAo+BY5u9Yah8CqU=;
- b=sb3FhRQdVR68D8kc7YpsAx1vathbBTfw978o7xsruz55UYqDEVFMzUmT5p1V4p2ibU
- ZwMQzAhyrxK4I9rQIYgr5Gn1VNBWseFVziEgvZbK6SKDv8vS99osEZrYu9K0HacczthN
- Mg/ONH+a+WB4OAwnfHNP/ZZBFNQNKWhojS82PYs664UXlQUHFR8Wh8S0odJAEZx31SIQ
- ak6BROyomxTAShSbPJAcjs61QUcws3WdL4RfX0KdwvY05vJJa3AQ0rnQVOiXY2lGw9If
- ILIg9dq0lHwPOKhgM68NniXErX1FcjO7dk+cHtWIS5cxZZEutITgaxYx+OS/RXtx0tep
- Jilw==
-X-Gm-Message-State: APjAAAWQvnssZu/BdFbIBxOTeMLfl0E/TZIj61fyd7ntNlLG4EGoO3rJ
- ejccQOhazI7E4jL9cJf/VwBEvLADY3I=
-X-Google-Smtp-Source: APXvYqx1DAEpIIzUckrgtHDqZZ7zzyJGHJdGm0bnyzJzACxs8iWK8NyxkImqWMOHhz6R7Upwgf7rSw==
-X-Received: by 2002:adf:fd84:: with SMTP id d4mr7437939wrr.211.1580417385375; 
- Thu, 30 Jan 2020 12:49:45 -0800 (PST)
-Received: from localhost ([2a00:79e0:d:11:1da2:3fd4:a302:4fff])
- by smtp.gmail.com with ESMTPSA id g128sm7341031wme.47.2020.01.30.12.49.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 12:49:44 -0800 (PST)
-Date: Thu, 30 Jan 2020 12:49:44 -0800 (PST)
-X-Google-Original-Date: Thu, 30 Jan 2020 20:49:43 GMT (+0000)
-From: Palmer Dabbelt <palmerdabbelt@google.com>
-X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
-Subject: Re: [PATCH] riscv: Separate FPU register size from core register size
- in gdbstub [v2]
-CC: qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- sagark@eecs.berkeley.edu, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- qemu-riscv@nongnu.org, keithp@keithp.com
-To: keithp@keithp.com
-In-Reply-To: <20200128233216.515171-1-keithp@keithp.com>
-References: <20200128233216.515171-1-keithp@keithp.com>
-Message-ID: <mhng-2ed22ad1-9efc-4ffb-856b-0d63ad8a9173@palmerdabbelt-glaptop1>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+ (envelope-from <kchamart@redhat.com>) id 1ixH3v-00066g-H4
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:09:20 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55223
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ixH3v-00064p-CK
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 16:09:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580418558;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zZ7++HqgHvjnupont+kkdEqfdJ8OccOOfmafIhzm2kk=;
+ b=AE0dUo0iHl4tREqBeB9fONbtfNM2fOUuSW1oRkQwOhNoOBgJD2ZDR5sYhfr5pBTYCGoheL
+ UW6WMHkKKE3Gupsl7Ghu0cCVb8ki+zUg25oVV3dNbAnfTy5s5R0RlW2HZgRVnkXr1SqakW
+ ROnicwekN80+4mZQLtFWQxLm/i1M5mE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-n5V4C0A3OnaT-Het2-G4lA-1; Thu, 30 Jan 2020 16:09:14 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F35F182B8E3;
+ Thu, 30 Jan 2020 21:09:12 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.118.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 381D21036B2C;
+ Thu, 30 Jan 2020 21:09:04 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+ id 6A9D63E04B8; Thu, 30 Jan 2020 22:09:02 +0100 (CET)
+Date: Thu, 30 Jan 2020 22:09:02 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Improving QOM documentation [Was: Re: Making QEMU easier for
+ management tools and applications]
+Message-ID: <20200130210902.GA25927@paraplu>
+References: <20200108104306.GC5057@dhcp-200-226.str.redhat.com>
+ <97F153BD-FB8A-46C7-90D0-9E894B9E0292@redhat.com>
+ <20200108133842.GE5057@dhcp-200-226.str.redhat.com>
+ <87d0bmchq0.fsf@dusky.pond.sub.org>
+ <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200115121953.GJ93923@redhat.com>
+ <874kwwvmuv.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+In-Reply-To: <874kwwvmuv.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: n5V4C0A3OnaT-Het2-G4lA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,123 +97,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, ehabkost@redhat.com,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jan 2020 23:32:16 GMT (+0000), keithp@keithp.com wrote:
-> The size of the FPU registers is dictated by the 'f' and 'd' features,
-> not the core processor register size. Processors with the 'd' feature
-> have 64-bit FPU registers. Processors without the 'd' feature but with
-> the 'f' feature have 32-bit FPU registers.
->
-> Signed-off-by: Keith Packard <keithp@keithp.com>
->
-> ---
->
-> v2:
->     Fix checkpatch formatting complaints.
-> ---
->  configure              |  4 ++--
->  target/riscv/gdbstub.c | 20 +++++++++++---------
->  2 files changed, 13 insertions(+), 11 deletions(-)
->
-> diff --git a/configure b/configure
-> index a72a5def57..c21bff8d10 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7709,13 +7709,13 @@ case "$target_name" in
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> -    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-32bit-csr.xml riscv-32bit-virtual.xml"
-> +    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-32bit-csr.xml riscv-32bit-virtual.xml"
->    ;;
->    riscv64)
->      TARGET_BASE_ARCH=riscv
->      TARGET_ABI_DIR=riscv
->      mttcg=yes
-> -    gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml riscv-64bit-virtual.xml"
-> +    gdb_xml_files="riscv-64bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml riscv-64bit-virtual.xml"
->    ;;
->    sh4|sh4eb)
->      TARGET_ARCH=sh4
-> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-> index 1a7947e019..1a72f7be9c 100644
-> --- a/target/riscv/gdbstub.c
-> +++ b/target/riscv/gdbstub.c
-> @@ -303,7 +303,12 @@ int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
->  static int riscv_gdb_get_fpu(CPURISCVState *env, uint8_t *mem_buf, int n)
->  {
->      if (n < 32) {
-> -        return gdb_get_reg64(mem_buf, env->fpr[n]);
-> +        if (env->misa & RVD) {
-> +            return gdb_get_reg64(mem_buf, env->fpr[n]);
-> +        }
-> +        if (env->misa & RVF) {
-> +            return gdb_get_reg32(mem_buf, env->fpr[n]);
-> +        }
->      /* there is hole between ft11 and fflags in fpu.xml */
->      } else if (n < 36 && n > 32) {
->          target_ulong val = 0;
-> @@ -403,23 +408,20 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
->  {
->      RISCVCPU *cpu = RISCV_CPU(cs);
->      CPURISCVState *env = &cpu->env;
-> -#if defined(TARGET_RISCV32)
-> -    if (env->misa & RVF) {
-> +    if (env->misa & RVD) {
-> +        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-> +                                 36, "riscv-64bit-fpu.xml", 0);
-> +    } else if (env->misa & RVF) {
->          gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
->                                   36, "riscv-32bit-fpu.xml", 0);
->      }
-> -
-> +#if defined(TARGET_RISCV32)
->      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
->                               240, "riscv-32bit-csr.xml", 0);
->
->      gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
->                               1, "riscv-32bit-virtual.xml", 0);
->  #elif defined(TARGET_RISCV64)
-> -    if (env->misa & RVF) {
-> -        gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
-> -                                 36, "riscv-64bit-fpu.xml", 0);
-> -    }
-> -
->      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
->                               240, "riscv-64bit-csr.xml", 0);
+On Wed, Jan 15, 2020 at 03:02:48PM +0100, Markus Armbruster wrote:
+> Daniel P. Berrang=E9 <berrange@redhat.com> writes:
 
-This isn't working for me.  When I apply it on top of my for-master (which is
-very close to master), I get 
+[Changed the subject-line to indicate deviation from the original
+topic.]
 
-    $ ./install/bin/qemu-system-riscv32 -M virt -m 256 -nographic -cpu rv32 -s -S -bios default -kernel vmlinux &
-    $ ./install/bin/riscv32-unknown-elf-gdb --ex "target remote :1234"
-    GNU gdb (GDB) 10.0.50.20200122-git
-    Copyright (C) 2020 Free Software Foundation, Inc.
-    License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-    This is free software: you are free to change and redistribute it.
-    There is NO WARRANTY, to the extent permitted by law.
-    Type "show copying" and "show warranty" for details.
-    This GDB was configured as "--host=x86_64-pc-linux-gnu --target=riscv32-unknown-elf".
-    Type "show configuration" for configuration details.
-    For bug reporting instructions, please see:
-    <http://www.gnu.org/software/gdb/bugs/>.
-    Find the GDB manual and other documentation resources online at:
-        <http://www.gnu.org/software/gdb/documentation/>.
-    
-    For help, type "help".
-    Type "apropos word" to search for commands related to "word".
-    Remote debugging using :1234
-    warning: while parsing target description (at line 1): Could not load XML document "riscv-64bit-fpu.xml"
-    warning: Could not load XML target description; ignoring
-    warning: No executable has been specified and target does not support
-    determining executable automatically.  Try using the "file" command.
-    Truncated register 16 in remote 'g' packet
-    (gdb) q
+[...]
 
-The same setup works (for some definition of works, as I get 32-bit D
-registers) before the patch, so I don't think it's just something silly in my
-environment.
+> > Libvirt is of course happy to switch to something else instead of
+> > qom-set for these features if QEMU wants to provide a safer
+> > alternative.
+>=20
+> Noted.
+>=20
+> libvirt's use of qom-set is okay.  What's not okay is the near-complete
+> lack of QOM documentation, its poor QMP interface, in part due to
+> non-integration with QAPI, and last but not least the lack of QOM
+> leadership leaving it adrift.
+
+What can be done to improve QOM documentation (or lack thereof)?
+
+From a couple of hurried `grep` queries in the QEMU tree, there seems to
+be no explicit qom.rst|txt, or qemu-object-model.txt|rst or some such.
+(I hope I haven't missed any other files.)
+
+Let's dig further.  Ah, I come across this helpful 2016 blog post[1]
+("An incomplete list of QEMU APIs") by Eduardo from my bookmarks.  Here
+I get some clues:
+
+(a) In the section titled "QOM", Eduardo writes:
+
+        "QOM is short for QEMU Object Model and was introduced in 2011.
+        It is heavily documented on its header file
+        [include/qom/object.h]"=20
+
+    Opening qom/object.h[2], indeed there is copious amounts of docs,
+    expressed as commented-out text.  Two questions:
+
+    - How much of this is still accurate?  (Sorry, if that's a loaded
+      question.)
+
+    - If at least 60% is still accurate, is it valuable to extract and
+      publish it as rendered rST, as part of the on-going QEMU Docs
+      improvement?
+
+(b) The other clue is also from the same post, where Eduardo provides
+    pointers to past KVM Forum presentations by MarkusA, PaoloB,
+    AndreasF on QOM, Qdev et al.
+
+    Is it worth slapping all these references (with a clear intro and
+    outro) into a qom.rst file in QEMU tree, even if only for
+    reference/context?  Or are these references, in-tree docs in
+    object.h out-of-date beyond repair? =20
+
+If it is useful, I'm happy to get the initial doc going, secure in the
+knowledge that more clueful people than me will chip in during the
+review :-)
+
+[1] https://habkost.net/posts/2016/11/incomplete-list-of-qemu-apis.html
+[2] https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dinclude/qom/object.h
+[3] http://www.linux-kvm.org/images/9/90/Kvmforum14-qom.pdf
+
+--=20
+/kashyap
+
 
