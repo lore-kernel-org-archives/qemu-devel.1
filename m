@@ -2,88 +2,78 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E76B1C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD4CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:31:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2086206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:30:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 533AC206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:31:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T6Ax4MNC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2086206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3lTSuAz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 533AC206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixCiM-0005K5-SP
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:30:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43271)
+	id 1ixCip-0005nI-HR
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:31:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ixCU7-0005ms-3G
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:06 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ixCX5-0002IX-Np
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ixCU5-00037G-KJ
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:02 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:52560)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ixCU4-00035o-EQ
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:01 -0500
-Received: by mail-wm1-x333.google.com with SMTP id p9so4410436wmc.2
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:16:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=dtQiX/MRRlIpxjI4PpXQAgny+XholocDWMM4mNtP8hw=;
- b=T6Ax4MNCp9n7ti4kobHPMF/yOGEiWv9V7JaWdtm4ioLfDHOmNzS1LCd2Q4XfOxDkcu
- Smegi6DCUKdLZ5ZFlpYZ1iLYOskjl8K7TfBJ7Ayy9UyR/t5zi0XCmO4T3ikjlPSpR5ot
- b3D3JMI/RsKy+CmXepquAaJxBLV0znsIF1689K9d88g1YSCj38XIyatiWR+lC9b4xB2k
- ohnfu9d3e9t2BkPAptFhTS94fOcCXOGw4jlZViY0F47uHfUAwYetrcWL59i9nf5DW6Xh
- 2255QPqraAdIsbjz3YzfdPwoHXfmsvBBhkaTVxgI4jjUlA9Wlv5juMl8pYa94SbBufkE
- DqTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=dtQiX/MRRlIpxjI4PpXQAgny+XholocDWMM4mNtP8hw=;
- b=CbbaVF7PSE6f8xNMpQYDxh09tLUqmP6+iD1nmohlCd9TL7oeSKN6dc9XbWjCG/QPaU
- uvQDunwnmhXKjB34qyZye1DOLfKhW/L5y0xOC7zeMBbsjMPSfWKZJVnwv0IeOmVuRLOH
- NMcmqCISK8gz70M6RRVPAH+IYs0Vgsk73q7bm4SgYHXSb4fa97diNrT05CPi8cUUZOk0
- XieNKfiXUj6yteVTo2W/U2ukOQO4V81UruQhsagH0NjAhmVJVFizXc0B7Bo6rRxSszc5
- L2vLpWfGIEq6yJqYNTnadhCwnNXVZTfL4wHMzwuN5iUQ/DRMhAYhmEZWxrfaOWnr8KOt
- dz7A==
-X-Gm-Message-State: APjAAAWqYUGpWMEqHGYQYF1/W58gmolROwNVCFdMn/dbsgov1JlXZXwt
- aLJLsqBQShhdE4aQs9OcaqxnerY/a1wKSg==
-X-Google-Smtp-Source: APXvYqy4jR7M/6lz0hTdCYGP8OANqsvE2q/Z9PPEFSBj5I13sYNsfILwtYpkyn3nHBFV80FFP1Rxtw==
-X-Received: by 2002:a05:600c:21c6:: with SMTP id
- x6mr6454258wmj.177.1580400958718; 
- Thu, 30 Jan 2020 08:15:58 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a22sm6994442wmd.20.2020.01.30.08.15.57
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 08:15:57 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 18/26] vl: replace deprecated qbus_reset_all registration
-Date: Thu, 30 Jan 2020 16:15:25 +0000
-Message-Id: <20200130161533.8180-19-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200130161533.8180-1-peter.maydell@linaro.org>
-References: <20200130161533.8180-1-peter.maydell@linaro.org>
+ (envelope-from <stefanha@redhat.com>) id 1ixCX3-0006Aq-C6
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:19:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48591
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ixCX3-0006AP-7A
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:19:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580401144;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=mJDuw8RyWmimZqJTb0SD7Zvy2aJ5w3lTDsQ2p3X6juI=;
+ b=V3lTSuAz/a/qZv7+9X6YfoA2R+8+cCdAt/n0lWSNbpaOUkHxvqDmb7ZjNdysz1O7bZOidc
+ USuRvkqG/39tyobGacqzaqOqwcqR1dsTiyt5JDeZAqxdjUBX61cVp+GZLX3YX7VuDH3/CM
+ cvaS1wftZ/uiOYrsCv2Vtfas4c8K6j4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-PY1kKj3_NESv_KNnXcXJ6Q-1; Thu, 30 Jan 2020 11:18:48 -0500
+X-MC-Unique: PY1kKj3_NESv_KNnXcXJ6Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 673EE107ACC7;
+ Thu, 30 Jan 2020 16:18:46 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CB6AF5DA75;
+ Thu, 30 Jan 2020 16:18:42 +0000 (UTC)
+Date: Thu, 30 Jan 2020 16:18:41 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 00/10] python: Explicit usage of Python 3
+Message-ID: <20200130161841.GB182316@stefanha-x1.localdomain>
+References: <20200129231402.23384-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::333
+In-Reply-To: <20200129231402.23384-1-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="E39vaYmALEf/7YXx"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,115 +85,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-block@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Damien Hedde <damien.hedde@greensocs.com>
+--E39vaYmALEf/7YXx
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Replace deprecated qbus_reset_all by resettable_cold_reset_fn for
-the sysbus reset registration.
+On Thu, Jan 30, 2020 at 12:13:52AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Hello,
+>=20
+> These are mechanical sed patches used to convert the
+> code base to Python 3, as suggested on this thread:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675024.html
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Philippe Mathieu-Daud=E9 (10):
+>   scripts: Explicit usage of Python 3
+>   tests/qemu-iotests: Explicit usage of Python 3
+>   tests: Explicit usage of Python 3
+>   scripts/minikconf: Explicit usage of Python 3
+>   tests/acceptance: Remove shebang header
+>   scripts/tracetool: Remove shebang header
+>   tests/vm: Remove shebang header
+>   tests/qemu-iotests: Explicit usage of Python 3
+>   scripts: Explicit usage of Python 3
+>   tests/qemu-iotests/check: Update to match Python 3 interpreter
+>=20
+>  scripts/analyse-9p-simpletrace.py                | 2 +-
+>  scripts/analyse-locks-simpletrace.py             | 2 +-
+>  scripts/decodetree.py                            | 2 +-
+>  scripts/device-crash-test                        | 2 +-
+>  scripts/kvm/kvm_flightrecorder                   | 2 +-
+>  scripts/minikconf.py                             | 1 +
+>  scripts/qapi-gen.py                              | 2 +-
+>  scripts/qmp/qemu-ga-client                       | 2 +-
+>  scripts/qmp/qmp                                  | 2 +-
+>  scripts/qmp/qmp-shell                            | 2 +-
+>  scripts/qmp/qom-fuse                             | 2 +-
+>  scripts/render_block_graph.py                    | 2 +-
+>  scripts/replay-dump.py                           | 2 +-
+>  scripts/simpletrace.py                           | 2 +-
+>  scripts/tracetool.py                             | 2 +-
+>  scripts/tracetool/__init__.py                    | 1 -
+>  scripts/tracetool/backend/__init__.py            | 1 -
+>  scripts/tracetool/backend/dtrace.py              | 1 -
+>  scripts/tracetool/backend/ftrace.py              | 1 -
+>  scripts/tracetool/backend/log.py                 | 1 -
+>  scripts/tracetool/backend/simple.py              | 1 -
+>  scripts/tracetool/backend/syslog.py              | 1 -
+>  scripts/tracetool/backend/ust.py                 | 1 -
+>  scripts/tracetool/format/__init__.py             | 1 -
+>  scripts/tracetool/format/c.py                    | 1 -
+>  scripts/tracetool/format/d.py                    | 1 -
+>  scripts/tracetool/format/h.py                    | 1 -
+>  scripts/tracetool/format/log_stap.py             | 1 -
+>  scripts/tracetool/format/simpletrace_stap.py     | 1 -
+>  scripts/tracetool/format/stap.py                 | 1 -
+>  scripts/tracetool/format/tcg_h.py                | 1 -
+>  scripts/tracetool/format/tcg_helper_c.py         | 1 -
+>  scripts/tracetool/format/tcg_helper_h.py         | 1 -
+>  scripts/tracetool/format/tcg_helper_wrapper_h.py | 1 -
+>  scripts/tracetool/format/ust_events_c.py         | 1 -
+>  scripts/tracetool/format/ust_events_h.py         | 1 -
+>  scripts/tracetool/transform.py                   | 1 -
+>  scripts/tracetool/vcpu.py                        | 1 -
+>  scripts/vmstate-static-checker.py                | 2 +-
+>  tests/acceptance/virtio_seg_max_adjust.py        | 1 -
+>  tests/acceptance/x86_cpu_model_versions.py       | 1 -
+>  tests/docker/travis.py                           | 2 +-
+>  tests/qapi-schema/test-qapi.py                   | 2 +-
+>  tests/qemu-iotests/030                           | 2 +-
+>  tests/qemu-iotests/040                           | 2 +-
+>  tests/qemu-iotests/041                           | 2 +-
+>  tests/qemu-iotests/044                           | 2 +-
+>  tests/qemu-iotests/045                           | 2 +-
+>  tests/qemu-iotests/055                           | 2 +-
+>  tests/qemu-iotests/056                           | 2 +-
+>  tests/qemu-iotests/057                           | 2 +-
+>  tests/qemu-iotests/065                           | 2 +-
+>  tests/qemu-iotests/093                           | 2 +-
+>  tests/qemu-iotests/096                           | 2 +-
+>  tests/qemu-iotests/118                           | 2 +-
+>  tests/qemu-iotests/124                           | 2 +-
+>  tests/qemu-iotests/129                           | 2 +-
+>  tests/qemu-iotests/132                           | 2 +-
+>  tests/qemu-iotests/136                           | 2 +-
+>  tests/qemu-iotests/139                           | 2 +-
+>  tests/qemu-iotests/147                           | 2 +-
+>  tests/qemu-iotests/148                           | 2 +-
+>  tests/qemu-iotests/149                           | 2 +-
+>  tests/qemu-iotests/151                           | 2 +-
+>  tests/qemu-iotests/152                           | 2 +-
+>  tests/qemu-iotests/155                           | 2 +-
+>  tests/qemu-iotests/163                           | 2 +-
+>  tests/qemu-iotests/165                           | 2 +-
+>  tests/qemu-iotests/169                           | 2 +-
+>  tests/qemu-iotests/194                           | 2 +-
+>  tests/qemu-iotests/196                           | 2 +-
+>  tests/qemu-iotests/199                           | 2 +-
+>  tests/qemu-iotests/202                           | 2 +-
+>  tests/qemu-iotests/203                           | 2 +-
+>  tests/qemu-iotests/205                           | 2 +-
+>  tests/qemu-iotests/206                           | 2 +-
+>  tests/qemu-iotests/207                           | 2 +-
+>  tests/qemu-iotests/208                           | 2 +-
+>  tests/qemu-iotests/209                           | 2 +-
+>  tests/qemu-iotests/210                           | 2 +-
+>  tests/qemu-iotests/211                           | 2 +-
+>  tests/qemu-iotests/212                           | 2 +-
+>  tests/qemu-iotests/213                           | 2 +-
+>  tests/qemu-iotests/216                           | 2 +-
+>  tests/qemu-iotests/218                           | 2 +-
+>  tests/qemu-iotests/219                           | 2 +-
+>  tests/qemu-iotests/222                           | 2 +-
+>  tests/qemu-iotests/224                           | 2 +-
+>  tests/qemu-iotests/228                           | 2 +-
+>  tests/qemu-iotests/234                           | 2 +-
+>  tests/qemu-iotests/235                           | 2 +-
+>  tests/qemu-iotests/236                           | 2 +-
+>  tests/qemu-iotests/237                           | 2 +-
+>  tests/qemu-iotests/238                           | 2 +-
+>  tests/qemu-iotests/242                           | 2 +-
+>  tests/qemu-iotests/245                           | 2 +-
+>  tests/qemu-iotests/246                           | 2 +-
+>  tests/qemu-iotests/248                           | 2 +-
+>  tests/qemu-iotests/254                           | 2 +-
+>  tests/qemu-iotests/255                           | 2 +-
+>  tests/qemu-iotests/256                           | 2 +-
+>  tests/qemu-iotests/257                           | 2 +-
+>  tests/qemu-iotests/258                           | 2 +-
+>  tests/qemu-iotests/260                           | 2 +-
+>  tests/qemu-iotests/262                           | 2 +-
+>  tests/qemu-iotests/264                           | 2 +-
+>  tests/qemu-iotests/266                           | 2 +-
+>  tests/qemu-iotests/277                           | 2 +-
+>  tests/qemu-iotests/280                           | 2 +-
+>  tests/qemu-iotests/281                           | 2 +-
+>  tests/qemu-iotests/check                         | 2 +-
+>  tests/qemu-iotests/nbd-fault-injector.py         | 2 +-
+>  tests/qemu-iotests/qcow2.py                      | 2 +-
+>  tests/qemu-iotests/qed.py                        | 2 +-
+>  tests/vm/basevm.py                               | 1 -
+>  tests/vm/centos                                  | 2 +-
+>  tests/vm/fedora                                  | 2 +-
+>  tests/vm/freebsd                                 | 2 +-
+>  tests/vm/netbsd                                  | 2 +-
+>  tests/vm/openbsd                                 | 2 +-
+>  tests/vm/ubuntu.i386                             | 2 +-
+>  121 files changed, 95 insertions(+), 120 deletions(-)
+>  mode change 100755 =3D> 100644 tests/acceptance/virtio_seg_max_adjust.py
+>  mode change 100755 =3D> 100644 tests/vm/basevm.py
+>=20
+> --=20
+> 2.21.1
+>=20
 
-Apart for the raspi machines, this does not impact the behavior
-because:
-+ at this point resettable just calls the old reset methods of devices
-  and buses in the same order as qdev/qbus.
-+ resettable handlers registered with qemu_register_reset are
-  serialized; there is no interleaving.
-+ eventual explicit calls to legacy reset API (device_reset or
-  qdev/qbus_reset) inside this reset handler will not be masked out
-  by resettable mechanism; they do not go through resettable api.
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-For the raspi machines, during the sysbus reset the sd-card is not
-reset twice anymore but only once. This is a consequence of switching
-both sysbus reset and changing parent to resettable; it detects the
-second reset is not needed. This has no impact on the state after
-reset; the sd-card reset method only reset local state and query
-information from the block backend.
+--E39vaYmALEf/7YXx
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The raspi reset change can be observed by using the following command
-(reset will occurs, then do Ctrl-C to end qemu; no firmware is
-given here).
-qemu-system-aarch64 -M raspi3 \
-    -trace resettable_phase_hold_exec \
-    -trace qdev_update_parent_bus \
-    -trace resettable_change_parent \
-    -trace qdev_reset -trace qbus_reset
+-----BEGIN PGP SIGNATURE-----
 
-Before the patch, the qdev/qbus_reset traces show when reset method are
-called. After the patch, the resettable_phase_hold_exec show when reset
-method are called.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4zAeEACgkQnKSrs4Gr
+c8i4Rwf8CbQ6iPcMGfSL3uMU2G1n1NGWN5x3KWK3QwVXGtSABwn1d9H+OOaFWlcf
+K8M4ev1lAef8Aj6w9HcVgx/xqJ++2fI6u5hMIIgMkGTlGp0D908LNKy/stXYTaBK
+th2bGcauEqoyVME+lXuAItxZzdsoLrrppF9XW+B1vIvtAAlKcy4vQl4lsW6AKESv
+2vWuFMEgjtrusojBH3dSssRxy2AtWs7OrINVDTrd9EaWSROjdBVYDx5HlrsUwQri
+phfYgCz5gcaVyNQR4lVOxf0NJI+GBLaGAfOm1OxPNLWFQGdQMIZtA2zvdtjkzwaX
+GRdE8PD3TUm68hMKj/LkcK8rPNifPw==
+=0FaO
+-----END PGP SIGNATURE-----
 
-The traced reset order of the raspi3 is listed below. I've added empty
-lines and the tree structure.
-
- +->bcm2835-peripherals reset
- |
- |       +->sd-card reset
- |   +->sd-bus reset
- +->bcm2835_gpio reset
- |      -> dev_update_parent_bus (move the sd-card on the sdhci-bus)
- |      -> resettable_change_parent
- |
- +->bcm2835-dma reset
- |
- |   +->bcm2835-sdhost-bus reset
- +->bcm2835-sdhost reset
- |
- |       +->sd-card (reset ONLY BEFORE BEFORE THE PATCH)
- |   +->sdhci-bus reset
- +->generic-sdhci reset
- |
- +->bcm2835-rng reset
- +->bcm2835-property reset
- +->bcm2835-fb reset
- +->bcm2835-mbox reset
- +->bcm2835-aux reset
- +->pl011 reset
- +->bcm2835-ic reset
- +->bcm2836-control reset
-System reset
-
-In both case, the sd-card is reset (being on bcm2835_gpio/sd-bus) then moved
-to generic-sdhci/sdhci-bus by the bcm2835_gpio reset method.
-
-Before the patch, it is then reset again being part of generic-sdhci/sdhci-bus.
-After the patch, it considered again for reset but its reset method is not
-called because it is already flagged as reset.
-
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20200123132823.1117486-11-damien.hedde@greensocs.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- vl.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/vl.c b/vl.c
-index b0f52c4d6e0..24951b51a94 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4381,7 +4381,15 @@ int main(int argc, char **argv, char **envp)
- 
-     /* TODO: once all bus devices are qdevified, this should be done
-      * when bus is created by qdev.c */
--    qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
-+    /*
-+     * TODO: If we had a main 'reset container' that the whole system
-+     * lived in, we could reset that using the multi-phase reset
-+     * APIs. For the moment, we just reset the sysbus, which will cause
-+     * all devices hanging off it (and all their child buses, recursively)
-+     * to be reset. Note that this will *not* reset any Device objects
-+     * which are not attached to some part of the qbus tree!
-+     */
-+    qemu_register_reset(resettable_cold_reset_fn, sysbus_get_default());
-     qemu_run_machine_init_done_notifiers();
- 
-     if (rom_check_and_register_reset() != 0) {
--- 
-2.20.1
+--E39vaYmALEf/7YXx--
 
 
