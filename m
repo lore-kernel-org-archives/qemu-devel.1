@@ -2,72 +2,85 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D433C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D721C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:53:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 033EF206D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:51:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 033EF206D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 38E50206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 10:53:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORvewhjy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E50206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix7Pn-0000CW-7k
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 05:51:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46040)
+	id 1ix7Rv-0001NO-E6
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 05:53:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46671)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ix7PF-0008FI-GK
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:50:42 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ix7RF-0000sO-Is
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:52:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ix7PE-0005HH-AP
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:50:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44916)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ix7PE-0005GB-4K
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:50:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ix7PC-0007Kp-KF
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 10:50:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 95A692E8030
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 10:50:38 +0000 (UTC)
+ (envelope-from <stefanha@redhat.com>) id 1ix7RD-0007Qx-Ev
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:52:44 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38276
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ix7RD-0007PZ-Ac
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 05:52:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580381562;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=52R3WfjMwr/4AEiLkD58VYagXb/KV3kiClhCbMyrrBU=;
+ b=ORvewhjyk1ULmZI9IaSZfAuI0t7+/BfimpUkLSMwNx/psJpxBTRtmIMmZbiO9J34k60lQO
+ l/tX88KsqG6OalrVIt/3+d9JOkRnI1YxUrbsaPPfpkGAdx7+O8ng9obfw3XNdS9MiZpVLl
+ 8CeuLjVuy0zxuPU9YYMUy8XVER/Fo40=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-2mVf8LE2Mim4hNZf_1irFA-1; Thu, 30 Jan 2020 05:52:40 -0500
+X-MC-Unique: 2mVf8LE2Mim4hNZf_1irFA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 571CA107ACC4;
+ Thu, 30 Jan 2020 10:52:39 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6EE9C6C523;
+ Thu, 30 Jan 2020 10:52:36 +0000 (UTC)
+Date: Thu, 30 Jan 2020 10:52:35 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 2/4] virtio-scsi: default num_queues to -smp N
+Message-ID: <20200130105235.GC176651@stefanha-x1.localdomain>
+References: <20200124100159.736209-1-stefanha@redhat.com>
+ <20200124100159.736209-3-stefanha@redhat.com>
+ <20200127141031.6e108839.cohuck@redhat.com>
+ <20200129154438.GC157595@stefanha-x1.localdomain>
+ <bc9680fc-c382-301f-a1fe-21740c918570@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jan 2020 10:44:02 -0000
-From: Wojtek Lewandowski <1861394@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jurand0289
-X-Launchpad-Bug-Reporter: Wojtek Lewandowski (jurand0289)
-X-Launchpad-Bug-Modifier: Wojtek Lewandowski (jurand0289)
-Message-Id: <158038104311.4545.16494729596486297372.malonedeb@soybean.canonical.com>
-Subject: [Bug 1861394] [NEW] qemu-system-riscv64 hangs after poweroff linux
- command
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="b8d1327fd820d6bf500589d6da587d5037c7d88e";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: cdd986ff31b9fd208d7df74740475ccdc8f1ef8e
+In-Reply-To: <bc9680fc-c382-301f-a1fe-21740c918570@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="gr/z0/N6AeWAPJVB"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,69 +89,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1861394 <1861394@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+--gr/z0/N6AeWAPJVB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-QEMU Version : v4.2.0-773-g43d1455-dirty (commit
-43d1455cf84283466e5c22a217db5ef4b8197b14)
+On Thu, Jan 30, 2020 at 01:29:16AM +0100, Paolo Bonzini wrote:
+> On 29/01/20 16:44, Stefan Hajnoczi wrote:
+> > On Mon, Jan 27, 2020 at 02:10:31PM +0100, Cornelia Huck wrote:
+> >> On Fri, 24 Jan 2020 10:01:57 +0000
+> >> Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >>> @@ -47,10 +48,15 @@ static void vhost_scsi_pci_realize(VirtIOPCIProxy=
+ *vpci_dev, Error **errp)
+> >>>  {
+> >>>      VHostSCSIPCI *dev =3D VHOST_SCSI_PCI(vpci_dev);
+> >>>      DeviceState *vdev =3D DEVICE(&dev->vdev);
+> >>> -    VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(vdev);
+> >>> +    VirtIOSCSIConf *conf =3D &dev->vdev.parent_obj.parent_obj.conf;
+> >>> +
+> >>> +    /* 1:1 vq to vcpu mapping is ideal because it avoids IPIs */
+> >>> +    if (conf->num_queues =3D=3D VIRTIO_SCSI_AUTO_NUM_QUEUES) {
+> >>> +        conf->num_queues =3D current_machine->smp.cpus;
+> >> This now maps the request vqs 1:1 to the vcpus. What about the fixed
+> >> vqs? If they don't really matter, amend the comment to explain that?
+> > The fixed vqs don't matter.  They are typically not involved in the dat=
+a
+> > path, only the control path where performance doesn't matter.
+>=20
+> Should we put a limit on the number of vCPUs?  For anything above ~128
+> the guest is probably not going to be disk or network bound.
 
-Command: qemu-system-riscv64 -machine virt -kernel ./bbl -nographic
--initrd rootfs.cpio.gz -append "root=3D/dev/ram console=3DttyS0"
+Michael Tsirkin pointed out there's a hard limit of VIRTIO_QUEUE_MAX
+(1024).  We need to at least stay under that limit.
 
-Host:LSB Version:    :core-4.1-amd64:core-4.1-noarch
-Distributor ID: CentOS
-Description:    CentOS Linux release 7.7.1908 (Core)
-Release:        7.7.1908
-Codename:       Core
+Should the guest have >128 virtqueues?  Each virtqueue requires guest
+RAM and 2 host eventfds.  Eventually these resource requirements will
+become a scalability problem, but how do we choose a hard limit and what
+happens to guest performance above that limit?
 
+Stefan
 
-Problem: after boot, when type poweroff -f it hangs (not quitting). I have =
-tested this for x86_64, and aarch64 and it works fine. The problem appears =
-only for risv64(of those mentioned). Last time i have checked it worked als=
-o for riscv64 and it was on the d0f90e1423b4f412adc620eee93e8bfef8af4117 co=
-mmit
+--gr/z0/N6AeWAPJVB
+Content-Type: application/pgp-signature; name="signature.asc"
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+-----BEGIN PGP SIGNATURE-----
 
--- =
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4ytXMACgkQnKSrs4Gr
+c8gNcQf/UTROvH/gmW65kqsGLKrkMELDkIbmMoYcWZ18OgMnY0/B7rSxMelhxPUu
+uiG+LXgW8usEPz5zq2UrBMXVe5uEuMQ1fiToHtX4csLQjxf8t/JM1Hl3aS9uAr12
+1Tg4WWFiNarFdMNoNxyGVmyONDNfDGUBb0YFAv3798XpK3Hmu7d5z912s7uZU+22
+MNItuJEFCziujquHcOpD+IkoggagDWYHG4I4lzVmiO+Zk9cu+utRC0+XtRbB1n8v
+Lzq3zRS8alzvccHB1W0oJ4XzUGMaiFanDXTolwrOoOZpg0+2kbCCNhJQ26zOyuRu
+djx8518bF2YzxFyOGB7O1Kl92BsGkg==
+=ix1x
+-----END PGP SIGNATURE-----
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1861394
+--gr/z0/N6AeWAPJVB--
 
-Title:
-  qemu-system-riscv64 hangs after poweroff linux command
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU Version : v4.2.0-773-g43d1455-dirty (commit
-  43d1455cf84283466e5c22a217db5ef4b8197b14)
-
-  Command: qemu-system-riscv64 -machine virt -kernel ./bbl -nographic
-  -initrd rootfs.cpio.gz -append "root=3D/dev/ram console=3DttyS0"
-
-  Host:LSB Version:    :core-4.1-amd64:core-4.1-noarch
-  Distributor ID: CentOS
-  Description:    CentOS Linux release 7.7.1908 (Core)
-  Release:        7.7.1908
-  Codename:       Core
-
-  =
-
-  Problem: after boot, when type poweroff -f it hangs (not quitting). I hav=
-e tested this for x86_64, and aarch64 and it works fine. The problem appear=
-s only for risv64(of those mentioned). Last time i have checked it worked a=
-lso for riscv64 and it was on the d0f90e1423b4f412adc620eee93e8bfef8af4117 =
-commit
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1861394/+subscriptions
 
