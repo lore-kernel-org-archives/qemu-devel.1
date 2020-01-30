@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 894E8C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 575CFC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:38:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54B2D20674
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:37:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2498520674
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:38:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QfAX5MGM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54B2D20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h8x9OAMS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2498520674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixCoX-0005TP-HV
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:37:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50648)
+	id 1ixCpU-00074g-9u
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:38:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixCkx-00089Z-4L
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:29 -0500
+ (envelope-from <philmd@redhat.com>) id 1ixClR-0000Ma-Mh
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:34:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixCkr-0007hN-0U
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:22 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35118
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1ixClQ-0000jN-Hv
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37730
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixCko-0007d3-CC
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:19 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixClQ-0000hn-Ds
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580401994;
+ s=mimecast20190719; t=1580402036;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OkZXP4rQ+IMQ4I/BEDdjSDu3MfCKUVX/p/IE/cPS0M4=;
- b=QfAX5MGMhjPsC+3mkO/ltUu6/lEQX1X8Y9BRbngATFB7dNKIurwg6Nudxn+lr9L55AT71i
- yh5z2ogo45dw7fIvMp4VdMNmUWgJREYCn+zwrXK/HZnAuz5Vury+8O2Foy55uepFPywOpY
- 3YE51st0qHmjyIwB7YsF45GnJne1hyE=
+ bh=jQXlB2AB6eUYg0qnVSegVUVg31jjhLlH05OlYfe6MC0=;
+ b=h8x9OAMSMAV2ToiPJjTL7A6b6VS7TGbNjhK0KVBnENBbn28dPpsfdbyCanHIk+hqkjHKue
+ 1ryF0hiNCFdCPe657SZ6gPzlEHVDPPECn+7De799KPJNGzigNBgdz25MFnqFwxI0CVf3Xg
+ BogIsbtzjjvDzduIdlEBX80MCz/yDU8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-rsll8GFiO7uWXVdGiC4EtA-1; Thu, 30 Jan 2020 11:33:12 -0500
-X-MC-Unique: rsll8GFiO7uWXVdGiC4EtA-1
+ us-mta-139-45g4bVZaO4SRFIWyoAHqXQ-1; Thu, 30 Jan 2020 11:33:53 -0500
+X-MC-Unique: 45g4bVZaO4SRFIWyoAHqXQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE1DB800D41;
- Thu, 30 Jan 2020 16:33:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E295800D41;
+ Thu, 30 Jan 2020 16:33:52 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C654E5E241;
- Thu, 30 Jan 2020 16:32:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4630E5DE53;
+ Thu, 30 Jan 2020 16:33:47 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 02/12] tests/qemu-iotests/check: Allow use of python3
- interpreter
-Date: Thu, 30 Jan 2020 17:32:22 +0100
-Message-Id: <20200130163232.10446-3-philmd@redhat.com>
+Subject: [PATCH v2 07/12] tests/acceptance: Remove shebang header
+Date: Thu, 30 Jan 2020 17:32:27 +0100
+Message-Id: <20200130163232.10446-8-philmd@redhat.com>
 In-Reply-To: <20200130163232.10446-1-philmd@redhat.com>
 References: <20200130163232.10446-1-philmd@redhat.com>
 MIME-Version: 1.0
@@ -72,7 +71,7 @@ X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,30 +100,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we want to enforce a unique and explicit Python 3 interpreter,
-we need let this script handle 'python3' too.
+Patch created mechanically by running:
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
+  $ chmod 644 $(git grep -lF '#!/usr/bin/env python' \
+      | xargs grep -L 'if __name__.*__main__')
+  $ sed -i "/^#\!\/usr\/bin\/\(env\ \)\?python.\?$/d" \
+      $(git grep -lF '#!/usr/bin/env python' \
+      | xargs grep -L 'if __name__.*__main__')
+
+Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/qemu-iotests/check | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tests/acceptance/virtio_seg_max_adjust.py  | 1 -
+ tests/acceptance/x86_cpu_model_versions.py | 1 -
+ 2 files changed, 2 deletions(-)
+ mode change 100755 =3D> 100644 tests/acceptance/virtio_seg_max_adjust.py
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 2890785a10..bdcd64aea4 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -825,7 +825,8 @@ do
-=20
-         start=3D$(_wallclock)
-=20
--        if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/en=
-v python" ]; then
-+        if [ "$(head -n 1 "$source_iotests/$seq" | sed 's/3$//')" \
-+            =3D=3D "#!/usr/bin/env python" ]; then
-             if $python_usable; then
-                 run_command=3D"$PYTHON $seq"
-             else
+diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance=
+/virtio_seg_max_adjust.py
+old mode 100755
+new mode 100644
+index 5458573138..8d4f24da49
+--- a/tests/acceptance/virtio_seg_max_adjust.py
++++ b/tests/acceptance/virtio_seg_max_adjust.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/env python
+ #
+ # Test virtio-scsi and virtio-blk queue settings for all machine types
+ #
+diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
+e/x86_cpu_model_versions.py
+index 90558d9a71..01ff614ec2 100644
+--- a/tests/acceptance/x86_cpu_model_versions.py
++++ b/tests/acceptance/x86_cpu_model_versions.py
+@@ -1,4 +1,3 @@
+-#!/usr/bin/env python
+ #
+ # Basic validation of x86 versioned CPU models and CPU model aliases
+ #
 --=20
 2.21.1
 
