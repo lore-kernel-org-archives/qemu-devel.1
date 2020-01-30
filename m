@@ -4,75 +4,95 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E699C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB2CC33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:34:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE462206D3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:32:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBF69206D3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 11:34:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fo+2Cvgj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE462206D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqOrFxVw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBF69206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ix83l-0005Z2-20
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:32:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58890)
+	id 1ix85C-0007WP-31
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 06:34:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ix7xu-0005zy-D4
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:31 -0500
+ (envelope-from <sgarzare@redhat.com>) id 1ix81C-000305-T5
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:29:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ix7xs-0004j8-Sx
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:30 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27573
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <sgarzare@redhat.com>) id 1ix81B-0008AF-Gy
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:29:54 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42602
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ix7xs-0004ih-Nj
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:26:28 -0500
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ix81A-00086D-Vj
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 06:29:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580383588;
+ s=mimecast20190719; t=1580383789;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9SlPk4NmjjNnpZB612uFFc7ZwjsKN9cXzlux9cD7IFw=;
- b=fo+2Cvgj7sV8gDo3LtxTU0nrRvDrG4JK6k+EiZRh55H0mdy4u/GG1G9irDm4ZbRpz+XQyT
- JQSpccZgJ1YI25vSNOoM8+Q/H4B8NOcTKAsXhFI2um+wQooh8kVQVUnCRH4+XYdiEO07GK
- FsoWq3N6NOFOmB5IOeg0h0rO214qCTU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-GbVGC-FgOV6xUg9HOdVxVQ-1; Thu, 30 Jan 2020 06:26:24 -0500
-X-MC-Unique: GbVGC-FgOV6xUg9HOdVxVQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0801DDB6E;
- Thu, 30 Jan 2020 11:26:23 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 86D131000322;
- Thu, 30 Jan 2020 11:26:15 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v2 9/9] arm: pmu: Test overflow interrupts
-Date: Thu, 30 Jan 2020 12:25:10 +0100
-Message-Id: <20200130112510.15154-10-eric.auger@redhat.com>
-In-Reply-To: <20200130112510.15154-1-eric.auger@redhat.com>
-References: <20200130112510.15154-1-eric.auger@redhat.com>
+ bh=KqXZf2ztUMPB3wtCyO35GWFqJbN8IzjzSmoBh49g5GU=;
+ b=TqOrFxVwJsJJwE+LSuNfEKz6eLhPDA6z+oLVnWWQoEM1ZRzhmZUS0uSWw3zicbZJTa10Om
+ K2H+NOYqFJp00MXhI3F+nFaMJfwytoYivTdMIm/+9U4gnvgmE9MVZD2wGGt6WJWa6ScCkh
+ hluyuYQScy4pml1E39aRz5dwNfP24gQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-u1KHiuSrOxy-loxyeUI-5Q-1; Thu, 30 Jan 2020 06:29:46 -0500
+Received: by mail-wm1-f70.google.com with SMTP id t17so1279900wmi.7
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 03:29:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=HbN0n3tMANoi5xaL4C59R8YBgKidmAPrlno7Ce4gnXI=;
+ b=gPZJBQZ2zDD4oRb7xbwJfku/A+xoQxuBLDQctZ69Fkx3Jsha1EmwaW+7Yt+APKqyD2
+ Py5tgzywR1mVkwAC1lFofDoyE4hbfeI3Gy2AzyainheX/ormOwfmHokt+rnft7qLbOQH
+ ly3Yq3ykZrgoJc9UHR0NxV7aBRl3hz9EcHJPinF0ZpszWMYmAJGWdzJqHjX35KDO7KXZ
+ 8FV9a2v4zrEOyPXU54dGpXLdxrZPGvi7QF53YLQCrI+B1xsHpL727RDfrznef0XNIB/0
+ zVUe42Ztqv1QEmSN3tM2p2cuQ4A+gYohyhBCqnvhjBWaeQFQUbNHqQi8Fm1eLoTi9EZ0
+ DqJg==
+X-Gm-Message-State: APjAAAWn/IhIXuAi3Km+HspQf8c4BYEC3Ce/dIYOW6H+W6CmYwWg8Q0t
+ GhmZCZ9DZcchZwvtUDLE7Kugl4/6+LEn6WZ5Kwe9TTe0d5YAz4L06GYus+GzjwhgL2/un51qRdf
+ vKRi0FIIA2+0pv20=
+X-Received: by 2002:a1c:a381:: with SMTP id m123mr5078293wme.158.1580383784685; 
+ Thu, 30 Jan 2020 03:29:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxyImVKBN2j/5tHNYJMWuyrTE7WzpdJvCQ3CztblwPxPxV2o+zqCo2/ELUW0PqewuH7j3jY6A==
+X-Received: by 2002:a1c:a381:: with SMTP id m123mr5078266wme.158.1580383784432; 
+ Thu, 30 Jan 2020 03:29:44 -0800 (PST)
+Received: from steredhat (host209-4-dynamic.27-79-r.retail.telecomitalia.it.
+ [79.27.4.209])
+ by smtp.gmail.com with ESMTPSA id m3sm7075269wrs.53.2020.01.30.03.29.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Jan 2020 03:29:43 -0800 (PST)
+Date: Thu, 30 Jan 2020 12:29:41 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Liam Merwick <liam.merwick@oracle.com>
+Subject: Re: [PATCH 3/6] tests/boot_linux_console: fix extract_from_deb()
+ comment
+Message-ID: <20200130112941.6eqfd75ri7icvxzl@steredhat>
+References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
+ <1580142994-1836-4-git-send-email-liam.merwick@oracle.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <1580142994-1836-4-git-send-email-liam.merwick@oracle.com>
+X-MC-Unique: u1KHiuSrOxy-loxyeUI-5Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,227 +104,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, andrew.murray@arm.com, drjones@redhat.com,
- alexandru.elisei@arm.com, andre.przywara@arm.com
+Cc: fam@euphon.net, slp@redhat.com, alex.bennee@linaro.org,
+ qemu-devel@nongnu.org, wainersm@redhat.com, pbonzini@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test overflows for MEM_ACCESS and SW_INCR events. Also tests
-overflows with 64-bit events.
+On Mon, Jan 27, 2020 at 04:36:31PM +0000, Liam Merwick wrote:
+> The second param in extract_from_deb() is 'path' not 'file'
+>=20
+> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+> ---
+>  tests/acceptance/boot_linux_console.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
----
+>=20
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+> index 8daf6461ffac..43bc928b03a2 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -40,7 +40,7 @@ class BootLinuxConsole(Test):
+>          Extracts a file from a deb package into the test workdir
+> =20
+>          :param deb: path to the deb archive
+> -        :param file: path within the deb archive of the file to be extra=
+cted
+> +        :param path: path within the deb archive of the file to be extra=
+cted
+>          :returns: path of the extracted file
+>          """
+>          cwd =3D os.getcwd()
+> --=20
+> 1.8.3.1
+>=20
 
-v1 -> v2:
-- inline setup_irq() code
----
- arm/pmu.c         | 137 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |   6 ++
- 2 files changed, 143 insertions(+)
-
-diff --git a/arm/pmu.c b/arm/pmu.c
-index fa77ab3..ada28a4 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -45,6 +45,11 @@ struct pmu {
- 	uint32_t pmcr_ro;
- };
-=20
-+struct pmu_stats {
-+	unsigned long bitmap;
-+	uint32_t interrupts[32];
-+};
-+
- static struct pmu pmu;
-=20
- #if defined(__arm__)
-@@ -116,6 +121,7 @@ static void test_mem_access(void) {}
- static void test_chained_counters(void) {}
- static void test_chained_sw_incr(void) {}
- static void test_chain_promotion(void) {}
-+static void test_overflow_interrupt(void) {}
-=20
- #elif defined(__aarch64__)
- #define ID_AA64DFR0_PERFMON_SHIFT 8
-@@ -261,6 +267,44 @@ asm volatile(
- 	: "x9", "x10", "cc");
- }
-=20
-+static struct pmu_stats pmu_stats;
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+	uint32_t irqstat, irqnr;
-+
-+	irqstat =3D gic_read_iar();
-+	irqnr =3D gic_iar_irqnr(irqstat);
-+	gic_write_eoir(irqstat);
-+
-+	if (irqnr =3D=3D 23) {
-+		unsigned long overflows =3D read_sysreg(pmovsclr_el0);
-+		int i;
-+
-+		report_info("--> PMU overflow interrupt %d (counter bitmask 0x%lx)",
-+			    irqnr, overflows);
-+		for (i =3D 0; i < 32; i++) {
-+			if (test_and_clear_bit(i, &overflows)) {
-+				pmu_stats.interrupts[i]++;
-+				pmu_stats.bitmap |=3D 1 << i;
-+			}
-+		}
-+		write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-+	} else {
-+		report_info("Unexpected interrupt: %d\n", irqnr);
-+	}
-+}
-+
-+static void pmu_reset_stats(void)
-+{
-+	int i;
-+
-+	for (i =3D 0; i < 32; i++)
-+		pmu_stats.interrupts[i] =3D 0;
-+
-+	pmu_stats.bitmap =3D 0;
-+}
-+
- static void pmu_reset(void)
- {
- 	/* reset all counters, counting disabled at PMCR level*/
-@@ -271,6 +315,7 @@ static void pmu_reset(void)
- 	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
- 	/* disable overflow interrupts on all counters */
- 	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-+	pmu_reset_stats();
- 	isb();
- }
-=20
-@@ -713,6 +758,95 @@ static void test_chain_promotion(void)
- 			read_sysreg(pmovsclr_el0));
- }
-=20
-+static bool expect_interrupts(uint32_t bitmap)
-+{
-+	int i;
-+
-+	if (pmu_stats.bitmap ^ bitmap)
-+		return false;
-+
-+	for (i =3D 0; i < 32; i++) {
-+		if (test_and_clear_bit(i, &pmu_stats.bitmap))
-+			if (pmu_stats.interrupts[i] !=3D 1)
-+				return false;
-+	}
-+	return true;
-+}
-+
-+static void test_overflow_interrupt(void)
-+{
-+	uint32_t events[] =3D { 0x13 /* MEM_ACCESS */, 0x00 /* SW_INCR */};
-+	void *addr =3D malloc(PAGE_SIZE);
-+	int i;
-+
-+	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-+		return;
-+
-+	gic_enable_defaults();
-+	install_irq_handler(EL1H_IRQ, irq_handler);
-+	local_irq_enable();
-+	gic_enable_irq(23);
-+
-+	pmu_reset();
-+
-+	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+	write_regn(pmevcntr, 1, 0xFFFFFFF0);
-+	isb();
-+
-+	/* interrupts are disabled */
-+
-+	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(expect_interrupts(0), "no overflow interrupt received");
-+
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	for (i =3D 0; i < 100; i++)
-+		write_sysreg(0x2, pmswinc_el0);
-+
-+	set_pmcr(pmu.pmcr_ro);
-+	report(expect_interrupts(0), "no overflow interrupt received");
-+
-+	/* enable interrupts */
-+
-+	pmu_reset_stats();
-+
-+	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+	write_regn(pmevcntr, 1, 0xFFFFFFF0);
-+	write_sysreg(0xFFFFFFFF, pmintenset_el1);
-+	isb();
-+
-+	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+	for (i =3D 0; i < 100; i++)
-+		write_sysreg(0x3, pmswinc_el0);
-+
-+	mem_access_loop(addr, 200, pmu.pmcr_ro);
-+	report_info("overflow=3D0x%lx", read_sysreg(pmovsclr_el0));
-+	report(expect_interrupts(0x3),
-+		"overflow interrupts expected on #0 and #1");
-+
-+	/* promote to 64-b */
-+
-+	pmu_reset_stats();
-+
-+	events[1] =3D 0x1E /* CHAIN */;
-+	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+	isb();
-+	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(expect_interrupts(0),
-+		"no overflow interrupt expected on 32b boundary");
-+
-+	/* overflow on odd counter */
-+	pmu_reset_stats();
-+	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+	write_regn(pmevcntr, 1, 0xFFFFFFFF);
-+	isb();
-+	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(expect_interrupts(0x2),
-+		"expect overflow interrupt on odd counter");
-+}
- #endif
-=20
- /*
-@@ -921,6 +1055,9 @@ int main(int argc, char *argv[])
- 	} else if (strcmp(argv[1], "chain-promotion") =3D=3D 0) {
- 		report_prefix_push(argv[1]);
- 		test_chain_promotion();
-+	} else if (strcmp(argv[1], "overflow-interrupt") =3D=3D 0) {
-+		report_prefix_push(argv[1]);
-+		test_overflow_interrupt();
- 	} else {
- 		report_abort("Unknown sub-test '%s'", argv[1]);
- 	}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index eb6e87e..1d1bc27 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -108,6 +108,12 @@ groups =3D pmu
- arch =3D arm64
- extra_params =3D -append 'chain-promotion'
-=20
-+[overflow-interrupt]
-+file =3D pmu.flat
-+groups =3D pmu
-+arch =3D arm64
-+extra_params =3D -append 'overflow-interrupt'
-+
- # Test PMU support (TCG) with -icount IPC=3D1
- #[pmu-tcg-icount-1]
- #file =3D pmu.flat
 --=20
-2.20.1
 
 
