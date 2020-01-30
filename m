@@ -2,76 +2,98 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 575CFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D88C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:38:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2498520674
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:38:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 916DB20674
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:38:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h8x9OAMS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2498520674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KP2hJQuO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 916DB20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixCpU-00074g-9u
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:38:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50942)
+	id 1ixCpp-0007ji-Nk
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:38:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixClR-0000Ma-Mh
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:34:02 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ixClC-0008OO-0K
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixClQ-0000jN-Hv
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37730
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1ixClA-0008Dh-KP
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:41 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42179
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixClQ-0000hn-Ds
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:56 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ixClA-00087J-DM
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:33:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580402036;
+ s=mimecast20190719; t=1580402016;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jQXlB2AB6eUYg0qnVSegVUVg31jjhLlH05OlYfe6MC0=;
- b=h8x9OAMSMAV2ToiPJjTL7A6b6VS7TGbNjhK0KVBnENBbn28dPpsfdbyCanHIk+hqkjHKue
- 1ryF0hiNCFdCPe657SZ6gPzlEHVDPPECn+7De799KPJNGzigNBgdz25MFnqFwxI0CVf3Xg
- BogIsbtzjjvDzduIdlEBX80MCz/yDU8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-45g4bVZaO4SRFIWyoAHqXQ-1; Thu, 30 Jan 2020 11:33:53 -0500
-X-MC-Unique: 45g4bVZaO4SRFIWyoAHqXQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E295800D41;
- Thu, 30 Jan 2020 16:33:52 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-184.brq.redhat.com [10.40.205.184])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4630E5DE53;
- Thu, 30 Jan 2020 16:33:47 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/12] tests/acceptance: Remove shebang header
-Date: Thu, 30 Jan 2020 17:32:27 +0100
-Message-Id: <20200130163232.10446-8-philmd@redhat.com>
-In-Reply-To: <20200130163232.10446-1-philmd@redhat.com>
-References: <20200130163232.10446-1-philmd@redhat.com>
+ bh=hNEA1GIzWXT/wo5gy6Vd0WcfjAAmLoSs3VyTc5jGVMc=;
+ b=KP2hJQuOF/7RDPGU4mNGUQo2eji/AejB0BnUXHziWsQDMHT4OHGvy+7cgyWIQtFMYgQKdI
+ qc9iD/W7JwrDoGIBLnmyx9dDgRhaWdx3347T5xdC7V14k1CvYuZVE30tqfxS3NgF+DP9PM
+ r/kqctMEa7vWKsdv1o9Y/Nc1Pgmz7sY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-88-K6h2-M0dNVWP2GdXuXfJRw-1; Thu, 30 Jan 2020 11:33:32 -0500
+Received: by mail-wr1-f69.google.com with SMTP id i9so1981354wru.1
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:33:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Idgu1ovbdhEjBDTiMNMMknYRQxAZFr079uqbL8FDl/A=;
+ b=bPfMMxT3vNWiw2NcyRe9+0VAgycqYNpXDne+0LFPUYMuBEyO/lOVq8IQqKD7flFNLq
+ OKDGOkvyJPy5Yz2zlodyfuTYahPenk6Ncz+32wKbW5wnrkrmfBBZ3DhRWkcymB6rdd79
+ u5/70XLZAQByOg4L5+f4+QXsT/YYdRDKXurqgJyAZrkILV2MGEb+vKBXIw26yTd1Gxdd
+ bjMuBuUS4IOxjx7teFBRj8jdST9ppLJXGWF8UM1sJ56uYqcA9uYt1amAREy2f+RKmMr2
+ qypziO16o4YW89UY6ZXm9ueBWtsycP7RzhNHbjzq/09Z8DzykuDUubzRNJbY6MPTklPw
+ ulJA==
+X-Gm-Message-State: APjAAAW0svROoj8/WK/uDeeQlButeEOIFDfEIikaljg+NOHRXL0HdzzZ
+ r87tdemFGFtMq5IgY1u1qnI5ZYTaKnl6xV2E/IfGjPGRwTQraxxbj6Kf+az1RRc0M48uhPW84yI
+ QY2FkxgqpXKaGeCY=
+X-Received: by 2002:adf:f850:: with SMTP id d16mr6349213wrq.161.1580402010932; 
+ Thu, 30 Jan 2020 08:33:30 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxedRCAD9LhGhFv/4AuZTMcHCAKEPcEd5gnPV6geTOku9onKmvBNZj9e1VHSmvjt1b2TTq36g==
+X-Received: by 2002:adf:f850:: with SMTP id d16mr6349193wrq.161.1580402010715; 
+ Thu, 30 Jan 2020 08:33:30 -0800 (PST)
+Received: from [10.200.153.153] ([213.175.37.12])
+ by smtp.gmail.com with ESMTPSA id c9sm7099750wme.41.2020.01.30.08.33.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Jan 2020 08:33:29 -0800 (PST)
+Subject: Re: [PATCH v2] hw/*/Makefile.objs: Move many .o files to common-objs
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Thomas Huth <thuth@redhat.com>
+References: <20200130133841.10779-1-thuth@redhat.com>
+ <871rrh9fkc.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8077a146-f190-a584-9700-e2931a2a3beb@redhat.com>
+Date: Thu, 30 Jan 2020 17:33:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <871rrh9fkc.fsf@linaro.org>
+Content-Language: en-US
+X-MC-Unique: K6h2-M0dNVWP2GdXuXfJRw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,65 +105,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, kvm@vger.kernel.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch created mechanically by running:
+On 30/01/20 15:36, Alex Benn=C3=A9e wrote:
+>=20
+>> We have many files that apparently do not depend on the target CPU
+>> configuration, i.e. which can be put into common-obj-y instead of
+>> obj-y.
+> While common-obj-y is still shared by linux-user this will also add
+> slightly to user-only build times.
 
-  $ chmod 644 $(git grep -lF '#!/usr/bin/env python' \
-      | xargs grep -L 'if __name__.*__main__')
-  $ sed -i "/^#\!\/usr\/bin\/\(env\ \)\?python.\?$/d" \
-      $(git grep -lF '#!/usr/bin/env python' \
-      | xargs grep -L 'if __name__.*__main__')
+It won't, all the directories that Thomas is touching are under ifeq
+($(CONFIG_SOFTMMU), y)...endif in hw/Makefile.objs.
 
-Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tests/acceptance/virtio_seg_max_adjust.py  | 1 -
- tests/acceptance/x86_cpu_model_versions.py | 1 -
- 2 files changed, 2 deletions(-)
- mode change 100755 =3D> 100644 tests/acceptance/virtio_seg_max_adjust.py
+> I'd like to see some separation of:
+>=20
+>  common-user-obj
+>  common-sys-obj
 
-diff --git a/tests/acceptance/virtio_seg_max_adjust.py b/tests/acceptance=
-/virtio_seg_max_adjust.py
-old mode 100755
-new mode 100644
-index 5458573138..8d4f24da49
---- a/tests/acceptance/virtio_seg_max_adjust.py
-+++ b/tests/acceptance/virtio_seg_max_adjust.py
-@@ -1,4 +1,3 @@
--#!/usr/bin/env python
- #
- # Test virtio-scsi and virtio-blk queue settings for all machine types
- #
-diff --git a/tests/acceptance/x86_cpu_model_versions.py b/tests/acceptanc=
-e/x86_cpu_model_versions.py
-index 90558d9a71..01ff614ec2 100644
---- a/tests/acceptance/x86_cpu_model_versions.py
-+++ b/tests/acceptance/x86_cpu_model_versions.py
-@@ -1,4 +1,3 @@
--#!/usr/bin/env python
- #
- # Basic validation of x86 versioned CPU models and CPU model aliases
- #
---=20
-2.21.1
+That actually is done in the Meson conversion, where they are called
+respectively user_ss and softmmu_ss ("ss" stands for sourceset).  They
+are added like so to common_ss:
+
+common_ss.add_all(when: 'CONFIG_SOFTMMU', if_true: softmmu_ss)
+common_ss.add_all(when: 'CONFIG_USER_ONLY', if_true: user_ss)
+
+> and I guess the stuff already common to everything is already in
+> libqemuutil.a
+
+In my meson-poc branch, the only files that are added directly to
+common_ss rather than softmmu_ss or user_ss are the files in hw/core and
+the disassemblers.
+
+Paolo
 
 
