@@ -2,79 +2,88 @@ Return-Path: <SRS0=hbhd=3T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B722AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18391C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81390206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:28:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D43A4206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:28:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aal+Xfa1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81390206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s6IwLRQH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D43A4206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixCfh-0000fw-Kv
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:28:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47328)
+	id 1ixCgP-0002Gr-1Y
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:28:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1ixCcI-0003XW-8X
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:24:31 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ixCU6-0005mY-W4
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1ixCcH-0004Sw-79
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:24:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57067
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1ixCcH-0004RZ-1j
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:24:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580401468;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LyMUHV/lq0z4ysTjfpPoak59tssXUYb+BoTtmfQXyCo=;
- b=Aal+Xfa1Xeq/PPIbCLwi3KwDHEQYRsvUbx3Qjzdc1+v95fRcy5feumRFiaoFqvoVWLgEE1
- KKgduPfpmloLDfXUiz8YZujg0Yn9aBYHCHYCb+I10lzN9Oxja2ZQ4WRm3AeuQvNazC3d5I
- DHvS4eLAl8L9+IAIgz+fFP3Xa/+/kAM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-7mImUWOpN2Cm9gVwxOkyOQ-1; Thu, 30 Jan 2020 11:24:26 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D9741902EB3;
- Thu, 30 Jan 2020 16:24:25 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BF266CFCC;
- Thu, 30 Jan 2020 16:24:20 +0000 (UTC)
-Message-ID: <3ae12c75db4ce389ad3c355bc112593d86e7a256.camel@redhat.com>
-Subject: Re: [PATCH 11/13] block/crypto: implement blockdev-amend
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>
-Date: Thu, 30 Jan 2020 18:24:19 +0200
-In-Reply-To: <20200128174008.GB1446339@redhat.com>
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-12-mlevitsk@redhat.com>
- <20200128174008.GB1446339@redhat.com>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 7mImUWOpN2Cm9gVwxOkyOQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ (envelope-from <peter.maydell@linaro.org>) id 1ixCU5-00037f-Q6
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:02 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:34160)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ixCU5-00036W-IU
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:01 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id t2so4820547wrr.1
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:16:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=aB8sogKHzqSo+5j5JJF7r8R8zdumzJOaE75J49k/efw=;
+ b=s6IwLRQHFNAyMMZuzbcLOY6WLQGB9B1kyq4dyaiH3rsHxUI6RUA3sKinBGzUN4jr+M
+ 14inPlUQe+UqNJ1r8F4/W/krG7qPkKlfbpuS/9G4rnHu6scw4SoXET7s030o3tMB5zsv
+ lSoxd7favoVl3fvWzb0USLomV665bOK2/zzX6p7RiZFe5ohsv29xNZSyWgSgpo7Axc0T
+ ULMJwPlmFDzE1OZDY0KrBklQ8evBV21XNxnTJqrZLrWYmAV4CjRybeT8qJBUyhQKfH8H
+ pr9ds+KrXL+PeNC8krqAdseOean0g9TGn647KTfNaxOO1daoK6fHo2HnFvCAN18IqmWF
+ lwig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=aB8sogKHzqSo+5j5JJF7r8R8zdumzJOaE75J49k/efw=;
+ b=Ej2K+Z+8hTPXuYctPC5BGqtegD2Y/atWPQVkLdsFKzBbYikRLSEFT+DeTfN07HqCg9
+ hyeqcOdLblmP97QLZ5zKH8uYQXct9ljkuUeKc/jIJso1NBsUX/h9Xq1rOtz/5OgUKNze
+ 3yARF2mK3fjA+9UvB0LVkmBMWs5MQPelnS8lOuHWIPoAS0fY3A0zZhifeGX4P6MfmSvQ
+ J/GyCt2yW+oiTK10QPNeu93YrKwKg71Ixi8Z4bTPTGQAXQsCrQsOlfZGaruy9pCElmk6
+ EeqAPo2wkwRKErTl+KdItd5jzbofB46jF9zjDuyfT++W57Z/bT5NagTVga0cTMtm2XiC
+ z88g==
+X-Gm-Message-State: APjAAAULEUUsDOan72iK/g0rDDnfI/u14rMro9MK41BPfugW4EDxBG7f
+ 1mNzw5tZC9jn7zPKJTzrBLu+bHweQZxwWw==
+X-Google-Smtp-Source: APXvYqwBSaBMT7SHiU3SiAe6Qhe/eHUNKbA7fcUyorCIvmd5T+XfQp9R83E7AD0oqP+nghFrHuGjLw==
+X-Received: by 2002:a5d:5706:: with SMTP id a6mr6474203wrv.108.1580400959993; 
+ Thu, 30 Jan 2020 08:15:59 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id a22sm6994442wmd.20.2020.01.30.08.15.58
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Jan 2020 08:15:59 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 19/26] hw/s390x/ipl: replace deprecated qdev_reset_all
+ registration
+Date: Thu, 30 Jan 2020 16:15:26 +0000
+Message-Id: <20200130161533.8180-20-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200130161533.8180-1-peter.maydell@linaro.org>
+References: <20200130161533.8180-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,74 +95,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2020-01-28 at 17:40 +0000, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Jan 14, 2020 at 09:33:48PM +0200, Maxim Levitsky wrote:
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  block/crypto.c       | 70 ++++++++++++++++++++++++++++++++------------
-> >  qapi/block-core.json | 14 ++++++++-
-> >  2 files changed, 64 insertions(+), 20 deletions(-)
-> >=20
-> > diff --git a/block/crypto.c b/block/crypto.c
-> > index 081880bced..6836337863 100644
-> > --- a/block/crypto.c
-> > +++ b/block/crypto.c
->=20
->=20
-> > =20
-> > +static int
-> > +coroutine_fn block_crypto_co_amend(BlockDriverState *bs,
-> > +                                   BlockdevAmendOptions *opts,
-> > +                                   bool force,
-> > +                                   Error **errp)
->=20
-> This should have a _luks suffix given...
+From: Damien Hedde <damien.hedde@greensocs.com>
 
-100% agree. Fixed now.
+Replace deprecated qdev_reset_all by resettable_cold_reset_fn for
+the ipl registration in the main reset handlers.
 
-> > +{
-> > +    QCryptoBlockAmendOptions amend_opts;
-> > +
-> > +    amend_opts =3D (QCryptoBlockAmendOptions) {
-> > +        .format =3D Q_CRYPTO_BLOCK_FORMAT_LUKS,
-> > +        .u.luks =3D *qapi_BlockdevAmendOptionsLUKS_base(&opts->u.luks)=
-,
->=20
-> ...this is hardcoded to luks
->=20
-> > +    };
-> > +    return block_crypto_amend_options_generic(bs, &amend_opts, force, =
-errp);
-> > +}
-> > =20
-> >  static void
-> >  block_crypto_child_perms(BlockDriverState *bs, BdrvChild *c,
-> > @@ -812,6 +843,7 @@ static BlockDriver bdrv_crypto_luks =3D {
-> >      .bdrv_get_info      =3D block_crypto_get_info_luks,
-> >      .bdrv_get_specific_info =3D block_crypto_get_specific_info_luks,
-> >      .bdrv_amend_options =3D block_crypto_amend_options,
-> > +    .bdrv_co_amend      =3D block_crypto_co_amend,
-> > =20
-> >      .strong_runtime_opts =3D block_crypto_strong_runtime_opts,
-> >  };
->=20
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+This does not impact the behavior for the following reasons:
++ at this point resettable just call the old reset methods of devices
+  and buses in the same order than qdev/qbus.
++ resettable handlers registered with qemu_register_reset are
+  serialized; there is no interleaving.
++ eventual explicit calls to legacy reset API (device_reset or
+  qdev/qbus_reset) inside this reset handler will not be masked out
+  by resettable mechanism; they do not go through resettable api.
 
-Thanks for the review,
-=09Best regards,
-=09=09Maxim Levitsky
->=20
->=20
->=20
-> Regards,
-> Daniel
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200123132823.1117486-12-damien.hedde@greensocs.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/s390x/ipl.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index ca8e7db4672..7773499d7f7 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -237,7 +237,15 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+      */
+     ipl->compat_start_addr = ipl->start_addr;
+     ipl->compat_bios_start_addr = ipl->bios_start_addr;
+-    qemu_register_reset(qdev_reset_all_fn, dev);
++    /*
++     * Because this Device is not on any bus in the qbus tree (it is
++     * not a sysbus device and it's not on some other bus like a PCI
++     * bus) it will not be automatically reset by the 'reset the
++     * sysbus' hook registered by vl.c like most devices. So we must
++     * manually register a reset hook for it.
++     * TODO: there should be a better way to do this.
++     */
++    qemu_register_reset(resettable_cold_reset_fn, dev);
+ error:
+     error_propagate(errp, err);
+ }
+-- 
+2.20.1
 
 
