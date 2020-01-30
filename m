@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B3DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:24:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E336EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:24:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1520F206D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:24:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A99AF206D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jan 2020 16:24:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F+unshtH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1520F206D5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lq/Wwa8P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A99AF206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixCbn-0001r1-7Q
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:23:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43289)
+	id 1ixCci-0003vq-TK
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 11:24:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ixCU8-0005nJ-0h
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:06 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ixCTz-0005fi-Ip
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ixCU6-00038A-CF
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:03 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36101)
+ (envelope-from <peter.maydell@linaro.org>) id 1ixCTw-0002zq-9m
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:55 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:45334)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ixCU6-00037D-5Q
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:16:02 -0500
-Received: by mail-wr1-x443.google.com with SMTP id z3so4816357wru.3
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:16:02 -0800 (PST)
+ id 1ixCTw-0002zD-2Y
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 11:15:52 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id a6so4728157wrx.12
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 08:15:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=FudFrPLs/FW28wgW4YGWYEJ4ys1uBPtYGVZ/qV1IY/0=;
- b=F+unshtH700rv40WL/rt6Kk1EVMPrfMuA2LZV+2W3UYilLAG7Oc4xZkOXSB1HmvxQz
- QEXu6gqBaSZ4cp0Z5l2tPHrE2Tkhtv/qqzpowWZTeWdpbrcROtz9KM/WBdaqBW09nB+K
- Xg8fHXWKpWxqLJXZtUcmPE+IJfIm8voLaguOGvTxe49jP2EMmcqpERCzrIWw9YyG6JMU
- crXD5qmBC/URL4kO7UPQu/ZnGB/PoScPjQuc8//Vf2JiorKJb977AOrDJFp5pwkR5VZ3
- A3Vvn6Qv1CLY6a3/XBir/RRFp/3PNYcafWHDpQNnI6UNEoOVfvOeTtxWl5DV3hbxQxrz
- 4VkQ==
+ bh=lt09TXjdWWSldnue6vzLMA5nWkuFv0K0sVt7j6VTK2g=;
+ b=lq/Wwa8PQTiGlBWdKJ86IcAHXKH2UI3ET0KyypKmT3iExA5FE58a5apPTvbp7s3kF/
+ bZXvBKpKdx7saumGBtmOwLWOgqaWvUi6WUCTdAvpw9BC0Bd6cJ7u0WrNbNCIaAYS8fZl
+ Xnt5QmWIB+cEYC2PjfqTUt+2i4rPE2y0zwUhEl9P2SAbpHNZgml+gQ3ooikoBUDP5iiB
+ gqBqWvFBz4SRZp1wfcNWLw8lK5OcuTWgUUzZLBUzMkh+6bCRcCHo9A4IcXjOv/UgirII
+ V08qhhhRaLg+d9D1ZcdU7SV0qrB771JYRUqHlJyQ58A7t753SMkBSFyxhGCfVqivGNvo
+ sZdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FudFrPLs/FW28wgW4YGWYEJ4ys1uBPtYGVZ/qV1IY/0=;
- b=YgX/esXk8zx42FvF6DrWhin/kkWy1HBHtpPW70sjFDVAEkvSJCBXWbm9Y9OepzYrwm
- BHZKW1XDAfAm+RS/FiWEUETiQwrNYKm2GjPY6PcwYRAuAfSnHAydAS5YYvis7dU+FF4w
- J5UWYi+OkOnuOM3WUg5v8F5QnrjBMz7FA2nQ2OoW5xh0sA2T+eajaWyuuVxefqUa5/D+
- W/+vyBmd9zhb0jo5bb3lyhe4lvAWF9EkAvvVBoMqk4sU24Fgu6iJkJ314LmdcnQmJH53
- /SmQi2RZsjP0p077rAxIe2FIh0JPHUK9j6rkteknihv+YDgxvwJFk+EnZkmOHYZpm5Sy
- 3zAw==
-X-Gm-Message-State: APjAAAWEpy0oalTT7Y4T5G1+fXKsBsQ6FqSAriT+zVxBpDnfPmDdZBzw
- Fgz632uN1V+PUXFgiPy14V7z88k5g2RFlA==
-X-Google-Smtp-Source: APXvYqyILcGWB3J8Izj0T7GaH0f4bzA9t1BC7YsWMz1Eeabpk/ttdMjuhkuq0csvcrmZBQT8Aa0f/Q==
-X-Received: by 2002:adf:f484:: with SMTP id l4mr6759498wro.207.1580400960970; 
- Thu, 30 Jan 2020 08:16:00 -0800 (PST)
+ bh=lt09TXjdWWSldnue6vzLMA5nWkuFv0K0sVt7j6VTK2g=;
+ b=P19j5cXqm7S+O24sVVm1RgtXnj29N96pu5IrcD6wDC0u7k2aIfiBCyIqKWHFCdxN94
+ 1GDa6bTKEGx+/+cR6HYylc6lOI393Keqad5dwcYQk/OYshUCfAF82pJ9FNklRk0ZC7BN
+ Zl81y2PWblDxts8qtn0aWHpmACE3YTA4yi/KRYVLlcc5zYJWFtP6JVJAxtGq7G7O2myD
+ jTXt3CEy1JJeGxju4mMJ2OSQtWd8ekHPOLkpNSpPbnIevMOJBimjGrJiyZsr8+xtZJ5q
+ iStqM3NxiJaT6ur1xDJ6FQzLGo2fCAYjoS/3AqNaTuluXggNnYE4mA0OveeF35Z3e4ev
+ w6yQ==
+X-Gm-Message-State: APjAAAV/9gNVGOBj3a9f9O567VhB0inYriZv2Dg9+bbXsZxDGlRSwlZh
+ dKFAkdwWmtbyqG2hxgLcB12H7GHa0Dlmfg==
+X-Google-Smtp-Source: APXvYqwg5kbXwMR0uDG009TUkg3urwxTOX11ezOG7/OitzP4dMVUmdi3I1ydwwBTjekTZ7b2t6PiOQ==
+X-Received: by 2002:a05:6000:1201:: with SMTP id
+ e1mr511292wrx.386.1580400950665; 
+ Thu, 30 Jan 2020 08:15:50 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id a22sm6994442wmd.20.2020.01.30.08.16.00
+ by smtp.gmail.com with ESMTPSA id a22sm6994442wmd.20.2020.01.30.08.15.49
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jan 2020 08:16:00 -0800 (PST)
+ Thu, 30 Jan 2020 08:15:49 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 20/26] hw/intc/arm_gicv3_kvm: Stop wrongly programming
- GICR_PENDBASER.PTZ bit
-Date: Thu, 30 Jan 2020 16:15:27 +0000
-Message-Id: <20200130161533.8180-21-peter.maydell@linaro.org>
+Subject: [PULL 13/26] hw/core/resettable: add support for changing parent
+Date: Thu, 30 Jan 2020 16:15:20 +0000
+Message-Id: <20200130161533.8180-14-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200130161533.8180-1-peter.maydell@linaro.org>
 References: <20200130161533.8180-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::42c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,58 +99,166 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Zenghui Yu <yuzenghui@huawei.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
 
-If LPIs are disabled, KVM will just ignore the GICR_PENDBASER.PTZ bit when
-restoring GICR_CTLR.  Setting PTZ here makes littlt sense in "reduce GIC
-initialization time".
+Add a function resettable_change_parent() to do the required
+plumbing when changing the parent a of Resettable object.
 
-And what's worse, PTZ is generally programmed by guest to indicate to the
-Redistributor whether the LPI Pending table is zero when enabling LPIs.
-If migration is triggered when the PTZ has just been cleared by guest (and
-before enabling LPIs), we will see PTZ==1 on the destination side, which
-is not as expected.  Let's just drop this hackish userspace behavior.
+We need to make sure that the reset state of the object remains
+coherent with the reset state of the new parent.
 
-Also take this chance to refine the comment a bit.
+We make the 2 following hypothesis:
++ when an object is put in a parent under reset, the object goes in
+reset.
++ when an object is removed from a parent under reset, the object
+leaves reset.
 
-Fixes: 367b9f527bec ("hw/intc/arm_gicv3_kvm: Implement get/put functions")
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-Message-id: 20200119133051.642-1-yuzenghui@huawei.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+The added function avoids any glitch if both old and new parent are
+already in reset.
+
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200123132823.1117486-6-damien.hedde@greensocs.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gicv3_kvm.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ include/hw/resettable.h | 16 +++++++++++
+ hw/core/resettable.c    | 62 +++++++++++++++++++++++++++++++++++++++--
+ hw/core/trace-events    |  1 +
+ 3 files changed, 77 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 9c7f4ab8711..49304ca589d 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -336,7 +336,10 @@ static void kvm_arm_gicv3_put(GICv3State *s)
-     kvm_gicd_access(s, GICD_CTLR, &reg, true);
+diff --git a/include/hw/resettable.h b/include/hw/resettable.h
+index c0b9fc6ad62..96073354fd6 100644
+--- a/include/hw/resettable.h
++++ b/include/hw/resettable.h
+@@ -194,6 +194,22 @@ void resettable_release_reset(Object *obj, ResetType type);
+  */
+ bool resettable_is_in_reset(Object *obj);
  
-     if (redist_typer & GICR_TYPER_PLPIS) {
--        /* Set base addresses before LPIs are enabled by GICR_CTLR write */
-+        /*
-+         * Restore base addresses before LPIs are potentially enabled by
-+         * GICR_CTLR write
-+         */
-         for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
-             GICv3CPUState *c = &s->cpu[ncpu];
++/**
++ * resettable_change_parent:
++ * Indicate that the parent of Ressettable @obj is changing from @oldp to @newp.
++ * All 3 objects must implement resettable interface. @oldp or @newp may be
++ * NULL.
++ *
++ * This function will adapt the reset state of @obj so that it is coherent
++ * with the reset state of @newp. It may trigger @resettable_assert_reset()
++ * or @resettable_release_reset(). It will do such things only if the reset
++ * state of @newp and @oldp are different.
++ *
++ * When using this function during reset, it must only be called during
++ * a hold phase method. Calling this during enter or exit phase is an error.
++ */
++void resettable_change_parent(Object *obj, Object *newp, Object *oldp);
++
+ /**
+  * resettable_class_set_parent_phases:
+  *
+diff --git a/hw/core/resettable.c b/hw/core/resettable.c
+index 91332084870..6e0b0f492f1 100644
+--- a/hw/core/resettable.c
++++ b/hw/core/resettable.c
+@@ -28,12 +28,16 @@ static void resettable_phase_exit(Object *obj, void *opaque, ResetType type);
+  * enter_phase_in_progress:
+  * True if we are currently in reset enter phase.
+  *
+- * Note: This flag is only used to guarantee (using asserts) that the reset
+- * API is used correctly. We can use a global variable because we rely on the
++ * exit_phase_in_progress:
++ * count the number of exit phase we are in.
++ *
++ * Note: These flags are only used to guarantee (using asserts) that the reset
++ * API is used correctly. We can use global variables because we rely on the
+  * iothread mutex to ensure only one reset operation is in a progress at a
+  * given time.
+  */
+ static bool enter_phase_in_progress;
++static unsigned exit_phase_in_progress;
  
-@@ -347,12 +350,6 @@ static void kvm_arm_gicv3_put(GICv3State *s)
-             kvm_gicr_access(s, GICR_PROPBASER + 4, ncpu, &regh, true);
+ void resettable_reset(Object *obj, ResetType type)
+ {
+@@ -65,7 +69,9 @@ void resettable_release_reset(Object *obj, ResetType type)
+     trace_resettable_reset_release_begin(obj, type);
+     assert(!enter_phase_in_progress);
  
-             reg64 = c->gicr_pendbaser;
--            if (!(c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS)) {
--                /* Setting PTZ is advised if LPIs are disabled, to reduce
--                 * GIC initialization time.
--                 */
--                reg64 |= GICR_PENDBASER_PTZ;
--            }
-             regl = (uint32_t)reg64;
-             kvm_gicr_access(s, GICR_PENDBASER, ncpu, &regl, true);
-             regh = (uint32_t)(reg64 >> 32);
++    exit_phase_in_progress += 1;
+     resettable_phase_exit(obj, NULL, type);
++    exit_phase_in_progress -= 1;
+ 
+     trace_resettable_reset_release_end(obj);
+ }
+@@ -206,6 +212,58 @@ static void resettable_phase_exit(Object *obj, void *opaque, ResetType type)
+     trace_resettable_phase_exit_end(obj, obj_typename, s->count);
+ }
+ 
++/*
++ * resettable_get_count:
++ * Get the count of the Resettable object @obj. Return 0 if @obj is NULL.
++ */
++static unsigned resettable_get_count(Object *obj)
++{
++    if (obj) {
++        ResettableClass *rc = RESETTABLE_GET_CLASS(obj);
++        return rc->get_state(obj)->count;
++    }
++    return 0;
++}
++
++void resettable_change_parent(Object *obj, Object *newp, Object *oldp)
++{
++    ResettableClass *rc = RESETTABLE_GET_CLASS(obj);
++    ResettableState *s = rc->get_state(obj);
++    unsigned newp_count = resettable_get_count(newp);
++    unsigned oldp_count = resettable_get_count(oldp);
++
++    /*
++     * Ensure we do not change parent when in enter or exit phase.
++     * During these phases, the reset subtree being updated is partly in reset
++     * and partly not in reset (it depends on the actual position in
++     * resettable_child_foreach()s). We are not able to tell in which part is a
++     * leaving or arriving device. Thus we cannot set the reset count of the
++     * moving device to the proper value.
++     */
++    assert(!enter_phase_in_progress && !exit_phase_in_progress);
++    trace_resettable_change_parent(obj, oldp, oldp_count, newp, newp_count);
++
++    /*
++     * At most one of the two 'for' loops will be executed below
++     * in order to cope with the difference between the two counts.
++     */
++    /* if newp is more reset than oldp */
++    for (unsigned i = oldp_count; i < newp_count; i++) {
++        resettable_assert_reset(obj, RESET_TYPE_COLD);
++    }
++    /*
++     * if obj is leaving a bus under reset, we need to ensure
++     * hold phase is not pending.
++     */
++    if (oldp_count && s->hold_phase_pending) {
++        resettable_phase_hold(obj, NULL, RESET_TYPE_COLD);
++    }
++    /* if oldp is more reset than newp */
++    for (unsigned i = newp_count; i < oldp_count; i++) {
++        resettable_release_reset(obj, RESET_TYPE_COLD);
++    }
++}
++
+ void resettable_class_set_parent_phases(ResettableClass *rc,
+                                         ResettableEnterPhase enter,
+                                         ResettableHoldPhase hold,
+diff --git a/hw/core/trace-events b/hw/core/trace-events
+index 77d61cb66e6..aecd8e160eb 100644
+--- a/hw/core/trace-events
++++ b/hw/core/trace-events
+@@ -16,6 +16,7 @@ resettable_reset_assert_begin(void *obj, int cold) "obj=%p cold=%d"
+ resettable_reset_assert_end(void *obj) "obj=%p"
+ resettable_reset_release_begin(void *obj, int cold) "obj=%p cold=%d"
+ resettable_reset_release_end(void *obj) "obj=%p"
++resettable_change_parent(void *obj, void *o, unsigned oc, void *n, unsigned nc) "obj=%p from=%p(%d) to=%p(%d)"
+ resettable_phase_enter_begin(void *obj, const char *objtype, unsigned count, int type) "obj=%p(%s) count=%d type=%d"
+ resettable_phase_enter_exec(void *obj, const char *objtype, int type, int has_method) "obj=%p(%s) type=%d method=%d"
+ resettable_phase_enter_end(void *obj, const char *objtype, unsigned count) "obj=%p(%s) count=%d"
 -- 
 2.20.1
 
