@@ -2,88 +2,93 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.8 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AF5BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C98C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:24:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 260BD20663
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:22:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C39020663
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:24:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tR9N3wyf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 260BD20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NVlfX2jU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C39020663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixa0G-0008QC-93
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 12:22:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33185)
+	id 1ixa2E-0001dQ-A1
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 12:24:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1ixZza-0007x3-56
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:22:07 -0500
+ (envelope-from <armbru@redhat.com>) id 1ixa1N-0000iu-5s
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:23:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1ixZzZ-0000se-6k
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:22:06 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:41270)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ixZzY-0000qb-Vg
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:22:05 -0500
-Received: by mail-wr1-x436.google.com with SMTP id c9so9562847wrw.8
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 09:22:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=yk3+W7sbap/tZdI3bg7dqQ8fV+ENIrbbwCwGfxjHnJM=;
- b=tR9N3wyfZ6fmfNQ5BCkiPlWa+T9rXADu1bJ3lEMLp5f18tNCALFW2UOYkMpq7lYddb
- Rl6NHWbAV+jOv8wv8cM5Wa9Zica29ShvzUUzrH6z/RaO5Xzv34ClaNaPfgkpIbGGxv9p
- B6WCGGpO33jD11/FY0mFayjz19R50BPDiKBxNY3kwBXDIiUyuwB2he53+DFXN2nI8o9p
- pSeJ8+J4lJ/nYPSIM9AmmwMRN9gIRrZWxbMUCrrlNaoTfbgGL9VfbltfLx27wfQXEVYL
- 2izyjc+a1C+KwngMncQ886M/XEZn0NswkBosgbOEAUKfsoPc1Gr0nG9S5wa8VjQnWLtY
- /qlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=yk3+W7sbap/tZdI3bg7dqQ8fV+ENIrbbwCwGfxjHnJM=;
- b=FYP4WOxssDrmgMGGihm44G1GUxwrvrlXb9FxzNKqLdEEmrd938aYA/pZKi9uVSYA/L
- igtVMjoC018q+jfrzuHRiAs36b3vCStNu8SV+yKPXV+Vo1lpXUoSL/D3rV354Z1Vaib7
- 8HuVAqTYn5erYVa9gXBqC1TSVRrD652BSZaHxBj4W8rMg0vAzG962CvM3Fp0xSK8hiJV
- R2kak0FGGwDzmXB5owVdtbovef4DdPLSiGiOx3eDNrBcHd9Gs1Itsrl2vRv3IVrTpcJq
- hXH02YqsVEv4JY8ocgiCnddkQ2kuU3ECVB7nSGgR6YmhgaPgNonPoeOxjO2Q26hoWQ/k
- 5uRA==
-X-Gm-Message-State: APjAAAXg1oa8gxM8Zxw0tZ6KfzEQMHKSE+AgN9JMJB3f5/tnWCdVx4JC
- jPPnLEstJsecBkitL076Kcs=
-X-Google-Smtp-Source: APXvYqw8lp5yUApzmbfSfL2/pH0scOzf2lypyO7rS38fvY2I9qF6yk+WaI1NluydGSC7UF7KEU88nw==
-X-Received: by 2002:adf:fd8d:: with SMTP id d13mr4440878wrr.208.1580491322640; 
- Fri, 31 Jan 2020 09:22:02 -0800 (PST)
-Received: from localhost (229.227-241-81.adsl-static.isp.belgacom.be.
- [81.241.227.229])
- by smtp.gmail.com with ESMTPSA id y12sm11332057wmj.6.2020.01.31.09.22.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 31 Jan 2020 09:22:01 -0800 (PST)
-Date: Fri, 31 Jan 2020 11:28:57 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Subject: Re: [GSoC/Outreachy QEMU proposal] Extend support for ioctls in QEMU
- linux-user mode
-Message-ID: <20200131112857.GA4487@stefanha-x1.localdomain>
-References: <CAL1e-=j5WJkV=X+KkfBuS3pjf6z3aJrtu4xpYeVbjEUYiWxxTQ@mail.gmail.com>
- <CAL1e-=ghxDLcU3iqkZ8q_sbk_DyR70t2a-jFtoNDVa7iTkMXsQ@mail.gmail.com>
+ (envelope-from <armbru@redhat.com>) id 1ixa1J-0002mC-OK
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:23:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56150
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ixa1J-0002le-Kb
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:23:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580491432;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NCnIy5nV5jdiJLAobGpgr6JyF1W9ZElJgutLBa59Isg=;
+ b=NVlfX2jU30MNXvKN4Ohc4QuVUIpfHIFeA0JbBMDGumi6PjL8X1IVYLxGo+2BIW4JgiWZ2X
+ JKT9+yCN6RPDs9A/5hxO5Gyq44i1Ru3/wMeXhjIlZzeQs6IUSdHjapGuUkHUWemzGWAMXI
+ SHlL15eJ6RtRiyTsnZylyOErEFi0XTU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-gtVYkZRvODeEKyNfRXC5BQ-1; Fri, 31 Jan 2020 12:23:40 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 960A910CE791;
+ Fri, 31 Jan 2020 17:23:38 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EC2D67792F;
+ Fri, 31 Jan 2020 17:23:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7FFF91138404; Fri, 31 Jan 2020 18:23:28 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Subject: Re: Improving QOM documentation [Was: Re: Making QEMU easier for
+ management tools and applications]
+References: <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200115121953.GJ93923@redhat.com>
+ <874kwwvmuv.fsf@dusky.pond.sub.org> <20200130210902.GA25927@paraplu>
+ <87y2toi29o.fsf@dusky.pond.sub.org>
+ <CAFEAcA-545QS9mnM6hwa6TxUpw_pDQ3Pa8tkf4qtzWS1Zi_fxQ@mail.gmail.com>
+ <CABgObfaB=wHXyJbQR163bZdFHhWdCc4D8sWRHzte019_hSTuhA@mail.gmail.com>
+ <20200131152243.GA24572@paraplu>
+Date: Fri, 31 Jan 2020 18:23:28 +0100
+In-Reply-To: <20200131152243.GA24572@paraplu> (Kashyap Chamarthy's message of
+ "Fri, 31 Jan 2020 16:22:43 +0100")
+Message-ID: <87sgjvbkvj.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
-Content-Disposition: inline
-In-Reply-To: <CAL1e-=ghxDLcU3iqkZ8q_sbk_DyR70t2a-jFtoNDVa7iTkMXsQ@mail.gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: gtVYkZRvODeEKyNfRXC5BQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,46 +100,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang?= =?utf-8?Q?=C3=A9?=" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Kashyap Chamarthy <kchamart@redhat.com> writes:
 
---LQksG6bCIzRHxTLp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> On Fri, Jan 31, 2020 at 12:02:05PM +0100, Paolo Bonzini wrote:
+>> Il ven 31 gen 2020, 11:36 Peter Maydell <peter.maydell@linaro.org> ha
+>> scritto:
+>
+> [...]
+>
+>> The advantage of putting them in the header is that you have them all in
+>> one place (inline functions and structs must be in the header). In pract=
+ice
+>> that balances for me the disadvantage of having some comments far from t=
+he
+>> code they document, which increases the risk of bitrot especially for
+>> comments such as "called with lock X held".
+>>=20
+>> I definitely agree that the overview/introduction/conventions
+>> > side of things is where we'd benefit most if somebody wanted
+>> > to try to tackle that. We could roll
+>> > https://wiki.qemu.org/Documentation/QOMConventions
+>> > into that if we had a better place to put that info.
+>> >
+>>=20
+>> I am travelling this weekend so I might try to do some kind of thread
+>> summary and brain dump in the wiki. I'll leave to Kashyap to do the rST
+>> conversion and patch submission. ;-)
+>
+> Thanks!  Happy to be the 'scribe' ;-)  I have a skeltal
+> qemu-object-model.rst file sitting with some initial content based on
+> various sources, including one of your presentations[*] from 2014.
+> I'll wait for your new Wiki link to incorporate that content.
+>
+> (Minor aside: I'm not sure if this file should be in docs/interop/ dir,
+> which IIRC, is for things that are 'external' interfaces.  And I learn
+> that QOM is used both internally in and as an external interface, e.g.
+> whenever a device is being created, machine types, CPU config, etc.)
 
-On Thu, Jan 30, 2020 at 12:09:58PM +0100, Aleksandar Markovic wrote:
-> Stefan, there was an idea in this thread that this project contributes
-> (apart to QEMU) to another ooen source project (LTP). In my layman view,
-> this is an advantage. But, how does that fit into GSoC/Outreachy rules?
+docs/devel/qapi-code-gen.txt has the same problem: it's mostly internal
+stuff, but there's also introspection, which is an external interface.
 
-That is fine for GSoC.  It will benefit the open source community and
-the code being written will be under an approved open source license.
+>
+>             - - -
+>
+> I've re-skimmed your scarily-titled "QOM exegesis and apocalypse" 2014
+> KVM Forum talk slides[*], where the "Why QOM?" slide says:
+>
+>     All device creation, device configuration, backend creation and
+>     backed configuration done through a single interface
+>    =20
+>     Rigorous support for introspection both of runtime objects and type
+>     capabilities
 
-For Outreachy we focus on the QEMU codebase because the funding comes
-for sponsors that may wish their donations to be used for QEMU
-development.
+For a value of "rigorous".
 
-Stefan
+Let me propose QAPI's query-qmp-schema as the tin standard[*] of
+introspection:
 
---LQksG6bCIzRHxTLp
-Content-Type: application/pgp-signature; name="signature.asc"
+* It's documented
 
------BEGIN PGP SIGNATURE-----
+* It comes with something that can pass as a type system
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl40D3kACgkQnKSrs4Gr
-c8hu2Qf8CuNztOMmZmBtlDN7+pACnSEur9lgJHOm2cMWy/m5+CZHEcm96SEGCEtM
-1ATvzmqx+BWVd+hnFCdMpLi9/HMjWjNczFwGUTOdKSr7GNpOyX7dCGjyXQIVcm1B
-VdxLqgnbaUEjgtEXBQuPldw/MbQnAcGWJzw9RBGurWotuICJ22UqAZSda/i0pY/3
-nOqF6w4jRylUjORmUPvrGYylAGfsGLI3IGDXSTwT/7UwzLaJAABPN1Nycfw9UwfA
-wQ8reE0MP6ck0TML4qjFIkmztREPIcEIllAu2xx3NsDvWNhiBUutZ/ILZEXvvtZG
-mTVQeEYG99mBrymicywf0cie7jBHaw==
-=zVYX
------END PGP SIGNATURE-----
+* It actually tells you the full truth.
 
---LQksG6bCIzRHxTLp--
+Now compare to QOM:
+
+* Documentation
+
+  QAPI: docs/devel/qapi-code-gen.txt section "Client JSON Protocol
+  introspection"
+
+  QOM: Nada
+
+* Type system
+
+  QAPI: A few built-in types specified in the documentation, type
+  constructors for complex types.
+
+  QOM: Types are strings, and you just need to know what they mean.
+  Some string patterns are special: link<STR>, child<STR>, STR[INT], and
+  you just need to know what that means, too.
+
+* Full truth
+
+  QAPI: If you can access it at the interface, you can also see it in
+  introspection.
+
+  QOM: Type introspection can show you only the properties of a freshly
+  created object.  Properties that get created only later are invisible.
+  Properties that depend on global state are unreliable.  Object
+  introspection is reliable, but only for that object in its current
+  state.
+
+> Me wonders how much of the above "Why" still holds true today.  Although
+> further slides give more clues on what worked and what didn't.
+>
+> I'll wait for fresher details from your upcoming Wiki :-)
+>
+> [*] http://www.linux-kvm.org/images/9/90/Kvmforum14-qom.pdf
+
+[*] Gold was too expensive, but we had some tin on hand, so...
+
 
