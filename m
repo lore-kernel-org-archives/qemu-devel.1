@@ -2,79 +2,80 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FFFFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1B1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A7F820707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:33:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDFD820707
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:34:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPYSKkW2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A7F820707
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FMd0mrDM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDFD820707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54823 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYIp-0006lL-7x
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:33:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39224)
+	id 1ixYJK-0007OK-2G
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:34:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXyJ-0004K8-Jj
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:40 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXyM-0004Ot-Uo
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXyH-00041l-2r
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:39 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35546
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXyL-00047Z-GW
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22813
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyG-00040i-Un
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:37 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyK-00045K-TP
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483556;
+ s=mimecast20190719; t=1580483559;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N7pEsu1r1OdDAFYw3vvYlFqwHnsJ1NNsfzOn1oUd+ko=;
- b=WPYSKkW2ad81tlmX7riCKyMoSUt4f7mOolxl4iiWalbK/P8sJdbL1G/HjFVGaTDh9Xpdtq
- fpMfx8PaASU5MawcVuKkCtQPlNS4rZWO7tVqPYHaTjNvL+fwbNeSZVPCwBP0Vc802vSqD1
- sYJcRbEhcTEPNlWcBM4xZWYtT/hOTuQ=
+ bh=XXby1nWvd5zb6b0oQKM3ukbJBbpvQHGhB57u/7VYc9w=;
+ b=FMd0mrDMIbLH0aK4G1rBK+1HPzqshRxeiMKEairkBmgDFIQF4bTKjQVg/eag5sggPfhUZV
+ T/XSCrOsAlcupo2htP5nq6pCE3LFGl8KjcUeKRkLUFkguRns1M0ULj439uL3YKpik0rFAL
+ sFVvDfeM81eEpPHUMbQIB6Yo2g0/Dfc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-maJiu6giPuSK7PnxrRLUAw-1; Fri, 31 Jan 2020 10:12:33 -0500
+ us-mta-275-IxlMaYnxOr6J5V-vvkTeFQ-1; Fri, 31 Jan 2020 10:12:36 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCDDD18C43C0;
- Fri, 31 Jan 2020 15:12:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F16E1005510
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:12:35 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3C16E87B09;
- Fri, 31 Jan 2020 15:12:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB9E486C4B
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:12:34 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 20/80] arm/mcimx6ul-evk: use memdev for RAM
-Date: Fri, 31 Jan 2020 16:08:50 +0100
-Message-Id: <1580483390-131164-21-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 23/80] arm/mps2: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:08:53 +0100
+Message-Id: <1580483390-131164-24-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: maJiu6giPuSK7PnxrRLUAw-1
+X-MC-Unique: IxlMaYnxOr6J5V-vvkTeFQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,7 +87,6 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jcd@tribudubois.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -100,87 +100,74 @@ and using MachineState::ram instead of manually initializing
 RAM memory region.
 
 PS:
-  remove no longer needed MCIMX6ULEVK
+ while at it add check for user supplied RAM size and error
+ out if it mismatches board expected value.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
-CC: jcd@tribudubois.net
+v2:
+  * fix format string causing build failure on 32-bit host
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
 ---
- hw/arm/mcimx6ul-evk.c | 25 +++++++++----------------
- 1 file changed, 9 insertions(+), 16 deletions(-)
+ hw/arm/mps2.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
-index e90b393..23a71ed 100644
---- a/hw/arm/mcimx6ul-evk.c
-+++ b/hw/arm/mcimx6ul-evk.c
-@@ -19,15 +19,10 @@
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index d002b12..f246213 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -24,6 +24,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
  #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
+ #include "hw/arm/boot.h"
+@@ -55,7 +56,6 @@ typedef struct {
+     MachineState parent;
 =20
--typedef struct {
--    FslIMX6ULState soc;
--    MemoryRegion ram;
--} MCIMX6ULEVK;
--
- static void mcimx6ul_evk_init(MachineState *machine)
- {
-     static struct arm_boot_info boot_info;
--    MCIMX6ULEVK *s =3D g_new0(MCIMX6ULEVK, 1);
-+    FslIMX6ULState *s;
-     int i;
-=20
-     if (machine->ram_size > FSL_IMX6UL_MMDC_SIZE) {
-@@ -43,15 +38,12 @@ static void mcimx6ul_evk_init(MachineState *machine)
-         .nb_cpus =3D machine->smp.cpus,
-     };
-=20
--    object_initialize_child(OBJECT(machine), "soc", &s->soc,  sizeof(s->so=
-c),
--                            TYPE_FSL_IMX6UL, &error_fatal, NULL);
--
--    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fat=
-al);
-+    s =3D FSL_IMX6UL(object_new(TYPE_FSL_IMX6UL));
-+    object_property_add_child(OBJECT(machine), "soc", OBJECT(s), &error_fa=
-tal);
-+    object_property_set_bool(OBJECT(s), true, "realized", &error_fatal);
-=20
--    memory_region_allocate_system_memory(&s->ram, NULL, "mcimx6ul-evk.ram"=
-,
--                                         machine->ram_size);
--    memory_region_add_subregion(get_system_memory(),
--                                FSL_IMX6UL_MMDC_ADDR, &s->ram);
-+    memory_region_add_subregion(get_system_memory(), FSL_IMX6UL_MMDC_ADDR,
-+                                machine->ram);
-=20
-     for (i =3D 0; i < FSL_IMX6UL_NUM_USDHCS; i++) {
-         BusState *bus;
-@@ -61,7 +53,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
-=20
-         di =3D drive_get_next(IF_SD);
-         blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
--        bus =3D qdev_get_child_bus(DEVICE(&s->soc.usdhc[i]), "sd-bus");
-+        bus =3D qdev_get_child_bus(DEVICE(&s->usdhc[i]), "sd-bus");
-         carddev =3D qdev_create(bus, TYPE_SD_CARD);
-         qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-         object_property_set_bool(OBJECT(carddev), true,
-@@ -69,7 +61,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
+     ARMv7MState armv7m;
+-    MemoryRegion psram;
+     MemoryRegion ssram1;
+     MemoryRegion ssram1_m;
+     MemoryRegion ssram23;
+@@ -118,6 +118,13 @@ static void mps2_common_init(MachineState *machine)
+         exit(1);
      }
 =20
-     if (!qtest_enabled()) {
--        arm_load_kernel(&s->soc.cpu, machine, &boot_info);
-+        arm_load_kernel(&s->cpu, machine, &boot_info);
-     }
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
++
+     /* The FPGA images have an odd combination of different RAMs,
+      * because in hardware they are different implementations and
+      * connected to different buses, giving varying performance/size
+@@ -146,9 +153,7 @@ static void mps2_common_init(MachineState *machine)
+      * This is of no use for QEMU so we don't implement it (as if
+      * zbt_boot_ctrl is always zero).
+      */
+-    memory_region_allocate_system_memory(&mms->psram,
+-                                         NULL, "mps.ram", 16 * MiB);
+-    memory_region_add_subregion(system_memory, 0x21000000, &mms->psram);
++    memory_region_add_subregion(system_memory, 0x21000000, machine->ram);
+=20
+     switch (mmc->fpga_type) {
+     case FPGA_AN385:
+@@ -338,6 +343,8 @@ static void mps2_class_init(ObjectClass *oc, void *data=
+)
+=20
+     mc->init =3D mps2_common_init;
+     mc->max_cpus =3D 1;
++    mc->default_ram_size =3D 16 * MiB;
++    mc->default_ram_id =3D "mps.ram";
  }
 =20
-@@ -78,5 +70,6 @@ static void mcimx6ul_evk_machine_init(MachineClass *mc)
-     mc->desc =3D "Freescale i.MX6UL Evaluation Kit (Cortex A7)";
-     mc->init =3D mcimx6ul_evk_init;
-     mc->max_cpus =3D FSL_IMX6UL_NUM_CPUS;
-+    mc->default_ram_id =3D "mcimx6ul-evk.ram";
- }
- DEFINE_MACHINE("mcimx6ul-evk", mcimx6ul_evk_machine_init)
+ static void mps2_an385_class_init(ObjectClass *oc, void *data)
 --=20
 2.7.4
 
