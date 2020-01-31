@@ -2,63 +2,63 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-0.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,URI_WP_DIRINDEX autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26577C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 04:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0425CC33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 04:20:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5BDD20702
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 04:19:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9EA020702
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 04:20:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PZMmeo7n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5BDD20702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OhPkwtwZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9EA020702
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixNmb-0003mh-4y
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 23:19:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58874)
+	id 1ixNna-0004kr-0F
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 23:20:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ixNlv-0003Ks-6g
+ (envelope-from <dgibson@ozlabs.org>) id 1ixNlv-0003Kr-0Y
  for qemu-devel@nongnu.org; Thu, 30 Jan 2020 23:19:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ixNlt-00028H-Hu
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 23:19:11 -0500
-Received: from ozlabs.org ([203.11.71.1]:46363)
+ (envelope-from <dgibson@ozlabs.org>) id 1ixNlt-00027x-EM
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 23:19:10 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56291 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ixNls-00023g-JL
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ixNls-00023c-Vx
  for qemu-devel@nongnu.org; Thu, 30 Jan 2020 23:19:09 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4883rR4rtpz9sPJ; Fri, 31 Jan 2020 15:19:03 +1100 (AEDT)
+ id 4883rR4R0jz9sRQ; Fri, 31 Jan 2020 15:19:03 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1580444343;
- bh=YMrHIKpHZN+FtTmXPufRwCtpDmLobyzyioqBex+64Qw=;
+ bh=S8HBFAr+JEPEt6RudSE2u2FRnvTK1cgTyXZx/iPTRdU=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=PZMmeo7n+ILHck96MbaK5ABTN5wd7eKLwH16rx+wv59aoQ3Eg6nJoxHJS/qLONtgW
- 6HJUZizCDJ/kP5aylkpdVIsFGVROKgC4Z/JARLCAst7BOYeTyjXt4CbLyoFCq30w07
- ydcLJF2m4nnce52pwYnh7Scraz1A1L2MAHekEUa4=
-Date: Fri, 31 Jan 2020 15:06:44 +1100
+ b=OhPkwtwZM+eUMobCQtW4UNn1sRRPuk4Ul6MdQXX3oLy3SY58Z2wldCSIRs6reItaU
+ nja5hiA6LgM/70Rcm/u69f+eBIaen+w5Let/iSr+4BfZGJ0Gcp60Im2Mhvm1ExI8oq
+ jY+3WwXgVRhzQqEFvLZQtcxlxCkf43oQVIT0/cS0=
+Date: Fri, 31 Jan 2020 14:59:14 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
-Message-ID: <20200131040644.GG15210@umbus.fritz.box>
+Subject: Re: [RFC v3 02/25] hw/iommu: introduce DualStageIOMMUObject
+Message-ID: <20200131035914.GF15210@umbus.fritz.box>
 References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-4-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-3-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="hcut4fGOf7Kh6EdG"
+ protocol="application/pgp-signature"; boundary="B0nZA57HJSoPbsHY"
 Content-Disposition: inline
-In-Reply-To: <1580300216-86172-4-git-send-email-yi.l.liu@intel.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <1580300216-86172-3-git-send-email-yi.l.liu@intel.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,208 +80,73 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---hcut4fGOf7Kh6EdG
+--B0nZA57HJSoPbsHY
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 29, 2020 at 04:16:34AM -0800, Liu, Yi L wrote:
-> From: Peter Xu <peterx@redhat.com>
+On Wed, Jan 29, 2020 at 04:16:33AM -0800, Liu, Yi L wrote:
+> From: Liu Yi L <yi.l.liu@intel.com>
 >=20
 > Currently, many platform vendors provide the capability of dual stage
 > DMA address translation in hardware. For example, nested translation
 > on Intel VT-d scalable mode, nested stage translation on ARM SMMUv3,
-> and etc. Also there are efforts to make QEMU vIOMMU be backed by dual
-> stage DMA address translation capability provided by hardware to have
-> better address translation support for passthru devices.
+> and etc. In dual stage DMA address translation, there are two stages
+> address translation, stage-1 (a.k.a first-level) and stage-2 (a.k.a
+> second-level) translation structures. Stage-1 translation results are
+> also subjected to stage-2 translation structures. Take vSVA (Virtual
+> Shared Virtual Addressing) as an example, guest IOMMU driver owns
+> stage-1 translation structures (covers GVA->GPA translation), and host
+> IOMMU driver owns stage-2 translation structures (covers GPA->HPA
+> translation). VMM is responsible to bind stage-1 translation structures
+> to host, thus hardware could achieve GVA->GPA and then GPA->HPA
+> translation. For more background on SVA, refer the below links.
+>  - https://www.youtube.com/watch?v=3DKq_nfGK5MwQ
+>  - https://events19.lfasiallc.com/wp-content/uploads/2017/11/\
+> Shared-Virtual-Memory-in-KVM_Yi-Liu.pdf
 >=20
-> As so, making vIOMMU be backed by dual stage translation capability
-> requires QEMU vIOMMU to have a way to get aware of such hardware
-> capability and also require a way to receive DMA address translation
-> faults (e.g. I/O page request) from host as guest owns stage-1 translation
-> structures in dual stage DAM address translation.
+> As above, dual stage DMA translation offers two stage address mappings,
+> which could have better DMA address translation support for passthru
+> devices. This is also what vIOMMU developers are doing so far. Efforts
+> includes vSVA enabling from Yi Liu and SMMUv3 Nested Stage Setup from
+> Eric Auger.
+> https://www.spinics.net/lists/kvm/msg198556.html
+> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02842.html
 >=20
-> This patch adds IOMMUContext as an abstract of vIOMMU related operations.
-> Like provide a way for passthru modules (e.g. VFIO) to register
-> DualStageIOMMUObject instances. And in future, it is expected to offer
-> support for receiving host DMA translation faults happened on stage-1
-> translation.
+> Both efforts are aiming to expose a vIOMMU with dual stage hardware
+> backed. As so, QEMU needs to have an explicit object to stand for
+> the dual stage capability from hardware. Such object offers abstract
+> for the dual stage DMA translation related operations, like:
 >=20
-> For more backgrounds, may refer to the discussion below, while there
-> is also difference between the current implementation and original
-> proposal. This patch introduces the IOMMUContext as an abstract layer
-> for passthru module (e.g. VFIO) calls into vIOMMU. The first introduced
-> interface is to make QEMU vIOMMU be aware of dual stage translation
-> capability.
+>  1) PASID allocation (allow host to intercept in PASID allocation)
+>  2) bind stage-1 translation structures to host
+>  3) propagate stage-1 cache invalidation to host
+>  4) DMA address translation fault (I/O page fault) servicing etc.
 >=20
-> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg05022.html
-
-Again, is there a reason for not making this a QOM class or interface?
-
-
-I'm not very clear on the relationship betwen an IOMMUContext and a
-DualStageIOMMUObject.  Can there be many IOMMUContexts to a
-DualStageIOMMUOBject?  The other way around?  Or is it just
-zero-or-one DualStageIOMMUObjects to an IOMMUContext?
-
+> This patch introduces DualStageIOMMUObject to stand for the hardware
+> dual stage DMA translation capability. PASID allocation/free are the
+> first operation included in it, in future, there will be more operations
+> like bind_stage1_pgtbl and invalidate_stage1_cache and etc.
+>=20
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 > Cc: Peter Xu <peterx@redhat.com>
 > Cc: Eric Auger <eric.auger@redhat.com>
 > Cc: Yi Sun <yi.y.sun@linux.intel.com>
 > Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/iommu/Makefile.objs           |  1 +
->  hw/iommu/iommu_context.c         | 54 +++++++++++++++++++++++++++++++++++
->  include/hw/iommu/iommu_context.h | 61 ++++++++++++++++++++++++++++++++++=
-++++++
->  3 files changed, 116 insertions(+)
->  create mode 100644 hw/iommu/iommu_context.c
->  create mode 100644 include/hw/iommu/iommu_context.h
->=20
-> diff --git a/hw/iommu/Makefile.objs b/hw/iommu/Makefile.objs
-> index d4f3b39..1e45072 100644
-> --- a/hw/iommu/Makefile.objs
-> +++ b/hw/iommu/Makefile.objs
-> @@ -1 +1,2 @@
->  obj-y +=3D dual_stage_iommu.o
-> +obj-y +=3D iommu_context.o
-> diff --git a/hw/iommu/iommu_context.c b/hw/iommu/iommu_context.c
-> new file mode 100644
-> index 0000000..6340ca3
-> --- /dev/null
-> +++ b/hw/iommu/iommu_context.c
-> @@ -0,0 +1,54 @@
-> +/*
-> + * QEMU abstract of vIOMMU context
-> + *
-> + * Copyright (C) 2020 Red Hat Inc.
-> + *
-> + * Authors: Peter Xu <peterx@redhat.com>,
-> + *          Liu Yi L <yi.l.liu@intel.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License alo=
-ng
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/iommu/iommu_context.h"
-> +
-> +int iommu_context_register_ds_iommu(IOMMUContext *iommu_ctx,
-> +                                    DualStageIOMMUObject *dsi_obj)
-> +{
-> +    if (!iommu_ctx || !dsi_obj) {
 
-Would this ever happen apart from a bug in the caller?  If not it
-should be an assert().
+Several overall queries about this:
 
-> +        return -ENOENT;
-> +    }
-> +
-> +    if (iommu_ctx->ops && iommu_ctx->ops->register_ds_iommu) {
-> +        return iommu_ctx->ops->register_ds_iommu(iommu_ctx, dsi_obj);
-> +    }
-> +    return -ENOENT;
-> +}
-> +
-> +void iommu_context_unregister_ds_iommu(IOMMUContext *iommu_ctx,
-> +                                      DualStageIOMMUObject *dsi_obj)
-> +{
-> +    if (!iommu_ctx || !dsi_obj) {
-> +        return;
-> +    }
-> +
-> +    if (iommu_ctx->ops && iommu_ctx->ops->unregister_ds_iommu) {
-> +        iommu_ctx->ops->unregister_ds_iommu(iommu_ctx, dsi_obj);
-> +    }
-> +}
-> +
-> +void iommu_context_init(IOMMUContext *iommu_ctx, IOMMUContextOps *ops)
-> +{
-> +    iommu_ctx->ops =3D ops;
-> +}
-> diff --git a/include/hw/iommu/iommu_context.h b/include/hw/iommu/iommu_co=
-ntext.h
-> new file mode 100644
-> index 0000000..6f2ccb5
-> --- /dev/null
-> +++ b/include/hw/iommu/iommu_context.h
-> @@ -0,0 +1,61 @@
-> +/*
-> + * QEMU abstraction of IOMMU Context
-> + *
-> + * Copyright (C) 2020 Red Hat Inc.
-> + *
-> + * Authors: Peter Xu <peterx@redhat.com>,
-> + *          Liu, Yi L <yi.l.liu@intel.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License alo=
-ng
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HW_IOMMU_CONTEXT_H
-> +#define HW_IOMMU_CONTEXT_H
-> +
-> +#include "qemu/queue.h"
-> +#ifndef CONFIG_USER_ONLY
-> +#include "exec/hwaddr.h"
-> +#endif
-> +#include "hw/iommu/dual_stage_iommu.h"
-> +
-> +typedef struct IOMMUContext IOMMUContext;
-> +typedef struct IOMMUContextOps IOMMUContextOps;
-> +
-> +struct IOMMUContextOps {
-> +    /*
-> +     * Register DualStageIOMMUObject to vIOMMU thus vIOMMU
-> +     * is aware of dual stage translation capability, and
-> +     * also be able to setup dual stage translation via
-> +     * interfaces exposed by DualStageIOMMUObject.
-> +     */
-> +    int (*register_ds_iommu)(IOMMUContext *iommu_ctx,
-> +                             DualStageIOMMUObject *dsi_obj);
-> +    void (*unregister_ds_iommu)(IOMMUContext *iommu_ctx,
-> +                                DualStageIOMMUObject *dsi_obj);
-> +};
-> +
-> +/*
-> + * This is an abstraction of IOMMU context.
-> + */
-> +struct IOMMUContext {
-> +    IOMMUContextOps *ops;
-> +};
-> +
-> +int iommu_context_register_ds_iommu(IOMMUContext *iommu_ctx,
-> +                                    DualStageIOMMUObject *dsi_obj);
-> +void iommu_context_unregister_ds_iommu(IOMMUContext *iommu_ctx,
-> +                                       DualStageIOMMUObject *dsi_obj);
-> +void iommu_context_init(IOMMUContext *iommu_ctx, IOMMUContextOps *ops);
-> +
-> +#endif
+1) Since it's explicitly handling PASIDs, this seems a lot more
+   specific to SVM than the name suggests.  I'd suggest a rename.
+
+2) Why are you hand rolling structures of pointers, rather than making
+   this a QOM class or interface and putting those things into methods?
+
+3) It's not really clear to me if this is for the case where both
+   stages of translation are visible to the guest, or only one of
+   them.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -289,25 +154,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hcut4fGOf7Kh6EdG
+--B0nZA57HJSoPbsHY
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4zp9MACgkQbDjKyiDZ
-s5ILnxAAwz0uyLrA+96XuLiZkJU3NqdNCf60z8Qc7zno3rlT/uAEJJgTYfnIV74G
-0zagkc9fCNp/ivmFRNVDeuhvgptrNobw6aT5eaI4sW3+1BjbUB2O5KEHxw2gT67i
-84uDMlyTTnKSlTRDjmjCbJtxD72fjqnNbBsCo0lc+H+qtH/C5NXMHVpnTSNqdpDD
-Z8slR+3pdP/LBsna2o0AM2d9QnDg8Ak7/ZExyA9YXamnXaWvLTmxxpM2wweuhEUu
-iVSt675Dzgo7DidsVBPV1l+kQI2/8+66BgoLFrHeTw6szJ+NeOPlmMod+jx8h02O
-k7dL+Qj7ctxbT7hG1DZbfbGW0odvxT7WjI+dc3yzz/hp0GpA4+HRvdJV9UUhCx2D
-5DnigmsSehV+lk5zaNhQLlnonvCraZFssHSs1g2Ed26swZTpHUleXoWZ222SYCAJ
-4bcPUxvnGlkXpECc3leKfEJCf9TW5Esm4P6GeFbkQ5EuevA1KsXWn0qtVcPfwgKL
-UvSBYaMQzqYb1X1PhAk+d4dg8i32qAHfOX5Gy268H42oc9hO/YPvrDV713ZYsbb4
-TJkEVmBpjy8ZNxe7st7Ag6dsjy2t67Gk0a39hFyG7cCoDQd1khGgtGsVKssqpEkQ
-6HivGpsuXvGSHw2T+ynV4X/DjM/Kx9HQ1wsaQB4rjWsCneK+sMo=
-=vboI
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4zphIACgkQbDjKyiDZ
+s5IQYg/+LAuO22iNHumMZpGs30DHJ8l/gPm+BizzzE4S4QHRwO5Pe8etzEUWfcRw
+ZlVfNTPtgKLOmgfJFk3kZt53UCuogwq4bodiNhTZ6ykCuq5LlADFMVhiaUJoUr8l
+vfcOfD7QhQw0zCG8vPoMh+hn1eBd6KfcoyW9TW8vK0/OzNBYhj8mg0vVcjrDOSQS
+Lzs/x8Pl8gnppwxgKqYBP8PATVeMOgnFPEfUaejvxW6/Dqg0Bwe55KF4ze/flAyA
+PQbdHeX/c/9tGjqjJ2bVDTGylgCyFIIqaXgdSR3xUniSWf7ttwRM9b7VJrHT86wQ
+D9NXjKIHQnhbgYOnsz3iI809oX3JFo8DKj2WvCvwWtLZO+ZyG1qR/SOEQZlGCe1S
+w5ItoN1T5Bdq21OVDifi3iVsr20RJsMgwzwbG3YJu2jW9w3iH7tvjAsjT4sVuS62
+YvhonQBiLpKr0FJsic9bgbTVnDDfQE9Nsm/cfnXrKIp505ELTFhl7BpLeit3TyCy
+PNqf2r0ICn5ZoxsZ1sK2MbBAm8K+rYKXmINk3R4vBfw8Cve1K5HZZWpoCqkCF1tb
+CUcwU/3B1Nem2hOGfI7JJIDXOf2BQuKnLVrTKuPOSO+ibYGWQO+BGmgoTG7ofZcf
+gfkkOAWSvkaOHu1w2GM/DudhRC/rRPdOcEPldvhE9V8dVn8c8HU=
+=YSYx
 -----END PGP SIGNATURE-----
 
---hcut4fGOf7Kh6EdG--
+--B0nZA57HJSoPbsHY--
 
