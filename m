@@ -2,58 +2,61 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3FDC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C028C33CB3
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:17:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C249A2063A
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:15:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C249A2063A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 655EC214D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:17:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 655EC214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41421 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJyP-0004BP-RW
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:15:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58813)
+	id 1ixJza-00066L-Id
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:17:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnq-0007uP-L9
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:57 -0500
+ (envelope-from <richardw.yang@linux.intel.com>) id 1ixJyL-0004Qg-MF
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:15:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnp-00036b-5t
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:54 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51417 helo=mail.rt-rk.com)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1ixJyK-0004sb-8D
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:15:45 -0500
+Received: from mga02.intel.com ([134.134.136.20]:38472)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ixJno-0002x9-Tw
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:53 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 867B01A2105;
- Fri, 31 Jan 2020 01:03:38 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 63E981A210A;
- Fri, 31 Jan 2020 01:03:38 +0100 (CET)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH rc4 29/29] .travis.yml: Run the AVR acceptance tests
-Date: Fri, 31 Jan 2020 01:03:13 +0100
-Message-Id: <1580428993-4767-30-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1ixJyJ-0004pt-VL
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:15:44 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 30 Jan 2020 16:15:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,383,1574150400"; d="scan'208";a="247562355"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by orsmga002.jf.intel.com with ESMTP; 30 Jan 2020 16:15:36 -0800
+Date: Fri, 31 Jan 2020 08:15:51 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH] migration/postcopy: not necessary to discard all RAM at
+ the beginning
+Message-ID: <20200131001551.GA21974@richard>
+References: <20191007091008.9435-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191007091008.9435-1-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.20
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,52 +68,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Hi, David and Juan
 
-We have one test so far, and it is very fast:
+Does it look good to you?
 
-  $ avocado --show=3Dapp run -t arch:avr tests/acceptance/
-  (1/1) tests/acceptance/machine_avr6.py:AVR6Machine.test_freertos: PASS =
-(2.13 s)
-  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 =
-| CANCEL 0
-  JOB TIME   : 2.30 s
+On Mon, Oct 07, 2019 at 05:10:08PM +0800, Wei Yang wrote:
+>ram_discard_range() unmap page for specific range. To be specific, this
+>clears related page table entries so that userfault would be triggered.
+>But this step is not necessary at the very beginning.
+>
+>ram_postcopy_incoming_init() is called when destination gets ADVISE
+>command. ADVISE command is sent when migration thread just starts, which
+>implies destination is not running yet. This means no page fault
+>happened and memory region's page tables entries are empty.
+>
+>This patch removes the discard at the beginning.
+>
+>Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>---
+> migration/postcopy-ram.c | 46 ----------------------------------------
+> migration/postcopy-ram.h |  7 ------
+> migration/ram.c          | 16 --------------
+> migration/ram.h          |  1 -
+> migration/savevm.c       |  4 ----
+> 5 files changed, 74 deletions(-)
+>
+>diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>index 5da6de8c8b..459be8e780 100644
+>--- a/migration/postcopy-ram.c
+>+++ b/migration/postcopy-ram.c
+>@@ -443,32 +443,6 @@ out:
+>     return ret;
+> }
+> 
+>-/*
+>- * Setup an area of RAM so that it *can* be used for postcopy later; this
+>- * must be done right at the start prior to pre-copy.
+>- * opaque should be the MIS.
+>- */
+>-static int init_range(RAMBlock *rb, void *opaque)
+>-{
+>-    const char *block_name = qemu_ram_get_idstr(rb);
+>-    void *host_addr = qemu_ram_get_host_addr(rb);
+>-    ram_addr_t offset = qemu_ram_get_offset(rb);
+>-    ram_addr_t length = qemu_ram_get_used_length(rb);
+>-    trace_postcopy_init_range(block_name, host_addr, offset, length);
+>-
+>-    /*
+>-     * We need the whole of RAM to be truly empty for postcopy, so things
+>-     * like ROMs and any data tables built during init must be zero'd
+>-     * - we're going to get the copy from the source anyway.
+>-     * (Precopy will just overwrite this data, so doesn't need the discard)
+>-     */
+>-    if (ram_discard_range(block_name, 0, length)) {
+>-        return -1;
+>-    }
+>-
+>-    return 0;
+>-}
+>-
+> /*
+>  * At the end of migration, undo the effects of init_range
+>  * opaque should be the MIS.
+>@@ -506,20 +480,6 @@ static int cleanup_range(RAMBlock *rb, void *opaque)
+>     return 0;
+> }
+> 
+>-/*
+>- * Initialise postcopy-ram, setting the RAM to a state where we can go into
+>- * postcopy later; must be called prior to any precopy.
+>- * called from arch_init's similarly named ram_postcopy_incoming_init
+>- */
+>-int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+>-{
+>-    if (foreach_not_ignored_block(init_range, NULL)) {
+>-        return -1;
+>-    }
+>-
+>-    return 0;
+>-}
+>-
+> /*
+>  * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
+>  * last caller wins.
+>@@ -1282,12 +1242,6 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>     return false;
+> }
+> 
+>-int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+>-{
+>-    error_report("postcopy_ram_incoming_init: No OS support");
+>-    return -1;
+>-}
+>-
+> int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+> {
+>     assert(0);
+>diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+>index c0ccf64a96..1c79c6e51f 100644
+>--- a/migration/postcopy-ram.h
+>+++ b/migration/postcopy-ram.h
+>@@ -22,13 +22,6 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
+>  */
+> int postcopy_ram_incoming_setup(MigrationIncomingState *mis);
+> 
+>-/*
+>- * Initialise postcopy-ram, setting the RAM to a state where we can go into
+>- * postcopy later; must be called prior to any precopy.
+>- * called from ram.c's similarly named ram_postcopy_incoming_init
+>- */
+>-int postcopy_ram_incoming_init(MigrationIncomingState *mis);
+>-
+> /*
+>  * At the end of a migration where postcopy_ram_incoming_init was called.
+>  */
+>diff --git a/migration/ram.c b/migration/ram.c
+>index dfc50d57d5..9a853703d8 100644
+>--- a/migration/ram.c
+>+++ b/migration/ram.c
+>@@ -4015,22 +4015,6 @@ static int ram_load_cleanup(void *opaque)
+>     return 0;
+> }
+> 
+>-/**
+>- * ram_postcopy_incoming_init: allocate postcopy data structures
+>- *
+>- * Returns 0 for success and negative if there was one error
+>- *
+>- * @mis: current migration incoming state
+>- *
+>- * Allocate data structures etc needed by incoming migration with
+>- * postcopy-ram. postcopy-ram's similarly names
+>- * postcopy_ram_incoming_init does the work.
+>- */
+>-int ram_postcopy_incoming_init(MigrationIncomingState *mis)
+>-{
+>-    return postcopy_ram_incoming_init(mis);
+>-}
+>-
+> /**
+>  * ram_load_postcopy: load a page in postcopy case
+>  *
+>diff --git a/migration/ram.h b/migration/ram.h
+>index 44fe4753ad..66cbff1d52 100644
+>--- a/migration/ram.h
+>+++ b/migration/ram.h
+>@@ -58,7 +58,6 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms);
+> int ram_postcopy_send_discard_bitmap(MigrationState *ms);
+> /* For incoming postcopy discard */
+> int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+>-int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+> bool postcopy_is_running(void);
+> 
+> void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+>diff --git a/migration/savevm.c b/migration/savevm.c
+>index 9dc191e0a0..d2a427a3bf 100644
+>--- a/migration/savevm.c
+>+++ b/migration/savevm.c
+>@@ -1674,10 +1674,6 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
+>         return -1;
+>     }
+> 
+>-    if (ram_postcopy_incoming_init(mis)) {
+>-        return -1;
+>-    }
+>-
+>     return 0;
+> }
+> 
+>-- 
+>2.17.1
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
----
- .travis.yml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index 1ae645e..71390e2 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -268,7 +268,7 @@ matrix:
-=20
-     # Acceptance (Functional) tests
-     - env:
--        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-so=
-ftmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
-+        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-s=
-oftmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-so=
-ftmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu,=
-avr-softmmu"
-         - TEST_CMD=3D"make check-acceptance"
-       after_script:
-         - python3 -c 'import json; r =3D json.load(open("tests/results/l=
-atest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["sta=
-tus"] not in ("PASS", "SKIP")]' | xargs cat
---=20
-2.7.4
-
+-- 
+Wei Yang
+Help you, Help me
 
