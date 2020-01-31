@@ -2,83 +2,88 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 898D4C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 09:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA9DC33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 09:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 558E520707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 09:39:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D683120707
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 09:41:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="BI/ZYDDp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 558E520707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eo/643r6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D683120707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixSmD-0006K9-JB
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 04:39:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38734)
+	id 1ixSo0-00084v-41
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 04:41:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1ixSla-0005mF-NN
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 04:39:11 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ixSn9-0007BV-Eg
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 04:40:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1ixSlZ-0004xX-CO
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 04:39:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56668)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>)
- id 1ixSlW-0004v3-FK; Fri, 31 Jan 2020 04:39:06 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3033B20707;
- Fri, 31 Jan 2020 09:39:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1580463545;
- bh=Cp3p5SMGhrd94coYZ6hL8kIlAqY8MsSmw65mT3Rp2as=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=BI/ZYDDpJJWbuc7Y85nN1Snwv7KzQb6uJTo9RL1KK+7CzlFV2i1muQuW/UCbFA7Mg
- oGEXkyNxNvs0QmwjEVJ+6cGolrWaCXg0vLPOVhiLeD4cwjly3V+Ht9YqvXzaKaBjki
- lb2DsYr42lb2PPc/ipzZRVgdy8EnpfaONJQAN86g=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1ixSlT-002Ki8-5g; Fri, 31 Jan 2020 09:39:03 +0000
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ixSn7-0006Qa-Qr
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 04:40:47 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:32791)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ixSn7-0006Q1-Jq
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 04:40:45 -0500
+Received: by mail-ot1-x341.google.com with SMTP id b18so6034777otp.0
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 01:40:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=5iwrAXkH8v6grgeLv0GLBpeko/kXNodpSmGQOyGJ5xs=;
+ b=eo/643r6SutQl+5HAs/nRBnXDicfMOAtha9MtZyy6w0i1VKkz4aLkho/lwoDD2XN/d
+ UsvYytb52GsmET15U+TcWXtIZVoT1vxvcFbBg4IknuemdfHTN/CGdc25U5n+S0ozjXcR
+ oiTFl0HJ1U1jXnRqRFqykdSpQlC0F8d3Jblgkq+lmzGgNxOod5gdP6QRxVmhFG/6Bj29
+ JxnruvO9CVZ8tnPLoR6o01/w+VFfja4UO6PtYpt3tH+/HcV8CdYyfe4ima2Ky0dyuLIx
+ cZ5fdhcGQ9BFV/WDUM9crOXuwBC7OHGoTYyVdV8MsjcwClhJ6RoQ5lkJaYCpnpgrgRQY
+ x/bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=5iwrAXkH8v6grgeLv0GLBpeko/kXNodpSmGQOyGJ5xs=;
+ b=PMZnkU+0VPddG7T9urpdJBY13DRt8mZtHvhk2FSqIF8d//lpcReel3Q7Mnr0GlgkdK
+ qfjBDdIgrKVVx6oOn6ElJhBygweWTpqRhagpmk+P2YiGd/72fSPifJ89sIgYgy2DpSrh
+ ICwKAkaRrGfn1F5jz3dUT+dyAGcaERAvCQgdZQcSFXpDSqBx3LtxG+q+heVJI4cNvrQ7
+ Alwp4CGk/9slFc3ZDXDVLpsGM+S2sBH3eLFMWbUm/jOqgrMvzJM1mwKxme6zg6NGfKWx
+ BYS5HuQkcMDLHrCgPD/SYs7Omx4tN4tq2gJv5Pwo4xVDvVB9Ze/hRVIAqbrsvlXwWZZx
+ Mtsw==
+X-Gm-Message-State: APjAAAXz8bfxwDihR+Yi1hU+uZyeB7BaoJWrXQThRaHEV0yyiOdJ24bI
+ rjfKp3K+5hw4GnY5ArC3Zym2UHJ+KNoaXxzXDE0=
+X-Google-Smtp-Source: APXvYqwcW7m87NF0FlCmTxjelWUDsZWvuzb6HorFwLuhjbvCa7CVsxlQ9wPqtyLCYE6Lul7HTPdMfSM2RcNhNJXOx+k=
+X-Received: by 2002:a9d:7305:: with SMTP id e5mr6684768otk.64.1580463644648;
+ Fri, 31 Jan 2020 01:40:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Fri, 31 Jan 2020 09:39:03 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
-In-Reply-To: <ff584722-1b51-e538-7c45-c71cdc40105f@redhat.com>
-References: <20191219040612.28431-1-gshan@redhat.com>
- <d972631d-7db7-b6d5-61b8-244ae2c85882@redhat.com>
- <7f6e29e6-1df9-4513-79ba-b53873b0735e@ozlabs.ru>
- <544f261e4b9c97f1d3a5fb64cef42ba5@kernel.org>
- <ff584722-1b51-e538-7c45-c71cdc40105f@redhat.com>
-Message-ID: <c61c95c434dbcf97a0c946f0993d4843@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.8
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: gshan@redhat.com, aik@ozlabs.ru, qemu-arm@nongnu.org,
- peter.maydell@linaro.org, pbonzini@redhat.com, drjones@redhat.com,
- eric.auger@redhat.com, jthierry@redhat.com, shan.gavin@gmail.com,
- qemu-devel@nongnu.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1580428993-4767-25-git-send-email-aleksandar.markovic@rt-rk.com>
+ <CAL1e-=j3b6Gfo4K56=tXc9jbXAy3fou5Dsxq3ns9C89mpuPXxA@mail.gmail.com>
+ <CAAdtpL6F=qbWT7keQxHtacndN+JUM32tyd9vW0ZEEMYYN=a=3g@mail.gmail.com>
+ <CAL1e-=hqWdFckhi30iws0_OMEB01dvs=ARTvpWrAJ4bF5qrKbQ@mail.gmail.com>
+ <CAL1e-=i-=NkATmB0XJ12mGBOin-OGZ5VMc1BD3O1iheNfbhBAQ@mail.gmail.com>
+ <91e475a8-ba43-05da-73d1-d59ca28228bf@redhat.com>
+In-Reply-To: <91e475a8-ba43-05da-73d1-d59ca28228bf@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 31 Jan 2020 10:40:33 +0100
+Message-ID: <CAL1e-=hCY+WRva59fkQCFaeCkoBJNqyLW-Y7HNiRZRJ07w4AwQ@mail.gmail.com>
+Subject: Re: [PATCH rc4 24/29] hw/avr: Add some ATmega microcontrollers
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 198.145.29.99
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,90 +95,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
- Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
- eric.auger@redhat.com, qemu-arm@nongnu.org, shan.gavin@gmail.com,
- pbonzini@redhat.com
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-01-31 06:59, Gavin Shan wrote:
-> On 1/29/20 8:04 PM, Marc Zyngier wrote:
->> On 2020-01-29 02:44, Alexey Kardashevskiy wrote:
->>> On 28/01/2020 17:48, Gavin Shan wrote:
->>>> but a NMI is injected
->>>> through LAPIC on x86. So I'm not sure what architect (system reset=20
->>>> on
->>>> ppc or injecting NMI on x86) aarch64 should follow.
->>>=20
->>> I'd say whatever triggers in-kernel debugger or kdump but I am not
->>> familiar with ARM at all :)
->>=20
->> All that is completely OS specific, and has no relation to the=20
->> architecture.
->> As I mentioned in another part of the thread, the closest thing to=20
->> this
->> would be to implement SDEI together with an IMPDEF mechanism to enter=20
->> it
->> (or even generate a RAS error).
->>=20
->> On the other hand, SDEI is pretty horrible, and means either KVM or=20
->> QEMU
->> acting like a firmware for the guest. To say that I'm not keen is a=20
->> massive
->> understatement.
->>=20
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 M.
->=20
-> Marc, could you please explain a bit about "IMPDEF mechanism"? I'm not=20
-> sure if
-> it means a non-standard SDEI event should be used, corresponding to the=
-=20
-> HMP/QMP
-> "nmi" command.
+On Fri, Jan 31, 2020 at 10:35 AM Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 31/01/2020 05.11, Aleksandar Markovic wrote:
+> > On Fri, Jan 31, 2020 at 4:45 AM Aleksandar Markovic
+> > <aleksandar.m.mail@gmail.com> wrote:
+> >>
+> >> On Fri, Jan 31, 2020 at 4:09 AM Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
+at.org> wrote:
+> >>>
+> >>> Hi Aleksandar,
+> >>>
+> >>> Cc'ing Thomas & Daniel who are not lawyers but tried to explain me fe=
+w
+> >>> times how licensing works.
+> >>>
+> >>> On Fri, Jan 31, 2020 at 2:56 AM Aleksandar Markovic
+> >>> <aleksandar.m.mail@gmail.com> wrote:
+> >>>> On Fri, Jan 31, 2020 at 1:03 AM Aleksandar Markovic
+> >>>> <aleksandar.markovic@rt-rk.com> wrote:
+> >>>>>
+> >>>>> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >>>>>
+> >>>>> Add some AVR microcontrollers from the ATmega family:
+> >>>>>
+> >>>>>   - middle range: ATmega168 and ATmega328
+> >>>>>   - high range: ATmega1280 and ATmega2560
+> >>>>>
+> >>>>> For product comparison:
+> >>>>>   https://www.microchip.com/wwwproducts/ProductCompare/ATmega168P/A=
+Tmega328P
+> >>>>>   https://www.microchip.com/wwwproducts/ProductCompare/ATmega1280/A=
+Tmega2560
+> >>>>>
+> >>>>> Datasheets:
+> >>>>>   http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-=
+PA-168A-PA-328-P-DS-DS40002061A.pdf
+> >>>>>   http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2549-8-bit-=
+AVR-Microcontroller-ATmega640-1280-1281-2560-2561_datasheet.pdf
+> >>>>>
+> >>>>> [AM: Remove word 'Atmel' from filenames and all elements of code]
+> >>>>> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> >>>>>
+> >>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >>>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> >>>>> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> >>>>> ---
+> >>>>>  hw/avr/Kconfig       |   5 +
+> >>>>>  hw/avr/Makefile.objs |   1 +
+> >>>>>  hw/avr/atmega.c      | 470 +++++++++++++++++++++++++++++++++++++++=
+++++++++++++
+> >>>>>  hw/avr/atmega.h      |  48 ++++++
+> >>>>>  4 files changed, 524 insertions(+)
+> >>>>>  create mode 100644 hw/avr/Kconfig
+> >>>>>  create mode 100644 hw/avr/atmega.c
+> >>>>>  create mode 100644 hw/avr/atmega.h
+> >>>>>
+> >>>>> diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+> >>>>> new file mode 100644
+> >>>>> index 0000000..9e6527e
+> >>>>> --- /dev/null
+> >>>>> +++ b/hw/avr/Kconfig
+> >>>>> @@ -0,0 +1,5 @@
+> >>>>> +config AVR_ATMEGA_MCU
+> >>>>> +    bool
+> >>>>> +    select AVR_TIMER16
+> >>>>> +    select AVR_USART
+> >>>>> +    select AVR_POWER
+> >>>>> diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+> >>>>> index 123f174..af0fdde 100644
+> >>>>> --- a/hw/avr/Makefile.objs
+> >>>>> +++ b/hw/avr/Makefile.objs
+> >>>>> @@ -1 +1,2 @@
+> >>>>>  obj-y +=3D boot.o
+> >>>>> +obj-$(CONFIG_AVR_ATMEGA_MCU) +=3D atmega.o
+> >>>>> diff --git a/hw/avr/atmega.c b/hw/avr/atmega.c
+> >>>>> new file mode 100644
+> >>>>> index 0000000..8cdf28b
+> >>>>> --- /dev/null
+> >>>>> +++ b/hw/avr/atmega.c
+> >>>>> @@ -0,0 +1,470 @@
+> >>>>> +/*
+> >>>>> + * QEMU ATmega MCU
+> >>>>> + *
+> >>>>> + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
+> >>>>> + *
+> >>>>> + * This work is licensed under the terms of the GNU GPLv2 or later=
+.
+> >>>>> + * See the COPYING file in the top-level directory.
+> >>>>> + * SPDX-License-Identifier: GPL-2.0-or-later
+> >>>>> + */
+> >>>>
+> >>>> Philippe,
+> >>>>
+> >>>> Michael and I already agreed at some moment that the whole target AV=
+R
+> >>>> should have harmonized licenses, and Sarrah agreed to change her
+> >>>> license to achieve this. Do you agree to harmonize your licenses wit=
+h
+> >>>> the rest of the project? (This would mean changing the preable, but =
+of
+> >>>> course you remain copyright carrier as is now.)
+> >>>
+> >>> What license do you want to use? I always use "GPLv2 or later" with
+> >>> QEMU, mostly following what the others do.
+> >>>
+> >>> Per https://wiki.qemu.org/License:
+> >>>
+> >>>   Source files with no licensing information are released under the
+> >>> GNU General Public License, version 2 or (at your option) any later
+> >>> version.
+> >>>
+> >>> Reading about licensing is not fun :(
+> >>>
+> >>
+> >> Philippe, here is the deal: All new files for AVR platform has the
+> >> following preamble, that Michael chose from the outset:
+> >>
+> >> + * This library is free software; you can redistribute it and/or
+> >> + * modify it under the terms of the GNU Lesser General Public
+> >> + * License as published by the Free Software Foundation; either
+> >> + * version 2.1 of the License, or (at your option) any later version.
+> >> + *
+> >> + * This library is distributed in the hope that it will be useful,
+> >> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> >> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> >> + * Lesser General Public License for more details.
+> >> + *
+> >> + * You should have received a copy of the GNU Lesser General Public
+> >> + * License along with this library; if not, see
+> >> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> >>
+> >> Now, it is preferable that licenses are harmonized within a module,
+> >> and I ask you to change the preamble to be the same as the rest of the
+> >> module, that is all. This practically means LGPL2.1+later instead
+> >> LGPL2.0+later. I think it is reasonable that we want to simplify out
+> >> license stuff, not complicate it with different licenses within a
+> >> module. There are examples of complications in cases of different
+> >> license within the same module, so it would be ideal if we avoid such
+> >> situations.
+> >>
+> >
+> > I didn't mean to scare you, I am just a developer like you, and I want
+> > to avoid thinking about licenses, and think of our real work, so, I
+> > gather, in my layman terms, it is better to have the same license for
+> > the new platform in its entirety, if possible, that is all. :)
+>
+> This is all part of QEMU, and QEMU is licensed under the GPLv2. If
+> someone wants to use a less strict license for their own code that is
+> still compatible with the GPLv2, like the LGPLv2.1, that's fine. But I
+> think if Philippe does not like to release his code under the LGPL, and
+> wants to use GPL instead, you can not force him to use LGPL here. It's
+> the decision of Philippe what he wants to use for his code.
+>
 
-SDEI doesn't quite describe *why* and *how* you enter it. You just get=20
-there by
-some mean (SError, Group-0 interrupt, or IMPlementation DEFined=20
-mechanism).
-It is then for the SDEI implementation to sort it out and enter the OS=20
-using the
-registered entry point.
+It is his decision, but it can be reasonable or not so reasonable. I
+think it is logical that he follows the license model of the module he
+contributes to, isn't it?
 
-> Also, If I'm correct, you agree that a crash dump should be triggered=20
-> on arm64
-> guest once HMP/QMP "nmi" command is issued?
+Aleksandar
 
-No, I don't agree. QEMU and KVM are OS agnostic, and there is nothing in=20
-the ARMv8
-architecture that talks about "crash dumps".  If your "nmi" command=20
-generates
-a SDEI event and that event gets dispatched to the guest, it is entirely=20
-the guest's
-responsibility to do whatever it wants. We should stay clear of assuming=20
-behaviours.
-
-> I also dig into SDEI a bit. It seems the SDEI support in QEMU isn't=20
-> upstream yet:
->=20
-> https://patchew.org/QEMU/20191105091056.9541-1-guoheyi@huawei.com/
-
-And I'm glad. SDEI, as I said, is absolutely horrible. I'm also very=20
-fortunate
-to have been CC'd on this series on an email address I cannot read.
-This would have huge impacts on both QEMU and KVM, and this needs more=20
-than
-a knee jerk reaction to support a QEMU command.
-
-And to be honest, if what you require is the guest kernel to panic, why=20
-don't
-you just implement a QEMU-specific driver in Linux that does just that?
-Some kind of watchdog driver, maybe?
-
-Thanks,
-
-         M.
---=20
-Jazz is not dead. It just smells funny...
+>  Thomas
+>
 
