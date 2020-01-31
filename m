@@ -2,79 +2,78 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E14C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8905C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:46:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4135215A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:46:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FE1B215A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:46:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D3u5hS2V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4135215A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DFUydRqt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FE1B215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYUx-0008OG-0Y
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:46:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40481)
+	id 1ixYV0-00006X-Gh
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:46:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXzH-0006JS-T4
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:40 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXyl-0005El-FH
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXzG-00076x-Oj
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28044
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXyk-0005KD-0m
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32337
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXzG-00075c-Kv
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:38 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyj-0005Jm-T0
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483618;
+ s=mimecast20190719; t=1580483585;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4yeJ9YeREyuFJXglzTpaDhwRAhnNJf43VPlN8rTv7J8=;
- b=D3u5hS2V5ldLZmymmnfb14knwMSSz0XS/cG45G+T84TZiQxYTVV5+/+Hj9zbP4Jx28Koy0
- jGZbFG45xu7W0/DyjqT58rhkTjKPOQMqG19i+IE7yvEmyetqqJyU0dqwZ42EYq1T9Twnyi
- Ui7sLGuds1/rpqV74OY33vOSMfkT2Ks=
+ bh=TKxtyz6vT2LCcjwSkSvIbFvI5KfyHW3WpKfPCkldYO4=;
+ b=DFUydRqt5v7gRjYMQTLgJGbM2pa0sE1P7cxzDUbv9q/QiDuJq2L4LX2f4mdf4gTHpI6AT2
+ exRcJFJ53OcJfl/9VqMLCTzsiJIX2VUnVg4ng5lrDzRmgrmIKFfNvQbqlgTw8y9IE6Khly
+ lOX1WuU4tVCJQ3NdvWmS9H196ozbvhI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-cLHnCsBWMhilrvSvxu1xUw-1; Fri, 31 Jan 2020 10:13:36 -0500
+ us-mta-399-UgHIrgEuOLS3fajC141aHw-1; Fri, 31 Jan 2020 10:13:03 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64FCF8017CC;
- Fri, 31 Jan 2020 15:13:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F04AB1088382;
+ Fri, 31 Jan 2020 15:13:01 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 90A6F89E87;
- Fri, 31 Jan 2020 15:13:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC27D86C4B;
+ Fri, 31 Jan 2020 15:13:00 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 75/80] exec: drop bogus mem_path from
- qemu_ram_alloc_from_fd()
-Date: Fri, 31 Jan 2020 16:09:45 +0100
-Message-Id: <1580483390-131164-76-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 43/80] x86/pc: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:09:13 +0100
+Message-Id: <1580483390-131164-44-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: cLHnCsBWMhilrvSvxu1xUw-1
+X-MC-Unique: UgHIrgEuOLS3fajC141aHw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,58 +85,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, rth@twiddle.net
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Function will report error that will mention global mem_path,
-which was valid the only if legacy -mem-path was used and
-only in case of main RAM.
-
-However it doesn't work with hostmem backends
-(for example:
-"
-  qemu: -object memory-backend-file,id=3Dram0,size=3D128M,mem-path=3Dfoo:
-    backing store (null) size 0x200000 does not match 'size' option 0x80000=
-00
-")
-and couldn't possibly work in general FD case the function
-is supposed to handle.
-
-Taking in account that main RAM was converted into
-memory-backend-foo object, there is no point in printing
-file name (from inappropriate place) as failing path is
-a part of backend's error message.
-
-Hence drop bogus mem_path usage from qemu_ram_alloc_from_fd(),
-it's a job of its user to add file name to error message if applicable.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
+CC: mst@redhat.com
 CC: pbonzini@redhat.com
 CC: rth@twiddle.net
+CC: ehabkost@redhat.com
 ---
- exec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/i386/pc.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 9f5421c..d827fac 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2308,9 +2308,9 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, Mem=
-oryRegion *mr,
-     size =3D HOST_PAGE_ALIGN(size);
-     file_size =3D get_file_size(fd);
-     if (file_size > 0 && file_size < size) {
--        error_setg(errp, "backing store %s size 0x%" PRIx64
-+        error_setg(errp, "backing store size 0x%" PRIx64
-                    " does not match 'size' option 0x" RAM_ADDR_FMT,
--                   mem_path, file_size, size);
-+                   file_size, size);
-         return NULL;
-     }
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2ddce42..6ab4acb 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -937,7 +937,7 @@ void pc_memory_init(PCMachineState *pcms,
+                     MemoryRegion **ram_memory)
+ {
+     int linux_boot, i;
+-    MemoryRegion *ram, *option_rom_mr;
++    MemoryRegion *option_rom_mr;
+     MemoryRegion *ram_below_4g, *ram_above_4g;
+     FWCfgState *fw_cfg;
+     MachineState *machine =3D MACHINE(pcms);
+@@ -950,22 +950,20 @@ void pc_memory_init(PCMachineState *pcms,
 =20
+     linux_boot =3D (machine->kernel_filename !=3D NULL);
+=20
+-    /* Allocate RAM.  We allocate it as a single memory region and use
+-     * aliases to address portions of it, mostly for backwards compatibili=
+ty
+-     * with older qemus that used qemu_ram_alloc().
++    /*
++     * Split single memory region and use aliases to address portions of i=
+t,
++     * done for backwards compatibility with older qemus.
+      */
+-    ram =3D g_malloc(sizeof(*ram));
+-    memory_region_allocate_system_memory(ram, NULL, "pc.ram",
+-                                         machine->ram_size);
+-    *ram_memory =3D ram;
++    *ram_memory =3D machine->ram;
+     ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
+-    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
++    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", machine->=
+ram,
+                              0, x86ms->below_4g_mem_size);
+     memory_region_add_subregion(system_memory, 0, ram_below_4g);
+     e820_add_entry(0, x86ms->below_4g_mem_size, E820_RAM);
+     if (x86ms->above_4g_mem_size > 0) {
+         ram_above_4g =3D g_malloc(sizeof(*ram_above_4g));
+-        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram,
++        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g",
++                                 machine->ram,
+                                  x86ms->below_4g_mem_size,
+                                  x86ms->above_4g_mem_size);
+         memory_region_add_subregion(system_memory, 0x100000000ULL,
+@@ -1952,6 +1950,7 @@ static void pc_machine_class_init(ObjectClass *oc, vo=
+id *data)
+     mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
+     mc->nvdimm_supported =3D true;
+     mc->numa_mem_supported =3D true;
++    mc->default_ram_id =3D "pc.ram";
+=20
+     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+         pc_machine_get_device_memory_region_size, NULL,
 --=20
 2.7.4
 
