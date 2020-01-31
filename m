@@ -2,78 +2,79 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB655C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEDAEC33CB7
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9868320707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:39:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E26420707
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:39:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HF4ZtkoB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9868320707
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hNFPR3KX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E26420707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYOI-0004fy-Qr
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:39:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39368)
+	id 1ixYOd-0005Dx-Lf
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:39:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXyR-0004Xh-LF
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:49 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXyW-0004g7-DK
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXyQ-0004HT-AA
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46832
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXyV-0004Sd-9K
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:52 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59773
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyQ-0004F6-5V
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:46 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyV-0004S0-5q
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483565;
+ s=mimecast20190719; t=1580483570;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ioguNgphklt2sk/hDk9HVNlqC+SBFzhz8BYSNxTF9/M=;
- b=HF4ZtkoBWWPKtvfV1NlZT2GrwSx8z2wzYXnBresRBEB8rhhX0fTHkQa+RyF4Pm9RtmbCu5
- bKivsluvbjQrAFmjsggCiGQuPP/fzRek8KGyGxgtXgn09KdmW2lSjVON2iEWnkZXHBYGNT
- z5PfnTVphyOHW/8/ZFvi4hLrTIWtT88=
+ bh=kw+4DlgM0odpHEZGphhJaCNVvyRS1Ybjd47rhhOmDls=;
+ b=hNFPR3KXZzp2waWVBnMTvs5RYh/z9UrQdKInPk6Ye9xkrBLZUkUawhuhKypc3hzWKua2V6
+ z9vywebs1CXHatd9suf/rUXiCgciRgMPuuV5kiRacCAYUoj9dZQKeuS4wFjgeseWQCk6RS
+ SFS7XmUvLb1OKA8mCViW6T5yXq57OI4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-aEDC5LlkMtmFgahpzoCO6Q-1; Fri, 31 Jan 2020 10:12:43 -0500
+ us-mta-426-BiU_0ttzOParRxKAT0GZjw-1; Fri, 31 Jan 2020 10:12:45 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A877F107ACC9;
- Fri, 31 Jan 2020 15:12:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B90508017CC;
+ Fri, 31 Jan 2020 15:12:44 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6906089E7A;
- Fri, 31 Jan 2020 15:12:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E4E6789E7A;
+ Fri, 31 Jan 2020 15:12:43 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 28/80] arm/raspi: use memdev for RAM
-Date: Fri, 31 Jan 2020 16:08:58 +0100
-Message-Id: <1580483390-131164-29-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 30/80] arm/sbsa-ref: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:09:00 +0100
+Message-Id: <1580483390-131164-31-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: aEDC5LlkMtmFgahpzoCO6Q-1
+X-MC-Unique: BiU_0ttzOParRxKAT0GZjw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,7 +86,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, Andrew.Baumann@microsoft.com
+Cc: radoslaw.biernacki@linaro.org, leif.lindholm@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -98,121 +99,49 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-PS:
- remove no longer needed RasPiState
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v4:
-  * fixed rebase conflicts
-
-CC: Andrew.Baumann@microsoft.com
-CC: philmd@redhat.com
+CC: radoslaw.biernacki@linaro.org
+CC: leif.lindholm@linaro.org
 ---
- hw/arm/raspi.c | 32 ++++++++++++--------------------
- 1 file changed, 12 insertions(+), 20 deletions(-)
+ hw/arm/sbsa-ref.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 3996f6c..549e5e1 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -32,11 +32,6 @@
- /* Table of Linux board IDs for different Pi versions */
- static const int raspi_boardid[] =3D {[1] =3D 0xc42, [2] =3D 0xc43, [3] =
-=3D 0xc44};
-=20
--typedef struct RasPiState {
--    BCM283XState soc;
--    MemoryRegion ram;
--} RasPiState;
--
- static void write_smpboot(ARMCPU *cpu, const struct arm_boot_info *info)
- {
-     static const uint32_t smpboot[] =3D {
-@@ -166,7 +161,7 @@ static void setup_boot(MachineState *machine, int versi=
-on, size_t ram_size)
-=20
- static void raspi_init(MachineState *machine, int version)
- {
--    RasPiState *s =3D g_new0(RasPiState, 1);
-+    Object *soc;
-     uint32_t vcram_size;
-     DriveInfo *di;
-     BlockBackend *blk;
-@@ -179,28 +174,24 @@ static void raspi_init(MachineState *machine, int ver=
-sion)
-         exit(1);
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 9b5bcb5..1cba9fc 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -593,7 +593,6 @@ static void sbsa_ref_init(MachineState *machine)
+     MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     MemoryRegion *sysmem =3D get_system_memory();
+     MemoryRegion *secure_sysmem =3D g_new(MemoryRegion, 1);
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     bool firmware_loaded;
+     const CPUArchIdList *possible_cpus;
+     int n, sbsa_max_cpus;
+@@ -685,9 +684,8 @@ static void sbsa_ref_init(MachineState *machine)
+         object_unref(cpuobj);
      }
 =20
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc=
-),
--                            version =3D=3D 3 ? TYPE_BCM2837 : TYPE_BCM2836=
-,
--                            &error_abort, NULL);
-+    soc =3D object_new(version =3D=3D 3 ? TYPE_BCM2837 : TYPE_BCM2836);
-+    object_property_add_child(OBJECT(machine), "soc", soc, &error_fatal);
-=20
--    /* Allocate and map RAM */
--    memory_region_allocate_system_memory(&s->ram, OBJECT(machine), "ram",
+-    memory_region_allocate_system_memory(ram, NULL, "sbsa-ref.ram",
 -                                         machine->ram_size);
-     /* FIXME: Remove when we have custom CPU address space support */
--    memory_region_add_subregion_overlap(get_system_memory(), 0, &s->ram, 0=
-);
-+    memory_region_add_subregion_overlap(get_system_memory(), 0,
-+                                        machine->ram, 0);
+-    memory_region_add_subregion(sysmem, sbsa_ref_memmap[SBSA_MEM].base, ra=
+m);
++    memory_region_add_subregion(sysmem, sbsa_ref_memmap[SBSA_MEM].base,
++                                machine->ram);
 =20
-     /* Setup the SOC */
--    object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram)=
-,
-+    object_property_add_const_link(soc, "ram", OBJECT(machine->ram),
-                                    &error_abort);
-     int board_rev =3D version =3D=3D 3 ? 0xa02082 : 0xa21041;
--    object_property_set_int(OBJECT(&s->soc), board_rev, "board-rev",
--                            &error_abort);
--    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_abo=
-rt);
-+    object_property_set_int(soc, board_rev, "board-rev", &error_abort);
-+    object_property_set_bool(soc, true, "realized", &error_abort);
+     create_fdt(sms);
 =20
-     /* Create and plug in the SD cards */
-     di =3D drive_get_next(IF_SD);
-     blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
--    bus =3D qdev_get_child_bus(DEVICE(&s->soc), "sd-bus");
-+    bus =3D qdev_get_child_bus(DEVICE(soc), "sd-bus");
-     if (bus =3D=3D NULL) {
-         error_report("No SD bus found in SOC object");
-         exit(1);
-@@ -209,8 +200,7 @@ static void raspi_init(MachineState *machine, int versi=
-on)
-     qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-     object_property_set_bool(OBJECT(carddev), true, "realized", &error_fat=
-al);
-=20
--    vcram_size =3D object_property_get_uint(OBJECT(&s->soc), "vcram-size",
--                                          &error_abort);
-+    vcram_size =3D object_property_get_uint(soc, "vcram-size", &error_abor=
-t);
-     setup_boot(machine, version, machine->ram_size - vcram_size);
- }
-=20
-@@ -231,6 +221,7 @@ static void raspi2_machine_init(MachineClass *mc)
-     mc->min_cpus =3D BCM283X_NCPUS;
-     mc->default_cpus =3D BCM283X_NCPUS;
+@@ -785,6 +783,7 @@ static void sbsa_ref_class_init(ObjectClass *oc, void *=
+data)
+     mc->block_default_type =3D IF_IDE;
+     mc->no_cdrom =3D 1;
      mc->default_ram_size =3D 1 * GiB;
-+    mc->default_ram_id =3D "ram";
-     mc->ignore_memory_transaction_failures =3D true;
- };
- DEFINE_MACHINE("raspi2", raspi2_machine_init)
-@@ -253,6 +244,7 @@ static void raspi3_machine_init(MachineClass *mc)
-     mc->min_cpus =3D BCM283X_NCPUS;
-     mc->default_cpus =3D BCM283X_NCPUS;
-     mc->default_ram_size =3D 1 * GiB;
-+    mc->default_ram_id =3D "ram";
- }
- DEFINE_MACHINE("raspi3", raspi3_machine_init)
- #endif
++    mc->default_ram_id =3D "sbsa-ref.ram";
+     mc->default_cpus =3D 4;
+     mc->possible_cpu_arch_ids =3D sbsa_ref_possible_cpu_arch_ids;
+     mc->cpu_index_to_instance_props =3D sbsa_ref_cpu_index_to_props;
 --=20
 2.7.4
 
