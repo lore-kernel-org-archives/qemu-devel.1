@@ -2,50 +2,52 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F8EC33CB3
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8339AC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:14:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A10D62067C
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:14:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A10D62067C
+	by mail.kernel.org (Postfix) with ESMTPS id 579AA2067C
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:14:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 579AA2067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJwp-0000ly-Re
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:14:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58760)
+	id 1ixJx3-0001Eu-DC
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:14:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnp-0007q5-0w
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:54 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnp-0007rr-Jl
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnn-000351-Ve
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:52 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51354 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnn-00033u-4r
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:53 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51207 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ixJnn-0002wG-M9
+ id 1ixJnm-0002tq-Th
  for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:51 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 3AA9C1A2085;
+ by mail.rt-rk.com (Postfix) with ESMTP id 133531A2104;
  Fri, 31 Jan 2020 01:03:38 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 07DB11A20A9;
- Fri, 31 Jan 2020 01:03:38 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id DD5E21A20EF;
+ Fri, 31 Jan 2020 01:03:37 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc4 22/29] target/avr: Update MAINTAINERS file
-Date: Fri, 31 Jan 2020 01:03:06 +0100
-Message-Id: <1580428993-4767-23-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc4 19/29] target/avr: Add section about AVR into QEMU
+ documentation
+Date: Fri, 31 Jan 2020 01:03:03 +0100
+Message-Id: <1580428993-4767-20-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -75,59 +77,98 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Include AVR maintaners in MAINTAINERS file
+Explains basic ways of using AVR target in QEMU.
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-[rth: Squash ordering fixes from f4bug]
+Message-Id: <20200118191416.19934-16-mrolnik@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+[PMD: Fixed typos]
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- MAINTAINERS | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ qemu-doc.texi | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c45e886..d0a114b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -163,6 +163,14 @@ S: Maintained
- F: hw/arm/smmu*
- F: include/hw/arm/smmu*
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 2328e7e..aaf4e54 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -1723,6 +1723,7 @@ differences are mentioned in the following sections=
+.
+ * Microblaze System emulator::
+ * SH4 System emulator::
+ * Xtensa System emulator::
++* AVR System emulator::
+ @end menu
 =20
-+AVR TCG CPUs
-+M: Michael Rolnik <mrolnik@gmail.com>
-+R: Sarah Harris <S.E.Harris@kent.ac.uk>
-+S: Maintained
-+F: target/avr/
-+F: default-configs/avr-softmmu.mak
-+F: gdb-xml/avr-cpu.xml
-+
- CRIS TCG CPUs
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- S: Maintained
-@@ -882,6 +890,22 @@ F: include/hw/*/nrf51*.h
- F: include/hw/*/microbit*.h
- F: tests/qtest/microbit-test.c
+ @node PowerPC System emulator
+@@ -2496,6 +2497,56 @@ so should only be used with trusted guest OS.
 =20
-+AVR Machines
-+-------------
+ @c man end
+=20
++@node AVR System emulator
++@section AVR System emulator
++@cindex system emulation (AVR)
 +
-+AVR MCUs
-+M: Michael Rolnik <mrolnik@gmail.com>
-+R: Sarah Harris <S.E.Harris@kent.ac.uk>
-+S: Maintained
-+F: hw/avr/
-+F: hw/char/avr_usart.c
-+F: include/hw/char/avr_usart.h
-+F: hw/timer/avr_timer16.c
-+F: include/hw/timer/avr_timer16.h
-+F: hw/misc/avr_power.c
-+F: include/hw/misc/avr_power.h
-+F: tests/acceptance/machine_avr6.py
++Use the executable @file{qemu-system-avr} to emulates a AVR 8 bit based =
+machine
++having one for the following cores: avr1, avr2, avr25, avr3, avr31, avr3=
+5, avr4,
++avr5, avr51, avr6, avrtiny, xmega2, xmega3, xmega4, xmega5, xmega6 and x=
+mega7.
 +
- CRIS Machines
- -------------
- Axis Dev88
++As for now it supports few Arduino boards for educational and testing pu=
+rposes.
++These boards use a ATmega controller, which model is limited to USART & =
+16 bit
++timer devices, enought to run FreeRTOS based applications (like this @ur=
+l{https://github.com/seharris/qemu-avr-tests/blob/master/free-rtos/Demo/A=
+VR_ATMega2560_GCC/demo.elf,,demo})
++
++Following are examples of possible usages, assuming demo.elf is compiled=
+ for
++AVR cpu
++@itemize
++
++@item Continuous non interrupted execution
++@example
++qemu-system-avr -machine mega2560 -bios demo.elf
++@end example
++
++@item Continuous non interrupted execution with serial output into telne=
+t window
++@example
++qemu-system-avr -machine mega2560 -bios demo.elf -serial tcp::5678,serve=
+r,nowait -nographic
++@end example
++and then in another shell
++@example
++telnet localhost 5678
++@end example
++
++@item Debugging wit GDB debugger
++@example
++qemu-system-avr -machine mega2560 -bios demo.elf -s -S
++@end example
++and then in another shell
++@example
++avr-gdb demo.elf
++@end example
++and then within GDB shell
++@example
++target remote :1234
++@end example
++
++@item Print out executed instructions
++@example
++qemu-system-avr -machine mega2560 -bios demo.elf -d in_asm
++@end example
++
++@end itemize
++
+ @node QEMU User space emulator
+ @chapter QEMU User space emulator
+=20
 --=20
 2.7.4
 
