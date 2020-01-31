@@ -2,103 +2,74 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD87AC33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 11:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85099C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 11:21:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CCA320707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 11:13:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="IKFY/9YW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CCA320707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 53119206F0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 11:21:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53119206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixUEq-00085k-O3
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 06:13:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36444)
+	id 1ixUN3-0004iI-AN
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 06:21:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anthony.perard@citrix.com>) id 1ixUE7-0007bW-Nl
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:12:44 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixUM7-0003lP-7f
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:21:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1ixUE6-0006XL-RS
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:12:43 -0500
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:14276)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1ixUE4-0006Sv-CK; Fri, 31 Jan 2020 06:12:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1580469161;
- h=date:from:to:cc:subject:message-id:references:
- mime-version:in-reply-to;
- bh=qfF8oVOo7ctviCi6mg6F9BGnSJ7daqD7vdkZGyymZFw=;
- b=IKFY/9YWN3vUeqJjjT7MY91M7kzuCItI81+BG0CHCl0JsBvN8d2q/YmV
- YjhmLrfKomgVZSOC5rSzirQ+HDxjkwl+XgmvT8l72UqQlM5myyxWpQ4b+
- h+X8NNyzUNVlnCuWxfxAQBIO5UAi5D0MOEPUnGMbMqWNCRjET4Vsg5hkf M=;
-Authentication-Results: esa3.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=anthony.perard@citrix.com;
- spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- anthony.perard@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible
-Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
- anthony.perard@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="anthony.perard@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
- ip4:168.245.78.127 ~all"
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
- envelope-from="anthony.perard@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: vDZIIl5/+JntewELYHJ9/JSdMe3F98V9bYxcBFBFej6UsoUtpFkt+XGuM9/sFQ5N6YsjSgN/g5
- fuxvZflgXWtiiUuFPyen+4T8WGJMrZjOFHMki16w6fHAwwZ11jPscj53yaC2K7kw6U5qV+kPeM
- rrEaSIHNG0f1LPsCSECmVQpQgEuKlQ1NGZZ1d9eL/U5Ff90C/GOTx2EwnJQBZ8NWkfi/smZtqo
- irVUeS70VZzILi6pxAArbgEAeLw/75owOBfpW4gv6EtQYoaTFqFoUI/TQSpqthjUfG3aoJcf/h
- jho=
-X-SBRS: 2.7
-X-MesageID: 11734366
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.70,385,1574139600"; d="scan'208";a="11734366"
-Date: Fri, 31 Jan 2020 11:12:22 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-To: Julien Grall <jgrall@amazon.com>
-Subject: Re: [PATCH] xen-bus/block: explicitly assign event channels to an
- AioContext
-Message-ID: <20200131111222.GT1288@perard.uk.xensource.com>
-References: <20191216143451.19024-1-pdurrant@amazon.com>
- <20191219171158.GF1267@perard.uk.xensource.com>
- <b2762e84-1cc4-649c-9b53-8754678525f6@amazon.com>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixUM5-0007xn-5U
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:20:58 -0500
+Received: from mail-yw1-f65.google.com ([209.85.161.65]:44236)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixUM4-0007wi-N6; Fri, 31 Jan 2020 06:20:57 -0500
+Received: by mail-yw1-f65.google.com with SMTP id t141so4274809ywc.11;
+ Fri, 31 Jan 2020 03:20:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=zbZ1Zr02zgbuu5FcJZu6KdN991TWDZ+GAwZPE7eywGA=;
+ b=IazKwUfjOxUxMTSwSN0mUpu850y7sFv9udMwlp/PFDjzVNUd2wn/Z5pV1QLi7QNNAh
+ xFSSIBZnF1t16ooxv4kwRT/CM7bDFyiBQLV09y+e8C98aoEDeC1+PWnA4kOL2Sdzmgza
+ p090CIjGOFHnLItv11t5Vh7ob9I6jTn7X/+5WGugIGQHETAkvJ2lRt8TlFnc8zzi2sJi
+ gCXnCaPXu7I7LmjXJ/m/X49btwfEX38WQRvvjIKtA3OLURixYWSO1BPeCj8Fu3bwCEu0
+ ZFbl2FQzy3odDRdFMAMA2s1uV0RAuIOjwmTBP/URbSS9+cTMkrX/7GGpOi50llb65onm
+ ne8Q==
+X-Gm-Message-State: APjAAAW8ROz0IQO0lvxdTS2tJ+Z0MKG4TNT/eA8KzYGmrj2NULkdp+vC
+ eEXftbTrLMTza96hNCOFavJ6pgqJgC/hYkao/aU=
+X-Google-Smtp-Source: APXvYqwFSOd3Y9qHIOl0t3Go4rLtedbFeiZPmz3UTeQaPPG0Lu4uGs7ep02wPWRYJxvk6QvEKgTecq+iC36ileB2dmI=
+X-Received: by 2002:a25:e696:: with SMTP id d144mr8050604ybh.316.1580469655897; 
+ Fri, 31 Jan 2020 03:20:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <b2762e84-1cc4-649c-9b53-8754678525f6@amazon.com>
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 216.71.145.155
+References: <20200124005131.16276-1-f4bug@amsat.org>
+ <20200124005131.16276-13-f4bug@amsat.org>
+ <875zh1yw38.fsf@linaro.org> <790c5181-c4b0-ea7b-f4e4-07bacae220b2@redhat.com>
+ <20200124120722.705ae8bac5cfc939dae2db5f@kent.ac.uk>
+ <CAL1e-=hCH7WQU-10zrOZW5imibZxAz7Ao0DVxekJEjSVB5pQhA@mail.gmail.com>
+In-Reply-To: <CAL1e-=hCH7WQU-10zrOZW5imibZxAz7Ao0DVxekJEjSVB5pQhA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 31 Jan 2020 12:20:44 +0100
+Message-ID: <CAAdtpL5VDkU69A-C80i+GuvVqjmE5px+NEtxbOV-ecdp6OVmKA@mail.gmail.com>
+Subject: Re: [PATCH rc2 12/25] hw/timer: Add limited support for Atmel 16 bit
+ timer peripheral
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.161.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,47 +81,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-block@nongnu.org, Paul Durrant <pdurrant@amazon.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, xen-devel@lists.xenproject.org
+Cc: Fam Zheng <fam@euphon.net>, "S.Harris" <S.E.Harris@kent.ac.uk>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "mrolnik@gmail.com" <mrolnik@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Sarah Harris <seh53@kent.ac.uk>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@dabbelt.com>, "E.Robbins" <E.J.C.Robbins@kent.ac.uk>,
+ "imammedo@redhat.com" <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 29, 2020 at 10:22:14PM +0000, Julien Grall wrote:
-> Hi Anthony,
-> 
-> On 19/12/2019 17:11, Anthony PERARD wrote:
-> > On Mon, Dec 16, 2019 at 02:34:51PM +0000, Paul Durrant wrote:
-> > > It is not safe to close an event channel from the QEMU main thread when
-> > > that channel's poller is running in IOThread context.
-> > > 
-> > > This patch adds a new xen_device_set_event_channel_context() function
-> > > to explicitly assign the channel AioContext, and modifies
-> > > xen_device_bind_event_channel() to initially assign the channel's poller
-> > > to the QEMU main thread context. The code in xen-block's dataplane is
-> > > then modified to assign the channel to IOThread context during
-> > > xen_block_dataplane_start() and de-assign it during in
-> > > xen_block_dataplane_stop(), such that the channel is always assigned
-> > > back to main thread context before it is closed. aio_set_fd_handler()
-> > > already deals with all the necessary synchronization when moving an fd
-> > > between AioContext-s so no extra code is needed to manage this.
-> > > 
-> > > Reported-by: Julien Grall <jgrall@amazon.com>
-> > > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> > 
-> > Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-> 
-> I can't find the patch in QEMU upstream. Are we missing any ack/review for
-> this patch?
+On Thu, Jan 30, 2020 at 11:44 PM Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+> On Fri, Jan 24, 2020 at 1:07 PM Sarah Harris <seh53@kent.ac.uk> wrote:
+> >
+> > Hi,
+> >
+> > Do I understand correctly that you need Ed to email a "Signed-off-by: E=
+d Robbins <email>" himself?
+> > Ed's cc'ed already, but I'll email him directly to make sure he's seen =
+this discussion.
+> >
+> > Sarah
+> >
+>
+> All authors should have their "Signed-off-by:" line in the commit
+> message. That is what Alex meant. I will fix that in rc4.
 
-No, I just need to prepare a pull request. It's in my list of patch for
-upstream, so there will be a pull request at some point before the next
-QEMU release.
+I am not sure this works that way...
 
-Cheers,
+https://www.kernel.org/doc/html/latest/process/submitting-patches.html#sign=
+-your-work-the-developer-s-certificate-of-origin
 
--- 
-Anthony PERARD
+  The sign-off is a simple line at the end of the explanation for the
+patch, which certifies that you wrote it or otherwise have the right
+to pass it on as an open-source patch.
+
+1/ https://www.mail-archive.com/qemu-devel@nongnu.org/msg620936.html
+- Ed requires the MIT license (https://opensource.org/licenses/MIT)
+- Sarah has the right to pass Ed's patch as an open-source patch, and
+signs the Developer=E2=80=99s Certificate of Origin
+
+  "The contribution is based upon previous work that, to the best of
+my knowledge, is covered under an appropriate open source license and
+I have the right under that license to submit that work with
+modifications, whether created in whole or in part by me, under the
+same open source license (unless I am permitted to submit under a
+different license), as indicated in the file;"
+
+2/ https://www.mail-archive.com/qemu-devel@nongnu.org/msg675573.html
+- License is changed to LGPLv2 (https://opensource.org/licenses/LGPL-2.1)
+- Ed appears as having signed the Developer=E2=80=99s Certificate of Origin=
+ himself
+
+  "The contribution was created in whole or in part by me and I have
+the right to submit it under the open source license indicated in the
+file;"
+
+IANAL so I'd like to get advises from the others.
 
