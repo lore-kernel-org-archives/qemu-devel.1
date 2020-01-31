@@ -2,70 +2,53 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.2 required=3.0 tests=DATE_IN_PAST_96_XX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF421C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 04:54:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF671C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 04:59:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97C7021775
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 04:54:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Imi6bZmp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C7021775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id A093320838
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 04:59:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A093320838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izZAy-0007Ap-OY
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 23:54:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41589)
+	id 1izZGZ-0001ay-QT
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 23:59:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1izZAO-0006mH-96
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 23:53:29 -0500
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1izZG1-00011V-EA
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 23:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1izZAM-0004Xu-KE
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 23:53:27 -0500
-Received: from ozlabs.org ([203.11.71.1]:39497)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1izZAL-0004Ii-GY
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 23:53:26 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48CmKD3nL3z9sP7; Thu,  6 Feb 2020 15:53:20 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580964800;
- bh=m4y17p3+xgYBQk6ljX39nwMiq9mz8i6qXENxtrea0fg=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Imi6bZmp9dlkyVIILNe6XN1wtVM5FwZVjijLe9rZTXyoQW1FxtaoyBXIPA8uZp87b
- 9DI2nz0bwCO90+c+yib1AcwPZwI6tqALirWldxCU5529xyg8KU7kf3/yY4OejAGnJy
- EJNymDriM8fKhHkzIIiWKS9I2t6AIREPM3aw4GDk=
-Date: Thu, 6 Feb 2020 15:47:57 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Cornelia Huck <conny@cornelia-huck.de>
-Subject: Re: VW ELF loader
-Message-ID: <20200206044757.GM60221@umbus.fritz.box>
-References: <20200203012842.GD52446@umbus.fritz.box>
- <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
- <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
- <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
- <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
- <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
- <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
- <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
- <20200205060634.GI60221@umbus.fritz.box>
- <20200205102830.15cb9706.conny@cornelia-huck.de>
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1izZFz-0004sG-MR
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 23:59:16 -0500
+Received: from [192.146.154.1] (port=4212 helo=mcp01.nutanix.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1izZFz-0004eK-Eq
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 23:59:15 -0500
+Received: from localhost.localdomain (unknown [10.40.36.165])
+ by mcp01.nutanix.com (Postfix) with ESMTP id E6C9910074C0;
+ Thu,  6 Feb 2020 04:59:10 +0000 (UTC)
+Date: Fri, 31 Jan 2020 16:21:59 -0500
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+To: qemu-devel@nongnu.org, mst@redhat.com
+Subject: Re: [PATCH v2 0/3] vhost-user: Lift Max Ram Slots Limitation
+Message-ID: <20200131212126.GA2422@localhost.localdomain>
+References: <1579143426-18305-1-git-send-email-raphael.norwitz@nutanix.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="eWmFpGZayiNrn4FL"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200205102830.15cb9706.conny@cornelia-huck.de>
+In-Reply-To: <1579143426-18305-1-git-send-email-raphael.norwitz@nutanix.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 192.146.154.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,64 +60,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-devel <qemu-devel@nongnu.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: raphael.s.norwitz@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Ping
 
---eWmFpGZayiNrn4FL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 05, 2020 at 10:28:30AM +0100, Cornelia Huck wrote:
-> On Wed, 5 Feb 2020 17:06:34 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Wed, Jan 15, 2020 at 09:57:03PM -0500, Raphael Norwitz wrote:
 >=20
-> > On Tue, Feb 04, 2020 at 12:26:32AM +0100, Paolo Bonzini wrote:
+> In QEMU today, a VM with a vhost-user device can hot add memory a
+> maximum of 8 times. See these threads, among others:
 >=20
-> > > You can generalize and reuse the s390 code. All you have to write is =
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01046.html=
+ =20
+>     https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01236.html=
+=20
+>=20
+> [2] https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04656.html=
+=20
+>=20
+> This series introduces a new protocol feature
+> VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS which, when enabled, lifts the
+> restriction on the maximum number RAM slots imposed by vhost-user.
+>=20
+> The patch consists of 3 changes:
+> 1. Fixed assert in vhost_user_set_mem_table_postcopy:
+>    This is a bug fix in the postcopy migration path
+> 2. Refactor vhost_user_set_mem_table functions:
+>    This is a non-functional change refractoring the
+>    vhost_user_set_mem_table and vhost_user_set_mem_table_postcopy
+>    functions such that the feature can be more cleanly added.
+> 3. Lift max memory slots limit imposed by vhost-user:
+>    This change introduces the new protocol feature
+>    VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS.
+>=20
+> The implementation details are explained in more detail in the commit
+> messages, but at a high level the new protocol feature works as follows=
+:
+> - If the VHOST_USER_PROTCOL_F_CONFIGURE_SLOTS feature is enabled, QEMU =
+will
+>   send multiple VHOST_USER_ADD_MEM_REG and VHOST_USER_REM_MEM_REG
+>   messages to map and unmap individual memory regions instead of one la=
+rge
+>   VHOST_USER_SET_MEM_TABLE message containing all memory regions.
+> - The vhost-user struct maintains a =E2=80=99shadow state=E2=80=99 of m=
+emory regions
+>   already sent to the guest. Each time vhost_user_set_mem_table is call=
+ed,
+>   the shadow state is compared with the new device state. A
+>   VHOST_USER_REM_MEM_REG will be sent for each region in the shadow sta=
+te
+>   not in the device state. Then, a VHOST_USER_ADD_MEM_REG will be sent
+>   for each region in the device state but not the shadow state. After
+>   these messages have been sent, the shadow state will be updated to
+>   reflect the new device state.
+>=20
+> The VHOST_USER_SET_MEM_TABLE message was not reused because as the numb=
+er of
+> regions grows, the message becomes very large. In practice, such large
+> messages caused problems (truncated messages) and in the past it seems =
 the
-> > > PCI scan and virtio-pci setup. =20
-> >=20
-> > If we assume virtio only.  In any case it sounds like the s390 code is
-> > actually based on the SLOF code anyway.
+> community has opted for smaller fixed size messages where possible. VRI=
+NGs,
+> for example, are sent to the backend individually instead of in one mas=
+sive
+> message.
 >=20
-> Only the netboot part. Device discovery/setup etc. had been written
-> from scratch, but I'm not sure how much reusable infrastructure remains
-> once you strip all the s390x-specific stuff.
-
-The netboot's the bit we'd be interested in, anyway.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---eWmFpGZayiNrn4FL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl47mn0ACgkQbDjKyiDZ
-s5IzmxAA1jDGcUUzuV/M3HY8XIe6OTOnwjp/IaNA17+MNHO80QsbPmVhngTMN0z/
-lFOsgmXe7cvdCvx5zC/+dvcKYZgHv4uC12kuFvNJe4yCUt+JqjjuVppb5LuxN2sV
-f4Hi8SEnr4qeYDtTQepqz/d/MlppzjU78Tf2S5NYx3LTn40Bu/tYT4milQo6tR1g
-WuOqeOAMuR+wNX6WBqNGCzEXb9Uj9+M/a13OtS067ZGC2RZuvuGcjgqTviAsJnT8
-KnLZj6YW1rrjllGINvTetTn8hj4Toxkgrvf/kX4g7+oIxIpUPvED2FZADikkNVGv
-BH4UerRUAcHPdQOjuD6BoM3ur2SsUaKGLDK077XNZM4j0zlWmMJP5xuOHL4ikMwM
-xJeIK4ssn+NwkZVGCnvMJBLVrN9QrzHJs6eCo1p150KTvrk1eH3fYGPeRCjhHdoN
-cJ9VWkWN7MIIjrIOBZfu2RTOuub06FqjhP5bg602vcrCQW/iCzKYARaG4jAK0tp9
-+jovIlgb8fmz7XEjRJIiDnN3SMiQKpcU8Fi0qowqTlBLazFFXZ8gRsXXSWx65hU5
-NxNc+WhXpyGEtCIo3MPZMDG6xzbhZ6CsF7AAKEffdllZBYJSYbc9xzwp6zgE2UYl
-FdSC0INhYyhwbmtQ/+/1tWcZMGbq5sLT7dPzlj4S9gF1cxFrlIw=
-=0xJy
------END PGP SIGNATURE-----
-
---eWmFpGZayiNrn4FL--
+> Current Limitations:
+> - postcopy migration is not supported when the
+>   VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS has been negotiated.=20
+> - VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS cannot be negotiated when
+>   VHOST_USER_PROTOCOL_F_REPLY_ACK has also been negotiated.
+>=20
+> Both of these limitations are due to resource contraints. They are not
+> imposed for technical reasons.
+>=20
+> Changes since V1:
+>     * Kept the assert in vhost_user_set_mem_table_postcopy, but moved i=
+t
+>       to prevent corruption
+>     * Made QEMU send a single VHOST_USER_GET_MAX_MEMSLOTS message at
+>       startup and cache the returned value so that QEMU does not need t=
+o
+>       query the backend every time vhost_backend_memslots_limit is call=
+ed.
+>=20
+> Best,
+> Raphael
+>=20
+> Raphael Norwitz (3):
+>   Fixed assert in vhost_user_set_mem_table_postcopy
+>   Refactor vhost_user_set_mem_table functions
+>   Lift max memory slots limit imposed by vhost-user
+>=20
+>  docs/interop/vhost-user.rst |  43 +++++
+>  hw/virtio/vhost-user.c      | 385 +++++++++++++++++++++++++++++++++---=
+--------
+>  2 files changed, 336 insertions(+), 92 deletions(-)
+>=20
+> --=20
+> 1.8.3.1
+>=20
+>=20
 
