@@ -6,46 +6,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E50BBC33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A5CC33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:07:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEB1320CC7
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:06:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEB1320CC7
+	by mail.kernel.org (Postfix) with ESMTPS id BA761205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:07:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA761205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixW01-000539-W7
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:06:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46248)
+	id 1ixW1c-0006oy-Vh
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:07:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvQ-0005rz-Ms
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvQ-0005ry-Mg
  for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvP-0007xo-3W
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvO-0007x8-MP
  for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:32 -0500
-Received: from relay.sw.ru ([185.231.240.75]:59642)
+Received: from relay.sw.ru ([185.231.240.75]:59620)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ixVvO-0007vb-SD; Fri, 31 Jan 2020 08:01:31 -0500
+ id 1ixVvO-0007ux-DU; Fri, 31 Jan 2020 08:01:30 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1ixVvH-0000zU-VQ; Fri, 31 Jan 2020 16:01:24 +0300
+ id 1ixVvJ-0000zU-Nu; Fri, 31 Jan 2020 16:01:25 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 02/11] error: auto propagated local_err
-Date: Fri, 31 Jan 2020 16:01:09 +0300
-Message-Id: <20200131130118.1716-3-vsementsov@virtuozzo.com>
+Subject: [PATCH v7 10/11] nbd: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 31 Jan 2020 16:01:17 +0300
+Message-Id: <20200131130118.1716-11-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200131130118.1716-1-vsementsov@virtuozzo.com>
 References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
@@ -61,180 +60,309 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- armbru@redhat.com, Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>,
- Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ armbru@redhat.com, Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
-functions with an errp OUT parameter.
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &error_fatal
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
-It has three goals:
+If we want to check error after errp-function call, we need to
+introduce local_err and then propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatal, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
 
-1. Fix issue with error_fatal and error_prepend/error_append_hint: user
-can't see this additional information, because exit() happens in
-error_setg earlier than information is added. [Reported by Greg Kurz]
+This commit is generated by command
 
-2. Fix issue with error_abort and error_propagate: when we wrap
-error_abort by local_err+error_propagate, the resulting coredump will
-refer to error_propagate and not to the place where error happened.
-(the macro itself doesn't fix the issue, but it allows us to [3.] drop
-the local_err+error_propagate pattern, which will definitely fix the
-issue) [Reported by Kevin Wolf]
+    sed -n '/^Network Block Device (NBD)$/,/^$/{s/^F: //p}' \
+        MAINTAINERS | \
+    xargs git ls-files | grep '\.[hc]$' | \
+    xargs spatch \
+        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+        --macro-file scripts/cocci-macro-file.h \
+        --in-place --no-show-diff --max-width 80
 
-3. Drop local_err+error_propagate pattern, which is used to workaround
-void functions with errp parameter, when caller wants to know resulting
-status. (Note: actually these functions could be merely updated to
-return int error code).
-
-To achieve these goals, later patches will add invocations
-of this macro at the start of functions with either use
-error_prepend/error_append_hint (solving 1) or which use
-local_err+error_propagate to check errors, switching those
-functions to use *errp instead (solving 2 and 3).
-
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
+ include/block/nbd.h |  1 +
+ block/nbd.c         | 49 +++++++++++++++++++++------------------------
+ nbd/client.c        |  5 +++++
+ nbd/server.c        |  5 +++++
+ 4 files changed, 34 insertions(+), 26 deletions(-)
 
-CC: Eric Blake <eblake@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Greg Kurz <groug@kaod.org>
-CC: Stefano Stabellini <sstabellini@kernel.org>
-CC: Anthony Perard <anthony.perard@citrix.com>
-CC: Paul Durrant <paul@xen.org>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-CC: Laszlo Ersek <lersek@redhat.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Stefan Berger <stefanb@linux.ibm.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Michael Roth <mdroth@linux.vnet.ibm.com>
-CC: qemu-block@nongnu.org
-CC: xen-devel@lists.xenproject.org
-
- include/qapi/error.h | 83 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 82 insertions(+), 1 deletion(-)
-
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index d34987148d..b9452d4806 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -78,7 +78,7 @@
-  * Call a function treating errors as fatal:
-  *     foo(arg, &error_fatal);
-  *
-- * Receive an error and pass it on to the caller:
-+ * Receive an error and pass it on to the caller (DEPRECATED*):
-  *     Error *err = NULL;
-  *     foo(arg, &err);
-  *     if (err) {
-@@ -98,6 +98,50 @@
-  *     foo(arg, errp);
-  * for readability.
-  *
-+ * DEPRECATED* This pattern is deprecated now, the use ERRP_AUTO_PROPAGATE macro
-+ * instead (defined below).
-+ * It's deprecated because of two things:
-+ *
-+ * 1. Issue with error_abort and error_propagate: when we wrap error_abort by
-+ * local_err+error_propagate, the resulting coredump will refer to
-+ * error_propagate and not to the place where error happened.
-+ *
-+ * 2. A lot of extra code of the same pattern
-+ *
-+ * How to update old code to use ERRP_AUTO_PROPAGATE?
-+ *
-+ * All you need is to add ERRP_AUTO_PROPAGATE() invocation at function start,
-+ * than you may safely dereference errp to check errors and do not need any
-+ * additional local Error variables or calls to error_propagate().
-+ *
-+ * Example:
-+ *
-+ * old code
-+ *
-+ *     void fn(..., Error **errp) {
-+ *         Error *err = NULL;
-+ *         foo(arg, &err);
-+ *         if (err) {
-+ *             handle the error...
-+ *             error_propagate(errp, err);
-+ *             return;
-+ *         }
-+ *         ...
-+ *     }
-+ *
-+ * updated code
-+ *
-+ *     void fn(..., Error **errp) {
-+ *         ERRP_AUTO_PROPAGATE();
-+ *         foo(arg, errp);
-+ *         if (*errp) {
-+ *             handle the error...
-+ *             return;
-+ *         }
-+ *         ...
-+ *     }
-+ *
-+ *
-  * Receive and accumulate multiple errors (first one wins):
-  *     Error *err = NULL, *local_err = NULL;
-  *     foo(arg, &err);
-@@ -348,6 +392,43 @@ void error_set_internal(Error **errp,
-                         ErrorClass err_class, const char *fmt, ...)
-     GCC_FMT_ATTR(6, 7);
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 7f46932d80..4ab8d917ed 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -360,6 +360,7 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+ static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
+                            const char *desc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret = qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
  
-+typedef struct ErrorPropagator {
-+    Error *local_err;
-+    Error **errp;
-+} ErrorPropagator;
-+
-+static inline void error_propagator_cleanup(ErrorPropagator *prop)
-+{
-+    error_propagate(prop->errp, prop->local_err);
-+}
-+
-+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
-+
-+/*
-+ * ERRP_AUTO_PROPAGATE
-+ *
-+ * This macro is created to be the first line of a function which use
-+ * Error **errp parameter to report error. It's needed only in cases where we
-+ * want to use error_prepend, error_append_hint or dereference *errp. It's
-+ * still safe (but useless) in other cases.
-+ *
-+ * If errp is NULL or points to error_fatal, it is rewritten to point to a
-+ * local Error object, which will be automatically propagated to the original
-+ * errp on function exit (see error_propagator_cleanup).
-+ *
-+ * After invocation of this macro it is always safe to dereference errp
-+ * (as it's not NULL anymore) and to add information by error_prepend or
-+ * error_append_hint (as, if it was error_fatal, we swapped it with a
-+ * local_error to be propagated on cleanup).
-+ *
-+ * Note: we don't wrap the error_abort case, as we want resulting coredump
-+ * to point to the place where the error happened, not to error_propagate.
-+ */
-+#define ERRP_AUTO_PROPAGATE()                                  \
-+    g_auto(ErrorPropagator) _auto_errp_prop = {.errp = errp};  \
-+    errp = ((errp == NULL || *errp == error_fatal)             \
-+            ? &_auto_errp_prop.local_err : errp)
-+
- /*
-  * Special error destination to abort on error.
-  * See error_setg() and error_propagate() for details.
+     if (ret < 0) {
+diff --git a/block/nbd.c b/block/nbd.c
+index d085554f21..9701ccf887 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -990,10 +990,10 @@ static int nbd_co_receive_cmdread_reply(BDRVNBDState *s, uint64_t handle,
+                                         uint64_t offset, QEMUIOVector *qiov,
+                                         int *request_ret, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NBDReplyChunkIter iter;
+     NBDReply reply;
+     void *payload = NULL;
+-    Error *local_err = NULL;
+ 
+     NBD_FOREACH_REPLY_CHUNK(s, iter, handle, s->info.structured_reply,
+                             qiov, &reply, &payload)
+@@ -1012,20 +1012,20 @@ static int nbd_co_receive_cmdread_reply(BDRVNBDState *s, uint64_t handle,
+             break;
+         case NBD_REPLY_TYPE_OFFSET_HOLE:
+             ret = nbd_parse_offset_hole_payload(s, &reply.structured, payload,
+-                                                offset, qiov, &local_err);
++                                                offset, qiov, errp);
+             if (ret < 0) {
+                 nbd_channel_error(s, ret);
+-                nbd_iter_channel_error(&iter, ret, &local_err);
++                nbd_iter_channel_error(&iter, ret, errp);
+             }
+             break;
+         default:
+             if (!nbd_reply_type_is_error(chunk->type)) {
+                 /* not allowed reply type */
+                 nbd_channel_error(s, -EINVAL);
+-                error_setg(&local_err,
++                error_setg(errp,
+                            "Unexpected reply type: %d (%s) for CMD_READ",
+                            chunk->type, nbd_reply_type_lookup(chunk->type));
+-                nbd_iter_channel_error(&iter, -EINVAL, &local_err);
++                nbd_iter_channel_error(&iter, -EINVAL, errp);
+             }
+         }
+ 
+@@ -1043,10 +1043,10 @@ static int nbd_co_receive_blockstatus_reply(BDRVNBDState *s,
+                                             NBDExtent *extent,
+                                             int *request_ret, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NBDReplyChunkIter iter;
+     NBDReply reply;
+     void *payload = NULL;
+-    Error *local_err = NULL;
+     bool received = false;
+ 
+     assert(!extent->length);
+@@ -1060,27 +1060,27 @@ static int nbd_co_receive_blockstatus_reply(BDRVNBDState *s,
+         case NBD_REPLY_TYPE_BLOCK_STATUS:
+             if (received) {
+                 nbd_channel_error(s, -EINVAL);
+-                error_setg(&local_err, "Several BLOCK_STATUS chunks in reply");
+-                nbd_iter_channel_error(&iter, -EINVAL, &local_err);
++                error_setg(errp, "Several BLOCK_STATUS chunks in reply");
++                nbd_iter_channel_error(&iter, -EINVAL, errp);
+             }
+             received = true;
+ 
+             ret = nbd_parse_blockstatus_payload(s, &reply.structured,
+                                                 payload, length, extent,
+-                                                &local_err);
++                                                errp);
+             if (ret < 0) {
+                 nbd_channel_error(s, ret);
+-                nbd_iter_channel_error(&iter, ret, &local_err);
++                nbd_iter_channel_error(&iter, ret, errp);
+             }
+             break;
+         default:
+             if (!nbd_reply_type_is_error(chunk->type)) {
+                 nbd_channel_error(s, -EINVAL);
+-                error_setg(&local_err,
++                error_setg(errp,
+                            "Unexpected reply type: %d (%s) "
+                            "for CMD_BLOCK_STATUS",
+                            chunk->type, nbd_reply_type_lookup(chunk->type));
+-                nbd_iter_channel_error(&iter, -EINVAL, &local_err);
++                nbd_iter_channel_error(&iter, -EINVAL, errp);
+             }
+         }
+ 
+@@ -1089,8 +1089,8 @@ static int nbd_co_receive_blockstatus_reply(BDRVNBDState *s,
+     }
+ 
+     if (!extent->length && !iter.request_ret) {
+-        error_setg(&local_err, "Server did not reply with any status extents");
+-        nbd_iter_channel_error(&iter, -EIO, &local_err);
++        error_setg(errp, "Server did not reply with any status extents");
++        nbd_iter_channel_error(&iter, -EIO, errp);
+     }
+ 
+     error_propagate(errp, iter.err);
+@@ -1385,16 +1385,15 @@ static void nbd_client_close(BlockDriverState *bs)
+ static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
+                                                   Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QIOChannelSocket *sioc;
+-    Error *local_err = NULL;
+ 
+     sioc = qio_channel_socket_new();
+     qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
+ 
+-    qio_channel_socket_connect_sync(sioc, saddr, &local_err);
+-    if (local_err) {
++    qio_channel_socket_connect_sync(sioc, saddr, errp);
++    if (*errp) {
+         object_unref(OBJECT(sioc));
+-        error_propagate(errp, local_err);
+         return NULL;
+     }
+ 
+@@ -1698,10 +1697,10 @@ static bool nbd_process_legacy_socket_options(QDict *output_options,
+ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
+                                  Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SocketAddress *saddr = NULL;
+     QDict *addr = NULL;
+     Visitor *iv = NULL;
+-    Error *local_err = NULL;
+ 
+     qdict_extract_subqdict(options, &addr, "server.");
+     if (!qdict_size(addr)) {
+@@ -1714,9 +1713,8 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
+         goto done;
+     }
+ 
+-    visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_SocketAddress(iv, NULL, &saddr, errp);
++    if (*errp) {
+         goto done;
+     }
+ 
+@@ -1809,15 +1807,14 @@ static QemuOptsList nbd_runtime_opts = {
+ static int nbd_process_options(BlockDriverState *bs, QDict *options,
+                                Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVNBDState *s = bs->opaque;
+     QemuOpts *opts;
+-    Error *local_err = NULL;
+     int ret = -EINVAL;
+ 
+     opts = qemu_opts_create(&nbd_runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, options, errp);
++    if (*errp) {
+         goto error;
+     }
+ 
+diff --git a/nbd/client.c b/nbd/client.c
+index ba173108ba..e258ef3f7e 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -68,6 +68,7 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
+                                    uint32_t len, const char *data,
+                                    Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NBDOption req;
+     QEMU_BUILD_BUG_ON(sizeof(req) != 16);
+ 
+@@ -153,6 +154,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
+ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+                                 bool strict, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     g_autofree char *msg = NULL;
+ 
+     if (!(reply->type & (1 << 31))) {
+@@ -337,6 +339,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
+ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
+                               NBDExportInfo *info, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NBDOptionReply reply;
+     uint32_t len = strlen(info->name);
+     uint16_t type;
+@@ -882,6 +885,7 @@ static int nbd_start_negotiate(AioContext *aio_context, QIOChannel *ioc,
+                                bool structured_reply, bool *zeroes,
+                                Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     uint64_t magic;
+ 
+     trace_nbd_start_negotiate(tlscreds, hostname ? hostname : "<null>");
+@@ -1017,6 +1021,7 @@ int nbd_receive_negotiate(AioContext *aio_context, QIOChannel *ioc,
+                           const char *hostname, QIOChannel **outioc,
+                           NBDExportInfo *info, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int result;
+     bool zeroes;
+     bool base_allocation = info->base_allocation;
+diff --git a/nbd/server.c b/nbd/server.c
+index 87fcd2e7bf..7dee3955dc 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -211,6 +211,7 @@ static int GCC_FMT_ATTR(4, 0)
+ nbd_negotiate_send_rep_verr(NBDClient *client, uint32_t type,
+                             Error **errp, const char *fmt, va_list va)
+ {
++    ERRP_AUTO_PROPAGATE();
+     g_autofree char *msg = NULL;
+     int ret;
+     size_t len;
+@@ -369,6 +370,7 @@ static int nbd_opt_read_name(NBDClient *client, char **name, uint32_t *length,
+ static int nbd_negotiate_send_rep_list(NBDClient *client, NBDExport *exp,
+                                        Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     size_t name_len, desc_len;
+     uint32_t len;
+     const char *name = exp->name ? exp->name : "";
+@@ -432,6 +434,7 @@ static void nbd_check_meta_export(NBDClient *client)
+ static int nbd_negotiate_handle_export_name(NBDClient *client, bool no_zeroes,
+                                             Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     g_autofree char *name = NULL;
+     char buf[NBD_REPLY_EXPORT_NAME_SIZE] = "";
+     size_t len;
+@@ -1272,6 +1275,7 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+  */
+ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     char buf[NBD_OLDSTYLE_NEGOTIATE_SIZE] = "";
+     int ret;
+ 
+@@ -1646,6 +1650,7 @@ void nbd_export_close(NBDExport *exp)
+ 
+ void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     if (mode == NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clients)) {
+         nbd_export_close(exp);
+         return;
 -- 
 2.21.0
 
