@@ -2,102 +2,92 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF6EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 248EEC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:21:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B9412082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:19:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1E3C2082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:21:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RxawB6l4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B9412082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VqjCyVZ5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E3C2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixZ1J-00022K-5H
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:19:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44666)
+	id 1ixZ2p-0003Rw-4N
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:21:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixY4c-0005T5-9A
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:19:11 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ixY6U-0008Db-8C
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:21:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixY4Z-0000hV-CQ
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:19:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23773
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixY4Z-0000fQ-8T
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:19:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483945;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=49lXZwtRaQqPm/K63p1Y5Z5AcTd39PdcBYjE1dNKtww=;
- b=RxawB6l4UlijDTHuVLCb1ILR7YVkONIZdCCetv9z6jeuk8c9fhxJQFEIblC615FcfD4em/
- NaE9nkOTde+O4OucLp+eAV7yGsUCIY4d4kA5jy6suH8x2dLMqiNIU7t75b43YrDngjMGP0
- SUZ1TB1ucziWjG3RL1SDzUgcFF2mKXE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-A7QIBJzwO9-LTKV73kBphg-1; Fri, 31 Jan 2020 10:19:02 -0500
-Received: by mail-wm1-f69.google.com with SMTP id a10so2159267wme.9
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 07:19:01 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1ixY6S-0005Hq-85
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:21:05 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:32883)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ixY6R-00058Q-Ob
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:21:04 -0500
+Received: by mail-wm1-x342.google.com with SMTP id m10so9051250wmc.0
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 07:21:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=MXOi1qvLvE3KNt33S4qvG4RLPUd9orOU/oy9xupr8AY=;
+ b=VqjCyVZ5xnkSxVPwwXy00UB/cvQceUwBcmIJqkKfj+ZtQjow3k8oiPnV8SgyIaZ2cV
+ HXSjNNih5ZM6DIzAjEFhWmrxwWEMGc9fxVRHX08dFUxUbWYWFCWH/MI9+mFwGaqg7jA4
+ Jv1A9ZDSE/UsvI1QYV4CxbY9SZ8k4VTAutF7u5QNvHXb3rPUH2mkv0oZzlnKx/m/gZ7B
+ N2JLIoYlsG9hP9QKdmhSzo1bkMREyGL3AvzPHuP9XJh5PtjexM761vTEPNbaTWzNvuFk
+ rk7pnKRQW2MTCfUrtTXEkEb2+hmmpbGKCV+CIUTxIH6ctzu10er1D855QQK7emHHKsVN
+ n8pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=i4LKDrjSRGHv2h04TmEepaQ4XYEPKqxh5lrtgHk0uSE=;
- b=F39jFcK1iwI6M/IlxVgtznRO8lWMS1EooRFV5iaLiJ8h7aBomHdHn8Ss15A+ahuWrP
- DQDvLGgzC5+l2OhykW+4Npmcoeq6QNnJfDDXBp9ujAdp6RTcupCLSEClVUHQFp0w6iAt
- hnEMBXgNo9KRC5WDVqUdpULtDA5ckXUoQvJdPd0Lzo7r05Zut0Vcs3JxZF23JymKR1MI
- hiKhNEaFfDfMhUt1H8kS1PFfMi7QMtyByyB6BUhwB9xE4gyiy17Uq0dTksgZLuBhHAzZ
- NmjIZT83JkdExjLmd5I9bFCGTQrH87gdPFzPf6K0XF2O6O1gmeHFVWESjVVx49CtH0/t
- 2f+Q==
-X-Gm-Message-State: APjAAAW0/pDxks26h1J8ZZZKlYHBhE+H3u64ASHg3GFJkpRIPoe89wAU
- FH23jFDWpeL6/AO4lux9qSxVPG2QP0PsDoy1c84p8mxjGQr7Z0ndQxrcKMv+hJfVeLOq39idA4h
- 07YpGaL3LG3GwPmw=
-X-Received: by 2002:a1c:5445:: with SMTP id p5mr12521878wmi.75.1580483938928; 
- Fri, 31 Jan 2020 07:18:58 -0800 (PST)
-X-Google-Smtp-Source: APXvYqySUZeZb/Hyt68qe+3ypMsKke2DIhPsiNLgXokZ2HWi1bF1TsZWuXB8my0EM9dtYr8sOcyoYQ==
-X-Received: by 2002:a1c:5445:: with SMTP id p5mr12521854wmi.75.1580483938654; 
- Fri, 31 Jan 2020 07:18:58 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id f1sm12346075wru.6.2020.01.31.07.18.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 31 Jan 2020 07:18:57 -0800 (PST)
-Subject: Re: [PATCH 6/6] tests/boot_linux_console: add PVH acceptance tests
-To: Liam Merwick <liam.merwick@oracle.com>, alex.bennee@linaro.org,
- fam@euphon.net
-References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-7-git-send-email-liam.merwick@oracle.com>
- <33e03e74-e579-c0e8-e1fc-bd408aeb32e8@redhat.com>
- <8bf4b25b-0e1b-1d7a-d166-e7b746dba207@oracle.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1f602309-123d-4227-9fe0-4933a6e2ac57@redhat.com>
-Date: Fri, 31 Jan 2020 16:18:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=MXOi1qvLvE3KNt33S4qvG4RLPUd9orOU/oy9xupr8AY=;
+ b=PlxcMYF4jMXER8YKtFnUQ5TzQTVjCp1wfIKIdr8PtUjbKpIdtkH4Pjmh4tVPoAnwRQ
+ SviX+XVc8bCLAPWTKXx64MryS09vb8bbtat/tRSHzzEFOdXhmCxefPnGEKAk8OqZLD+d
+ rSQda6JZHyyGFg+Wd6AvLfH5Xqxqw2AZvDr1HmSAGwu4FjRBSFawnLgWNDLE6DkhEbGr
+ gQWCLvZ3XqTyI30e/gmoMvIpBaR935d8w2KlWfkmdvnCydO7qUYp+q6Gx9oCka8mkQoc
+ +G1Xb4B8JO5Z89sTchlIuSA33Qgr2NuwrRojKif93sO0SsVbJoiydx8UTAboflQSfro/
+ 12fA==
+X-Gm-Message-State: APjAAAXgWFxxLXN8HbBD8KhDzWA/FhZCXS44QE5uul0Pb7rJCCy6Je7d
+ UlghaCoJz0Q7WDAeLb1E8R1zUg==
+X-Google-Smtp-Source: APXvYqxhdymk8tpkDcu2P7lgJVcHoxZ8MG0vDJHOxSiBtvrDEsMFEUlbNWF639P5OVYNXXypFnrLVg==
+X-Received: by 2002:a05:600c:292:: with SMTP id
+ 18mr13357407wmk.128.1580484061213; 
+ Fri, 31 Jan 2020 07:21:01 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id d23sm12430172wra.30.2020.01.31.07.20.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 31 Jan 2020 07:21:00 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 51C4B1FF87;
+ Fri, 31 Jan 2020 15:20:59 +0000 (GMT)
+References: <20200124162606.8787-1-peter.maydell@linaro.org>
+ <20200124162606.8787-2-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 1/8] Makefile: Ensure we don't run Sphinx in parallel
+ for manpages
+In-reply-to: <20200124162606.8787-2-peter.maydell@linaro.org>
+Date: Fri, 31 Jan 2020 15:20:59 +0000
+Message-ID: <878sln8xes.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8bf4b25b-0e1b-1d7a-d166-e7b746dba207@oracle.com>
-Content-Language: en-US
-X-MC-Unique: A7QIBJzwO9-LTKV73kBphg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,175 +99,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, sgarzare@redhat.com, qemu-devel@nongnu.org,
- slp@redhat.com, wainersm@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/31/20 4:03 PM, Liam Merwick wrote:
-> On 30/01/2020 23:57, Philippe Mathieu-Daud=E9 wrote:
->> On 1/27/20 5:36 PM, Liam Merwick wrote:
->>> Add tests to boot an uncompressed kernel using the x86/HVM direct=20
->>> boot ABI.
->>> The vmlinux binary is obtained from a small RPM for Kata containers and
->>> extracted using the new extract_from_rpm() method.
->>>
->>> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
->>> ---
->>> =A0 tests/acceptance/boot_linux_console.py | 49=20
->>> +++++++++++++++++++++++++++++-----
->>> =A0 1 file changed, 43 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/tests/acceptance/boot_linux_console.py=20
->>> b/tests/acceptance/boot_linux_console.py
->>> index 6af19ae3b14a..ab2200aa0e47 100644
->>> --- a/tests/acceptance/boot_linux_console.py
->>> +++ b/tests/acceptance/boot_linux_console.py
->>> @@ -65,15 +65,26 @@ class BootLinuxConsole(Test):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 os.chdir(cwd)
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return self.workdir + '/' + path
->>> -=A0=A0=A0 def do_test_x86_64_machine(self):
->>> +=A0=A0=A0 def do_test_x86_64_machine(self, pvh=3DFalse):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:x86_64
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->>> -=A0=A0=A0=A0=A0=A0=A0 kernel_url =3D=20
->>> ('https://archives.fedoraproject.org/pub/archive/fedora'
->>> - '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
->>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 '/vmli=
-nuz')
->>> -=A0=A0=A0=A0=A0=A0=A0 kernel_hash =3D '23bebd2680757891cf7adedb0335321=
-63a792495'
->>> -=A0=A0=A0=A0=A0=A0=A0 kernel_path =3D self.fetch_asset(kernel_url,=20
->>> asset_hash=3Dkernel_hash)
->>> +=A0=A0=A0=A0=A0=A0=A0 if pvh:
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rpm_url =3D ('https://yum.oracle.com=
-/repo/OracleLinux/'
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'OL=
-7/olcne/x86_64/getPackage/'
->>> + 'kernel-uek-container-4.14.35-1902.6.6.1.el7.x86_64.rpm')
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rpm_hash =3D '4c781711a9d32dcb8e81da=
-2b397cb98926744e23'
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rpm_path =3D self.fetch_asset(rpm_ur=
-l, asset_hash=3Drpm_hash)
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_path =3D self.extract_from_rp=
-m(rpm_path,
->>> + './usr/share/kata-containers/'
->>> + 'vmlinux-4.14.35-1902.6.6.1.el7.container')
->>> +=A0=A0=A0=A0=A0=A0=A0 else:
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_url =3D=20
->>> ('https://archives.fedoraproject.org/pub/archive/'
->>> + 'fedora/linux/releases/29/Everything/x86_64/os/'
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 'images/pxeboot/vmlinuz')
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_hash =3D '23bebd2680757891cf7=
-adedb033532163a792495'
->>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_path =3D self.fetch_asset(ker=
-nel_url,=20
->>> asset_hash=3Dkernel_hash)
->>> +
->>
->> Can you try using a dictionaries instead? This way we can add more=20
->> images easily.
->> See IMAGE_INFO in tests/acceptance/linux_ssh_mips_malta.py.
->=20
-> I can. I won't convert the users of extract_from_deb() but will try make=
-=20
-> it easily extendable.
->=20
->=20
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -31,6 +31,29 @@ class BootLinuxConsole(Test):
->=20
->  =A0=A0=A0=A0 KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
->=20
-> +=A0=A0=A0 KERNEL_PATH_INFO =3D {
-> +=A0=A0=A0=A0=A0=A0=A0 ('x86_64', 'bzImage'): {
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'type': 'file',
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'url': 'https://archives.fedoraproject=
-.org/'
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'pub/archive/fedo=
-ra/linux/releases/29/Everything/'
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'x86_64/os/images=
-/pxeboot/vmlinuz',
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'hash': '23bebd2680757891cf7adedb03353=
-2163a792495'
-> +=A0=A0=A0=A0=A0=A0=A0 }
-> +=A0=A0=A0 }
 
-I was thinking of something simpler, adding the dictionary local to=20
-do_test_x86_64_machine().
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-  def do_test_x86_64_machine(self, test_type):
-    d =3D {
-      'pvh_disabled': {
-         'url': 'https://archives.fedoraproject.org/'
-                'pub/archive/fedora/linux/releases/29/Everything/'
-                'x86_64/os/images/pxeboot/vmlinuz',
-          'hash': '23bebd2680757891cf7adedb033532163a792495'
-      },
-      'pvh_enabled': {...}
-    }
-    ...
+> Sphinx will corrupt its doctree cache if we run two copies
+> of it in parallel. In commit 6bda415c10d966c8d3 we worked
+> around this by having separate doctrees for 'html' vs 'manpage'
+> runs. However now that we have more than one manpage produced
+> from a single manual we can run into this again when trying
+> to produce the two manpages.
+>
+> Use the trick described in 'Atomic Rules in GNU Make'
+> https://www.cmcrossroads.com/article/atomic-rules-gnu-make
+> to ensure that we only run the Sphinx manpage builder once
+> for each manual, even if we're producing several manpages.
+> This fixes doctree corruption in parallel builds and also
+> avoids pointlessly running Sphinx more often than we need to.
+>
+> (In GNU Make 4.3 there is builtin support for this, via
+> the "&:" syntax, but we can't wait for that to be available
+> in all the distros we support...)
+>
+> The generic "one invocation for multiple output files"
+> machinery is provided as a macro named 'atomic' in rules.mak;
+> we then wrap this in a more specific macro for defining
+> the rule and dependencies for the manpages in a Sphinx
+> manual, to avoid excessive repetition.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-  def test_x86_64_pc_pvh(self):
-         """
-         :avocado: tags=3Dmachine:pc
-         """
-         self.do_test_x86_64_machine('pvh_enabled')
+I won't claim I fully follow the invocation but it works and I have
+tested it.
 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+
+> ---
+>  Makefile  | 17 ++++++++++-------
+>  rules.mak | 36 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 46 insertions(+), 7 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 04c77d3b962..9b7ff1dc82f 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1028,6 +1028,14 @@ build-manual =3D $(call quiet-command,CONFDIR=3D"$=
+(qemu_confdir)" sphinx-build $(if
+>  manual-deps =3D $(wildcard $(SRC_PATH)/docs/$1/*.rst) \
+>                $(wildcard $(SRC_PATH)/docs/$1/*.rst.inc) \
+>                $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
+> +# Macro to write out the rule and dependencies for building manpages
+> +# Usage: $(call define-manpage-rule,manualname,manpage1 manpage2...[,ext=
+radeps])
+> +# 'extradeps' is optional, and specifies extra files (eg .hx files) that
+> +# the manual page depends on.
+> +define define-manpage-rule
+> +$(call atomic,$(foreach manpage,$2,$(MANUAL_BUILDDIR)/$1/$(manpage)),$(c=
+all manual-deps,$1) $3)
+> +	$(call build-manual,$1,man)
+> +endef
+>=20=20
+>  $(MANUAL_BUILDDIR)/devel/index.html: $(call manual-deps,devel)
+>  	$(call build-manual,devel,html)
+> @@ -1041,14 +1049,9 @@ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual=
+-deps,specs)
+>  $(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system)
+>  	$(call build-manual,system,html)
+>=20=20
+> -$(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
+> -	$(call build-manual,interop,man)
+> +$(call define-manpage-rule,interop,qemu-ga.8 qemu-nbd.8)
+>=20=20
+> -$(MANUAL_BUILDDIR)/interop/qemu-nbd.8: $(call manual-deps,interop)
+> -	$(call build-manual,interop,man)
+> -
+> -$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7: $(call manual-deps,syste=
+m)
+> -	$(call build-manual,system,man)
+> +$(call define-manpage-rule,system,qemu-block-drivers.7)
+>=20=20
+>  $(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-versi=
+on.h
+>  	@mkdir -p "$(MANUAL_BUILDDIR)"
+> diff --git a/rules.mak b/rules.mak
+> index 967295dd2b6..50f6776f529 100644
+> --- a/rules.mak
+> +++ b/rules.mak
+> @@ -399,3 +399,39 @@ GEN_SUBST =3D $(call quiet-command, \
+>=20=20
+>  %.json: %.json.in
+>  	$(call GEN_SUBST)
 > +
-> +=A0=A0=A0 def get_kernel_path(self, key):
-> +=A0=A0=A0=A0=A0=A0=A0 """
-> +=A0=A0=A0=A0=A0=A0=A0 For the provided key, download (and extract, if ne=
-cessary) the=20
-> kernel
-> +=A0=A0=A0=A0=A0=A0=A0 and return the path the the kernel binary.
+> +# Support for building multiple output files by atomically executing
+> +# a single rule which depends on several input files (so the rule
+> +# will be executed exactly once, not once per output file, and
+> +# not multiple times in parallel.) For more explanation see:
+> +# https://www.cmcrossroads.com/article/atomic-rules-gnu-make
 > +
-> +=A0=A0=A0=A0=A0=A0=A0 :param key: index into KERNEL_PATH_INFO dict conta=
-ining kernel=20
-> location
-> +=A0=A0=A0=A0=A0=A0=A0 :returns: path of the extracted file
-> +=A0=A0=A0=A0=A0=A0=A0 """
-> +=A0=A0=A0=A0=A0=A0=A0 dinfo =3D self.KERNEL_PATH_INFO[(self.arch, key)]
+> +# Given a space-separated list of filenames, create the name of
+> +# a 'sentinel' file to use to indicate that they have been built.
+> +# We use fixed text on the end to avoid accidentally triggering
+> +# automatic pattern rules, and . on the start to make the file
+> +# not show up in ls output.
+> +sentinel =3D .$(subst $(SPACE),_,$(subst /,_,$1)).sentinel.
 > +
-> +=A0=A0=A0=A0=A0=A0=A0 if dinfo['type'] is 'file':
-> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return self.fetch_asset(dinfo['url'],=
-=20
-> asset_hash=3Ddinfo['hash'])
-> +
->  =A0=A0=A0=A0 def wait_for_console_pattern(self, success_message):
->  =A0=A0=A0=A0=A0=A0=A0=A0 wait_for_console_pattern(self, success_message,
->  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0 failure_message=3D'Kernel panic - not=20
-> syncing')
-> @@ -72,11 +95,7 @@ class BootLinuxConsole(Test):
->  =A0=A0=A0=A0=A0=A0=A0=A0 Common routine to boot an x86_64 guest.
->  =A0=A0=A0=A0=A0=A0=A0=A0 Caller must specify tags=3Darch and tags=3Dmach=
-ine
->  =A0=A0=A0=A0=A0=A0=A0=A0 """
-> -=A0=A0=A0=A0=A0=A0=A0 kernel_url =3D=20
-> ('https://archives.fedoraproject.org/pub/archive/fedora'
-> - '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
-> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 '/vmlinu=
-z')
-> -=A0=A0=A0=A0=A0=A0=A0 kernel_hash =3D '23bebd2680757891cf7adedb033532163=
-a792495'
-> -=A0=A0=A0=A0=A0=A0=A0 kernel_path =3D self.fetch_asset(kernel_url, asset=
-_hash=3Dkernel_hash)
-> +=A0=A0=A0=A0=A0=A0=A0 kernel_path =3D self.get_kernel_path('bzImage')
->  =A0=A0=A0=A0=A0=A0=A0=A0 self.vm.set_console()
->  =A0=A0=A0=A0=A0=A0=A0=A0 kernel_command_line =3D self.KERNEL_COMMON_COMM=
-AND_LINE +=20
-> 'console=3DttyS0'
->  =A0=A0=A0=A0=A0=A0=A0=A0 self.vm.add_args('-kernel', kernel_path,
->=20
->=20
-> Regards,
-> Liam
->=20
->=20
+> +# Define an atomic rule that builds multiple outputs from multiple input=
+s.
+> +# To use:
+> +#    $(call atomic,out1 out2 ...,in1 in2 ...)
+> +#    <TAB>rule to do the operation
+> +#
+> +# Make 4.3 will have native support for this, and you would be able
+> +# to instead write:
+> +#    out1 out2 ... &: in1 in2 ...
+> +#    <TAB>rule to do the operation
+> +#
+> +# The way this works is that it creates a make rule
+> +# "out1 out2 ... : sentinel-file ; @:" which says that the sentinel
+> +# depends on the dependencies, and the rule to do that is "do nothing".
+> +# Then we have a rule
+> +# "sentinel-file : in1 in2 ..."
+> +# whose commands start with "touch sentinel-file" and then continue
+> +# with the rule text provided by the user of this 'atomic' function.
+> +# The foreach... is there to delete the sentinel file if any of the
+> +# output files don't exist, so that we correctly rebuild in that situati=
+on.
+> +atomic =3D $(eval $1: $(call sentinel,$1) ; @:) \
+> +         $(call sentinel,$1) : $2 ; @touch $$@ \
+> +         $(foreach t,$1,$(if $(wildcard $t),,$(shell rm -f $(call sentin=
+el,$1))))
 
+
+--=20
+Alex Benn=C3=A9e
 
