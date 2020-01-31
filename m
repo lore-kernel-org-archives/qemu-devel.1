@@ -2,73 +2,56 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C66C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 12:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71349C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0F5320707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 12:41:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F5320707
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 44C2420705
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:02:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44C2420705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixVcF-0002oA-51
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 07:41:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38768)
+	id 1ixVwV-0007WP-D4
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:02:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46175)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ixVbP-0002Pb-P2
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:40:53 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvP-0005rm-8W
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ixVbN-00070C-AF
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:40:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60616)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ixVbN-0006x7-4l
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:40:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ixVbL-0000yr-Kl
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 12:40:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 722A42E80C9
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 12:40:47 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jan 2020 12:30:36 -0000
-From: Max Reitz <1860759@bugs.launchpad.net>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvN-0007vR-S5
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:30 -0500
+Received: from relay.sw.ru ([185.231.240.75]:59604)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ixVvN-0007rU-Ki
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:29 -0500
+Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ixVvI-0000zU-8u; Fri, 31 Jan 2020 16:01:24 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: eblake ildar-users xanclic
-X-Launchpad-Bug-Reporter: Ildar (ildar-users)
-X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
-References: <157985376657.5102.13233182944615356318.malonedeb@wampee.canonical.com>
-Message-Id: <158047383613.27016.11439532050083192360.malone@soybean.canonical.com>
-Subject: [Bug 1860759] Re: [REGRESSION] option `-snapshot` ignored with
- blockdev
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1ad4e61e5a91e5add727455a117751bf3c6c3f70
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Subject: [PATCH v7 04/11] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
+Date: Fri, 31 Jan 2020 16:01:11 +0300
+Message-Id: <20200131130118.1716-5-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200131130118.1716-1-vsementsov@virtuozzo.com>
+References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,85 +60,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1860759 <1860759@bugs.launchpad.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+It's wrong to use same err object as errp parameter for several
+function calls without intermediate checking for error: we'll crash if
+try to set err object twice.
 
-The technical difference is that -blockdev requires you (the user or
-management software) to create all block graph nodes explicitly.  -drive
-snapshot=3Don implicitly creates a qcow2 node above the actual disk image
-(and that node points to a temporary image in /tmp).  So because it=E2=80=
-=99s
-implicit and not explicit, it can=E2=80=99t work with -blockdev.
+Fix that, using new ERRP_AUTO_PROPAGATE macro.
 
-With -blockdev, the user has to create this temporary overlay, open it
-in qemu (with blockdev-add or -blockdev), and then delete it.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ hw/sd/ssi-sd.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-Max
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index 91db069212..bc44e1a0f5 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -241,10 +241,10 @@ static const VMStateDescription vmstate_ssi_sd = {
+ 
+ static void ssi_sd_realize(SSISlave *d, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, d);
+     DeviceState *carddev;
+     DriveInfo *dinfo;
+-    Error *err = NULL;
+ 
+     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+                         DEVICE(d), "sd-bus");
+@@ -254,14 +254,26 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
+     dinfo = drive_get_next(IF_SD);
+     carddev = qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
+     if (dinfo) {
+-        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
++        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), errp);
++        if (*errp) {
++            goto fail;
++        }
++    }
++
++    object_property_set_bool(OBJECT(carddev), true, "spi", errp);
++    if (*errp) {
++        goto fail;
+     }
+-    object_property_set_bool(OBJECT(carddev), true, "spi", &err);
+-    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+-    if (err) {
+-        error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
+-        return;
++
++    object_property_set_bool(OBJECT(carddev), true, "realized", errp);
++    if (*errp) {
++        goto fail;
+     }
++
++    return;
++
++fail:
++    error_prepend(errp, "failed to init SD card: ");
+ }
+ 
+ static void ssi_sd_reset(DeviceState *dev)
+-- 
+2.21.0
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1860759
-
-Title:
-  [REGRESSION] option `-snapshot` ignored with blockdev
-
-Status in QEMU:
-  New
-
-Bug description:
-  After upgrade of qemu 3.1.0 =E2=86=92 4.2.0 I found that running with lib=
-virt doesn't honor `-snapshot` option anymore. I.e. disk images get modifie=
-d.
-  Using `-hda` option honors `-snapshot`
-
-  So I made a test case without libvirt. Testcase using 4.2.0:
-
-  > qemu -hda tmp-16G.img -cdrom regular-rescue-latest-x86_64.iso -m 2G
-
-  This works fine and tmp-16G.img stays unmodified.
-
-  But:
-  > /usr/bin/qemu-system-x86_64 -name guest=3Dtest-linux,debug-threads=3Don=
- -S -machine pc-i440fx-3.1,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-co=
-re=3Doff -cpu Broadwell-noTSX,vme=3Don,ss=3Don,f16c=3Don,rdrand=3Don,hyperv=
-isor=3Don,arat=3Don,tsc-adjust=3Don,xsaveopt=3Don,pdpe1gb=3Don,abm=3Don -m =
-2048 -overcommit mem-lock=3Doff -smp 3,sockets=3D3,cores=3D1,threads=3D1 -u=
-uid d32a9191-f51d-4fae-a419-b73d85b49198 -no-user-config -nodefaults -rtc b=
-ase=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-hpet=
- -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=
-=3D1 -boot strict=3Don -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0=
-x5.0x7 -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,m=
-ultifunction=3Don,addr=3D0x5 -device ich9-usb-uhci2,masterbus=3Dusb.0,first=
-port=3D2,bus=3Dpci.0,addr=3D0x5.0x1 -device ich9-usb-uhci3,masterbus=3Dusb.=
-0,firstport=3D4,bus=3Dpci.0,addr=3D0x5.0x2 -blockdev \{\"driver\":\"file\",=
-\"filename\":\"/tmp/regular-rescue-latest-x86_64.iso\",\"node-name\":\"libv=
-irt-2-storage\",\"auto-read-only\":true,\"discard\":\"unmap\"} -blockdev \{=
-\"node-name\":\"libvirt-2-format\",\"read-only\":true,\"driver\":\"raw\",\"=
-file\":\"libvirt-2-storage\"} -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dl=
-ibvirt-2-format,id=3Dide0-0-0,bootindex=3D1 -blockdev \{\"driver\":\"file\"=
-,\"filename\":\"/tmp/tmp-2G.img\",\"node-name\":\"libvirt-1-storage\",\"aut=
-o-read-only\":true,\"discard\":\"unmap\"} -blockdev \{\"node-name\":\"libvi=
-rt-1-format\",\"read-only\":false,\"driver\":\"qcow2\",\"file\":\"libvirt-1=
--storage\",\"backing\":null} -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,=
-addr=3D0x7,drive=3Dlibvirt-1-format,id=3Dvirtio-disk0 -netdev user,id=3Dhos=
-tnet0 -device e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:ab:d8:29,bus=
-=3Dpci.0,addr=3D0x3 -chardev pty,id=3Dcharserial0 -device isa-serial,charde=
-v=3Dcharserial0,id=3Dserial0 -device qxl-vga,id=3Dvideo0,ram_size=3D6710886=
-4,vram_size=3D67108864,vram64_size_mb=3D0,vgamem_mb=3D16,max_outputs=3D1,bu=
-s=3Dpci.0,addr=3D0x2 -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -=
-device hda-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -device virtio-=
-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6 -snapshot -sandbox on,obso=
-lete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=3Ddeny -m=
-sg timestamp=3Don
-
-  This modifies tmp-16G.img.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1860759/+subscriptions
 
