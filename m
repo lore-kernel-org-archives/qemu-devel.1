@@ -2,56 +2,91 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C353C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 21:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3034C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 21:38:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1DA820CC7
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 21:34:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1DA820CC7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 87CC120707
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 21:38:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T/ZIZ8NX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87CC120707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixdvv-0003hE-36
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 16:34:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39743)
+	id 1ixe02-00058z-Oo
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 16:38:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41029)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1ixdvJ-00037m-0h
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 16:33:58 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ixdzR-0004fj-Nu
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 16:38:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1ixdvH-0006b4-Q6
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 16:33:56 -0500
-Resent-Date: Fri, 31 Jan 2020 16:33:56 -0500
-Resent-Message-Id: <E1ixdvH-0006b4-Q6@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21110)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1ixdvA-0006IO-Lm; Fri, 31 Jan 2020 16:33:48 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1580506414270910.1412821761918;
- Fri, 31 Jan 2020 13:33:34 -0800 (PST)
-In-Reply-To: <20200131212742.18579-1-lyan@suse.com>
-Subject: Re: [PATCH] target/arm/monitor: query-cpu-model-expansion crashed
- qemu when using machine type none
-Message-ID: <158050641310.22889.11030132008008695138@a1bbccc8075a>
+ (envelope-from <richard.henderson@linaro.org>) id 1ixdzQ-0003fI-HW
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 16:38:13 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46631)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ixdzQ-0003Ys-8e
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 16:38:12 -0500
+Received: by mail-pf1-x442.google.com with SMTP id k29so3985912pfp.13
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 13:38:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=mdxohfEONQjOVEKLYnAaMlrDRr2Z9qPOiQ+uVP/XjJ4=;
+ b=T/ZIZ8NXHIp+TNH7FPzKQ7OxnMYgskru5NDkKe2rawpZtepJ/j7yM1yPuCWbGleyjX
+ CRgcIqvb3cN5eM49/gfTx09nJoxAG1/Pg+O9wa3wEcm1P4/XpVu+jyxbx46PlVPBrhlj
+ koeGQiTbwd8JXZIpE9HPbTsXyV0I4ra6qMnfyvzRSHwPLmT1KR724Ob59hMThbM3KRzS
+ lNcGfetAoRRehWQlJJM62dxx+XewZsSoWyPh0XqNXxWLJvAriBMCiYCG9vv6PGZovYyB
+ g1S/4QbtrTVkfSak0ZBLHF7znLS46B+Y+zdtTVc+YkmTASz0Zjmtf+mvQJGRqVI5omvH
+ UQWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mdxohfEONQjOVEKLYnAaMlrDRr2Z9qPOiQ+uVP/XjJ4=;
+ b=Smqf89GLRQQtLBVQJ6tWyTLW6IhBbJ9j+b2kmjbWPyfjasbAyvOc+7146Du2Cd4sJo
+ SXvRKZ8hI4KSeZVpm8/NyiHCqhCm69bMdALUGuHZfW9FwYuaAMY6LNdLuy7wwwpjjy51
+ J5XOjOSShDKmuAsokhkN0E65Zx5pxhCv1uavqhgfTTO5a4rnAnRHD8HHKEbxQhodpVe9
+ If2HDvy58vEWe2jhzzqTKf/czeRyQh0Qto8IQbGnxWKpUd89JifctKHFh+BD5EQSFmiD
+ zTwwPWPTiWk0rJPy+ea9fRt1OnowbrOH00df+BrZXOFh/WtFuGbr34fjpVDZEQDoL2Yn
+ Zcfw==
+X-Gm-Message-State: APjAAAU4hOnE/wDMiyrAtXNP+oCBg1dFsOYbQ4x1z5tfN4xUs1A6K6KU
+ GVwHrMy3gx2fFcgP7B6LJdLO9qwLYeg=
+X-Google-Smtp-Source: APXvYqzulhMNRjvEPCqxJNxxLfbpjGgYvuHfNL/aQ1nisY0JPCdpn43Eb9v45t2+GGWxSN/RuioYyQ==
+X-Received: by 2002:aa7:87c5:: with SMTP id i5mr12602584pfo.114.1580506689566; 
+ Fri, 31 Jan 2020 13:38:09 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ y16sm11341719pfn.177.2020.01.31.13.38.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 31 Jan 2020 13:38:08 -0800 (PST)
+Subject: Re: [PATCH 10/11] target/arm: Implement ATS1E1 system registers
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191203225333.17055-1-richard.henderson@linaro.org>
+ <20191203225333.17055-11-richard.henderson@linaro.org>
+ <CAFEAcA9s279rfuG3_b=7GpMwHKKF7U4vQ8sxh4wartet4pUWTQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e3ccdc0e-b856-f052-3800-038c1951f974@linaro.org>
+Date: Fri, 31 Jan 2020 13:38:06 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: LYan@suse.com
-Date: Fri, 31 Jan 2020 13:33:34 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+In-Reply-To: <CAFEAcA9s279rfuG3_b=7GpMwHKKF7U4vQ8sxh4wartet4pUWTQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,46 +98,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEzMTIxMjc0Mi4xODU3
-OS0xLWx5YW5Ac3VzZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21l
-IGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1h
-dGlvbjoKClN1YmplY3Q6IFtQQVRDSF0gdGFyZ2V0L2FybS9tb25pdG9yOiBxdWVyeS1jcHUtbW9k
-ZWwtZXhwYW5zaW9uIGNyYXNoZWQgcWVtdSB3aGVuIHVzaW5nIG1hY2hpbmUgdHlwZSBub25lCk1l
-c3NhZ2UtaWQ6IDIwMjAwMTMxMjEyNzQyLjE4NTc5LTEtbHlhbkBzdXNlLmNvbQpUeXBlOiBzZXJp
-ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBi
-YXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
-aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
-bWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0
-aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICBhZWFiOGU1Li4yOGRiNjRmICBtYXN0ZXIg
-ICAgIC0+IG1hc3RlcgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwMTMxMjEyNzQyLjE4NTc5LTEtbHlh
-bkBzdXNlLmNvbSAtPiBwYXRjaGV3LzIwMjAwMTMxMjEyNzQyLjE4NTc5LTEtbHlhbkBzdXNlLmNv
-bQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU0YmQzM2IgdGFyZ2V0L2FybS9tb25p
-dG9yOiBxdWVyeS1jcHUtbW9kZWwtZXhwYW5zaW9uIGNyYXNoZWQgcWVtdSB3aGVuIHVzaW5nIG1h
-Y2hpbmUgdHlwZSBub25lCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MzogRklMRTogdGFyZ2V0L2FybS9tb25pdG9yLmM6MTQ5
-OgorXkleSV5JICAgICFzdHJuY21wKG1vZGVsLT5uYW1lLCBjcHVfdHlwZSwgbGVuKSkgeyQKCkVS
-Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ0OiBGSUxFOiB0YXJnZXQv
-YXJtL21vbml0b3IuYzoxNTA6CiteSV5JICAgIC8qIEtWTSBpcyBlbmFibGVkIGFuZCB3ZSdyZSB1
-c2luZyB0aGlzIHR5cGUsIHNvIGl0IHdvcmtzLiAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzQ1OiBGSUxFOiB0YXJnZXQvYXJtL21vbml0b3IuYzoxNTE6Cite
-SV5JICAgIHN1cHBvcnRlZCA9IHRydWU7JAoKdG90YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAy
-NSBsaW5lcyBjaGVja2VkCgpDb21taXQgNTRiZDMzYjViZjAxICh0YXJnZXQvYXJtL21vbml0b3I6
-IHF1ZXJ5LWNwdS1tb2RlbC1leHBhbnNpb24gY3Jhc2hlZCBxZW11IHdoZW4gdXNpbmcgbWFjaGlu
-ZSB0eXBlIG5vbmUpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09
-PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
-aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMTMxMjEyNzQyLjE4NTc5LTEt
-bHlhbkBzdXNlLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 12/9/19 5:41 AM, Peter Maydell wrote:
+>>          case 1:
+>> -            mmu_idx = secure ? ARMMMUIdx_SE1 : ARMMMUIdx_Stage1_E1;
+>> +            if (ri->crm == 9 && (env->uncached_cpsr & CPSR_PAN)) {
+>> +                mmu_idx = secure ? ARMMMUIdx_SE1_PAN : ARMMMUIdx_Stage1_E1_PAN;
+>> +            } else {
+>> +                mmu_idx = secure ? ARMMMUIdx_SE1 : ARMMMUIdx_Stage1_E1;
+>> +            }
+> 
+> This way of writing it is fine, but just to check my understanding:
+> if the CPSR_PAN bit isn't set, then will a lookup via Idx_SE1_PAN
+> and a lookup via Idx_SE1 return the same results?
+
+No.
+
+> Or do we guarantee that we only use the _PAN versions of the indexes
+> if the PAN bit is actually active?
+
+Yes.  We enforce the PAN behaviour based on *_PAN deep within a
+get_phys_addr_lpae subroutine.  See patch 8.
+
+
+r~
 
