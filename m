@@ -2,89 +2,95 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44485C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 12:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD87C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 12:40:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1089520CC7
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 12:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 177B620707
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 12:40:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cAOPVI66"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1089520CC7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JsRF7h0G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 177B620707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixVPe-0005Yv-7X
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 07:28:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33586)
+	id 1ixVax-0001qA-AX
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 07:40:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38100)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1ixVP1-000580-QW
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:28:04 -0500
+ (envelope-from <pmathieu@redhat.com>) id 1ixVaK-0001Ra-D2
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:39:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1ixVP0-0007Rc-Kl
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:28:03 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27739
+ (envelope-from <pmathieu@redhat.com>) id 1ixVaH-00038y-Qg
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:39:42 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27613
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ixVP0-0007Q7-Ge
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:28:02 -0500
+ (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1ixVaH-00035I-Dj
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 07:39:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580473682;
+ s=mimecast20190719; t=1580474380;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=o07wf33T7b01eg8hIsXyaCmaR/muSP2k6vcCnC5MFHE=;
- b=cAOPVI66B72LkrvlCLkI0shRZgn6Ke+gp9SNgnFSe/guSKUHD6ddLs3Z6JLPWo86toydze
- /1RXcno1INPxJh/81m7qeRNHUxRkUihZlFzpzPfX3DKUQxN3b9FNFN3N1iT9D8higsEoyM
- oJCVDU0gO52roUHVv7GRogi+ia79mOY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-qpHuXxPqOluBlt3hKur_bQ-1; Fri, 31 Jan 2020 07:28:00 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52571100550E;
- Fri, 31 Jan 2020 12:27:59 +0000 (UTC)
-Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 51BCB60BE0;
- Fri, 31 Jan 2020 12:27:51 +0000 (UTC)
-Subject: Re: Making QEMU easier for management tools and applications
-To: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <871rrp474i.fsf@dusky.pond.sub.org> <20200124102743.GB824327@redhat.com>
- <20200124143841.GG4732@dhcp-200-226.str.redhat.com>
- <87sgk3x2im.fsf@dusky.pond.sub.org> <20200127115606.GA5669@linux.fritz.box>
- <1c65b678-7bb4-a4cc-5fa6-03d6d27cf381@redhat.com>
- <20200128102855.GA6431@linux.fritz.box> <87mua7bvwf.fsf@dusky.pond.sub.org>
- <20200128125409.GF6431@linux.fritz.box>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <4cf1864c-3527-b015-0691-1788a37f4f7e@redhat.com>
-Date: Fri, 31 Jan 2020 06:27:50 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=T2b+QgEzuVKByGjJjhYypMM6H6XjQsw9xG0hUraATwQ=;
+ b=JsRF7h0GMt9jUcoKlOj7QM1joex8coEcnUvRZoZ1dCQqAd1fvzTu5H2UqtjWhk790slOdB
+ U/gYORQnJ5HRroQE/hLGNJkpWqSwI1LHphVbJAilxghOH1satsVB4Pp77YUGC7XjXtTGdD
+ j+nCrRG85Wq3FFdMP2X8fhUvIIhBwxM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40-aGyLamc1PACa1lwZQTRh_Q-1; Fri, 31 Jan 2020 07:39:38 -0500
+Received: by mail-wr1-f72.google.com with SMTP id b13so3261941wrx.22
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 04:39:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=T2b+QgEzuVKByGjJjhYypMM6H6XjQsw9xG0hUraATwQ=;
+ b=jFFg/aqM8VpYimKEjFwTKQLAv5zP1uvGnz9gMVN4vbOIxLJLNdGN7utCZN+vklbTwJ
+ HywFkSGWFaodDdm724Y8Zyz1nHlDDTGsehf9Wm6vCWqq5Yme3ZIdL18SyzksrPobdsyo
+ tYX28Wm1QqyEk6TGBsEUN4f4A5Ivg1DoDUfldMczQcVJ5outHvKBok4UuTNtDAT/2ufu
+ A8pI+e/U05v+hN6vt26AXuvnRGO3vGzFe/HVfkiH5W7yyFRVFKr7JXCeQHKvXDBZe81q
+ Prar/SNhpsUViwqoTvY/GFII3I5QsGPxtdedP3RRd7tR+tlvXjJwdG5iUDqB5PcCAqaE
+ Juzg==
+X-Gm-Message-State: APjAAAW3JNY8G7bCM37JKFiNo8/mQwHev+ViSvPUd6Y1Y+IrpGyGB3kA
+ kTRqCgzGjMQbedrgc8vgOZou+tSEXU6Rs0Smjdi4HyHHd+TkM5RGMHJigG4EzlfbIMnUZohYK1O
+ wU4HGN4XyoGzwbgzvSnRBb5iY52+nJ/E=
+X-Received: by 2002:a05:600c:291d:: with SMTP id
+ i29mr12480900wmd.39.1580474377616; 
+ Fri, 31 Jan 2020 04:39:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwSIH+2vr5NdtYqIZgbb0REIT81SkRGRl/HaNr+3c9fObxbNw8xhLqeDgMhyf4FTVhXSzWZ+1LcPpD4uWrym48=
+X-Received: by 2002:a05:600c:291d:: with SMTP id
+ i29mr12480881wmd.39.1580474377355; 
+ Fri, 31 Jan 2020 04:39:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200128125409.GF6431@linux.fritz.box>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: qpHuXxPqOluBlt3hKur_bQ-1
+References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <20200131010941.10636-1-philmd@redhat.com>
+ <20200131010941.10636-2-philmd@redhat.com>
+ <87sgjv9883.fsf@linaro.org>
+In-Reply-To: <87sgjv9883.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 31 Jan 2020 13:39:26 +0100
+Message-ID: <CAP+75-WkRVeV3B09C7sTkzzH6DSNzO4vitTf7Q4SYBSxL1CgSg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] !fixup "hw/misc: Add limited support for AVR power
+ device"
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+X-MC-Unique: aGyLamc1PACa1lwZQTRh_Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,42 +102,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/28/20 6:54 AM, Kevin Wolf wrote:
+On Fri, Jan 31, 2020 at 12:27 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>
+> > - convert DB_PRINT() to trace-events
+> > - fix style/indentation
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > ---
+> >  hw/misc/avr_power.c  | 17 +++++++++--------
+> >  hw/misc/trace-events |  4 ++++
+> >  2 files changed, 13 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/hw/misc/avr_power.c b/hw/misc/avr_power.c
+> > index 598bc7279c..65ff7c4405 100644
+> > --- a/hw/misc/avr_power.c
+> > +++ b/hw/misc/avr_power.c
+> > @@ -27,9 +27,7 @@
+> >  #include "qemu/log.h"
+> >  #include "hw/qdev-properties.h"
+> >  #include "hw/irq.h"
+> > -
+> > -#define DB_PRINT(fmt, args...) /* Nothing */
+> > -/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## =
+args)*/
+> > +#include "trace.h"
+> >
+> >  static void avr_mask_reset(DeviceState *dev)
+> >  {
+> > @@ -48,19 +46,20 @@ static uint64_t avr_mask_read(void *opaque, hwaddr =
+offset, unsigned size)
+> >      assert(offset =3D=3D 0);
+> >      AVRMaskState *s =3D opaque;
+> >
+> > +    trace_avr_power_read(s->val);
+> > +
+> >      return (uint64_t)s->val;
+> >  }
+> >
+> >  static void avr_mask_write(void *opaque, hwaddr offset,
+> > -                              uint64_t val64, unsigned size)
+> > +                           uint64_t val64, unsigned size)
+> >  {
+> >      assert(size =3D=3D 1);
+> >      assert(offset =3D=3D 0);
+> >      AVRMaskState *s =3D opaque;
+> >      uint8_t val8 =3D val64;
+> >
+> > -    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
+> > -
+> > +    trace_avr_power_write(val8);
+>
+> You've dropped offset in this trace point which is probably worth
+> keeping so you track where is being written to. Same with the read.
 
->>
->> The arguments as dotted keys:
->>
->>      id=bar,backend.type=file,backend.data.out=/tmp/bar.log
->>
->> Observe there's quite some of nesting.  While that's somewhat cumbersome
->> in JSON, it's a lot worse with dotted keys, because there nesting means
->> repeated key prefixes.  I could give much worse examples, actually.
-> 
-> This is true, but even without the repeated keys (e.g. in a syntax that
-> would use brackets), it would still be unnecessarily verbose and
-> probably hard to remember:
-> 
->      id=bar,backend={type=file,data={out=/tmp/bar.log}}
+I dropped it because it is always 0x00, the register is 8bit wide. See
+below, memory_region_init_io(...,1).
+I thought about adding a "name" property so each instance can display
+the device it belongs to, but this was too invasive, so I decided to
+keep this change for later.
 
-With shells like bash, that would need quoting to avoid unintended brace 
-expansions.  It is not the end of the world to require shell quoting 
-(and passing JSON on the command line definitely needs it), but a syntax 
-that avoids shell quoting is marginally easier to type and reason about.
+> >      s->val =3D val8;
+> >      for (int i =3D 0; i < 8; i++) {
+> >          qemu_set_irq(s->irq[i], (val8 & (1 << i)) !=3D 0);
+> > @@ -71,7 +70,9 @@ static const MemoryRegionOps avr_mask_ops =3D {
+> >      .read =3D avr_mask_read,
+> >      .write =3D avr_mask_write,
+> >      .endianness =3D DEVICE_NATIVE_ENDIAN,
+> > -    .impl =3D {.max_access_size =3D 1}
+> > +    .impl =3D {
+> > +        .max_access_size =3D 1,
+> > +    },
+> >  };
+> >
+> >  static void avr_mask_init(Object *dev)
+> > @@ -80,7 +81,7 @@ static void avr_mask_init(Object *dev)
+> >      SysBusDevice *busdev =3D SYS_BUS_DEVICE(dev);
+> >
+> >      memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s, TYPE_AVR_M=
+ASK,
+> > -            0x01);
+> > +                          0x01);
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+^ Region has only 1 address: 0x00.
+
+> >      sysbus_init_mmio(busdev, &s->iomem);
+> >
+> >      for (int i =3D 0; i < 8; i++) {
+> > diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+> > index 7f0f5dff3a..f716881bb1 100644
+> > --- a/hw/misc/trace-events
+> > +++ b/hw/misc/trace-events
+> > @@ -179,3 +179,7 @@ via1_rtc_cmd_pram_read(int addr, int value) "addr=
+=3D%u value=3D0x%02x"
+> >  via1_rtc_cmd_pram_write(int addr, int value) "addr=3D%u value=3D0x%02x=
+"
+> >  via1_rtc_cmd_pram_sect_read(int sector, int offset, int addr, int valu=
+e) "sector=3D%u offset=3D%u addr=3D%d value=3D0x%02x"
+> >  via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int val=
+ue) "sector=3D%u offset=3D%u addr=3D%d value=3D0x%02x"
+> > +
+> > +# avr_power.c
+> > +avr_power_read(uint8_t value) "power_reduc read value:%u"
+> > +avr_power_write(uint8_t value) "power_reduc write value:%u"
+>
+>
+> --
+> Alex Benn=C3=A9e
+>
 
 
