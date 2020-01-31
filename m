@@ -7,96 +7,96 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF5AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B95DC3F68F
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:38:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8505C206F0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:36:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A709214D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:38:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpioF/SP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8505C206F0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FV7DM1J1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A709214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixZHn-000088-M6
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:36:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57432)
+	id 1ixZJ3-0001Ij-Ce
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:38:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixYaW-0000jJ-SO
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:52:10 -0500
+ (envelope-from <philmd@redhat.com>) id 1ixYe0-0007Mm-27
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixYaU-0001O0-ED
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:52:07 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31646
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1ixYdz-0005e2-1t
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:55:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47873
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixYaU-0001NI-9e
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:52:06 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixYdy-0005cU-UG
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:55:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580485925;
+ s=mimecast20190719; t=1580486141;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eZcPdYLnsv/7dMZeN3eNALNEwtOjyVMkI4B7mSTlC0g=;
- b=OpioF/SPCpk/IrFaeiEECRulclIqN3oe0Q+VwnN2qm7a/Da4f0loqHn9GvkM/vi1lplOfY
- l8NA9Ii2GOdgM5TAD4fsoeHe54Plh4z2HBwGk69mvDNFfbxRFa1w5F8Jg3Rjxup7HJX++m
- +L1WOm0pfVn+PheJMs35L1R+vA8ZLzk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-O9w72xd4Osq55WQBEHDm7Q-1; Fri, 31 Jan 2020 10:51:57 -0500
-Received: by mail-wm1-f69.google.com with SMTP id o193so2980315wme.8
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 07:51:56 -0800 (PST)
+ bh=0ni+Mjjroqo37ab3NJdQhsXcR33AUVVEulRv0JhcZBg=;
+ b=FV7DM1J17FHo9AgGYEA7GfIG1Q+Cj4BDmJXKrAyLIlb+C48alB9C/0N7/Wf0n5d6S/Ag81
+ jLLhtgelRqxEgtavJ9aRHUNw1O1h7//+rIMQewWoTnKwZcAGI6t1QdK9Selze/TLlG4zgr
+ d724RssAbCV7S1uqBUfY0eJ9MyIPxnw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-3dKBWXfUPOienz2_lalX_w-1; Fri, 31 Jan 2020 10:55:38 -0500
+Received: by mail-wr1-f71.google.com with SMTP id 50so2680528wrc.2
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 07:55:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ky2LiZptdep06Zi2oZpZNw4UX/QTxEu/nizMBlJPj8Y=;
- b=qfFQNa1qyU7LV0QwndTSAdyZfzoriio3dDRQFX9tlJ4283H5akUvcgDgfs455cCVc+
- Btd2y42i+dZhQ21N4Ek4gQvmIoieeUlL3o/Ni80bdbXBW6G++LAegMIxxIfGDUFDW7CN
- ejBz1loT+UcTqgDitrShvievAzFQ90J6ATaHnfLEm84tdbn3PwdTuSwe25Y8Z7n/6Co0
- 6/D57b7qbK9Y8YXL6P3IR73yHrjme3UNdJuqsTlBredwkCfKB6X/r2R/qqkiQ189Of5w
- iL+J47wg/HG54/YMBo0JHfkpphhXwtE/9Uw/3mD0tDA1xJHBXc0beSbQ/DOmxJvPVP9M
- KSww==
-X-Gm-Message-State: APjAAAW4Us4OdX2IGxAb4ABEAdQWA++lg0oERZ5F0lEHG8rPqNAo0i5i
- DPZxVrzb9QM++ATXpfGAppEuUIij1uhTF2A2iN6s3iBGIIJlXWGSPZc17v0gqLQpfG7viPgMq3u
- BM/oZfU63CqUsZIw=
-X-Received: by 2002:adf:f10a:: with SMTP id r10mr12954773wro.202.1580485915791; 
- Fri, 31 Jan 2020 07:51:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyjpT0l7mUhDLOhon1BRsUjwVzj18H+Mik/rNROH08Vz7bRzOZacVxoWukMg7q//X/XMoCVnQ==
-X-Received: by 2002:adf:f10a:: with SMTP id r10mr12954742wro.202.1580485915519; 
- Fri, 31 Jan 2020 07:51:55 -0800 (PST)
+ bh=fvWEUUq8uaf3wSjrAJUdy6Gyk4HvFShvcLglmnjEmYQ=;
+ b=pkUymai8JPIlkIoBdMSVrYNQgpAwk3VQ6PhUdwGGwFGPZUDaKrXSUE0Yeg/d/K+Z0G
+ HyRxXDRnxL29M701pkcOBoFjmX7jPt6SQ8ufw8aXRKw4JTlOPPpJlBaR/jwxM5e0jc4u
+ e2kfbIK/6JYYlhbmqIP9ThElLxrm+b71LVIkb8vjaai/Z92sVP0Dv0poaiGwBwln4HwP
+ E34IZEOLCuWDJRhhO3t+5zanyFMqhtS87IbTGjd8sVuxfC8hw+JXs5NYjrYWqk+wnNo9
+ pL1zOR4OO7eNEZ/9J02Nvwg9/F2PykfhNnIZ2UhXHBTEmgVBr4zaoTcg7wWy0HD8dNUH
+ OVgQ==
+X-Gm-Message-State: APjAAAVBs/eT7+mXMzKkZfunuJz4lk177k9RukcLOvjAaqAekx2EPGL/
+ aNSaiPFHarbW2fLoP1uTxStcPzMYioyoE5b1xVL6p86JX1MmfDSzFdUOjPlgAKZfwFZz5tVGm5g
+ Plz1qSGq18AmL0XY=
+X-Received: by 2002:a5d:6284:: with SMTP id k4mr13166427wru.398.1580486137604; 
+ Fri, 31 Jan 2020 07:55:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw2n4z8ezxSCWzMRByMICXfZ/a4KWsCVztZSG1V3ZhStboWAoKQk9hg31euj5moWWwpb8h8Kg==
+X-Received: by 2002:a5d:6284:: with SMTP id k4mr13166407wru.398.1580486137369; 
+ Fri, 31 Jan 2020 07:55:37 -0800 (PST)
 Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
  [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id t9sm10649390wmj.28.2020.01.31.07.51.53
+ by smtp.gmail.com with ESMTPSA id a26sm11746852wmm.18.2020.01.31.07.55.36
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 31 Jan 2020 07:51:54 -0800 (PST)
-Subject: Re: [PATCH v2 11/12] .travis.yml: probe for number of available
- processors
+ Fri, 31 Jan 2020 07:55:36 -0800 (PST)
+Subject: Re: [PATCH v2 12/12] .travis.yml: limit the arm64 target list
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20200130113223.31046-1-alex.bennee@linaro.org>
- <20200130113223.31046-12-alex.bennee@linaro.org>
+ <20200130113223.31046-13-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ea3262e1-43b0-8382-a5b9-aff969e7145a@redhat.com>
-Date: Fri, 31 Jan 2020 16:51:52 +0100
+Message-ID: <b30243fd-c95a-9199-4a7f-16f9df1e9a9b@redhat.com>
+Date: Fri, 31 Jan 2020 16:55:35 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200130113223.31046-12-alex.bennee@linaro.org>
+In-Reply-To: <20200130113223.31046-13-alex.bennee@linaro.org>
 Content-Language: en-US
-X-MC-Unique: O9w72xd4Osq55WQBEHDm7Q-1
+X-MC-Unique: 3dKBWXfUPOienz2_lalX_w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,148 +109,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, Ed Vielmetti <ed@packet.com>,
- cota@braap.org, stefanha@redhat.com, marcandre.lureau@redhat.com,
- pbonzini@redhat.com, aurelien@aurel32.net
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-(Cc'ing Ed Vielmetti)
-
 On 1/30/20 12:32 PM, Alex Benn=C3=A9e wrote:
-> The arm64 hardware was especially hit by only building on 3 of the 32
-> available cores. Introduce a JOBS environment variable which we use
-> for all parallel builds. We still run the main checks single threaded
-> though so to make it easier to spot hangs.
+> Even though we can do a good multi-threaded build we are still
+> exceeding the 50 minute build time while running the tests.
 >=20
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->   .travis.yml | 20 +++++++++++---------
->   1 file changed, 11 insertions(+), 9 deletions(-)
+>   .travis.yml | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
 > diff --git a/.travis.yml b/.travis.yml
-> index 1b92f40eab..a600f508b0 100644
+> index a600f508b0..71bf650b1d 100644
 > --- a/.travis.yml
 > +++ b/.travis.yml
-> @@ -85,6 +85,8 @@ git:
->   # Common first phase for all steps
->   before_install:
->     - if command -v ccache ; then ccache --zero-stats ; fi
-> +  - export JOBS=3D$(($(getconf _NPROCESSORS_ONLN) + 1))
-
-Yeah finally!
-
-Note, on the Cavium ThunderX CN88XX provided by Packet, Ed Vielmetti=20
-once suggested to use the --load-average make option due to Amdahl's=20
-law, and I noticed a minor speedup using -j96 -l47.5 (-l48 already=20
-starts to decrease).
-
-On https://docs.travis-ci.com/user/reference/overview/#linux I read
-"LXD compliant OS images for arm64 are run in Packet."
-
-Per=20
-https://travis-ci.community/t/what-machine-s-does-travis-use-for-arm64/5579=
-/2=20
-the CPU seems to be a Ampere eMAG Skylark:
-https://en.wikichip.org/wiki/apm/microarchitectures/skylark
-Probably the eMAG 8180:
-https://en.wikichip.org/wiki/ampere_computing/emag/8180
-
-I don't know what would be the best limit for this CPU.
-
-Back to this patch, it indeed reduced the build time by 2+, so:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-> +  - echo "=3D=3D=3D Using ${JOBS} simultaneous jobs =3D=3D=3D"
->  =20
->   # Configure step - may be overridden
->   before_script:
-> @@ -93,7 +95,7 @@ before_script:
->  =20
->   # Main build & test - rarely overridden - controlled by TEST_CMD
->   script:
-> -  - BUILD_RC=3D0 && make -j3 || BUILD_RC=3D$?
-> +  - BUILD_RC=3D0 && make -j${JOBS} || BUILD_RC=3D$?
->     - if [ "$BUILD_RC" -eq 0 ] ; then travis_retry ${TEST_CMD} ; else $(e=
-xit $BUILD_RC); fi
->   after_script:
->     - if command -v ccache ; then ccache --show-stats ; fi
-> @@ -125,7 +127,7 @@ matrix:
+> @@ -426,7 +426,7 @@ matrix:
+>             - genisoimage
 >         env:
->           - BASE_CONFIG=3D"--enable-tools"
->           - CONFIG=3D"--disable-user --disable-system"
-> -        - TEST_CMD=3D"make check-unit check-softfloat -j3"
-> +        - TEST_CMD=3D"make check-unit check-softfloat -j${JOBS}"
->           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
+>           - TEST_CMD=3D"make check check-tcg V=3D1"
+> -        - CONFIG=3D"--disable-containers --target-list=3D${MAIN_SOFTMMU_=
+TARGETS}"
+> +        - CONFIG=3D"--disable-containers --target-list=3Daarch64-softmmu=
+,aarch64-linux-user,arm-softmmu,arm-linux-user"
+
+We should split this job in 2 using --target-list-exclude, like on=20
+X86/debug:
+
+   env:
+   - CONFIG=3D"--disable-containers=20
+--target-list-exclude=3D${MAIN_SOFTMMU_TARGETS}"
+
 >  =20
->  =20
-> @@ -160,13 +162,13 @@ matrix:
->       - name: "check-unit coroutine=3Ducontext"
->         env:
->           - CONFIG=3D"--with-coroutine=3Ducontext --disable-tcg"
-> -        - TEST_CMD=3D"make check-unit -j3 V=3D1"
-> +        - TEST_CMD=3D"make check-unit -j${JOBS} V=3D1"
->  =20
->  =20
->       - name: "check-unit coroutine=3Dsigaltstack"
->         env:
->           - CONFIG=3D"--with-coroutine=3Dsigaltstack --disable-tcg"
-> -        - TEST_CMD=3D"make check-unit -j3 V=3D1"
-> +        - TEST_CMD=3D"make check-unit -j${JOBS} V=3D1"
->  =20
->  =20
->       # Check we can build docs and tools (out of tree)
-> @@ -366,7 +368,7 @@ matrix:
->       - name: "GCC check-tcg (user)"
->         env:
->           - CONFIG=3D"--disable-system --enable-debug-tcg"
-> -        - TEST_CMD=3D"make -j3 check-tcg V=3D1"
-> +        - TEST_CMD=3D"make -j${JOBS} check-tcg V=3D1"
->           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->  =20
->  =20
-> @@ -375,7 +377,7 @@ matrix:
->       - name: "GCC plugins check-tcg (user)"
->         env:
->           - CONFIG=3D"--disable-system --enable-plugins --enable-debug-tc=
-g --target-list-exclude=3Dsparc64-linux-user"
-> -        - TEST_CMD=3D"make -j3 check-tcg V=3D1"
-> +        - TEST_CMD=3D"make -j${JOBS} check-tcg V=3D1"
->           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->  =20
->  =20
-> @@ -383,7 +385,7 @@ matrix:
->       - name: "GCC check-tcg (some-softmmu)"
->         env:
->           - CONFIG=3D"--enable-debug-tcg --target-list=3Dxtensa-softmmu,a=
-rm-softmmu,aarch64-softmmu,alpha-softmmu"
-> -        - TEST_CMD=3D"make -j3 check-tcg V=3D1"
-> +        - TEST_CMD=3D"make -j${JOBS} check-tcg V=3D1"
->           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->  =20
->  =20
-> @@ -391,7 +393,7 @@ matrix:
->       - name: "GCC plugins check-tcg (some-softmmu)"
->         env:
->           - CONFIG=3D"--enable-plugins --enable-debug-tcg --target-list=
-=3Dxtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
-> -        - TEST_CMD=3D"make -j3 check-tcg V=3D1"
-> +        - TEST_CMD=3D"make -j${JOBS} check-tcg V=3D1"
->           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->  =20
->       - name: "[aarch64] GCC check-tcg"
-> @@ -500,7 +502,7 @@ matrix:
->           - BUILD_DIR=3D"release/build/dir" SRC_DIR=3D"../../.."
->           - BASE_CONFIG=3D"--prefix=3D$PWD/dist"
->           - CONFIG=3D"--target-list=3Dx86_64-softmmu,aarch64-softmmu,arme=
-b-linux-user,ppc-linux-user"
-> -        - TEST_CMD=3D"make install -j3"
-> +        - TEST_CMD=3D"make install -j${JOBS}"
->           - QEMU_VERSION=3D"${TRAVIS_TAG:1}"
->           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-default"
->         script:
+>       - name: "[ppc64] GCC check-tcg"
+>         arch: ppc64le
 >=20
 
 
