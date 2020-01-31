@@ -2,94 +2,96 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39087C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 08:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6618DC33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 08:35:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F373020707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 08:10:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUJUi5w6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F373020707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 37AB1206F0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 08:35:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37AB1206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixRNl-0003FK-5p
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 03:10:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40526)
+	id 1ixRmJ-0007As-CQ
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 03:35:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ixRMj-0002fN-Al
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 03:09:26 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ixRlg-0006ef-3Z
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 03:35:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ixRMi-0007TG-0z
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 03:09:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32792
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ixRMh-0007Su-U9
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 03:09:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580458163;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yClRdQKmckDNZu4U0nJwi9u0XzrjNGwdpKr59+rw2c0=;
- b=JUJUi5w6NVTkI2H6GCfnkyHsMiZVGyN305cAw0RwDKoO3YZDmLr7NN60pu+bYz6ZIkFzlu
- tNqGrzlt+1PK0ueMm2kjVKo9gCQ61t3h8CP7s2MkjcEFrY5vVc9GNQZl9zcQw7oRMG0sCh
- fRNm9106bpnSq7sRs/FAacBn6BI2JaE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-KXP3Y83pMeKIAbInicQm5A-1; Fri, 31 Jan 2020 03:09:21 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2031A8017CC;
- Fri, 31 Jan 2020 08:09:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 227961001B05;
- Fri, 31 Jan 2020 08:09:12 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id AC38F1138404; Fri, 31 Jan 2020 09:09:10 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Making QEMU easier for management tools and applications
-References: <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <871rrp474i.fsf@dusky.pond.sub.org>
- <20200124102743.GB824327@redhat.com>
- <20200124143841.GG4732@dhcp-200-226.str.redhat.com>
- <87sgk3x2im.fsf@dusky.pond.sub.org>
- <20200127115606.GA5669@linux.fritz.box>
- <1c65b678-7bb4-a4cc-5fa6-03d6d27cf381@redhat.com>
- <20200128102855.GA6431@linux.fritz.box>
- <87mua7bvwf.fsf@dusky.pond.sub.org>
- <20200128125409.GF6431@linux.fritz.box>
- <878sloi0fp.fsf@dusky.pond.sub.org>
- <e52f0561-5094-cacc-846e-086bad840f56@redhat.com>
-Date: Fri, 31 Jan 2020 09:09:10 +0100
-In-Reply-To: <e52f0561-5094-cacc-846e-086bad840f56@redhat.com> (Paolo
- Bonzini's message of "Fri, 31 Jan 2020 08:48:03 +0100")
-Message-ID: <878slof3o9.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ixRle-00078t-P9
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 03:35:11 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:52588
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1ixRle-00074D-Il
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 03:35:10 -0500
+Received: from host86-162-6-122.range86-162.btcentralplus.com ([86.162.6.122]
+ helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1ixRle-0000Pc-GD; Fri, 31 Jan 2020 08:35:13 +0000
+To: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Volker_R=c3=bcmelin?=
+ <vr_qemu@t-online.de>
+References: <43D423C6-78D4-4DCE-B97C-0658D3D2E3BD@gmail.com>
+ <4021690b-2380-3925-209e-d4cc66928773@gmail.com>
+ <5314e860-dffe-3bc0-209f-bd2b937cd0c6@t-online.de>
+ <CABLmASGcUVyASudNizcgPshEqahwYt-4m9Z1DXEhVe2vdko9cQ@mail.gmail.com>
+ <54f5ddf3-5ea9-bd6d-8c71-edf4db527463@t-online.de>
+ <f03b7ae9-344c-5a7f-414c-6250a9c5ec2f@t-online.de>
+ <CABLmASGkSnG4+vfykBnEznX=kCAcSaiW20nf-wT9Cne4Cj9+LQ@mail.gmail.com>
+ <3e4f565a-07d7-c1cc-b49c-0a8c504ae07c@t-online.de>
+ <20200131080357.wyiof5grg2jtgot2@sirius.home.kraxel.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <87db6b90-0f37-30a9-9934-57af7eaf02cb@ilande.co.uk>
+Date: Fri, 31 Jan 2020 08:35:00 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: KXP3Y83pMeKIAbInicQm5A-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20200131080357.wyiof5grg2jtgot2@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.162.6.122
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [RFC] coreaudio: fix coreaudio_test.diff
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,54 +103,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>, John Snow <jsnow@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Programmingkid <programmingkidx@gmail.com>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, qemu Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 31/01/2020 08:03, Gerd Hoffmann wrote:
 
-> On 31/01/20 07:50, Markus Armbruster wrote:
->>>> Consider chardev-add.  Example:
->>>>
->>>>     {"execute": "chardev-add",
->>>>      "arguments": {"id": "bar",
->>>>                    "backend": {"type": "file",
->>>>                                "data": {"out": "/tmp/bar.log"}}}}
->>>>
->>>> The arguments as dotted keys:
->>>>
->>>>     id=3Dbar,backend.type=3Dfile,backend.data.out=3D/tmp/bar.log
->>>>
->>>> Observe there's quite some of nesting.  While that's somewhat cumberso=
-me
->>>> in JSON, it's a lot worse with dotted keys, because there nesting mean=
-s
->>>> repeated key prefixes.  I could give much worse examples, actually.
->>> This is true, but even without the repeated keys (e.g. in a syntax that
->>> would use brackets), it would still be unnecessarily verbose and
->>> probably hard to remember:
->>>
->>>     id=3Dbar,backend=3D{type=3Dfile,data=3D{out=3D/tmp/bar.log}}
->> No argument.  It's unnecessarily verbose in JSON, too.
->>=20
->
-> I think we should be able to switch chardevs to -object/object_add these
-> days.  Not right now, but it may be possible.
+>> Thank you for testing the two patches. I will wait a few days to see if Zoltán wants to write a cleaned up patch. Otherwise I'll try to write a patch that's acceptable for submission.
+> 
+> I'm busy collecting pending audio fixes for the next pull req,
+> planned to send out early next week.  Would be cool if I can
+> include a coreaudio fix ;)
+> 
+> The RFC patch looks sane to me but it clearly needs a better
+> commit message.
+> 
+> Current patch queue state:
+>   https://git.kraxel.org/cgit/qemu/log/?h=queue/audio
+> 
+> If I missed something please resend.
 
-Intriguing idea.  Would avoid the ugliness of chardev-add-2.
+That would be great! One thing to note is that Volker's RFC patch applies on top of
+Zoltan's original diff from
+https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg02142.html rather than
+being standalone.
 
->                                                Introducing a warning
-> when chardev and object ids conflict would be a start.
+If you take a look at my branch at https://github.com/mcayland/qemu/commits/for-cat7
+then it's just a case of squashing the top 2 commits and coming up with a suitable
+commit message.
 
-Yes.
 
-Perhaps even any kind instead of just chardev and object IDs.
+ATB,
 
+Mark.
 
