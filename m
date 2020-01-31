@@ -6,47 +6,46 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B94C2D0DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0D9C47409
 	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:05:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C7C3206F0
+	by mail.kernel.org (Postfix) with ESMTPS id 4E51820CC7
 	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:05:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C7C3206F0
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E51820CC7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJom-0000w7-DO
+	id 1ixJom-0000wf-FA
 	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:05:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58603)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJne-0007SD-9R
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnd-0007R3-1w
  for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnc-0002up-A6
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:46234 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnb-0002sS-5Y
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:40 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51002 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ixJnb-0001wH-Vf
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:40 -0500
+ id 1ixJna-0002r8-QD
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:39 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id EEC301A1E05;
- Fri, 31 Jan 2020 01:03:36 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 5B61A1A1E86;
+ Fri, 31 Jan 2020 01:03:37 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id D085B1A1DA4;
- Fri, 31 Jan 2020 01:03:36 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 2C2551A1E1C;
+ Fri, 31 Jan 2020 01:03:37 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc4 01/29] target/avr: Add basic parameters for new AVR
- platform
-Date: Fri, 31 Jan 2020 01:02:45 +0100
-Message-Id: <1580428993-4767-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc4 07/29] target/avr: Add instruction helpers
+Date: Fri, 31 Jan 2020 01:02:51 +0100
+Message-Id: <1580428993-4767-8-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -67,7 +66,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+ Michael Rolnik <mrolnik@gmail.com>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -75,35 +74,252 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-This includes definitions of various basic parameters needed
-for integration of a new platform into QEMU.
+Add helpers for instructions that need to interact with QEMU. Also,
+add stubs for unimplemented instructions. Instructions SPM and WDR
+are left unimplemented because they require emulation of complex
+peripherals. The implementation of instruction SLEEP is very limited
+due to the lack of peripherals to generate wake interrupts. Memory
+access instructions are implemented here because some address ranges
+actually refer to CPU registers.
 
-[AM: Split a larger AVR introduction patch into logical units]
-Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-
-Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
-Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- target/avr/cpu-param.h | 37 ++++++++++++++++++++++++++
- target/avr/cpu.h       | 72 ++++++++++++++++++++++++++++++++++++++++++++=
+ target/avr/helper.c | 203 ++++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- 2 files changed, 109 insertions(+)
- create mode 100644 target/avr/cpu-param.h
- create mode 100644 target/avr/cpu.h
+ target/avr/helper.h |  29 ++++++++
+ 2 files changed, 232 insertions(+)
+ create mode 100644 target/avr/helper.h
 
-diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
+diff --git a/target/avr/helper.c b/target/avr/helper.c
+index 354def2..c582312 100644
+--- a/target/avr/helper.c
++++ b/target/avr/helper.c
+@@ -137,3 +137,206 @@ bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, =
+int size,
+=20
+     return true;
+ }
++
++/*
++ *  helpers
++ */
++
++void helper_sleep(CPUAVRState *env)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    cs->exception_index =3D EXCP_HLT;
++    cpu_loop_exit(cs);
++}
++
++void helper_unsupported(CPUAVRState *env)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    /*
++     *  I count not find what happens on the real platform, so
++     *  it's EXCP_DEBUG for meanwhile
++     */
++    cs->exception_index =3D EXCP_DEBUG;
++    if (qemu_loglevel_mask(LOG_UNIMP)) {
++        qemu_log("UNSUPPORTED\n");
++        cpu_dump_state(cs, stderr, 0);
++    }
++    cpu_loop_exit(cs);
++}
++
++void helper_debug(CPUAVRState *env)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    cs->exception_index =3D EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void helper_break(CPUAVRState *env)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    cs->exception_index =3D EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void helper_wdr(CPUAVRState *env)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    /* WD is not implemented yet, placeholder */
++    cs->exception_index =3D EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++/*
++ * This function implements IN instruction
++ *
++ * It does the following
++ * a.  if an IO register belongs to CPU, its value is read and returned
++ * b.  otherwise io address is translated to mem address and physical me=
+mory
++ *     is read.
++ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementat=
+ion
++ *
++ */
++target_ulong helper_inb(CPUAVRState *env, uint32_t port)
++{
++    target_ulong data =3D 0;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        data =3D 0xff & (env->rampD >> 16);
++        break;
++    case 0x39: /* RAMPX */
++        data =3D 0xff & (env->rampX >> 16);
++        break;
++    case 0x3a: /* RAMPY */
++        data =3D 0xff & (env->rampY >> 16);
++        break;
++    case 0x3b: /* RAMPZ */
++        data =3D 0xff & (env->rampZ >> 16);
++        break;
++    case 0x3c: /* EIND */
++        data =3D 0xff & (env->eind >> 16);
++        break;
++    case 0x3d: /* SPL */
++        data =3D env->sp & 0x00ff;
++        break;
++    case 0x3e: /* SPH */
++        data =3D env->sp >> 8;
++        break;
++    case 0x3f: /* SREG */
++        data =3D cpu_get_sreg(env);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
++    }
++
++    return data;
++}
++
++/*
++ *  This function implements OUT instruction
++ *
++ *  It does the following
++ *  a.  if an IO register belongs to CPU, its value is written into the =
+register
++ *  b.  otherwise io address is translated to mem address and physical m=
+emory
++ *      is written.
++ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementa=
+tion
++ *
++ */
++void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
++{
++    data &=3D 0x000000ff;
++
++    switch (port) {
++    case 0x38: /* RAMPD */
++        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
++            env->rampD =3D (data & 0xff) << 16;
++        }
++        break;
++    case 0x39: /* RAMPX */
++        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
++            env->rampX =3D (data & 0xff) << 16;
++        }
++        break;
++    case 0x3a: /* RAMPY */
++        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
++            env->rampY =3D (data & 0xff) << 16;
++        }
++        break;
++    case 0x3b: /* RAMPZ */
++        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
++            env->rampZ =3D (data & 0xff) << 16;
++        }
++        break;
++    case 0x3c: /* EIDN */
++        env->eind =3D (data & 0xff) << 16;
++        break;
++    case 0x3d: /* SPL */
++        env->sp =3D (env->sp & 0xff00) | (data);
++        break;
++    case 0x3e: /* SPH */
++        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
++            env->sp =3D (env->sp & 0x00ff) | (data << 8);
++        }
++        break;
++    case 0x3f: /* SREG */
++        cpu_set_sreg(env, data);
++        break;
++    default:
++        /* not a special register, pass to normal memory access */
++        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
++    }
++}
++
++/*
++ *  this function implements LD instruction when there is a posibility t=
+o read
++ *  from a CPU register
++ */
++target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
++{
++    uint8_t data;
++
++    env->fullacc =3D false;
++
++    if (addr < NUMBER_OF_CPU_REGISTERS) {
++        /* CPU registers */
++        data =3D env->r[addr];
++    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) =
+{
++        /* IO registers */
++        data =3D helper_inb(env, addr - NUMBER_OF_CPU_REGISTERS);
++    } else {
++        /* memory */
++        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
++    }
++    return data;
++}
++
++/*
++ *  this function implements ST instruction when there is a posibility t=
+o write
++ *  into a CPU register
++ */
++void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
++{
++    env->fullacc =3D false;
++
++    /* Following logic assumes this: */
++    assert(OFFSET_CPU_REGISTERS =3D=3D OFFSET_DATA);
++    assert(OFFSET_IO_REGISTERS =3D=3D OFFSET_CPU_REGISTERS +
++            NUMBER_OF_CPU_REGISTERS);
++
++    if (addr < NUMBER_OF_CPU_REGISTERS) {
++        /* CPU registers */
++        env->r[addr] =3D data;
++    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) =
+{
++        /* IO registers */
++        helper_outb(env, addr - NUMBER_OF_CPU_REGISTERS, data);
++    } else {
++        /* memory */
++        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
++    }
++}
+diff --git a/target/avr/helper.h b/target/avr/helper.h
 new file mode 100644
-index 0000000..0c29ce4
+index 0000000..bf08750
 --- /dev/null
-+++ b/target/avr/cpu-param.h
-@@ -0,0 +1,37 @@
++++ b/target/avr/helper.h
+@@ -0,0 +1,29 @@
 +/*
 + * QEMU AVR CPU
 + *
@@ -124,103 +340,15 @@ index 0000000..0c29ce4
 + * <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
 +
-+#ifndef AVR_CPU_PARAM_H
-+#define AVR_CPU_PARAM_H
-+
-+#define TARGET_LONG_BITS 32
-+/*
-+ * TARGET_PAGE_BITS cannot be more than 8 bits because
-+ * 1.  all IO registers occupy [0x0000 .. 0x00ff] address range, and the=
-y
-+ *     should be implemented as a device and not memory
-+ * 2.  SRAM starts at the address 0x0100
-+ */
-+#define TARGET_PAGE_BITS 8
-+#define TARGET_PHYS_ADDR_SPACE_BITS 24
-+#define TARGET_VIRT_ADDR_SPACE_BITS 24
-+#define NB_MMU_MODES 2
-+
-+
-+#endif
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-new file mode 100644
-index 0000000..d122611
---- /dev/null
-+++ b/target/avr/cpu.h
-@@ -0,0 +1,72 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+#ifndef QEMU_AVR_CPU_H
-+#define QEMU_AVR_CPU_H
-+
-+#include "cpu-qom.h"
-+#include "exec/cpu-defs.h"
-+
-+#define TCG_GUEST_DEFAULT_MO 0
-+#define AVR_CPU_TYPE_SUFFIX "-" TYPE_AVR_CPU
-+#define AVR_CPU_TYPE_NAME(name) (name AVR_CPU_TYPE_SUFFIX)
-+#define CPU_RESOLVING_TYPE TYPE_AVR_CPU
-+
-+/*
-+ * AVR has two memory spaces, data & code.
-+ * e.g. both have 0 address
-+ * ST/LD instructions access data space
-+ * LPM/SPM and instruction fetching access code memory space
-+ */
-+#define MMU_CODE_IDX 0
-+#define MMU_DATA_IDX 1
-+
-+#define EXCP_RESET 1
-+#define EXCP_INT(n) (EXCP_RESET + (n) + 1)
-+
-+/* Number of CPU registers */
-+#define NUMBER_OF_CPU_REGISTERS 32
-+/* Number of IO registers accessible by ld/st/in/out */
-+#define NUMBER_OF_IO_REGISTERS 64
-+
-+/*
-+ * Offsets of AVR memory regions in host memory space.
-+ *
-+ * This is needed because the AVR has separate code and data address
-+ * spaces that both have start from zero but have to go somewhere in
-+ * host memory.
-+ *
-+ * It's also useful to know where some things are, like the IO registers=
-.
-+ */
-+/* Flash program memory */
-+#define OFFSET_CODE 0x00000000
-+/* CPU registers, IO registers, and SRAM */
-+#define OFFSET_DATA 0x00800000
-+/* CPU registers specifically, these are mapped at the start of data */
-+#define OFFSET_CPU_REGISTERS OFFSET_DATA
-+/*
-+ * IO registers, including status register, stack pointer, and memory
-+ * mapped peripherals, mapped just after CPU registers
-+ */
-+#define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)
-+
-+#define EF_AVR_MACH 0x7F
-+
-+#endif /* !defined (QEMU_AVR_CPU_H) */
++DEF_HELPER_1(wdr, void, env)
++DEF_HELPER_1(debug, void, env)
++DEF_HELPER_1(break, void, env)
++DEF_HELPER_1(sleep, void, env)
++DEF_HELPER_1(unsupported, void, env)
++DEF_HELPER_3(outb, void, env, i32, i32)
++DEF_HELPER_2(inb, tl, env, i32)
++DEF_HELPER_3(fullwr, void, env, i32, i32)
++DEF_HELPER_2(fullrd, tl, env, i32)
 --=20
 2.7.4
 
