@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 166ADC33CB7
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 536F6C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:04:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E37B420705
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:02:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37B420705
+	by mail.kernel.org (Postfix) with ESMTPS id 2824420705
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:04:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2824420705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixVwZ-0007hN-2T
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:02:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46263)
+	id 1ixVxp-0002Pq-D7
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:04:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46208)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvQ-0005sN-Sf
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:34 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvP-0005ro-Pm
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvP-0007xx-4V
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:32 -0500
-Received: from relay.sw.ru ([185.231.240.75]:59638)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvO-0007wY-KI
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:31 -0500
+Received: from relay.sw.ru ([185.231.240.75]:59614)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ixVvO-0007vd-TD; Fri, 31 Jan 2020 08:01:31 -0500
+ id 1ixVvO-0007ut-Bl
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:30 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1ixVvH-0000zU-Oq; Fri, 31 Jan 2020 16:01:23 +0300
+ id 1ixVvJ-0000zU-HN; Fri, 31 Jan 2020 16:01:25 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 01/11] qapi/error: add (Error **errp) cleaning APIs
-Date: Fri, 31 Jan 2020 16:01:08 +0300
-Message-Id: <20200131130118.1716-2-vsementsov@virtuozzo.com>
+Subject: [PATCH v7 09/11] TPM: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 31 Jan 2020 16:01:16 +0300
+Message-Id: <20200131130118.1716-10-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200131130118.1716-1-vsementsov@virtuozzo.com>
 References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
@@ -60,91 +60,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- armbru@redhat.com, Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>,
- Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add functions to clean Error **errp: call corresponding Error *err
-cleaning function an set pointer to NULL.
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &error_fatal
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
-New functions:
-  error_free_errp
-  error_report_errp
-  warn_report_errp
+If we want to check error after errp-function call, we need to
+introduce local_err and then propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatal, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
 
+This commit is generated by command
+
+    sed -n '/^TPM$/,/^$/{s/^F: //p}' MAINTAINERS | \
+    xargs git ls-files | grep '\.[hc]$' | \
+    xargs spatch \
+        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+        --macro-file scripts/cocci-macro-file.h \
+        --in-place --no-show-diff --max-width 80
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
+ hw/tpm/tpm_util.c | 7 +++----
+ tpm.c             | 7 +++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
-CC: Eric Blake <eblake@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Greg Kurz <groug@kaod.org>
-CC: Stefano Stabellini <sstabellini@kernel.org>
-CC: Anthony Perard <anthony.perard@citrix.com>
-CC: Paul Durrant <paul@xen.org>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-CC: Laszlo Ersek <lersek@redhat.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Stefan Berger <stefanb@linux.ibm.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Michael Roth <mdroth@linux.vnet.ibm.com>
-CC: qemu-block@nongnu.org
-CC: xen-devel@lists.xenproject.org
-
- include/qapi/error.h | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
-
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index ad5b6e896d..d34987148d 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -309,6 +309,32 @@ void warn_reportf_err(Error *err, const char *fmt, ...)
- void error_reportf_err(Error *err, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
+diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
+index 62b091f0c0..b0657bbbf2 100644
+--- a/hw/tpm/tpm_util.c
++++ b/hw/tpm/tpm_util.c
+@@ -47,8 +47,8 @@ static void get_tpm(Object *obj, Visitor *v, const char *name, void *opaque,
+ static void set_tpm(Object *obj, Visitor *v, const char *name, void *opaque,
+                     Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+-    Error *local_err = NULL;
+     Property *prop = opaque;
+     TPMBackend *s, **be = qdev_get_prop_ptr(dev, prop);
+     char *str;
+@@ -58,9 +58,8 @@ static void set_tpm(Object *obj, Visitor *v, const char *name, void *opaque,
+         return;
+     }
  
-+/*
-+ * Functions to clean Error **errp: call corresponding Error *err cleaning
-+ * function, then set pointer to NULL.
-+ */
-+static inline void error_free_errp(Error **errp)
-+{
-+    assert(errp && *errp);
-+    error_free(*errp);
-+    *errp = NULL;
-+}
-+
-+static inline void error_report_errp(Error **errp)
-+{
-+    assert(errp && *errp);
-+    error_report_err(*errp);
-+    *errp = NULL;
-+}
-+
-+static inline void warn_report_errp(Error **errp)
-+{
-+    assert(errp && *errp);
-+    warn_report_err(*errp);
-+    *errp = NULL;
-+}
-+
-+
- /*
-  * Just like error_setg(), except you get to specify the error class.
-  * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR is
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/tpm.c b/tpm.c
+index 9c9e20bbb7..359ebb7f68 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -81,11 +81,11 @@ TPMBackend *qemu_find_tpm_be(const char *id)
+ 
+ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const char *value;
+     const char *id;
+     const TPMBackendClass *be;
+     TPMBackend *drv;
+-    Error *local_err = NULL;
+     int i;
+ 
+     if (!QLIST_EMPTY(&tpm_backends)) {
+@@ -116,9 +116,8 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+     }
+ 
+     /* validate backend specific opts */
+-    qemu_opts_validate(opts, be->opts, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_validate(opts, be->opts, errp);
++    if (*errp) {
+         return 1;
+     }
+ 
 -- 
 2.21.0
 
