@@ -2,61 +2,59 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C028C33CB3
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F72C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:17:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 655EC214D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:17:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 655EC214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5538C2063A
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:17:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5538C2063A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJza-00066L-Id
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:17:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33949)
+	id 1ixK04-0006vX-Ep
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:17:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58791)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1ixJyL-0004Qg-MF
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:15:47 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnp-0007sS-RP
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1ixJyK-0004sb-8D
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:15:45 -0500
-Received: from mga02.intel.com ([134.134.136.20]:38472)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnn-00034F-9T
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:53 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51202 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1ixJyJ-0004pt-VL
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:15:44 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 30 Jan 2020 16:15:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,383,1574150400"; d="scan'208";a="247562355"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga002.jf.intel.com with ESMTP; 30 Jan 2020 16:15:36 -0800
-Date: Fri, 31 Jan 2020 08:15:51 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [PATCH] migration/postcopy: not necessary to discard all RAM at
- the beginning
-Message-ID: <20200131001551.GA21974@richard>
-References: <20191007091008.9435-1-richardw.yang@linux.intel.com>
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1ixJnm-0002ti-TA
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:51 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id E87711A20FD;
+ Fri, 31 Jan 2020 01:03:37 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id AD3AC1A20A9;
+ Fri, 31 Jan 2020 01:03:37 +0100 (CET)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH rc4 16/29] hw/char: Add limited support for AVR USART
+ peripheral
+Date: Fri, 31 Jan 2020 01:03:00 +0100
+Message-Id: <1580428993-4767-17-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191007091008.9435-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.20
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,184 +66,493 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, David and Juan
+From: Michael Rolnik <mrolnik@gmail.com>
 
-Does it look good to you?
+These were designed to facilitate testing but should provide enough
+function to be useful in other contexts.  Only a subset of the functions
+of each peripheral is implemented, mainly due to the lack of a standard
+way to handle electrical connections (like GPIO pins).
 
-On Mon, Oct 07, 2019 at 05:10:08PM +0800, Wei Yang wrote:
->ram_discard_range() unmap page for specific range. To be specific, this
->clears related page table entries so that userfault would be triggered.
->But this step is not necessary at the very beginning.
->
->ram_postcopy_incoming_init() is called when destination gets ADVISE
->command. ADVISE command is sent when migration thread just starts, which
->implies destination is not running yet. This means no page fault
->happened and memory region's page tables entries are empty.
->
->This patch removes the discard at the beginning.
->
->Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->---
-> migration/postcopy-ram.c | 46 ----------------------------------------
-> migration/postcopy-ram.h |  7 ------
-> migration/ram.c          | 16 --------------
-> migration/ram.h          |  1 -
-> migration/savevm.c       |  4 ----
-> 5 files changed, 74 deletions(-)
->
->diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->index 5da6de8c8b..459be8e780 100644
->--- a/migration/postcopy-ram.c
->+++ b/migration/postcopy-ram.c
->@@ -443,32 +443,6 @@ out:
->     return ret;
-> }
-> 
->-/*
->- * Setup an area of RAM so that it *can* be used for postcopy later; this
->- * must be done right at the start prior to pre-copy.
->- * opaque should be the MIS.
->- */
->-static int init_range(RAMBlock *rb, void *opaque)
->-{
->-    const char *block_name = qemu_ram_get_idstr(rb);
->-    void *host_addr = qemu_ram_get_host_addr(rb);
->-    ram_addr_t offset = qemu_ram_get_offset(rb);
->-    ram_addr_t length = qemu_ram_get_used_length(rb);
->-    trace_postcopy_init_range(block_name, host_addr, offset, length);
->-
->-    /*
->-     * We need the whole of RAM to be truly empty for postcopy, so things
->-     * like ROMs and any data tables built during init must be zero'd
->-     * - we're going to get the copy from the source anyway.
->-     * (Precopy will just overwrite this data, so doesn't need the discard)
->-     */
->-    if (ram_discard_range(block_name, 0, length)) {
->-        return -1;
->-    }
->-
->-    return 0;
->-}
->-
-> /*
->  * At the end of migration, undo the effects of init_range
->  * opaque should be the MIS.
->@@ -506,20 +480,6 @@ static int cleanup_range(RAMBlock *rb, void *opaque)
->     return 0;
-> }
-> 
->-/*
->- * Initialise postcopy-ram, setting the RAM to a state where we can go into
->- * postcopy later; must be called prior to any precopy.
->- * called from arch_init's similarly named ram_postcopy_incoming_init
->- */
->-int postcopy_ram_incoming_init(MigrationIncomingState *mis)
->-{
->-    if (foreach_not_ignored_block(init_range, NULL)) {
->-        return -1;
->-    }
->-
->-    return 0;
->-}
->-
-> /*
->  * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
->  * last caller wins.
->@@ -1282,12 +1242,6 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
->     return false;
-> }
-> 
->-int postcopy_ram_incoming_init(MigrationIncomingState *mis)
->-{
->-    error_report("postcopy_ram_incoming_init: No OS support");
->-    return -1;
->-}
->-
-> int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
-> {
->     assert(0);
->diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
->index c0ccf64a96..1c79c6e51f 100644
->--- a/migration/postcopy-ram.h
->+++ b/migration/postcopy-ram.h
->@@ -22,13 +22,6 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
->  */
-> int postcopy_ram_incoming_setup(MigrationIncomingState *mis);
-> 
->-/*
->- * Initialise postcopy-ram, setting the RAM to a state where we can go into
->- * postcopy later; must be called prior to any precopy.
->- * called from ram.c's similarly named ram_postcopy_incoming_init
->- */
->-int postcopy_ram_incoming_init(MigrationIncomingState *mis);
->-
-> /*
->  * At the end of a migration where postcopy_ram_incoming_init was called.
->  */
->diff --git a/migration/ram.c b/migration/ram.c
->index dfc50d57d5..9a853703d8 100644
->--- a/migration/ram.c
->+++ b/migration/ram.c
->@@ -4015,22 +4015,6 @@ static int ram_load_cleanup(void *opaque)
->     return 0;
-> }
-> 
->-/**
->- * ram_postcopy_incoming_init: allocate postcopy data structures
->- *
->- * Returns 0 for success and negative if there was one error
->- *
->- * @mis: current migration incoming state
->- *
->- * Allocate data structures etc needed by incoming migration with
->- * postcopy-ram. postcopy-ram's similarly names
->- * postcopy_ram_incoming_init does the work.
->- */
->-int ram_postcopy_incoming_init(MigrationIncomingState *mis)
->-{
->-    return postcopy_ram_incoming_init(mis);
->-}
->-
-> /**
->  * ram_load_postcopy: load a page in postcopy case
->  *
->diff --git a/migration/ram.h b/migration/ram.h
->index 44fe4753ad..66cbff1d52 100644
->--- a/migration/ram.h
->+++ b/migration/ram.h
->@@ -58,7 +58,6 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms);
-> int ram_postcopy_send_discard_bitmap(MigrationState *ms);
-> /* For incoming postcopy discard */
-> int ram_discard_range(const char *block_name, uint64_t start, size_t length);
->-int ram_postcopy_incoming_init(MigrationIncomingState *mis);
-> bool postcopy_is_running(void);
-> 
-> void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
->diff --git a/migration/savevm.c b/migration/savevm.c
->index 9dc191e0a0..d2a427a3bf 100644
->--- a/migration/savevm.c
->+++ b/migration/savevm.c
->@@ -1674,10 +1674,6 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
->         return -1;
->     }
-> 
->-    if (ram_postcopy_incoming_init(mis)) {
->-        return -1;
->-    }
->-
->     return 0;
-> }
-> 
->-- 
->2.17.1
+[AM: Remove word 'Atmel' from filenames and all elements of code]
+Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 
--- 
-Wei Yang
-Help you, Help me
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+[rth: Squash I/O size fix and file rename from f4bug]
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+---
+ hw/char/Kconfig             |   3 +
+ hw/char/Makefile.objs       |   1 +
+ hw/char/avr_usart.c         | 320 ++++++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/char/avr_usart.h |  93 +++++++++++++
+ 4 files changed, 417 insertions(+)
+ create mode 100644 hw/char/avr_usart.c
+ create mode 100644 include/hw/char/avr_usart.h
+
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 40e7a8b..331b209 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -46,3 +46,6 @@ config SCLPCONSOLE
+=20
+ config TERMINAL3270
+     bool
++
++config AVR_USART
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 02d8a66..f05c1f5 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
+ obj-$(CONFIG_DIGIC) +=3D digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
++common-obj-$(CONFIG_AVR_USART) +=3D avr_usart.o
+=20
+ common-obj-$(CONFIG_CMSDK_APB_UART) +=3D cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
+diff --git a/hw/char/avr_usart.c b/hw/char/avr_usart.c
+new file mode 100644
+index 0000000..fbe2a11
+--- /dev/null
++++ b/hw/char/avr_usart.c
+@@ -0,0 +1,320 @@
++/*
++ * AVR USART
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Sarah Harris
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "qemu/osdep.h"
++#include "hw/char/avr_usart.h"
++#include "qemu/log.h"
++#include "hw/irq.h"
++#include "hw/qdev-properties.h"
++
++static int avr_usart_can_receive(void *opaque)
++{
++    AVRUsartState *usart =3D opaque;
++
++    if (usart->data_valid || !(usart->csrb & USART_CSRB_RXEN)) {
++        return 0;
++    }
++    return 1;
++}
++
++static void avr_usart_receive(void *opaque, const uint8_t *buffer, int s=
+ize)
++{
++    AVRUsartState *usart =3D opaque;
++    assert(size =3D=3D 1);
++    assert(!usart->data_valid);
++    usart->data =3D buffer[0];
++    usart->data_valid =3D true;
++    usart->csra |=3D USART_CSRA_RXC;
++    if (usart->csrb & USART_CSRB_RXCIE) {
++        qemu_set_irq(usart->rxc_irq, 1);
++    }
++}
++
++static void update_char_mask(AVRUsartState *usart)
++{
++    uint8_t mode =3D ((usart->csrc & USART_CSRC_CSZ0) ? 1 : 0) |
++        ((usart->csrc & USART_CSRC_CSZ1) ? 2 : 0) |
++        ((usart->csrb & USART_CSRB_CSZ2) ? 4 : 0);
++    switch (mode) {
++    case 0:
++        usart->char_mask =3D 0b11111;
++        break;
++    case 1:
++        usart->char_mask =3D 0b111111;
++        break;
++    case 2:
++        usart->char_mask =3D 0b1111111;
++        break;
++    case 3:
++        usart->char_mask =3D 0b11111111;
++        break;
++    case 4:
++        /* Fallthrough. */
++    case 5:
++        /* Fallthrough. */
++    case 6:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Reserved character size 0x%x\n",
++            __func__,
++            mode);
++        break;
++    case 7:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Nine bit character size not supported (forcing eight)\n=
+",
++            __func__);
++        usart->char_mask =3D 0b11111111;
++        break;
++    default:
++        assert(0);
++    }
++}
++
++static void avr_usart_reset(DeviceState *dev)
++{
++    AVRUsartState *usart =3D AVR_USART(dev);
++    usart->data_valid =3D false;
++    usart->csra =3D 0b00100000;
++    usart->csrb =3D 0b00000000;
++    usart->csrc =3D 0b00000110;
++    usart->brrl =3D 0;
++    usart->brrh =3D 0;
++    update_char_mask(usart);
++    qemu_set_irq(usart->rxc_irq, 0);
++    qemu_set_irq(usart->txc_irq, 0);
++    qemu_set_irq(usart->dre_irq, 0);
++}
++
++static uint64_t avr_usart_read(void *opaque, hwaddr addr, unsigned int s=
+ize)
++{
++    AVRUsartState *usart =3D opaque;
++    uint8_t data;
++    assert(size =3D=3D 1);
++
++    if (!usart->enabled) {
++        return 0;
++    }
++
++    switch (addr) {
++    case USART_DR:
++        if (!(usart->csrb & USART_CSRB_RXEN)) {
++            /* Receiver disabled, ignore. */
++            return 0;
++        }
++        if (usart->data_valid) {
++            data =3D usart->data & usart->char_mask;
++            usart->data_valid =3D false;
++        } else {
++            data =3D 0;
++        }
++        usart->csra &=3D 0xff ^ USART_CSRA_RXC;
++        qemu_set_irq(usart->rxc_irq, 0);
++        qemu_chr_fe_accept_input(&usart->chr);
++        return data;
++    case USART_CSRA:
++        return usart->csra;
++    case USART_CSRB:
++        return usart->csrb;
++    case USART_CSRC:
++        return usart->csrc;
++    case USART_BRRL:
++        return usart->brrl;
++    case USART_BRRH:
++        return usart->brrh;
++    default:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Bad offset 0x%"HWADDR_PRIx"\n",
++            __func__,
++            addr);
++    }
++    return 0;
++}
++
++static void avr_usart_write(void *opaque, hwaddr addr, uint64_t value,
++                                unsigned int size)
++{
++    AVRUsartState *usart =3D opaque;
++    uint8_t mask;
++    uint8_t data;
++    assert((value & 0xff) =3D=3D value);
++    assert(size =3D=3D 1);
++
++    if (!usart->enabled) {
++        return;
++    }
++
++    switch (addr) {
++    case USART_DR:
++        if (!(usart->csrb & USART_CSRB_TXEN)) {
++            /* Transmitter disabled, ignore. */
++            return;
++        }
++        usart->csra |=3D USART_CSRA_TXC;
++        usart->csra |=3D USART_CSRA_DRE;
++        if (usart->csrb & USART_CSRB_TXCIE) {
++            qemu_set_irq(usart->txc_irq, 1);
++            usart->csra &=3D 0xff ^ USART_CSRA_TXC;
++        }
++        if (usart->csrb & USART_CSRB_DREIE) {
++            qemu_set_irq(usart->dre_irq, 1);
++        }
++        data =3D value;
++        qemu_chr_fe_write_all(&usart->chr, &data, 1);
++        break;
++    case USART_CSRA:
++        mask =3D 0b01000011;
++        /* Mask read-only bits. */
++        value =3D (value & mask) | (usart->csra & (0xff ^ mask));
++        usart->csra =3D value;
++        if (value & USART_CSRA_TXC) {
++            usart->csra ^=3D USART_CSRA_TXC;
++            qemu_set_irq(usart->txc_irq, 0);
++        }
++        if (value & USART_CSRA_MPCM) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: MPCM not supported by USART\n",
++                __func__);
++        }
++        break;
++    case USART_CSRB:
++        mask =3D 0b11111101;
++        /* Mask read-only bits. */
++        value =3D (value & mask) | (usart->csrb & (0xff ^ mask));
++        usart->csrb =3D value;
++        if (!(value & USART_CSRB_RXEN)) {
++            /* Receiver disabled, flush input buffer. */
++            usart->data_valid =3D false;
++        }
++        qemu_set_irq(usart->rxc_irq,
++            ((value & USART_CSRB_RXCIE) &&
++            (usart->csra & USART_CSRA_RXC)) ? 1 : 0);
++        qemu_set_irq(usart->txc_irq,
++            ((value & USART_CSRB_TXCIE) &&
++            (usart->csra & USART_CSRA_TXC)) ? 1 : 0);
++        qemu_set_irq(usart->dre_irq,
++            ((value & USART_CSRB_DREIE) &&
++            (usart->csra & USART_CSRA_DRE)) ? 1 : 0);
++        update_char_mask(usart);
++        break;
++    case USART_CSRC:
++        usart->csrc =3D value;
++        if ((value & USART_CSRC_MSEL1) && (value & USART_CSRC_MSEL0)) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: SPI mode not supported by USART\n",
++                __func__);
++        }
++        if ((value & USART_CSRC_MSEL1) && !(value & USART_CSRC_MSEL0)) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad USART mode\n", __fun=
+c__);
++        }
++        if (!(value & USART_CSRC_PM1) && (value & USART_CSRC_PM0)) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: Bad USART parity mode\n",
++                __func__);
++        }
++        update_char_mask(usart);
++        break;
++    case USART_BRRL:
++        usart->brrl =3D value;
++        break;
++    case USART_BRRH:
++        usart->brrh =3D value & 0b00001111;
++        break;
++    default:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Bad offset 0x%"HWADDR_PRIx"\n",
++            __func__,
++            addr);
++    }
++}
++
++static const MemoryRegionOps avr_usart_ops =3D {
++    .read =3D avr_usart_read,
++    .write =3D avr_usart_write,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .impl =3D {.min_access_size =3D 1, .max_access_size =3D 1}
++};
++
++static Property avr_usart_properties[] =3D {
++    DEFINE_PROP_CHR("chardev", AVRUsartState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void avr_usart_pr(void *opaque, int irq, int level)
++{
++    AVRUsartState *s =3D AVR_USART(opaque);
++
++    s->enabled =3D !level;
++
++    if (!s->enabled) {
++        avr_usart_reset(DEVICE(s));
++    }
++}
++
++static void avr_usart_init(Object *obj)
++{
++    AVRUsartState *s =3D AVR_USART(obj);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->rxc_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->dre_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->txc_irq);
++    memory_region_init_io(&s->mmio, obj, &avr_usart_ops, s, TYPE_AVR_USA=
+RT, 7);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++    qdev_init_gpio_in(DEVICE(s), avr_usart_pr, 1);
++    s->enabled =3D true;
++}
++
++static void avr_usart_realize(DeviceState *dev, Error **errp)
++{
++    AVRUsartState *s =3D AVR_USART(dev);
++    qemu_chr_fe_set_handlers(&s->chr, avr_usart_can_receive,
++                             avr_usart_receive, NULL, NULL,
++                             s, NULL, true);
++    avr_usart_reset(dev);
++}
++
++static void avr_usart_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->reset =3D avr_usart_reset;
++    device_class_set_props(dc, avr_usart_properties);
++    dc->realize =3D avr_usart_realize;
++}
++
++static const TypeInfo avr_usart_info =3D {
++    .name          =3D TYPE_AVR_USART,
++    .parent        =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(AVRUsartState),
++    .instance_init =3D avr_usart_init,
++    .class_init    =3D avr_usart_class_init,
++};
++
++static void avr_usart_register_types(void)
++{
++    type_register_static(&avr_usart_info);
++}
++
++type_init(avr_usart_register_types)
+diff --git a/include/hw/char/avr_usart.h b/include/hw/char/avr_usart.h
+new file mode 100644
+index 0000000..5739aaf
+--- /dev/null
++++ b/include/hw/char/avr_usart.h
+@@ -0,0 +1,93 @@
++/*
++ * AVR USART
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Sarah Harris
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#ifndef HW_CHAR_AVR_USART_H
++#define HW_CHAR_AVR_USART_H
++
++#include "hw/sysbus.h"
++#include "chardev/char-fe.h"
++#include "hw/hw.h"
++
++/* Offsets of registers. */
++#define USART_DR   0x06
++#define USART_CSRA  0x00
++#define USART_CSRB  0x01
++#define USART_CSRC  0x02
++#define USART_BRRH 0x05
++#define USART_BRRL 0x04
++
++/* Relevant bits in regiters. */
++#define USART_CSRA_RXC    (1 << 7)
++#define USART_CSRA_TXC    (1 << 6)
++#define USART_CSRA_DRE    (1 << 5)
++#define USART_CSRA_MPCM   (1 << 0)
++
++#define USART_CSRB_RXCIE  (1 << 7)
++#define USART_CSRB_TXCIE  (1 << 6)
++#define USART_CSRB_DREIE  (1 << 5)
++#define USART_CSRB_RXEN   (1 << 4)
++#define USART_CSRB_TXEN   (1 << 3)
++#define USART_CSRB_CSZ2   (1 << 2)
++#define USART_CSRB_RXB8   (1 << 1)
++#define USART_CSRB_TXB8   (1 << 0)
++
++#define USART_CSRC_MSEL1  (1 << 7)
++#define USART_CSRC_MSEL0  (1 << 6)
++#define USART_CSRC_PM1    (1 << 5)
++#define USART_CSRC_PM0    (1 << 4)
++#define USART_CSRC_CSZ1   (1 << 2)
++#define USART_CSRC_CSZ0   (1 << 1)
++
++#define TYPE_AVR_USART "avr-usart"
++#define AVR_USART(obj) \
++    OBJECT_CHECK(AVRUsartState, (obj), TYPE_AVR_USART)
++
++typedef struct {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion mmio;
++
++    CharBackend chr;
++
++    bool enabled;
++
++    uint8_t data;
++    bool data_valid;
++    uint8_t char_mask;
++    /* Control and Status Registers */
++    uint8_t csra;
++    uint8_t csrb;
++    uint8_t csrc;
++    /* Baud Rate Registers (low/high byte) */
++    uint8_t brrh;
++    uint8_t brrl;
++
++    /* Receive Complete */
++    qemu_irq rxc_irq;
++    /* Transmit Complete */
++    qemu_irq txc_irq;
++    /* Data Register Empty */
++    qemu_irq dre_irq;
++} AVRUsartState;
++
++#endif /* HW_CHAR_AVR_USART_H */
+--=20
+2.7.4
+
 
