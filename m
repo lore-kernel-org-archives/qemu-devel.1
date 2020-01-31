@@ -2,80 +2,76 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16405C35240
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 477F1C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:53:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDABE206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:53:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gk5b5oP4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDABE206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 22758206D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:53:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22758206D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixaTf-0008FB-23
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 12:53:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41567)
+	id 1ixaTv-0000Sk-Af
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 12:53:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1ixaLl-0003CB-78
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:45:02 -0500
+ (envelope-from <bounces@canonical.com>) id 1ixaMT-0004Af-2c
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:45:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1ixaLk-0004iP-0O
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:45:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34232
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ixaLj-0004ha-T9
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:44:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580492699;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Jf6rrmMMkG7rUq9+VULR4sD8iT5fg6b7OJ1gXa5pIec=;
- b=Gk5b5oP4N4bFG43EDlIrhGL6hAM4w6gK9nwiAMMqIS9u/YmpD8dalMVDOvT9EGTc/v6Dk6
- uwOHre1290MBb1+pXLMgFNYWpSvnpwKz+B+HKiA1h/kY/WdgqLg/D6stdaOp+mwJ6MgZrL
- OAMoEbDLnSUv7rpl5zmyZLM+ECSCydo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-9WEUHAjVO7OdEaS2C4nYeA-1; Fri, 31 Jan 2020 12:44:55 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFB998F4964;
- Fri, 31 Jan 2020 17:44:54 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2835C7FB60;
- Fri, 31 Jan 2020 17:44:54 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 12/17] gluster: Support BDRV_ZERO_OPEN
-Date: Fri, 31 Jan 2020 11:44:31 -0600
-Message-Id: <20200131174436.2961874-13-eblake@redhat.com>
-In-Reply-To: <20200131174436.2961874-1-eblake@redhat.com>
-References: <20200131174436.2961874-1-eblake@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1ixaMN-0005nT-DN
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:45:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41812)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ixaMN-0005lL-65
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:45:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ixaML-0005jg-Cf
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 17:45:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5A1682E80C0
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 17:45:37 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 9WEUHAjVO7OdEaS2C4nYeA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 Jan 2020 17:37:19 -0000
+From: Aleksandar Markovic <1861404@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: tcg testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: amarkovic stvlvrn
+X-Launchpad-Bug-Reporter: Stevie Lavern (stvlvrn)
+X-Launchpad-Bug-Modifier: Aleksandar Markovic (amarkovic)
+References: <158038956597.5319.13308249814127344774.malonedeb@chaenomeles.canonical.com>
+ <158049016711.20266.13259801440809425215.launchpad@wampee.canonical.com>
+Message-Id:
+ <CAL1e-=hQ=j2H3XiaJSG4XuutU_owjv1BF_Zhhg7STgLUm0bJdQ@mail.gmail.com>
+Subject: Re: [Bug 1861404] [NEW] AVX instruction VMOVDQU implementation error
+ for YMM registers
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 5669f5118272b7865f05a8867c9a814d4bf76a7f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,82 +80,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david.edmondson@oracle.com, Kevin Wolf <kwolf@redhat.com>,
- "open list:GLUSTER" <integration@gluster.org>, qemu-block@nongnu.org,
- mreitz@redhat.com
+Reply-To: Bug 1861404 <1861404@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200131173719.gBHT6hQIE-dUxJyeUvhNXec3mqntXf7U0pBQInAyEL8@z>
 
-Since gluster already copies file-posix for lseek usage in block
-status, it also makes sense to copy it for learning if the image
-currently reads as all zeroes.
+On Friday, January 31, 2020, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/gluster.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+> ** Tags added: tcg testcase
+>
+> --
+> You received this bug notification because you are a member of qemu-
+> devel-ml, which is subscribed to QEMU.
+> https://bugs.launchpad.net/bugs/1861404
+>
+> Title:
+>   AVX instruction VMOVDQU implementation error for YMM registers
+>
+>
+If I remember well, there is no support for AVX instructions in linux-user
+mode.
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 9d952c70981b..0417a86547c8 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1464,6 +1464,22 @@ exit:
-     return -ENOTSUP;
- }
+If that is true, how come handling of unsupported instruction went that
+far?
 
-+static int qemu_gluster_known_zeroes(BlockDriverState *bs)
-+{
-+    /*
-+     * GlusterFS volume could be backed by a block device, with no way
-+     * to query if regions added by creation or truncation will read
-+     * as zeroes.  However, we can use lseek(SEEK_DATA) to check if
-+     * contents currently read as zero.
-+     */
-+    off_t data, hole;
-+
-+    if (find_allocation(bs, 0, &data, &hole) =3D=3D -ENXIO) {
-+        return BDRV_ZERO_OPEN;
-+    }
-+    return 0;
-+}
-+
- /*
-  * Returns the allocation status of the specified offset.
-  *
-@@ -1561,6 +1577,7 @@ static BlockDriver bdrv_gluster =3D {
-     .bdrv_co_readv                =3D qemu_gluster_co_readv,
-     .bdrv_co_writev               =3D qemu_gluster_co_writev,
-     .bdrv_co_flush_to_disk        =3D qemu_gluster_co_flush_to_disk,
-+    .bdrv_known_zeroes            =3D qemu_gluster_known_zeroes,
- #ifdef CONFIG_GLUSTERFS_DISCARD
-     .bdrv_co_pdiscard             =3D qemu_gluster_co_pdiscard,
- #endif
-@@ -1591,6 +1608,7 @@ static BlockDriver bdrv_gluster_tcp =3D {
-     .bdrv_co_readv                =3D qemu_gluster_co_readv,
-     .bdrv_co_writev               =3D qemu_gluster_co_writev,
-     .bdrv_co_flush_to_disk        =3D qemu_gluster_co_flush_to_disk,
-+    .bdrv_known_zeroes            =3D qemu_gluster_known_zeroes,
- #ifdef CONFIG_GLUSTERFS_DISCARD
-     .bdrv_co_pdiscard             =3D qemu_gluster_co_pdiscard,
- #endif
-@@ -1621,6 +1639,7 @@ static BlockDriver bdrv_gluster_unix =3D {
-     .bdrv_co_readv                =3D qemu_gluster_co_readv,
-     .bdrv_co_writev               =3D qemu_gluster_co_writev,
-     .bdrv_co_flush_to_disk        =3D qemu_gluster_co_flush_to_disk,
-+    .bdrv_known_zeroes            =3D qemu_gluster_known_zeroes,
- #ifdef CONFIG_GLUSTERFS_DISCARD
-     .bdrv_co_pdiscard             =3D qemu_gluster_co_pdiscard,
- #endif
-@@ -1657,6 +1676,7 @@ static BlockDriver bdrv_gluster_rdma =3D {
-     .bdrv_co_readv                =3D qemu_gluster_co_readv,
-     .bdrv_co_writev               =3D qemu_gluster_co_writev,
-     .bdrv_co_flush_to_disk        =3D qemu_gluster_co_flush_to_disk,
-+    .bdrv_known_zeroes            =3D qemu_gluster_known_zeroes,
- #ifdef CONFIG_GLUSTERFS_DISCARD
-     .bdrv_co_pdiscard             =3D qemu_gluster_co_pdiscard,
- #endif
---=20
-2.24.1
+Did you try other AVX instructions?
 
+Aleksandar
+
+
+
+> Status in QEMU:
+>   New
+>
+> Bug description:
+>   Hi,
+>
+>   Tested with Qemu 4.2.0, and with git version
+>   bddff6f6787c916b0e9d63ef9e4d442114257739.
+>
+>   The x86 AVX instruction VMOVDQU doesn't work properly with YMM registers
+> (32 bytes).
+>   It works with XMM registers (16 bytes) though.
+>
+>   See the attached test case `ymm.c`: when copying from memory-to-ymm0
+>   and then back from ymm0-to-memory using VMOVDQU, Qemu only copies the
+>   first 16 of the total 32 bytes.
+>
+>   ```
+>   user@ubuntu ~/Qemu % gcc -o ymm ymm.c -Wall -Wextra -Werror
+>
+>   user@ubuntu ~/Qemu % ./ymm
+>   00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17
+> 18 19 1A 1B 1C 1D 1E 1F
+>
+>   user@ubuntu ~/Qemu % ./x86_64-linux-user/qemu-x86_64 -cpu max ymm
+>   00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 00 00 00 00 00 00 00 00
+> 00 00 00 00 00 00 00 00
+>   ```
+>
+>   This seems to be because in `translate.c > gen_sse()`, the case
+>   handling the VMOVDQU instruction calls `gen_ldo_env_A0` which always
+>   performs a 16 bytes copy using two 8 bytes load and store operations
+>   (with `tcg_gen_qemu_ld_i64` and `tcg_gen_st_i64`).
+>
+>   Instead, the `gen_ldo_env_A0` function should generate a copy with a
+>   size corresponding to the used register.
+>
+>
+>   ```
+>   static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+>                       target_ulong pc_start, int rex_r)
+>   {
+>           [...]
+>           case 0x26f: /* movdqu xmm, ea */
+>               if (mod !=3D 3) {
+>                   gen_lea_modrm(env, s, modrm);
+>                   gen_ldo_env_A0(s, offsetof(CPUX86State, xmm_regs[reg]));
+>               } else {
+>           [...]
+>   ```
+>
+>   ```
+>   static inline void gen_ldo_env_A0(DisasContext *s, int offset)
+>   {
+>       int mem_index =3D s->mem_index;
+>       tcg_gen_qemu_ld_i64(s->tmp1_i64, s->A0, mem_index, MO_LEQ);
+>       tcg_gen_st_i64(s->tmp1_i64, cpu_env, offset + offsetof(ZMMReg,
+> ZMM_Q(0)));
+>       tcg_gen_addi_tl(s->tmp0, s->A0, 8);
+>       tcg_gen_qemu_ld_i64(s->tmp1_i64, s->tmp0, mem_index, MO_LEQ);
+>       tcg_gen_st_i64(s->tmp1_i64, cpu_env, offset + offsetof(ZMMReg,
+> ZMM_Q(1)));
+>   }
+>   ```
+>
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1861404/+subscriptions
+>
+>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1861404
+
+Title:
+  AVX instruction VMOVDQU implementation error for YMM registers
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  Tested with Qemu 4.2.0, and with git version
+  bddff6f6787c916b0e9d63ef9e4d442114257739.
+
+  The x86 AVX instruction VMOVDQU doesn't work properly with YMM registers =
+(32 bytes).
+  It works with XMM registers (16 bytes) though.
+
+  See the attached test case `ymm.c`: when copying from memory-to-ymm0
+  and then back from ymm0-to-memory using VMOVDQU, Qemu only copies the
+  first 16 of the total 32 bytes.
+
+  ```
+  user@ubuntu ~/Qemu % gcc -o ymm ymm.c -Wall -Wextra -Werror
+
+  user@ubuntu ~/Qemu % ./ymm
+  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 1=
+8 19 1A 1B 1C 1D 1E 1F
+
+  user@ubuntu ~/Qemu % ./x86_64-linux-user/qemu-x86_64 -cpu max ymm
+  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 00 00 00 00 00 00 00 00 0=
+0 00 00 00 00 00 00 00
+  ```
+
+  This seems to be because in `translate.c > gen_sse()`, the case
+  handling the VMOVDQU instruction calls `gen_ldo_env_A0` which always
+  performs a 16 bytes copy using two 8 bytes load and store operations
+  (with `tcg_gen_qemu_ld_i64` and `tcg_gen_st_i64`).
+
+  Instead, the `gen_ldo_env_A0` function should generate a copy with a
+  size corresponding to the used register.
+
+  =
+
+  ```
+  static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+                      target_ulong pc_start, int rex_r)
+  {
+          [...]
+          case 0x26f: /* movdqu xmm, ea */
+              if (mod !=3D 3) {
+                  gen_lea_modrm(env, s, modrm);
+                  gen_ldo_env_A0(s, offsetof(CPUX86State, xmm_regs[reg]));
+              } else { =
+
+          [...]
+  ```
+
+  ```
+  static inline void gen_ldo_env_A0(DisasContext *s, int offset)
+  {
+      int mem_index =3D s->mem_index;
+      tcg_gen_qemu_ld_i64(s->tmp1_i64, s->A0, mem_index, MO_LEQ);
+      tcg_gen_st_i64(s->tmp1_i64, cpu_env, offset + offsetof(ZMMReg, ZMM_Q(=
+0)));
+      tcg_gen_addi_tl(s->tmp0, s->A0, 8);
+      tcg_gen_qemu_ld_i64(s->tmp1_i64, s->tmp0, mem_index, MO_LEQ);
+      tcg_gen_st_i64(s->tmp1_i64, cpu_env, offset + offsetof(ZMMReg, ZMM_Q(=
+1)));
+  }
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1861404/+subscriptions
 
