@@ -2,76 +2,91 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DAE3C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 07:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E2C8C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 07:09:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69BBD20705
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 07:06:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69BBD20705
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 57879206F0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 07:09:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GTMnZkPV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57879206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixQNs-0001wl-Lj
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 02:06:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48173)
+	id 1ixQQd-00030V-JJ
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 02:09:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ixQNI-0001YJ-JL
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 02:05:58 -0500
+ (envelope-from <thuth@redhat.com>) id 1ixQPs-0002X2-Ob
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 02:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ixQNH-0005mm-Ah
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 02:05:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56522)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ixQNH-0005mT-5W
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 02:05:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ixQNF-0004Lp-OA
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 07:05:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B25902E80C0
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 07:05:53 +0000 (UTC)
+ (envelope-from <thuth@redhat.com>) id 1ixQPr-0007Pg-N2
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 02:08:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29875
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ixQPr-0007PY-K6
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 02:08:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580454515;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=VF7Lc6L7PKzqaTyOhzb8Bs0z6xhj8HwSrz383sHX258=;
+ b=GTMnZkPVVADuLhjhG4/pC5iRw5stAZ1BAw8bnLNwQqW4Zw7vGrxj9Q0twOGclAdlL9yDp6
+ qBsnrhg6XkpdK+AXtKIR//RbD0gVbw3VbpZaAj/+nwlPtbdRADBj7J262TrsGH2ti8Xbim
+ AJ6M6xNPl0anNzx/e+8BLeWSYKy98tY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-qmsvDFYaOQaOLBkNJucKew-1; Fri, 31 Jan 2020 02:08:29 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B67E1005512;
+ Fri, 31 Jan 2020 07:08:28 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-176.ams2.redhat.com [10.36.116.176])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5016260BE0;
+ Fri, 31 Jan 2020 07:08:24 +0000 (UTC)
+Subject: Re: [PATCH v5 5/6] iotests: Skip Python-based tests if QEMU does not
+ support virtio-blk
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>
+References: <20200121095205.26323-1-thuth@redhat.com>
+ <20200121095205.26323-6-thuth@redhat.com>
+ <ef7deb82-e2da-f572-8e17-aaf59b34dd4c@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5490675f-bb3c-dd69-6b16-da2ff10c52bd@redhat.com>
+Date: Fri, 31 Jan 2020 08:08:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <ef7deb82-e2da-f572-8e17-aaf59b34dd4c@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: qmsvDFYaOQaOLBkNJucKew-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jan 2020 06:58:19 -0000
-From: Ildar <1860759@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: eblake ildar-users xanclic
-X-Launchpad-Bug-Reporter: Ildar (ildar-users)
-X-Launchpad-Bug-Modifier: Ildar (ildar-users)
-References: <157985376657.5102.13233182944615356318.malonedeb@wampee.canonical.com>
- <157986030424.5154.393920880621051062.malone@chaenomeles.canonical.com>
- <CACAYGhuurXCHk7b9we2P7Vbx_dajAN5_i4FyL7Ck3q4-m7fbQA@mail.gmail.com>
- <15cde2ad-31d0-69ea-fecf-4db380c55984@redhat.com>
-Message-Id: <CACAYGhsk9haGf4szPUeqiwxQHd7pTTO8zgzi=JOWNbmnU4cWuA@mail.gmail.com>
-Subject: Re: [Bug 1860759] Re: [REGRESSION] option `-snapshot` ignored with
- blockdev
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e3a83be3b6feb50420a435d576a8aca87badcea6
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,87 +95,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1860759 <1860759@bugs.launchpad.net>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank a lot for the detailed answer. Surely it's worth discussing qemu here
-leaving libvirt for RH bugzilla.
+On 30/01/2020 23.31, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/21/20 10:52 AM, Thomas Huth wrote:
+>> We are going to enable some of the python-based tests in the "auto"
+>> group,
+>> and these tests require virtio-blk to work properly. Running iotests
+>> without virtio-blk likely does not make too much sense anyway, so instea=
+d
+>> of adding a check for the availability of virtio-blk to each and every
+>> test (which does not sound very appealing), let's rather add a check for
+>> this a central spot in the "check" script instead (so that it is still
+>> possible to run "make check" for qemu-system-tricore for example).
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>> =C2=A0 tests/qemu-iotests/check | 12 ++++++++++--
+>> =C2=A0 1 file changed, 10 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+>> index 2890785a10..1629b6c914 100755
+>> --- a/tests/qemu-iotests/check
+>> +++ b/tests/qemu-iotests/check
+>> @@ -642,7 +642,15 @@ fi
+>> =C2=A0 python_usable=3Dfalse
+>> =C2=A0 if $PYTHON -c 'import sys; sys.exit(0 if sys.version_info >=3D (3=
+,6)
+>> else 1)'
+>> =C2=A0 then
+>> -=C2=A0=C2=A0=C2=A0 python_usable=3Dtrue
+>> +=C2=A0=C2=A0=C2=A0 # Our python framework also requires virtio-blk
+>> +=C2=A0=C2=A0=C2=A0 if "$QEMU_PROG" -M none -device help | grep -q virti=
+o-blk
+>> >/dev/null 2>&1
+>=20
+> FYI I proposed a patch adding a binary_get_devices() helper:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg07314.html
+>=20
+> You could use something such
+>=20
+> =C2=A0 @SkipUntil('virtio-blk' in binary_get_devices(qemu_bin))
 
-> But since modern qemu has declared -snapshot to be unsupported with
--blockdev, and modern libvirt has switched to -blockdev, I claim that this
-is not a qemu bug, but a libvirt feature request.
+Unfortunately, that doesn't scale here. You'd have to add this to almost
+all python-based iotests, since the virtio-blk dependency is hard-wired
+deep in the code there (look at the add_drive function).
 
-I'm convinced this isn't qemu's bug. And everything you wrote is
-well-justified. Yet, one question left unanswered:
-> Do you mean that snapshot-ing isn't possible totally for blockdev?
-> Actually I didn't quite caught the reason why a blockdev supports backing
-but not {backing to a file on /tmp then promptly deleted} ? What's the
-technical difference?
+ Thomas
 
-Thanks!
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1860759
-
-Title:
-  [REGRESSION] option `-snapshot` ignored with blockdev
-
-Status in QEMU:
-  New
-
-Bug description:
-  After upgrade of qemu 3.1.0 =E2=86=92 4.2.0 I found that running with lib=
-virt doesn't honor `-snapshot` option anymore. I.e. disk images get modifie=
-d.
-  Using `-hda` option honors `-snapshot`
-
-  So I made a test case without libvirt. Testcase using 4.2.0:
-
-  > qemu -hda tmp-16G.img -cdrom regular-rescue-latest-x86_64.iso -m 2G
-
-  This works fine and tmp-16G.img stays unmodified.
-
-  But:
-  > /usr/bin/qemu-system-x86_64 -name guest=3Dtest-linux,debug-threads=3Don=
- -S -machine pc-i440fx-3.1,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-co=
-re=3Doff -cpu Broadwell-noTSX,vme=3Don,ss=3Don,f16c=3Don,rdrand=3Don,hyperv=
-isor=3Don,arat=3Don,tsc-adjust=3Don,xsaveopt=3Don,pdpe1gb=3Don,abm=3Don -m =
-2048 -overcommit mem-lock=3Doff -smp 3,sockets=3D3,cores=3D1,threads=3D1 -u=
-uid d32a9191-f51d-4fae-a419-b73d85b49198 -no-user-config -nodefaults -rtc b=
-ase=3Dutc,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddelay -no-hpet=
- -no-shutdown -global PIIX4_PM.disable_s3=3D1 -global PIIX4_PM.disable_s4=
-=3D1 -boot strict=3Don -device ich9-usb-ehci1,id=3Dusb,bus=3Dpci.0,addr=3D0=
-x5.0x7 -device ich9-usb-uhci1,masterbus=3Dusb.0,firstport=3D0,bus=3Dpci.0,m=
-ultifunction=3Don,addr=3D0x5 -device ich9-usb-uhci2,masterbus=3Dusb.0,first=
-port=3D2,bus=3Dpci.0,addr=3D0x5.0x1 -device ich9-usb-uhci3,masterbus=3Dusb.=
-0,firstport=3D4,bus=3Dpci.0,addr=3D0x5.0x2 -blockdev \{\"driver\":\"file\",=
-\"filename\":\"/tmp/regular-rescue-latest-x86_64.iso\",\"node-name\":\"libv=
-irt-2-storage\",\"auto-read-only\":true,\"discard\":\"unmap\"} -blockdev \{=
-\"node-name\":\"libvirt-2-format\",\"read-only\":true,\"driver\":\"raw\",\"=
-file\":\"libvirt-2-storage\"} -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dl=
-ibvirt-2-format,id=3Dide0-0-0,bootindex=3D1 -blockdev \{\"driver\":\"file\"=
-,\"filename\":\"/tmp/tmp-2G.img\",\"node-name\":\"libvirt-1-storage\",\"aut=
-o-read-only\":true,\"discard\":\"unmap\"} -blockdev \{\"node-name\":\"libvi=
-rt-1-format\",\"read-only\":false,\"driver\":\"qcow2\",\"file\":\"libvirt-1=
--storage\",\"backing\":null} -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,=
-addr=3D0x7,drive=3Dlibvirt-1-format,id=3Dvirtio-disk0 -netdev user,id=3Dhos=
-tnet0 -device e1000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:ab:d8:29,bus=
-=3Dpci.0,addr=3D0x3 -chardev pty,id=3Dcharserial0 -device isa-serial,charde=
-v=3Dcharserial0,id=3Dserial0 -device qxl-vga,id=3Dvideo0,ram_size=3D6710886=
-4,vram_size=3D67108864,vram64_size_mb=3D0,vgamem_mb=3D16,max_outputs=3D1,bu=
-s=3Dpci.0,addr=3D0x2 -device intel-hda,id=3Dsound0,bus=3Dpci.0,addr=3D0x4 -=
-device hda-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -device virtio-=
-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x6 -snapshot -sandbox on,obso=
-lete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=3Ddeny -m=
-sg timestamp=3Don
-
-  This modifies tmp-16G.img.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1860759/+subscriptions
 
