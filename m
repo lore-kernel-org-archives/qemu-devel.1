@@ -2,92 +2,78 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83549C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38614C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:01:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C333206D3
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:01:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01BF2206D3
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:01:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jMpavgzl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C333206D3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fT996l6+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01BF2206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYjN-00061h-F2
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:01:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46715)
+	id 1ixYje-0006DX-3a
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:01:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kchamart@redhat.com>) id 1ixY8k-0001ea-90
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:23:27 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXzF-0006CX-4n
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kchamart@redhat.com>) id 1ixY8i-00030x-Si
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:23:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31456
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXzD-0006tl-Bt
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:37 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52197
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ixY8i-0002vO-KP
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:23:24 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXzD-0006sK-6Y
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580484198;
+ s=mimecast20190719; t=1580483614;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TawxEKQ4luwMe/Cf3ho+H6grhw051OxwGtYMWM4eEjo=;
- b=jMpavgzl0JQiTvciKEkiU5EXkOsD5VXtNTE//ls3up8w+QQMnOBv7hNwqJ0lrXnxJryeCA
- R8MSIw6HuSzVdgVqyfGvc/xTbesN5R4SV99Jj0NPSIgS/IfRvCEcLqoXsFDZ9yxwXsaqeD
- ESz3P7S/kCIahkm3ixnJUTjoHuPiyyg=
+ bh=E/V1sPplJvKqepdTEO2MVvkG8XlPvKW/sYjLdsbSB18=;
+ b=fT996l6+Rff5VPlJP+sdrEDsR8CIXigwPMBa3vLJukpLBzQ3FeV8c74KLByQPJ/MDiEPcU
+ bI12gkvJtua7PVnFARNIjYfbqXANxIy84g7Ex87gPXa5OEweHpu+Aen74CbAL70JkkFJyW
+ l7gj4zShWV6RPNDM8al9Vz6iMky0mLU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-XtiSWXTxOw-G4GUZMY7yVA-1; Fri, 31 Jan 2020 10:22:56 -0500
+ us-mta-226-AYFBzrYFOhKFH2aauhdknA-1; Fri, 31 Jan 2020 10:13:30 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA4668010F0;
- Fri, 31 Jan 2020 15:22:54 +0000 (UTC)
-Received: from paraplu.localdomain (ovpn-117-101.ams2.redhat.com
- [10.36.117.101])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C12EB86C4B;
- Fri, 31 Jan 2020 15:22:44 +0000 (UTC)
-Received: by paraplu.localdomain (Postfix, from userid 1001)
- id 48E953E04B8; Fri, 31 Jan 2020 16:22:43 +0100 (CET)
-Date: Fri, 31 Jan 2020 16:22:43 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Improving QOM documentation [Was: Re: Making QEMU easier for
- management tools and applications]
-Message-ID: <20200131152243.GA24572@paraplu>
-References: <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200115121953.GJ93923@redhat.com>
- <874kwwvmuv.fsf@dusky.pond.sub.org>
- <20200130210902.GA25927@paraplu>
- <87y2toi29o.fsf@dusky.pond.sub.org>
- <CAFEAcA-545QS9mnM6hwa6TxUpw_pDQ3Pa8tkf4qtzWS1Zi_fxQ@mail.gmail.com>
- <CABgObfaB=wHXyJbQR163bZdFHhWdCc4D8sWRHzte019_hSTuhA@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CABgObfaB=wHXyJbQR163bZdFHhWdCc4D8sWRHzte019_hSTuhA@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D796118C43C0;
+ Fri, 31 Jan 2020 15:13:29 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D8D9186C4B;
+ Fri, 31 Jan 2020 15:13:28 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 71/80] sparc/sun4m: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:09:41 +0100
+Message-Id: <1580483390-131164-72-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: XtiSWXTxOw-G4GUZMY7yVA-1
+X-MC-Unique: AYFBzrYFOhKFH2aauhdknA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,72 +85,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Christophe de Dinechin <dinechin@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>, John Snow <jsnow@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, atar4qemu@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 31, 2020 at 12:02:05PM +0100, Paolo Bonzini wrote:
-> Il ven 31 gen 2020, 11:36 Peter Maydell <peter.maydell@linaro.org> ha
-> scritto:
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
-[...]
+Patch moves ram size check into sun4m_hw_init() and drops
+ram_init() moving remainder to sun4m_hw_init() as well,
+as it was the only place that called it.
 
-> The advantage of putting them in the header is that you have them all in
-> one place (inline functions and structs must be in the header). In practi=
-ce
-> that balances for me the disadvantage of having some comments far from th=
-e
-> code they document, which increases the risk of bitrot especially for
-> comments such as "called with lock X held".
->=20
-> I definitely agree that the overview/introduction/conventions
-> > side of things is where we'd benefit most if somebody wanted
-> > to try to tackle that. We could roll
-> > https://wiki.qemu.org/Documentation/QOMConventions
-> > into that if we had a better place to put that info.
-> >
->=20
-> I am travelling this weekend so I might try to do some kind of thread
-> summary and brain dump in the wiki. I'll leave to Kashyap to do the rST
-> conversion and patch submission. ;-)
+Also it rewrites impl. of RamDevice a little bit, which
+could serve as an example of frontend device for RAM backend.
+(Caveats are:
+  1. it doesn't check for memdev backend being mapped
+     since it's been  usurped by generic machine to handle
+     majority of machines which don't have RAM frontend device
+  2. it still lacks 'addr' property and still has hardcoded
+     sysbus_mmio_map() in board init. If done right, board should
+     set 'addr' property and bus/machine plug handler should map
+     it during device realize time.
+)
+Further improvements were left as exercise for the future,
+since frontends are out scope of RAM conversion to memdev.
 
-Thanks!  Happy to be the 'scribe' ;-)  I have a skeltal
-qemu-object-model.rst file sitting with some initial content based on
-various sources, including one of your presentations[*] from 2014.
-I'll wait for your new Wiki link to incorporate that content.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v4:
+  * 'machine: introduce memory-backend property' patch changed
+    'memory-backend' property from link to backend id to allow for
+    delayed initialization. Take that in account and add resolving
+    machine->ram_memdev_id into backend pointer before setting link
+    on RamDevice.
 
-(Minor aside: I'm not sure if this file should be in docs/interop/ dir,
-which IIRC, is for things that are 'external' interfaces.  And I learn
-that QOM is used both internally in and as an external interface, e.g.
-whenever a device is being created, machine types, CPU config, etc.)
+CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+CC: atar4qemu@gmail.com
+---
+ hw/sparc/sun4m.c | 74 ++++++++++++++++++++++++++++------------------------=
+----
+ 1 file changed, 37 insertions(+), 37 deletions(-)
 
-            - - -
-
-I've re-skimmed your scarily-titled "QOM exegesis and apocalypse" 2014
-KVM Forum talk slides[*], where the "Why QOM?" slide says:
-
-    All device creation, device configuration, backend creation and
-    backed configuration done through a single interface
-   =20
-    Rigorous support for introspection both of runtime objects and type
-    capabilities
-
-Me wonders how much of the above "Why" still holds true today.  Although
-further slides give more clues on what worked and what didn't.
-
-I'll wait for fresher details from your upcoming Wiki :-)
-
-[*] http://www.linux-kvm.org/images/9/90/Kvmforum14-qom.pdf
-
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 25e96db..f5bf95f 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -777,63 +777,42 @@ static const TypeInfo prom_info =3D {
+=20
+ typedef struct RamDevice {
+     SysBusDevice parent_obj;
+-
+-    MemoryRegion ram;
+-    uint64_t size;
++    HostMemoryBackend *memdev;
+ } RamDevice;
+=20
+ /* System RAM */
+ static void ram_realize(DeviceState *dev, Error **errp)
+ {
+     RamDevice *d =3D SUN4M_RAM(dev);
+-    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
++    MemoryRegion *ram =3D host_memory_backend_get_memory(d->memdev);
+=20
+-    memory_region_allocate_system_memory(&d->ram, OBJECT(d), "sun4m.ram",
+-                                         d->size);
+-    sysbus_init_mmio(sbd, &d->ram);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), ram);
+ }
+=20
+-static void ram_init(hwaddr addr, ram_addr_t RAM_size,
+-                     uint64_t max_mem)
++static void ram_initfn(Object *obj)
+ {
+-    DeviceState *dev;
+-    SysBusDevice *s;
+-    RamDevice *d;
+-
+-    /* allocate RAM */
+-    if ((uint64_t)RAM_size > max_mem) {
+-        error_report("Too much memory for this machine: %" PRId64 ","
+-                     " maximum %" PRId64,
+-                     RAM_size / MiB, max_mem / MiB);
+-        exit(1);
+-    }
+-    dev =3D qdev_create(NULL, "memory");
+-    s =3D SYS_BUS_DEVICE(dev);
+-
+-    d =3D SUN4M_RAM(dev);
+-    d->size =3D RAM_size;
+-    qdev_init_nofail(dev);
+-
+-    sysbus_mmio_map(s, 0, addr);
++    RamDevice *d =3D SUN4M_RAM(obj);
++    object_property_add_link(obj, "memdev", TYPE_MEMORY_BACKEND,
++                             (Object **)&d->memdev,
++                             object_property_allow_set_link,
++                             OBJ_PROP_LINK_STRONG, &error_abort);
++    object_property_set_description(obj, "memdev", "Set RAM backend"
++                                    "Valid value is ID of a hostmem backen=
+d",
++                                     &error_abort);
+ }
+=20
+-static Property ram_properties[] =3D {
+-    DEFINE_PROP_UINT64("size", RamDevice, size, 0),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void ram_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+     dc->realize =3D ram_realize;
+-    device_class_set_props(dc, ram_properties);
+ }
+=20
+ static const TypeInfo ram_info =3D {
+     .name          =3D TYPE_SUN4M_MEMORY,
+     .parent        =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(RamDevice),
++    .instance_init =3D ram_initfn,
+     .class_init    =3D ram_class_init,
+ };
+=20
+@@ -879,6 +858,15 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hw=
+def,
+     SysBusDevice *s;
+     unsigned int smp_cpus =3D machine->smp.cpus;
+     unsigned int max_cpus =3D machine->smp.max_cpus;
++    Object *ram_memdev =3D object_resolve_path_type(machine->ram_memdev_id=
+,
++                                                  TYPE_MEMORY_BACKEND, NUL=
+L);
++
++    if (machine->ram_size > hwdef->max_mem) {
++        error_report("Too much memory for this machine: %" PRId64 ","
++                     " maximum %" PRId64,
++                     machine->ram_size / MiB, hwdef->max_mem / MiB);
++        exit(1);
++    }
+=20
+     /* init CPUs */
+     for(i =3D 0; i < smp_cpus; i++) {
+@@ -888,9 +876,12 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hw=
+def,
+     for (i =3D smp_cpus; i < MAX_CPUS; i++)
+         cpu_irqs[i] =3D qemu_allocate_irqs(dummy_cpu_set_irq, NULL, MAX_PI=
+LS);
+=20
++    /* Create and map RAM frontend */
++    dev =3D qdev_create(NULL, "memory");
++    object_property_set_link(OBJECT(dev), ram_memdev, "memdev", &error_fat=
+al);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0);
+=20
+-    /* set up devices */
+-    ram_init(0, machine->ram_size, hwdef->max_mem);
+     /* models without ECC don't trap when missing ram is accessed */
+     if (!hwdef->ecc_base) {
+         empty_slot_init(machine->ram_size, hwdef->max_mem - machine->ram_s=
+ize);
+@@ -1078,7 +1069,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
+wdef,
+=20
+     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
+-    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
++    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, hwdef->machine_id);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_SUN4M_DEPTH, graphic_depth);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_SUN4M_WIDTH, graphic_width);
+@@ -1415,6 +1406,7 @@ static void ss5_class_init(ObjectClass *oc, void *dat=
+a)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo ss5_type =3D {
+@@ -1434,6 +1426,7 @@ static void ss10_class_init(ObjectClass *oc, void *da=
+ta)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo ss10_type =3D {
+@@ -1453,6 +1446,7 @@ static void ss600mp_class_init(ObjectClass *oc, void =
+*data)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo ss600mp_type =3D {
+@@ -1472,6 +1466,7 @@ static void ss20_class_init(ObjectClass *oc, void *da=
+ta)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo ss20_type =3D {
+@@ -1490,6 +1485,7 @@ static void voyager_class_init(ObjectClass *oc, void =
+*data)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo voyager_type =3D {
+@@ -1508,6 +1504,7 @@ static void ss_lx_class_init(ObjectClass *oc, void *d=
+ata)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo ss_lx_type =3D {
+@@ -1526,6 +1523,7 @@ static void ss4_class_init(ObjectClass *oc, void *dat=
+a)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo ss4_type =3D {
+@@ -1544,6 +1542,7 @@ static void scls_class_init(ObjectClass *oc, void *da=
+ta)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo scls_type =3D {
+@@ -1562,6 +1561,7 @@ static void sbook_class_init(ObjectClass *oc, void *d=
+ata)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo sbook_type =3D {
 --=20
-/kashyap
+2.7.4
 
 
