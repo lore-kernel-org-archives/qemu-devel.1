@@ -2,75 +2,110 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A643EC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DD9C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:03:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CF0C20705
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:01:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF0C20705
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8483920705
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:03:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kaTdO0WZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8483920705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixXnu-0000Ey-MK
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:01:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34735)
+	id 1ixXpj-0001Qi-Mm
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:03:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35820)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ixXmu-0007od-8V
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:00:53 -0500
+ (envelope-from <liam.merwick@oracle.com>) id 1ixXot-0000za-Ah
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:02:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ixXmt-0006vr-09
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:00:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39008)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ixXms-0006ph-QO
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:00:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ixXmr-0002RU-9Q
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:00:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3FE972E80C3
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:00:49 +0000 (UTC)
+ (envelope-from <liam.merwick@oracle.com>) id 1ixXor-0002tR-Bb
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:02:54 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:47244)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+ id 1ixXoq-0002sO-UI
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:02:53 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00VErkG0083252;
+ Fri, 31 Jan 2020 15:02:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=2R9x3wDchnnzyLdMBDIH6f9u0qJgeAwsPdG7j93NEFs=;
+ b=kaTdO0WZETKEK0KWbFqwqKPvzsH1OgQbxRGMEPb5F8vC3/TKYkjKuyC7PRFU7vFcF79p
+ W01geBRniNKRRM2CqMiDIMsnltGhrJksKuiFFHuBuZNwM/lybp5wq/ZW6i/XHd2ok7OW
+ YFyq1qSMyqcugtZWu9cgRH949sZYfXBHWzoYfpLz1H0ggowpBnaQ4wgZ6+rqyGfvOoBr
+ 0CrtfhbBpyPLedi5v66Et+ZdbcmKP2Xlt+uwBYYZXljXSmgvBbWoqQuVibZUca6E4eqX
+ jxL4duZwkdZMKnWU7XQKIjIkDu+yTQYdsbSk60rEnjodQnU2poQQSvhhMn+yJb9DTJxx dg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2xrd3utwk9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 31 Jan 2020 15:02:36 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00VF0LEV011249;
+ Fri, 31 Jan 2020 15:02:36 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 2xv8nr54h3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 31 Jan 2020 15:02:35 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00VF2W41006253;
+ Fri, 31 Jan 2020 15:02:32 GMT
+Received: from [10.175.183.219] (/10.175.183.219)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 31 Jan 2020 07:02:32 -0800
+Subject: Re: [PATCH 5/6] tests/boot_linux_console: add extract_from_rpm method
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
+References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
+ <1580142994-1836-6-git-send-email-liam.merwick@oracle.com>
+ <20200130120506.mq6tejv5i2k776k5@steredhat>
+ <f60513b8-b974-a46b-f829-993e45a0cff9@oracle.com>
+ <d6bed079-9e79-5e64-f7e2-76499f24454c@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <027bfff2-ff27-3fc6-05e6-aa5940e7fc04@oracle.com>
+Date: Fri, 31 Jan 2020 15:02:29 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <d6bed079-9e79-5e64-f7e2-76499f24454c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9516
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=875
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001310127
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9516
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=925 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001310127
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jan 2020 14:52:35 -0000
-From: Joey Adams <joeyadams3.14159@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: joeyadams3-14159
-X-Launchpad-Bug-Reporter: Joey Adams (joeyadams3-14159)
-X-Launchpad-Bug-Modifier: Joey Adams (joeyadams3-14159)
-References: <157879657262.5123.4155249157481007374.malonedeb@gac.canonical.com>
-Message-Id: <158048235594.18744.4386381018708216063.malone@gac.canonical.com>
-Subject: [Bug 1859310] Re: libvirt probing fails due to assertion failure with
- KVM and 'none' machine type
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 117d24e90b24daf3326af51226e1c87ac07aedd8
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
+ 00VErkG0083252
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,57 +114,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859310 <1859310@bugs.launchpad.net>
+Cc: fam@euphon.net, slp@redhat.com, alex.bennee@linaro.org,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This was fixed in commit 8f54bbd0b4 "x86: Check for machine state object
-class before typecasting it".
+On 30/01/2020 19:19, Wainer dos Santos Moschetta wrote:
+>=20
+> On 1/30/20 1:34 PM, Liam Merwick wrote:
+>> On 30/01/2020 12:05, Stefano Garzarella wrote:
+>>> On Mon, Jan 27, 2020 at 04:36:33PM +0000, Liam Merwick wrote:
+>>>> Add a method to extract a specified file from an RPM to the test's
+>>>> working directory and return the path to the extracted file.
+>>>>
+>>>> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+>>>> ---
+>>>> =C2=A0 tests/acceptance/boot_linux_console.py | 14 ++++++++++++++
+>>>> =C2=A0 1 file changed, 14 insertions(+)
+>>>>
+>>>> diff --git a/tests/acceptance/boot_linux_console.py=20
+>>>> b/tests/acceptance/boot_linux_console.py
+>>>> index 43bc928b03a2..6af19ae3b14a 100644
+>>>> --- a/tests/acceptance/boot_linux_console.py
+>>>> +++ b/tests/acceptance/boot_linux_console.py
+>>>> @@ -51,6 +51,20 @@ class BootLinuxConsole(Test):
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 os.chdir(cwd)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return self.w=
+orkdir + path
+>>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 def extract_from_rpm(self, rpm, path):
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Extracts a file from a r=
+pm package into the test workdir
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :param rpm: path to the =
+rpm archive
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :param path: path within=
+ the rpm archive of the file to be=20
+>>>> extracted
+>=20
+>=20
+> Might not be obvious to users that `path` should start with '.', and if=
+=20
+> he/she doesn't do that then extract_from_rpm() will silently fail to=20
+> extract the file. So could you document that?
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
 
--- =
+Sure.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859310
+>=20
+>>>>
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :returns: path of the ex=
+tracted file
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cwd =3D os.getcwd()
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 os.chdir(self.workdir)
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 process.run("rpm2cpio %s=
+ | cpio -id %s" % (rpm, path),=20
+>>>> shell=3DTrue)
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 os.chdir(cwd)
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return self.workdir + '/=
+' + path
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 Is the extra slash needed? (just because the=
+ extract_from_deb()
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 doesn't put it)
+>>>
+>>
+>>
+>> Yes, I needed to put it in there because the 'path' passed in for
+>> processing by cpio is a relative patch unlike the deb arg so it
+>> couldn't be just appended to 'self.workdir' which doesn't end in a '/'.
+>=20
+>=20
+> It is a good practice use the `os.path` module methods when dealing wit=
+h=20
+> filesystem paths. So that can be replaced with:
+>=20
+>  >>> os.path.normpath(os.path.join('/path/to/workdir', './file/in/rpm')=
+)
+> '/path/to/workdir/file/in/rpm'
+>=20
 
-Title:
-  libvirt probing fails due to assertion failure with KVM and 'none'
-  machine type
 
-Status in QEMU:
-  Fix Committed
+Will do.  I'll add a patch to fix extract_from_deb() too.
 
-Bug description:
-  Using libvirt on Ubuntu 19.10, I get the following error when I try to
-  set <emulator> to the latest qemu from git (commit dc65a5bdc9):
+Regards,
+Liam
 
-      error: internal error: Failed to start QEMU binary /usr/local/bin
-  /qemu-system-x86_64 for probing:
-  /home/joey/git/qemu/target/i386/kvm.c:2176:kvm_arch_init: Object
-  0x564bfd5c3200 is not an instance of type x86-machine
 
-  Qemu command line to reproduce:
+> Thanks,
+>=20
+> Wainer
+>=20
+>=20
+>>
+>>
+>> Regards,
+>> Liam
+>>
+>>
+>>> Anyway this patch LGTM:
+>>>
+>>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>
+>>>> +
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def do_test_x86_64_machine(self):
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tag=
+s=3Darch:x86_64
+>>>> --=20
+>>>> 1.8.3.1
+>>>>
+>>>
+>>
+>=20
 
-      sudo x86_64-softmmu/qemu-system-x86_64 -machine 'none,accel=3Dkvm'
-
-  Commit ed9e923c3c (Dec 12, 2019) introduced the issue by removing an
-  object_dynamic_cast call.  In this scenario, kvm_arch_init is passed
-  an instance of "none-machine" instead of "x86-machine".
-
-  The following one-line change to target/i386/kvm.c reintroduces the
-  cast:
-
-       if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
-  +        object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE) &&
-           x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
-           smram_machine_done.notify =3D register_smram_listener;
-           qemu_add_machine_init_done_notifier(&smram_machine_done);
-       }
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859310/+subscriptions
 
