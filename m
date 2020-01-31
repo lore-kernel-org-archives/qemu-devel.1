@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8917C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0085C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:19:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 980782082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C54C2082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:19:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dlA7uKdO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 980782082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HwaZ4R32"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C54C2082E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48833 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixPdu-0005yj-O2
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:19:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59275)
+	id 1ixPdw-00065U-NA
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:19:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUu-0006iB-GG
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:45 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUs-0006cB-AY
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUs-0000Ur-Th
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:44 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:49775 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUq-0000RF-Kh
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:42 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:55675 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ixPUs-0000Pm-Gx; Fri, 31 Jan 2020 01:09:42 -0500
+ id 1ixPUq-0000Ld-9c; Fri, 31 Jan 2020 01:09:40 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4886Hs66Xdz9sSK; Fri, 31 Jan 2020 17:09:29 +1100 (AEDT)
+ id 4886Hs5dhgz9sSL; Fri, 31 Jan 2020 17:09:29 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1580450969;
- bh=/gMtryY5Y8bw1UckL7OkaDAyp68AQ1ZkrQyBfh5fIBQ=;
+ bh=HZ6MMSrGN35mEgYWbJ6raH9CmczvTz+3+v1fB4KOqJo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=dlA7uKdORs5Hap1/wggcOEi5VS7oxgw9w92Xc5q/yxikPBJA8kmCePh/Kt42T4HkI
- RisyrolsMrK7/BKH8FlGosGJ1fiO67XJTobgxhTJvHR9proAfgzwiTxobFOBsjo/D6
- rdhD0YfgbOQ0X3s+V92PnnKQSPJ4dAYEIzohJ7Yg=
+ b=HwaZ4R321M4iTrGWzd8EvKqSdDHIN2h7uJY59Ll4na3klVa2SfL7t6D5XnelyNVXl
+ birXMdTN/BX3pt5fiLycZkCd/35/DQSaTCpFiWPtACd+zteGz1SAmdEwli80k/EBmY
+ ivrhURD4Oj5OqqyQxBSA+oFBpxTA+l12LobddzM4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 13/34] tpm: Move tpm_tis_show_buffer to tpm_util.c
-Date: Fri, 31 Jan 2020 17:09:03 +1100
-Message-Id: <20200131060924.147449-14-david@gibson.dropbear.id.au>
+Subject: [PULL 12/34] ppc/pnv: Add support for "hostboot" mode
+Date: Fri, 31 Jan 2020 17:09:02 +1100
+Message-Id: <20200131060924.147449-13-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 References: <20200131060924.147449-1-david@gibson.dropbear.id.au>
@@ -69,159 +69,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20200121152935.649898-2-stefanb@linux.ibm.com>
+When the "hb-mode" option is activated on the powernv machine, the
+firmware is mapped at 0x8000000 and the HRMOR of the HW threads are
+set to the same address.
+
+The PNOR mapping on the FW address space of the LPC bus is left enabled
+to let the firmware load any other images required to boot the host.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20200127144154.10170-4-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/tpm/tpm_tis.c    | 32 ++++----------------------------
- hw/tpm/tpm_util.c   | 25 +++++++++++++++++++++++++
- hw/tpm/tpm_util.h   |  3 +++
- hw/tpm/trace-events |  2 +-
- 4 files changed, 33 insertions(+), 29 deletions(-)
+ hw/ppc/pnv.c              | 28 +++++++++++++++++++++++++++-
+ hw/ppc/pnv_core.c         |  3 +++
+ hw/ppc/pnv_lpc.c          |  5 ++++-
+ include/hw/ppc/pnv.h      |  2 ++
+ include/hw/ppc/pnv_core.h |  1 +
+ 5 files changed, 37 insertions(+), 2 deletions(-)
 
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 5362df2711..31facb896d 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -107,30 +107,6 @@ static uint8_t tpm_tis_locality_from_addr(hwaddr add=
-r)
-     return (uint8_t)((addr >> TPM_TIS_LOCALITY_SHIFT) & 0x7);
- }
-=20
--static void tpm_tis_show_buffer(const unsigned char *buffer,
--                                size_t buffer_size, const char *string)
--{
--    size_t len, i;
--    char *line_buffer, *p;
--
--    len =3D MIN(tpm_cmd_get_size(buffer), buffer_size);
--
--    /*
--     * allocate enough room for 3 chars per buffer entry plus a
--     * newline after every 16 chars and a final null terminator.
--     */
--    line_buffer =3D g_malloc(len * 3 + (len / 16) + 1);
--
--    for (i =3D 0, p =3D line_buffer; i < len; i++) {
--        if (i && !(i % 16)) {
--            p +=3D sprintf(p, "\n");
--        }
--        p +=3D sprintf(p, "%.2X ", buffer[i]);
--    }
--    trace_tpm_tis_show_buffer(string, len, line_buffer);
--
--    g_free(line_buffer);
--}
-=20
- /*
-  * Set the given flags in the STS register by clearing the register but
-@@ -156,8 +132,8 @@ static void tpm_tis_sts_set(TPMLocality *l, uint32_t =
-flags)
-  */
- static void tpm_tis_tpm_send(TPMState *s, uint8_t locty)
- {
--    if (trace_event_get_state_backends(TRACE_TPM_TIS_SHOW_BUFFER)) {
--        tpm_tis_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
-+    if (trace_event_get_state_backends(TRACE_TPM_UTIL_SHOW_BUFFER)) {
-+        tpm_util_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index e61994cf5a..9442e5eb63 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -716,7 +716,7 @@ static void pnv_init(MachineState *machine)
+         exit(1);
      }
 =20
-     /*
-@@ -325,8 +301,8 @@ static void tpm_tis_request_completed(TPMIf *ti, int =
-ret)
-     s->loc[locty].state =3D TPM_TIS_STATE_COMPLETION;
-     s->rw_offset =3D 0;
+-    fw_size =3D load_image_targphys(fw_filename, FW_LOAD_ADDR, FW_MAX_SI=
+ZE);
++    fw_size =3D load_image_targphys(fw_filename, pnv->fw_load_addr, FW_M=
+AX_SIZE);
+     if (fw_size < 0) {
+         error_report("Could not load OPAL firmware '%s'", fw_filename);
+         exit(1);
+@@ -1533,6 +1533,7 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
+ror **errp)
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+     const char *typename =3D pnv_chip_core_typename(chip);
+     int i, core_hwid;
++    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
 =20
--    if (trace_event_get_state_backends(TRACE_TPM_TIS_SHOW_BUFFER)) {
--        tpm_tis_show_buffer(s->buffer, s->be_buffer_size, "From TPM");
-+    if (trace_event_get_state_backends(TRACE_TPM_UTIL_SHOW_BUFFER)) {
-+        tpm_util_show_buffer(s->buffer, s->be_buffer_size, "From TPM");
-     }
-=20
-     if (TPM_TIS_IS_VALID_LOCTY(s->next_locty)) {
-diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-index 62b091f0c0..c0a0f3d71f 100644
---- a/hw/tpm/tpm_util.c
-+++ b/hw/tpm/tpm_util.c
-@@ -350,3 +350,28 @@ void tpm_sized_buffer_reset(TPMSizedBuffer *tsb)
-     tsb->buffer =3D NULL;
-     tsb->size =3D 0;
+     if (!object_class_by_name(typename)) {
+         error_setg(errp, "Unable to find PowerNV CPU Core '%s'", typenam=
+e);
+@@ -1571,6 +1572,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
+ror **errp)
+         object_property_set_int(OBJECT(pnv_core),
+                                 pcc->core_pir(chip, core_hwid),
+                                 "pir", &error_fatal);
++        object_property_set_int(OBJECT(pnv_core), pnv->fw_load_addr,
++                                "hrmor", &error_fatal);
+         object_property_set_link(OBJECT(pnv_core), OBJECT(chip), "chip",
+                                  &error_abort);
+         object_property_set_bool(OBJECT(pnv_core), true, "realized",
+@@ -1767,6 +1770,22 @@ static void pnv_machine_power10_class_init(ObjectC=
+lass *oc, void *data)
+     pmc->dt_power_mgt =3D pnv_dt_power_mgt;
  }
-+
-+void tpm_util_show_buffer(const unsigned char *buffer,
-+                          size_t buffer_size, const char *string)
+=20
++static bool pnv_machine_get_hb(Object *obj, Error **errp)
 +{
-+    size_t len, i;
-+    char *line_buffer, *p;
++    PnvMachineState *pnv =3D PNV_MACHINE(obj);
 +
-+    len =3D MIN(tpm_cmd_get_size(buffer), buffer_size);
-+
-+    /*
-+     * allocate enough room for 3 chars per buffer entry plus a
-+     * newline after every 16 chars and a final null terminator.
-+     */
-+    line_buffer =3D g_malloc(len * 3 + (len / 16) + 1);
-+
-+    for (i =3D 0, p =3D line_buffer; i < len; i++) {
-+        if (i && !(i % 16)) {
-+            p +=3D sprintf(p, "\n");
-+        }
-+        p +=3D sprintf(p, "%.2X ", buffer[i]);
-+    }
-+    trace_tpm_util_show_buffer(string, len, line_buffer);
-+
-+    g_free(line_buffer);
++    return !!pnv->fw_load_addr;
 +}
-diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-index f397ac21b8..7889081fba 100644
---- a/hw/tpm/tpm_util.h
-+++ b/hw/tpm/tpm_util.h
-@@ -79,4 +79,7 @@ typedef struct TPMSizedBuffer {
-=20
- void tpm_sized_buffer_reset(TPMSizedBuffer *tsb);
-=20
-+void tpm_util_show_buffer(const unsigned char *buffer,
-+                          size_t buffer_size, const char *string);
 +
- #endif /* TPM_TPM_UTIL_H */
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 89804bcd64..357c9e9a84 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -14,6 +14,7 @@ tpm_util_get_buffer_size_len(uint32_t len, size_t expec=
-ted) "tpm_resp->len =3D %u,
- tpm_util_get_buffer_size_hdr_len2(uint32_t len, size_t expected) "tpm2_r=
-esp->hdr.len =3D %u, expected =3D %zu"
- tpm_util_get_buffer_size_len2(uint32_t len, size_t expected) "tpm2_resp-=
->len =3D %u, expected =3D %zu"
- tpm_util_get_buffer_size(size_t len) "buffersize of device: %zu"
-+tpm_util_show_buffer(const char *direction, size_t len, const char *buf)=
- "direction: %s len: %zu\n%s"
++static void pnv_machine_set_hb(Object *obj, bool value, Error **errp)
++{
++    PnvMachineState *pnv =3D PNV_MACHINE(obj);
++
++    if (value) {
++        pnv->fw_load_addr =3D 0x8000000;
++    }
++}
++
+ static void pnv_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc =3D MACHINE_CLASS(oc);
+@@ -1786,6 +1805,13 @@ static void pnv_machine_class_init(ObjectClass *oc=
+, void *data)
+      */
+     mc->default_ram_size =3D INITRD_LOAD_ADDR + INITRD_MAX_SIZE;
+     ispc->print_info =3D pnv_pic_print_info;
++
++    object_class_property_add_bool(oc, "hb-mode",
++                                   pnv_machine_get_hb, pnv_machine_set_h=
+b,
++                                   &error_abort);
++    object_class_property_set_description(oc, "hb-mode",
++                              "Use a hostboot like boot loader",
++                              NULL);
+ }
 =20
- # tpm_emulator.c
- tpm_emulator_set_locality(uint8_t locty) "setting locality to %d"
-@@ -36,7 +37,6 @@ tpm_emulator_pre_save(void) ""
- tpm_emulator_inst_init(void) ""
+ #define DEFINE_PNV8_CHIP_TYPE(type, class_initfn) \
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index 5fe3f21e12..f7247222bc 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -56,6 +56,8 @@ static void pnv_core_cpu_reset(PnvCore *pc, PowerPCCPU =
+*cpu)
+     env->nip =3D 0x10;
+     env->msr |=3D MSR_HVB; /* Hypervisor mode */
 =20
- # tpm_tis.c
--tpm_tis_show_buffer(const char *direction, size_t len, const char *buf) =
-"direction: %s len: %zu\nbuf: %s"
- tpm_tis_raise_irq(uint32_t irqmask) "Raising IRQ for flag 0x%08x"
- tpm_tis_new_active_locality(uint8_t locty) "Active locality is now %d"
- tpm_tis_abort(uint8_t locty) "New active locality is %d"
++    env->spr[SPR_HRMOR] =3D pc->hrmor;
++
+     pcc->intc_reset(pc->chip, cpu);
+ }
+=20
+@@ -289,6 +291,7 @@ static void pnv_core_unrealize(DeviceState *dev, Erro=
+r **errp)
+=20
+ static Property pnv_core_properties[] =3D {
+     DEFINE_PROP_UINT32("pir", PnvCore, pir, 0),
++    DEFINE_PROP_UINT64("hrmor", PnvCore, hrmor, 0),
+     DEFINE_PROP_LINK("chip", PnvCore, chip, TYPE_PNV_CHIP, PnvChip *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index 22b205532b..d1de98f04c 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -825,6 +825,7 @@ ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, boo=
+l use_cpld, Error **errp)
+     qemu_irq *irqs;
+     qemu_irq_handler handler;
+     PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
++    bool hostboot_mode =3D !!pnv->fw_load_addr;
+=20
+     /* let isa_bus_new() create its own bridge on SysBus otherwise
+      * devices speficied on the command line won't find the bus and
+@@ -859,7 +860,9 @@ ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, boo=
+l use_cpld, Error **errp)
+      * Start disabled. The HIOMAP protocol will activate the mapping
+      * with HIOMAP_C_CREATE_WRITE_WINDOW
+      */
+-    memory_region_set_enabled(&pnv->pnor->mmio, false);
++    if (!hostboot_mode) {
++        memory_region_set_enabled(&pnv->pnor->mmio, false);
++    }
+=20
+     return isa_bus;
+ }
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index d65dd32036..f225f2f6bf 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -217,6 +217,8 @@ struct PnvMachineState {
+     Notifier     powerdown_notifier;
+=20
+     PnvPnor      *pnor;
++
++    hwaddr       fw_load_addr;
+ };
+=20
+ #define PNV_FDT_ADDR          0x01000000
+diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+index 55eee95104..113550eb7f 100644
+--- a/include/hw/ppc/pnv_core.h
++++ b/include/hw/ppc/pnv_core.h
+@@ -40,6 +40,7 @@ typedef struct PnvCore {
+     /*< public >*/
+     PowerPCCPU **threads;
+     uint32_t pir;
++    uint64_t hrmor;
+     PnvChip *chip;
+=20
+     MemoryRegion xscom_regs;
 --=20
 2.24.1
 
