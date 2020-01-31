@@ -2,93 +2,93 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D62C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D506AC33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:52:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EB4D20674
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:31:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94B4720705
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:52:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ivUBqUo5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EB4D20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VNll7wfg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94B4720705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixPpt-0000Ha-PW
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:31:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60471)
+	id 1ixQ9q-000443-IU
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:52:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44186)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ixPWm-0002TO-KW
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:11:42 -0500
+ (envelope-from <armbru@redhat.com>) id 1ixQ93-0003Un-9d
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:51:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ixPWj-0003ds-Rm
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:11:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41453
+ (envelope-from <armbru@redhat.com>) id 1ixQ90-0007vH-HI
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:51:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36678
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ixPWj-0003cx-N9
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:11:37 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ixQ90-0007up-5j
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:51:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580451097;
+ s=mimecast20190719; t=1580453469;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=D/hKssfTqGpa/gYEZkWQcvYASWY+aM6BGvgO4+yT9jc=;
- b=ivUBqUo5t1mjBIGp7XkQMUTJN9+i2QMalDhV0+Dtc607RztkYBtnhZWSVqwirOtzVH+vhI
- L+uuAJS5+7Nj/zYgXt6ZrWzAn2LmhMF3XPnPkq52v7qgdNgzQsLm+JGULzptfImBg/79XB
- AI1ZwU/2F1gHoSzO5+gmwBDwYwJtv4Y=
+ bh=TlbTveGjVI26Xn0BtFhSlUZqLVf4FvYA+JxYa0oV7ac=;
+ b=VNll7wfgWIsngAq25pozF6iCXoSWai04OMH6htgDGfYXO/89LUoshy3JZW46y2G6hcQwQ6
+ Pj5MkmAlIG0RamiQ9JpdCMfx85N12v1sqyMJmUwBTA/htl7bJMRNsZWZb2RI1XqgiMYEhW
+ GcEDN3kabMXqVmYnFI+g4JlxkAVtc/s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-gTBVkOXvMLOnZr4sCi7hwA-1; Fri, 31 Jan 2020 01:11:27 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-69-dFbeZIPtNxOO5CLyahGwdg-1; Fri, 31 Jan 2020 01:51:07 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8750318B9FC1;
- Fri, 31 Jan 2020 06:11:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D33FCA0CCF;
+ Fri, 31 Jan 2020 06:51:05 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
  [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EA3819488;
- Fri, 31 Jan 2020 06:11:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 333F860BE2;
+ Fri, 31 Jan 2020 06:50:52 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 32DE21138404; Fri, 31 Jan 2020 07:11:15 +0100 (CET)
+ id B91E81138404; Fri, 31 Jan 2020 07:50:50 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Subject: Re: Improving QOM documentation [Was: Re: Making QEMU easier for
- management tools and applications]
-References: <20200108104306.GC5057@dhcp-200-226.str.redhat.com>
- <97F153BD-FB8A-46C7-90D0-9E894B9E0292@redhat.com>
- <20200108133842.GE5057@dhcp-200-226.str.redhat.com>
- <87d0bmchq0.fsf@dusky.pond.sub.org>
- <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200115121953.GJ93923@redhat.com>
- <874kwwvmuv.fsf@dusky.pond.sub.org> <20200130210902.GA25927@paraplu>
-Date: Fri, 31 Jan 2020 07:11:15 +0100
-In-Reply-To: <20200130210902.GA25927@paraplu> (Kashyap Chamarthy's message of
- "Thu, 30 Jan 2020 22:09:02 +0100")
-Message-ID: <87y2toi29o.fsf@dusky.pond.sub.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+References: <20200123190145.GI657556@redhat.com>
+ <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
+ <871rrp474i.fsf@dusky.pond.sub.org>
+ <20200124102743.GB824327@redhat.com>
+ <20200124143841.GG4732@dhcp-200-226.str.redhat.com>
+ <87sgk3x2im.fsf@dusky.pond.sub.org>
+ <20200127115606.GA5669@linux.fritz.box>
+ <1c65b678-7bb4-a4cc-5fa6-03d6d27cf381@redhat.com>
+ <20200128102855.GA6431@linux.fritz.box>
+ <87mua7bvwf.fsf@dusky.pond.sub.org>
+ <20200128125409.GF6431@linux.fritz.box>
+Date: Fri, 31 Jan 2020 07:50:50 +0100
+In-Reply-To: <20200128125409.GF6431@linux.fritz.box> (Kevin Wolf's message of
+ "Tue, 28 Jan 2020 13:54:09 +0100")
+Message-ID: <878sloi0fp.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: gTBVkOXvMLOnZr4sCi7hwA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: dFbeZIPtNxOO5CLyahGwdg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,133 +100,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>, John Snow <jsnow@redhat.com>,
- ehabkost@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang?= =?utf-8?Q?=C3=A9?=" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Mar?= =?utf-8?Q?c-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kashyap Chamarthy <kchamart@redhat.com> writes:
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> On Wed, Jan 15, 2020 at 03:02:48PM +0100, Markus Armbruster wrote:
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->
-> [Changed the subject-line to indicate deviation from the original
-> topic.]
->
-> [...]
->
->> > Libvirt is of course happy to switch to something else instead of
->> > qom-set for these features if QEMU wants to provide a safer
->> > alternative.
+> Am 28.01.2020 um 13:36 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
 >>=20
->> Noted.
+>> > Am 27.01.2020 um 21:11 hat John Snow geschrieben:
+>> [...]
+>> >> (The argument here is: It's a little harder and a little longer to ty=
+pe,
+>> >> but the benefits from the schema organization may improve productivit=
+y
+>> >> of using QEMU directly instead of harming it.)
+>> >
+>> > I think this is a false dichotomy.
+>> >
+>> > You can have everything defined by the schema and properly documented
+>> > and still have a non-JSON command line. Translating the QAPI schema to
+>> > a command line option is a solved problem, this is exactly how
+>> > -blockdev works.
+>> >
+>> > The unsolved part is how to compatibly convert the existing options. I=
+f
+>> > you're willing to sacrifice compatibility, great. Then we can just
+>> > define stuff in the QAPI schema and still keep a command line syntax
+>> > that is usable for humans. The code for mapping a QAPI type to the
+>> > argument of an option is basically already there.
 >>=20
->> libvirt's use of qom-set is okay.  What's not okay is the near-complete
->> lack of QOM documentation, its poor QMP interface, in part due to
->> non-integration with QAPI, and last but not least the lack of QOM
->> leadership leaving it adrift.
+>> Correct.
+>>=20
+>> Solving that problem took time, but that's sunk cost now.
+>>=20
+>> > The only question is "is compatibility important"? If the answer is no=
+,
+>> > then we'll be there in no time.
+>>=20
+>> I doubt we'll be there in no time, but certainly much sooner than if we
+>> have to grapple with compatibility to a byzantine CLI nobody truly
+>> understands.
+>>=20
+>> There's one known issue caused by having "a non-JSON command line"
+>> (actually: dotted keys as sugar for JSON): pressure to reduce nesting.
+>>=20
+>> Consider chardev-add.  Example:
+>>=20
+>>     {"execute": "chardev-add",
+>>      "arguments": {"id": "bar",
+>>                    "backend": {"type": "file",
+>>                                "data": {"out": "/tmp/bar.log"}}}}
+>>=20
+>> The arguments as dotted keys:
+>>=20
+>>     id=3Dbar,backend.type=3Dfile,backend.data.out=3D/tmp/bar.log
+>>=20
+>> Observe there's quite some of nesting.  While that's somewhat cumbersome
+>> in JSON, it's a lot worse with dotted keys, because there nesting means
+>> repeated key prefixes.  I could give much worse examples, actually.
 >
-> What can be done to improve QOM documentation (or lack thereof)?
-
-Are you trying to push us from idle grousing to actually improve things?
-No fair!
-
-> From a couple of hurried `grep` queries in the QEMU tree, there seems to
-> be no explicit qom.rst|txt, or qemu-object-model.txt|rst or some such.
-> (I hope I haven't missed any other files.)
-
-As far as I know, all we have is the lovingly[*] written comments in
-include/qom/object.h.  Sadly, we've let them rot in places.  In
-particular, many newer functions are undocumented.
-
-This is *reference* documentation.  What we lack (sorely!) is an
-overview / friendly introduction, and a design document with rationale.
-Reconstructing rationale now would involve guesswork.
-
-> Let's dig further.  Ah, I come across this helpful 2016 blog post[1]
-> ("An incomplete list of QEMU APIs") by Eduardo from my bookmarks.  Here
-> I get some clues:
+> This is true, but even without the repeated keys (e.g. in a syntax that
+> would use brackets), it would still be unnecessarily verbose and
+> probably hard to remember:
 >
-> (a) In the section titled "QOM", Eduardo writes:
+>     id=3Dbar,backend=3D{type=3Dfile,data=3D{out=3D/tmp/bar.log}}
+
+No argument.  It's unnecessarily verbose in JSON, too.
+
+>> We'd rather have something like
+>>=20
+>>     id=3Dbar,type=3Dfile,out=3D/tmp/bar.log
+>>=20
+>> Back to JSON:
+>>=20
+>>     "arguments": {"id": "bar", "type": "file", "out": "/tmp/bar.log"}
+>>=20
+>> QAPI can do this, but it uses feature that predate chardev-add.
+>>=20
+>> We don't want to duplicate the chardev-add schema in modern, flattened
+>> form for the CLI.
+>>=20
+>> So the compatibility problem actually shifts to QMP: can we evolve the
+>> existing QMP command compatibly at a reasonable cost in design, coding
+>> and complexity to support flat arguments?
 >
->         "QOM is short for QEMU Object Model and was introduced in 2011.
->         It is heavily documented on its header file
->         [include/qom/object.h]"=20
+> Well, first of all: Do we need compatibility? If we don't, then we can
+> just make the change.
+
+The trouble with flattening this one is QMP, where we promise stability.
+
+> Much of this threads plays with the though that maybe we don't need any
+> compatibility and make the radical conclusion that we don't need any
+> human-friendly interface at all. Keeping full compatibility is the other
+> extreme.
 >
->     Opening qom/object.h[2], indeed there is copious amounts of docs,
->     expressed as commented-out text.  Two questions:
->
->     - How much of this is still accurate?  (Sorry, if that's a loaded
->       question.)
+> There might be some middle ground where we break compatibility where the
+> old way can't easily be maintained with the new infrastructure, but
+> don't give up on the idea of being used by humans.
 
-May I present you Armbru's Comment Trust Levels:
+I'm not sure the connection between maintaining compatibility and
+supporting human use is as strong as you seem to imply.
 
-ACTL2: The comment may be overly terse or incomplete, but the
-probability for it to be outright wrong is low.
+As far as I can tell, the "maybe we don't need any compatibility"
+discussion is about the CLI.  I'd rephrase it as "maybe we need a
+machine-friendly CLI on par with QMP more than we need compatibility to
+the current CLI".
 
-ACTL1: Treat as helpful guidance (with gratitude), but trust only the
-code.
+"We don't need any human-friendly interface at all" comes in not because
+machine-friendly necessarily precludes human-friendly, but only if we're
+unwilling (unable?) to do the extra work for it.
 
-ACTL0: It is a tale Told by an idiot[**], full of sound and fury,
-Signifying nothing.
+Compare the monitor:
 
-Most comments in decently maintained code are at ACTL1.
+* QMP is primarily for machines.  We promise stability: no incompatible
+  changes without clear communicaton of intent and a grace period.  We
+  provide machine clients tools to deal with the interface evolution,
+  e.g. query-qmp-schema.
 
-Around the time initial QOM development solidified, object.h's comments
-were ACTL2.  The neglect that is now clearly visible there makes me
-downgrade to ACTL1.
+* HMP is exclusively for humans.  It may change at any time.
 
-Paolo will have a more informed and possibly different opinion.
+For the CLI, we don't have such a separation, and our offerings for
+dealing with interface evolution are wholly inadequate.  We *need* to do
+better for machines.
 
->     - If at least 60% is still accurate, is it valuable to extract and
->       publish it as rendered rST, as part of the on-going QEMU Docs
->       improvement?
+Now, the monitor also informs us about the cost of providing a
+completely separate interface for humans.
 
-Beware, personal opinion.
+Elsewhere in this thread, we discussed layering (a replacement for) HMP
+on top of QMP cleanly, possibly in a separate process, possibly written
+in a high-level language like Python.
 
-When you put documentation next to the code it documents (which you
-absolutely should, because it's your only realistic chance to keep the
-two in sync), then extracting API comments is useful, because it
-collects them in one place.
+HMP predates QMP.  We reworked it so the HMP commands are implemented on
+top of the QMP commands, or at least on top of common helpers.  But this
+is not quite the same as layering HMP on top of QMP.
 
-It's of next to no use to me when the comments are all in the same place
-already, namely the header.
-
-> (b) The other clue is also from the same post, where Eduardo provides
->     pointers to past KVM Forum presentations by MarkusA, PaoloB,
->     AndreasF on QOM, Qdev et al.
->
->     Is it worth slapping all these references (with a clear intro and
->     outro) into a qom.rst file in QEMU tree, even if only for
->     reference/context?  Or are these references, in-tree docs in
->     object.h out-of-date beyond repair? =20
-
-Uff.
-
-My qdev talks predate the rebase onto QOM.  They may well confuse /
-mislead as much as inform now.
-
-> If it is useful, I'm happy to get the initial doc going, secure in the
-> knowledge that more clueful people than me will chip in during the
-> review :-)
-
-Ha, nerd sniping!
-
-> [1] https://habkost.net/posts/2016/11/incomplete-list-of-qemu-apis.html
-> [2] https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dinclude/qom/object.h
-> [3] http://www.linux-kvm.org/images/9/90/Kvmforum14-qom.pdf
-
-
-[*] Absolutely no irony intended.  Honest, officer!
-
-[**] Don't take it personally, we're all part-time idiots.  Besides,
-this is literature.
+If we decide to radically break the CLI so we can start over, we get to
+decide whether and how to do a human-friendly CLI, in particular how it
+relates to the machine-friendly CLI.
 
 
