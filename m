@@ -2,74 +2,91 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.8 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 125EFC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AF5BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB464206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:16:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB464206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 260BD20663
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:22:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tR9N3wyf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 260BD20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixZuA-0006MJ-4p
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 12:16:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59951)
+	id 1ixa0G-0008QC-93
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 12:22:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33185)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ixZtO-0005vk-7G
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:15:43 -0500
+ (envelope-from <stefanha@gmail.com>) id 1ixZza-0007x3-56
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:22:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ixZtN-00086l-16
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:15:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38480)
+ (envelope-from <stefanha@gmail.com>) id 1ixZzZ-0000se-6k
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:22:06 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:41270)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ixZtM-0007zn-S5
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:15:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ixZtJ-0002gI-RY
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 17:15:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CBFB42E80C0
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 17:15:37 +0000 (UTC)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ixZzY-0000qb-Vg
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:22:05 -0500
+Received: by mail-wr1-x436.google.com with SMTP id c9so9562847wrw.8
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 09:22:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=yk3+W7sbap/tZdI3bg7dqQ8fV+ENIrbbwCwGfxjHnJM=;
+ b=tR9N3wyfZ6fmfNQ5BCkiPlWa+T9rXADu1bJ3lEMLp5f18tNCALFW2UOYkMpq7lYddb
+ Rl6NHWbAV+jOv8wv8cM5Wa9Zica29ShvzUUzrH6z/RaO5Xzv34ClaNaPfgkpIbGGxv9p
+ B6WCGGpO33jD11/FY0mFayjz19R50BPDiKBxNY3kwBXDIiUyuwB2he53+DFXN2nI8o9p
+ pSeJ8+J4lJ/nYPSIM9AmmwMRN9gIRrZWxbMUCrrlNaoTfbgGL9VfbltfLx27wfQXEVYL
+ 2izyjc+a1C+KwngMncQ886M/XEZn0NswkBosgbOEAUKfsoPc1Gr0nG9S5wa8VjQnWLtY
+ /qlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=yk3+W7sbap/tZdI3bg7dqQ8fV+ENIrbbwCwGfxjHnJM=;
+ b=FYP4WOxssDrmgMGGihm44G1GUxwrvrlXb9FxzNKqLdEEmrd938aYA/pZKi9uVSYA/L
+ igtVMjoC018q+jfrzuHRiAs36b3vCStNu8SV+yKPXV+Vo1lpXUoSL/D3rV354Z1Vaib7
+ 8HuVAqTYn5erYVa9gXBqC1TSVRrD652BSZaHxBj4W8rMg0vAzG962CvM3Fp0xSK8hiJV
+ R2kak0FGGwDzmXB5owVdtbovef4DdPLSiGiOx3eDNrBcHd9Gs1Itsrl2vRv3IVrTpcJq
+ hXH02YqsVEv4JY8ocgiCnddkQ2kuU3ECVB7nSGgR6YmhgaPgNonPoeOxjO2Q26hoWQ/k
+ 5uRA==
+X-Gm-Message-State: APjAAAXg1oa8gxM8Zxw0tZ6KfzEQMHKSE+AgN9JMJB3f5/tnWCdVx4JC
+ jPPnLEstJsecBkitL076Kcs=
+X-Google-Smtp-Source: APXvYqw8lp5yUApzmbfSfL2/pH0scOzf2lypyO7rS38fvY2I9qF6yk+WaI1NluydGSC7UF7KEU88nw==
+X-Received: by 2002:adf:fd8d:: with SMTP id d13mr4440878wrr.208.1580491322640; 
+ Fri, 31 Jan 2020 09:22:02 -0800 (PST)
+Received: from localhost (229.227-241-81.adsl-static.isp.belgacom.be.
+ [81.241.227.229])
+ by smtp.gmail.com with ESMTPSA id y12sm11332057wmj.6.2020.01.31.09.22.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 31 Jan 2020 09:22:01 -0800 (PST)
+Date: Fri, 31 Jan 2020 11:28:57 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Subject: Re: [GSoC/Outreachy QEMU proposal] Extend support for ioctls in QEMU
+ linux-user mode
+Message-ID: <20200131112857.GA4487@stefanha-x1.localdomain>
+References: <CAL1e-=j5WJkV=X+KkfBuS3pjf6z3aJrtu4xpYeVbjEUYiWxxTQ@mail.gmail.com>
+ <CAL1e-=ghxDLcU3iqkZ8q_sbk_DyR70t2a-jFtoNDVa7iTkMXsQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jan 2020 17:02:46 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: tcg testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: stvlvrn
-X-Launchpad-Bug-Reporter: Stevie Lavern (stvlvrn)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <158038956597.5319.13308249814127344774.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158049016711.20266.13259801440809425215.launchpad@wampee.canonical.com>
-Subject: [Bug 1861404] Re: AVX instruction VMOVDQU implementation error for
- YMM registers
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6daf66a9be2463601a9f02393ec9492c3e484414
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
+Content-Disposition: inline
+In-Reply-To: <CAL1e-=ghxDLcU3iqkZ8q_sbk_DyR70t2a-jFtoNDVa7iTkMXsQ@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,89 +95,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1861404 <1861404@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: tcg testcase
 
--- =
+--LQksG6bCIzRHxTLp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1861404
+On Thu, Jan 30, 2020 at 12:09:58PM +0100, Aleksandar Markovic wrote:
+> Stefan, there was an idea in this thread that this project contributes
+> (apart to QEMU) to another ooen source project (LTP). In my layman view,
+> this is an advantage. But, how does that fit into GSoC/Outreachy rules?
 
-Title:
-  AVX instruction VMOVDQU implementation error for YMM registers
+That is fine for GSoC.  It will benefit the open source community and
+the code being written will be under an approved open source license.
 
-Status in QEMU:
-  New
+For Outreachy we focus on the QEMU codebase because the funding comes
+for sponsors that may wish their donations to be used for QEMU
+development.
 
-Bug description:
-  Hi,
+Stefan
 
-  Tested with Qemu 4.2.0, and with git version
-  bddff6f6787c916b0e9d63ef9e4d442114257739.
+--LQksG6bCIzRHxTLp
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  The x86 AVX instruction VMOVDQU doesn't work properly with YMM registers =
-(32 bytes).
-  It works with XMM registers (16 bytes) though.
+-----BEGIN PGP SIGNATURE-----
 
-  See the attached test case `ymm.c`: when copying from memory-to-ymm0
-  and then back from ymm0-to-memory using VMOVDQU, Qemu only copies the
-  first 16 of the total 32 bytes.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl40D3kACgkQnKSrs4Gr
+c8hu2Qf8CuNztOMmZmBtlDN7+pACnSEur9lgJHOm2cMWy/m5+CZHEcm96SEGCEtM
+1ATvzmqx+BWVd+hnFCdMpLi9/HMjWjNczFwGUTOdKSr7GNpOyX7dCGjyXQIVcm1B
+VdxLqgnbaUEjgtEXBQuPldw/MbQnAcGWJzw9RBGurWotuICJ22UqAZSda/i0pY/3
+nOqF6w4jRylUjORmUPvrGYylAGfsGLI3IGDXSTwT/7UwzLaJAABPN1Nycfw9UwfA
+wQ8reE0MP6ck0TML4qjFIkmztREPIcEIllAu2xx3NsDvWNhiBUutZ/ILZEXvvtZG
+mTVQeEYG99mBrymicywf0cie7jBHaw==
+=zVYX
+-----END PGP SIGNATURE-----
 
-  ```
-  user@ubuntu ~/Qemu % gcc -o ymm ymm.c -Wall -Wextra -Werror
-
-  user@ubuntu ~/Qemu % ./ymm
-  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 1=
-8 19 1A 1B 1C 1D 1E 1F
-
-  user@ubuntu ~/Qemu % ./x86_64-linux-user/qemu-x86_64 -cpu max ymm
-  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 00 00 00 00 00 00 00 00 0=
-0 00 00 00 00 00 00 00
-  ```
-
-  This seems to be because in `translate.c > gen_sse()`, the case
-  handling the VMOVDQU instruction calls `gen_ldo_env_A0` which always
-  performs a 16 bytes copy using two 8 bytes load and store operations
-  (with `tcg_gen_qemu_ld_i64` and `tcg_gen_st_i64`).
-
-  Instead, the `gen_ldo_env_A0` function should generate a copy with a
-  size corresponding to the used register.
-
-  =
-
-  ```
-  static void gen_sse(CPUX86State *env, DisasContext *s, int b,
-                      target_ulong pc_start, int rex_r)
-  {
-          [...]
-          case 0x26f: /* movdqu xmm, ea */
-              if (mod !=3D 3) {
-                  gen_lea_modrm(env, s, modrm);
-                  gen_ldo_env_A0(s, offsetof(CPUX86State, xmm_regs[reg]));
-              } else { =
-
-          [...]
-  ```
-
-  ```
-  static inline void gen_ldo_env_A0(DisasContext *s, int offset)
-  {
-      int mem_index =3D s->mem_index;
-      tcg_gen_qemu_ld_i64(s->tmp1_i64, s->A0, mem_index, MO_LEQ);
-      tcg_gen_st_i64(s->tmp1_i64, cpu_env, offset + offsetof(ZMMReg, ZMM_Q(=
-0)));
-      tcg_gen_addi_tl(s->tmp0, s->A0, 8);
-      tcg_gen_qemu_ld_i64(s->tmp1_i64, s->tmp0, mem_index, MO_LEQ);
-      tcg_gen_st_i64(s->tmp1_i64, cpu_env, offset + offsetof(ZMMReg, ZMM_Q(=
-1)));
-  }
-  ```
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1861404/+subscriptions
+--LQksG6bCIzRHxTLp--
 
