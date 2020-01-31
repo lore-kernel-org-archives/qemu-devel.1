@@ -2,78 +2,89 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B70C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:01:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E13EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 565A2206D3
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:01:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB07A206D3
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:02:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ibYlVtFc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 565A2206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c6tN46Ti"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB07A206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYk2-0006mf-CS
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:01:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40071)
+	id 1ixYkv-0007sS-0d
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:02:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXyy-0005aD-Ab
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:21 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ixY00-0007VU-Ho
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:14:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXyx-0005u6-7p
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31258
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyx-0005sB-48
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483598;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+MiabNXH7yzsDOg22n+URIhmCX6kTQn3rFgVZl3uMUc=;
- b=ibYlVtFcqOf6xDgXYoWRlW2HzfV7+ZnJDWCwIOdGUB7peLCZODUOk89sZach/r5kBT3Mzo
- kHGKRjqhdMdWpV3G7gvSrDHKzlmizBSKZX65+Ho4ty8S6ybQydRYAc+/+vVcG005Khx006
- 5Owp4ykZAX7aG1pDZ/WmyW9VD6nLILo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-6HDLHqlTOx6bFpoEYrM5iQ-1; Fri, 31 Jan 2020 10:13:15 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47275800D48;
- Fri, 31 Jan 2020 15:13:14 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 22C7787B09;
- Fri, 31 Jan 2020 15:13:12 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 52/80] mips/mips_fulong2e: use memdev for RAM
-Date: Fri, 31 Jan 2020 16:09:22 +0100
-Message-Id: <1580483390-131164-53-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
-References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 6HDLHqlTOx6bFpoEYrM5iQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <alex.bennee@linaro.org>) id 1ixXzz-0002k1-4Y
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:14:24 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42758)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ixXzy-0002YI-Ru
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:14:23 -0500
+Received: by mail-wr1-x442.google.com with SMTP id k11so8995196wrd.9
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 07:14:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=F5Kal3QYgjGCbr6y7XeoXy166XSqtRMEalK7GQ3CG4s=;
+ b=c6tN46TiXLtwT7HEw3z+Nz2KZxQrD3nG1Y1uO6eWHwJx6UICueUy10UCip1Vot9/4p
+ q7F7wBJtiy8n4nMxsHvbcBz26Maza784y+qqb5aCok0ayqWmFthTHoYaquodW/c8E+Iq
+ hrH/AL9knd2e39JyDButKqXpPtvxotzveqEz6zskflNcorMgxxMffEOxllSG/llNBrtZ
+ pf6QmRlkZOqHMycVAhf1cw0z6bLbQ3bRTSTezxCSeEZKI4zQHnr169VMj8AGyXaodjRO
+ V7/MfsZqfMazkVKfx4SsNYc7enombaT+5VxVTC5EmAgs3AE9K0eWgNqH2cyuwE+aZmOC
+ UQUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=F5Kal3QYgjGCbr6y7XeoXy166XSqtRMEalK7GQ3CG4s=;
+ b=VVXkJ1g1zorT7ppTY7hRGcBUR5r4+kOp4QtgUe5GYWe3WVMuTrzdG/upDqxJgl3Zvq
+ aMP6yMWoIwV2j30t+RlrUZ5yygM1YagChE9Refj7PHBtRzTty+9uAirHPBREGr3yJEpL
+ MYc67lXuVT1UhEoaRRu4flzO8BwHHcup1x61h3BnhC4hxyOscVUmdVPa+PiN7DPenEzo
+ Av/0y/Le1QrcpWetELtQtiyBFbWVhYAGFCeJskW+Mw4WkTFeddspGHagSjPUD+pZzHer
+ cwn0wrgnjBQzv1Tc4VBBAUpXeYGSA0ZGmqoKUiX65fjAXSzGN1kYmC88ctIL2OjgDGC7
+ ZcGw==
+X-Gm-Message-State: APjAAAVvqjYA3m3G4jeK2xaYyJmiIVwc6S+751V8jI7QR+LBkl21vNT2
+ Q7PVvbYCsGUlJtG1YgHQcZo0PQ==
+X-Google-Smtp-Source: APXvYqwMrCAfGJsAp/2E0L1j3zCKVyJBsJzFMOrutoAqdwpld3Bl39xTpw+cprjOFD4SXCJSDFLmmg==
+X-Received: by 2002:a5d:5752:: with SMTP id q18mr13182309wrw.277.1580483661168; 
+ Fri, 31 Jan 2020 07:14:21 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h10sm10466551wre.3.2020.01.31.07.14.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 31 Jan 2020 07:14:20 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 55D711FF87;
+ Fri, 31 Jan 2020 15:14:19 +0000 (GMT)
+References: <20200124162606.8787-1-peter.maydell@linaro.org>
+ <20200124162606.8787-6-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 5/8] qemu-img: Convert invocation documentation to rST
+In-reply-to: <20200124162606.8787-6-peter.maydell@linaro.org>
+Date: Fri, 31 Jan 2020 15:14:19 +0000
+Message-ID: <87h80b8xpw.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,67 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@rt-rk.com, philmd@redhat.com, aurelien@aurel32.net,
- amarkovic@wavecomp.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-CC: philmd@redhat.com
-CC: amarkovic@wavecomp.com
-CC: aurelien@aurel32.net
-CC: aleksandar.rikalo@rt-rk.com
----
- hw/mips/mips_fulong2e.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index cf00211..c373ab0 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -294,7 +294,6 @@ static void mips_fulong2e_init(MachineState *machine)
-     const char *initrd_filename =3D machine->initrd_filename;
-     char *filename;
-     MemoryRegion *address_space_mem =3D get_system_memory();
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *bios =3D g_new(MemoryRegion, 1);
-     long bios_size;
-     uint8_t *spd_data;
-@@ -320,13 +319,11 @@ static void mips_fulong2e_init(MachineState *machine)
-     }
-=20
-     /* allocate RAM */
--    memory_region_allocate_system_memory(ram, NULL, "fulong2e.ram",
--                                         machine->ram_size);
-     memory_region_init_ram(bios, NULL, "fulong2e.bios", BIOS_SIZE,
-                            &error_fatal);
-     memory_region_set_readonly(bios, true);
-=20
--    memory_region_add_subregion(address_space_mem, 0, ram);
-+    memory_region_add_subregion(address_space_mem, 0, machine->ram);
-     memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
-=20
-     /*
-@@ -402,6 +399,7 @@ static void mips_fulong2e_machine_init(MachineClass *mc=
-)
-     mc->block_default_type =3D IF_IDE;
-     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("Loongson-2E");
-     mc->default_ram_size =3D 256 * MiB;
-+    mc->default_ram_id =3D "fulong2e.ram";
- }
-=20
- DEFINE_MACHINE("fulong2e", mips_fulong2e_machine_init)
+> The qemu-img documentation is currently in qemu-nbd.texi in Texinfo
+> format, which we present to the user as:
+>  * a qemu-img manpage
+>  * a section of the main qemu-doc HTML documentation
+>
+> Convert the documentation to rST format, and present it to the user as:
+>  * a qemu-img manpage
+>  * part of the interop/ Sphinx manual
+>
+> The qemu-img rST document uses the new hxtool extension
+> to handle pulling rST fragments out of qemu-img-cmds.hx.
+>
+> The documentation of the various options and commands is rather
+> muddled, with some options being described inside the relevant
+> command description and some in a more general section near the start
+> of the manual.  All the command synopses are replicated in the .hx
+> file and then again in the manual.  A lot of text is also duplicated
+> in the qemu-img.c code for the help text.  I have not attempted to
+> deal with any of this, but have simply transposed the existing
+> structure into rST.
+>
+> As usual, there are some minor formatting changes but no
+> textual changes, except that as with one or two other conversions
+> I have dropped the 'see also' section since it's not very
+> informative and looks odd in the HTML.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 --=20
-2.7.4
-
+Alex Benn=C3=A9e
 
