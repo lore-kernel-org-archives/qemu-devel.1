@@ -6,47 +6,46 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF46FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD59C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:09:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 956682067C
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:08:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 956682067C
+	by mail.kernel.org (Postfix) with ESMTPS id 5FD8E2067C
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:09:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FD8E2067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJrZ-0007i4-Oq
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:08:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58618)
+	id 1ixJsh-0001nB-GE
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:09:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58759)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnf-0007UO-3v
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:45 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnp-0007q4-14
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnc-0002vx-Lv
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:43 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51063 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnn-000344-7k
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:52 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51208 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ixJnc-0002sp-8a
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:40 -0500
+ id 1ixJnm-0002tp-SE
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:51 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id C27541A20E1;
- Fri, 31 Jan 2020 01:03:37 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 0EF991A20FE;
+ Fri, 31 Jan 2020 01:03:38 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 959481A207B;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id CF2661A207B;
  Fri, 31 Jan 2020 01:03:37 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc4 14/29] target/avr: Add instruction translation - CPU main
- translation function
-Date: Fri, 31 Jan 2020 01:02:58 +0100
-Message-Id: <1580428993-4767-15-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc4 18/29] hw/misc: Add limited support for AVR power device
+Date: Fri, 31 Jan 2020 01:03:02 +0100
+Message-Id: <1580428993-4767-19-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -68,6 +67,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
  Michael Rolnik <mrolnik@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -75,286 +75,245 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Co-developed-by: Richard Henderson <richard.henderson@linaro.org>
-Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
+This is a simple device of just one register, and whenever this
+register is written to it calls qemu_set_irq function for each
+of 8 bits/IRQs. It is used to implement AVR Power Reduction.
+
+[AM: Remove word 'Atmel' from filenames and all elements of code]
+Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+[rth: Squash include fix and file rename from f4bug]
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- target/avr/translate.c | 234 +++++++++++++++++++++++++++++++++++++++++++=
+ hw/misc/Kconfig             |   3 ++
+ hw/misc/Makefile.objs       |   2 +
+ hw/misc/avr_power.c         | 112 ++++++++++++++++++++++++++++++++++++++=
 ++++++
- 1 file changed, 234 insertions(+)
+ include/hw/misc/avr_power.h |  46 ++++++++++++++++++
+ 4 files changed, 163 insertions(+)
+ create mode 100644 hw/misc/avr_power.c
+ create mode 100644 include/hw/misc/avr_power.h
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 4c68007..af88bb2 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -2749,3 +2749,237 @@ static bool trans_WDR(DisasContext *ctx, arg_WDR =
-*a)
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index bdd77d8..92c397c 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -131,4 +131,7 @@ config MAC_VIA
+     select MOS6522
+     select ADB
 =20
-     return true;
- }
++config AVR_POWER
++    bool
 +
+ source macio/Kconfig
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index da993f4..df8e457 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -85,3 +85,5 @@ common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_rng.o
+ obj-$(CONFIG_MAC_VIA) +=3D mac_via.o
+=20
+ common-obj-$(CONFIG_GRLIB) +=3D grlib_ahb_apb_pnp.o
 +
-+void avr_cpu_tcg_init(void)
++obj-$(CONFIG_AVR_POWER) +=3D avr_power.o
+diff --git a/hw/misc/avr_power.c b/hw/misc/avr_power.c
+new file mode 100644
+index 0000000..598bc72
+--- /dev/null
++++ b/hw/misc/avr_power.c
+@@ -0,0 +1,112 @@
++/*
++ * AVR Power Reduction Management
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/misc/avr_power.h"
++#include "qemu/log.h"
++#include "hw/qdev-properties.h"
++#include "hw/irq.h"
++
++#define DB_PRINT(fmt, args...) /* Nothing */
++/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## ar=
+gs)*/
++
++static void avr_mask_reset(DeviceState *dev)
 +{
-+    int i;
++    AVRMaskState *s =3D AVR_MASK(dev);
 +
-+#define AVR_REG_OFFS(x) offsetof(CPUAVRState, x)
-+    cpu_pc =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(pc_w), "pc")=
-;
-+    cpu_Cf =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregC), "Cf"=
-);
-+    cpu_Zf =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregZ), "Zf"=
-);
-+    cpu_Nf =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregN), "Nf"=
-);
-+    cpu_Vf =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregV), "Vf"=
-);
-+    cpu_Sf =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregS), "Sf"=
-);
-+    cpu_Hf =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregH), "Hf"=
-);
-+    cpu_Tf =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregT), "Tf"=
-);
-+    cpu_If =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregI), "If"=
-);
-+    cpu_rampD =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampD), "=
-rampD");
-+    cpu_rampX =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampX), "=
-rampX");
-+    cpu_rampY =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampY), "=
-rampY");
-+    cpu_rampZ =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampZ), "=
-rampZ");
-+    cpu_eind =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(eind), "ei=
-nd");
-+    cpu_sp =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sp), "sp");
-+    cpu_skip =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(skip), "sk=
-ip");
++    s->val =3D 0x00;
 +
-+    for (i =3D 0; i < NUMBER_OF_CPU_REGISTERS; i++) {
-+        cpu_r[i] =3D tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(r[i]),
-+                                          reg_names[i]);
++    for (int i =3D 0; i < 8; i++) {
++        qemu_set_irq(s->irq[i], 0);
 +    }
-+#undef AVR_REG_OFFS
 +}
 +
-+static void translate(DisasContext *ctx)
++static uint64_t avr_mask_read(void *opaque, hwaddr offset, unsigned size=
+)
 +{
-+    uint32_t opcode =3D next_word(ctx);
++    assert(size =3D=3D 1);
++    assert(offset =3D=3D 0);
++    AVRMaskState *s =3D opaque;
 +
-+    if (!decode_insn(ctx, opcode)) {
-+        gen_helper_unsupported(cpu_env);
-+        ctx->bstate =3D DISAS_NORETURN;
++    return (uint64_t)s->val;
++}
++
++static void avr_mask_write(void *opaque, hwaddr offset,
++                              uint64_t val64, unsigned size)
++{
++    assert(size =3D=3D 1);
++    assert(offset =3D=3D 0);
++    AVRMaskState *s =3D opaque;
++    uint8_t val8 =3D val64;
++
++    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
++
++    s->val =3D val8;
++    for (int i =3D 0; i < 8; i++) {
++        qemu_set_irq(s->irq[i], (val8 & (1 << i)) !=3D 0);
 +    }
 +}
 +
-+/* Standardize the cpu_skip condition to NE.  */
-+static bool canonicalize_skip(DisasContext *ctx)
++static const MemoryRegionOps avr_mask_ops =3D {
++    .read =3D avr_mask_read,
++    .write =3D avr_mask_write,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .impl =3D {.max_access_size =3D 1}
++};
++
++static void avr_mask_init(Object *dev)
 +{
-+    switch (ctx->skip_cond) {
-+    case TCG_COND_NEVER:
-+        /* Normal case: cpu_skip is known to be false.  */
-+        return false;
++    AVRMaskState *s =3D AVR_MASK(dev);
++    SysBusDevice *busdev =3D SYS_BUS_DEVICE(dev);
 +
-+    case TCG_COND_ALWAYS:
-+        /*
-+         * Breakpoint case: cpu_skip is known to be true, via TB_FLAGS_S=
-KIP.
-+         * The breakpoint is on the instruction being skipped, at the st=
-art
-+         * of the TranslationBlock.  No need to update.
-+         */
-+        return false;
++    memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s, TYPE_AVR_MAS=
+K,
++            0x01);
++    sysbus_init_mmio(busdev, &s->iomem);
 +
-+    case TCG_COND_NE:
-+        if (ctx->skip_var1 =3D=3D NULL) {
-+            tcg_gen_mov_tl(cpu_skip, ctx->skip_var0);
-+        } else {
-+            tcg_gen_xor_tl(cpu_skip, ctx->skip_var0, ctx->skip_var1);
-+            ctx->skip_var1 =3D NULL;
-+        }
-+        break;
-+
-+    default:
-+        /* Convert to a NE condition vs 0. */
-+        if (ctx->skip_var1 =3D=3D NULL) {
-+            tcg_gen_setcondi_tl(ctx->skip_cond, cpu_skip, ctx->skip_var0=
-, 0);
-+        } else {
-+            tcg_gen_setcond_tl(ctx->skip_cond, cpu_skip,
-+                               ctx->skip_var0, ctx->skip_var1);
-+            ctx->skip_var1 =3D NULL;
-+        }
-+        ctx->skip_cond =3D TCG_COND_NE;
-+        break;
++    for (int i =3D 0; i < 8; i++) {
++        sysbus_init_irq(busdev, &s->irq[i]);
 +    }
-+    if (ctx->free_skip_var0) {
-+        tcg_temp_free(ctx->skip_var0);
-+        ctx->free_skip_var0 =3D false;
-+    }
-+    ctx->skip_var0 =3D cpu_skip;
-+    return true;
++    s->val =3D 0x00;
 +}
 +
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_i=
-nsns)
++static void avr_mask_class_init(ObjectClass *klass, void *data)
 +{
-+    CPUAVRState *env =3D cs->env_ptr;
-+    DisasContext ctx =3D {
-+        .tb =3D tb,
-+        .cs =3D cs,
-+        .env =3D env,
-+        .memidx =3D 0,
-+        .bstate =3D DISAS_NEXT,
-+        .skip_cond =3D TCG_COND_NEVER,
-+        .singlestep =3D cs->singlestep_enabled,
-+    };
-+    target_ulong pc_start =3D tb->pc / 2;
-+    int num_insns =3D 0;
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
 +
-+    if (tb->flags & TB_FLAGS_FULL_ACCESS) {
-+        /*
-+         * This flag is set by ST/LD instruction we will regenerate it O=
-NLY
-+         * with mem/cpu memory access instead of mem access
-+         */
-+        max_insns =3D 1;
-+    }
-+    if (ctx.singlestep) {
-+        max_insns =3D 1;
-+    }
-+
-+    gen_tb_start(tb);
-+
-+    ctx.npc =3D pc_start;
-+    if (tb->flags & TB_FLAGS_SKIP) {
-+        ctx.skip_cond =3D TCG_COND_ALWAYS;
-+        ctx.skip_var0 =3D cpu_skip;
-+    }
-+
-+    do {
-+        TCGLabel *skip_label =3D NULL;
-+
-+        /* translate current instruction */
-+        tcg_gen_insn_start(ctx.npc);
-+        num_insns++;
-+
-+        /*
-+         * this is due to some strange GDB behavior
-+         * let's assume main has address 0x100
-+         * b main   - sets breakpoint at address 0x00000100 (code)
-+         * b *0x100 - sets breakpoint at address 0x00800100 (data)
-+         */
-+        if (unlikely(!ctx.singlestep &&
-+                (cpu_breakpoint_test(cs, OFFSET_CODE + ctx.npc * 2, BP_A=
-NY) ||
-+                 cpu_breakpoint_test(cs, OFFSET_DATA + ctx.npc * 2, BP_A=
-NY)))) {
-+            canonicalize_skip(&ctx);
-+            tcg_gen_movi_tl(cpu_pc, ctx.npc);
-+            gen_helper_debug(cpu_env);
-+            goto done_generating;
-+        }
-+
-+        /* Conditionally skip the next instruction, if indicated.  */
-+        if (ctx.skip_cond !=3D TCG_COND_NEVER) {
-+            skip_label =3D gen_new_label();
-+            if (ctx.skip_var0 =3D=3D cpu_skip) {
-+                /*
-+                 * Copy cpu_skip so that we may zero it before the branc=
-h.
-+                 * This ensures that cpu_skip is non-zero after the labe=
-l
-+                 * if and only if the skipped insn itself sets a skip.
-+                 */
-+                ctx.free_skip_var0 =3D true;
-+                ctx.skip_var0 =3D tcg_temp_new();
-+                tcg_gen_mov_tl(ctx.skip_var0, cpu_skip);
-+                tcg_gen_movi_tl(cpu_skip, 0);
-+            }
-+            if (ctx.skip_var1 =3D=3D NULL) {
-+                tcg_gen_brcondi_tl(ctx.skip_cond, ctx.skip_var0, 0, skip=
-_label);
-+            } else {
-+                tcg_gen_brcond_tl(ctx.skip_cond, ctx.skip_var0,
-+                                  ctx.skip_var1, skip_label);
-+                ctx.skip_var1 =3D NULL;
-+            }
-+            if (ctx.free_skip_var0) {
-+                tcg_temp_free(ctx.skip_var0);
-+                ctx.free_skip_var0 =3D false;
-+            }
-+            ctx.skip_cond =3D TCG_COND_NEVER;
-+            ctx.skip_var0 =3D NULL;
-+        }
-+
-+        translate(&ctx);
-+
-+        if (skip_label) {
-+            canonicalize_skip(&ctx);
-+            gen_set_label(skip_label);
-+            if (ctx.bstate =3D=3D DISAS_NORETURN) {
-+                ctx.bstate =3D DISAS_CHAIN;
-+            }
-+        }
-+    } while (ctx.bstate =3D=3D DISAS_NEXT
-+             && num_insns < max_insns
-+             && (ctx.npc - pc_start) * 2 < TARGET_PAGE_SIZE - 4
-+             && !tcg_op_buf_full());
-+
-+    if (tb->cflags & CF_LAST_IO) {
-+        gen_io_end();
-+    }
-+
-+    bool nonconst_skip =3D canonicalize_skip(&ctx);
-+
-+    switch (ctx.bstate) {
-+    case DISAS_NORETURN:
-+        assert(!nonconst_skip);
-+        break;
-+    case DISAS_NEXT:
-+    case DISAS_TOO_MANY:
-+    case DISAS_CHAIN:
-+        if (!nonconst_skip) {
-+            /* Note gen_goto_tb checks singlestep.  */
-+            gen_goto_tb(&ctx, 1, ctx.npc);
-+            break;
-+        }
-+        tcg_gen_movi_tl(cpu_pc, ctx.npc);
-+        /* fall through */
-+    case DISAS_LOOKUP:
-+        if (!ctx.singlestep) {
-+            tcg_gen_lookup_and_goto_ptr();
-+            break;
-+        }
-+        /* fall through */
-+    case DISAS_EXIT:
-+        if (ctx.singlestep) {
-+            gen_helper_debug(cpu_env);
-+        } else {
-+            tcg_gen_exit_tb(NULL, 0);
-+        }
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+done_generating:
-+    gen_tb_end(tb, num_insns);
-+
-+    tb->size =3D (ctx.npc - pc_start) * 2;
-+    tb->icount =3D num_insns;
++    dc->reset =3D avr_mask_reset;
 +}
 +
-+void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
-+                            target_ulong *data)
++static const TypeInfo avr_mask_info =3D {
++    .name          =3D TYPE_AVR_MASK,
++    .parent        =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(AVRMaskState),
++    .class_init    =3D avr_mask_class_init,
++    .instance_init =3D avr_mask_init,
++};
++
++static void avr_mask_register_types(void)
 +{
-+    env->pc_w =3D data[0];
++    type_register_static(&avr_mask_info);
 +}
++
++type_init(avr_mask_register_types)
+diff --git a/include/hw/misc/avr_power.h b/include/hw/misc/avr_power.h
+new file mode 100644
+index 0000000..434ac23
+--- /dev/null
++++ b/include/hw/misc/avr_power.h
+@@ -0,0 +1,46 @@
++/*
++ * AVR Power Reduction Management
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
++ * of this software and associated documentation files (the "Software"),=
+ to deal
++ * in the Software without restriction, including without limitation the=
+ rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
+sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be includ=
+ed in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
+LL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_MISC_AVR_POWER_H
++#define HW_MISC_AVR_POWER_H
++
++#include "hw/sysbus.h"
++#include "hw/hw.h"
++
++
++#define TYPE_AVR_MASK "avr-power"
++#define AVR_MASK(obj) OBJECT_CHECK(AVRMaskState, (obj), TYPE_AVR_MASK)
++
++typedef struct {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion iomem;
++
++    uint8_t val;
++    qemu_irq irq[8];
++} AVRMaskState;
++
++#endif /* HW_MISC_AVR_POWER_H */
 --=20
 2.7.4
 
