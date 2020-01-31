@@ -2,79 +2,93 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3EB4C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA0B3C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:12:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 701CE214D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:11:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 73F16214D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:12:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fo3eAD7A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 701CE214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="In7fAtzY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73F16214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYtM-0006uR-Kc
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:11:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40327)
+	id 1ixYtv-0007OY-Ml
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:12:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58377)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXzB-00062a-Mo
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:35 -0500
+ (envelope-from <programmingkidx@gmail.com>) id 1ixYe0-0007Mw-3A
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXz8-0006b0-9D
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:32 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33736
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXz8-0006Zt-4u
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483609;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XSz0fh95TiXEIYskr68dnamMm5+1Fzfe2ip323eVXVM=;
- b=fo3eAD7AuKC/+TU7XSLGyzwhriNIU3CB85dn7uyNDoV7EN1IPv41No0AtD4lBgkTGsBQT0
- zg2EfZgZOF21km1yFNl5OdO3UeswMJD29/f+Kz9RJ95l7maO0bGOSvb3ux3/4Ux5qxu3DJ
- UyumvSpbY5+r5bFoA0v2bPcJHfpBbik=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-jXrj0U3IMxyCz3kVjekrtQ-1; Fri, 31 Jan 2020 10:13:25 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 953151088380
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:24 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1C83C86C4B
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:23 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 65/80] ppc/{ppc440_bamboo, sam460ex}: use memdev for RAM
-Date: Fri, 31 Jan 2020 16:09:35 +0100
-Message-Id: <1580483390-131164-66-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
-References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: jXrj0U3IMxyCz3kVjekrtQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <programmingkidx@gmail.com>) id 1ixYdv-0005aO-B2
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:55:44 -0500
+Received: from mail-yw1-xc2b.google.com ([2607:f8b0:4864:20::c2b]:32947)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+ id 1ixYdv-0005Yo-46
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:55:39 -0500
+Received: by mail-yw1-xc2b.google.com with SMTP id 192so5160814ywy.0
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 07:55:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=f5hrlS77TAxjUCJk3JD4gINUtLSam/mkMAuUqAP5cbc=;
+ b=In7fAtzYw1dpHbx0+veGVV8Jv4gy+8x6L8kiMYdJnUDtxITcqFopEtGYtyfJJxq6Bp
+ /NXbrottc/K/LGggwyoUa6K6YAxMQQ8axwDVL0Ov8MJozYtPzro/0MdQBIlRsdW2CIqK
+ 854i7YUkVXu2a1N1uBEB+t2uBeGACPDl6xTv/f0KV52W58D1vP60K0VMWEobWeZFBbjg
+ mOGWSgRLzeVVQhbB0jek0d4f2p/s6PtML1xcUHAcBUEWbmAHw9FLBKDj7BkZNKnz/y+H
+ cJdgbZZ9m047C+jHzNahA0baRo/grqm6k5OMG/hh8S/PK4Ql4WUgGmMOMnJyb8Bm3xW/
+ u5Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=f5hrlS77TAxjUCJk3JD4gINUtLSam/mkMAuUqAP5cbc=;
+ b=Pt+hcmjm/Nva5T6iUXkumB2ReJH3zUFDsalRMJ0t7kHD1gN+TNAxVhEq1cX6hKH+pI
+ a3zw/RvxcJ6as9h03zhjf/aBI9CmXPJbBOB2e5WqIEoPO6DmjfxW2ReUhzWvhhqNv8ps
+ 4N9RXHgW1qdQZUU9iM2En8L26y2LCZvP/uudgRqYZnKGon+wqmQuTCV16LkscO4cPYLe
+ jDy8yWgY+yfGNZarfQangGjt9CI3oh0zlakgnFKgB36OwR7wZgQxt0Za7XMtcb4l/c1f
+ 5CtS1Xrf1AJwkVcxOIBLlyKpTmvVUtBBgkkhyrw77yiX8ca/GaQ84FiRcFIlnZk8Z2tK
+ 73GQ==
+X-Gm-Message-State: APjAAAWcIpC/ib6BbpUXjZ1cwqbIUyExv2MOSZPGYMoAA1b8SEpQfqIG
+ j4/70MMndIC2EYlu5fj68Vc=
+X-Google-Smtp-Source: APXvYqx8QKwUOyNwYCjMGLtG3nhsECl3K8UDxAws/kLzf6Ytu4z9aaHXYo2ikF93Nyw2gt7wp9ej0Q==
+X-Received: by 2002:a25:9b01:: with SMTP id y1mr8518584ybn.179.1580486138207; 
+ Fri, 31 Jan 2020 07:55:38 -0800 (PST)
+Received: from [192.168.0.5] (d149-67-30-58.try.wideopenwest.com.
+ [67.149.58.30])
+ by smtp.gmail.com with ESMTPSA id 207sm4126493ywq.100.2020.01.31.07.55.37
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 31 Jan 2020 07:55:37 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [RFC] coreaudio: fix coreaudio_test.diff
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <f03b7ae9-344c-5a7f-414c-6250a9c5ec2f@t-online.de>
+Date: Fri, 31 Jan 2020 10:55:36 -0500
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Message-Id: <6DC8EF02-E8AF-4E10-934D-CD76D3230F72@gmail.com>
+References: <43D423C6-78D4-4DCE-B97C-0658D3D2E3BD@gmail.com>
+ <4021690b-2380-3925-209e-d4cc66928773@gmail.com>
+ <5314e860-dffe-3bc0-209f-bd2b937cd0c6@t-online.de>
+ <CABLmASGcUVyASudNizcgPshEqahwYt-4m9Z1DXEhVe2vdko9cQ@mail.gmail.com>
+ <54f5ddf3-5ea9-bd6d-8c71-edf4db527463@t-online.de>
+ <f03b7ae9-344c-5a7f-414c-6250a9c5ec2f@t-online.de>
+To: =?utf-8?Q?Volker_R=C3=BCmelin?= <vr_qemu@t-online.de>
+X-Mailer: Apple Mail (2.3273)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c2b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,183 +100,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Gerd Hoffmann <kraxel@redhat.com>,
+ =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu Developers <qemu-devel@nongnu.org>, Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
----
-v3:
-  * drop ram_size from comment above ppc4xx_sdram_banks
-     (BALATON Zoltan <balaton@eik.bme.hu>)
-  * move memory alias initialization into the same loop
-    where RAM is split on banks.
-     (BALATON Zoltan <balaton@eik.bme.hu>)
-v3.1
-  * rebase on top of previous patch due to changed context
----
- include/hw/ppc/ppc4xx.h |  2 +-
- hw/ppc/ppc440_bamboo.c  |  3 ++-
- hw/ppc/ppc4xx_devs.c    | 25 +++++++++----------------
- hw/ppc/sam460ex.c       |  3 ++-
- 4 files changed, 14 insertions(+), 19 deletions(-)
+> On Jan 29, 2020, at 2:13 AM, Volker R=C3=BCmelin <vr_qemu@t-online.de> =
+wrote:
+>=20
+> This is an untested patch that tries to fix the problems in the
+> patch found at
+> =
+https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg02142.html.=20=
 
-diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
-index b8c8f32..cc19c8d 100644
---- a/include/hw/ppc/ppc4xx.h
-+++ b/include/hw/ppc/ppc4xx.h
-@@ -42,7 +42,7 @@ enum {
- qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
-                        uint32_t dcr_base, int has_ssr, int has_vr);
-=20
--void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
-+void ppc4xx_sdram_banks(MemoryRegion *ram, int nr_banks,
-                         MemoryRegion ram_memories[],
-                         hwaddr ram_bases[], hwaddr ram_sizes[],
-                         const ram_addr_t sdram_bank_sizes[]);
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index 7e3bc0e..4c5e9e4 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -202,7 +202,7 @@ static void bamboo_init(MachineState *machine)
-     /* SDRAM controller */
-     memset(ram_bases, 0, sizeof(ram_bases));
-     memset(ram_sizes, 0, sizeof(ram_sizes));
--    ppc4xx_sdram_banks(machine->ram_size, PPC440EP_SDRAM_NR_BANKS, ram_mem=
-ories,
-+    ppc4xx_sdram_banks(machine->ram, PPC440EP_SDRAM_NR_BANKS, ram_memories=
-,
-                        ram_bases, ram_sizes, ppc440ep_sdram_bank_sizes);
-     /* XXX 440EP's ECC interrupts are on UIC1, but we've only created UIC0=
-. */
-     ppc4xx_sdram_init(env, pic[14], PPC440EP_SDRAM_NR_BANKS, ram_memories,
-@@ -289,6 +289,7 @@ static void bamboo_machine_init(MachineClass *mc)
-     mc->desc =3D "bamboo";
-     mc->init =3D bamboo_init;
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("440epb");
-+    mc->default_ram_id =3D "ppc4xx.sdram";
- }
-=20
- DEFINE_MACHINE("bamboo", bamboo_machine_init)
-diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-index d89008a..0e2f81c 100644
---- a/hw/ppc/ppc4xx_devs.c
-+++ b/hw/ppc/ppc4xx_devs.c
-@@ -666,7 +666,7 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq,=
- int nbanks,
-         sdram_map_bcr(sdram);
- }
-=20
--/* Fill in consecutive SDRAM banks with 'ram_size' bytes of memory.
-+/* Split RAM between SDRAM banks.
-  *
-  * sdram_bank_sizes[] must be in descending order, that is sizes[i] > size=
-s[i+1]
-  * and must be 0-terminated.
-@@ -674,16 +674,14 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq ir=
-q, int nbanks,
-  * The 4xx SDRAM controller supports a small number of banks, and each ban=
-k
-  * must be one of a small set of sizes. The number of banks and the suppor=
-ted
-  * sizes varies by SoC. */
--void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_banks,
-+void ppc4xx_sdram_banks(MemoryRegion *ram, int nr_banks,
-                         MemoryRegion ram_memories[],
-                         hwaddr ram_bases[], hwaddr ram_sizes[],
-                         const ram_addr_t sdram_bank_sizes[])
- {
--    MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
--    ram_addr_t size_left =3D ram_size;
-+    ram_addr_t size_left =3D memory_region_size(ram);
-     ram_addr_t base =3D 0;
-     ram_addr_t bank_size;
--    int last_bank =3D 0;
-     int i;
-     int j;
-=20
-@@ -691,11 +689,15 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_b=
-anks,
-         for (j =3D 0; sdram_bank_sizes[j] !=3D 0; j++) {
-             bank_size =3D sdram_bank_sizes[j];
-             if (bank_size <=3D size_left) {
-+                char name[32];
-+
-                 ram_bases[i] =3D base;
-                 ram_sizes[i] =3D bank_size;
-                 base +=3D bank_size;
-                 size_left -=3D bank_size;
--                last_bank =3D i;
-+                snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
-+                memory_region_init_alias(&ram_memories[i], NULL, name, ram=
-,
-+                                         ram_bases[i], ram_sizes[i]);
-                 break;
-             }
-         }
-@@ -706,7 +708,7 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_ban=
-ks,
-     }
-=20
-     if (size_left) {
--        ram_addr_t used_size =3D ram_size - size_left;
-+        ram_addr_t used_size =3D memory_region_size(ram) - size_left;
-         GString *s =3D g_string_new(NULL);
-=20
-         for (i =3D 0; sdram_bank_sizes[i]; i++) {
-@@ -722,15 +724,6 @@ void ppc4xx_sdram_banks(ram_addr_t ram_size, int nr_ba=
-nks,
-         g_string_free(s, true);
-         exit(EXIT_FAILURE);
-     }
--
--    memory_region_allocate_system_memory(ram, NULL, "ppc4xx.sdram", ram_si=
-ze);
--
--    for (i =3D 0; i <=3D last_bank; i++) {
--        char name[32];
--        snprintf(name, sizeof(name), "ppc4xx.sdram%d", i);
--        memory_region_init_alias(&ram_memories[i], NULL, name, ram,
--                                 ram_bases[i], ram_sizes[i]);
--    }
- }
-=20
- /*************************************************************************=
-****/
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index 17d40bd..898453c 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -324,7 +324,7 @@ static void sam460ex_init(MachineState *machine)
-     /* SDRAM controller */
-     /* put all RAM on first bank because board has one slot
-      * and firmware only checks that */
--    ppc4xx_sdram_banks(machine->ram_size, 1, ram_memories, ram_bases, ram_=
-sizes,
-+    ppc4xx_sdram_banks(machine->ram, 1, ram_memories, ram_bases, ram_sizes=
-,
-                        ppc460ex_sdram_bank_sizes);
-=20
-     /* FIXME: does 460EX have ECC interrupts? */
-@@ -484,6 +484,7 @@ static void sam460ex_machine_init(MachineClass *mc)
-     mc->init =3D sam460ex_init;
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("460exb");
-     mc->default_ram_size =3D 512 * MiB;
-+    mc->default_ram_id =3D "ppc4xx.sdram";
- }
-=20
- DEFINE_MACHINE("sam460ex", sam460ex_machine_init)
---=20
-2.7.4
+>=20
+> Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
+> ---
+> audio/audio_template.h | 16 ++++++++--------
+> audio/coreaudio.c      |  5 +++++
+> 2 files changed, 13 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/audio/audio_template.h b/audio/audio_template.h
+> index a7b46b8363..e6724c5d68 100644
+> --- a/audio/audio_template.h
+> +++ b/audio/audio_template.h
+> @@ -153,13 +153,6 @@ static int glue (audio_pcm_sw_init_, TYPE) (
+>     sw->ratio =3D ((int64_t) sw->info.freq << 32) / sw->hw->info.freq;
+> #endif
+>=20
+> -#ifdef FLOAT_MIXENG
+> -#ifdef DAC
+> -    sw->conv =3D mixeng_conv_float;
+> -#else
+> -    sw->clip =3D mixeng_clip_float;
+> -#endif
+> -#else
+> #ifdef DAC
+>     sw->conv =3D mixeng_conv
+> #else
+> @@ -169,7 +162,6 @@ static int glue (audio_pcm_sw_init_, TYPE) (
+>         [sw->info.sign]
+>         [sw->info.swap_endianness]
+>         [audio_bits_to_index (sw->info.bits)];
+> -#endif
+>=20
+>     sw->name =3D g_strdup (name);
+>     err =3D glue (audio_pcm_sw_alloc_resources_, TYPE) (sw);
+> @@ -284,6 +276,13 @@ static HW *glue(audio_pcm_hw_add_new_, =
+TYPE)(AudioState *s,
+>         goto err1;
+>     }
+>=20
+> +#ifdef FLOAT_MIXENG
+> +#ifdef DAC
+> +    hw->clip =3D mixeng_clip_float;
+> +#else
+> +    hw->conv =3D mixeng_conv_float;
+> +#endif
+> +#else
+> #ifdef DAC
+>     hw->clip =3D mixeng_clip
+> #else
+> @@ -293,6 +292,7 @@ static HW *glue(audio_pcm_hw_add_new_, =
+TYPE)(AudioState *s,
+>         [hw->info.sign]
+>         [hw->info.swap_endianness]
+>         [audio_bits_to_index (hw->info.bits)];
+> +#endif
+>=20
+>     glue(audio_pcm_hw_alloc_resources_, TYPE)(hw);
+>=20
+> diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+> index 4e7e509ad0..ff0d23fd7d 100644
+> --- a/audio/coreaudio.c
+> +++ b/audio/coreaudio.c
+> @@ -482,6 +482,7 @@ static int coreaudio_init_out(HWVoiceOut *hw, =
+struct audsettings *as,
+>     Audiodev *dev =3D drv_opaque;
+>     AudiodevCoreaudioPerDirectionOptions *cpdo =3D =
+dev->u.coreaudio.out;
+>     int frames;
+> +    struct audsettings fake_as;
+>=20
+>     /* create mutex */
+>     err =3D pthread_mutex_init(&core->mutex, NULL);
+> @@ -490,6 +491,10 @@ static int coreaudio_init_out(HWVoiceOut *hw, =
+struct audsettings *as,
+>         return -1;
+>     }
+>=20
+> +    memcpy(&fake_as, as, sizeof(struct audsettings));
+> +    as =3D &fake_as;
+> +    /* size of float is 32bits */
+> +    as->fmt =3D AUDIO_FORMAT_S32;
+>     audio_pcm_init_info (&hw->info, as);
+>=20
+>     status =3D coreaudio_get_voice(&core->outputDeviceID);
+> --=20
+> 2.16.4
+>=20
 
+I could not apply this patch using 'patch -p1 < <patch file>'. I kept =
+seeing the error malformed patch.=20
+
+When I applied the patch by hand QEMU was able to play sound normally =
+again. Thank you :)
+
+I used qemu-system-i386 at git commit =
+adcd6e93b9519f7fe421d543e3aa646895b32e1a to test this patch.=20
+
+Both the AC97 and SB16 sound cards with Windows XP and Windows NT 4.0 =
+respectively. Only the ES1370 sound card used with Windows 2000 failed =
+to play anything. This is probably a problem with it and not your patch.
+
+Reviewed-by: John Arbuckle <programmingkidx@gmail.com>=
 
