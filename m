@@ -2,85 +2,82 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4991C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CBFC33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:12:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D2FB205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:10:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 400DC205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:12:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RemdxnV9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D2FB205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zZr/gaI0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 400DC205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixW4G-00020n-L3
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:10:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48911)
+	id 1ixW5c-0002zA-Gk
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:12:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1ixW2L-0007tn-Di
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:08:42 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ixW50-0002Xh-M5
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:11:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1ixW2J-0003X5-5o
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:08:40 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23297
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ixW2I-0003UZ-Td
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:08:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580476118;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WD9XJunk4udcum0FdR8WtrQEOzr5FIDs1fs2L9kD3J4=;
- b=RemdxnV9HfMp4H9dOzDxjaU4B5++J6+jQLA9EOs8xQlEMkZlXb+ePTU7+S6Zy8xzgVz1Gf
- jP+3VW+x+N9L/3/bRTpaVbo5fZZzM1LP898odddB3WEKYMg7Gvej32C3EL1Ruj2KHRWsES
- 0PRTb3VVaDRfqCYLvKrFqgyc5N7bagg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-eCJVtjFjMkym4CYwHou0jA-1; Fri, 31 Jan 2020 08:08:34 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4337E8C8E05
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 13:08:33 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-40.gru2.redhat.com
- [10.97.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 090668885B;
- Fri, 31 Jan 2020 13:08:28 +0000 (UTC)
-Subject: Re: [PATCH 0/5] python/qemu: qmp: Fix, delint and improvements
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191227134101.244496-1-wainersm@redhat.com>
- <fe3ffe05-c620-7770-2752-3d2c4973da03@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <a729dffa-2c74-8cfe-123c-8d5fe47f9cb5@redhat.com>
-Date: Fri, 31 Jan 2020 11:08:27 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <peter.maydell@linaro.org>) id 1ixW4z-0000Ia-A7
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:11:26 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:47043)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ixW4z-0000Hl-4a
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:11:25 -0500
+Received: by mail-ot1-x344.google.com with SMTP id g64so6431475otb.13
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 05:11:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=RDQY3gNXXYvcxgo8mWEqK+uC9feJt5tPCLhtqB093hU=;
+ b=zZr/gaI0NbbnEyJVlsWbDB+RPQMicNBnwYNpNjxIPKcgx8dA0lcXzGdiYDwlTZ1Fcp
+ zHbYaQFiAzYtl31S2o5v6QQDtqZPfXk5+nLO4DpKTOXmit+AmwVTpIVkJRh+kMMjerWE
+ 037RPQHw+5FVgoo8rSFc1pTvgWJ5x5W0gfFyOGEwjjcE0jsA3+yD9tiJC5pac8tvESYX
+ Ly54rALOUgTxJDaXH5jji1dFhvs08S2v+0bIKx9BMwZd17tRvINMierG7LW4RpaOKaZD
+ 1pktgSnfRpFJKv5KqKUXtuHn1B9Xkp+9peZD6vqkL/fpaokJFAu6eWdlbprSHIWx3SUk
+ BApA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=RDQY3gNXXYvcxgo8mWEqK+uC9feJt5tPCLhtqB093hU=;
+ b=SmA9fQ7CPKs7lMTkW6iq4kPR64WAdy0Lo6W0hxOQSEf3P3hZdaY36gDsNNHRn3uhuJ
+ xUCfKtlpsnnxa/Ye/lvr7svqfRaii5KlhAQGz1zTP9UNxw/TPVCRaEy/NsGZCLm3phpM
+ wpRYgIU+psAzTV/2IYsTqOpLzSi265fWgcqsO/S3Rd5vkIpnCe2OfzTu67rSwLEEO9Fn
+ 7NamEZJJIMfM7+AypCnVvGFUJUh5+6GtkvFNuD/rIj9nOze74FH1dlw3K+4kqTOTWgv4
+ ykHFYuXIlsicUwrbwMrjj0xHaXh1JQbJCo2dxlUgQJVmpgq4qqBUs0oYy7sS9X49wMWV
+ AmHQ==
+X-Gm-Message-State: APjAAAURpTD/NDz4KQoRBrecCQu86t/Ae6P5tp/1G66hi4xdAeaXMKdk
+ CUuxMqkyHYnElM3vy6DEB4geymRrDpQgQa7kDK1xgkd491g=
+X-Google-Smtp-Source: APXvYqzG1xP7ruG4lUry8RXI31b0SDwnce/XQcaGv2uuQPODeS2y4d7Mz/DuvhVx5nKCe9KRTSXLK6OKvC4j8m/0PNA=
+X-Received: by 2002:a05:6830:1184:: with SMTP id
+ u4mr7273210otq.221.1580476283536; 
+ Fri, 31 Jan 2020 05:11:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <fe3ffe05-c620-7770-2752-3d2c4973da03@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: eCJVtjFjMkym4CYwHou0jA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200129235614.29829-1-richard.henderson@linaro.org>
+ <20200129235614.29829-31-richard.henderson@linaro.org>
+In-Reply-To: <20200129235614.29829-31-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 31 Jan 2020 13:11:12 +0000
+Message-ID: <CAFEAcA-FnhiRuFG49ZJ3s9OUb2VAqKtJAnceMQ8GOOyJtmHDnQ@mail.gmail.com>
+Subject: Re: [PATCH v5 30/41] target/arm: Flush tlb for ASID changes in EL2&0
+ translation regime
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,51 +89,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, crosa@redhat.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 1/30/20 8:41 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 12/27/19 2:40 PM, Wainer dos Santos Moschetta wrote:
->> I started fixing an issue on exception handling which in some places
->> currently use the deprecated (in Python 3.3) `socket.error`. Then I
->> ended up delinting the module code and making some improvements.
->>
->> Git:
->> - Tree: https://github.com/wainersm/qemu
->> - Branch: python_qmp_sockets_error
->>
->> CI:
->> - Travis (FAIL): https://travis-ci.org/wainersm/qemu/builds/629772066
->> =C2=A0=C2=A0 Failure not related with this series. Even QEMU master bran=
-ch is
->> =C2=A0=C2=A0 failing to build when `--without-default-devices --disable-=
-user`.
->>
->> Wainer dos Santos Moschetta (5):
->> =C2=A0=C2=A0 python/qemu: qmp: Replace socket.error with OSError
->> =C2=A0=C2=A0 python/qemu: Delint the qmp module
->> =C2=A0=C2=A0 python/qemu: qmp: Make accept()'s timeout configurable
->> =C2=A0=C2=A0 python/qemu: qmp: Make QEMUMonitorProtocol a context manage=
-r
->> =C2=A0=C2=A0 python/qemu: qmp: Remove unnused attributes
->>
->> =C2=A0 python/qemu/qmp.py | 91 +++++++++++++++++++++++++++++++++--------=
------
->> =C2=A0 1 file changed, 65 insertions(+), 26 deletions(-)
->>
+On Wed, 29 Jan 2020 at 23:56, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Thanks, applied patches 1, 2 and 5 to my python-next tree:
-> https://gitlab.com/philmd/qemu/commits/python-next
+> Since we only support a single ASID, flush the tlb when it changes.
 >
+> Note that TCR_EL2, like TCR_EL1, has the A1 bit that chooses between
+> the two TTBR* registers for the location of the ASID.
 >
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 22 +++++++++++++++-------
+>  1 file changed, 15 insertions(+), 7 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 0b67cefcbb..708a2ecf91 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3763,7 +3763,7 @@ static void vmsa_ttbcr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+>      tcr->base_mask = 0xffffc000u;
+>  }
+>
+> -static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +static void vmsa_tcr_el12_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                                 uint64_t value)
+>  {
+>      ARMCPU *cpu = env_archcpu(env);
+> @@ -3789,7 +3789,17 @@ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>  static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                                      uint64_t value)
+>  {
+> -    /* TODO: There are ASID fields in here with HCR_EL2.E2H */
+> +    /*
+> +     * If we are running with E2&0 regime, then an ASID is active.
+> +     * Flush if that might be changing.  Note we're not checking
+> +     * TCR_EL2.A1 to know if this is really the TTBRx_EL2 that
+> +     * holds the active ASID, only checking the field that might.
+> +     */
+> +    if (extract64(raw_read(env, ri) ^ value, 48, 16) &&
+> +        (arm_hcr_el2_eff(env) & HCR_E2H)) {
+> +        tlb_flush_by_mmuidx(env_cpu(env),
+> +                            ARMMMUIdxBit_E20_2 | ARMMMUIdxBit_E20_0);
+> +    }
+>      raw_write(env, ri, value);
+>  }
+>
+> @@ -3849,7 +3859,7 @@ static const ARMCPRegInfo vmsa_cp_reginfo[] = {
+>                               offsetof(CPUARMState, cp15.ttbr1_ns) } },
+>      { .name = "TCR_EL1", .state = ARM_CP_STATE_AA64,
+>        .opc0 = 3, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 2,
+> -      .access = PL1_RW, .writefn = vmsa_tcr_el1_write,
+> +      .access = PL1_RW, .writefn = vmsa_tcr_el12_write,
+>        .resetfn = vmsa_ttbcr_reset, .raw_writefn = raw_write,
+>        .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[1]) },
+>      { .name = "TTBCR", .cp = 15, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 2,
+> @@ -5175,10 +5185,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
+>        .resetvalue = 0 },
+>      { .name = "TCR_EL2", .state = ARM_CP_STATE_BOTH,
+>        .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 2,
+> -      .access = PL2_RW,
+> -      /* no .writefn needed as this can't cause an ASID change;
+> -       * no .raw_writefn or .resetfn needed as we never use mask/base_mask
+> -       */
+> +      .access = PL2_RW, .writefn = vmsa_tcr_el12_write,
 
-Great, I was going to ask you that. Patches 3 and 4 are likely to need a=20
-respin.
+This blows away the entire TLB on a TCR_EL2 write, which is
+safe but a bit overzealous; we could skip it if E2H was clear
+(and probably also be a bit more precise about which TLB
+indexes to clear). But it's not a big deal so I'm happy if
+we leave this as-is.
 
-Thanks Philippe!
+> +      /* no .raw_writefn or .resetfn needed as we never use mask/base_mask */
+>        .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[2]) },
+>      { .name = "VTCR", .state = ARM_CP_STATE_AA32,
+>        .cp = 15, .opc1 = 4, .crn = 2, .crm = 1, .opc2 = 2,
+> --
+> 2.20.1
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
+thanks
+-- PMM
 
