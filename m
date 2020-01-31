@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 060FAC35240
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68294C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:16:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C951E20661
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32BA020661
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:16:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LjA6+cl2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C951E20661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SHRe2CMX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32BA020661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixXzS-00063R-UY
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:13:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38909)
+	id 1ixY1X-00012o-9V
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:15:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXy2-0003qV-Qu
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:23 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXy3-0003qg-Hw
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXy0-0003ZC-Bd
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33653
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXy0-0003ZZ-S3
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:22 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60752
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXxz-0003WN-Tb
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXy0-0003Z8-Np
  for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483536;
+ s=mimecast20190719; t=1580483540;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OiTH3RCZbiNiyeo52IdgEALm97v/0+Rpq/gsC0EpHEo=;
- b=LjA6+cl22oqTpPzc63qNN7htWW1YnXCj99E4zaT/HEJKuFE4Aik3YFw2R6dQi2Cc6WuhNr
- s+9HJTAyZNX9/iVxl8LFNYOAkwT/ppOjDsOgA7Og/F20T+Kuw7Hw7RLoZF/FoAP/EcVCaB
- y5x7JrbM1U1ulSo6sVkhdQfLlHmnu6U=
+ bh=lmDmKrxuhg1ZIXsWAlEWgIMCzv8Db3KijOYDOEVYpSw=;
+ b=SHRe2CMXES14CAJ8sHMJ7jTrXeLknbqmiaaoHfS2EYA+9oxESNklsjZ/u6QrD0rQBzYXZg
+ gUfDOHQf6abbdAU2bXKcaau8zqryI1ILvdTcho/NYC8N12jHYiTuHA9d6ymhMjnbBqDG8n
+ unG2Kq2GK5UVGroGeLdXX48PyDH1iOs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-6YfG3V8TNVe5UjD41iTvVQ-1; Fri, 31 Jan 2020 10:12:13 -0500
+ us-mta-364-9BwmqxAUMfeHDnkCRZYkkA-1; Fri, 31 Jan 2020 10:12:17 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDEE91005512;
- Fri, 31 Jan 2020 15:12:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCBB318C43C3;
+ Fri, 31 Jan 2020 15:12:16 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C278B8887E;
- Fri, 31 Jan 2020 15:12:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E128786C4B;
+ Fri, 31 Jan 2020 15:12:15 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 02/80] machine: introduce memory-backend property
-Date: Fri, 31 Jan 2020 16:08:32 +0100
-Message-Id: <1580483390-131164-3-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 04/80] machine: introduce convenience MachineState::ram
+Date: Fri, 31 Jan 2020 16:08:34 +0100
+Message-Id: <1580483390-131164-5-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 6YfG3V8TNVe5UjD41iTvVQ-1
+X-MC-Unique: 9BwmqxAUMfeHDnkCRZYkkA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,97 +89,141 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Property will contain link to memory backend that will be
-used for backing initial RAM.
-Follow up commit will alias -mem-path and -mem-prealloc
-CLI options into memory backend options to make memory
-handling consistent (using only hostmem backend family
-for guest RAM allocation).
+the new field will be used by boards to get access to main
+RAM memory region and will help to save boiler plate in
+boards which often introduce a field or variable just for
+this purpose.
+
+Memory region will be equivalent to what currently used
+memory_region_allocate_system_memory() is returning apart
+from that it will come from hostmem backend.
+Followup patches will incrementally switch boards to using
+RAM from MachineState::ram.
+
+Patch takes care of non-NUMA case and follow up patch will
+initialize MachineState::ram for NUMA case.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-v4:
- * make property a string, instead of a link.
-   Fixes -M memory-backend=3Dfoo: foo not found error
-   since foo creation is delayed well beyond point
-   where machine's properties are set
-v3:
- * rename property name from ram-memdev to memory-backend
-   (Paolo Bonzini <pbonzini@redhat.com>)
-
 CC: ehabkost@redhat.com
 CC: pbonzini@redhat.com
 CC: pasic@linux.ibm.com
 ---
- include/hw/boards.h |  2 ++
+ include/hw/boards.h | 12 +++++++++++-
  hw/core/machine.c   | 24 ++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ hw/core/numa.c      | 14 +-------------
+ 3 files changed, 36 insertions(+), 14 deletions(-)
 
 diff --git a/include/hw/boards.h b/include/hw/boards.h
-index fb1b43d..7b4b6b7 100644
+index 106de87..98330e0 100644
 --- a/include/hw/boards.h
 +++ b/include/hw/boards.h
-@@ -4,6 +4,7 @@
- #define HW_BOARDS_H
+@@ -73,7 +73,12 @@ void machine_set_cpu_numa_node(MachineState *machine,
+                                Error **errp);
 =20
- #include "exec/memory.h"
-+#include "sysemu/hostmem.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/accel.h"
- #include "qapi/qapi-types-machine.h"
-@@ -285,6 +286,7 @@ struct MachineState {
-     bool enforce_config_section;
+ void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *=
+type);
+-
++/*
++ * Checks that backend isn't used, preps it for exclusive usage and
++ * returns migratable MemoryRegion provided by backend.
++ */
++MemoryRegion *machine_consume_memdev(MachineState *machine,
++                                     HostMemoryBackend *backend);
+=20
+ /**
+  * CPUArchId:
+@@ -292,6 +297,11 @@ struct MachineState {
      bool enable_graphics;
      char *memory_encryption;
-+    char *ram_memdev_id;
+     char *ram_memdev_id;
++    /*
++     * convenience alias to ram_memdev_id backend memory region
++     * or to numa container memory region
++     */
++    MemoryRegion *ram;
      DeviceMemoryState *device_memory;
 =20
      ram_addr_t ram_size;
 diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 3e288bf..752a227 100644
+index 752a227..5aae488 100644
 --- a/hw/core/machine.c
 +++ b/hw/core/machine.c
-@@ -505,6 +505,22 @@ static void validate_sysbus_device(SysBusDevice *sbdev=
-, void *opaque)
-     }
+@@ -26,6 +26,7 @@
+ #include "sysemu/qtest.h"
+ #include "hw/pci/pci.h"
+ #include "hw/mem/nvdimm.h"
++#include "migration/vmstate.h"
+=20
+ GlobalProperty hw_compat_4_2[] =3D {
+     { "virtio-blk-device", "x-enable-wce-if-config-wce", "off" },
+@@ -1056,10 +1057,33 @@ static void machine_numa_finish_cpu_init(MachineSta=
+te *machine)
+     g_string_free(s, true);
  }
 =20
-+static char *machine_get_memdev(Object *obj, Error **errp)
++MemoryRegion *machine_consume_memdev(MachineState *machine,
++                                     HostMemoryBackend *backend)
 +{
-+    MachineState *ms =3D MACHINE(obj);
++    MemoryRegion *ret =3D host_memory_backend_get_memory(backend);
 +
-+    return g_strdup(ms->ram_memdev_id);
++    if (memory_region_is_mapped(ret)) {
++        char *path =3D object_get_canonical_path_component(OBJECT(backend)=
+);
++        error_report("memory backend %s can't be used multiple times.", pa=
+th);
++        g_free(path);
++        exit(EXIT_FAILURE);
++    }
++    host_memory_backend_set_mapped(backend, true);
++    vmstate_register_ram_global(ret);
++    return ret;
 +}
 +
-+static void machine_set_memdev(Object *obj, const char *value, Error **err=
-p)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    g_free(ms->ram_memdev_id);
-+    ms->ram_memdev_id =3D g_strdup(value);
-+}
-+
-+
- static void machine_init_notify(Notifier *notifier, void *data)
+ void machine_run_board_init(MachineState *machine)
  {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-@@ -886,6 +902,14 @@ static void machine_initfn(Object *obj)
-                                         "Table (HMAT)", NULL);
-     }
+     MachineClass *machine_class =3D MACHINE_GET_CLASS(machine);
 =20
-+    object_property_add_str(obj, "memory-backend",
-+                            machine_get_memdev, machine_set_memdev,
-+                            &error_abort);
-+    object_property_set_description(obj, "memory-backend",
-+                                    "Set RAM backend"
-+                                    "Valid value is ID of hostmem based ba=
-ckend",
-+                                     &error_abort);
++    if (machine->ram_memdev_id) {
++        Object *o;
++        o =3D object_resolve_path_type(machine->ram_memdev_id,
++                                     TYPE_MEMORY_BACKEND, NULL);
++        machine->ram =3D machine_consume_memdev(machine, MEMORY_BACKEND(o)=
+);
++    }
 +
-     /* Register notifier when init is done for sysbus sanity checks */
-     ms->sysbus_notifier.notify =3D machine_init_notify;
-     qemu_add_machine_init_done_notifier(&ms->sysbus_notifier);
+     if (machine->numa_state) {
+         numa_complete_configuration(machine);
+         if (machine->numa_state->num_nodes) {
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 840e685..8264336 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -817,20 +817,8 @@ void memory_region_allocate_system_memory(MemoryRegion=
+ *mr, Object *owner,
+         if (!backend) {
+             continue;
+         }
+-        MemoryRegion *seg =3D host_memory_backend_get_memory(backend);
+-
+-        if (memory_region_is_mapped(seg)) {
+-            char *path =3D object_get_canonical_path_component(OBJECT(back=
+end));
+-            error_report("memory backend %s is used multiple times. Each "
+-                         "-numa option must use a different memdev value."=
+,
+-                         path);
+-            g_free(path);
+-            exit(1);
+-        }
+-
+-        host_memory_backend_set_mapped(backend, true);
++        MemoryRegion *seg =3D machine_consume_memdev(ms, backend);
+         memory_region_add_subregion(mr, addr, seg);
+-        vmstate_register_ram_global(seg);
+         addr +=3D size;
+     }
+ }
 --=20
 2.7.4
 
