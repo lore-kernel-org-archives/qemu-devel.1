@@ -2,54 +2,85 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E945EC33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4991C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:10:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0195205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:09:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0195205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D2FB205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:10:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RemdxnV9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D2FB205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixW3D-0000ND-Uf
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:09:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46449)
+	id 1ixW4G-00020n-L3
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:10:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48911)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvk-0006kH-Uh
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:54 -0500
+ (envelope-from <wainersm@redhat.com>) id 1ixW2L-0007tn-Di
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:08:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvj-0008Ol-9g
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:52 -0500
-Received: from relay.sw.ru ([185.231.240.75]:59648)
+ (envelope-from <wainersm@redhat.com>) id 1ixW2J-0003X5-5o
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:08:40 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23297
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ixVvj-0007ve-1j; Fri, 31 Jan 2020 08:01:51 -0500
-Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1ixVvI-0000zU-3z; Fri, 31 Jan 2020 16:01:24 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 03/11] scripts: add coccinelle script to use auto
- propagated errp
-Date: Fri, 31 Jan 2020 16:01:10 +0300
-Message-Id: <20200131130118.1716-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200131130118.1716-1-vsementsov@virtuozzo.com>
-References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ixW2I-0003UZ-Td
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:08:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580476118;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WD9XJunk4udcum0FdR8WtrQEOzr5FIDs1fs2L9kD3J4=;
+ b=RemdxnV9HfMp4H9dOzDxjaU4B5++J6+jQLA9EOs8xQlEMkZlXb+ePTU7+S6Zy8xzgVz1Gf
+ jP+3VW+x+N9L/3/bRTpaVbo5fZZzM1LP898odddB3WEKYMg7Gvej32C3EL1Ruj2KHRWsES
+ 0PRTb3VVaDRfqCYLvKrFqgyc5N7bagg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-235-eCJVtjFjMkym4CYwHou0jA-1; Fri, 31 Jan 2020 08:08:34 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4337E8C8E05
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 13:08:33 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-40.gru2.redhat.com
+ [10.97.116.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 090668885B;
+ Fri, 31 Jan 2020 13:08:28 +0000 (UTC)
+Subject: Re: [PATCH 0/5] python/qemu: qmp: Fix, delint and improvements
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191227134101.244496-1-wainersm@redhat.com>
+ <fe3ffe05-c620-7770-2752-3d2c4973da03@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <a729dffa-2c74-8cfe-123c-8d5fe47f9cb5@redhat.com>
+Date: Fri, 31 Jan 2020 11:08:27 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <fe3ffe05-c620-7770-2752-3d2c4973da03@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: eCJVtjFjMkym4CYwHou0jA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,234 +92,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Greg Kurz <groug@kaod.org>, armbru@redhat.com,
- Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Script adds ERRP_AUTO_PROPAGATE macro invocation where appropriate and
-does corresponding changes in code (look for details in
-include/qapi/error.h)
 
-Usage example:
-spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
- --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
- blockdev-nbd.c qemu-nbd.c {block/nbd*,nbd/*,include/block/nbd*}.[hc]
+On 1/30/20 8:41 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 12/27/19 2:40 PM, Wainer dos Santos Moschetta wrote:
+>> I started fixing an issue on exception handling which in some places
+>> currently use the deprecated (in Python 3.3) `socket.error`. Then I
+>> ended up delinting the module code and making some improvements.
+>>
+>> Git:
+>> - Tree: https://github.com/wainersm/qemu
+>> - Branch: python_qmp_sockets_error
+>>
+>> CI:
+>> - Travis (FAIL): https://travis-ci.org/wainersm/qemu/builds/629772066
+>> =C2=A0=C2=A0 Failure not related with this series. Even QEMU master bran=
+ch is
+>> =C2=A0=C2=A0 failing to build when `--without-default-devices --disable-=
+user`.
+>>
+>> Wainer dos Santos Moschetta (5):
+>> =C2=A0=C2=A0 python/qemu: qmp: Replace socket.error with OSError
+>> =C2=A0=C2=A0 python/qemu: Delint the qmp module
+>> =C2=A0=C2=A0 python/qemu: qmp: Make accept()'s timeout configurable
+>> =C2=A0=C2=A0 python/qemu: qmp: Make QEMUMonitorProtocol a context manage=
+r
+>> =C2=A0=C2=A0 python/qemu: qmp: Remove unnused attributes
+>>
+>> =C2=A0 python/qemu/qmp.py | 91 +++++++++++++++++++++++++++++++++--------=
+-----
+>> =C2=A0 1 file changed, 65 insertions(+), 26 deletions(-)
+>>
+>
+> Thanks, applied patches 1, 2 and 5 to my python-next tree:
+> https://gitlab.com/philmd/qemu/commits/python-next
+>
+>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+Great, I was going to ask you that. Patches 3 and 4 are likely to need a=20
+respin.
 
-CC: Eric Blake <eblake@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Greg Kurz <groug@kaod.org>
-CC: Stefano Stabellini <sstabellini@kernel.org>
-CC: Anthony Perard <anthony.perard@citrix.com>
-CC: Paul Durrant <paul@xen.org>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-CC: Laszlo Ersek <lersek@redhat.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Stefan Berger <stefanb@linux.ibm.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Michael Roth <mdroth@linux.vnet.ibm.com>
-CC: qemu-block@nongnu.org
-CC: xen-devel@lists.xenproject.org
+Thanks Philippe!
 
- include/qapi/error.h                          |   3 +
- scripts/coccinelle/auto-propagated-errp.cocci | 158 ++++++++++++++++++
- 2 files changed, 161 insertions(+)
- create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
-
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index b9452d4806..79f8e95214 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -141,6 +141,9 @@
-  *         ...
-  *     }
-  *
-+ * For mass conversion use script
-+ *   scripts/coccinelle/auto-propagated-errp.cocci
-+ *
-  *
-  * Receive and accumulate multiple errors (first one wins):
-  *     Error *err = NULL, *local_err = NULL;
-diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/coccinelle/auto-propagated-errp.cocci
-new file mode 100644
-index 0000000000..fb03c871cb
---- /dev/null
-+++ b/scripts/coccinelle/auto-propagated-errp.cocci
-@@ -0,0 +1,158 @@
-+// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
-+//
-+// Copyright (c) 2020 Virtuozzo International GmbH.
-+//
-+// This program is free software; you can redistribute it and/or modify
-+// it under the terms of the GNU General Public License as published by
-+// the Free Software Foundation; either version 2 of the License, or
-+// (at your option) any later version.
-+//
-+// This program is distributed in the hope that it will be useful,
-+// but WITHOUT ANY WARRANTY; without even the implied warranty of
-+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+// GNU General Public License for more details.
-+//
-+// You should have received a copy of the GNU General Public License
-+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+//
-+// Usage example:
-+// spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-+//  --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
-+//  blockdev-nbd.c qemu-nbd.c {block/nbd*,nbd/*,include/block/nbd*}.[hc]
-+
-+@rule0@
-+// Add invocation to errp-functions where necessary
-+// We should skip functions with "Error *const *errp"
-+// parameter, but how to do it with coccinelle?
-+// I don't know, so, I skip them by function name regex.
-+// It's safe: if we did not skip some functions with
-+// "Error *const *errp", ERRP_AUTO_PROPAGATE invocation
-+// will fail to compile, because of const violation.
-+identifier fn !~ "error_append_.*_hint";
-+identifier local_err, ERRP;
-+@@
-+
-+ fn(..., Error **ERRP, ...)
-+ {
-++   ERRP_AUTO_PROPAGATE();
-+    <+...
-+        when != ERRP_AUTO_PROPAGATE();
-+(
-+    error_append_hint(ERRP, ...);
-+|
-+    error_prepend(ERRP, ...);
-+|
-+    Error *local_err = NULL;
-+)
-+    ...+>
-+ }
-+
-+@@
-+// Switch unusual (Error **) parameter names to errp
-+// (this is necessary to use ERRP_AUTO_PROPAGATE).
-+identifier rule0.fn;
-+identifier rule0.ERRP != errp;
-+@@
-+
-+ fn(...,
-+-   Error **ERRP
-++   Error **errp
-+    ,...)
-+ {
-+     <...
-+-    ERRP
-++    errp
-+     ...>
-+ }
-+
-+@rule1@
-+// We want to patch error propagation in functions regardless of
-+// whether the function already uses ERRP_AUTO_PROPAGATE prior to
-+// applying rule0, hence this one does not inherit from it.
-+identifier fn !~ "error_append_.*_hint";
-+identifier local_err;
-+symbol errp;
-+@@
-+
-+ fn(..., Error **errp, ...)
-+ {
-+     <...
-+-    Error *local_err = NULL;
-+     ...>
-+ }
-+
-+@@
-+// Handle pattern with goto, otherwise we'll finish up
-+// with labels at function end which will not compile.
-+identifier rule1.fn, rule1.local_err;
-+identifier OUT;
-+@@
-+
-+ fn(...)
-+ {
-+     <...
-+-    goto OUT;
-++    return;
-+     ...>
-+- OUT:
-+-    error_propagate(errp, local_err);
-+ }
-+
-+@@
-+identifier rule1.fn, rule1.local_err;
-+expression list args; // to reindent error_propagate_prepend
-+@@
-+
-+ fn(...)
-+ {
-+     <...
-+(
-+-    error_free(local_err);
-+-    local_err = NULL;
-++    error_free_errp(errp);
-+|
-+-    error_free(local_err);
-++    error_free_errp(errp);
-+|
-+-    error_report_err(local_err);
-++    error_report_errp(errp);
-+|
-+-    warn_report_err(local_err);
-++    warn_report_errp(errp);
-+|
-+-    error_propagate_prepend(errp, local_err, args);
-++    error_prepend(errp, args);
-+|
-+-    error_propagate(errp, local_err);
-+)
-+     ...>
-+ }
-+
-+@@
-+identifier rule1.fn, rule1.local_err;
-+@@
-+
-+ fn(...)
-+ {
-+     <...
-+(
-+-    &local_err
-++    errp
-+|
-+-    local_err
-++    *errp
-+)
-+     ...>
-+ }
-+
-+@@
-+identifier rule1.fn;
-+@@
-+
-+ fn(...)
-+ {
-+     <...
-+- *errp != NULL
-++ *errp
-+     ...>
-+ }
--- 
-2.21.0
 
 
