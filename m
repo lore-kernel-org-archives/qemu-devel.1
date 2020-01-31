@@ -2,78 +2,80 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 120B4C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F7DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:52:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D145120661
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 173DB20661
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:52:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D0FjFP+C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D145120661
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/AMSMEe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173DB20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYZq-0007YX-0g
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:51:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40567)
+	id 1ixYau-0000nn-8q
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:52:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXzM-0006TY-57
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:45 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXyr-0005Jn-6p
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXzJ-0007Mw-Kp
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31804
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXyp-0005TX-0j
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:13 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39343
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXzJ-0007KH-Ft
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:41 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyo-0005Sb-Sn
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483621;
+ s=mimecast20190719; t=1580483590;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TBIxQoShAsGwESE9L+6A5UH+yJNVS48YSvnz14NmbTA=;
- b=D0FjFP+CizutrAN8YmonhMV4OOFEVQHAOHNQi8VcL84MQrTM1gGGNJTCEOFEgaTBgjS94i
- m6Pz1qZG72I7FKqYFYMJl183cDj4ti9mdMWtuKe0Sza3EHF10Hji+64KP81fp3DQElVQ70
- +yWQMkAc/MAjgXis+JCAf4aoVjtC5Q4=
+ bh=QXV9Q0kkuwn+AcaQLS+xKXn6p1g67iEt3Z9eSrbNEqE=;
+ b=N/AMSMEen4eEz//q7/W+V6meFHkdehXyBS1dLl4tAEfdtl+AhKtVg8cDHspLFpBsk+nEyi
+ JUp/U+AuzoZV7jg2zdTq0PwPomOjT2fiIEgMP/PnX8OGv2oZOKnG2aL+C3WbVW/nw28TfY
+ WPX4ZpbqNdan/gioZdqjz3xPSR1LcnI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-R4MUTcvrMa6zSG_F9nZo6g-1; Fri, 31 Jan 2020 10:13:38 -0500
+ us-mta-237-8cc_B_2_PayhA3ruP205JQ-1; Fri, 31 Jan 2020 10:13:07 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D023313F6
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAC2B18C43CD;
+ Fri, 31 Jan 2020 15:13:06 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 07CF486C4B;
- Fri, 31 Jan 2020 15:13:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1643089E89;
+ Fri, 31 Jan 2020 15:13:05 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 77/80] hostmem: introduce "prealloc-threads" property
-Date: Fri, 31 Jan 2020 16:09:47 +0100
-Message-Id: <1580483390-131164-78-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 45/80] lm32/milkymist: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:09:15 +0100
+Message-Id: <1580483390-131164-46-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: R4MUTcvrMa6zSG_F9nZo6g-1
+X-MC-Unique: 8cc_B_2_PayhA3ruP205JQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,211 +87,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, ehabkost@redhat.com
+Cc: michael@walle.cc
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-the property will allow user to specify number of threads to use
-in pre-allocation stage. It also will allow to reduce implicit
-hostmem dependency on current_machine.
-On object creation it will default to 1, but via machine
-compat property it will be updated to MachineState::smp::cpus
-to keep current behavior for hostmem and main RAM (which is
-now also hostmem based).
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
+
+PS:
+ while at it add check for user supplied RAM size and error
+ out if it mismatches board expected value.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
+v2:
+  * fix format string causing build failure on 32-bit host
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
 v3:
-  - use object_register_sugar_prop() instead of directly hacking
-    compat_props (Paolo Bonzini <pbonzini@redhat.com>)
-  - fix TODO description
+  * use size_to_str() to pretty print size in MiB
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
 
-CC: pbonzini@redhat.com
-CC: ehabkost@redhat.com
+CC: michael@walle.cc
 ---
- include/sysemu/hostmem.h |  2 ++
- backends/hostmem.c       | 43 +++++++++++++++++++++++++++++++++++++++----
- vl.c                     | 14 ++++++++++----
- 3 files changed, 51 insertions(+), 8 deletions(-)
+ hw/lm32/milkymist.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index 5db0d66..bdf8666 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -61,6 +61,7 @@ struct HostMemoryBackendClass {
-  * @parent: opaque parent object container
-  * @size: amount of memory backend provides
-  * @mr: MemoryRegion representing host memory belonging to backend
-+ * @prealloc_threads: number of threads to be used for preallocatining RAM
-  */
- struct HostMemoryBackend {
-     /* private */
-@@ -70,6 +71,7 @@ struct HostMemoryBackend {
-     uint64_t size;
-     bool merge, dump, use_canonical_path;
-     bool prealloc, force_prealloc, is_mapped, share;
-+    uint32_t prealloc_threads;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-     HostMemPolicy policy;
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index 6d46134..5c72266 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -36,6 +36,7 @@
+ #include "hw/display/milkymist_tmu2.h"
+ #include "lm32.h"
+ #include "exec/address-spaces.h"
++#include "qemu/cutils.h"
 =20
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index e773bdf..0988986 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -223,7 +223,6 @@ static void host_memory_backend_set_prealloc(Object *ob=
-j, bool value,
+ #define BIOS_FILENAME    "mmone-bios.bin"
+ #define BIOS_OFFSET      0x00860000
+@@ -82,6 +83,7 @@ static void main_cpu_reset(void *opaque)
+ static void
+ milkymist_init(MachineState *machine)
  {
-     Error *local_err =3D NULL;
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
--    MachineState *ms =3D MACHINE(qdev_get_machine());
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     const char *initrd_filename =3D machine->initrd_filename;
+@@ -90,22 +92,27 @@ milkymist_init(MachineState *machine)
+     int kernel_size;
+     DriveInfo *dinfo;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+-    MemoryRegion *phys_sdram =3D g_new(MemoryRegion, 1);
+     qemu_irq irq[32];
+     int i;
+     char *bios_filename;
+     ResetInfo *reset_info;
 =20
-     if (backend->force_prealloc) {
-         if (value) {
-@@ -243,7 +242,7 @@ static void host_memory_backend_set_prealloc(Object *ob=
-j, bool value,
-         void *ptr =3D memory_region_get_ram_ptr(&backend->mr);
-         uint64_t sz =3D memory_region_size(&backend->mr);
-=20
--        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
-+        os_mem_prealloc(fd, ptr, sz, backend->prealloc_threads, &local_err=
-);
-         if (local_err) {
-             error_propagate(errp, local_err);
-             return;
-@@ -252,14 +251,45 @@ static void host_memory_backend_set_prealloc(Object *=
-obj, bool value,
-     }
- }
-=20
-+static void host_memory_backend_get_prealloc_threads(Object *obj, Visitor =
-*v,
-+    const char *name, void *opaque, Error **errp)
-+{
-+    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+    visit_type_uint32(v, name, &backend->prealloc_threads, errp);
-+}
-+
-+static void host_memory_backend_set_prealloc_threads(Object *obj, Visitor =
-*v,
-+    const char *name, void *opaque, Error **errp)
-+{
-+    HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-+    Error *local_err =3D NULL;
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    if (value <=3D 0) {
-+        error_setg(&local_err,
-+                   "property '%s' of %s doesn't take value '%d'",
-+                   name, object_get_typename(obj), value);
-+        goto out;
-+    }
-+    backend->prealloc_threads =3D value;
-+out:
-+    error_propagate(errp, local_err);
-+}
-+
- static void host_memory_backend_init(Object *obj)
- {
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-=20
-+    /* TODO: convert access to globals to compat properties */
-     backend->merge =3D machine_mem_merge(machine);
-     backend->dump =3D machine_dump_guest_core(machine);
-     backend->prealloc =3D mem_prealloc;
-+    backend->prealloc_threads =3D 1;
- }
-=20
- static void host_memory_backend_post_init(Object *obj)
-@@ -313,7 +343,6 @@ host_memory_backend_memory_complete(UserCreatable *uc, =
-Error **errp)
- {
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(uc);
-     HostMemoryBackendClass *bc =3D MEMORY_BACKEND_GET_CLASS(uc);
--    MachineState *ms =3D MACHINE(qdev_get_machine());
-     Error *local_err =3D NULL;
-     void *ptr;
-     uint64_t sz;
-@@ -378,7 +407,7 @@ host_memory_backend_memory_complete(UserCreatable *uc, =
-Error **errp)
-          */
-         if (backend->prealloc) {
-             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
--                            ms->smp.cpus, &local_err);
-+                            backend->prealloc_threads, &local_err);
-             if (local_err) {
-                 goto out;
-             }
-@@ -456,6 +485,12 @@ host_memory_backend_class_init(ObjectClass *oc, void *=
-data)
-         host_memory_backend_set_prealloc, &error_abort);
-     object_class_property_set_description(oc, "prealloc",
-         "Preallocate memory", &error_abort);
-+    object_class_property_add(oc, "prealloc-threads", "int",
-+        host_memory_backend_get_prealloc_threads,
-+        host_memory_backend_set_prealloc_threads,
-+        NULL, NULL, &error_abort);
-+    object_class_property_set_description(oc, "prealloc-threads",
-+        "Number of CPU threads to use for prealloc", &error_abort);
-     object_class_property_add(oc, "size", "int",
-         host_memory_backend_get_size,
-         host_memory_backend_set_size,
-diff --git a/vl.c b/vl.c
-index 7f12666..9a63487 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2862,8 +2862,7 @@ static void configure_accelerators(const char *progna=
-me)
-     }
- }
-=20
--static void create_default_memdev(MachineState *ms, const char *path,
--                                  bool prealloc)
-+static void create_default_memdev(MachineState *ms, const char *path)
- {
-     Object *obj;
-     MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-@@ -2872,7 +2871,6 @@ static void create_default_memdev(MachineState *ms, c=
-onst char *path,
-     if (path) {
-         object_property_set_str(obj, path, "mem-path", &error_fatal);
-     }
--    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
-     object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
-     object_property_add_child(object_get_objects_root(), mc->default_ram_i=
-d,
-                               obj, &error_fatal);
-@@ -4014,6 +4012,14 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
-=20
-+    if (mem_prealloc) {
-+        char *val;
-+
-+        val =3D g_strdup_printf("%d", current_machine->smp.cpus);
-+        object_register_sugar_prop("memory-backend", "prealloc-threads", v=
-al);
-+        g_free(val);
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
 +    }
 +
-     /*
-      * Get the default machine options from the machine if it is not alrea=
-dy
-      * specified either by the configuration file or by the command line.
-@@ -4341,7 +4347,7 @@ int main(int argc, char **argv, char **envp)
+     /* memory map */
+     hwaddr flash_base   =3D 0x00000000;
+     size_t flash_sector_size        =3D 128 * KiB;
+     size_t flash_size               =3D 32 * MiB;
+     hwaddr sdram_base   =3D 0x40000000;
+-    size_t sdram_size               =3D 128 * MiB;
 =20
-     if (machine_class->default_ram_id && current_machine->ram_size &&
-         numa_uses_legacy_mem() && !current_machine->ram_memdev_id) {
--        create_default_memdev(current_machine, mem_path, mem_prealloc);
-+        create_default_memdev(current_machine, mem_path);
-     }
-     /* do monitor/qmp handling at preconfig state if requested */
-     main_loop();
+     hwaddr initrd_base  =3D sdram_base + 0x1002000;
+     hwaddr cmdline_base =3D sdram_base + 0x1000000;
+-    size_t initrd_max =3D sdram_size - 0x1002000;
++    size_t initrd_max =3D machine->ram_size - 0x1002000;
+=20
+     reset_info =3D g_malloc0(sizeof(ResetInfo));
+=20
+@@ -116,9 +123,7 @@ milkymist_init(MachineState *machine)
+=20
+     cpu_lm32_set_phys_msb_ignore(env, 1);
+=20
+-    memory_region_allocate_system_memory(phys_sdram, NULL, "milkymist.sdra=
+m",
+-                                         sdram_size);
+-    memory_region_add_subregion(address_space_mem, sdram_base, phys_sdram)=
+;
++    memory_region_add_subregion(address_space_mem, sdram_base, machine->ra=
+m);
+=20
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     /* Numonyx JS28F256J3F105 */
+@@ -183,7 +188,7 @@ milkymist_init(MachineState *machine)
+=20
+         if (kernel_size < 0) {
+             kernel_size =3D load_image_targphys(kernel_filename, sdram_bas=
+e,
+-                                              sdram_size);
++                                              machine->ram_size);
+             reset_info->bootstrap_pc =3D sdram_base;
+         }
+=20
+@@ -216,6 +221,8 @@ static void milkymist_machine_init(MachineClass *mc)
+     mc->init =3D milkymist_init;
+     mc->is_default =3D 0;
+     mc->default_cpu_type =3D LM32_CPU_TYPE_NAME("lm32-full");
++    mc->default_ram_size =3D 128 * MiB;
++    mc->default_ram_id =3D "milkymist.sdram";
+ }
+=20
+ DEFINE_MACHINE("milkymist", milkymist_machine_init)
 --=20
 2.7.4
 
