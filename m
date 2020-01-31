@@ -7,56 +7,57 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B285BC33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF363C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:13:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 827A920663
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:12:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDD2024687
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:13:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="j8iX98X1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 827A920663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="kGdE1Cw5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD2024687
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixPXd-0003Zy-L0
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:12:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59116)
+	id 1ixPYa-0005sU-Rp
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:13:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUr-0006b6-0H
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:42 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUy-0006ug-Gd
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUp-0000Ov-St
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:40 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:44231 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUx-0000ZG-4F
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:48 -0500
+Received: from ozlabs.org ([203.11.71.1]:59227)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ixPUp-0000LD-IE; Fri, 31 Jan 2020 01:09:39 -0500
+ id 1ixPUw-0000WJ-OR; Fri, 31 Jan 2020 01:09:47 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4886Hs30XFz9sSG; Fri, 31 Jan 2020 17:09:29 +1100 (AEDT)
+ id 4886Hv3Mzgz9sSg; Fri, 31 Jan 2020 17:09:31 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580450969;
- bh=2jmkwg3BUMMJqmimdvGd8n4T5fRDXI2SsSNGCZE1miI=;
+ d=gibson.dropbear.id.au; s=201602; t=1580450971;
+ bh=fKPavTsxkuQdbNDZU0BEGGp8qbruBMk+OGeYF/Wc2+Y=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=j8iX98X1RXCjSwtaLsNW63D+6/aflhzM6WpnSC5yGQfTXddIqDl/bdddE7rUNI+hv
- 4XFLvLHoYhws7G8weG/+i7ks8pObaxXxtvmEy1jItM6qzwGu35VBT4sNCGXAhrrVbi
- EBwaeYk/gropnXkGrd26zbZQNHLZSjZrKcxn4HrY=
+ b=kGdE1Cw52xyAOEyObZFNTW02x4SjNxmYlqi087KRXJ0scY6Pd9m9oW+3xsgXtpWsU
+ FJksaAvBS9sBiHdkpmPfMJkHJcrWEITnpvRIQAhCqNiFEoHJkDHPmSHTf7OLkEQEOP
+ laeNU2VRG8HFi0AOtB150zej3RgKb2aM/LcVLcWg=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 09/34] spapr: Don't allow multiple active vCPUs at CAS
-Date: Fri, 31 Jan 2020 17:08:59 +1100
-Message-Id: <20200131060924.147449-10-david@gibson.dropbear.id.au>
+Subject: [PULL 22/34] spapr: Enable DD2.3 accelerated count cache flush in
+ pseries-5.0 machine
+Date: Fri, 31 Jan 2020 17:09:12 +1100
+Message-Id: <20200131060924.147449-23-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 References: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,55 +75,120 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+For POWER9 DD2.2 cpus, the best current Spectre v2 indirect branch
+mitigation is "count cache disabled", which is configured with:
+    -machine cap-ibs=3Dfixed-ccd
+However, this option isn't available on DD2.3 CPUs with KVM, because they
+don't have the count cache disabled.
 
-According to the description of "ibm,client-architecture-support" that
-can found in LoPAPR "B.6.2.3 Root Node Methods":
+For POWER9 DD2.3 cpus, it is "count cache flush with assist", configured
+with:
+    -machine cap-ibs=3Dworkaround,cap-ccf-assist=3Don
+However this option isn't available on DD2.2 CPUs with KVM, because they
+don't have the special CCF assist instruction this relies on.
 
-If multiple partition processors or threads are active at the time of
-the ibm,client-architecture-support method call, or an error is detected
-in the format of the ibm,architecture.vec structure, the err? boolean
-shall be TRUE; else FALSE.
+On current machine types, we default to "count cache flush w/o assist",
+that is:
+    -machine cap-ibs=3Dworkaround,cap-ccf-assist=3Doff
+This runs, with mitigation on both DD2.2 and DD2.3 host cpus, but has a
+fairly significant performance impact.
 
-We certainly don't want to temper with the platform or with the PCR of
-the other vCPUs if they happen to be active. Ensure we have only one
-active vCPU and fail CAS otherwise. This is just for conformance and
-robustness, it doesn't fix any known bugs.
+It turns out we can do better.  The special instruction that CCF assist
+uses to trigger a count cache flush is a no-op on earlier CPUs, rather th=
+an
+trapping or causing other badness.  It doesn't, of itself, implement the
+mitigation, but *if* we have count-cache-disabled, then the count cache
+flush is unnecessary, and so using the count cache flush mitigation is
+harmless.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <157969867170.571404.12117797348882189656.stgit@bahia.lan>
+Therefore for the new pseries-5.0 machine type, enable cap-ccf-assist by
+default.  Along with that, suppress throwing an error if cap-ccf-assist
+is selected but KVM doesn't support it, as long as KVM *is* giving us
+count-cache-disabled.  To allow TCG to work out of the box, even though i=
+t
+doesn't implement the ccf flush assist, downgrade the error in that case =
+to
+a warning.  This matches several Spectre mitigations where we allow TCG
+to operate for debugging, since we don't really make guarantees about TCG
+security properties anyway.
+
+While we're there, make the TCG warning for this case match that for othe=
+r
+mitigations.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_hcall.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ hw/ppc/spapr.c      |  5 ++++-
+ hw/ppc/spapr_caps.c | 21 +++++++++++++++++----
+ 2 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index ffb14641f9..b8bb66b5c0 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1676,6 +1676,18 @@ static target_ulong h_client_architecture_support(=
-PowerPCCPU *cpu,
-     Error *local_err =3D NULL;
-     bool raw_mode_supported =3D false;
-     bool guest_xive;
-+    CPUState *cs;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index a0076e5fbd..fe8266a1d1 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4397,7 +4397,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+     smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB *=
+/
+     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
+     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON=
+;
+-    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
++    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_ON;
+     spapr_caps_add_properties(smc, &error_abort);
+     smc->irq =3D &spapr_irq_dual;
+     smc->dr_phb_enabled =3D true;
+@@ -4465,8 +4465,11 @@ DEFINE_SPAPR_MACHINE(5_0, "5.0", true);
+  */
+ static void spapr_machine_4_2_class_options(MachineClass *mc)
+ {
++    SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
 +
-+    /* CAS is supposed to be called early when only the boot vCPU is act=
-ive. */
-+    CPU_FOREACH(cs) {
-+        if (cs =3D=3D CPU(cpu)) {
-+            continue;
-+        }
-+        if (!cs->halted) {
-+            warn_report("guest has multiple active vCPUs at CAS, which i=
-s not allowed");
-+            return H_MULTI_THREADS_ACTIVE;
-+        }
-+    }
+     spapr_machine_5_0_class_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len)=
+;
++    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
+ }
 =20
-     cas_pvr =3D cas_check_pvr(spapr, cpu, &addr, &raw_mode_supported, &l=
-ocal_err);
-     if (local_err) {
+ DEFINE_SPAPR_MACHINE(4_2, "4.2", false);
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 481dfd2a27..7f933a98ed 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -485,11 +485,24 @@ static void cap_ccf_assist_apply(SpaprMachineState =
+*spapr, uint8_t val,
+     uint8_t kvm_val =3D kvmppc_get_cap_count_cache_flush_assist();
+=20
+     if (tcg_enabled() && val) {
+-        /* TODO - for now only allow broken for TCG */
+-        error_setg(errp,
+-"Requested count cache flush assist capability level not supported by tc=
+g,"
+-                   " try appending -machine cap-ccf-assist=3Doff");
++        /* TCG doesn't implement anything here, but allow with a warning=
+ */
++        warn_report("TCG doesn't support requested feature, cap-ccf-assi=
+st=3Don");
+     } else if (kvm_enabled() && (val > kvm_val)) {
++        uint8_t kvm_ibs =3D kvmppc_get_cap_safe_indirect_branch();
++
++        if (kvm_ibs =3D=3D SPAPR_CAP_FIXED_CCD) {
++            /*
++             * If we don't have CCF assist on the host, the assist
++             * instruction is a harmless no-op.  It won't correctly
++             * implement the cache count flush *but* if we have
++             * count-cache-disabled in the host, that flush is
++             * unnnecessary.  So, specifically allow this case.  This
++             * allows us to have better performance on POWER9 DD2.3,
++             * while still working on POWER9 DD2.2 and POWER8 host
++             * cpus.
++             */
++            return;
++        }
+         error_setg(errp,
+ "Requested count cache flush assist capability level not supported by kv=
+m,"
+                    " try appending -machine cap-ccf-assist=3Doff");
 --=20
 2.24.1
 
