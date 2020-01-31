@@ -2,88 +2,121 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC55C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 18:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C749C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 18:16:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A46620707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 18:11:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A44A20CC7
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 18:16:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bZNkC+fr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A46620707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="h2FPDIG7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A44A20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixalF-00035v-7K
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 13:11:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52023)
+	id 1ixaqA-0006JH-Gf
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 13:16:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1ixakc-0002dT-Ul
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 13:10:44 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixapR-0005t7-26
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 13:15:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1ixakb-0005w2-4A
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 13:10:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58276
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ixaka-0005qj-Ti
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 13:10:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580494239;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/Y8gJumZJgFgwgyJBpV3z+VSGYPnvNmvrfoSosGn70U=;
- b=bZNkC+frGTw7zp94nS0AkpSuHUYHCWbMANfenDCER2/hAtV71nPW5wk/r0V01UEjNEPtZh
- dwVUm7iu4DqPOXgynTmjPjc4XrOnP1KF/HKl7fcZKYsvUvC+j/r3x8WMSXh3Gk5/GtCPvi
- OLi19EayUzPm6FKshsnAbBTGAYJAEoo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-A5M4W67aOnOptUA7qpEYdQ-1; Fri, 31 Jan 2020 13:10:34 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B94110052E8;
- Fri, 31 Jan 2020 18:10:32 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-40.gru2.redhat.com
- [10.97.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 551A35D9E5;
- Fri, 31 Jan 2020 18:10:23 +0000 (UTC)
-Subject: Re: [PATCH 1/6] tests/boot_linux_console: add microvm acceptance test
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Liam Merwick <liam.merwick@oracle.com>, alex.bennee@linaro.org,
- fam@euphon.net
-References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-2-git-send-email-liam.merwick@oracle.com>
- <a968cbba-911c-ac0b-6b7e-d50e83e877e3@redhat.com>
- <acf418d0-a002-4ae0-06cc-c26bf495f3f8@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <1559491d-d8e1-8099-64b0-ec0a33d0faf1@redhat.com>
-Date: Fri, 31 Jan 2020 16:10:21 -0200
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixapP-0001YQ-OC
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 13:15:40 -0500
+Received: from mail-eopbgr50113.outbound.protection.outlook.com
+ ([40.107.5.113]:43540 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ixapP-0001Rj-1A; Fri, 31 Jan 2020 13:15:39 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cD279Tb9pjR7psZdg1WE4wId7igUTsdkIcDwm9VDllOczZUtRD8UJGDJSk40ysQ8xMbrD5+jPqcDLWhiffGasFav18svIPet7Xe/XwND+Ijq+5sqZBBuj5h2t/4pxWMwuD7wIzBzThsQ4cFFj7Yo7V07rQBudKMCKoacVKmmiK0vFzVQD5qYY+CZmefwX+nZ6vZ5Xdy2RFSjRgdniy38ZgGm7XLtEnXneizN/Sa/xXaRiLFugYjaox/zkHeh1tisuI8540M+CGyo2tMLBd4YTpWt8+NntziRXmR+HvD3CgyLZfeIgo1KjusXIkNA09VKu/oUiYeImBQNV8o3r1OtQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=04QGv3P+TUtYwypi8j4VBy53rs8z7EvwIMe+R4U94Vw=;
+ b=mm1let7hKXlL0VSdzKKhsGVA+Tgt4yfu2wrIa5venSj9sxJh0iyPJteTL1EOwXAqwkZzMe1Fb38Hge5f029EzDB/tKE2loRUIFmBxMqsgDwcfFgajfSoC+hmHURwAoZB1itWjy0ihEaV84SyScHnfPWT6Mlmvddo0lsz/KnQnXmJpGyj+hKR6UafE0g7vCXNbbYZ/Z7aE7DMWrAHfuPfT+jFs9mO8lDMLNmyQFOUMSNEkgbGpClvW0DGZwr1TfJDgJeyqCJDdFGhvB0GLRkaH9dfsYhgGmMzZNzqn3ChEB3fRasHBp0MVDiheBwyYD6+LNamt0hIkc5cM75tB4VOIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=04QGv3P+TUtYwypi8j4VBy53rs8z7EvwIMe+R4U94Vw=;
+ b=h2FPDIG7k/Hp+ITt2niaF6i7Vd2o3WN/AvvnR4lEIL8bLmscbGySQNMDm2evCOvoVJDR/iwqOaxY4/XjtaGvdXjy+Mq/fjZ3rMA7qr3pNKTfOssjyroHoZJLJSt805pVLFZC/KIURnF+H9FYw6dANAA6Ge2/vsWZk/9tqUMSn1Y=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB5029.eurprd08.prod.outlook.com (10.255.121.154) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.21; Fri, 31 Jan 2020 18:15:36 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.028; Fri, 31 Jan 2020
+ 18:15:36 +0000
+Subject: Re: [PATCH v11 2/2] docs: qcow2: introduce compression type feature
+To: Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org
+References: <20200131142219.3264-1-vsementsov@virtuozzo.com>
+ <20200131142219.3264-3-vsementsov@virtuozzo.com>
+ <ee6b018a-be33-ed77-c4b9-4894c685d30a@redhat.com>
+ <w51mua3zg16.fsf@maestria.local.igalia.com>
+ <18578060-2c1f-6c63-31e1-dee51387210a@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200131211533699
+Message-ID: <aa9050a1-b071-6e08-bb91-8b513de09180@virtuozzo.com>
+Date: Fri, 31 Jan 2020 21:15:33 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <acf418d0-a002-4ae0-06cc-c26bf495f3f8@redhat.com>
+ Thunderbird/60.2.1
+In-Reply-To: <18578060-2c1f-6c63-31e1-dee51387210a@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: A5M4W67aOnOptUA7qpEYdQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-ClientProxiedBy: HE1P190CA0026.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::15)
+ To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+MIME-Version: 1.0
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1P190CA0026.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.20 via Frontend Transport; Fri, 31 Jan 2020 18:15:35 +0000
+X-Tagtoolbar-Keys: D20200131211533699
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ed38061f-1ce3-4eef-22c4-08d7a67991a1
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5029:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB5029D7DE8CF1CA8A1B5A02F0C1070@AM6PR08MB5029.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:422;
+X-Forefront-PRVS: 029976C540
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(376002)(346002)(366004)(136003)(396003)(39850400004)(189003)(199004)(8936002)(186003)(16526019)(66946007)(16576012)(110136005)(66556008)(66476007)(36756003)(26005)(31686004)(2906002)(52116002)(956004)(81156014)(53546011)(31696002)(86362001)(8676002)(81166006)(478600001)(4326008)(2616005)(6486002)(5660300002)(316002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5029;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0Y7+YWe7YZ33Qc5E0nY1z8vCKzc5ht8ukOijb14UGwFsgniPaSDsjcl5022EZJ0hOvI5AwoNdh9WtOUd9T043LG8suLD7bbuhp9v81hWYsBJJnNFKWidcXFBYJcEF9zhX9ELS9q33uRmOxZCOhUcRD4ZA17aJ1UfNuEH+s/7PfyRpBj1N1W0C0Z0MMzn6BckAI6rtBou3n60OIOYwz3sOrZxktkwheey0KMR+pfg6XXaKEFH5HykfPiTvR25Oj05NOw2AQ6Ia9gE+T0KLpMDiw8iL4/y+gfSywZfmbhcwMO//0Ooo4cluOk4xUb+wYJvTrhH9N/8RaVtM+hxWvFFQuN4axSh0jk4enJuXEob/vzcagIW6igIrgdxp8CBDjdlqH/rU3byR67FGbuqAIbBJRluzNkGUIb3lOlyf/Mmopp7a8FV95HDGNwphfo6u++8
+X-MS-Exchange-AntiSpam-MessageData: BShUYmqrVPVchh6fnTbkYXaHBVsWV+b+sRQCnWw8wxJDBUh1FnSJGmXTV49nGqt/1qcFE4prDyqJH5rHNLNJdcnj5MvimqP1HMHAHFki2OR2gRUbuftLU9qA1Xe7e5Yrwx+yOGdcF36sG1o27V1BuQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed38061f-1ce3-4eef-22c4-08d7a67991a1
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2020 18:15:36.2603 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SNu+6EkYtovgo4pX91WsBymmRUTM6pD3Rm0y+w5A1tdsmXs3WcZvS8QrUA05UsdVgeGHFwSh2hAY7jSiTcoWs3hKC1Otn58iYwtEOMXrfxc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5029
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.5.113
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,119 +128,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, slp@redhat.com,
- sgarzare@redhat.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ mreitz@redhat.com, dplotnikov@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 1/30/20 9:51 PM, Philippe Mathieu-Daud=E9 wrote:
-> On 1/30/20 6:41 PM, Wainer dos Santos Moschetta wrote:
->> On 1/27/20 2:36 PM, Liam Merwick wrote:
->>> Refactor test_x86_64_pc() to test_x86_64_machine() so that separate
->>> functions which specify the Avocado tag of ':avocado: tags=3Dmachine:'
->>> as being either 'pc' or 'microvm' can be used to test booting a
->>> compressed kernel using either machine class.
+31.01.2020 20:49, Eric Blake wrote:
+> On 1/31/20 11:34 AM, Alberto Garcia wrote:
+>> On Fri 31 Jan 2020 03:46:12 PM CET, Eric Blake wrote:
+>>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 If the inco=
+mpatible bit "Compression type" is set: the field
+>>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 must be pre=
+sent and non-zero (which means non-zlib
+>>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 compression=
+ type). Otherwise, this field must not be present
+>>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 or must be =
+zero (which means zlib).
 >>>
->>> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
->>> ---
->>> =A0 tests/acceptance/boot_linux_console.py | 15 +++++++++++++--
->>> =A0 1 file changed, 13 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/tests/acceptance/boot_linux_console.py=20
->>> b/tests/acceptance/boot_linux_console.py
->>> index e40b84651b0b..aa5b07b1c609 100644
->>> --- a/tests/acceptance/boot_linux_console.py
->>> +++ b/tests/acceptance/boot_linux_console.py
->>> @@ -51,10 +51,9 @@ class BootLinuxConsole(Test):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 os.chdir(cwd)
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return self.workdir + path
->>> -=A0=A0=A0 def test_x86_64_pc(self):
->>> +=A0=A0=A0 def do_test_x86_64_machine(self):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:x86_64
->>> -=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:pc
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_url =3D=20
->>> ('https://archives.fedoraproject.org/pub/archive/fedora'
->>> '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
->>> @@ -70,6 +69,18 @@ class BootLinuxConsole(Test):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 console_pattern =3D 'Kernel command line: %=
-s' %=20
->>> kernel_command_line
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 self.wait_for_console_pattern(console_patte=
-rn)
->>> +=A0=A0=A0 def test_x86_64_pc(self):
->>> +=A0=A0=A0=A0=A0=A0=A0 """
->>> +=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:pc
->>> +=A0=A0=A0=A0=A0=A0=A0 """
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 If the incompatible bit "Compressi=
+on type" is set: the field
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 must be present. Otherwise, this f=
+ield must not be present
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 or must be zero (which means zlib)=
+.
 >>
->> The test method won't inherit the 'arch' tag from=20
->> `do_test_x86_64_machine()`, so you need to explicitly 'arch' tag each=20
->> test you created in this series. If you don't do so, Avocado won't=20
->> filter out those x86_64 tests in case QEMU is built with non-x86_64=20
->> targets.
+>> But "not being present" and "being zero" is equivalent (as described in
+>> the previous commit).
 >>
->> Follows an example, I built QEMU with '--target-list=3Darm-softmmu'. I=
-=20
->> got:
+>> And if the incompatible bit is not present then the field can be safely
+>> ignored (i.e. whether it is zero or not is irrelevant).
 >>
->> ```
+>> Let's try again:
 >>
->> (02/18)=20
->> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:=
-=20
->> CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
->> =A0=A0(03/18)=20
->> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_micr=
-ovm:=20
->> CANCEL: No QEMU binary defined or found in the source tree (0.00 s)
->> =A0=A0(04/18)=20
->> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_virt:=
-=20
->> PASS (1.25 s)
+>> =A0=A0=A0 Defines the compression method used for compressed clusters. A=
+ll
+>> =A0=A0=A0 compressed clusters in an image use the same type.
 >>
->> ```
->>
->> OK, avocado_qemu was smart enough to skip the tests, but ideally it=20
->> should not even consider running them in the first place.
->
-> This should be solved by this patch:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg07311.html
-> "tests/acceptance: Use 'machine' tag to check if available in QEMU binary=
-"
+>> =A0=A0=A0 The value of this field should only be used when the incompati=
+ble bit
+>> =A0=A0=A0 "Compression type" is set. If that bit is unset then this fiel=
+d is
+>> =A0=A0=A0 not used and the compression method is zlib.
+>=20
+> I like that wording.
+>=20
 
+I'm OK with it too, as well as I'm OK with the stricter variant, when we do=
+n't allow incompatible images with zlib set. I don't see any serious differ=
+ence.
 
-That patch is useful**=A0 but does not solve the problem that I point out=
-=20
-here. If you have a test case which is arch-specific and the arch-QEMU=20
-was not built then it should not be executed. Tagging the test with=20
-'arch' ensures that.
+But I need this to land somehow. Max likes stricter variant and he is maint=
+ainer of qcow2..
 
-** BTW, I'm going to review it soon
+Max, will you merge it as is, or did you change your mind, or should we ask=
+ Kevin for his opinion?
 
-- Wainer
-
-
->>
->> Thanks!
->>
->> - Wainer
->>
->>> +=A0=A0=A0=A0=A0=A0=A0 self.do_test_x86_64_machine()
->>> +
->>> +=A0=A0=A0 def test_x86_64_microvm(self):
->>> +=A0=A0=A0=A0=A0=A0=A0 """
->>> +=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:microvm
->>> +=A0=A0=A0=A0=A0=A0=A0 """
->>> +=A0=A0=A0=A0=A0=A0=A0 self.do_test_x86_64_machine()
->>> +
->>> =A0=A0=A0=A0=A0 def test_mips_malta(self):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:mips
->>
->
->
-
+--=20
+Best regards,
+Vladimir
 
