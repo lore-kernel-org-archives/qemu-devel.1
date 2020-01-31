@@ -2,79 +2,92 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 005EEC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83549C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:01:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2C69206D3
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:59:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C333206D3
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:01:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AnPkJNxY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C69206D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jMpavgzl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C333206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYhk-00041B-SK
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:59:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40611)
+	id 1ixYjN-00061h-F2
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:01:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXzO-0006ZP-BG
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:47 -0500
+ (envelope-from <kchamart@redhat.com>) id 1ixY8k-0001ea-90
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:23:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXzM-0007gd-SV
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:46 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46959
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kchamart@redhat.com>) id 1ixY8i-00030x-Si
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:23:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31456
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXzM-0007cQ-MC
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:44 -0500
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1ixY8i-0002vO-KP
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:23:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483624;
+ s=mimecast20190719; t=1580484198;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=InmtWZr4VBzvXoi7lXHgyU80VuAxaHMHEJa5KAgZjbI=;
- b=AnPkJNxYuYgzTjYOeqOJ18JBYWkFqCkoG0UiSD/6/qmwliZXbiNW+wbV2xB1Unegqah68z
- ec/TyqrPB4+qAW1IfXBxZdYf/P73j+8JzXhuASJam7Pp11OIXYiNy5IeMY9MLLw1+N6f6U
- gO5xpa4GtOYDZyXKeW3QmWKbjdIp1SQ=
+ bh=TawxEKQ4luwMe/Cf3ho+H6grhw051OxwGtYMWM4eEjo=;
+ b=jMpavgzl0JQiTvciKEkiU5EXkOsD5VXtNTE//ls3up8w+QQMnOBv7hNwqJ0lrXnxJryeCA
+ R8MSIw6HuSzVdgVqyfGvc/xTbesN5R4SV99Jj0NPSIgS/IfRvCEcLqoXsFDZ9yxwXsaqeD
+ ESz3P7S/kCIahkm3ixnJUTjoHuPiyyg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-WmdFy3BgOP2H3HT7VeCTVg-1; Fri, 31 Jan 2020 10:13:41 -0500
+ us-mta-407-XtiSWXTxOw-G4GUZMY7yVA-1; Fri, 31 Jan 2020 10:22:56 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8BC5107ACC5
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:40 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5EF8F86C4B
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:40 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 80/80] tests:numa-test: use explicit memdev to specify node
- RAM
-Date: Fri, 31 Jan 2020 16:09:50 +0100
-Message-Id: <1580483390-131164-81-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
-References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA4668010F0;
+ Fri, 31 Jan 2020 15:22:54 +0000 (UTC)
+Received: from paraplu.localdomain (ovpn-117-101.ams2.redhat.com
+ [10.36.117.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C12EB86C4B;
+ Fri, 31 Jan 2020 15:22:44 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+ id 48E953E04B8; Fri, 31 Jan 2020 16:22:43 +0100 (CET)
+Date: Fri, 31 Jan 2020 16:22:43 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Improving QOM documentation [Was: Re: Making QEMU easier for
+ management tools and applications]
+Message-ID: <20200131152243.GA24572@paraplu>
+References: <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200115121953.GJ93923@redhat.com>
+ <874kwwvmuv.fsf@dusky.pond.sub.org>
+ <20200130210902.GA25927@paraplu>
+ <87y2toi29o.fsf@dusky.pond.sub.org>
+ <CAFEAcA-545QS9mnM6hwa6TxUpw_pDQ3Pa8tkf4qtzWS1Zi_fxQ@mail.gmail.com>
+ <CABgObfaB=wHXyJbQR163bZdFHhWdCc4D8sWRHzte019_hSTuhA@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABgObfaB=wHXyJbQR163bZdFHhWdCc4D8sWRHzte019_hSTuhA@mail.gmail.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: WmdFy3BgOP2H3HT7VeCTVg-1
+X-MC-Unique: XtiSWXTxOw-G4GUZMY7yVA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,151 +99,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>, John Snow <jsnow@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Follow up patches will remove automatic RAM distribution
-between nodes and will make default machine types require
-"memdev" option instead of legacy "mem" option.
+On Fri, Jan 31, 2020 at 12:02:05PM +0100, Paolo Bonzini wrote:
+> Il ven 31 gen 2020, 11:36 Peter Maydell <peter.maydell@linaro.org> ha
+> scritto:
 
-Make tests to follow new rules and add an additional test
-for legacy "mem" option on old machine type, to make sure
-it won't regress in the future.
+[...]
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
----
-v3:
-   * s/strcmp/g_str_equal/
-   * put -object lines before -m
-     (Thomas Huth <thuth@redhat.com>)
-   * drop new test_pc_legacy_mem(), due to dropping
-      "numa: forbid '-numa node,mem' for 5.0 and newer machine types"
-     it will be posted later, when libvirt side is prepared for
-     disabled '-numa node,mem' (hopefully 5.1)
----
- tests/qtest/numa-test.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+> The advantage of putting them in the header is that you have them all in
+> one place (inline functions and structs must be in the header). In practi=
+ce
+> that balances for me the disadvantage of having some comments far from th=
+e
+> code they document, which increases the risk of bitrot especially for
+> comments such as "called with lock X held".
+>=20
+> I definitely agree that the overview/introduction/conventions
+> > side of things is where we'd benefit most if somebody wanted
+> > to try to tackle that. We could roll
+> > https://wiki.qemu.org/Documentation/QOMConventions
+> > into that if we had a better place to put that info.
+> >
+>=20
+> I am travelling this weekend so I might try to do some kind of thread
+> summary and brain dump in the wiki. I'll leave to Kashyap to do the rST
+> conversion and patch submission. ;-)
 
-diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
-index 35999ea..2f9b7f6 100644
---- a/tests/qtest/numa-test.c
-+++ b/tests/qtest/numa-test.c
-@@ -25,9 +25,8 @@ static void test_mon_explicit(const void *data)
-     g_autofree char *s =3D NULL;
-     g_autofree char *cli =3D NULL;
-=20
--    cli =3D make_cli(data, "-smp 8 "
--                   "-numa node,nodeid=3D0,cpus=3D0-3 "
--                   "-numa node,nodeid=3D1,cpus=3D4-7 ");
-+    cli =3D make_cli(data, "-smp 8 -numa node,nodeid=3D0,memdev=3Dram,cpus=
-=3D0-3 "
-+                         "-numa node,nodeid=3D1,cpus=3D4-7");
-     qts =3D qtest_init(cli);
-=20
-     s =3D qtest_hmp(qts, "info numa");
-@@ -37,13 +36,13 @@ static void test_mon_explicit(const void *data)
-     qtest_quit(qts);
- }
-=20
--static void test_mon_default(const void *data)
-+static void test_def_cpu_split(const void *data)
- {
-     QTestState *qts;
-     g_autofree char *s =3D NULL;
-     g_autofree char *cli =3D NULL;
-=20
--    cli =3D make_cli(data, "-smp 8 -numa node -numa node");
-+    cli =3D make_cli(data, "-smp 8 -numa node,memdev=3Dram -numa node");
-     qts =3D qtest_init(cli);
-=20
-     s =3D qtest_hmp(qts, "info numa");
-@@ -60,7 +59,7 @@ static void test_mon_partial(const void *data)
-     g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 8 "
--                   "-numa node,nodeid=3D0,cpus=3D0-1 "
-+                   "-numa node,nodeid=3D0,memdev=3Dram,cpus=3D0-1 "
-                    "-numa node,nodeid=3D1,cpus=3D4-5 ");
-     qts =3D qtest_init(cli);
-=20
-@@ -87,7 +86,8 @@ static void test_query_cpus(const void *data)
-     QTestState *qts;
-     g_autofree char *cli =3D NULL;
-=20
--    cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
-=3D4-7");
-+    cli =3D make_cli(data, "-smp 8 -numa node,memdev=3Dram,cpus=3D0-3 "
-+                         "-numa node,cpus=3D4-7");
-     qts =3D qtest_init(cli);
-     cpus =3D get_cpus(qts, &resp);
-     g_assert(cpus);
-@@ -125,7 +125,7 @@ static void pc_numa_cpu(const void *data)
-     g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,thre=
-ads=3D2 "
--        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-+        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
-         "-numa cpu,node-id=3D1,socket-id=3D0 "
-         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D0 "
-         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D0 "
-@@ -178,7 +178,7 @@ static void spapr_numa_cpu(const void *data)
-     g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 4,cores=3D4 "
--        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-+        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
-         "-numa cpu,node-id=3D0,core-id=3D0 "
-         "-numa cpu,node-id=3D0,core-id=3D1 "
-         "-numa cpu,node-id=3D0,core-id=3D2 "
-@@ -223,7 +223,7 @@ static void aarch64_numa_cpu(const void *data)
-     g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 2 "
--        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-+        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
-         "-numa cpu,node-id=3D1,thread-id=3D0 "
-         "-numa cpu,node-id=3D0,thread-id=3D1");
-     qts =3D qtest_init(cli);
-@@ -270,7 +270,7 @@ static void pc_dynamic_cpu_cfg(const void *data)
-=20
-     /* create 2 numa nodes */
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
--        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
-+        " 'arguments': { 'type': 'node', 'nodeid': 0, 'memdev': 'ram' } }"=
-)));
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-         " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
-=20
-@@ -542,13 +542,19 @@ int main(int argc, char **argv)
-     g_autoptr(GString) args =3D g_string_new(NULL);
-     const char *arch =3D qtest_get_arch();
-=20
-+    if (g_str_equal(arch, "ppc64")) {
-+        g_string_append(args, " -object memory-backend-ram,id=3Dram,size=
-=3D512M");
-+    } else {
-+        g_string_append(args, " -object memory-backend-ram,id=3Dram,size=
-=3D128M");
-+    }
-+
-     if (g_str_equal(arch, "aarch64")) {
-         g_string_append(args, " -machine virt");
-     }
-=20
-     g_test_init(&argc, &argv, NULL);
-=20
--    qtest_add_data_func("/numa/mon/default", args, test_mon_default);
-+    qtest_add_data_func("/numa/mon/cpus/default", args, test_def_cpu_split=
-);
-     qtest_add_data_func("/numa/mon/cpus/explicit", args, test_mon_explicit=
-);
-     qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial);
-     qtest_add_data_func("/numa/qmp/cpus/query-cpus", args, test_query_cpus=
-);
+Thanks!  Happy to be the 'scribe' ;-)  I have a skeltal
+qemu-object-model.rst file sitting with some initial content based on
+various sources, including one of your presentations[*] from 2014.
+I'll wait for your new Wiki link to incorporate that content.
+
+(Minor aside: I'm not sure if this file should be in docs/interop/ dir,
+which IIRC, is for things that are 'external' interfaces.  And I learn
+that QOM is used both internally in and as an external interface, e.g.
+whenever a device is being created, machine types, CPU config, etc.)
+
+            - - -
+
+I've re-skimmed your scarily-titled "QOM exegesis and apocalypse" 2014
+KVM Forum talk slides[*], where the "Why QOM?" slide says:
+
+    All device creation, device configuration, backend creation and
+    backed configuration done through a single interface
+   =20
+    Rigorous support for introspection both of runtime objects and type
+    capabilities
+
+Me wonders how much of the above "Why" still holds true today.  Although
+further slides give more clues on what worked and what didn't.
+
+I'll wait for fresher details from your upcoming Wiki :-)
+
+[*] http://www.linux-kvm.org/images/9/90/Kvmforum14-qom.pdf
+
 --=20
-2.7.4
+/kashyap
 
 
