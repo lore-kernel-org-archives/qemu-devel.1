@@ -2,78 +2,80 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26E0C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 01:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A93C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 01:13:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7691C206E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 01:12:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4154C206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 01:13:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yis4aFRr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7691C206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lk1+5Luo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4154C206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixKr4-0001j1-LP
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 20:12:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58378)
+	id 1ixKsX-0002ll-HD
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 20:13:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59543)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixKou-0007vN-CP
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 20:10:05 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ixKrw-0002Jg-6g
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 20:13:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixKor-00076b-Tu
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 20:10:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32165
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixKor-00072X-NP
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 20:10:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580432997;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hTdels3lLogtY3GE7YXCvYtzkeoykd41wRZrcLAwDYA=;
- b=Yis4aFRrVu0fzrOefz++rS8J1tWa3nydnHfJp9U5JR3iSnfVQMEqWT1INsdC1JEA1It/CH
- SvqlcRuNfgRbX90eX+K8Qi0nJU/K+bC4tq+0PLQrA4h7h+pY//MuxNIe5XLuO7nb7kZ2Mu
- m1z4ewnSOLTp/4gjcU2MRUIZVMYF/YY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-qLjYAn62PW2n-jiAxeKJoA-1; Thu, 30 Jan 2020 20:09:53 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2BE413E7;
- Fri, 31 Jan 2020 01:09:51 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-34.brq.redhat.com [10.40.204.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A0C1E5DA75;
- Fri, 31 Jan 2020 01:09:49 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] !fixup "hw/misc: Add limited support for AVR power device"
-Date: Fri, 31 Jan 2020 02:09:40 +0100
-Message-Id: <20200131010941.10636-2-philmd@redhat.com>
-In-Reply-To: <20200131010941.10636-1-philmd@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ixKru-0002lS-Vy
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 20:13:11 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34674)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ixKru-0002kw-PZ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 20:13:10 -0500
+Received: by mail-ot1-x343.google.com with SMTP id a15so5089095otf.1
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 17:13:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=D2XLdd38zIoHxWUicyqjI+KIqj+lpNSKfejzDOiOJK8=;
+ b=lk1+5Luo/ho8y95pEq6PqoQkyZDEt7MAE/G5L48xsrks68xOaL1uYNJBDLjoQeKpJJ
+ sNaOGDr3YuV6C0d9L90Jj6Nh3zKQsFbD4MVpnpvM1I9zI5gUZRN0PEsmgo7mpSHz84qA
+ fqw9nqVn+KFTISJxajFZTMjoKu+0tIKuK72Tvjps3WzoJFsTtVMf449ZgXeVhqOTfKqN
+ FTUmpEAlTkAYghXqPu1zd8R33C40o6tgRqt2DPne46TWiU4gqPlNMDxWQ6sQsFTrfrbW
+ RF0YcgETfo0aTMbG8n61IoSu3MBH00aV9sMnZdVw1T4EBTwL/CDvwlofBYmFvECF/gIA
+ z7IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=D2XLdd38zIoHxWUicyqjI+KIqj+lpNSKfejzDOiOJK8=;
+ b=hsbG1cbaGExW5y1+CGfu7uRTQb767M55r1MQWFji95PMyXdxiMuYBA7o3FmHjYgUXh
+ VQrjP39jpL+MpbwMipyBTd7Xmnp39ElFpSat1s4oiKh7tcCCMuVtLzjALHhmed6pVBXY
+ 7kg6BAjGPD9UYsSWSWGwyVcZvlFigxrY/R6WfiJ9i59r7u+M6AC4Vgd5altZ7GUQT0j3
+ DZNeL/qPnOX7NbjUwPcw+qHH6m2mlFGQOIPvXQhyllXEOHVFi2xxPWrFSaljyHpXnPwF
+ 82IYJAQudRbzlCubQ96jGMVLBqdIdqStaMnolPG5+KhQUWharWya1CmSmvaX7zClz705
+ mU2A==
+X-Gm-Message-State: APjAAAWv49X8wC4UYNf5DZzhGCcnPTedh8KZPjbc4z5PXU1vDw6I2A6D
+ tQu2S4KX/DHE8ouGgU9F0XA5UP2X83pCilC6X4I=
+X-Google-Smtp-Source: APXvYqxh9pPKj7/uNnCZH5Ejm/9nqcky5X2AOeMOr/xD4E0bKHGzYzkmoz0gxPwZJobmqRSyN3Zky8cB/gz5G7X8dc4=
+X-Received: by 2002:a9d:7305:: with SMTP id e5mr5591394otk.64.1580433189908;
+ Thu, 30 Jan 2020 17:13:09 -0800 (PST)
+MIME-Version: 1.0
 References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
  <20200131010941.10636-1-philmd@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: qLjYAn62PW2n-jiAxeKJoA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20200131010941.10636-1-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 31 Jan 2020 02:12:59 +0100
+Message-ID: <CAL1e-=i2samx0r+B_UFP6ya0hSNeaib45ok6KY8c3u5h0wbHdg@mail.gmail.com>
+Subject: Re: [PATCH 0/2] !fixup target/avr merger-rc4
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000e0383c059d654602"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,102 +88,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
  Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
  Michael Rolnik <mrolnik@gmail.com>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-- convert DB_PRINT() to trace-events
-- fix style/indentation
+--000000000000e0383c059d654602
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/misc/avr_power.c  | 17 +++++++++--------
- hw/misc/trace-events |  4 ++++
- 2 files changed, 13 insertions(+), 8 deletions(-)
+On Fri, Jan 31, 2020 at 2:09 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com>
+wrote:
+>
+> Aleksandar, I addressed Alex Benn=C3=A9e comment as fixup, so you
+> can squash directly. See:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg673846.html
+>
+> - convert DB_PRINT() to trace-events
+> - fix style/indentation
+>
+> Based-on: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com=
+>
+>
 
-diff --git a/hw/misc/avr_power.c b/hw/misc/avr_power.c
-index 598bc7279c..65ff7c4405 100644
---- a/hw/misc/avr_power.c
-+++ b/hw/misc/avr_power.c
-@@ -27,9 +27,7 @@
- #include "qemu/log.h"
- #include "hw/qdev-properties.h"
- #include "hw/irq.h"
--
--#define DB_PRINT(fmt, args...) /* Nothing */
--/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ## args=
-)*/
-+#include "trace.h"
-=20
- static void avr_mask_reset(DeviceState *dev)
- {
-@@ -48,19 +46,20 @@ static uint64_t avr_mask_read(void *opaque, hwaddr offs=
-et, unsigned size)
-     assert(offset =3D=3D 0);
-     AVRMaskState *s =3D opaque;
-=20
-+    trace_avr_power_read(s->val);
-+
-     return (uint64_t)s->val;
- }
-=20
- static void avr_mask_write(void *opaque, hwaddr offset,
--                              uint64_t val64, unsigned size)
-+                           uint64_t val64, unsigned size)
- {
-     assert(size =3D=3D 1);
-     assert(offset =3D=3D 0);
-     AVRMaskState *s =3D opaque;
-     uint8_t val8 =3D val64;
-=20
--    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
--
-+    trace_avr_power_write(val8);
-     s->val =3D val8;
-     for (int i =3D 0; i < 8; i++) {
-         qemu_set_irq(s->irq[i], (val8 & (1 << i)) !=3D 0);
-@@ -71,7 +70,9 @@ static const MemoryRegionOps avr_mask_ops =3D {
-     .read =3D avr_mask_read,
-     .write =3D avr_mask_write,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
--    .impl =3D {.max_access_size =3D 1}
-+    .impl =3D {
-+        .max_access_size =3D 1,
-+    },
- };
-=20
- static void avr_mask_init(Object *dev)
-@@ -80,7 +81,7 @@ static void avr_mask_init(Object *dev)
-     SysBusDevice *busdev =3D SYS_BUS_DEVICE(dev);
-=20
-     memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s, TYPE_AVR_MASK,
--            0x01);
-+                          0x01);
-     sysbus_init_mmio(busdev, &s->iomem);
-=20
-     for (int i =3D 0; i < 8; i++) {
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 7f0f5dff3a..f716881bb1 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -179,3 +179,7 @@ via1_rtc_cmd_pram_read(int addr, int value) "addr=3D%u =
-value=3D0x%02x"
- via1_rtc_cmd_pram_write(int addr, int value) "addr=3D%u value=3D0x%02x"
- via1_rtc_cmd_pram_sect_read(int sector, int offset, int addr, int value) "=
-sector=3D%u offset=3D%u addr=3D%d value=3D0x%02x"
- via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) =
-"sector=3D%u offset=3D%u addr=3D%d value=3D0x%02x"
-+
-+# avr_power.c
-+avr_power_read(uint8_t value) "power_reduc read value:%u"
-+avr_power_write(uint8_t value) "power_reduc write value:%u"
---=20
-2.21.1
+That is great!
 
+I am going to squash it into corresponding patches, and mention that in
+commit messages.
+Then I guess some r-b (by Alex) can be added.
+
+Cool!
+
+> Philippe Mathieu-Daud=C3=A9 (2):
+>   !fixup "hw/misc: Add limited support for AVR power device"
+>   !fixup "hw/timer: Add limited support for AVR 16-bit timer peripheral"
+>
+>  hw/misc/avr_power.c    | 17 +++++++++--------
+>  hw/timer/avr_timer16.c | 25 +++++++++++++++----------
+>  hw/misc/trace-events   |  4 ++++
+>  hw/timer/trace-events  | 12 ++++++++++++
+>  4 files changed, 40 insertions(+), 18 deletions(-)
+>
+> --
+> 2.21.1
+>
+
+--000000000000e0383c059d654602
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>On Fri, Jan 31, 2020 at 2:09 AM Philippe Mathieu-D=
+aud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt=
+; wrote:<br>&gt;<br>&gt; Aleksandar, I addressed Alex Benn=C3=A9e comment a=
+s fixup, so you<br>&gt; can squash directly. See:<br>&gt; <a href=3D"https:=
+//www.mail-archive.com/qemu-devel@nongnu.org/msg673846.html">https://www.ma=
+il-archive.com/qemu-devel@nongnu.org/msg673846.html</a><br>&gt;<br>&gt; - c=
+onvert DB_PRINT() to trace-events<br>&gt; - fix style/indentation<br>&gt;<b=
+r>&gt; Based-on: &lt;<a href=3D"mailto:1580428993-4767-1-git-send-email-ale=
+ksandar.markovic@rt-rk.com">1580428993-4767-1-git-send-email-aleksandar.mar=
+kovic@rt-rk.com</a>&gt;<br><div>&gt;</div><div><br></div><div>That is great=
+!</div><div><br></div><div>I am going to squash it into corresponding patch=
+es, and mention that in commit messages.</div><div>Then I guess some r-b (b=
+y Alex) can be added.<br></div><div><br></div><div>Cool!<br></div><div><br>=
+</div>&gt; Philippe Mathieu-Daud=C3=A9 (2):<br>&gt; =C2=A0 !fixup &quot;hw/=
+misc: Add limited support for AVR power device&quot;<br>&gt; =C2=A0 !fixup =
+&quot;hw/timer: Add limited support for AVR 16-bit timer peripheral&quot;<b=
+r>&gt;<br>&gt; =C2=A0hw/misc/avr_power.c =C2=A0 =C2=A0| 17 +++++++++-------=
+-<br>&gt; =C2=A0hw/timer/avr_timer16.c | 25 +++++++++++++++----------<br>&g=
+t; =C2=A0hw/misc/trace-events =C2=A0 | =C2=A04 ++++<br>&gt; =C2=A0hw/timer/=
+trace-events =C2=A0| 12 ++++++++++++<br>&gt; =C2=A04 files changed, 40 inse=
+rtions(+), 18 deletions(-)<br>&gt;<br>&gt; --<br>&gt; 2.21.1<br>&gt;<br></d=
+iv>
+
+--000000000000e0383c059d654602--
 
