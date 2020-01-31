@@ -2,50 +2,51 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0D9C47409
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A1FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:06:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E51820CC7
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:05:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E51820CC7
+	by mail.kernel.org (Postfix) with ESMTPS id B9338214D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:06:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9338214D8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJom-0000wf-FA
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:05:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58582)
+	id 1ixJpE-0001z7-V5
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:06:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58641)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnd-0007R3-1w
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:43 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnf-0007WH-M0
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnb-0002sS-5Y
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:40 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51002 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnc-0002vT-H3
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:43 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51051 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ixJna-0002r8-QD
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:39 -0500
+ id 1ixJnc-0002sk-5U
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:40 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 5B61A1A1E86;
+ by mail.rt-rk.com (Postfix) with ESMTP id 9FBED1A20C4;
  Fri, 31 Jan 2020 01:03:37 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 2C2551A1E1C;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 740F81A1E6F;
  Fri, 31 Jan 2020 01:03:37 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc4 07/29] target/avr: Add instruction helpers
-Date: Fri, 31 Jan 2020 01:02:51 +0100
-Message-Id: <1580428993-4767-8-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc4 12/29] target/avr: Add instruction translation - Bit and
+ Bit-test Instructions
+Date: Fri, 31 Jan 2020 01:02:56 +0100
+Message-Id: <1580428993-4767-13-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -74,281 +75,310 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Add helpers for instructions that need to interact with QEMU. Also,
-add stubs for unimplemented instructions. Instructions SPM and WDR
-are left unimplemented because they require emulation of complex
-peripherals. The implementation of instruction SLEEP is very limited
-due to the lack of peripherals to generate wake interrupts. Memory
-access instructions are implemented here because some address ranges
-actually refer to CPU registers.
+This includes:
+    - LSR, ROR
+    - ASR
+    - SWAP
+    - SBI, CBI
+    - BST, BLD
+    - BSET, BCLR
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- target/avr/helper.c | 203 ++++++++++++++++++++++++++++++++++++++++++++++=
+ target/avr/insn.decode |  14 +++
+ target/avr/translate.c | 241 +++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- target/avr/helper.h |  29 ++++++++
- 2 files changed, 232 insertions(+)
- create mode 100644 target/avr/helper.h
+ 2 files changed, 255 insertions(+)
 
-diff --git a/target/avr/helper.c b/target/avr/helper.c
-index 354def2..c582312 100644
---- a/target/avr/helper.c
-+++ b/target/avr/helper.c
-@@ -137,3 +137,206 @@ bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, =
-int size,
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+index 3f9304f..4ee5586 100644
+--- a/target/avr/insn.decode
++++ b/target/avr/insn.decode
+@@ -158,3 +158,17 @@ XCH             1001 001 rd:5 0100
+ LAC             1001 001 rd:5 0110
+ LAS             1001 001 rd:5 0101
+ LAT             1001 001 rd:5 0111
++
++#
++# Bit and Bit-test Instructions
++#
++LSR             1001 010 rd:5 0110
++ROR             1001 010 rd:5 0111
++ASR             1001 010 rd:5 0101
++SWAP            1001 010 rd:5 0010
++SBI             1001 1010 reg:5 bit:3
++CBI             1001 1000 reg:5 bit:3
++BST             1111 101 rd:5 0 bit:3
++BLD             1111 100 rd:5 0 bit:3
++BSET            1001 0100 0 bit:3 1000
++BCLR            1001 0100 1 bit:3 1000
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 4a62d93..58775af 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -2440,3 +2440,244 @@ static bool trans_LAT(DisasContext *ctx, arg_LAT =
+*a)
 =20
      return true;
  }
 +
 +/*
-+ *  helpers
++ * Bit and Bit-test Instructions
 + */
-+
-+void helper_sleep(CPUAVRState *env)
++static void gen_rshift_ZNVSf(TCGv R)
 +{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_HLT;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_unsupported(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    /*
-+     *  I count not find what happens on the real platform, so
-+     *  it's EXCP_DEBUG for meanwhile
-+     */
-+    cs->exception_index =3D EXCP_DEBUG;
-+    if (qemu_loglevel_mask(LOG_UNIMP)) {
-+        qemu_log("UNSUPPORTED\n");
-+        cpu_dump_state(cs, stderr, 0);
-+    }
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_debug(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_break(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_wdr(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    /* WD is not implemented yet, placeholder */
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
+ */
++    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf =3D R(7) */
++    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
++    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf =3D Nf ^ Vf */
 +}
 +
 +/*
-+ * This function implements IN instruction
-+ *
-+ * It does the following
-+ * a.  if an IO register belongs to CPU, its value is read and returned
-+ * b.  otherwise io address is translated to mem address and physical me=
-mory
-+ *     is read.
-+ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementat=
-ion
-+ *
++ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit =
+0 is
++ *  loaded into the C Flag of the SREG. This operation effectively divid=
+es an
++ *  unsigned value by two. The C Flag can be used to round the result.
 + */
-+target_ulong helper_inb(CPUAVRState *env, uint32_t port)
++static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
 +{
-+    target_ulong data =3D 0;
++    TCGv Rd =3D cpu_r[a->rd];
 +
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        data =3D 0xff & (env->rampD >> 16);
-+        break;
-+    case 0x39: /* RAMPX */
-+        data =3D 0xff & (env->rampX >> 16);
-+        break;
-+    case 0x3a: /* RAMPY */
-+        data =3D 0xff & (env->rampY >> 16);
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        data =3D 0xff & (env->rampZ >> 16);
-+        break;
-+    case 0x3c: /* EIND */
-+        data =3D 0xff & (env->eind >> 16);
-+        break;
-+    case 0x3d: /* SPL */
-+        data =3D env->sp & 0x00ff;
-+        break;
-+    case 0x3e: /* SPH */
-+        data =3D env->sp >> 8;
-+        break;
-+    case 0x3f: /* SREG */
-+        data =3D cpu_get_sreg(env);
-+        break;
-+    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
-+    }
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    /* update status register */
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf =3D Rd =3D=3D=
+ 0 */
++    tcg_gen_movi_tl(cpu_Nf, 0);
++    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
++    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
 +
-+    return data;
++    return true;
 +}
 +
 +/*
-+ *  This function implements OUT instruction
-+ *
-+ *  It does the following
-+ *  a.  if an IO register belongs to CPU, its value is written into the =
-register
-+ *  b.  otherwise io address is translated to mem address and physical m=
-emory
-+ *      is written.
-+ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementa=
-tion
-+ *
++ *  Shifts all bits in Rd one place to the right. The C Flag is shifted =
+into
++ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, comb=
+ined
++ *  with ASR, effectively divides multi-byte signed values by two. Combi=
+ned with
++ *  LSR it effectively divides multi-byte unsigned values by two. The Ca=
+rry Flag
++ *  can be used to round the result.
 + */
-+void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
++static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
 +{
-+    data &=3D 0x000000ff;
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv t0 =3D tcg_temp_new_i32();
 +
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
-+            env->rampD =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x39: /* RAMPX */
-+        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
-+            env->rampX =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3a: /* RAMPY */
-+        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
-+            env->rampY =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
-+            env->rampZ =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3c: /* EIDN */
-+        env->eind =3D (data & 0xff) << 16;
-+        break;
-+    case 0x3d: /* SPL */
-+        env->sp =3D (env->sp & 0xff00) | (data);
-+        break;
-+    case 0x3e: /* SPH */
-+        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
-+            env->sp =3D (env->sp & 0x00ff) | (data << 8);
-+        }
-+        break;
-+    case 0x3f: /* SREG */
-+        cpu_set_sreg(env, data);
-+        break;
-+    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
-+    }
++    tcg_gen_shli_tl(t0, cpu_Cf, 7);
++    /* update status register */
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
++    /* update output register */
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    tcg_gen_or_tl(Rd, Rd, t0);
++    /* update status register */
++    gen_rshift_ZNVSf(Rd);
++
++    tcg_temp_free_i32(t0);
++
++    return true;
 +}
 +
 +/*
-+ *  this function implements LD instruction when there is a posibility t=
-o read
-+ *  from a CPU register
++ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant=
+. Bit 0
++ *  is loaded into the C Flag of the SREG. This operation effectively di=
+vides a
++ *  signed value by two without changing its sign. The Carry Flag can be=
+ used to
++ *  round the result.
 + */
-+target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
++static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
 +{
-+    uint8_t data;
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv t0 =3D tcg_temp_new_i32();
 +
-+    env->fullacc =3D false;
++    /* update status register */
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf =3D Rd(0) */
++    /* update output register */
++    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd =3D (Rd & 0x80) | (Rd >> 1) */
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    tcg_gen_or_tl(Rd, Rd, t0);
++    /* update status register */
++    gen_rshift_ZNVSf(Rd);
 +
-+    if (addr < NUMBER_OF_CPU_REGISTERS) {
-+        /* CPU registers */
-+        data =3D env->r[addr];
-+    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) =
-{
-+        /* IO registers */
-+        data =3D helper_inb(env, addr - NUMBER_OF_CPU_REGISTERS);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
-+    }
-+    return data;
++    tcg_temp_free_i32(t0);
++
++    return true;
 +}
 +
 +/*
-+ *  this function implements ST instruction when there is a posibility t=
-o write
-+ *  into a CPU register
++ *  Swaps high and low nibbles in a register.
 + */
-+void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
++static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
 +{
-+    env->fullacc =3D false;
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv t0 =3D tcg_temp_new_i32();
++    TCGv t1 =3D tcg_temp_new_i32();
 +
-+    /* Following logic assumes this: */
-+    assert(OFFSET_CPU_REGISTERS =3D=3D OFFSET_DATA);
-+    assert(OFFSET_IO_REGISTERS =3D=3D OFFSET_CPU_REGISTERS +
-+            NUMBER_OF_CPU_REGISTERS);
++    tcg_gen_andi_tl(t0, Rd, 0x0f);
++    tcg_gen_shli_tl(t0, t0, 4);
++    tcg_gen_andi_tl(t1, Rd, 0xf0);
++    tcg_gen_shri_tl(t1, t1, 4);
++    tcg_gen_or_tl(Rd, t0, t1);
 +
-+    if (addr < NUMBER_OF_CPU_REGISTERS) {
-+        /* CPU registers */
-+        env->r[addr] =3D data;
-+    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) =
-{
-+        /* IO registers */
-+        helper_outb(env, addr - NUMBER_OF_CPU_REGISTERS, data);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
-+    }
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++
++    return true;
 +}
-diff --git a/target/avr/helper.h b/target/avr/helper.h
-new file mode 100644
-index 0000000..bf08750
---- /dev/null
-+++ b/target/avr/helper.h
-@@ -0,0 +1,29 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
 +
-+DEF_HELPER_1(wdr, void, env)
-+DEF_HELPER_1(debug, void, env)
-+DEF_HELPER_1(break, void, env)
-+DEF_HELPER_1(sleep, void, env)
-+DEF_HELPER_1(unsupported, void, env)
-+DEF_HELPER_3(outb, void, env, i32, i32)
-+DEF_HELPER_2(inb, tl, env, i32)
-+DEF_HELPER_3(fullwr, void, env, i32, i32)
-+DEF_HELPER_2(fullrd, tl, env, i32)
++/*
++ *  Sets a specified bit in an I/O Register. This instruction operates o=
+n
++ *  the lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
++{
++    TCGv data =3D tcg_temp_new_i32();
++    TCGv port =3D tcg_const_i32(a->reg);
++
++    gen_helper_inb(data, cpu_env, port);
++    tcg_gen_ori_tl(data, data, 1 << a->bit);
++    gen_helper_outb(cpu_env, port, data);
++
++    tcg_temp_free_i32(port);
++    tcg_temp_free_i32(data);
++
++    return true;
++}
++
++/*
++ *  Clears a specified bit in an I/O Register. This instruction operates=
+ on
++ *  the lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
++{
++    TCGv data =3D tcg_temp_new_i32();
++    TCGv port =3D tcg_const_i32(a->reg);
++
++    gen_helper_inb(data, cpu_env, port);
++    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
++    gen_helper_outb(cpu_env, port, data);
++
++    tcg_temp_free_i32(data);
++    tcg_temp_free_i32(port);
++
++    return true;
++}
++
++/*
++ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
++ */
++static bool trans_BST(DisasContext *ctx, arg_BST *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++
++    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
++    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
++
++    return true;
++}
++
++/*
++ *  Copies the T Flag in the SREG (Status Register) to bit b in register=
+ Rd.
++ */
++static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
++{
++    TCGv Rd =3D cpu_r[a->rd];
++    TCGv t1 =3D tcg_temp_new_i32();
++
++    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
++    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
++    tcg_gen_or_tl(Rd, Rd, t1);
++
++    tcg_temp_free_i32(t1);
++
++    return true;
++}
++
++/*
++ *  Sets a single Flag or bit in SREG.
++ */
++static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
++{
++    switch (a->bit) {
++    case 0x00:
++        tcg_gen_movi_tl(cpu_Cf, 0x01);
++        break;
++    case 0x01:
++        tcg_gen_movi_tl(cpu_Zf, 0x01);
++        break;
++    case 0x02:
++        tcg_gen_movi_tl(cpu_Nf, 0x01);
++        break;
++    case 0x03:
++        tcg_gen_movi_tl(cpu_Vf, 0x01);
++        break;
++    case 0x04:
++        tcg_gen_movi_tl(cpu_Sf, 0x01);
++        break;
++    case 0x05:
++        tcg_gen_movi_tl(cpu_Hf, 0x01);
++        break;
++    case 0x06:
++        tcg_gen_movi_tl(cpu_Tf, 0x01);
++        break;
++    case 0x07:
++        tcg_gen_movi_tl(cpu_If, 0x01);
++        break;
++    }
++
++    return true;
++}
++
++/*
++ *  Clears a single Flag in SREG.
++ */
++static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
++{
++    switch (a->bit) {
++    case 0x00:
++        tcg_gen_movi_tl(cpu_Cf, 0x00);
++        break;
++    case 0x01:
++        tcg_gen_movi_tl(cpu_Zf, 0x00);
++        break;
++    case 0x02:
++        tcg_gen_movi_tl(cpu_Nf, 0x00);
++        break;
++    case 0x03:
++        tcg_gen_movi_tl(cpu_Vf, 0x00);
++        break;
++    case 0x04:
++        tcg_gen_movi_tl(cpu_Sf, 0x00);
++        break;
++    case 0x05:
++        tcg_gen_movi_tl(cpu_Hf, 0x00);
++        break;
++    case 0x06:
++        tcg_gen_movi_tl(cpu_Tf, 0x00);
++        break;
++    case 0x07:
++        tcg_gen_movi_tl(cpu_If, 0x00);
++        break;
++    }
++
++    return true;
++}
 --=20
 2.7.4
 
