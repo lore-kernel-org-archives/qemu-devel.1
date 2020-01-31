@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B35C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F95C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:54:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1024820661
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:53:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25EB320661
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:54:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7mxH8fu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1024820661
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/uHmGt7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25EB320661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYbv-0002mZ-7K
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:53:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40592)
+	id 1ixYcg-0004Lg-6G
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:54:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39913)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXzN-0006X9-GK
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:47 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXys-0005Ka-8V
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXzL-0007Xe-N4
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:45 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33323
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXyr-0005YE-BX
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37426
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXzL-0007Uy-IL
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:43 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyr-0005Wi-7X
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483623;
+ s=mimecast20190719; t=1580483592;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=m0L2eSmfRc1BYzX/g9odh+BLEI88CeNpYtPOcxjWdfo=;
- b=D7mxH8fu+SD564hBvu+QZI+7LQsDMvkvIt7zgK4icVn14olSF6R1Y3EeeZ1nMDHbDhJrF7
- 5QL/Rv0VeoX0M2KYuvu07eEUK3F7sFG3KfDjjZUNQsb9+ZA1cyVcFrcl2Yd4KNxHepUhlp
- eHI1ZErwDDuh+W3NchBYXRY0AL2wfGE=
+ bh=N5dK9wKgEZzA+7aNL3OJSRdYpKQmq/nb/tAWzoaID24=;
+ b=Y/uHmGt78zyZNLAPcvPXLU1TjC4sKszqXIZwMIAe9RhzDQlj+RlLw0CT0Q7z3YmhVsspON
+ qDfOKKQrglkyw0ypkDIwvIVLOKICWs6JUjAlRy9Qu0lXdfgHGzCIqVbWcnzBszLIudg/Rp
+ 13v4QlZJG2/Qe99vUBRvaAzOXRnJ9Tk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-v1v3BVpLPv21QCxzTiHDuw-1; Fri, 31 Jan 2020 10:13:40 -0500
+ us-mta-421-PSeOSQcLOtKBilb2NVZzjA-1; Fri, 31 Jan 2020 10:13:10 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18E60800D48
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5AB518C43C0
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:09 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 90CB589E8E
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6AF1D86C4B
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:09 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 79/80] tests/numa-test: make top level args dynamic and
- g_autofree(cli) cleanups
-Date: Fri, 31 Jan 2020 16:09:49 +0100
-Message-Id: <1580483390-131164-80-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 49/80] m68k/next-cube: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:09:19 +0100
+Message-Id: <1580483390-131164-50-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: v1v3BVpLPv21QCxzTiHDuw-1
+X-MC-Unique: PSeOSQcLOtKBilb2NVZzjA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,301 +90,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use GString to pass argument to make_cli() so that it would be easy
-to dynamically change test case arguments from main(). The follow up
-patch will use it to change RAM size options depending on target.
-
-While at it cleanup 'cli' freeing, using g_autofree annotation.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
-v3:
-  * s/strcmp/g_str_equal/
-    (Thomas Huth <thuth@redhat.com>)
-  * use pair make_cli/qtest_init instead of qtest_initf
-PS:
-  made as a separate patch so it won't clutter followup testcase changes.
-v4:
-  * use g_string_new(NULL) instead of g_string_new("")
-    (Thomas Huth <thuth@redhat.com>)
----
- tests/qtest/numa-test.c | 108 ++++++++++++++++++++++++--------------------=
-----
- 1 file changed, 54 insertions(+), 54 deletions(-)
+ hw/m68k/next-cube.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
-index 17dd807..35999ea 100644
---- a/tests/qtest/numa-test.c
-+++ b/tests/qtest/numa-test.c
-@@ -14,16 +14,16 @@
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
-=20
--static char *make_cli(const char *generic_cli, const char *test_cli)
-+static char *make_cli(const GString *generic_cli, const char *test_cli)
+diff --git a/hw/m68k/next-cube.c b/hw/m68k/next-cube.c
+index e534334..cd93d9e 100644
+--- a/hw/m68k/next-cube.c
++++ b/hw/m68k/next-cube.c
+@@ -860,7 +860,6 @@ static void next_cube_init(MachineState *machine)
  {
--    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", test_c=
-li);
-+    return g_strdup_printf("%s %s", generic_cli->str, test_cli);
+     M68kCPU *cpu;
+     CPUM68KState *env;
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *rom =3D g_new(MemoryRegion, 1);
+     MemoryRegion *mmiomem =3D g_new(MemoryRegion, 1);
+     MemoryRegion *scrmem =3D g_new(MemoryRegion, 1);
+@@ -893,8 +892,7 @@ static void next_cube_init(MachineState *machine)
+     memcpy(ns->rtc.ram, rtc_ram2, 32);
+=20
+     /* 64MB RAM starting at 0x04000000  */
+-    memory_region_allocate_system_memory(ram, NULL, "next.ram", ram_size);
+-    memory_region_add_subregion(sysmem, 0x04000000, ram);
++    memory_region_add_subregion(sysmem, 0x04000000, machine->ram);
+=20
+     /* Framebuffer */
+     dev =3D qdev_create(NULL, TYPE_NEXTFB);
+@@ -967,6 +965,7 @@ static void next_machine_class_init(ObjectClass *oc, vo=
+id *data)
+     mc->desc =3D "NeXT Cube";
+     mc->init =3D next_cube_init;
+     mc->default_ram_size =3D RAM_SIZE;
++    mc->default_ram_id =3D "next.ram";
+     mc->default_cpu_type =3D M68K_CPU_TYPE_NAME("m68040");
  }
 =20
- static void test_mon_explicit(const void *data)
- {
--    char *s;
--    char *cli;
-     QTestState *qts;
-+    g_autofree char *s =3D NULL;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 8 "
-                    "-numa node,nodeid=3D0,cpus=3D0-3 "
-@@ -33,17 +33,15 @@ static void test_mon_explicit(const void *data)
-     s =3D qtest_hmp(qts, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 1 2 3"));
-     g_assert(strstr(s, "node 1 cpus: 4 5 6 7"));
--    g_free(s);
-=20
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void test_mon_default(const void *data)
- {
--    char *s;
--    char *cli;
-     QTestState *qts;
-+    g_autofree char *s =3D NULL;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 8 -numa node -numa node");
-     qts =3D qtest_init(cli);
-@@ -51,17 +49,15 @@ static void test_mon_default(const void *data)
-     s =3D qtest_hmp(qts, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 2 4 6"));
-     g_assert(strstr(s, "node 1 cpus: 1 3 5 7"));
--    g_free(s);
-=20
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void test_mon_partial(const void *data)
- {
--    char *s;
--    char *cli;
-     QTestState *qts;
-+    g_autofree char *s =3D NULL;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 8 "
-                    "-numa node,nodeid=3D0,cpus=3D0-1 "
-@@ -71,10 +67,8 @@ static void test_mon_partial(const void *data)
-     s =3D qtest_hmp(qts, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 1 2 3 6 7"));
-     g_assert(strstr(s, "node 1 cpus: 4 5"));
--    g_free(s);
-=20
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static QList *get_cpus(QTestState *qts, QDict **resp)
-@@ -87,11 +81,11 @@ static QList *get_cpus(QTestState *qts, QDict **resp)
-=20
- static void test_query_cpus(const void *data)
- {
--    char *cli;
-     QDict *resp;
-     QList *cpus;
-     QObject *e;
-     QTestState *qts;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
-=3D4-7");
-     qts =3D qtest_init(cli);
-@@ -120,16 +114,15 @@ static void test_query_cpus(const void *data)
-=20
-     qobject_unref(resp);
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void pc_numa_cpu(const void *data)
- {
--    char *cli;
-     QDict *resp;
-     QList *cpus;
-     QObject *e;
-     QTestState *qts;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,thre=
-ads=3D2 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -174,16 +167,15 @@ static void pc_numa_cpu(const void *data)
-=20
-     qobject_unref(resp);
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void spapr_numa_cpu(const void *data)
- {
--    char *cli;
-     QDict *resp;
-     QList *cpus;
-     QObject *e;
-     QTestState *qts;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 4,cores=3D4 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -220,16 +212,15 @@ static void spapr_numa_cpu(const void *data)
-=20
-     qobject_unref(resp);
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void aarch64_numa_cpu(const void *data)
- {
--    char *cli;
-     QDict *resp;
-     QList *cpus;
-     QObject *e;
-     QTestState *qts;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 2 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -264,7 +255,6 @@ static void aarch64_numa_cpu(const void *data)
-=20
-     qobject_unref(resp);
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void pc_dynamic_cpu_cfg(const void *data)
-@@ -273,9 +263,10 @@ static void pc_dynamic_cpu_cfg(const void *data)
-     QDict *resp;
-     QList *cpus;
-     QTestState *qs;
-+    g_autofree char *cli =3D NULL;
-=20
--    qs =3D qtest_initf("%s -nodefaults --preconfig -smp 2",
--                     data ? (char *)data : "");
-+    cli =3D make_cli(data, "-nodefaults --preconfig -smp 2");
-+    qs =3D qtest_init(cli);
-=20
-     /* create 2 numa nodes */
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-@@ -329,16 +320,19 @@ static void pc_dynamic_cpu_cfg(const void *data)
-=20
- static void pc_hmat_build_cfg(const void *data)
- {
--    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig -machine hm=
-at=3Don "
--                     "-smp 2,sockets=3D2 "
--                     "-m 128M,slots=3D2,maxmem=3D1G "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
--                     "-numa node,nodeid=3D0,memdev=3Dm0 "
--                     "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 "
--                     "-numa cpu,node-id=3D0,socket-id=3D0 "
--                     "-numa cpu,node-id=3D0,socket-id=3D1",
--                     data ? (char *)data : "");
-+    QTestState *qs;
-+    g_autofree char *cli =3D NULL;
-+
-+    cli =3D make_cli(data, "-nodefaults --preconfig -machine hmat=3Don "
-+                         "-smp 2,sockets=3D2 "
-+                         "-m 128M,slots=3D2,maxmem=3D1G "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm0 "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm1 "
-+                         "-numa node,nodeid=3D0,memdev=3Dm0 "
-+                         "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 =
-"
-+                         "-numa cpu,node-id=3D0,socket-id=3D0 "
-+                         "-numa cpu,node-id=3D0,socket-id=3D1");
-+    qs =3D qtest_init(cli);
-=20
-     /* Fail: Initiator should be less than the number of nodes */
-     g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
-e',"
-@@ -455,13 +449,16 @@ static void pc_hmat_build_cfg(const void *data)
-=20
- static void pc_hmat_off_cfg(const void *data)
- {
--    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig "
--                     "-smp 2,sockets=3D2 "
--                     "-m 128M,slots=3D2,maxmem=3D1G "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
--                     "-numa node,nodeid=3D0,memdev=3Dm0",
--                     data ? (char *)data : "");
-+    QTestState *qs;
-+    g_autofree char *cli =3D NULL;
-+
-+    cli =3D make_cli(data, "-nodefaults --preconfig "
-+                         "-smp 2,sockets=3D2 "
-+                         "-m 128M,slots=3D2,maxmem=3D1G "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm0 "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm1 "
-+                         "-numa node,nodeid=3D0,memdev=3Dm0");
-+    qs =3D qtest_init(cli);
-=20
-     /*
-      * Fail: Enable HMAT with -machine hmat=3Don
-@@ -491,16 +488,19 @@ static void pc_hmat_off_cfg(const void *data)
-=20
- static void pc_hmat_erange_cfg(const void *data)
- {
--    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig -machine hm=
-at=3Don "
--                     "-smp 2,sockets=3D2 "
--                     "-m 128M,slots=3D2,maxmem=3D1G "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
--                     "-numa node,nodeid=3D0,memdev=3Dm0 "
--                     "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 "
--                     "-numa cpu,node-id=3D0,socket-id=3D0 "
--                     "-numa cpu,node-id=3D0,socket-id=3D1",
--                     data ? (char *)data : "");
-+    QTestState *qs;
-+    g_autofree char *cli =3D NULL;
-+
-+    cli =3D make_cli(data, "-nodefaults --preconfig -machine hmat=3Don "
-+                         "-smp 2,sockets=3D2 "
-+                         "-m 128M,slots=3D2,maxmem=3D1G "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm0 "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm1 "
-+                         "-numa node,nodeid=3D0,memdev=3Dm0 "
-+                         "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 =
-"
-+                         "-numa cpu,node-id=3D0,socket-id=3D0 "
-+                         "-numa cpu,node-id=3D0,socket-id=3D1");
-+    qs =3D qtest_init(cli);
-=20
-     /* Can't store the compressed latency */
-     g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
-de',"
-@@ -539,11 +539,11 @@ static void pc_hmat_erange_cfg(const void *data)
-=20
- int main(int argc, char **argv)
- {
--    const char *args =3D NULL;
-+    g_autoptr(GString) args =3D g_string_new(NULL);
-     const char *arch =3D qtest_get_arch();
-=20
--    if (strcmp(arch, "aarch64") =3D=3D 0) {
--        args =3D "-machine virt";
-+    if (g_str_equal(arch, "aarch64")) {
-+        g_string_append(args, " -machine virt");
-     }
-=20
-     g_test_init(&argc, &argv, NULL);
 --=20
 2.7.4
 
