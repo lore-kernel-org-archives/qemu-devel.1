@@ -2,105 +2,79 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0EDC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6FDC35240
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:13:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E64F420705
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:04:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BC3820661
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:13:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DWkw6Zij"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E64F420705
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SITJGQ8v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC3820661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixXqi-0002b0-5k
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:04:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35920)
+	id 1ixXzJ-0005gr-AQ
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:13:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38910)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.merwick@oracle.com>) id 1ixXpL-0001KG-N8
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:03:25 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXy2-0003qW-Oi
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1ixXpK-0003A7-9r
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:03:23 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:40750)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1ixXpK-00038j-17
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:03:22 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00VErgXb062498;
- Fri, 31 Jan 2020 15:03:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=zXBsTISomMyCgoC+86sjB1Wwa6DygwQ46La4orjAFNg=;
- b=DWkw6Zijw6LHrAPbDQ20fhMUnv5w4XUqFoX6UmnS8BymXyZGv4QaBA0jc43zfikbZ/JA
- Uoz+4eU5PrfBSfTibp5CaGTBp/YCcv5jo5lkcx55K5G6fpY38RWS5dTvjyVGNs/Uvxtg
- 7lueZLlo7Zveh0TyVlvQd1Er2CvU5838F0v9z5UBOMza5o22uwcJojdXeTXBuDMKZNny
- UuKSVqc3kjfBWy7X1NS8kJYELXtnIfNfwfyheuamdj4CSBt5/EM0rAjjGw4SWTSKIXVG
- 2jrBkwZuxlXYu8QG0y2ROLQ903h9R81cy6/4pPkiO6mchMvNgczanacMPxkv5GrPbTR6 uQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2xrearttfj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 31 Jan 2020 15:03:12 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00VF0IW4011081;
- Fri, 31 Jan 2020 15:03:12 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 2xv8nr55xc-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 31 Jan 2020 15:03:11 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00VF3Aq1007004;
- Fri, 31 Jan 2020 15:03:10 GMT
-Received: from [10.175.183.219] (/10.175.183.219)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 31 Jan 2020 07:03:10 -0800
-Subject: Re: [PATCH 6/6] tests/boot_linux_console: add PVH acceptance tests
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- alex.bennee@linaro.org, fam@euphon.net
-References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-7-git-send-email-liam.merwick@oracle.com>
- <33e03e74-e579-c0e8-e1fc-bd408aeb32e8@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <8bf4b25b-0e1b-1d7a-d166-e7b746dba207@oracle.com>
-Date: Fri, 31 Jan 2020 15:03:06 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
-MIME-Version: 1.0
-In-Reply-To: <33e03e74-e579-c0e8-e1fc-bd408aeb32e8@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9516
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001310127
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9516
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001310127
+ (envelope-from <imammedo@redhat.com>) id 1ixXy0-0003Z4-94
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40836
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXxz-0003VZ-Tc
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580483535;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=GlmRBop9nElvXuFN6PoY0ESAWjBwRozWcS3wK5a/CTY=;
+ b=SITJGQ8vmz/1vmLUrClgIK2rc5bp0d8zx/QxP6tJ/plwNKJfsviMYqi5xwBzlqWHUW96Ro
+ X/BHtLa/uGVdLmf5CWFjvbvgoanrMocUNNGdZO2X/IdA5F6uYHCLM8hjydZCkQRgBHRFoo
+ Hd+/3ZooBdEPVkDVKddWsNGpSXIApAU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-pBcC-_CYOyq-sJGCpIyKKw-1; Fri, 31 Jan 2020 10:12:11 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7754F13F5
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:12:10 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CA3C086C4B;
+ Fri, 31 Jan 2020 15:12:09 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 01/80] numa: remove deprecated -mem-path fallback to
+ anonymous RAM
+Date: Fri, 31 Jan 2020 16:08:31 +0100
+Message-Id: <1580483390-131164-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: pBcC-_CYOyq-sJGCpIyKKw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
- 00VErgXb062498
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,145 +86,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: slp@redhat.com, qemu-devel@nongnu.org, wainersm@redhat.com,
- pbonzini@redhat.com, sgarzare@redhat.com
+Cc: ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/01/2020 23:57, Philippe Mathieu-Daud=E9 wrote:
-> On 1/27/20 5:36 PM, Liam Merwick wrote:
->> Add tests to boot an uncompressed kernel using the x86/HVM direct boot=
+it has been deprecated since 4.0 by commit
+ cb79224b7 (deprecate -mem-path fallback to anonymous RAM)
+Deprecation period ran out and it's time to remove it
+so it won't get in a way of switching to using hostmem
+backend for RAM.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+CC:libvir-list@redhat.com
+CC: ehabkost@redhat.com
+---
+ hw/core/numa.c       | 18 +-----------------
+ qemu-deprecated.texi |  9 ---------
+ 2 files changed, 1 insertion(+), 26 deletions(-)
+
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 0d1b4be..840e685 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -784,24 +784,8 @@ static void allocate_system_memory_nonnuma(MemoryRegio=
+n *mr, Object *owner,
+ {
+     if (mem_path) {
+ #ifdef __linux__
+-        Error *err =3D NULL;
+         memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, 0,
+-                                         mem_path, &err);
+-        if (err) {
+-            error_report_err(err);
+-            if (mem_prealloc) {
+-                exit(1);
+-            }
+-            warn_report("falling back to regular RAM allocation");
+-            error_printf("This is deprecated. Make sure that -mem-path "
+-                         " specified path has sufficient resources to allo=
+cate"
+-                         " -m specified RAM amount\n");
+-            /* Legacy behavior: if allocation failed, fall back to
+-             * regular RAM allocation.
+-             */
+-            mem_path =3D NULL;
+-            memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &e=
+rror_fatal);
+-        }
++                                         mem_path, &error_fatal);
+ #else
+         fprintf(stderr, "-mem-path not supported on this host\n");
+         exit(1);
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 3d2a8ff..0d614f0 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -113,15 +113,6 @@ QEMU using implicit generic or board specific splittin=
+g rule.
+ Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} =
+(if
+ it's supported by used machine type) to define mapping explictly instead.
 =20
->> ABI.
->> The vmlinux binary is obtained from a small RPM for Kata containers an=
-d
->> extracted using the new extract_from_rpm() method.
->>
->> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
->> ---
->> =A0 tests/acceptance/boot_linux_console.py | 49=20
->> +++++++++++++++++++++++++++++-----
->> =A0 1 file changed, 43 insertions(+), 6 deletions(-)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py=20
->> b/tests/acceptance/boot_linux_console.py
->> index 6af19ae3b14a..ab2200aa0e47 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -65,15 +65,26 @@ class BootLinuxConsole(Test):
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 os.chdir(cwd)
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return self.workdir + '/' + path
->> -=A0=A0=A0 def do_test_x86_64_machine(self):
->> +=A0=A0=A0 def do_test_x86_64_machine(self, pvh=3DFalse):
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:x86_64
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->> -=A0=A0=A0=A0=A0=A0=A0 kernel_url =3D=20
->> ('https://archives.fedoraproject.org/pub/archive/fedora'
->> -                     =20
->> '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
->> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 '/vml=
-inuz')
->> -=A0=A0=A0=A0=A0=A0=A0 kernel_hash =3D '23bebd2680757891cf7adedb033532=
-163a792495'
->> -=A0=A0=A0=A0=A0=A0=A0 kernel_path =3D self.fetch_asset(kernel_url,=20
->> asset_hash=3Dkernel_hash)
->> +=A0=A0=A0=A0=A0=A0=A0 if pvh:
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rpm_url =3D ('https://yum.oracle.co=
-m/repo/OracleLinux/'
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 'O=
-L7/olcne/x86_64/getPackage/'
->> +                      =20
->> 'kernel-uek-container-4.14.35-1902.6.6.1.el7.x86_64.rpm')
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rpm_hash =3D '4c781711a9d32dcb8e81d=
-a2b397cb98926744e23'
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 rpm_path =3D self.fetch_asset(rpm_u=
-rl, asset_hash=3Drpm_hash)
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_path =3D self.extract_from_r=
-pm(rpm_path,
->> +                                               =20
->> './usr/share/kata-containers/'
->> +                                   =20
->> 'vmlinux-4.14.35-1902.6.6.1.el7.container')
->> +=A0=A0=A0=A0=A0=A0=A0 else:
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_url =3D=20
->> ('https://archives.fedoraproject.org/pub/archive/'
->> +                         =20
->> 'fedora/linux/releases/29/Everything/x86_64/os/'
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0 'images/pxeboot/vmlinuz')
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_hash =3D '23bebd2680757891cf=
-7adedb033532163a792495'
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_path =3D self.fetch_asset(ke=
-rnel_url,=20
->> asset_hash=3Dkernel_hash)
->> +
->=20
-> Can you try using a dictionaries instead? This way we can add more=20
-> images easily.
-> See IMAGE_INFO in tests/acceptance/linux_ssh_mips_malta.py.
-
-I can. I won't convert the users of extract_from_deb() but will try make=20
-it easily extendable.
-
-
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -31,6 +31,29 @@ class BootLinuxConsole(Test):
-
-      KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
-
-+    KERNEL_PATH_INFO =3D {
-+        ('x86_64', 'bzImage'): {
-+            'type': 'file',
-+            'url': 'https://archives.fedoraproject.org/'
-+                   'pub/archive/fedora/linux/releases/29/Everything/'
-+                   'x86_64/os/images/pxeboot/vmlinuz',
-+            'hash': '23bebd2680757891cf7adedb033532163a792495'
-+        }
-+    }
-+
-+    def get_kernel_path(self, key):
-+        """
-+        For the provided key, download (and extract, if necessary) the=20
-kernel
-+        and return the path the the kernel binary.
-+
-+        :param key: index into KERNEL_PATH_INFO dict containing kernel=20
-location
-+        :returns: path of the extracted file
-+        """
-+        dinfo =3D self.KERNEL_PATH_INFO[(self.arch, key)]
-+
-+        if dinfo['type'] is 'file':
-+            return self.fetch_asset(dinfo['url'], asset_hash=3Ddinfo['ha=
-sh'])
-+
-      def wait_for_console_pattern(self, success_message):
-          wait_for_console_pattern(self, success_message,
-                                   failure_message=3D'Kernel panic - not=20
-syncing')
-@@ -72,11 +95,7 @@ class BootLinuxConsole(Test):
-          Common routine to boot an x86_64 guest.
-          Caller must specify tags=3Darch and tags=3Dmachine
-          """
--        kernel_url =3D=20
-('https://archives.fedoraproject.org/pub/archive/fedora'
--=20
-'/linux/releases/29/Everything/x86_64/os/images/pxeboot'
--                      '/vmlinuz')
--        kernel_hash =3D '23bebd2680757891cf7adedb033532163a792495'
--        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-+        kernel_path =3D self.get_kernel_path('bzImage')
-          self.vm.set_console()
-          kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE +=20
-'console=3DttyS0'
-          self.vm.add_args('-kernel', kernel_path,
-
-
-Regards,
-Liam
+-@subsection -mem-path fallback to RAM (since 4.1)
+-Currently if guest RAM allocation from file pointed by @option{mem-path}
+-fails, QEMU falls back to allocating from RAM, which might result
+-in unpredictable behavior since the backing file specified by the user
+-is ignored. In the future, users will be responsible for making sure
+-the backing storage specified with @option{-mem-path} can actually provide
+-the guest RAM configured with @option{-m} and QEMU will fail to start up i=
+f
+-RAM allocation is unsuccessful.
+-
+ @subsection RISC-V -bios (since 4.1)
+=20
+ QEMU 4.1 introduced support for the -bios option in QEMU for RISC-V for th=
+e
+--=20
+2.7.4
 
 
