@@ -2,79 +2,80 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E4AC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A701C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDB43206D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D94AB206D5
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 16:09:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q+Itn0dJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDB43206D5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d1NnGe4h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D94AB206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYpi-00005P-Ue
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:07:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40178)
+	id 1ixYrO-0003Vv-TT
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 11:09:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40213)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXz3-0005ja-EV
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:26 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXz5-0005o0-2W
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXz2-0006CU-8W
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36882
+ (envelope-from <imammedo@redhat.com>) id 1ixXz3-0006J1-GD
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44430
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXz2-0006AQ-3q
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:24 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXz3-0006Fu-AC
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483603;
+ s=mimecast20190719; t=1580483604;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vpz++9MC9J/xw9EMwaLlmSSaNVzyVBQ/A8wZaBbbuvk=;
- b=Q+Itn0dJncZpf7C5kvkTM4HcUl4Y89mrxCSMcrGMzR/zT8NH117VTljTpdq308z+HqVbnJ
- ztjhq+MikfFV+6ug0Atzxzl4c+7IhlZxLlh8DC42PVTnEX6hLbaFhaYDH4rfbk+wSfsVRU
- YFE/ePTvT01rfMpig1nRmybh2FAgLq8=
+ bh=Y/zr34DV+dS40A+ZIyFY1KSyFewZk+gPgCZObqD4xbI=;
+ b=d1NnGe4hjLRVGEvxJt1sBAPh+yYgz1AZqSKlUW1A4tlPtiS0ZKGaa7nXeZpI4p9dG/fpca
+ R9Sv4zmVlLbGuZlfHNdggHtwbxKJuFBDw6fCTcyzzlhbl0v3vZYkf8L3lqfwPt1ZgiIjwH
+ 2Zymp7FzkD69mXm9jcquYJPfkca7imQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-OFIoa3K0OGu_S_A4N6VDrQ-1; Fri, 31 Jan 2020 10:13:21 -0500
+ us-mta-366-9aBhhsG9Mxau5bCYic_87Q-1; Fri, 31 Jan 2020 10:13:23 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B45818C43C2
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36433800D48
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:22 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 22F8986C4B
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1E5386C4B
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:21 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 60/80] ppc/mac_oldworld: use memdev for RAM
-Date: Fri, 31 Jan 2020 16:09:30 +0100
-Message-Id: <1580483390-131164-61-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 62/80] ppc/ppc405_boards: add RAM size checks
+Date: Fri, 31 Jan 2020 16:09:32 +0100
+Message-Id: <1580483390-131164-63-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: OFIoa3K0OGu_S_A4N6VDrQ-1
+X-MC-Unique: 9aBhhsG9Mxau5bCYic_87Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,53 +91,179 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+If user provided non-sense RAM size, board will ignore it
+and continue running with fixed RAM size.
+
+Also RAM is going to be allocated by generic code, so it
+won't be possible for board to fix CLI.
+
+Make it error message and exit to force user fix CLI,
+instead of accepting non-sense CLI values.
+
+PS:
+move fixed RAM size into mc->default_ram_size, so that
+generic code will know how much to allocate.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/ppc/mac_oldworld.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+v2:
+  * fix format string causing build failure on 32-bit host
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
+v3:
+  * use size_to_str() to pretty print size in MiB
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>/
+     BALATON Zoltan <balaton@eik.bme.hu>)
+---
+ hw/ppc/ppc405_boards.c | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 7318d7e..66e434b 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -91,7 +91,6 @@ static void ppc_heathrow_init(MachineState *machine)
-     CPUPPCState *env =3D NULL;
-     char *filename;
-     int linux_boot, i;
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *bios =3D g_new(MemoryRegion, 1);
-     uint32_t kernel_base, initrd_base, cmdline_base =3D 0;
-     int32_t kernel_size, initrd_size;
-@@ -127,9 +126,7 @@ static void ppc_heathrow_init(MachineState *machine)
-         exit(1);
-     }
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 1f721fe..057882a 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -40,6 +40,7 @@
+ #include "qemu/error-report.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
++#include "qemu/cutils.h"
 =20
--    memory_region_allocate_system_memory(ram, NULL, "ppc_heathrow.ram",
--                                         ram_size);
--    memory_region_add_subregion(sysmem, 0, ram);
-+    memory_region_add_subregion(sysmem, 0, machine->ram);
+ #define BIOS_FILENAME "ppc405_rom.bin"
+ #define BIOS_SIZE (2 * MiB)
+@@ -137,7 +138,7 @@ static void ref405ep_fpga_init(MemoryRegion *sysmem, ui=
+nt32_t base)
 =20
-     /* allocate and load BIOS */
-     memory_region_init_ram(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
-@@ -446,6 +443,7 @@ static void heathrow_class_init(ObjectClass *oc, void *=
+ static void ref405ep_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     const char *initrd_filename =3D machine->initrd_filename;
+@@ -161,15 +162,21 @@ static void ref405ep_init(MachineState *machine)
+     DriveInfo *dinfo;
+     MemoryRegion *sysmem =3D get_system_memory();
+=20
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
++
+     /* XXX: fix this */
+     memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.=
+ram",
+-                                         0x08000000);
++                                         machine->ram_size);
+     ram_bases[0] =3D 0;
+-    ram_sizes[0] =3D 0x08000000;
++    ram_sizes[0] =3D machine->ram_size;
+     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
+     ram_bases[1] =3D 0x00000000;
+     ram_sizes[1] =3D 0x00000000;
+-    ram_size =3D 128 * MiB;
+     env =3D ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
+                         33333333, &pic, kernel_filename =3D=3D NULL ? 0 : =
+1);
+     /* allocate SRAM */
+@@ -227,7 +234,7 @@ static void ref405ep_init(MachineState *machine)
+     if (linux_boot) {
+         memset(&bd, 0, sizeof(bd));
+         bd.bi_memstart =3D 0x00000000;
+-        bd.bi_memsize =3D ram_size;
++        bd.bi_memsize =3D machine->ram_size;
+         bd.bi_flashstart =3D -bios_size;
+         bd.bi_flashsize =3D -bios_size;
+         bd.bi_flashoffset =3D 0;
+@@ -255,7 +262,7 @@ static void ref405ep_init(MachineState *machine)
+         kernel_base =3D KERNEL_LOAD_ADDR;
+         /* now we can load the kernel */
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base,
+-                                          ram_size - kernel_base);
++                                          machine->ram_size - kernel_base)=
+;
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+@@ -266,7 +273,7 @@ static void ref405ep_init(MachineState *machine)
+         if (initrd_filename) {
+             initrd_base =3D INITRD_LOAD_ADDR;
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_ba=
+se,
+-                                              ram_size - initrd_base);
++                                              machine->ram_size - initrd_b=
+ase);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+                              initrd_filename);
+@@ -304,6 +311,7 @@ static void ref405ep_class_init(ObjectClass *oc, void *=
 data)
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("750_v3.1");
-     mc->default_display =3D "std";
-     mc->ignore_boot_device_suffixes =3D true;
-+    mc->default_ram_id =3D "ppc_heathrow.ram";
-     fwc->get_dev_path =3D heathrow_fw_dev_path;
+=20
+     mc->desc =3D "ref405ep";
+     mc->init =3D ref405ep_init;
++    mc->default_ram_size =3D 0x08000000;
  }
 =20
+ static const TypeInfo ref405ep_type =3D {
+@@ -408,7 +416,7 @@ static void taihu_cpld_init(MemoryRegion *sysmem, uint3=
+2_t base)
+=20
+ static void taihu_405ep_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *initrd_filename =3D machine->initrd_filename;
+     char *filename;
+@@ -425,10 +433,14 @@ static void taihu_405ep_init(MachineState *machine)
+     int fl_idx;
+     DriveInfo *dinfo;
+=20
+-    /* RAM is soldered to the board so the size cannot be changed */
+-    ram_size =3D 0x08000000;
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
+     memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
+-                                         ram_size);
++                                         machine->ram_size);
+=20
+     ram_bases[0] =3D 0;
+     ram_sizes[0] =3D 0x04000000;
+@@ -500,7 +512,7 @@ static void taihu_405ep_init(MachineState *machine)
+         kernel_base =3D KERNEL_LOAD_ADDR;
+         /* now we can load the kernel */
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base,
+-                                          ram_size - kernel_base);
++                                          machine->ram_size - kernel_base)=
+;
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+@@ -509,7 +521,7 @@ static void taihu_405ep_init(MachineState *machine)
+         if (initrd_filename) {
+             initrd_base =3D INITRD_LOAD_ADDR;
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_ba=
+se,
+-                                              ram_size - initrd_base);
++                                              machine->ram_size - initrd_b=
+ase);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+                              initrd_filename);
+@@ -533,6 +545,7 @@ static void taihu_class_init(ObjectClass *oc, void *dat=
+a)
+=20
+     mc->desc =3D "taihu";
+     mc->init =3D taihu_405ep_init;
++    mc->default_ram_size =3D 0x08000000;
+ }
+=20
+ static const TypeInfo taihu_type =3D {
 --=20
 2.7.4
 
