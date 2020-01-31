@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1FADC35240
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22097C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:17:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A15862173E
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:16:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0E582082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:17:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="duNUy9Rj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A15862173E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EI1/AUjn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E582082E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixPbq-0002c3-LF
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:16:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59148)
+	id 1ixPc8-0003Fy-2H
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:17:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59385)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUr-0006bR-MS
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:43 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUy-0006uL-BP
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUq-0000QR-CG
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:41 -0500
-Received: from ozlabs.org ([203.11.71.1]:39913)
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUw-0000Yo-R2
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:48 -0500
+Received: from ozlabs.org ([203.11.71.1]:37575)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ixPUq-0000LQ-0a; Fri, 31 Jan 2020 01:09:40 -0500
+ id 1ixPUw-0000VQ-FC; Fri, 31 Jan 2020 01:09:46 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4886Hs4dDJz9sSH; Fri, 31 Jan 2020 17:09:29 +1100 (AEDT)
+ id 4886Hv0hxDz9sSl; Fri, 31 Jan 2020 17:09:30 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580450969;
- bh=0PDGeHNNFly2LX5qs4wnsyQKICr3TyHxGxrkZ3zjoiQ=;
+ d=gibson.dropbear.id.au; s=201602; t=1580450971;
+ bh=b+jEKCcOsZP9lpCTW7dR8B27vCgt7Ad6CoaXidvsZDI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=duNUy9RjfaxRQXgQgIXMOENy8wbcERBmVpusk4c+J0lOcJKUD0WpRwKM+1v/EtVcr
- 4VOCAgji3/3HTVydhdNXDMwnRgmShll9UOBTChwdHaWCYSg075GCRFqllZBJl8kHUU
- yBFj6Zw7txOjZ2qtTvTD8hvuJ/HWj31z+E4byp78=
+ b=EI1/AUjnDWJXexDp3ztsNkDxMElzWpxa/sy9otXh05Tjo0gKWcv05B2kIwBAxpdLN
+ 0qlBVVj3K74D+VtshCrTIPjAJTMg8+FM6rqEmNk4+7QBg6Iueu040JydRBjQf1ez7L
+ RyZMTTYgq0wxnEFzuwvzvLphAk/RMcZsK18tHRqg=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 11/34] ppc/pnv: remove useless "core-pir" property alias.
-Date: Fri, 31 Jan 2020 17:09:01 +1100
-Message-Id: <20200131060924.147449-12-david@gibson.dropbear.id.au>
+Subject: [PULL 21/34] ppc/pnv: change the PowerNV machine devices to be non
+ user creatable
+Date: Fri, 31 Jan 2020 17:09:11 +1100
+Message-Id: <20200131060924.147449-22-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 References: <20200131060924.147449-1-david@gibson.dropbear.id.au>
@@ -69,8 +70,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ groug@kaod.org, qemu-ppc@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -78,141 +80,171 @@ Sender: "Qemu-devel"
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Commit 158e17a65e1a ("ppc/pnv: Link "chip" property to PnvCore::chip
-pointer") introduced some cleanups of the PnvCore realize handler.
-Let's continue by reworking a bit the interface of the PnvCore
-handlers for the CPU threads. These changes make the "core-pir"
-property alias unused. Remove it.
+The PowerNV machine emulates an OpenPOWER system and the PowerNV chip
+devices are models of the internal logic of the POWER processor. They
+can not be instantiated by the user on the QEMU command line.
+
+The PHB3/PHB4 devices could be an exception in the future after some
+rework on how the device tree is built. For the moment, exclude them
+also.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20200127144154.10170-3-clg@kaod.org>
+Message-Id: <20200129113720.7404-1-clg@kaod.org>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv_core.c | 28 +++++++++++++---------------
- 1 file changed, 13 insertions(+), 15 deletions(-)
+ hw/pci-host/pnv_phb3.c      | 2 ++
+ hw/pci-host/pnv_phb3_pbcq.c | 1 +
+ hw/pci-host/pnv_phb4.c      | 3 ++-
+ hw/pci-host/pnv_phb4_pec.c  | 2 ++
+ hw/ppc/pnv_core.c           | 2 ++
+ hw/ppc/pnv_homer.c          | 1 +
+ hw/ppc/pnv_lpc.c            | 1 +
+ hw/ppc/pnv_occ.c            | 1 +
+ 8 files changed, 12 insertions(+), 1 deletion(-)
 
+diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
+index f03399c406..74618fadf0 100644
+--- a/hw/pci-host/pnv_phb3.c
++++ b/hw/pci-host/pnv_phb3.c
+@@ -1115,6 +1115,7 @@ static void pnv_phb3_class_init(ObjectClass *klass,=
+ void *data)
+     dc->realize =3D pnv_phb3_realize;
+     device_class_set_props(dc, pnv_phb3_properties);
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_phb3_type_info =3D {
+@@ -1168,6 +1169,7 @@ static void pnv_phb3_root_port_class_init(ObjectCla=
+ss *klass, void *data)
+=20
+     device_class_set_parent_realize(dc, pnv_phb3_root_port_realize,
+                                     &rpc->parent_realize);
++    dc->user_creatable =3D false;
+=20
+     k->vendor_id =3D PCI_VENDOR_ID_IBM;
+     k->device_id =3D 0x03dc;
+diff --git a/hw/pci-host/pnv_phb3_pbcq.c b/hw/pci-host/pnv_phb3_pbcq.c
+index 6f0c05be68..f232228b0e 100644
+--- a/hw/pci-host/pnv_phb3_pbcq.c
++++ b/hw/pci-host/pnv_phb3_pbcq.c
+@@ -335,6 +335,7 @@ static void pnv_pbcq_class_init(ObjectClass *klass, v=
+oid *data)
+     xdc->dt_xscom =3D pnv_pbcq_dt_xscom;
+=20
+     dc->realize =3D pnv_pbcq_realize;
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_pbcq_type_info =3D {
+diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
+index 61235d13a6..23cf093928 100644
+--- a/hw/pci-host/pnv_phb4.c
++++ b/hw/pci-host/pnv_phb4.c
+@@ -1290,7 +1290,7 @@ static void pnv_phb4_class_init(ObjectClass *klass,=
+ void *data)
+     dc->realize         =3D pnv_phb4_realize;
+     device_class_set_props(dc, pnv_phb4_properties);
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+-    dc->user_creatable  =3D true;
++    dc->user_creatable  =3D false;
+     dc->reset           =3D pnv_phb4_reset;
+=20
+     xfc->notify         =3D pnv_phb4_xive_notify;
+@@ -1368,6 +1368,7 @@ static void pnv_phb4_root_port_class_init(ObjectCla=
+ss *klass, void *data)
+     PCIERootPortClass *rpc =3D PCIE_ROOT_PORT_CLASS(klass);
+=20
+     dc->desc     =3D "IBM PHB4 PCIE Root Port";
++    dc->user_creatable =3D false;
+=20
+     device_class_set_parent_realize(dc, pnv_phb4_root_port_realize,
+                                     &rpc->parent_realize);
+diff --git a/hw/pci-host/pnv_phb4_pec.c b/hw/pci-host/pnv_phb4_pec.c
+index fd92041d69..68e1db3eac 100644
+--- a/hw/pci-host/pnv_phb4_pec.c
++++ b/hw/pci-host/pnv_phb4_pec.c
+@@ -490,6 +490,7 @@ static void pnv_pec_class_init(ObjectClass *klass, vo=
+id *data)
+=20
+     dc->realize =3D pnv_pec_realize;
+     device_class_set_props(dc, pnv_pec_properties);
++    dc->user_creatable =3D false;
+=20
+     pecc->xscom_nest_base =3D pnv_pec_xscom_nest_base;
+     pecc->xscom_pci_base  =3D pnv_pec_xscom_pci_base;
+@@ -568,6 +569,7 @@ static void pnv_pec_stk_class_init(ObjectClass *klass=
+, void *data)
+=20
+     device_class_set_props(dc, pnv_pec_stk_properties);
+     dc->realize =3D pnv_pec_stk_realize;
++    dc->user_creatable =3D false;
+=20
+     /* TODO: reset regs ? */
+ }
 diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 8ca5fbd1a9..5fe3f21e12 100644
+index f7247222bc..234562040d 100644
 --- a/hw/ppc/pnv_core.c
 +++ b/hw/ppc/pnv_core.c
-@@ -40,11 +40,11 @@ static const char *pnv_core_cpu_typename(PnvCore *pc)
-     return cpu_type;
+@@ -325,6 +325,7 @@ static void pnv_core_class_init(ObjectClass *oc, void=
+ *data)
+     dc->realize =3D pnv_core_realize;
+     dc->unrealize =3D pnv_core_unrealize;
+     device_class_set_props(dc, pnv_core_properties);
++    dc->user_creatable =3D false;
  }
 =20
--static void pnv_core_cpu_reset(PowerPCCPU *cpu, PnvChip *chip)
-+static void pnv_core_cpu_reset(PnvCore *pc, PowerPCCPU *cpu)
- {
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
--    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(pc->chip);
+ #define DEFINE_PNV_CORE_TYPE(family, cpu_model) \
+@@ -423,6 +424,7 @@ static void pnv_quad_class_init(ObjectClass *oc, void=
+ *data)
 =20
-     cpu_reset(cs);
-=20
-@@ -56,7 +56,7 @@ static void pnv_core_cpu_reset(PowerPCCPU *cpu, PnvChip=
- *chip)
-     env->nip =3D 0x10;
-     env->msr |=3D MSR_HVB; /* Hypervisor mode */
-=20
--    pcc->intc_reset(chip, cpu);
-+    pcc->intc_reset(pc->chip, cpu);
+     dc->realize =3D pnv_quad_realize;
+     device_class_set_props(dc, pnv_quad_properties);
++    dc->user_creatable =3D false;
  }
 =20
- /*
-@@ -162,14 +162,14 @@ static const MemoryRegionOps pnv_core_power9_xscom_=
-ops =3D {
-     .endianness =3D DEVICE_BIG_ENDIAN,
- };
-=20
--static void pnv_core_cpu_realize(PowerPCCPU *cpu, PnvChip *chip, Error *=
-*errp)
-+static void pnv_core_cpu_realize(PnvCore *pc, PowerPCCPU *cpu, Error **e=
-rrp)
- {
-     CPUPPCState *env =3D &cpu->env;
-     int core_pir;
-     int thread_index =3D 0; /* TODO: TCG supports only one thread */
-     ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
-     Error *local_err =3D NULL;
--    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(pc->chip);
-=20
-     object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
-     if (local_err) {
-@@ -177,13 +177,13 @@ static void pnv_core_cpu_realize(PowerPCCPU *cpu, P=
-nvChip *chip, Error **errp)
-         return;
-     }
-=20
--    pcc->intc_create(chip, cpu, &local_err);
-+    pcc->intc_create(pc->chip, cpu, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-     }
-=20
--    core_pir =3D object_property_get_uint(OBJECT(cpu), "core-pir", &erro=
-r_abort);
-+    core_pir =3D object_property_get_uint(OBJECT(pc), "pir", &error_abor=
-t);
-=20
-     /*
-      * The PIR of a thread is the core PIR + the thread index. We will
-@@ -203,7 +203,7 @@ static void pnv_core_reset(void *dev)
-     int i;
-=20
-     for (i =3D 0; i < cc->nr_threads; i++) {
--        pnv_core_cpu_reset(pc->threads[i], pc->chip);
-+        pnv_core_cpu_reset(pc, pc->threads[i]);
-     }
+ static const TypeInfo pnv_quad_info =3D {
+diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
+index 93ae42f7e4..9a262629b7 100644
+--- a/hw/ppc/pnv_homer.c
++++ b/hw/ppc/pnv_homer.c
+@@ -360,6 +360,7 @@ static void pnv_homer_class_init(ObjectClass *klass, =
+void *data)
+     dc->realize =3D pnv_homer_realize;
+     dc->desc =3D "PowerNV HOMER Memory";
+     device_class_set_props(dc, pnv_homer_properties);
++    dc->user_creatable =3D false;
  }
 =20
-@@ -231,8 +231,6 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
-=20
-         snprintf(name, sizeof(name), "thread[%d]", i);
-         object_property_add_child(OBJECT(pc), name, obj, &error_abort);
--        object_property_add_alias(obj, "core-pir", OBJECT(pc),
--                                  "pir", &error_abort);
-=20
-         cpu->machine_data =3D g_new0(PnvCPUState, 1);
-=20
-@@ -240,7 +238,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
-     }
-=20
-     for (j =3D 0; j < cc->nr_threads; j++) {
--        pnv_core_cpu_realize(pc->threads[j], pc->chip, &local_err);
-+        pnv_core_cpu_realize(pc, pc->threads[j], &local_err);
-         if (local_err) {
-             goto err;
-         }
-@@ -263,12 +261,12 @@ err:
-     error_propagate(errp, local_err);
+ static const TypeInfo pnv_homer_type_info =3D {
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index d1de98f04c..5989d723c5 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -762,6 +762,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
+id *data)
+     dc->realize =3D pnv_lpc_realize;
+     dc->desc =3D "PowerNV LPC Controller";
+     device_class_set_props(dc, pnv_lpc_properties);
++    dc->user_creatable =3D false;
  }
 =20
--static void pnv_core_cpu_unrealize(PowerPCCPU *cpu, PnvChip *chip)
-+static void pnv_core_cpu_unrealize(PnvCore *pc, PowerPCCPU *cpu)
- {
-     PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
--    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(pc->chip);
-=20
--    pcc->intc_destroy(chip, cpu);
-+    pcc->intc_destroy(pc->chip, cpu);
-     cpu_remove_sync(CPU(cpu));
-     cpu->machine_data =3D NULL;
-     g_free(pnv_cpu);
-@@ -284,7 +282,7 @@ static void pnv_core_unrealize(DeviceState *dev, Erro=
-r **errp)
-     qemu_unregister_reset(pnv_core_reset, pc);
-=20
-     for (i =3D 0; i < cc->nr_threads; i++) {
--        pnv_core_cpu_unrealize(pc->threads[i], pc->chip);
-+        pnv_core_cpu_unrealize(pc, pc->threads[i]);
-     }
-     g_free(pc->threads);
+ static const TypeInfo pnv_lpc_info =3D {
+diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
+index 2173fac0e7..5a716c256e 100644
+--- a/hw/ppc/pnv_occ.c
++++ b/hw/ppc/pnv_occ.c
+@@ -280,6 +280,7 @@ static void pnv_occ_class_init(ObjectClass *klass, vo=
+id *data)
+     dc->realize =3D pnv_occ_realize;
+     dc->desc =3D "PowerNV OCC Controller";
+     device_class_set_props(dc, pnv_occ_properties);
++    dc->user_creatable =3D false;
  }
+=20
+ static const TypeInfo pnv_occ_type_info =3D {
 --=20
 2.24.1
 
