@@ -2,81 +2,116 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07474C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B97C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6E2F20707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F5EC20707
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:34:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Si0TeV68"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6E2F20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="M5aqL8bm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F5EC20707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixWQA-0001HA-W8
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:33:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57161)
+	id 1ixWRC-0002Nq-Sr
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:34:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57336)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ixWP5-0000js-56
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:32:15 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixWPh-00011O-Mf
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:32:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ixWP4-0002jF-2E
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:32:11 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41813)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ixWP3-0002iU-Sf
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:32:10 -0500
-Received: by mail-ot1-x343.google.com with SMTP id r27so6529386otc.8
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 05:32:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=X3oak3I5x2qcKyM9o7o7AucOda6RH8Eho0VwIkg7pG8=;
- b=Si0TeV68kylwZ4d1MN0cA/vf8crcZmsvwTh+ETQmboCm+xfBy1NfTqwhCAdBQthzg6
- 1OpstV5gAKuf8aiNbJ3p5eaiIFlvAGTNgjYlJJpkMrrALw1cmQ/T5C5CoWHChTPTLStJ
- FZYdwKRXxlV9mI5WTrSO+PQGMrPG6uc/YQfOa/m8gXjok1HdTWa2qGT0QJ/m7PLvJKqs
- 51N36NJcUwEgTXyEzGa7TFbS36+OJWKv1O5FD8TEAjGluWpw3QTaXtdHg/ICZo8UB8CP
- CF86adk6jdHxHBEvrPjM5qj4B6zv6EBeAVSUgGgHk36sdJNnQI6ZqtmWZqg0Z5Sj9uUq
- FsKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=X3oak3I5x2qcKyM9o7o7AucOda6RH8Eho0VwIkg7pG8=;
- b=TdM5r7YdEmUvWAY6s5NLdtwwOl/HitcbZozSfE99BIXkgCd3B9lrKjg98nVgikOvPu
- cvUK8zqjEY9cPMWl5tPs7YT1IvpT/8ddQO2yoH6zivz+ba5e3cmEBn2z2XdI0se929+o
- RTV1WgB8UnvKktl8FXmKzSHQoUMsU8l9Gsn8fdhgoSlWCHdlqRj0mo/Z1tqWuE1ZHGxc
- owJ1zXG/QuZIEBfESMkrttZjwhVzHapAU/h2MYDM52Gez6Z5lmUORwmQ94sBHLUpn3e0
- btcAZWbzi8rnbS7ZHV2hCW1k6ZaINo9kaDGgHpGJRVoVWaTXqHAMSAn/OTcD+xGKhBv9
- SMyA==
-X-Gm-Message-State: APjAAAVrUUctzJ8r/9Gb+v5aDhKE8Jl2SMrvabSu/zqRixdOuUPHmnM3
- g73/jGnZhsVBXi+wYT/NdBZmO9CKRioqRsyDXdQzAQ==
-X-Google-Smtp-Source: APXvYqylG4zeNNQW+QDs13UfEugPrXYE3YfCuI1ZH/4xIwsDHRcmWRB5SOYAnzDC7gBgIp+q+M5A6c5+wcLsBj9jHTI=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr7581158otd.91.1580477528930; 
- Fri, 31 Jan 2020 05:32:08 -0800 (PST)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixWPg-000342-4I
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:32:49 -0500
+Received: from mail-am6eur05on2132.outbound.protection.outlook.com
+ ([40.107.22.132]:19937 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ixWPa-0002xu-O9; Fri, 31 Jan 2020 08:32:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W5frjGlOlds2l0X9u8xgvya1N8GBG92mdkHYTT13mQLNEH7Fs04uu7W2sEYKrE/dqeWa0hZf4tgiXHCh7qsjVU0nh1B9L0pV1C5I6M0QPut/QvwIOGFgxQ3lGnNJNi2hpOkWVWz0kw73SafPvFCf6v7mrOzVF12Igl6Q42fkWdvc9bmVILW85633qSCt7gQT3s83puKpBGna+HwSWnrFdt2Zftfav4SHekula3PDt12RSZGCYl2qe3k/H9Jzb+B3sXcUVZ2H8eLI8KD7dDC1XUA9L7KnU7fliNh+BEcFYVpE7ULVz2l/O87QF9L3QJ6XwYtolkqd64w8nfaPHOE/uA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YFYAep/tS6mwUtZH26H3avQEM2YOp38cuQd9r662xUg=;
+ b=lr/613s1S2vejZnKAh4WkKmqQe30VSpQK24VL2j3bQjjjqDMSHA4qR5e7wERun5k19XFifZu1GWOT88CzvLxmFuVWsW/SFoNNkxCyK5SkVxlxv8QM/dhXGH351Y2oQkysIl8U3WwSTvzQ3YLownFlcVS/qndICyJoEM8bsCRoO4a3Nr9CUd5T7ItAo3AF+2BL44DP1Jqera9Aw7htvfPfbhrBa+hM3fjL+syZWyidcYEyaSadsmABRkccpIs6TZIPx6mNMyCHbjWJlfM2oQOewRFx0b9/LEFrLE3OCLK/5Zh7sTV6tm4VnILaZhRtlQl6eTgJI+zGUNeGRobtsNo9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YFYAep/tS6mwUtZH26H3avQEM2YOp38cuQd9r662xUg=;
+ b=M5aqL8bmgdV4BmNChy3XMr2BB1k1UtzeUWK+mEFOtAhVyblMeiKhDf6WGI5aQoaHyeB754RMl22dawX+rIII4V9HYmwn9VUTXcRq0yJOC0BVzdJXLCZjhYuief8cc+wBbzS5NuOvmgzn0WR9OdiwVlj2vCr+5g+xjJlcxU6bGQI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3701.eurprd08.prod.outlook.com (20.178.90.159) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.29; Fri, 31 Jan 2020 13:32:40 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.028; Fri, 31 Jan 2020
+ 13:32:40 +0000
+Subject: Re: [Xen-devel] [PATCH v7 00/11] error: auto propagated local_err
+ part I
+To: qemu-devel@nongnu.org
+References: <158047636035.17955.5913248840185467774@a1bbccc8075a>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200131163237327
+Message-ID: <26ba57f0-8a7f-c73b-ccab-b2811af24d3d@virtuozzo.com>
+Date: Fri, 31 Jan 2020 16:32:37 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <158047636035.17955.5913248840185467774@a1bbccc8075a>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1PR05CA0362.eurprd05.prod.outlook.com
+ (2603:10a6:7:94::21) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
-References: <20200129235614.29829-1-richard.henderson@linaro.org>
- <20200129235614.29829-29-richard.henderson@linaro.org>
-In-Reply-To: <20200129235614.29829-29-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 31 Jan 2020 13:31:58 +0000
-Message-ID: <CAFEAcA-Cau97Z_ZnfCcre+yojuSJFmptQRvZiBSTdr1JnWk7Xw@mail.gmail.com>
-Subject: Re: [PATCH v5 28/41] target/arm: Add VHE system register redirection
- and aliasing
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR05CA0362.eurprd05.prod.outlook.com (2603:10a6:7:94::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.27 via Frontend Transport; Fri, 31 Jan 2020 13:32:38 +0000
+X-Tagtoolbar-Keys: D20200131163237327
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 27a7f96a-7fb3-4ceb-016a-08d7a6520b05
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3701:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3701FA92430A0A3F12BE549CC1070@AM6PR08MB3701.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 029976C540
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10001)(10019020)(39850400004)(396003)(366004)(136003)(346002)(376002)(189003)(199004)(2906002)(31686004)(8676002)(52116002)(81156014)(8936002)(81166006)(7416002)(316002)(16576012)(4326008)(6486002)(16526019)(26005)(86362001)(66946007)(66556008)(186003)(66476007)(966005)(5660300002)(478600001)(6916009)(31696002)(2616005)(956004)(36756003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3701;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: NwgG338uH+J2XkH5g0MTCLrhZcoQzcaaTp/U40TdkzOaTbgVBjfwFuwmeyn5/ivm/ReiLev226n7IoaRx2aKJvCyaucqPnFFnXzBcZHe8kFvM3kZnvxrC/F/z+9FKlkUAYvo5vJplrzXOEVLrGOmGx86r30YmN6NYR5KWArkBewHDWMwxXWrznjzwo7RzVpICwbjTIpjS0Bza5MPdQOSroybQeer3u+9nUJdXrdNH+ec6gf7HViJzaXO+gck1WmqsyD7Ej3knuuCPX4PU2DYXtBf54HxE9uAERl7pmGe7VF3k9zE47i+WKYxqltbrqMFfD1cBf1kGKE/gB4/SXikm//ZGXAhjIVsmnX5GYoMgEe4nhbZdt50h1XWOImH1mkg7T/0At9c9ha80gWzThxpq4y6NmooS1IigACpcpbKhIdcNkqEIEZQpE0/iWfcTRLEZ2pZm+FohjlKl7Ungtdcr5b0BrK73lDqHpZm1WZ8yjVBmRbvPmEC84rLZi/3pn9imRTSbZi8r53WdhZfMfh0LXU4ny3xMLSeWqf+6S+muFxnt4M/QTJ8oc05csyJ4e5GIRt30dqmesYANuImP5Wbsg==
+X-MS-Exchange-AntiSpam-MessageData: X4QUHuGp+/GaFbC2LY5a/bunhzK3NFfE14fe6LyVt+l8xBWirGqFldHtLOJJuKfcW1wgx6xyZ7dps3ue6E0RgI1LeI6H5OJfCUN9p3La1cHFAHh1dUreLt7J4GkgmCggkRGAlEvXNXC3OYyF9zvDIQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27a7f96a-7fb3-4ceb-016a-08d7a6520b05
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2020 13:32:40.0869 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qf/vCjL5pqouBXMuHa6kYKz7D2pHHi07mPFHUZQcHRumxo92q9ITDMhmswu+QqJwxXKVIaU6UYl/joeiANjzpWh+pbBtPGy94jRIkGxLv+8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3701
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.22.132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,94 +123,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, sstabellini@kernel.org, mdroth@linux.vnet.ibm.com,
+ qemu-block@nongnu.org, paul@xen.org, lersek@redhat.com, groug@kaod.org,
+ armbru@redhat.com, kraxel@redhat.com, stefanha@redhat.com,
+ anthony.perard@citrix.com, xen-devel@lists.xenproject.org, mreitz@redhat.com,
+ philmd@redhat.com, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 29 Jan 2020 at 23:56, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Several of the EL1/0 registers are redirected to the EL2 version when in
-> EL2 and HCR_EL2.E2H is set.  Many of these registers have side effects.
-> Link together the two ARMCPRegInfo structures after they have been
-> properly instantiated.  Install common dispatch routines to all of the
-> relevant registers.
->
-> The same set of registers that are redirected also have additional
-> EL12/EL02 aliases created to access the original register that was
-> redirected.
->
-> Omit the generic timer registers from redirection here, because we'll
-> need multiple kinds of redirection from both EL0 and EL2.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+31.01.2020 16:12, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200131130118.1716-1-vsementsov@virtuozzo.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Subject: [Xen-devel] [PATCH v7 00/11] error: auto propagated local_err part I
+> Message-id: 20200131130118.1716-1-vsementsov@virtuozzo.com
+> Type: series
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> === TEST SCRIPT END ===
+> 
+>  From https://github.com/patchew-project/qemu
+>     9281736..adcd6e9  master     -> master
+>  From https://github.com/patchew-project/qemu
+>   * [new tag]         patchew/20200131130118.1716-1-vsementsov@virtuozzo.com -> patchew/20200131130118.1716-1-vsementsov@virtuozzo.com
+> Switched to a new branch 'test'
+> b0f4834 xen: introduce ERRP_AUTO_PROPAGATE
+> c704561 nbd: introduce ERRP_AUTO_PROPAGATE
+> 238b4d2 TPM: introduce ERRP_AUTO_PROPAGATE
+> 56af634 virtio-9p: introduce ERRP_AUTO_PROPAGATE
+> 8dd497a fw_cfg: introduce ERRP_AUTO_PROPAGATE
+> cd54750 pflash: introduce ERRP_AUTO_PROPAGATE
+> 031d7ed SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
+> 7dc91c5 hw/sd/ssi-sd: fix error handling in ssi_sd_realize
+> 57435c4 scripts: add coccinelle script to use auto propagated errp
+> 0883f29 error: auto propagated local_err
+> df0db83 qapi/error: add (Error **errp) cleaning APIs
+> 
+> === OUTPUT BEGIN ===
+> 1/11 Checking commit df0db83cd18a (qapi/error: add (Error **errp) cleaning APIs)
+> 2/11 Checking commit 0883f296ed8f (error: auto propagated local_err)
+> ERROR: Macros with multiple statements should be enclosed in a do - while loop
+> #139: FILE: include/qapi/error.h:427:
+> +#define ERRP_AUTO_PROPAGATE()                                  \
+> +    g_auto(ErrorPropagator) _auto_errp_prop = {.errp = errp};  \
+> +    errp = ((errp == NULL || *errp == error_fatal)             \
+> +            ? &_auto_errp_prop.local_err : errp)
+
+
+It worth it.
+
+> 
+> total: 1 errors, 0 warnings, 101 lines checked
+> 
+> Patch 2/11 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> 3/11 Checking commit 57435c473bf1 (scripts: add coccinelle script to use auto propagated errp)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #34:
+> new file mode 100644
+> 
+> total: 0 errors, 1 warnings, 167 lines checked
+> 
+> Patch 3/11 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 4/11 Checking commit 7dc91c560263 (hw/sd/ssi-sd: fix error handling in ssi_sd_realize)
+> 5/11 Checking commit 031d7eda4bbb (SD (Secure Card): introduce ERRP_AUTO_PROPAGATE)
+> 6/11 Checking commit cd54750748f4 (pflash: introduce ERRP_AUTO_PROPAGATE)
+> 7/11 Checking commit 8dd497a506bc (fw_cfg: introduce ERRP_AUTO_PROPAGATE)
+> 8/11 Checking commit 56af634941d2 (virtio-9p: introduce ERRP_AUTO_PROPAGATE)
+> 9/11 Checking commit 238b4d2c886f (TPM: introduce ERRP_AUTO_PROPAGATE)
+> 10/11 Checking commit c7045610d28d (nbd: introduce ERRP_AUTO_PROPAGATE)
+> 11/11 Checking commit b0f483460534 (xen: introduce ERRP_AUTO_PROPAGATE)
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20200131130118.1716-1-vsementsov@virtuozzo.com/testing.checkpatch/?type=message.
 > ---
-> v5: Drop unioning in ARMCPRegInfo with bank_fieldoffsets[].
-> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
 
 
-> +    for (i = 0; i < ARRAY_SIZE(aliases); i++) {
-> +        const struct E2HAlias *a = &aliases[i];
-> +        ARMCPRegInfo *src_reg, *dst_reg;
-> +
-> +        if (a->feature && !a->feature(&cpu->isar)) {
-> +            continue;
-> +        }
-> +
-> +        src_reg = g_hash_table_lookup(cpu->cp_regs, &a->src_key);
-> +        dst_reg = g_hash_table_lookup(cpu->cp_regs, &a->dst_key);
-> +        g_assert(src_reg != NULL);
-> +        g_assert(dst_reg != NULL);
-> +
-> +        /* Cross-compare names to detect typos in the keys.  */
-> +        g_assert(strcmp(src_reg->name, a->src_name) == 0);
-> +        g_assert(strcmp(dst_reg->name, a->dst_name) == 0);
-> +
-> +        /* None of the core system registers use opaque; we will.  */
-> +        g_assert(src_reg->opaque == NULL);
-> +
-> +        /* Create alias before redirection so we dup the right data. */
-> +        if (a->new_key) {
-> +            ARMCPRegInfo *new_reg = g_memdup(src_reg, sizeof(ARMCPRegInfo));
-> +            uint32_t *new_key = g_memdup(&a->new_key, sizeof(uint32_t));
-> +            bool ok;
-> +
-> +            new_reg->name = a->new_name;
-> +            new_reg->type |= ARM_CP_ALIAS;
-> +            /* Remove PL1/PL0 access, leaving PL2/PL3 R/W in place.  */
-> +            new_reg->access &= 0xf0;
-
-That seems like it would be more clear written as
-   new_reg->access &= (PL2_RW | PL3_RW);
-
-(strictly there the PL3_RW is useless as PL2_RW implies it but
-it captures the intent better I think)
-
-> +
-> +            ok = g_hash_table_insert(cpu->cp_regs, new_key, new_reg);
-> +            g_assert(ok);
-> +        }
-> +
-> +        src_reg->opaque = dst_reg;
-> +        src_reg->orig_readfn = src_reg->readfn ?: raw_read;
-> +        src_reg->orig_writefn = src_reg->writefn ?: raw_write;
-> +        if (!src_reg->raw_readfn) {
-> +            src_reg->raw_readfn = raw_read;
-> +        }
-> +        if (!src_reg->raw_writefn) {
-> +            src_reg->raw_writefn = raw_write;
-> +        }
-> +        src_reg->readfn = el2_e2h_read;
-> +        src_reg->writefn = el2_e2h_write;
-> +    }
-> +}
-> +#endif
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+-- 
+Best regards,
+Vladimir
 
