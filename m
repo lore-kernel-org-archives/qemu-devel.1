@@ -7,57 +7,58 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF363C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7959CC35240
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:14:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDD2024687
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EC242173E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:14:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="kGdE1Cw5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD2024687
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="b6f4D6vU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EC242173E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixPYa-0005sU-Rp
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:13:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59390)
+	id 1ixPZ5-00073r-Ed
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:14:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59181)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUy-0006ug-Gd
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:49 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUs-0006cD-AP
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUx-0000ZG-4F
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:48 -0500
-Received: from ozlabs.org ([203.11.71.1]:59227)
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUq-0000Ph-6O
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:42 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:47309 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ixPUw-0000WJ-OR; Fri, 31 Jan 2020 01:09:47 -0500
+ id 1ixPUp-0000LA-Qo; Fri, 31 Jan 2020 01:09:40 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4886Hv3Mzgz9sSg; Fri, 31 Jan 2020 17:09:31 +1100 (AEDT)
+ id 4886Hs27n2z9sS3; Fri, 31 Jan 2020 17:09:29 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580450971;
- bh=fKPavTsxkuQdbNDZU0BEGGp8qbruBMk+OGeYF/Wc2+Y=;
+ d=gibson.dropbear.id.au; s=201602; t=1580450969;
+ bh=bjwdRjPCaoEcFDlMKXa0ywMeEd6AJUOtKpBCM/ICTLQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=kGdE1Cw52xyAOEyObZFNTW02x4SjNxmYlqi087KRXJ0scY6Pd9m9oW+3xsgXtpWsU
- FJksaAvBS9sBiHdkpmPfMJkHJcrWEITnpvRIQAhCqNiFEoHJkDHPmSHTf7OLkEQEOP
- laeNU2VRG8HFi0AOtB150zej3RgKb2aM/LcVLcWg=
+ b=b6f4D6vUzQtOd0MiQ9Jfxkx7dzs2H0e/9/JqhKZyBceCzeD5Pde1wArhODFnCIOqg
+ uJNJ2lxbq2gO37GXpuJaPq0o0HK2Ohhetfml+GGcnjaPiz+77BJ97Z2wHeyH6jz+oW
+ TedMJ5WOuMKaHfQ+ujA6Sbk5ZporeZE9wHHRGlvs=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 22/34] spapr: Enable DD2.3 accelerated count cache flush in
- pseries-5.0 machine
-Date: Fri, 31 Jan 2020 17:09:12 +1100
-Message-Id: <20200131060924.147449-23-david@gibson.dropbear.id.au>
+Subject: [PULL 08/34] target/ppc: add support for Hypervisor Facility
+ Unavailable Exception
+Date: Fri, 31 Jan 2020 17:08:58 +1100
+Message-Id: <20200131060924.147449-9-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 References: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,126 +70,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For POWER9 DD2.2 cpus, the best current Spectre v2 indirect branch
-mitigation is "count cache disabled", which is configured with:
-    -machine cap-ibs=3Dfixed-ccd
-However, this option isn't available on DD2.3 CPUs with KVM, because they
-don't have the count cache disabled.
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-For POWER9 DD2.3 cpus, it is "count cache flush with assist", configured
-with:
-    -machine cap-ibs=3Dworkaround,cap-ccf-assist=3Don
-However this option isn't available on DD2.2 CPUs with KVM, because they
-don't have the special CCF assist instruction this relies on.
+The privileged message send and clear instructions (msgsndp & msgclrp)
+are privileged, but will generate a hypervisor facility unavailable
+exception if not enabled in the HFSCR and executed in privileged
+non-hypervisor state.
 
-On current machine types, we default to "count cache flush w/o assist",
-that is:
-    -machine cap-ibs=3Dworkaround,cap-ccf-assist=3Doff
-This runs, with mitigation on both DD2.2 and DD2.3 host cpus, but has a
-fairly significant performance impact.
+Add checks when accessing the DPDES register and when using the
+msgsndp and msgclrp isntructions.
 
-It turns out we can do better.  The special instruction that CCF assist
-uses to trigger a count cache flush is a no-op on earlier CPUs, rather th=
-an
-trapping or causing other badness.  It doesn't, of itself, implement the
-mitigation, but *if* we have count-cache-disabled, then the count cache
-flush is unnecessary, and so using the count cache flush mitigation is
-harmless.
-
-Therefore for the new pseries-5.0 machine type, enable cap-ccf-assist by
-default.  Along with that, suppress throwing an error if cap-ccf-assist
-is selected but KVM doesn't support it, as long as KVM *is* giving us
-count-cache-disabled.  To allow TCG to work out of the box, even though i=
-t
-doesn't implement the ccf flush assist, downgrade the error in that case =
-to
-a warning.  This matches several Spectre mitigations where we allow TCG
-to operate for debugging, since we don't really make guarantees about TCG
-security properties anyway.
-
-While we're there, make the TCG warning for this case match that for othe=
-r
-mitigations.
-
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20200120104935.24449-3-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c      |  5 ++++-
- hw/ppc/spapr_caps.c | 21 +++++++++++++++++----
- 2 files changed, 21 insertions(+), 5 deletions(-)
+ target/ppc/cpu.h         |  6 ++++++
+ target/ppc/excp_helper.c | 13 +++++++++++++
+ target/ppc/misc_helper.c | 27 +++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a0076e5fbd..fe8266a1d1 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4397,7 +4397,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB *=
-/
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON=
-;
--    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
-+    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_ON;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq =3D &spapr_irq_dual;
-     smc->dr_phb_enabled =3D true;
-@@ -4465,8 +4465,11 @@ DEFINE_SPAPR_MACHINE(5_0, "5.0", true);
-  */
- static void spapr_machine_4_2_class_options(MachineClass *mc)
- {
-+    SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 8ebeaba649..96aeea1934 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -397,6 +397,10 @@ typedef struct ppc_v3_pate_t {
+ #define PSSCR_ESL         PPC_BIT(42) /* Enable State Loss */
+ #define PSSCR_EC          PPC_BIT(43) /* Exit Criterion */
+=20
++/* HFSCR bits */
++#define HFSCR_MSGP     PPC_BIT(53) /* Privileged Message Send Facilities=
+ */
++#define HFSCR_IC_MSGP  0xA
 +
-     spapr_machine_5_0_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len)=
-;
-+    smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
+ #define msr_sf   ((env->msr >> MSR_SF)   & 1)
+ #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
+ #define msr_shv  ((env->msr >> MSR_SHV)  & 1)
+@@ -1329,6 +1333,8 @@ void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHy=
+pervisor *vhyp);
+ #endif
+=20
+ void store_fpscr(CPUPPCState *env, uint64_t arg, uint32_t mask);
++void helper_hfscr_facility_check(CPUPPCState *env, uint32_t bit,
++                                 const char *caller, uint32_t cause);
+=20
+ static inline uint64_t ppc_dump_gpr(CPUPPCState *env, int gprn)
+ {
+diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+index 1b07c3ed56..027f54c0ed 100644
+--- a/target/ppc/excp_helper.c
++++ b/target/ppc/excp_helper.c
+@@ -471,6 +471,15 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int=
+ excp_model, int excp)
+     case POWERPC_EXCP_FU:         /* Facility unavailable exception     =
+     */
+ #ifdef TARGET_PPC64
+         env->spr[SPR_FSCR] |=3D ((target_ulong)env->error_code << 56);
++#endif
++        break;
++    case POWERPC_EXCP_HV_FU:     /* Hypervisor Facility Unavailable Exce=
+ption */
++#ifdef TARGET_PPC64
++        env->spr[SPR_HFSCR] |=3D ((target_ulong)env->error_code << FSCR_=
+IC_POS);
++        srr0 =3D SPR_HSRR0;
++        srr1 =3D SPR_HSRR1;
++        new_msr |=3D (target_ulong)MSR_HVB;
++        new_msr |=3D env->msr & ((target_ulong)1 << MSR_RI);
+ #endif
+         break;
+     case POWERPC_EXCP_PIT:       /* Programmable interval timer interrup=
+t    */
+@@ -1277,6 +1286,8 @@ void helper_book3s_msgsnd(target_ulong rb)
+ #if defined(TARGET_PPC64)
+ void helper_book3s_msgclrp(CPUPPCState *env, target_ulong rb)
+ {
++    helper_hfscr_facility_check(env, HFSCR_MSGP, "msgclrp", HFSCR_IC_MSG=
+P);
++
+     if (!dbell_type_server(rb)) {
+         return;
+     }
+@@ -1292,6 +1303,8 @@ void helper_book3s_msgsndp(CPUPPCState *env, target=
+_ulong rb)
+ {
+     int pir =3D env->spr_cb[SPR_PIR].default_value;
+=20
++    helper_hfscr_facility_check(env, HFSCR_MSGP, "msgsndp", HFSCR_IC_MSG=
+P);
++
+     if (!dbell_type_server(rb)) {
+         return;
+     }
+diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+index 0c5919ff08..55b68d1246 100644
+--- a/target/ppc/misc_helper.c
++++ b/target/ppc/misc_helper.c
+@@ -41,6 +41,18 @@ void helper_store_dump_spr(CPUPPCState *env, uint32_t =
+sprn)
  }
 =20
- DEFINE_SPAPR_MACHINE(4_2, "4.2", false);
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 481dfd2a27..7f933a98ed 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -485,11 +485,24 @@ static void cap_ccf_assist_apply(SpaprMachineState =
-*spapr, uint8_t val,
-     uint8_t kvm_val =3D kvmppc_get_cap_count_cache_flush_assist();
-=20
-     if (tcg_enabled() && val) {
--        /* TODO - for now only allow broken for TCG */
--        error_setg(errp,
--"Requested count cache flush assist capability level not supported by tc=
-g,"
--                   " try appending -machine cap-ccf-assist=3Doff");
-+        /* TCG doesn't implement anything here, but allow with a warning=
- */
-+        warn_report("TCG doesn't support requested feature, cap-ccf-assi=
-st=3Don");
-     } else if (kvm_enabled() && (val > kvm_val)) {
-+        uint8_t kvm_ibs =3D kvmppc_get_cap_safe_indirect_branch();
+ #ifdef TARGET_PPC64
++static void raise_hv_fu_exception(CPUPPCState *env, uint32_t bit,
++                                  const char *caller, uint32_t cause,
++                                  uintptr_t raddr)
++{
++    qemu_log_mask(CPU_LOG_INT, "HV Facility %d is unavailable (%s)\n",
++                  bit, caller);
 +
-+        if (kvm_ibs =3D=3D SPAPR_CAP_FIXED_CCD) {
-+            /*
-+             * If we don't have CCF assist on the host, the assist
-+             * instruction is a harmless no-op.  It won't correctly
-+             * implement the cache count flush *but* if we have
-+             * count-cache-disabled in the host, that flush is
-+             * unnnecessary.  So, specifically allow this case.  This
-+             * allows us to have better performance on POWER9 DD2.3,
-+             * while still working on POWER9 DD2.2 and POWER8 host
-+             * cpus.
-+             */
-+            return;
-+        }
-         error_setg(errp,
- "Requested count cache flush assist capability level not supported by kv=
-m,"
-                    " try appending -machine cap-ccf-assist=3Doff");
++    env->spr[SPR_HFSCR] &=3D ~((target_ulong)FSCR_IC_MASK << FSCR_IC_POS=
+);
++
++    raise_exception_err_ra(env, POWERPC_EXCP_HV_FU, cause, raddr);
++}
++
+ static void raise_fu_exception(CPUPPCState *env, uint32_t bit,
+                                uint32_t sprn, uint32_t cause,
+                                uintptr_t raddr)
+@@ -55,6 +67,17 @@ static void raise_fu_exception(CPUPPCState *env, uint3=
+2_t bit,
+ }
+ #endif
+=20
++void helper_hfscr_facility_check(CPUPPCState *env, uint32_t bit,
++                                 const char *caller, uint32_t cause)
++{
++#ifdef TARGET_PPC64
++    if ((env->msr_mask & MSR_HVB) && !msr_hv &&
++                                     !(env->spr[SPR_HFSCR] & (1UL << bit=
+))) {
++        raise_hv_fu_exception(env, bit, caller, cause, GETPC());
++    }
++#endif
++}
++
+ void helper_fscr_facility_check(CPUPPCState *env, uint32_t bit,
+                                 uint32_t sprn, uint32_t cause)
+ {
+@@ -114,6 +137,8 @@ target_ulong helper_load_dpdes(CPUPPCState *env)
+ {
+     target_ulong dpdes =3D 0;
+=20
++    helper_hfscr_facility_check(env, HFSCR_MSGP, "load DPDES", HFSCR_IC_=
+MSGP);
++
+     /* TODO: TCG supports only one thread */
+     if (env->pending_interrupts & (1 << PPC_INTERRUPT_DOORBELL)) {
+         dpdes =3D 1;
+@@ -127,6 +152,8 @@ void helper_store_dpdes(CPUPPCState *env, target_ulon=
+g val)
+     PowerPCCPU *cpu =3D env_archcpu(env);
+     CPUState *cs =3D CPU(cpu);
+=20
++    helper_hfscr_facility_check(env, HFSCR_MSGP, "store DPDES", HFSCR_IC=
+_MSGP);
++
+     /* TODO: TCG supports only one thread */
+     if (val & ~0x1) {
+         qemu_log_mask(LOG_GUEST_ERROR, "Invalid DPDES register value "
 --=20
 2.24.1
 
