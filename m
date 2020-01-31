@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD2BC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D270C2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:11:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33D03217BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:10:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33D03217BA
+	by mail.kernel.org (Postfix) with ESMTPS id E48422067C
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:11:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E48422067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJt5-0002Yf-B6
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:10:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58660)
+	id 1ixJuT-0005Ok-1P
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:11:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58815)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJng-0007XW-Bw
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:46 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnq-0007uX-Ml
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnd-0002x2-0f
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:44 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:46251 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJno-00035P-4Z
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:54 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51380 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ixJnc-0001wU-Kh
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:40 -0500
+ id 1ixJnn-0002wh-Nq
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:52 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 1ACF31A1E89;
- Fri, 31 Jan 2020 01:03:37 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 6B3DF1A20EF;
+ Fri, 31 Jan 2020 01:03:38 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id EF52C1A1E0C;
- Fri, 31 Jan 2020 01:03:36 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 424621A2102;
+ Fri, 31 Jan 2020 01:03:38 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc4 03/29] target/avr: Add migration support
-Date: Fri, 31 Jan 2020 01:02:47 +0100
-Message-Id: <1580428993-4767-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc4 26/29] target/avr: Update build system
+Date: Fri, 31 Jan 2020 01:03:10 +0100
+Message-Id: <1580428993-4767-27-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -66,7 +66,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+ Michael Rolnik <mrolnik@gmail.com>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -74,181 +74,103 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Add migration functions for AVR cores.
+Make AVR support buildable.
 
-[AM: Split a larger AVR introduction patch into logical units]
+[AM: Remove word 'Atmel' from filenames and all elements of code]
 Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 
-Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
-Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- target/avr/cpu.c     |   1 +
- target/avr/cpu.h     |   2 +
- target/avr/machine.c | 121 +++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 3 files changed, 124 insertions(+)
- create mode 100644 target/avr/machine.c
+ configure                       |  7 +++++++
+ default-configs/avr-softmmu.mak |  5 +++++
+ target/avr/Makefile.objs        | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 target/avr/Makefile.objs
 
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-index beda91e..49e32af 100644
---- a/target/avr/cpu.c
-+++ b/target/avr/cpu.c
-@@ -205,6 +205,7 @@ static void avr_cpu_class_init(ObjectClass *oc, void =
-*data)
-     cc->set_pc =3D avr_cpu_set_pc;
-     cc->memory_rw_debug =3D avr_cpu_memory_rw_debug;
-     cc->get_phys_page_debug =3D avr_cpu_get_phys_page_debug;
-+    cc->vmsd =3D &vms_avr_cpu;
-     cc->disas_set_info =3D avr_cpu_disas_set_info;
-     cc->tlb_fill =3D avr_cpu_tlb_fill;
-     cc->tcg_initialize =3D avr_cpu_tcg_init;
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-index 08f4415..2907a37 100644
---- a/target/avr/cpu.h
-+++ b/target/avr/cpu.h
-@@ -119,6 +119,8 @@ typedef struct AVRCPU {
-     CPUAVRState env;
- } AVRCPU;
-=20
-+extern const struct VMStateDescription vms_avr_cpu;
-+
- void avr_cpu_do_interrupt(CPUState *cpu);
- bool avr_cpu_exec_interrupt(CPUState *cpu, int int_req);
- hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-diff --git a/target/avr/machine.c b/target/avr/machine.c
+diff --git a/configure b/configure
+index a72a5de..51f0b9e 100755
+--- a/configure
++++ b/configure
+@@ -7640,6 +7640,10 @@ case "$target_name" in
+     mttcg=3D"yes"
+     gdb_xml_files=3D"aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-v=
+fp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
++  avr)
++    gdb_xml_files=3D"avr-cpu.xml"
++    target_compiler=3D$cross_cc_avr
++  ;;
+   cris)
+   ;;
+   hppa)
+@@ -7859,6 +7863,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+       disas_config "ARM_A64"
+     fi
+   ;;
++  avr)
++    disas_config "AVR"
++  ;;
+   cris)
+     disas_config "CRIS"
+   ;;
+diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmm=
+u.mak
 new file mode 100644
-index 0000000..ba44bd0
+index 0000000..80218ad
 --- /dev/null
-+++ b/target/avr/machine.c
-@@ -0,0 +1,121 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
++++ b/default-configs/avr-softmmu.mak
+@@ -0,0 +1,5 @@
++# Default configuration for avr-softmmu
 +
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "migration/cpu.h"
++# Boards:
++#
++CONFIG_ARDUINO=3Dy
+diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
+new file mode 100644
+index 0000000..7523e0c
+--- /dev/null
++++ b/target/avr/Makefile.objs
+@@ -0,0 +1,34 @@
++#
++#  QEMU AVR CPU
++#
++#  Copyright (c) 2019 Michael Rolnik
++#
++#  This library is free software; you can redistribute it and/or
++#  modify it under the terms of the GNU Lesser General Public
++#  License as published by the Free Software Foundation; either
++#  version 2.1 of the License, or (at your option) any later version.
++#
++#  This library is distributed in the hope that it will be useful,
++#  but WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++#  Lesser General Public License for more details.
++#
++#  You should have received a copy of the GNU Lesser General Public
++#  License along with this library; if not, see
++#  <http://www.gnu.org/licenses/lgpl-2.1.html>
++#
 +
-+static int get_sreg(QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field)
-+{
-+    CPUAVRState *env =3D opaque;
-+    uint8_t sreg;
++DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
++decode-y =3D $(SRC_PATH)/target/avr/insn.decode
 +
-+    sreg =3D qemu_get_byte(f);
-+    cpu_set_sreg(env, sreg);
-+    return 0;
-+}
++target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
++	$(call quiet-command, \
++	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<,=
+ \
++	  "GEN", $(TARGET_DIR)$@)
 +
-+static int put_sreg(
-+    QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field, QJSON *vmdesc)
-+{
-+    CPUAVRState *env =3D opaque;
-+    uint8_t sreg =3D cpu_get_sreg(env);
++target/avr/translate.o: target/avr/decode_insn.inc.c
 +
-+    qemu_put_byte(f, sreg);
-+    return 0;
-+}
-+
-+static const VMStateInfo vms_sreg =3D {
-+    .name =3D "sreg",
-+    .get =3D get_sreg,
-+    .put =3D put_sreg,
-+};
-+
-+static int get_segment(
-+    QEMUFile *f, void *opaque, size_t size, const VMStateField *field)
-+{
-+    uint32_t *ramp =3D opaque;
-+    uint8_t temp;
-+
-+    temp =3D qemu_get_byte(f);
-+    *ramp =3D ((uint32_t)temp) << 16;
-+    return 0;
-+}
-+
-+static int put_segment(
-+    QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field, QJSON *vmdesc)
-+{
-+    uint32_t *ramp =3D opaque;
-+    uint8_t temp =3D *ramp >> 16;
-+
-+    qemu_put_byte(f, temp);
-+    return 0;
-+}
-+
-+static const VMStateInfo vms_rampD =3D {
-+    .name =3D "rampD",
-+    .get =3D get_segment,
-+    .put =3D put_segment,
-+};
-+static const VMStateInfo vms_rampX =3D {
-+    .name =3D "rampX",
-+    .get =3D get_segment,
-+    .put =3D put_segment,
-+};
-+static const VMStateInfo vms_rampY =3D {
-+    .name =3D "rampY",
-+    .get =3D get_segment,
-+    .put =3D put_segment,
-+};
-+static const VMStateInfo vms_rampZ =3D {
-+    .name =3D "rampZ",
-+    .get =3D get_segment,
-+    .put =3D put_segment,
-+};
-+static const VMStateInfo vms_eind =3D {
-+    .name =3D "eind",
-+    .get =3D get_segment,
-+    .put =3D put_segment,
-+};
-+
-+const VMStateDescription vms_avr_cpu =3D {
-+    .name =3D "cpu",
-+    .version_id =3D 0,
-+    .minimum_version_id =3D 0,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(env.pc_w, AVRCPU),
-+        VMSTATE_UINT32(env.sp, AVRCPU),
-+        VMSTATE_UINT32(env.skip, AVRCPU),
-+
-+        VMSTATE_UINT32_ARRAY(env.r, AVRCPU, NUMBER_OF_CPU_REGISTERS),
-+
-+        VMSTATE_SINGLE(env, AVRCPU, 0, vms_sreg, CPUAVRState),
-+        VMSTATE_SINGLE(env.rampD, AVRCPU, 0, vms_rampD, uint32_t),
-+        VMSTATE_SINGLE(env.rampX, AVRCPU, 0, vms_rampX, uint32_t),
-+        VMSTATE_SINGLE(env.rampY, AVRCPU, 0, vms_rampY, uint32_t),
-+        VMSTATE_SINGLE(env.rampZ, AVRCPU, 0, vms_rampZ, uint32_t),
-+        VMSTATE_SINGLE(env.eind, AVRCPU, 0, vms_eind, uint32_t),
-+
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
++obj-y +=3D translate.o cpu.o helper.o
++obj-y +=3D gdbstub.o
++obj-y +=3D disas.o
++obj-$(CONFIG_SOFTMMU) +=3D machine.o
 --=20
 2.7.4
 
