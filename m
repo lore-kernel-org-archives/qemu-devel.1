@@ -2,80 +2,78 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F7DC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8116CC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:53:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 173DB20661
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:52:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C3732082E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:53:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/AMSMEe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173DB20661
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzNA+akC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C3732082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYau-0000nn-8q
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:52:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39885)
+	id 1ixYbO-0001Td-FT
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:53:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXyr-0005Jn-6p
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:14 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXzC-00065L-LH
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXyp-0005TX-0j
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:13 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39343
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXzB-0006ku-Hh
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:34 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59693)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyo-0005Sb-Sn
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:10 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXzB-0006eC-Di
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483590;
+ s=mimecast20190719; t=1580483611;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QXV9Q0kkuwn+AcaQLS+xKXn6p1g67iEt3Z9eSrbNEqE=;
- b=N/AMSMEen4eEz//q7/W+V6meFHkdehXyBS1dLl4tAEfdtl+AhKtVg8cDHspLFpBsk+nEyi
- JUp/U+AuzoZV7jg2zdTq0PwPomOjT2fiIEgMP/PnX8OGv2oZOKnG2aL+C3WbVW/nw28TfY
- WPX4ZpbqNdan/gioZdqjz3xPSR1LcnI=
+ bh=jxPQu7ACy6Nxc4Ef3oGPgdzcL0Tcqt7GD/Y31IzNZok=;
+ b=DzNA+akCl6ukRqyhDTz9SZFGjviR6vHPcOt/cQEjaFvYibMYUoLjDsZ7QGIFHxZnXaKjWM
+ R4pq0LyQ6QqnNFTAVh04kVnS6sUFRH61N6ciKTom+RxvEuLd3icn9FVKWiOQpgjyBf/PfA
+ 2wwLPxB4yMtDYqKa2ceUbM7D2bF8Y0k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-8cc_B_2_PayhA3ruP205JQ-1; Fri, 31 Jan 2020 10:13:07 -0500
+ us-mta-10-5tT-JjNYNBCERLkc84-Q9g-1; Fri, 31 Jan 2020 10:13:29 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAC2B18C43CD;
- Fri, 31 Jan 2020 15:13:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9074C107ACC5
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:28 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1643089E89;
- Fri, 31 Jan 2020 15:13:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1647286C4B
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:27 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 45/80] lm32/milkymist: use memdev for RAM
-Date: Fri, 31 Jan 2020 16:09:15 +0100
-Message-Id: <1580483390-131164-46-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 70/80] sparc/leon3: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:09:40 +0100
+Message-Id: <1580483390-131164-71-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 8cc_B_2_PayhA3ruP205JQ-1
+X-MC-Unique: 5tT-JjNYNBCERLkc84-Q9g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,7 +85,6 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: michael@walle.cc
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -100,109 +97,48 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-PS:
- while at it add check for user supplied RAM size and error
- out if it mismatches board expected value.
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2:
-  * fix format string causing build failure on 32-bit host
-    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
-v3:
-  * use size_to_str() to pretty print size in MiB
-    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
+ hw/sparc/leon3.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-CC: michael@walle.cc
----
- hw/lm32/milkymist.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
-
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index 6d46134..5c72266 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -36,6 +36,7 @@
- #include "hw/display/milkymist_tmu2.h"
- #include "lm32.h"
- #include "exec/address-spaces.h"
-+#include "qemu/cutils.h"
-=20
- #define BIOS_FILENAME    "mmone-bios.bin"
- #define BIOS_OFFSET      0x00860000
-@@ -82,6 +83,7 @@ static void main_cpu_reset(void *opaque)
- static void
- milkymist_init(MachineState *machine)
- {
-+    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     const char *initrd_filename =3D machine->initrd_filename;
-@@ -90,22 +92,27 @@ milkymist_init(MachineState *machine)
-     int kernel_size;
-     DriveInfo *dinfo;
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index f5a087d..5fa58aa 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -189,7 +189,6 @@ static void leon3_generic_hw_init(MachineState *machine=
+)
+     SPARCCPU *cpu;
+     CPUSPARCState   *env;
      MemoryRegion *address_space_mem =3D get_system_memory();
--    MemoryRegion *phys_sdram =3D g_new(MemoryRegion, 1);
-     qemu_irq irq[32];
-     int i;
-     char *bios_filename;
-     ResetInfo *reset_info;
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *prom =3D g_new(MemoryRegion, 1);
+     int         ret;
+     char       *filename;
+@@ -251,8 +250,8 @@ static void leon3_generic_hw_init(MachineState *machine=
+)
+         exit(1);
+     }
 =20
-+    if (machine->ram_size !=3D mc->default_ram_size) {
-+        char *sz =3D size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be %s", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-+    }
-+
-     /* memory map */
-     hwaddr flash_base   =3D 0x00000000;
-     size_t flash_sector_size        =3D 128 * KiB;
-     size_t flash_size               =3D 32 * MiB;
-     hwaddr sdram_base   =3D 0x40000000;
--    size_t sdram_size               =3D 128 * MiB;
-=20
-     hwaddr initrd_base  =3D sdram_base + 0x1002000;
-     hwaddr cmdline_base =3D sdram_base + 0x1000000;
--    size_t initrd_max =3D sdram_size - 0x1002000;
-+    size_t initrd_max =3D machine->ram_size - 0x1002000;
-=20
-     reset_info =3D g_malloc0(sizeof(ResetInfo));
-=20
-@@ -116,9 +123,7 @@ milkymist_init(MachineState *machine)
-=20
-     cpu_lm32_set_phys_msb_ignore(env, 1);
-=20
--    memory_region_allocate_system_memory(phys_sdram, NULL, "milkymist.sdra=
-m",
--                                         sdram_size);
--    memory_region_add_subregion(address_space_mem, sdram_base, phys_sdram)=
+-    memory_region_allocate_system_memory(ram, NULL, "leon3.ram", ram_size)=
 ;
-+    memory_region_add_subregion(address_space_mem, sdram_base, machine->ra=
-m);
+-    memory_region_add_subregion(address_space_mem, LEON3_RAM_OFFSET, ram);
++    memory_region_add_subregion(address_space_mem, LEON3_RAM_OFFSET,
++                                machine->ram);
 =20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     /* Numonyx JS28F256J3F105 */
-@@ -183,7 +188,7 @@ milkymist_init(MachineState *machine)
-=20
-         if (kernel_size < 0) {
-             kernel_size =3D load_image_targphys(kernel_filename, sdram_bas=
-e,
--                                              sdram_size);
-+                                              machine->ram_size);
-             reset_info->bootstrap_pc =3D sdram_base;
-         }
-=20
-@@ -216,6 +221,8 @@ static void milkymist_machine_init(MachineClass *mc)
-     mc->init =3D milkymist_init;
-     mc->is_default =3D 0;
-     mc->default_cpu_type =3D LM32_CPU_TYPE_NAME("lm32-full");
-+    mc->default_ram_size =3D 128 * MiB;
-+    mc->default_ram_id =3D "milkymist.sdram";
+     /* Allocate BIOS */
+     prom_size =3D 8 * MiB;
+@@ -358,6 +357,7 @@ static void leon3_generic_machine_init(MachineClass *mc=
+)
+     mc->desc =3D "Leon-3 generic";
+     mc->init =3D leon3_generic_hw_init;
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("LEON3");
++    mc->default_ram_id =3D "leon3.ram";
  }
 =20
- DEFINE_MACHINE("milkymist", milkymist_machine_init)
+ DEFINE_MACHINE("leon3_generic", leon3_generic_machine_init)
 --=20
 2.7.4
 
