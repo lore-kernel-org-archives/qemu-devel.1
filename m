@@ -2,73 +2,73 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D623FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E36DC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:13:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3D8220661
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:13:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A7E520661
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:13:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O41GCLxH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D8220661
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c4aHdwow"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7E520661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixXzL-0005lw-Rm
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:13:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38996)
+	id 1ixXzR-0005yc-4n
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:13:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39084)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXy7-0003vF-Un
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:29 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXyB-00040V-Uc
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXy4-0003fD-Nl
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52330
+ (envelope-from <imammedo@redhat.com>) id 1ixXyA-0003o7-Lh
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44940
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXy4-0003f8-Jw
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:24 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyA-0003nK-IM
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483544;
+ s=mimecast20190719; t=1580483550;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Uxh1MDtor6ksvxv5IqHpxBEpcfn+0iEehH4/pNYoeHw=;
- b=O41GCLxHRdC+XEXGv2qZfZjz4rEDVpkHQN1B1LpetZYHCKayFek/rm8MUa+ZolqHwY9UZg
- TmmLymF4SleLG+9sT1CLtUcZxolASB4f4kzHa/IaazJY90QHfPl0OQ/z8iCjDA5vFhp70L
- TZLFCBnG0RpaFACLy6XuXCVm2GtbqTc=
+ bh=tRR6idtTZjaYauPMF4eyl7BXETOFWK0mtGpakVsAPdw=;
+ b=c4aHdwowM2VDwzmL2no+FktJndWTWOX8MnH4FM6PLZnNnOSes6VZwnTICLBazOVQAcY0hx
+ T5EBu+pbkvg7uE4/tJZLmcv7QuOPywbtxIoa7AwqJ+I8bRBOTZs5GqvPwFSGX1OWJo9HX/
+ inujky+z2lubGXApZ0Ffg0jt8h6YN0Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-I9Asno2gOpeOmlsq9iPbXg-1; Fri, 31 Jan 2020 10:12:22 -0500
+ us-mta-367-bOTEjmScPaOkghUew96tDA-1; Fri, 31 Jan 2020 10:12:26 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31F18107ACCA
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:12:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A9E78010CB;
+ Fri, 31 Jan 2020 15:12:25 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AC9868887E
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:12:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CEE0586C4B;
+ Fri, 31 Jan 2020 15:12:24 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 08/80] alpha/dp264: use memdev for RAM
-Date: Fri, 31 Jan 2020 16:08:38 +0100
-Message-Id: <1580483390-131164-9-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 13/80] arm/digic_boards: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:08:43 +0100
+Message-Id: <1580483390-131164-14-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: I9Asno2gOpeOmlsq9iPbXg-1
+X-MC-Unique: bOTEjmScPaOkghUew96tDA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -87,6 +87,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: antonynpavlov@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,85 +100,133 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
----
- hw/alpha/alpha_sys.h | 2 +-
- hw/alpha/dp264.c     | 3 ++-
- hw/alpha/typhoon.c   | 8 ++------
- 3 files changed, 5 insertions(+), 8 deletions(-)
+PS:
+ remove no longer needed DigicBoardState
 
-diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
-index 95033d7..bc0a286 100644
---- a/hw/alpha/alpha_sys.h
-+++ b/hw/alpha/alpha_sys.h
-@@ -11,7 +11,7 @@
- #include "hw/intc/i8259.h"
+PS2:
+ while at it add check for user supplied RAM size and error
+ out if it mismatches board expected value.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+---
+v3:
+  * move 'DigicState *s' declaration to the top of digic4_board_init()
+v2:
+  * fix format string causing build failure on 32-bit host
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
+
+CC: antonynpavlov@gmail.com
+---
+ hw/arm/digic_boards.c | 40 +++++++++++++++++++++-------------------
+ 1 file changed, 21 insertions(+), 19 deletions(-)
+
+diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
+index ef3fc2b..518a63e 100644
+--- a/hw/arm/digic_boards.c
++++ b/hw/arm/digic_boards.c
+@@ -35,39 +35,40 @@
+ #include "hw/loader.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/qtest.h"
++#include "qemu/units.h"
++#include "qemu/cutils.h"
 =20
+ #define DIGIC4_ROM0_BASE      0xf0000000
+ #define DIGIC4_ROM1_BASE      0xf8000000
+ #define DIGIC4_ROM_MAX_SIZE   0x08000000
 =20
--PCIBus *typhoon_init(ram_addr_t, ISABus **, qemu_irq *, AlphaCPU *[4],
-+PCIBus *typhoon_init(MemoryRegion *, ISABus **, qemu_irq *, AlphaCPU *[4],
-                      pci_map_irq_fn);
+-typedef struct DigicBoardState {
+-    DigicState *digic;
+-    MemoryRegion ram;
+-} DigicBoardState;
+-
+ typedef struct DigicBoard {
+-    hwaddr ram_size;
+-    void (*add_rom0)(DigicBoardState *, hwaddr, const char *);
++    void (*add_rom0)(DigicState *, hwaddr, const char *);
+     const char *rom0_def_filename;
+-    void (*add_rom1)(DigicBoardState *, hwaddr, const char *);
++    void (*add_rom1)(DigicState *, hwaddr, const char *);
+     const char *rom1_def_filename;
+ } DigicBoard;
 =20
- /* alpha_pci.c.  */
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index a8f9a89..8d71a30 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -75,7 +75,7 @@ static void clipper_init(MachineState *machine)
-     cpus[0]->env.trap_arg2 =3D smp_cpus;
+-static void digic4_board_init(DigicBoard *board)
++static void digic4_board_init(MachineState *machine, DigicBoard *board)
+ {
+     Error *err =3D NULL;
++    DigicState *s =3D DIGIC(object_new(TYPE_DIGIC));
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
++
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
 =20
-     /* Init the chipset.  */
--    pci_bus =3D typhoon_init(ram_size, &isa_bus, &rtc_irq, cpus,
-+    pci_bus =3D typhoon_init(machine->ram, &isa_bus, &rtc_irq, cpus,
-                            clipper_pci_map_irq);
+-    DigicBoardState *s =3D g_new(DigicBoardState, 1);
+-
+-    s->digic =3D DIGIC(object_new(TYPE_DIGIC));
+-    object_property_set_bool(OBJECT(s->digic), true, "realized", &err);
++    object_property_set_bool(OBJECT(s), true, "realized", &err);
+     if (err !=3D NULL) {
+         error_reportf_err(err, "Couldn't realize DIGIC SoC: ");
+         exit(1);
+     }
 =20
-     /* Since we have an SRM-compatible PALcode, use the SRM epoch.  */
-@@ -183,6 +183,7 @@ static void clipper_machine_init(MachineClass *mc)
-     mc->max_cpus =3D 4;
-     mc->is_default =3D 1;
-     mc->default_cpu_type =3D ALPHA_CPU_TYPE_NAME("ev67");
+-    memory_region_allocate_system_memory(&s->ram, NULL, "ram", board->ram_=
+size);
+-    memory_region_add_subregion(get_system_memory(), 0, &s->ram);
++    memory_region_add_subregion(get_system_memory(), 0, machine->ram);
+=20
+     if (board->add_rom0) {
+         board->add_rom0(s, DIGIC4_ROM0_BASE, board->rom0_def_filename);
+@@ -78,7 +79,7 @@ static void digic4_board_init(DigicBoard *board)
+     }
+ }
+=20
+-static void digic_load_rom(DigicBoardState *s, hwaddr addr,
++static void digic_load_rom(DigicState *s, hwaddr addr,
+                            hwaddr max_size, const char *def_filename)
+ {
+     target_long rom_size;
+@@ -118,7 +119,7 @@ static void digic_load_rom(DigicBoardState *s, hwaddr a=
+ddr,
+  * Samsung K8P3215UQB
+  * 64M Bit (4Mx16) Page Mode / Multi-Bank NOR Flash Memory
+  */
+-static void digic4_add_k8p3215uqb_rom(DigicBoardState *s, hwaddr addr,
++static void digic4_add_k8p3215uqb_rom(DigicState *s, hwaddr addr,
+                                       const char *def_filename)
+ {
+ #define FLASH_K8P3215UQB_SIZE (4 * 1024 * 1024)
+@@ -135,14 +136,13 @@ static void digic4_add_k8p3215uqb_rom(DigicBoardState=
+ *s, hwaddr addr,
+ }
+=20
+ static DigicBoard digic4_board_canon_a1100 =3D {
+-    .ram_size =3D 64 * 1024 * 1024,
+     .add_rom1 =3D digic4_add_k8p3215uqb_rom,
+     .rom1_def_filename =3D "canon-a1100-rom1.bin",
+ };
+=20
+ static void canon_a1100_init(MachineState *machine)
+ {
+-    digic4_board_init(&digic4_board_canon_a1100);
++    digic4_board_init(machine, &digic4_board_canon_a1100);
+ }
+=20
+ static void canon_a1100_machine_init(MachineClass *mc)
+@@ -150,6 +150,8 @@ static void canon_a1100_machine_init(MachineClass *mc)
+     mc->desc =3D "Canon PowerShot A1100 IS";
+     mc->init =3D &canon_a1100_init;
+     mc->ignore_memory_transaction_failures =3D true;
++    mc->default_ram_size =3D 64 * MiB;
 +    mc->default_ram_id =3D "ram";
  }
 =20
- DEFINE_MACHINE("clipper", clipper_machine_init)
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index 179e1f7..1795e2f 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -58,7 +58,6 @@ typedef struct TyphoonState {
-     TyphoonCchip cchip;
-     TyphoonPchip pchip;
-     MemoryRegion dchip_region;
--    MemoryRegion ram_region;
- } TyphoonState;
-=20
- /* Called when one of DRIR or DIM changes.  */
-@@ -817,8 +816,7 @@ static void typhoon_alarm_timer(void *opaque)
-     cpu_interrupt(CPU(s->cchip.cpu[cpu]), CPU_INTERRUPT_TIMER);
- }
-=20
--PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
--                     qemu_irq *p_rtc_irq,
-+PCIBus *typhoon_init(MemoryRegion *ram, ISABus **isa_bus, qemu_irq *p_rtc_=
-irq,
-                      AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq)
- {
-     MemoryRegion *addr_space =3D get_system_memory();
-@@ -851,9 +849,7 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_=
-bus,
-=20
-     /* Main memory region, 0x00.0000.0000.  Real hardware supports 32GB,
-        but the address space hole reserved at this point is 8TB.  */
--    memory_region_allocate_system_memory(&s->ram_region, OBJECT(s), "ram",
--                                         ram_size);
--    memory_region_add_subregion(addr_space, 0, &s->ram_region);
-+    memory_region_add_subregion(addr_space, 0, ram);
-=20
-     /* TIGbus, 0x801.0000.0000, 1GB.  */
-     /* ??? The TIGbus is used for delivering interrupts, and access to
+ DEFINE_MACHINE("canon-a1100", canon_a1100_machine_init)
 --=20
 2.7.4
 
