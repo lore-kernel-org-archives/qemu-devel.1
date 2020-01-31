@@ -2,54 +2,51 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A1FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A559FC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:07:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9338214D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:06:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9338214D8
+	by mail.kernel.org (Postfix) with ESMTPS id 7B1B72067C
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:07:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B1B72067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJpE-0001z7-V5
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:06:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58641)
+	id 1ixJq6-00045e-N0
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:07:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnf-0007WH-M0
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:45 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJna-0007Qq-LL
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnc-0002vT-H3
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:43 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51051 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnY-0002oj-HZ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:38 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:46213 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ixJnc-0002sk-5U
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:40 -0500
+ id 1ixJnY-0001r8-6c
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:36 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 9FBED1A20C4;
- Fri, 31 Jan 2020 01:03:37 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id D56961A1DBD;
+ Fri, 31 Jan 2020 01:03:30 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 740F81A1E6F;
- Fri, 31 Jan 2020 01:03:37 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id BB0281A1DA4;
+ Fri, 31 Jan 2020 01:03:30 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc4 12/29] target/avr: Add instruction translation - Bit and
- Bit-test Instructions
-Date: Fri, 31 Jan 2020 01:02:56 +0100
-Message-Id: <1580428993-4767-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc4 00/29] target/avr merger
+Date: Fri, 31 Jan 2020 01:02:44 +0100
+Message-Id: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -66,319 +63,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Michael Rolnik <mrolnik@gmail.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Rolnik <mrolnik@gmail.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-This includes:
-    - LSR, ROR
-    - ASR
-    - SWAP
-    - SBI, CBI
-    - BST, BLD
-    - BSET, BCLR
+This is the AVR port from Michael, release (merge) candidate 4.
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
----
- target/avr/insn.decode |  14 +++
- target/avr/translate.c | 241 +++++++++++++++++++++++++++++++++++++++++++=
+The series can be found also in this repository:
+
+https://github.com/AMarkovic/qemu-avr-merger-rc4
+
+History:
+
+Since v3:
+
+- Removed a patch on load_elf() modification, since it has been merged
+- Removed references to CONFIG_USER_ONLY and provided a guard against
+  building lunux user mode for AVR
+- Removed all references to 'Atmel' (including file renames)
+- Rebased the code (there was common interface change regarding 'props')
+- Various corrections of commit messages
+- A bit field for AVRFeatures is nor 64 bit long
+- Other minor fixes
+
+Since v2:
+
+- First patch is split into six smaller logical units (net result
+  remains the same)
+- Patch "hw/core/loader: Let load_elf populate the processor-specific
+  flags" was redone to reflect the original intent that was lost in
+  transalation between multiple autors
+- Patch "hw/avr: Add helper to load raw/ELF firmware binaries" was
+  corrected only in one line to rectify type of "e_flags"
+- Patch "target/avr: Add section about AVR into QEMU documentation"
+- Spurious <message-Id:> elements were removed
+- The series was rebased to the latest code
+
+Since v1:
+
+- Addressed Thomas comments
+- Fixed a non-critical bug in ATmega (incorrect SRAM base address)
+- Added ELF parsing requested by Aleksandar
+- Dropped default machine (as with the ARM port)
+
+Michael Rolnik (25):
+  target/avr: Add basic parameters for new AVR platform
+  target/avr: Introduce AVR CPU class object
+  target/avr: Add migration support
+  target/avr: Add GDB support
+  target/avr: Introduce enumeration AVRFeature
+  target/avr: Add defintions of AVR core types
+  target/avr: Add instruction helpers
+  target/avr: Add instruction translation - Register definitions
+  target/avr: Add instruction translation - Arithmetic and Logic
+    Instructions
+  target/avr: Add instruction translation - Branch Instructions
+  target/avr: Add instruction translation - Data Transfer Instructions
+  target/avr: Add instruction translation - Bit and Bit-test
+    Instructions
+  target/avr: Add instruction translation - MCU Control Instructions
+  target/avr: Add instruction translation - CPU main translation
+    function
+  target/avr: Add instruction disassembly function
+  hw/char: Add limited support for AVR USART peripheral
+  hw/timer: Add limited support for AVR 16-bit timer peripheral
+  hw/misc: Add limited support for AVR power device
+  target/avr: Add section about AVR into QEMU documentation
+  target/avr: Register AVR support with the rest of QEMU
+  target/avr: Add machine none test
+  target/avr: Update MAINTAINERS file
+  target/avr: Update build system
+  tests/boot-serial-test: Test some Arduino boards (AVR based)
+  tests/acceptance: Test the Arduino MEGA2560 board
+
+Philippe Mathieu-Daud=C3=A9 (4):
+  hw/avr: Add helper to load raw/ELF firmware binaries
+  hw/avr: Add some ATmega microcontrollers
+  hw/avr: Add some Arduino boards
+  .travis.yml: Run the AVR acceptance tests
+
+ .travis.yml                      |    2 +-
+ MAINTAINERS                      |   31 +
+ arch_init.c                      |    2 +
+ configure                        |    7 +
+ default-configs/avr-softmmu.mak  |    5 +
+ gdb-xml/avr-cpu.xml              |   49 +
+ hw/avr/Kconfig                   |    9 +
+ hw/avr/Makefile.objs             |    3 +
+ hw/avr/arduino.c                 |  151 ++
+ hw/avr/atmega.c                  |  470 ++++++
+ hw/avr/atmega.h                  |   48 +
+ hw/avr/boot.c                    |   74 +
+ hw/avr/boot.h                    |   33 +
+ hw/char/Kconfig                  |    3 +
+ hw/char/Makefile.objs            |    1 +
+ hw/char/avr_usart.c              |  320 ++++
+ hw/misc/Kconfig                  |    3 +
+ hw/misc/Makefile.objs            |    2 +
+ hw/misc/avr_power.c              |  112 ++
+ hw/timer/Kconfig                 |    3 +
+ hw/timer/Makefile.objs           |    2 +
+ hw/timer/avr_timer16.c           |  604 ++++++++
+ include/disas/dis-asm.h          |   19 +
+ include/elf.h                    |    2 +
+ include/hw/char/avr_usart.h      |   93 ++
+ include/hw/misc/avr_power.h      |   46 +
+ include/hw/timer/avr_timer16.h   |   94 ++
+ include/sysemu/arch_init.h       |    1 +
+ qapi/machine.json                |    3 +-
+ qemu-doc.texi                    |   51 +
+ target/avr/Makefile.objs         |   34 +
+ target/avr/cpu-param.h           |   37 +
+ target/avr/cpu-qom.h             |   54 +
+ target/avr/cpu.c                 |  818 +++++++++++
+ target/avr/cpu.h                 |  259 ++++
+ target/avr/disas.c               |  246 ++++
+ target/avr/gdbstub.c             |   84 ++
+ target/avr/helper.c              |  342 +++++
+ target/avr/helper.h              |   29 +
+ target/avr/insn.decode           |  182 +++
+ target/avr/machine.c             |  121 ++
+ target/avr/translate.c           | 2997 ++++++++++++++++++++++++++++++++=
 ++++++
- 2 files changed, 255 insertions(+)
+ tests/acceptance/machine_avr6.py |   50 +
+ tests/qtest/Makefile.include     |    2 +
+ tests/qtest/boot-serial-test.c   |   11 +
+ tests/qtest/machine-none-test.c  |    1 +
+ 46 files changed, 7508 insertions(+), 2 deletions(-)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 gdb-xml/avr-cpu.xml
+ create mode 100644 hw/avr/Kconfig
+ create mode 100644 hw/avr/Makefile.objs
+ create mode 100644 hw/avr/arduino.c
+ create mode 100644 hw/avr/atmega.c
+ create mode 100644 hw/avr/atmega.h
+ create mode 100644 hw/avr/boot.c
+ create mode 100644 hw/avr/boot.h
+ create mode 100644 hw/char/avr_usart.c
+ create mode 100644 hw/misc/avr_power.c
+ create mode 100644 hw/timer/avr_timer16.c
+ create mode 100644 include/hw/char/avr_usart.h
+ create mode 100644 include/hw/misc/avr_power.h
+ create mode 100644 include/hw/timer/avr_timer16.h
+ create mode 100644 target/avr/Makefile.objs
+ create mode 100644 target/avr/cpu-param.h
+ create mode 100644 target/avr/cpu-qom.h
+ create mode 100644 target/avr/cpu.c
+ create mode 100644 target/avr/cpu.h
+ create mode 100644 target/avr/disas.c
+ create mode 100644 target/avr/gdbstub.c
+ create mode 100644 target/avr/helper.c
+ create mode 100644 target/avr/helper.h
+ create mode 100644 target/avr/insn.decode
+ create mode 100644 target/avr/machine.c
+ create mode 100644 target/avr/translate.c
+ create mode 100644 tests/acceptance/machine_avr6.py
 
-diff --git a/target/avr/insn.decode b/target/avr/insn.decode
-index 3f9304f..4ee5586 100644
---- a/target/avr/insn.decode
-+++ b/target/avr/insn.decode
-@@ -158,3 +158,17 @@ XCH             1001 001 rd:5 0100
- LAC             1001 001 rd:5 0110
- LAS             1001 001 rd:5 0101
- LAT             1001 001 rd:5 0111
-+
-+#
-+# Bit and Bit-test Instructions
-+#
-+LSR             1001 010 rd:5 0110
-+ROR             1001 010 rd:5 0111
-+ASR             1001 010 rd:5 0101
-+SWAP            1001 010 rd:5 0010
-+SBI             1001 1010 reg:5 bit:3
-+CBI             1001 1000 reg:5 bit:3
-+BST             1111 101 rd:5 0 bit:3
-+BLD             1111 100 rd:5 0 bit:3
-+BSET            1001 0100 0 bit:3 1000
-+BCLR            1001 0100 1 bit:3 1000
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 4a62d93..58775af 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -2440,3 +2440,244 @@ static bool trans_LAT(DisasContext *ctx, arg_LAT =
-*a)
-=20
-     return true;
- }
-+
-+/*
-+ * Bit and Bit-test Instructions
-+ */
-+static void gen_rshift_ZNVSf(TCGv R)
-+{
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf =3D R =3D=3D 0=
- */
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf =3D R(7) */
-+    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf =3D Nf ^ Vf */
-+}
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit =
-0 is
-+ *  loaded into the C Flag of the SREG. This operation effectively divid=
-es an
-+ *  unsigned value by two. The C Flag can be used to round the result.
-+ */
-+static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
-+{
-+    TCGv Rd =3D cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    /* update status register */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf =3D Rd =3D=3D=
- 0 */
-+    tcg_gen_movi_tl(cpu_Nf, 0);
-+    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
-+    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. The C Flag is shifted =
-into
-+ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, comb=
-ined
-+ *  with ASR, effectively divides multi-byte signed values by two. Combi=
-ned with
-+ *  LSR it effectively divides multi-byte unsigned values by two. The Ca=
-rry Flag
-+ *  can be used to round the result.
-+ */
-+static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
-+{
-+    TCGv Rd =3D cpu_r[a->rd];
-+    TCGv t0 =3D tcg_temp_new_i32();
-+
-+    tcg_gen_shli_tl(t0, cpu_Cf, 7);
-+    /* update status register */
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    /* update output register */
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+    /* update status register */
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant=
-. Bit 0
-+ *  is loaded into the C Flag of the SREG. This operation effectively di=
-vides a
-+ *  signed value by two without changing its sign. The Carry Flag can be=
- used to
-+ *  round the result.
-+ */
-+static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
-+{
-+    TCGv Rd =3D cpu_r[a->rd];
-+    TCGv t0 =3D tcg_temp_new_i32();
-+
-+    /* update status register */
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf =3D Rd(0) */
-+    /* update output register */
-+    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd =3D (Rd & 0x80) | (Rd >> 1) */
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+    /* update status register */
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Swaps high and low nibbles in a register.
-+ */
-+static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
-+{
-+    TCGv Rd =3D cpu_r[a->rd];
-+    TCGv t0 =3D tcg_temp_new_i32();
-+    TCGv t1 =3D tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(t0, Rd, 0x0f);
-+    tcg_gen_shli_tl(t0, t0, 4);
-+    tcg_gen_andi_tl(t1, Rd, 0xf0);
-+    tcg_gen_shri_tl(t1, t1, 4);
-+    tcg_gen_or_tl(Rd, t0, t1);
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Sets a specified bit in an I/O Register. This instruction operates o=
-n
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
-+{
-+    TCGv data =3D tcg_temp_new_i32();
-+    TCGv port =3D tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_ori_tl(data, data, 1 << a->bit);
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(port);
-+    tcg_temp_free_i32(data);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Clears a specified bit in an I/O Register. This instruction operates=
- on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
-+{
-+    TCGv data =3D tcg_temp_new_i32();
-+    TCGv port =3D tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(data);
-+    tcg_temp_free_i32(port);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
-+ */
-+static bool trans_BST(DisasContext *ctx, arg_BST *a)
-+{
-+    TCGv Rd =3D cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
-+    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Copies the T Flag in the SREG (Status Register) to bit b in register=
- Rd.
-+ */
-+static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
-+{
-+    TCGv Rd =3D cpu_r[a->rd];
-+    TCGv t1 =3D tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
-+    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
-+    tcg_gen_or_tl(Rd, Rd, t1);
-+
-+    tcg_temp_free_i32(t1);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Sets a single Flag or bit in SREG.
-+ */
-+static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x01);
-+        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x01);
-+        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x01);
-+        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x01);
-+        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x01);
-+        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x01);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x01);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x01);
-+        break;
-+    }
-+
-+    return true;
-+}
-+
-+/*
-+ *  Clears a single Flag in SREG.
-+ */
-+static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x00);
-+        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x00);
-+        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x00);
-+        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x00);
-+        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x00);
-+        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x00);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x00);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x00);
-+        break;
-+    }
-+
-+    return true;
-+}
 --=20
 2.7.4
 
