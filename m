@@ -7,49 +7,48 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF50CC33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D6CC33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:27:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7594720678
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:25:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C086820663
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:27:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WFQQ4p57"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7594720678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QtpeHT1C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C086820663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixPkD-0001OM-KT
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:25:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59784)
+	id 1ixPlh-0003pE-V1
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:27:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPVQ-00081I-P4
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:10:18 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPVI-0007jF-2M
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:10:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPVP-00019N-Ax
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:10:16 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:33673 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPVH-00012K-0b
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:10:08 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52313 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ixPVO-0000fN-VM; Fri, 31 Jan 2020 01:10:15 -0500
+ id 1ixPVG-0000WW-Lj; Fri, 31 Jan 2020 01:10:06 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4886Hw579Kz9sSr; Fri, 31 Jan 2020 17:09:32 +1100 (AEDT)
+ id 4886Hv4zGPz9sSm; Fri, 31 Jan 2020 17:09:31 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580450972;
- bh=W4NiEDR/AFqbp4X4jXnBnkJsZydyt4U2Uc5GDM2GCFg=;
+ d=gibson.dropbear.id.au; s=201602; t=1580450971;
+ bh=3GGHmTqGUj7+eFhoY9ratQw9EQ42IJhrwzVbsH3efOM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=WFQQ4p57+qk4fRjApHeSbyYtkEQxkFZAf5ZLXlKSxMoMus/agbfYX9IVoYhQ2YhJl
- oqasfEHGugI2TuXQIdFMoab1HB/PYKLZvYdjmTE6MB6AJa2o91cUzlNGg1iYqh9dyU
- 7spLnIe/A96p1mxWQw5vl2zogKmeTsCXL3R9F2GU=
+ b=QtpeHT1C+tqWjIDSmibXFk3B2ebwLZehwa/5Khp8Ro+X3TYGVVzD9vNvmNogZM1LS
+ yhaXUHh1cbrrK5R2g6g7P1COFnt0yn5GSyPwWXvRluKFsV8wYbNuCXsiujw7IzTTqr
+ mgZxEzk6jNAOwwUbCin2jw0xPsy0vQDgBtJwIjIQ=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 28/34] ppc: spapr: Handle "ibm, nmi-register" and "ibm,
- nmi-interlock" RTAS calls
-Date: Fri, 31 Jan 2020 17:09:18 +1100
-Message-Id: <20200131060924.147449-29-david@gibson.dropbear.id.au>
+Subject: [PULL 23/34] target/ppc/cpu.h: Put macro parameter in parentheses
+Date: Fri, 31 Jan 2020 17:09:13 +1100
+Message-Id: <20200131060924.147449-24-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 References: <20200131060924.147449-1-david@gibson.dropbear.id.au>
@@ -69,165 +68,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Aravinda Prasad <arawinda.p@gmail.com>,
- qemu-devel@nongnu.org, groug@kaod.org, Ganesh Goudar <ganeshgr@linux.ibm.com>,
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
  qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aravinda Prasad <arawinda.p@gmail.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-This patch adds support in QEMU to handle "ibm,nmi-register"
-and "ibm,nmi-interlock" RTAS calls.
+Fix PPC_INPUT macro to work with more complex expressions by
+protecting its argument with parentheses.
 
-The machine check notification address is saved when the
-OS issues "ibm,nmi-register" RTAS call.
-
-This patch also handles the case when multiple processors
-experience machine check at or about the same time by
-handling "ibm,nmi-interlock" call. In such cases, as per
-PAPR, subsequent processors serialize waiting for the first
-processor to issue the "ibm,nmi-interlock" call. The second
-processor that also received a machine check error waits
-till the first processor is done reading the error log.
-The first processor issues "ibm,nmi-interlock" call
-when the error log is consumed.
-
-Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
-[Register fwnmi RTAS calls in core_rtas_register_types()
- where other RTAS calls are registered]
-Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
-Message-Id: <20200130184423.20519-6-ganeshgr@linux.ibm.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Message-Id: <20200130021619.65FAB747871@zero.eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_caps.c    | 10 +++++++
- hw/ppc/spapr_rtas.c    | 59 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  4 ++-
- 3 files changed, 72 insertions(+), 1 deletion(-)
+ target/ppc/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 393ee6845e..8b27d3ac09 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -515,6 +515,16 @@ static void cap_fwnmi_mce_apply(SpaprMachineState *s=
-papr, uint8_t val,
-     if (!val) {
-         return; /* Disabled by default */
-     }
-+
-+    if (tcg_enabled()) {
-+        warn_report("Firmware Assisted Non-Maskable Interrupts(FWNMI) no=
-t "
-+                    "supported in TCG");
-+    } else if (kvm_enabled()) {
-+        if (kvmppc_set_fwnmi() < 0) {
-+            error_setg(errp, "Firmware Assisted Non-Maskable Interrupts(=
-FWNMI) "
-+                             "not supported by KVM");
-+        }
-+    }
- }
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 96aeea1934..3a1eb76004 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -180,7 +180,7 @@ enum {
+     POWERPC_EXCP_TRAP          =3D 0x40,
+ };
 =20
- SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 89b7eb6c54..35d91260e6 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -399,6 +399,61 @@ static void rtas_get_power_level(PowerPCCPU *cpu, Sp=
-aprMachineState *spapr,
-     rtas_st(rets, 1, 100);
- }
+-#define PPC_INPUT(env) (env->bus_model)
++#define PPC_INPUT(env) ((env)->bus_model)
 =20
-+static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
-+                                  SpaprMachineState *spapr,
-+                                  uint32_t token, uint32_t nargs,
-+                                  target_ulong args,
-+                                  uint32_t nret, target_ulong rets)
-+{
-+    hwaddr rtas_addr;
-+
-+    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) =3D=3D SPAPR_CAP_OFF) =
-{
-+        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-+        return;
-+    }
-+
-+    rtas_addr =3D spapr_get_rtas_addr();
-+    if (!rtas_addr) {
-+        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-+        return;
-+    }
-+
-+    spapr->guest_machine_check_addr =3D rtas_ld(args, 1);
-+    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-+}
-+
-+static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-+                                   SpaprMachineState *spapr,
-+                                   uint32_t token, uint32_t nargs,
-+                                   target_ulong args,
-+                                   uint32_t nret, target_ulong rets)
-+{
-+    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) =3D=3D SPAPR_CAP_OFF) =
-{
-+        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-+        return;
-+    }
-+
-+    if (spapr->guest_machine_check_addr =3D=3D -1) {
-+        /* NMI register not called */
-+        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+        return;
-+    }
-+
-+    if (spapr->mc_status !=3D cpu->vcpu_id) {
-+        /* The vCPU that hit the NMI should invoke "ibm,nmi-interlock" *=
-/
-+        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+        return;
-+    }
-+
-+    /*
-+     * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
-+     * hence unset mc_status.
-+     */
-+    spapr->mc_status =3D -1;
-+    qemu_cond_signal(&spapr->mc_delivery_cond);
-+    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-+}
-+
- static struct rtas_call {
-     const char *name;
-     spapr_rtas_fn fn;
-@@ -527,6 +582,10 @@ static void core_rtas_register_types(void)
-                         rtas_set_power_level);
-     spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
-                         rtas_get_power_level);
-+    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
-+                        rtas_ibm_nmi_register);
-+    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
-+                        rtas_ibm_nmi_interlock);
- }
-=20
- type_init(core_rtas_register_types)
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 652a5514e8..f6f82d88aa 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -656,8 +656,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target=
-_ulong opcode,
- #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
- #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
- #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
-+#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2B)
-+#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2C)
-=20
--#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
-+#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2D)
-=20
- /* RTAS ibm,get-system-parameter token values */
- #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+ /***********************************************************************=
+******/
+ typedef struct opc_handler_t opc_handler_t;
 --=20
 2.24.1
 
