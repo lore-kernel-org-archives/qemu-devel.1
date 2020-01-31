@@ -7,53 +7,52 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C75C33CB7
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B91C35240
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:15:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A2D520663
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:14:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3085E2173E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 06:15:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aMKVXcfS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A2D520663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dSfdTtEN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3085E2173E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixPZg-000898-SF
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:14:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59296)
+	id 1ixPaE-0000oY-8I
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 01:15:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUv-0006kY-6X
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:46 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPV1-00072D-3e
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ixPUt-0000W5-S9
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:45 -0500
-Received: from ozlabs.org ([203.11.71.1]:49037)
+ (envelope-from <dgibson@ozlabs.org>) id 1ixPUz-0000bS-La
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 01:09:51 -0500
+Received: from ozlabs.org ([203.11.71.1]:46495)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ixPUt-0000RA-GM; Fri, 31 Jan 2020 01:09:43 -0500
+ id 1ixPUz-0000Zq-8l; Fri, 31 Jan 2020 01:09:49 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4886Ht15Mgz9sSQ; Fri, 31 Jan 2020 17:09:30 +1100 (AEDT)
+ id 4886Hw2N7Mz9sSn; Fri, 31 Jan 2020 17:09:32 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580450970;
- bh=U+wz4tpMQershG/v0k5XFHf47IX4TK/gQB/3vxIqD/4=;
+ d=gibson.dropbear.id.au; s=201602; t=1580450972;
+ bh=lK8czom00O4GWzY079M0xoysfWxvky43GTeSphPo8Qo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=aMKVXcfSj+LtMxtL4qTNKhdXouUiY0eiwqNIcS9QZhuA8amREv+L1N8lzjPRKNSSv
- k5gZwa/nDmC7jolNKz6+3K35jFegaZqUqmkvm0vQKNjnrUmHCqBQR5yK37n0/fDtvN
- WutVDZzZght5wk/Qk2wOlqCpjHwLpN03pRF5oZC0=
+ b=dSfdTtENzhNMhAwo1EqxyqtH/H+QRnOeuCwGfgkg12MsYeNSTMHGAyiYiTFInpuV/
+ ztL36RzZhAvQuqhFrz8/8zVJHkqibtfmysJDaDEqbUWwcZ6bCBx/Rlx4rUGtLYKbN6
+ M7AXaYR23M741eCOt8crsLRZtSJ72CBhoFbMOYcc=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 16/34] tpm_spapr: Support suspend and resume
-Date: Fri, 31 Jan 2020 17:09:06 +1100
-Message-Id: <20200131060924.147449-17-david@gibson.dropbear.id.au>
+Subject: [PULL 25/34] ppc: spapr: Introduce FWNMI capability
+Date: Fri, 31 Jan 2020 17:09:15 +1100
+Message-Id: <20200131060924.147449-26-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 References: <20200131060924.147449-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -69,132 +68,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, Aravinda Prasad <arawinda.p@gmail.com>,
+ qemu-devel@nongnu.org, groug@kaod.org, Ganesh Goudar <ganeshgr@linux.ibm.com>,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+From: Aravinda Prasad <arawinda.p@gmail.com>
 
-Extend the tpm_spapr frontend with VM suspend and resume support.
+Introduce fwnmi an spapr capability and add a helper function
+which tries to enable it, which would be used by following patch
+of the series. This patch by itself does not change the existing
+behavior.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Message-Id: <20200121152935.649898-5-stefanb@linux.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+[eliminate cap_ppc_fwnmi, add fwnmi cap to migration state
+ and reprhase the commit message]
+Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20200130184423.20519-3-ganeshgr@linux.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/tpm/tpm_spapr.c  | 52 ++++++++++++++++++++++++++++++++++++++++++++-
- hw/tpm/trace-events |  2 ++
- 2 files changed, 53 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c         |  2 ++
+ hw/ppc/spapr_caps.c    | 18 ++++++++++++++++++
+ include/hw/ppc/spapr.h |  5 ++++-
+ target/ppc/kvm.c       |  8 ++++++++
+ target/ppc/kvm_ppc.h   |  6 ++++++
+ 5 files changed, 38 insertions(+), 1 deletion(-)
 
-diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-index 2ac4cb061c..ce65eb2e45 100644
---- a/hw/tpm/tpm_spapr.c
-+++ b/hw/tpm/tpm_spapr.c
-@@ -76,6 +76,8 @@ typedef struct {
-=20
-     unsigned char *buffer;
-=20
-+    uint32_t numbytes; /* number of bytes to deliver on resume */
-+
-     TPMBackendCmd cmd;
-=20
-     TPMBackend *be_driver;
-@@ -240,6 +242,14 @@ static void tpm_spapr_request_completed(TPMIf *ti, i=
-nt ret)
-=20
-     /* a max. of be_buffer_size bytes can be transported */
-     len =3D MIN(tpm_cmd_get_size(s->buffer), s->be_buffer_size);
-+
-+    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
-+        trace_tpm_spapr_caught_response(len);
-+        /* defer delivery of response until .post_load */
-+        s->numbytes =3D len;
-+        return;
-+    }
-+
-     rc =3D spapr_vio_dma_write(&s->vdev, be32_to_cpu(crq->data),
-                              s->buffer, len);
-=20
-@@ -288,6 +298,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
-     SpaprTpmState *s =3D VIO_SPAPR_VTPM(dev);
-=20
-     s->state =3D SPAPR_VTPM_STATE_NONE;
-+    s->numbytes =3D 0;
-=20
-     s->be_tpm_version =3D tpm_backend_get_tpm_version(s->be_driver);
-=20
-@@ -309,9 +320,48 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *=
-ti)
-     return tpm_backend_get_tpm_version(s->be_driver);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index fe8266a1d1..aa739e943f 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1992,6 +1992,7 @@ static const VMStateDescription vmstate_spapr =3D {
+         &vmstate_spapr_dtb,
+         &vmstate_spapr_cap_large_decr,
+         &vmstate_spapr_cap_ccf_assist,
++        &vmstate_spapr_cap_fwnmi,
+         NULL
+     }
+ };
+@@ -4398,6 +4399,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
+     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON=
+;
+     smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_ON;
++    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_OFF;
+     spapr_caps_add_properties(smc, &error_abort);
+     smc->irq =3D &spapr_irq_dual;
+     smc->dr_phb_enabled =3D true;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 7f933a98ed..393ee6845e 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -509,6 +509,14 @@ static void cap_ccf_assist_apply(SpaprMachineState *=
+spapr, uint8_t val,
+     }
  }
 =20
-+/* persistent state handling */
-+
-+static int tpm_spapr_pre_save(void *opaque)
++static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
++                                Error **errp)
 +{
-+    SpaprTpmState *s =3D opaque;
-+
-+    tpm_backend_finish_sync(s->be_driver);
-+    /*
-+     * we cannot deliver the results to the VM since DMA would touch VM =
-memory
-+     */
-+
-+    return 0;
++    if (!val) {
++        return; /* Disabled by default */
++    }
 +}
 +
-+static int tpm_spapr_post_load(void *opaque, int version_id)
-+{
-+    SpaprTpmState *s =3D opaque;
-+
-+    if (s->numbytes) {
-+        trace_tpm_spapr_post_load();
-+        /* deliver the results to the VM via DMA */
-+        tpm_spapr_request_completed(TPM_IF(s), 0);
-+        s->numbytes =3D 0;
-+    }
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_spapr_vtpm =3D {
-     .name =3D "tpm-spapr",
--    .unmigratable =3D 1,
-+    .pre_save =3D tpm_spapr_pre_save,
-+    .post_load =3D tpm_spapr_post_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_SPAPR_VIO(vdev, SpaprTpmState),
-+
-+        VMSTATE_UINT8(state, SpaprTpmState),
-+        VMSTATE_UINT32(numbytes, SpaprTpmState),
-+        VMSTATE_VBUFFER_UINT32(buffer, SpaprTpmState, 0, NULL, numbytes)=
-,
-+        /* remember DMA address */
-+        VMSTATE_UINT32(crq.data, SpaprTpmState),
-+        VMSTATE_END_OF_LIST(),
-+    }
+ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
+     [SPAPR_CAP_HTM] =3D {
+         .name =3D "htm",
+@@ -608,6 +616,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =
+=3D {
+         .type =3D "bool",
+         .apply =3D cap_ccf_assist_apply,
+     },
++    [SPAPR_CAP_FWNMI_MCE] =3D {
++        .name =3D "fwnmi-mce",
++        .description =3D "Handle fwnmi machine check exceptions",
++        .index =3D SPAPR_CAP_FWNMI_MCE,
++        .get =3D spapr_cap_get_bool,
++        .set =3D spapr_cap_set_bool,
++        .type =3D "bool",
++        .apply =3D cap_fwnmi_mce_apply,
++    },
  };
 =20
- static Property tpm_spapr_properties[] =3D {
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 9143a8eaa3..439e514787 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -67,3 +67,5 @@ tpm_spapr_do_crq_get_version(uint32_t version) "respons=
-e: version %u"
- tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspen=
-d"
- tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x=
-%02x"
- tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x=
-%02x 0x%02x ..."
-+tpm_spapr_post_load(void) "Delivering TPM response after resume"
-+tpm_spapr_caught_response(uint32_t v) "Caught response to deliver after =
-resume: %u bytes"
+ static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+@@ -747,6 +764,7 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MA=
+XPAGESIZE);
+ SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+ SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+ SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
++SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI_MCE);
+=20
+ void spapr_caps_init(SpaprMachineState *spapr)
+ {
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 61f005c6f6..7bc5fc3a9e 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -79,8 +79,10 @@ typedef enum {
+ #define SPAPR_CAP_LARGE_DECREMENTER     0x08
+ /* Count Cache Flush Assist HW Instruction */
+ #define SPAPR_CAP_CCF_ASSIST            0x09
++/* FWNMI machine check handling */
++#define SPAPR_CAP_FWNMI_MCE             0x0A
+ /* Num Caps */
+-#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
++#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI_MCE + 1)
+=20
+ /*
+  * Capability Values
+@@ -869,6 +871,7 @@ extern const VMStateDescription vmstate_spapr_cap_hpt=
+_maxpagesize;
+ extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
+ extern const VMStateDescription vmstate_spapr_cap_large_decr;
+ extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
++extern const VMStateDescription vmstate_spapr_cap_fwnmi;
+=20
+ static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int cap)
+ {
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index c05dde5985..4438d0c743 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2057,6 +2057,14 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mp=
+ic_proxy)
+     }
+ }
+=20
++int kvmppc_set_fwnmi(void)
++{
++    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
++    CPUState *cs =3D CPU(cpu);
++
++    return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
++}
++
+ int kvmppc_smt_threads(void)
+ {
+     return cap_ppc_smt ? cap_ppc_smt : 1;
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index b713097bfb..2c60dedd0d 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -27,6 +27,7 @@ void kvmppc_enable_h_page_init(void);
+ void kvmppc_set_papr(PowerPCCPU *cpu);
+ int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
++int kvmppc_set_fwnmi(void);
+ int kvmppc_smt_threads(void);
+ void kvmppc_error_append_smt_possible_hint(Error *const *errp);
+ int kvmppc_set_smt_threads(int smt);
+@@ -160,6 +161,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU =
+*cpu, int mpic_proxy)
+ {
+ }
+=20
++static inline int kvmppc_set_fwnmi(void)
++{
++    return -1;
++}
++
+ static inline int kvmppc_smt_threads(void)
+ {
+     return 1;
 --=20
 2.24.1
 
