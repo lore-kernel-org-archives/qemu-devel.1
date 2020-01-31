@@ -2,46 +2,48 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7281EC33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 166ADC33CB7
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:02:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 490ED20705
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:02:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 490ED20705
+	by mail.kernel.org (Postfix) with ESMTPS id E37B420705
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 13:02:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37B420705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixVwX-0007ap-Ef
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:02:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46255)
+	id 1ixVwZ-0007hN-2T
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 08:02:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46263)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvQ-0005s0-Oy
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvQ-0005sN-Sf
  for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvP-0007xw-4a
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ixVvP-0007xx-4V
  for qemu-devel@nongnu.org; Fri, 31 Jan 2020 08:01:32 -0500
-Received: from relay.sw.ru ([185.231.240.75]:59636)
+Received: from relay.sw.ru ([185.231.240.75]:59638)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ixVvO-0007vZ-Rk; Fri, 31 Jan 2020 08:01:31 -0500
+ id 1ixVvO-0007vd-TD; Fri, 31 Jan 2020 08:01:31 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1ixVvH-0000zU-Fm; Fri, 31 Jan 2020 16:01:23 +0300
+ id 1ixVvH-0000zU-Oq; Fri, 31 Jan 2020 16:01:23 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 00/11] error: auto propagated local_err part I
-Date: Fri, 31 Jan 2020 16:01:07 +0300
-Message-Id: <20200131130118.1716-1-vsementsov@virtuozzo.com>
+Subject: [PATCH v7 01/11] qapi/error: add (Error **errp) cleaning APIs
+Date: Fri, 31 Jan 2020 16:01:08 +0300
+Message-Id: <20200131130118.1716-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200131130118.1716-1-vsementsov@virtuozzo.com>
+References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -63,137 +65,28 @@ Cc: Kevin Wolf <kwolf@redhat.com>,
  Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
  Paul Durrant <paul@xen.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Greg Kurz <groug@kaod.org>, armbru@redhat.com,
+ armbru@redhat.com, Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>,
  Stefano Stabellini <sstabellini@kernel.org>, Gerd Hoffmann <kraxel@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>,
  Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
  Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
+Add functions to clean Error **errp: call corresponding Error *err
+cleaning function an set pointer to NULL.
 
-v7 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v7
+New functions:
+  error_free_errp
+  error_report_errp
+  warn_report_errp
 
-Changes v6->v7:
-
-01: - improve commit message
-    - fix typo in comment [Eric]
-    - add Eric's and Greg's r-b
-02: - grammar/wording [Eric]
-    - add Eric's and Greg's r-b
-03: - improve commit message
-    - grammar [Eric]
-    - improve script to rename unusual (Error **) parameters
-      to errp, and after it switch errp back to be "symbol"
-      instead of "identifier"
-04: - add Eric's r-b
-08: - add Greg's a-b
-11: - add Paul's a-b
-
-
-v6 is available at
- https://src.openvz.org/scm/~vsementsov/qemu.git #tag up-auto-local-err-partI-v6 
-
-Changes v5->v6:
-01: use errp name for the parameter, add assertion
-02: add a lot of text information, drop Eric's r-b.
-    no semantic changes.
-03: add more comments
-    skip functions with pattern error_append_.*_hint in name
-    make errp identifier, to match any name of Error ** paramter
-    some other improvements
-04: only commit message changed,
-    keep Philippe's r-b
-05: new, manual update for hw/sd/ssi-sd
-06: only commit message changed,
-    keep Philippe's r-b
-07: only commit message changed,
-    keep Philippe's r-b
-08: local_parse_opts() changed, so patch changed in this
-    function, drop a-b mark
-    also, indentation fixed, by improvement in coccinelle script
-09: only commit message changed,
-    keep Stefan's r-b
-10: commit message and a bit of context changed, still seems
-    valid to keep Eric's r-b
-11: add new hunk: hw/pci-host/xen_igd_pt.c, so, drop r-b
-    also, indentation fixed, by improvement in coccinelle script
-
-In these series, there is no commit-per-subsystem script, each generated
-commit is generated in separate.
-
-Still, generating commands are very similar, and looks like
-
-    sed -n '/^<Subsystem name>$/,/^$/{s/^F: //p}' MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
-
-Note, that in each generated commit, generation command is the only
-text, indented by 8 spaces in 'git log -1' output, so, to regenerate all
-commits (for example, after rebase, or change in coccinelle script), you
-may use the following command:
-
-git rebase -x "sh -c \"git show --pretty= --name-only | xargs git checkout HEAD^ -- ; git reset; git log -1 | grep '^        ' | sh\"" HEAD~7
-
-Which will start automated interactive rebase for generated patches,
-which will stop if generated patch changed
-(you may do git commit --amend to apply updated generated changes).
-
-Note:
-  git show --pretty= --name-only   - lists files, changed in HEAD
-  git log -1 | grep '^        ' | sh   - rerun generation command of HEAD
-
-
-Check for compilation of changed .c files
-git rebase -x "sh -c \"git show --pretty= --name-only | sed -n 's/\.c$/.o/p' | xargs make -j9\"" HEAD~7
-  
-
-Vladimir Sementsov-Ogievskiy (11):
-  qapi/error: add (Error **errp) cleaning APIs
-  error: auto propagated local_err
-  scripts: add coccinelle script to use auto propagated errp
-  hw/sd/ssi-sd: fix error handling in ssi_sd_realize
-  SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
-  pflash: introduce ERRP_AUTO_PROPAGATE
-  fw_cfg: introduce ERRP_AUTO_PROPAGATE
-  virtio-9p: introduce ERRP_AUTO_PROPAGATE
-  TPM: introduce ERRP_AUTO_PROPAGATE
-  nbd: introduce ERRP_AUTO_PROPAGATE
-  xen: introduce ERRP_AUTO_PROPAGATE
-
- include/block/nbd.h                           |   1 +
- include/qapi/error.h                          | 112 ++++++++++++-
- block/nbd.c                                   |  49 +++---
- hw/9pfs/9p-local.c                            |  12 +-
- hw/9pfs/9p.c                                  |   1 +
- hw/block/dataplane/xen-block.c                |  17 +-
- hw/block/pflash_cfi01.c                       |   7 +-
- hw/block/pflash_cfi02.c                       |   7 +-
- hw/block/xen-block.c                          | 125 ++++++--------
- hw/nvram/fw_cfg.c                             |  14 +-
- hw/pci-host/xen_igd_pt.c                      |   7 +-
- hw/sd/sdhci-pci.c                             |   7 +-
- hw/sd/sdhci.c                                 |  21 +--
- hw/sd/ssi-sd.c                                |  26 ++-
- hw/tpm/tpm_util.c                             |   7 +-
- hw/xen/xen-backend.c                          |   7 +-
- hw/xen/xen-bus.c                              | 100 +++++------
- hw/xen/xen-host-pci-device.c                  |  27 ++-
- hw/xen/xen_pt.c                               |  25 ++-
- hw/xen/xen_pt_config_init.c                   |  20 +--
- nbd/client.c                                  |   5 +
- nbd/server.c                                  |   5 +
- tpm.c                                         |   7 +-
- scripts/coccinelle/auto-propagated-errp.cocci | 158 ++++++++++++++++++
- 24 files changed, 500 insertions(+), 267 deletions(-)
- create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
 
 CC: Eric Blake <eblake@redhat.com>
 CC: Kevin Wolf <kwolf@redhat.com>
@@ -212,6 +105,46 @@ CC: Michael Roth <mdroth@linux.vnet.ibm.com>
 CC: qemu-block@nongnu.org
 CC: xen-devel@lists.xenproject.org
 
+ include/qapi/error.h | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index ad5b6e896d..d34987148d 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -309,6 +309,32 @@ void warn_reportf_err(Error *err, const char *fmt, ...)
+ void error_reportf_err(Error *err, const char *fmt, ...)
+     GCC_FMT_ATTR(2, 3);
+ 
++/*
++ * Functions to clean Error **errp: call corresponding Error *err cleaning
++ * function, then set pointer to NULL.
++ */
++static inline void error_free_errp(Error **errp)
++{
++    assert(errp && *errp);
++    error_free(*errp);
++    *errp = NULL;
++}
++
++static inline void error_report_errp(Error **errp)
++{
++    assert(errp && *errp);
++    error_report_err(*errp);
++    *errp = NULL;
++}
++
++static inline void warn_report_errp(Error **errp)
++{
++    assert(errp && *errp);
++    warn_report_err(*errp);
++    *errp = NULL;
++}
++
++
+ /*
+  * Just like error_setg(), except you get to specify the error class.
+  * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR is
 -- 
 2.21.0
 
