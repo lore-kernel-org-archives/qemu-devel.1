@@ -2,96 +2,75 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FA8C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 14:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A643EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D88620707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 14:54:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CtDHQv6U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D88620707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7CF0C20705
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:01:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF0C20705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixXgL-000645-Kl
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 09:54:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58693)
+	id 1ixXnu-0000Ey-MK
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:01:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34735)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ixXfM-0005PO-U8
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 09:53:06 -0500
+ (envelope-from <bounces@canonical.com>) id 1ixXmu-0007od-8V
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:00:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ixXfL-0000ZO-IF
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 09:53:04 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40687)
+ (envelope-from <bounces@canonical.com>) id 1ixXmt-0006vr-09
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:00:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39008)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ixXfL-0000Xm-9A
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 09:53:03 -0500
-Received: by mail-wr1-x442.google.com with SMTP id j104so8919761wrj.7
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 06:53:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=nA+qHn+r1zOEXnmkqs1YpSUQU3YPmVelMWhzQ5Ift5A=;
- b=CtDHQv6UsrgBcllmuGv4G+YdQX92gWmfhOSDXLERjMmtTV5mKtZRB86JE6FCOXrAXY
- p8nfgv+tb4MTCaY75VtnX4Vlzag824VuyBbJPye7gO1r3wF/v7W5BDtBO8JKZ/FQPflm
- tmpdBUw+ETQ322MZKbTNAoRcHKXXVEzpeeGwO/yW5WotkBtvLQPf/Gr3ZI10Eug0KgRl
- X9WTKBecIzWdX3pWT2+rtCfBIBjjQUtKaCMfEhLSC5hPSvBcsNIHsIckMAKqoeYdaVFm
- EdGoB+VPyboXGhthcfKxYI/LNod3BHsEsiInApvVaSIYYDJNEPDulwl2nAVtiPGNX/5L
- phWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=nA+qHn+r1zOEXnmkqs1YpSUQU3YPmVelMWhzQ5Ift5A=;
- b=SG8BZdMAVEOgtnOGTAQSXRi3Ee8/LvImEEB0tLuQi/BXy/Vt4xrdmI/2UZRgMtcNdq
- 2iBDVd7eiD2m1R2auxff4T/+542HBEDin9OAqyaGkNV6g06A7hk56EcsgXQ7Zaz3Adel
- jxCz61zUZgXReRasCOWwbEwAJhm8kZp9psyFlQerTdK/bsgRTL3AQkLk//4qqSfET0TC
- EFWraomUXlVEWcb/n6ywsiwll9541hMHZL0sESkUUqDtBvQvGF5Ht7JMoSSU+TPUOVq5
- 2ZP9J0Q79ODn1kYIrZpIjktuCbvPP7chCFpx/dVXlfXrhO85StKwQGSq08tfLJi+cEMk
- Rbdg==
-X-Gm-Message-State: APjAAAVsjwTr9UPYncieiLzEE9LCO4RtlygtQh5FehjoaS8ybFg1H3rl
- o0FrkiRnCA1T7G4aqv/LR/kHfw==
-X-Google-Smtp-Source: APXvYqyMSKp5GvmzN4uwjkX+Grjz+LB7dPoQjsMpdsRw67eW6DoxUBzKa+fi4zWlfNme3J8cHO4mwQ==
-X-Received: by 2002:a5d:6048:: with SMTP id j8mr13145459wrt.41.1580482381883; 
- Fri, 31 Jan 2020 06:53:01 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y20sm11137339wmj.23.2020.01.31.06.52.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 31 Jan 2020 06:52:59 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2B7A01FF87;
- Fri, 31 Jan 2020 14:52:59 +0000 (GMT)
-References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <20200131010941.10636-1-philmd@redhat.com>
- <20200131010941.10636-2-philmd@redhat.com> <87sgjv9883.fsf@linaro.org>
- <CAP+75-WkRVeV3B09C7sTkzzH6DSNzO4vitTf7Q4SYBSxL1CgSg@mail.gmail.com>
-User-agent: mu4e 1.3.7; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 1/2] !fixup "hw/misc: Add limited support for AVR power
- device"
-In-reply-to: <CAP+75-WkRVeV3B09C7sTkzzH6DSNzO4vitTf7Q4SYBSxL1CgSg@mail.gmail.com>
-Date: Fri, 31 Jan 2020 14:52:59 +0000
-Message-ID: <87mua38ypg.fsf@linaro.org>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ixXms-0006ph-QO
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:00:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ixXmr-0002RU-9Q
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:00:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3FE972E80C3
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:00:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+Date: Fri, 31 Jan 2020 14:52:35 -0000
+From: Joey Adams <joeyadams3.14159@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: joeyadams3-14159
+X-Launchpad-Bug-Reporter: Joey Adams (joeyadams3-14159)
+X-Launchpad-Bug-Modifier: Joey Adams (joeyadams3-14159)
+References: <157879657262.5123.4155249157481007374.malonedeb@gac.canonical.com>
+Message-Id: <158048235594.18744.4386381018708216063.malone@gac.canonical.com>
+Subject: [Bug 1859310] Re: libvirt probing fails due to assertion failure with
+ KVM and 'none' machine type
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 117d24e90b24daf3326af51226e1c87ac07aedd8
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,137 +79,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Michael Rolnik <mrolnik@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Reply-To: Bug 1859310 <1859310@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This was fixed in commit 8f54bbd0b4 "x86: Check for machine state object
+class before typecasting it".
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-> On Fri, Jan 31, 2020 at 12:27 PM Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>
->> > - convert DB_PRINT() to trace-events
->> > - fix style/indentation
->> >
->> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> > ---
->> >  hw/misc/avr_power.c  | 17 +++++++++--------
->> >  hw/misc/trace-events |  4 ++++
->> >  2 files changed, 13 insertions(+), 8 deletions(-)
->> >
->> > diff --git a/hw/misc/avr_power.c b/hw/misc/avr_power.c
->> > index 598bc7279c..65ff7c4405 100644
->> > --- a/hw/misc/avr_power.c
->> > +++ b/hw/misc/avr_power.c
->> > @@ -27,9 +27,7 @@
->> >  #include "qemu/log.h"
->> >  #include "hw/qdev-properties.h"
->> >  #include "hw/irq.h"
->> > -
->> > -#define DB_PRINT(fmt, args...) /* Nothing */
->> > -/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ##=
- args)*/
->> > +#include "trace.h"
->> >
->> >  static void avr_mask_reset(DeviceState *dev)
->> >  {
->> > @@ -48,19 +46,20 @@ static uint64_t avr_mask_read(void *opaque, hwaddr=
- offset, unsigned size)
->> >      assert(offset =3D=3D 0);
->> >      AVRMaskState *s =3D opaque;
->> >
->> > +    trace_avr_power_read(s->val);
->> > +
->> >      return (uint64_t)s->val;
->> >  }
->> >
->> >  static void avr_mask_write(void *opaque, hwaddr offset,
->> > -                              uint64_t val64, unsigned size)
->> > +                           uint64_t val64, unsigned size)
->> >  {
->> >      assert(size =3D=3D 1);
->> >      assert(offset =3D=3D 0);
->> >      AVRMaskState *s =3D opaque;
->> >      uint8_t val8 =3D val64;
->> >
->> > -    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
->> > -
->> > +    trace_avr_power_write(val8);
->>
->> You've dropped offset in this trace point which is probably worth
->> keeping so you track where is being written to. Same with the read.
->
-> I dropped it because it is always 0x00, the register is 8bit wide. See
-> below, memory_region_init_io(...,1).
-> I thought about adding a "name" property so each instance can display
-> the device it belongs to, but this was too invasive, so I decided to
-> keep this change for later.
+-- =
 
-Ahh I did wonder (I was reviewing without applying). Might be worth
-mentioning in the commit then.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859310
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Title:
+  libvirt probing fails due to assertion failure with KVM and 'none'
+  machine type
 
+Status in QEMU:
+  Fix Committed
 
->
->> >      s->val =3D val8;
->> >      for (int i =3D 0; i < 8; i++) {
->> >          qemu_set_irq(s->irq[i], (val8 & (1 << i)) !=3D 0);
->> > @@ -71,7 +70,9 @@ static const MemoryRegionOps avr_mask_ops =3D {
->> >      .read =3D avr_mask_read,
->> >      .write =3D avr_mask_write,
->> >      .endianness =3D DEVICE_NATIVE_ENDIAN,
->> > -    .impl =3D {.max_access_size =3D 1}
->> > +    .impl =3D {
->> > +        .max_access_size =3D 1,
->> > +    },
->> >  };
->> >
->> >  static void avr_mask_init(Object *dev)
->> > @@ -80,7 +81,7 @@ static void avr_mask_init(Object *dev)
->> >      SysBusDevice *busdev =3D SYS_BUS_DEVICE(dev);
->> >
->> >      memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s, TYPE_AVR_=
-MASK,
->> > -            0x01);
->> > +                          0x01);
->
-> ^ Region has only 1 address: 0x00.
->
->> >      sysbus_init_mmio(busdev, &s->iomem);
->> >
->> >      for (int i =3D 0; i < 8; i++) {
->> > diff --git a/hw/misc/trace-events b/hw/misc/trace-events
->> > index 7f0f5dff3a..f716881bb1 100644
->> > --- a/hw/misc/trace-events
->> > +++ b/hw/misc/trace-events
->> > @@ -179,3 +179,7 @@ via1_rtc_cmd_pram_read(int addr, int value) "addr=
-=3D%u value=3D0x%02x"
->> >  via1_rtc_cmd_pram_write(int addr, int value) "addr=3D%u value=3D0x%02=
-x"
->> >  via1_rtc_cmd_pram_sect_read(int sector, int offset, int addr, int val=
-ue) "sector=3D%u offset=3D%u addr=3D%d value=3D0x%02x"
->> >  via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int va=
-lue) "sector=3D%u offset=3D%u addr=3D%d value=3D0x%02x"
->> > +
->> > +# avr_power.c
->> > +avr_power_read(uint8_t value) "power_reduc read value:%u"
->> > +avr_power_write(uint8_t value) "power_reduc write value:%u"
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
+Bug description:
+  Using libvirt on Ubuntu 19.10, I get the following error when I try to
+  set <emulator> to the latest qemu from git (commit dc65a5bdc9):
 
+      error: internal error: Failed to start QEMU binary /usr/local/bin
+  /qemu-system-x86_64 for probing:
+  /home/joey/git/qemu/target/i386/kvm.c:2176:kvm_arch_init: Object
+  0x564bfd5c3200 is not an instance of type x86-machine
 
---=20
-Alex Benn=C3=A9e
+  Qemu command line to reproduce:
+
+      sudo x86_64-softmmu/qemu-system-x86_64 -machine 'none,accel=3Dkvm'
+
+  Commit ed9e923c3c (Dec 12, 2019) introduced the issue by removing an
+  object_dynamic_cast call.  In this scenario, kvm_arch_init is passed
+  an instance of "none-machine" instead of "x86-machine".
+
+  The following one-line change to target/i386/kvm.c reintroduces the
+  cast:
+
+       if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
+  +        object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE) &&
+           x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
+           smram_machine_done.notify =3D register_smram_listener;
+           qemu_add_machine_init_done_notifier(&smram_machine_done);
+       }
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859310/+subscriptions
 
