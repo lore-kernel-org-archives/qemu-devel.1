@@ -2,78 +2,80 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E056FC2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D262BC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:41:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB1BF20707
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:40:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D99C20707
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 15:41:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BcgafMpA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1BF20707
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYHa728l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D99C20707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixYP7-0006AC-RA
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:40:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40233)
+	id 1ixYQG-0008BC-5S
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 10:41:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ixXz6-0005r3-08
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:29 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ixXyT-0004bb-UD
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ixXz4-0006O5-MQ
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:27 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48993
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ixXyR-0004LI-LJ
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44537
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXz4-0006Lu-I8
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:13:26 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ixXyR-0004K1-Gg
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 10:12:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580483606;
+ s=mimecast20190719; t=1580483567;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tX+sh3q8pnAHNZrtPwaBLhbqHv0X0llbx6hQh4+/+oY=;
- b=BcgafMpAExJk6IRjubyOdD12df67Cout0VF6hmp55NIE6R4oXJZqDahEzJvQ0UO8MSuqke
- EJSeYQ9m4uqNBujQF+FNQwFIkGhbjgHYzmzXawXwUQIn5ZQOHapLY4W4ID4mhNYzUJPNol
- Ic7CROQpuIwtPNWsOYyitFf7Zf2OsBI=
+ bh=lR7C/r0jf6Tkq1j/PEpNQwhbFnic/ceL5vqEE0Btoxo=;
+ b=aYHa728l9Bamg8jzL3Sj7vu231cuUR6sfST33K0K8hZqkuhAPjW0gqWkiQ2S3FYihQxNgq
+ XEjZR/GioNWabRTnRQcaJCay/75rXOGFBEi2NplzdmQafyyS/f8rw0SZcwc0FxkqkYRLgu
+ /GD9FKmtRPz0P3lkqxrCr4qNKsnLw5A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-F_MITDOTO2WzShtXEE0uNA-1; Fri, 31 Jan 2020 10:13:23 -0500
+ us-mta-177-RSezCYp6N2G0m_Nn7wn9ow-1; Fri, 31 Jan 2020 10:12:44 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04608477
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CD4E800E21;
+ Fri, 31 Jan 2020 15:12:43 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7FC8086C4B
- for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 15:13:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F0D8586C4B;
+ Fri, 31 Jan 2020 15:12:42 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 63/80] ppc/ppc405_boards: use memdev for RAM
-Date: Fri, 31 Jan 2020 16:09:33 +0100
-Message-Id: <1580483390-131164-64-git-send-email-imammedo@redhat.com>
+Subject: [PATCH v4 29/80] arm/sabrelite: use memdev for RAM
+Date: Fri, 31 Jan 2020 16:08:59 +0100
+Message-Id: <1580483390-131164-30-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: F_MITDOTO2WzShtXEE0uNA-1
+X-MC-Unique: RSezCYp6N2G0m_Nn7wn9ow-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,6 +87,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: jcd@tribudubois.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -98,81 +101,95 @@ and using MachineState::ram instead of manually initializing
 RAM memory region.
 
 PS:
-in ref405ep alias RAM into ram_memories[] to avoid re-factoring
-its user ppc405ep_init(), which would be invasive and out of
-scope this patch.
+ remove no longer needed IMX6Sabrelite
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- hw/ppc/ppc405_boards.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+CC: jcd@tribudubois.net
+---
+ hw/arm/sabrelite.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index 057882a..f9c5b77 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -170,8 +170,8 @@ static void ref405ep_init(MachineState *machine)
+diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
+index 96cc455..e31694b 100644
+--- a/hw/arm/sabrelite.c
++++ b/hw/arm/sabrelite.c
+@@ -19,11 +19,6 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
+=20
+-typedef struct IMX6Sabrelite {
+-    FslIMX6State soc;
+-    MemoryRegion ram;
+-} IMX6Sabrelite;
+-
+ static struct arm_boot_info sabrelite_binfo =3D {
+     /* DDR memory start */
+     .loader_start =3D FSL_IMX6_MMDC_ADDR,
+@@ -45,7 +40,7 @@ static void sabrelite_reset_secondary(ARMCPU *cpu,
+=20
+ static void sabrelite_init(MachineState *machine)
+ {
+-    IMX6Sabrelite *s =3D g_new0(IMX6Sabrelite, 1);
++    FslIMX6State *s;
+     Error *err =3D NULL;
+=20
+     /* Check the amount of memory is compatible with the SOC */
+@@ -55,19 +50,16 @@ static void sabrelite_init(MachineState *machine)
+         exit(1);
      }
 =20
-     /* XXX: fix this */
--    memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.=
-ram",
--                                         machine->ram_size);
-+    memory_region_init_alias(&ram_memories[0], NULL, "ef405ep.ram.alias",
-+                             machine->ram, 0, machine->ram_size);
-     ram_bases[0] =3D 0;
-     ram_sizes[0] =3D machine->ram_size;
-     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
-@@ -312,6 +312,7 @@ static void ref405ep_class_init(ObjectClass *oc, void *=
-data)
-     mc->desc =3D "ref405ep";
-     mc->init =3D ref405ep_init;
-     mc->default_ram_size =3D 0x08000000;
-+    mc->default_ram_id =3D "ef405ep.ram";
- }
-=20
- static const TypeInfo ref405ep_type =3D {
-@@ -424,7 +425,6 @@ static void taihu_405ep_init(MachineState *machine)
-     MemoryRegion *sysmem =3D get_system_memory();
-     MemoryRegion *bios;
-     MemoryRegion *ram_memories =3D g_new(MemoryRegion, 2);
--    MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
-     hwaddr ram_bases[2], ram_sizes[2];
-     long bios_size;
-     target_ulong kernel_base, initrd_base;
-@@ -439,18 +439,16 @@ static void taihu_405ep_init(MachineState *machine)
-         g_free(sz);
-         exit(EXIT_FAILURE);
+-    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc=
+),
+-                            TYPE_FSL_IMX6, &error_abort, NULL);
+-
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized", &err);
++    s =3D FSL_IMX6(object_new(TYPE_FSL_IMX6));
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(s), &error_fa=
+tal);
++    object_property_set_bool(OBJECT(s), true, "realized", &err);
+     if (err !=3D NULL) {
+         error_report("%s", error_get_pretty(err));
+         exit(1);
      }
--    memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
--                                         machine->ram_size);
 =20
-     ram_bases[0] =3D 0;
-     ram_sizes[0] =3D 0x04000000;
-     memory_region_init_alias(&ram_memories[0], NULL,
--                             "taihu_405ep.ram-0", ram, ram_bases[0],
-+                             "taihu_405ep.ram-0", machine->ram, ram_bases[=
-0],
-                              ram_sizes[0]);
-     ram_bases[1] =3D 0x04000000;
-     ram_sizes[1] =3D 0x04000000;
-     memory_region_init_alias(&ram_memories[1], NULL,
--                             "taihu_405ep.ram-1", ram, ram_bases[1],
-+                             "taihu_405ep.ram-1", machine->ram, ram_bases[=
-1],
-                              ram_sizes[1]);
-     ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
-                   33333333, &pic, kernel_filename =3D=3D NULL ? 0 : 1);
-@@ -546,6 +544,7 @@ static void taihu_class_init(ObjectClass *oc, void *dat=
-a)
-     mc->desc =3D "taihu";
-     mc->init =3D taihu_405ep_init;
-     mc->default_ram_size =3D 0x08000000;
-+    mc->default_ram_id =3D "ef405ep.ram";
+-    memory_region_allocate_system_memory(&s->ram, NULL, "sabrelite.ram",
+-                                         machine->ram_size);
+     memory_region_add_subregion(get_system_memory(), FSL_IMX6_MMDC_ADDR,
+-                                &s->ram);
++                                machine->ram);
+=20
+     {
+         /*
+@@ -78,7 +70,7 @@ static void sabrelite_init(MachineState *machine)
+         /* Add the sst25vf016b NOR FLASH memory to first SPI */
+         Object *spi_dev;
+=20
+-        spi_dev =3D object_resolve_path_component(OBJECT(&s->soc), "spi1")=
+;
++        spi_dev =3D object_resolve_path_component(OBJECT(s), "spi1");
+         if (spi_dev) {
+             SSIBus *spi_bus;
+=20
+@@ -109,7 +101,7 @@ static void sabrelite_init(MachineState *machine)
+     sabrelite_binfo.secondary_cpu_reset_hook =3D sabrelite_reset_secondary=
+;
+=20
+     if (!qtest_enabled()) {
+-        arm_load_kernel(&s->soc.cpu[0], machine, &sabrelite_binfo);
++        arm_load_kernel(&s->cpu[0], machine, &sabrelite_binfo);
+     }
  }
 =20
- static const TypeInfo taihu_type =3D {
+@@ -119,6 +111,7 @@ static void sabrelite_machine_init(MachineClass *mc)
+     mc->init =3D sabrelite_init;
+     mc->max_cpus =3D FSL_IMX6_NUM_CPUS;
+     mc->ignore_memory_transaction_failures =3D true;
++    mc->default_ram_id =3D "sabrelite.ram";
+ }
+=20
+ DEFINE_MACHINE("sabrelite", sabrelite_machine_init)
 --=20
 2.7.4
 
