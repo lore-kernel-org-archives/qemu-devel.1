@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D146C2D0DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A59C35240
 	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:15:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 013032067C
+	by mail.kernel.org (Postfix) with ESMTPS id AAF382067C
 	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 00:15:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 013032067C
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAF382067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixJyA-0003gv-6V
+	id 1ixJyA-0003gr-Sz
 	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 19:15:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58779)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnp-0007rW-Gq
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:55 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnr-0007vG-0M
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJno-00035I-2m
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:53 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51355 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ixJnp-00036k-7S
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:54 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51411 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ixJnn-0002wH-N8
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:52 -0500
+ id 1ixJno-0002x7-VJ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 19:04:53 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 35E721A20CC;
+ by mail.rt-rk.com (Postfix) with ESMTP id 7BA9A1A20F7;
  Fri, 31 Jan 2020 01:03:38 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id E68AB1A20F7;
- Fri, 31 Jan 2020 01:03:37 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 4D3521A20F3;
+ Fri, 31 Jan 2020 01:03:38 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc4 20/29] target/avr: Register AVR support with the rest of
- QEMU
-Date: Fri, 31 Jan 2020 01:03:04 +0100
-Message-Id: <1580428993-4767-21-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc4 27/29] tests/boot-serial-test: Test some Arduino boards
+ (AVR based)
+Date: Fri, 31 Jan 2020 01:03:11 +0100
+Message-Id: <1580428993-4767-28-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -68,6 +68,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
  Michael Rolnik <mrolnik@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -75,97 +76,71 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-Add AVR related definitions into QEMU.
+Print out 'T' through serial port
 
-[AM: Remove word 'Atmel' from filenames and all elements of code]
-Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+The Arduino Duemilanove is based on a AVR5 CPU, while the
+Arduino MEGA2560 on a AVR6 CPU.
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+[rth: Squash Arduino adjustments from f4bug]
+Tested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- arch_init.c                |  2 ++
- include/disas/dis-asm.h    | 19 +++++++++++++++++++
- include/sysemu/arch_init.h |  1 +
- qapi/machine.json          |  3 ++-
- 4 files changed, 24 insertions(+), 1 deletion(-)
+ tests/qtest/Makefile.include   |  2 ++
+ tests/qtest/boot-serial-test.c | 11 +++++++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/arch_init.c b/arch_init.c
-index 705d0b9..6a74116 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -89,6 +89,8 @@ int graphic_depth =3D 32;
- #define QEMU_ARCH QEMU_ARCH_UNICORE32
- #elif defined(TARGET_XTENSA)
- #define QEMU_ARCH QEMU_ARCH_XTENSA
-+#elif defined(TARGET_AVR)
-+#define QEMU_ARCH QEMU_ARCH_AVR
- #endif
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index e6bb4ab..4817b63 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -65,6 +65,8 @@ check-qtest-i386-y +=3D numa-test
 =20
- const uint32_t arch_type =3D QEMU_ARCH;
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index f87f468..a36e658 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -211,6 +211,25 @@ enum bfd_architecture
- #define bfd_mach_m32r          0  /* backwards compatibility */
-   bfd_arch_mn10200,    /* Matsushita MN10200 */
-   bfd_arch_mn10300,    /* Matsushita MN10300 */
-+  bfd_arch_avr,        /* AVR microcontrollers */
-+#define bfd_mach_avr1       1
-+#define bfd_mach_avr2       2
-+#define bfd_mach_avr25      25
-+#define bfd_mach_avr3       3
-+#define bfd_mach_avr31      31
-+#define bfd_mach_avr35      35
-+#define bfd_mach_avr4       4
-+#define bfd_mach_avr5       5
-+#define bfd_mach_avr51      51
-+#define bfd_mach_avr6       6
-+#define bfd_mach_avrtiny    100
-+#define bfd_mach_avrxmega1  101
-+#define bfd_mach_avrxmega2  102
-+#define bfd_mach_avrxmega3  103
-+#define bfd_mach_avrxmega4  104
-+#define bfd_mach_avrxmega5  105
-+#define bfd_mach_avrxmega6  106
-+#define bfd_mach_avrxmega7  107
-   bfd_arch_cris,       /* Axis CRIS */
- #define bfd_mach_cris_v0_v10   255
- #define bfd_mach_cris_v32      32
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 62c6fe4..893df26 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -24,6 +24,7 @@ enum {
-     QEMU_ARCH_NIOS2 =3D (1 << 17),
-     QEMU_ARCH_HPPA =3D (1 << 18),
-     QEMU_ARCH_RISCV =3D (1 << 19),
-+    QEMU_ARCH_AVR =3D (1 << 20),
- };
+ check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
 =20
- extern const uint32_t arch_type;
-diff --git a/qapi/machine.json b/qapi/machine.json
-index b3d30bc..f2dc385 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -21,11 +21,12 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# avr: since 5.0
- #
- # Since: 3.0
- ##
- { 'enum' : 'SysEmuTarget',
--  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', '=
-lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-              'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
++check-qtest-avr-y +=3D boot-serial-test
++
+ check-qtest-alpha-y +=3D boot-serial-test
+ check-qtest-alpha-$(CONFIG_VGA) +=3D display-vga-test
+=20
+diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-tes=
+t.c
+index 8e8c5b0..55a37a4 100644
+--- a/tests/qtest/boot-serial-test.c
++++ b/tests/qtest/boot-serial-test.c
+@@ -16,6 +16,15 @@
+ #include "qemu/osdep.h"
+ #include "libqtest.h"
+=20
++static const uint8_t bios_avr[] =3D {
++    0x88, 0xe0,             /* ldi r24, 0x08   */
++    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
++    0x86, 0xe0,             /* ldi r24, 0x06   */
++    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 =
+*/
++    0x84, 0xe5,             /* ldi r24, 0x54   */
++    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
++};
++
+ static const uint8_t kernel_mcf5208[] =3D {
+     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+@@ -103,6 +112,8 @@ typedef struct testdef {
+=20
+ static testdef_t tests[] =3D {
+     { "alpha", "clipper", "", "PCI:" },
++    { "avr", "arduino-duemilanove", "", "T", sizeof(bios_avr), NULL, bio=
+s_avr },
++    { "avr", "arduino-mega-2560-v3", "", "T", sizeof(bios_avr), NULL, bi=
+os_avr},
+     { "ppc", "ppce500", "", "U-Boot" },
+     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+     { "ppc", "g3beige", "", "PowerPC,750" },
 --=20
 2.7.4
 
