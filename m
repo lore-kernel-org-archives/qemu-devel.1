@@ -2,102 +2,73 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57415C33C9E
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 02:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1756CC33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 03:10:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 238A9206F0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 02:11:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VM7OMU8k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238A9206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB1C5206E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 03:10:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB1C5206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixLmM-0003GM-DV
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 21:11:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50847)
+	id 1ixMhg-0002zk-03
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jan 2020 22:10:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ixLle-0002eB-MD
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 21:10:48 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixMh0-0002U4-Fl
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 22:10:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ixLlc-0000mm-5W
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 21:10:45 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53933
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ixLlc-0000lG-1o
- for qemu-devel@nongnu.org; Thu, 30 Jan 2020 21:10:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580436643;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=N6ayk/ft5wsmfKUBydtbk6VT0gvwHB29Ch32NVXJQJM=;
- b=VM7OMU8kfvtVGWn3xWnwPT52Z/HfJ0uhPzbI/30lowp5xscnQ+QWkps3MY8B1Jq5U5Egs8
- SjKKb8sqB4JD6jqaR0+cDTqA/LrHzA0Fy47mAFS7Topfj+/EeonJuGCFmrzeSMNtfbkW5s
- C46gzoghnS5AJ/0Zb22f7j6c0VAZjXA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-m368kySOMU2xOuUAiXW7Fw-1; Thu, 30 Jan 2020 21:10:39 -0500
-Received: by mail-wm1-f70.google.com with SMTP id p5so2154730wmc.4
- for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 18:10:38 -0800 (PST)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixMgx-0004XU-LZ
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 22:10:02 -0500
+Received: from mail-yw1-f65.google.com ([209.85.161.65]:41564)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixMgx-0004XB-Hx
+ for qemu-devel@nongnu.org; Thu, 30 Jan 2020 22:09:59 -0500
+Received: by mail-yw1-f65.google.com with SMTP id l22so3324512ywc.8
+ for <qemu-devel@nongnu.org>; Thu, 30 Jan 2020 19:09:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sQ2XPoEyVrYXsnHP3S+Bx1jgnWR7qliXlQ6rATor0F8=;
- b=RHIejUp52v2gXxByfbRRRniW2xwaPtoSXANKQUUXWMhPLEC52H9py546GEFx8CUFVN
- 8qi+PHWjBdKa5AkcLV8S7NSl6RprpqQks6i3CasOUkT3hFOwZiYwjuezp7rsvjs7bQX9
- YfyXdeGksN12JFqC2tNyJt5qXYsPDhbpi3WPySy+R0xkvJnacasZEp5VUV/gEaUj7xVp
- UEfX031iEirOLPJdDkcdsnfYXU611kmbBrNmLHHFdAkY36rOh9IMvaokDV+tOGSmMdPy
- 1lmS/uu0ZrGIv5uhw3PvBppOe1IPzJUqbHixDTdZb564hYDotgQxJQN60TZHY/0osa0Y
- 6psQ==
-X-Gm-Message-State: APjAAAV4nx5gAGGNd6hfxdjiQZPbAt7pGwDtAsphKkLFItliWo7VzHI2
- 1FSAdby6w45DlECL6wkIDdjTA262ZC8NAGoUh3ac7yBo1wRF6SA2QV7cWOgThRW1kRKiGNxjgoz
- MaNTpuZQaqKRXXV8=
-X-Received: by 2002:a1c:80d4:: with SMTP id b203mr8938964wmd.102.1580436637815; 
- Thu, 30 Jan 2020 18:10:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy2BkzamxUFHHgelW+zEPD+ndEPPLbrrmVC285N4ZFYcPlX4XrMUUmSjzubCnKnirYGBJsFHQ==
-X-Received: by 2002:a1c:80d4:: with SMTP id b203mr8938944wmd.102.1580436637597; 
- Thu, 30 Jan 2020 18:10:37 -0800 (PST)
-Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
- [83.57.172.113])
- by smtp.gmail.com with ESMTPSA id z21sm8644614wml.5.2020.01.30.18.10.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jan 2020 18:10:36 -0800 (PST)
-Subject: Re: [PATCH v4 7/7] tests/boot_linux_console: Tag Emcraft Smartfusion2
- as running 'u-boot'
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200120235159.18510-1-f4bug@amsat.org>
- <20200120235159.18510-8-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <851737e6-9afd-85a5-b9a8-49e506287cf8@redhat.com>
-Date: Fri, 31 Jan 2020 03:10:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=0h6IgEdEtMmYyx0iKvyy2g75DudKmWYfqSb4/kcJYP4=;
+ b=B07uMoyMGXl55lJ2Jd1NrcOstm2MmkxOjNAMqU+mxritR5fsHS5dJcBxTgDmiYUege
+ OXPU70EzyVV8s9xz9HQkvIs/NXt6H4bYsOI7LsPXMllwXh3UjlDfxX+18Wj7fA3059r0
+ vBb3mnTpSb2WzGudcO3TwKq61XOZ9rZmseyr0YpLLeLrX3rTcJpnR4xuFKmLgqMhtnF6
+ zjnz24p9/Yc4F3/gaAuKvNk7Cl3JCFLyaSwaXdcO+h3TicTnZHNxt/2ymbxBOA9Oc7Fa
+ 2UJCZpxNvmzfg6TK8tBpAcOECmCksdMvjZTZ3+8abmPNO27/iNisn46YQQGsgYLHoKUt
+ TmWg==
+X-Gm-Message-State: APjAAAV0rMJlnIEmWPON8Kx9sZuf4QJSqY3I6KQlJtbC4DvM7+i2BTxf
+ ZF0/8TPdG08N+xVk9j5vnOY0d8zDyNJ7FTSW28E=
+X-Google-Smtp-Source: APXvYqwEPLURj8Lj1z0gOxYQeYrkMULSVhOAV6+rIBlFhs2/oCgUVcxiU+ofJHkgcQGkzxH/uZpEjTet0x0NoNbh/uw=
+X-Received: by 2002:a0d:c3c4:: with SMTP id f187mr6416575ywd.201.1580440198712; 
+ Thu, 30 Jan 2020 19:09:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200120235159.18510-8-f4bug@amsat.org>
-Content-Language: en-US
-X-MC-Unique: m368kySOMU2xOuUAiXW7Fw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1580428993-4767-25-git-send-email-aleksandar.markovic@rt-rk.com>
+ <CAL1e-=j3b6Gfo4K56=tXc9jbXAy3fou5Dsxq3ns9C89mpuPXxA@mail.gmail.com>
+In-Reply-To: <CAL1e-=j3b6Gfo4K56=tXc9jbXAy3fou5Dsxq3ns9C89mpuPXxA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 31 Jan 2020 04:09:47 +0100
+Message-ID: <CAAdtpL6F=qbWT7keQxHtacndN+JUM32tyd9vW0ZEEMYYN=a=3g@mail.gmail.com>
+Subject: Re: [PATCH rc4 24/29] hw/avr: Add some ATmega microcontrollers
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 209.85.161.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,55 +80,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
- Cleber Rosa <crosa@redhat.com>, Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/21/20 12:51 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Avocado tags are handy to automatically select tests matching
-> the tags. Since this test also runs U-Boot, tag it.
->=20
-> We can run all the tests using U-Boot as once with:
->=20
->    $ avocado --show=3Dapp run -t u-boot tests/acceptance/
->    JOB LOG    : avocado/job-results/job-2020-01-21T00.16-ee9344e/job.log
->     (1/3) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_ar=
-m_emcraft_sf2: PASS (16.59 s)
->     (2/3) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_ar=
-m_raspi2_uboot: PASS (0.47 s)
->     (3/3) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_aa=
-rch64_raspi3_uboot: PASS (2.43 s)
->    RESULTS    : PASS 3 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0=
- | CANCEL 0
->    JOB TIME   : 19.78 s
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->   tests/acceptance/boot_linux_console.py | 1 +
->   1 file changed, 1 insertion(+)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index 22b360118d..4a4cf9d0ea 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -305,6 +305,7 @@ class BootLinuxConsole(Test):
->           :avocado: tags=3Darch:arm
->           :avocado: tags=3Dmachine:emcraft-sf2
->           :avocado: tags=3Dendian:little
-> +        :avocado: tags=3Du-boot
->           """
->           uboot_url =3D ('https://raw.githubusercontent.com/'
->                        'Subbaraya-Sundeep/qemu-test-binaries/'
->=20
+Hi Aleksandar,
 
-Thanks, applied to my python-next tree:
-https://gitlab.com/philmd/qemu/commits/python-next
+Cc'ing Thomas & Daniel who are not lawyers but tried to explain me few
+times how licensing works.
 
+On Fri, Jan 31, 2020 at 2:56 AM Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+> On Fri, Jan 31, 2020 at 1:03 AM Aleksandar Markovic
+> <aleksandar.markovic@rt-rk.com> wrote:
+> >
+> > From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >
+> > Add some AVR microcontrollers from the ATmega family:
+> >
+> >   - middle range: ATmega168 and ATmega328
+> >   - high range: ATmega1280 and ATmega2560
+> >
+> > For product comparison:
+> >   https://www.microchip.com/wwwproducts/ProductCompare/ATmega168P/ATmeg=
+a328P
+> >   https://www.microchip.com/wwwproducts/ProductCompare/ATmega1280/ATmeg=
+a2560
+> >
+> > Datasheets:
+> >   http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-1=
+68A-PA-328-P-DS-DS40002061A.pdf
+> >   http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2549-8-bit-AVR-=
+Microcontroller-ATmega640-1280-1281-2560-2561_datasheet.pdf
+> >
+> > [AM: Remove word 'Atmel' from filenames and all elements of code]
+> > Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> > Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> > ---
+> >  hw/avr/Kconfig       |   5 +
+> >  hw/avr/Makefile.objs |   1 +
+> >  hw/avr/atmega.c      | 470 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  hw/avr/atmega.h      |  48 ++++++
+> >  4 files changed, 524 insertions(+)
+> >  create mode 100644 hw/avr/Kconfig
+> >  create mode 100644 hw/avr/atmega.c
+> >  create mode 100644 hw/avr/atmega.h
+> >
+> > diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+> > new file mode 100644
+> > index 0000000..9e6527e
+> > --- /dev/null
+> > +++ b/hw/avr/Kconfig
+> > @@ -0,0 +1,5 @@
+> > +config AVR_ATMEGA_MCU
+> > +    bool
+> > +    select AVR_TIMER16
+> > +    select AVR_USART
+> > +    select AVR_POWER
+> > diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+> > index 123f174..af0fdde 100644
+> > --- a/hw/avr/Makefile.objs
+> > +++ b/hw/avr/Makefile.objs
+> > @@ -1 +1,2 @@
+> >  obj-y +=3D boot.o
+> > +obj-$(CONFIG_AVR_ATMEGA_MCU) +=3D atmega.o
+> > diff --git a/hw/avr/atmega.c b/hw/avr/atmega.c
+> > new file mode 100644
+> > index 0000000..8cdf28b
+> > --- /dev/null
+> > +++ b/hw/avr/atmega.c
+> > @@ -0,0 +1,470 @@
+> > +/*
+> > + * QEMU ATmega MCU
+> > + *
+> > + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
+> > + *
+> > + * This work is licensed under the terms of the GNU GPLv2 or later.
+> > + * See the COPYING file in the top-level directory.
+> > + * SPDX-License-Identifier: GPL-2.0-or-later
+> > + */
+>
+> Philippe,
+>
+> Michael and I already agreed at some moment that the whole target AVR
+> should have harmonized licenses, and Sarrah agreed to change her
+> license to achieve this. Do you agree to harmonize your licenses with
+> the rest of the project? (This would mean changing the preable, but of
+> course you remain copyright carrier as is now.)
+
+What license do you want to use? I always use "GPLv2 or later" with
+QEMU, mostly following what the others do.
+
+Per https://wiki.qemu.org/License:
+
+  Source files with no licensing information are released under the
+GNU General Public License, version 2 or (at your option) any later
+version.
+
+Reading about licensing is not fun :(
+
+>
+> Thanks,
+> Aleksandar
 
