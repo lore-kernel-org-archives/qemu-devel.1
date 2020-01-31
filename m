@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6AE2C2D0DB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:48:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B614EC2D0DB
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:49:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8359B214D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:48:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86ADC21734
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 17:49:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aIgfrVii"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8359B214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dq6WucUY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86ADC21734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixaP5-0007rd-L4
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 12:48:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41180)
+	id 1ixaQB-0001OO-JT
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 12:49:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41535)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1ixaLV-0002c1-SZ
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:44:47 -0500
+ (envelope-from <eblake@redhat.com>) id 1ixaLj-00038w-VC
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:45:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1ixaLT-0004Ga-Vy
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:44:45 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59560
+ (envelope-from <eblake@redhat.com>) id 1ixaLi-0004fF-L5
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:44:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46699
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ixaLT-0004G4-Rv
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:44:43 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ixaLi-0004ec-Gx
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 12:44:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580492683;
+ s=mimecast20190719; t=1580492698;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NECrzhLnAJqisY5S+eozbIOoiheU/vYYbDCkaJ8l/Y4=;
- b=aIgfrViieS9hm4aZVU27vBArdy6IDQE7T4OIm+l0BzXfwtX2FNNWijCRfwn26104O8387b
- JjBEhdQqkedpFF4Ot1CXV2MNo8NMIMJY5D+1/jjIwrjpAP9iYuT57AkYCpprEp+OI5X2A7
- nETfBOvTBbrnrlfoT0mUcbAUQXWMfeE=
+ bh=a4rFAJzXEu4+xQ1KGm8pisE5inMABop5rkbEiEgeSus=;
+ b=Dq6WucUY7Oer/xMFxr0dg535DdCMYpooGvw4YAbFEPZW1F+NWclsIftYwyoShfjWqIuTQV
+ 0q58SEWTXK92MHYI/enIRjl1EDg+3xU01i57alqE1wDBRXqVNvyXHAIuipfxAi6LI3bly1
+ O7TzoqUokToVGH5x9sP2/oJ61KZsWxg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-WJgYAmB_Ns-NgI9iyCbNKA-1; Fri, 31 Jan 2020 12:44:41 -0500
+ us-mta-184-VmLEKIqBO4SMu_YsNn6m9A-1; Fri, 31 Jan 2020 12:44:54 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79C7D801E67;
- Fri, 31 Jan 2020 17:44:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51FC61937FC0;
+ Fri, 31 Jan 2020 17:44:53 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 079FC7FB60;
- Fri, 31 Jan 2020 17:44:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D4E1384D96;
+ Fri, 31 Jan 2020 17:44:52 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/17] qcow2: List autoclear bit names in header
-Date: Fri, 31 Jan 2020 11:44:21 -0600
-Message-Id: <20200131174436.2961874-3-eblake@redhat.com>
+Subject: [PATCH 10/17] block: Add new BDRV_ZERO_OPEN flag
+Date: Fri, 31 Jan 2020 11:44:29 -0600
+Message-Id: <20200131174436.2961874-11-eblake@redhat.com>
 In-Reply-To: <20200131174436.2961874-1-eblake@redhat.com>
 References: <20200131174436.2961874-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: WJgYAmB_Ns-NgI9iyCbNKA-1
+X-MC-Unique: VmLEKIqBO4SMu_YsNn6m9A-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,200 +90,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The feature table is supposed to advertise the name of all feature
-bits that we support; however, we forgot to update the table for
-autoclear bits.  While at it, move the table to read-only memory in
-code, and tweak the qcow2 spec to name the second autoclear bit.
-Update iotests that are affected by the longer header length.
+Knowing that a file reads as all zeroes when created is useful, but
+limited in scope to drivers that can create images.  However, there
+are also situations where pre-existing images can quickly be
+determined to read as all zeroes, even when the image was not just
+created by the same process.  The optimization used in qemu-img
+convert to avoid a pre-zeroing pass on the destination is just as
+useful in such a scenario.  As such, it is worth the block layer
+adding another bit to bdrv_known_zeroes().
 
-Fixes: 88ddffae
-Fixes: 93c24936
+Note that while BDRV_ZERO_CREATE cannot chase through backing layers
+(because it only applies at creation time, but the backing layer was
+not created at the same time as the active layer being created), it IS
+okay for BDRV_ZERO_OPEN to chase through layers (as long as all layers
+currently read as zero, the image reads as zero).
+
+Upcoming patches will update the qcow2, file-posix, and nbd drivers to
+advertise the new bit when appropriate.
+
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/qcow2.c              | 12 +++++++++++-
- docs/interop/qcow2.txt     |  3 ++-
- tests/qemu-iotests/031.out |  8 ++++----
- tests/qemu-iotests/036.out |  4 ++--
- tests/qemu-iotests/061.out | 14 +++++++-------
- 5 files changed, 26 insertions(+), 15 deletions(-)
+ block.c               | 12 ++++++------
+ include/block/block.h | 10 ++++++++++
+ qemu-img.c            | 10 ++++++----
+ 3 files changed, 22 insertions(+), 10 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 30fd3d13032a..d3e7709ac2b4 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2821,7 +2821,7 @@ int qcow2_update_header(BlockDriverState *bs)
+diff --git a/block.c b/block.c
+index fac0813140aa..d68f527dc41f 100644
+--- a/block.c
++++ b/block.c
+@@ -5078,7 +5078,7 @@ int bdrv_known_zeroes_truncate(BlockDriverState *bs)
 
-     /* Feature table */
-     if (s->qcow_version >=3D 3) {
--        Qcow2Feature features[] =3D {
-+        static const Qcow2Feature features[] =3D {
-             {
-                 .type =3D QCOW2_FEAT_TYPE_INCOMPATIBLE,
-                 .bit  =3D QCOW2_INCOMPAT_DIRTY_BITNR,
-@@ -2842,6 +2842,16 @@ int qcow2_update_header(BlockDriverState *bs)
-                 .bit  =3D QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
-                 .name =3D "lazy refcounts",
-             },
-+            {
-+                .type =3D QCOW2_FEAT_TYPE_AUTOCLEAR,
-+                .bit  =3D QCOW2_AUTOCLEAR_BITMAPS_BITNR,
-+                .name =3D "consistent bitmaps",
-+            },
-+            {
-+                .type =3D QCOW2_FEAT_TYPE_AUTOCLEAR,
-+                .bit  =3D QCOW2_AUTOCLEAR_DATA_FILE_RAW_BITNR,
-+                .name =3D "raw external data",
-+            },
-         };
+ int bdrv_known_zeroes(BlockDriverState *bs)
+ {
+-    int mask =3D BDRV_ZERO_CREATE | BDRV_ZERO_TRUNCATE;
++    int mask =3D BDRV_ZERO_CREATE | BDRV_ZERO_TRUNCATE | BDRV_ZERO_OPEN;
 
-         ret =3D header_ext_add(buf, QCOW2_EXT_MAGIC_FEATURE_TABLE,
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index af5711e53371..8510d74c8079 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -138,7 +138,8 @@ in the description of a field.
-                                 bit is unset, the bitmaps extension data m=
-ust be
-                                 considered inconsistent.
+     if (!bs->drv) {
+         return 0;
+@@ -5100,17 +5100,17 @@ int bdrv_known_zeroes(BlockDriverState *bs)
+      * ZERO_CREATE is not viable.  If the current layer is smaller
+      * than the backing layer, truncation may expose backing data,
+      * restricting ZERO_TRUNCATE; treat failure to query size in the
+-     * same manner.  Otherwise, we can trust the driver.
++     * same manner.  For ZERO_OPEN, we insist that both backing and
++     * current layer report the bit.
+      */
+-
+     if (bs->backing) {
+         int64_t back =3D bdrv_getlength(bs->backing->bs);
+         int64_t curr =3D bdrv_getlength(bs);
 
--                    Bit 1:      If this bit is set, the external data file=
- can
-+                    Bit 1:      Raw external data bit
-+                                If this bit is set, the external data file=
- can
-                                 be read as a consistent standalone raw ima=
-ge
-                                 without looking at the qcow2 metadata.
+-        if (back < 0 || curr < back) {
+-            return 0;
++        mask =3D bdrv_known_zeroes(bs->backing->bs) & BDRV_ZERO_OPEN;
++        if (back >=3D 0 && curr >=3D back) {
++            mask |=3D BDRV_ZERO_TRUNCATE;
+         }
+-        mask =3D BDRV_ZERO_TRUNCATE;
+     }
 
-diff --git a/tests/qemu-iotests/031.out b/tests/qemu-iotests/031.out
-index d535e407bc30..46f97c5a4ea4 100644
---- a/tests/qemu-iotests/031.out
-+++ b/tests/qemu-iotests/031.out
-@@ -117,7 +117,7 @@ header_length             104
+     if (bs->drv->bdrv_known_zeroes) {
+diff --git a/include/block/block.h b/include/block/block.h
+index a6a227f50678..dafb8cc2bd80 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -105,6 +105,16 @@ typedef enum {
+      * for drivers that set .bdrv_co_truncate.
+      */
+     BDRV_ZERO_TRUNCATE      =3D 0x2,
++
++    /*
++     * bdrv_known_zeroes() should include this bit if an image is
++     * known to read as all zeroes when first opened; this bit should
++     * not be relied on after any writes to the image.  This can be
++     * set even if BDRV_ZERO_INIT is clear, but should only be set if
++     * making the determination is more efficient than looping over
++     * block status for the image.
++     */
++    BDRV_ZERO_OPEN          =3D 0x4,
+ } BdrvZeroFlags;
 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
+ typedef struct BlockSizes {
+diff --git a/qemu-img.c b/qemu-img.c
+index e60217e6c382..c8519a74f738 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1985,10 +1985,12 @@ static int convert_do_copy(ImgConvertState *s)
+     int64_t sector_num =3D 0;
 
- Header extension:
-@@ -150,7 +150,7 @@ header_length             104
+     /* Check whether we have zero initialisation or can get it efficiently=
+ */
+-    if (!s->has_zero_init && s->target_is_new && s->min_sparse &&
+-        !s->target_has_backing) {
+-        s->has_zero_init =3D !!(bdrv_known_zeroes(blk_bs(s->target)) &
+-                              BDRV_ZERO_CREATE);
++    if (!s->has_zero_init && s->min_sparse && !s->target_has_backing) {
++        ret =3D bdrv_known_zeroes(blk_bs(s->target));
++        if (ret & BDRV_ZERO_OPEN ||
++            (s->target_is_new && ret & BDRV_ZERO_CREATE)) {
++            s->has_zero_init =3D true;
++        }
+     }
 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- Header extension:
-@@ -164,7 +164,7 @@ No errors were found on the image.
-
- magic                     0x514649fb
- version                   3
--backing_file_offset       0x178
-+backing_file_offset       0x1d8
- backing_file_size         0x17
- cluster_bits              16
- size                      67108864
-@@ -188,7 +188,7 @@ data                      'host_device'
-
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- Header extension:
-diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotests/036.out
-index 0b52b934e115..23b699ce0622 100644
---- a/tests/qemu-iotests/036.out
-+++ b/tests/qemu-iotests/036.out
-@@ -26,7 +26,7 @@ compatible_features       []
- autoclear_features        [63]
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
-
-@@ -38,7 +38,7 @@ compatible_features       []
- autoclear_features        []
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- *** done
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index 8b3091a412bc..413cc4e0f4ab 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -26,7 +26,7 @@ header_length             104
-
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- magic                     0x514649fb
-@@ -84,7 +84,7 @@ header_length             104
-
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- magic                     0x514649fb
-@@ -140,7 +140,7 @@ header_length             104
-
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- ERROR cluster 5 refcount=3D0 reference=3D1
-@@ -195,7 +195,7 @@ header_length             104
-
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- magic                     0x514649fb
-@@ -264,7 +264,7 @@ header_length             104
-
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- read 65536/65536 bytes at offset 44040192
-@@ -298,7 +298,7 @@ header_length             104
-
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- ERROR cluster 5 refcount=3D0 reference=3D1
-@@ -327,7 +327,7 @@ header_length             104
-
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    288
- data                      <binary>
-
- read 131072/131072 bytes at offset 0
+     if (!s->has_zero_init && !s->target_has_backing &&
 --=20
 2.24.1
 
