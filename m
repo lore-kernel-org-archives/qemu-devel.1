@@ -2,78 +2,80 @@ Return-Path: <SRS0=aXOp=3U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24040C33CB2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 11:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 690E6C33CB2
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 11:45:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDA18206F0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 11:44:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA18206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33193206F0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jan 2020 11:45:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hnFWcE9a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33193206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixUiy-0000Ni-73
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 06:44:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45701)
+	id 1ixUjl-0001SM-Cf
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 06:45:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46384)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1ixUgm-0006Ol-GC
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:42:21 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ixUj2-0000eB-TP
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:44:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1ixUgl-0007Ss-FQ
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:42:20 -0500
-Received: from mga06.intel.com ([134.134.136.31]:39336)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1ixUgl-0007QZ-6w
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:42:19 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 31 Jan 2020 03:42:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,385,1574150400"; d="scan'208";a="323340350"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by fmsmga001.fm.intel.com with ESMTP; 31 Jan 2020 03:42:17 -0800
-Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 31 Jan 2020 03:42:16 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.197]) by
- SHSMSX153.ccr.corp.intel.com ([169.254.12.97]) with mapi id 14.03.0439.000;
- Fri, 31 Jan 2020 19:41:53 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: RE: [RFC v3 07/25] header file update VFIO/IOMMU vSVA APIs
-Thread-Topic: [RFC v3 07/25] header file update VFIO/IOMMU vSVA APIs
-Thread-Index: AQHV1p1OoTYvvVpt3kqFgb7urV9AkKgBC/CAgAOdaoA=
-Date: Fri, 31 Jan 2020 11:41:53 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A1992E4@SHSMSX104.ccr.corp.intel.com>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-8-git-send-email-yi.l.liu@intel.com>
- <20200129132841.6900963f.cohuck@redhat.com>
-In-Reply-To: <20200129132841.6900963f.cohuck@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMTZlNTYwNjAtYTNlNC00MjQ1LTlmNzUtMDEwODViMThjYTVjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSGFGb0hiNjF0N0g3c2d3UmQrXC8xYXJEeFhib3NhQW1TYkNBXC91dE42SVFXRCs4RXN0eXN0U3BDMWZNT3NpajFCIn0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <peter.maydell@linaro.org>) id 1ixUj1-0003U3-AJ
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:44:40 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42462)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ixUj1-0003RV-3r
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 06:44:39 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 66so6254575otd.9
+ for <qemu-devel@nongnu.org>; Fri, 31 Jan 2020 03:44:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=AZDYNDSbSEPlDO5GL/RS+Paol6CiMRQi6AXB3v402Lk=;
+ b=hnFWcE9aOVEPSt5J6yaewPu7Hfwv2ncyyO9jMFlK2k0v1O5ROqyiKJ5AE1znjXkL+/
+ boJRxvwMrvgSOmswnPFADlVusGsXGJuaA3DBxOTeuj2n/uyyW05vrZ2x01kZbNskqp7C
+ ttbq3oKBXpyzTOQW33fKPlF8GLRL0+1TiQM6ykp68uTQMIFfi4KBzF5DczpuR5eLIGNJ
+ xQFr4gm5BGnqdvu4kfdabErSCccsePqmj0EnqYl3sDd0e65rox53XyBfuwDOTYQ2plYD
+ xBArO3AIx6rHAUMaxSyPySwKsd/eckFlHza+0Q3AqvIGntI5xxq8uKqX+rKmFhjbMbug
+ f2ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=AZDYNDSbSEPlDO5GL/RS+Paol6CiMRQi6AXB3v402Lk=;
+ b=QgamiEZQFSpmX+fNBaXxctckEEuW/1gR5kgKGYpq4xeZk8EdAL5MajiuEu/2N5MK4U
+ GlnqEPsV3a9eHjbi3QU0uvf8wDgsb76ZkfA8JWOqLIbBZtgS9YuGfzRyEpp58pvST28y
+ fflDtkbeUqlJBZj4uXZuac6x08OglbgCIQSdwgJJIWgAnxvl+0GpCxmyN7H+fu+AK3Rf
+ Ixx8Nn1ksKWaK8pxg5egGC2UU5h8iHYhKRLvNljNHKsEQYn8KaGt9RSHulGSXrSO8OY/
+ QIKLfJTc33cTaSLC2HvX7xRqRTBCkcahHRk0Tjl5ujTW2xVoOHWpwzLjBFzJJEZKjpZb
+ P6MQ==
+X-Gm-Message-State: APjAAAW8WYy54yNQ26lERT4/leYr7t0JKG4DNeW8zPLT4tOlL1U0XYEp
+ +QmReF+aMHT8ujWwcF12iVO8qgdsCQbKextuAEJWkC6QxO8=
+X-Google-Smtp-Source: APXvYqzMnU8MAY8Qdai2I3Wy5ckKIHFpZZ8X5qRLha/RMsd8QyHqNxoRZnZcFeaA6w0hy9lrMdAJj7UMMOMKbgUgGnY=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr7256026otd.91.1580471077954; 
+ Fri, 31 Jan 2020 03:44:37 -0800 (PST)
 MIME-Version: 1.0
+References: <20200124162606.8787-1-peter.maydell@linaro.org>
+In-Reply-To: <20200124162606.8787-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 31 Jan 2020 11:44:27 +0000
+Message-ID: <CAFEAcA9wHqKhpiCXG1AokYDJ0DHbzG0Qg6WogY1bqDdgt5iRag@mail.gmail.com>
+Subject: Re: [PATCH v2 0/8] qemu-img, qemu-trace-stap, virtfs-proxy-helper:
+ convert to rST
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.31
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,61 +87,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, Greg Kurz <groug@kaod.org>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Beh=
-alf
-> Of Cornelia Huck
-> Sent: Wednesday, January 29, 2020 8:29 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v3 07/25] header file update VFIO/IOMMU vSVA APIs
->=20
-> On Wed, 29 Jan 2020 04:16:38 -0800
-> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
->=20
-> > From: Liu Yi L <yi.l.liu@intel.com>
-> >
-> > The kernel uapi/linux/iommu.h header file includes the extensions for
-> > vSVA support. e.g. bind gpasid, iommu fault report related user
-> > structures and etc.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  linux-headers/linux/iommu.h | 372
-> > ++++++++++++++++++++++++++++++++++++++++++++
-> >  linux-headers/linux/vfio.h  | 148 ++++++++++++++++++
-> >  2 files changed, 520 insertions(+)
-> >  create mode 100644 linux-headers/linux/iommu.h
->=20
-> Please add a note that this is to be replaced with a full headers update,=
- so that it
-> doesn't get missed :)
+I know it's only a week, but could I ping for review on this?
+(statements of the form "I do want to review but need more
+time" also welcome.) Given the potential for conflicts with
+other changes that touch the docs, plus that there's other
+patchsets which depend on this one, it would be nice to put
+it into the tree sooner rather than later.
 
-Exactly, thanks for the reminder. I expect to have a full headers update wh=
-en
-the whole vSVA series is accepted. :-)
+Still in need of review: patches 1 (makefile magic),
+5 (the qemu-img conversion itself), 7 (qemu-trace-stap).
 
-Thanks,
-Yi Liu
+thanks
+-- PMM
 
+On Fri, 24 Jan 2020 at 16:26, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> This patchset converts the following documentation to rST format:
+>  * qemu-img
+>  * qemu-trace-stap
+>  * virtfs-proxy-helper
+>
+> (That means everything in step 3 in the plan:
+> https://wiki.qemu.org/Features/Documentation#3:_Convert_things_which_are_mostly_standalone_manpages
+> will be done except for qemu-cpu-models.texi. That
+> should be a straightforward conversion but I haven't
+> touched it yet because I know there's an on-list patch
+> that updates the texi and wanted to avoid a conflict.)
+>
+> The patchset includes a new Sphinx extension which handles parsing
+> the .hx files which provide documentation fragments for the qemu-img
+> manual.
+>
+> Changes from v1 to v2:
+>  * rebased on master, since the qemu-nbd conversion has now
+>    gone in
+>  * the patches at the end to convert qemu-trace-stap and
+>    virtfs-proxy-helper are new
+>  * new patch at the start of the series which fixes a
+>    bug in our makefiles where we could try to invoke
+>    Sphinx twice in parallel on the same doctree (which
+>    causes it to crash, as well as being unnecessary work)
+>  * fixed the import line for ExtensionError, so this
+>    should now work with Sphinx 1.8
+>
+> I've assigned manpages to interop/ or system/ according
+> to the structure set out in the wiki page above. We should
+> have a discussion about whether some of these should go
+> in a new tools/ manual or not (I'll start a separate
+> thread for that), but it's easy enough to move them
+> later if we need to.
+>
+> The general approach follows the outline in the email I
+> sent the other day:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg03786.html
+>
+> The new Sphinx extension implements the hxtool-doc::
+> directive, which indicates where the assembled rST
+> document fragments should be inserted into the manual.
+> qemu-img-cmds.hx doesn't use the DEFHEADING or ARCHHEADING
+> directives, but the extension implements them (tested
+> with some local modifications to the .hx file to check
+> that they do the right thing).
+>
+> As noted in the commit message for the qemu-img.texi conversion,
+> I have not attempted to tackle any of the muddle in the
+> current documentation structure or the repetition between
+> the manual document, the fragments in the .hx file and
+> the C code; this is a "simplest thing that works"
+> like-for-like conversion.
+>
+> Another deliberate omission is that I have not attempted
+> to get links between our various Sphinx manuals (system,
+> interop, etc) working yet, as this is not totally trivial
+> and the odd minor missed hyperlink doesn't seem to me
+> to be a deal-breaker.
+>
+> Sorry about the size of the main 'convert qemu-img'
+> patch, but it's unavoidable when converting a big
+> document between formats.
+>
+> thanks
+> -- PMM
+>
+> Peter Maydell (8):
+>   Makefile: Ensure we don't run Sphinx in parallel for manpages
+>   hxtool: Support SRST/ERST directives
+>   docs/sphinx: Add new hxtool Sphinx extension
+>   qemu-img-cmds.hx: Add rST documentation fragments
+>   qemu-img: Convert invocation documentation to rST
+>   qemu-img-cmds.hx: Remove texinfo document fragments
+>   scripts/qemu-trace-stap: Convert documentation to rST
+>   virtfs-proxy-helper: Convert documentation to rST
+>
+>  Makefile                             |  46 +-
+>  MAINTAINERS                          |   3 +
+>  docs/conf.py                         |   3 +-
+>  docs/interop/conf.py                 |   9 +-
+>  docs/interop/index.rst               |   3 +
+>  docs/interop/qemu-img.rst            | 822 +++++++++++++++++++++++++++
+>  docs/interop/qemu-trace-stap.rst     | 124 ++++
+>  docs/interop/virtfs-proxy-helper.rst |  72 +++
+>  docs/sphinx/hxtool.py                | 210 +++++++
+>  fsdev/virtfs-proxy-helper.texi       |  63 --
+>  qemu-doc.texi                        |  10 +-
+>  qemu-img-cmds.hx                     |  99 ++--
+>  qemu-img.texi                        | 795 --------------------------
+>  rules.mak                            |  36 ++
+>  scripts/hxtool                       |  33 +-
+>  scripts/qemu-trace-stap.texi         | 140 -----
+>  16 files changed, 1383 insertions(+), 1085 deletions(-)
+>  create mode 100644 docs/interop/qemu-img.rst
+>  create mode 100644 docs/interop/qemu-trace-stap.rst
+>  create mode 100644 docs/interop/virtfs-proxy-helper.rst
+>  create mode 100644 docs/sphinx/hxtool.py
+>  delete mode 100644 fsdev/virtfs-proxy-helper.texi
+>  delete mode 100644 qemu-img.texi
+>  delete mode 100644 scripts/qemu-trace-stap.texi
+>
+> --
+> 2.20.1
 
