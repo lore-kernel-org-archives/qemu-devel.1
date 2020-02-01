@@ -2,86 +2,70 @@ Return-Path: <SRS0=CCzH=3V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C04C33C9E
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 13:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9833FC33CB3
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 16:02:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 872E4206E3
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 13:40:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="iZsdTaCp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872E4206E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 6B27D205F4
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 16:02:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B27D205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixt0j-00034v-Lz
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 08:40:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43164)
+	id 1ixvEI-000122-KQ
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 11:02:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55476)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1ixszs-00022R-P3
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:39:41 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixvDb-0000Y7-RV
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 11:02:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1ixszr-0004H0-5F
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:39:40 -0500
-Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:40460)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixvDa-0006Cg-3z
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 11:01:59 -0500
+Received: from mail-yw1-f65.google.com ([209.85.161.65]:39096)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ixszq-0004D8-ND
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:39:39 -0500
-Received: by mail-pg1-x530.google.com with SMTP id k25so5150245pgt.7
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 05:39:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=to:cc:from:subject:message-id:date:user-agent:mime-version
- :content-language:content-transfer-encoding;
- bh=rABcoo/u0/TOWZt1uTwTlTwdq2LCrEHeDYt9JzK+Fcs=;
- b=iZsdTaCp7Ejz7d2+4B6UQypSjnZSVm1n8KYLps3H2lElmAZub8ZZ3aVzCZ/pz/R8Is
- /MKrZCf3mESl8t7w7GVoc7hwBAZwyjrceJ22xdc1fyQEDK7cEfUm5BsJNyoHB7ey7YPR
- d+QBWgp4yJl7pgEnsaqe+kiFaYySz+t1nGbxT9inFkE8lXM6B501NS7u6uJzK95tot+1
- SuXRiJOR0/cSgI2Ctp2zanu3OtvRPWv7EQDolGmliMe1eg5FmkChL4xlvuEC9OkFih82
- SCh6rYchduMkIDNw5pYu/CaaM2Cvh8EmdIV3yfoMifZmzw9BUyeE1c8mOdv56wHH9SY6
- Z7aw==
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ixvDZ-0006BA-VN; Sat, 01 Feb 2020 11:01:58 -0500
+Received: by mail-yw1-f65.google.com with SMTP id h126so8186485ywc.6;
+ Sat, 01 Feb 2020 08:01:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
- :mime-version:content-language:content-transfer-encoding;
- bh=rABcoo/u0/TOWZt1uTwTlTwdq2LCrEHeDYt9JzK+Fcs=;
- b=oLqsjwjW5apRwzhLgE6iPqjqXJoNGde2GcxurCMFBjjSrc/Fp946IPV6qCJOfbS7SM
- 1RTvdYm0hRr7QZp0wm68IhEa5PZqgvZgizUtRfbCbG5AQ9zeT+f7KZMfygFPp3yDbwce
- N0VWICxshU/RrP1xLuYAbVy4VjbXoal61IiAM7IDe6CE4DiDGF3vz4JDz23XiQ1F/FEi
- 6ZosV2NirqPysKpsQ5GRvaoRQ5J30JDM5f5RJi2Say2YA9oN2uT4ZpLgIZxkzS8QmD2e
- IE9p4DG/Avqo8mpaR8rIWG+ATVJAZW9i2hCqpgM1Nmd8DY3GkqkjJ92OtPTHRTdNMMYt
- fgEQ==
-X-Gm-Message-State: APjAAAUgjgREv23uKHxNBrayfAibRHcpr3Z1OkNlSolUEaoEqrYhgN6U
- ZEkvwgCt47iG7n4FTxq3T6D82Q==
-X-Google-Smtp-Source: APXvYqz1DjZzbkIDxu6l1KRHAeo6yqmGJQ7gg7hKZTohg6S3pqpJCrVvJMJfjoTeg2wKlsDGbCh2kA==
-X-Received: by 2002:aa7:94a4:: with SMTP id a4mr15464762pfl.178.1580564376752; 
- Sat, 01 Feb 2020 05:39:36 -0800 (PST)
-Received: from [192.168.10.86] (ppp121-45-221-81.bras1.cbr2.internode.on.net.
- [121.45.221.81])
- by smtp.gmail.com with ESMTPSA id z4sm14234349pfn.42.2020.02.01.05.39.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 01 Feb 2020 05:39:36 -0800 (PST)
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: VW ELF loader
-Message-ID: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
-Date: Sun, 2 Feb 2020 00:39:32 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=RUhkBX5ugvtgVEtwfFT3sOmjFQyA3qnVa2rfRvw9MpU=;
+ b=ioQQdZXqaIa3eGJMOtRnfFl6avAPA1mAfToUQt+CVSL9jpt3man9yw0v2iMakJDmPw
+ s//Lgt/MKEF983byxDMcSkF3ZFY8CbzhOtMvOi7hrbuQIBKaysLzbFpf4C6MUza7l/gG
+ 96f9Sh+bZnOpbM/X3MtDWMnLNI0aNW+wfpykKEmezEnEHCeC7iGHJoBPOswnuknwlXJk
+ xoJIYsclcpoG/dl1BsY6golChY2dcJmNFlOkBJUwh9Z3rVbY8F5fLezp6WcucW0WHLtd
+ v7BVThY9SUKrEJFuH+uKzRlutR/h8kn83YRrXKWj0ia0FFW7B5602t9hCQDBLtuzKpti
+ 0/ig==
+X-Gm-Message-State: APjAAAUQfAqRtO1lyeZD7ov3f90KepyYUp1MptGe931kRQpimioq/Dn8
+ dhDyUfdR56W1q1w6BteFaVIBPdsJDILdqWmleZ4=
+X-Google-Smtp-Source: APXvYqw33MKxszIP5RTyPm49ZZ4Gbed52UtTWx0qnXg59c8jOSIliC0ulTKCJAJshLQhH/qtwi3R3Iez6OQg/l92FM4=
+X-Received: by 2002:a81:3ad0:: with SMTP id h199mr11427186ywa.37.1580572916034; 
+ Sat, 01 Feb 2020 08:01:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::530
+References: <20190620200840.17655-1-ptoscano@redhat.com>
+ <8f91b94b-8ba3-8aed-f2fb-aacdbc35cfd9@redhat.com>
+In-Reply-To: <8f91b94b-8ba3-8aed-f2fb-aacdbc35cfd9@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 1 Feb 2020 17:01:44 +0100
+Message-ID: <CAAdtpL7p+BG=O8b4+fjAhGO4y-ongpcYX0N5gcLDSYq8q9z2Rg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v11] ssh: switch from libssh2 to libssh
+To: Pino Toscano <ptoscano@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.161.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,43 +77,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Stefan Weil <sw@weilnetz.de>, "Richard W . M . Jones" <rjones@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi!
+ On Thu, Jun 20, 2019 at 10:36 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+> On 6/20/19 10:08 PM, Pino Toscano wrote:
+> > Rewrite the implementation of the ssh block driver to use libssh instea=
+d
+> > of libssh2.  The libssh library has various advantages over libssh2:
+> > - easier API for authentication (for example for using ssh-agent)
+> > - easier API for known_hosts handling
+> > - supports newer types of keys in known_hosts
+> >
+> > Use APIs/features available in libssh 0.8 conditionally, to support
+> > older versions (which are not recommended though).
+> >
+> > Adjust the iotest 207 according to the different error message, and to
+> > find the default key type for localhost (to properly compare the
+> > fingerprint with).
+> > Contributed-by: Max Reitz <mreitz@redhat.com>
+> >
+> > Adjust the various Docker/Travis scripts to use libssh when available
+> > instead of libssh2. The mingw/mxe testing is dropped for now, as there
+> > are no packages for it.
+> >
+> > Signed-off-by: Pino Toscano <ptoscano@redhat.com>
+> > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> > ---
+> >
+> > Changes from v10:
+> > - improve error message for key mismatch
+> > - integrate Max Reitz' fix to iotest 207 to detect the key type used by
+> >   localhost
+> >
+> > Changes from v9:
+> > - restored "default" case in the server status switch for libssh < 0.8.=
+0
+> > - print the host key type & fingerprint on mismatch with known_hosts
+> > - improve/fix message for failed socket_set_nodelay()
+> > - reset s->sock properly
+> >
+> > Changes from v8:
+> > - use a newer key type in iotest 207
+> > - improve the commit message
+> >
+> > Changes from v7:
+> > - #if HAVE_LIBSSH_0_8 -> #ifdef HAVE_LIBSSH_0_8
+> > - ptrdiff_t -> size_t
+> >
+> > Changes from v6:
+> > - fixed few checkpatch style issues
+> > - detect libssh 0.8 via symbol detection
+> > - adjust travis/docker test material
+> > - remove dead "default" case in a switch
+> > - use variables for storing MIN() results
+> > - adapt a documentation bit
+> >
+> > Changes from v5:
+> > - adapt to newer tracing APIs
+> > - disable ssh compression (mimic what libssh2 does by default)
+> > - use build time checks for libssh 0.8, and use newer APIs directly
+> >
+> > Changes from v4:
+> > - fix wrong usages of error_setg/session_error_setg/sftp_error_setg
+> > - fix few return code checks
+> > - remove now-unused parameters in few internal functions
+> > - allow authentication with "none" method
+> > - switch to unsigned int for the port number
+> > - enable TCP_NODELAY on the socket
+> > - fix one reference error message in iotest 207
+> >
+> > Changes from v3:
+> > - fix socket cleanup in connect_to_ssh()
+> > - add comments about the socket cleanup
+> > - improve the error reporting (closer to what was with libssh2)
+> > - improve EOF detection on sftp_read()
+> >
+> > Changes from v2:
+> > - used again an own fd
+> > - fixed co_yield() implementation
+> >
+> > Changes from v1:
+> > - fixed jumbo packets writing
+> > - fixed missing 'err' assignment
+> > - fixed commit message
+> >
+> >  .travis.yml                                   |   4 +-
+> >  block/Makefile.objs                           |   6 +-
+> >  block/ssh.c                                   | 669 ++++++++++--------
+> >  block/trace-events                            |  14 +-
+> >  configure                                     |  65 +-
+> >  docs/qemu-block-drivers.texi                  |   2 +-
+> >  .../dockerfiles/debian-win32-cross.docker     |   1 -
+> >  .../dockerfiles/debian-win64-cross.docker     |   1 -
+> >  tests/docker/dockerfiles/fedora.docker        |   4 +-
+> >  tests/docker/dockerfiles/ubuntu.docker        |   2 +-
+> >  tests/docker/dockerfiles/ubuntu1804.docker    |   2 +-
+> >  tests/qemu-iotests/207                        |  54 +-
+> >  tests/qemu-iotests/207.out                    |   2 +-
+> >  13 files changed, 468 insertions(+), 358 deletions(-)
+> >
+[...]
+> > diff --git a/configure b/configure
+> > index b091b82cb3..5c7914570e 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -472,7 +472,7 @@ auth_pam=3D""
+> >  vte=3D""
+> >  virglrenderer=3D""
+> >  tpm=3D""
+> > -libssh2=3D""
+> > +libssh=3D""
+> >  live_block_migration=3D"yes"
+> >  numa=3D""
+> >  tcmalloc=3D"no"
+> > @@ -1439,9 +1439,9 @@ for opt do
+> >    ;;
+> >    --enable-tpm) tpm=3D"yes"
+> >    ;;
+> > -  --disable-libssh2) libssh2=3D"no"
 
-In my effort to "kill SLOF" (the PPC pseries guest firmware), I proceeded to the stage when QEMU needs to load GRUB from 
-the disk. The current workaround is to read it from qcow2, save in a file and then call load_elf(). Not nice.
+Now than I'm bisecting over this commit, I realize removing this
+option was not a good idea, we should have done like commit
+cb6414dfec8 or 315d3184525:
 
-2 problems with that.
+  @@ -886,10 +885,6 @@ for opt do
+  -  --disable-uuid) uuid=3D"no"
+  -  ;;
+  -  --enable-uuid) uuid=3D"yes"
+  -  ;;
+  ...
+  +  --enable-uuid|--disable-uuid)
+  +      echo "$0: $opt is obsolete, UUID support is always built" >&2
+  +  ;;
 
-1. when load_elf calls address_space_write() - I need to know where and how much RAM was used to mark this memory "used" 
-for the OF client interface (/memory@0/available FDT property). So I'll need "preload()" hook.
-
-2. (bigger) GRUB comes from PReP partition which is 8MB. load_elf{32|64} consumes filename, not a memory pointer nor a 
-"read_fn" callback - so I thought I need a "read_fn" callback.
-
-And then I discovered that load_elf actually maps the passed file. And here I got lost.
-
-Why does not load_elf just map the entire file and parse the bits? It still reads chunks with seek+read and then it maps 
-the file in a loop potentially multiple times - is this even correct? Passing "fd" around is weird.
-
-Why ROMs are different from "-kernel"?
-
-If I want to solve 1 and 2 of my problem, should I just cut-n-paste load_elf and tweak bits rather then add more 
-parameters to already 15-parameters long prototypes?
-Or I could read GRUB from qcow2 into the memory and change the rest to parse ELF from memory (mapped from a ELF file or 
-read from qcow2)?
-
-
-Thanks,
-
-ps. VW == very weird, indeed :)
-
--- 
-Alexey
+> > +  --disable-libssh) libssh=3D"no"
+> >    ;;
+> > -  --enable-libssh2) libssh2=3D"yes"
+> > +  --enable-libssh) libssh=3D"yes"
+> >    ;;
+> >    --disable-live-block-migration) live_block_migration=3D"no"
+> >    ;;
+> > @@ -1810,7 +1810,7 @@ disabled with --disable-FEATURE, default is enabl=
+ed if available:
+> >    coroutine-pool  coroutine freelist (better performance)
+> >    glusterfs       GlusterFS backend
+> >    tpm             TPM support
+> > -  libssh2         ssh block device support
+> > +  libssh          ssh block device support
+> >    numa            libnuma support
+> >    libxml2         for Parallels image format
+> >    tcmalloc        tcmalloc support
+> > @@ -3914,43 +3914,34 @@ EOF
+> >  fi
+> >
+> >  ##########################################
+> > -# libssh2 probe
+> > -min_libssh2_version=3D1.2.8
+> > -if test "$libssh2" !=3D "no" ; then
+> > -  if $pkg_config --atleast-version=3D$min_libssh2_version libssh2; the=
+n
+> > -    libssh2_cflags=3D$($pkg_config libssh2 --cflags)
+> > -    libssh2_libs=3D$($pkg_config libssh2 --libs)
+> > -    libssh2=3Dyes
+> > +# libssh probe
+> > +if test "$libssh" !=3D "no" ; then
+> > +  if $pkg_config --exists libssh; then
+> > +    libssh_cflags=3D$($pkg_config libssh --cflags)
+> > +    libssh_libs=3D$($pkg_config libssh --libs)
+> > +    libssh=3Dyes
+> >    else
+> > -    if test "$libssh2" =3D "yes" ; then
+> > -      error_exit "libssh2 >=3D $min_libssh2_version required for --ena=
+ble-libssh2"
+> > +    if test "$libssh" =3D "yes" ; then
+> > +      error_exit "libssh required for --enable-libssh"
+> >      fi
+> > -    libssh2=3Dno
+> > +    libssh=3Dno
+> >    fi
+> >  fi
+> >
+> >  ##########################################
+> > -# libssh2_sftp_fsync probe
+> > +# Check for libssh 0.8
+> > +# This is done like this instead of using the LIBSSH_VERSION_* and
+> > +# SSH_VERSION_* macros because some distributions in the past shipped
+> > +# snapshots of the future 0.8 from Git, and those snapshots did not
+> > +# have updated version numbers (still referring to 0.7.0).
+> >
+> > -if test "$libssh2" =3D "yes"; then
+> > +if test "$libssh" =3D "yes"; then
+> >    cat > $TMPC <<EOF
+> > -#include <stdio.h>
+> > -#include <libssh2.h>
+> > -#include <libssh2_sftp.h>
+> > -int main(void) {
+> > -    LIBSSH2_SESSION *session;
+> > -    LIBSSH2_SFTP *sftp;
+> > -    LIBSSH2_SFTP_HANDLE *sftp_handle;
+> > -    session =3D libssh2_session_init ();
+> > -    sftp =3D libssh2_sftp_init (session);
+> > -    sftp_handle =3D libssh2_sftp_open (sftp, "/", 0, 0);
+> > -    libssh2_sftp_fsync (sftp_handle);
+> > -    return 0;
+> > -}
+> > +#include <libssh/libssh.h>
+> > +int main(void) { return ssh_get_server_publickey(NULL, NULL); }
+> >  EOF
+> > -  # libssh2_cflags/libssh2_libs defined in previous test.
+> > -  if compile_prog "$libssh2_cflags" "$libssh2_libs" ; then
+> > -    QEMU_CFLAGS=3D"-DHAS_LIBSSH2_SFTP_FSYNC $QEMU_CFLAGS"
+> > +  if compile_prog "$libssh_cflags" "$libssh_libs"; then
+> > +    libssh_cflags=3D"-DHAVE_LIBSSH_0_8 $libssh_cflags"
+> >    fi
+> >  fi
+> >
+> > @@ -6451,7 +6442,7 @@ echo "GlusterFS support $glusterfs"
+> >  echo "gcov              $gcov_tool"
+> >  echo "gcov enabled      $gcov"
+> >  echo "TPM support       $tpm"
+> > -echo "libssh2 support   $libssh2"
+> > +echo "libssh support    $libssh"
+> >  echo "QOM debugging     $qom_cast_debug"
+> >  echo "Live block migration $live_block_migration"
+> >  echo "lzo support       $lzo"
+> > @@ -7144,10 +7135,10 @@ if test "$glusterfs_iocb_has_stat" =3D "yes" ; =
+then
+> >    echo "CONFIG_GLUSTERFS_IOCB_HAS_STAT=3Dy" >> $config_host_mak
+> >  fi
+> >
+> > -if test "$libssh2" =3D "yes" ; then
+> > -  echo "CONFIG_LIBSSH2=3Dm" >> $config_host_mak
+> > -  echo "LIBSSH2_CFLAGS=3D$libssh2_cflags" >> $config_host_mak
+> > -  echo "LIBSSH2_LIBS=3D$libssh2_libs" >> $config_host_mak
+> > +if test "$libssh" =3D "yes" ; then
+> > +  echo "CONFIG_LIBSSH=3Dm" >> $config_host_mak
+> > +  echo "LIBSSH_CFLAGS=3D$libssh_cflags" >> $config_host_mak
+> > +  echo "LIBSSH_LIBS=3D$libssh_libs" >> $config_host_mak
+> >  fi
+> >
+> >  if test "$live_block_migration" =3D "yes" ; then
+[...]
 
