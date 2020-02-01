@@ -2,81 +2,120 @@ Return-Path: <SRS0=CCzH=3V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D3CC33CB3
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 21:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CAC7C35249
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 22:08:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2194F205F4
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 21:17:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0F8320643
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 22:08:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJW+zhNz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2194F205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S5ilEkQ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F8320643
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iy08t-000598-8R
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 16:17:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54720)
+	id 1iy0wR-0003gd-2b
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 17:08:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iy07X-0004Sq-SC
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 16:16:07 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iy0vY-000301-Ls
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 17:07:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iy07R-00051L-UM
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 16:16:03 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:35899)
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iy0vT-0006Ys-1T
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 17:07:44 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37709)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1iy07R-00050E-JU; Sat, 01 Feb 2020 16:15:57 -0500
-Received: by mail-io1-xd42.google.com with SMTP id d15so12379769iog.3;
- Sat, 01 Feb 2020 13:15:57 -0800 (PST)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iy0vS-0006YQ-Hq
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 17:07:38 -0500
+Received: by mail-wr1-x441.google.com with SMTP id w15so12993423wru.4
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 14:07:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8CrTI1x28AEnv7nsdh425qbQwcCSbX9hpSA2ziORwS8=;
- b=iJW+zhNzH9Nri7ryl5PRVN2WHEnCJfAguSZ2i6A/v+yHN7+IXEEOl9C0vABDt9x/HP
- B5hMOkFyrVPKJ8Xj17Cb0UuRdRis361HsxL3vrcybmYNnX0e9e5yPfacOklfXXSKD5HV
- weBR8/EmRQe2B1d3Jbpa8LOWDG3Nm4rfzJGI98+n78NW6lBovsDB9Bvl7ciGyfNeFZod
- EMPrLt1VarjA9eKOBejCVA1Q8H0EGnhx6oR+MuODbKEt2Sm+NpiLX3wmk5W+RBOCVaEa
- Yrd9KF9DHTdlDAcZYTHfYvuhZZfrQphgyumzCTwIfsqW5hk+Vlbx7xzMyejcSfrtuTet
- 85gQ==
+ h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=F1kdGlmCkfxxIqfZcIv8K5LTOE3qH2kFOYxR4dBBUvI=;
+ b=S5ilEkQ+JXQXblz+KoAQX0ZxRbcAwlqYLixeRsRUAeQoKJsCNkpU25sKoKRMJJYKC3
+ DaSn58xKbDjhesXBnkDJC6OMf7JQTxuYWS3Aipni2Tcl/+C/uvucHCSJUru/jNrZGgbX
+ WeLP5Yb2mn8D3gjVvB+bg7fkA7rT32nIgePquNh9R22KbUrzXbWHarYW0ORS2cifOKHj
+ iVHrwFVtV8ZNmZk4kkmQVW+x/xcXH+4Ij6vJtMdZOIoBkvD/1+J+nhFgUQbOOaNx44jk
+ QF+g9MGjJKSJsmm8Tge3roLd2tQWZLRhNjDqUTHh5aV0twHKjPd8unmd5MJdjB2j0LCR
+ lUUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8CrTI1x28AEnv7nsdh425qbQwcCSbX9hpSA2ziORwS8=;
- b=pCe5cherB1ijKpR3uJOgG5DLmi1sedNu8JWIYdfTKdflKaZMHGJbovbVaiDfWuqsIj
- /t+9nlI/AkJ+Kgsu3vM2kvwo75iBmvjoTS4lv0XTpqWVnTLxvke8Nm3R+myUnvCkUdG/
- qKCAPJ968wsHTjC7YmcAWA8HR8EZ071LMjirfJMa92pDLLbfFiboRJOd8me8i6g/1yX1
- hwKigH0k9ZcEjRr3Xjau++34fPbOffyigLGH45uQAQimfLqhAhizXE4sAVyccpCzUgoC
- DCR2C840oAxJa9XMYlh22aSen1SqiCTbpGazJmp24Qij85ZNjYQRBhbmTRnZvJJSIKV4
- MsHw==
-X-Gm-Message-State: APjAAAXUyJPs075RKx+sIDOj8dtYTqp5hnYsp1Z1D/+G4FF23dVF33jX
- fGCkTioFwz/IrarPavTwqgoDlheYVcuWw/W6ybI=
-X-Google-Smtp-Source: APXvYqwocmNVt9095e7yoUJVglyUPD5yWxh6X/RKjJzy5jQOBy8HwUcCNXrAGXzYPv8Nl0I3e1tpb22dhHJUevLhtkg=
-X-Received: by 2002:a6b:7902:: with SMTP id i2mr12791358iop.67.1580591756357; 
- Sat, 01 Feb 2020 13:15:56 -0800 (PST)
+ h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=F1kdGlmCkfxxIqfZcIv8K5LTOE3qH2kFOYxR4dBBUvI=;
+ b=pFhZLgIcNAKa4JLeVe+nKLUs1F2rjBAOvx344UNUoQsWWLz1Z2a44TE5tzRDbs35mU
+ U7oFDP2MDGmf19cxJDaIY/NUbkcsswF537Gekdn4Bht64LxoVets0wtB8C0wr2QtN+fj
+ DW3e3QzU66RWHbiFeO7dCnpDbOSeEKo7WEDZkBHI3ukOLqg1VRz2tbQEWAw4AlaqO+Ld
+ v51Z7rfEFqEyKafXZqCm7J48UWfpFYPoZIFBA/JSpMlQqqhLfmOchgEvvOAttiWE7WjW
+ n5vW345H394YGEgxJCSSvWj3GMsHAiP2lQPpuOQ0EdN/yvBYRH3uEX9erF2kO1+PG3sZ
+ +3RA==
+X-Gm-Message-State: APjAAAWQxC8e/MFWefs6Ca2jHYj+kwp8F9JT72xmjoo1qL2QBsiKnmGh
+ KgTq9myTjS0vOx90lFpF+rU=
+X-Google-Smtp-Source: APXvYqxMg09GdhmAHxw4i9cSR5qtrYD0re/lrQ/IODxrKrM25xSgwaWjAYQksqbnNy2T5IDjqC1y6Q==
+X-Received: by 2002:adf:f0cb:: with SMTP id x11mr6073745wro.421.1580594856205; 
+ Sat, 01 Feb 2020 14:07:36 -0800 (PST)
+Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
+ [83.52.55.162])
+ by smtp.gmail.com with ESMTPSA id x6sm16331219wmi.44.2020.02.01.14.07.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 01 Feb 2020 14:07:35 -0800 (PST)
+Subject: Re: [PULL 32/41] target/mips: Use cpu_*_mmuidx_ra instead of
+ MMU_MODE*_SUFFIX
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200108034523.17349-1-richard.henderson@linaro.org>
+ <20200108034523.17349-33-richard.henderson@linaro.org>
+ <7c714bf4-2e5c-c17b-5a06-72d63e06d3a4@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <51ba939f-b90f-0413-aa37-4af427bb63e3@amsat.org>
+Date: Sat, 1 Feb 2020 23:07:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
- <20200119005102.3847-4-nieklinnenbank@gmail.com>
- <61914945-ab68-b47b-9d8d-3ed78c93640c@redhat.com>
-In-Reply-To: <61914945-ab68-b47b-9d8d-3ed78c93640c@redhat.com>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Sat, 1 Feb 2020 22:15:45 +0100
-Message-ID: <CAPan3Wr-tswXP3esO70mcNjHJrbfjKL47BVRhK_K4XzZ68W5sg@mail.gmail.com>
-Subject: Re: [PATCH v4 03/20] hw/arm/allwinner-h3: add Clock Control Unit
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000002c33e9059d8a324f"
+In-Reply-To: <7c714bf4-2e5c-c17b-5a06-72d63e06d3a4@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,1162 +127,1182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, jasowang@redhat.com,
- QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- imammedo@redhat.com, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002c33e9059d8a324f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 2/1/20 9:12 PM, Philippe Mathieu-Daudé wrote:
+> Hi Richard,
+> 
+> On 1/8/20 4:45 AM, Richard Henderson wrote:
+>> The separate suffixed functions were used to construct
+>> some do_##insn function switched on mmu_idx.  The interface
+>> is exactly identical to the *_mmuidx_ra functions.  Replace
+>> them directly and remove the constructions.
+>>
+>> Cc: Aurelien Jarno <aurelien@aurel32.net>
+>> Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+>> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> I'm seeing a regression since commit 7dd547e5a (however I'm not sure
+> this particular commit introduced the regression, or instead revealed it).
+> 
+> I get a hang when booting a I6400 CPU on Malta:
+> 
+> $ qemu-system-mips64el -cpu I6400 -serial stdio \
+>   -kernel vmlinux \
+>   -append "clocksource=GIC console=ttyS0 printk.time=1"
 
-Hi Philippe,
+FYI this binary was built using:
 
-On Sun, Jan 19, 2020 at 7:34 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
+  ./configure --target-list=mips64el-softmmu --disable-xen
+--disable-spice --disable-vnc --disable-rdma --disable-vde --disable-rbd
+--disable-smartcard --disable-libusb --disable-glusterfs --disable-tpm
+--disable-vhdx --disable-tools --disable-guest-agent --disable-docs
+--disable-vhost-vsock --extra-cflags='-Wno-format-truncation
+-Wno-stringop-truncation -Wno-address-of-packed-member'
 
-> On 1/19/20 1:50 AM, Niek Linnenbank wrote:
-> > The Clock Control Unit is responsible for clock signal generation,
-> > configuration and distribution in the Allwinner H3 System on Chip.
-> > This commit adds support for the Clock Control Unit which emulates
-> > a simple read/write register interface.
-> >
-> > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-> > ---
-> >   include/hw/arm/allwinner-h3.h      |   3 +
-> >   include/hw/misc/allwinner-h3-ccu.h |  66 ++++++++
-> >   hw/arm/allwinner-h3.c              |   9 +-
-> >   hw/misc/allwinner-h3-ccu.c         | 243 ++++++++++++++++++++++++++++=
-+
-> >   hw/misc/Makefile.objs              |   1 +
-> >   5 files changed, 321 insertions(+), 1 deletion(-)
-> >   create mode 100644 include/hw/misc/allwinner-h3-ccu.h
-> >   create mode 100644 hw/misc/allwinner-h3-ccu.c
-> >
-> > diff --git a/include/hw/arm/allwinner-h3.h
-> b/include/hw/arm/allwinner-h3.h
-> > index 2aac9b78ec..abdc20871a 100644
-> > --- a/include/hw/arm/allwinner-h3.h
-> > +++ b/include/hw/arm/allwinner-h3.h
-> > @@ -39,6 +39,7 @@
-> >   #include "hw/arm/boot.h"
-> >   #include "hw/timer/allwinner-a10-pit.h"
-> >   #include "hw/intc/arm_gic.h"
-> > +#include "hw/misc/allwinner-h3-ccu.h"
-> >   #include "target/arm/cpu.h"
-> >
-> >   /**
-> > @@ -55,6 +56,7 @@ enum {
-> >       AW_H3_SRAM_A1,
-> >       AW_H3_SRAM_A2,
-> >       AW_H3_SRAM_C,
-> > +    AW_H3_CCU,
-> >       AW_H3_PIT,
-> >       AW_H3_UART0,
-> >       AW_H3_UART1,
-> > @@ -97,6 +99,7 @@ typedef struct AwH3State {
-> >       ARMCPU cpus[AW_H3_NUM_CPUS];
-> >       const hwaddr *memmap;
-> >       AwA10PITState timer;
-> > +    AwH3ClockCtlState ccu;
-> >       GICState gic;
-> >       MemoryRegion sram_a1;
-> >       MemoryRegion sram_a2;
-> > diff --git a/include/hw/misc/allwinner-h3-ccu.h
-> b/include/hw/misc/allwinner-h3-ccu.h
-> > new file mode 100644
-> > index 0000000000..9c8a887782
-> > --- /dev/null
-> > +++ b/include/hw/misc/allwinner-h3-ccu.h
-> > @@ -0,0 +1,66 @@
-> > +/*
-> > + * Allwinner H3 Clock Control Unit emulation
-> > + *
-> > + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-> > + *
-> > + * This program is free software: you can redistribute it and/or modif=
-y
-> > + * it under the terms of the GNU General Public License as published b=
-y
-> > + * the Free Software Foundation, either version 2 of the License, or
-> > + * (at your option) any later version.
-> > + *
-> > + * This program is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + * GNU General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License
-> > + * along with this program.  If not, see <http://www.gnu.org/licenses/
-> >.
-> > + */
-> > +
-> > +#ifndef HW_MISC_ALLWINNER_H3_CCU_H
-> > +#define HW_MISC_ALLWINNER_H3_CCU_H
-> > +
-> > +#include "qom/object.h"
-> > +#include "hw/sysbus.h"
-> > +
-> > +/**
-> > + * @name Constants
-> > + * @{
-> > + */
-> > +
-> > +/** Highest register address used by CCU device */
-> > +#define AW_H3_CCU_REGS_MAXADDR  (0x304)
->
-> There might be a migration issue if one day we see some firmware
-> accessing some undocumented register > 0x304 (you'd need to migrate more
-> than 0x304/4 registers, so increase allwinner_h3_ccu_vmstate.version_id.
->
-> I'd simply replace this definition by
->
->    #define AW_H3_CCU_IOSIZE 0x400
->
-> And see comment in write().
->
+> Linux version 4.7.0-rc1 (@859affe05464) (gcc version 6.3.0 20170516
+> (Debian 6.3.0-18) ) #2 SMP Sat Feb 1 18:16:17 UTC 2020
+> GCRs appear to have been moved (expected them at 0x1fbf8000)!
+> earlycon: uart8250 at I/O port 0x3f8 (options '38400n8')
+> bootconsole [uart8250] enabled
+> MIPS CPS SMP unable to proceed without a CM
+> CPU0 revision is: 0001a900 (MIPS I6400)
+> FPU revision is: 20f30300
+> MSA revision is: 00000300
+> MIPS: machine is mti,malta
+> Software DMA cache coherency enabled
+> Determined physical RAM map:
+>  memory: 0000000008000000 @ 0000000000000000 (usable)
+> Zone ranges:
+>   DMA      [mem 0x0000000000000000-0x0000000000ffffff]
+>   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+>   Normal   empty
+> Movable zone start for each node
+> Early memory node ranges
+>   node   0: [mem 0x0000000000000000-0x0000000007ffffff]
+> Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+> Primary instruction cache 64kB, VIPT, 4-way, linesize 64 bytes.
+> Primary data cache 64kB, 4-way, VIPT, no aliases, linesize 64 bytes
+> percpu: Embedded 5 pages/cpu @980000000107c000 s29664 r8192 d44064 u81920
+> Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 8163
+> Kernel command line: clocksource=GIC console=ttyS0 printk.time=1
+> [    0.000000] PID hash table entries: 512 (order: -2, 4096 bytes)
+> [    0.000000] Dentry cache hash table entries: 16384 (order: 3, 131072
+> bytes)
+> [    0.000000] Inode-cache hash table entries: 8192 (order: 2, 65536 bytes)
+> [    0.000000] Writing ErrCtl register=00000000
+> [    0.000000] Readback ErrCtl register=00000000
+> [    0.000000] MAAR configuration:
+> [    0.000000]   [0]: 0x0000000000010000-0x0000000007ffffff speculate
+> [    0.000000]   [1]: disabled
+> [    0.000000]   [2]: disabled
+> [    0.000000]   [3]: disabled
+> [    0.000000]   [4]: disabled
+> [    0.000000]   [5]: disabled
+> [    0.000000]   [6]: disabled
+> [    0.000000]   [7]: disabled
+> [    0.000000] Memory: 121728K/131072K available (5253K kernel code,
+> 380K rwdata, 1276K rodata, 304K init, 278K bss, 9344K reserved, 0K
+> cma-reserved)
+> [    0.000000] Hierarchical RCU implementation.
+> [    0.000000]  Build-time adjustment of leaf fanout to 64.
+> [    0.000000]  RCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=1.
+> [    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=64, nr_cpu_ids=1
+> [    0.000000] NR_IRQS:256
+> [    0.000000] CPU frequency 200.00 MHz
+> [    0.000000] clocksource: MIPS: mask: 0xffffffff max_cycles:
+> 0xffffffff, max_idle_ns: 19112598155 ns
+> [    0.000223] sched_clock: 32 bits at 100MHz, resolution 9ns, wraps
+> every 21474829307ns
+> [    0.008011] Console: colour dummy device 80x25
+> [    0.012181] Calibrating delay loop... 950.27 BogoMIPS (lpj=4751360)
+> [    0.164015] pid_max: default: 32768 minimum: 301
+> [    0.165920] Mount-cache hash table entries: 2048 (order: 0, 16384 bytes)
+> [    0.166244] Mountpoint-cache hash table entries: 2048 (order: 0,
+> 16384 bytes)
+> [    0.202498] Brought up 1 CPUs
+> [    0.213199] devtmpfs: initialized
+> [    0.228877] clocksource: jiffies: mask: 0xffffffff max_cycles:
+> 0xffffffff, max_idle_ns: 19112604462750000 ns
+> [    0.236181] NET: Registered protocol family 16
+> [    0.253496] clocksource: pit: mask: 0xffffffff max_cycles:
+> 0xffffffff, max_idle_ns: 1601818034827 ns
+> [    0.254012] pm-cps: no CM, non-coherent states unavailable
+> [    0.257508] ------------[ cut here ]------------
+> [    0.258085] WARNING: CPU: 0 PID: 1 at fs/kernfs/dir.c:502
+> __kernfs_remove+0x250/0x258
+> [    0.258489] Modules linked in:
+> [   21.494186] INFO: rcu_sched detected stalls on CPUs/tasks:
+> [   21.494530]  (detected by 0, t=2102 jiffies, g=-299, c=-300, q=1)
+> [   21.494921] All QSes seen, last rcu_sched kthread activity 2101
+> (4294939419-4294937318), jiffies_till_next_fqs=1, root ->qsmask 0x0
+> [   21.495583] swapper/0       R  running task        0     1      0
+> 0x00100004
+> [   21.496028] Stack : 000000000000001d 0000000000000004
+> ffffffff80790000 ffffffff80820000
+>           0000000000000000 0000000000000000 000000000000001d
+> 0000000000000002
+>           ffffffff80820000 ffffffff80170c70 0000000000000000
+> 0000000000000000
+>           0000000000000000 ffffffff80822328 0000000000000001
+> ffffffff80822328
+>           9800000007052fc0 ffffffff80780000 ffffffff8078e340
+> ffffffff8078e340
+>           ffffffff80780000 ffffffff80780000 ffffffff80781010
+> ffffffff8078e540
+>           0000000000000000 0000000000000000 0000000000000000
+> 0000000000000000
+>           0000000000000000 98000000070577b0 0000000000000000
+> ffffffff80182a64
+>           0000000000000000 0000000000000000 0000000000100004
+> 9800000007052fc0
+>           ffffffff80780000 ffffffff8010c460 9800000001082f80
+> ffffffff80182a64
+>           ...
+> [   21.498954] Call Trace:
+> [   21.499132] [<ffffffff8010c460>] show_stack+0x80/0xa0
+> [   21.499520] [<ffffffff80182a64>] rcu_check_callbacks+0x804/0x810
+> [   21.499744] [<ffffffff80185360>] update_process_times+0x38/0x70
+> [   21.499981] [<ffffffff80193c34>] tick_handle_periodic+0x2c/0xa8
+> [   21.500215] [<ffffffff801114b4>] c0_compare_interrupt+0x74/0xb8
+> [   21.500451] [<ffffffff80172e18>] handle_irq_event_percpu+0x80/0x1a0
+> [   21.500707] [<ffffffff801775ac>] handle_percpu_irq+0x7c/0xb8
+> [   21.500935] [<ffffffff80172308>] generic_handle_irq+0x38/0x48
+> [   21.501176] [<ffffffff80108010>] do_IRQ+0x18/0x28
+> [   21.501369] [<ffffffff803746c4>] plat_irq_dispatch+0x64/0xa0
+> [   21.501606] [<ffffffff80106370>] ret_from_irq+0x0/0x4
+> [   21.501868] [<ffffffff8034573c>] dump_stack+0x6c/0xd0
+> [   21.502068] [<ffffffff8012d088>] __warn+0xf0/0x108
+> [   21.502268] [<ffffffff80269e78>] __kernfs_remove+0x250/0x258
+> [   21.502519] [<ffffffff8026ae38>] kernfs_remove_by_name_ns+0x48/0xb0
+> [   21.502771] [<ffffffff8026dc44>] remove_files.isra.0+0x44/0x98
+> [   21.503003] [<ffffffff8026e034>] sysfs_remove_group+0x4c/0xc0
+> [   21.503339] [<ffffffff807cbc18>] param_sysfs_init+0x178/0x1f0
+> [   21.503605] [<ffffffff80100564>] do_one_initcall+0x3c/0x148
+> [   21.503830] [<ffffffff807c4b38>] kernel_init_freeable+0x15c/0x210
+> [   21.504075] [<ffffffff80619cd0>] kernel_init+0x10/0xf8
+> [   21.504324] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+> [   21.504683]
+> [   21.504843] rcu_sched kthread starved for 2101 jiffies!
+> g18446744073709551317 c18446744073709551316 f0x2 RCU_GP_WAIT_FQS(3)
+> ->state=0x0
+> [   21.505320] rcu_sched       R  running task        0     7      2
+> 0x00100000
+> [   21.505639] Stack : ffffffff8078e5a8 ffffffffffff00fe
+> 000000000234fb95 0000000000000000
+>           0000000000000117 000000000005fcb4 00000000ffff8ae7
+> 980000000107e600
+>           980000000107e600 ffffffff80780000 ffffffff80781010
+> ffffffff80790000
+>           0000000000000000 0000000000000001 0000000000000003
+> ffffffff8061b2b4
+>           0000000000000000 ffffffff8061dbac 0000000000000200
+> 0000000000000000
+>           00000000ffff8ae7 ffffffff80183fa8 9800000007093000
+> ffffffff00000000
+>           0000000000000001 9800000001082f80 ffffffff8078e340
+> ffffffff8078e340
+>           ffffffff8078e5a0 ffffffff80780000 ffffffff80780000
+> ffffffff80181a98
+>           9800000007093000 9800000007097d58 9800000007097d58
+> 0000000000000000
+>           0000000000000001 ffffffff80180000 ffffffff8017f140
+> ffffffff806e0000
+>           ...
+> [   21.508301] Call Trace:
+> [   21.508413] [<ffffffff8061ae28>] __schedule+0x4c8/0x930
+> [   21.508668] [<ffffffff8061b2b4>] schedule+0x24/0x80
+> [   21.508892] [<ffffffff8061dbac>] schedule_timeout+0x11c/0x1e0
+> [   21.509121] [<ffffffff80181a98>] rcu_gp_kthread+0x510/0x948
+> [   21.509349] [<ffffffff8014a9c8>] kthread+0xc8/0xe0
+> [   21.509555] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+> [   21.509794]
+> ^C
+> qemu-system-mips64el.bad: terminating on signal 2
+> 
+> When using '-d in_asm' I see timer interrupts are delivered and handler
+> executed, before the rcu_sched detects the cpu stalling.
+> 
+> 
+> Console output from the previous commit (330edfcc):
+> 
+> Linux version 4.7.0-rc1 (@859affe05464) (gcc version 6.3.0 20170516
+> (Debian 6.3.0-18) ) #2 SMP Sat Feb 1 18:16:17 UTC 2020
+> GCRs appear to have been moved (expected them at 0x1fbf8000)!
+> earlycon: uart8250 at I/O port 0x3f8 (options '38400n8')
+> bootconsole [uart8250] enabled
+> MIPS CPS SMP unable to proceed without a CM
+> CPU0 revision is: 0001a900 (MIPS I6400)
+> FPU revision is: 20f30300
+> MSA revision is: 00000300
+> MIPS: machine is mti,malta
+> Software DMA cache coherency enabled
+> Determined physical RAM map:
+>  memory: 0000000008000000 @ 0000000000000000 (usable)
+> Zone ranges:
+>   DMA      [mem 0x0000000000000000-0x0000000000ffffff]
+>   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+>   Normal   empty
+> Movable zone start for each node
+> Early memory node ranges
+>   node   0: [mem 0x0000000000000000-0x0000000007ffffff]
+> Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+> Primary instruction cache 64kB, VIPT, 4-way, linesize 64 bytes.
+> Primary data cache 64kB, 4-way, VIPT, no aliases, linesize 64 bytes
+> percpu: Embedded 5 pages/cpu @980000000107c000 s29664 r8192 d44064 u81920
+> Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 8163
+> Kernel command line: clocksource=GIC console=ttyS0 printk.time=1
+> [    0.000000] PID hash table entries: 512 (order: -2, 4096 bytes)
+> [    0.000000] Dentry cache hash table entries: 16384 (order: 3, 131072
+> bytes)
+> [    0.000000] Inode-cache hash table entries: 8192 (order: 2, 65536 bytes)
+> [    0.000000] Writing ErrCtl register=00000000
+> [    0.000000] Readback ErrCtl register=00000000
+> [    0.000000] MAAR configuration:
+> [    0.000000]   [0]: 0x0000000000010000-0x0000000007ffffff speculate
+> [    0.000000]   [1]: disabled
+> [    0.000000]   [2]: disabled
+> [    0.000000]   [3]: disabled
+> [    0.000000]   [4]: disabled
+> [    0.000000]   [5]: disabled
+> [    0.000000]   [6]: disabled
+> [    0.000000]   [7]: disabled
+> [    0.000000] Memory: 121728K/131072K available (5253K kernel code,
+> 380K rwdata, 1276K rodata, 304K init, 278K bss, 9344K reserved, 0K
+> cma-reserved)
+> [    0.000000] Hierarchical RCU implementation.
+> [    0.000000]  Build-time adjustment of leaf fanout to 64.
+> [    0.000000]  RCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=1.
+> [    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=64, nr_cpu_ids=1
+> [    0.000000] NR_IRQS:256
+> [    0.000000] CPU frequency 200.00 MHz
+> [    0.000000] clocksource: MIPS: mask: 0xffffffff max_cycles:
+> 0xffffffff, max_idle_ns: 19112606563 ns
+> [    0.000227] sched_clock: 32 bits at 99MHz, resolution 10ns, wraps
+> every 21474838522ns
+> [    0.008164] Console: colour dummy device 80x25
+> [    0.012438] Calibrating delay loop... 910.13 BogoMIPS (lpj=4550656)
+> [    0.153536] pid_max: default: 32768 minimum: 301
+> [    0.155594] Mount-cache hash table entries: 2048 (order: 0, 16384 bytes)
+> [    0.156021] Mountpoint-cache hash table entries: 2048 (order: 0,
+> 16384 bytes)
+> [    0.192797] Brought up 1 CPUs
+> [    0.203257] devtmpfs: initialized
+> [    0.217846] clocksource: jiffies: mask: 0xffffffff max_cycles:
+> 0xffffffff, max_idle_ns: 19112604462750000 ns
+> [    0.224678] NET: Registered protocol family 16
+> [    0.242230] clocksource: pit: mask: 0xffffffff max_cycles:
+> 0xffffffff, max_idle_ns: 1601818034827 ns
+> [    0.242911] pm-cps: no CM, non-coherent states unavailable
+> [    0.294752] vgaarb: loaded
+> [    0.296299] SCSI subsystem initialized
+> [    0.301656] PCI host bridge to bus 0000:00
+> [    0.302541] pci_bus 0000:00: root bus resource [mem
+> 0x10000000-0x17ffffff]
+> [    0.303066] pci_bus 0000:00: root bus resource [io  0x1000-0x1fffff]
+> [    0.303567] pci_bus 0000:00: root bus resource [??? 0x00000000 flags 0x0]
+> [    0.304037] pci_bus 0000:00: No busn resource found for root bus,
+> will use [bus 00-ff]
+> [    0.306645] pci 0000:00:00.0: [Firmware Bug]: reg 0x14: invalid BAR
+> (can't size)
+> [    0.307287] pci 0000:00:00.0: [Firmware Bug]: reg 0x18: invalid BAR
+> (can't size)
+> [    0.307732] pci 0000:00:00.0: [Firmware Bug]: reg 0x1c: invalid BAR
+> (can't size)
+> [    0.308191] pci 0000:00:00.0: [Firmware Bug]: reg 0x20: invalid BAR
+> (can't size)
+> [    0.308683] pci 0000:00:00.0: [Firmware Bug]: reg 0x24: invalid BAR
+> (can't size)
+> [    0.312906] pci 0000:00:0a.1: legacy IDE quirk: reg 0x10: [io
+> 0x01f0-0x01f7]
+> [    0.313321] pci 0000:00:0a.1: legacy IDE quirk: reg 0x14: [io  0x03f6]
+> [    0.313834] pci 0000:00:0a.1: legacy IDE quirk: reg 0x18: [io
+> 0x0170-0x0177]
+> [    0.314301] pci 0000:00:0a.1: legacy IDE quirk: reg 0x1c: [io  0x0376]
+> [    0.316353] pci 0000:00:0a.3: quirk: [io  0x1000-0x103f] claimed by
+> PIIX4 ACPI
+> [    0.316796] pci 0000:00:0a.3: quirk: [io  0x1100-0x110f] claimed by
+> PIIX4 SMB
+> [    0.318865] vgaarb: device added:
+> PCI:0000:00:12.0,decodes=io+mem,owns=none,locks=none
+> [    0.321353] pci 0000:00:12.0: BAR 0: assigned [mem
+> 0x10000000-0x11ffffff pref]
+> [    0.322118] pci 0000:00:0b.0: BAR 6: assigned [mem
+> 0x12000000-0x1203ffff pref]
+> [    0.322655] pci 0000:00:12.0: BAR 6: assigned [mem
+> 0x12040000-0x1204ffff pref]
+> [    0.323124] pci 0000:00:12.0: BAR 1: assigned [mem 0x12050000-0x12050fff]
+> [    0.323594] pci 0000:00:0a.2: BAR 4: assigned [io  0x1040-0x105f]
+> [    0.323984] pci 0000:00:0b.0: BAR 0: assigned [io  0x1060-0x107f]
+> [    0.324368] pci 0000:00:0b.0: BAR 1: assigned [mem 0x12051000-0x1205101f]
+> [    0.324787] pci 0000:00:0a.1: BAR 4: assigned [io  0x1080-0x108f]
+> [    0.342630] clocksource: Switched to clocksource MIPS
+> [    0.344235] VFS: Disk quotas dquot_6.6.0
+> [    0.344890] VFS: Dquot-cache hash table entries: 2048 (order 0, 16384
+> bytes)
+> [    0.386512] NET: Registered protocol family 2
+> [    0.398836] TCP established hash table entries: 2048 (order: 0, 16384
+> bytes)
+> [    0.400383] TCP bind hash table entries: 2048 (order: 1, 32768 bytes)
+> [    0.400907] TCP: Hash tables configured (established 2048 bind 2048)
+> [    0.402979] UDP hash table entries: 512 (order: 0, 16384 bytes)
+> [    0.403480] UDP-Lite hash table entries: 512 (order: 0, 16384 bytes)
+> [    0.406146] NET: Registered protocol family 1
+> [    0.410131] RPC: Registered named UNIX socket transport module.
+> [    0.410481] RPC: Registered udp transport module.
+> [    0.410723] RPC: Registered tcp transport module.
+> [    0.410969] RPC: Registered tcp NFSv4.1 backchannel transport module.
+> [    0.418784] futex hash table entries: 256 (order: 0, 16384 bytes)
+> [    0.423787] workingset: timestamp_bits=60 max_order=13 bucket_order=0
+> [    0.427615] Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+> [    0.432664] Block layer SCSI generic (bsg) driver version 0.4 loaded
+> (major 253)
+> [    0.433193] io scheduler noop registered
+> [    0.433428] io scheduler deadline registered
+> [    0.433795] io scheduler cfq registered (default)
+> [    0.436019] PCI: Enabling device 0000:00:12.0 (0000 -> 0002)
+> [    0.437688] cirrusfb 0000:00:12.0: Cirrus Logic chipset on PCI bus,
+> RAM (4096 kB) at 0x10000000
+> [    0.693879] Console: switching to colour frame buffer device 80x30
+> [    0.890253] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+> [    0.900232] console [ttyS0] disabled
+> [    0.931815] serial8250.0: ttyS0 at I/O 0x3f8 (irq = 4, base_baud =
+> 115200) is a 16550A
+> [    0.934068] console [ttyS0] enabled
+> [    0.934068] console [ttyS0] enabled
+> [    0.934866] bootconsole [uart8250] disabled
+> [    0.934866] bootconsole [uart8250] disabled
+> [    0.963488] serial8250.0: ttyS1 at I/O 0x2f8 (irq = 3, base_baud =
+> 115200) is a 16550A
+> [    0.991024] serial8250.0: ttyS2 at MMIO 0x1f000900 (irq = 20,
+> base_baud = 230400) is a 16550A
+> [    0.993376] [drm] Initialized drm 1.1.0 20060810
+> [    1.035413] brd: module loaded
+> [    1.036869] PCI: Enabling device 0000:00:0a.1 (0000 -> 0001)
+> [    1.052237] scsi host0: ata_piix
+> [    1.055459] scsi host1: ata_piix
+> [    1.056457] ata1: PATA max UDMA/33 cmd 0x1f0 ctl 0x3f6 bmdma 0x1080
+> irq 14
+> [    1.056967] ata2: PATA max UDMA/33 cmd 0x170 ctl 0x376 bmdma 0x1088
+> irq 15
+> [    1.060000] physmap platform flash device: 00400000 at 1e000000
+> [    1.063974] physmap-flash.0: Found 1 x32 devices at 0x0 in 32-bit
+> bank. Manufacturer ID 0x000000 Chip ID 0x000000
+> [    1.065202] Intel/Sharp Extended Query Table at 0x0031
+> [    1.066817] Using buffer write method
+> [    1.080256] Creating 3 MTD partitions on "physmap-flash.0":
+> [    1.081618] 0x000000000000-0x000000100000 : "YAMON"
+> [    1.088644] 0x000000100000-0x0000003e0000 : "User FS"
+> [    1.091480] 0x0000003e0000-0x000000400000 : "Board Config"
+> [    1.094277] pcnet32: pcnet32.c:v1.35 21.Apr.2008
+> tsbogend@alpha.franken.de
+> [    1.094891] PCI: Enabling device 0000:00:0b.0 (0000 -> 0003)
+> [    1.096781] pcnet32: PCnet/PCI II 79C970A at 0x1060,
+> 52:54:00:12:34:56 assigned IRQ 10
+> [    1.100991] pcnet32: eth0: registered as PCnet/PCI II 79C970A
+> [    1.101594] pcnet32: 1 cards_found
+> [    1.104245] mousedev: PS/2 mouse device common for all mice
+> [    1.107521] rtc_cmos rtc_cmos: rtc core: registered rtc_cmos as rtc0
+> [    1.108464] rtc_cmos rtc_cmos: alarms up to one day, 242 bytes nvram
+> [    1.111009] NET: Registered protocol family 10
+> [    1.121232] sit: IPv6 over IPv4 tunneling driver
+> [    1.124784] NET: Registered protocol family 17
+> [    1.125362] NET: Registered protocol family 15
+> [    1.135855] rtc_cmos rtc_cmos: setting system clock to 2020-02-01
+> 20:08:10 UTC (1580587690)
+> [    1.328785] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+> [    1.335399] ata2.00: configured for UDMA/33
+> [    1.377344] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM
+>  2.5+ PQ: 0 ANSI: 5
+> [    1.407242] sr 1:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+> [    1.409546] cdrom: Uniform CD-ROM driver Revision: 3.20
+> ...
+> 
+> When booting
+> 
+> The kernel I'm using is available here:
+> https://github.com/philmd/qemu-testing-blob/tree/malta_i6400/mips/malta/mips64el
+> 
+> It is built following the steps from:
+> https://www.mips.com/blog/how-to-run-smp-linux-in-qemu-on-a-mips64-release-6-cpu/
+> You can rebuild using docker anyway:
+> https://github.com/philmd/qemu-testing-blob/blob/malta_i6400/mips/malta/mips64el/Dockerfile
 
-Good point, thanks I'll change that to 0x400!
+I'm not sure this is not related to this commit, but it certainly
+changes something.
 
-
->
-> > +
-> > +/** Total number of known registers */
-> > +#define AW_H3_CCU_REGS_NUM      (AW_H3_CCU_REGS_MAXADDR /
-> sizeof(uint32_t))
-> > +
-> > +/** @} */
-> > +
-> > +/**
-> > + * @name Object model
-> > + * @{
-> > + */
-> > +
-> > +#define TYPE_AW_H3_CCU    "allwinner-h3-ccu"
-> > +#define AW_H3_CCU(obj) \
-> > +    OBJECT_CHECK(AwH3ClockCtlState, (obj), TYPE_AW_H3_CCU)
-> > +
-> > +/** @} */
-> > +
-> > +/**
-> > + * Allwinner H3 CCU object instance state.
-> > + */
-> > +typedef struct AwH3ClockCtlState {
-> > +    /*< private >*/
-> > +    SysBusDevice parent_obj;
-> > +    /*< public >*/
-> > +
-> > +    /** Maps I/O registers in physical memory */
-> > +    MemoryRegion iomem;
-> > +
-> > +    /** Array of hardware registers */
-> > +    uint32_t regs[AW_H3_CCU_REGS_NUM];
-> > +
-> > +} AwH3ClockCtlState;
-> > +
-> > +#endif /* HW_MISC_ALLWINNER_H3_CCU_H */
-> > diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-> > index efe6042af3..8df8e3e05e 100644
-> > --- a/hw/arm/allwinner-h3.c
-> > +++ b/hw/arm/allwinner-h3.c
-> > @@ -36,6 +36,7 @@ const hwaddr allwinner_h3_memmap[] =3D {
-> >       [AW_H3_SRAM_A1]    =3D 0x00000000,
-> >       [AW_H3_SRAM_A2]    =3D 0x00044000,
-> >       [AW_H3_SRAM_C]     =3D 0x00010000,
-> > +    [AW_H3_CCU]        =3D 0x01c20000,
-> >       [AW_H3_PIT]        =3D 0x01c20c00,
-> >       [AW_H3_UART0]      =3D 0x01c28000,
-> >       [AW_H3_UART1]      =3D 0x01c28400,
-> > @@ -77,7 +78,6 @@ struct AwH3Unimplemented {
-> >       { "usb2",      0x01c1c000, 4 * KiB },
-> >       { "usb3",      0x01c1d000, 4 * KiB },
-> >       { "smc",       0x01c1e000, 4 * KiB },
-> > -    { "ccu",       0x01c20000, 1 * KiB },
-> >       { "pio",       0x01c20800, 1 * KiB },
-> >       { "owa",       0x01c21000, 1 * KiB },
-> >       { "pwm",       0x01c21400, 1 * KiB },
-> > @@ -172,6 +172,9 @@ static void allwinner_h3_init(Object *obj)
-> >                                 "clk0-freq", &error_abort);
-> >       object_property_add_alias(obj, "clk1-freq", OBJECT(&s->timer),
-> >                                 "clk1-freq", &error_abort);
-> > +
-> > +    sysbus_init_child_obj(obj, "ccu", &s->ccu, sizeof(s->ccu),
-> > +                          TYPE_AW_H3_CCU);
-> >   }
-> >
-> >   static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-> > @@ -277,6 +280,10 @@ static void allwinner_h3_realize(DeviceState *dev,
-> Error **errp)
-> >       memory_region_add_subregion(get_system_memory(),
-> s->memmap[AW_H3_SRAM_C],
-> >                                   &s->sram_c);
-> >
-> > +    /* Clock Control Unit */
-> > +    qdev_init_nofail(DEVICE(&s->ccu));
-> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, s->memmap[AW_H3_CCU]);
-> > +
-> >       /* UART0. For future clocktree API: All UARTS are connected to
-> APB2_CLK. */
-> >       serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART0], 2,
-> >                      qdev_get_gpio_in(DEVICE(&s->gic),
-> AW_H3_GIC_SPI_UART0),
-> > diff --git a/hw/misc/allwinner-h3-ccu.c b/hw/misc/allwinner-h3-ccu.c
-> > new file mode 100644
-> > index 0000000000..ccf58ccdf2
-> > --- /dev/null
-> > +++ b/hw/misc/allwinner-h3-ccu.c
-> > @@ -0,0 +1,243 @@
-> > +/*
-> > + * Allwinner H3 Clock Control Unit emulation
-> > + *
-> > + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-> > + *
-> > + * This program is free software: you can redistribute it and/or modif=
-y
-> > + * it under the terms of the GNU General Public License as published b=
-y
-> > + * the Free Software Foundation, either version 2 of the License, or
-> > + * (at your option) any later version.
-> > + *
-> > + * This program is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + * GNU General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU General Public License
-> > + * along with this program.  If not, see <http://www.gnu.org/licenses/
-> >.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "qemu/units.h"
-> > +#include "hw/sysbus.h"
-> > +#include "migration/vmstate.h"
-> > +#include "qemu/log.h"
-> > +#include "qemu/module.h"
-> > +#include "hw/misc/allwinner-h3-ccu.h"
-> > +
-> > +/* CCU register offsets */
-> > +enum {
-> > +    REG_PLL_CPUX             =3D 0x0000, /* PLL CPUX Control */
-> > +    REG_PLL_AUDIO            =3D 0x0008, /* PLL Audio Control */
-> > +    REG_PLL_VIDEO            =3D 0x0010, /* PLL Video Control */
-> > +    REG_PLL_VE               =3D 0x0018, /* PLL VE Control */
-> > +    REG_PLL_DDR              =3D 0x0020, /* PLL DDR Control */
-> > +    REG_PLL_PERIPH0          =3D 0x0028, /* PLL Peripherals 0 Control =
-*/
-> > +    REG_PLL_GPU              =3D 0x0038, /* PLL GPU Control */
-> > +    REG_PLL_PERIPH1          =3D 0x0044, /* PLL Peripherals 1 Control =
-*/
-> > +    REG_PLL_DE               =3D 0x0048, /* PLL Display Engine Control=
- */
-> > +    REG_CPUX_AXI             =3D 0x0050, /* CPUX/AXI Configuration */
-> > +    REG_APB1                 =3D 0x0054, /* ARM Peripheral Bus 1 Confi=
-g */
-> > +    REG_APB2                 =3D 0x0058, /* ARM Peripheral Bus 2 Confi=
-g */
-> > +    REG_DRAM_CFG             =3D 0x00F4, /* DRAM Configuration */
-> > +    REG_MBUS                 =3D 0x00FC, /* MBUS Reset */
-> > +    REG_PLL_TIME0            =3D 0x0200, /* PLL Stable Time 0 */
-> > +    REG_PLL_TIME1            =3D 0x0204, /* PLL Stable Time 1 */
-> > +    REG_PLL_CPUX_BIAS        =3D 0x0220, /* PLL CPUX Bias */
-> > +    REG_PLL_AUDIO_BIAS       =3D 0x0224, /* PLL Audio Bias */
-> > +    REG_PLL_VIDEO_BIAS       =3D 0x0228, /* PLL Video Bias */
-> > +    REG_PLL_VE_BIAS          =3D 0x022C, /* PLL VE Bias */
-> > +    REG_PLL_DDR_BIAS         =3D 0x0230, /* PLL DDR Bias */
-> > +    REG_PLL_PERIPH0_BIAS     =3D 0x0234, /* PLL Peripherals 0 Bias */
-> > +    REG_PLL_GPU_BIAS         =3D 0x023C, /* PLL GPU Bias */
-> > +    REG_PLL_PERIPH1_BIAS     =3D 0x0244, /* PLL Peripherals 1 Bias */
-> > +    REG_PLL_DE_BIAS          =3D 0x0248, /* PLL Display Engine Bias */
-> > +    REG_PLL_CPUX_TUNING      =3D 0x0250, /* PLL CPUX Tuning */
-> > +    REG_PLL_DDR_TUNING       =3D 0x0260, /* PLL DDR Tuning */
-> > +};
-> > +
-> > +#define REG_INDEX(offset)    (offset / sizeof(uint32_t))
-> > +
-> > +/* CCU register flags */
-> > +enum {
-> > +    REG_DRAM_CFG_UPDATE      =3D (1 << 16),
-> > +};
-> > +
-> > +enum {
-> > +    REG_PLL_ENABLE           =3D (1 << 31),
-> > +    REG_PLL_LOCK             =3D (1 << 28),
-> > +};
-> > +
-> > +
-> > +/* CCU register reset values */
-> > +enum {
-> > +    REG_PLL_CPUX_RST         =3D 0x00001000,
-> > +    REG_PLL_AUDIO_RST        =3D 0x00035514,
-> > +    REG_PLL_VIDEO_RST        =3D 0x03006207,
-> > +    REG_PLL_VE_RST           =3D 0x03006207,
-> > +    REG_PLL_DDR_RST          =3D 0x00001000,
-> > +    REG_PLL_PERIPH0_RST      =3D 0x00041811,
-> > +    REG_PLL_GPU_RST          =3D 0x03006207,
-> > +    REG_PLL_PERIPH1_RST      =3D 0x00041811,
-> > +    REG_PLL_DE_RST           =3D 0x03006207,
-> > +    REG_CPUX_AXI_RST         =3D 0x00010000,
-> > +    REG_APB1_RST             =3D 0x00001010,
-> > +    REG_APB2_RST             =3D 0x01000000,
-> > +    REG_DRAM_CFG_RST         =3D 0x00000000,
-> > +    REG_MBUS_RST             =3D 0x80000000,
-> > +    REG_PLL_TIME0_RST        =3D 0x000000FF,
-> > +    REG_PLL_TIME1_RST        =3D 0x000000FF,
-> > +    REG_PLL_CPUX_BIAS_RST    =3D 0x08100200,
-> > +    REG_PLL_AUDIO_BIAS_RST   =3D 0x10100000,
-> > +    REG_PLL_VIDEO_BIAS_RST   =3D 0x10100000,
-> > +    REG_PLL_VE_BIAS_RST      =3D 0x10100000,
-> > +    REG_PLL_DDR_BIAS_RST     =3D 0x81104000,
-> > +    REG_PLL_PERIPH0_BIAS_RST =3D 0x10100010,
-> > +    REG_PLL_GPU_BIAS_RST     =3D 0x10100000,
-> > +    REG_PLL_PERIPH1_BIAS_RST =3D 0x10100010,
-> > +    REG_PLL_DE_BIAS_RST      =3D 0x10100000,
-> > +    REG_PLL_CPUX_TUNING_RST  =3D 0x0A101000,
-> > +    REG_PLL_DDR_TUNING_RST   =3D 0x14880000,
-> > +};
-> > +
-> > +static uint64_t allwinner_h3_ccu_read(void *opaque, hwaddr offset,
-> > +                                      unsigned size)
-> > +{
-> > +    const AwH3ClockCtlState *s =3D AW_H3_CCU(opaque);
-> > +    const uint32_t idx =3D REG_INDEX(offset);
-> > +
-> > +    if (idx >=3D AW_H3_CCU_REGS_NUM) {
-> > +        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset
-> 0x%04x\n",
-> > +                      __func__, (uint32_t)offset);
->
-> See comment in write().
->
-> > +        return 0;
-> > +    }
-> > +
-> > +    return s->regs[idx];
-> > +}
-> > +
-> > +static void allwinner_h3_ccu_write(void *opaque, hwaddr offset,
-> > +                                   uint64_t val, unsigned size)
-> > +{
-> > +    AwH3ClockCtlState *s =3D AW_H3_CCU(opaque);
-> > +    const uint32_t idx =3D REG_INDEX(offset);
-> > +
-> > +    if (idx >=3D AW_H3_CCU_REGS_NUM) {
-> > +        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset
-> 0x%04x\n",
-> > +                      __func__, (uint32_t)offset);
->
-> I'd replace this check by ...
->
-> > +        return;
-> > +    }
-> > +
-> > +    switch (offset) {
-> > +    case REG_DRAM_CFG:    /* DRAM Configuration */
-> > +        val &=3D ~REG_DRAM_CFG_UPDATE;
-> > +        break;
-> > +    case REG_PLL_CPUX:    /* PLL CPUX Control */
-> > +    case REG_PLL_AUDIO:   /* PLL Audio Control */
-> > +    case REG_PLL_VIDEO:   /* PLL Video Control */
-> > +    case REG_PLL_VE:      /* PLL VE Control */
-> > +    case REG_PLL_DDR:     /* PLL DDR Control */
-> > +    case REG_PLL_PERIPH0: /* PLL Peripherals 0 Control */
-> > +    case REG_PLL_GPU:     /* PLL GPU Control */
-> > +    case REG_PLL_PERIPH1: /* PLL Peripherals 1 Control */
-> > +    case REG_PLL_DE:      /* PLL Display Engine Control */
-> > +        if (val & REG_PLL_ENABLE) {
-> > +            val |=3D REG_PLL_LOCK;
-> > +        }
-> > +        break;
->
->         case 0x304 ... AW_H3_CCU_IOSIZE:
->             qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset
-> 0x%04x\n",
->                           __func__, (uint32_t)offset);
->             break;
->
-
-OK, looks more compact indeed.
-
-
->
-> > +    default:
-> > +        qemu_log_mask(LOG_UNIMP, "%s: unimplemented write offset
-> 0x%04x\n",
-> > +                      __func__, (uint32_t)offset);
-> > +        break;
-> > +    }
-> > +
-> > +    s->regs[idx] =3D (uint32_t) val;
-> > +}
->
-> That said,
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-
-Thanks!
-
-Niek
+I can reproduce 1/10 on commit 330edfcc84 building with --enable-debug,
+while 10/10 using commit 7dd547e5a.
 
 
->
-> > +
-> > +static const MemoryRegionOps allwinner_h3_ccu_ops =3D {
-> > +    .read =3D allwinner_h3_ccu_read,
-> > +    .write =3D allwinner_h3_ccu_write,
-> > +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> > +    .valid =3D {
-> > +        .min_access_size =3D 4,
-> > +        .max_access_size =3D 4,
-> > +    },
-> > +    .impl.min_access_size =3D 4,
-> > +};
-> > +
-> > +static void allwinner_h3_ccu_reset(DeviceState *dev)
-> > +{
-> > +    AwH3ClockCtlState *s =3D AW_H3_CCU(dev);
-> > +
-> > +    /* Set default values for registers */
-> > +    s->regs[REG_INDEX(REG_PLL_CPUX)] =3D REG_PLL_CPUX_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_AUDIO)] =3D REG_PLL_AUDIO_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_VIDEO)] =3D REG_PLL_VIDEO_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_VE)] =3D REG_PLL_VE_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_DDR)] =3D REG_PLL_DDR_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_PERIPH0)] =3D REG_PLL_PERIPH0_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_GPU)] =3D REG_PLL_GPU_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_PERIPH1)] =3D REG_PLL_PERIPH1_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_DE)] =3D REG_PLL_DE_RST;
-> > +    s->regs[REG_INDEX(REG_CPUX_AXI)] =3D REG_CPUX_AXI_RST;
-> > +    s->regs[REG_INDEX(REG_APB1)] =3D REG_APB1_RST;
-> > +    s->regs[REG_INDEX(REG_APB2)] =3D REG_APB2_RST;
-> > +    s->regs[REG_INDEX(REG_DRAM_CFG)] =3D REG_DRAM_CFG_RST;
-> > +    s->regs[REG_INDEX(REG_MBUS)] =3D REG_MBUS_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_TIME0)] =3D REG_PLL_TIME0_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_TIME1)] =3D REG_PLL_TIME1_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_CPUX_BIAS)] =3D REG_PLL_CPUX_BIAS_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_AUDIO_BIAS)] =3D REG_PLL_AUDIO_BIAS_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_VIDEO_BIAS)] =3D REG_PLL_VIDEO_BIAS_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_VE_BIAS)] =3D REG_PLL_VE_BIAS_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_DDR_BIAS)] =3D REG_PLL_DDR_BIAS_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_PERIPH0_BIAS)] =3D REG_PLL_PERIPH0_BIAS_=
-RST;
-> > +    s->regs[REG_INDEX(REG_PLL_GPU_BIAS)] =3D REG_PLL_GPU_BIAS_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_PERIPH1_BIAS)] =3D REG_PLL_PERIPH1_BIAS_=
-RST;
-> > +    s->regs[REG_INDEX(REG_PLL_DE_BIAS)] =3D REG_PLL_DE_BIAS_RST;
-> > +    s->regs[REG_INDEX(REG_PLL_CPUX_TUNING)] =3D REG_PLL_CPUX_TUNING_RS=
-T;
-> > +    s->regs[REG_INDEX(REG_PLL_DDR_TUNING)] =3D REG_PLL_DDR_TUNING_RST;
-> > +}
-> > +
-> > +static void allwinner_h3_ccu_init(Object *obj)
-> > +{
-> > +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> > +    AwH3ClockCtlState *s =3D AW_H3_CCU(obj);
-> > +
-> > +    /* Memory mapping */
-> > +    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_h3_ccu_ops,
-> s,
-> > +                          TYPE_AW_H3_CCU, 1 * KiB);
-> > +    sysbus_init_mmio(sbd, &s->iomem);
-> > +}
-> > +
-> > +static const VMStateDescription allwinner_h3_ccu_vmstate =3D {
-> > +    .name =3D "allwinner-h3-ccu",
-> > +    .version_id =3D 1,
-> > +    .minimum_version_id =3D 1,
-> > +    .fields =3D (VMStateField[]) {
-> > +        VMSTATE_UINT32_ARRAY(regs, AwH3ClockCtlState,
-> AW_H3_CCU_REGS_NUM),
-> > +        VMSTATE_END_OF_LIST()
-> > +    }
-> > +};
-> > +
-> > +static void allwinner_h3_ccu_class_init(ObjectClass *klass, void *data=
-)
-> > +{
-> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > +
-> > +    dc->reset =3D allwinner_h3_ccu_reset;
-> > +    dc->vmsd =3D &allwinner_h3_ccu_vmstate;
-> > +}
-> > +
-> > +static const TypeInfo allwinner_h3_ccu_info =3D {
-> > +    .name          =3D TYPE_AW_H3_CCU,
-> > +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> > +    .instance_init =3D allwinner_h3_ccu_init,
-> > +    .instance_size =3D sizeof(AwH3ClockCtlState),
-> > +    .class_init    =3D allwinner_h3_ccu_class_init,
-> > +};
-> > +
-> > +static void allwinner_h3_ccu_register(void)
-> > +{
-> > +    type_register_static(&allwinner_h3_ccu_info);
-> > +}
-> > +
-> > +type_init(allwinner_h3_ccu_register)
-> > diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> > index da993f45b7..5e635b74d5 100644
-> > --- a/hw/misc/Makefile.objs
-> > +++ b/hw/misc/Makefile.objs
-> > @@ -28,6 +28,7 @@ common-obj-$(CONFIG_MACIO) +=3D macio/
-> >
-> >   common-obj-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem.o
-> >
-> > +common-obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3-ccu.o
-> >   common-obj-$(CONFIG_REALVIEW) +=3D arm_sysctl.o
-> >   common-obj-$(CONFIG_NSERIES) +=3D cbus.o
-> >   common-obj-$(CONFIG_ECCMEMCTL) +=3D eccmemctl.o
-> >
->
->
+Console log using --enable-debug on 330edfcc84:
 
---=20
-Niek Linnenbank
+Linux version 4.7.0-rc1 (@859affe05464) (gcc version 6.3.0 20170516
+(Debian 6.3.0-18) ) #2 SMP Sat Feb 1 18:16:17 UTC 2020
+earlycon: uart8250 at I/O port 0x3f8 (options '38400n8')
+bootconsole [uart8250] enabled
+CPU0 revision is: 0001a900 (MIPS I6400)
+FPU revision is: 20f30300
+MSA revision is: 00000300
+MIPS: machine is mti,malta
+Software DMA cache coherency enabled
+Determined physical RAM map:
+ memory: 0000000008000000 @ 0000000000000000 (usable)
+Zone ranges:
+  DMA      [mem 0x0000000000000000-0x0000000000ffffff]
+  DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+  Normal   empty
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000000000000-0x0000000007ffffff]
+Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+VP topology {8} total 8
+Primary instruction cache 64kB, VIPT, 4-way, linesize 64 bytes.
+Primary data cache 64kB, 4-way, VIPT, no aliases, linesize 64 bytes
+percpu: Embedded 5 pages/cpu @980000000107c000 s29664 r8192 d44064 u81920
+Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 8163
+Kernel command line: clocksource=GIC console=ttyS0 printk.time=1
+[    0.000000] log_buf_len individual max cpu contribution: 4096 bytes
+[    0.000000] log_buf_len total cpu_extra contributions: 28672 bytes
+[    0.000000] log_buf_len min size: 32768 bytes
+[    0.000000] log_buf_len: 65536 bytes
+[    0.000000] early log buf free: 30424(92%)
+[    0.000000] PID hash table entries: 512 (order: -2, 4096 bytes)
+[    0.000000] Dentry cache hash table entries: 16384 (order: 3, 131072
+bytes)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 2, 65536 bytes)
+[    0.000000] Writing ErrCtl register=00000000
+[    0.000000] Readback ErrCtl register=00000000
+[    0.000000] MAAR configuration:
+[    0.000000]   [0]: 0x0000000000010000-0x0000000007ffffff speculate
+[    0.000000]   [1]: disabled
+[    0.000000]   [2]: disabled
+[    0.000000]   [3]: disabled
+[    0.000000]   [4]: disabled
+[    0.000000]   [5]: disabled
+[    0.000000]   [6]: disabled
+[    0.000000]   [7]: disabled
+[    0.000000] Memory: 121104K/131072K available (5253K kernel code,
+380K rwdata, 1276K rodata, 304K init, 278K bss, 9968K reserved, 0K
+cma-reserved)
+[    0.000000] Hierarchical RCU implementation.
+[    0.000000]  Build-time adjustment of leaf fanout to 64.
+[    0.000000] NR_IRQS:256
+[    0.000000] CPU frequency 200.00 MHz
+[    0.000000] GIC frequency 99.98 MHz
+[    0.000000] clocksource: GIC: mask: 0xffffffff max_cycles:
+0xffffffff, max_idle_ns: 19117033123 ns
+[    0.000000] clocksource: MIPS: mask: 0xffffffff max_cycles:
+0xffffffff, max_idle_ns: 19112620523 ns
+[    0.000787] sched_clock: 32 bits at 99MHz, resolution 10ns, wraps
+every 21474854906ns
+[    0.045704] Console: colour dummy device 80x25
+[    0.053021] Calibrating delay loop... 1325.46 BogoMIPS (lpj=6627328)
+[    0.129932] pid_max: default: 32768 minimum: 301
+[    0.136234] Mount-cache hash table entries: 2048 (order: 0, 16384 bytes)
+[    0.136906] Mountpoint-cache hash table entries: 2048 (order: 0,
+16384 bytes)
+[   41.031274] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.033583] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.054201] CPU1 revision is: 0001a900 (MIPS I6400)
+[   41.055728] FPU revision is: 20f30300
+[   41.055863] MSA revision is: 00000300
+[    0.442532] Synchronize counters for CPU 1: done.
+[   41.014309] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.014327] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.014786] CPU2 revision is: 0001a900 (MIPS I6400)
+[   41.014798] FPU revision is: 20f30300
+[   41.014804] MSA revision is: 00000300
+[    0.504208] Synchronize counters for CPU 2: done.
+[   41.014212] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.014229] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.014579] CPU3 revision is: 0001a900 (MIPS I6400)
+[   41.014592] FPU revision is: 20f30300
+[   41.014599] MSA revision is: 00000300
+[    0.544586] Synchronize counters for CPU 3: done.
+[   41.014251] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.014272] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.014563] CPU4 revision is: 0001a900 (MIPS I6400)
+[   41.014576] FPU revision is: 20f30300
+[   41.014582] MSA revision is: 00000300
+[    0.695674] Synchronize counters for CPU 4: done.
+[   41.014280] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.014309] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.014659] CPU5 revision is: 0001a900 (MIPS I6400)
+[   41.014675] FPU revision is: 20f30300
+[   41.014684] MSA revision is: 00000300
+[    0.929436] Synchronize counters for CPU 5: done.
+[   41.014251] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.014271] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.014600] CPU6 revision is: 0001a900 (MIPS I6400)
+[   41.014612] FPU revision is: 20f30300
+[   41.014618] MSA revision is: 00000300
+[    0.969928] Synchronize counters for CPU 6: done.
+[   41.014292] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.014313] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.014625] CPU7 revision is: 0001a900 (MIPS I6400)
+[   41.014638] FPU revision is: 20f30300
+[   41.014644] MSA revision is: 00000300
+[    1.051137] Synchronize counters for CPU 7: done.
+[    1.051764] Brought up 8 CPUs
+[    1.121113] devtmpfs: initialized
+[    1.215360] clocksource: jiffies: mask: 0xffffffff max_cycles:
+0xffffffff, max_idle_ns: 19112604462750000 ns
+[    1.358645] NET: Registered protocol family 16
+[    1.392339] pm-cps: CPC does not support clock gating
+[    1.732391] vgaarb: loaded
+[    1.811916] SCSI subsystem initialized
+[    1.829400] PCI host bridge to bus 0000:00
+[    1.833354] pci_bus 0000:00: root bus resource [mem
+0x10000000-0x17ffffff]
+[    1.834048] pci_bus 0000:00: root bus resource [io  0x1000-0x1fffff]
+[    1.834760] pci_bus 0000:00: root bus resource [??? 0x00000000 flags 0x0]
+[    1.835537] pci_bus 0000:00: No busn resource found for root bus,
+will use [bus 00-ff]
+[    1.845795] pci 0000:00:00.0: [Firmware Bug]: reg 0x14: invalid BAR
+(can't size)
+[    1.846928] pci 0000:00:00.0: [Firmware Bug]: reg 0x18: invalid BAR
+(can't size)
+[    1.847531] pci 0000:00:00.0: [Firmware Bug]: reg 0x1c: invalid BAR
+(can't size)
+[    1.848025] pci 0000:00:00.0: [Firmware Bug]: reg 0x20: invalid BAR
+(can't size)
+[    1.848970] pci 0000:00:00.0: [Firmware Bug]: reg 0x24: invalid BAR
+(can't size)
+[    1.874551] pci 0000:00:0a.1: legacy IDE quirk: reg 0x10: [io
+0x01f0-0x01f7]
+[    1.875292] pci 0000:00:0a.1: legacy IDE quirk: reg 0x14: [io  0x03f6]
+[    1.876094] pci 0000:00:0a.1: legacy IDE quirk: reg 0x18: [io
+0x0170-0x0177]
+[    1.876873] pci 0000:00:0a.1: legacy IDE quirk: reg 0x1c: [io  0x0376]
+[    1.884188] pci 0000:00:0a.3: quirk: [io  0x1000-0x103f] claimed by
+PIIX4 ACPI
+[    1.884928] pci 0000:00:0a.3: quirk: [io  0x1100-0x110f] claimed by
+PIIX4 SMB
+[    1.890092] vgaarb: device added:
+PCI:0000:00:12.0,decodes=io+mem,owns=none,locks=none
+[    1.900721] pci 0000:00:12.0: BAR 0: assigned [mem
+0x10000000-0x10ffffff pref]
+[    1.902774] pci 0000:00:0b.0: BAR 6: assigned [mem
+0x11000000-0x1103ffff pref]
+[    1.903875] pci 0000:00:12.0: BAR 6: assigned [mem
+0x11040000-0x1104ffff pref]
+[    1.904908] pci 0000:00:13.0: BAR 4: assigned [mem
+0x11050000-0x11053fff 64bit pref]
+[    1.906044] pci 0000:00:12.0: BAR 2: assigned [mem 0x11054000-0x11054fff]
+[    1.906570] pci 0000:00:0a.2: BAR 4: assigned [io  0x1040-0x105f]
+[    1.906963] pci 0000:00:0b.0: BAR 0: assigned [io  0x1060-0x107f]
+[    1.907308] pci 0000:00:0b.0: BAR 1: assigned [mem 0x11055000-0x1105501f]
+[    1.908194] pci 0000:00:0a.1: BAR 4: assigned [io  0x1080-0x108f]
+[    1.967033] clocksource: Switched to clocksource GIC
+[   22.982466] INFO: rcu_sched detected stalls on CPUs/tasks:
+[   22.998174]  2-...: (1 GPs behind) idle=37e/0/0 softirq=55/57 fqs=1
+[   23.002730]  (detected by 3, t=2104 jiffies, g=-272, c=-273, q=128)
+[   23.007730] Task dump for CPU 2:
+[   23.010438] swapper/2       R  running task        0     0      1
+0x00100000
+[   23.013820] Stack : ffffffff806dd460 ffffffff807c0000
+0000000000000001 ffffffff80780e78
+          ffffffff807807c0 0000000000000001 00000000001abff1
+ffffffff80107f18
+          ffffffff806dd460 ffffffff807c0000 98000000070c8000
+98000000070cbdf0
+          ffffffff80780000 ffffffff80166758 000000001400fce3
+ffffffff80780e78
+          ffffffff807807c0 ffffffff80195630 0000000000800400
+ffffffff80166754
+          000000000000000a ffffffff8012eec8 ffffffff807805c0
+0000000000000001
+          0000000000000008 0000000000000008 ffffffff8081cc40
+ffffffff80114914
+          0000000000000001 0000000000000000 0000000000000004
+0000000000000002
+          ffffffff80820000 0000000000000000 0000000000000005
+0000000000000000
+          0000000000000000 0000000000000000 0000000000000000
+0000000000000000
+          ...
+[   23.022834] Call Trace:
+[   23.025982] [<ffffffff8061ae28>] __schedule+0x4c8/0x930
+[   23.029166]
+[   23.031304] rcu_sched kthread starved for 2106 jiffies!
+g18446744073709551344 c18446744073709551343 f0x0 RCU_GP_WAIT_FQS(3)
+->state=0x1
+[   23.033442] rcu_sched       S ffffffff8061b2b4     0     7      2
+0x00100000
+[   23.034900] Stack : 00000000000001d7 ffffffff8078e340
+00000000ffff8b7d 0000000000000005
+          98000000070afce0 980000000110a600 00000000ffff8b8d
+980000000110a600
+          980000000110a600 ffffffff80780000 ffffffff80781010
+ffffffff80790000
+          0000000000000000 0000000000000001 0000000000000003
+ffffffff8061b2b4
+          ffffffff80790000 ffffffff8061dbac 0000000000000000
+980000000110aaa0
+          00000000ffff8b8d ffffffff80183fa8 98000000070ab000
+ffffffff00000007
+          0000000000000001 ffffffff80780000 ffffffff8078e340
+ffffffff8078e340
+          ffffffff8078e5a0 ffffffff80780000 ffffffff80780000
+ffffffff80181a98
+          98000000070ab000 ffffffff8078e5a8 ffffffff8078e5a8
+0000000000000000
+          0000000000000000 ffffffff80180000 ffffffff8017f140
+ffffffff806e0000
+          ...
+[   23.042338] Call Trace:
+[   23.042732] [<ffffffff8061ae28>] __schedule+0x4c8/0x930
+[   23.043187] [<ffffffff8061b2b4>] schedule+0x24/0x80
+[   23.043567] [<ffffffff8061dbac>] schedule_timeout+0x11c/0x1e0
+[   23.043943] [<ffffffff80181a98>] rcu_gp_kthread+0x510/0x948
+[   23.044381] [<ffffffff8014a9c8>] kthread+0xc8/0xe0
+[   23.044702] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+[   23.045165]
+[   44.055135] INFO: rcu_sched detected stalls on CPUs/tasks:
+[   44.058011]  7-...: (0 ticks this GP) idle=232/0/0 softirq=45/45 fqs=1
+[   44.059496]  (detected by 0, t=2102 jiffies, g=-271, c=-272, q=88)
+[   44.061806] Task dump for CPU 7:
+[   44.063035] swapper/7       R  running task        0     0      1
+0x00100000
+[   44.067350] Stack : ffffffff806dd460 ffffffff807c0000
+0000000000000001 980000000110ba08
+          0000000000000007 ffffffff806dd460 ffffffff807c0000
+ffffffff80195080
+          7fffffffffffffff ffffffff807c0000 ffffffff80780000
+ffffffff80780e78
+          ffffffff806dd460 ffffffff807c0000 0000000000000001
+ffffffff80780e78
+          ffffffff80780cc0 ffffffff80195630 ffffffff806dd460
+ffffffff80166754
+          000000000000000a ffffffff8012eec8 ffffffff807805c0
+0000000000000001
+          0000000000000008 0000000000000008 ffffffff8081cc40
+ffffffff80114914
+          0000000000000001 0000000000000000 0000000000000080
+0000000000000007
+          ffffffff80820000 0000000000000000 0000000000000005
+0000000000000000
+          0000000000000000 0000000000000000 0000000000000000
+0000000000000000
+          ...
+[   44.078926] Call Trace:
+[   44.079358] [<ffffffff8061ae28>] __schedule+0x4c8/0x930
+[   44.079998]
+[   44.080211] rcu_sched kthread starved for 2101 jiffies!
+g18446744073709551345 c18446744073709551344 f0x0 RCU_GP_WAIT_FQS(3)
+->state=0x1
+[   44.081905] rcu_sched       S ffffffff8061b2b4     0     7      2
+0x00100000
+[   44.082736] Stack : 00000000000001d7 ffffffff8078e340
+00000000ffff8b7d 0000000000000005
+          98000000070afce0 980000000110a600 00000000ffff93c9
+980000000110a600
+          980000000110a600 ffffffff80780000 ffffffff80781010
+ffffffff80790000
+          0000000000000000 0000000000000001 0000000000000003
+ffffffff8061b2b4
+          ffffffff80790000 ffffffff8061dbac 0000000000000000
+980000000110aed0
+          00000000ffff93c9 ffffffff80183fa8 98000000070ab000
+ffffffff00000007
+          0000000000000001 ffffffff80780000 ffffffff8078e340
+ffffffff8078e340
+          ffffffff8078e5a0 ffffffff80780000 ffffffff80780000
+ffffffff80181a98
+          98000000070ab000 ffffffff8078e5a8 ffffffff8078e5a8
+0000000000000000
+          0000000000000000 ffffffff80180000 ffffffff8017f140
+ffffffff806e0000
+          ...
+[   44.089552] Call Trace:
+[   44.089733] [<ffffffff8061ae28>] __schedule+0x4c8/0x930
+[   44.090069] [<ffffffff8061b2b4>] schedule+0x24/0x80
+[   44.090375] [<ffffffff8061dbac>] schedule_timeout+0x11c/0x1e0
+[   44.090743] [<ffffffff80181a98>] rcu_gp_kthread+0x510/0x948
+[   44.091093] [<ffffffff8014a9c8>] kthread+0xc8/0xe0
+[   44.091395] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+[   44.091767]
+[   44.945325] VFS: Disk quotas dquot_6.6.0
+[   44.984731] VFS: Dquot-cache hash table entries: 2048 (order 0, 16384
+bytes)
+[   45.176126] NET: Registered protocol family 2
+[   45.414925] TCP established hash table entries: 2048 (order: 0, 16384
+bytes)
+[   45.419093] TCP bind hash table entries: 2048 (order: 1, 32768 bytes)
+[   45.421411] TCP: Hash tables configured (established 2048 bind 2048)
+[   45.430481] UDP hash table entries: 512 (order: 0, 16384 bytes)
+[   45.431498] UDP-Lite hash table entries: 512 (order: 0, 16384 bytes)
+[   45.534362] NET: Registered protocol family 1
+[   45.606926] RPC: Registered named UNIX socket transport module.
+[   45.608354] RPC: Registered udp transport module.
+[   45.609336] RPC: Registered tcp transport module.
+[   45.610249] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[   45.718310] futex hash table entries: 2048 (order: 3, 131072 bytes)
+[   45.747210] workingset: timestamp_bits=60 max_order=13 bucket_order=0
+[   46.275627] Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+[   46.354259] Block layer SCSI generic (bsg) driver version 0.4 loaded
+(major 253)
+[   46.355680] io scheduler noop registered
+[   46.356208] io scheduler deadline registered
+[   46.395936] io scheduler cfq registered (default)
+[   46.512436] PCI: Enabling device 0000:00:13.0 (0000 -> 0002)
+[   46.555822] input: QEMU Virtio Keyboard as
+/devices/pci0000:00/0000:00:13.0/virtio0/input/input0
+[   46.716413] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[   46.756069] console [ttyS0] disabled
+[   46.787920] serial8250.0: ttyS0 at I/O 0x3f8 (irq = 4, base_baud =
+115200) is a 16550A
+[   46.795739] console [ttyS0] enabled
+[   46.795739] console [ttyS0] enabled
+[   46.797338] bootconsole [uart8250] disabled
+[   46.797338] bootconsole [uart8250] disabled
+[   46.818839] serial8250.0: ttyS1 at I/O 0x2f8 (irq = 3, base_baud =
+115200) is a 16550A
+[   46.839273] serial8250.0: ttyS2 at MMIO 0x1f000900 (irq = 20,
+base_baud = 230400) is a 16550A
+[   46.842492] [drm] Initialized drm 1.1.0 20060810
+[   46.854005] PCI: Enabling device 0000:00:12.0 (0000 -> 0002)
+[   46.859898] [drm] Found bochs VGA, ID 0xb0c5.
+[   46.860297] [drm] Framebuffer size 16384 kB @ 0x10000000, mmio @
+0x11054000.
+[   46.866727] [TTM] Zone  kernel: Available graphics memory: 60552 kiB
+[   46.867364] [TTM] Initializing pool allocator
+[   47.092723] Console: switching to colour frame buffer device 128x48
+[   47.117712] bochs-drm 0000:00:12.0: fb0: bochsdrmfb frame buffer device
+[   47.121833] [drm] Initialized bochs-drm 1.0.0 20130925 for
+0000:00:12.0 on minor 0
+[   47.307909] brd: module loaded
+[   47.325590] PCI: Enabling device 0000:00:0a.1 (0000 -> 0001)
+[   47.379430] scsi host0: ata_piix
+[   47.391937] scsi host1: ata_piix
+[   47.394914] ata1: PATA max UDMA/33 cmd 0x1f0 ctl 0x3f6 bmdma 0x1080
+irq 14
+[   47.395537] ata2: PATA max UDMA/33 cmd 0x170 ctl 0x376 bmdma 0x1088
+irq 15
+[   47.407079] physmap platform flash device: 00400000 at 1e000000
+[   47.420227] physmap-flash.0: Found 1 x32 devices at 0x0 in 32-bit
+bank. Manufacturer ID 0x000000 Chip ID 0x000000
+[   47.424040] Intel/Sharp Extended Query Table at 0x0031
+[   47.427841] Using buffer write method
+[   47.441991] Creating 3 MTD partitions on "physmap-flash.0":
+[   47.445025] 0x000000000000-0x000000100000 : "YAMON"
+[   47.459268] 0x000000100000-0x0000003e0000 : "User FS"
+[   47.463336] 0x0000003e0000-0x000000400000 : "Board Config"
+[   47.469471] pcnet32: pcnet32.c:v1.35 21.Apr.2008
+tsbogend@alpha.franken.de
+[   47.470336] PCI: Enabling device 0000:00:0b.0 (0000 -> 0003)
+[   47.477538] pcnet32: PCnet/PCI II 79C970A at 0x1060,
+52:54:00:12:34:56 assigned IRQ 10
+[   47.515743] pcnet32: eth0: registered as PCnet/PCI II 79C970A
+[   47.516844] pcnet32: 1 cards_found
+[   47.526661] mousedev: PS/2 mouse device common for all mice
+[   47.539046] rtc_cmos rtc_cmos: rtc core: registered rtc_cmos as rtc0
+[   47.541127] rtc_cmos rtc_cmos: alarms up to one day, 242 bytes nvram
+[   47.643909] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[   47.651047] ata2.00: configured for UDMA/33
+[   47.704763] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM
+ 2.5+ PQ: 0 ANSI: 5
+[   47.830833] sr 1:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[   47.833285] cdrom: Uniform CD-ROM driver Revision: 3.20
+[   47.855442] NET: Registered protocol family 10
+[   48.049944] sit: IPv6 over IPv4 tunneling driver
+[   48.135772] NET: Registered protocol family 17
+[   48.137211] NET: Registered protocol family 15
+[   48.188261] rtc_cmos rtc_cmos: setting system clock to 2020-02-01
+21:54:13 UTC (1580594053)
 
---0000000000002c33e9059d8a324f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+While there is no activity during 20s after "clocksource: Switched to
+clocksource GIC" is displayed, QEMU use very little resources (3% on a
+core).
 
-<div dir=3D"ltr"><div>Hi Philippe,<br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Jan 19, 2020 at 7:34 PM Phili=
-ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redh=
-at.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
-:1ex">On 1/19/20 1:50 AM, Niek Linnenbank wrote:<br>
-&gt; The Clock Control Unit is responsible for clock signal generation,<br>
-&gt; configuration and distribution in the Allwinner H3 System on Chip.<br>
-&gt; This commit adds support for the Clock Control Unit which emulates<br>
-&gt; a simple read/write register interface.<br>
-&gt; <br>
-&gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gm=
-ail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 =C2=A0include/hw/arm/allwinner-h3.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =
-=C2=A03 +<br>
-&gt;=C2=A0 =C2=A0include/hw/misc/allwinner-h3-ccu.h |=C2=A0 66 ++++++++<br>
-&gt;=C2=A0 =C2=A0hw/arm/allwinner-h3.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A09 +-<br>
-&gt;=C2=A0 =C2=A0hw/misc/allwinner-h3-ccu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0| 243 +++++++++++++++++++++++++++++<br>
-&gt;=C2=A0 =C2=A0hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
-&gt;=C2=A0 =C2=A05 files changed, 321 insertions(+), 1 deletion(-)<br>
-&gt;=C2=A0 =C2=A0create mode 100644 include/hw/misc/allwinner-h3-ccu.h<br>
-&gt;=C2=A0 =C2=A0create mode 100644 hw/misc/allwinner-h3-ccu.c<br>
-&gt; <br>
-&gt; diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-=
-h3.h<br>
-&gt; index 2aac9b78ec..abdc20871a 100644<br>
-&gt; --- a/include/hw/arm/allwinner-h3.h<br>
-&gt; +++ b/include/hw/arm/allwinner-h3.h<br>
-&gt; @@ -39,6 +39,7 @@<br>
-&gt;=C2=A0 =C2=A0#include &quot;hw/arm/boot.h&quot;<br>
-&gt;=C2=A0 =C2=A0#include &quot;hw/timer/allwinner-a10-pit.h&quot;<br>
-&gt;=C2=A0 =C2=A0#include &quot;hw/intc/arm_gic.h&quot;<br>
-&gt; +#include &quot;hw/misc/allwinner-h3-ccu.h&quot;<br>
-&gt;=C2=A0 =C2=A0#include &quot;target/arm/cpu.h&quot;<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0/**<br>
-&gt; @@ -55,6 +56,7 @@ enum {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_SRAM_A1,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_SRAM_A2,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_SRAM_C,<br>
-&gt; +=C2=A0 =C2=A0 AW_H3_CCU,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_PIT,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_UART0,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_UART1,<br>
-&gt; @@ -97,6 +99,7 @@ typedef struct AwH3State {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0ARMCPU cpus[AW_H3_NUM_CPUS];<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0const hwaddr *memmap;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AwA10PITState timer;<br>
-&gt; +=C2=A0 =C2=A0 AwH3ClockCtlState ccu;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0GICState gic;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0MemoryRegion sram_a1;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0MemoryRegion sram_a2;<br>
-&gt; diff --git a/include/hw/misc/allwinner-h3-ccu.h b/include/hw/misc/allw=
-inner-h3-ccu.h<br>
-&gt; new file mode 100644<br>
-&gt; index 0000000000..9c8a887782<br>
-&gt; --- /dev/null<br>
-&gt; +++ b/include/hw/misc/allwinner-h3-ccu.h<br>
-&gt; @@ -0,0 +1,66 @@<br>
-&gt; +/*<br>
-&gt; + * Allwinner H3 Clock Control Unit emulation<br>
-&gt; + *<br>
-&gt; + * Copyright (C) 2019 Niek Linnenbank &lt;<a href=3D"mailto:nieklinne=
-nbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
-&gt; + *<br>
-&gt; + * This program is free software: you can redistribute it and/or modi=
-fy<br>
-&gt; + * it under the terms of the GNU General Public License as published =
-by<br>
-&gt; + * the Free Software Foundation, either version 2 of the License, or<=
-br>
-&gt; + * (at your option) any later version.<br>
-&gt; + *<br>
-&gt; + * This program is distributed in the hope that it will be useful,<br=
->
-&gt; + * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-&gt; + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the=
-<br>
-&gt; + * GNU General Public License for more details.<br>
-&gt; + *<br>
-&gt; + * You should have received a copy of the GNU General Public License<=
-br>
-&gt; + * along with this program.=C2=A0 If not, see &lt;<a href=3D"http://w=
-ww.gnu.org/licenses/" rel=3D"noreferrer" target=3D"_blank">http://www.gnu.o=
-rg/licenses/</a>&gt;.<br>
-&gt; + */<br>
-&gt; +<br>
-&gt; +#ifndef HW_MISC_ALLWINNER_H3_CCU_H<br>
-&gt; +#define HW_MISC_ALLWINNER_H3_CCU_H<br>
-&gt; +<br>
-&gt; +#include &quot;qom/object.h&quot;<br>
-&gt; +#include &quot;hw/sysbus.h&quot;<br>
-&gt; +<br>
-&gt; +/**<br>
-&gt; + * @name Constants<br>
-&gt; + * @{<br>
-&gt; + */<br>
-&gt; +<br>
-&gt; +/** Highest register address used by CCU device */<br>
-&gt; +#define AW_H3_CCU_REGS_MAXADDR=C2=A0 (0x304)<br>
-<br>
-There might be a migration issue if one day we see some firmware <br>
-accessing some undocumented register &gt; 0x304 (you&#39;d need to migrate =
-more <br>
-than 0x304/4 registers, so increase allwinner_h3_ccu_vmstate.version_id.<br=
->
-<br>
-I&#39;d simply replace this definition by<br>
-<br>
-=C2=A0 =C2=A0#define AW_H3_CCU_IOSIZE 0x400<br>
-<br>
-And see comment in write().<br></blockquote><div><br></div><div>Good point,=
- thanks I&#39;ll change that to 0x400!<br></div><div>=C2=A0</div><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px s=
-olid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt; +<br>
-&gt; +/** Total number of known registers */<br>
-&gt; +#define AW_H3_CCU_REGS_NUM=C2=A0 =C2=A0 =C2=A0 (AW_H3_CCU_REGS_MAXADD=
-R / sizeof(uint32_t))<br>
-&gt; +<br>
-&gt; +/** @} */<br>
-&gt; +<br>
-&gt; +/**<br>
-&gt; + * @name Object model<br>
-&gt; + * @{<br>
-&gt; + */<br>
-&gt; +<br>
-&gt; +#define TYPE_AW_H3_CCU=C2=A0 =C2=A0 &quot;allwinner-h3-ccu&quot;<br>
-&gt; +#define AW_H3_CCU(obj) \<br>
-&gt; +=C2=A0 =C2=A0 OBJECT_CHECK(AwH3ClockCtlState, (obj), TYPE_AW_H3_CCU)<=
-br>
-&gt; +<br>
-&gt; +/** @} */<br>
-&gt; +<br>
-&gt; +/**<br>
-&gt; + * Allwinner H3 CCU object instance state.<br>
-&gt; + */<br>
-&gt; +typedef struct AwH3ClockCtlState {<br>
-&gt; +=C2=A0 =C2=A0 /*&lt; private &gt;*/<br>
-&gt; +=C2=A0 =C2=A0 SysBusDevice parent_obj;<br>
-&gt; +=C2=A0 =C2=A0 /*&lt; public &gt;*/<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 /** Maps I/O registers in physical memory */<br>
-&gt; +=C2=A0 =C2=A0 MemoryRegion iomem;<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 /** Array of hardware registers */<br>
-&gt; +=C2=A0 =C2=A0 uint32_t regs[AW_H3_CCU_REGS_NUM];<br>
-&gt; +<br>
-&gt; +} AwH3ClockCtlState;<br>
-&gt; +<br>
-&gt; +#endif /* HW_MISC_ALLWINNER_H3_CCU_H */<br>
-&gt; diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c<br>
-&gt; index efe6042af3..8df8e3e05e 100644<br>
-&gt; --- a/hw/arm/allwinner-h3.c<br>
-&gt; +++ b/hw/arm/allwinner-h3.c<br>
-&gt; @@ -36,6 +36,7 @@ const hwaddr allwinner_h3_memmap[] =3D {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_SRAM_A1]=C2=A0 =C2=A0 =3D 0x00000000,=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_SRAM_A2]=C2=A0 =C2=A0 =3D 0x00044000,=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_SRAM_C]=C2=A0 =C2=A0 =C2=A0=3D 0x0001=
-0000,<br>
-&gt; +=C2=A0 =C2=A0 [AW_H3_CCU]=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x01c20000,<=
-br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_PIT]=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0=
-x01c20c00,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_UART0]=C2=A0 =C2=A0 =C2=A0 =3D 0x01c2=
-8000,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_UART1]=C2=A0 =C2=A0 =C2=A0 =3D 0x01c2=
-8400,<br>
-&gt; @@ -77,7 +78,6 @@ struct AwH3Unimplemented {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;usb2&quot;,=C2=A0 =C2=A0 =C2=A0 0x01=
-c1c000, 4 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;usb3&quot;,=C2=A0 =C2=A0 =C2=A0 0x01=
-c1d000, 4 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;smc&quot;,=C2=A0 =C2=A0 =C2=A0 =C2=
-=A00x01c1e000, 4 * KiB },<br>
-&gt; -=C2=A0 =C2=A0 { &quot;ccu&quot;,=C2=A0 =C2=A0 =C2=A0 =C2=A00x01c20000=
-, 1 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;pio&quot;,=C2=A0 =C2=A0 =C2=A0 =C2=
-=A00x01c20800, 1 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;owa&quot;,=C2=A0 =C2=A0 =C2=A0 =C2=
-=A00x01c21000, 1 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;pwm&quot;,=C2=A0 =C2=A0 =C2=A0 =C2=
-=A00x01c21400, 1 * KiB },<br>
-&gt; @@ -172,6 +172,9 @@ static void allwinner_h3_init(Object *obj)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;clk0-freq&quot;, &amp=
-;error_abort);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0object_property_add_alias(obj, &quot;clk1-fr=
-eq&quot;, OBJECT(&amp;s-&gt;timer),<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;clk1-freq&quot;, &amp=
-;error_abort);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 sysbus_init_child_obj(obj, &quot;ccu&quot;, &amp;s-&gt;=
-ccu, sizeof(s-&gt;ccu),<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 TYPE_AW_H3_CCU);<br>
-&gt;=C2=A0 =C2=A0}<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0static void allwinner_h3_realize(DeviceState *dev, Error *=
-*errp)<br>
-&gt; @@ -277,6 +280,10 @@ static void allwinner_h3_realize(DeviceState *dev=
-, Error **errp)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0memory_region_add_subregion(get_system_memor=
-y(), s-&gt;memmap[AW_H3_SRAM_C],<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;s-&gt;sram_c);<=
-br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; +=C2=A0 =C2=A0 /* Clock Control Unit */<br>
-&gt; +=C2=A0 =C2=A0 qdev_init_nofail(DEVICE(&amp;s-&gt;ccu));<br>
-&gt; +=C2=A0 =C2=A0 sysbus_mmio_map(SYS_BUS_DEVICE(&amp;s-&gt;ccu), 0, s-&g=
-t;memmap[AW_H3_CCU]);<br>
-&gt; +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0/* UART0. For future clocktree API: All UART=
-S are connected to APB2_CLK. */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0serial_mm_init(get_system_memory(), s-&gt;me=
-mmap[AW_H3_UART0], 2,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 qdev_get_gpio_in(DEVICE(&amp;s-&gt;gic), AW_H3_GIC_SPI_UART0),<br>
-&gt; diff --git a/hw/misc/allwinner-h3-ccu.c b/hw/misc/allwinner-h3-ccu.c<b=
-r>
-&gt; new file mode 100644<br>
-&gt; index 0000000000..ccf58ccdf2<br>
-&gt; --- /dev/null<br>
-&gt; +++ b/hw/misc/allwinner-h3-ccu.c<br>
-&gt; @@ -0,0 +1,243 @@<br>
-&gt; +/*<br>
-&gt; + * Allwinner H3 Clock Control Unit emulation<br>
-&gt; + *<br>
-&gt; + * Copyright (C) 2019 Niek Linnenbank &lt;<a href=3D"mailto:nieklinne=
-nbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
-&gt; + *<br>
-&gt; + * This program is free software: you can redistribute it and/or modi=
-fy<br>
-&gt; + * it under the terms of the GNU General Public License as published =
-by<br>
-&gt; + * the Free Software Foundation, either version 2 of the License, or<=
-br>
-&gt; + * (at your option) any later version.<br>
-&gt; + *<br>
-&gt; + * This program is distributed in the hope that it will be useful,<br=
->
-&gt; + * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-&gt; + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the=
-<br>
-&gt; + * GNU General Public License for more details.<br>
-&gt; + *<br>
-&gt; + * You should have received a copy of the GNU General Public License<=
-br>
-&gt; + * along with this program.=C2=A0 If not, see &lt;<a href=3D"http://w=
-ww.gnu.org/licenses/" rel=3D"noreferrer" target=3D"_blank">http://www.gnu.o=
-rg/licenses/</a>&gt;.<br>
-&gt; + */<br>
-&gt; +<br>
-&gt; +#include &quot;qemu/osdep.h&quot;<br>
-&gt; +#include &quot;qemu/units.h&quot;<br>
-&gt; +#include &quot;hw/sysbus.h&quot;<br>
-&gt; +#include &quot;migration/vmstate.h&quot;<br>
-&gt; +#include &quot;qemu/log.h&quot;<br>
-&gt; +#include &quot;qemu/module.h&quot;<br>
-&gt; +#include &quot;hw/misc/allwinner-h3-ccu.h&quot;<br>
-&gt; +<br>
-&gt; +/* CCU register offsets */<br>
-&gt; +enum {<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_CPUX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0=3D 0x0000, /* PLL CPUX Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_AUDIO=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=3D 0x0008, /* PLL Audio Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_VIDEO=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=3D 0x0010, /* PLL Video Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_VE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0=3D 0x0018, /* PLL VE Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DDR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =3D 0x0020, /* PLL DDR Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_PERIPH0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0=
-x0028, /* PLL Peripherals 0 Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_GPU=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =3D 0x0038, /* PLL GPU Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_PERIPH1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0=
-x0044, /* PLL Peripherals 1 Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0=3D 0x0048, /* PLL Display Engine Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPUX_AXI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0=3D 0x0050, /* CPUX/AXI Configuration */<br>
-&gt; +=C2=A0 =C2=A0 REG_APB1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0=3D 0x0054, /* ARM Peripheral Bus 1 Config */<br>
-&gt; +=C2=A0 =C2=A0 REG_APB2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0=3D 0x0058, /* ARM Peripheral Bus 2 Config */<br>
-&gt; +=C2=A0 =C2=A0 REG_DRAM_CFG=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0=3D 0x00F4, /* DRAM Configuration */<br>
-&gt; +=C2=A0 =C2=A0 REG_MBUS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0=3D 0x00FC, /* MBUS Reset */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_TIME0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=3D 0x0200, /* PLL Stable Time 0 */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_TIME1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=3D 0x0204, /* PLL Stable Time 1 */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_CPUX_BIAS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x0220=
-, /* PLL CPUX Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_AUDIO_BIAS=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x0224=
-, /* PLL Audio Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_VIDEO_BIAS=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x0228=
-, /* PLL Video Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_VE_BIAS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0=
-x022C, /* PLL VE Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DDR_BIAS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0=
-x0230, /* PLL DDR Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_PERIPH0_BIAS=C2=A0 =C2=A0 =C2=A0=3D 0x0234, /* =
-PLL Peripherals 0 Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_GPU_BIAS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0=
-x023C, /* PLL GPU Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_PERIPH1_BIAS=C2=A0 =C2=A0 =C2=A0=3D 0x0244, /* =
-PLL Peripherals 1 Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DE_BIAS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0=
-x0248, /* PLL Display Engine Bias */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_CPUX_TUNING=C2=A0 =C2=A0 =C2=A0 =3D 0x0250, /* =
-PLL CPUX Tuning */<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DDR_TUNING=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x0260=
-, /* PLL DDR Tuning */<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +#define REG_INDEX(offset)=C2=A0 =C2=A0 (offset / sizeof(uint32_t))<br=
->
-&gt; +<br>
-&gt; +/* CCU register flags */<br>
-&gt; +enum {<br>
-&gt; +=C2=A0 =C2=A0 REG_DRAM_CFG_UPDATE=C2=A0 =C2=A0 =C2=A0 =3D (1 &lt;&lt;=
- 16),<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +enum {<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_ENABLE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=3D (1 &lt;&lt; 31),<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_LOCK=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0=3D (1 &lt;&lt; 28),<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +<br>
-&gt; +/* CCU register reset values */<br>
-&gt; +enum {<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_CPUX_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0=
-x00001000,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_AUDIO_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x0003=
-5514,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_VIDEO_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x0300=
-6207,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_VE_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=3D 0x03006207,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DDR_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0=
-x00001000,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_PERIPH0_RST=C2=A0 =C2=A0 =C2=A0 =3D 0x00041811,=
-<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_GPU_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0=
-x03006207,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_PERIPH1_RST=C2=A0 =C2=A0 =C2=A0 =3D 0x00041811,=
-<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DE_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=3D 0x03006207,<br>
-&gt; +=C2=A0 =C2=A0 REG_CPUX_AXI_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0=
-x00010000,<br>
-&gt; +=C2=A0 =C2=A0 REG_APB1_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0=3D 0x00001010,<br>
-&gt; +=C2=A0 =C2=A0 REG_APB2_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0=3D 0x01000000,<br>
-&gt; +=C2=A0 =C2=A0 REG_DRAM_CFG_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0=
-x00000000,<br>
-&gt; +=C2=A0 =C2=A0 REG_MBUS_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0=3D 0x80000000,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_TIME0_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x0000=
-00FF,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_TIME1_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x0000=
-00FF,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_CPUX_BIAS_RST=C2=A0 =C2=A0 =3D 0x08100200,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_AUDIO_BIAS_RST=C2=A0 =C2=A0=3D 0x10100000,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_VIDEO_BIAS_RST=C2=A0 =C2=A0=3D 0x10100000,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_VE_BIAS_RST=C2=A0 =C2=A0 =C2=A0 =3D 0x10100000,=
-<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DDR_BIAS_RST=C2=A0 =C2=A0 =C2=A0=3D 0x81104000,=
-<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_PERIPH0_BIAS_RST =3D 0x10100010,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_GPU_BIAS_RST=C2=A0 =C2=A0 =C2=A0=3D 0x10100000,=
-<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_PERIPH1_BIAS_RST =3D 0x10100010,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DE_BIAS_RST=C2=A0 =C2=A0 =C2=A0 =3D 0x10100000,=
-<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_CPUX_TUNING_RST=C2=A0 =3D 0x0A101000,<br>
-&gt; +=C2=A0 =C2=A0 REG_PLL_DDR_TUNING_RST=C2=A0 =C2=A0=3D 0x14880000,<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +static uint64_t allwinner_h3_ccu_read(void *opaque, hwaddr offset,<br=
->
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned si=
-ze)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 const AwH3ClockCtlState *s =3D AW_H3_CCU(opaque);<br>
-&gt; +=C2=A0 =C2=A0 const uint32_t idx =3D REG_INDEX(offset);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 if (idx &gt;=3D AW_H3_CCU_REGS_NUM) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_GUEST_ERROR, &quot;%s: =
-out-of-bounds offset 0x%04x\n&quot;,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 __func__, (uint32_t)offset);<br>
-<br>
-See comment in write().<br>
-<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 return s-&gt;regs[idx];<br>
-&gt; +}<br>
-&gt; +<br>
-&gt; +static void allwinner_h3_ccu_write(void *opaque, hwaddr offset,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint64_t val, unsig=
-ned size)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 AwH3ClockCtlState *s =3D AW_H3_CCU(opaque);<br>
-&gt; +=C2=A0 =C2=A0 const uint32_t idx =3D REG_INDEX(offset);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 if (idx &gt;=3D AW_H3_CCU_REGS_NUM) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_GUEST_ERROR, &quot;%s: =
-out-of-bounds offset 0x%04x\n&quot;,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 __func__, (uint32_t)offset);<br>
-<br>
-I&#39;d replace this check by ...<br>
-<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 switch (offset) {<br>
-&gt; +=C2=A0 =C2=A0 case REG_DRAM_CFG:=C2=A0 =C2=A0 /* DRAM Configuration *=
-/<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val &amp;=3D ~REG_DRAM_CFG_UPDATE;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_CPUX:=C2=A0 =C2=A0 /* PLL CPUX Control */<=
-br>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_AUDIO:=C2=A0 =C2=A0/* PLL Audio Control */=
-<br>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_VIDEO:=C2=A0 =C2=A0/* PLL Video Control */=
-<br>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_VE:=C2=A0 =C2=A0 =C2=A0 /* PLL VE Control =
-*/<br>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_DDR:=C2=A0 =C2=A0 =C2=A0/* PLL DDR Control=
- */<br>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_PERIPH0: /* PLL Peripherals 0 Control */<b=
-r>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_GPU:=C2=A0 =C2=A0 =C2=A0/* PLL GPU Control=
- */<br>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_PERIPH1: /* PLL Peripherals 1 Control */<b=
-r>
-&gt; +=C2=A0 =C2=A0 case REG_PLL_DE:=C2=A0 =C2=A0 =C2=A0 /* PLL Display Eng=
-ine Control */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (val &amp; REG_PLL_ENABLE) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 val |=3D REG_PLL_LOCK;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 case 0x304 ... AW_H3_CCU_IOSIZE:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_GUEST_ERROR, &q=
-uot;%s: out-of-bounds offset <br>
-0x%04x\n&quot;,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 __func__, (uint32_t)offset);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br></blockquote><div><br><=
-/div><div>OK, looks more compact indeed.<br></div><div>=C2=A0</div><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
- solid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt; +=C2=A0 =C2=A0 default:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_UNIMP, &quot;%s: unimpl=
-emented write offset 0x%04x\n&quot;,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 __func__, (uint32_t)offset);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[idx] =3D (uint32_t) val;<br>
-&gt; +}<br>
-<br>
-That said,<br>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redha=
-t.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com" target=3D"_blank">philmd@redhat.com</a>&gt;<br></blockquote><div><br><=
-/div><div>Thanks!</div><div><br></div><div>Niek<br></div><div>=C2=A0</div><=
-blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
-eft:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt; +<br>
-&gt; +static const MemoryRegionOps allwinner_h3_ccu_ops =3D {<br>
-&gt; +=C2=A0 =C2=A0 .read =3D allwinner_h3_ccu_read,<br>
-&gt; +=C2=A0 =C2=A0 .write =3D allwinner_h3_ccu_write,<br>
-&gt; +=C2=A0 =C2=A0 .endianness =3D DEVICE_NATIVE_ENDIAN,<br>
-&gt; +=C2=A0 =C2=A0 .valid =3D {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .min_access_size =3D 4,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .max_access_size =3D 4,<br>
-&gt; +=C2=A0 =C2=A0 },<br>
-&gt; +=C2=A0 =C2=A0 .impl.min_access_size =3D 4,<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +static void allwinner_h3_ccu_reset(DeviceState *dev)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 AwH3ClockCtlState *s =3D AW_H3_CCU(dev);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 /* Set default values for registers */<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_CPUX)] =3D REG_PLL_CPUX_RS=
-T;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_AUDIO)] =3D REG_PLL_AUDIO_=
-RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_VIDEO)] =3D REG_PLL_VIDEO_=
-RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_VE)] =3D REG_PLL_VE_RST;<b=
-r>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_DDR)] =3D REG_PLL_DDR_RST;=
-<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_PERIPH0)] =3D REG_PLL_PERI=
-PH0_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_GPU)] =3D REG_PLL_GPU_RST;=
-<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_PERIPH1)] =3D REG_PLL_PERI=
-PH1_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_DE)] =3D REG_PLL_DE_RST;<b=
-r>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_CPUX_AXI)] =3D REG_CPUX_AXI_RS=
-T;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_APB1)] =3D REG_APB1_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_APB2)] =3D REG_APB2_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_DRAM_CFG)] =3D REG_DRAM_CFG_RS=
-T;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_MBUS)] =3D REG_MBUS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_TIME0)] =3D REG_PLL_TIME0_=
-RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_TIME1)] =3D REG_PLL_TIME1_=
-RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_CPUX_BIAS)] =3D REG_PLL_CP=
-UX_BIAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_AUDIO_BIAS)] =3D REG_PLL_A=
-UDIO_BIAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_VIDEO_BIAS)] =3D REG_PLL_V=
-IDEO_BIAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_VE_BIAS)] =3D REG_PLL_VE_B=
-IAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_DDR_BIAS)] =3D REG_PLL_DDR=
-_BIAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_PERIPH0_BIAS)] =3D REG_PLL=
-_PERIPH0_BIAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_GPU_BIAS)] =3D REG_PLL_GPU=
-_BIAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_PERIPH1_BIAS)] =3D REG_PLL=
-_PERIPH1_BIAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_DE_BIAS)] =3D REG_PLL_DE_B=
-IAS_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_CPUX_TUNING)] =3D REG_PLL_=
-CPUX_TUNING_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;regs[REG_INDEX(REG_PLL_DDR_TUNING)] =3D REG_PLL_D=
-DR_TUNING_RST;<br>
-&gt; +}<br>
-&gt; +<br>
-&gt; +static void allwinner_h3_ccu_init(Object *obj)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);<br>
-&gt; +=C2=A0 =C2=A0 AwH3ClockCtlState *s =3D AW_H3_CCU(obj);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 /* Memory mapping */<br>
-&gt; +=C2=A0 =C2=A0 memory_region_init_io(&amp;s-&gt;iomem, OBJECT(s), &amp=
-;allwinner_h3_ccu_ops, s,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 TYPE_AW_H3_CCU, 1 * KiB);<br>
-&gt; +=C2=A0 =C2=A0 sysbus_init_mmio(sbd, &amp;s-&gt;iomem);<br>
-&gt; +}<br>
-&gt; +<br>
-&gt; +static const VMStateDescription allwinner_h3_ccu_vmstate =3D {<br>
-&gt; +=C2=A0 =C2=A0 .name =3D &quot;allwinner-h3-ccu&quot;,<br>
-&gt; +=C2=A0 =C2=A0 .version_id =3D 1,<br>
-&gt; +=C2=A0 =C2=A0 .minimum_version_id =3D 1,<br>
-&gt; +=C2=A0 =C2=A0 .fields =3D (VMStateField[]) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT32_ARRAY(regs, AwH3ClockCtlSt=
-ate, AW_H3_CCU_REGS_NUM),<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_END_OF_LIST()<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +static void allwinner_h3_ccu_class_init(ObjectClass *klass, void *dat=
-a)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 DeviceClass *dc =3D DEVICE_CLASS(klass);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 dc-&gt;reset =3D allwinner_h3_ccu_reset;<br>
-&gt; +=C2=A0 =C2=A0 dc-&gt;vmsd =3D &amp;allwinner_h3_ccu_vmstate;<br>
-&gt; +}<br>
-&gt; +<br>
-&gt; +static const TypeInfo allwinner_h3_ccu_info =3D {<br>
-&gt; +=C2=A0 =C2=A0 .name=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_AW_H3_=
-CCU,<br>
-&gt; +=C2=A0 =C2=A0 .parent=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_SYS_BUS_DEV=
-ICE,<br>
-&gt; +=C2=A0 =C2=A0 .instance_init =3D allwinner_h3_ccu_init,<br>
-&gt; +=C2=A0 =C2=A0 .instance_size =3D sizeof(AwH3ClockCtlState),<br>
-&gt; +=C2=A0 =C2=A0 .class_init=C2=A0 =C2=A0 =3D allwinner_h3_ccu_class_ini=
-t,<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +static void allwinner_h3_ccu_register(void)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 type_register_static(&amp;allwinner_h3_ccu_info);<br>
-&gt; +}<br>
-&gt; +<br>
-&gt; +type_init(allwinner_h3_ccu_register)<br>
-&gt; diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs<br>
-&gt; index da993f45b7..5e635b74d5 100644<br>
-&gt; --- a/hw/misc/Makefile.objs<br>
-&gt; +++ b/hw/misc/Makefile.objs<br>
-&gt; @@ -28,6 +28,7 @@ common-obj-$(CONFIG_MACIO) +=3D macio/<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0common-obj-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem.o<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; +common-obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3-ccu.o<br>
-&gt;=C2=A0 =C2=A0common-obj-$(CONFIG_REALVIEW) +=3D arm_sysctl.o<br>
-&gt;=C2=A0 =C2=A0common-obj-$(CONFIG_NSERIES) +=3D cbus.o<br>
-&gt;=C2=A0 =C2=A0common-obj-$(CONFIG_ECCMEMCTL) +=3D eccmemctl.o<br>
-&gt; <br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
 
---0000000000002c33e9059d8a324f--
+Console log using --enable-debug on 7dd547e5a:
+
+Linux version 4.7.0-rc1 (@859affe05464) (gcc version 6.3.0 20170516
+(Debian 6.3.0-18) ) #2 SMP Sat Feb 1 18:16:17 UTC 2020
+earlycon: uart8250 at I/O port 0x3f8 (options '38400n8')
+bootconsole [uart8250] enabled
+CPU0 revision is: 0001a900 (MIPS I6400)
+FPU revision is: 20f30300
+MSA revision is: 00000300
+MIPS: machine is mti,malta
+Software DMA cache coherency enabled
+Determined physical RAM map:
+ memory: 0000000008000000 @ 0000000000000000 (usable)
+Zone ranges:
+  DMA      [mem 0x0000000000000000-0x0000000000ffffff]
+  DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+  Normal   empty
+Movable zone start for each node
+Early memory node ranges
+  node   0: [mem 0x0000000000000000-0x0000000007ffffff]
+Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+VP topology {8} total 8
+Primary instruction cache 64kB, VIPT, 4-way, linesize 64 bytes.
+Primary data cache 64kB, 4-way, VIPT, no aliases, linesize 64 bytes
+percpu: Embedded 5 pages/cpu @980000000107c000 s29664 r8192 d44064 u81920
+Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 8163
+Kernel command line: clocksource=GIC console=ttyS0 printk.time=1
+[    0.000000] log_buf_len individual max cpu contribution: 4096 bytes
+[    0.000000] log_buf_len total cpu_extra contributions: 28672 bytes
+[    0.000000] log_buf_len min size: 32768 bytes
+[    0.000000] log_buf_len: 65536 bytes
+[    0.000000] early log buf free: 30424(92%)
+[    0.000000] PID hash table entries: 512 (order: -2, 4096 bytes)
+[    0.000000] Dentry cache hash table entries: 16384 (order: 3, 131072
+bytes)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 2, 65536 bytes)
+[    0.000000] Writing ErrCtl register=00000000
+[    0.000000] Readback ErrCtl register=00000000
+[    0.000000] MAAR configuration:
+[    0.000000]   [0]: 0x0000000000010000-0x0000000007ffffff speculate
+[    0.000000]   [1]: disabled
+[    0.000000]   [2]: disabled
+[    0.000000]   [3]: disabled
+[    0.000000]   [4]: disabled
+[    0.000000]   [5]: disabled
+[    0.000000]   [6]: disabled
+[    0.000000]   [7]: disabled
+[    0.000000] Memory: 121104K/131072K available (5253K kernel code,
+380K rwdata, 1276K rodata, 304K init, 278K bss, 9968K reserved, 0K
+cma-reserved)
+[    0.000000] Hierarchical RCU implementation.
+[    0.000000]  Build-time adjustment of leaf fanout to 64.
+[    0.000000] NR_IRQS:256
+[    0.000000] CPU frequency 200.00 MHz
+[    0.000000] GIC frequency 99.99 MHz
+[    0.000000] clocksource: GIC: mask: 0xffffffff max_cycles:
+0xffffffff, max_idle_ns: 19113957547 ns
+[    0.000000] clocksource: MIPS: mask: 0xffffffff max_cycles:
+0xffffffff, max_idle_ns: 19112610963 ns
+[    0.000741] sched_clock: 32 bits at 99MHz, resolution 10ns, wraps
+every 21474843642ns
+[    0.045796] Console: colour dummy device 80x25
+[    0.052754] Calibrating delay loop... 1380.35 BogoMIPS (lpj=6901760)
+[    0.182166] pid_max: default: 32768 minimum: 301
+[    0.188361] Mount-cache hash table entries: 2048 (order: 0, 16384 bytes)
+[    0.189064] Mountpoint-cache hash table entries: 2048 (order: 0,
+16384 bytes)
+[   41.034804] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.036928] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.056628] CPU1 revision is: 0001a900 (MIPS I6400)
+[   41.058037] FPU revision is: 20f30300
+[   41.058156] MSA revision is: 00000300
+[    0.535401] Synchronize counters for CPU 1: done.
+[   41.018777] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.018795] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.019379] CPU2 revision is: 0001a900 (MIPS I6400)
+[   41.019391] FPU revision is: 20f30300
+[   41.019397] MSA revision is: 00000300
+[    0.628295] Synchronize counters for CPU 2: done.
+[   41.018747] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.018763] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.019222] CPU3 revision is: 0001a900 (MIPS I6400)
+[   41.019233] FPU revision is: 20f30300
+[   41.019238] MSA revision is: 00000300
+[    0.769903] Synchronize counters for CPU 3: done.
+[   41.018757] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.018774] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.019008] CPU4 revision is: 0001a900 (MIPS I6400)
+[   41.019020] FPU revision is: 20f30300
+[   41.019026] MSA revision is: 00000300
+[    0.911756] Synchronize counters for CPU 4: done.
+[   41.018736] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.018756] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.018990] CPU5 revision is: 0001a900 (MIPS I6400)
+[   41.019002] FPU revision is: 20f30300
+[   41.019009] MSA revision is: 00000300
+[    1.043787] Synchronize counters for CPU 5: done.
+[   41.018734] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.018752] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.018977] CPU6 revision is: 0001a900 (MIPS I6400)
+[   41.018989] FPU revision is: 20f30300
+[   41.018995] MSA revision is: 00000300
+[    1.085417] Synchronize counters for CPU 6: done.
+[   41.018723] Primary instruction cache 64kB, VIPT, 4-way, linesize 64
+bytes.
+[   41.018742] Primary data cache 64kB, 4-way, VIPT, no aliases,
+linesize 64 bytes
+[   41.019068] CPU7 revision is: 0001a900 (MIPS I6400)
+[   41.019080] FPU revision is: 20f30300
+[   41.019085] MSA revision is: 00000300
+[    1.226464] Synchronize counters for CPU 7: done.
+[    1.227129] Brought up 8 CPUs
+[    1.297485] devtmpfs: initialized
+[    1.383773] clocksource: jiffies: mask: 0xffffffff max_cycles:
+0xffffffff, max_idle_ns: 19112604462750000 ns
+[    1.498275] NET: Registered protocol family 16
+[    1.535531] pm-cps: CPC does not support clock gating
+[    1.558214] ------------[ cut here ]------------
+[    1.560406] WARNING: CPU: 0 PID: 1 at fs/kernfs/dir.c:502
+__kernfs_remove+0x250/0x258
+[    1.561507] Modules linked in:
+[   22.727193] INFO: rcu_sched self-detected stall on CPU
+[   22.728201]  0-...: (2099 ticks this GP) idle=051/140000000000001/0
+softirq=14/14 fqs=2085
+[   22.728694]   (t=2100 jiffies g=-292 c=-293 q=134)
+[   22.729734] Task dump for CPU 0:
+[   22.730579] swapper/0       R  running task        0     1      0
+0x00100004
+[   22.731798] Stack : 000000000000001d 0000000000000004
+ffffffff80790000 ffffffff80820000
+          0000000000000000 0000000000000000 000000000000001d
+0000000000000002
+          ffffffff80820000 ffffffff80170c70 0000000000000000
+0000000000000000
+          0000000000000000 ffffffff80822328 0000000000000001
+0000000000000002
+          9800000007066fc0 ffffffff8078e340 ffffffff80780000
+0000000000000000
+          0000000000000000 ffffffff80780000 ffffffff80781010
+0000000000000086
+          0000000000000000 0000000000000000 0000000000000000
+0000000000000000
+          0000000000000000 980000000706b760 0000000000000000
+ffffffff801a726c
+          0000000000000000 0000000000000000 0000000000100004
+9800000007066fc0
+          ffffffff8078e340 ffffffff8010c460 ffffffff8078e340
+ffffffff801a726c
+          ...
+[   22.736574] Call Trace:
+[   22.736932] [<ffffffff8010c460>] show_stack+0x80/0xa0
+[   22.737782] [<ffffffff801a726c>] rcu_dump_cpu_stacks+0x8c/0xc8
+[   22.738076] [<ffffffff801829e0>] rcu_check_callbacks+0x780/0x810
+[   22.738407] [<ffffffff80185360>] update_process_times+0x38/0x70
+[   22.738731] [<ffffffff80193c34>] tick_handle_periodic+0x2c/0xa8
+[   22.739059] [<ffffffff804b6fe8>] gic_compare_interrupt+0x28/0x40
+[   22.739356] [<ffffffff80177688>] handle_percpu_devid_irq+0xa0/0xf0
+[   22.739655] [<ffffffff80172308>] generic_handle_irq+0x38/0x48
+[   22.740096] [<ffffffff80375d70>] gic_irq_dispatch+0x80/0x268
+[   22.740371] [<ffffffff80172308>] generic_handle_irq+0x38/0x48
+[   22.740647] [<ffffffff80108010>] do_IRQ+0x18/0x28
+[   22.740879] [<ffffffff803746c4>] plat_irq_dispatch+0x64/0xa0
+[   22.741158] [<ffffffff80106370>] ret_from_irq+0x0/0x4
+[   22.741616] [<ffffffff8034573c>] dump_stack+0x6c/0xd0
+[   22.741870] [<ffffffff8012d088>] __warn+0xf0/0x108
+[   22.742117] [<ffffffff80269e78>] __kernfs_remove+0x250/0x258
+[   22.742390] [<ffffffff8026ae38>] kernfs_remove_by_name_ns+0x48/0xb0
+[   22.742689] [<ffffffff8026dc44>] remove_files.isra.0+0x44/0x98
+[   22.742969] [<ffffffff8026e034>] sysfs_remove_group+0x4c/0xc0
+[   22.743553] [<ffffffff807cbc18>] param_sysfs_init+0x178/0x1f0
+[   22.744001] [<ffffffff80100564>] do_one_initcall+0x3c/0x148
+[   22.744286] [<ffffffff807c4b38>] kernel_init_freeable+0x15c/0x210
+[   22.744588] [<ffffffff80619cd0>] kernel_init+0x10/0xf8
+[   22.744841] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+[   22.745542]
+[   86.443882] INFO: rcu_sched self-detected stall on CPU
+[   86.444599]  0-...: (8402 ticks this GP) idle=051/140000000000001/0
+softirq=14/14 fqs=7208
+[   86.445336]   (t=8403 jiffies g=-292 c=-293 q=134)
+[   86.446122] rcu_sched kthread starved for 1127 jiffies!
+g18446744073709551324 c18446744073709551323 f0x0 RCU_GP_WAIT_FQS(3)
+->state=0x0
+[   86.447172] rcu_sched       R  running task        0     7      2
+0x00100000
+[   86.447843] Stack : ffffffff8017f140 98000000070afd68
+98000000070afd50 ffffffff80781010
+          98000000070afce0 98000000010f6600 00000000ffffa7cd
+98000000010f6600
+          98000000010f6600 ffffffff80780000 ffffffff80781010
+ffffffff80790000
+          0000000000000000 0000000000000001 0000000000000003
+ffffffff8061b2b4
+          0000000000000000 ffffffff8061dbac 0000000000000200
+0000000000000000
+          00000000ffffa7cd ffffffff80183fa8 98000000070ab000
+ffffffff00000006
+          0000000000000001 ffffffff80780000 ffffffff8078e340
+ffffffff8078e340
+          ffffffff8078e5a0 ffffffff80780000 ffffffff80780000
+ffffffff80181a98
+          98000000070ab000 ffffffff8078e5a8 ffffffff8078e5a8
+0000000000000001
+          0000000000000000 ffffffff80180000 ffffffff8017f140
+ffffffff806e0000
+          ...
+[   86.452980] Call Trace:
+[   86.453240] [<ffffffff8061ae28>] __schedule+0x4c8/0x930
+[   86.453728] [<ffffffff8061b2b4>] schedule+0x24/0x80
+[   86.454571] [<ffffffff8061dbac>] schedule_timeout+0x11c/0x1e0
+[   86.455103] [<ffffffff80181a98>] rcu_gp_kthread+0x510/0x948
+[   86.455731] [<ffffffff8014a9c8>] kthread+0xc8/0xe0
+[   86.456180] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+[   86.456721]
+[   86.456991] Task dump for CPU 0:
+[   86.457297] swapper/0       R  running task        0     1      0
+0x00100004
+[   86.457956] Stack : 000000000000001d 0000000000000004
+ffffffff80790000 ffffffff80820000
+          0000000000000000 0000000000000000 000000000000001d
+0000000000000002
+          ffffffff80820000 ffffffff80170c70 0000000000000000
+0000000000000000
+          0000000000000000 ffffffff80822328 0000000000000001
+ffffffff80822328
+          9800000007066fc0 ffffffff8078e340 ffffffff80780000
+0000000000000000
+          0000000000000000 ffffffff80780000 ffffffff80781010
+0000000000000086
+          0000000000000000 0000000000000000 0000000000000000
+0000000000000000
+          0000000000000000 980000000706b760 0000000000000000
+ffffffff801a726c
+          0000000000000000 0000000000000000 0000000000100004
+9800000007066fc0
+          ffffffff8078e340 ffffffff8010c460 ffffffff8078e340
+ffffffff801a726c
+          ...
+[   86.464391] Call Trace:
+[   86.464637] [<ffffffff8010c460>] show_stack+0x80/0xa0
+[   86.465108] [<ffffffff801a726c>] rcu_dump_cpu_stacks+0x8c/0xc8
+[   86.465639] [<ffffffff801829e0>] rcu_check_callbacks+0x780/0x810
+[   86.466157] [<ffffffff80185360>] update_process_times+0x38/0x70
+[   86.466482] [<ffffffff80193c34>] tick_handle_periodic+0x2c/0xa8
+[   86.466861] [<ffffffff804b6fe8>] gic_compare_interrupt+0x28/0x40
+[   86.467198] [<ffffffff80177688>] handle_percpu_devid_irq+0xa0/0xf0
+[   86.467536] [<ffffffff80172308>] generic_handle_irq+0x38/0x48
+[   86.467849] [<ffffffff80375d70>] gic_irq_dispatch+0x80/0x268
+[   86.468165] [<ffffffff80172308>] generic_handle_irq+0x38/0x48
+[   86.468479] [<ffffffff80108010>] do_IRQ+0x18/0x28
+[   86.468757] [<ffffffff803746c4>] plat_irq_dispatch+0x64/0xa0
+[   86.469070] [<ffffffff80106370>] ret_from_irq+0x0/0x4
+[   86.469358] [<ffffffff8034573c>] dump_stack+0x6c/0xd0
+[   86.469638] [<ffffffff8012d088>] __warn+0xf0/0x108
+[   86.469909] [<ffffffff80269e78>] __kernfs_remove+0x250/0x258
+[   86.470321] [<ffffffff8026ae38>] kernfs_remove_by_name_ns+0x48/0xb0
+[   86.470766] [<ffffffff8026dc44>] remove_files.isra.0+0x44/0x98
+[   86.471183] [<ffffffff8026e034>] sysfs_remove_group+0x4c/0xc0
+[   86.471592] [<ffffffff807cbc18>] param_sysfs_init+0x178/0x1f0
+[   86.472003] [<ffffffff80100564>] do_one_initcall+0x3c/0x148
+[   86.472405] [<ffffffff807c4b38>] kernel_init_freeable+0x15c/0x210
+[   86.472840] [<ffffffff80619cd0>] kernel_init+0x10/0xf8
+[   86.473219] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+[   86.473546]
+[  150.198525] INFO: rcu_sched self-detected stall on CPU
+[  150.198956]  0-...: (14705 ticks this GP) idle=051/140000000000001/0
+softirq=14/14 fqs=7208
+[  150.199539]   (t=14706 jiffies g=-292 c=-293 q=134)
+[  150.199943] rcu_sched kthread starved for 7430 jiffies!
+g18446744073709551324 c18446744073709551323 f0x0 RCU_GP_WAIT_FQS(3)
+->state=0x0
+[  150.200850] rcu_sched       R  running task        0     7      2
+0x00100000
+[  150.201251] Stack : ffffffff8017f140 98000000070afd68
+98000000070afd50 ffffffff80781010
+          98000000070afce0 98000000010f6600 00000000ffffa7cd
+98000000010f6600
+          98000000010f6600 ffffffff80780000 ffffffff80781010
+ffffffff80790000
+          0000000000000000 0000000000000001 0000000000000003
+ffffffff8061b2b4
+          0000000000000000 ffffffff8061dbac 0000000000000200
+0000000000000000
+          00000000ffffa7cd ffffffff80183fa8 98000000070ab000
+ffffffff00000006
+          0000000000000001 ffffffff80780000 ffffffff8078e340
+ffffffff8078e340
+          ffffffff8078e5a0 ffffffff80780000 ffffffff80780000
+ffffffff80181a98
+          98000000070ab000 ffffffff8078e5a8 ffffffff8078e5a8
+0000000000000001
+          0000000000000000 ffffffff80180000 ffffffff8017f140
+ffffffff806e0000
+          ...
+[  150.205988] Call Trace:
+[  150.206198] [<ffffffff8061ae28>] __schedule+0x4c8/0x930
+[  150.206588] [<ffffffff8061b2b4>] schedule+0x24/0x80
+[  150.206951] [<ffffffff8061dbac>] schedule_timeout+0x11c/0x1e0
+[  150.207381] [<ffffffff80181a98>] rcu_gp_kthread+0x510/0x948
+[  150.207794] [<ffffffff8014a9c8>] kthread+0xc8/0xe0
+[  150.208157] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+[  150.208641]
+[  150.208805] Task dump for CPU 0:
+[  150.209047] swapper/0       R  running task        0     1      0
+0x00100004
+[  150.209580] Stack : 000000000000001d 0000000000000004
+ffffffff80790000 ffffffff80820000
+          0000000000000000 0000000000000000 000000000000001d
+0000000000000002
+          ffffffff80820000 ffffffff80170c70 0000000000000000
+0000000000000000
+          0000000000000000 ffffffff80822328 0000000000000001
+ffffffff80822328
+          9800000007066fc0 ffffffff8078e340 ffffffff80780000
+0000000000000000
+          0000000000000000 ffffffff80780000 ffffffff80781010
+0000000000000086
+          0000000000000000 0000000000000000 0000000000000000
+0000000000000000
+          0000000000000000 980000000706b760 0000000000000000
+ffffffff801a726c
+          0000000000000000 0000000000000000 0000000000100004
+9800000007066fc0
+          ffffffff8078e340 ffffffff8010c460 ffffffff8078e340
+ffffffff801a726c
+          ...
+[  150.215207] Call Trace:
+[  150.215407] [<ffffffff8010c460>] show_stack+0x80/0xa0
+[  150.215782] [<ffffffff801a726c>] rcu_dump_cpu_stacks+0x8c/0xc8
+[  150.216211] [<ffffffff801829e0>] rcu_check_callbacks+0x780/0x810
+[  150.216646] [<ffffffff80185360>] update_process_times+0x38/0x70
+[  150.217076] [<ffffffff80193c34>] tick_handle_periodic+0x2c/0xa8
+[  150.217512] [<ffffffff804b6fe8>] gic_compare_interrupt+0x28/0x40
+[  150.217948] [<ffffffff80177688>] handle_percpu_devid_irq+0xa0/0xf0
+[  150.218400] [<ffffffff80172308>] generic_handle_irq+0x38/0x48
+[  150.218820] [<ffffffff80375d70>] gic_irq_dispatch+0x80/0x268
+[  150.219240] [<ffffffff80172308>] generic_handle_irq+0x38/0x48
+[  150.219660] [<ffffffff80108010>] do_IRQ+0x18/0x28
+[  150.220123] [<ffffffff803746c4>] plat_irq_dispatch+0x64/0xa0
+[  150.220579] [<ffffffff80106370>] ret_from_irq+0x0/0x4
+[  150.220952] [<ffffffff8034573c>] dump_stack+0x6c/0xd0
+[  150.221328] [<ffffffff8012d088>] __warn+0xf0/0x108
+[  150.221688] [<ffffffff80269e78>] __kernfs_remove+0x250/0x258
+[  150.222105] [<ffffffff8026ae38>] kernfs_remove_by_name_ns+0x48/0xb0
+[  150.222565] [<ffffffff8026dc44>] remove_files.isra.0+0x44/0x98
+[  150.222989] [<ffffffff8026e034>] sysfs_remove_group+0x4c/0xc0
+[  150.223412] [<ffffffff807cbc18>] param_sysfs_init+0x178/0x1f0
+[  150.223832] [<ffffffff80100564>] do_one_initcall+0x3c/0x148
+[  150.224246] [<ffffffff807c4b38>] kernel_init_freeable+0x15c/0x210
+[  150.224693] [<ffffffff80619cd0>] kernel_init+0x10/0xf8
+[  150.225069] [<ffffffff801063b8>] ret_from_kernel_thread+0x14/0x1c
+[  150.225506]
+^C
+qemu-system-mips64el: terminating on signal 2
+
+While hanging, QEMU is using 2 cores at 100%.
 
