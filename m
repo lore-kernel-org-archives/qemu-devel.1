@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78C7C33CB7
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 01:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF6EC33CB7
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 01:26:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DA9820663
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 01:26:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39AA420663
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 01:26:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hlbEv7Mq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DA9820663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hqdULqlL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39AA420663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixhXr-0002Ga-QL
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 20:25:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57399)
+	id 1ixhXx-0002Qb-Em
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 20:26:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=2939926b3=alistair.francis@wdc.com>)
- id 1ixhIy-0005Ai-Rn
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 20:10:38 -0500
+ id 1ixhIM-00044p-LX
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 20:09:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=2939926b3=alistair.francis@wdc.com>)
- id 1ixhIx-0006zw-Ko
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 20:10:36 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17129)
+ id 1ixhIL-0006h8-JR
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 20:09:58 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17177)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=2939926b3=alistair.francis@wdc.com>)
- id 1ixhIx-00069K-BS; Fri, 31 Jan 2020 20:10:35 -0500
+ id 1ixhIL-0006JU-AS; Fri, 31 Jan 2020 20:09:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1580519435; x=1612055435;
+ t=1580519396; x=1612055396;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=VZvOTH8k7NLUxTYGrJKj+ErgddFbqIGwYkWqdg/z9qo=;
- b=hlbEv7MqRB4CopdAPTRhgtEJw4bhVPqY1IG9FYoctLsjpeObfFUBtjwO
- /lycLcxqMcnXUmlLHnNhxxfdtzAIqkU/cTeUgNp8bJszf9QVEwn5elYM/
- 8UgMJW5lGN7dj+F1ghh+ZL4Od7J7N5fCV+lGR7BXyC95Rkk0lRRwYaYKn
- +BPLgAxZdLi8WEWhbZXrrWueA0s21OlyyzJdXmlxCudXtQ4jGLIsU6jwo
- OSq9xRSzkCAar0oyJN6uCvEOWxo1JI5GqTvLUybQS+CvlfpP5tZjccbsC
- YaYktRre+NQRyZ0dpsQOct7JiDflvIxEl5I6IvOwTrwVHjFcU5fYDcZIy w==;
-IronPort-SDR: hGFRGo2DRk9b6BUww6nEqYnaZWBTntbjKD7fcy7NqNn2wCrhZVLqn/1UgW6H1rOPKHln2DUJ58
- IeohCkeBfi65Zd5+ov3lLlBZGJuyGqMZAVFyWND8DMME3PsEe+xyYX31kD3EgOfFtNP/Ac1Hdo
- OsG1VQ0MyjMX+NrQDw0p4BJVCyqFjgfWiD09T3I7t7p5Vl5jAYzi4m3ucGzUXLHe6JratGS/1r
- rfAFygF7PFv9W0Wy9OR9rtNQrZT5X/JAlme41g/FA3pGYz1tKhmeurI75tHyQNkbwJXR2LUTAw
- zfM=
-X-IronPort-AV: E=Sophos;i="5.70,388,1574092800"; d="scan'208";a="128872491"
+ bh=BKj4+XG8YW0q5cgQbIAIcsOQyLvJBI4Rl5XMrfwJLkE=;
+ b=hqdULqlLHlArIwkFYVAk57O6GURLR+4TsbUWpK43CzQk0bvoOlkzKrwT
+ o3mVsdIwdZDVPO+URAf9+WOeUY//WyDQ3Rl5KVUIFgBVzdHUXdz9lnOOF
+ X0t1UhDULzTaU7qY9rHnKU24LnvKTIWN+otLKagSZmbS/8mH/KTzIbmYI
+ N3NdGoi+YxBp7JIXh7kCN09wDRH7lM5v5TrF4WMp3fUmz0lRlilamIaqw
+ Gik+ngOoSGEmjc4nQLo9LfA6yI1cgEUFF6GBiprNM3q6yDZ8i0V9l4cNa
+ vgfJ6/vjpxxiRDRjstXLQK5bDAM1P3prbthO0kONStAw8Q7C24/b5dMEW w==;
+IronPort-SDR: a/S5ajjofxy+CZ8PZt1cm6SB6I4hXmRPszn3JRGS+iWba8JgzDGa+hS3cSI/RFG8gUcSt/9Fhm
+ iHIusxzdB2h2WbfGT/56MNaprhofd7WF+fKpu8T4gv2FLOusjjXMeTR9G7IZBs5gj7cugDdx3Z
+ 41qjpIGdYAOD+QumHQ//86bzN4vl/JexGamHEuAXYBalu4NcAd2aFZ5Hl0L5HVdwLB2U+sEy9y
+ 6ynfDhDaDlo7uGKXt9hIS2ulMBYPyx2nY9P4u3GZ2lhLf8CHWvOZLHdXg2BQGffZRPfoJCxwT5
+ lMU=
+X-IronPort-AV: E=Sophos;i="5.70,388,1574092800"; d="scan'208";a="128872483"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 01 Feb 2020 09:09:29 +0800
-IronPort-SDR: zncOfuiMzGk/h8S8i63fSIP5npDyZM1yfYeQQ1EQ9jB5Qc22ArrounjNPS+xEKjpOIDeHF7xID
- nMZCaDAJRr7KUoNiGhxh361InjSxJtZgWIkX7FkY7m9ow3HfpC/1ahlk8Ed7MQNedt1XsNj6p+
- Heqi99SHFD+MhrXnekcJC/fhdSPh0FLjtqP1Pjshgj/ZRmJuUqzw17q0Z6H+hmjexDB7XHJzQp
- iz49sZxVJ96EIiZtsoz93tBlr2iddBN3QkCUBj/gRKo8RLvhTzzQVa/uluy7RMGZ1R0n6g2zIU
- 1DYn8D+QNz6uh3b5o0LzwlL3
+ by ob1.hgst.iphmx.com with ESMTP; 01 Feb 2020 09:09:15 +0800
+IronPort-SDR: 78vd74HWmLlC8o1jerZJhtFBYA2TOA3POhLV3bm4Jr5rnzx+RjRUIxMXMagbPhtOSvoi6SHQ5L
+ 9aB1ckefT/sl3qBGwtbVy5zDByodJZWKBzWR60zNxJh49AJyfLgCd0+ALbq2pntQr2sHa/+IQe
+ DRYJzTS20ZO0nXm7mmeUuOut5ZXnQLU4QtT1h5HiN0GQLp8uYHCiDxYBh+3UJozH6qe9b/hnUE
+ HbFgdn0yyYfAFdkYM6tVLi7gXIv7g42C3A5D23TLzZ44TdBDp0HYUuYuWXwrNoizjtNqbLebjA
+ N1LHB9d6dL0ZcMCAKLfF90wG
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 31 Jan 2020 17:02:38 -0800
-IronPort-SDR: o227rWEHJEfYETUUWcFGqsNwB+ybR59DOOVqIOje/DCDbP+Cg+fYl21DTUmmEf/p8JFhaBqiJT
- G0UuxytvBU0buUBMO2GeaeTIANeL3TE3MJD72NPDNiGQ6nn53Pddpq1g3g+POb94Tw9yoTG705
- 8Hubqe1LxDTiJ07EufWa3FD51Q6a0zlaDllkNg6eQzzIFYFp0eAuI6kbV9k0ULEl3scjWcfTpt
- v2FEJsyQxXNIUNB+TIXudFEBAyyLeatYRawK9g110epG9266sCLIxkVI4nv/rBp1sVlWMZT1lu
- yzY=
+ 31 Jan 2020 17:02:24 -0800
+IronPort-SDR: rUmK1oE+zeiXw6gyVE7UZwWLDTywwi7lC0pm07A78awcq5d+9K8Rykx7uqvY6nKrVwUffzQFU0
+ /qLMC+TC6skaAD7+46TJVNsXnqC6Y+pDKk4NgRAI9Hw3CZuFOV7AHT3ovdx02+GrPUWyy7VfJq
+ 3AnVu7X4PnLJOlQnWhvOF0S9beHII39Py/HVyiwQahqUNQYURa6FOloMzbQCn5U7ZHft5ZCUPM
+ JZx5rDZ54kmd1SegkL/W2taAfEgmuGosecU2Oydr8+PuX9jYSQdD3iLtZoRlN0VgyAsMcmqT/W
+ VP0=
 WDCIronportException: Internal
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.158.235])
- by uls-op-cesaip02.wdc.com with ESMTP; 31 Jan 2020 17:09:29 -0800
+ by uls-op-cesaip02.wdc.com with ESMTP; 31 Jan 2020 17:09:15 -0800
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 29/35] target/riscv: Allow specifying MMU stage
-Date: Fri, 31 Jan 2020 17:02:53 -0800
-Message-Id: <6f5f9cab7e5094f5a2f9d5a47d5036a426126ebb.1580518859.git.alistair.francis@wdc.com>
+Subject: [PATCH v2 24/35] target/riscv: Remove the hret instruction
+Date: Fri, 31 Jan 2020 17:02:38 -0800
+Message-Id: <39083deec532135287402aab20ab370f4cad68e3.1580518859.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <cover.1580518859.git.alistair.francis@wdc.com>
 References: <cover.1580518859.git.alistair.francis@wdc.com>
@@ -104,93 +104,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The hret instruction does not exist in the new spec versions, so remove
+it from QEMU.
+
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/cpu_helper.c | 37 ++++++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 9 deletions(-)
+ target/riscv/insn32.decode                     | 1 -
+ target/riscv/insn_trans/trans_privileged.inc.c | 5 -----
+ 2 files changed, 6 deletions(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 827a38324c..cd2d9341b9 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -277,10 +277,19 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
-  *
-  * Adapted from Spike's mmu_t::translate and mmu_t::walk
-  *
-+ * @env: CPURISCVState
-+ * @physical: This will be set to the calculated physical address
-+ * @prot: The returned protection attributes
-+ * @addr: The virtual address to be translated
-+ * @access_type: The type of MMU access
-+ * @mmu_idx: Indicates current privilege level
-+ * @first_stage: Are we in first stage translation?
-+ *               Second stage is used for hypervisor guest translation
-  */
- static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-                                 int *prot, target_ulong addr,
--                                int access_type, int mmu_idx)
-+                                int access_type, int mmu_idx,
-+                                bool first_stage)
- {
-     /* NOTE: the env->pc value visible here will not be
-      * correct, but the value visible to the exception handler
-@@ -483,13 +492,21 @@ restart:
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index cfd9ca6d2b..b883672e63 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -75,7 +75,6 @@ ecall       000000000000     00000 000 00000 1110011
+ ebreak      000000000001     00000 000 00000 1110011
+ uret        0000000    00010 00000 000 00000 1110011
+ sret        0001000    00010 00000 000 00000 1110011
+-hret        0010000    00010 00000 000 00000 1110011
+ mret        0011000    00010 00000 000 00000 1110011
+ wfi         0001000    00101 00000 000 00000 1110011
+ hfence_gvma 0110001    ..... ..... 000 00000 1110011 @hfence_gvma
+diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
+index b9b5a89b52..76c2fad71c 100644
+--- a/target/riscv/insn_trans/trans_privileged.inc.c
++++ b/target/riscv/insn_trans/trans_privileged.inc.c
+@@ -58,11 +58,6 @@ static bool trans_sret(DisasContext *ctx, arg_sret *a)
+ #endif
  }
  
- static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
--                                MMUAccessType access_type, bool pmp_violation)
-+                                MMUAccessType access_type, bool pmp_violation,
-+                                bool first_stage)
+-static bool trans_hret(DisasContext *ctx, arg_hret *a)
+-{
+-    return false;
+-}
+-
+ static bool trans_mret(DisasContext *ctx, arg_mret *a)
  {
-     CPUState *cs = env_cpu(env);
--    int page_fault_exceptions =
--        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
--        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
--        !pmp_violation;
-+    int page_fault_exceptions;
-+    if (first_stage) {
-+        page_fault_exceptions =
-+            (env->priv_ver >= PRIV_VERSION_1_10_0) &&
-+            get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
-+            !pmp_violation;
-+    } else {
-+        page_fault_exceptions =
-+            get_field(env->hgatp, HGATP_MODE) != VM_1_10_MBARE &&
-+            !pmp_violation;
-+    }
-     switch (access_type) {
-     case MMU_INST_FETCH:
-         cs->exception_index = page_fault_exceptions ?
-@@ -516,7 +533,8 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     int prot;
-     int mmu_idx = cpu_mmu_index(&cpu->env, false);
- 
--    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx)) {
-+    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx,
-+                             true)) {
-         return -1;
-     }
-     return phys_addr;
-@@ -581,7 +599,8 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
-                   __func__, address, access_type, mmu_idx);
- 
--    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
-+    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx,
-+                               true);
- 
-     if (mode == PRV_M && access_type != MMU_INST_FETCH) {
-         if (get_field(env->mstatus, MSTATUS_MPRV)) {
-@@ -608,7 +627,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     } else if (probe) {
-         return false;
-     } else {
--        raise_mmu_exception(env, address, access_type, pmp_violation);
-+        raise_mmu_exception(env, address, access_type, pmp_violation, true);
-         riscv_raise_exception(env, cs->exception_index, retaddr);
-     }
- #else
+ #ifndef CONFIG_USER_ONLY
 -- 
 2.25.0
 
