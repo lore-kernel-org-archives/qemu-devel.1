@@ -2,87 +2,87 @@ Return-Path: <SRS0=CCzH=3V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A56FC33CB3
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A8DC3F68F
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:50:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB8B4205F4
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:49:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 940DC205F4
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:50:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zZ9CvDny"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB8B4205F4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VTXjsKOX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 940DC205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixyli-0005XP-4K
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:49:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58998)
+	id 1ixymG-0006tg-RG
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:50:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58894)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ixyT1-00084e-0c
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:30:08 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySr-0007qT-Gu
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySz-0007Fx-LR
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:30:06 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37119)
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySp-00071s-UN
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:57 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43533)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ixySz-0007Ec-FB
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:30:05 -0500
-Received: by mail-pf1-x444.google.com with SMTP id p14so5273828pfn.4
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:30:05 -0800 (PST)
+ id 1ixySp-00071D-OE
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:55 -0500
+Received: by mail-pl1-x641.google.com with SMTP id p11so4173023plq.10
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:29:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=u56IY+HRZxZx4lkNPaNYlhu3dFhpsHvask7g8ioRP78=;
- b=zZ9CvDnyU9pcbNVQ/2X1oYhkXancUwUOIa2ckxIXqiovtNPe5WyaacXv44bDPaiAsK
- xmhsp0UgCdf8PKjNAopAVTXpEcwvFlxgsY3twQUvsBgMqr6P2Qces3HetrW8z4HmbleK
- +2TvbaHH52RrGGlSATqtcOKmBtTXQ9o3Zmun2W7m8qGoy7upchTKie/6UeTrttsrkvcj
- rP/Gwsf7vg4iOdxEKJARhAp7fYNu8qS+3fir/QZdjkLO3twJJMfVcwcgY4NaW6CLQ8S0
- vkkNj/U0Q24g/V0BPo5nb7ceuS9Vi41F64thfNwq9MyxSpJn9xPtuwvHnk/J/jT+jZe0
- Z1TQ==
+ bh=Lx6/vKYYp72gTf4UzAbSPEaYbohru43Bb1YVjGxSPOk=;
+ b=VTXjsKOXLLDWu/8fnM+GyNmzUeqOH2g+GM6CPoaywnMdCUnVIfGuLd65u3xaYez5kr
+ FpKS+8oLi3frkPErtqgorMxAuUUea+OEdPdyzHLPOZ5NEo0SFKmfvlD1aCCX8ghzVQfL
+ 4lhMbBuSfkhLm51PJqMIvcZS3fywxMwTQxL4AGVB3pK6fVrAvuevijYZKzKupXvDMxVK
+ JngcWJgCZWiYy5Jl3qPbsMXqVJmPIUoXnvO/jRSoRKY1cQM6QOu+E1IXhcbUADpUZDLo
+ 7K93pXS+t1VLEmFJtTigNPk480XRh0TdjsrYTurAeC67scUU3UWDA9eEsvaUwkrichAx
+ LAuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=u56IY+HRZxZx4lkNPaNYlhu3dFhpsHvask7g8ioRP78=;
- b=ZlHLc0epi/qPSCPX87AjugJxgKovgHT9dtFkmpMNAWqQh9zLR9IERLTLlNIyGLmAGU
- be0glCAP35U2FFeCg7fNsCXbbKvv9lHU2tFQTg5qOrxUYLLNgvB7PY8ZCtBcOEdAv3lL
- wMT/K0fNbzzBHU0ZwYIhgkRfkiYRXsjZ+DWOdF8/vg5OGHcGMs9n5KLGKR+yRf8cLi2P
- GBdhaJgS4bhyh43t4k7ppsse4wtKq1X5NldxcOSAnWRedbkomlL0FnUaWBzWWETGCtik
- DojDm3xSWyQ+YGS6eaP1zOpiXMYVaE4LzMiUW5ljmQhgNkhXMqz++ZOKNJlLwBo/2pLI
- gtJA==
-X-Gm-Message-State: APjAAAUVIYU7putClDG0h11HUd1xWu0DtvldDgxu1YLTTnIyS39Ct43k
- VlfzLDjgQWm8ukqK7s3h42j/9ADqPy4=
-X-Google-Smtp-Source: APXvYqwAAjgK5SXRedqTLx9P94fP4c2QVu+tKxxz2Bvq+pGU2f389ArMnDMXxyY969jiQk1TdmrDzw==
-X-Received: by 2002:a63:4641:: with SMTP id v1mr16547886pgk.389.1580585404268; 
- Sat, 01 Feb 2020 11:30:04 -0800 (PST)
+ bh=Lx6/vKYYp72gTf4UzAbSPEaYbohru43Bb1YVjGxSPOk=;
+ b=ZdKVppyhK3I2zZLfbz1VLohWlF2PhZk0M0tf7zOYkfMrp1j7AyeU6mQP4DL3d+2PU9
+ R29T3TZWWaX+6KmgwPuW2XwxAkvPMbVn1aDtAJTn4J3THdqeeQPzDvzfd148E2sxqrmc
+ sz2fcRPhsrlCmuIB2keIF+OVDnthdAThrONbyQcYtYqDmyYWeSSO7PYE7iA3nVWwJA5V
+ WGxnemIJBWPSm82GfOvcYme5eCqtJ82TVHqMkHOh873qryrNWiLmnosd9nzBP8CN7K36
+ W5INk9tPGEqj68B5Yvk1pGmzJP3rSGlwarA++ywb7odnyKvlnvwPKiPjdcRK8QQyf7VE
+ OLpA==
+X-Gm-Message-State: APjAAAUhfJ5B0n1qt2t/E9JPPtgGwWSZO1PH20/gG0ZQz5wrs3MVsAkM
+ oEq13r/di2G6cGcxsxQDWqntB01Ve3M=
+X-Google-Smtp-Source: APXvYqw3Quxvlf+KoHLVh7anwxb+t9irTmm6KkeZ61Xt8zeaYnS3mfCBukLr9WAkhxEjgrti0Muaqw==
+X-Received: by 2002:a17:90a:858c:: with SMTP id
+ m12mr18764534pjn.127.1580585394346; 
+ Sat, 01 Feb 2020 11:29:54 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.30.03
+ by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 01 Feb 2020 11:30:03 -0800 (PST)
+ Sat, 01 Feb 2020 11:29:53 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 39/41] target/arm: Pass more cpu state to arm_excp_unmasked
-Date: Sat,  1 Feb 2020 11:29:14 -0800
-Message-Id: <20200201192916.31796-40-richard.henderson@linaro.org>
+Subject: [PATCH v6 31/41] target/arm: Flush tlbs for E2&0 translation regime
+Date: Sat,  1 Feb 2020 11:29:06 -0800
+Message-Id: <20200201192916.31796-32-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200201192916.31796-1-richard.henderson@linaro.org>
 References: <20200201192916.31796-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,100 +94,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Avoid redundant computation of cpu state by passing it in
-from the caller, which has already computed it for itself.
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+v5: Flush all EL2 regimes with TLBI ALLE2 (pmm).
+---
+ target/arm/helper.c | 34 +++++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index b81ed44bd2..fcee0a2dd4 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -411,14 +411,13 @@ static void arm_cpu_reset(CPUState *s)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f9be6b052f..0e2278b5aa 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -4174,8 +4174,12 @@ static CPAccessResult aa64_cacheop_access(CPUARMState *env,
+ 
+ static int vae1_tlbmask(CPUARMState *env)
+ {
++    /* Since we exclude secure first, we may read HCR_EL2 directly. */
+     if (arm_is_secure_below_el3(env)) {
+         return ARMMMUIdxBit_SE10_1 | ARMMMUIdxBit_SE10_0;
++    } else if ((env->cp15.hcr_el2 & (HCR_E2H | HCR_TGE))
++               == (HCR_E2H | HCR_TGE)) {
++        return ARMMMUIdxBit_E20_2 | ARMMMUIdxBit_E20_0;
+     } else {
+         return ARMMMUIdxBit_E10_1 | ARMMMUIdxBit_E10_0;
+     }
+@@ -4219,6 +4223,12 @@ static int alle1_tlbmask(CPUARMState *env)
+     }
  }
  
- static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
--                                     unsigned int target_el)
-+                                     unsigned int target_el,
-+                                     unsigned int cur_el, bool secure,
-+                                     uint64_t hcr_el2)
++static int alle2_tlbmask(CPUARMState *env)
++{
++    /* TODO: ARMv8.4-SecEL2 */
++    return ARMMMUIdxBit_E20_0 | ARMMMUIdxBit_E20_2 | ARMMMUIdxBit_E2;
++}
++
+ static void tlbi_aa64_alle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                   uint64_t value)
  {
-     CPUARMState *env = cs->env_ptr;
--    unsigned int cur_el = arm_current_el(env);
--    bool secure = arm_is_secure(env);
-     bool pstate_unmasked;
-     int8_t unmasked = 0;
--    uint64_t hcr_el2;
+@@ -4231,10 +4241,10 @@ static void tlbi_aa64_alle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void tlbi_aa64_alle2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                   uint64_t value)
+ {
+-    ARMCPU *cpu = env_archcpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUState *cs = env_cpu(env);
++    int mask = alle2_tlbmask(env);
  
-     /*
-      * Don't take exceptions if they target a lower EL.
-@@ -429,8 +428,6 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-         return false;
-     }
+-    tlb_flush_by_mmuidx(cs, ARMMMUIdxBit_E2);
++    tlb_flush_by_mmuidx(cs, mask);
+ }
  
--    hcr_el2 = arm_hcr_el2_eff(env);
--
-     switch (excp_idx) {
-     case EXCP_FIQ:
-         pstate_unmasked = !(env->daif & PSTATE_F);
-@@ -535,6 +532,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     CPUARMState *env = cs->env_ptr;
-     uint32_t cur_el = arm_current_el(env);
-     bool secure = arm_is_secure(env);
-+    uint64_t hcr_el2 = arm_hcr_el2_eff(env);
-     uint32_t target_el;
-     uint32_t excp_idx;
-     bool ret = false;
-@@ -542,7 +540,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_FIQ) {
-         excp_idx = EXCP_FIQ;
-         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
--        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
-+        if (arm_excp_unmasked(cs, excp_idx, target_el,
-+                              cur_el, secure, hcr_el2)) {
-             cs->exception_index = excp_idx;
-             env->exception.target_el = target_el;
-             cc->do_interrupt(cs);
-@@ -552,7 +551,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_HARD) {
-         excp_idx = EXCP_IRQ;
-         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
--        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
-+        if (arm_excp_unmasked(cs, excp_idx, target_el,
-+                              cur_el, secure, hcr_el2)) {
-             cs->exception_index = excp_idx;
-             env->exception.target_el = target_el;
-             cc->do_interrupt(cs);
-@@ -562,7 +562,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_VIRQ) {
-         excp_idx = EXCP_VIRQ;
-         target_el = 1;
--        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
-+        if (arm_excp_unmasked(cs, excp_idx, target_el,
-+                              cur_el, secure, hcr_el2)) {
-             cs->exception_index = excp_idx;
-             env->exception.target_el = target_el;
-             cc->do_interrupt(cs);
-@@ -572,7 +573,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_VFIQ) {
-         excp_idx = EXCP_VFIQ;
-         target_el = 1;
--        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
-+        if (arm_excp_unmasked(cs, excp_idx, target_el,
-+                              cur_el, secure, hcr_el2)) {
-             cs->exception_index = excp_idx;
-             env->exception.target_el = target_el;
-             cc->do_interrupt(cs);
+ static void tlbi_aa64_alle3_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -4259,8 +4269,9 @@ static void tlbi_aa64_alle2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                     uint64_t value)
+ {
+     CPUState *cs = env_cpu(env);
++    int mask = alle2_tlbmask(env);
+ 
+-    tlb_flush_by_mmuidx_all_cpus_synced(cs, ARMMMUIdxBit_E2);
++    tlb_flush_by_mmuidx_all_cpus_synced(cs, mask);
+ }
+ 
+ static void tlbi_aa64_alle3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -4271,6 +4282,15 @@ static void tlbi_aa64_alle3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     tlb_flush_by_mmuidx_all_cpus_synced(cs, ARMMMUIdxBit_SE3);
+ }
+ 
++static int vae2_tlbmask(CPUARMState *env)
++{
++    if (arm_hcr_el2_eff(env) & HCR_E2H) {
++        return ARMMMUIdxBit_E20_0 | ARMMMUIdxBit_E20_2;
++    } else {
++        return ARMMMUIdxBit_E2;
++    }
++}
++
+ static void tlbi_aa64_vae2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                  uint64_t value)
+ {
+@@ -4278,11 +4298,11 @@ static void tlbi_aa64_vae2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+      * Currently handles both VAE2 and VALE2, since we don't support
+      * flush-last-level-only.
+      */
+-    ARMCPU *cpu = env_archcpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUState *cs = env_cpu(env);
++    int mask = vae2_tlbmask(env);
+     uint64_t pageaddr = sextract64(value << 12, 0, 56);
+ 
+-    tlb_flush_page_by_mmuidx(cs, pageaddr, ARMMMUIdxBit_E2);
++    tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
+ }
+ 
+ static void tlbi_aa64_vae3_write(CPUARMState *env, const ARMCPRegInfo *ri,
 -- 
 2.20.1
 
