@@ -7,80 +7,81 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF6EC33CB7
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 01:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 049FCC33CB7
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 01:27:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39AA420663
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 01:26:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0EA320663
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 01:27:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hqdULqlL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39AA420663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZQIZ0tH/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0EA320663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixhXx-0002Qb-Em
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 20:26:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57197)
+	id 1ixhZZ-0004Hq-W0
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jan 2020 20:27:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=2939926b3=alistair.francis@wdc.com>)
- id 1ixhIM-00044p-LX
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 20:09:59 -0500
+ id 1ixhJ2-0005JP-Oo
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 20:10:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=2939926b3=alistair.francis@wdc.com>)
- id 1ixhIL-0006h8-JR
- for qemu-devel@nongnu.org; Fri, 31 Jan 2020 20:09:58 -0500
+ id 1ixhJ1-00075g-OR
+ for qemu-devel@nongnu.org; Fri, 31 Jan 2020 20:10:40 -0500
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17177)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=2939926b3=alistair.francis@wdc.com>)
- id 1ixhIL-0006JU-AS; Fri, 31 Jan 2020 20:09:57 -0500
+ id 1ixhJ1-0006JU-G8; Fri, 31 Jan 2020 20:10:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1580519396; x=1612055396;
+ t=1580519439; x=1612055439;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=BKj4+XG8YW0q5cgQbIAIcsOQyLvJBI4Rl5XMrfwJLkE=;
- b=hqdULqlLHlArIwkFYVAk57O6GURLR+4TsbUWpK43CzQk0bvoOlkzKrwT
- o3mVsdIwdZDVPO+URAf9+WOeUY//WyDQ3Rl5KVUIFgBVzdHUXdz9lnOOF
- X0t1UhDULzTaU7qY9rHnKU24LnvKTIWN+otLKagSZmbS/8mH/KTzIbmYI
- N3NdGoi+YxBp7JIXh7kCN09wDRH7lM5v5TrF4WMp3fUmz0lRlilamIaqw
- Gik+ngOoSGEmjc4nQLo9LfA6yI1cgEUFF6GBiprNM3q6yDZ8i0V9l4cNa
- vgfJ6/vjpxxiRDRjstXLQK5bDAM1P3prbthO0kONStAw8Q7C24/b5dMEW w==;
-IronPort-SDR: a/S5ajjofxy+CZ8PZt1cm6SB6I4hXmRPszn3JRGS+iWba8JgzDGa+hS3cSI/RFG8gUcSt/9Fhm
- iHIusxzdB2h2WbfGT/56MNaprhofd7WF+fKpu8T4gv2FLOusjjXMeTR9G7IZBs5gj7cugDdx3Z
- 41qjpIGdYAOD+QumHQ//86bzN4vl/JexGamHEuAXYBalu4NcAd2aFZ5Hl0L5HVdwLB2U+sEy9y
- 6ynfDhDaDlo7uGKXt9hIS2ulMBYPyx2nY9P4u3GZ2lhLf8CHWvOZLHdXg2BQGffZRPfoJCxwT5
- lMU=
-X-IronPort-AV: E=Sophos;i="5.70,388,1574092800"; d="scan'208";a="128872483"
+ bh=THmG6Z8Iy0AS7qhVhPSh/tjhQzN/1puYu98Jb+bF4F8=;
+ b=ZQIZ0tH/IFLN8uAEeLss94i/Z9TKcnzTOSP452RKe+OY/cMBIFFOxnvt
+ XLprp611yoFksH4NkB81TmfvfaG1rum6Jmjn97vtnjRyiK9ukMtT69arV
+ YZ0KJKWPf/Gs7FYESQGtlHRlyUWNsAV1KMkjK9+1OPCi7XbXLWh0BH2QI
+ 3p6Qukhdam+GRRz/94/PFc0LtuCMWD/w9ICymclC5wop+sTKe/sXPyFje
+ L1DyfJEYe04A7rNIrTDhZt50EIAhr5tfotdVGjliwC4cwBvhqhcauXMOl
+ RFvwQY2PdtvbZlN2c+eSAk5bpusJup7Y8cm9D6OEtewrs5XJ22pcJV0qK w==;
+IronPort-SDR: XCO6KQl7eP6KjazhChtjjNQf/oiS5wJPu8qErDM2YmmkJ07clX0uPWUXpC6nHpzmPGuoLdlF26
+ UO1JYxnrwaO3/n7DZ5tb/1RxTZImcO1Hw4rXkFmXKbJf2nFQ0o9cTgC6Uaa23XmaUDVKLpnPWA
+ 1++CQpq2iCGj80601U/wsVXihcS+2NTo5J0GUWApeve9F4wgixLiNgSQ0xoavGpvewxiQ5pQu6
+ 3i0Vz/xZvgRmOEklLNqy5LPh87lyZqeBPh96XZWbaYh/8LfaTwK3uygVu8fMh32R/P0cP4XlZE
+ pYc=
+X-IronPort-AV: E=Sophos;i="5.70,388,1574092800"; d="scan'208";a="128872496"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 01 Feb 2020 09:09:15 +0800
-IronPort-SDR: 78vd74HWmLlC8o1jerZJhtFBYA2TOA3POhLV3bm4Jr5rnzx+RjRUIxMXMagbPhtOSvoi6SHQ5L
- 9aB1ckefT/sl3qBGwtbVy5zDByodJZWKBzWR60zNxJh49AJyfLgCd0+ALbq2pntQr2sHa/+IQe
- DRYJzTS20ZO0nXm7mmeUuOut5ZXnQLU4QtT1h5HiN0GQLp8uYHCiDxYBh+3UJozH6qe9b/hnUE
- HbFgdn0yyYfAFdkYM6tVLi7gXIv7g42C3A5D23TLzZ44TdBDp0HYUuYuWXwrNoizjtNqbLebjA
- N1LHB9d6dL0ZcMCAKLfF90wG
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by ob1.hgst.iphmx.com with ESMTP; 01 Feb 2020 09:09:35 +0800
+IronPort-SDR: 7+zEhE5I2GKWVfw58fdXyolLOEOlJynnolLx74CscgK4Wax1IOtg/LXZILObgsiv/w2wpfi2oX
+ OHtKWZJKAv7/CNPKQOotBpdItrfn8htRX6Bl3P0qq0zf8xovuvyt18N99Lx/dNgeobxupeT/oZ
+ Xbau8t6Me1TCVmNsyI9sGNhQJwnLeoVB0HAg6I5DF4M/QMuyUIJPiKNr17Qh/Gpwao7k1b/m76
+ 5N88AIG/6euawCuAeYSlug3rGRK8WwvfE4gRDbnS1V25jTRwnXGuA3ZMRQhPehpE1pu+64iDRh
+ XEe0NhBGtCmecnfsQ4m8oOIJ
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 31 Jan 2020 17:02:24 -0800
-IronPort-SDR: rUmK1oE+zeiXw6gyVE7UZwWLDTywwi7lC0pm07A78awcq5d+9K8Rykx7uqvY6nKrVwUffzQFU0
- /qLMC+TC6skaAD7+46TJVNsXnqC6Y+pDKk4NgRAI9Hw3CZuFOV7AHT3ovdx02+GrPUWyy7VfJq
- 3AnVu7X4PnLJOlQnWhvOF0S9beHII39Py/HVyiwQahqUNQYURa6FOloMzbQCn5U7ZHft5ZCUPM
- JZx5rDZ54kmd1SegkL/W2taAfEgmuGosecU2Oydr8+PuX9jYSQdD3iLtZoRlN0VgyAsMcmqT/W
- VP0=
+ 31 Jan 2020 17:02:44 -0800
+IronPort-SDR: feceoVqIxADoaF8zJpF9lyUTvldpwBe8TsrWS78fBT8PPH2DAZg5O7iGgPaxa121bBZMnXt+ia
+ Om53I7gnGNSNkDLw/BSwa47BFRaAZ6m/ERH91aPo9PkEsdqO7kolDHDafBXbKsYBMpAiCqWrVf
+ rsjcdqsjpgfbBeIQQ/j30r1zTyYqAT5OSVLPtiA05m7THF57UPs0B50GaEyDqKpNz2S4mg/0ux
+ HWO56DyZGcB/yzmBBepn+0PWh9Zj1Hh44sz0DAi2g3aYjCL5xccNXs/3b0hux2vvBgcrscGluk
+ nIU=
 WDCIronportException: Internal
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.158.235])
- by uls-op-cesaip02.wdc.com with ESMTP; 31 Jan 2020 17:09:15 -0800
+ by uls-op-cesaip01.wdc.com with ESMTP; 31 Jan 2020 17:09:35 -0800
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 24/35] target/riscv: Remove the hret instruction
-Date: Fri, 31 Jan 2020 17:02:38 -0800
-Message-Id: <39083deec532135287402aab20ab370f4cad68e3.1580518859.git.alistair.francis@wdc.com>
+Subject: [PATCH v2 31/35] target/riscv: Raise the new execptions when 2nd
+ stage translation fails
+Date: Fri, 31 Jan 2020 17:02:59 -0800
+Message-Id: <b13f9c636f3c9fde604a27140df328ee10305078.1580518859.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <cover.1580518859.git.alistair.francis@wdc.com>
 References: <cover.1580518859.git.alistair.francis@wdc.com>
@@ -104,44 +105,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The hret instruction does not exist in the new spec versions, so remove
-it from QEMU.
-
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/insn32.decode                     | 1 -
- target/riscv/insn_trans/trans_privileged.inc.c | 5 -----
- 2 files changed, 6 deletions(-)
+ target/riscv/cpu_helper.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index cfd9ca6d2b..b883672e63 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -75,7 +75,6 @@ ecall       000000000000     00000 000 00000 1110011
- ebreak      000000000001     00000 000 00000 1110011
- uret        0000000    00010 00000 000 00000 1110011
- sret        0001000    00010 00000 000 00000 1110011
--hret        0010000    00010 00000 000 00000 1110011
- mret        0011000    00010 00000 000 00000 1110011
- wfi         0001000    00101 00000 000 00000 1110011
- hfence_gvma 0110001    ..... ..... 000 00000 1110011 @hfence_gvma
-diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
-index b9b5a89b52..76c2fad71c 100644
---- a/target/riscv/insn_trans/trans_privileged.inc.c
-+++ b/target/riscv/insn_trans/trans_privileged.inc.c
-@@ -58,11 +58,6 @@ static bool trans_sret(DisasContext *ctx, arg_sret *a)
- #endif
- }
- 
--static bool trans_hret(DisasContext *ctx, arg_hret *a)
--{
--    return false;
--}
--
- static bool trans_mret(DisasContext *ctx, arg_mret *a)
- {
- #ifndef CONFIG_USER_ONLY
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 5f96631637..da994aba57 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -585,16 +585,28 @@ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+     }
+     switch (access_type) {
+     case MMU_INST_FETCH:
+-        cs->exception_index = page_fault_exceptions ?
+-            RISCV_EXCP_INST_PAGE_FAULT : RISCV_EXCP_INST_ACCESS_FAULT;
++        if (riscv_cpu_virt_enabled(env) && !first_stage) {
++            cs->exception_index = RISCV_EXCP_INST_GUEST_PAGE_FAULT;
++        } else {
++            cs->exception_index = page_fault_exceptions ?
++                RISCV_EXCP_INST_PAGE_FAULT : RISCV_EXCP_INST_ACCESS_FAULT;
++        }
+         break;
+     case MMU_DATA_LOAD:
+-        cs->exception_index = page_fault_exceptions ?
+-            RISCV_EXCP_LOAD_PAGE_FAULT : RISCV_EXCP_LOAD_ACCESS_FAULT;
++        if (riscv_cpu_virt_enabled(env) && !first_stage) {
++            cs->exception_index = RISCV_EXCP_LOAD_GUEST_ACCESS_FAULT;
++        } else {
++            cs->exception_index = page_fault_exceptions ?
++                RISCV_EXCP_LOAD_PAGE_FAULT : RISCV_EXCP_LOAD_ACCESS_FAULT;
++        }
+         break;
+     case MMU_DATA_STORE:
+-        cs->exception_index = page_fault_exceptions ?
+-            RISCV_EXCP_STORE_PAGE_FAULT : RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
++        if (riscv_cpu_virt_enabled(env) && !first_stage) {
++            cs->exception_index = RISCV_EXCP_STORE_GUEST_AMO_ACCESS_FAULT;
++        } else {
++            cs->exception_index = page_fault_exceptions ?
++                RISCV_EXCP_STORE_PAGE_FAULT : RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
++        }
+         break;
+     default:
+         g_assert_not_reached();
 -- 
 2.25.0
 
