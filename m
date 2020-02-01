@@ -2,78 +2,79 @@ Return-Path: <SRS0=CCzH=3V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02BA4C33CB3
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D6F4C33CB3
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:35:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2A6620661
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:34:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAC3620661
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:35:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qtb1YiIL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2A6620661
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wW/zK8OV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC3620661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixyWz-0004TL-Un
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:34:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58726)
+	id 1ixyYC-00074h-Nz
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:35:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySd-0007Zk-93
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:45 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySN-00075J-DF
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySa-0006o5-Ur
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:43 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36603)
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySM-0006TB-DB
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:27 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:56270)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ixySa-0006nZ-Ph
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:40 -0500
-Received: by mail-pg1-x542.google.com with SMTP id k3so5486125pgc.3
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:29:40 -0800 (PST)
+ id 1ixySM-0006Rx-7b
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:26 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id d5so4462698pjz.5
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:29:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZmLVKq5ZCR+ymmuOiYYpLo/dLKBJqCs80mPJBtIPf/g=;
- b=Qtb1YiIL7xV1wTeQvk6PsfbH2NCOGI6S9ZW0BI2Z7zPrFatoYfdhhMl+kZU0Dkeq4B
- 4GScZmf7JwkWMzVniCxJJc3LtviZJIM7ORT8KpWT7kWPI7HeHXe1hU7fJ4q7rYhdmIW8
- rK3AiKUYBylRqkHKJl7VFrGVjgvPwp8MTC/44327wYuQ30/0QDIIqLoca0GTwvAAhSTy
- wn0TfGBc0QKvhVq/dArEf+xEZqWtNgf96YFRO1X3+OsUbfANi7O4bP3kT9U62l64LRtU
- Muu1nwq088UnBMlpWX0UYrNEWhtd/OIAOo7FbwF01AYi5yRN27OwOWubcDEQUP9x+PZl
- uQhA==
+ bh=rwV4ZNAYmUhb3kMWrkN08M3nDN8bK4HgsQpKFnhrwoc=;
+ b=wW/zK8OVMUMtda4NULAhEDzzWPnwaZPhxm+z8HDOwOuin10C1NGqOl2ZbD6A+f1ZFb
+ VaW3OyynAaoZ1/RNEctsKG/0cEqQtkD1tu86i8I2pdg9NFxEsBmQFzOL/n3Sm1+is6a8
+ IVd2+4UXoVURfgUTtFORSJf4utiEgYflIkqGYdNLVDFpfCMGqZmzYMAxJ4z2XGiQSdoH
+ fWhZMmbRABE+UJaso74hJCiLZVp+keUqfJTztV9qXDP4jJw8JWnds+Qq0wBR2fD8i87d
+ xfFPNA5vh7seALhteTPYCvma3f5DllVUuCcF+jR9mqkzT3Akm6DqN3VBFBpH8Op6u90d
+ SQhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZmLVKq5ZCR+ymmuOiYYpLo/dLKBJqCs80mPJBtIPf/g=;
- b=FBCbLkGP367vHr/AiusqqZQZb0D1bPzDSBW75v1MNf2eQLZK0esJPkfcCrDs8ebtJw
- /wlcOttajRFztYqZ2eEQpNWV4UiAPbPJQTZoIKJPuYCQ5K+0mCAbfAThKrPhe1JGMhK4
- 0aVjGTrz+PMVoFrzmMVCvfyxK8oyG5JGJFvuCjDO4Xmi183Zr9pTlqKLnAjdMiBm3PST
- yLVQtCIjBuwDBh3qrAHhISw5yFwLvVLaIdBCqDdq1cKHLf1f4NtGwT3+L82uKlKJTQ9v
- 7WYm3B5FGBRuthpA2jfxVA20ywcqGaT7UMIQTOdlL6YDdVnTuu1VfMt1iXjhmQfsTD7u
- zr6g==
-X-Gm-Message-State: APjAAAXRR79jlqPi4B948sA3wmYTZ3+y8qQHFonW1eZibMN0dQxaKVFY
- YbT/BSkW7pRKeNV9Qdj9fIa3GhiGa2g=
-X-Google-Smtp-Source: APXvYqyJi8oxI62qCXSFxOMrnBMaXbcLO/saFJC0Ev+Rr+iPTAB3LI/oqbzbkB7aYeqKlfcwaGWZYg==
-X-Received: by 2002:a63:691:: with SMTP id 139mr1535022pgg.325.1580585379363; 
- Sat, 01 Feb 2020 11:29:39 -0800 (PST)
+ bh=rwV4ZNAYmUhb3kMWrkN08M3nDN8bK4HgsQpKFnhrwoc=;
+ b=OjxutocFxA2yXa9FZw3daMVXFOTn5VfLFVK29iYqYLPD7geowb21SvsSn0PZ8/ruPk
+ dCa20DN9g1QSu2bMBONONR8qEviuVbtDb0ntqL29PaDGI943+lVopgTKSrZp/cdU9JTt
+ whKdRq+BHGMFqEZKJa6iqEgNXyfn7wabud9viIBZPZmCWPTKKa8sZjK9aI+7fsmFyxAM
+ 28ZmaJtFcwWSopU6Xzhc99JRNPFpgmPrUIqCVlCk/Nxo/ypw/SYjQsn+OWGODVO529BJ
+ i0ar+StoryL2zNE8ABdEC+UKUJe2VMuMX4tfULkWVLecvXOtCsif13kxWIXNPs45FAgT
+ q0HA==
+X-Gm-Message-State: APjAAAUEcZxTjVQPJR7pqSE5IUM9dVLf//BcmxZ7ELIUyvNHqMIJYAqb
+ 9DItXiQ2BLYMDt/APaAqXodWaciYRnA=
+X-Google-Smtp-Source: APXvYqz1paFPS8A+Pvv7qgRglu2dv5La2/nYhbCgV9y/jQzIVuPTUZnUIDABGkcTMVOarIo5llhiFg==
+X-Received: by 2002:a17:90a:af81:: with SMTP id
+ w1mr20467865pjq.14.1580585364892; 
+ Sat, 01 Feb 2020 11:29:24 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.38
+ by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 01 Feb 2020 11:29:38 -0800 (PST)
+ Sat, 01 Feb 2020 11:29:24 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 18/41] target/arm: Tidy ARMMMUIdx m-profile definitions
-Date: Sat,  1 Feb 2020 11:28:53 -0800
-Message-Id: <20200201192916.31796-19-richard.henderson@linaro.org>
+Subject: [PATCH v6 06/41] target/arm: Split out vae1_tlbmask
+Date: Sat,  1 Feb 2020 11:28:41 -0800
+Message-Id: <20200201192916.31796-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200201192916.31796-1-richard.henderson@linaro.org>
 References: <20200201192916.31796-1-richard.henderson@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,48 +95,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace the magic numbers with the relevant ARM_MMU_IDX_M_* constants.
-Keep the definitions short by referencing previous symbols.
+No functional change, but unify code sequences.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ target/arm/helper.c | 32 +++++++++++++-------------------
+ 1 file changed, 13 insertions(+), 19 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index aa121cd9d0..ad92873943 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2912,14 +2912,14 @@ typedef enum ARMMMUIdx {
-     ARMMMUIdx_SE10_0 = 4 | ARM_MMU_IDX_A,
-     ARMMMUIdx_SE10_1 = 5 | ARM_MMU_IDX_A,
-     ARMMMUIdx_Stage2 = 6 | ARM_MMU_IDX_A,
--    ARMMMUIdx_MUser = 0 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MPriv = 1 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MUserNegPri = 2 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MPrivNegPri = 3 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MSUser = 4 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MSPriv = 5 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MSUserNegPri = 6 | ARM_MMU_IDX_M,
--    ARMMMUIdx_MSPrivNegPri = 7 | ARM_MMU_IDX_M,
-+    ARMMMUIdx_MUser = ARM_MMU_IDX_M,
-+    ARMMMUIdx_MPriv = ARM_MMU_IDX_M | ARM_MMU_IDX_M_PRIV,
-+    ARMMMUIdx_MUserNegPri = ARMMMUIdx_MUser | ARM_MMU_IDX_M_NEGPRI,
-+    ARMMMUIdx_MPrivNegPri = ARMMMUIdx_MPriv | ARM_MMU_IDX_M_NEGPRI,
-+    ARMMMUIdx_MSUser = ARMMMUIdx_MUser | ARM_MMU_IDX_M_S,
-+    ARMMMUIdx_MSPriv = ARMMMUIdx_MPriv | ARM_MMU_IDX_M_S,
-+    ARMMMUIdx_MSUserNegPri = ARMMMUIdx_MUserNegPri | ARM_MMU_IDX_M_S,
-+    ARMMMUIdx_MSPrivNegPri = ARMMMUIdx_MPrivNegPri | ARM_MMU_IDX_M_S,
-     /* Indexes below here don't have TLBs and are used only for AT system
-      * instructions or for the first stage of an S12 page table walk.
-      */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index dbfdf2324b..8b3bb51dee 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -3940,42 +3940,36 @@ static CPAccessResult aa64_cacheop_access(CPUARMState *env,
+  * Page D4-1736 (DDI0487A.b)
+  */
+ 
++static int vae1_tlbmask(CPUARMState *env)
++{
++    if (arm_is_secure_below_el3(env)) {
++        return ARMMMUIdxBit_S1SE1 | ARMMMUIdxBit_S1SE0;
++    } else {
++        return ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0;
++    }
++}
++
+ static void tlbi_aa64_vmalle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                       uint64_t value)
+ {
+     CPUState *cs = env_cpu(env);
+-    bool sec = arm_is_secure_below_el3(env);
++    int mask = vae1_tlbmask(env);
+ 
+-    if (sec) {
+-        tlb_flush_by_mmuidx_all_cpus_synced(cs,
+-                                            ARMMMUIdxBit_S1SE1 |
+-                                            ARMMMUIdxBit_S1SE0);
+-    } else {
+-        tlb_flush_by_mmuidx_all_cpus_synced(cs,
+-                                            ARMMMUIdxBit_S12NSE1 |
+-                                            ARMMMUIdxBit_S12NSE0);
+-    }
++    tlb_flush_by_mmuidx_all_cpus_synced(cs, mask);
+ }
+ 
+ static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                     uint64_t value)
+ {
+     CPUState *cs = env_cpu(env);
++    int mask = vae1_tlbmask(env);
+ 
+     if (tlb_force_broadcast(env)) {
+         tlbi_aa64_vmalle1is_write(env, NULL, value);
+         return;
+     }
+ 
+-    if (arm_is_secure_below_el3(env)) {
+-        tlb_flush_by_mmuidx(cs,
+-                            ARMMMUIdxBit_S1SE1 |
+-                            ARMMMUIdxBit_S1SE0);
+-    } else {
+-        tlb_flush_by_mmuidx(cs,
+-                            ARMMMUIdxBit_S12NSE1 |
+-                            ARMMMUIdxBit_S12NSE0);
+-    }
++    tlb_flush_by_mmuidx(cs, mask);
+ }
+ 
+ static void tlbi_aa64_alle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
 -- 
 2.20.1
 
