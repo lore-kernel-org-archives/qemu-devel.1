@@ -7,83 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F96C33CB3
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FAAAC33CB3
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3C45205F4
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:42:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1144205F4
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:43:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A64BgSml"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3C45205F4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QvzshMOj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1144205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixyfA-0002HK-Up
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:42:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58874)
+	id 1ixyfu-00045U-5T
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:43:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58818)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySq-0007ob-7O
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:57 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySk-0007hm-Cw
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySo-000710-Tb
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:56 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34657)
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySj-0006vd-2T
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:50 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:32834)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ixySo-00070C-NS
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:54 -0500
-Received: by mail-pl1-x641.google.com with SMTP id j7so4184415plt.1
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:29:54 -0800 (PST)
+ id 1ixySi-0006v1-SC
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:49 -0500
+Received: by mail-pg1-x541.google.com with SMTP id 6so5497281pgk.0
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:29:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=MOQeWRomrPDFg8FXKVWMJui75ucXzLZW3uSDCABTB9c=;
- b=A64BgSml2Rn8pLxcwWWoSNTnJiW3VCCBWG8V0j6DFe4gqEoVQ0VY9hhCyKHHylr/bL
- 5v15q7X7rsg97iU3wIunOjW3WdME6qHK9ftk2xo66VVvV9mvOnfS7h+YOmuab0DT3Nsl
- lzPuCZ8mOhvJGEH9yiH8yPBwEKksAI9AjyMEhksTFXrNt3Jff6ZMRO9YjY2vOvwxrO7S
- weXEU69MEyOpz8f7iOYYmF6aehkDzpupXOPIx7fbrMhTeCxHJ3eY4cJjcs+olKowQQqY
- PdcrmLnduiNGsOJSVyWna2gpl3ihkKxuaCO5Yh9R53IVZK/0NzZM9oqBc4jFMFS2RuVn
- Bn2g==
+ bh=6fBYDBbBGzGCNAPDa08PxtCmB4d0j+1WV/uHW0dOHhc=;
+ b=QvzshMOjxjCSBWhWmZCUNiXyko1+WoscNQpcmJoGxQ0bpvjlvnDmhhhlJNaUwe5Ywo
+ x0GvCJGamy2EJDMqWfwc7En0eTPlo2w3vzj+GgRrNRK7K/UeHaHleZ/WbQjviis4Zubq
+ DMKqfv133v3FKdENCV/qJtrBnTxEljdT4EsDhyprournUlSCpMjacOUKteYoBhB7HHgt
+ 1V6K1wcWTtVtJis4Tca3OBo9+wpUceim5e6iiEKRKeDL+1KFEcVo22e/vxYuXuRuRTJR
+ FRkxqzC8C6plnXQc//VtO9VFKRzGGtpq4tam4SEj9SI4ttuB60cU8CQ7W0bc1zpHxT3T
+ /ycQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=MOQeWRomrPDFg8FXKVWMJui75ucXzLZW3uSDCABTB9c=;
- b=Yjw5lXmfYF+HxoVjsPqnfBuzL8YM1Pa6aFLFSxfmU/vmM6maTOHGUuVvqd1/A4NQEi
- 7Rlid8bWBxZbG5BGm65bsu6yRPHnqzIAxfJFmiOTvQSm9mEHjq3bYw0lATllrDo5dhHg
- wM3gSqymWN2xe8VDaXJSaCNnIWUjJDQ9QZhjT+F32fc7AR2YkqO2qeeMHUXcqsZUgr7U
- TFfLh1fIA2hc9rsBJE1odCaTACoV/s8iveQbna5xmKY3+korYesl3ETPBwTweAmB6qi5
- RHuU4V86LtP7atpESXTT9UdrqSRknR1qfSlu/RJOL9u0lsIQNXREaBbuI02gH1U0ChMt
- 26Ow==
-X-Gm-Message-State: APjAAAUuQ0YCYazko4+KmID4rUqdMFe1aqz43x6BN9FXz75Be4DZ7vWf
- OFNnvG5yzzbEl/qh0246FwdFAe3n4/4=
-X-Google-Smtp-Source: APXvYqyPGYzv5A1wRvu7n2HJQWcXwB42A0vFb0HUpvH7eMi0serrCQWidCkHdIvwP2nf2xOzz/Ertg==
-X-Received: by 2002:a17:90a:a881:: with SMTP id
- h1mr19904912pjq.50.1580585393274; 
- Sat, 01 Feb 2020 11:29:53 -0800 (PST)
+ bh=6fBYDBbBGzGCNAPDa08PxtCmB4d0j+1WV/uHW0dOHhc=;
+ b=fXp+zdhUkM9UIn59RHIW+YJr3+ssBHPltDtnalzSNUBLoD1TwHm+U1+59TzzzJJzcS
+ T60dVVEjWrwyRSpLengLJRSlrzCi+zxm5BUAIP+1bOz6Pz95r04CIZHODc+l1fAymbzQ
+ seO3+INAuTokB+IRaqlc0RSoA3EkkpIb6iz8D50YsgJ17fFGL8JptYtxAaDilUfHNetG
+ XL1TuN80vQcegt7sQO4noe9YEOPyJcLapYVFG5cmirFzrF/1sRHYaBm6oaPQ/HCouk5m
+ KQkwT6j8Us2ydiAV8P6A92ABfyMU4BpHwvIuSB5o4aBpJbzN+6RjcYPw7lf7iKF4lsNy
+ 80aQ==
+X-Gm-Message-State: APjAAAW+yqPi32Oj8bxCrGDI+TPypE4WewSknuw0p1tFyD7pDCP9HwR1
+ 8P2NiW3oaAhKZ/UGLAZI5IS3qYdepkM=
+X-Google-Smtp-Source: APXvYqxArT+X0Y1EpG2gE/X1MOg+TszlqyUGl4+wX2BpdmtSjtMHxAKo0EQMrwINcfR2nDjrOY0kzA==
+X-Received: by 2002:a63:f70e:: with SMTP id x14mr4397266pgh.71.1580585387721; 
+ Sat, 01 Feb 2020 11:29:47 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.52
+ by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 01 Feb 2020 11:29:52 -0800 (PST)
+ Sat, 01 Feb 2020 11:29:47 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 30/41] target/arm: Flush tlb for ASID changes in EL2&0
- translation regime
-Date: Sat,  1 Feb 2020 11:29:05 -0800
-Message-Id: <20200201192916.31796-31-richard.henderson@linaro.org>
+Subject: [PATCH v6 25/41] target/arm: Add the hypervisor virtual counter
+Date: Sat,  1 Feb 2020 11:29:00 -0800
+Message-Id: <20200201192916.31796-26-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200201192916.31796-1-richard.henderson@linaro.org>
 References: <20200201192916.31796-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,76 +94,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since we only support a single ASID, flush the tlb when it changes.
-
-Note that TCR_EL2, like TCR_EL1, has the A1 bit that chooses between
-the two TTBR* registers for the location of the ASID.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ target/arm/cpu-qom.h |  1 +
+ target/arm/cpu.h     | 11 +++++----
+ target/arm/cpu.c     |  3 ++-
+ target/arm/helper.c  | 56 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 65 insertions(+), 6 deletions(-)
 
+diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
+index 7f5b244bde..3a9d31ea9d 100644
+--- a/target/arm/cpu-qom.h
++++ b/target/arm/cpu-qom.h
+@@ -76,6 +76,7 @@ void arm_gt_ptimer_cb(void *opaque);
+ void arm_gt_vtimer_cb(void *opaque);
+ void arm_gt_htimer_cb(void *opaque);
+ void arm_gt_stimer_cb(void *opaque);
++void arm_gt_hvtimer_cb(void *opaque);
+ 
+ #define ARM_AFF0_SHIFT 0
+ #define ARM_AFF0_MASK  (0xFFULL << ARM_AFF0_SHIFT)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 68e11f0eda..ded1e8e0a8 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -144,11 +144,12 @@ typedef struct ARMGenericTimer {
+     uint64_t ctl; /* Timer Control register */
+ } ARMGenericTimer;
+ 
+-#define GTIMER_PHYS 0
+-#define GTIMER_VIRT 1
+-#define GTIMER_HYP  2
+-#define GTIMER_SEC  3
+-#define NUM_GTIMERS 4
++#define GTIMER_PHYS     0
++#define GTIMER_VIRT     1
++#define GTIMER_HYP      2
++#define GTIMER_SEC      3
++#define GTIMER_HYPVIRT  4
++#define NUM_GTIMERS     5
+ 
+ typedef struct {
+     uint64_t raw_tcr;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index f86e71a260..1ecf2adb6a 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1272,7 +1272,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         }
+     }
+ 
+-
+     {
+         uint64_t scale;
+ 
+@@ -1295,6 +1294,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+                                               arm_gt_htimer_cb, cpu);
+         cpu->gt_timer[GTIMER_SEC] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
+                                               arm_gt_stimer_cb, cpu);
++        cpu->gt_timer[GTIMER_HYPVIRT] = timer_new(QEMU_CLOCK_VIRTUAL, scale,
++                                                  arm_gt_hvtimer_cb, cpu);
+     }
+ #endif
+ 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index cfa6ce59dc..f9be6b052f 100644
+index 72b336e3b5..996865a3a2 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -3763,7 +3763,7 @@ static void vmsa_ttbcr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-     tcr->base_mask = 0xffffc000u;
+@@ -2556,6 +2556,7 @@ static uint64_t gt_tval_read(CPUARMState *env, const ARMCPRegInfo *ri,
+ 
+     switch (timeridx) {
+     case GTIMER_VIRT:
++    case GTIMER_HYPVIRT:
+         offset = gt_virt_cnt_offset(env);
+         break;
+     }
+@@ -2572,6 +2573,7 @@ static void gt_tval_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ 
+     switch (timeridx) {
+     case GTIMER_VIRT:
++    case GTIMER_HYPVIRT:
+         offset = gt_virt_cnt_offset(env);
+         break;
+     }
+@@ -2727,6 +2729,34 @@ static void gt_sec_ctl_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     gt_ctl_write(env, ri, GTIMER_SEC, value);
  }
  
--static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+static void vmsa_tcr_el12_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                uint64_t value)
++static void gt_hv_timer_reset(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    gt_timer_reset(env, ri, GTIMER_HYPVIRT);
++}
++
++static void gt_hv_cval_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                             uint64_t value)
++{
++    gt_cval_write(env, ri, GTIMER_HYPVIRT, value);
++}
++
++static uint64_t gt_hv_tval_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    return gt_tval_read(env, ri, GTIMER_HYPVIRT);
++}
++
++static void gt_hv_tval_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                             uint64_t value)
++{
++    gt_tval_write(env, ri, GTIMER_HYPVIRT, value);
++}
++
++static void gt_hv_ctl_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                            uint64_t value)
++{
++    gt_ctl_write(env, ri, GTIMER_HYPVIRT, value);
++}
++
+ void arm_gt_ptimer_cb(void *opaque)
+ {
+     ARMCPU *cpu = opaque;
+@@ -2755,6 +2785,13 @@ void arm_gt_stimer_cb(void *opaque)
+     gt_recalc_timer(cpu, GTIMER_SEC);
+ }
+ 
++void arm_gt_hvtimer_cb(void *opaque)
++{
++    ARMCPU *cpu = opaque;
++
++    gt_recalc_timer(cpu, GTIMER_HYPVIRT);
++}
++
+ static void arm_gt_cntfrq_reset(CPUARMState *env, const ARMCPRegInfo *opaque)
  {
      ARMCPU *cpu = env_archcpu(env);
-@@ -3789,7 +3789,17 @@ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    /* TODO: There are ASID fields in here with HCR_EL2.E2H */
-+    /*
-+     * If we are running with E2&0 regime, then an ASID is active.
-+     * Flush if that might be changing.  Note we're not checking
-+     * TCR_EL2.A1 to know if this is really the TTBRx_EL2 that
-+     * holds the active ASID, only checking the field that might.
-+     */
-+    if (extract64(raw_read(env, ri) ^ value, 48, 16) &&
-+        (arm_hcr_el2_eff(env) & HCR_E2H)) {
-+        tlb_flush_by_mmuidx(env_cpu(env),
-+                            ARMMMUIdxBit_E20_2 | ARMMMUIdxBit_E20_0);
-+    }
-     raw_write(env, ri, value);
- }
+@@ -6164,6 +6201,25 @@ static const ARMCPRegInfo vhe_reginfo[] = {
+       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 1,
+       .access = PL2_RW, .writefn = vmsa_tcr_ttbr_el2_write,
+       .fieldoffset = offsetof(CPUARMState, cp15.ttbr1_el[2]) },
++#ifndef CONFIG_USER_ONLY
++    { .name = "CNTHV_CVAL_EL2", .state = ARM_CP_STATE_AA64,
++      .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 2,
++      .fieldoffset =
++        offsetof(CPUARMState, cp15.c14_timer[GTIMER_HYPVIRT].cval),
++      .type = ARM_CP_IO, .access = PL2_RW,
++      .writefn = gt_hv_cval_write, .raw_writefn = raw_write },
++    { .name = "CNTHV_TVAL_EL2", .state = ARM_CP_STATE_BOTH,
++      .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 0,
++      .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL2_RW,
++      .resetfn = gt_hv_timer_reset,
++      .readfn = gt_hv_tval_read, .writefn = gt_hv_tval_write },
++    { .name = "CNTHV_CTL_EL2", .state = ARM_CP_STATE_BOTH,
++      .type = ARM_CP_IO,
++      .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 1,
++      .access = PL2_RW,
++      .fieldoffset = offsetof(CPUARMState, cp15.c14_timer[GTIMER_HYPVIRT].ctl),
++      .writefn = gt_hv_ctl_write, .raw_writefn = raw_write },
++#endif
+     REGINFO_SENTINEL
+ };
  
-@@ -3849,7 +3859,7 @@ static const ARMCPRegInfo vmsa_cp_reginfo[] = {
-                              offsetof(CPUARMState, cp15.ttbr1_ns) } },
-     { .name = "TCR_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 2,
--      .access = PL1_RW, .writefn = vmsa_tcr_el1_write,
-+      .access = PL1_RW, .writefn = vmsa_tcr_el12_write,
-       .resetfn = vmsa_ttbcr_reset, .raw_writefn = raw_write,
-       .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[1]) },
-     { .name = "TTBCR", .cp = 15, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 2,
-@@ -5175,10 +5185,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
-       .resetvalue = 0 },
-     { .name = "TCR_EL2", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 2,
--      .access = PL2_RW,
--      /* no .writefn needed as this can't cause an ASID change;
--       * no .raw_writefn or .resetfn needed as we never use mask/base_mask
--       */
-+      .access = PL2_RW, .writefn = vmsa_tcr_el12_write,
-+      /* no .raw_writefn or .resetfn needed as we never use mask/base_mask */
-       .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[2]) },
-     { .name = "VTCR", .state = ARM_CP_STATE_AA32,
-       .cp = 15, .opc1 = 4, .crn = 2, .crm = 1, .opc2 = 2,
 -- 
 2.20.1
 
