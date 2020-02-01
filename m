@@ -2,84 +2,86 @@ Return-Path: <SRS0=CCzH=3V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 048E3C33C9E
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 13:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C04C33C9E
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 13:40:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A708F206F0
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 13:20:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 872E4206E3
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 13:40:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sc78DA1L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A708F206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="iZsdTaCp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872E4206E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixshP-0007gM-Qe
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 08:20:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38444)
+	id 1ixt0j-00034v-Lz
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 08:40:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43164)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ixsgV-0007Dv-Uy
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:19:41 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1ixszs-00022R-P3
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ixsgU-0005Tr-DX
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:19:39 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40214)
+ (envelope-from <aik@ozlabs.ru>) id 1ixszr-0004H0-5F
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:39:40 -0500
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:40460)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ixsgU-0005QO-7h
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:19:38 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a142so10199068oii.7
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 05:19:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=1SdmdbUD1kykmWAWQIR1QZFF7r75Z07c+NoLesdt+ls=;
- b=sc78DA1LImtOyRmkhJamm0nJ8VDT3YV2AfmGpxSwLI7cEGoCSzCYeoct6ia0QPkzPt
- iZufDyZffOY/1UMDtuv5Ojaqr+ddT22c0f5V8oN8LtUb5SjlOzI1Mo2bawKWITEKgESO
- X4zSBLvzCRyJ4Ft1+wcPUuTRz5DWSompH9OZ7+JlBaI2ncdnXSz37zdVez+hGkcX970I
- N9GOzpIn86vpFt/k93nx3cAbpieh6a278DwvWeEnneA7vqMEisViyDg4c6EY8iUNdVs4
- KO4IycJLfI14j5nNaXnt8wQulOBg/jvwdCF2TrTANrfZwPEm1QENR8/fUfuarAfwcYyL
- TFXA==
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ixszq-0004D8-ND
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 08:39:39 -0500
+Received: by mail-pg1-x530.google.com with SMTP id k25so5150245pgt.7
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 05:39:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=to:cc:from:subject:message-id:date:user-agent:mime-version
+ :content-language:content-transfer-encoding;
+ bh=rABcoo/u0/TOWZt1uTwTlTwdq2LCrEHeDYt9JzK+Fcs=;
+ b=iZsdTaCp7Ejz7d2+4B6UQypSjnZSVm1n8KYLps3H2lElmAZub8ZZ3aVzCZ/pz/R8Is
+ /MKrZCf3mESl8t7w7GVoc7hwBAZwyjrceJ22xdc1fyQEDK7cEfUm5BsJNyoHB7ey7YPR
+ d+QBWgp4yJl7pgEnsaqe+kiFaYySz+t1nGbxT9inFkE8lXM6B501NS7u6uJzK95tot+1
+ SuXRiJOR0/cSgI2Ctp2zanu3OtvRPWv7EQDolGmliMe1eg5FmkChL4xlvuEC9OkFih82
+ SCh6rYchduMkIDNw5pYu/CaaM2Cvh8EmdIV3yfoMifZmzw9BUyeE1c8mOdv56wHH9SY6
+ Z7aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=1SdmdbUD1kykmWAWQIR1QZFF7r75Z07c+NoLesdt+ls=;
- b=DCQejaUxu6B/6vHayXBzjJYiEYn2rqyk0c81kQOp6WZWMeAX2ojKKYVO5/3LM6XoiR
- Ymhm/+wfsVYjkShVSbIJmy7frzjGpBhpFK+QFt9mVpKuxrzTBCJjy5fW6yzdA0DNp5er
- 9UOu2a/gqjk8Mo/Pkgl3nWO/QX84eO3VitP+wOTJ1+CVbJx92u8AfNnkyQgpwpF/0onG
- suwb0Vq8ktMBlsG1YzP6ZIB7/yK75fFkl7sQgFqtLSsKhttG+rZ1gKCbzIMWy/6n91BA
- nNmH0M4nNJ3AtioJaJrpdz1dZ3Vk1UANX3I9AvV6iZ2vE7WOCRYSbwg+ZEzE/x7XtqMH
- 2hsg==
-X-Gm-Message-State: APjAAAU1IfDCMBogRdpHJL2XXX069dazkurj5IAE4Ai2ZnJHXe43cyne
- kk3hU9OKuYkp98huLVvOAoUDhMWKxMbvvVQ7nzM=
-X-Google-Smtp-Source: APXvYqw6dXcV6IBR76KkydCBrydhw/WjgwOEXqFGwd9WsC6kJEeaculLH0N3zodMM9kjr453tlSahT1jQEXbuQWlY1I=
-X-Received: by 2002:aca:5248:: with SMTP id g69mr3958576oib.106.1580563177340; 
- Sat, 01 Feb 2020 05:19:37 -0800 (PST)
+ h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+ :mime-version:content-language:content-transfer-encoding;
+ bh=rABcoo/u0/TOWZt1uTwTlTwdq2LCrEHeDYt9JzK+Fcs=;
+ b=oLqsjwjW5apRwzhLgE6iPqjqXJoNGde2GcxurCMFBjjSrc/Fp946IPV6qCJOfbS7SM
+ 1RTvdYm0hRr7QZp0wm68IhEa5PZqgvZgizUtRfbCbG5AQ9zeT+f7KZMfygFPp3yDbwce
+ N0VWICxshU/RrP1xLuYAbVy4VjbXoal61IiAM7IDe6CE4DiDGF3vz4JDz23XiQ1F/FEi
+ 6ZosV2NirqPysKpsQ5GRvaoRQ5J30JDM5f5RJi2Say2YA9oN2uT4ZpLgIZxkzS8QmD2e
+ IE9p4DG/Avqo8mpaR8rIWG+ATVJAZW9i2hCqpgM1Nmd8DY3GkqkjJ92OtPTHRTdNMMYt
+ fgEQ==
+X-Gm-Message-State: APjAAAUgjgREv23uKHxNBrayfAibRHcpr3Z1OkNlSolUEaoEqrYhgN6U
+ ZEkvwgCt47iG7n4FTxq3T6D82Q==
+X-Google-Smtp-Source: APXvYqz1DjZzbkIDxu6l1KRHAeo6yqmGJQ7gg7hKZTohg6S3pqpJCrVvJMJfjoTeg2wKlsDGbCh2kA==
+X-Received: by 2002:aa7:94a4:: with SMTP id a4mr15464762pfl.178.1580564376752; 
+ Sat, 01 Feb 2020 05:39:36 -0800 (PST)
+Received: from [192.168.10.86] (ppp121-45-221-81.bras1.cbr2.internode.on.net.
+ [121.45.221.81])
+ by smtp.gmail.com with ESMTPSA id z4sm14234349pfn.42.2020.02.01.05.39.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 01 Feb 2020 05:39:36 -0800 (PST)
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: VW ELF loader
+Message-ID: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
+Date: Sun, 2 Feb 2020 00:39:32 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Sat, 1 Feb 2020 05:19:36 -0800 (PST)
-In-Reply-To: <1580428993-4767-20-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1580428993-4767-20-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 1 Feb 2020 14:19:36 +0100
-Message-ID: <CAL1e-=ikjR8XvfX0ZtOvy8frBncQ4y2OpMj6XuVEGeGxmtzQ+w@mail.gmail.com>
-Subject: Re: [PATCH rc4 19/29] target/avr: Add section about AVR into QEMU
- documentation
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Content-Type: multipart/alternative; boundary="000000000000bb012c059d838a0b"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::530
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,248 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Michael Rolnik <mrolnik@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000bb012c059d838a0b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi!
 
-On Friday, January 31, 2020, Aleksandar Markovic <
-aleksandar.markovic@rt-rk.com> wrote:
+In my effort to "kill SLOF" (the PPC pseries guest firmware), I proceeded to the stage when QEMU needs to load GRUB from 
+the disk. The current workaround is to read it from qcow2, save in a file and then call load_elf(). Not nice.
 
-> From: Michael Rolnik <mrolnik@gmail.com>
->
-> Explains basic ways of using AVR target in QEMU.
->
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> Message-Id: <20200118191416.19934-16-mrolnik@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> [PMD: Fixed typos]
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-> ---
->  qemu-doc.texi | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
->
->
-Reviewed-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+2 problems with that.
+
+1. when load_elf calls address_space_write() - I need to know where and how much RAM was used to mark this memory "used" 
+for the OF client interface (/memory@0/available FDT property). So I'll need "preload()" hook.
+
+2. (bigger) GRUB comes from PReP partition which is 8MB. load_elf{32|64} consumes filename, not a memory pointer nor a 
+"read_fn" callback - so I thought I need a "read_fn" callback.
+
+And then I discovered that load_elf actually maps the passed file. And here I got lost.
+
+Why does not load_elf just map the entire file and parse the bits? It still reads chunks with seek+read and then it maps 
+the file in a loop potentially multiple times - is this even correct? Passing "fd" around is weird.
+
+Why ROMs are different from "-kernel"?
+
+If I want to solve 1 and 2 of my problem, should I just cut-n-paste load_elf and tweak bits rather then add more 
+parameters to already 15-parameters long prototypes?
+Or I could read GRUB from qcow2 into the memory and change the rest to parse ELF from memory (mapped from a ELF file or 
+read from qcow2)?
 
 
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index 2328e7e..aaf4e54 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -1723,6 +1723,7 @@ differences are mentioned in the following sections=
-.
->  * Microblaze System emulator::
->  * SH4 System emulator::
->  * Xtensa System emulator::
-> +* AVR System emulator::
->  @end menu
->
->  @node PowerPC System emulator
-> @@ -2496,6 +2497,56 @@ so should only be used with trusted guest OS.
->
->  @c man end
->
-> +@node AVR System emulator
-> +@section AVR System emulator
-> +@cindex system emulation (AVR)
-> +
-> +Use the executable @file{qemu-system-avr} to emulates a AVR 8 bit based
-> machine
-> +having one for the following cores: avr1, avr2, avr25, avr3, avr31,
-> avr35, avr4,
-> +avr5, avr51, avr6, avrtiny, xmega2, xmega3, xmega4, xmega5, xmega6 and
-> xmega7.
-> +
-> +As for now it supports few Arduino boards for educational and testing
-> purposes.
-> +These boards use a ATmega controller, which model is limited to USART &
-> 16 bit
-> +timer devices, enought to run FreeRTOS based applications (like this @ur=
-l{
-> https://github.com/seharris/qemu-avr-tests/blob/master/free-rtos/Demo/AVR=
-_
-> ATMega2560_GCC/demo.elf,,demo})
-> +
-> +Following are examples of possible usages, assuming demo.elf is compiled
-> for
-> +AVR cpu
-> +@itemize
-> +
-> +@item Continuous non interrupted execution
-> +@example
-> +qemu-system-avr -machine mega2560 -bios demo.elf
-> +@end example
-> +
-> +@item Continuous non interrupted execution with serial output into telne=
-t
-> window
-> +@example
-> +qemu-system-avr -machine mega2560 -bios demo.elf -serial
-> tcp::5678,server,nowait -nographic
-> +@end example
-> +and then in another shell
-> +@example
-> +telnet localhost 5678
-> +@end example
-> +
-> +@item Debugging wit GDB debugger
-> +@example
-> +qemu-system-avr -machine mega2560 -bios demo.elf -s -S
-> +@end example
-> +and then in another shell
-> +@example
-> +avr-gdb demo.elf
-> +@end example
-> +and then within GDB shell
-> +@example
-> +target remote :1234
-> +@end example
-> +
-> +@item Print out executed instructions
-> +@example
-> +qemu-system-avr -machine mega2560 -bios demo.elf -d in_asm
-> +@end example
-> +
-> +@end itemize
-> +
->  @node QEMU User space emulator
->  @chapter QEMU User space emulator
->
-> --
-> 2.7.4
->
->
+Thanks,
 
---000000000000bb012c059d838a0b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ps. VW == very weird, indeed :)
 
-<br><br>On Friday, January 31, 2020, Aleksandar Markovic &lt;<a href=3D"mai=
-lto:aleksandar.markovic@rt-rk.com">aleksandar.markovic@rt-rk.com</a>&gt; wr=
-ote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border=
--left:1px #ccc solid;padding-left:1ex">From: Michael Rolnik &lt;<a href=3D"=
-mailto:mrolnik@gmail.com">mrolnik@gmail.com</a>&gt;<br>
-<br>
-Explains basic ways of using AVR target in QEMU.<br>
-<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrol=
-nik@gmail.com</a>&gt;<br>
-Message-Id: &lt;<a href=3D"mailto:20200118191416.19934-16-mrolnik@gmail.com=
-">20200118191416.19934-16-<wbr>mrolnik@gmail.com</a>&gt;<br>
-Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
-naro.org">richard.henderson@linaro.org</a>&gt;<br>
-[PMD: Fixed typos]<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
-t.org">f4bug@amsat.org</a>&gt;<br>
-Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@=
-gmail.com">aleksandar.m.mail@gmail.com</a>&gt;<br>
----<br>
-=C2=A0qemu-doc.texi | 51 ++++++++++++++++++++++++++++++<wbr>+++++++++++++++=
-++++++<br>
-=C2=A01 file changed, 51 insertions(+)<br>
-<br></blockquote><div><br></div><div><span style=3D"color:rgb(34,34,34);fon=
-t-size:14px;line-height:22.1200008392334px">Reviewed-by: Aleksandar Markovi=
-c &lt;</span><a href=3D"mailto:aleksandar.m.mail@gmail.com" target=3D"_blan=
-k" style=3D"font-size:14px;line-height:22.1200008392334px">aleksandar.m.mai=
-l@gmail.com</a><span style=3D"color:rgb(34,34,34);font-size:14px;line-heigh=
-t:22.1200008392334px">&gt;</span><br></div><div>=C2=A0</div><blockquote cla=
-ss=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pa=
-dding-left:1ex">
-diff --git a/qemu-doc.texi b/qemu-doc.texi<br>
-index 2328e7e..aaf4e54 100644<br>
---- a/qemu-doc.texi<br>
-+++ b/qemu-doc.texi<br>
-@@ -1723,6 +1723,7 @@ differences are mentioned in the following sections.<=
-br>
-=C2=A0* Microblaze System emulator::<br>
-=C2=A0* SH4 System emulator::<br>
-=C2=A0* Xtensa System emulator::<br>
-+* AVR System emulator::<br>
-=C2=A0@end menu<br>
-<br>
-=C2=A0@node PowerPC System emulator<br>
-@@ -2496,6 +2497,56 @@ so should only be used with trusted guest OS.<br>
-<br>
-=C2=A0@c man end<br>
-<br>
-+@node AVR System emulator<br>
-+@section AVR System emulator<br>
-+@cindex system emulation (AVR)<br>
-+<br>
-+Use the executable @file{qemu-system-avr} to emulates a AVR 8 bit based ma=
-chine<br>
-+having one for the following cores: avr1, avr2, avr25, avr3, avr31, avr35,=
- avr4,<br>
-+avr5, avr51, avr6, avrtiny, xmega2, xmega3, xmega4, xmega5, xmega6 and xme=
-ga7.<br>
-+<br>
-+As for now it supports few Arduino boards for educational and testing purp=
-oses.<br>
-+These boards use a ATmega controller, which model is limited to USART &amp=
-; 16 bit<br>
-+timer devices, enought to run FreeRTOS based applications (like this @url{=
-<a href=3D"https://github.com/seharris/qemu-avr-tests/blob/master/free-rtos=
-/Demo/AVR_ATMega2560_GCC/demo.elf,,demo" target=3D"_blank">https://github.c=
-om/<wbr>seharris/qemu-avr-tests/blob/<wbr>master/free-rtos/Demo/AVR_<wbr>AT=
-Mega2560_GCC/demo.elf,,demo</a>}<wbr>)<br>
-+<br>
-+Following are examples of possible usages, assuming demo.elf is compiled f=
-or<br>
-+AVR cpu<br>
-+@itemize<br>
-+<br>
-+@item Continuous non interrupted execution<br>
-+@example<br>
-+qemu-system-avr -machine mega2560 -bios demo.elf<br>
-+@end example<br>
-+<br>
-+@item Continuous non interrupted execution with serial output into telnet =
-window<br>
-+@example<br>
-+qemu-system-avr -machine mega2560 -bios demo.elf -serial tcp::5678,server,=
-nowait -nographic<br>
-+@end example<br>
-+and then in another shell<br>
-+@example<br>
-+telnet localhost 5678<br>
-+@end example<br>
-+<br>
-+@item Debugging wit GDB debugger<br>
-+@example<br>
-+qemu-system-avr -machine mega2560 -bios demo.elf -s -S<br>
-+@end example<br>
-+and then in another shell<br>
-+@example<br>
-+avr-gdb demo.elf<br>
-+@end example<br>
-+and then within GDB shell<br>
-+@example<br>
-+target remote :1234<br>
-+@end example<br>
-+<br>
-+@item Print out executed instructions<br>
-+@example<br>
-+qemu-system-avr -machine mega2560 -bios demo.elf -d in_asm<br>
-+@end example<br>
-+<br>
-+@end itemize<br>
-+<br>
-=C2=A0@node QEMU User space emulator<br>
-=C2=A0@chapter QEMU User space emulator<br>
-=C2=A0<br>
--- <br>
-2.7.4<br>
-<br>
-</blockquote>
-
---000000000000bb012c059d838a0b--
+-- 
+Alexey
 
