@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF01C33CB3
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F96C33CB3
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:42:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AFD1205F4
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:42:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3C45205F4
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:42:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gIMVNOAM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AFD1205F4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A64BgSml"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3C45205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixyeW-0001IO-Gu
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:42:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58970)
+	id 1ixyfA-0002HK-Up
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:42:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58874)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySy-0007yv-9G
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:30:05 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySq-0007ob-7O
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySx-00079F-5f
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:30:04 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33892)
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySo-000710-Tb
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:56 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34657)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ixySw-00075n-Vn
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:30:03 -0500
-Received: by mail-pf1-x444.google.com with SMTP id i6so5291093pfc.1
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:30:02 -0800 (PST)
+ id 1ixySo-00070C-NS
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:54 -0500
+Received: by mail-pl1-x641.google.com with SMTP id j7so4184415plt.1
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:29:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lOpt+tnic+DBm+8Ls3O8L5tH0MsUO+4UoXmIfqQorxk=;
- b=gIMVNOAMZvAeLm/G/EOxYs7gMFHuN1Gw+JwbNNFAmEQj3/p4zX8CHxgNnxT3jc982g
- BPTp9zeYkqloNH65FimNCBHCEXfwDQu/YJ/CvZWqlBb9QY++Wv3VXt0xOsuq1yAVj6lH
- VX+xPHRlpbgMa3o776H/h5hNkmtccpj5ovIPQ2i8S4/glwRrwYJqm3xVkHXr+tKeb4va
- MiF5uln82JS9hjF3nnOgfu0CIwB72n633qBobqzwz+W40JcRpaWbuwo+PuVokfotYkJG
- /C8YKhxzhBHcHY1oNpT5tGbaI95ZjPJWpW3cXk7wp5Z5ugBGPVgrS4TFtpcz9nlpLdHZ
- Pybg==
+ bh=MOQeWRomrPDFg8FXKVWMJui75ucXzLZW3uSDCABTB9c=;
+ b=A64BgSml2Rn8pLxcwWWoSNTnJiW3VCCBWG8V0j6DFe4gqEoVQ0VY9hhCyKHHylr/bL
+ 5v15q7X7rsg97iU3wIunOjW3WdME6qHK9ftk2xo66VVvV9mvOnfS7h+YOmuab0DT3Nsl
+ lzPuCZ8mOhvJGEH9yiH8yPBwEKksAI9AjyMEhksTFXrNt3Jff6ZMRO9YjY2vOvwxrO7S
+ weXEU69MEyOpz8f7iOYYmF6aehkDzpupXOPIx7fbrMhTeCxHJ3eY4cJjcs+olKowQQqY
+ PdcrmLnduiNGsOJSVyWna2gpl3ihkKxuaCO5Yh9R53IVZK/0NzZM9oqBc4jFMFS2RuVn
+ Bn2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lOpt+tnic+DBm+8Ls3O8L5tH0MsUO+4UoXmIfqQorxk=;
- b=kpmOal8Pf6/aeXahirdGG6ZHpzOXogBf5p0c4SY7sdZJ0d0f6HPv1jrmGDqsPCDsJz
- XAaQ3ZMsw7dUoaKPdbt3QmiOdkIuZMl6Mdmoc2Z5OAJqDsYbVKVfSqQqWQbJVUqbbfXW
- wYDeG88aUPrCEwEVAG98mwb91z6yhgi90qlyzUk8/gMJXXga+d9N0vOUZJ+EZHY7QlFK
- j2BSV4a81/fy/MiNN6H/GfNQDIWXGyq/rc5WzwGaqaCcnkS7adjGmeC+qHSXNcxYxSCl
- 7u7r/HUoIvUju8qJO2PRwWMV0DQhuf7oVWnljhi5si5CXO2IcbzKOvVD26RAQuDvuXgo
- q0AA==
-X-Gm-Message-State: APjAAAVOKQbb26F2SWKtTg4XE2LWlYvATv8F7O3UvkBgmGkJ3Z3AlotV
- rFlxVSO5Pzz28iR+sId5CyeAkkjhsf0=
-X-Google-Smtp-Source: APXvYqyFUSPZJ5IbI4cU0lt1AVIzys/mQGVk9m5nB44woO3pmQyMEoiuWIxK0UowSvv0MiIbyuiSDg==
-X-Received: by 2002:aa7:820d:: with SMTP id k13mr17393692pfi.10.1580585400429; 
- Sat, 01 Feb 2020 11:30:00 -0800 (PST)
+ bh=MOQeWRomrPDFg8FXKVWMJui75ucXzLZW3uSDCABTB9c=;
+ b=Yjw5lXmfYF+HxoVjsPqnfBuzL8YM1Pa6aFLFSxfmU/vmM6maTOHGUuVvqd1/A4NQEi
+ 7Rlid8bWBxZbG5BGm65bsu6yRPHnqzIAxfJFmiOTvQSm9mEHjq3bYw0lATllrDo5dhHg
+ wM3gSqymWN2xe8VDaXJSaCNnIWUjJDQ9QZhjT+F32fc7AR2YkqO2qeeMHUXcqsZUgr7U
+ TFfLh1fIA2hc9rsBJE1odCaTACoV/s8iveQbna5xmKY3+korYesl3ETPBwTweAmB6qi5
+ RHuU4V86LtP7atpESXTT9UdrqSRknR1qfSlu/RJOL9u0lsIQNXREaBbuI02gH1U0ChMt
+ 26Ow==
+X-Gm-Message-State: APjAAAUuQ0YCYazko4+KmID4rUqdMFe1aqz43x6BN9FXz75Be4DZ7vWf
+ OFNnvG5yzzbEl/qh0246FwdFAe3n4/4=
+X-Google-Smtp-Source: APXvYqyPGYzv5A1wRvu7n2HJQWcXwB42A0vFb0HUpvH7eMi0serrCQWidCkHdIvwP2nf2xOzz/Ertg==
+X-Received: by 2002:a17:90a:a881:: with SMTP id
+ h1mr19904912pjq.50.1580585393274; 
+ Sat, 01 Feb 2020 11:29:53 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.59
+ by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 01 Feb 2020 11:29:59 -0800 (PST)
+ Sat, 01 Feb 2020 11:29:52 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 36/41] target/arm: Update arm_cpu_do_interrupt_aarch64 for
- VHE
-Date: Sat,  1 Feb 2020 11:29:11 -0800
-Message-Id: <20200201192916.31796-37-richard.henderson@linaro.org>
+Subject: [PATCH v6 30/41] target/arm: Flush tlb for ASID changes in EL2&0
+ translation regime
+Date: Sat,  1 Feb 2020 11:29:05 -0800
+Message-Id: <20200201192916.31796-31-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200201192916.31796-1-richard.henderson@linaro.org>
 References: <20200201192916.31796-1-richard.henderson@linaro.org>
@@ -82,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,42 +100,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When VHE is enabled, the exception level below EL2 is not EL1,
-but EL0, and so to identify the entry vector offset for exceptions
-targeting EL2 we need to look at the width of EL0, not of EL1.
+Since we only support a single ASID, flush the tlb when it changes.
+
+Note that TCR_EL2, like TCR_EL1, has the A1 bit that chooses between
+the two TTBR* registers for the location of the ASID.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ target/arm/helper.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 576afd9c9e..70b10428c5 100644
+index cfa6ce59dc..f9be6b052f 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -9026,14 +9026,19 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
-          * immediately lower than the target level is using AArch32 or AArch64
-          */
-         bool is_aa64;
-+        uint64_t hcr;
+@@ -3763,7 +3763,7 @@ static void vmsa_ttbcr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+     tcr->base_mask = 0xffffc000u;
+ }
  
-         switch (new_el) {
-         case 3:
-             is_aa64 = (env->cp15.scr_el3 & SCR_RW) != 0;
-             break;
-         case 2:
--            is_aa64 = (env->cp15.hcr_el2 & HCR_RW) != 0;
--            break;
-+            hcr = arm_hcr_el2_eff(env);
-+            if ((hcr & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
-+                is_aa64 = (hcr & HCR_RW) != 0;
-+                break;
-+            }
-+            /* fall through */
-         case 1:
-             is_aa64 = is_a64(env);
-             break;
+-static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
++static void vmsa_tcr_el12_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                uint64_t value)
+ {
+     ARMCPU *cpu = env_archcpu(env);
+@@ -3789,7 +3789,17 @@ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                                     uint64_t value)
+ {
+-    /* TODO: There are ASID fields in here with HCR_EL2.E2H */
++    /*
++     * If we are running with E2&0 regime, then an ASID is active.
++     * Flush if that might be changing.  Note we're not checking
++     * TCR_EL2.A1 to know if this is really the TTBRx_EL2 that
++     * holds the active ASID, only checking the field that might.
++     */
++    if (extract64(raw_read(env, ri) ^ value, 48, 16) &&
++        (arm_hcr_el2_eff(env) & HCR_E2H)) {
++        tlb_flush_by_mmuidx(env_cpu(env),
++                            ARMMMUIdxBit_E20_2 | ARMMMUIdxBit_E20_0);
++    }
+     raw_write(env, ri, value);
+ }
+ 
+@@ -3849,7 +3859,7 @@ static const ARMCPRegInfo vmsa_cp_reginfo[] = {
+                              offsetof(CPUARMState, cp15.ttbr1_ns) } },
+     { .name = "TCR_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 2,
+-      .access = PL1_RW, .writefn = vmsa_tcr_el1_write,
++      .access = PL1_RW, .writefn = vmsa_tcr_el12_write,
+       .resetfn = vmsa_ttbcr_reset, .raw_writefn = raw_write,
+       .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[1]) },
+     { .name = "TTBCR", .cp = 15, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 2,
+@@ -5175,10 +5185,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
+       .resetvalue = 0 },
+     { .name = "TCR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 2,
+-      .access = PL2_RW,
+-      /* no .writefn needed as this can't cause an ASID change;
+-       * no .raw_writefn or .resetfn needed as we never use mask/base_mask
+-       */
++      .access = PL2_RW, .writefn = vmsa_tcr_el12_write,
++      /* no .raw_writefn or .resetfn needed as we never use mask/base_mask */
+       .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[2]) },
+     { .name = "VTCR", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 4, .crn = 2, .crm = 1, .opc2 = 2,
 -- 
 2.20.1
 
