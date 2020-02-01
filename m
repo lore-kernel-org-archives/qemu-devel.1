@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84612C33CB3
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 083BDC33CB3
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56CC5205F4
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA1DC205F4
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Feb 2020 19:37:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UGAx3YFq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56CC5205F4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hnove9da"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA1DC205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ixyaH-0002Ab-Bv
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:37:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58599)
+	id 1ixyaQ-0002X1-1E
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 14:37:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58664)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySP-00079L-PK
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:30 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySW-0007NH-KO
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ixySO-0006Uu-I6
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:29 -0500
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:33392)
+ (envelope-from <richard.henderson@linaro.org>) id 1ixySV-0006kL-3y
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:36 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:38992)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ixySO-0006UT-CA
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:28 -0500
-Received: by mail-pj1-x1044.google.com with SMTP id m7so3936034pjs.0
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:29:28 -0800 (PST)
+ id 1ixySU-0006k9-U9
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 14:29:35 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id e9so4542689pjr.4
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 11:29:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=A62BKHsum52XJEWLW3Xhs8oGxaRzaiLid6BDgVa6hV8=;
- b=UGAx3YFqcbomPyR3FBmDMEKWkKdofPgypnE4thTQQVzOWGCpA1NuCStnGjVut8g/LF
- JzUWMA0iHGYx893to02G0PPTxd28m4PXkiPzoz7Z8OjyZ3OK+bbcjsJr+hi30Q8+Rmf1
- 2lvfZlZxLNsMrRux67Ka+1t3ezLxVcEAZfvhy83ksYLDUaV21hPcUzCH3tVzJWzMC/vq
- koYQnh2calhMRjufEW77f5ExKYtF2pAJ6T5H+7CDqORsX7I85nZljqahnrYC7RT1Hpjd
- KTXedRjbln0983/7E+mwj3FbyEzCpC3Phg08YyDHNVF30+t+28/6sz2FKLaKvWgTzviA
- 0NnA==
+ bh=hoJvzrX4f+0BJ6bLY7sMhUFjMJd/sGp1cni6mPQQjaA=;
+ b=hnove9da/6OC8gH/xfeQD1V34x2EiZX3yku01mY7fjDUWPOV8h2W9ffHIc6jg6hQff
+ AfxusK0w1esPxl4Q/BNgdA9g0WUaN2geiWJTjyEZ3E4lJo0uYn6Vo4cIX/gy4R9N0KHG
+ +y4UAl7gTed1z/11uFX2LhnVYhPaUvzVRjbRDwhjedvSbyAwIewFqRFnimmQkP8iUyqH
+ 7sCc+OLHsjAl1MrWiDNlmI2i4aqWjdIcWARSgtm+8gUOcYLZQmg8OwNCu6k11hNMOPTD
+ t17+NXla2OgpiB+3FwFXQ9jhxRD52C2DkUsVrHhkD4OnUclmphXyvUsXrGCktFGwwtlg
+ l/9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=A62BKHsum52XJEWLW3Xhs8oGxaRzaiLid6BDgVa6hV8=;
- b=d4aj16zqe8GlSZL56rJfqAR8uWHh/59lKN75TCRuVFZcWfjNmF43wXm44n5VkrCq5h
- IX8tYk9pvCGGMaT0tCvNkOUvSG28haQJAH4wgOo7gwW4C4xosreUqq32pGlK/yeKY9Ru
- 3LpcQGQfbERV2+yDccvL1FanGdN/NpknB+B9CqJzrnxdMs9pRKZ47E7azZeZyBEZLF8W
- H+P/vjmP3q57P+IZ6UwI9u2FJxwKex/gm8jktDti2+h7nQFZTu39V6eM8HswFgQurVh8
- 7QS8Dp+EgecOL7bJ0W20m1UD7rRcloqFdxS6Pamf+eoivcJxNYSZnCArcRw7sGS7r0lw
- wb5g==
-X-Gm-Message-State: APjAAAXR3lQeX3dIU1kHRi6C7goII9t1c8AMq518YdEK6v/8FVOdW/UQ
- JQuNN2qX6nOVW84TKcMzHYpgbhmwNxw=
-X-Google-Smtp-Source: APXvYqx45AqtRDRs49lCKAnHLYE+7mwbrweIHwKBxFRY+NGHI4xFKCzCEvzIeXQXXwz6NH8ngAeeYA==
-X-Received: by 2002:a17:90a:5d85:: with SMTP id
- t5mr19892507pji.126.1580585367087; 
- Sat, 01 Feb 2020 11:29:27 -0800 (PST)
+ bh=hoJvzrX4f+0BJ6bLY7sMhUFjMJd/sGp1cni6mPQQjaA=;
+ b=jXF8Agr9NYQNsa88m/8rr/jRpueUTLOVFT2xkjwZ6xR1yWPnmSTF/e5RbX/oXrG0LN
+ I7n5hQYGe6F6XOl2myuJn2YP91BpJPhv7EmSo8CCpw+nXnuONGFV+pe6Be3p89QXmthQ
+ 8qIv/m5lHQ5b+b9255Pyn1fHkXf5DK0OXUmDaasXB2GP8xr2BZ2k+szpJ4PNTxKR8zH6
+ AYNUZ/4KmgOKZMREQrb55EnaSdw62pKFvgG4TmA8k6Wwnqj8emD4tB+eUFWSIZ1D/4SD
+ qvClWC3t1HMM96GRwCucf783TfCx27dJHk/l3i9Glm+53jlkT+hSgXBjLLQS2jvAkdC6
+ 8+2g==
+X-Gm-Message-State: APjAAAVQxWSw7yPS8CmBraKibt9gxvyIFWBVtMRf3xyGwhL1HQw5CN2I
+ gO7A7B5O3hEtsLWUgyDdsZ7Wa8qmYeE=
+X-Google-Smtp-Source: APXvYqzyuSOzVpUvNx2dRgPQF9V09sdgwuOBFohc8f6qBSXL9l/WLLRj/CKg5m9oqL27hQ0x+Gz+fQ==
+X-Received: by 2002:a17:90a:5801:: with SMTP id
+ h1mr7282315pji.121.1580585373712; 
+ Sat, 01 Feb 2020 11:29:33 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.26
+ by smtp.gmail.com with ESMTPSA id l7sm3668509pga.27.2020.02.01.11.29.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 01 Feb 2020 11:29:26 -0800 (PST)
+ Sat, 01 Feb 2020 11:29:33 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 08/41] target/arm: Simplify tlb_force_broadcast alternatives
-Date: Sat,  1 Feb 2020 11:28:43 -0800
-Message-Id: <20200201192916.31796-9-richard.henderson@linaro.org>
+Subject: [PATCH v6 13/41] target/arm: Rename ARMMMUIdx*_S1E3 to ARMMMUIdx*_SE3
+Date: Sat,  1 Feb 2020 11:28:48 -0800
+Message-Id: <20200201192916.31796-14-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200201192916.31796-1-richard.henderson@linaro.org>
 References: <20200201192916.31796-1-richard.henderson@linaro.org>
@@ -101,125 +101,134 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rather than call to a separate function and re-compute any
-parameters for the flush, simply use the correct flush
-function directly.
+This is part of a reorganization to the set of mmu_idx.
+The EL3 regime only has a single stage translation, and
+is always secure.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 52 +++++++++++++++++++++------------------------
- 1 file changed, 24 insertions(+), 28 deletions(-)
+ target/arm/cpu.h       |  4 ++--
+ target/arm/internals.h |  2 +-
+ target/arm/helper.c    | 14 +++++++-------
+ target/arm/translate.c |  2 +-
+ 4 files changed, 11 insertions(+), 11 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 6cf2b3d6fd..9f01ec8dd2 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2908,7 +2908,7 @@ typedef enum ARMMMUIdx {
+     ARMMMUIdx_E10_0 = 0 | ARM_MMU_IDX_A,
+     ARMMMUIdx_E10_1 = 1 | ARM_MMU_IDX_A,
+     ARMMMUIdx_S1E2 = 2 | ARM_MMU_IDX_A,
+-    ARMMMUIdx_S1E3 = 3 | ARM_MMU_IDX_A,
++    ARMMMUIdx_SE3 = 3 | ARM_MMU_IDX_A,
+     ARMMMUIdx_SE10_0 = 4 | ARM_MMU_IDX_A,
+     ARMMMUIdx_SE10_1 = 5 | ARM_MMU_IDX_A,
+     ARMMMUIdx_Stage2 = 6 | ARM_MMU_IDX_A,
+@@ -2934,7 +2934,7 @@ typedef enum ARMMMUIdxBit {
+     ARMMMUIdxBit_E10_0 = 1 << 0,
+     ARMMMUIdxBit_E10_1 = 1 << 1,
+     ARMMMUIdxBit_S1E2 = 1 << 2,
+-    ARMMMUIdxBit_S1E3 = 1 << 3,
++    ARMMMUIdxBit_SE3 = 1 << 3,
+     ARMMMUIdxBit_SE10_0 = 1 << 4,
+     ARMMMUIdxBit_SE10_1 = 1 << 5,
+     ARMMMUIdxBit_Stage2 = 1 << 6,
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index eafcd326e1..d8730fbbad 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -819,7 +819,7 @@ static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
+     case ARMMMUIdx_MPriv:
+     case ARMMMUIdx_MUser:
+         return false;
+-    case ARMMMUIdx_S1E3:
++    case ARMMMUIdx_SE3:
+     case ARMMMUIdx_SE10_0:
+     case ARMMMUIdx_SE10_1:
+     case ARMMMUIdx_MSPrivNegPri:
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 49da685b29..bf69935550 100644
+index bbceb7a38e..f5d97da1c4 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -614,56 +614,54 @@ static void tlbiall_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                           uint64_t value)
+@@ -3187,7 +3187,7 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+         /* stage 1 current state PL1: ATS1CPR, ATS1CPW */
+         switch (el) {
+         case 3:
+-            mmu_idx = ARMMMUIdx_S1E3;
++            mmu_idx = ARMMMUIdx_SE3;
+             break;
+         case 2:
+             mmu_idx = ARMMMUIdx_Stage1_E1;
+@@ -3269,7 +3269,7 @@ static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
+             mmu_idx = ARMMMUIdx_S1E2;
+             break;
+         case 6: /* AT S1E3R, AT S1E3W */
+-            mmu_idx = ARMMMUIdx_S1E3;
++            mmu_idx = ARMMMUIdx_SE3;
+             break;
+         default:
+             g_assert_not_reached();
+@@ -4013,7 +4013,7 @@ static void tlbi_aa64_alle3_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     ARMCPU *cpu = env_archcpu(env);
+     CPUState *cs = CPU(cpu);
+ 
+-    tlb_flush_by_mmuidx(cs, ARMMMUIdxBit_S1E3);
++    tlb_flush_by_mmuidx(cs, ARMMMUIdxBit_SE3);
+ }
+ 
+ static void tlbi_aa64_alle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -4038,7 +4038,7 @@ static void tlbi_aa64_alle3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
  {
-     /* Invalidate all (TLBIALL) */
--    ARMCPU *cpu = env_archcpu(env);
-+    CPUState *cs = env_cpu(env);
+     CPUState *cs = env_cpu(env);
  
-     if (tlb_force_broadcast(env)) {
--        tlbiall_is_write(env, NULL, value);
--        return;
-+        tlb_flush_all_cpus_synced(cs);
-+    } else {
-+        tlb_flush(cs);
-     }
--
--    tlb_flush(CPU(cpu));
+-    tlb_flush_by_mmuidx_all_cpus_synced(cs, ARMMMUIdxBit_S1E3);
++    tlb_flush_by_mmuidx_all_cpus_synced(cs, ARMMMUIdxBit_SE3);
  }
  
- static void tlbimva_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                           uint64_t value)
- {
-     /* Invalidate single TLB entry by MVA and ASID (TLBIMVA) */
--    ARMCPU *cpu = env_archcpu(env);
-+    CPUState *cs = env_cpu(env);
- 
-+    value &= TARGET_PAGE_MASK;
-     if (tlb_force_broadcast(env)) {
--        tlbimva_is_write(env, NULL, value);
--        return;
-+        tlb_flush_page_all_cpus_synced(cs, value);
-+    } else {
-+        tlb_flush_page(cs, value);
-     }
--
--    tlb_flush_page(CPU(cpu), value & TARGET_PAGE_MASK);
- }
- 
- static void tlbiasid_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                            uint64_t value)
- {
-     /* Invalidate by ASID (TLBIASID) */
--    ARMCPU *cpu = env_archcpu(env);
-+    CPUState *cs = env_cpu(env);
- 
-     if (tlb_force_broadcast(env)) {
--        tlbiasid_is_write(env, NULL, value);
--        return;
-+        tlb_flush_all_cpus_synced(cs);
-+    } else {
-+        tlb_flush(cs);
-     }
--
--    tlb_flush(CPU(cpu));
- }
- 
- static void tlbimvaa_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                            uint64_t value)
- {
-     /* Invalidate single entry by MVA, all ASIDs (TLBIMVAA) */
--    ARMCPU *cpu = env_archcpu(env);
-+    CPUState *cs = env_cpu(env);
- 
-+    value &= TARGET_PAGE_MASK;
-     if (tlb_force_broadcast(env)) {
--        tlbimvaa_is_write(env, NULL, value);
--        return;
-+        tlb_flush_page_all_cpus_synced(cs, value);
-+    } else {
-+        tlb_flush_page(cs, value);
-     }
--
--    tlb_flush_page(CPU(cpu), value & TARGET_PAGE_MASK);
- }
- 
- static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -3965,11 +3963,10 @@ static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     int mask = vae1_tlbmask(env);
- 
-     if (tlb_force_broadcast(env)) {
--        tlbi_aa64_vmalle1is_write(env, NULL, value);
--        return;
-+        tlb_flush_by_mmuidx_all_cpus_synced(cs, mask);
-+    } else {
-+        tlb_flush_by_mmuidx(cs, mask);
-     }
--
--    tlb_flush_by_mmuidx(cs, mask);
- }
- 
- static int alle1_tlbmask(CPUARMState *env)
-@@ -4091,11 +4088,10 @@ static void tlbi_aa64_vae1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void tlbi_aa64_vae2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -4066,7 +4066,7 @@ static void tlbi_aa64_vae3_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     CPUState *cs = CPU(cpu);
      uint64_t pageaddr = sextract64(value << 12, 0, 56);
  
-     if (tlb_force_broadcast(env)) {
--        tlbi_aa64_vae1is_write(env, NULL, value);
--        return;
-+        tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr, mask);
-+    } else {
-+        tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
-     }
--
--    tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
+-    tlb_flush_page_by_mmuidx(cs, pageaddr, ARMMMUIdxBit_S1E3);
++    tlb_flush_page_by_mmuidx(cs, pageaddr, ARMMMUIdxBit_SE3);
  }
  
- static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void tlbi_aa64_vae1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -4115,7 +4115,7 @@ static void tlbi_aa64_vae3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     uint64_t pageaddr = sextract64(value << 12, 0, 56);
+ 
+     tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
+-                                             ARMMMUIdxBit_S1E3);
++                                             ARMMMUIdxBit_SE3);
+ }
+ 
+ static void tlbi_aa64_ipas2e1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -8713,7 +8713,7 @@ static inline uint32_t regime_el(CPUARMState *env, ARMMMUIdx mmu_idx)
+     case ARMMMUIdx_Stage2:
+     case ARMMMUIdx_S1E2:
+         return 2;
+-    case ARMMMUIdx_S1E3:
++    case ARMMMUIdx_SE3:
+         return 3;
+     case ARMMMUIdx_SE10_0:
+         return arm_el_is_aa64(env, 3) ? 1 : 3;
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index a2019a9b2a..75afcb03fb 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -156,7 +156,7 @@ static inline int get_a32_user_mem_index(DisasContext *s)
+     case ARMMMUIdx_E10_0:
+     case ARMMMUIdx_E10_1:
+         return arm_to_core_mmu_idx(ARMMMUIdx_E10_0);
+-    case ARMMMUIdx_S1E3:
++    case ARMMMUIdx_SE3:
+     case ARMMMUIdx_SE10_0:
+     case ARMMMUIdx_SE10_1:
+         return arm_to_core_mmu_idx(ARMMMUIdx_SE10_0);
 -- 
 2.20.1
 
