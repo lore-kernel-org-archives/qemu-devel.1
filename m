@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 407DDC35249
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 01:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF434C35249
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 01:09:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08C6720658
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 01:09:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87EB220658
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 01:09:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C9kv1ZVj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08C6720658
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PcHBbJ1R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87EB220658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iy3lj-0005Wc-8B
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 20:09:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45656)
+	id 1iy3ll-0005bG-On
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 20:09:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45673)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iy3gz-0003hZ-IA
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:54 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iy3h0-0003lN-SN
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iy3gy-00026a-AY
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:53 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:46034)
+ (envelope-from <richard.henderson@linaro.org>) id 1iy3gz-00028q-Jm
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:54 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42886)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iy3gy-00025Q-42
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:52 -0500
-Received: by mail-pg1-x541.google.com with SMTP id b9so5712355pgk.12
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 17:04:52 -0800 (PST)
+ id 1iy3gz-00027m-EL
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:53 -0500
+Received: by mail-pg1-x544.google.com with SMTP id s64so5713281pgb.9
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 17:04:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=LdEIwR4tXW88OebyAe9sT02I9h4JxavRP0Kmc9yS4sc=;
- b=C9kv1ZVjKKQMfNYOlK7ZVqvZpsVvWdMPdcSlIAmOmf6jge2A/N0JbGqQ/8hKZrIJcq
- I0eXalnRgc1DgJT+aCyptQ4C29z+a8hqCxBy8gbtM7TyH7yLL4WZA0+zoo60qQEnwE9O
- i+OITKQRtmG3YESPPD+MSX/DUuWh+ySRjZfUgWLrv/SkSP/slqH3iJDAAXL3eUkEmq1k
- Rv9rjhSf1WzIC0EMNfxA74w8yOhYbI5Fq/HFo7oSaqQx3pJQ2/73/7n31HbWoXw4lWXn
- /5QKDq8+OTaMDpFrOA8M64cfWpJ8JvdUy7h52J6HAwoZKYWnNbabICKX7tu+opnR+dJN
- qxEA==
+ bh=ABlKw+Ee4niadP/JeYKLANZAwZirqXwkkASseIFrEXM=;
+ b=PcHBbJ1RlfITAOyME7zPemx8OjVC2hcpfNOn+1Xk2qkG3u5+vFwVQ83sF7MVTgNsTE
+ ulOvnpL3+FnOfjx4sSIjWVRLAyoz4rRANBKt6d8GCOaEDdVKZ+TNWgcIkswmk3kiNTP5
+ aVaoy/rHKarILH8ZuD2Yg1EctVn/zeHc3FLEu5Krjx9QklZ1pR8Onei/jTdrdetoTIOo
+ GHIDDyhmLr4QFKkgFcuebECb7w6Hjs4LU0c4MP207Z39QH9NirvGrY5fdwtnO+Hdvcz0
+ /poePsnJt5RibP7Y4eJYfnae+HNHHbUW+7UjPsvPGH+bIRnu2+r8+IZ1tcdjiGKHINEz
+ uSDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=LdEIwR4tXW88OebyAe9sT02I9h4JxavRP0Kmc9yS4sc=;
- b=DR/dZKWn51ZyRJnOv/F47ZX+XdWpb3osP9lJl+nyX2eS0oJF4lYdjr0rnKcfb7Pd2O
- yw3jfvBTCKndb0hwqW6ZJAqjMS19JmDT1xfcCKBcpbv+1Daj6lyhqTgJ8/KBkLoX45NZ
- kTDPtdEkE7GStGyTipxH81JLvxKigvDFOGUkTbMGPb89/FAkVQlWhtr2T+YSkuokSA/0
- IRrwR3z6RT+nJljj9j8dmAQfFsLtPZIPVO0vB0Q/qhkZ/hKy9CzAbvsUIiFk/DD/pCnJ
- 2ghvpXprLLI1Ved8qftwIbhHSNhu3nFgS3GPSUTnz1q6Ht679Ciilo6sfncpPyumrUU0
- BjuA==
-X-Gm-Message-State: APjAAAU1Joo7rzN1+Mpd9BjbAreORc/9/iAidjN+ux+YxYDSYGlsgSBt
- lMQLdlHO3IAw+M3IMigDWgNBB/1vCFQ=
-X-Google-Smtp-Source: APXvYqwgI6kiGm5sSix1bEGS9PzDlRsUSSDsv2d3yQ1+OJpjRLej7ZiNLNLPkfFnNdRJ+xlWJTBGKg==
-X-Received: by 2002:a62:cece:: with SMTP id y197mr18383547pfg.9.1580605490891; 
- Sat, 01 Feb 2020 17:04:50 -0800 (PST)
+ bh=ABlKw+Ee4niadP/JeYKLANZAwZirqXwkkASseIFrEXM=;
+ b=p5IeI5mJaAmdbQ4YQyzcEZxC3b0jtJfntGzut/TOYeFe5j5o3z4rKZzJ1xqLpDmyM5
+ vU1KAMSHcMx2AL5ZJ7ZwaWK0V1ZSByXcY9lGwPwWzLl8cHzXQgr36luPjcJqTCtwz7Yw
+ PUUwDlLejGB7+oxuSjS4gvx/QSWiDVrsKD8M9CakHQEga0yzcjYCfPdjs1OhJnHbe2E9
+ hUleTEj0A1C2SLnXSe+JnRX4iIef1fMkRmeYcz7QbK05+4BEnQ0/qEA5u7mjsVEHT/ek
+ RaOK3J6mLC0zMJdUsCBa06tBGxo/p19H7sWGvdkG+n3LjCKerVA9kUMP8obFVu4YL+aF
+ WyBA==
+X-Gm-Message-State: APjAAAXpCWblGK0QZl4CMVqz8CRHQISeZoZ89LNEhtkCJQPjJKGyA3gf
+ /k2aCG9QqFLfpb4Hhq8JqHi2neOcJyE=
+X-Google-Smtp-Source: APXvYqxFzNP2rJm3iGS5OjHLFsRYxn3kP8+FLNtIsoBpqvSQNZdgnEnQV9SD6k+yTgrt/E1kpXsKRA==
+X-Received: by 2002:a62:8e0a:: with SMTP id k10mr18270835pfe.49.1580605492196; 
+ Sat, 01 Feb 2020 17:04:52 -0800 (PST)
 Received: from cloudburst.WiFi.IPv4InfoBelow
  (h210.212.133.40.static.ip.windstream.net. [40.133.212.210])
- by smtp.gmail.com with ESMTPSA id 13sm14678975pfi.78.2020.02.01.17.04.49
+ by smtp.gmail.com with ESMTPSA id 13sm14678975pfi.78.2020.02.01.17.04.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 01 Feb 2020 17:04:50 -0800 (PST)
+ Sat, 01 Feb 2020 17:04:51 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 08/14] target/arm: Set PAN bit as required on exception
- entry
-Date: Sat,  1 Feb 2020 17:04:33 -0800
-Message-Id: <20200202010439.6410-9-richard.henderson@linaro.org>
+Subject: [PATCH v2 09/14] target/arm: Implement ATS1E1 system registers
+Date: Sat,  1 Feb 2020 17:04:34 -0800
+Message-Id: <20200202010439.6410-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200202010439.6410-1-richard.henderson@linaro.org>
 References: <20200202010439.6410-1-richard.henderson@linaro.org>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,109 +98,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PAN bit is preserved, or set as per SCTLR_ELx.SPAN,
-plus several other conditions listed in the ARM ARM.
+This is a minor enhancement over ARMv8.1-PAN.
+The *_PAN mmu_idx are used with the existing do_ats_write.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Tidy preservation of CPSR_PAN in take_aarch32_exception (pmm).
+v2: Move regdefs to file scope (pmm).
 ---
- target/arm/helper.c | 40 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+ target/arm/helper.c | 56 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 50 insertions(+), 6 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 18e4cbb63c..4c0eb7e7d9 100644
+index 4c0eb7e7d9..e69cde801f 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -8772,8 +8772,12 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
-                                    uint32_t mask, uint32_t offset,
-                                    uint32_t newpc)
- {
-+    int new_el;
-+
-     /* Change the CPU state so as to actually take the exception. */
-     switch_mode(env, new_mode);
-+    new_el = arm_current_el(env);
-+
-     /*
-      * For exceptions taken to AArch32 we must clear the SS bit in both
-      * PSTATE and in the old-state value we save to SPSR_<mode>, so zero it now.
-@@ -8786,7 +8790,7 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
-     env->uncached_cpsr = (env->uncached_cpsr & ~CPSR_M) | new_mode;
-     /* Set new mode endianness */
-     env->uncached_cpsr &= ~CPSR_E;
--    if (env->cp15.sctlr_el[arm_current_el(env)] & SCTLR_EE) {
-+    if (env->cp15.sctlr_el[new_el] & SCTLR_EE) {
-         env->uncached_cpsr |= CPSR_E;
-     }
-     /* J and IL must always be cleared for exception entry */
-@@ -8797,6 +8801,12 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
-         env->thumb = (env->cp15.sctlr_el[2] & SCTLR_TE) != 0;
-         env->elr_el[2] = env->regs[15];
-     } else {
-+        /* CPSR.PAN is preserved unless target is EL1 and SCTLR.SPAN == 0. */
-+        if (cpu_isar_feature(aa64_pan, env_archcpu(env))
-+            && new_el == 1
-+            && !(env->cp15.sctlr_el[1] & SCTLR_SPAN)) {
-+            env->uncached_cpsr |= CPSR_PAN;
-+        }
-         /*
-          * this is a lie, as there was no c1_sys on V4T/V5, but who cares
-          * and we should just guard the thumb mode on V4
-@@ -9059,6 +9069,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
-     unsigned int new_el = env->exception.target_el;
-     target_ulong addr = env->cp15.vbar_el[new_el];
-     unsigned int new_mode = aarch64_pstate_mode(new_el, true);
-+    unsigned int old_mode;
-     unsigned int cur_el = arm_current_el(env);
+@@ -3409,16 +3409,21 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
  
-     /*
-@@ -9138,20 +9149,43 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
-     }
- 
-     if (is_a64(env)) {
--        env->banked_spsr[aarch64_banked_spsr_index(new_el)] = pstate_read(env);
-+        old_mode = pstate_read(env);
-         aarch64_save_sp(env, arm_current_el(env));
-         env->elr_el[new_el] = env->pc;
-     } else {
--        env->banked_spsr[aarch64_banked_spsr_index(new_el)] = cpsr_read(env);
-+        old_mode = cpsr_read(env);
-         env->elr_el[new_el] = env->regs[15];
- 
-         aarch64_sync_32_to_64(env);
- 
-         env->condexec_bits = 0;
-     }
-+    env->banked_spsr[aarch64_banked_spsr_index(new_el)] = old_mode;
-+
-     qemu_log_mask(CPU_LOG_INT, "...with ELR 0x%" PRIx64 "\n",
-                   env->elr_el[new_el]);
- 
-+    if (cpu_isar_feature(aa64_pan, cpu)) {
-+        /* The value of PSTATE.PAN is normally preserved, except when ... */
-+        new_mode |= old_mode & PSTATE_PAN;
-+        switch (new_el) {
-+        case 2:
-+            /* ... the target is EL2 with HCR_EL2.{E2H,TGE} == '11' ...  */
-+            if ((arm_hcr_el2_eff(env) & (HCR_E2H | HCR_TGE))
-+                != (HCR_E2H | HCR_TGE)) {
-+                break;
-+            }
+     switch (ri->opc2 & 6) {
+     case 0:
+-        /* stage 1 current state PL1: ATS1CPR, ATS1CPW */
++        /* stage 1 current state PL1: ATS1CPR, ATS1CPW, ATS1CPRP, ATS1CPWP */
+         switch (el) {
+         case 3:
+             mmu_idx = ARMMMUIdx_SE3;
+             break;
+         case 2:
+-            mmu_idx = ARMMMUIdx_Stage1_E1;
+-            break;
++            g_assert(!secure);  /* TODO: ARMv8.4-SecEL2 */
 +            /* fall through */
-+        case 1:
-+            /* ... the target is EL1 ... */
-+            /* ... and SCTLR_ELx.SPAN == 0, then set to 1.  */
-+            if ((env->cp15.sctlr_el[new_el] & SCTLR_SPAN) == 0) {
-+                new_mode |= PSTATE_PAN;
+         case 1:
+-            mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
++            if (ri->crm == 9 && (env->uncached_cpsr & CPSR_PAN)) {
++                mmu_idx = (secure ? ARMMMUIdx_SE10_1_PAN
++                           : ARMMMUIdx_Stage1_E1_PAN);
++            } else {
++                mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
 +            }
-+            break;
-+        }
-+    }
+             break;
+         default:
+             g_assert_not_reached();
+@@ -3487,8 +3492,13 @@ static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
+     switch (ri->opc2 & 6) {
+     case 0:
+         switch (ri->opc1) {
+-        case 0: /* AT S1E1R, AT S1E1W */
+-            mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
++        case 0: /* AT S1E1R, AT S1E1W, AT S1E1RP, AT S1E1WP */
++            if (ri->crm == 9 && (env->pstate & PSTATE_PAN)) {
++                mmu_idx = (secure ? ARMMMUIdx_SE10_1_PAN
++                           : ARMMMUIdx_Stage1_E1_PAN);
++            } else {
++                mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
++            }
+             break;
+         case 4: /* AT S1E2R, AT S1E2W */
+             mmu_idx = ARMMMUIdx_E2;
+@@ -6692,6 +6702,32 @@ static const ARMCPRegInfo vhe_reginfo[] = {
+     REGINFO_SENTINEL
+ };
+ 
++#ifndef CONFIG_USER_ONLY
++static const ARMCPRegInfo ats1e1_reginfo[] = {
++    { .name = "AT_S1E1R", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 0,
++      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
++      .writefn = ats_write64 },
++    { .name = "AT_S1E1W", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 1,
++      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
++      .writefn = ats_write64 },
++    REGINFO_SENTINEL
++};
 +
-     pstate_write(env, PSTATE_DAIF | new_mode);
-     env->aarch64 = 1;
-     aarch64_restore_sp(env, new_el);
++static const ARMCPRegInfo ats1cp_reginfo[] = {
++    { .name = "ATS1CPRP",
++      .cp = 15, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 0,
++      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
++      .writefn = ats_write },
++    { .name = "ATS1CPWP",
++      .cp = 15, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 1,
++      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
++      .writefn = ats_write },
++    REGINFO_SENTINEL
++};
++#endif
++
+ void register_cp_regs_for_features(ARMCPU *cpu)
+ {
+     /* Register all the coprocessor registers based on feature bits */
+@@ -7629,6 +7665,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+     if (cpu_isar_feature(aa64_pan, cpu)) {
+         define_one_arm_cp_reg(cpu, &pan_reginfo);
+     }
++#ifndef CONFIG_USER_ONLY
++    if (cpu_isar_feature(aa64_ats1e1, cpu)) {
++        define_arm_cp_regs(cpu, ats1e1_reginfo);
++    }
++    if (cpu_isar_feature(aa32_ats1e1, cpu)) {
++        define_arm_cp_regs(cpu, ats1cp_reginfo);
++    }
++#endif
+ 
+     if (arm_feature(env, ARM_FEATURE_EL2) && cpu_isar_feature(aa64_vh, cpu)) {
+         define_arm_cp_regs(cpu, vhe_reginfo);
 -- 
 2.20.1
 
