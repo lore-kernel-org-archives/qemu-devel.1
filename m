@@ -5,78 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D70EFC35249
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 22:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEFB6C35249
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 22:48:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D9512051A
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 22:38:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BB6A2067C
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 22:48:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+KU+0jr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9512051A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="it7s9jdW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BB6A2067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyNsU-0007YN-Q2
-	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 17:38:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38889)
+	id 1iyO2t-0001mn-KL
+	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 17:48:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41024)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iyNrs-0006xa-98
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:37:30 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iyO1u-0001F8-Ps
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:47:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iyNrq-0003dV-AY
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:37:28 -0500
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:36302)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iyO1s-0001Wt-P1
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:47:50 -0500
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:43395)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1iyNrq-0003cV-3p; Sun, 02 Feb 2020 17:37:26 -0500
-Received: by mail-io1-xd42.google.com with SMTP id d15so14642121iog.3;
- Sun, 02 Feb 2020 14:37:26 -0800 (PST)
+ id 1iyO1s-0001Us-GB; Sun, 02 Feb 2020 17:47:48 -0500
+Received: by mail-io1-xd43.google.com with SMTP id n21so14593562ioo.10;
+ Sun, 02 Feb 2020 14:47:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=sGMMb1ihPJPT1WIKt21/HxT/dBXuoaH0TpAk6fviiYQ=;
- b=i+KU+0jrwQhAZGQRv4Ab4uC0R+UQsEWN4Ydm+muGKxKYVVP32tCzhtc04JIZlAYoaW
- kKAedaBGRUkEg9DQfcZ3D1cIDhq0Qo2TtyLrei2w8zqhRbm2wK5kZ0ivxTkZcruEKm4c
- /g4K4QFIGGEWWT8/jT7B+vGB4A2+oEjvc9atlqX6fVsA42hkOgLJx5Ken36u+x7TIXLd
- wcSJCX4KIeC+Inok0MLLJMrnX6PpaivIUdy+NkT+yJRKo0GKce7B9VGy+fdFMXr/r2e/
- lxhqngGF4r+Gg678rcfhR5Wn7DNto1P0a4HsoH3vPaMHuFkj1gN5yfx4ZlGJVC/1S8UL
- k3Fw==
+ :cc; bh=gmCYa385pea/JeSMYrSTjZ6v3PvAilauHA5ORn8pv8o=;
+ b=it7s9jdWwRXvN02qA0jDTNQiZhK+R+KHxqIB+MSslq8fYqk2fa1XJWFMAN0H57sSjl
+ FC9LLW3Dnf9/3/ecwyPSsMK6J0G1dmZZ/cAQn+n0bjbJhO/V18m2O1EH95KC/KAV1fQY
+ jSawnCI0cNA1uDCwHzKRHpzxrN5WtqPPcpPntf1HQehR4sssxUBI4K6nn7MPm7DaVuaR
+ d/sXmJ2r25YTRSIXLFb7ZPg0Mn/GWScSu81dSoIWZ83yeb85WxBfQ21Kxn9+o3V6FsNk
+ fFvqFAPH5XMo1RER4o9EJ6i3cBP8SOYg/TTFMJ13mGy4Ui649+t9ng6U7LEX5R/4drDN
+ AxNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=sGMMb1ihPJPT1WIKt21/HxT/dBXuoaH0TpAk6fviiYQ=;
- b=E44Rt6YtBO9HyFh02noByhtc/7EAxg+pOS/GGNJTo8PPq6QmglztdGfNz8EFvfyAsk
- aLQS5AQZLETRDh4c38F74Bkiqxpj0ss5555maSv1IP5YZ7LnkBiAGwdH5U7OxpCADaET
- 9ABaDafIt34OUVaqH5A9ToO+VQawwqJmMvRFQS0vvhH7t8NfiVrsennadHstekz4mU+a
- fz9qFMbpcNk8OiRP6VwIfaarsYTihJ7N5gsFHfKJI90rMC9UTaDm4arWYYsUpdHQT2/H
- SyDEGB0kHkHJs1K6ZJdhdbHec/A0uV86ILUIyrOiUirOmcwA/AEWUaXS9bfancVDvIvZ
- pziA==
-X-Gm-Message-State: APjAAAXGYUSDekICd3t823x/QnYPXiC7+RRFWUSKtMrdGzYj0T/4yDjg
- pP5Vk8SWa+kZouQ3v95h+W9PuTtB83uZsX43LbY=
-X-Google-Smtp-Source: APXvYqzPLHguKtvkgNbXnW3OzLW5f/hteDkdS9fmd/MnwglBsx6khck6G8i2L6iD9EypyK211VeN3PrOO+xgO5WZ5Mc=
-X-Received: by 2002:a02:856a:: with SMTP id g97mr16885023jai.97.1580683045469; 
- Sun, 02 Feb 2020 14:37:25 -0800 (PST)
+ bh=gmCYa385pea/JeSMYrSTjZ6v3PvAilauHA5ORn8pv8o=;
+ b=FwMBRF8LoR0sWxDin+H4LzYFYh32EjgjpzQzGQoODiP8ayZ1RbZ9cO5fE9NFgLa5+g
+ jDy41XAkrg0pTWad/t4ZAmHQmphI1TwGGsoL7YSlY22aReecI2vgWe3KsOtWLzkocAXO
+ 9qEOnZkyuTMFL8QE61tvVmv/+RqM4TSOAcqN+4GGO/yOGVREuSzNHA5N5wZSkVmopGv/
+ Jfw8jdK029b7vkiw//i3fvmg+y5PoiTS5XYdJoX11X620LJAw7k4sZlkBcOc4ICxEiTX
+ /G7CFvg8e7dEwsDvdiqPGihpI70lhD7jHnwPTAMkAcJuTuB/ImMXm14SFemkeauLC0D5
+ vYhw==
+X-Gm-Message-State: APjAAAXfey0IVEi2dOH2uyTLl03VE206pT2VDwURKBpULVzNJs1ulH8B
+ ID0Q9rSpp0haYxmT+fjFZSKVOkMsdmTohFpsiSs=
+X-Google-Smtp-Source: APXvYqzjnil2mUx36k1nhQolNCE4agoeA7CjWxWPCL8GLErprQTXx24No+vHzazZJ97lXZTp30iKq+epWaR2qGT+DUM=
+X-Received: by 2002:a6b:6f01:: with SMTP id k1mr17100672ioc.28.1580683667515; 
+ Sun, 02 Feb 2020 14:47:47 -0800 (PST)
 MIME-Version: 1.0
 References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
  <20200119005102.3847-3-nieklinnenbank@gmail.com>
- <20200121173906.626c700b@Igors-MacBook-Pro>
-In-Reply-To: <20200121173906.626c700b@Igors-MacBook-Pro>
+ <6dd9ce64-8126-2849-fcf1-fff71582b8f9@redhat.com>
+In-Reply-To: <6dd9ce64-8126-2849-fcf1-fff71582b8f9@redhat.com>
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Sun, 2 Feb 2020 23:37:14 +0100
-Message-ID: <CAPan3WpNH-P7EtOFm92-z9wjadmKUACvyuNYe5t-Z-+ig2uW2Q@mail.gmail.com>
+Date: Sun, 2 Feb 2020 23:47:36 +0100
+Message-ID: <CAPan3WouMvrNq+5gN5Ja3wQVSBMBWxUC0qtdnisjHxMyBB2aMQ@mail.gmail.com>
 Subject: Re: [PATCH v4 02/20] hw/arm: add Xunlong Orange Pi PC machine
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000006d81c4059d9f73fd"
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000812d24059d9f98ad"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d42
+X-Received-From: 2607:f8b0:4864:20::d43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,24 +88,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- jasowang@redhat.com, QEMU Developers <qemu-devel@nongnu.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, jasowang@redhat.com,
+ QEMU Developers <qemu-devel@nongnu.org>,
  Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
  =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000006d81c4059d9f73fd
+--000000000000812d24059d9f98ad
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 21, 2020 at 5:39 PM Igor Mammedov <imammedo@redhat.com> wrote:
+On Sun, Jan 19, 2020 at 7:04 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com>
+wrote:
 
-> On Sun, 19 Jan 2020 01:50:44 +0100
-> Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
->
+> On 1/19/20 1:50 AM, Niek Linnenbank wrote:
 > > The Xunlong Orange Pi PC is an Allwinner H3 System on Chip
 > > based embedded computer with mainline support in both U-Boot
 > > and Linux. The board comes with a Quad Core Cortex A7 @ 1.3GHz,
@@ -116,23 +116,13 @@ On Tue, Jan 21, 2020 at 5:39 PM Igor Mammedov <imammedo@redhat.com> wrote:
 > > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 > > Tested-by: KONRAD Frederic <frederic.konrad@adacore.com>
 > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-> Acked-by: Igor Mammedov <imammedo@redhat.com>
->
-
-Thanks for the Acked-by Igor, I'm adding it to the commit message.
-
-Regards,
-Niek
-
-
->
 > > ---
-> >  hw/arm/orangepi.c    | 93 ++++++++++++++++++++++++++++++++++++++++++++
-> >  MAINTAINERS          |  1 +
-> >  hw/arm/Makefile.objs |  2 +-
-> >  3 files changed, 95 insertions(+), 1 deletion(-)
-> >  create mode 100644 hw/arm/orangepi.c
+> >   hw/arm/orangepi.c    | 93 +++++++++++++++++++++++++++++++++++++++++++=
++
+> >   MAINTAINERS          |  1 +
+> >   hw/arm/Makefile.objs |  2 +-
+> >   3 files changed, 95 insertions(+), 1 deletion(-)
+> >   create mode 100644 hw/arm/orangepi.c
 > >
 > > diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
 > > new file mode 100644
@@ -220,6 +210,17 @@ y
 ;
 > > +        exit(1);
 > > +    }
+>
+> I'd move this check earlier, eventually between the bios/cpu checks.
+>
+
+Sure, I'll move it between the bios/cpu checks.
+
+Regards,
+Niek
+
+
+>
 > > +    memory_region_allocate_system_memory(&s->sdram, NULL, "sdram",
 > > +                                         machine->ram_size);
 > > +    memory_region_add_subregion(get_system_memory(),
@@ -248,45 +249,44 @@ y
 > > --- a/MAINTAINERS
 > > +++ b/MAINTAINERS
 > > @@ -487,6 +487,7 @@ L: qemu-arm@nongnu.org
-> >  S: Maintained
-> >  F: hw/*/allwinner-h3*
-> >  F: include/hw/*/allwinner-h3*
+> >   S: Maintained
+> >   F: hw/*/allwinner-h3*
+> >   F: include/hw/*/allwinner-h3*
 > > +F: hw/arm/orangepi.c
 > >
-> >  ARM PrimeCell and CMSDK devices
-> >  M: Peter Maydell <peter.maydell@linaro.org>
+> >   ARM PrimeCell and CMSDK devices
+> >   M: Peter Maydell <peter.maydell@linaro.org>
 > > diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
 > > index ae577e875f..534a6a119e 100644
 > > --- a/hw/arm/Makefile.objs
 > > +++ b/hw/arm/Makefile.objs
 > > @@ -35,7 +35,7 @@ obj-$(CONFIG_DIGIC) +=3D digic.o
-> >  obj-$(CONFIG_OMAP) +=3D omap1.o omap2.o
-> >  obj-$(CONFIG_STRONGARM) +=3D strongarm.o
-> >  obj-$(CONFIG_ALLWINNER_A10) +=3D allwinner-a10.o cubieboard.o
+> >   obj-$(CONFIG_OMAP) +=3D omap1.o omap2.o
+> >   obj-$(CONFIG_STRONGARM) +=3D strongarm.o
+> >   obj-$(CONFIG_ALLWINNER_A10) +=3D allwinner-a10.o cubieboard.o
 > > -obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3.o
 > > +obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3.o orangepi.o
-> >  obj-$(CONFIG_RASPI) +=3D bcm2835_peripherals.o bcm2836.o raspi.o
-> >  obj-$(CONFIG_STM32F205_SOC) +=3D stm32f205_soc.o
-> >  obj-$(CONFIG_STM32F405_SOC) +=3D stm32f405_soc.o
+> >   obj-$(CONFIG_RASPI) +=3D bcm2835_peripherals.o bcm2836.o raspi.o
+> >   obj-$(CONFIG_STM32F205_SOC) +=3D stm32f205_soc.o
+> >   obj-$(CONFIG_STM32F405_SOC) +=3D stm32f405_soc.o
+> >
+>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >
 >
-
 --=20
 Niek Linnenbank
 
---0000000000006d81c4059d9f73fd
+--000000000000812d24059d9f98ad
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jan 21, 2020 at 5:39 PM Igor =
-Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com">imammedo@redhat.com</a>=
-&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
-0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On S=
-un, 19 Jan 2020 01:50:44 +0100<br>
-Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" target=3D"_=
-blank">nieklinnenbank@gmail.com</a>&gt; wrote:<br>
-<br>
+<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Jan 19, 2020 at 7:04 PM Phili=
+ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redh=
+at.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">On 1/19/20 1:50 AM, Niek Linnenbank wrote:<br>
 &gt; The Xunlong Orange Pi PC is an Allwinner H3 System on Chip<br>
 &gt; based embedded computer with mainline support in both U-Boot<br>
 &gt; and Linux. The board comes with a Quad Core Cortex A7 @ 1.3GHz,<br>
@@ -300,21 +300,14 @@ ail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
 re.com" target=3D"_blank">frederic.konrad@adacore.com</a>&gt;<br>
 &gt; Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@=
 redhat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-<br>
-Acked-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" target=
-=3D"_blank">imammedo@redhat.com</a>&gt;<br></blockquote><div><br></div><div=
->Thanks for the Acked-by Igor, I&#39;m adding it to the commit message.</di=
-v><div><br></div><div>Regards,</div><div>Niek<br></div><div>=C2=A0</div><bl=
-ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
-t:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
 &gt; ---<br>
-&gt;=C2=A0 hw/arm/orangepi.c=C2=A0 =C2=A0 | 93 ++++++++++++++++++++++++++++=
-++++++++++++++++<br>
-&gt;=C2=A0 MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 1 +<br>
-&gt;=C2=A0 hw/arm/Makefile.objs |=C2=A0 2 +-<br>
-&gt;=C2=A0 3 files changed, 95 insertions(+), 1 deletion(-)<br>
-&gt;=C2=A0 create mode 100644 hw/arm/orangepi.c<br>
+&gt;=C2=A0 =C2=A0hw/arm/orangepi.c=C2=A0 =C2=A0 | 93 ++++++++++++++++++++++=
+++++++++++++++++++++++<br>
+&gt;=C2=A0 =C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 1 +<=
+br>
+&gt;=C2=A0 =C2=A0hw/arm/Makefile.objs |=C2=A0 2 +-<br>
+&gt;=C2=A0 =C2=A03 files changed, 95 insertions(+), 1 deletion(-)<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/arm/orangepi.c<br>
 &gt; <br>
 &gt; diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c<br>
 &gt; new file mode 100644<br>
@@ -411,6 +404,13 @@ realized&quot;, &amp;error_abort);<br>
 be used with 1GiB of RAM&quot;);<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(1);<br>
 &gt; +=C2=A0 =C2=A0 }<br>
+<br>
+I&#39;d move this check earlier, eventually between the bios/cpu checks.<br=
+></blockquote><div><br></div><div>Sure, I&#39;ll move it between the bios/c=
+pu checks.</div><div><br></div><div>Regards,</div><div>Niek<br></div><div>=
+=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
+.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
 &gt; +=C2=A0 =C2=A0 memory_region_allocate_system_memory(&amp;s-&gt;sdram, =
 NULL, &quot;sdram&quot;,<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
@@ -447,33 +447,37 @@ tex-a7&quot;);<br>
 &gt; +++ b/MAINTAINERS<br>
 &gt; @@ -487,6 +487,7 @@ L: <a href=3D"mailto:qemu-arm@nongnu.org" target=
 =3D"_blank">qemu-arm@nongnu.org</a><br>
-&gt;=C2=A0 S: Maintained<br>
-&gt;=C2=A0 F: hw/*/allwinner-h3*<br>
-&gt;=C2=A0 F: include/hw/*/allwinner-h3*<br>
+&gt;=C2=A0 =C2=A0S: Maintained<br>
+&gt;=C2=A0 =C2=A0F: hw/*/allwinner-h3*<br>
+&gt;=C2=A0 =C2=A0F: include/hw/*/allwinner-h3*<br>
 &gt; +F: hw/arm/orangepi.c<br>
-&gt;=C2=A0 <br>
-&gt;=C2=A0 ARM PrimeCell and CMSDK devices<br>
-&gt;=C2=A0 M: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org"=
- target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt;=C2=A0 =C2=A0ARM PrimeCell and CMSDK devices<br>
+&gt;=C2=A0 =C2=A0M: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linar=
+o.org" target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
 &gt; diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs<br>
 &gt; index ae577e875f..534a6a119e 100644<br>
 &gt; --- a/hw/arm/Makefile.objs<br>
 &gt; +++ b/hw/arm/Makefile.objs<br>
 &gt; @@ -35,7 +35,7 @@ obj-$(CONFIG_DIGIC) +=3D digic.o<br>
-&gt;=C2=A0 obj-$(CONFIG_OMAP) +=3D omap1.o omap2.o<br>
-&gt;=C2=A0 obj-$(CONFIG_STRONGARM) +=3D strongarm.o<br>
-&gt;=C2=A0 obj-$(CONFIG_ALLWINNER_A10) +=3D allwinner-a10.o cubieboard.o<br=
->
+&gt;=C2=A0 =C2=A0obj-$(CONFIG_OMAP) +=3D omap1.o omap2.o<br>
+&gt;=C2=A0 =C2=A0obj-$(CONFIG_STRONGARM) +=3D strongarm.o<br>
+&gt;=C2=A0 =C2=A0obj-$(CONFIG_ALLWINNER_A10) +=3D allwinner-a10.o cubieboar=
+d.o<br>
 &gt; -obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3.o<br>
 &gt; +obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3.o orangepi.o<br>
-&gt;=C2=A0 obj-$(CONFIG_RASPI) +=3D bcm2835_peripherals.o bcm2836.o raspi.o=
+&gt;=C2=A0 =C2=A0obj-$(CONFIG_RASPI) +=3D bcm2835_peripherals.o bcm2836.o r=
+aspi.o<br>
+&gt;=C2=A0 =C2=A0obj-$(CONFIG_STM32F205_SOC) +=3D stm32f205_soc.o<br>
+&gt;=C2=A0 =C2=A0obj-$(CONFIG_STM32F405_SOC) +=3D stm32f405_soc.o<br>
+&gt; <br>
 <br>
-&gt;=C2=A0 obj-$(CONFIG_STM32F205_SOC) +=3D stm32f205_soc.o<br>
-&gt;=C2=A0 obj-$(CONFIG_STM32F405_SOC) +=3D stm32f405_soc.o<br>
+Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
+com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
 <br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
+</blockquote></div><div><br>-- <br><div dir=3D"ltr" class=3D"gmail_signatur=
+e"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></div></div></d=
+iv>
 
---0000000000006d81c4059d9f73fd--
+--000000000000812d24059d9f98ad--
 
