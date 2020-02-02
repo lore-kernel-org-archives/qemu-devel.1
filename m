@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C403C35249
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 01:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0460FC35249
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 01:08:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E504A20658
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 01:07:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2A5620658
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 01:08:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kvJbbi/e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E504A20658
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PdE5fkFr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2A5620658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iy3jq-0001Jf-3h
-	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 20:07:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45686)
+	id 1iy3kW-0002zs-0H
+	for qemu-devel@archiver.kernel.org; Sat, 01 Feb 2020 20:08:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45611)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iy3h5-0003nq-IE
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:05:00 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iy3gw-0003Z2-Ro
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iy3h0-0002AK-JQ
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:59 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42884)
+ (envelope-from <richard.henderson@linaro.org>) id 1iy3gv-000224-Sm
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:50 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39411)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iy3h0-00029E-CN
- for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:54 -0500
-Received: by mail-pg1-x541.google.com with SMTP id s64so5713299pgb.9
- for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 17:04:54 -0800 (PST)
+ id 1iy3gv-00020c-N3
+ for qemu-devel@nongnu.org; Sat, 01 Feb 2020 20:04:49 -0500
+Received: by mail-pg1-x542.google.com with SMTP id 4so5734811pgd.6
+ for <qemu-devel@nongnu.org>; Sat, 01 Feb 2020 17:04:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=pbTFZCO7ADOXNmgFtzr7ygDnLBWMHSNndfGhWIzZQwI=;
- b=kvJbbi/e/ah++Z8bA/jeiNK/zEI8r+LxCSD2L8Lxo5j+OSUFuisYSgMiVvBOZheMZ7
- oRX4ZCxjIA3W0hknMWH+UXvHInePAb5qk6wMlhLsDks14BjDegd4kFg0dS+fBjcUgsyq
- MlyliUefO/Gv6xYraceKqStJs7n+n/rm/GlDlw1gU5QMas5ftWBtlAWIRJ0H2Ut/jwhx
- V9KG/90ff3HdZQVN/XdXmKZrxhugBolpqtDfxoeejDW7nYYb2b3mwTo5QmH0ZyOc/Bn9
- EAGA2ZWy1o9gf5zmHZOsID1b/C0TsQmx8LhtShoILlvyaXx/AY3gaLfGTgzNXyW7E79E
- +RzA==
+ bh=Vm99WKNsbIgWAw0gtT4tkIR4+ETnRFNvmZH5RsHuOfI=;
+ b=PdE5fkFrg8A8UJiG/TF69h1FFceh69fibJBHeJjz8ZgMVAQMgQw5EBSLyi9SqGEDX4
+ e6Bdinb9ZZMAeJUQIJaQiC457uZSzj8myDjAdQWT7BMh26rPrp+1JX1f1NZS7WgRgyd7
+ C9cM4s8y/iZmc+Sb2EwXxJb/Ztl+w4lmripTiZkou+hHYLWfQI8PI5OZeZkJnAaMJJtF
+ xHVFnl5Nq+16YGRPcmh7GoJKLy7tjgBAXa1S+hPMDa3G3Wsd2qLwpfSn4ASnvZPcEm6E
+ Vn3SDxXVArdr8gGEy9P3HaG2TqxNLjfN4Pyvs8y9034Vk/BospJPuiUNLtDQz1BJRyGs
+ 2RTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=pbTFZCO7ADOXNmgFtzr7ygDnLBWMHSNndfGhWIzZQwI=;
- b=DJSdE6tcngm0rmpEnArvCZjjO4rau7t4rkZ7DJjxZcRYgTc0Q8wWpMR40/45ZB1pn7
- 0qGpgkydWu8L9EjK9erZgSeZ4+JvytRDoU4lz+5VnP8/tfrh38W5/JNW5Fyjke8PrOro
- YTSv7nbwyr7LJioqqGy/8iYP8oH9a9+0U6PjAXmwM2G7F/1kiGyPZp2NHfV9ycxZeA25
- HYV+dX75/yPGPOkf7P84xeXUSyuqe0fgmTvXXgVtntWphIneOH8cU5XSGZhSfCwG/V8X
- QClot8toaEGRH68TctX0iSx3ilxuSO9I/F123mHYighyibm4+g1snW7G9iNuTDuMI1IV
- rUFA==
-X-Gm-Message-State: APjAAAWkteV/p9+lw/EBAFBctJhbMQs3RHng4mOBRdXZrGH0XOmAb4VY
- 6ydmYPLkRXsm8rgvncxxPbyfrYVO/cE=
-X-Google-Smtp-Source: APXvYqwebZoX+QwJCpH7ZyngcTQRhVgKKtEYExmKLVBaQzzRghWDIkODVpqGwVNcwvziY1cOs63OQw==
-X-Received: by 2002:a62:788a:: with SMTP id
- t132mr17931725pfc.134.1580605493230; 
- Sat, 01 Feb 2020 17:04:53 -0800 (PST)
+ bh=Vm99WKNsbIgWAw0gtT4tkIR4+ETnRFNvmZH5RsHuOfI=;
+ b=Om3epyU4TS/As2PBcjB4kpG26duUTAL8L/nPn/SvllwWOeQdWhm0gqy2I7kCMaIL8c
+ UF8cJI0LTA3snK2yov98FKfN2B12n13NipoTCWIaBHWwvJ5JnlHvrFCxqn0j8iVNVuwL
+ ri8D6artIkM92sHaYZ5N8EOS991+eSdUfJJOamNH6q9JxYAlFILUTp8yNJC9B7V8bDb8
+ mcHS/JiBWZx6iLtEnYG4QlLLtztDWHBmf+tWRMYG6WwNHv9RGFvEL4N3pz2pYkuNYhjT
+ V6Fi1awef0iM3JyAja7/VMM+jLxXLEoooOGAliyL7FEW7qsDpRY8Udds9gD9gQkAOfhd
+ 0lkg==
+X-Gm-Message-State: APjAAAUKucxKsUlKBLkrGnP9Vrkr36r4vZqdjufzDEmvHDYasuMhv8tl
+ Z2h8ANmp3ESRVu0njdPiKCN+cSlDw8U=
+X-Google-Smtp-Source: APXvYqw0XqwXY8swZZaxxc2zioeMhKT6UH91gvgw7kRRrx8rAC85rBTWLLDmclIBVh4NnMr/80KDWA==
+X-Received: by 2002:a63:ba43:: with SMTP id l3mr3402636pgu.120.1580605488451; 
+ Sat, 01 Feb 2020 17:04:48 -0800 (PST)
 Received: from cloudburst.WiFi.IPv4InfoBelow
  (h210.212.133.40.static.ip.windstream.net. [40.133.212.210])
- by smtp.gmail.com with ESMTPSA id 13sm14678975pfi.78.2020.02.01.17.04.52
+ by smtp.gmail.com with ESMTPSA id 13sm14678975pfi.78.2020.02.01.17.04.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 01 Feb 2020 17:04:52 -0800 (PST)
+ Sat, 01 Feb 2020 17:04:47 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 10/14] target/arm: Enable ARMv8.2-ATS1E1 in -cpu max
-Date: Sat,  1 Feb 2020 17:04:35 -0800
-Message-Id: <20200202010439.6410-11-richard.henderson@linaro.org>
+Subject: [PATCH v2 06/14] target/arm: Update arm_mmu_idx_el for PAN
+Date: Sat,  1 Feb 2020 17:04:31 -0800
+Message-Id: <20200202010439.6410-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200202010439.6410-1-richard.henderson@linaro.org>
 References: <20200202010439.6410-1-richard.henderson@linaro.org>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,53 +98,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes enablement of ARMv8.1-PAN.
+Examine the PAN bit for EL1, EL2, and Secure EL1 to
+determine if it applies.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c   | 4 ++++
- target/arm/cpu64.c | 5 +++++
- 2 files changed, 9 insertions(+)
+ target/arm/helper.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index b0762a76c4..de733aceeb 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2709,6 +2709,10 @@ static void arm_max_initfn(Object *obj)
-             t = FIELD_DP32(t, MVFR2, FPMISC, 4);   /* FP MaxNum */
-             cpu->isar.mvfr2 = t;
- 
-+            t = cpu->id_mmfr3;
-+            t = FIELD_DP32(t, ID_MMFR3, PAN, 2); /* ATS1E1 */
-+            cpu->id_mmfr3 = t;
-+
-             t = cpu->id_mmfr4;
-             t = FIELD_DP32(t, ID_MMFR4, HPDS, 1); /* AA32HPD */
-             cpu->id_mmfr4 = t;
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index c80fb5fd43..57fbc5eade 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -673,6 +673,7 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
-         t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
-         t = FIELD_DP64(t, ID_AA64MMFR1, VH, 1);
-+        t = FIELD_DP64(t, ID_AA64MMFR1, PAN, 2); /* ATS1E1 */
-         cpu->isar.id_aa64mmfr1 = t;
- 
-         /* Replicate the same data to the 32-bit id registers.  */
-@@ -693,6 +694,10 @@ static void aarch64_max_initfn(Object *obj)
-         u = FIELD_DP32(u, ID_ISAR6, SPECRES, 1);
-         cpu->isar.id_isar6 = u;
- 
-+        u = cpu->id_mmfr3;
-+        u = FIELD_DP32(u, ID_MMFR3, PAN, 2); /* ATS1E1 */
-+        cpu->id_mmfr3 = u;
-+
-         /*
-          * FIXME: We do not yet support ARMv8.2-fp16 for AArch32 yet,
-          * so do not set MVFR1.FPHP.  Strictly speaking this is not legal,
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 90a22921dc..638abe6af0 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11904,13 +11904,22 @@ ARMMMUIdx arm_mmu_idx_el(CPUARMState *env, int el)
+         return ARMMMUIdx_E10_0;
+     case 1:
+         if (arm_is_secure_below_el3(env)) {
++            if (env->pstate & PSTATE_PAN) {
++                return ARMMMUIdx_SE10_1_PAN;
++            }
+             return ARMMMUIdx_SE10_1;
+         }
++        if (env->pstate & PSTATE_PAN) {
++            return ARMMMUIdx_E10_1_PAN;
++        }
+         return ARMMMUIdx_E10_1;
+     case 2:
+         /* TODO: ARMv8.4-SecEL2 */
+         /* Note that TGE does not apply at EL2.  */
+         if ((env->cp15.hcr_el2 & HCR_E2H) && arm_el_is_aa64(env, 2)) {
++            if (env->pstate & PSTATE_PAN) {
++                return ARMMMUIdx_E20_2_PAN;
++            }
+             return ARMMMUIdx_E20_2;
+         }
+         return ARMMMUIdx_E2;
 -- 
 2.20.1
 
