@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75834C35249
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 20:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1254AC35249
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 20:48:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1965920658
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 20:26:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABF38206D3
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 20:48:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="njOX5Iq3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1965920658
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wt5EAKtS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABF38206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyLpG-0007fC-Bb
-	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 15:26:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42063)
+	id 1iyMAJ-0003Jj-Sx
+	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 15:48:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45439)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iyLoa-0007Ev-E1
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 15:26:00 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iyM9f-0002l3-Oe
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 15:47:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iyLoV-0006RP-Up
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 15:25:56 -0500
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:33864)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iyM9c-0004Xh-FD
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 15:47:43 -0500
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:37515)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1iyLoV-0006Iz-A3; Sun, 02 Feb 2020 15:25:51 -0500
-Received: by mail-io1-xd41.google.com with SMTP id z193so14396383iof.1;
- Sun, 02 Feb 2020 12:25:51 -0800 (PST)
+ id 1iyM9c-0004WQ-2B; Sun, 02 Feb 2020 15:47:40 -0500
+Received: by mail-io1-xd43.google.com with SMTP id k24so14445462ioc.4;
+ Sun, 02 Feb 2020 12:47:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1FjnH8+dbn5Z6wTCVoyE57+rssbT4E0qvkQ87rsHoCY=;
- b=njOX5Iq3kso/pHthXlvA38UwBiZUB/AXFFSr6RZ0W1pYUxEwfiL62uK1fAGL/c4wXU
- /h20yc/lo3GV7BtsGAShE0HOeYNZElEkC3b2YxWl53w3qFZqPDT8SdO/6wOFN7g/lrWc
- Fk8phqh5x6dg5CMrpQwg6pmo62W22rbl7bWKCWMaPxNUE3dI1QwqMehhN99+iGthmv1F
- fSyZHt6ApTa+AuyaGoVkINlSxcp8Nf5/fb3vscxZkFmiAI37fAAIQsCpWZSNC4KvoA37
- YI1WnNi1cLgQ5IlNF92LF/Y2NGpIV3JR7MFDR1DIsbnQxbDY/DLt2sJun30yGof1EpyT
- mLjQ==
+ :cc; bh=6ohC8Bdc+TsTTgBiiKMC9C50ISFWVPgXdwzCNXKGxrI=;
+ b=Wt5EAKtSQmD14dm/NzQj/jKZiz7kedJXRCZYNJct4N75q9Bsg4QrnfzPOFA9MXyZqw
+ i2p0LdtYnadjjHFoG5THGnhKL9iY7DE34wpjkoqphvgnl3Lq0geZ0RKAtK8d2C0d4aKj
+ amPSRcXSi75Lwmm1GrNeG4EW/Pz16+QUo9DRTW+jmPwtZzddstzlYvisi3aalNwz5Kiy
+ ssZ1XTK8jQvjIf2FLGubmYvn899/nMTVB9bAAJ5UYOpqu5+T15GZ/T107khq0RXGFB2q
+ GX8lFkbSWCVVdGRrcsBk4lWv4RkFWXONA60dduktfmSwGU1PDu/lnVTxpdS0nedWnpSH
+ 5PpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=1FjnH8+dbn5Z6wTCVoyE57+rssbT4E0qvkQ87rsHoCY=;
- b=eSGmXViTvykE9W+ExuJIlss1lKzbWXuun+yZ53sMuJSwBcuNdKL/hoN2ab3SSDYKU6
- tvThUbPYsOm0r64YuKWde54cqrqxUP0Nke3qxj+wCOcUs8wbLgZn2VkMHFlAEP5G5KYc
- Y4hH5P2ua0ArzSh8WCm8dOp9sPfJHE7k8QqwYOx8b4j45/7jmAREFSRl1iix3/y4XD55
- Gxh6P5FuohJawhIBSuyQP/MxYJ/0k3b71wvcZTQl2VUXqgyjx0QC7vV0y/I3pvWZYujR
- y+3X7VlxWXStSqcEFMZPxHzwoebCPIIMX8WoHVLAc0CbAo9IFoD6RM+TCtjSBu6KEWtb
- z8HA==
-X-Gm-Message-State: APjAAAXsmf6DtPFJKH058EcmArxn3dNsG8LCv3Sos3XcLV/Pv8ok/vvm
- bKykru+3Gs+FTnaLTX69SbCqi7WuCLScu2DVtIw=
-X-Google-Smtp-Source: APXvYqyQ7q9gcRT53ST0jdkpKC4zX82KaWrKHdgULo7olBP3nS+Otw0TqAgHyB9hQnFa4dopfIjSFbVH+OqyvPg+JWQ=
-X-Received: by 2002:a02:8817:: with SMTP id r23mr17032769jai.120.1580675150125; 
- Sun, 02 Feb 2020 12:25:50 -0800 (PST)
+ bh=6ohC8Bdc+TsTTgBiiKMC9C50ISFWVPgXdwzCNXKGxrI=;
+ b=UGT1R5m99WIZqKOgZywxj+b9su/cYVO47eY9NqIi3MYJ1t36XPKXvXyYxCLAFBlANm
+ GWBE7e1YUZAfLjH+Oh0N17HOJXsC9KaA5Wv4yXlRv9CkecjEmmuocqeVJaupjvbneG/w
+ uwZZ4LjfwRghaAl0EcSqjqYrQevAivL9BdRfYZ2sUmE5+0e23As4Kb6PSS/bU7whsXPI
+ LzCTmaOij291NFYPMdZ7J3SKC99/r5zH4Nhi+T5vqS2E0PNajEaNj1jiM6f905CJRPXq
+ gQcfB7Mg8eQYHrzoOrUKm6aAFoaxIUuvyWHCln1s1Iu0EOJ7sP7ICXeA+ZcHN0+WzqXy
+ zK7A==
+X-Gm-Message-State: APjAAAX7aJu0Nv/nCKpCjCLSXm/J3AwM83iWGtRRRnnQuJwpEbP0QWFM
+ dJhs0ER7PEGMGhV30qv2RYY9VODiXY/aFg9BQL4=
+X-Google-Smtp-Source: APXvYqxSPOvi6f8/ZEzD8sgrunsKQE8i2ebVpNqJX+5rQNPPjsYTsm7NdJ5lyebUJVBaGSmDvlUUBZeUCxA/8NUjm9w=
+X-Received: by 2002:a6b:7902:: with SMTP id i2mr15691027iop.67.1580676459131; 
+ Sun, 02 Feb 2020 12:47:39 -0800 (PST)
 MIME-Version: 1.0
 References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
- <20200119005102.3847-7-nieklinnenbank@gmail.com>
- <62aa1a33-45db-bae0-b436-6bcb1847ab1c@redhat.com>
-In-Reply-To: <62aa1a33-45db-bae0-b436-6bcb1847ab1c@redhat.com>
+ <20200119005102.3847-8-nieklinnenbank@gmail.com>
+ <0e46df1c-d140-23f0-6dbc-c7eb233010e5@redhat.com>
+In-Reply-To: <0e46df1c-d140-23f0-6dbc-c7eb233010e5@redhat.com>
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Sun, 2 Feb 2020 21:25:38 +0100
-Message-ID: <CAPan3WoZOJ5f247MtN9adSfiwJUSnvj8nq43b5=2QTD7UsYGaQ@mail.gmail.com>
-Subject: Re: [PATCH v4 06/20] hw/arm/allwinner: add CPU Configuration module
+Date: Sun, 2 Feb 2020 21:47:28 +0100
+Message-ID: <CAPan3Wr2otKWNOX2qa5UEQ1hVSMLb9SdPopvr=xCf-Du9P29uw@mail.gmail.com>
+Subject: Re: [PATCH v4 07/20] hw/arm/allwinner: add Security Identifier device
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000d42029059d9d9c85"
+Content-Type: multipart/alternative; boundary="000000000000d9f710059d9deac2"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d41
+X-Received-From: 2607:f8b0:4864:20::d43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,74 +96,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d42029059d9d9c85
+--000000000000d9f710059d9deac2
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 19, 2020 at 7:52 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+On Sun, Jan 19, 2020 at 7:57 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
 com>
 wrote:
 
 > On 1/19/20 1:50 AM, Niek Linnenbank wrote:
-> > Various Allwinner System on Chip designs contain multiple processors
-> > that can be configured and reset using the generic CPU Configuration
-> > module interface. This commit adds support for the Allwinner CPU
-> > configuration interface which emulates the following features:
-> >
-> >   * CPU reset
-> >   * CPU status
+> > The Security Identifier device found in various Allwinner System on Chi=
+p
+> > designs gives applications a per-board unique identifier. This commit
+> > adds support for the Allwinner Security Identifier using a 128-bit
+> > UUID value as input.
 > >
 > > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 > > ---
-> >   include/hw/arm/allwinner-h3.h      |   3 +
-> >   include/hw/misc/allwinner-cpucfg.h |  52 ++++++
-> >   hw/arm/allwinner-h3.c              |   9 +-
-> >   hw/misc/allwinner-cpucfg.c         | 269 ++++++++++++++++++++++++++++=
+> >   include/hw/arm/allwinner-h3.h   |   3 +
+> >   include/hw/misc/allwinner-sid.h |  60 +++++++++++
+> >   hw/arm/allwinner-h3.c           |  11 ++-
+> >   hw/arm/orangepi.c               |   4 +
+> >   hw/misc/allwinner-sid.c         | 170 +++++++++++++++++++++++++++++++=
 +
-> >   hw/misc/Makefile.objs              |   1 +
-> >   hw/misc/trace-events               |   5 +
-> >   6 files changed, 338 insertions(+), 1 deletion(-)
-> >   create mode 100644 include/hw/misc/allwinner-cpucfg.h
-> >   create mode 100644 hw/misc/allwinner-cpucfg.c
+> >   hw/misc/Makefile.objs           |   1 +
+> >   hw/misc/trace-events            |   4 +
+> >   7 files changed, 252 insertions(+), 1 deletion(-)
+> >   create mode 100644 include/hw/misc/allwinner-sid.h
+> >   create mode 100644 hw/misc/allwinner-sid.c
 > >
 > > diff --git a/include/hw/arm/allwinner-h3.h
 > b/include/hw/arm/allwinner-h3.h
-> > index 43500c4262..dc729176ab 100644
+> > index dc729176ab..85416d9d64 100644
 > > --- a/include/hw/arm/allwinner-h3.h
 > > +++ b/include/hw/arm/allwinner-h3.h
-> > @@ -40,6 +40,7 @@
-> >   #include "hw/timer/allwinner-a10-pit.h"
-> >   #include "hw/intc/arm_gic.h"
+> > @@ -42,6 +42,7 @@
 > >   #include "hw/misc/allwinner-h3-ccu.h"
-> > +#include "hw/misc/allwinner-cpucfg.h"
+> >   #include "hw/misc/allwinner-cpucfg.h"
 > >   #include "hw/misc/allwinner-h3-sysctrl.h"
+> > +#include "hw/misc/allwinner-sid.h"
 > >   #include "target/arm/cpu.h"
 > >
-> > @@ -76,6 +77,7 @@ enum {
-> >       AW_H3_GIC_CPU,
-> >       AW_H3_GIC_HYP,
-> >       AW_H3_GIC_VCPU,
-> > +    AW_H3_CPUCFG,
-> >       AW_H3_SDRAM
-> >   };
-> >
-> > @@ -110,6 +112,7 @@ typedef struct AwH3State {
-> >       const hwaddr *memmap;
-> >       AwA10PITState timer;
+> >   /**
+> > @@ -59,6 +60,7 @@ enum {
+> >       AW_H3_SRAM_A2,
+> >       AW_H3_SRAM_C,
+> >       AW_H3_SYSCTRL,
+> > +    AW_H3_SID,
+> >       AW_H3_EHCI0,
+> >       AW_H3_OHCI0,
+> >       AW_H3_EHCI1,
+> > @@ -114,6 +116,7 @@ typedef struct AwH3State {
 > >       AwH3ClockCtlState ccu;
-> > +    AwCpuCfgState cpucfg;
+> >       AwCpuCfgState cpucfg;
 > >       AwH3SysCtrlState sysctrl;
+> > +    AwSidState sid;
 > >       GICState gic;
 > >       MemoryRegion sram_a1;
-> > diff --git a/include/hw/misc/allwinner-cpucfg.h
-> b/include/hw/misc/allwinner-cpucfg.h
+> >       MemoryRegion sram_a2;
+> > diff --git a/include/hw/misc/allwinner-sid.h
+> b/include/hw/misc/allwinner-sid.h
 > > new file mode 100644
-> > index 0000000000..2c3693a8be
+> > index 0000000000..4c1fa4762b
 > > --- /dev/null
-> > +++ b/include/hw/misc/allwinner-cpucfg.h
-> > @@ -0,0 +1,52 @@
+> > +++ b/include/hw/misc/allwinner-sid.h
+> > @@ -0,0 +1,60 @@
 > > +/*
-> > + * Allwinner CPU Configuration Module emulation
+> > + * Allwinner Security ID emulation
 > > + *
 > > + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 > > + *
@@ -184,93 +183,127 @@ y
 > >.
 > > + */
 > > +
-> > +#ifndef HW_MISC_ALLWINNER_CPUCFG_H
-> > +#define HW_MISC_ALLWINNER_CPUCFG_H
+> > +#ifndef HW_MISC_ALLWINNER_SID_H
+> > +#define HW_MISC_ALLWINNER_SID_H
 > > +
 > > +#include "qom/object.h"
 > > +#include "hw/sysbus.h"
+> > +#include "qemu/uuid.h"
 > > +
 > > +/**
 > > + * Object model
 > > + * @{
 > > + */
 > > +
-> > +#define TYPE_AW_CPUCFG   "allwinner-cpucfg"
-> > +#define AW_CPUCFG(obj) \
-> > +    OBJECT_CHECK(AwCpuCfgState, (obj), TYPE_AW_CPUCFG)
+> > +#define TYPE_AW_SID    "allwinner-sid"
+> > +#define AW_SID(obj) \
+> > +    OBJECT_CHECK(AwSidState, (obj), TYPE_AW_SID)
 > > +
 > > +/** @} */
 > > +
 > > +/**
-> > + * Allwinner CPU Configuration Module instance state
+> > + * Allwinner Security ID object instance state
 > > + */
-> > +typedef struct AwCpuCfgState {
+> > +typedef struct AwSidState {
 > > +    /*< private >*/
 > > +    SysBusDevice parent_obj;
 > > +    /*< public >*/
 > > +
+> > +    /** Maps I/O registers in physical memory */
 > > +    MemoryRegion iomem;
-> > +    uint32_t gen_ctrl;
-> > +    uint32_t super_standby;
-> > +    uint32_t entry_addr;
 > > +
-> > +} AwCpuCfgState;
+> > +    /** Control register defines how and what to read */
+> > +    uint32_t control;
 > > +
-> > +#endif /* HW_MISC_ALLWINNER_CPUCFG_H */
+> > +    /** RdKey register contains the data retrieved by the device */
+> > +    uint32_t rdkey;
+> > +
+> > +    /** Stores the emulated device identifier */
+> > +    QemuUUID identifier;
+> > +
+> > +} AwSidState;
+> > +
+> > +#endif /* HW_MISC_ALLWINNER_SID_H */
 > > diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-> > index 600cfa2c11..daa2d3c819 100644
+> > index daa2d3c819..919fba6cf6 100644
 > > --- a/hw/arm/allwinner-h3.c
 > > +++ b/hw/arm/allwinner-h3.c
-> > @@ -56,6 +56,7 @@ const hwaddr allwinner_h3_memmap[] =3D {
-> >       [AW_H3_GIC_CPU]    =3D 0x01c82000,
-> >       [AW_H3_GIC_HYP]    =3D 0x01c84000,
-> >       [AW_H3_GIC_VCPU]   =3D 0x01c86000,
-> > +    [AW_H3_CPUCFG]     =3D 0x01f01c00,
-> >       [AW_H3_SDRAM]      =3D 0x40000000
-> >   };
+> > @@ -38,6 +38,7 @@ const hwaddr allwinner_h3_memmap[] =3D {
+> >       [AW_H3_SRAM_A2]    =3D 0x00044000,
+> >       [AW_H3_SRAM_C]     =3D 0x00010000,
+> >       [AW_H3_SYSCTRL]    =3D 0x01c00000,
+> > +    [AW_H3_SID]        =3D 0x01c14000,
+> >       [AW_H3_EHCI0]      =3D 0x01c1a000,
+> >       [AW_H3_OHCI0]      =3D 0x01c1a400,
+> >       [AW_H3_EHCI1]      =3D 0x01c1b000,
+> > @@ -78,7 +79,6 @@ struct AwH3Unimplemented {
+> >       { "mmc0",      0x01c0f000, 4 * KiB },
+> >       { "mmc1",      0x01c10000, 4 * KiB },
+> >       { "mmc2",      0x01c11000, 4 * KiB },
+> > -    { "sid",       0x01c14000, 1 * KiB },
+> >       { "crypto",    0x01c15000, 4 * KiB },
+> >       { "msgbox",    0x01c17000, 4 * KiB },
+> >       { "spinlock",  0x01c18000, 4 * KiB },
+> > @@ -198,6 +198,11 @@ static void allwinner_h3_init(Object *obj)
 > >
-> > @@ -122,7 +123,6 @@ struct AwH3Unimplemented {
-> >       { "r_wdog",    0x01f01000, 1 * KiB },
-> >       { "r_prcm",    0x01f01400, 1 * KiB },
-> >       { "r_twd",     0x01f01800, 1 * KiB },
-> > -    { "r_cpucfg",  0x01f01c00, 1 * KiB },
-> >       { "r_cir-rx",  0x01f02000, 1 * KiB },
-> >       { "r_twi",     0x01f02400, 1 * KiB },
-> >       { "r_uart",    0x01f02800, 1 * KiB },
-> > @@ -195,6 +195,9 @@ static void allwinner_h3_init(Object *obj)
-> >
-> >       sysbus_init_child_obj(obj, "sysctrl", &s->sysctrl,
-> sizeof(s->sysctrl),
-> >                             TYPE_AW_H3_SYSCTRL);
+> >       sysbus_init_child_obj(obj, "cpucfg", &s->cpucfg, sizeof(s->cpucfg=
+),
+> >                             TYPE_AW_CPUCFG);
 > > +
-> > +    sysbus_init_child_obj(obj, "cpucfg", &s->cpucfg, sizeof(s->cpucfg)=
-,
-> > +                          TYPE_AW_CPUCFG);
+> > +    sysbus_init_child_obj(obj, "sid", &s->sid, sizeof(s->sid),
+> > +                          TYPE_AW_SID);
+> > +    object_property_add_alias(obj, "identifier", OBJECT(&s->sid),
+> > +                              "identifier", &error_abort);
 > >   }
 > >
 > >   static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-> > @@ -308,6 +311,10 @@ static void allwinner_h3_realize(DeviceState *dev,
+> > @@ -315,6 +320,10 @@ static void allwinner_h3_realize(DeviceState *dev,
 > Error **errp)
-> >       qdev_init_nofail(DEVICE(&s->sysctrl));
-> >       sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctrl), 0,
-> s->memmap[AW_H3_SYSCTRL]);
-> >
-> > +    /* CPU Configuration */
-> > +    qdev_init_nofail(DEVICE(&s->cpucfg));
-> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->cpucfg), 0,
+> >       qdev_init_nofail(DEVICE(&s->cpucfg));
+> >       sysbus_mmio_map(SYS_BUS_DEVICE(&s->cpucfg), 0,
 > s->memmap[AW_H3_CPUCFG]);
+> >
+> > +    /* Security Identifier */
+> > +    qdev_init_nofail(DEVICE(&s->sid));
+> > +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sid), 0, s->memmap[AW_H3_SID]);
 > > +
 > >       /* Universal Serial Bus */
 > >       sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI0],
 > >                            qdev_get_gpio_in(DEVICE(&s->gic),
-> > diff --git a/hw/misc/allwinner-cpucfg.c b/hw/misc/allwinner-cpucfg.c
+> > diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
+> > index 866f5f7cd6..5b60f35a80 100644
+> > --- a/hw/arm/orangepi.c
+> > +++ b/hw/arm/orangepi.c
+> > @@ -61,6 +61,10 @@ static void orangepi_init(MachineState *machine)
+> >       object_property_set_int(OBJECT(s->h3), 24 * 1000 * 1000,
+> "clk1-freq",
+> >                               &error_abort);
+> >
+> > +    /* Setup SID properties */
+> > +    qdev_prop_set_string(DEVICE(s->h3), "identifier",
+> > +                         "8100c002-0001-0002-0003-000044556677");
+>
+> This part misses a comment that we are enforcing the same UUID on all
+> VMs (for now).
+>
+
+Good idea, I'll add that in a comment.
+
+
+>
+> > +
+> >       /* Mark H3 object realized */
+> >       object_property_set_bool(OBJECT(s->h3), true, "realized",
+> &error_abort);
+> >
+> > diff --git a/hw/misc/allwinner-sid.c b/hw/misc/allwinner-sid.c
 > > new file mode 100644
-> > index 0000000000..47254bfafd
+> > index 0000000000..954de935bc
 > > --- /dev/null
-> > +++ b/hw/misc/allwinner-cpucfg.c
-> > @@ -0,0 +1,269 @@
+> > +++ b/hw/misc/allwinner-sid.c
+> > @@ -0,0 +1,170 @@
 > > +/*
-> > + * Allwinner CPU Configuration Module emulation
+> > + * Allwinner Security ID emulation
 > > + *
 > > + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 > > + *
@@ -297,182 +330,74 @@ y
 > > +#include "migration/vmstate.h"
 > > +#include "qemu/log.h"
 > > +#include "qemu/module.h"
-> > +#include "qemu/error-report.h"
-> > +#include "qemu/timer.h"
-> > +#include "hw/core/cpu.h"
-> > +#include "arm-powerctl.h"
-> > +#include "hw/misc/allwinner-cpucfg.h"
+> > +#include "qemu/guest-random.h"
+> > +#include "qapi/error.h"
+> > +#include "hw/qdev-properties.h"
+> > +#include "hw/misc/allwinner-sid.h"
 > > +#include "trace.h"
 > > +
-> > +/* CPUCFG register offsets */
+> > +/* SID register offsets */
 > > +enum {
-> > +    REG_CPUS_RST_CTRL       =3D 0x0000, /* CPUs Reset Control */
-> > +    REG_CPU0_RST_CTRL       =3D 0x0040, /* CPU#0 Reset Control */
-> > +    REG_CPU0_CTRL           =3D 0x0044, /* CPU#0 Control */
-> > +    REG_CPU0_STATUS         =3D 0x0048, /* CPU#0 Status */
-> > +    REG_CPU1_RST_CTRL       =3D 0x0080, /* CPU#1 Reset Control */
-> > +    REG_CPU1_CTRL           =3D 0x0084, /* CPU#1 Control */
-> > +    REG_CPU1_STATUS         =3D 0x0088, /* CPU#1 Status */
-> > +    REG_CPU2_RST_CTRL       =3D 0x00C0, /* CPU#2 Reset Control */
-> > +    REG_CPU2_CTRL           =3D 0x00C4, /* CPU#2 Control */
-> > +    REG_CPU2_STATUS         =3D 0x00C8, /* CPU#2 Status */
-> > +    REG_CPU3_RST_CTRL       =3D 0x0100, /* CPU#3 Reset Control */
-> > +    REG_CPU3_CTRL           =3D 0x0104, /* CPU#3 Control */
-> > +    REG_CPU3_STATUS         =3D 0x0108, /* CPU#3 Status */
-> > +    REG_CPU_SYS_RST         =3D 0x0140, /* CPU System Reset */
-> > +    REG_CLK_GATING          =3D 0x0144, /* CPU Clock Gating */
-> > +    REG_GEN_CTRL            =3D 0x0184, /* General Control */
-> > +    REG_SUPER_STANDBY       =3D 0x01A0, /* Super Standby Flag */
-> > +    REG_ENTRY_ADDR          =3D 0x01A4, /* Reset Entry Address */
-> > +    REG_DBG_EXTERN          =3D 0x01E4, /* Debug External */
-> > +    REG_CNT64_CTRL          =3D 0x0280, /* 64-bit Counter Control */
-> > +    REG_CNT64_LOW           =3D 0x0284, /* 64-bit Counter Low */
-> > +    REG_CNT64_HIGH          =3D 0x0288, /* 64-bit Counter High */
+> > +    REG_PRCTL =3D 0x40,   /* Control */
+> > +    REG_RDKEY =3D 0x60,   /* Read Key */
 > > +};
 > > +
-> > +/* CPUCFG register flags */
+> > +/* SID register flags */
 > > +enum {
-> > +    CPUX_RESET_RELEASED     =3D ((1 << 1) | (1 << 0)),
-> > +    CPUX_STATUS_SMP         =3D (1 << 0),
-> > +    CPU_SYS_RESET_RELEASED  =3D (1 << 0),
-> > +    CLK_GATING_ENABLE       =3D ((1 << 8) | 0xF),
+> > +    REG_PRCTL_WRITE   =3D 0x0002, /* Unknown write flag */
+> > +    REG_PRCTL_OP_LOCK =3D 0xAC00, /* Lock operation */
 > > +};
 > > +
-> > +/* CPUCFG register reset values */
-> > +enum {
-> > +    REG_CLK_GATING_RST      =3D 0x0000010F,
-> > +    REG_GEN_CTRL_RST        =3D 0x00000020,
-> > +    REG_SUPER_STANDBY_RST   =3D 0x0,
-> > +    REG_CNT64_CTRL_RST      =3D 0x0,
-> > +};
-> > +
-> > +/* CPUCFG constants */
-> > +enum {
-> > +    CPU_EXCEPTION_LEVEL_ON_RESET =3D 3, /* EL3 */
-> > +};
-> > +
-> > +static void allwinner_cpucfg_cpu_reset(AwCpuCfgState *s, uint8_t cpu_i=
-d)
+> > +static uint64_t allwinner_sid_read(void *opaque, hwaddr offset,
+> > +                                   unsigned size)
 > > +{
-> > +    int ret;
-> > +
-> > +    trace_allwinner_cpucfg_cpu_reset(cpu_id, s->entry_addr);
-> > +
-> > +    ret =3D arm_set_cpu_on(cpu_id, s->entry_addr, 0,
-> > +                         CPU_EXCEPTION_LEVEL_ON_RESET, false);
-> > +    if (ret !=3D QEMU_ARM_POWERCTL_RET_SUCCESS) {
-> > +        error_report("%s: failed to bring up CPU %d: err %d",
-> > +                     __func__, cpu_id, ret);
-> > +        return;
-> > +    }
-> > +}
-> > +
-> > +static uint64_t allwinner_cpucfg_read(void *opaque, hwaddr offset,
-> > +                                      unsigned size)
-> > +{
-> > +    const AwCpuCfgState *s =3D AW_CPUCFG(opaque);
+> > +    const AwSidState *s =3D AW_SID(opaque);
 > > +    uint64_t val =3D 0;
 > > +
 > > +    switch (offset) {
-> > +    case REG_CPUS_RST_CTRL:     /* CPUs Reset Control */
-> > +    case REG_CPU_SYS_RST:       /* CPU System Reset */
-> > +        val =3D CPU_SYS_RESET_RELEASED;
+> > +    case REG_PRCTL:    /* Control */
+> > +        val =3D s->control;
 > > +        break;
-> > +    case REG_CPU0_RST_CTRL:     /* CPU#0 Reset Control */
-> > +    case REG_CPU1_RST_CTRL:     /* CPU#1 Reset Control */
-> > +    case REG_CPU2_RST_CTRL:     /* CPU#2 Reset Control */
-> > +    case REG_CPU3_RST_CTRL:     /* CPU#3 Reset Control */
-> > +        val =3D CPUX_RESET_RELEASED;
-> > +        break;
-> > +    case REG_CPU0_CTRL:         /* CPU#0 Control */
-> > +    case REG_CPU1_CTRL:         /* CPU#1 Control */
-> > +    case REG_CPU2_CTRL:         /* CPU#2 Control */
-> > +    case REG_CPU3_CTRL:         /* CPU#3 Control */
-> > +        val =3D 0;
-> > +        break;
-> > +    case REG_CPU0_STATUS:       /* CPU#0 Status */
-> > +    case REG_CPU1_STATUS:       /* CPU#1 Status */
-> > +    case REG_CPU2_STATUS:       /* CPU#2 Status */
-> > +    case REG_CPU3_STATUS:       /* CPU#3 Status */
-> > +        val =3D CPUX_STATUS_SMP;
-> > +        break;
-> > +    case REG_CLK_GATING:        /* CPU Clock Gating */
-> > +        val =3D CLK_GATING_ENABLE;
-> > +        break;
-> > +    case REG_GEN_CTRL:          /* General Control */
-> > +        val =3D s->gen_ctrl;
-> > +        break;
-> > +    case REG_SUPER_STANDBY:     /* Super Standby Flag */
-> > +        val =3D s->super_standby;
-> > +        break;
-> > +    case REG_ENTRY_ADDR:        /* Reset Entry Address */
-> > +        val =3D s->entry_addr;
-> > +        break;
-> > +    case REG_DBG_EXTERN:        /* Debug External */
-> > +    case REG_CNT64_CTRL:        /* 64-bit Counter Control */
-> > +    case REG_CNT64_LOW:         /* 64-bit Counter Low */
-> > +    case REG_CNT64_HIGH:        /* 64-bit Counter High */
-> > +        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register at
-> 0x%04x\n",
-> > +                      __func__, (uint32_t)offset);
+> > +    case REG_RDKEY:    /* Read Key */
+> > +        val =3D s->rdkey;
 > > +        break;
 > > +    default:
 > > +        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset
 > 0x%04x\n",
 > > +                      __func__, (uint32_t)offset);
-> > +        break;
+> > +        return 0;
 > > +    }
 > > +
-> > +    trace_allwinner_cpucfg_read(offset, val, size);
+> > +    trace_allwinner_sid_read(offset, val, size);
 > > +
 > > +    return val;
 > > +}
 > > +
-> > +static void allwinner_cpucfg_write(void *opaque, hwaddr offset,
-> > +                                   uint64_t val, unsigned size)
+> > +static void allwinner_sid_write(void *opaque, hwaddr offset,
+> > +                                uint64_t val, unsigned size)
 > > +{
-> > +    AwCpuCfgState *s =3D AW_CPUCFG(opaque);
+> > +    AwSidState *s =3D AW_SID(opaque);
 > > +
-> > +    trace_allwinner_cpucfg_write(offset, val, size);
+> > +    trace_allwinner_sid_write(offset, val, size);
 > > +
 > > +    switch (offset) {
-> > +    case REG_CPUS_RST_CTRL:     /* CPUs Reset Control */
-> > +    case REG_CPU_SYS_RST:       /* CPU System Reset */
-> > +        break;
-> > +    case REG_CPU0_RST_CTRL:     /* CPU#0 Reset Control */
-> > +    case REG_CPU1_RST_CTRL:     /* CPU#1 Reset Control */
-> > +    case REG_CPU2_RST_CTRL:     /* CPU#2 Reset Control */
-> > +    case REG_CPU3_RST_CTRL:     /* CPU#3 Reset Control */
-> > +        if (val) {
-> > +            allwinner_cpucfg_cpu_reset(s, (offset - REG_CPU0_RST_CTRL)
-> >> 6);
+> > +    case REG_PRCTL:    /* Control */
+> > +        s->control =3D val;
+> > +
+> > +        if ((s->control & REG_PRCTL_OP_LOCK) &&
+> > +            (s->control & REG_PRCTL_WRITE)) {
+> > +            uint32_t id =3D s->control >> 16;
+> > +
+> > +            if (id < sizeof(QemuUUID)) {
+> > +                s->rdkey =3D (s->identifier.data[id]) |
+> > +                           (s->identifier.data[id + 1] << 8) |
+> > +                           (s->identifier.data[id + 2] << 16) |
+> > +                           (s->identifier.data[id + 3] << 24);
+> > +            }
 > > +        }
+> > +        s->control &=3D ~REG_PRCTL_WRITE;
 > > +        break;
-> > +    case REG_CPU0_CTRL:         /* CPU#0 Control */
-> > +    case REG_CPU1_CTRL:         /* CPU#1 Control */
-> > +    case REG_CPU2_CTRL:         /* CPU#2 Control */
-> > +    case REG_CPU3_CTRL:         /* CPU#3 Control */
-> > +    case REG_CPU0_STATUS:       /* CPU#0 Status */
-> > +    case REG_CPU1_STATUS:       /* CPU#1 Status */
-> > +    case REG_CPU2_STATUS:       /* CPU#2 Status */
-> > +    case REG_CPU3_STATUS:       /* CPU#3 Status */
-> > +    case REG_CLK_GATING:        /* CPU Clock Gating */
-> > +    case REG_GEN_CTRL:          /* General Control */
-> > +        s->gen_ctrl =3D val;
-> > +        break;
-> > +    case REG_SUPER_STANDBY:     /* Super Standby Flag */
-> > +        s->super_standby =3D val;
-> > +        break;
-> > +    case REG_ENTRY_ADDR:        /* Reset Entry Address */
-> > +        s->entry_addr =3D val;
-> > +        break;
-> > +    case REG_DBG_EXTERN:        /* Debug External */
-> > +    case REG_CNT64_CTRL:        /* 64-bit Counter Control */
-> > +    case REG_CNT64_LOW:         /* 64-bit Counter Low */
-> > +    case REG_CNT64_HIGH:        /* 64-bit Counter High */
-> > +        qemu_log_mask(LOG_UNIMP, "%s: unimplemented register at
-> 0x%04x\n",
-> > +                      __func__, (uint32_t)offset);
+> > +    case REG_RDKEY:    /* Read Key */
 > > +        break;
 > > +    default:
 > > +        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset
@@ -482,9 +407,9 @@ d)
 > > +    }
 > > +}
 > > +
-> > +static const MemoryRegionOps allwinner_cpucfg_ops =3D {
-> > +    .read =3D allwinner_cpucfg_read,
-> > +    .write =3D allwinner_cpucfg_write,
+> > +static const MemoryRegionOps allwinner_sid_ops =3D {
+> > +    .read =3D allwinner_sid_read,
+> > +    .write =3D allwinner_sid_write,
 > > +    .endianness =3D DEVICE_NATIVE_ENDIAN,
 > > +    .valid =3D {
 > > +        .min_access_size =3D 4,
@@ -493,98 +418,114 @@ d)
 > > +    .impl.min_access_size =3D 4,
 > > +};
 > > +
-> > +static void allwinner_cpucfg_reset(DeviceState *dev)
+> > +static void allwinner_sid_reset(DeviceState *dev)
 > > +{
-> > +    AwCpuCfgState *s =3D AW_CPUCFG(dev);
+> > +    AwSidState *s =3D AW_SID(dev);
 > > +
 > > +    /* Set default values for registers */
-> > +    s->gen_ctrl =3D REG_GEN_CTRL_RST;
-> > +    s->super_standby =3D REG_SUPER_STANDBY_RST;
-> > +    s->entry_addr =3D 0;
+> > +    s->control =3D 0;
+> > +    s->rdkey =3D 0;
 > > +}
 > > +
-> > +static void allwinner_cpucfg_init(Object *obj)
+> > +static void allwinner_sid_init(Object *obj)
 > > +{
 > > +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> > +    AwCpuCfgState *s =3D AW_CPUCFG(obj);
+> > +    AwSidState *s =3D AW_SID(obj);
 > > +
 > > +    /* Memory mapping */
-> > +    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_cpucfg_ops,
-> s,
-> > +                          TYPE_AW_CPUCFG, 1 * KiB);
+> > +    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_sid_ops, s,
+> > +                           TYPE_AW_SID, 1 * KiB);
 > > +    sysbus_init_mmio(sbd, &s->iomem);
 > > +}
 > > +
-> > +static const VMStateDescription allwinner_cpucfg_vmstate =3D {
-> > +    .name =3D "allwinner-cpucfg",
+> > +static Property allwinner_sid_properties[] =3D {
+> > +    DEFINE_PROP_UUID_NODEFAULT("identifier", AwSidState, identifier),
+> > +    DEFINE_PROP_END_OF_LIST()
+> > +};
+> > +
+> > +static const VMStateDescription allwinner_sid_vmstate =3D {
+> > +    .name =3D "allwinner-sid",
 > > +    .version_id =3D 1,
 > > +    .minimum_version_id =3D 1,
 > > +    .fields =3D (VMStateField[]) {
-> > +        VMSTATE_UINT32(gen_ctrl, AwCpuCfgState),
-> > +        VMSTATE_UINT32(super_standby, AwCpuCfgState),
+> > +        VMSTATE_UINT32(control, AwSidState),
+> > +        VMSTATE_UINT32(rdkey, AwSidState),
 >
-> Don't we need to migrate entry_addr?
+> We need to migrate the UUID too:
 >
+>             VMSTATE_UINT8_ARRAY_V(identifier.data, AwSidState,
+> sizeof(QemuUUID), 1),
 >
-Thanks Philippe, indeed entry_addr should also be there. I'll add it.
+
+Previously in v1 Peter explained that when using a fixed value for the
+identifier,
+migration should not be needed [1]. On the other hand, having it anyway in
+the VMState
+shouldn't break anything and also avoids that we forget about it later, so
+I'll add it, thanks!
 
 Regards,
 Niek
 
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg01203.html
 
+
+
+>
 > > +        VMSTATE_END_OF_LIST()
 > > +    }
 > > +};
 > > +
-> > +static void allwinner_cpucfg_class_init(ObjectClass *klass, void *data=
-)
+> > +static void allwinner_sid_class_init(ObjectClass *klass, void *data)
 > > +{
 > > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
 > > +
-> > +    dc->reset =3D allwinner_cpucfg_reset;
-> > +    dc->vmsd =3D &allwinner_cpucfg_vmstate;
+> > +    dc->reset =3D allwinner_sid_reset;
+> > +    dc->vmsd =3D &allwinner_sid_vmstate;
+> > +    dc->props =3D allwinner_sid_properties;
 > > +}
 > > +
-> > +static const TypeInfo allwinner_cpucfg_info =3D {
-> > +    .name          =3D TYPE_AW_CPUCFG,
+> > +static const TypeInfo allwinner_sid_info =3D {
+> > +    .name          =3D TYPE_AW_SID,
 > > +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> > +    .instance_init =3D allwinner_cpucfg_init,
-> > +    .instance_size =3D sizeof(AwCpuCfgState),
-> > +    .class_init    =3D allwinner_cpucfg_class_init,
+> > +    .instance_init =3D allwinner_sid_init,
+> > +    .instance_size =3D sizeof(AwSidState),
+> > +    .class_init    =3D allwinner_sid_class_init,
 > > +};
 > > +
-> > +static void allwinner_cpucfg_register(void)
+> > +static void allwinner_sid_register(void)
 > > +{
-> > +    type_register_static(&allwinner_cpucfg_info);
+> > +    type_register_static(&allwinner_sid_info);
 > > +}
 > > +
-> > +type_init(allwinner_cpucfg_register)
+> > +type_init(allwinner_sid_register)
 > > diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> > index 63b2e528f9..f3788a5903 100644
+> > index f3788a5903..daa734036e 100644
 > > --- a/hw/misc/Makefile.objs
 > > +++ b/hw/misc/Makefile.objs
-> > @@ -29,6 +29,7 @@ common-obj-$(CONFIG_MACIO) +=3D macio/
-> >   common-obj-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem.o
-> >
+> > @@ -31,6 +31,7 @@ common-obj-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem.o
 > >   common-obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3-ccu.o
-> > +obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-cpucfg.o
+> >   obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-cpucfg.o
 > >   common-obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3-sysctrl.o
+> > +common-obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-sid.o
 > >   common-obj-$(CONFIG_REALVIEW) +=3D arm_sysctl.o
 > >   common-obj-$(CONFIG_NSERIES) +=3D cbus.o
+> >   common-obj-$(CONFIG_ECCMEMCTL) +=3D eccmemctl.o
 > > diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> > index 7f0f5dff3a..ede1650672 100644
+> > index ede1650672..4f38328d9c 100644
 > > --- a/hw/misc/trace-events
 > > +++ b/hw/misc/trace-events
-> > @@ -1,5 +1,10 @@
-> >   # See docs/devel/tracing.txt for syntax documentation.
-> >
-> > +# allwinner-cpucfg.c
-> > +allwinner_cpucfg_cpu_reset(uint8_t cpu_id, uint32_t reset_addr) "id %u=
-,
-> reset_addr 0x%" PRIu32
-> > +allwinner_cpucfg_read(uint64_t offset, uint64_t data, unsigned size)
+> > @@ -5,6 +5,10 @@ allwinner_cpucfg_cpu_reset(uint8_t cpu_id, uint32_t
+> reset_addr) "id %u, reset_ad
+> >   allwinner_cpucfg_read(uint64_t offset, uint64_t data, unsigned size)
 > "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
-> > +allwinner_cpucfg_write(uint64_t offset, uint64_t data, unsigned size)
+> >   allwinner_cpucfg_write(uint64_t offset, uint64_t data, unsigned size)
+> "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
+> >
+> > +# allwinner-sid.c
+> > +allwinner_sid_read(uint64_t offset, uint64_t data, unsigned size)
+> "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
+> > +allwinner_sid_write(uint64_t offset, uint64_t data, unsigned size)
 > "offset 0x%" PRIx64 " data 0x%" PRIx64 " size %" PRIu32
 > > +
 > >   # eccmemctl.c
@@ -597,82 +538,81 @@ Niek
 --=20
 Niek Linnenbank
 
---000000000000d42029059d9d9c85
+--000000000000d9f710059d9deac2
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Jan 19, 2020 at 7:52 PM Phili=
+<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Jan 19, 2020 at 7:57 PM Phili=
 ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redh=
 at.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
 argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
 :1ex">On 1/19/20 1:50 AM, Niek Linnenbank wrote:<br>
-&gt; Various Allwinner System on Chip designs contain multiple processors<b=
-r>
-&gt; that can be configured and reset using the generic CPU Configuration<b=
-r>
-&gt; module interface. This commit adds support for the Allwinner CPU<br>
-&gt; configuration interface which emulates the following features:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0* CPU reset<br>
-&gt;=C2=A0 =C2=A0* CPU status<br>
+&gt; The Security Identifier device found in various Allwinner System on Ch=
+ip<br>
+&gt; designs gives applications a per-board unique identifier. This commit<=
+br>
+&gt; adds support for the Allwinner Security Identifier using a 128-bit<br>
+&gt; UUID value as input.<br>
 &gt; <br>
 &gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gm=
 ail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
 &gt; ---<br>
-&gt;=C2=A0 =C2=A0include/hw/arm/allwinner-h3.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =
-=C2=A03 +<br>
-&gt;=C2=A0 =C2=A0include/hw/misc/allwinner-cpucfg.h |=C2=A0 52 ++++++<br>
+&gt;=C2=A0 =C2=A0include/hw/arm/allwinner-h3.h=C2=A0 =C2=A0|=C2=A0 =C2=A03 =
++<br>
+&gt;=C2=A0 =C2=A0include/hw/misc/allwinner-sid.h |=C2=A0 60 +++++++++++<br>
 &gt;=C2=A0 =C2=A0hw/arm/allwinner-h3.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A09 +-<br>
-&gt;=C2=A0 =C2=A0hw/misc/allwinner-cpucfg.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0| 269 +++++++++++++++++++++++++++++<br>
+=C2=A0|=C2=A0 11 ++-<br>
+&gt;=C2=A0 =C2=A0hw/arm/orangepi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0|=C2=A0 =C2=A04 +<br>
+&gt;=C2=A0 =C2=A0hw/misc/allwinner-sid.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+ 170 ++++++++++++++++++++++++++++++++<br>
 &gt;=C2=A0 =C2=A0hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
+=C2=A0|=C2=A0 =C2=A01 +<br>
 &gt;=C2=A0 =C2=A0hw/misc/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A05 +<br>
-&gt;=C2=A0 =C2=A06 files changed, 338 insertions(+), 1 deletion(-)<br>
-&gt;=C2=A0 =C2=A0create mode 100644 include/hw/misc/allwinner-cpucfg.h<br>
-&gt;=C2=A0 =C2=A0create mode 100644 hw/misc/allwinner-cpucfg.c<br>
+=A0 |=C2=A0 =C2=A04 +<br>
+&gt;=C2=A0 =C2=A07 files changed, 252 insertions(+), 1 deletion(-)<br>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/misc/allwinner-sid.h<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/misc/allwinner-sid.c<br>
 &gt; <br>
 &gt; diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-=
 h3.h<br>
-&gt; index 43500c4262..dc729176ab 100644<br>
+&gt; index dc729176ab..85416d9d64 100644<br>
 &gt; --- a/include/hw/arm/allwinner-h3.h<br>
 &gt; +++ b/include/hw/arm/allwinner-h3.h<br>
-&gt; @@ -40,6 +40,7 @@<br>
-&gt;=C2=A0 =C2=A0#include &quot;hw/timer/allwinner-a10-pit.h&quot;<br>
-&gt;=C2=A0 =C2=A0#include &quot;hw/intc/arm_gic.h&quot;<br>
+&gt; @@ -42,6 +42,7 @@<br>
 &gt;=C2=A0 =C2=A0#include &quot;hw/misc/allwinner-h3-ccu.h&quot;<br>
-&gt; +#include &quot;hw/misc/allwinner-cpucfg.h&quot;<br>
+&gt;=C2=A0 =C2=A0#include &quot;hw/misc/allwinner-cpucfg.h&quot;<br>
 &gt;=C2=A0 =C2=A0#include &quot;hw/misc/allwinner-h3-sysctrl.h&quot;<br>
+&gt; +#include &quot;hw/misc/allwinner-sid.h&quot;<br>
 &gt;=C2=A0 =C2=A0#include &quot;target/arm/cpu.h&quot;<br>
 &gt;=C2=A0 =C2=A0<br>
-&gt; @@ -76,6 +77,7 @@ enum {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_GIC_CPU,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_GIC_HYP,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_GIC_VCPU,<br>
-&gt; +=C2=A0 =C2=A0 AW_H3_CPUCFG,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_SDRAM<br>
-&gt;=C2=A0 =C2=A0};<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; @@ -110,6 +112,7 @@ typedef struct AwH3State {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0const hwaddr *memmap;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AwA10PITState timer;<br>
+&gt;=C2=A0 =C2=A0/**<br>
+&gt; @@ -59,6 +60,7 @@ enum {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_SRAM_A2,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_SRAM_C,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_SYSCTRL,<br>
+&gt; +=C2=A0 =C2=A0 AW_H3_SID,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_EHCI0,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_OHCI0,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AW_H3_EHCI1,<br>
+&gt; @@ -114,6 +116,7 @@ typedef struct AwH3State {<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AwH3ClockCtlState ccu;<br>
-&gt; +=C2=A0 =C2=A0 AwCpuCfgState cpucfg;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AwCpuCfgState cpucfg;<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0AwH3SysCtrlState sysctrl;<br>
+&gt; +=C2=A0 =C2=A0 AwSidState sid;<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0GICState gic;<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0MemoryRegion sram_a1;<br>
-&gt; diff --git a/include/hw/misc/allwinner-cpucfg.h b/include/hw/misc/allw=
-inner-cpucfg.h<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0MemoryRegion sram_a2;<br>
+&gt; diff --git a/include/hw/misc/allwinner-sid.h b/include/hw/misc/allwinn=
+er-sid.h<br>
 &gt; new file mode 100644<br>
-&gt; index 0000000000..2c3693a8be<br>
+&gt; index 0000000000..4c1fa4762b<br>
 &gt; --- /dev/null<br>
-&gt; +++ b/include/hw/misc/allwinner-cpucfg.h<br>
-&gt; @@ -0,0 +1,52 @@<br>
+&gt; +++ b/include/hw/misc/allwinner-sid.h<br>
+&gt; @@ -0,0 +1,60 @@<br>
 &gt; +/*<br>
-&gt; + * Allwinner CPU Configuration Module emulation<br>
+&gt; + * Allwinner Security ID emulation<br>
 &gt; + *<br>
 &gt; + * Copyright (C) 2019 Niek Linnenbank &lt;<a href=3D"mailto:nieklinne=
 nbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
@@ -699,111 +639,156 @@ ww.gnu.org/licenses/" rel=3D"noreferrer" target=3D"_blank">http://www.gnu.o=
 rg/licenses/</a>&gt;.<br>
 &gt; + */<br>
 &gt; +<br>
-&gt; +#ifndef HW_MISC_ALLWINNER_CPUCFG_H<br>
-&gt; +#define HW_MISC_ALLWINNER_CPUCFG_H<br>
+&gt; +#ifndef HW_MISC_ALLWINNER_SID_H<br>
+&gt; +#define HW_MISC_ALLWINNER_SID_H<br>
 &gt; +<br>
 &gt; +#include &quot;qom/object.h&quot;<br>
 &gt; +#include &quot;hw/sysbus.h&quot;<br>
+&gt; +#include &quot;qemu/uuid.h&quot;<br>
 &gt; +<br>
 &gt; +/**<br>
 &gt; + * Object model<br>
 &gt; + * @{<br>
 &gt; + */<br>
 &gt; +<br>
-&gt; +#define TYPE_AW_CPUCFG=C2=A0 =C2=A0&quot;allwinner-cpucfg&quot;<br>
-&gt; +#define AW_CPUCFG(obj) \<br>
-&gt; +=C2=A0 =C2=A0 OBJECT_CHECK(AwCpuCfgState, (obj), TYPE_AW_CPUCFG)<br>
+&gt; +#define TYPE_AW_SID=C2=A0 =C2=A0 &quot;allwinner-sid&quot;<br>
+&gt; +#define AW_SID(obj) \<br>
+&gt; +=C2=A0 =C2=A0 OBJECT_CHECK(AwSidState, (obj), TYPE_AW_SID)<br>
 &gt; +<br>
 &gt; +/** @} */<br>
 &gt; +<br>
 &gt; +/**<br>
-&gt; + * Allwinner CPU Configuration Module instance state<br>
+&gt; + * Allwinner Security ID object instance state<br>
 &gt; + */<br>
-&gt; +typedef struct AwCpuCfgState {<br>
+&gt; +typedef struct AwSidState {<br>
 &gt; +=C2=A0 =C2=A0 /*&lt; private &gt;*/<br>
 &gt; +=C2=A0 =C2=A0 SysBusDevice parent_obj;<br>
 &gt; +=C2=A0 =C2=A0 /*&lt; public &gt;*/<br>
 &gt; +<br>
+&gt; +=C2=A0 =C2=A0 /** Maps I/O registers in physical memory */<br>
 &gt; +=C2=A0 =C2=A0 MemoryRegion iomem;<br>
-&gt; +=C2=A0 =C2=A0 uint32_t gen_ctrl;<br>
-&gt; +=C2=A0 =C2=A0 uint32_t super_standby;<br>
-&gt; +=C2=A0 =C2=A0 uint32_t entry_addr;<br>
 &gt; +<br>
-&gt; +} AwCpuCfgState;<br>
+&gt; +=C2=A0 =C2=A0 /** Control register defines how and what to read */<br=
+>
+&gt; +=C2=A0 =C2=A0 uint32_t control;<br>
 &gt; +<br>
-&gt; +#endif /* HW_MISC_ALLWINNER_CPUCFG_H */<br>
+&gt; +=C2=A0 =C2=A0 /** RdKey register contains the data retrieved by the d=
+evice */<br>
+&gt; +=C2=A0 =C2=A0 uint32_t rdkey;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /** Stores the emulated device identifier */<br>
+&gt; +=C2=A0 =C2=A0 QemuUUID identifier;<br>
+&gt; +<br>
+&gt; +} AwSidState;<br>
+&gt; +<br>
+&gt; +#endif /* HW_MISC_ALLWINNER_SID_H */<br>
 &gt; diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c<br>
-&gt; index 600cfa2c11..daa2d3c819 100644<br>
+&gt; index daa2d3c819..919fba6cf6 100644<br>
 &gt; --- a/hw/arm/allwinner-h3.c<br>
 &gt; +++ b/hw/arm/allwinner-h3.c<br>
-&gt; @@ -56,6 +56,7 @@ const hwaddr allwinner_h3_memmap[] =3D {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_GIC_CPU]=C2=A0 =C2=A0 =3D 0x01c82000,=
+&gt; @@ -38,6 +38,7 @@ const hwaddr allwinner_h3_memmap[] =3D {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_SRAM_A2]=C2=A0 =C2=A0 =3D 0x00044000,=
 <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_GIC_HYP]=C2=A0 =C2=A0 =3D 0x01c84000,=
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_SRAM_C]=C2=A0 =C2=A0 =C2=A0=3D 0x0001=
+0000,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_SYSCTRL]=C2=A0 =C2=A0 =3D 0x01c00000,=
 <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_GIC_VCPU]=C2=A0 =C2=A0=3D 0x01c86000,=
-<br>
-&gt; +=C2=A0 =C2=A0 [AW_H3_CPUCFG]=C2=A0 =C2=A0 =C2=A0=3D 0x01f01c00,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_SDRAM]=C2=A0 =C2=A0 =C2=A0 =3D 0x4000=
-0000<br>
-&gt;=C2=A0 =C2=A0};<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; @@ -122,7 +123,6 @@ struct AwH3Unimplemented {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;r_wdog&quot;,=C2=A0 =C2=A0 0x01f0100=
-0, 1 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;r_prcm&quot;,=C2=A0 =C2=A0 0x01f0140=
-0, 1 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;r_twd&quot;,=C2=A0 =C2=A0 =C2=A00x01=
-f01800, 1 * KiB },<br>
-&gt; -=C2=A0 =C2=A0 { &quot;r_cpucfg&quot;,=C2=A0 0x01f01c00, 1 * KiB },<br=
->
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;r_cir-rx&quot;,=C2=A0 0x01f02000, 1 =
+&gt; +=C2=A0 =C2=A0 [AW_H3_SID]=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x01c14000,<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_EHCI0]=C2=A0 =C2=A0 =C2=A0 =3D 0x01c1=
+a000,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_OHCI0]=C2=A0 =C2=A0 =C2=A0 =3D 0x01c1=
+a400,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0[AW_H3_EHCI1]=C2=A0 =C2=A0 =C2=A0 =3D 0x01c1=
+b000,<br>
+&gt; @@ -78,7 +79,6 @@ struct AwH3Unimplemented {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;mmc0&quot;,=C2=A0 =C2=A0 =C2=A0 0x01=
+c0f000, 4 * KiB },<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;mmc1&quot;,=C2=A0 =C2=A0 =C2=A0 0x01=
+c10000, 4 * KiB },<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;mmc2&quot;,=C2=A0 =C2=A0 =C2=A0 0x01=
+c11000, 4 * KiB },<br>
+&gt; -=C2=A0 =C2=A0 { &quot;sid&quot;,=C2=A0 =C2=A0 =C2=A0 =C2=A00x01c14000=
+, 1 * KiB },<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;crypto&quot;,=C2=A0 =C2=A0 0x01c1500=
+0, 4 * KiB },<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;msgbox&quot;,=C2=A0 =C2=A0 0x01c1700=
+0, 4 * KiB },<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;spinlock&quot;,=C2=A0 0x01c18000, 4 =
 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;r_twi&quot;,=C2=A0 =C2=A0 =C2=A00x01=
-f02400, 1 * KiB },<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{ &quot;r_uart&quot;,=C2=A0 =C2=A0 0x01f0280=
-0, 1 * KiB },<br>
-&gt; @@ -195,6 +195,9 @@ static void allwinner_h3_init(Object *obj)<br>
+&gt; @@ -198,6 +198,11 @@ static void allwinner_h3_init(Object *obj)<br>
 &gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_init_child_obj(obj, &quot;sysctrl&quo=
-t;, &amp;s-&gt;sysctrl, sizeof(s-&gt;sysctrl),<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_init_child_obj(obj, &quot;cpucfg&quot=
+;, &amp;s-&gt;cpucfg, sizeof(s-&gt;cpucfg),<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0TYPE_AW_H3_SYSCTRL);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0TYPE_AW_CPUCFG);<br>
 &gt; +<br>
-&gt; +=C2=A0 =C2=A0 sysbus_init_child_obj(obj, &quot;cpucfg&quot;, &amp;s-&=
-gt;cpucfg, sizeof(s-&gt;cpucfg),<br>
+&gt; +=C2=A0 =C2=A0 sysbus_init_child_obj(obj, &quot;sid&quot;, &amp;s-&gt;=
+sid, sizeof(s-&gt;sid),<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 TYPE_AW_CPUCFG);<br>
+ =C2=A0 =C2=A0 =C2=A0 TYPE_AW_SID);<br>
+&gt; +=C2=A0 =C2=A0 object_property_add_alias(obj, &quot;identifier&quot;, =
+OBJECT(&amp;s-&gt;sid),<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;identifier&quot;, &amp;error_abor=
+t);<br>
 &gt;=C2=A0 =C2=A0}<br>
 &gt;=C2=A0 =C2=A0<br>
 &gt;=C2=A0 =C2=A0static void allwinner_h3_realize(DeviceState *dev, Error *=
 *errp)<br>
-&gt; @@ -308,6 +311,10 @@ static void allwinner_h3_realize(DeviceState *dev=
+&gt; @@ -315,6 +320,10 @@ static void allwinner_h3_realize(DeviceState *dev=
 , Error **errp)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_init_nofail(DEVICE(&amp;s-&gt;sysctrl))=
-;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_mmio_map(SYS_BUS_DEVICE(&amp;s-&gt;sy=
-sctrl), 0, s-&gt;memmap[AW_H3_SYSCTRL]);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_init_nofail(DEVICE(&amp;s-&gt;cpucfg));=
+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_mmio_map(SYS_BUS_DEVICE(&amp;s-&gt;cp=
+ucfg), 0, s-&gt;memmap[AW_H3_CPUCFG]);<br>
 &gt;=C2=A0 =C2=A0<br>
-&gt; +=C2=A0 =C2=A0 /* CPU Configuration */<br>
-&gt; +=C2=A0 =C2=A0 qdev_init_nofail(DEVICE(&amp;s-&gt;cpucfg));<br>
-&gt; +=C2=A0 =C2=A0 sysbus_mmio_map(SYS_BUS_DEVICE(&amp;s-&gt;cpucfg), 0, s=
--&gt;memmap[AW_H3_CPUCFG]);<br>
+&gt; +=C2=A0 =C2=A0 /* Security Identifier */<br>
+&gt; +=C2=A0 =C2=A0 qdev_init_nofail(DEVICE(&amp;s-&gt;sid));<br>
+&gt; +=C2=A0 =C2=A0 sysbus_mmio_map(SYS_BUS_DEVICE(&amp;s-&gt;sid), 0, s-&g=
+t;memmap[AW_H3_SID]);<br>
 &gt; +<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0/* Universal Serial Bus */<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_create_simple(TYPE_AW_H3_EHCI, s-&gt;=
 memmap[AW_H3_EHCI0],<br>
 &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_get_gpio_in(DEVICE(&amp;s-&gt;gic),<br>
-&gt; diff --git a/hw/misc/allwinner-cpucfg.c b/hw/misc/allwinner-cpucfg.c<b=
-r>
+&gt; diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c<br>
+&gt; index 866f5f7cd6..5b60f35a80 100644<br>
+&gt; --- a/hw/arm/orangepi.c<br>
+&gt; +++ b/hw/arm/orangepi.c<br>
+&gt; @@ -61,6 +61,10 @@ static void orangepi_init(MachineState *machine)<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0object_property_set_int(OBJECT(s-&gt;h3), 24=
+ * 1000 * 1000, &quot;clk1-freq&quot;,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;error_abort);<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt; +=C2=A0 =C2=A0 /* Setup SID properties */<br>
+&gt; +=C2=A0 =C2=A0 qdev_prop_set_string(DEVICE(s-&gt;h3), &quot;identifier=
+&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0&quot;8100c002-0001-0002-0003-000044556677&quot;);<br>
+<br>
+This part misses a comment that we are enforcing the same UUID on all <br>
+VMs (for now).<br></blockquote><div><br></div><div>Good idea, I&#39;ll add =
+that in a comment.<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quo=
+te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
+);padding-left:1ex">
+<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0/* Mark H3 object realized */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0object_property_set_bool(OBJECT(s-&gt;h3), t=
+rue, &quot;realized&quot;, &amp;error_abort);<br>
+&gt;=C2=A0 =C2=A0<br>
+&gt; diff --git a/hw/misc/allwinner-sid.c b/hw/misc/allwinner-sid.c<br>
 &gt; new file mode 100644<br>
-&gt; index 0000000000..47254bfafd<br>
+&gt; index 0000000000..954de935bc<br>
 &gt; --- /dev/null<br>
-&gt; +++ b/hw/misc/allwinner-cpucfg.c<br>
-&gt; @@ -0,0 +1,269 @@<br>
+&gt; +++ b/hw/misc/allwinner-sid.c<br>
+&gt; @@ -0,0 +1,170 @@<br>
 &gt; +/*<br>
-&gt; + * Allwinner CPU Configuration Module emulation<br>
+&gt; + * Allwinner Security ID emulation<br>
 &gt; + *<br>
 &gt; + * Copyright (C) 2019 Niek Linnenbank &lt;<a href=3D"mailto:nieklinne=
 nbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
@@ -836,265 +821,90 @@ rg/licenses/</a>&gt;.<br>
 &gt; +#include &quot;migration/vmstate.h&quot;<br>
 &gt; +#include &quot;qemu/log.h&quot;<br>
 &gt; +#include &quot;qemu/module.h&quot;<br>
-&gt; +#include &quot;qemu/error-report.h&quot;<br>
-&gt; +#include &quot;qemu/timer.h&quot;<br>
-&gt; +#include &quot;hw/core/cpu.h&quot;<br>
-&gt; +#include &quot;arm-powerctl.h&quot;<br>
-&gt; +#include &quot;hw/misc/allwinner-cpucfg.h&quot;<br>
+&gt; +#include &quot;qemu/guest-random.h&quot;<br>
+&gt; +#include &quot;qapi/error.h&quot;<br>
+&gt; +#include &quot;hw/qdev-properties.h&quot;<br>
+&gt; +#include &quot;hw/misc/allwinner-sid.h&quot;<br>
 &gt; +#include &quot;trace.h&quot;<br>
 &gt; +<br>
-&gt; +/* CPUCFG register offsets */<br>
+&gt; +/* SID register offsets */<br>
 &gt; +enum {<br>
-&gt; +=C2=A0 =C2=A0 REG_CPUS_RST_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x0000,=
- /* CPUs Reset Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU0_RST_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x0040,=
- /* CPU#0 Reset Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU0_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=3D 0x0044, /* CPU#0 Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU0_STATUS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x=
-0048, /* CPU#0 Status */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU1_RST_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x0080,=
- /* CPU#1 Reset Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU1_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=3D 0x0084, /* CPU#1 Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU1_STATUS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x=
-0088, /* CPU#1 Status */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU2_RST_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x00C0,=
- /* CPU#2 Reset Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU2_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=3D 0x00C4, /* CPU#2 Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU2_STATUS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x=
-00C8, /* CPU#2 Status */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU3_RST_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x0100,=
- /* CPU#3 Reset Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU3_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=3D 0x0104, /* CPU#3 Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU3_STATUS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x=
-0108, /* CPU#3 Status */<br>
-&gt; +=C2=A0 =C2=A0 REG_CPU_SYS_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x=
-0140, /* CPU System Reset */<br>
-&gt; +=C2=A0 =C2=A0 REG_CLK_GATING=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x=
-0144, /* CPU Clock Gating */<br>
-&gt; +=C2=A0 =C2=A0 REG_GEN_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=3D 0x0184, /* General Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_SUPER_STANDBY=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D 0x01A0,=
- /* Super Standby Flag */<br>
-&gt; +=C2=A0 =C2=A0 REG_ENTRY_ADDR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x=
-01A4, /* Reset Entry Address */<br>
-&gt; +=C2=A0 =C2=A0 REG_DBG_EXTERN=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x=
-01E4, /* Debug External */<br>
-&gt; +=C2=A0 =C2=A0 REG_CNT64_CTRL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x=
-0280, /* 64-bit Counter Control */<br>
-&gt; +=C2=A0 =C2=A0 REG_CNT64_LOW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-=3D 0x0284, /* 64-bit Counter Low */<br>
-&gt; +=C2=A0 =C2=A0 REG_CNT64_HIGH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x=
-0288, /* 64-bit Counter High */<br>
+&gt; +=C2=A0 =C2=A0 REG_PRCTL =3D 0x40,=C2=A0 =C2=A0/* Control */<br>
+&gt; +=C2=A0 =C2=A0 REG_RDKEY =3D 0x60,=C2=A0 =C2=A0/* Read Key */<br>
 &gt; +};<br>
 &gt; +<br>
-&gt; +/* CPUCFG register flags */<br>
+&gt; +/* SID register flags */<br>
 &gt; +enum {<br>
-&gt; +=C2=A0 =C2=A0 CPUX_RESET_RELEASED=C2=A0 =C2=A0 =C2=A0=3D ((1 &lt;&lt;=
- 1) | (1 &lt;&lt; 0)),<br>
-&gt; +=C2=A0 =C2=A0 CPUX_STATUS_SMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=3D (1=
- &lt;&lt; 0),<br>
-&gt; +=C2=A0 =C2=A0 CPU_SYS_RESET_RELEASED=C2=A0 =3D (1 &lt;&lt; 0),<br>
-&gt; +=C2=A0 =C2=A0 CLK_GATING_ENABLE=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D ((1 &lt=
-;&lt; 8) | 0xF),<br>
+&gt; +=C2=A0 =C2=A0 REG_PRCTL_WRITE=C2=A0 =C2=A0=3D 0x0002, /* Unknown writ=
+e flag */<br>
+&gt; +=C2=A0 =C2=A0 REG_PRCTL_OP_LOCK =3D 0xAC00, /* Lock operation */<br>
 &gt; +};<br>
 &gt; +<br>
-&gt; +/* CPUCFG register reset values */<br>
-&gt; +enum {<br>
-&gt; +=C2=A0 =C2=A0 REG_CLK_GATING_RST=C2=A0 =C2=A0 =C2=A0 =3D 0x0000010F,<=
-br>
-&gt; +=C2=A0 =C2=A0 REG_GEN_CTRL_RST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D 0x00000=
-020,<br>
-&gt; +=C2=A0 =C2=A0 REG_SUPER_STANDBY_RST=C2=A0 =C2=A0=3D 0x0,<br>
-&gt; +=C2=A0 =C2=A0 REG_CNT64_CTRL_RST=C2=A0 =C2=A0 =C2=A0 =3D 0x0,<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +/* CPUCFG constants */<br>
-&gt; +enum {<br>
-&gt; +=C2=A0 =C2=A0 CPU_EXCEPTION_LEVEL_ON_RESET =3D 3, /* EL3 */<br>
-&gt; +};<br>
-&gt; +<br>
-&gt; +static void allwinner_cpucfg_cpu_reset(AwCpuCfgState *s, uint8_t cpu_=
-id)<br>
+&gt; +static uint64_t allwinner_sid_read(void *opaque, hwaddr offset,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0unsigned size)<br>
 &gt; +{<br>
-&gt; +=C2=A0 =C2=A0 int ret;<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 trace_allwinner_cpucfg_cpu_reset(cpu_id, s-&gt;entry_ad=
-dr);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 ret =3D arm_set_cpu_on(cpu_id, s-&gt;entry_addr, 0,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0CPU_EXCEPTION_LEVEL_ON_RESET, false);<br>
-&gt; +=C2=A0 =C2=A0 if (ret !=3D QEMU_ARM_POWERCTL_RET_SUCCESS) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;%s: failed to bring up=
- CPU %d: err %d&quot;,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0__func__, cpu_id, ret);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
-&gt; +=C2=A0 =C2=A0 }<br>
-&gt; +}<br>
-&gt; +<br>
-&gt; +static uint64_t allwinner_cpucfg_read(void *opaque, hwaddr offset,<br=
->
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned si=
-ze)<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 const AwCpuCfgState *s =3D AW_CPUCFG(opaque);<br>
+&gt; +=C2=A0 =C2=A0 const AwSidState *s =3D AW_SID(opaque);<br>
 &gt; +=C2=A0 =C2=A0 uint64_t val =3D 0;<br>
 &gt; +<br>
 &gt; +=C2=A0 =C2=A0 switch (offset) {<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPUS_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPUs Rese=
-t Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU_SYS_RST:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU =
-System Reset */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D CPU_SYS_RESET_RELEASED;<br>
+&gt; +=C2=A0 =C2=A0 case REG_PRCTL:=C2=A0 =C2=A0 /* Control */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D s-&gt;control;<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU0_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPU#0 Res=
-et Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU1_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPU#1 Res=
-et Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU2_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPU#2 Res=
-et Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU3_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPU#3 Res=
-et Control */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D CPUX_RESET_RELEASED;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU0_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- CPU#0 Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU1_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- CPU#1 Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU2_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- CPU#2 Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU3_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- CPU#3 Control */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D 0;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU0_STATUS:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#=
-0 Status */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU1_STATUS:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#=
-1 Status */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU2_STATUS:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#=
-2 Status */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU3_STATUS:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#=
-3 Status */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D CPUX_STATUS_SMP;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_CLK_GATING:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* CPU =
-Clock Gating */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D CLK_GATING_ENABLE;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_GEN_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*=
- General Control */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D s-&gt;gen_ctrl;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_SUPER_STANDBY:=C2=A0 =C2=A0 =C2=A0/* Super Sta=
-ndby Flag */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D s-&gt;super_standby;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_ENTRY_ADDR:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Rese=
-t Entry Address */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D s-&gt;entry_addr;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_DBG_EXTERN:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Debu=
-g External */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CNT64_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* 64-b=
-it Counter Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CNT64_LOW:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- 64-bit Counter Low */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CNT64_HIGH:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* 64-b=
-it Counter High */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_UNIMP, &quot;%s: unimpl=
-emented register at 0x%04x\n&quot;,<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 __func__, (uint32_t)offset);<br>
+&gt; +=C2=A0 =C2=A0 case REG_RDKEY:=C2=A0 =C2=A0 /* Read Key */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D s-&gt;rdkey;<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
 &gt; +=C2=A0 =C2=A0 default:<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_GUEST_ERROR, &quot;%s: =
 out-of-bounds offset 0x%04x\n&quot;,<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
  =C2=A0 __func__, (uint32_t)offset);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
 &gt; +=C2=A0 =C2=A0 }<br>
 &gt; +<br>
-&gt; +=C2=A0 =C2=A0 trace_allwinner_cpucfg_read(offset, val, size);<br>
+&gt; +=C2=A0 =C2=A0 trace_allwinner_sid_read(offset, val, size);<br>
 &gt; +<br>
 &gt; +=C2=A0 =C2=A0 return val;<br>
 &gt; +}<br>
 &gt; +<br>
-&gt; +static void allwinner_cpucfg_write(void *opaque, hwaddr offset,<br>
+&gt; +static void allwinner_sid_write(void *opaque, hwaddr offset,<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint64_t val, unsig=
-ned size)<br>
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint64_t val, unsigned size)<br>
 &gt; +{<br>
-&gt; +=C2=A0 =C2=A0 AwCpuCfgState *s =3D AW_CPUCFG(opaque);<br>
+&gt; +=C2=A0 =C2=A0 AwSidState *s =3D AW_SID(opaque);<br>
 &gt; +<br>
-&gt; +=C2=A0 =C2=A0 trace_allwinner_cpucfg_write(offset, val, size);<br>
+&gt; +=C2=A0 =C2=A0 trace_allwinner_sid_write(offset, val, size);<br>
 &gt; +<br>
 &gt; +=C2=A0 =C2=A0 switch (offset) {<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPUS_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPUs Rese=
-t Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU_SYS_RST:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU =
-System Reset */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU0_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPU#0 Res=
-et Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU1_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPU#1 Res=
-et Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU2_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPU#2 Res=
-et Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU3_RST_CTRL:=C2=A0 =C2=A0 =C2=A0/* CPU#3 Res=
-et Control */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (val) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 allwinner_cpucfg_cpu_reset(=
-s, (offset - REG_CPU0_RST_CTRL) &gt;&gt; 6);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU0_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- CPU#0 Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU1_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- CPU#1 Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU2_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- CPU#2 Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU3_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- CPU#3 Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU0_STATUS:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#=
-0 Status */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU1_STATUS:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#=
-1 Status */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU2_STATUS:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#=
-2 Status */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CPU3_STATUS:=C2=A0 =C2=A0 =C2=A0 =C2=A0/* CPU#=
-3 Status */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CLK_GATING:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* CPU =
-Clock Gating */<br>
-&gt; +=C2=A0 =C2=A0 case REG_GEN_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*=
- General Control */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;gen_ctrl =3D val;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_SUPER_STANDBY:=C2=A0 =C2=A0 =C2=A0/* Super Sta=
-ndby Flag */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;super_standby =3D val;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_ENTRY_ADDR:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Rese=
-t Entry Address */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;entry_addr =3D val;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 case REG_DBG_EXTERN:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Debu=
-g External */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CNT64_CTRL:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* 64-b=
-it Counter Control */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CNT64_LOW:=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*=
- 64-bit Counter Low */<br>
-&gt; +=C2=A0 =C2=A0 case REG_CNT64_HIGH:=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* 64-b=
-it Counter High */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_UNIMP, &quot;%s: unimpl=
-emented register at 0x%04x\n&quot;,<br>
+&gt; +=C2=A0 =C2=A0 case REG_PRCTL:=C2=A0 =C2=A0 /* Control */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;control =3D val;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((s-&gt;control &amp; REG_PRCTL_OP_LOC=
+K) &amp;&amp;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (s-&gt;control &amp; REG_PR=
+CTL_WRITE)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint32_t id =3D s-&gt;contr=
+ol &gt;&gt; 16;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (id &lt; sizeof(QemuUUID=
+)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;rdkey =
+=3D (s-&gt;identifier.data[id]) |<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 __func__, (uint32_t)offset);<br>
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0(s-&gt;identifier.data[id + 1] &lt;&lt; 8) |<br=
+>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0(s-&gt;identifier.data[id + 2] &lt;&lt; 16) |<b=
+r>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0(s-&gt;identifier.data[id + 3] &lt;&lt; 24);<br=
+>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;control &amp;=3D ~REG_PRCTL_WRITE;<=
+br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 case REG_RDKEY:=C2=A0 =C2=A0 /* Read Key */<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
 &gt; +=C2=A0 =C2=A0 default:<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_GUEST_ERROR, &quot;%s: =
@@ -1105,9 +915,9 @@ out-of-bounds offset 0x%04x\n&quot;,<br>
 &gt; +=C2=A0 =C2=A0 }<br>
 &gt; +}<br>
 &gt; +<br>
-&gt; +static const MemoryRegionOps allwinner_cpucfg_ops =3D {<br>
-&gt; +=C2=A0 =C2=A0 .read =3D allwinner_cpucfg_read,<br>
-&gt; +=C2=A0 =C2=A0 .write =3D allwinner_cpucfg_write,<br>
+&gt; +static const MemoryRegionOps allwinner_sid_ops =3D {<br>
+&gt; +=C2=A0 =C2=A0 .read =3D allwinner_sid_read,<br>
+&gt; +=C2=A0 =C2=A0 .write =3D allwinner_sid_write,<br>
 &gt; +=C2=A0 =C2=A0 .endianness =3D DEVICE_NATIVE_ENDIAN,<br>
 &gt; +=C2=A0 =C2=A0 .valid =3D {<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .min_access_size =3D 4,<br>
@@ -1116,105 +926,124 @@ out-of-bounds offset 0x%04x\n&quot;,<br>
 &gt; +=C2=A0 =C2=A0 .impl.min_access_size =3D 4,<br>
 &gt; +};<br>
 &gt; +<br>
-&gt; +static void allwinner_cpucfg_reset(DeviceState *dev)<br>
+&gt; +static void allwinner_sid_reset(DeviceState *dev)<br>
 &gt; +{<br>
-&gt; +=C2=A0 =C2=A0 AwCpuCfgState *s =3D AW_CPUCFG(dev);<br>
+&gt; +=C2=A0 =C2=A0 AwSidState *s =3D AW_SID(dev);<br>
 &gt; +<br>
 &gt; +=C2=A0 =C2=A0 /* Set default values for registers */<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;gen_ctrl =3D REG_GEN_CTRL_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;super_standby =3D REG_SUPER_STANDBY_RST;<br>
-&gt; +=C2=A0 =C2=A0 s-&gt;entry_addr =3D 0;<br>
+&gt; +=C2=A0 =C2=A0 s-&gt;control =3D 0;<br>
+&gt; +=C2=A0 =C2=A0 s-&gt;rdkey =3D 0;<br>
 &gt; +}<br>
 &gt; +<br>
-&gt; +static void allwinner_cpucfg_init(Object *obj)<br>
+&gt; +static void allwinner_sid_init(Object *obj)<br>
 &gt; +{<br>
 &gt; +=C2=A0 =C2=A0 SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);<br>
-&gt; +=C2=A0 =C2=A0 AwCpuCfgState *s =3D AW_CPUCFG(obj);<br>
+&gt; +=C2=A0 =C2=A0 AwSidState *s =3D AW_SID(obj);<br>
 &gt; +<br>
 &gt; +=C2=A0 =C2=A0 /* Memory mapping */<br>
 &gt; +=C2=A0 =C2=A0 memory_region_init_io(&amp;s-&gt;iomem, OBJECT(s), &amp=
-;allwinner_cpucfg_ops, s,<br>
+;allwinner_sid_ops, s,<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 TYPE_AW_CPUCFG, 1 * KiB);<br>
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0TYPE_AW_SID, 1 * KiB);<br>
 &gt; +=C2=A0 =C2=A0 sysbus_init_mmio(sbd, &amp;s-&gt;iomem);<br>
 &gt; +}<br>
 &gt; +<br>
-&gt; +static const VMStateDescription allwinner_cpucfg_vmstate =3D {<br>
-&gt; +=C2=A0 =C2=A0 .name =3D &quot;allwinner-cpucfg&quot;,<br>
+&gt; +static Property allwinner_sid_properties[] =3D {<br>
+&gt; +=C2=A0 =C2=A0 DEFINE_PROP_UUID_NODEFAULT(&quot;identifier&quot;, AwSi=
+dState, identifier),<br>
+&gt; +=C2=A0 =C2=A0 DEFINE_PROP_END_OF_LIST()<br>
+&gt; +};<br>
+&gt; +<br>
+&gt; +static const VMStateDescription allwinner_sid_vmstate =3D {<br>
+&gt; +=C2=A0 =C2=A0 .name =3D &quot;allwinner-sid&quot;,<br>
 &gt; +=C2=A0 =C2=A0 .version_id =3D 1,<br>
 &gt; +=C2=A0 =C2=A0 .minimum_version_id =3D 1,<br>
 &gt; +=C2=A0 =C2=A0 .fields =3D (VMStateField[]) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT32(gen_ctrl, AwCpuCfgState),<=
-br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT32(super_standby, AwCpuCfgSta=
-te),<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT32(control, AwSidState),<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT32(rdkey, AwSidState),<br>
 <br>
-Don&#39;t we need to migrate entry_addr?<br>
-<br></blockquote><div><br></div><div>Thanks Philippe, indeed entry_addr sho=
-uld also be there. I&#39;ll add it.</div><div><br></div><div>Regards,</div>=
-<div>Niek<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex">
+We need to migrate the UUID too:<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_UINT8_ARRAY_V(identifier.=
+data, AwSidState, <br>
+sizeof(QemuUUID), 1),<br></blockquote><div><br></div><div>Previously in v1 =
+Peter explained that when using a fixed value for the identifier,</div><div=
+>migration should not be needed [1]. On the other hand, having it anyway in=
+ the VMState</div><div>shouldn&#39;t break anything and also avoids that we=
+ forget about it later, so I&#39;ll add it, thanks!<br></div><div><br></div=
+><div>Regards,</div><div>Niek<br></div><div><br></div><div>[1] <a href=3D"h=
+ttps://lists.gnu.org/archive/html/qemu-devel/2019-12/msg01203.html">https:/=
+/lists.gnu.org/archive/html/qemu-devel/2019-12/msg01203.html</a></div><div>=
+<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margi=
+n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
+">
+<br>
 &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 VMSTATE_END_OF_LIST()<br>
 &gt; +=C2=A0 =C2=A0 }<br>
 &gt; +};<br>
 &gt; +<br>
-&gt; +static void allwinner_cpucfg_class_init(ObjectClass *klass, void *dat=
-a)<br>
+&gt; +static void allwinner_sid_class_init(ObjectClass *klass, void *data)<=
+br>
 &gt; +{<br>
 &gt; +=C2=A0 =C2=A0 DeviceClass *dc =3D DEVICE_CLASS(klass);<br>
 &gt; +<br>
-&gt; +=C2=A0 =C2=A0 dc-&gt;reset =3D allwinner_cpucfg_reset;<br>
-&gt; +=C2=A0 =C2=A0 dc-&gt;vmsd =3D &amp;allwinner_cpucfg_vmstate;<br>
+&gt; +=C2=A0 =C2=A0 dc-&gt;reset =3D allwinner_sid_reset;<br>
+&gt; +=C2=A0 =C2=A0 dc-&gt;vmsd =3D &amp;allwinner_sid_vmstate;<br>
+&gt; +=C2=A0 =C2=A0 dc-&gt;props =3D allwinner_sid_properties;<br>
 &gt; +}<br>
 &gt; +<br>
-&gt; +static const TypeInfo allwinner_cpucfg_info =3D {<br>
-&gt; +=C2=A0 =C2=A0 .name=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_AW_CPU=
-CFG,<br>
+&gt; +static const TypeInfo allwinner_sid_info =3D {<br>
+&gt; +=C2=A0 =C2=A0 .name=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_AW_SID=
+,<br>
 &gt; +=C2=A0 =C2=A0 .parent=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_SYS_BUS_DEV=
 ICE,<br>
-&gt; +=C2=A0 =C2=A0 .instance_init =3D allwinner_cpucfg_init,<br>
-&gt; +=C2=A0 =C2=A0 .instance_size =3D sizeof(AwCpuCfgState),<br>
-&gt; +=C2=A0 =C2=A0 .class_init=C2=A0 =C2=A0 =3D allwinner_cpucfg_class_ini=
-t,<br>
+&gt; +=C2=A0 =C2=A0 .instance_init =3D allwinner_sid_init,<br>
+&gt; +=C2=A0 =C2=A0 .instance_size =3D sizeof(AwSidState),<br>
+&gt; +=C2=A0 =C2=A0 .class_init=C2=A0 =C2=A0 =3D allwinner_sid_class_init,<=
+br>
 &gt; +};<br>
 &gt; +<br>
-&gt; +static void allwinner_cpucfg_register(void)<br>
+&gt; +static void allwinner_sid_register(void)<br>
 &gt; +{<br>
-&gt; +=C2=A0 =C2=A0 type_register_static(&amp;allwinner_cpucfg_info);<br>
+&gt; +=C2=A0 =C2=A0 type_register_static(&amp;allwinner_sid_info);<br>
 &gt; +}<br>
 &gt; +<br>
-&gt; +type_init(allwinner_cpucfg_register)<br>
+&gt; +type_init(allwinner_sid_register)<br>
 &gt; diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs<br>
-&gt; index 63b2e528f9..f3788a5903 100644<br>
+&gt; index f3788a5903..daa734036e 100644<br>
 &gt; --- a/hw/misc/Makefile.objs<br>
 &gt; +++ b/hw/misc/Makefile.objs<br>
-&gt; @@ -29,6 +29,7 @@ common-obj-$(CONFIG_MACIO) +=3D macio/<br>
-&gt;=C2=A0 =C2=A0common-obj-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem.o<br>
-&gt;=C2=A0 =C2=A0<br>
+&gt; @@ -31,6 +31,7 @@ common-obj-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem.o<b=
+r>
 &gt;=C2=A0 =C2=A0common-obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3-ccu.o<=
 br>
-&gt; +obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-cpucfg.o<br>
+&gt;=C2=A0 =C2=A0obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-cpucfg.o<br>
 &gt;=C2=A0 =C2=A0common-obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3-sysctr=
 l.o<br>
+&gt; +common-obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-sid.o<br>
 &gt;=C2=A0 =C2=A0common-obj-$(CONFIG_REALVIEW) +=3D arm_sysctl.o<br>
 &gt;=C2=A0 =C2=A0common-obj-$(CONFIG_NSERIES) +=3D cbus.o<br>
+&gt;=C2=A0 =C2=A0common-obj-$(CONFIG_ECCMEMCTL) +=3D eccmemctl.o<br>
 &gt; diff --git a/hw/misc/trace-events b/hw/misc/trace-events<br>
-&gt; index 7f0f5dff3a..ede1650672 100644<br>
+&gt; index ede1650672..4f38328d9c 100644<br>
 &gt; --- a/hw/misc/trace-events<br>
 &gt; +++ b/hw/misc/trace-events<br>
-&gt; @@ -1,5 +1,10 @@<br>
-&gt;=C2=A0 =C2=A0# See docs/devel/tracing.txt for syntax documentation.<br>
+&gt; @@ -5,6 +5,10 @@ allwinner_cpucfg_cpu_reset(uint8_t cpu_id, uint32_t r=
+eset_addr) &quot;id %u, reset_ad<br>
+&gt;=C2=A0 =C2=A0allwinner_cpucfg_read(uint64_t offset, uint64_t data, unsi=
+gned size) &quot;offset 0x%&quot; PRIx64 &quot; data 0x%&quot; PRIx64 &quot=
+; size %&quot; PRIu32<br>
+&gt;=C2=A0 =C2=A0allwinner_cpucfg_write(uint64_t offset, uint64_t data, uns=
+igned size) &quot;offset 0x%&quot; PRIx64 &quot; data 0x%&quot; PRIx64 &quo=
+t; size %&quot; PRIu32<br>
 &gt;=C2=A0 =C2=A0<br>
-&gt; +# allwinner-cpucfg.c<br>
-&gt; +allwinner_cpucfg_cpu_reset(uint8_t cpu_id, uint32_t reset_addr) &quot=
-;id %u, reset_addr 0x%&quot; PRIu32<br>
-&gt; +allwinner_cpucfg_read(uint64_t offset, uint64_t data, unsigned size) =
-&quot;offset 0x%&quot; PRIx64 &quot; data 0x%&quot; PRIx64 &quot; size %&qu=
-ot; PRIu32<br>
-&gt; +allwinner_cpucfg_write(uint64_t offset, uint64_t data, unsigned size)=
- &quot;offset 0x%&quot; PRIx64 &quot; data 0x%&quot; PRIx64 &quot; size %&q=
-uot; PRIu32<br>
+&gt; +# allwinner-sid.c<br>
+&gt; +allwinner_sid_read(uint64_t offset, uint64_t data, unsigned size) &qu=
+ot;offset 0x%&quot; PRIx64 &quot; data 0x%&quot; PRIx64 &quot; size %&quot;=
+ PRIu32<br>
+&gt; +allwinner_sid_write(uint64_t offset, uint64_t data, unsigned size) &q=
+uot;offset 0x%&quot; PRIx64 &quot; data 0x%&quot; PRIx64 &quot; size %&quot=
+; PRIu32<br>
 &gt; +<br>
 &gt;=C2=A0 =C2=A0# eccmemctl.c<br>
 &gt;=C2=A0 =C2=A0ecc_mem_writel_mer(uint32_t val) &quot;Write memory enable=
@@ -1227,5 +1056,5 @@ uot; PRIu32<br>
 mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
 div></div>
 
---000000000000d42029059d9d9c85--
+--000000000000d9f710059d9deac2--
 
