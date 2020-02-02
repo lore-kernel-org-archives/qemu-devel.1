@@ -2,89 +2,79 @@ Return-Path: <SRS0=8j4I=3W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B55C35249
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 17:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A863C35249
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 18:17:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D80B2067C
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 17:40:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AAD7920658
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 18:17:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bMeYTbiY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D80B2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxrRwvcl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD7920658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyJE0-0004vO-EE
-	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 12:40:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40070)
+	id 1iyJoa-0006pv-Qb
+	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 13:17:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iyJDN-0004U0-6i
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 12:39:22 -0500
+ (envelope-from <hsp.cat7@gmail.com>) id 1iyJnx-0006Qz-UP
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 13:17:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iyJDK-0005J7-H8
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 12:39:19 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57943
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iyJDK-0005I8-5t
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 12:39:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580665157;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=eDDd0cYoJOZkjqMgJm0NoCq1plQbOHdYWc9yxgib78c=;
- b=bMeYTbiYenpeN2JxHwNWt9H6P3BgveUWVxV/QcdJ4j7hb0Dg13OVo3w0bac7SQp0GMYrkR
- whxTQp7AMfEeoXgAPEVVYxr0jxeR+t/YAVgdksoKn62lptAJbFcDiGIAN/mRkAtaQiA/T+
- Zju3GOKwdPoKivfsEQ15tZOkdjKS21c=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-VsBdmg30NNCt2HYbAEuHDw-1; Sun, 02 Feb 2020 12:39:12 -0500
-Received: by mail-ed1-f72.google.com with SMTP id y23so8507215edt.2
- for <qemu-devel@nongnu.org>; Sun, 02 Feb 2020 09:39:12 -0800 (PST)
+ (envelope-from <hsp.cat7@gmail.com>) id 1iyJnw-0005VE-Lb
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 13:17:09 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36684)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1iyJnw-0005UP-Em
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 13:17:08 -0500
+Received: by mail-ot1-x344.google.com with SMTP id j20so3039959otq.3
+ for <qemu-devel@nongnu.org>; Sun, 02 Feb 2020 10:17:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Zx9TYA7gRlxRnb+a1ZJJPV6+asReS6BX/OS/2zUzVvg=;
+ b=bxrRwvclCY6vjgYtWLcKyZUTQUQZRoYjF4W0+enlei8ob7GYpgSBGZMbrSxtR7KiLY
+ vLJsSIcqfHnkk73Ddxe+PmwI24wFhmgN89eBbcISHg6YoY+UN/Ra1mQyBm7rdYrnmyIK
+ 6DFHwClbwUbDblnML6OzIcaNfTPakI64BnK0yTHQZcl5OPkOZb0x+T9RUlQk70mxRxRn
+ 55jI4OiY4Z0vDs6mKvmZzL/+wa3SHM3FaalW73eqp5iW0tqEXpeyNjMBRfiVFwCq4MWe
+ wfaswfl2Vx32rSsLxm2IOu+1q9nogeuzOANS9oaxlsNiDMHWuS+44zERbO68A5vZCWVr
+ lLNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=LEqheHclh57Ie60G7IJ/frK0f/FIEp+k4/PdsuZSddc=;
- b=ry9bY4iJr5/ohhLScdSBj55NF67ixgrecjIvZOPeoflgOHoGxIoe0ZIrhYYBjaGYzq
- Epcst+i8uBJzT+rGkWnba+ebitQxTZXgdpVqH1rpJOT/3+OW0G3K1jNc4xih+GjzkLo8
- OpMrFmPEOwyhhnfnIv3XL4JSUX0bMje7gVvysmNrUuL2GOkLg5hY1shqFu5RCrWQqXT4
- ir7zg/gwe9CeHHEuVpeWMnVACQZtCs6ELIgUqyixdfVuBs+6yyCry2k7mu8w3mZPO6kA
- qBrvEkJWnP4pcsey6O5nrFmoya3/WZf0R1P030Vm8LjVd3FFqxp9+AjQslrGSanR0cEc
- iphw==
-X-Gm-Message-State: APjAAAXChLKDn5ItCc+UOCxfPXBtFTtIQTsV7Q76w3OeGsRHID07M9H7
- HUzn9oI+jO7FCfw7ZEAb5eP2lNhfvdhDO7pkd0iKtT7J+VYq+7b6wZ4WHM7+g/zjcgXCL6u7po6
- c9fPQHywiCT2ImVV8gRUvIcpA8H3+060=
-X-Received: by 2002:a50:c04e:: with SMTP id u14mr8843801edd.193.1580665151535; 
- Sun, 02 Feb 2020 09:39:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxROVZnwukmMqP1AhBOep23SSPwMf02ABd626yNGnlicMq6j3cB+SgaHmyhr3O9CYmXqQ8UVIaH3kJzwS8i3ao=
-X-Received: by 2002:a50:c04e:: with SMTP id u14mr8843777edd.193.1580665151305; 
- Sun, 02 Feb 2020 09:39:11 -0800 (PST)
+ bh=Zx9TYA7gRlxRnb+a1ZJJPV6+asReS6BX/OS/2zUzVvg=;
+ b=eOjEJdPilNwdSWSzfrsq1qUcboAaED3TT1Xvnl04YpIVuHkqoBQrS3wDVvNn5jU0Lx
+ eAOKMzNKxs/Ok3TbX+xo0gZjIv5jKDur5T00wp6np3mqsZzeNyMjHUQrmOj1y7tRcq7p
+ DGEFOd6uYXO6345fRn9c4/Ef+WuJZylKxU/IizBx8IGd32fHmTEVGvPcZinJwfra3gFZ
+ ZXC17xkL4pOvJ3N3jfAu8HEdTL1402dqFvQHi9qHBUGQfUpBkNdHLJbd4+6UNCcZpj4a
+ gCOL0VpxFqf3cfEokXBW5MVOnuhZ9OM6wY+Qpo1S8weMzmb/fJtgchX58Z0PZYjViOdW
+ 6luQ==
+X-Gm-Message-State: APjAAAVEnBp0QA8kQRNaYuSKqQuuQdMt4ck86fZikPROZTjJdPTIgv3u
+ 19BQOgsf/Vl1kcjJlsRv+3dXt+bEFrAQx8XBSCQ=
+X-Google-Smtp-Source: APXvYqx9Q6dUA02g/FWq1q3t/PDoC9PmlPMytotN7fq3ekpRKrw0xbcS+xkC7fZWqt7/kF3kUkJdvXjoB5vv4P9ePLM=
+X-Received: by 2002:a9d:22:: with SMTP id 31mr14384203ota.173.1580667427510;
+ Sun, 02 Feb 2020 10:17:07 -0800 (PST)
 MIME-Version: 1.0
-References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
- <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
- <94828b1d-fa7d-149e-9eb3-d001d6484489@ozlabs.ru>
-In-Reply-To: <94828b1d-fa7d-149e-9eb3-d001d6484489@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 2 Feb 2020 18:38:59 +0100
-Message-ID: <CABgObfaG6th54YJkEPaqq=_UQhvmZiJz6X6Yb_PZJQ15AZvMTA@mail.gmail.com>
-Subject: Re: VW ELF loader
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-X-MC-Unique: VsBdmg30NNCt2HYbAEuHDw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000da68f6059d9b48d1"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <30c8b9e6-484c-5785-b178-bef01628db49@t-online.de>
+In-Reply-To: <30c8b9e6-484c-5785-b178-bef01628db49@t-online.de>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Sun, 2 Feb 2020 19:16:56 +0100
+Message-ID: <CABLmASH07iyCdGaWzX5CpYSm0BA-Ww5F3-uOeUduiTLDuKRPjw@mail.gmail.com>
+Subject: Re: [PATCH 0/1] coreaudio: fix coreaudio playback
+To: =?UTF-8?Q?Volker_R=C3=BCmelin?= <vr_qemu@t-online.de>
+Content-Type: multipart/alternative; boundary="000000000000865d9b059d9bd06c"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,137 +86,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Cornelia Huck <conny@cornelia-huck.de>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu Developers <qemu-devel@nongnu.org>,
+ Programmingkid <programmingkidx@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000da68f6059d9b48d1
+--000000000000865d9b059d9bd06c
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Il dom 2 feb 2020, 12:51 Alexey Kardashevskiy <aik@ozlabs.ru> ha scritto:
+On Sun, Feb 2, 2020 at 3:03 PM Volker R=C3=BCmelin <vr_qemu@t-online.de> wr=
+ote:
 
-> > QEMU must not load GRUB from disk, that's the firmware's task.  If you
-> > want to kill SLOF, you can rewrite it, but loading the kernel GRUB from
-> > disk within QEMU is a bad idea: the next feature you'll be requested to
-> > implement will be network boot, and there's no way to do that in QEMU.
+> Hi,
 >
-> What is exactly the problem with netboot? I can hook up the OF's "net" to
-> a backend (as I do for serial console and
-> blockdev, in boot order)
-
-
-Who provides the OpenFirmware entry point when you remove SLOF and boot
-directly into grub?
-
-Or alternatively it is possible with my patchset to load petitboot (kernel
-> + intramdisk, the default way of booting
-> POWER8/9 baremetal systems) and that thing can do whole lot of things, we
-> can consider it as a replacement for ROMs from
-> devices (or I misunderstood what kind of netboot you meant).
+> here is a new patch for the CoreAudio playback problem. This patch
+> is Zolt=C3=A1n's patch from
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg02142.html
+> and a improved version of my patch squashed together.
 >
-
-Why wouldn't that have the same issue as SLOF that you describe below (I
-honestly don't understand anything of it, but that's not your fault :-)).
-
-Paolo
-
-
-> > You should be able to reuse quite a lot of code from both
-> > pc-bios/s390-ccw (for virtio drivers) and kvm-unit-tests (for device
-> > tree parsing).  You'd have to write the glue code for PCI hypercalls,
-> > and adapt virtio.c for virtio-pci instead of virtio-ccw.
+> I actually tested the changes in audio/audio_template.h,
+> audio/mixeng.c and audio/mixeng.h with all useful permutations of
+> FLOAT_MIXENG and RECIPROCAL defined/undefined.
 >
-> The reason for killing SLOF is to keep one device tree for the entire boo=
-t
-> process including
-> ibm,client-architecture-support with possible (and annoying) configuratio=
-n
-> reboots. Having another firware won't help
-> with that.
+> @Howard and John
+> Can you please test this patch? Compared to the patches you tested
+> this patch is quite different.
 >
-> Also the OF1275 client interface is the way for the client to get
-> net/block device without need to have drivers, I'd
-> like to do just this and skip the middle man (QEMU device and guest drive=
-r
-> in firmware/bootloader).
+> @John
+> 'git am exported_mail.eml' knows how to handle
+> Content-Transfer-Encoding: in a mail file. It's not necessary to
+> apply this patch by hand.
 >
-> I'll post another RFC tomorrow to give a better idea.
+> Volker R=C3=BCmelin (1):
+>   coreaudio: fix coreaudio playback
 >
+>  audio/audio_template.h |  7 +++++++
+>  audio/coreaudio.c      | 32 +++++++++-----------------------
+>  audio/mixeng.c         | 48
+> ++++++++++++++++++++++++++++++++++++++++++++++++
+>  audio/mixeng.h         |  5 +++++
+>  4 files changed, 69 insertions(+), 23 deletions(-)
 >
 > --
-> Alexey
+> 2.16.4
 >
->
+> Hi,
 
---000000000000da68f6059d9b48d1
+This patch restores coreaudio for me.
+I applied the patch on top of https://github.com/mcayland/qemu/tree/screame=
+r
+to test audio support in qemu-system-ppc running Mac OS 9.2 and OSX 10.5.
+Host is OSX Sierra.
+
+Thanks,
+Howard
+
+--000000000000865d9b059d9bd06c
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il dom 2 feb 2020, 12:51 Alexey Kardashevskiy &lt;<a h=
-ref=3D"mailto:aik@ozlabs.ru">aik@ozlabs.ru</a>&gt; ha scritto:<br></div><bl=
-ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
-ccc solid;padding-left:1ex">&gt; QEMU must not load GRUB from disk, that&#3=
-9;s the firmware&#39;s task.=C2=A0 If you<br>
-&gt; want to kill SLOF, you can rewrite it, but loading the kernel GRUB fro=
-m<br>
-&gt; disk within QEMU is a bad idea: the next feature you&#39;ll be request=
-ed to<br>
-&gt; implement will be network boot, and there&#39;s no way to do that in Q=
-EMU.<br>
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Feb 2, 2020 at 3:03 PM Volker=
+ R=C3=BCmelin &lt;<a href=3D"mailto:vr_qemu@t-online.de">vr_qemu@t-online.d=
+e</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
+:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
+>Hi,<br>
 <br>
-What is exactly the problem with netboot? I can hook up the OF&#39;s &quot;=
-net&quot; to a backend (as I do for serial console and <br>
-blockdev, in boot order)</blockquote></div></div><div dir=3D"auto"><br></di=
-v><div dir=3D"auto">Who provides the OpenFirmware entry point when you remo=
-ve SLOF and boot directly into grub?</div><div dir=3D"auto"><br></div><div =
-dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" s=
-tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Or a=
-lternatively it is possible with my patchset to load petitboot (kernel + in=
-tramdisk, the default way of booting <br>
-POWER8/9 baremetal systems) and that thing can do whole lot of things, we c=
-an consider it as a replacement for ROMs from <br>
-devices (or I misunderstood what kind of netboot you meant).<br></blockquot=
-e></div></div><div dir=3D"auto"><br></div><div dir=3D"auto">Why wouldn&#39;=
-t that have the same issue as SLOF that you describe below (I honestly don&=
-#39;t understand anything of it, but that&#39;s not your fault :-)).</div><=
-div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=3D"auto"><=
-br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"=
-gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-=
-left:1ex">
+here is a new patch for the CoreAudio playback problem. This patch<br>
+is Zolt=C3=A1n&#39;s patch from<br>
+<a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg0214=
+2.html" rel=3D"noreferrer" target=3D"_blank">https://lists.nongnu.org/archi=
+ve/html/qemu-devel/2020-01/msg02142.html</a><br>
+and a improved version of my patch squashed together.<br>
 <br>
-&gt; You should be able to reuse quite a lot of code from both<br>
-&gt; pc-bios/s390-ccw (for virtio drivers) and kvm-unit-tests (for device<b=
-r>
-&gt; tree parsing).=C2=A0 You&#39;d have to write the glue code for PCI hyp=
-ercalls,<br>
-&gt; and adapt virtio.c for virtio-pci instead of virtio-ccw.<br>
+I actually tested the changes in audio/audio_template.h,<br>
+audio/mixeng.c and audio/mixeng.h with all useful permutations of<br>
+FLOAT_MIXENG and RECIPROCAL defined/undefined.<br>
 <br>
-The reason for killing SLOF is to keep one device tree for the entire boot =
-process including <br>
-ibm,client-architecture-support with possible (and annoying) configuration =
-reboots. Having another firware won&#39;t help <br>
-with that.<br>
+@Howard and John<br>
+Can you please test this patch? Compared to the patches you tested<br>
+this patch is quite different.<br>
 <br>
-Also the OF1275 client interface is the way for the client to get net/block=
- device without need to have drivers, I&#39;d <br>
-like to do just this and skip the middle man (QEMU device and guest driver =
-in firmware/bootloader).<br>
+@John<br>
+&#39;git am exported_mail.eml&#39; knows how to handle<br>
+Content-Transfer-Encoding: in a mail file. It&#39;s not necessary to<br>
+apply this patch by hand.<br>
 <br>
-I&#39;ll post another RFC tomorrow to give a better idea.<br>
+Volker R=C3=BCmelin (1):<br>
+=C2=A0 coreaudio: fix coreaudio playback<br>
 <br>
+=C2=A0audio/audio_template.h |=C2=A0 7 +++++++<br>
+=C2=A0audio/coreaudio.c=C2=A0 =C2=A0 =C2=A0 | 32 +++++++++-----------------=
+------<br>
+=C2=A0audio/mixeng.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 48 ++++++++++++++++=
+++++++++++++++++++++++++++++++++<br>
+=C2=A0audio/mixeng.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 5 +++++<br>
+=C2=A04 files changed, 69 insertions(+), 23 deletions(-)<br>
 <br>
 -- <br>
-Alexey<br>
-<br>
-</blockquote></div></div></div>
+2.16.4<br>
+<br></blockquote><div>Hi,</div><div><br></div><div>This patch restores core=
+audio for me.</div><div>I applied the patch on top of <a href=3D"https://gi=
+thub.com/mcayland/qemu/tree/screamer">https://github.com/mcayland/qemu/tree=
+/screamer</a> to test audio support in qemu-system-ppc running Mac OS 9.2 a=
+nd OSX 10.5. Host is OSX Sierra. <br></div><div><br></div><div>Thanks,</div=
+><div>Howard<br></div><div>=C2=A0</div></div></div>
 
---000000000000da68f6059d9b48d1--
-
+--000000000000865d9b059d9bd06c--
 
