@@ -2,80 +2,81 @@ Return-Path: <SRS0=8j4I=3W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC946C35249
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 22:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D70EFC35249
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 22:38:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E33020661
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 22:15:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D9512051A
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 22:38:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zq7CvGpM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E33020661
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+KU+0jr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9512051A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyNWY-0003I4-HI
-	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 17:15:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34479)
+	id 1iyNsU-0007YN-Q2
+	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 17:38:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hsp.cat7@gmail.com>) id 1iyNVW-0002os-HM
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:14:26 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iyNrs-0006xa-98
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:37:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1iyNVT-0005fK-06
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:14:22 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44631)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iyNrq-0003dV-AY
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:37:28 -0500
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:36302)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1iyNVS-0005c2-ND
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 17:14:18 -0500
-Received: by mail-oi1-x241.google.com with SMTP id d62so12898898oia.11
- for <qemu-devel@nongnu.org>; Sun, 02 Feb 2020 14:14:18 -0800 (PST)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1iyNrq-0003cV-3p; Sun, 02 Feb 2020 17:37:26 -0500
+Received: by mail-io1-xd42.google.com with SMTP id d15so14642121iog.3;
+ Sun, 02 Feb 2020 14:37:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2PorBm+g6i7zOkE4BiaipsweciwSawe3xOzmdrt3dAM=;
- b=Zq7CvGpM+GLvc43xXZC/uoPsjcHn6Tn7ct3KdmsyN/VArQVcK0Dk5p6V17NupDLAcU
- NdiMmJHMMlI84A2R3oFUWkmrAiT0aouch7PLEKPBC8H0T5sVipmbBVzzPSE0lLOfULPr
- TOs9t5BaUM7CnuKvjoSx1zTK4sB821gaV5p/AFMVwJ0oIctXJonIg/6HPbI7J1QsTyIy
- 5c0Kg0DaHb9fNleaoQZwlPR+huITDnGJkUuDac1f8drcnpFfti1Dll1hoLi/ColzYZri
- ic0A6X3MHFTewTB2QZRMUsELCbHGoUz4zClAEe4arCWDWz+1KOR9j1rdhwDU8qzX/Mjo
- 4Q5A==
+ :cc; bh=sGMMb1ihPJPT1WIKt21/HxT/dBXuoaH0TpAk6fviiYQ=;
+ b=i+KU+0jrwQhAZGQRv4Ab4uC0R+UQsEWN4Ydm+muGKxKYVVP32tCzhtc04JIZlAYoaW
+ kKAedaBGRUkEg9DQfcZ3D1cIDhq0Qo2TtyLrei2w8zqhRbm2wK5kZ0ivxTkZcruEKm4c
+ /g4K4QFIGGEWWT8/jT7B+vGB4A2+oEjvc9atlqX6fVsA42hkOgLJx5Ken36u+x7TIXLd
+ wcSJCX4KIeC+Inok0MLLJMrnX6PpaivIUdy+NkT+yJRKo0GKce7B9VGy+fdFMXr/r2e/
+ lxhqngGF4r+Gg678rcfhR5Wn7DNto1P0a4HsoH3vPaMHuFkj1gN5yfx4ZlGJVC/1S8UL
+ k3Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2PorBm+g6i7zOkE4BiaipsweciwSawe3xOzmdrt3dAM=;
- b=rhsnyOIcE9OUl4brz8EXYGwaoDAzndt9rxdvYjmNuaAAWvzuXTj5p9PAAcPxAMoJXh
- 86UBMA+hrw5eLhv6nYyPLzZveZonVlhYGsmRSVxy0TAFLBUq1HfeI5KCitNyJPjZYlGv
- jIYeQ6TWgoHPh11eHSt99UFNvQVnL+6mxYT3PV9Uk3PdEBA2p1fRm0oFJ6GvpRL36qOb
- b9p9b2s2gh4Y0Fj5r4+22T1YXCmdp7KZyW+gW2p5mSDnQwsdTdtE5bxs5aWria8nHroR
- WzFMR2eR+DYJoHJ/bT9QxfjX6bQR4g9kN52eUp9uBHw3t2MTWHc3cXaBCO80P7vOKccL
- YWqQ==
-X-Gm-Message-State: APjAAAWKSRc2ldhLh98ObFmIzx+abRwznO2Q7gJAofsQ2NDGZJEahSaN
- MeejL9TIHgJsplTBhw0Az3U2hOcq+Gr0LgLE9iw=
-X-Google-Smtp-Source: APXvYqz1xHDRhhGZ6BUl6LDdpd4QoTTvnpVD8j5S6tFoT7sHvVfD0VERPHuM85Yf7uRyjVoeII7aZ+EZ0fHNYi8ziC8=
-X-Received: by 2002:a05:6808:3ba:: with SMTP id
- n26mr13242629oie.62.1580681657734; 
- Sun, 02 Feb 2020 14:14:17 -0800 (PST)
+ bh=sGMMb1ihPJPT1WIKt21/HxT/dBXuoaH0TpAk6fviiYQ=;
+ b=E44Rt6YtBO9HyFh02noByhtc/7EAxg+pOS/GGNJTo8PPq6QmglztdGfNz8EFvfyAsk
+ aLQS5AQZLETRDh4c38F74Bkiqxpj0ss5555maSv1IP5YZ7LnkBiAGwdH5U7OxpCADaET
+ 9ABaDafIt34OUVaqH5A9ToO+VQawwqJmMvRFQS0vvhH7t8NfiVrsennadHstekz4mU+a
+ fz9qFMbpcNk8OiRP6VwIfaarsYTihJ7N5gsFHfKJI90rMC9UTaDm4arWYYsUpdHQT2/H
+ SyDEGB0kHkHJs1K6ZJdhdbHec/A0uV86ILUIyrOiUirOmcwA/AEWUaXS9bfancVDvIvZ
+ pziA==
+X-Gm-Message-State: APjAAAXGYUSDekICd3t823x/QnYPXiC7+RRFWUSKtMrdGzYj0T/4yDjg
+ pP5Vk8SWa+kZouQ3v95h+W9PuTtB83uZsX43LbY=
+X-Google-Smtp-Source: APXvYqzPLHguKtvkgNbXnW3OzLW5f/hteDkdS9fmd/MnwglBsx6khck6G8i2L6iD9EypyK211VeN3PrOO+xgO5WZ5Mc=
+X-Received: by 2002:a02:856a:: with SMTP id g97mr16885023jai.97.1580683045469; 
+ Sun, 02 Feb 2020 14:37:25 -0800 (PST)
 MIME-Version: 1.0
-References: <8a8b0b5698401b78d3c4c8ec90aef83b95babb06.1580672076.git.DirtY.iCE.hu@gmail.com>
-In-Reply-To: <8a8b0b5698401b78d3c4c8ec90aef83b95babb06.1580672076.git.DirtY.iCE.hu@gmail.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Sun, 2 Feb 2020 23:14:06 +0100
-Message-ID: <CABLmASEHUkq7sCr8_Re68u-FOVPt+nym6vqP+8HYhjqTv20AhA@mail.gmail.com>
-Subject: Re: [RFC PATCH] audio: proper support for float samples in mixeng
-To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000b658ca059d9f20be"
+References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
+ <20200119005102.3847-3-nieklinnenbank@gmail.com>
+ <20200121173906.626c700b@Igors-MacBook-Pro>
+In-Reply-To: <20200121173906.626c700b@Igors-MacBook-Pro>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Sun, 2 Feb 2020 23:37:14 +0100
+Message-ID: <CAPan3WpNH-P7EtOFm92-z9wjadmKUACvyuNYe5t-Z-+ig2uW2Q@mail.gmail.com>
+Subject: Re: [PATCH v4 02/20] hw/arm: add Xunlong Orange Pi PC machine
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000006d81c4059d9f73fd"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,1282 +88,392 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ jasowang@redhat.com, QEMU Developers <qemu-devel@nongnu.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b658ca059d9f20be
+--0000000000006d81c4059d9f73fd
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Feb 2, 2020 at 8:38 PM K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ic=
-e.hu@gmail.com>
-wrote:
+On Tue, Jan 21, 2020 at 5:39 PM Igor Mammedov <imammedo@redhat.com> wrote:
 
-> This adds proper support for float samples in mixeng by adding a new
-> audio format for it.
+> On Sun, 19 Jan 2020 01:50:44 +0100
+> Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
 >
-> Limitations: only native endianness is supported.
+> > The Xunlong Orange Pi PC is an Allwinner H3 System on Chip
+> > based embedded computer with mainline support in both U-Boot
+> > and Linux. The board comes with a Quad Core Cortex A7 @ 1.3GHz,
+> > 1GiB RAM, 100Mbit ethernet, USB, SD/MMC, USB, HDMI and
+> > various other I/O. This commit add support for the Xunlong
+> > Orange Pi PC machine.
+> >
+> > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+> > Tested-by: KONRAD Frederic <frederic.konrad@adacore.com>
+> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >
-> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
+> Acked-by: Igor Mammedov <imammedo@redhat.com>
 >
-> ---
->
-> This patch is meant to be applied on top of "[PATCH] coreaudio: fix
-> coreaudio
-> playback" by Volker R=C3=BCmelin, available at:
-> https://lists.nongnu.org/archive/html/qemu-devel/2020-02/msg00114.html
->
-> For more information, please refer to that thread.
->
-> ---
->  qapi/audio.json        |  2 +-
->  audio/audio_int.h      |  3 +-
->  audio/audio_template.h | 41 ++++++++++++--------
->  audio/mixeng.h         |  8 ++--
->  audio/alsaaudio.c      | 17 ++++++++
->  audio/audio.c          | 56 ++++++++++++++++++---------
->  audio/coreaudio.c      |  7 +---
->  audio/mixeng.c         | 88 ++++++++++++++++++++++++++----------------
->  audio/paaudio.c        |  9 +++++
->  audio/sdlaudio.c       | 28 ++++++++++++++
->  10 files changed, 180 insertions(+), 79 deletions(-)
->
-> diff --git a/qapi/audio.json b/qapi/audio.json
-> index 83312b2339..d8c507cced 100644
-> --- a/qapi/audio.json
-> +++ b/qapi/audio.json
-> @@ -276,7 +276,7 @@
->  # Since: 4.0
->  ##
->  { 'enum': 'AudioFormat',
-> -  'data': [ 'u8', 's8', 'u16', 's16', 'u32', 's32' ] }
-> +  'data': [ 'u8', 's8', 'u16', 's16', 'u32', 's32', 'f32' ] }
->
->  ##
->  # @AudiodevDriver:
-> diff --git a/audio/audio_int.h b/audio/audio_int.h
-> index 5ba2078346..cd92e48163 100644
-> --- a/audio/audio_int.h
-> +++ b/audio/audio_int.h
-> @@ -40,7 +40,8 @@ struct audio_callback {
->
->  struct audio_pcm_info {
->      int bits;
-> -    int sign;
-> +    bool is_signed;
-> +    bool is_float;
->      int freq;
->      int nchannels;
->      int bytes_per_frame;
-> diff --git a/audio/audio_template.h b/audio/audio_template.h
-> index 0336d2670c..7013d3041f 100644
-> --- a/audio/audio_template.h
-> +++ b/audio/audio_template.h
-> @@ -153,15 +153,23 @@ static int glue (audio_pcm_sw_init_, TYPE) (
->      sw->ratio =3D ((int64_t) sw->info.freq << 32) / sw->hw->info.freq;
->  #endif
->
-> +    if (sw->info.is_float) {
->  #ifdef DAC
-> -    sw->conv =3D mixeng_conv
-> +        sw->conv =3D mixeng_conv_float[sw->info.nchannels =3D=3D 2];
->  #else
-> -    sw->clip =3D mixeng_clip
-> +        sw->clip =3D mixeng_clip_float[sw->info.nchannels =3D=3D 2];
->  #endif
-> -        [sw->info.nchannels =3D=3D 2]
-> -        [sw->info.sign]
-> -        [sw->info.swap_endianness]
-> -        [audio_bits_to_index (sw->info.bits)];
-> +    } else {
-> +#ifdef DAC
-> +        sw->conv =3D mixeng_conv
-> +#else
-> +        sw->clip =3D mixeng_clip
-> +#endif
-> +            [sw->info.nchannels =3D=3D 2]
-> +            [sw->info.is_signed]
-> +            [sw->info.swap_endianness]
-> +            [audio_bits_to_index(sw->info.bits)];
-> +    }
->
->      sw->name =3D g_strdup (name);
->      err =3D glue (audio_pcm_sw_alloc_resources_, TYPE) (sw);
-> @@ -276,22 +284,23 @@ static HW *glue(audio_pcm_hw_add_new_,
-> TYPE)(AudioState *s,
->          goto err1;
->      }
->
-> -    if (s->dev->driver =3D=3D AUDIODEV_DRIVER_COREAUDIO) {
-> +    if (hw->info.is_float) {
->  #ifdef DAC
-> -        hw->clip =3D clip_natural_float_from_stereo;
-> +        hw->clip =3D mixeng_clip_float[hw->info.nchannels =3D=3D 2];
->  #else
-> -        hw->conv =3D conv_natural_float_to_stereo;
-> +        hw->conv =3D mixeng_conv_float[hw->info.nchannels =3D=3D 2];
->  #endif
-> -    } else
-> +    } else {
->  #ifdef DAC
-> -    hw->clip =3D mixeng_clip
-> +        hw->clip =3D mixeng_clip
->  #else
-> -    hw->conv =3D mixeng_conv
-> +        hw->conv =3D mixeng_conv
->  #endif
-> -        [hw->info.nchannels =3D=3D 2]
-> -        [hw->info.sign]
-> -        [hw->info.swap_endianness]
-> -        [audio_bits_to_index (hw->info.bits)];
-> +            [hw->info.nchannels =3D=3D 2]
-> +            [hw->info.is_signed]
-> +            [hw->info.swap_endianness]
-> +            [audio_bits_to_index(hw->info.bits)];
-> +    }
->
->      glue(audio_pcm_hw_alloc_resources_, TYPE)(hw);
->
-> diff --git a/audio/mixeng.h b/audio/mixeng.h
-> index 7ef61763e8..2dcd6df245 100644
-> --- a/audio/mixeng.h
-> +++ b/audio/mixeng.h
-> @@ -38,13 +38,13 @@ typedef struct st_sample st_sample;
->  typedef void (t_sample) (struct st_sample *dst, const void *src, int
-> samples);
->  typedef void (f_sample) (void *dst, const struct st_sample *src, int
-> samples);
->
-> +/* indices: [stereo][signed][swap endiannes][8, 16 or 32-bits] */
->  extern t_sample *mixeng_conv[2][2][2][3];
->  extern f_sample *mixeng_clip[2][2][2][3];
->
-> -void conv_natural_float_to_stereo(struct st_sample *dst, const void *src=
-,
-> -                                  int samples);
-> -void clip_natural_float_from_stereo(void *dst, const struct st_sample
-> *src,
-> -                                    int samples);
-> +/* indices: [stereo] */
-> +extern t_sample *mixeng_conv_float[2];
-> +extern f_sample *mixeng_clip_float[2];
->
->  void *st_rate_start (int inrate, int outrate);
->  void st_rate_flow(void *opaque, st_sample *ibuf, st_sample *obuf,
-> diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-> index f37ce1ce85..768b896a93 100644
-> --- a/audio/alsaaudio.c
-> +++ b/audio/alsaaudio.c
-> @@ -307,6 +307,13 @@ static snd_pcm_format_t aud_to_alsafmt (AudioFormat
-> fmt, int endianness)
->              return SND_PCM_FORMAT_U32_LE;
->          }
->
-> +    case AUDIO_FORMAT_F32:
-> +        if (endianness) {
-> +            return SND_PCM_FORMAT_FLOAT_BE;
-> +        } else {
-> +            return SND_PCM_FORMAT_FLOAT_LE;
-> +        }
-> +
->      default:
->          dolog ("Internal logic error: Bad audio format %d\n", fmt);
->  #ifdef DEBUG_AUDIO
-> @@ -370,6 +377,16 @@ static int alsa_to_audfmt (snd_pcm_format_t alsafmt,
-> AudioFormat *fmt,
->          *fmt =3D AUDIO_FORMAT_U32;
->          break;
->
-> +    case SND_PCM_FORMAT_FLOAT_LE:
-> +        *endianness =3D 0;
-> +        *fmt =3D AUDIO_FORMAT_F32;
-> +        break;
-> +
-> +    case SND_PCM_FORMAT_FLOAT_BE:
-> +        *endianness =3D 1;
-> +        *fmt =3D AUDIO_FORMAT_F32;
-> +        break;
-> +
->      default:
->          dolog ("Unrecognized audio format %d\n", alsafmt);
->          return -1;
-> diff --git a/audio/audio.c b/audio/audio.c
-> index f63f39769a..53fdb42ec7 100644
-> --- a/audio/audio.c
-> +++ b/audio/audio.c
-> @@ -218,6 +218,9 @@ static void audio_print_settings (struct audsettings
-> *as)
->      case AUDIO_FORMAT_U32:
->          AUD_log (NULL, "U32");
->          break;
-> +    case AUDIO_FORMAT_F32:
-> +        AUD_log (NULL, "F32");
-> +        break;
->      default:
->          AUD_log (NULL, "invalid(%d)", as->fmt);
->          break;
-> @@ -252,6 +255,7 @@ static int audio_validate_settings (struct audsetting=
-s
-> *as)
->      case AUDIO_FORMAT_U16:
->      case AUDIO_FORMAT_S32:
->      case AUDIO_FORMAT_U32:
-> +    case AUDIO_FORMAT_F32:
->          break;
->      default:
->          invalid =3D 1;
-> @@ -264,24 +268,28 @@ static int audio_validate_settings (struct
-> audsettings *as)
->
->  static int audio_pcm_info_eq (struct audio_pcm_info *info, struct
-> audsettings *as)
->  {
-> -    int bits =3D 8, sign =3D 0;
-> +    int bits =3D 8;
-> +    bool is_signed =3D false, is_float =3D false;
->
->      switch (as->fmt) {
->      case AUDIO_FORMAT_S8:
-> -        sign =3D 1;
-> +        is_signed =3D true;
->          /* fall through */
->      case AUDIO_FORMAT_U8:
->          break;
->
->      case AUDIO_FORMAT_S16:
-> -        sign =3D 1;
-> +        is_signed =3D true;
->          /* fall through */
->      case AUDIO_FORMAT_U16:
->          bits =3D 16;
->          break;
->
-> +    case AUDIO_FORMAT_F32:
-> +        is_float =3D true;
-> +        /* fall through */
->      case AUDIO_FORMAT_S32:
-> -        sign =3D 1;
-> +        is_signed =3D true;
->          /* fall through */
->      case AUDIO_FORMAT_U32:
->          bits =3D 32;
-> @@ -292,33 +300,38 @@ static int audio_pcm_info_eq (struct audio_pcm_info
-> *info, struct audsettings *a
->      }
->      return info->freq =3D=3D as->freq
->          && info->nchannels =3D=3D as->nchannels
-> -        && info->sign =3D=3D sign
-> +        && info->is_signed =3D=3D is_signed
-> +        && info->is_float =3D=3D is_float
->          && info->bits =3D=3D bits
->          && info->swap_endianness =3D=3D (as->endianness !=3D
-> AUDIO_HOST_ENDIANNESS);
->  }
->
->  void audio_pcm_init_info (struct audio_pcm_info *info, struct audsetting=
-s
-> *as)
->  {
-> -    int bits =3D 8, sign =3D 0, mul;
-> +    int bits =3D 8, mul;
-> +    bool is_signed =3D false, is_float =3D false;
->
->      switch (as->fmt) {
->      case AUDIO_FORMAT_S8:
-> -        sign =3D 1;
-> +        is_signed =3D true;
->          /* fall through */
->      case AUDIO_FORMAT_U8:
->          mul =3D 1;
->          break;
->
->      case AUDIO_FORMAT_S16:
-> -        sign =3D 1;
-> +        is_signed =3D true;
->          /* fall through */
->      case AUDIO_FORMAT_U16:
->          bits =3D 16;
->          mul =3D 2;
->          break;
->
-> +    case AUDIO_FORMAT_F32:
-> +        is_float =3D true;
-> +        /* fall through */
->      case AUDIO_FORMAT_S32:
-> -        sign =3D 1;
-> +        is_signed =3D true;
->          /* fall through */
->      case AUDIO_FORMAT_U32:
->          bits =3D 32;
-> @@ -331,7 +344,8 @@ void audio_pcm_init_info (struct audio_pcm_info *info=
-,
-> struct audsettings *as)
->
->      info->freq =3D as->freq;
->      info->bits =3D bits;
-> -    info->sign =3D sign;
-> +    info->is_signed =3D is_signed;
-> +    info->is_float =3D is_float;
->      info->nchannels =3D as->nchannels;
->      info->bytes_per_frame =3D as->nchannels * mul;
->      info->bytes_per_second =3D info->freq * info->bytes_per_frame;
-> @@ -344,7 +358,7 @@ void audio_pcm_info_clear_buf (struct audio_pcm_info
-> *info, void *buf, int len)
->          return;
->      }
->
-> -    if (info->sign) {
-> +    if (info->is_signed || info->is_float) {
->          memset(buf, 0x00, len * info->bytes_per_frame);
->      }
->      else {
-> @@ -770,8 +784,9 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void
-> *buf, size_t size)
->  #ifdef DEBUG_AUDIO
->  static void audio_pcm_print_info (const char *cap, struct audio_pcm_info
-> *info)
->  {
-> -    dolog ("%s: bits %d, sign %d, freq %d, nchan %d\n",
-> -           cap, info->bits, info->sign, info->freq, info->nchannels);
-> +    dolog("%s: bits %d, sign %d, float %d, freq %d, nchan %d\n",
-> +          cap, info->bits, info->is_signed, info->is_float, info->freq,
-> +          info->nchannels);
->  }
->  #endif
->
-> @@ -1837,11 +1852,15 @@ CaptureVoiceOut *AUD_add_capture(
->
->          cap->buf =3D g_malloc0_n(hw->mix_buf->size,
-> hw->info.bytes_per_frame);
->
-> -        hw->clip =3D mixeng_clip
-> -            [hw->info.nchannels =3D=3D 2]
-> -            [hw->info.sign]
-> -            [hw->info.swap_endianness]
-> -            [audio_bits_to_index (hw->info.bits)];
-> +        if (hw->info.is_float) {
-> +            hw->clip =3D mixeng_clip_float[hw->info.nchannels =3D=3D 2];
-> +        } else {
-> +            hw->clip =3D mixeng_clip
-> +                [hw->info.nchannels =3D=3D 2]
-> +                [hw->info.is_signed]
-> +                [hw->info.swap_endianness]
-> +                [audio_bits_to_index(hw->info.bits)];
-> +        }
->
->          QLIST_INSERT_HEAD (&s->cap_head, cap, entries);
->          QLIST_INSERT_HEAD (&cap->cb_head, cb, entries);
-> @@ -2080,6 +2099,7 @@ int audioformat_bytes_per_sample(AudioFormat fmt)
->
->      case AUDIO_FORMAT_U32:
->      case AUDIO_FORMAT_S32:
-> +    case AUDIO_FORMAT_F32:
->          return 4;
->
->      case AUDIO_FORMAT__MAX:
-> diff --git a/audio/coreaudio.c b/audio/coreaudio.c
-> index 0049db97fa..f1a009610c 100644
-> --- a/audio/coreaudio.c
-> +++ b/audio/coreaudio.c
-> @@ -491,14 +491,9 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct
-> audsettings *as,
->          return -1;
->      }
->
-> -    /*
-> -     * The canonical audio format for CoreAudio on macOS is float.
-> Currently
-> -     * there is no generic code for AUDIO_FORMAT_F32 in qemu. Here we
-> select
-> -     * AUDIO_FORMAT_S32 instead because only the sample size has to matc=
-h.
-> -     */
->      fake_as =3D *as;
->      as =3D &fake_as;
-> -    as->fmt =3D AUDIO_FORMAT_S32;
-> +    as->fmt =3D AUDIO_FORMAT_F32;
->      audio_pcm_init_info (&hw->info, as);
->
->      status =3D coreaudio_get_voice(&core->outputDeviceID);
-> diff --git a/audio/mixeng.c b/audio/mixeng.c
-> index 16b646d48c..c14b0d874c 100644
-> --- a/audio/mixeng.c
-> +++ b/audio/mixeng.c
-> @@ -267,55 +267,77 @@ f_sample *mixeng_clip[2][2][2][3] =3D {
->      }
->  };
->
-> -void conv_natural_float_to_stereo(struct st_sample *dst, const void *src=
-,
-> -                                  int samples)
-> +#ifdef FLOAT_MIXENG
-> +#define FLOAT_CONV_TO(x) (x)
-> +#define FLOAT_CONV_FROM(x) (x)
-> +#else
-> +static const float float_scale =3D UINT_MAX;
-> +#define FLOAT_CONV_TO(x) ((x) * float_scale)
-> +
-> +#ifdef RECIPROCAL
-> +static const float float_scale_reciprocal =3D 1.f / UINT_MAX;
-> +#define FLOAT_CONV_FROM(x) ((x) * float_scale_reciprocal)
-> +#else
-> +#define FLOAT_CONV_FROM(x) ((x) / float_scale)
-> +#endif
-> +#endif
-> +
-> +static void conv_natural_float_to_mono(struct st_sample *dst, const void
-> *src,
-> +                                       int samples)
->  {
->      float *in =3D (float *)src;
-> -#ifndef FLOAT_MIXENG
-> -    const float scale =3D UINT_MAX;
-> -#endif
->
->      while (samples--) {
-> -#ifdef FLOAT_MIXENG
-> -        dst->l =3D *in++;
-> -        dst->r =3D *in++;
-> -#else
-> -        dst->l =3D *in++ * scale;
-> -        dst->r =3D *in++ * scale;
-> -#endif
-> +        dst->r =3D dst->l =3D FLOAT_CONV_TO(*in++);
-> +        dst++;
-> +    }
-> +}
-> +
-> +static void conv_natural_float_to_stereo(struct st_sample *dst, const
-> void *src,
-> +                                         int samples)
-> +{
-> +    float *in =3D (float *)src;
-> +
-> +    while (samples--) {
-> +        dst->l =3D FLOAT_CONV_TO(*in++);
-> +        dst->r =3D FLOAT_CONV_TO(*in++);
->          dst++;
->      }
->  }
->
-> -void clip_natural_float_from_stereo(void *dst, const struct st_sample
-> *src,
-> -                                    int samples)
-> +t_sample *mixeng_conv_float[2] =3D {
-> +    conv_natural_float_to_mono,
-> +    conv_natural_float_to_stereo,
-> +};
-> +
-> +static void clip_natural_float_from_mono(void *dst, const struct
-> st_sample *src,
-> +                                         int samples)
->  {
->      float *out =3D (float *)dst;
-> -#ifndef FLOAT_MIXENG
-> -#ifdef RECIPROCAL
-> -    const float scale =3D 1.f / UINT_MAX;
-> -#else
-> -    const float scale =3D UINT_MAX;
-> -#endif
-> -#endif
->
->      while (samples--) {
-> -#ifdef FLOAT_MIXENG
-> -        *out++ =3D src->l;
-> -        *out++ =3D src->r;
-> -#else
-> -#ifdef RECIPROCAL
-> -        *out++ =3D src->l * scale;
-> -        *out++ =3D src->r * scale;
-> -#else
-> -        *out++ =3D src->l / scale;
-> -        *out++ =3D src->r / scale;
-> -#endif
-> -#endif
-> +        *out++ =3D FLOAT_CONV_FROM(src->l) + FLOAT_CONV_FROM(src->r);
-> +        src++;
-> +    }
-> +}
-> +
-> +static void clip_natural_float_from_stereo(
-> +    void *dst, const struct st_sample *src, int samples)
-> +{
-> +    float *out =3D (float *)dst;
-> +
-> +    while (samples--) {
-> +        *out++ =3D FLOAT_CONV_FROM(src->l);
-> +        *out++ =3D FLOAT_CONV_FROM(src->r);
->          src++;
->      }
->  }
->
-> +f_sample *mixeng_clip_float[2] =3D {
-> +    clip_natural_float_from_mono,
-> +    clip_natural_float_from_stereo,
-> +};
-> +
->  void audio_sample_to_uint64(void *samples, int pos,
->                              uint64_t *left, uint64_t *right)
->  {
-> diff --git a/audio/paaudio.c b/audio/paaudio.c
-> index dbfe48c03a..1278c5a775 100644
-> --- a/audio/paaudio.c
-> +++ b/audio/paaudio.c
-> @@ -279,6 +279,9 @@ static pa_sample_format_t audfmt_to_pa (AudioFormat
-> afmt, int endianness)
->      case AUDIO_FORMAT_U32:
->          format =3D endianness ? PA_SAMPLE_S32BE : PA_SAMPLE_S32LE;
->          break;
-> +    case AUDIO_FORMAT_F32:
-> +        format =3D endianness ? PA_SAMPLE_FLOAT32BE : PA_SAMPLE_FLOAT32L=
-E;
-> +        break;
->      default:
->          dolog ("Internal logic error: Bad audio format %d\n", afmt);
->          format =3D PA_SAMPLE_U8;
-> @@ -304,6 +307,12 @@ static AudioFormat pa_to_audfmt (pa_sample_format_t
-> fmt, int *endianness)
->      case PA_SAMPLE_S32LE:
->          *endianness =3D 0;
->          return AUDIO_FORMAT_S32;
-> +    case PA_SAMPLE_FLOAT32BE:
-> +        *endianness =3D 1;
-> +        return AUDIO_FORMAT_F32;
-> +    case PA_SAMPLE_FLOAT32LE:
-> +        *endianness =3D 0;
-> +        return AUDIO_FORMAT_F32;
->      default:
->          dolog ("Internal logic error: Bad pa_sample_format %d\n", fmt);
->          return AUDIO_FORMAT_U8;
-> diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c
-> index 5c6bcfcb3e..6af1911db9 100644
-> --- a/audio/sdlaudio.c
-> +++ b/audio/sdlaudio.c
-> @@ -77,6 +77,14 @@ static int aud_to_sdlfmt (AudioFormat fmt)
->      case AUDIO_FORMAT_U16:
->          return AUDIO_U16LSB;
->
-> +    case AUDIO_FORMAT_S32:
-> +        return AUDIO_S32LSB;
-> +
-> +    /* no unsigned 32-bit support in SDL */
-> +
-> +    case AUDIO_FORMAT_F32:
-> +        return AUDIO_F32LSB;
-> +
->      default:
->          dolog ("Internal logic error: Bad audio format %d\n", fmt);
->  #ifdef DEBUG_AUDIO
-> @@ -119,6 +127,26 @@ static int sdl_to_audfmt(int sdlfmt, AudioFormat
-> *fmt, int *endianness)
->          *fmt =3D AUDIO_FORMAT_U16;
->          break;
->
-> +    case AUDIO_S32LSB:
-> +        *endianness =3D 0;
-> +        *fmt =3D AUDIO_FORMAT_S32;
-> +        break;
-> +
-> +    case AUDIO_S32MSB:
-> +        *endianness =3D 1;
-> +        *fmt =3D AUDIO_FORMAT_S32;
-> +        break;
-> +
-> +    case AUDIO_F32LSB:
-> +        *endianness =3D 0;
-> +        *fmt =3D AUDIO_FORMAT_F32;
-> +        break;
-> +
-> +    case AUDIO_F32MSB:
-> +        *endianness =3D 1;
-> +        *fmt =3D AUDIO_FORMAT_F32;
-> +        break;
-> +
->      default:
->          dolog ("Unrecognized SDL audio format %d\n", sdlfmt);
->          return -1;
-> --
-> 2.25.0
->
->
-> Hi,
 
-I applied the 2 patches to https://github.com/mcayland/qemu/tree/screamer
-to test audio support in qemu-system-ppc running Mac OS 9.2 and OSX 10.5.
-Host is OSX Sierra. Coreaudio seems happy with them.
+Thanks for the Acked-by Igor, I'm adding it to the commit message.
 
-Best,
-Howard
+Regards,
+Niek
 
---000000000000b658ca059d9f20be
+
+>
+> > ---
+> >  hw/arm/orangepi.c    | 93 ++++++++++++++++++++++++++++++++++++++++++++
+> >  MAINTAINERS          |  1 +
+> >  hw/arm/Makefile.objs |  2 +-
+> >  3 files changed, 95 insertions(+), 1 deletion(-)
+> >  create mode 100644 hw/arm/orangepi.c
+> >
+> > diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
+> > new file mode 100644
+> > index 0000000000..866f5f7cd6
+> > --- /dev/null
+> > +++ b/hw/arm/orangepi.c
+> > @@ -0,0 +1,93 @@
+> > +/*
+> > + * Orange Pi emulation
+> > + *
+> > + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
+> > + *
+> > + * This program is free software: you can redistribute it and/or modif=
+y
+> > + * it under the terms of the GNU General Public License as published b=
+y
+> > + * the Free Software Foundation, either version 2 of the License, or
+> > + * (at your option) any later version.
+> > + *
+> > + * This program is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > + * GNU General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License
+> > + * along with this program.  If not, see <http://www.gnu.org/licenses/
+> >.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu/units.h"
+> > +#include "exec/address-spaces.h"
+> > +#include "qapi/error.h"
+> > +#include "cpu.h"
+> > +#include "hw/sysbus.h"
+> > +#include "hw/boards.h"
+> > +#include "hw/qdev-properties.h"
+> > +#include "hw/arm/allwinner-h3.h"
+> > +#include "sysemu/sysemu.h"
+> > +
+> > +static struct arm_boot_info orangepi_binfo =3D {
+> > +    .nb_cpus =3D AW_H3_NUM_CPUS,
+> > +};
+> > +
+> > +typedef struct OrangePiState {
+> > +    AwH3State *h3;
+> > +    MemoryRegion sdram;
+> > +} OrangePiState;
+> > +
+> > +static void orangepi_init(MachineState *machine)
+> > +{
+> > +    OrangePiState *s =3D g_new(OrangePiState, 1);
+> > +
+> > +    /* BIOS is not supported by this board */
+> > +    if (bios_name) {
+> > +        error_report("BIOS not supported for this machine");
+> > +        exit(1);
+> > +    }
+> > +
+> > +    /* Only allow Cortex-A7 for this board */
+> > +    if (strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("cortex-a7")) !=3D=
+ 0)
+> {
+> > +        error_report("This board can only be used with cortex-a7 CPU")=
+;
+> > +        exit(1);
+> > +    }
+> > +
+> > +    s->h3 =3D AW_H3(object_new(TYPE_AW_H3));
+> > +
+> > +    /* Setup timer properties */
+> > +    object_property_set_int(OBJECT(s->h3), 32768, "clk0-freq",
+> > +                            &error_abort);
+> > +    object_property_set_int(OBJECT(s->h3), 24 * 1000 * 1000,
+> "clk1-freq",
+> > +                            &error_abort);
+> > +
+> > +    /* Mark H3 object realized */
+> > +    object_property_set_bool(OBJECT(s->h3), true, "realized",
+> &error_abort);
+> > +
+> > +    /* SDRAM */
+> > +    if (machine->ram_size !=3D 1 * GiB) {
+> > +        error_report("This machine can only be used with 1GiB of RAM")=
+;
+> > +        exit(1);
+> > +    }
+> > +    memory_region_allocate_system_memory(&s->sdram, NULL, "sdram",
+> > +                                         machine->ram_size);
+> > +    memory_region_add_subregion(get_system_memory(),
+> s->h3->memmap[AW_H3_SDRAM],
+> > +                                &s->sdram);
+> > +
+> > +    orangepi_binfo.loader_start =3D s->h3->memmap[AW_H3_SDRAM];
+> > +    orangepi_binfo.ram_size =3D machine->ram_size;
+> > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &orangepi_binfo);
+> > +}
+> > +
+> > +static void orangepi_machine_init(MachineClass *mc)
+> > +{
+> > +    mc->desc =3D "Orange Pi PC";
+> > +    mc->init =3D orangepi_init;
+> > +    mc->min_cpus =3D AW_H3_NUM_CPUS;
+> > +    mc->max_cpus =3D AW_H3_NUM_CPUS;
+> > +    mc->default_cpus =3D AW_H3_NUM_CPUS;
+> > +    mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
+> > +    mc->default_ram_size =3D 1 * GiB;
+> > +}
+> > +
+> > +DEFINE_MACHINE("orangepi-pc", orangepi_machine_init)
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 225582704d..e99797eec9 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -487,6 +487,7 @@ L: qemu-arm@nongnu.org
+> >  S: Maintained
+> >  F: hw/*/allwinner-h3*
+> >  F: include/hw/*/allwinner-h3*
+> > +F: hw/arm/orangepi.c
+> >
+> >  ARM PrimeCell and CMSDK devices
+> >  M: Peter Maydell <peter.maydell@linaro.org>
+> > diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+> > index ae577e875f..534a6a119e 100644
+> > --- a/hw/arm/Makefile.objs
+> > +++ b/hw/arm/Makefile.objs
+> > @@ -35,7 +35,7 @@ obj-$(CONFIG_DIGIC) +=3D digic.o
+> >  obj-$(CONFIG_OMAP) +=3D omap1.o omap2.o
+> >  obj-$(CONFIG_STRONGARM) +=3D strongarm.o
+> >  obj-$(CONFIG_ALLWINNER_A10) +=3D allwinner-a10.o cubieboard.o
+> > -obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3.o
+> > +obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3.o orangepi.o
+> >  obj-$(CONFIG_RASPI) +=3D bcm2835_peripherals.o bcm2836.o raspi.o
+> >  obj-$(CONFIG_STM32F205_SOC) +=3D stm32f205_soc.o
+> >  obj-$(CONFIG_STM32F405_SOC) +=3D stm32f405_soc.o
+>
+>
+
+--=20
+Niek Linnenbank
+
+--0000000000006d81c4059d9f73fd
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Feb 2, 2020 at 8:38 PM K=C5=
-=91v=C3=A1g=C3=B3, Zolt=C3=A1n &lt;<a href=3D"mailto:dirty.ice.hu@gmail.com=
-" target=3D"_blank">dirty.ice.hu@gmail.com</a>&gt; wrote:<br></div><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
- solid rgb(204,204,204);padding-left:1ex">This adds proper support for floa=
-t samples in mixeng by adding a new<br>
-audio format for it.<br>
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jan 21, 2020 at 5:39 PM Igor =
+Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com">imammedo@redhat.com</a>=
+&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On S=
+un, 19 Jan 2020 01:50:44 +0100<br>
+Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" target=3D"_=
+blank">nieklinnenbank@gmail.com</a>&gt; wrote:<br>
 <br>
-Limitations: only native endianness is supported.<br>
+&gt; The Xunlong Orange Pi PC is an Allwinner H3 System on Chip<br>
+&gt; based embedded computer with mainline support in both U-Boot<br>
+&gt; and Linux. The board comes with a Quad Core Cortex A7 @ 1.3GHz,<br>
+&gt; 1GiB RAM, 100Mbit ethernet, USB, SD/MMC, USB, HDMI and<br>
+&gt; various other I/O. This commit add support for the Xunlong<br>
+&gt; Orange Pi PC machine.<br>
+&gt; <br>
+&gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gm=
+ail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
+&gt; Tested-by: KONRAD Frederic &lt;<a href=3D"mailto:frederic.konrad@adaco=
+re.com" target=3D"_blank">frederic.konrad@adacore.com</a>&gt;<br>
+&gt; Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@=
+redhat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
 <br>
-Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n &lt;<a href=3D"mailto:Dir=
-tY.iCE.hu@gmail.com" target=3D"_blank">DirtY.iCE.hu@gmail.com</a>&gt;<br>
----<br>
+Acked-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" target=
+=3D"_blank">imammedo@redhat.com</a>&gt;<br></blockquote><div><br></div><div=
+>Thanks for the Acked-by Igor, I&#39;m adding it to the commit message.</di=
+v><div><br></div><div>Regards,</div><div>Niek<br></div><div>=C2=A0</div><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
+t:1px solid rgb(204,204,204);padding-left:1ex">
 <br>
-This patch is meant to be applied on top of &quot;[PATCH] coreaudio: fix co=
-reaudio<br>
-playback&quot; by Volker R=C3=BCmelin, available at:<br>
-<a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-02/msg0011=
-4.html" rel=3D"noreferrer" target=3D"_blank">https://lists.nongnu.org/archi=
-ve/html/qemu-devel/2020-02/msg00114.html</a><br>
-<br>
-For more information, please refer to that thread.<br>
-<br>
----<br>
-=C2=A0qapi/audio.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 2 +-<br>
-=C2=A0audio/audio_int.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 3 +-<br>
-=C2=A0audio/audio_template.h | 41 ++++++++++++--------<br>
-=C2=A0audio/mixeng.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 8 ++--<br>
-=C2=A0audio/alsaaudio.c=C2=A0 =C2=A0 =C2=A0 | 17 ++++++++<br>
-=C2=A0audio/audio.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 56 ++++++++++++++++=
-++---------<br>
-=C2=A0audio/coreaudio.c=C2=A0 =C2=A0 =C2=A0 |=C2=A0 7 +---<br>
-=C2=A0audio/mixeng.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 88 ++++++++++++++++=
-++++++++++----------------<br>
-=C2=A0audio/paaudio.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 9 +++++<br>
-=C2=A0audio/sdlaudio.c=C2=A0 =C2=A0 =C2=A0 =C2=A0| 28 ++++++++++++++<br>
-=C2=A010 files changed, 180 insertions(+), 79 deletions(-)<br>
-<br>
-diff --git a/qapi/audio.json b/qapi/audio.json<br>
-index 83312b2339..d8c507cced 100644<br>
---- a/qapi/audio.json<br>
-+++ b/qapi/audio.json<br>
-@@ -276,7 +276,7 @@<br>
-=C2=A0# Since: 4.0<br>
-=C2=A0##<br>
-=C2=A0{ &#39;enum&#39;: &#39;AudioFormat&#39;,<br>
--=C2=A0 &#39;data&#39;: [ &#39;u8&#39;, &#39;s8&#39;, &#39;u16&#39;, &#39;s=
-16&#39;, &#39;u32&#39;, &#39;s32&#39; ] }<br>
-+=C2=A0 &#39;data&#39;: [ &#39;u8&#39;, &#39;s8&#39;, &#39;u16&#39;, &#39;s=
-16&#39;, &#39;u32&#39;, &#39;s32&#39;, &#39;f32&#39; ] }<br>
-<br>
-=C2=A0##<br>
-=C2=A0# @AudiodevDriver:<br>
-diff --git a/audio/audio_int.h b/audio/audio_int.h<br>
-index 5ba2078346..cd92e48163 100644<br>
---- a/audio/audio_int.h<br>
-+++ b/audio/audio_int.h<br>
-@@ -40,7 +40,8 @@ struct audio_callback {<br>
-<br>
-=C2=A0struct audio_pcm_info {<br>
-=C2=A0 =C2=A0 =C2=A0int bits;<br>
--=C2=A0 =C2=A0 int sign;<br>
-+=C2=A0 =C2=A0 bool is_signed;<br>
-+=C2=A0 =C2=A0 bool is_float;<br>
-=C2=A0 =C2=A0 =C2=A0int freq;<br>
-=C2=A0 =C2=A0 =C2=A0int nchannels;<br>
-=C2=A0 =C2=A0 =C2=A0int bytes_per_frame;<br>
-diff --git a/audio/audio_template.h b/audio/audio_template.h<br>
-index 0336d2670c..7013d3041f 100644<br>
---- a/audio/audio_template.h<br>
-+++ b/audio/audio_template.h<br>
-@@ -153,15 +153,23 @@ static int glue (audio_pcm_sw_init_, TYPE) (<br>
-=C2=A0 =C2=A0 =C2=A0sw-&gt;ratio =3D ((int64_t) sw-&gt;info.freq &lt;&lt; 3=
-2) / sw-&gt;hw-&gt;info.freq;<br>
-=C2=A0#endif<br>
-<br>
-+=C2=A0 =C2=A0 if (sw-&gt;info.is_float) {<br>
-=C2=A0#ifdef DAC<br>
--=C2=A0 =C2=A0 sw-&gt;conv =3D mixeng_conv<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 sw-&gt;conv =3D mixeng_conv_float[sw-&gt;info.=
-nchannels =3D=3D 2];<br>
-=C2=A0#else<br>
--=C2=A0 =C2=A0 sw-&gt;clip =3D mixeng_clip<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 sw-&gt;clip =3D mixeng_clip_float[sw-&gt;info.=
-nchannels =3D=3D 2];<br>
-=C2=A0#endif<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 [sw-&gt;info.nchannels =3D=3D 2]<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 [sw-&gt;info.sign]<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 [sw-&gt;info.swap_endianness]<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 [audio_bits_to_index (sw-&gt;info.bits)];<br>
-+=C2=A0 =C2=A0 } else {<br>
-+#ifdef DAC<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 sw-&gt;conv =3D mixeng_conv<br>
-+#else<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 sw-&gt;clip =3D mixeng_clip<br>
-+#endif<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [sw-&gt;info.nchannels =3D=3D 2]=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [sw-&gt;info.is_signed]<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [sw-&gt;info.swap_endianness]<br=
+&gt; ---<br>
+&gt;=C2=A0 hw/arm/orangepi.c=C2=A0 =C2=A0 | 93 ++++++++++++++++++++++++++++=
+++++++++++++++++<br>
+&gt;=C2=A0 MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 1 +<br>
+&gt;=C2=A0 hw/arm/Makefile.objs |=C2=A0 2 +-<br>
+&gt;=C2=A0 3 files changed, 95 insertions(+), 1 deletion(-)<br>
+&gt;=C2=A0 create mode 100644 hw/arm/orangepi.c<br>
+&gt; <br>
+&gt; diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c<br>
+&gt; new file mode 100644<br>
+&gt; index 0000000000..866f5f7cd6<br>
+&gt; --- /dev/null<br>
+&gt; +++ b/hw/arm/orangepi.c<br>
+&gt; @@ -0,0 +1,93 @@<br>
+&gt; +/*<br>
+&gt; + * Orange Pi emulation<br>
+&gt; + *<br>
+&gt; + * Copyright (C) 2019 Niek Linnenbank &lt;<a href=3D"mailto:nieklinne=
+nbank@gmail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
+&gt; + *<br>
+&gt; + * This program is free software: you can redistribute it and/or modi=
+fy<br>
+&gt; + * it under the terms of the GNU General Public License as published =
+by<br>
+&gt; + * the Free Software Foundation, either version 2 of the License, or<=
+br>
+&gt; + * (at your option) any later version.<br>
+&gt; + *<br>
+&gt; + * This program is distributed in the hope that it will be useful,<br=
 >
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [audio_bits_to_index(sw-&gt;info=
-.bits)];<br>
-+=C2=A0 =C2=A0 }<br>
+&gt; + * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
+&gt; + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the=
 <br>
-=C2=A0 =C2=A0 =C2=A0sw-&gt;name =3D g_strdup (name);<br>
-=C2=A0 =C2=A0 =C2=A0err =3D glue (audio_pcm_sw_alloc_resources_, TYPE) (sw)=
-;<br>
-@@ -276,22 +284,23 @@ static HW *glue(audio_pcm_hw_add_new_, TYPE)(AudioSta=
-te *s,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto err1;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
--=C2=A0 =C2=A0 if (s-&gt;dev-&gt;driver =3D=3D AUDIODEV_DRIVER_COREAUDIO) {=
-<br>
-+=C2=A0 =C2=A0 if (hw-&gt;info.is_float) {<br>
-=C2=A0#ifdef DAC<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;clip =3D clip_natural_float_from_stereo=
-;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;clip =3D mixeng_clip_float[hw-&gt;info.=
-nchannels =3D=3D 2];<br>
-=C2=A0#else<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;conv =3D conv_natural_float_to_stereo;<=
+&gt; + * GNU General Public License for more details.<br>
+&gt; + *<br>
+&gt; + * You should have received a copy of the GNU General Public License<=
 br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;conv =3D mixeng_conv_float[hw-&gt;info.=
-nchannels =3D=3D 2];<br>
-=C2=A0#endif<br>
--=C2=A0 =C2=A0 } else<br>
-+=C2=A0 =C2=A0 } else {<br>
-=C2=A0#ifdef DAC<br>
--=C2=A0 =C2=A0 hw-&gt;clip =3D mixeng_clip<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;clip =3D mixeng_clip<br>
-=C2=A0#else<br>
--=C2=A0 =C2=A0 hw-&gt;conv =3D mixeng_conv<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;conv =3D mixeng_conv<br>
-=C2=A0#endif<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.nchannels =3D=3D 2]<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.sign]<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.swap_endianness]<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 [audio_bits_to_index (hw-&gt;info.bits)];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.nchannels =3D=3D 2]=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.is_signed]<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.swap_endianness]<br=
+&gt; + * along with this program.=C2=A0 If not, see &lt;<a href=3D"http://w=
+ww.gnu.org/licenses/" rel=3D"noreferrer" target=3D"_blank">http://www.gnu.o=
+rg/licenses/</a>&gt;.<br>
+&gt; + */<br>
+&gt; +<br>
+&gt; +#include &quot;qemu/osdep.h&quot;<br>
+&gt; +#include &quot;qemu/units.h&quot;<br>
+&gt; +#include &quot;exec/address-spaces.h&quot;<br>
+&gt; +#include &quot;qapi/error.h&quot;<br>
+&gt; +#include &quot;cpu.h&quot;<br>
+&gt; +#include &quot;hw/sysbus.h&quot;<br>
+&gt; +#include &quot;hw/boards.h&quot;<br>
+&gt; +#include &quot;hw/qdev-properties.h&quot;<br>
+&gt; +#include &quot;hw/arm/allwinner-h3.h&quot;<br>
+&gt; +#include &quot;sysemu/sysemu.h&quot;<br>
+&gt; +<br>
+&gt; +static struct arm_boot_info orangepi_binfo =3D {<br>
+&gt; +=C2=A0 =C2=A0 .nb_cpus =3D AW_H3_NUM_CPUS,<br>
+&gt; +};<br>
+&gt; +<br>
+&gt; +typedef struct OrangePiState {<br>
+&gt; +=C2=A0 =C2=A0 AwH3State *h3;<br>
+&gt; +=C2=A0 =C2=A0 MemoryRegion sdram;<br>
+&gt; +} OrangePiState;<br>
+&gt; +<br>
+&gt; +static void orangepi_init(MachineState *machine)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 OrangePiState *s =3D g_new(OrangePiState, 1);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /* BIOS is not supported by this board */<br>
+&gt; +=C2=A0 =C2=A0 if (bios_name) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;BIOS not supported for=
+ this machine&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(1);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /* Only allow Cortex-A7 for this board */<br>
+&gt; +=C2=A0 =C2=A0 if (strcmp(machine-&gt;cpu_type, ARM_CPU_TYPE_NAME(&quo=
+t;cortex-a7&quot;)) !=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;This board can only be=
+ used with cortex-a7 CPU&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(1);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 s-&gt;h3 =3D AW_H3(object_new(TYPE_AW_H3));<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /* Setup timer properties */<br>
+&gt; +=C2=A0 =C2=A0 object_property_set_int(OBJECT(s-&gt;h3), 32768, &quot;=
+clk0-freq&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;error_abort);<br>
+&gt; +=C2=A0 =C2=A0 object_property_set_int(OBJECT(s-&gt;h3), 24 * 1000 * 1=
+000, &quot;clk1-freq&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;error_abort);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /* Mark H3 object realized */<br>
+&gt; +=C2=A0 =C2=A0 object_property_set_bool(OBJECT(s-&gt;h3), true, &quot;=
+realized&quot;, &amp;error_abort);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /* SDRAM */<br>
+&gt; +=C2=A0 =C2=A0 if (machine-&gt;ram_size !=3D 1 * GiB) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;This machine can only =
+be used with 1GiB of RAM&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(1);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 memory_region_allocate_system_memory(&amp;s-&gt;sdram, =
+NULL, &quot;sdram&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0machine-&gt;ram_size);<br>
+&gt; +=C2=A0 =C2=A0 memory_region_add_subregion(get_system_memory(), s-&gt;=
+h3-&gt;memmap[AW_H3_SDRAM],<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;s-&gt;sdram);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 orangepi_binfo.loader_start =3D s-&gt;h3-&gt;memmap[AW_=
+H3_SDRAM];<br>
+&gt; +=C2=A0 =C2=A0 orangepi_binfo.ram_size =3D machine-&gt;ram_size;<br>
+&gt; +=C2=A0 =C2=A0 arm_load_kernel(ARM_CPU(first_cpu), machine, &amp;orang=
+epi_binfo);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void orangepi_machine_init(MachineClass *mc)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 mc-&gt;desc =3D &quot;Orange Pi PC&quot;;<br>
+&gt; +=C2=A0 =C2=A0 mc-&gt;init =3D orangepi_init;<br>
+&gt; +=C2=A0 =C2=A0 mc-&gt;min_cpus =3D AW_H3_NUM_CPUS;<br>
+&gt; +=C2=A0 =C2=A0 mc-&gt;max_cpus =3D AW_H3_NUM_CPUS;<br>
+&gt; +=C2=A0 =C2=A0 mc-&gt;default_cpus =3D AW_H3_NUM_CPUS;<br>
+&gt; +=C2=A0 =C2=A0 mc-&gt;default_cpu_type =3D ARM_CPU_TYPE_NAME(&quot;cor=
+tex-a7&quot;);<br>
+&gt; +=C2=A0 =C2=A0 mc-&gt;default_ram_size =3D 1 * GiB;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +DEFINE_MACHINE(&quot;orangepi-pc&quot;, orangepi_machine_init)<br>
+&gt; diff --git a/MAINTAINERS b/MAINTAINERS<br>
+&gt; index 225582704d..e99797eec9 100644<br>
+&gt; --- a/MAINTAINERS<br>
+&gt; +++ b/MAINTAINERS<br>
+&gt; @@ -487,6 +487,7 @@ L: <a href=3D"mailto:qemu-arm@nongnu.org" target=
+=3D"_blank">qemu-arm@nongnu.org</a><br>
+&gt;=C2=A0 S: Maintained<br>
+&gt;=C2=A0 F: hw/*/allwinner-h3*<br>
+&gt;=C2=A0 F: include/hw/*/allwinner-h3*<br>
+&gt; +F: hw/arm/orangepi.c<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 ARM PrimeCell and CMSDK devices<br>
+&gt;=C2=A0 M: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org"=
+ target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
+&gt; diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs<br>
+&gt; index ae577e875f..534a6a119e 100644<br>
+&gt; --- a/hw/arm/Makefile.objs<br>
+&gt; +++ b/hw/arm/Makefile.objs<br>
+&gt; @@ -35,7 +35,7 @@ obj-$(CONFIG_DIGIC) +=3D digic.o<br>
+&gt;=C2=A0 obj-$(CONFIG_OMAP) +=3D omap1.o omap2.o<br>
+&gt;=C2=A0 obj-$(CONFIG_STRONGARM) +=3D strongarm.o<br>
+&gt;=C2=A0 obj-$(CONFIG_ALLWINNER_A10) +=3D allwinner-a10.o cubieboard.o<br=
 >
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [audio_bits_to_index(hw-&gt;info=
-.bits)];<br>
-+=C2=A0 =C2=A0 }<br>
+&gt; -obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3.o<br>
+&gt; +obj-$(CONFIG_ALLWINNER_H3) +=3D allwinner-h3.o orangepi.o<br>
+&gt;=C2=A0 obj-$(CONFIG_RASPI) +=3D bcm2835_peripherals.o bcm2836.o raspi.o=
 <br>
-=C2=A0 =C2=A0 =C2=A0glue(audio_pcm_hw_alloc_resources_, TYPE)(hw);<br>
+&gt;=C2=A0 obj-$(CONFIG_STM32F205_SOC) +=3D stm32f205_soc.o<br>
+&gt;=C2=A0 obj-$(CONFIG_STM32F405_SOC) +=3D stm32f405_soc.o<br>
 <br>
-diff --git a/audio/mixeng.h b/audio/mixeng.h<br>
-index 7ef61763e8..2dcd6df245 100644<br>
---- a/audio/mixeng.h<br>
-+++ b/audio/mixeng.h<br>
-@@ -38,13 +38,13 @@ typedef struct st_sample st_sample;<br>
-=C2=A0typedef void (t_sample) (struct st_sample *dst, const void *src, int =
-samples);<br>
-=C2=A0typedef void (f_sample) (void *dst, const struct st_sample *src, int =
-samples);<br>
-<br>
-+/* indices: [stereo][signed][swap endiannes][8, 16 or 32-bits] */<br>
-=C2=A0extern t_sample *mixeng_conv[2][2][2][3];<br>
-=C2=A0extern f_sample *mixeng_clip[2][2][2][3];<br>
-<br>
--void conv_natural_float_to_stereo(struct st_sample *dst, const void *src,<=
-br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int samples);<br>
--void clip_natural_float_from_stereo(void *dst, const struct st_sample *src=
-,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int samples);<br>
-+/* indices: [stereo] */<br>
-+extern t_sample *mixeng_conv_float[2];<br>
-+extern f_sample *mixeng_clip_float[2];<br>
-<br>
-=C2=A0void *st_rate_start (int inrate, int outrate);<br>
-=C2=A0void st_rate_flow(void *opaque, st_sample *ibuf, st_sample *obuf,<br>
-diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c<br>
-index f37ce1ce85..768b896a93 100644<br>
---- a/audio/alsaaudio.c<br>
-+++ b/audio/alsaaudio.c<br>
-@@ -307,6 +307,13 @@ static snd_pcm_format_t aud_to_alsafmt (AudioFormat fm=
-t, int endianness)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return SND_PCM_FORMAT_U32_L=
-E;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_F32:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (endianness) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return SND_PCM_FORMAT_FLOAT_BE;<=
-br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return SND_PCM_FORMAT_FLOAT_LE;<=
-br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dolog (&quot;Internal logic error: Bad au=
-dio format %d\n&quot;, fmt);<br>
-=C2=A0#ifdef DEBUG_AUDIO<br>
-@@ -370,6 +377,16 @@ static int alsa_to_audfmt (snd_pcm_format_t alsafmt, A=
-udioFormat *fmt,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*fmt =3D AUDIO_FORMAT_U32;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-+=C2=A0 =C2=A0 case SND_PCM_FORMAT_FLOAT_LE:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *endianness =3D 0;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *fmt =3D AUDIO_FORMAT_F32;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+<br>
-+=C2=A0 =C2=A0 case SND_PCM_FORMAT_FLOAT_BE:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *endianness =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *fmt =3D AUDIO_FORMAT_F32;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dolog (&quot;Unrecognized audio format %d=
-\n&quot;, alsafmt);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -1;<br>
-diff --git a/audio/audio.c b/audio/audio.c<br>
-index f63f39769a..53fdb42ec7 100644<br>
---- a/audio/audio.c<br>
-+++ b/audio/audio.c<br>
-@@ -218,6 +218,9 @@ static void audio_print_settings (struct audsettings *a=
-s)<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U32:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0AUD_log (NULL, &quot;U32&quot;);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_F32:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 AUD_log (NULL, &quot;F32&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0AUD_log (NULL, &quot;invalid(%d)&quot;, a=
-s-&gt;fmt);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-@@ -252,6 +255,7 @@ static int audio_validate_settings (struct audsettings =
-*as)<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U16:<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_S32:<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U32:<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_F32:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0invalid =3D 1;<br>
-@@ -264,24 +268,28 @@ static int audio_validate_settings (struct audsetting=
-s *as)<br>
-<br>
-=C2=A0static int audio_pcm_info_eq (struct audio_pcm_info *info, struct aud=
-settings *as)<br>
-=C2=A0{<br>
--=C2=A0 =C2=A0 int bits =3D 8, sign =3D 0;<br>
-+=C2=A0 =C2=A0 int bits =3D 8;<br>
-+=C2=A0 =C2=A0 bool is_signed =3D false, is_float =3D false;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0switch (as-&gt;fmt) {<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_S8:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 sign =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_signed =3D true;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* fall through */<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U8:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_S16:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 sign =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_signed =3D true;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* fall through */<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U16:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0bits =3D 16;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_F32:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_float =3D true;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* fall through */<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_S32:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 sign =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_signed =3D true;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* fall through */<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U32:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0bits =3D 32;<br>
-@@ -292,33 +300,38 @@ static int audio_pcm_info_eq (struct audio_pcm_info *=
-info, struct audsettings *a<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0return info-&gt;freq =3D=3D as-&gt;freq<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;&amp; info-&gt;nchannels =3D=3D as-&=
-gt;nchannels<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;&amp; info-&gt;sign =3D=3D sign<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;&amp; info-&gt;is_signed =3D=3D is_signed=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;&amp; info-&gt;is_float =3D=3D is_float<b=
-r>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;&amp; info-&gt;bits =3D=3D bits<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;&amp; info-&gt;swap_endianness =3D=
-=3D (as-&gt;endianness !=3D AUDIO_HOST_ENDIANNESS);<br>
-=C2=A0}<br>
-<br>
-=C2=A0void audio_pcm_init_info (struct audio_pcm_info *info, struct audsett=
-ings *as)<br>
-=C2=A0{<br>
--=C2=A0 =C2=A0 int bits =3D 8, sign =3D 0, mul;<br>
-+=C2=A0 =C2=A0 int bits =3D 8, mul;<br>
-+=C2=A0 =C2=A0 bool is_signed =3D false, is_float =3D false;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0switch (as-&gt;fmt) {<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_S8:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 sign =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_signed =3D true;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* fall through */<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U8:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0mul =3D 1;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_S16:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 sign =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_signed =3D true;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* fall through */<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U16:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0bits =3D 16;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0mul =3D 2;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_F32:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_float =3D true;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* fall through */<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_S32:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 sign =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is_signed =3D true;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* fall through */<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U32:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0bits =3D 32;<br>
-@@ -331,7 +344,8 @@ void audio_pcm_init_info (struct audio_pcm_info *info, =
-struct audsettings *as)<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0info-&gt;freq =3D as-&gt;freq;<br>
-=C2=A0 =C2=A0 =C2=A0info-&gt;bits =3D bits;<br>
--=C2=A0 =C2=A0 info-&gt;sign =3D sign;<br>
-+=C2=A0 =C2=A0 info-&gt;is_signed =3D is_signed;<br>
-+=C2=A0 =C2=A0 info-&gt;is_float =3D is_float;<br>
-=C2=A0 =C2=A0 =C2=A0info-&gt;nchannels =3D as-&gt;nchannels;<br>
-=C2=A0 =C2=A0 =C2=A0info-&gt;bytes_per_frame =3D as-&gt;nchannels * mul;<br=
->
-=C2=A0 =C2=A0 =C2=A0info-&gt;bytes_per_second =3D info-&gt;freq * info-&gt;=
-bytes_per_frame;<br>
-@@ -344,7 +358,7 @@ void audio_pcm_info_clear_buf (struct audio_pcm_info *i=
-nfo, void *buf, int len)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
--=C2=A0 =C2=A0 if (info-&gt;sign) {<br>
-+=C2=A0 =C2=A0 if (info-&gt;is_signed || info-&gt;is_float) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memset(buf, 0x00, len * info-&gt;bytes_pe=
-r_frame);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0else {<br>
-@@ -770,8 +784,9 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *=
-buf, size_t size)<br>
-=C2=A0#ifdef DEBUG_AUDIO<br>
-=C2=A0static void audio_pcm_print_info (const char *cap, struct audio_pcm_i=
-nfo *info)<br>
-=C2=A0{<br>
--=C2=A0 =C2=A0 dolog (&quot;%s: bits %d, sign %d, freq %d, nchan %d\n&quot;=
-,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cap, info-&gt;bits, info-&gt;sign=
-, info-&gt;freq, info-&gt;nchannels);<br>
-+=C2=A0 =C2=A0 dolog(&quot;%s: bits %d, sign %d, float %d, freq %d, nchan %=
-d\n&quot;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cap, info-&gt;bits, info-&gt;is_signed,=
- info-&gt;is_float, info-&gt;freq,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 info-&gt;nchannels);<br>
-=C2=A0}<br>
-=C2=A0#endif<br>
-<br>
-@@ -1837,11 +1852,15 @@ CaptureVoiceOut *AUD_add_capture(<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cap-&gt;buf =3D g_malloc0_n(hw-&gt;mix_bu=
-f-&gt;size, hw-&gt;info.bytes_per_frame);<br>
-<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;clip =3D mixeng_clip<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.nchannels =3D=3D 2]=
-<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.sign]<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.swap_endianness]<br=
->
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [audio_bits_to_index (hw-&gt;inf=
-o.bits)];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (hw-&gt;info.is_float) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;clip =3D mixeng_clip_floa=
-t[hw-&gt;info.nchannels =3D=3D 2];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;clip =3D mixeng_clip<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.nchan=
-nels =3D=3D 2]<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.is_si=
-gned]<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [hw-&gt;info.swap_=
-endianness]<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [audio_bits_to_ind=
-ex(hw-&gt;info.bits)];<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0QLIST_INSERT_HEAD (&amp;s-&gt;cap_head, c=
-ap, entries);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0QLIST_INSERT_HEAD (&amp;cap-&gt;cb_head, =
-cb, entries);<br>
-@@ -2080,6 +2099,7 @@ int audioformat_bytes_per_sample(AudioFormat fmt)<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U32:<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_S32:<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_F32:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 4;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT__MAX:<br>
-diff --git a/audio/coreaudio.c b/audio/coreaudio.c<br>
-index 0049db97fa..f1a009610c 100644<br>
---- a/audio/coreaudio.c<br>
-+++ b/audio/coreaudio.c<br>
-@@ -491,14 +491,9 @@ static int coreaudio_init_out(HWVoiceOut *hw, struct a=
-udsettings *as,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -1;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
--=C2=A0 =C2=A0 /*<br>
--=C2=A0 =C2=A0 =C2=A0* The canonical audio format for CoreAudio on macOS is=
- float. Currently<br>
--=C2=A0 =C2=A0 =C2=A0* there is no generic code for AUDIO_FORMAT_F32 in qem=
-u. Here we select<br>
--=C2=A0 =C2=A0 =C2=A0* AUDIO_FORMAT_S32 instead because only the sample siz=
-e has to match.<br>
--=C2=A0 =C2=A0 =C2=A0*/<br>
-=C2=A0 =C2=A0 =C2=A0fake_as =3D *as;<br>
-=C2=A0 =C2=A0 =C2=A0as =3D &amp;fake_as;<br>
--=C2=A0 =C2=A0 as-&gt;fmt =3D AUDIO_FORMAT_S32;<br>
-+=C2=A0 =C2=A0 as-&gt;fmt =3D AUDIO_FORMAT_F32;<br>
-=C2=A0 =C2=A0 =C2=A0audio_pcm_init_info (&amp;hw-&gt;info, as);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0status =3D coreaudio_get_voice(&amp;core-&gt;outputDevi=
-ceID);<br>
-diff --git a/audio/mixeng.c b/audio/mixeng.c<br>
-index 16b646d48c..c14b0d874c 100644<br>
---- a/audio/mixeng.c<br>
-+++ b/audio/mixeng.c<br>
-@@ -267,55 +267,77 @@ f_sample *mixeng_clip[2][2][2][3] =3D {<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0};<br>
-<br>
--void conv_natural_float_to_stereo(struct st_sample *dst, const void *src,<=
-br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int samples)<br>
-+#ifdef FLOAT_MIXENG<br>
-+#define FLOAT_CONV_TO(x) (x)<br>
-+#define FLOAT_CONV_FROM(x) (x)<br>
-+#else<br>
-+static const float float_scale =3D UINT_MAX;<br>
-+#define FLOAT_CONV_TO(x) ((x) * float_scale)<br>
-+<br>
-+#ifdef RECIPROCAL<br>
-+static const float float_scale_reciprocal =3D 1.f / UINT_MAX;<br>
-+#define FLOAT_CONV_FROM(x) ((x) * float_scale_reciprocal)<br>
-+#else<br>
-+#define FLOAT_CONV_FROM(x) ((x) / float_scale)<br>
-+#endif<br>
-+#endif<br>
-+<br>
-+static void conv_natural_float_to_mono(struct st_sample *dst, const void *=
-src,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int sampl=
-es)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0float *in =3D (float *)src;<br>
--#ifndef FLOAT_MIXENG<br>
--=C2=A0 =C2=A0 const float scale =3D UINT_MAX;<br>
--#endif<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0while (samples--) {<br>
--#ifdef FLOAT_MIXENG<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst-&gt;l =3D *in++;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst-&gt;r =3D *in++;<br>
--#else<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst-&gt;l =3D *in++ * scale;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst-&gt;r =3D *in++ * scale;<br>
--#endif<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst-&gt;r =3D dst-&gt;l =3D FLOAT_CONV_TO(*in+=
-+);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst++;<br>
-+=C2=A0 =C2=A0 }<br>
-+}<br>
-+<br>
-+static void conv_natural_float_to_stereo(struct st_sample *dst, const void=
- *src,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0in=
-t samples)<br>
-+{<br>
-+=C2=A0 =C2=A0 float *in =3D (float *)src;<br>
-+<br>
-+=C2=A0 =C2=A0 while (samples--) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst-&gt;l =3D FLOAT_CONV_TO(*in++);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst-&gt;r =3D FLOAT_CONV_TO(*in++);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dst++;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0}<br>
-<br>
--void clip_natural_float_from_stereo(void *dst, const struct st_sample *src=
-,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int samples)<br>
-+t_sample *mixeng_conv_float[2] =3D {<br>
-+=C2=A0 =C2=A0 conv_natural_float_to_mono,<br>
-+=C2=A0 =C2=A0 conv_natural_float_to_stereo,<br>
-+};<br>
-+<br>
-+static void clip_natural_float_from_mono(void *dst, const struct st_sample=
- *src,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0in=
-t samples)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0float *out =3D (float *)dst;<br>
--#ifndef FLOAT_MIXENG<br>
--#ifdef RECIPROCAL<br>
--=C2=A0 =C2=A0 const float scale =3D 1.f / UINT_MAX;<br>
--#else<br>
--=C2=A0 =C2=A0 const float scale =3D UINT_MAX;<br>
--#endif<br>
--#endif<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0while (samples--) {<br>
--#ifdef FLOAT_MIXENG<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D src-&gt;l;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D src-&gt;r;<br>
--#else<br>
--#ifdef RECIPROCAL<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D src-&gt;l * scale;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D src-&gt;r * scale;<br>
--#else<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D src-&gt;l / scale;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D src-&gt;r / scale;<br>
--#endif<br>
--#endif<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D FLOAT_CONV_FROM(src-&gt;l) + FLOAT_=
-CONV_FROM(src-&gt;r);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 src++;<br>
-+=C2=A0 =C2=A0 }<br>
-+}<br>
-+<br>
-+static void clip_natural_float_from_stereo(<br>
-+=C2=A0 =C2=A0 void *dst, const struct st_sample *src, int samples)<br>
-+{<br>
-+=C2=A0 =C2=A0 float *out =3D (float *)dst;<br>
-+<br>
-+=C2=A0 =C2=A0 while (samples--) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D FLOAT_CONV_FROM(src-&gt;l);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *out++ =3D FLOAT_CONV_FROM(src-&gt;r);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0src++;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0}<br>
-<br>
-+f_sample *mixeng_clip_float[2] =3D {<br>
-+=C2=A0 =C2=A0 clip_natural_float_from_mono,<br>
-+=C2=A0 =C2=A0 clip_natural_float_from_stereo,<br>
-+};<br>
-+<br>
-=C2=A0void audio_sample_to_uint64(void *samples, int pos,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint64_t *left, uint64_t *right)<br>
-=C2=A0{<br>
-diff --git a/audio/paaudio.c b/audio/paaudio.c<br>
-index dbfe48c03a..1278c5a775 100644<br>
---- a/audio/paaudio.c<br>
-+++ b/audio/paaudio.c<br>
-@@ -279,6 +279,9 @@ static pa_sample_format_t audfmt_to_pa (AudioFormat afm=
-t, int endianness)<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U32:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0format =3D endianness ? PA_SAMPLE_S32BE :=
- PA_SAMPLE_S32LE;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_F32:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 format =3D endianness ? PA_SAMPLE_FLOAT32BE : =
-PA_SAMPLE_FLOAT32LE;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dolog (&quot;Internal logic error: Bad au=
-dio format %d\n&quot;, afmt);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0format =3D PA_SAMPLE_U8;<br>
-@@ -304,6 +307,12 @@ static AudioFormat pa_to_audfmt (pa_sample_format_t fm=
-t, int *endianness)<br>
-=C2=A0 =C2=A0 =C2=A0case PA_SAMPLE_S32LE:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*endianness =3D 0;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return AUDIO_FORMAT_S32;<br>
-+=C2=A0 =C2=A0 case PA_SAMPLE_FLOAT32BE:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *endianness =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return AUDIO_FORMAT_F32;<br>
-+=C2=A0 =C2=A0 case PA_SAMPLE_FLOAT32LE:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *endianness =3D 0;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return AUDIO_FORMAT_F32;<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dolog (&quot;Internal logic error: Bad pa=
-_sample_format %d\n&quot;, fmt);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return AUDIO_FORMAT_U8;<br>
-diff --git a/audio/sdlaudio.c b/audio/sdlaudio.c<br>
-index 5c6bcfcb3e..6af1911db9 100644<br>
---- a/audio/sdlaudio.c<br>
-+++ b/audio/sdlaudio.c<br>
-@@ -77,6 +77,14 @@ static int aud_to_sdlfmt (AudioFormat fmt)<br>
-=C2=A0 =C2=A0 =C2=A0case AUDIO_FORMAT_U16:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return AUDIO_U16LSB;<br>
-<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_S32:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return AUDIO_S32LSB;<br>
-+<br>
-+=C2=A0 =C2=A0 /* no unsigned 32-bit support in SDL */<br>
-+<br>
-+=C2=A0 =C2=A0 case AUDIO_FORMAT_F32:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return AUDIO_F32LSB;<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dolog (&quot;Internal logic error: Bad au=
-dio format %d\n&quot;, fmt);<br>
-=C2=A0#ifdef DEBUG_AUDIO<br>
-@@ -119,6 +127,26 @@ static int sdl_to_audfmt(int sdlfmt, AudioFormat *fmt,=
- int *endianness)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*fmt =3D AUDIO_FORMAT_U16;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-<br>
-+=C2=A0 =C2=A0 case AUDIO_S32LSB:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *endianness =3D 0;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *fmt =3D AUDIO_FORMAT_S32;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+<br>
-+=C2=A0 =C2=A0 case AUDIO_S32MSB:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *endianness =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *fmt =3D AUDIO_FORMAT_S32;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+<br>
-+=C2=A0 =C2=A0 case AUDIO_F32LSB:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *endianness =3D 0;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *fmt =3D AUDIO_FORMAT_F32;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+<br>
-+=C2=A0 =C2=A0 case AUDIO_F32MSB:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *endianness =3D 1;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *fmt =3D AUDIO_FORMAT_F32;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dolog (&quot;Unrecognized SDL audio forma=
-t %d\n&quot;, sdlfmt);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -1;<br>
--- <br>
-2.25.0<br>
-<br>
-<br></blockquote><div>Hi,</div><div><br></div><div>I applied the 2 patches =
-to <a href=3D"https://github.com/mcayland/qemu/tree/screamer" target=3D"_bl=
-ank">https://github.com/mcayland/qemu/tree/screamer</a> to test audio suppo=
-rt in qemu-system-ppc running Mac OS 9.2 and OSX 10.5. Host is OSX Sierra. =
-Coreaudio seems happy with them.</div><div><br></div><div>Best,</div><div>H=
-oward<br></div></div></div>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
 
---000000000000b658ca059d9f20be--
+--0000000000006d81c4059d9f73fd--
 
