@@ -2,64 +2,64 @@ Return-Path: <SRS0=8j4I=3W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38659C3524A
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 14:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C96C3524A
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 14:04:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F210420679
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 14:02:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F210420679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B604120679
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Feb 2020 14:04:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B604120679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyFpo-0002DD-62
-	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 09:02:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56552)
+	id 1iyFrf-0003DN-W6
+	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 09:04:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56678)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1iyFp7-0001hD-3K
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 09:02:07 -0500
+ (envelope-from <vr_qemu@t-online.de>) id 1iyFqq-0002kf-Nf
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 09:03:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1iyFp5-00034x-29
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 09:02:05 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2746 helo=huawei.com)
+ (envelope-from <vr_qemu@t-online.de>) id 1iyFqp-0003W8-J3
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 09:03:52 -0500
+Received: from mailout10.t-online.de ([194.25.134.21]:57614)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1iyFoz-00033Q-6Y; Sun, 02 Feb 2020 09:01:57 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 7079A892D86C4AF33C67;
- Sun,  2 Feb 2020 22:01:51 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Sun, 2 Feb 2020
- 22:01:41 +0800
-Subject: Re: [PATCH v22 3/9] ACPI: Build related register address fields via
- hardware error fw_cfg blob
-To: Igor Mammedov <imammedo@redhat.com>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-4-git-send-email-gengdongjiu@huawei.com>
- <20200123161451.07c4a291@redhat.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <b52ac02a-bd19-2c96-80ef-d976d1abd707@huawei.com>
-Date: Sun, 2 Feb 2020 22:01:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (Exim 4.71) (envelope-from <vr_qemu@t-online.de>) id 1iyFqp-0003VO-Co
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 09:03:51 -0500
+Received: from fwd29.aul.t-online.de (fwd29.aul.t-online.de [172.20.26.134])
+ by mailout10.t-online.de (Postfix) with SMTP id 600AC4169294;
+ Sun,  2 Feb 2020 15:03:48 +0100 (CET)
+Received: from [192.168.211.200]
+ (bLF3D4ZBYh4LOByp52kgkgnv8FfJbHK6S+8NwEqIMIZ-iYzugFwLDi5ijaSEI4swqA@[93.236.154.40])
+ by fwd29.t-online.de
+ with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
+ esmtp id 1iyFqi-1KYWMS0; Sun, 2 Feb 2020 15:03:44 +0100
+From: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>
+Subject: [PATCH 0/1] coreaudio: fix coreaudio playback
+To: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
+ <dirty.ice.hu@gmail.com>, Howard Spoelstra <hsp.cat7@gmail.com>,
+ Programmingkid <programmingkidx@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <30c8b9e6-484c-5785-b178-bef01628db49@t-online.de>
+Date: Sun, 2 Feb 2020 15:03:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-In-Reply-To: <20200123161451.07c4a291@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+X-ID: bLF3D4ZBYh4LOByp52kgkgnv8FfJbHK6S+8NwEqIMIZ-iYzugFwLDi5ijaSEI4swqA
+X-TOI-MSGID: 7edc1606-c20f-4528-a73f-addf3975737f
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 194.25.134.21
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,300 +71,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com,
- kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
- qemu-devel@nongnu.org, linuxarm@huawei.com, shannon.zhaosl@gmail.com,
- zhengxiang9@huawei.com, qemu-arm@nongnu.org, james.morse@arm.com,
- xuwei5@huawei.com, jonathan.cameron@huawei.com, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020/1/23 23:14, Igor Mammedov wrote:
-> On Wed, 8 Jan 2020 19:32:17 +0800
-> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> 
->> This patch builds error_block_address and read_ack_register fields
->> in hardware errors table , the error_block_address points to Generic
->> Error Status Block(GESB) via bios_linker. The max size for one GESB
->> is 0x1000 in bytes, For more detailed information, please refer to
-> 
-> s/0x1000/4Kb/
+Hi,
 
-will update it.
+here is a new patch for the CoreAudio playback problem. This patch
+is Zolt=C3=A1n's patch from
+https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg02142.html
+and a improved version of my patch squashed together.
 
-> 
->> document: docs/specs/acpi_hest_ghes.rst
->>
->> Now we only support one Error source, if necessary, we can extend to
->> support more.
->>
->> Suggested-by: Laszlo Ersek <lersek@redhat.com>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>  default-configs/arm-softmmu.mak |  1 +
->>  hw/acpi/Kconfig                 |  4 ++
->>  hw/acpi/Makefile.objs           |  1 +
->>  hw/acpi/aml-build.c             |  2 +
->>  hw/acpi/ghes.c                  | 94 +++++++++++++++++++++++++++++++++++++++++
->>  hw/arm/virt-acpi-build.c        |  6 +++
->>  include/hw/acpi/aml-build.h     |  1 +
->>  include/hw/acpi/ghes.h          | 26 ++++++++++++
->>  8 files changed, 135 insertions(+)
->>  create mode 100644 hw/acpi/ghes.c
->>  create mode 100644 include/hw/acpi/ghes.h
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->> index 1f2e0e7..5722f31 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -40,3 +40,4 @@ CONFIG_FSL_IMX25=y
->>  CONFIG_FSL_IMX7=y
->>  CONFIG_FSL_IMX6UL=y
->>  CONFIG_SEMIHOSTING=y
->> +CONFIG_ACPI_APEI=y
->> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
->> index 12e3f1e..ed8c34d 100644
->> --- a/hw/acpi/Kconfig
->> +++ b/hw/acpi/Kconfig
->> @@ -23,6 +23,10 @@ config ACPI_NVDIMM
->>      bool
->>      depends on ACPI
->>  
->> +config ACPI_APEI
->> +    bool
->> +    depends on ACPI
->> +
->>  config ACPI_PCI
->>      bool
->>      depends on ACPI && PCI
->> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->> index 9925305..7b5db4b 100644
->> --- a/hw/acpi/Makefile.objs
->> +++ b/hw/acpi/Makefile.objs
->> @@ -5,6 +5,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
->>  common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->>  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->> +common-obj-$(CONFIG_ACPI_APEI) += ghes.o
->>  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
->>  common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
->>  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
->> index 2c3702b..3681ec6 100644
->> --- a/hw/acpi/aml-build.c
->> +++ b/hw/acpi/aml-build.c
->> @@ -1578,6 +1578,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
->>      tables->table_data = g_array_new(false, true /* clear */, 1);
->>      tables->tcpalog = g_array_new(false, true /* clear */, 1);
->>      tables->vmgenid = g_array_new(false, true /* clear */, 1);
->> +    tables->hardware_errors = g_array_new(false, true /* clear */, 1);
->>      tables->linker = bios_linker_loader_init();
->>  }
->>  
->> @@ -1588,6 +1589,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
->>      g_array_free(tables->table_data, true);
->>      g_array_free(tables->tcpalog, mfre);
->>      g_array_free(tables->vmgenid, mfre);
->> +    g_array_free(tables->hardware_errors, mfre);
->>  }
->>  
->>  /*
->> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
->> new file mode 100644
->> index 0000000..b7fdbbb
->> --- /dev/null
->> +++ b/hw/acpi/ghes.c
->> @@ -0,0 +1,94 @@
->> +/*
->> + * Support for generating APEI tables and recording CPER for Guests
->> + *
->> + * Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
-> s/2019/2020/
-> 
-> the same for other places that add this string within this series
+I actually tested the changes in audio/audio_template.h,
+audio/mixeng.c and audio/mixeng.h with all useful permutations of
+FLOAT_MIXENG and RECIPROCAL defined/undefined.
 
-sure, thanks for the pointing out.
+@Howard and John
+Can you please test this patch? Compared to the patches you tested
+this patch is quite different.
 
-> 
->> + *
->> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation; either version 2 of the License, or
->> + * (at your option) any later version.
->> +
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> +
->> + * You should have received a copy of the GNU General Public License along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/acpi/acpi.h"
->> +#include "hw/acpi/ghes.h"
->> +#include "hw/acpi/aml-build.h"
->> +#include "hw/nvram/fw_cfg.h"
->> +#include "sysemu/sysemu.h"
->> +#include "qemu/error-report.h"
->> +
->> +#include "hw/acpi/bios-linker-loader.h"
->> +
->> +#define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
->> +#define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
->> +
->> +/* The max size in bytes for one error block */
->> +#define ACPI_GHES_MAX_RAW_DATA_LENGTH       0x400
-> 
-> using 1 * KiB would make it more readable
-sure
+@John
+'git am exported_mail.eml' knows how to handle
+Content-Transfer-Encoding: in a mail file. It's not necessary to
+apply this patch by hand.
 
-> 
-> 
->> +
->> +/* Now only support ARMv8 SEA notification type error source */
->> +#define ACPI_GHES_ERROR_SOURCE_COUNT        1
->> +
->> +/*
->> + * Build table for the hardware error fw_cfg blob.
->> + * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
->> + * See docs/specs/acpi_hest_ghes.rst for blobs format.
->> + */
->> +void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)
->> +{
->> +    int i, error_status_block_offset;
->> +
->> +    /* Build error_block_address */
->> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->> +        build_append_int_noprefix(hardware_errors, 0, sizeof(uint64_t));
->> +    }
->> +
->> +    /* Build read_ack_register */
->> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->> +        /*
->> +         * Initialize the value of read_ack_register to 1, so GHES can be
->> +         * writeable after (re)boot.
->> +         * ACPI 6.2: 18.3.2.8 Generic Hardware Error Source version 2
->> +         * (GHESv2 - Type 10)
->> +         */
->> +        build_append_int_noprefix(hardware_errors, 1, sizeof(uint64_t));
->> +    }
->> +
->> +    /* Generic Error Status Block offset in the hardware error fw_cfg blob */
->> +    error_status_block_offset = hardware_errors->len;
->> +
->> +    /* Reserve space for Error Status Data Block */
->> +    acpi_data_push(hardware_errors,
->> +        ACPI_GHES_MAX_RAW_DATA_LENGTH * ACPI_GHES_ERROR_SOURCE_COUNT);
->> +
->> +    /* Tell guest firmware to place hardware_errors blob into RAM */
->> +    bios_linker_loader_alloc(linker, ACPI_GHES_ERRORS_FW_CFG_FILE,
->> +                             hardware_errors, 1, false);
->                                                 ^^
-> /*                                                                               
->  * bios_linker_loader_alloc: ask guest to load file into guest memory.           
-> [...]
->  * @alloc_align: required minimal alignment in bytes. Must be a power of 2.      
->                                                                                                           Maybe use 8 here to make 64bit addresses naturally aligned?
-I think we can use "sizeof(uint64_t)" to make it aligned.
+Volker R=C3=BCmelin (1):
+  coreaudio: fix coreaudio playback
 
-> 
->> +
->> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->> +        /*
->> +         * Tell firmware to patch error_block_address entries to point to
->> +         * corresponding "Generic Error Status Block"
->> +         */
->> +        bios_linker_loader_add_pointer(linker,
->> +            ACPI_GHES_ERRORS_FW_CFG_FILE, sizeof(uint64_t) * i,
->> +            sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
->> +            error_status_block_offset + i * ACPI_GHES_MAX_RAW_DATA_LENGTH);
->> +    }
->> +
->> +    /*
->> +     * tell firmware to write hardware_errors GPA into
->> +     * hardware_errors_addr fw_cfg, once the former has been initialized.
->> +     */
->> +    bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
->> +        0, sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
->> +}
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index bd5f771..6819fcf 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -48,6 +48,7 @@
->>  #include "sysemu/reset.h"
->>  #include "kvm_arm.h"
->>  #include "migration/vmstate.h"
->> +#include "hw/acpi/ghes.h"
->>  
->>  #define ARM_SPI_BASE 32
->>  
->> @@ -830,6 +831,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>      acpi_add_table(table_offsets, tables_blob);
->>      build_spcr(tables_blob, tables->linker, vms);
->>  
->> +    if (vms->ras) {
->> +        acpi_add_table(table_offsets, tables_blob);
->> +        build_ghes_error_table(tables->hardware_errors, tables->linker);
->> +    }
->> +
->>      if (ms->numa_state->num_nodes > 0) {
->>          acpi_add_table(table_offsets, tables_blob);
->>          build_srat(tables_blob, tables->linker, vms);
->> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
->> index de4a406..8f13620 100644
->> --- a/include/hw/acpi/aml-build.h
->> +++ b/include/hw/acpi/aml-build.h
->> @@ -220,6 +220,7 @@ struct AcpiBuildTables {
->>      GArray *rsdp;
->>      GArray *tcpalog;
->>      GArray *vmgenid;
->> +    GArray *hardware_errors;
->>      BIOSLinker *linker;
->>  } AcpiBuildTables;
->>  
->> diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
->> new file mode 100644
->> index 0000000..3dbda3f
->> --- /dev/null
->> +++ b/include/hw/acpi/ghes.h
->> @@ -0,0 +1,26 @@
->> +/*
->> + * Support for generating APEI tables and recording CPER for Guests
->> + *
->> + * Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
->> + *
->> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation; either version 2 of the License, or
->> + * (at your option) any later version.
->> +
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> +
->> + * You should have received a copy of the GNU General Public License along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#ifndef ACPI_GHES_H
->> +#define ACPI_GHES_H
->> +
->> +void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
->> +#endif
-> 
-> .
-> 
+ audio/audio_template.h |  7 +++++++
+ audio/coreaudio.c      | 32 +++++++++-----------------------
+ audio/mixeng.c         | 48 ++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ audio/mixeng.h         |  5 +++++
+ 4 files changed, 69 insertions(+), 23 deletions(-)
+
+--=20
+2.16.4
 
 
