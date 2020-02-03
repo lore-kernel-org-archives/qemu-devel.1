@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7F5C3524C
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D688EC33C9E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:29:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08E9D20658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:28:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E80120658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:29:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nTWvCc6O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E9D20658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Ec0b6pyv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E80120658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyVDg-00014k-7A
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 01:28:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57874)
+	id 1iyVEx-0003Ti-PD
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 01:29:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iyUy4-0003ka-JT
+ (envelope-from <dgibson@ozlabs.org>) id 1iyUy2-0003ie-2i
  for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:12:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iyUy3-0003bF-1W
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:12:20 -0500
-Received: from ozlabs.org ([203.11.71.1]:33999)
+ (envelope-from <dgibson@ozlabs.org>) id 1iyUxr-0003Xu-2D
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:12:12 -0500
+Received: from ozlabs.org ([203.11.71.1]:42153)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iyUy1-0003V1-Hx; Mon, 03 Feb 2020 01:12:18 -0500
+ id 1iyUxq-0003Tc-Kw; Mon, 03 Feb 2020 01:12:06 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 489yBv4Lnqz9sTD; Mon,  3 Feb 2020 17:11:35 +1100 (AEDT)
+ id 489yBv14Ssz9sTB; Mon,  3 Feb 2020 17:11:35 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1580710295;
- bh=oqZJddFUnwsLfIFIVQRKiSeYF6bqaQRx08wy+81lhP8=;
+ bh=5sM9Lz2RmC8JDBadeQkrCEvJ50g3Y0oRMAd6UT8RVTA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=nTWvCc6OwXdiy8Pu7lTzmyRgB8pvY3P4SZk9II608Qb9tkqlHSVIUK8lTLasRmxGT
- FCGX95gyo0NPtsnKNRlfOX4IZkbYIQXwCXx5ex6YwZ8ej6GAU4+4e730X3HOMlu6I1
- 9Tz2jT5FbZkWpKtUCFSUWSswxrTS8h6AYb8ql2l4=
+ b=Ec0b6pyvH4a9697DR7i0cUUZ4UHB6YR/1ljm/78ApANeS1oxKvgj/IRT5Df14bUn2
+ Hv2kEjdAtKqsrKgNWDoCmNaDGSzIYXGBXv8S/4exmWidyTaLsCG8a3/89cYe3pTNJG
+ Sx8W6i95x69oK142c3Zf1U8gcSGoujUrpf3mVGWA=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 35/35] tests: Silence various warnings with pseries
-Date: Mon,  3 Feb 2020 17:11:23 +1100
-Message-Id: <20200203061123.59150-36-david@gibson.dropbear.id.au>
+Subject: [PULL 34/35] target/ppc: Use probe_write for DCBZ
+Date: Mon,  3 Feb 2020 17:11:22 +1100
+Message-Id: <20200203061123.59150-35-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200203061123.59150-1-david@gibson.dropbear.id.au>
 References: <20200203061123.59150-1-david@gibson.dropbear.id.au>
@@ -68,150 +68,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- groug@kaod.org, qemu-ppc@nongnu.org,
+Cc: lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ Howard Spoelstra <hsp.cat7@gmail.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Some default features of the pseries machine are only available with
-KVM. Warnings are printed when the pseries machine is used with another
-accelerator:
+Using probe_write instead of tlb_vaddr_to_host means that we
+process watchpoints and notdirty pages more efficiently.
 
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-ccf-assist=3Don
-qemu-system-ppc64: warning: Firmware Assisted Non-Maskable
-Interrupts(FWNMI) not supported in TCG
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-ccf-assist=3Don
-qemu-system-ppc64: warning: Firmware Assisted Non-Maskable
-Interrupts(FWNMI) not supported in TCG
-qemu-system-ppc64: warning: TCG doesn't support requested feature,
-cap-ccf-assist=3Don
-qemu-system-ppc64: warning: Firmware Assisted Non-Maskable
-Interrupts(FWNMI) not supported in TCG
-
-This is annoying for CI since it usually runs without KVM. We already
-disable features that emit similar warnings thanks to properties of
-the pseries machine, but this is open-coded in various
-places. Consolidate the set of properties in a single place. Extend it
-to silence the above warnings. And use it in the various tests that
-start pseries machines.
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <158059697130.1820292.7823434132030453110.stgit@bahia.lan>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-[dwg: Correct minor grammatical error]
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200129235040.24022-5-richard.henderson@linaro.org>
+Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- tests/qtest/boot-serial-test.c    | 3 ++-
- tests/qtest/libqos/libqos-spapr.h | 8 ++++++++
- tests/qtest/prom-env-test.c       | 3 ++-
- tests/qtest/pxe-test.c            | 7 ++++---
- 4 files changed, 16 insertions(+), 5 deletions(-)
+ target/ppc/mem_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-tes=
-t.c
-index 8e8c5b0a0f..85a3614286 100644
---- a/tests/qtest/boot-serial-test.c
-+++ b/tests/qtest/boot-serial-test.c
-@@ -15,6 +15,7 @@
-=20
- #include "qemu/osdep.h"
- #include "libqtest.h"
-+#include "libqos/libqos-spapr.h"
-=20
- static const uint8_t kernel_mcf5208[] =3D {
-     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-@@ -112,7 +113,7 @@ static testdef_t tests[] =3D {
-     { "ppc64", "40p", "-m 192", "Memory: 192M" },
-     { "ppc64", "mac99", "", "PowerPC,970FX" },
-     { "ppc64", "pseries",
--      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken",
-+      "-machine " PSERIES_DEFAULT_CAPABILITIES,
-       "Open Firmware" },
-     { "ppc64", "powernv8", "", "OPAL" },
-     { "ppc64", "powernv9", "", "OPAL" },
-diff --git a/tests/qtest/libqos/libqos-spapr.h b/tests/qtest/libqos/libqo=
-s-spapr.h
-index dcb5c43ad3..d9c4c22343 100644
---- a/tests/qtest/libqos/libqos-spapr.h
-+++ b/tests/qtest/libqos/libqos-spapr.h
-@@ -7,4 +7,12 @@ QOSState *qtest_spapr_vboot(const char *cmdline_fmt, va_=
-list ap);
- QOSState *qtest_spapr_boot(const char *cmdline_fmt, ...);
- void qtest_spapr_shutdown(QOSState *qs);
-=20
-+/* List of capabilities needed to silence warnings with TCG */
-+#define PSERIES_DEFAULT_CAPABILITIES             \
-+    "cap-cfpc=3Dbroken,"                           \
-+    "cap-sbbc=3Dbroken,"                           \
-+    "cap-ibs=3Dbroken,"                            \
-+    "cap-ccf-assist=3Doff,"                        \
-+    "cap-fwnmi-mce=3Doff"
-+
- #endif
-diff --git a/tests/qtest/prom-env-test.c b/tests/qtest/prom-env-test.c
-index 9be52c766f..60e6ec3153 100644
---- a/tests/qtest/prom-env-test.c
-+++ b/tests/qtest/prom-env-test.c
-@@ -21,6 +21,7 @@
-=20
- #include "qemu/osdep.h"
- #include "libqtest.h"
-+#include "libqos/libqos-spapr.h"
-=20
- #define MAGIC   0xcafec0de
- #define ADDRESS 0x4000
-@@ -54,7 +55,7 @@ static void test_machine(const void *machine)
-      */
-     if (strcmp(machine, "pseries") =3D=3D 0) {
-         extra_args =3D "-nodefaults"
--            " -machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbro=
-ken";
-+            " -machine " PSERIES_DEFAULT_CAPABILITIES;
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index 0cb78777e7..98f589552b 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -298,7 +298,7 @@ static void dcbz_common(CPUPPCState *env, target_ulon=
+g addr,
      }
 =20
-     qts =3D qtest_initf("-M %s -accel tcg %s -prom-env 'use-nvramrc?=3Dt=
-rue' "
-diff --git a/tests/qtest/pxe-test.c b/tests/qtest/pxe-test.c
-index f68d0aadbb..1161a773a4 100644
---- a/tests/qtest/pxe-test.c
-+++ b/tests/qtest/pxe-test.c
-@@ -17,6 +17,7 @@
- #include "qemu-common.h"
- #include "libqtest.h"
- #include "boot-sector.h"
-+#include "libqos/libqos-spapr.h"
-=20
- #define NETNAME "net0"
-=20
-@@ -46,15 +47,15 @@ static testdef_t x86_tests_slow[] =3D {
-=20
- static testdef_t ppc64_tests[] =3D {
-     { "pseries", "spapr-vlan",
--      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
-t=3D8" },
-+      "-machine vsmt=3D8," PSERIES_DEFAULT_CAPABILITIES },
-     { "pseries", "virtio-net-pci",
--      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
-t=3D8" },
-+      "-machine vsmt=3D8," PSERIES_DEFAULT_CAPABILITIES },
-     { NULL },
- };
-=20
- static testdef_t ppc64_tests_slow[] =3D {
-     { "pseries", "e1000",
--      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
-t=3D8" },
-+      "-machine vsmt=3D8," PSERIES_DEFAULT_CAPABILITIES },
-     { NULL },
- };
-=20
+     /* Try fast path translate */
+-    haddr =3D tlb_vaddr_to_host(env, addr, MMU_DATA_STORE, mmu_idx);
++    haddr =3D probe_write(env, addr, dcbz_size, mmu_idx, retaddr);
+     if (haddr) {
+         memset(haddr, 0, dcbz_size);
+     } else {
 --=20
 2.24.1
 
