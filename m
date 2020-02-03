@@ -2,86 +2,93 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D71E3C33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 910F3C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A23A120658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:58:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AC2120658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSL8E3bq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A23A120658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="rHbYPBJu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AC2120658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyZRI-00087r-1g
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 05:58:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52980)
+	id 1iyZS1-0000iZ-Il
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 05:59:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iyZQg-0007iY-EH
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:58:11 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1iyZRM-0008MJ-4g
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:58:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iyZQf-0002yT-3v
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:58:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27074
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iyZQe-0002uu-Vm
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:58:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580727488;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3wHcIu0764/YGu7WKZ7yArQEcjKk7IGWvNX32L8D1Q4=;
- b=FSL8E3bq/70sQe8PdZmjgzG9VZuBLqwZhtKjMfqGo5+jgKun+hiwBCTzLG9JzhlIEoM+SV
- iNTusqzDXzqYT5euqF8tfomKUhpQkuBngp8TxZB/WCn0V/tdfgx7A5lIPFwBataplFi2hl
- MnUvccd8Shd8/SKIryNIukmLlxUG3VY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-24YUKCO4PnKy7wlAxK8qIg-1; Mon, 03 Feb 2020 05:57:59 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D710A13E6;
- Mon,  3 Feb 2020 10:57:57 +0000 (UTC)
-Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 43B8410013A7;
- Mon,  3 Feb 2020 10:57:47 +0000 (UTC)
-Date: Mon, 3 Feb 2020 10:57:44 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH v2 2/4] virtio-scsi: default num_queues to -smp N
-Message-ID: <20200203105744.GD1922177@redhat.com>
-References: <20200124100159.736209-1-stefanha@redhat.com>
- <20200124100159.736209-3-stefanha@redhat.com>
- <20200127141031.6e108839.cohuck@redhat.com>
- <20200129154438.GC157595@stefanha-x1.localdomain>
- <bc9680fc-c382-301f-a1fe-21740c918570@redhat.com>
- <20200130105235.GC176651@stefanha-x1.localdomain>
- <20200203102529.3op54zggtquoguuo@dritchie>
+ (envelope-from <aik@ozlabs.ru>) id 1iyZRK-00066g-DB
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:58:51 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35923)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iyZRJ-00063C-Vt
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:58:50 -0500
+Received: by mail-pg1-x543.google.com with SMTP id k3so7627286pgc.3
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 02:58:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=NRWM0E1bafEKcPBcUriwPBrnB3ZJe2oBlMdsvRRlbM8=;
+ b=rHbYPBJuTICyymCa0VHztL21VzSKAwIO5VrA/H5bO234GunJkD6dCSAM6P+Acni04r
+ qB/t8vxZ+muY3gxa+o2kUKSq7blLUMTPABssq8NMHIEqNYupFpytNvqm+2i4ycf2LCWh
+ seZ5Lf8KTtteYM98X8Jh3Bmn3NLgRR1+yLrW5/EUCtmIilx/WQno6poonw2oG8ExHR88
+ 5or8jaKL9w6zRvBmy2dhJv/+b2l2yIFKRnnfanfvdXUjFHUaoIMxMjZQrIV6JB6g6RUM
+ zWgRW5Xko8ISsBTESd0ESZEmau9d+gGPjeep+7SqqSd8LhtPdhrA3ztEEdjrV1dnED0H
+ jz/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=NRWM0E1bafEKcPBcUriwPBrnB3ZJe2oBlMdsvRRlbM8=;
+ b=pNiskZy6lKuY/ZnVQLIqguJ/MIpevsK4F9GwoCL6uJszRPcnk2kseIWBZ3BY8B7Dfy
+ S8zNV0GcrSyUlztWfTwBQ8B8ck6/kMyomB/GmLIri+K7CiK7tXh7uGDcw/zcZrJreQ8z
+ p/GInDBJxe4THhmKzbhCm84kKYX3Ch+7PMHbFObIXGdAhLX7qyKzOIRe/ib2pfX91SEJ
+ MXwXgYvFJMfXjWyoxxMQzRC7mfJ8LeXC5apyFER59Fr3Iy6LVH4WF28USq6gdIAowXMx
+ L1tuEFv5g0oAh3ZAi2Dt0nnxvF8m+AEjBaYoDy9fLHBbIpAaV/k3kJZpmWHK+OaYYWba
+ bd7Q==
+X-Gm-Message-State: APjAAAUX9X+kA4hk5udO1vKTsT0rfnzkThu1mcoVcOUzWX8VTgk4auvm
+ WbrBQoefeUIYEVRDLkzFH6bZTA==
+X-Google-Smtp-Source: APXvYqzRpejdY8U2a9mmsLGBOCvkMXyhQLGDB0kJR4G2pIGbK2c3nd309aC97XQzInQt8s+uODIEeA==
+X-Received: by 2002:a63:3d42:: with SMTP id k63mr1550763pga.318.1580727528785; 
+ Mon, 03 Feb 2020 02:58:48 -0800 (PST)
+Received: from [192.168.10.85] (ppp121-45-221-81.bras1.cbr2.internode.on.net.
+ [121.45.221.81])
+ by smtp.gmail.com with ESMTPSA id o6sm19055915pgg.37.2020.02.03.02.58.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 03 Feb 2020 02:58:48 -0800 (PST)
+Subject: Re: VW ELF loader
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
+ <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
+ <20200203012842.GD52446@umbus.fritz.box>
+ <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
+Date: Mon, 3 Feb 2020 21:58:43 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200203102529.3op54zggtquoguuo@dritchie>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 24YUKCO4PnKy7wlAxK8qIg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,82 +100,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Cornelia Huck <conny@cornelia-huck.de>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 03, 2020 at 11:25:29AM +0100, Sergio Lopez wrote:
-> On Thu, Jan 30, 2020 at 10:52:35AM +0000, Stefan Hajnoczi wrote:
-> > On Thu, Jan 30, 2020 at 01:29:16AM +0100, Paolo Bonzini wrote:
-> > > On 29/01/20 16:44, Stefan Hajnoczi wrote:
-> > > > On Mon, Jan 27, 2020 at 02:10:31PM +0100, Cornelia Huck wrote:
-> > > >> On Fri, 24 Jan 2020 10:01:57 +0000
-> > > >> Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > > >>> @@ -47,10 +48,15 @@ static void vhost_scsi_pci_realize(VirtIOPCIP=
-roxy *vpci_dev, Error **errp)
-> > > >>>  {
-> > > >>>      VHostSCSIPCI *dev =3D VHOST_SCSI_PCI(vpci_dev);
-> > > >>>      DeviceState *vdev =3D DEVICE(&dev->vdev);
-> > > >>> -    VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(vdev);
-> > > >>> +    VirtIOSCSIConf *conf =3D &dev->vdev.parent_obj.parent_obj.co=
-nf;
-> > > >>> +
-> > > >>> +    /* 1:1 vq to vcpu mapping is ideal because it avoids IPIs */
-> > > >>> +    if (conf->num_queues =3D=3D VIRTIO_SCSI_AUTO_NUM_QUEUES) {
-> > > >>> +        conf->num_queues =3D current_machine->smp.cpus;
-> > > >> This now maps the request vqs 1:1 to the vcpus. What about the fix=
-ed
-> > > >> vqs? If they don't really matter, amend the comment to explain tha=
-t?
-> > > > The fixed vqs don't matter.  They are typically not involved in the=
- data
-> > > > path, only the control path where performance doesn't matter.
-> > >=20
-> > > Should we put a limit on the number of vCPUs?  For anything above ~12=
-8
-> > > the guest is probably not going to be disk or network bound.
-> >=20
-> > Michael Tsirkin pointed out there's a hard limit of VIRTIO_QUEUE_MAX
-> > (1024).  We need to at least stay under that limit.
-> >=20
-> > Should the guest have >128 virtqueues?  Each virtqueue requires guest
-> > RAM and 2 host eventfds.  Eventually these resource requirements will
-> > become a scalability problem, but how do we choose a hard limit and wha=
-t
-> > happens to guest performance above that limit?
->=20
-> From the UX perspective, I think it's safer to use a rather low upper
-> limit for the automatic configuration.
->=20
-> Users of large VMs (>=3D32 vCPUs) aiming for the optimal performance are
-> already facing the need of manually tuning (or relying on a software
-> to do that for them) other aspects of it, like vNUMA, IOThreads and
-> CPU pinning, so I don't think we should focus on this group.
 
-Whether they're runing manually, or relying on software to tune for
-them, we (QEMU maintainers) still need to provide credible guidance
-on what todo with tuning for large CPU counts. Without clear info
-from QEMU, it just descends into hearsay and guesswork, both of which
-approaches leave QEMU looking bad.
 
-So I think we need to, at the very least, make a clear statement here
-about what tuning approach should be applied vCPU count gets high,
-and probably even apply that  as a default out of the box approach.
+On 3/2/20 8:12 pm, Paolo Bonzini wrote:
+> On 03/02/20 02:28, David Gibson wrote:
+>> But "pseries" is different.  We're implementing the PAPR platform,
+>> which describes an OS environment that's presented by a combination of
+>> a hypervisor and firmware.  The features it specifies *require*
+>> collaboration between the firmware and the hypervisor.
+> 
+> Which features are these?
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+RTAS: PCI handling - MSI allocations, config space, interrupts
+(XICS/XIVE) - we do it in QEMU right now so this went unnoticed but
+ideally there should have been a RTAS binary lot bigger than those 20
+bytes (never even had a chance to look at what IBM pHyp does).
 
+OF CI: ibm,client-architecture-support and all these spapr-vlan/vty/scsi
+paradevices - we do not really need any driver between GRUB and QEMU -
+the OF interface defines enough.
+
+Resource allocation - we allocate some in QEMU (PCI bus numbers
+assignment and PHB windows) but assign BARs and bridge windows in SLOF
+(boottime) or Linux (hotplug). We could just let Linux do this or do
+this in QEMU.
+
+Interrupt map - QEMU does this for PHB (as a host interrupt controller
+is a parent) and SLOF does it for PCI bridges (they have PHB or other
+bridges as parents so they do it themselves), except of course PCI hot
+plug after the guest started but Linux has not fetched the device tree.
+
+All this is manageable but quite hard to maintain while benefits of such
+separation of hypervisor code are not clear.
+
+
+>> So really, the question isn't whether we implement things in firmware
+>> or in qemu.  It's whether we implement the firmware functionality as
+>> guest cpu code, which needs to be coded to work with a limited
+>> environment, built with a special toolchain, then emulated with TCG.
+>> Or, do we just implement it in normal C code, with a full C library,
+>> and existing device and backend abstractions inside qemu.
+> 
+> ... which is adding almost 2000 lines of new code to the host despite
+> the following limitations:
+
+Kind of. But it replaces a log bigger chunk of SLOF, easy to read and it
+works faster. Just virtio-scsi/net drivers are about 1700 lines and we
+do need them at all with the proposed patches (or I missed the bigger
+picture again and we need them?).
+
+Also Linux needs only roughly a half of this. One idea was to hack GRUB
+to run in the userspace from initrd with petitboot-alike kernel, and
+carry this small kernel with a franken-GRUB with QEMU, then extra code
+goes to GRUB and then those folks become unhappy :)
+
+
+>> 4. no networking in OF CI at all;
+>> 5. no vga;
+>> 6. no disk partitions in CI, i.e. no commas to select a partition -
+>> this relies on a bootloader accessing the disk as a whole;
+
+This is not going to be a lot really, especially supporting partitions -
+the code is practically there already as I needed it to find GRUB, and
+GRUB does the rest asking very little from the firmware to work.
+
+btw what is the common way of netbooting in x86? NIC ROM or GRUB (but
+this would be a disk anyway)? Can we consider having a precompiled GRUB
+image somewhere in pc-bios/ to use for netboot? Or Uboot would do (it is
+already in pc-bios/, no?), I suppose?
+
+
+> and of course:
+> 
+>> 7. "interpret" (executes passed forth expression) does nothing as in this
+>> environment grub only uses it for switching cursor off and similar tasks.
+> 
+> In other words you're not dropping SLOF, you're really dropping
+> OpenFirmware completely.
+
+What is the exact benefit of having OpenFirmware's "interpret"? The rest
+is there as far as known clients are concerned. FreeBSD is somewhere
+between GRUB and Linux, and we never truly supported AIX as it has (or
+at least used to) fixes for pHyp firmware bugs which we never cared to
+simulate in SLOF.
+
+I totally get why people want a firmware, it makes perfect sense when
+emulating bare metal machine (such as the powernv machine type in QEMU)
+but spapr is not the case.
+
+
+
+>  It's little more than what ARM does.
+> 
+> Paolo
+> 
+
+-- 
+Alexey
 
