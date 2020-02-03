@@ -2,90 +2,83 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54153C35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 18:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B8B8C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 18:10:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 239E620838
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 18:09:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C52120838
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 18:10:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M9JF5z8/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 239E620838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YIoNpmYc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C52120838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45495 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iygAG-0001oO-32
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 13:09:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43759)
+	id 1iygBR-00038r-5M
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 13:10:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iyg9J-0000nl-Sy
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:08:43 -0500
+ (envelope-from <groeck7@gmail.com>) id 1iyg9s-0001QX-Rb
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:09:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iyg9I-0002JJ-CI
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:08:41 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39307)
+ (envelope-from <groeck7@gmail.com>) id 1iyg9r-0004Jc-QX
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:09:16 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41725)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iyg9I-0002BF-4B
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:08:40 -0500
-Received: by mail-wm1-x341.google.com with SMTP id c84so332916wme.4
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 10:08:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=HN/AMUYpPDTg5XPVDPdZLw6+47h5YeQOo+AaPv3O9qI=;
- b=M9JF5z8/HFPVAZiVT2UOZq+c7ZSkNFybjS5mae6gPhULpaBjyysu9WPkZp1MQWDChY
- Qo/3GgsfJy6EE2dHj/3rHb1KHHxkfYQci0DSH/zV2MtnS3Wvvi7k+4k3v4QTeXXW7Oer
- JBr9oM9c8VpJeHmNKGN/3E12j8Qtc4FXTbmK1su5wqctpAB6gcXeheVH9Ax1wMsYjCeA
- QXyCGAx0yzpx3eaiZnaa1+0ScGnwD1w92AFPmGXU5RG+T9iY3cE71sF1Yo3KiR8Oy4Le
- iJ6sTkqb7Cf7sbexrCSEjFFY/CTtI+lUo71bUE1JdYKxS6+JjcjbcO8ZxdmnPs8mpFnT
- 8t9g==
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1iyg9m-0003zp-SB; Mon, 03 Feb 2020 13:09:12 -0500
+Received: by mail-pl1-x641.google.com with SMTP id t14so6155666plr.8;
+ Mon, 03 Feb 2020 10:09:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=yq6eFFb6QlatLCP1XykFR99zBztSE9O3BlU2GJ/1iI0=;
+ b=YIoNpmYcwsYHxKOK/UlD0vU6PTWdFWExXlL2JmdbzLh3oQk8fK66V6QL10L6w0ibtT
+ A0wCYQI+1/Ah68mpRTr2DA/2BgTn8wWm4b0oY4Lw3CF/T0DDwhBI5r8aTjlMAaYbDXjH
+ FXcIsD5GCXw9oG7uZcu1TY96k0BVyNpm27i412bAZv9GQFgyAzYlUWTyzBn5einmf3vB
+ jMM3SQFiy5cUUW1A0oCUzOyqCrB2NZHdNr2ldXh97NTRavO36uH+j6A0u7ybqy5zjfJv
+ ieor9NEYnd1bfnLqACFid750QI7pTfpUlFp/dJYM//RYEyiUi6DzEXvx6Re02X/0Pyxj
+ cPcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=HN/AMUYpPDTg5XPVDPdZLw6+47h5YeQOo+AaPv3O9qI=;
- b=f3xmxtrZv4TWuY32TLoFu/6Q1Yeb+bcH/BflFZqDVW4+nnPjxEG284i9Np84FXHVhK
- 41Dyp/LBRCNEIyNGUjjDCtgpr4FP1Jdo+L5UTBkfyB621V1Ra5qwd/jwAfLrA/kw5xWr
- 4sUzfOsMkJHAeFn0pzFM1450xN3RXTs7VSubN/v6AeQDVdvrEUCLKGfS5/DelZdKysKU
- MUzWAm/EekixtEgcYuXMuiPy6uUuBM4kDKFvE5llozbepE28GiSvcnAcZ8CsGJLHyQkp
- AsbcaUcaacpAFNQAjYTbSeD4SJOe5KARfBomqS89wLYgBJeJm3uQ8K9C6KR6QGpIGQw+
- z78g==
-X-Gm-Message-State: APjAAAWpjEFYtt5PHgp3UDYD5TSwvnzBexiLQ0AlGzHIu43Y6zMGlaJO
- qAvxd8oUlf/9MFN3re6bdoTbiA==
-X-Google-Smtp-Source: APXvYqwt8oIY2YrVXQnux3jqXbQmPHlx4w1FFIhOQHQ4ocULxoyUa818CbablR3n3ghREaGGq/K02w==
-X-Received: by 2002:a1c:a514:: with SMTP id o20mr231429wme.179.1580753317756; 
- Mon, 03 Feb 2020 10:08:37 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b18sm26458394wru.50.2020.02.03.10.08.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 10:08:36 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D9CDD1FF87;
- Mon,  3 Feb 2020 18:08:35 +0000 (GMT)
-References: <20200203132533.21850-1-peter.maydell@linaro.org>
- <20200203132533.21850-2-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.7; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 1/2] configure: Allow user to specify sphinx-build binary
-In-reply-to: <20200203132533.21850-2-peter.maydell@linaro.org>
-Date: Mon, 03 Feb 2020 18:08:35 +0000
-Message-ID: <875zgna6ho.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=yq6eFFb6QlatLCP1XykFR99zBztSE9O3BlU2GJ/1iI0=;
+ b=mp0g83B+CjFejlYU41TkxtEN3bQrIj6B0G/E2ZPtbbS6VZutnxjT6hEt5iSUkbDXxN
+ iGyATluFYkSac8JbDPRL62N7nXys7JUpjgsLF89125fWl8ZdH1MH7V4ppNjyBiZpN+t6
+ FsyGthWbsU63NF3gTxueh2XWi+bb34G/4cCLy2usnA2JUZb9n2dl0+FXVuYYAdJNafR9
+ WKlAVgV+WvGOoc++kSYzRerBNcZ43Ku9rQM9w+9CGiHLwaa5wF8vAyEF5V5GY2X5LFlV
+ KJK3v8tlYU9Ucii4g97zW6OEnBCjRqZlj8zhcRfyc1Iiaoo0hOdUO38m8oZXPcB8JyDl
+ duLA==
+X-Gm-Message-State: APjAAAVXOF1UBc2FIoDoOGtXwMooDHnZ17vXH18FXWiLqQP3ykjhABPL
+ sU8/tSw8smtN0lhu03ShP+Q=
+X-Google-Smtp-Source: APXvYqxNcoSiAvTbvVAXBjor2xFhCeHSF05GHapaTJvEuLnCDZn/C69tle6tRbIwACZlY1B0RqQNjw==
+X-Received: by 2002:a17:902:a616:: with SMTP id
+ u22mr24614170plq.173.1580753348008; 
+ Mon, 03 Feb 2020 10:09:08 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id w128sm20324023pgb.53.2020.02.03.10.09.07
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 03 Feb 2020 10:09:07 -0800 (PST)
+From: Guenter Roeck <linux@roeck-us.net>
+To: Alistair Francis <alistair@alistair23.me>
+Subject: [PATCH 2/3] m25p80: Improve command handling for Jedec and
+ unsupported commands
+Date: Mon,  3 Feb 2020 10:09:03 -0800
+Message-Id: <20200203180904.2727-2-linux@roeck-us.net>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200203180904.2727-1-linux@roeck-us.net>
+References: <20200203180904.2727-1-linux@roeck-us.net>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,118 +90,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Guenter Roeck <linux@roeck-us.net>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Always report 6 bytes of JEDEC data. Fill remaining data with 0.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+For unsupported commands, keep sending a value of 0 until the chip
+is deselected.
 
-> Currently we insist on using 'sphinx-build' from the $PATH;
-> allow the user to specify the binary to use. This will be
-> more useful as we become pickier about the capabilities
-> we require (eg needing a Python 3 sphinx-build).
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Both changes avoid attempts to decode random commands. Up to now this
+happened if the reported Jedec data was shorter than 6 bytes but the
+host read 6 bytes, and with all unsupported commands.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ hw/block/m25p80.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-> ---
-> I went with the most common convention for specifying "here's
-> an executable", like --make=3D, --install=3D, --python=3D....
->
-> The only odd one out for our current configure options seems to be
-> that we want --with-git=3DGIT, not --git=3DGIT. You could argue that
-> that's a better convention, but it makes more sense to me to
-> stick with the convention we currently mostly have. (Perhaps
-> we should even change --with-git=3D to --git=3D ?)
->
->  configure | 10 +++++++++-
->  Makefile  |  2 +-
->  2 files changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/configure b/configure
-> index 5095f017283..830f325822a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -584,6 +584,7 @@ query_pkg_config() {
->  }
->  pkg_config=3Dquery_pkg_config
->  sdl2_config=3D"${SDL2_CONFIG-${cross_prefix}sdl2-config}"
-> +sphinx_build=3Dsphinx-build
->=20=20
->  # If the user hasn't specified ARFLAGS, default to 'rv', just as make do=
-es.
->  ARFLAGS=3D"${ARFLAGS-rv}"
-> @@ -975,6 +976,8 @@ for opt do
->    ;;
->    --python=3D*) python=3D"$optarg"
->    ;;
-> +  --sphinx-build=3D*) sphinx_build=3D"$optarg"
-> +  ;;
->    --gcov=3D*) gcov_tool=3D"$optarg"
->    ;;
->    --smbd=3D*) smbd=3D"$optarg"
-> @@ -1677,6 +1680,7 @@ Advanced options (experts only):
->    --make=3DMAKE              use specified make [$make]
->    --install=3DINSTALL        use specified install [$install]
->    --python=3DPYTHON          use specified python [$python]
-> +  --sphinx-build=3DSPHINX    use specified sphinx-build [$sphinx_build]
->    --smbd=3DSMBD              use specified smbd [$smbd]
->    --with-git=3DGIT           use specified git [$git]
->    --static                 enable static build [$static]
-> @@ -4799,7 +4803,7 @@ has_sphinx_build() {
->      # sphinx-build doesn't exist at all or if it is too old.
->      mkdir -p "$TMPDIR1/sphinx"
->      touch "$TMPDIR1/sphinx/index.rst"
-> -    sphinx-build -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPD=
-IR1/sphinx/out" >/dev/null 2>&1
-> +    $sphinx_build -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMP=
-DIR1/sphinx/out" >/dev/null 2>&1
->  }
->=20=20
->  # Check if tools are available to build documentation.
-> @@ -6474,6 +6478,9 @@ echo "QEMU_LDFLAGS      $QEMU_LDFLAGS"
->  echo "make              $make"
->  echo "install           $install"
->  echo "python            $python ($python_version)"
-> +if test "$docs" !=3D "no"; then
-> +    echo "sphinx-build      $sphinx_build"
-> +fi
->  echo "slirp support     $slirp $(echo_version $slirp $slirp_version)"
->  if test "$slirp" !=3D "no" ; then
->      echo "smbd              $smbd"
-> @@ -7503,6 +7510,7 @@ echo "INSTALL_DATA=3D$install -c -m 0644" >> $confi=
-g_host_mak
->  echo "INSTALL_PROG=3D$install -c -m 0755" >> $config_host_mak
->  echo "INSTALL_LIB=3D$install -c -m 0644" >> $config_host_mak
->  echo "PYTHON=3D$python" >> $config_host_mak
-> +echo "SPHINX_BUILD=3D$sphinx_build" >> $config_host_mak
->  echo "CC=3D$cc" >> $config_host_mak
->  if $iasl -h > /dev/null 2>&1; then
->    echo "IASL=3D$iasl" >> $config_host_mak
-> diff --git a/Makefile b/Makefile
-> index a6f5d440828..1f37523b528 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1024,7 +1024,7 @@ sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
->  # Note the use of different doctree for each (manual, builder) tuple;
->  # this works around Sphinx not handling parallel invocation on
->  # a single doctree: https://github.com/sphinx-doc/sphinx/issues/2946
-> -build-manual =3D $(call quiet-command,CONFDIR=3D"$(qemu_confdir)" sphinx=
--build $(if $(V),,-q) -W -b $2 -D version=3D$(VERSION) -D release=3D"$(FULL=
-_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"S=
-PHINX","$(MANUAL_BUILDDIR)/$1")
-> +build-manual =3D $(call quiet-command,CONFDIR=3D"$(qemu_confdir)" $(SPHI=
-NX_BUILD) $(if $(V),,-q) -W -b $2 -D version=3D$(VERSION) -D release=3D"$(F=
-ULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 =
-,"SPHINX","$(MANUAL_BUILDDIR)/$1")
->  # We assume all RST files in the manual's directory are used in it
->  manual-deps =3D $(wildcard $(SRC_PATH)/docs/$1/*.rst) \
->                $(wildcard $(SRC_PATH)/docs/$1/*.rst.inc) \
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index 63e050d7d3..aca75edcc1 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -1040,8 +1040,11 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         for (i = 0; i < s->pi->id_len; i++) {
+             s->data[i] = s->pi->id[i];
+         }
++        for (; i < SPI_NOR_MAX_ID_LEN; i++) {
++            s->data[i] = 0;
++        }
+ 
+-        s->len = s->pi->id_len;
++        s->len = SPI_NOR_MAX_ID_LEN;
+         s->pos = 0;
+         s->state = STATE_READING_DATA;
+         break;
+@@ -1158,6 +1161,11 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+         s->quad_enable = false;
+         break;
+     default:
++        s->pos = 0;
++        s->len = 1;
++        s->state = STATE_READING_DATA;
++        s->data_read_loop = true;
++        s->data[0] = 0;
+         qemu_log_mask(LOG_GUEST_ERROR, "M25P80: Unknown cmd %x\n", value);
+         break;
+     }
+-- 
+2.17.1
 
-
---=20
-Alex Benn=C3=A9e
 
