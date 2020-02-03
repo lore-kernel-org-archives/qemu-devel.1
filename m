@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30DB0C35249
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32579C35249
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:18:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0263C20679
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:18:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0263C20679
+	by mail.kernel.org (Postfix) with ESMTPS id 0719620679
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:18:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0719620679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyPRU-0000Md-4e
-	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 19:18:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33057)
+	id 1iyPRa-0000fL-7P
+	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 19:18:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33012)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iyPQU-0006qp-5l
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:19 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1iyPQS-0006lf-1J
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iyPQT-00049X-32
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:18 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2692 helo=huawei.com)
+ (envelope-from <guoheyi@huawei.com>) id 1iyPQQ-00047I-Ui
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:15 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2690 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iyPQP-00041C-9N; Sun, 02 Feb 2020 19:17:13 -0500
+ id 1iyPQO-000419-Hl; Sun, 02 Feb 2020 19:17:12 -0500
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 5E670FE6E6B5D5E7C80C;
+ by Forcepoint Email with ESMTP id 5961495E92C981BD13A2;
  Mon,  3 Feb 2020 08:17:09 +0800 (CST)
 Received: from linux-TFkxOR.huawei.com (10.175.104.212) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 3 Feb 2020 08:17:03 +0800
+ 14.3.439.0; Mon, 3 Feb 2020 08:17:00 +0800
 From: Heyi Guo <guoheyi@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 4/7] arm/acpi: fix PCI _PRT definition
-Date: Mon, 3 Feb 2020 08:15:02 +0800
-Message-ID: <20200203001505.52573-5-guoheyi@huawei.com>
+Subject: [PATCH v2 1/7] bios-tables-test: prepare to change ARM virt ACPI DSDT
+Date: Mon, 3 Feb 2020 08:14:59 +0800
+Message-ID: <20200203001505.52573-2-guoheyi@huawei.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20200203001505.52573-1-guoheyi@huawei.com>
 References: <20200203001505.52573-1-guoheyi@huawei.com>
@@ -74,10 +74,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The address field in each _PRT mapping package should be constructed
-with high word for device# and low word for function#, so it is wrong
-to use bus_no as the high word. Enumerate all possible slots
-(i.e. PCI_SLOT_MAX) instead.
+We are going to change ARM virt ACPI DSDT table, which will cause make
+check to fail, so temporarily add related golden masters to ignore
+list.
 
 Signed-off-by: Heyi Guo <guoheyi@huawei.com>
 
@@ -89,41 +88,19 @@ Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 Cc: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org
 ---
- hw/arm/virt-acpi-build.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ tests/qtest/bios-tables-test-allowed-diff.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index be752c0ad8..5d157a9dd5 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -151,7 +151,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
-pEntry *memmap,
- {
-     int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
-     Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
--    int i, bus_no;
-+    int i, slot_no;
-     hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
-     hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
-     hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
-@@ -170,12 +170,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const Mem=
-MapEntry *memmap,
-     aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-=20
-     /* Declare the PCI Routing Table. */
--    Aml *rt_pkg =3D aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
--    for (bus_no =3D 0; bus_no < nr_pcie_buses; bus_no++) {
-+    Aml *rt_pkg =3D aml_varpackage(PCI_SLOT_MAX * PCI_NUM_PINS);
-+    for (slot_no =3D 0; slot_no < PCI_SLOT_MAX; slot_no++) {
-         for (i =3D 0; i < PCI_NUM_PINS; i++) {
--            int gsi =3D (i + bus_no) % PCI_NUM_PINS;
-+            int gsi =3D (i + slot_no) % PCI_NUM_PINS;
-             Aml *pkg =3D aml_package(4);
--            aml_append(pkg, aml_int((bus_no << 16) | 0xFFFF));
-+            aml_append(pkg, aml_int((slot_no << 16) | 0xFFFF));
-             aml_append(pkg, aml_int(i));
-             aml_append(pkg, aml_name("GSI%d", gsi));
-             aml_append(pkg, aml_int(0));
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bi=
+os-tables-test-allowed-diff.h
+index dfb8523c8b..32a401ae35 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,4 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/virt/DSDT",
++"tests/data/acpi/virt/DSDT.memhp",
++"tests/data/acpi/virt/DSDT.numamem",
 --=20
 2.19.1
 
