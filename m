@@ -2,71 +2,64 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B8CC33C9E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C10C33C9E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:32:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 064FF20658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:32:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 064FF20658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C188220658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:32:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QCIRfKUN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C188220658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyVHC-0006tz-6D
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 01:32:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59401)
+	id 1iyVHm-0007j6-Va
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 01:32:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iyV6A-0003Q7-O5
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:20:44 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iyUyF-0003ue-Fg
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:12:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iyV69-0005a6-47
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:20:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53952)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iyV68-0005WA-Ub
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:20:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iyV67-0007Ne-E8
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 06:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 69B2D2E80C3
- for <qemu-devel@nongnu.org>; Mon,  3 Feb 2020 06:20:39 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1iyUyE-0003t6-6R
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:12:31 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:50999 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iyUyD-0003R2-Rw; Mon, 03 Feb 2020 01:12:30 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 489yBt1QNVz9sT7; Mon,  3 Feb 2020 17:11:34 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1580710294;
+ bh=3iAC76bwztBry20u5fNvLcGtCULA+alfuoS+B5Ni6nE=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=QCIRfKUNQcaoaM/Y6taYimvUqCWJnheJSUFan5C3jwNFodkifBu4187KwXRozwOB3
+ RRMs5KV6K5UtLHIe/rbCiLP6wZFoIi/zzDN8kpfV/OnvIUO/G0ly1It6QIjt40lxZB
+ jj6q1Ev+31oSjxDgD3Izm7Io7ITj7AV7+sJ76gzw=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 31/35] target/ppc: Use probe_access for LSW, STSW
+Date: Mon,  3 Feb 2020 17:11:19 +1100
+Message-Id: <20200203061123.59150-32-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200203061123.59150-1-david@gibson.dropbear.id.au>
+References: <20200203061123.59150-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Feb 2020 06:13:39 -0000
-From: zwq <1861653@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: awdrg901
-X-Launchpad-Bug-Reporter: zwq (awdrg901)
-X-Launchpad-Bug-Modifier: zwq (awdrg901)
-Message-Id: <158071042004.19865.7386710530747108432.malonedeb@wampee.canonical.com>
-Subject: [Bug 1861653] [NEW] CPU of qemu-system-aarch64 always stuck
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 24e44a63cc61a3296c062f13f29e15df5f59ac6e
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,147 +68,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1861653 <1861653@bugs.launchpad.net>
+Cc: lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ Howard Spoelstra <hsp.cat7@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-I started qemu with these arguments:
- qemu-system-aarch64 -M virt-2.9 -cpu cortex-a72 -smp cores=3D8,threads=3D1=
-,sockets=3D1 -m 2G -device nec-usb-xhci -device usb-kbd -device usb-tablet =
--pflash /sdcard/QEMU_EFI.img -pflash /sdcard/QEMU_VARS.img -device virtio-b=
-lk-device,drive=3DUbuntu -drive if=3Dnone,id=3DUbuntu,file=3DUbuntu.vhd -no=
-graphic -net user -net nic,model=3Drtl8139 -kernel linux -initrd initrd.gz
-The setup program of Ubuntu devel aarch64 ran normally.But after several ho=
-urs,the CPUs emulated by qemu-system-aarch64 went wrong.
-Here are the messages displayed on the tty
-[15842.164745] watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksoftirqd=
-/0:9]                                                                      =
-   [15930.163589] watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksofti=
-rqd/0:9]
-[16110.163540] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [ksoftirqd=
-/0:9] =
+Use a minimum number of mmu lookups for the contiguous bytes
+that are accessed.  If the lookup succeeds, we can finish the
+operation with host addresses only.
 
-[16290.162801] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [ksoftirqd=
-/0:9]
-[16470.163927] watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksoftirqd=
-/0:9] =
+Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200129235040.24022-2-richard.henderson@linaro.org>
+Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/mem_helper.c | 148 ++++++++++++++++++++++++++++++++++------
+ 1 file changed, 128 insertions(+), 20 deletions(-)
 
-[16650.163246] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [ksoftirqd=
-/0:9] =
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index e8e2a8ac2a..508d472a2f 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -56,6 +56,32 @@ static inline target_ulong addr_add(CPUPPCState *env, =
+target_ulong addr,
+     }
+ }
+=20
++static void *probe_contiguous(CPUPPCState *env, target_ulong addr, uint3=
+2_t nb,
++                              MMUAccessType access_type, int mmu_idx,
++                              uintptr_t raddr)
++{
++    void *host1, *host2;
++    uint32_t nb_pg1, nb_pg2;
++
++    nb_pg1 =3D -(addr | TARGET_PAGE_MASK);
++    if (likely(nb <=3D nb_pg1)) {
++        /* The entire operation is on a single page.  */
++        return probe_access(env, addr, nb, access_type, mmu_idx, raddr);
++    }
++
++    /* The operation spans two pages.  */
++    nb_pg2 =3D nb - nb_pg1;
++    host1 =3D probe_access(env, addr, nb_pg1, access_type, mmu_idx, radd=
+r);
++    addr =3D addr_add(env, addr, nb_pg1);
++    host2 =3D probe_access(env, addr, nb_pg2, access_type, mmu_idx, radd=
+r);
++
++    /* If the two host pages are contiguous, optimize.  */
++    if (host2 =3D=3D host1 + nb_pg1) {
++        return host1;
++    }
++    return NULL;
++}
++
+ void helper_lmw(CPUPPCState *env, target_ulong addr, uint32_t reg)
+ {
+     for (; reg < 32; reg++) {
+@@ -84,23 +110,65 @@ void helper_stmw(CPUPPCState *env, target_ulong addr=
+, uint32_t reg)
+ static void do_lsw(CPUPPCState *env, target_ulong addr, uint32_t nb,
+                    uint32_t reg, uintptr_t raddr)
+ {
+-    int sh;
++    int mmu_idx;
++    void *host;
++    uint32_t val;
+=20
+-    for (; nb > 3; nb -=3D 4) {
+-        env->gpr[reg] =3D cpu_ldl_data_ra(env, addr, raddr);
+-        reg =3D (reg + 1) % 32;
+-        addr =3D addr_add(env, addr, 4);
++    if (unlikely(nb =3D=3D 0)) {
++        return;
+     }
+-    if (unlikely(nb > 0)) {
+-        env->gpr[reg] =3D 0;
+-        for (sh =3D 24; nb > 0; nb--, sh -=3D 8) {
+-            env->gpr[reg] |=3D cpu_ldub_data_ra(env, addr, raddr) << sh;
+-            addr =3D addr_add(env, addr, 1);
++
++    mmu_idx =3D cpu_mmu_index(env, false);
++    host =3D probe_contiguous(env, addr, nb, MMU_DATA_LOAD, mmu_idx, rad=
+dr);
++
++    if (likely(host)) {
++        /* Fast path -- the entire operation is in RAM at host.  */
++        for (; nb > 3; nb -=3D 4) {
++            env->gpr[reg] =3D (uint32_t)ldl_be_p(host);
++            reg =3D (reg + 1) % 32;
++            host +=3D 4;
++        }
++        switch (nb) {
++        default:
++            return;
++        case 1:
++            val =3D ldub_p(host) << 24;
++            break;
++        case 2:
++            val =3D lduw_be_p(host) << 16;
++            break;
++        case 3:
++            val =3D (lduw_be_p(host) << 16) | (ldub_p(host + 2) << 8);
++            break;
++        }
++    } else {
++        /* Slow path -- at least some of the operation requires i/o.  */
++        for (; nb > 3; nb -=3D 4) {
++            env->gpr[reg] =3D cpu_ldl_mmuidx_ra(env, addr, mmu_idx, radd=
+r);
++            reg =3D (reg + 1) % 32;
++            addr =3D addr_add(env, addr, 4);
++        }
++        switch (nb) {
++        default:
++            return;
++        case 1:
++            val =3D cpu_ldub_mmuidx_ra(env, addr, mmu_idx, raddr) << 24;
++            break;
++        case 2:
++            val =3D cpu_lduw_mmuidx_ra(env, addr, mmu_idx, raddr) << 16;
++            break;
++        case 3:
++            val =3D cpu_lduw_mmuidx_ra(env, addr, mmu_idx, raddr) << 16;
++            addr =3D addr_add(env, addr, 2);
++            val |=3D cpu_ldub_mmuidx_ra(env, addr, mmu_idx, raddr) << 8;
++            break;
+         }
+     }
++    env->gpr[reg] =3D val;
+ }
+=20
+-void helper_lsw(CPUPPCState *env, target_ulong addr, uint32_t nb, uint32=
+_t reg)
++void helper_lsw(CPUPPCState *env, target_ulong addr,
++                uint32_t nb, uint32_t reg)
+ {
+     do_lsw(env, addr, nb, reg, GETPC());
+ }
+@@ -130,17 +198,57 @@ void helper_lswx(CPUPPCState *env, target_ulong add=
+r, uint32_t reg,
+ void helper_stsw(CPUPPCState *env, target_ulong addr, uint32_t nb,
+                  uint32_t reg)
+ {
+-    int sh;
++    uintptr_t raddr =3D GETPC();
++    int mmu_idx;
++    void *host;
++    uint32_t val;
+=20
+-    for (; nb > 3; nb -=3D 4) {
+-        cpu_stl_data_ra(env, addr, env->gpr[reg], GETPC());
+-        reg =3D (reg + 1) % 32;
+-        addr =3D addr_add(env, addr, 4);
++    if (unlikely(nb =3D=3D 0)) {
++        return;
+     }
+-    if (unlikely(nb > 0)) {
+-        for (sh =3D 24; nb > 0; nb--, sh -=3D 8) {
+-            cpu_stb_data_ra(env, addr, (env->gpr[reg] >> sh) & 0xFF, GET=
+PC());
+-            addr =3D addr_add(env, addr, 1);
++
++    mmu_idx =3D cpu_mmu_index(env, false);
++    host =3D probe_contiguous(env, addr, nb, MMU_DATA_STORE, mmu_idx, ra=
+ddr);
++
++    if (likely(host)) {
++        /* Fast path -- the entire operation is in RAM at host.  */
++        for (; nb > 3; nb -=3D 4) {
++            stl_be_p(host, env->gpr[reg]);
++            reg =3D (reg + 1) % 32;
++            host +=3D 4;
++        }
++        val =3D env->gpr[reg];
++        switch (nb) {
++        case 1:
++            stb_p(host, val >> 24);
++            break;
++        case 2:
++            stw_be_p(host, val >> 16);
++            break;
++        case 3:
++            stw_be_p(host, val >> 16);
++            stb_p(host + 2, val >> 8);
++            break;
++        }
++    } else {
++        for (; nb > 3; nb -=3D 4) {
++            cpu_stl_mmuidx_ra(env, addr, env->gpr[reg], mmu_idx, raddr);
++            reg =3D (reg + 1) % 32;
++            addr =3D addr_add(env, addr, 4);
++        }
++        val =3D env->gpr[reg];
++        switch (nb) {
++        case 1:
++            cpu_stb_mmuidx_ra(env, addr, val >> 24, mmu_idx, raddr);
++            break;
++        case 2:
++            cpu_stw_mmuidx_ra(env, addr, val >> 16, mmu_idx, raddr);
++            break;
++        case 3:
++            cpu_stw_mmuidx_ra(env, addr, val >> 16, mmu_idx, raddr);
++            addr =3D addr_add(env, addr, 2);
++            cpu_stb_mmuidx_ra(env, addr, val >> 8, mmu_idx, raddr);
++            break;
+         }
+     }
+ }
+--=20
+2.24.1
 
-[16830.163216] watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksoftirqd=
-/0:9] =
-
-[17010.164504] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [ksoftirqd=
-/0:9]
-
-Then I tried CentOS 7.1908 aarch64 with almost the same arguments.
-After several hours,it went wrong too.
-[17480 . 201 1 58] rcu : (3 ticks this GP) idle=3D362/0/0x3 softirq=3D61631=
- /61 631 fqs=3D10077
-[17480 . 204889] (detected by 3 , t=3D24007 jiffies , g=3D218453 , q=3D5285=
-) [1 7480 . 21 7986] Task dump for CPU 7 :
-[17480.222379] swapper/7R running task	0 =
-
-0  0x0000002a [17480.229073] Call trace :
-[1 7480.241518]	switch t0+0x104/0x1 f8
-[17480.249839]	Ox7fffffffffffffff
-[17660.232314] rcu : INFO: rcu sched detected stalls on CPUs/ tasks :
-[17660.233580] rcu : (3 ticks this GP) idle=3D362/0/0x3 softirq=3D61631 /61=
- 631 fqs=3D17770
-[17660.235837] (detected by 3,t=3D42012 jiffies , g=3D218453 , q=3D7039) =
-
-[17660 . 237955] Task dump for CPU 7 :
-[17660.238900] swapper/ 7  R running task  0   0
-[17660.242967] Call trace :
-[17660.246192]	switch t0+0x104/0x1 f8
-[17660.253215]	Ox7fffffffffffffff
-
-Obviously qemu-system-aarch64 caused these bugs.
-
-qemu version: 4.x(I have tested version 4.0 & 4.1.0 & 4.2.0)
-host architecture: aarch64(Qualcomm Snapdragon series)
-host system:Ubuntu devel 20.04& Debian 10(I have tested on many devices)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1861653
-
-Title:
-  CPU of qemu-system-aarch64 always stuck
-
-Status in QEMU:
-  New
-
-Bug description:
-  I started qemu with these arguments:
-   qemu-system-aarch64 -M virt-2.9 -cpu cortex-a72 -smp cores=3D8,threads=
-=3D1,sockets=3D1 -m 2G -device nec-usb-xhci -device usb-kbd -device usb-tab=
-let -pflash /sdcard/QEMU_EFI.img -pflash /sdcard/QEMU_VARS.img -device virt=
-io-blk-device,drive=3DUbuntu -drive if=3Dnone,id=3DUbuntu,file=3DUbuntu.vhd=
- -nographic -net user -net nic,model=3Drtl8139 -kernel linux -initrd initrd=
-.gz
-  The setup program of Ubuntu devel aarch64 ran normally.But after several =
-hours,the CPUs emulated by qemu-system-aarch64 went wrong.
-  Here are the messages displayed on the tty
-  [15842.164745] watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksoftir=
-qd/0:9]                                                                    =
-     [15930.163589] watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksof=
-tirqd/0:9]
-  [16110.163540] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [ksoftir=
-qd/0:9] =
-
-  [16290.162801] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [ksoftir=
-qd/0:9]
-  [16470.163927] watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksoftir=
-qd/0:9] =
-
-  [16650.163246] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [ksoftir=
-qd/0:9] =
-
-  [16830.163216] watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [ksoftir=
-qd/0:9] =
-
-  [17010.164504] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [ksoftir=
-qd/0:9]
-
-  Then I tried CentOS 7.1908 aarch64 with almost the same arguments.
-  After several hours,it went wrong too.
-  [17480 . 201 1 58] rcu : (3 ticks this GP) idle=3D362/0/0x3 softirq=3D616=
-31 /61 631 fqs=3D10077
-  [17480 . 204889] (detected by 3 , t=3D24007 jiffies , g=3D218453 , q=3D52=
-85) [1 7480 . 21 7986] Task dump for CPU 7 :
-  [17480.222379] swapper/7R running task	0 =
-
-  0  0x0000002a [17480.229073] Call trace :
-  [1 7480.241518]	switch t0+0x104/0x1 f8
-  [17480.249839]	Ox7fffffffffffffff
-  [17660.232314] rcu : INFO: rcu sched detected stalls on CPUs/ tasks :
-  [17660.233580] rcu : (3 ticks this GP) idle=3D362/0/0x3 softirq=3D61631 /=
-61 631 fqs=3D17770
-  [17660.235837] (detected by 3,t=3D42012 jiffies , g=3D218453 , q=3D7039) =
-
-  [17660 . 237955] Task dump for CPU 7 :
-  [17660.238900] swapper/ 7  R running task  0   0
-  [17660.242967] Call trace :
-  [17660.246192]	switch t0+0x104/0x1 f8
-  [17660.253215]	Ox7fffffffffffffff
-
-  Obviously qemu-system-aarch64 caused these bugs.
-
-  qemu version: 4.x(I have tested version 4.0 & 4.1.0 & 4.2.0)
-  host architecture: aarch64(Qualcomm Snapdragon series)
-  host system:Ubuntu devel 20.04& Debian 10(I have tested on many devices)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1861653/+subscriptions
 
