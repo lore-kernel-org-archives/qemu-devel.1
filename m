@@ -2,67 +2,77 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F49C35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 17:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB66C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 17:42:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2809E20CC7
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 17:38:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2809E20CC7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 52B1B2051A
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 17:42:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=megamailservers.eu header.i=@megamailservers.eu header.b="g+vyjUW3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B1B2051A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=o2online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyfgQ-0001Fu-DL
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 12:38:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35972)
+	id 1iyfkA-0002qj-85
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 12:42:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42405)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iyffN-0000Y1-I3
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:37:46 -0500
+ (envelope-from <rsta2@o2online.de>) id 1iyfj3-0002Jc-Cp
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:41:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iyffK-0002aF-Uy
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:37:44 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:34295)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iyffK-0002R4-F0
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:37:42 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MjSHc-1jNa5q0ChG-00l0Ma; Mon, 03 Feb 2020 18:37:28 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] linux-user: implement TARGET_SO_PEERSEC
-Date: Mon,  3 Feb 2020 18:37:24 +0100
-Message-Id: <20200203173724.1601021-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <rsta2@o2online.de>) id 1iyfj2-0003KH-E9
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:41:33 -0500
+Received: from mail1454c50.megamailservers.eu ([91.136.14.54]:52974
+ helo=mail266c50.megamailservers.eu)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rsta2@o2online.de>)
+ id 1iyfiz-0002vb-Cm; Mon, 03 Feb 2020 12:41:30 -0500
+X-Authenticated-User: 017626146082@o2online.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=megamailservers.eu;
+ s=maildub; t=1580744483;
+ bh=UEdoKkBekSSPy6Qva+zTYSGw/Rf/PxDmGz4nNClJIFw=;
+ h=From:To:Cc:Subject:Date:From;
+ b=g+vyjUW3mtpmUo7qWoMTJkoXtilP06Y4BQASpVpatLAQRs/rwHKcr+BITr4d4Vqxg
+ pVSZBhaU7EgQwvWvtI2Smg4p1pZuXOR3LtWBODobZ+zbFu3hWOe88/LLOgNqWyZMrJ
+ s7MjQusGqd/zgbsCYqzZMF+hxoPxZUClHLwHNO5A=
+Feedback-ID: rsta2@o2online.
+Received: from desktop2.localnet (178-21-1-177.ilmprovider.net [178.21.1.177])
+ (authenticated bits=0)
+ by mail266c50.megamailservers.eu (8.14.9/8.13.1) with ESMTP id 013FfLPU022990
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+ Mon, 3 Feb 2020 15:41:23 +0000
+From: Rene Stange <rsta2@o2online.de>
+To: Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>
+Subject: [PATCH v2 2/2] bcm2835_dma: Re-initialize xlen in TD mode
+Date: Mon, 03 Feb 2020 16:40:51 +0100
+Message-ID: <5397138.k0qeMALlIp@desktop2>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:MJ4kazHLBaO0nqE0HRDtWzjjljEosgIimjN7HyjDPY8ePAboeS8
- 7ulrDNxtDmZSKPMJzvG0E+jwMZKYfEWpkIkApR9hJXUvS7JOenPioLXagBAqpjbtnGVql8K
- FoGxPrFq4ietvj7bStvQl6YbxQR6id8XR0rZG+UPP7PSTmNdpDJS+mFsD8miqd/1SZ9M9DG
- 5+EnKkB2bMBXqRxf5gxAg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:lfinzv2pjb4=:erBTSYaBwNpfDwSWWzVBgv
- AKHBITV5EdKVeECw9kO94OSCHLIK8FkB0mAvcZKvxR0POjeCold+Ml/ObiLKeiavUH0ZBsfw/
- xGD+9dx3sP4/E3gsahj+PUJdHVJ5DSoT+YYaC5/6uB9K53gQmJTyEDwb/kLL+pFvxmgD6k5p3
- FzVE4Wj8bwb89QtlifX/C8vJ39Vovv/lZqVzXGITNO98YTotNMvcv0r6Vc+Koj8U9ibXG0k9u
- wzCidO5DWqXdou5Qt0iloxgIhMSAAbybtXExY9OUIqv5FSqQ1SG6Zza6U+bksBfj/MCtFNvig
- rlq45qNEtFWhr6uKhlo4brw8evAv58CEMVoWSU45AbSFL4XB9EmRh3z3b6XXrxGqtPqRfqkFm
- NJViXwEwtZSYkYNkn6dTC6xFCcp/UXgatIMDMgYgCBDi357d34wUj94ep5WLKfI4GAoSUPecH
- UF62vRaibbY7hak92C2hiKcSEsD4H9vawQQVgzpDXjoS4INK7X+jZ8qdaMcB7weuGLEySH0ng
- E0VOp3ViH8VcS1oOxTiAvaewuAPDM7nD6KR4L1GN/dUxzjiEaWIs5xye8epwUVKZH5681H/JP
- LKerqnUdpN7VqygaYViw+XhWXnEQxlrtT7dkAJzA/Wm8Xt/YLR2+byXLS0EjtJo2DAznOYt4v
- XILINABF0y0UNl3GDkRpHSDEhRj/Syz+IzJB6pQOFGbPZdn6aSyHc6j16VMkfjtzyaR54OQd2
- 6T5g7+R6FtNceNPjeAS+hUcM/YRxLQbBN+WVdJrPT4gGjLCbvZfu/2n4KDwPpWSxyaYqjNdt7
- WaDSuDTMt7ukoEa+kppbJnG+a60CRnqYWbLK8CZ83H9vR6wEn3QI1EQgbsvbTEqPEmyzmcC
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-CTCH-RefID: str=0001.0A0B0201.5E383F23.0053, ss=1, re=0.000, recu=0.000,
+ reip=0.000, cl=1, cld=1, fgs=0
+X-CTCH-VOD: Unknown
+X-CTCH-Spam: Unknown
+X-CTCH-Score: 0.000
+X-CTCH-Rules: 
+X-CTCH-Flags: 0
+X-CTCH-ScoreCust: 0.000
+X-CSC: 0
+X-CHA: v=2.3 cv=PNJxBsiC c=1 sm=1 tr=0 a=oFQkuSNlBNCQRuITVo1IXg==:117
+ a=oFQkuSNlBNCQRuITVo1IXg==:17 a=kj9zAlcOel0A:10 a=SvY40l2xVmRt99U1V6QA:9
+ a=CjuIK1q_8ugA:10
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic]
+X-Received-From: 91.136.14.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,122 +84,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Matthias=20L=C3=BCscher?= <lueschem@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ Andrew Baumann <andrew.baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"The purpose of this option is to allow an application to obtain the
-security credentials of a Unix stream socket peer.  It is analogous to
-SO_PEERCRED (which provides authentication using standard Unix credentials
-of pid, uid and gid), and extends this concept to other security
-models." -- https://lwn.net/Articles/62370/
+TD (two dimensions) DMA mode did not work, because the xlen variable
+has not been re-initialized before each additional ylen run through
+in bcm2835_dma_update(), which has been fixed.
 
-Until now it was passed to the kernel with an "int" argument and
-fails when it was supported by the host because the parameter is
-like a filename: it is always a \0-terminated string with no embedded
-\0 characters, but is not guaranteed to be ASCII or UTF-8.
-
-I've tested the option with the following program:
-
-    /*
-     * cc -o getpeercon getpeercon.c
-     */
-
-    #include <stdio.h>
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <arpa/inet.h>
-
-    int main(void)
-    {
-        int fd;
-        struct sockaddr_in server, addr;
-        int ret;
-        socklen_t len;
-        char buf[256];
-
-        fd = socket(PF_INET, SOCK_STREAM, 0);
-        if (fd == -1) {
-            perror("socket");
-            return 1;
-        }
-
-        server.sin_family = AF_INET;
-        inet_aton("127.0.0.1", &server.sin_addr);
-        server.sin_port = htons(40390);
-
-        connect(fd, (struct sockaddr*)&server, sizeof(server));
-
-        len = sizeof(buf);
-        ret = getsockopt(fd, SOL_SOCKET, SO_PEERSEC, buf, &len);
-        if (ret == -1) {
-            perror("getsockopt");
-            return 1;
-        }
-        printf("%d %s\n", len, buf);
-        return 0;
-    }
-
-On host:
-
-  $ ./getpeercon
-  33 system_u:object_r:unlabeled_t:s0
-
-With qemu-aarch64/bionic without the patch:
-
-  $ ./getpeercon
-  getsockopt: Numerical result out of range
-
-With the patch:
-
-  $ ./getpeercon
-  33 system_u:object_r:unlabeled_t:s0
-
-Bug: https://bugs.launchpad.net/qemu/+bug/1823790
-Reported-by: Matthias Lüscher <lueschem@gmail.com>
-Tested-by: Matthias Lüscher <lueschem@gmail.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Rene Stange <rsta2@o2online.de>
 ---
- linux-user/syscall.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ hw/dma/bcm2835_dma.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index d60142f0691c..5f37e62772de 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2344,6 +2344,28 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-             }
-             break;
+diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
+index 667d951a6f..ccff5ed55b 100644
+--- a/hw/dma/bcm2835_dma.c
++++ b/hw/dma/bcm2835_dma.c
+@@ -54,7 +54,7 @@
+ static void bcm2835_dma_update(BCM2835DMAState *s, unsigned c)
+ {
+     BCM2835DMAChan *ch = &s->chan[c];
+-    uint32_t data, xlen, ylen;
++    uint32_t data, xlen, xlen_td, ylen;
+     int16_t dst_stride, src_stride;
+ 
+     if (!(s->enable & (1 << c))) {
+@@ -82,6 +82,7 @@ static void bcm2835_dma_update(BCM2835DMAState *s, unsigned c)
+             dst_stride = 0;
+             src_stride = 0;
          }
-+        case TARGET_SO_PEERSEC: {
-+            char *name;
-+
-+            if (get_user_u32(len, optlen)) {
-+                return -TARGET_EFAULT;
-+            }
-+            if (len < 0) {
-+                return -TARGET_EINVAL;
-+            }
-+            name = lock_user(VERIFY_WRITE, optval_addr, len, 0);
-+            if (!name) {
-+                return -TARGET_EFAULT;
-+            }
-+            lv = len;
-+            ret = get_errno(getsockopt(sockfd, level, SO_PEERSEC,
-+                                       name, &lv));
-+            if (put_user_u32(lv, optlen)) {
-+                ret = -TARGET_EFAULT;
-+            }
-+            unlock_user(name, optval_addr, 0);
-+            break;
-+        }
-         case TARGET_SO_LINGER:
-         {
-             struct linger lg;
++        xlen_td = xlen;
+ 
+         while (ylen != 0) {
+             /* Normal transfer mode */
+@@ -117,6 +118,7 @@ static void bcm2835_dma_update(BCM2835DMAState *s, unsigned c)
+             if (--ylen != 0) {
+                 ch->source_ad += src_stride;
+                 ch->dest_ad += dst_stride;
++                xlen = xlen_td;
+             }
+         }
+         ch->cs |= BCM2708_DMA_END;
 -- 
-2.24.1
+2.16.4
+
+
+
 
 
