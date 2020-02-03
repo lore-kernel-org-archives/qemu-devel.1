@@ -2,88 +2,88 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C16E7C3524D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68852C3524D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:08:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D4D220661
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:05:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30EFE2070A
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:08:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H4HIkKDd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D4D220661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EMfm66/a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30EFE2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyXfG-0004dp-P1
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 04:05:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45973)
+	id 1iyXiA-0005jt-D9
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 04:08:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46934)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iyXec-0004Ae-1h
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:04:27 -0500
+ (envelope-from <mst@redhat.com>) id 1iyXhS-0005Hr-OU
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:07:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iyXea-0003Be-5r
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:04:25 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36619
+ (envelope-from <mst@redhat.com>) id 1iyXhR-0005g7-LE
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:07:22 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40942
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iyXea-0003A2-0z
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:04:24 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iyXhR-0005fh-Ga
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:07:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580720663;
+ s=mimecast20190719; t=1580720841;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=L2nlnyb9M/cQPfNngS/yX3DXgvPe5jm+Z8q6Itkk+/8=;
- b=H4HIkKDddzw6tmhIfoyfBj/y63Zdrv8s8sVPbXeJ5qfUdEvN5XoH+31yo2HGW5iVCNMirT
- JlXG4JyduE2UwejacFB5EI7HQ2hXV661YOfvpXCimx0qGibDHvy6spMaO2AXK/PMXcskhJ
- 6MfV6oIVIyq2WCAGAmhMxfkjO185plI=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-M46l1N-0Nw2OKvX3nN5oZg-1; Mon, 03 Feb 2020 04:04:21 -0500
-Received: by mail-qt1-f198.google.com with SMTP id d9so9488421qtq.13
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 01:04:21 -0800 (PST)
+ bh=3SFZ1U9p+hsmLArZ051uB8UvyFgwah7c78ZaL0LL9GE=;
+ b=EMfm66/arMV0kuv6SPjbOnQ7xxw5gl5C3AuA0d6uQQW9/8dDjo+E/7XEzH4m8GoQvxKVmz
+ KG4cFEYHd/wPRJEl79jirjDtlglmmbEWIrAZLP3nTOBccySHhPovrXqFIlGXLVu84tpfNd
+ vTdBvBR5q8v8+6DcYMHTxFu0KYf5eM0=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-OISC1u0jNGOgVoBg4LI_xw-1; Mon, 03 Feb 2020 04:07:17 -0500
+Received: by mail-qv1-f70.google.com with SMTP id e10so9051858qvq.18
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 01:07:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=VAxLpU8vY4sszduIEmbVpIY8M2z95ngMeg4cT120aGk=;
- b=jx6SkyLEwAoZy9A7nl6INvT0cgDh4haLOJPCKvhzjVosomspTLI1nzRRKmffhZuL3Y
- c+HxZ20Z2hGkNtNIAlxA4v77yxOwHXxyq5uyQlVyBra9DVGL7s/h2/s8gVZCtKzKbesb
- ZgHiSvfiBxZX8zDpVcAnAvKTEdocYy0XKfdBF9mCZrV8mK0k6bACWgur+o3WOissyh4H
- DojRgKAvTHtah3K11AD8mK0q3dqQKxML6PsQ0phX5enw8JU/ELb5I7DzmbqIwV0cZvL3
- 99arN8ABGyEf5KqU9Em7nRSip4EMBb0/OFRe6z/cirLKLkOT0/qbDGDqSBu1LzA2itSK
- a4mw==
-X-Gm-Message-State: APjAAAXeteML2Ve00xegh/lZ9tvR8jeVc9iK+o7S8fqCgRPJCQVh0/Pt
- CWMr9tM3AeGznchwM75j87GHIdUuYDicHjXPV5BXbLujOqFD8We9umtQYmcxAD0sSLwnZ6Ekews
- rp27TYfCM4RQIYa4=
-X-Received: by 2002:ac8:36ab:: with SMTP id a40mr22284764qtc.60.1580720660988; 
- Mon, 03 Feb 2020 01:04:20 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy2TXjRHFLIxA0HqwaTmBNpvBuLH3xzunfzdW1168aykxU6YQgV7J2QfmrYQqQ3xGbVBCNAlA==
-X-Received: by 2002:ac8:36ab:: with SMTP id a40mr22284749qtc.60.1580720660712; 
- Mon, 03 Feb 2020 01:04:20 -0800 (PST)
+ bh=XgSoVOBb7T4uOh6oYhrMMDEjfdaynsWMAZqImMYH6qM=;
+ b=eBA8uLj1SG+zAZHC7B/8iR/LAAPokfn1F1c3Ee/Vs/9Vp91q4xtOB6JqqMw4rzOeCU
+ N2ZFANqeS4rF39IMi8ugkWF4HZNSRCYrELR65mcY9DshM6QksBJojw1v7eI0FHYgxDYk
+ mcUX4vPrTW6J+z6G4mTpAbLE4hNSwzzw+SEVw9Fm6S4H2X3TGtaWS5Nt4DBfSVGGPuh9
+ j8/X3inSIxp9zqqeMNLspeFU+boizZzwmL+5ipn8SflOxHf6Jfo48/5wxZ0HWj1ZSHge
+ BUHB+413FjsbF3+JyUknk/ZdVVtjzPLPKqON8/GR4mBCtjqPq23BLP2zIl5rO2+IfBma
+ QTTw==
+X-Gm-Message-State: APjAAAUyVn77ZLHTrFvx949DhxMAMOMimGHGvHe6w6GbjAyLD+OCHmZg
+ 0QALbrYJLsALID/cWrAwQmVgjgw3gY53ZpjMKblUHB9tCUb3rqL7zzarWejRzSf2uqPP/0tzsTf
+ VnMV9MQ/M+xlUvF4=
+X-Received: by 2002:aed:3344:: with SMTP id u62mr22196333qtd.73.1580720837113; 
+ Mon, 03 Feb 2020 01:07:17 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwAR42PzV+v2ry8S7HwP3d1dPgKtGe4mbo29h3GME1MJtkaXT1TITXjFdac9p8kylij+Xow1Q==
+X-Received: by 2002:aed:3344:: with SMTP id u62mr22196314qtd.73.1580720836830; 
+ Mon, 03 Feb 2020 01:07:16 -0800 (PST)
 Received: from redhat.com (bzq-109-64-11-187.red.bezeqint.net. [109.64.11.187])
- by smtp.gmail.com with ESMTPSA id y27sm9858543qta.50.2020.02.03.01.04.18
+ by smtp.gmail.com with ESMTPSA id u21sm3104182qke.102.2020.02.03.01.07.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 01:04:19 -0800 (PST)
-Date: Mon, 3 Feb 2020 04:04:15 -0500
+ Mon, 03 Feb 2020 01:07:16 -0800 (PST)
+Date: Mon, 3 Feb 2020 04:07:12 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v4 03/80] machine: alias -mem-path and -mem-prealloc into
- memory-foo backend
-Message-ID: <20200203040204-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH v4 43/80] x86/pc: use memdev for RAM
+Message-ID: <20200203040441-mutt-send-email-mst@kernel.org>
 References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
- <1580483390-131164-4-git-send-email-imammedo@redhat.com>
+ <1580483390-131164-44-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1580483390-131164-4-git-send-email-imammedo@redhat.com>
-X-MC-Unique: M46l1N-0Nw2OKvX3nN5oZg-1
+In-Reply-To: <1580483390-131164-44-git-send-email-imammedo@redhat.com>
+X-MC-Unique: OISC1u0jNGOgVoBg4LI_xw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -103,195 +103,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.ibm.com, pbonzini@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 31, 2020 at 04:08:33PM +0100, Igor Mammedov wrote:
-> Allow machine to opt in for hostmem backend based initial RAM
-> even if user uses old -mem-path/prealloc options by providing
+On Fri, Jan 31, 2020 at 04:09:13PM +0100, Igor Mammedov wrote:
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
 >   MachineClass::default_ram_id
-> Follow up patches will incrementally convert machines to new API,
-> by dropping memory_region_allocate_system_memory() and setting
-> default_ram_id that board used to use before conversion to keep
-> migration stream the same.
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
 >=20
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-What about non-versioned machines though?
-Why do these need to set default_ram_id?
-Seems redundant as they don't need to support cross-version
-migration ...
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+But see by other comment - I think a bool flag to opt in,
+that can then be dropped for non-versioned boards would be nicer.
+
+E.g. use_memdev_for_ram.
+
 
 
 > ---
-> v3:
->    * rename "ram-memdev" property to "memory-backend"
->      (Paolo Bonzini <pbonzini@redhat.com>)
-> v4:
->    * previous patch changed memory-backend property from link
->      to string to allow for delayed backend creation, when
->      backend comes explicitly from CLI.
->      So s/object_property_set_link()/object_property_set_str()/
->      to account for that.
->=20
-> CC: ehabkost@redhat.com
+> CC: mst@redhat.com
 > CC: pbonzini@redhat.com
-> CC: philmd@redhat.com
-> CC: pasic@linux.ibm.com
+> CC: rth@twiddle.net
+> CC: ehabkost@redhat.com
 > ---
->  include/hw/boards.h      |  5 +++++
->  include/sysemu/hostmem.h | 16 ++++++++++++++++
->  backends/hostmem-file.c  |  7 -------
->  backends/hostmem-ram.c   |  2 --
->  vl.c                     | 25 +++++++++++++++++++++++++
->  5 files changed, 46 insertions(+), 9 deletions(-)
+>  hw/i386/pc.c | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
 >=20
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 7b4b6b7..106de87 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -170,6 +170,10 @@ typedef struct {
->   *    false is returned, an error must be set to show the reason of
->   *    the rejection.  If the hook is not provided, all hotplug will be
->   *    allowed.
-> + * @default_ram_id:
-> + *    Specifies inital RAM MemoryRegion name to be used for default back=
-end
-> + *    creation if user explicitly hasn't specified backend with "memory-=
-backend"
-> + *    property.
->   */
->  struct MachineClass {
->      /*< private >*/
-> @@ -226,6 +230,7 @@ struct MachineClass {
->      bool nvdimm_supported;
->      bool numa_mem_supported;
->      bool auto_enable_numa;
-> +    const char *default_ram_id;
-> =20
->      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
->                                             DeviceState *dev);
-> diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-> index 4dbdadd..5db0d66 100644
-> --- a/include/sysemu/hostmem.h
-> +++ b/include/sysemu/hostmem.h
-> @@ -27,6 +27,22 @@
->  #define MEMORY_BACKEND_CLASS(klass) \
->      OBJECT_CLASS_CHECK(HostMemoryBackendClass, (klass), TYPE_MEMORY_BACK=
-END)
-> =20
-> +/* hostmem-ram.c */
-> +/**
-> + * @TYPE_MEMORY_BACKEND_RAM:
-> + * name of backend that uses mmap on the anonymous RAM
-> + */
-> +
-> +#define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
-> +
-> +/* hostmem-file.c */
-> +/**
-> + * @TYPE_MEMORY_BACKEND_FILE:
-> + * name of backend that uses mmap on a file descriptor
-> + */
-> +#define TYPE_MEMORY_BACKEND_FILE "memory-backend-file"
-> +
-> +typedef struct HostMemoryBackend HostMemoryBackend;
->  typedef struct HostMemoryBackendClass HostMemoryBackendClass;
-> =20
->  /**
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> index be64020..cb319a9 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -18,13 +18,6 @@
->  #include "sysemu/sysemu.h"
->  #include "qom/object_interfaces.h"
-> =20
-> -/* hostmem-file.c */
-> -/**
-> - * @TYPE_MEMORY_BACKEND_FILE:
-> - * name of backend that uses mmap on a file descriptor
-> - */
-> -#define TYPE_MEMORY_BACKEND_FILE "memory-backend-file"
-> -
->  #define MEMORY_BACKEND_FILE(obj) \
->      OBJECT_CHECK(HostMemoryBackendFile, (obj), TYPE_MEMORY_BACKEND_FILE)
-> =20
-> diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
-> index 6aab8d3..5cc53e7 100644
-> --- a/backends/hostmem-ram.c
-> +++ b/backends/hostmem-ram.c
-> @@ -16,8 +16,6 @@
->  #include "qemu/module.h"
->  #include "qom/object_interfaces.h"
-> =20
-> -#define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
-> -
->  static void
->  ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 2ddce42..6ab4acb 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -937,7 +937,7 @@ void pc_memory_init(PCMachineState *pcms,
+>                      MemoryRegion **ram_memory)
 >  {
-> diff --git a/vl.c b/vl.c
-> index 24951b5..2367cb6 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -75,6 +75,7 @@ int main(int argc, char **argv)
->  #include "ui/input.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/numa.h"
-> +#include "sysemu/hostmem.h"
->  #include "exec/gdbstub.h"
->  #include "qemu/timer.h"
->  #include "chardev/char.h"
-> @@ -2839,6 +2840,26 @@ static void configure_accelerators(const char *pro=
-gname)
->      }
->  }
+>      int linux_boot, i;
+> -    MemoryRegion *ram, *option_rom_mr;
+> +    MemoryRegion *option_rom_mr;
+>      MemoryRegion *ram_below_4g, *ram_above_4g;
+>      FWCfgState *fw_cfg;
+>      MachineState *machine =3D MACHINE(pcms);
+> @@ -950,22 +950,20 @@ void pc_memory_init(PCMachineState *pcms,
 > =20
-> +static void create_default_memdev(MachineState *ms, const char *path,
-> +                                  bool prealloc)
-> +{
-> +    Object *obj;
-> +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-> +
-> +    obj =3D object_new(path ? TYPE_MEMORY_BACKEND_FILE : TYPE_MEMORY_BAC=
-KEND_RAM);
-> +    if (path) {
-> +        object_property_set_str(obj, path, "mem-path", &error_fatal);
-> +    }
-> +    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
-> +    object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
-> +    object_property_add_child(object_get_objects_root(), mc->default_ram=
-_id,
-> +                              obj, &error_fatal);
-> +    user_creatable_complete(USER_CREATABLE(obj), &error_fatal);
-> +    object_unref(obj);
-> +    object_property_set_str(OBJECT(ms), mc->default_ram_id, "memory-back=
-end",
-> +                            &error_fatal);
-> +}
-> +
->  int main(int argc, char **argv, char **envp)
->  {
->      int i;
-> @@ -4302,6 +4323,10 @@ int main(int argc, char **argv, char **envp)
->      }
->      parse_numa_opts(current_machine);
+>      linux_boot =3D (machine->kernel_filename !=3D NULL);
 > =20
-> +    if (machine_class->default_ram_id && current_machine->ram_size &&
-> +        !current_machine->ram_memdev_id) {
-> +        create_default_memdev(current_machine, mem_path, mem_prealloc);
-> +    }
->      /* do monitor/qmp handling at preconfig state if requested */
->      main_loop();
-
-So this check for default_ram_id will become redundant after the
-patchset is fully applied, this is just for bisect to work well, right?
-I couldn't find patches that drop this check though.
-
-
+> -    /* Allocate RAM.  We allocate it as a single memory region and use
+> -     * aliases to address portions of it, mostly for backwards compatibi=
+lity
+> -     * with older qemus that used qemu_ram_alloc().
+> +    /*
+> +     * Split single memory region and use aliases to address portions of=
+ it,
+> +     * done for backwards compatibility with older qemus.
+>       */
+> -    ram =3D g_malloc(sizeof(*ram));
+> -    memory_region_allocate_system_memory(ram, NULL, "pc.ram",
+> -                                         machine->ram_size);
+> -    *ram_memory =3D ram;
+> +    *ram_memory =3D machine->ram;
+>      ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
+> -    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
+> +    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", machine=
+->ram,
+>                               0, x86ms->below_4g_mem_size);
+>      memory_region_add_subregion(system_memory, 0, ram_below_4g);
+>      e820_add_entry(0, x86ms->below_4g_mem_size, E820_RAM);
+>      if (x86ms->above_4g_mem_size > 0) {
+>          ram_above_4g =3D g_malloc(sizeof(*ram_above_4g));
+> -        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram=
+,
+> +        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g",
+> +                                 machine->ram,
+>                                   x86ms->below_4g_mem_size,
+>                                   x86ms->above_4g_mem_size);
+>          memory_region_add_subregion(system_memory, 0x100000000ULL,
+> @@ -1952,6 +1950,7 @@ static void pc_machine_class_init(ObjectClass *oc, =
+void *data)
+>      mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
+>      mc->nvdimm_supported =3D true;
+>      mc->numa_mem_supported =3D true;
+> +    mc->default_ram_id =3D "pc.ram";
+> =20
+>      object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
+>          pc_machine_get_device_memory_region_size, NULL,
 > --=20
 > 2.7.4
 >=20
