@@ -2,103 +2,119 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAD7C33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 836EFC33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:57:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AC772080D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:54:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 504392080D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:57:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0yiWaZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AC772080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="dLfXjKOz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504392080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iybFB-0007qN-GI
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:54:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34922)
+	id 1iybHx-0000Zk-Is
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:57:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35893)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iybEI-0006z1-JL
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:53:31 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iybH1-0008TD-Fk
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:56:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iybEH-00082W-93
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:53:30 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55278
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iybEH-00082F-5R
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:53:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580734408;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kdVN3Zi9ejxzn6Fb9EOp2ieVboK6viHxB7rMgqcVwO8=;
- b=I0yiWaZ6RVwZhQinqiUw6hMPl9XBU3b+8N0nQ7pRpjZPR2ggnGQ8KsNu3oUp3zKSaKxLcS
- U4RPq1LduI7cpe0P//ztMa0wIYz35V2Bn2TuNaRHaWqMbGBMgwJTUtHrqLSE7HWcmLwcYv
- 2B8bCz3nox1A82AURR9L5TgVeAHx0VA=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-gATivyekMmKwrtIV92WU-w-1; Mon, 03 Feb 2020 07:53:26 -0500
-Received: by mail-qt1-f199.google.com with SMTP id e37so9813553qtk.7
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 04:53:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=WglZzTMNw7J4xeNlp3OUXtdB7aXTMzK+smoW8gtda7c=;
- b=f0TK6BfHnf9Fehrei4jhTGwvnIVrcOcSpgx3RXAy3i/Whgx+DoL3oRF+92BFw/5TAY
- shnS8vt1yhDDOO1eV/UF9HBzMygCRnrIGgyik9YbtSaEI5GNPp9CebYSwAgWKmswryqe
- o6nmwiOl59Qw6bjDKriA0EJxdtawphBtiemF+Vp6vzCCJqCqXNrbeSs989cHIlZa+rtA
- r+VCM0m5t7er8meo5gZneZoqfMn1N2Vebd4Hw7wUS+LLdfrwKnSAJu3RMe5AOampAOuD
- bEwu54tJa/UziJlzSYjCmWqitGGlvuoZmWqadUsYLk4lFStjrwzDwuNbfeXo+fcyJMB2
- Y7Ug==
-X-Gm-Message-State: APjAAAUq0Qo73c5E5HBSIR5jzPFkbZ/YMph7bgRF1nmMuAmSxlnfUX91
- RtInbkLn9I/hCIGwdJU2E8GtzcfuLZj5elUPWkLKQmiXpH5cgm3f6RLaP3W9I90KbFQx5CMUuZn
- j6cnaDJNq2uzDSEM=
-X-Received: by 2002:a37:a958:: with SMTP id s85mr8963480qke.243.1580734405875; 
- Mon, 03 Feb 2020 04:53:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzaoky7IObG+4FFBwo0mrO64PyRihks2+7pFijQYWzetWZVBCJAW/EGfsYggreJZ0wlh4bmKg==
-X-Received: by 2002:a37:a958:: with SMTP id s85mr8963460qke.243.1580734405602; 
- Mon, 03 Feb 2020 04:53:25 -0800 (PST)
-Received: from redhat.com (bzq-109-64-11-187.red.bezeqint.net. [109.64.11.187])
- by smtp.gmail.com with ESMTPSA id s20sm9065388qkg.131.2020.02.03.04.53.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 04:53:24 -0800 (PST)
-Date: Mon, 3 Feb 2020 07:53:20 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH v2 2/4] virtio-scsi: default num_queues to -smp N
-Message-ID: <20200203075246-mutt-send-email-mst@kernel.org>
-References: <20200124100159.736209-1-stefanha@redhat.com>
- <20200124100159.736209-3-stefanha@redhat.com>
- <20200127141031.6e108839.cohuck@redhat.com>
- <20200129154438.GC157595@stefanha-x1.localdomain>
- <bc9680fc-c382-301f-a1fe-21740c918570@redhat.com>
- <20200130105235.GC176651@stefanha-x1.localdomain>
- <20200203102529.3op54zggtquoguuo@dritchie>
- <20200203105744.GD1922177@redhat.com>
- <20200203113949.hnjuqzkrqqwst54e@dritchie>
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iybH0-0003AD-6b
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:56:19 -0500
+Received: from mail-eopbgr30100.outbound.protection.outlook.com
+ ([40.107.3.100]:4675 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iybGv-00031N-HP; Mon, 03 Feb 2020 07:56:14 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=h1bJgRdiB11AG23LRTZUYL8i5hsGsQKuiMh7DHIQ/UgyrogMVD2+L4SPZTK10x5pGOsDsbiPJiZzoYhC9I6gxoURqr4iCQCe7PUmOHtJLXzAb+qAcBgGSCX+x2xb7vFmCaZ8UNTIO/xJHZw3O+yQIw+CnpvGOjqndcC6DWpgLvsyZlqVglMWBk4ps3VS7mzWL9X1/dfFDJtYWu4cf2lBwEqrNWN7puEs+dh7csQyfseFkbPYk1gkZ4o7T0RSI/4mTGgC8n44t9NiRrT3+Q7CX/D2np+FksTDhC4EiuVfLkJMAkSLdxHFJ8mYArDfUfI7WxZKSVT8wMK/8YCZcoeQfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6YRyNf1QPqCBry+TSB4b3TpPDtn0G1YK4ZE4u7/9g8Q=;
+ b=ijQG5k/URkXxQURTxXuQszrUml6W9uGF0k+KhTxQdEWkw9ZbWnu9dvy6/3OH20YZx5lYvy2BJZR950xN3SQjD+AQUFwMElGY9SCXoRL3fP52C+BSip/aJbRJ035kyTYeuCy2PNooDYBddmGXURSnENjUDhR4cz1kO7nuZmoB32rTvjPgv8HPf8hkOcB2PXz2QaA3xSIALEJ3u+xhhjuYzuwS5WBCOmUAVWjLwkNIDelKsfh767U/yMXlJ+IEt2myqJZT0x/N6jWBwF1NobAIfqzg8nG0vuhvvVBR7XpSo3HkTKODseIJAf6TaGGw/Ckxu5k21BJcO45CyJj8gc+eEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6YRyNf1QPqCBry+TSB4b3TpPDtn0G1YK4ZE4u7/9g8Q=;
+ b=dLfXjKOzrmtLon9ckzyBKvnpVX9xbLL3K/fZ5rGy3Xc5TXRni5JCCVZjN7iRGd1W4fZYG50RQ1qaGIy1pZy/1HKJwfMKjngSSS7CxUdSBfPO//N3VuKT6Z3vnGdzeg4EU+QYXju8kkXn9VUdBy+M4J3sxdICVnZPtg7RQMe+gEM=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
+ AM0PR08MB5169.eurprd08.prod.outlook.com (10.255.31.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.26; Mon, 3 Feb 2020 12:56:09 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::5558:d9d2:7f7d:e4]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::5558:d9d2:7f7d:e4%2]) with mapi id 15.20.2686.031; Mon, 3 Feb 2020
+ 12:56:09 +0000
+Subject: Re: [PATCH v1 1/4] virtio: introduce VIRTQUEUE_DEFUALT_SIZE instead
+ of hardcoded constants
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
+ <20200129140702.5411-2-dplotnikov@virtuozzo.com>
+ <20200130083800-mutt-send-email-mst@kernel.org>
+ <ad737ab5-2931-0a56-20d2-abc2bbf1838a@virtuozzo.com>
+ <20200203075041-mutt-send-email-mst@kernel.org>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <beb426a6-207a-c50e-199a-4242483edce0@virtuozzo.com>
+Date: Mon, 3 Feb 2020 15:56:05 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200203075041-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: HE1PR05CA0216.eurprd05.prod.outlook.com
+ (2603:10a6:3:fa::16) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
 MIME-Version: 1.0
-In-Reply-To: <20200203113949.hnjuqzkrqqwst54e@dritchie>
-X-MC-Unique: gATivyekMmKwrtIV92WU-w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Received: from [192.168.1.63] (46.63.156.34) by
+ HE1PR05CA0216.eurprd05.prod.outlook.com (2603:10a6:3:fa::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.27 via Frontend Transport; Mon, 3 Feb 2020 12:56:07 +0000
+X-Originating-IP: [46.63.156.34]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 89db8185-d466-469e-7f5f-08d7a8a8705c
+X-MS-TrafficTypeDiagnostic: AM0PR08MB5169:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB5169BF9097E86C4B708B2585CF000@AM0PR08MB5169.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2449;
+X-Forefront-PRVS: 0302D4F392
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(136003)(346002)(376002)(366004)(39850400004)(396003)(189003)(199004)(6486002)(31686004)(16576012)(316002)(31696002)(86362001)(2906002)(52116002)(36756003)(81166006)(478600001)(8676002)(81156014)(8936002)(107886003)(4326008)(66476007)(66946007)(66556008)(7416002)(186003)(53546011)(5660300002)(2616005)(16526019)(26005)(6916009)(956004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB5169;
+ H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UHuVR2va8FDDsHnmTGXQyEJIeDMLOD4bArBeEh5EiTNUqPxThqq6+EQ5fFvQ9qEBFMxUx8Nnl6Ikpggp+kEr1SiuQaNi2Yb1ccAhcYM5wQBvy9vi16ImHhxnptqjag6QHnSOw/+eoZ9WIGEnz/U7vlY+5TpYSleeqc54M8JusGiwndRaQnELGdci579cimuSbo8AO17OdzW2Xv6OX6F79yxwUP+SPhiTwFv8K/kRAl/C8iU2xTiZTuWTNSpq4uPpA9P8VyqeAEpdJVkbneZ9TqeXXPh18NeS4faPhqqE88HUF4XBeIHKp53ZUWxoaZeKAwg+XGTOgn2+q2X7Q1c/TUw1LC8F0D9Pp9OXOrvVEUn+Uuc1w8advupkdkpTvPVoIII3VOSDbqMA+pDCGAyVQZ1p2b0uoYrH5glC0zupWJ+kwpbPg+soEhc3v8ponQC+
+X-MS-Exchange-AntiSpam-MessageData: JCQCX9dvN+wGKFOUsW633wsNKsxIPrP1wuvyYBxsKScUU7so0bUWcnwLTs2mFNKIoNtN3r7eSKPmCO5i39gKLtsXdaZecuBz9s8LwCONuVNkMlc98K0xjgaKgr9KL6FRypOW1mc6HiTd/KsBJZ/1IQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89db8185-d466-469e-7f5f-08d7a8a8705c
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2020 12:56:09.0496 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 43TBGXQ69d6H1rACqwfaol/kjInJgu9+p5+v3gsRoKqNe1aAr97gHHSG3qyyffxtVfPZnyZa254ie0bcYB2LwOTFAhd8c+jig1IC7gAdxZY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5169
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,104 +126,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org, stefanha@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com,
+ den@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 03, 2020 at 12:39:49PM +0100, Sergio Lopez wrote:
-> On Mon, Feb 03, 2020 at 10:57:44AM +0000, Daniel P. Berrang=E9 wrote:
-> > On Mon, Feb 03, 2020 at 11:25:29AM +0100, Sergio Lopez wrote:
-> > > On Thu, Jan 30, 2020 at 10:52:35AM +0000, Stefan Hajnoczi wrote:
-> > > > On Thu, Jan 30, 2020 at 01:29:16AM +0100, Paolo Bonzini wrote:
-> > > > > On 29/01/20 16:44, Stefan Hajnoczi wrote:
-> > > > > > On Mon, Jan 27, 2020 at 02:10:31PM +0100, Cornelia Huck wrote:
-> > > > > >> On Fri, 24 Jan 2020 10:01:57 +0000
-> > > > > >> Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > > > > >>> @@ -47,10 +48,15 @@ static void vhost_scsi_pci_realize(VirtIO=
-PCIProxy *vpci_dev, Error **errp)
-> > > > > >>>  {
-> > > > > >>>      VHostSCSIPCI *dev =3D VHOST_SCSI_PCI(vpci_dev);
-> > > > > >>>      DeviceState *vdev =3D DEVICE(&dev->vdev);
-> > > > > >>> -    VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(vdev);
-> > > > > >>> +    VirtIOSCSIConf *conf =3D &dev->vdev.parent_obj.parent_ob=
-j.conf;
-> > > > > >>> +
-> > > > > >>> +    /* 1:1 vq to vcpu mapping is ideal because it avoids IPI=
-s */
-> > > > > >>> +    if (conf->num_queues =3D=3D VIRTIO_SCSI_AUTO_NUM_QUEUES)=
- {
-> > > > > >>> +        conf->num_queues =3D current_machine->smp.cpus;
-> > > > > >> This now maps the request vqs 1:1 to the vcpus. What about the=
- fixed
-> > > > > >> vqs? If they don't really matter, amend the comment to explain=
- that?
-> > > > > > The fixed vqs don't matter.  They are typically not involved in=
- the data
-> > > > > > path, only the control path where performance doesn't matter.
-> > > > >=20
-> > > > > Should we put a limit on the number of vCPUs?  For anything above=
- ~128
-> > > > > the guest is probably not going to be disk or network bound.
-> > > >=20
-> > > > Michael Tsirkin pointed out there's a hard limit of VIRTIO_QUEUE_MA=
-X
-> > > > (1024).  We need to at least stay under that limit.
-> > > >=20
-> > > > Should the guest have >128 virtqueues?  Each virtqueue requires gue=
-st
-> > > > RAM and 2 host eventfds.  Eventually these resource requirements wi=
-ll
-> > > > become a scalability problem, but how do we choose a hard limit and=
- what
-> > > > happens to guest performance above that limit?
-> > >=20
-> > > From the UX perspective, I think it's safer to use a rather low upper
-> > > limit for the automatic configuration.
-> > >=20
-> > > Users of large VMs (>=3D32 vCPUs) aiming for the optimal performance =
-are
-> > > already facing the need of manually tuning (or relying on a software
-> > > to do that for them) other aspects of it, like vNUMA, IOThreads and
-> > > CPU pinning, so I don't think we should focus on this group.
-> >=20
-> > Whether they're runing manually, or relying on software to tune for
-> > them, we (QEMU maintainers) still need to provide credible guidance
-> > on what todo with tuning for large CPU counts. Without clear info
-> > from QEMU, it just descends into hearsay and guesswork, both of which
-> > approaches leave QEMU looking bad.
->=20
-> I agree. Good documentation, ideally with some benchmarks, and safe
-> defaults sound like a good approach to me.
->=20
-> > So I think we need to, at the very least, make a clear statement here
-> > about what tuning approach should be applied vCPU count gets high,
-> > and probably even apply that  as a default out of the box approach.
->=20
-> In general, I would agree, but in this particular case the
-> optimization has an impact on something outside's QEMU control (host's
-> resources), so we lack the information needed to make a proper guess.
->=20
-> My main concern here is users upgrading QEMU to hit some kind of crash
-> or performance issue, without having touched their VM config. And
-> let's not forget that Stefan said in the cover that this amounts to a
-> 1-4% improvement on 4k operations on an SSD, and I guess that's with
-> iodepth=3D1. I suspect with a larger block size and/or higher iodepth
-> the improvement will be barely noticeable, which means it'll only have
-> a positive impact on users running DB/OLTP or similar workloads on
-> dedicated, directly attached, low-latency storage.
->=20
-> But don't get me wrong, this is a *good* optimization. It's just I
-> think we should play safe here.
->=20
-> Sergio.
 
-Yea I think a bit more benchmarking than with 4 vcpus
-so at least we can see the trend can't hurt.
+
+On 03.02.2020 15:51, Michael S. Tsirkin wrote:
+> On Mon, Feb 03, 2020 at 03:17:07PM +0300, Denis Plotnikov wrote:
+>>
+>> On 30.01.2020 16:38, Michael S. Tsirkin wrote:
+>>> On Wed, Jan 29, 2020 at 05:06:59PM +0300, Denis Plotnikov wrote:
+>>>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>>> I'm not sure what the point is. It's more or less an accident that
+>>> these two devices share the queue size, this constance
+>>> makes no sense to me.
+>> Ok, then let's just make a separate queue length constant for each type.
+> it's just a number, I don't think we need a constant here.
+> If you feel it needs documentation, add a comment!
+I just thought that the meaningful name for the number would be better 
+for the code understanding.
+Anyway, If doesn't improve anything I'll just change the number and add 
+a comment what it means.
+
+Denis
+>
+>> (Will redo and send in the next series)
+>> Thanks!
+>>
+>> Denis
+>>>> ---
+>>>>    hw/block/virtio-blk.c      | 6 ++++--
+>>>>    hw/scsi/virtio-scsi.c      | 5 +++--
+>>>>    include/hw/virtio/virtio.h | 1 +
+>>>>    3 files changed, 8 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+>>>> index 09f46ed85f..72f935033f 100644
+>>>> --- a/hw/block/virtio-blk.c
+>>>> +++ b/hw/block/virtio-blk.c
+>>>> @@ -914,7 +914,8 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
+>>>>        memset(&blkcfg, 0, sizeof(blkcfg));
+>>>>        virtio_stq_p(vdev, &blkcfg.capacity, capacity);
+>>>>        virtio_stl_p(vdev, &blkcfg.seg_max,
+>>>> -                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 : 128 - 2);
+>>>> +                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 :
+>>>> +                                          VIRTQUEUE_DEFAULT_SIZE - 2);
+>>>>        virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
+>>>>        virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
+>>>>        virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
+>>>> @@ -1272,7 +1273,8 @@ static Property virtio_blk_properties[] = {
+>>>>        DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging, 0,
+>>>>                        true),
+>>>>        DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
+>>>> -    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
+>>>> +    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size,
+>>>> +                       VIRTQUEUE_DEFAULT_SIZE),
+>>>>        DEFINE_PROP_BOOL("seg-max-adjust", VirtIOBlock, conf.seg_max_adjust, true),
+>>>>        DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+>>>>                         IOThread *),
+>>>> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+>>>> index 3b61563609..36f66046ae 100644
+>>>> --- a/hw/scsi/virtio-scsi.c
+>>>> +++ b/hw/scsi/virtio-scsi.c
+>>>> @@ -660,7 +660,8 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
+>>>>        virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
+>>>>        virtio_stl_p(vdev, &scsiconf->seg_max,
+>>>> -                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 : 128 - 2);
+>>>> +                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 :
+>>>> +                                          VIRTQUEUE_DEFAULT_SIZE - 2);
+>>>>        virtio_stl_p(vdev, &scsiconf->max_sectors, s->conf.max_sectors);
+>>>>        virtio_stl_p(vdev, &scsiconf->cmd_per_lun, s->conf.cmd_per_lun);
+>>>>        virtio_stl_p(vdev, &scsiconf->event_info_size, sizeof(VirtIOSCSIEvent));
+>>>> @@ -965,7 +966,7 @@ static void virtio_scsi_device_unrealize(DeviceState *dev, Error **errp)
+>>>>    static Property virtio_scsi_properties[] = {
+>>>>        DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
+>>>>        DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
+>>>> -                                         parent_obj.conf.virtqueue_size, 128),
+>>>> +                       parent_obj.conf.virtqueue_size, VIRTQUEUE_DEFAULT_SIZE),
+>>>>        DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSI,
+>>>>                          parent_obj.conf.seg_max_adjust, true),
+>>>>        DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_sectors,
+>>>> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+>>>> index b69d517496..a66ea2368b 100644
+>>>> --- a/include/hw/virtio/virtio.h
+>>>> +++ b/include/hw/virtio/virtio.h
+>>>> @@ -48,6 +48,7 @@ size_t virtio_feature_get_config_size(VirtIOFeature *features,
+>>>>    typedef struct VirtQueue VirtQueue;
+>>>>    #define VIRTQUEUE_MAX_SIZE 1024
+>>>> +#define VIRTQUEUE_DEFAULT_SIZE 128
+>>>>    typedef struct VirtQueueElement
+>>>>    {
+>>>> -- 
+>>>> 2.17.0
 
 
