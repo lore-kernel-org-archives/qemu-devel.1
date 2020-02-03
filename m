@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E8CC3524D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1F6C3524D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:15:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FCF82070A
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:14:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 964222070A
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:15:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e3ANyyk6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FCF82070A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uPepcULe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 964222070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyXnx-0006sJ-HS
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 04:14:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47771)
+	id 1iyXow-0007wW-QT
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 04:15:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47757)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iyXjr-0006xC-AQ
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:09:53 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iyXjp-0006rI-Bl
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:09:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iyXjp-0001Dr-GF
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:09:51 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:42708)
+ (envelope-from <alex.bennee@linaro.org>) id 1iyXjo-00019S-9P
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:09:49 -0500
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:35065)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iyXjp-0001Ad-8E
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:09:49 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id k11so16876542wrd.9
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 01:09:49 -0800 (PST)
+ id 1iyXjo-00017f-2g
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:09:48 -0500
+Received: by mail-wr1-x436.google.com with SMTP id w12so5985029wrt.2
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 01:09:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fTQ3LvFL13twHFzUdt/LymZKMHQDYPz4ZY8OCNkyk1M=;
- b=e3ANyyk6Y3t3OZ5Ru/+Wk7u64hZf73IneR2yJSlmdEaQMUCuTqVkKCmYhUyy3+cCU0
- ILpLNHSxVLNSfs7ogk/d7+pVhDbi9XMDYdj1BkrU1wyld244b+XGFdD5P2Svr9t2tMGR
- YKdDXF0aDyy+XIgiIk+/M9vZNhdcfzS10Z0AtnkM/vGaqOOvBbJ6KHOoZzvzJ5CVNjsm
- POMiqtE2/C6gCIZm3ujlLbNxqajxZRvf7hxE0poly0g2x7MHYJrIsy89tu953cH8M2Uh
- Pq+1K+yJ6XozdXKIpqmSn7HlHYWCZ8zwBSrrb97acLTzYtEtdCIH6OIKXsXO/0nevYWv
- I9fQ==
+ bh=JI9taW7Mf8A4HrYR0xn5XJboAo2fuIQkC6EsJTBwttw=;
+ b=uPepcULeMox8z0v1mNzicpUoANqPRHsd2LbPWEn/2IDJeM8I2DCeyWsAjbt7FFbUgb
+ G+rJOCl6NQC/TTbewM7ZfI7y/3kw13QbPXe3OqK5ggxRrKEaAz6ge+wt6P80u1OkVboR
+ pU7s5rym8HosXcMSF2yBrJPAzKhLUazEDIVoZnJLb4BQLPS0zI4OEh2OR1boUetdP8DG
+ FJ+jVjKX0EKly8dD77WjA7Rc93Txhmq8TSGd14pz4WiKrMhyYGkGm1tZQW7nCJXBQdS1
+ mhfiVpov3kLU//4olZoMnxd16bX1JeXTXncv+33i7bv1DaXY8cQcNNRq5OI6NMdVJ+A0
+ qoQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=fTQ3LvFL13twHFzUdt/LymZKMHQDYPz4ZY8OCNkyk1M=;
- b=LQ1vte8gUTS2PVFYEt7INOAS8noJPQvlrq0SZWGWeZFfM8E980WNa5QI34I39i86UK
- Iki+IMRYNN8z3CiQyWzoXLR93drhZaPnk78cl+8qUhC3RHnyQh2Jz5Ht0H7AisWK+tvK
- 6olvfM5ef4zmgLKoQDPWxFxjoeDcgwBA6LOqYqTv5BJDuQxoF/Ni8fSNFgiCmUwz6kHz
- o5Z5UBY1BLyaBBQnTBEaYOwNf+n2X2J0CdQ3beeTBiVKp/9uBXicxwcba5POajXOkdzt
- J05tWW1WhHgshMcPp+nKyEUJC90M+LIcUQXFxEiFy49xn4T8DsY1wLdjR5h1HepK1UKp
- poyA==
-X-Gm-Message-State: APjAAAXMX1cHBwYpGkXvZvJu00cej3EVbNo84ezsMpC7Tgv6XzGW8rWb
- Jv1/YU0pR2bhj43afrzXUaT/GQ==
-X-Google-Smtp-Source: APXvYqxxfJpH21Jhgy9ZLYA1MegrxhafNGsVglnZ4+Vi3qoI6whow8Kpl8ro5qwSrCX7TWvdoy5ltA==
-X-Received: by 2002:a5d:4983:: with SMTP id r3mr13421098wrq.134.1580720988192; 
- Mon, 03 Feb 2020 01:09:48 -0800 (PST)
+ bh=JI9taW7Mf8A4HrYR0xn5XJboAo2fuIQkC6EsJTBwttw=;
+ b=RS8Ec3m7Hm6yYe0xEW9cQbU+tIPU1EhpnBRYGemZaLID9+K7H1MejePLiRcZ7pMjIs
+ ZmGz6PR5ABXc4wGjksbKFV22okuXhNIjSfAJFGYhr3korPD0nyUy140H9Hj/ST1xwHTp
+ A8oixYkMtvE3u76p9BKyD9fWR5nyr40dpUdyggoQjSPpDEpZfWJKcGBMulHx3CuOFOo7
+ 5+BI0Vu549j4Vg+LCefPbFTRk88eb0o0qDvEpWH8VesXItmj34seZEjXow/oSCxG7zWh
+ y/SMWkueUJ7BWa72l25gjl6nKdX1H0lFB2diye4nChoIAveTKPoacyag206kkESysWlZ
+ QS/g==
+X-Gm-Message-State: APjAAAWwvRza4XcVvpqqkQPLZfX7cEq+KzL6KxOVEvLRX77Uprg2Yao1
+ dKsFnUskfY1pZ55xpDXyGah4SQ==
+X-Google-Smtp-Source: APXvYqxPJ/8g+dUWE9RVsSMZ8QBqdrnDR77DoerUtzL4SoVYHoKSnrl3ClZP4fnId2YOuX0t3GAB2g==
+X-Received: by 2002:a5d:52c4:: with SMTP id r4mr14157583wrv.368.1580720987107; 
+ Mon, 03 Feb 2020 01:09:47 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t12sm16944666wrq.97.2020.02.03.01.09.35
+ by smtp.gmail.com with ESMTPSA id j5sm15359345wrb.33.2020.02.03.01.09.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Mon, 03 Feb 2020 01:09:39 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 115B01FF98;
+ by zen.linaroharston (Postfix) with ESMTP id 3BB841FF9A;
  Mon,  3 Feb 2020 09:09:33 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 08/17] .travis.yml: Add description to each job
-Date: Mon,  3 Feb 2020 09:09:23 +0000
-Message-Id: <20200203090932.19147-9-alex.bennee@linaro.org>
+Subject: [PATCH v3 10/17] .travis.yml: move cache flushing to early common
+ phase
+Date: Mon,  3 Feb 2020 09:09:25 +0000
+Message-Id: <20200203090932.19147-11-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200203090932.19147-1-alex.bennee@linaro.org>
 References: <20200203090932.19147-1-alex.bennee@linaro.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,323 +107,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+We shall be adding more common early setup in a future commit.
 
-The NAME variable can be used to describe nicely a job (see [*]).
-As we currently have 32 jobs, use it. This helps for quickly
-finding a particular job.
-
-  before: https://travis-ci.org/qemu/qemu/builds/639887646
-  after: https://travis-ci.org/philmd/qemu/builds/641795043
-
-[*] https://docs.travis-ci.com/user/customizing-the-build/#naming-jobs-within-matrices
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200125183135.28317-1-f4bug@amsat.org>
-
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
-[ajb]
-  - drop [x86]
----
- .travis.yml | 101 ++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 67 insertions(+), 34 deletions(-)
+ .travis.yml | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/.travis.yml b/.travis.yml
-index 75269678476..3128eff7e01 100644
+index f245765cfed..1b92f40eab2 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -96,24 +96,28 @@ after_script:
+@@ -82,11 +82,16 @@ git:
+   # we want to do this ourselves
+   submodules: false
  
- matrix:
-   include:
--    - env:
-+    - name: "GCC static (user)"
-+      env:
-         - CONFIG="--disable-system --static"
++# Common first phase for all steps
++before_install:
++  - if command -v ccache ; then ccache --zero-stats ; fi
+ 
++# Configure step - may be overridden
+ before_script:
+-  - if command -v ccache ; then ccache --zero-stats ; fi
+   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+   - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
++
++# Main build & test - rarely overridden - controlled by TEST_CMD
+ script:
+   - BUILD_RC=0 && make -j3 || BUILD_RC=$?
+   - if [ "$BUILD_RC" -eq 0 ] ; then travis_retry ${TEST_CMD} ; else $(exit $BUILD_RC); fi
+@@ -268,7 +273,6 @@ matrix:
+       before_script:
+         - brew link --overwrite python
+         - export PATH="/usr/local/opt/ccache/libexec:$PATH"
+-        - if command -v ccache ; then ccache --zero-stats ; fi
+         - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+         - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
+ 
+@@ -499,9 +503,6 @@ matrix:
+         - TEST_CMD="make install -j3"
+         - QEMU_VERSION="${TRAVIS_TAG:1}"
          - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
- 
-     # we split the system builds as it takes a while to build them all
--    - env:
-+    - name: "GCC (main-softmmu)"
-+      env:
-         - CONFIG="--disable-user --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
- 
--    - env:
--        - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
-+    - name: "GCC (other-softmmu)"
-+      env:
-+       - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
- 
-     # Just build tools and run minimal unit and softfloat checks
--    - env:
-+    - name: "GCC check-softfloat (user)"
-+      env:
-         - BASE_CONFIG="--enable-tools"
-         - CONFIG="--disable-user --disable-system"
-         - TEST_CMD="make check-unit check-softfloat -j3"
-@@ -121,41 +125,48 @@ matrix:
- 
- 
-     # --enable-debug implies --enable-debug-tcg, also runs quite a bit slower
--    - env:
-+    - name: "GCC debug (main-softmmu)"
-+      env:
-         - CONFIG="--enable-debug --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
- 
- 
-     # TCG debug can be run just on its own and is mostly agnostic to user/softmmu distinctions
--    - env:
-+    - name: "GCC debug (user)"
-+      env:
-         - CONFIG="--enable-debug-tcg --disable-system"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
- 
--    - env:
-+    - name: "GCC some libs disabled (main-softmmu)"
-+      env:
-         - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-libusb --disable-replication --target-list=${MAIN_SOFTMMU_TARGETS}"
- 
- 
-     # Module builds are mostly of interest to major distros
--    - env:
-+    - name: "GCC modules (main-softmmu)"
-+      env:
-         - CONFIG="--enable-modules --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
- 
-     # Alternate coroutines implementations are only really of interest to KVM users
-     # However we can't test against KVM on Travis so we can only run unit tests
--    - env:
-+    - name: "check-unit coroutine=ucontext"
-+      env:
-         - CONFIG="--with-coroutine=ucontext --disable-tcg"
-         - TEST_CMD="make check-unit -j3 V=1"
- 
- 
--    - env:
-+    - name: "check-unit coroutine=sigaltstack"
-+      env:
-         - CONFIG="--with-coroutine=sigaltstack --disable-tcg"
-         - TEST_CMD="make check-unit -j3 V=1"
- 
- 
-     # Check we can build docs and tools (out of tree)
--    - env:
-+    - name: "tools and docs"
-+      env:
-         - BUILD_DIR="out-of-tree/build/dir" SRC_DIR="../../.."
-         - BASE_CONFIG="--enable-tools --enable-docs"
-         - CONFIG="--target-list=x86_64-softmmu,aarch64-linux-user"
-@@ -169,13 +180,15 @@ matrix:
- 
- 
-     # Test with Clang for compile portability (Travis uses clang-5.0)
--    - env:
-+    - name: "Clang (user)"
-+      env:
-         - CONFIG="--disable-system"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-       compiler: clang
- 
- 
--    - env:
-+    - name: "Clang (main-softmmu)"
-+      env:
-         - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS} "
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-sanitize"
-       compiler: clang
-@@ -184,52 +197,60 @@ matrix:
-         - ${SRC_DIR}/configure ${CONFIG} --extra-cflags="-fsanitize=undefined -Werror" || { cat config.log && exit 1; }
- 
- 
--    - env:
-+    - name: "Clang (other-softmmu)"
-+      env:
-         - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-       compiler: clang
- 
- 
-     # gprof/gcov are GCC features
--    - env:
-+    - name: "GCC gprof/gcov"
-+      env:
-         - CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=${MAIN_SOFTMMU_TARGETS}"
-       after_success:
-         - ${SRC_DIR}/scripts/travis/coverage-summary.sh
- 
- 
-     # We manually include builds which we disable "make check" for
--    - env:
-+    - name: "GCC without-default-devices (softmmu)"
-+      env:
-         - CONFIG="--without-default-devices --disable-user"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-         - TEST_CMD=""
- 
- 
-     # Check the TCG interpreter (TCI)
--    - env:
-+    - name: "GCC TCI"
-+      env:
-         - CONFIG="--enable-debug-tcg --enable-tcg-interpreter --disable-kvm --disable-containers
-             --target-list=alpha-softmmu,arm-softmmu,hppa-softmmu,m68k-softmmu,microblaze-softmmu,moxie-softmmu,ppc-softmmu,s390x-softmmu,x86_64-softmmu"
-         - TEST_CMD="make check-qtest check-tcg V=1"
- 
- 
-     # We don't need to exercise every backend with every front-end
--    - env:
-+    - name: "GCC trace log,simple,syslog (user)"
-+      env:
-         - CONFIG="--enable-trace-backends=log,simple,syslog --disable-system"
-         - TEST_CMD=""
- 
- 
--    - env:
-+    - name: "GCC trace ftrace (x86_64-softmmu)"
-+      env:
-         - CONFIG="--enable-trace-backends=ftrace --target-list=x86_64-softmmu"
-         - TEST_CMD=""
- 
- 
--    - env:
-+    - name: "GCC trace ust (x86_64-softmmu)"
-+      env:
-         - CONFIG="--enable-trace-backends=ust --target-list=x86_64-softmmu"
-         - TEST_CMD=""
- 
- 
-     # MacOSX builds - cirrus.yml also tests some MacOS builds including latest Xcode
- 
--    - env:
-+    - name: "OSX Xcode 10.3"
-+      env:
-         - CONFIG="--target-list=i386-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,x86_64-softmmu"
-       os: osx
-       osx_image: xcode10.3
-@@ -252,7 +273,8 @@ matrix:
- 
- 
-     # Python builds
--    - env:
-+    - name: "GCC Python 3.5 (x86_64-softmmu)"
-+      env:
-         - CONFIG="--target-list=x86_64-softmmu"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-       language: python
-@@ -260,7 +282,8 @@ matrix:
-         - "3.5"
- 
- 
--    - env:
-+    - name: "GCC Python 3.6 (x86_64-softmmu)"
-+      env:
-         - CONFIG="--target-list=x86_64-softmmu"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-       language: python
-@@ -269,7 +292,8 @@ matrix:
- 
- 
-     # Acceptance (Functional) tests
--    - env:
-+    - name: "GCC check-acceptance"
-+      env:
-         - CONFIG="--target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
-         - TEST_CMD="make check-acceptance"
-       after_script:
-@@ -285,7 +309,8 @@ matrix:
- 
- 
-     # Using newer GCC with sanitizers
--    - addons:
-+    - name: "GCC9 with sanitizers (softmmu)"
-+      addons:
-         apt:
-           update: true
-           sources:
-@@ -333,7 +358,8 @@ matrix:
- 
- 
-     # Run check-tcg against linux-user
--    - env:
-+    - name: "GCC check-tcg (user)"
-+      env:
-         - CONFIG="--disable-system --enable-debug-tcg"
-         - TEST_CMD="make -j3 check-tcg V=1"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
-@@ -341,26 +367,30 @@ matrix:
- 
-     # Run check-tcg against linux-user (with plugins)
-     # we skip sparc64-linux-user until it has been fixed somewhat
--    - env:
-+    - name: "GCC plugins check-tcg (user)"
-+      env:
-         - CONFIG="--disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user"
-         - TEST_CMD="make -j3 check-tcg V=1"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
- 
-     # Run check-tcg against softmmu targets
--    - env:
-+    - name: "GCC check-tcg (some-softmmu)"
-+      env:
-         - CONFIG="--enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
-         - TEST_CMD="make -j3 check-tcg V=1"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
- 
-     # Run check-tcg against softmmu targets (with plugins)
--    - env:
-+    - name: "GCC plugins check-tcg (some-softmmu)"
-+      env:
-         - CONFIG="--enable-plugins --enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
-         - TEST_CMD="make -j3 check-tcg V=1"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
--    - arch: arm64
-+    - name: "[aarch64] GCC check-tcg"
-+      arch: arm64
-       dist: xenial
-       addons:
-         apt_packages:
-@@ -391,7 +421,8 @@ matrix:
-         - TEST_CMD="make check check-tcg V=1"
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS}"
- 
--    - arch: ppc64le
-+    - name: "[ppc64] GCC check-tcg"
-+      arch: ppc64le
-       dist: xenial
-       addons:
-         apt_packages:
-@@ -422,7 +453,8 @@ matrix:
-         - TEST_CMD="make check check-tcg V=1"
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},ppc64le-linux-user"
- 
--    - arch: s390x
-+    - name: "[s390x] GCC check-tcg"
-+      arch: s390x
-       dist: bionic
-       addons:
-         apt_packages:
-@@ -456,7 +488,8 @@ matrix:
-     # Release builds
-     # The make-release script expect a QEMU version, so our tag must start with a 'v'.
-     # This is the case when release candidate tags are created.
--    - if: tag IS present AND tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
-+    - name: "Release tarball"
-+      if: tag IS present AND tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
-       env:
-         # We want to build from the release tarball
-         - BUILD_DIR="release/build/dir" SRC_DIR="../../.."
+-      before_script:
+-        - command -v ccache && ccache --zero-stats
+-        - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
+       script:
+         - make -C ${SRC_DIR} qemu-${QEMU_VERSION}.tar.bz2
+         - ls -l ${SRC_DIR}/qemu-${QEMU_VERSION}.tar.bz2
 -- 
 2.20.1
 
