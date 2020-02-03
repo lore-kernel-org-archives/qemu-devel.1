@@ -2,101 +2,82 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B4FC33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C537C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:37:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29FCC20661
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 174CB20658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:37:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BwTTFD6M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29FCC20661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nv7jlb9T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 174CB20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iya1L-0006bf-5K
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 06:36:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36093)
+	id 1iya2M-0007WT-Ae
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 06:37:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36326)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iya0j-00065c-K7
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:35:26 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iya1d-000703-9Z
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:36:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iya0h-0004vs-8M
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:35:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37306
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iya0g-0004ue-VB
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:35:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580729721;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=r1iXVjc07uG0uVlpmdp5IKhpiZQJmrU+IUscOzkOOjQ=;
- b=BwTTFD6M4xejPu0Q5T0IZIAiHHpa0pdQMoREdwyj2RSBowruTdRbXQgLRT/Zc6KeEFYTyv
- QVqbaWGHEqYFD/ct0B1NRlvhrqap+W51ywJDuGJQl9SYPgF1Gk7ilFOftFSY24DhyXQNXP
- Ym9pjihS3HbOXzl9Hkc6+U8fskrjods=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-CPzxHP0wMnGtE3NuRGoSDQ-1; Mon, 03 Feb 2020 06:35:18 -0500
-Received: by mail-wr1-f72.google.com with SMTP id t6so4993465wru.3
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 03:35:18 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1iya1c-00067S-54
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:36:21 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39687)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iya1b-00066a-W4
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:36:20 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 77so13301743oty.6
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 03:36:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=WjvcwcjrT89kMVrD2gN+cHLbR83zRSARv+WYvKIJ6y4=;
+ b=Nv7jlb9TFFF5iHQyzfHydE9FvUnVFfc6L3AQH4mFbUNrG/69ewAlReCFDm/WQi1RHd
+ aPjJVDgulSf8xJi2Gi6TfOXDB36iWGomfEeaXgbdKEhnvMEdbkbSnpZv18igPBSgk1ZV
+ pNOPNsl7B+Wv1Dkho6NpIraSoqN2YpjGFpOGzjKgE2pLf0RNQkE7EXopGCRmBCnAF2Vd
+ Mr201C6RqNHiC8R/fwVi4qkZ1vp6OCY3Wk4n5HfK7/K5GO6gmX4eYtN3wrbk3p0lRGEz
+ RFAPUXRsp7EenT1z0+ZeC/plcsyBI+SbWHbLiSIdiwosy9iGLGAPduklKvWvxDQJk0H+
+ 2koQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Lz+8ipTmeS7Pf+B5yUK6EP0lfsK2KuA80CqfiqAmiSk=;
- b=LL2DRjWH57XJRBW5MZLQvYA4wF0HbW68lVE2w7n8q8KOm3fgghHd9XTGtTp25ItIdS
- ph4aLVhTqFLnwrs+XWlphhGI4/P8M4aFIJEe8ziC6FYd/3qo7K/yeq7aAdnEGHhVPo2Z
- xJBvZsJzJOlcK3L0eWWFuVlOn2hDOrG2+LP8qjy2fxqvXRIylz7a/kcybGxJ5JkfYjcc
- lUzYLirOgKcEu0IHxKDmrEyOQZ3wYpzKKE+Tc1++uhyk2VXigsyjUMITNSLEhrbnHUGz
- IIbTiPYak7XWuxVyH0Sqmea+lx+/H4sbp6OKTBEkVhM+d8lgcBC+Std40JQLZDnbG5VG
- a8dA==
-X-Gm-Message-State: APjAAAV5VMv7jbHow7ls79OutiN6G9s1xA3IDIBAE/Ttgy4qH2SYJ140
- kkDs47bpgq5zzo0l3zZ6jc/rH/yNWbvr/rihxqeMx42iYhSyEZT6OkORLc0cYGXLz6FIsox0+PI
- ooqs2RJZDL7g8eqQ=
-X-Received: by 2002:adf:e40f:: with SMTP id g15mr14608240wrm.223.1580729717183; 
- Mon, 03 Feb 2020 03:35:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwBgNbS4TpkzWCglEQncQkOOlQRh6Uhosab0KxbpbWBMFAfAuz2/jxM/G38/qNYj81U4AYaiA==
-X-Received: by 2002:adf:e40f:: with SMTP id g15mr14608200wrm.223.1580729716953; 
- Mon, 03 Feb 2020 03:35:16 -0800 (PST)
-Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
- [83.52.55.162])
- by smtp.gmail.com with ESMTPSA id c17sm24307753wrr.87.2020.02.03.03.35.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Feb 2020 03:35:16 -0800 (PST)
-Subject: Re: [PATCH v3 17/17] .travis.yml: single thread build-tcg
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-References: <20200203090932.19147-1-alex.bennee@linaro.org>
- <20200203090932.19147-18-alex.bennee@linaro.org>
- <e1f501e7-b3c4-5d88-3f10-cd2c1c7a1cd6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <21b86fba-8f28-736e-89d1-f7548e1f92e2@redhat.com>
-Date: Mon, 3 Feb 2020 12:35:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WjvcwcjrT89kMVrD2gN+cHLbR83zRSARv+WYvKIJ6y4=;
+ b=of+GqAblKRw6uTNCJfCpgg8SZK10gJG2tChS5xMuGw8jLbQEH+OCFw0iodC7aYmW6G
+ rBnVOAGRAy4Sibf7NQ0DfrWmcTme/FXqnY/pRyhn1gt0WHuqsS+m01o4bKRvpBmPytst
+ vIwEmeVq8RYLygyeMtYa08tQd+NI+yZStPl15GSXhm1qI5QssxP5aQjz8dFcQkTjUV6Y
+ 90fUd6wpPbCXDlq3nZTvCDsh/4AALuG1Zisd6PZ62gU0EI8G3qazg3CbMWidUdSVxV0e
+ 56r6HVmF8M7jFcYHW8NHgH9ne+2+SLfMw4lI/A8RnUPs2rL2Voh2s4UBkF3VaCzaXsfm
+ svLA==
+X-Gm-Message-State: APjAAAW7nTKOZ/YnUkLHbO4YlCLdDh34kjseaZhkXsSMU5I6sSFCHEJI
+ FKmd6fSHs8ZLMXZFshEE5Nt7MDXv8dzQzA/4gLBScw==
+X-Google-Smtp-Source: APXvYqzpkEame9QXNJthdawdODrQb2VrUwm3WRr+8Cm/uCW8iC0huE8aiRdz/RSzvrNGmqg7pTUg2iqEofBo5VFuJs8=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr16419976otq.97.1580729778972; 
+ Mon, 03 Feb 2020 03:36:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <e1f501e7-b3c4-5d88-3f10-cd2c1c7a1cd6@redhat.com>
-Content-Language: en-US
-X-MC-Unique: CPzxHP0wMnGtE3NuRGoSDQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20200201192916.31796-1-richard.henderson@linaro.org>
+ <20200201192916.31796-31-richard.henderson@linaro.org>
+In-Reply-To: <20200201192916.31796-31-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Feb 2020 11:36:08 +0000
+Message-ID: <CAFEAcA_0at8qwiyxqwwqath9i3URBWBEKf-9nfgWikhnOfcO6A@mail.gmail.com>
+Subject: Re: [PATCH v6 30/41] target/arm: Flush tlb for ASID changes in EL2&0
+ translation regime
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,51 +89,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- stefanha@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com,
- aurelien@aurel32.net
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/3/20 11:01 AM, Thomas Huth wrote:
-> On 03/02/2020 10.09, Alex Benn=C3=A9e wrote:
->> I've theorised that a parallel build-tcg is somehow getting confused
->> when two fedora-30 based cross compilers attempt to build at the same
->> time. From one data-point so far this may fix the problem although the
->> plugins job runs quite close to timeout.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>   .travis.yml | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/.travis.yml b/.travis.yml
->> index c1c6df475a8..3b35b7cf04d 100644
->> --- a/.travis.yml
->> +++ b/.travis.yml
->> @@ -380,7 +380,7 @@ matrix:
->>       - name: "GCC check-tcg (user)"
->>         env:
->>           - CONFIG=3D"--disable-system --enable-debug-tcg"
->> -        - TEST_BUILD_CMD=3D"make -j${JOBS} build-tcg"
->> +        - TEST_BUILD_CMD=3D"make build-tcg"
->>           - TEST_CMD=3D"make check-tcg"
->>           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->>  =20
->> @@ -391,7 +391,7 @@ matrix:
->>       - name: "GCC plugins check-tcg (user)"
->>         env:
->>           - CONFIG=3D"--disable-system --enable-plugins --enable-debug-t=
-cg --target-list-exclude=3Dsparc64-linux-user,cris-linux-user"
->> -        - TEST_BUILD_CMD=3D"make -j${JOBS} build-tcg"
->> +        - TEST_BUILD_CMD=3D"make build-tcg"
->>           - TEST_CMD=3D"make check-tcg"
->>           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
->=20
-> Squash it into patch 14/17 ?
+On Sat, 1 Feb 2020 at 19:29, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Since we only support a single ASID, flush the tlb when it changes.
+>
+> Note that TCR_EL2, like TCR_EL1, has the A1 bit that chooses between
+> the two TTBR* registers for the location of the ASID.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 22 +++++++++++++++-------
+>  1 file changed, 15 insertions(+), 7 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index cfa6ce59dc..f9be6b052f 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3763,7 +3763,7 @@ static void vmsa_ttbcr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+>      tcr->base_mask = 0xffffc000u;
+>  }
+>
+> -static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +static void vmsa_tcr_el12_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                                 uint64_t value)
+>  {
+>      ARMCPU *cpu = env_archcpu(env);
+> @@ -3789,7 +3789,17 @@ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>  static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                                      uint64_t value)
+>  {
+> -    /* TODO: There are ASID fields in here with HCR_EL2.E2H */
+> +    /*
+> +     * If we are running with E2&0 regime, then an ASID is active.
+> +     * Flush if that might be changing.  Note we're not checking
+> +     * TCR_EL2.A1 to know if this is really the TTBRx_EL2 that
+> +     * holds the active ASID, only checking the field that might.
+> +     */
+> +    if (extract64(raw_read(env, ri) ^ value, 48, 16) &&
+> +        (arm_hcr_el2_eff(env) & HCR_E2H)) {
+> +        tlb_flush_by_mmuidx(env_cpu(env),
+> +                            ARMMMUIdxBit_E20_2 | ARMMMUIdxBit_E20_0);
+> +    }
+>      raw_write(env, ri, value);
 
-I'd rather not, ideally we will revert this patch once the issue is fixed.
+Since we don't flush TLBs when HCR_EL2.E2H changes, I'm wondering
+about this sequence:
 
+ * initially HCR_EL2.E2H == 1 and the E2&0 TLBs are populated
+ * HCR_EL2.E2H is set to 0
+ * TTBR1_EL2 is written with a different ASID from step 1,
+   but we don't flush the TLBs because HCR_EL2.E2H is 0
+ * HCR_EL2.E2H is set to 1
+ * guest will pick up wrong-ASID TLB entries from step 1
+
+Does the architecture require that the guest did some TLB
+maintenance ops somewhere along the line to avoid this?
+I haven't tried to look for them, but given the different
+ASIDs I'm not sure it does...
+
+thanks
+-- PMM
 
