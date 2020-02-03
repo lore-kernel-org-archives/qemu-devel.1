@@ -2,101 +2,90 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E64BAC33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5315C3524D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:47:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1A7D20658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9466620658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:47:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WbPPoDWt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1A7D20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xA8PiyGc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9466620658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iya9C-0003Gy-U1
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 06:44:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37831)
+	id 1iyaCA-0004ap-Mj
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 06:47:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39115)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iya7P-0001uw-W3
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:42:21 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iyaBT-000460-0B
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:46:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iya7O-0005HP-M2
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:42:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50171
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iya7O-0005H7-Hx
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:42:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580730138;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zXydyNMSTCC/yf3cjarTtkF/nrZ4ZrNDBBM4L4QJyLA=;
- b=WbPPoDWt2Ca6B1oZlUVBHh8MtWd+g7jc2JnCo+AzZ9Qgv5MtCCLp94senHG4EwPRfdes/y
- AQyfrfyfgQuZAAH+IyAZ2F8c6iWVuCzpZwHUoq3I667GOKq3Zu7vS22COqlARr5gARC1w7
- AuJRUaX3MdEyi2Klp5k6udJcVQTcE0w=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-268-M_OViaNnOgClxo3uS_L1FQ-1; Mon, 03 Feb 2020 06:42:16 -0500
-Received: by mail-wm1-f70.google.com with SMTP id d4so3907809wmd.7
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 03:42:16 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1iyaBQ-0002ah-Hk
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:46:30 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33016)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iyaBP-0002ZR-3L
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:46:27 -0500
+Received: by mail-wm1-x341.google.com with SMTP id m10so14131695wmc.0
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 03:46:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=NgtKPEP8ZdRA53CRUqcLQzq0EY5wXSOQj/FEO/MsvOs=;
+ b=xA8PiyGcm97KBMPBTdFaCQjZtbp7NmVKA78vPokiUlYidc+Y8lMDtt5MiBo69HGhl4
+ QdRG8B4gU5Z10nfhJ5tpXY8kfSNEtz4V+7AVxFAfYr71aUQO6hESY/tn/yL7wATArG7k
+ EGOcUJIQ+mQl/b2DIvl4/z/VJoyvTBLQwK1tLuRhna0QYYSJWEvgdisOiy6D9jjCRTZd
+ gEFWjcPptzhpjdFMmFRT+Tmge/vZ8SS5o4h/Yw1PCbzOYbd+dJ2igNtt3AJkN0nY7SZd
+ gx7HfquN9JJF+1wFfEKAnZ29eWRI+Dv/f1ozJTtvj41Aw5oRi7b7HipIJzqHQPAkXNyw
+ 9vXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=7I1IfdkBXtLkiqMPZg/YqwanXIsktJg+Exz5sWuafTE=;
- b=KSfKYD/ug+cnhE91xtV4t3yUrNbhtem0WZRo06wI4D5r9Fq2i5ct38jNTb5GOt0T4y
- mt8qkFcpQQ45JxNpvkW3bBJR4N6yc4EOVkAnGw6W73or0wREcMo7aJ/ZHdvrYKXNeFcB
- F0hChBtRN3f5deM2Lp0yO2NrDS/0TxOCAnb1cgg9PBy4K8ZHeTr4htDqsVkNa+BM5emG
- /mYtkeKZ32eAfL8CTUy/Tc6Pja2A0fVTNoFPC8B2hqqEqp4D/mKo+u07wC9tc3zoi3E9
- JxiflZCDRIiDJPCjZj5B8BZuonaFPk6Hr6c8DZKA4WpfSqTlnO6YA/BF9WIOzty7CY19
- hO/w==
-X-Gm-Message-State: APjAAAXNmg5i36gKQ09YfQ0xsRsrTTLHoiX2ERmPkBTy7to5NyKqud9n
- Yf7ybZinn468eeTS9uQxzsG+MMljE2kr9nlZW+Wdafaaf8AMoG+nzjIsUY6c5XwmwX81ofVx85/
- yJmNgz+FaeKGhVFo=
-X-Received: by 2002:a7b:c93a:: with SMTP id h26mr30291469wml.83.1580730135071; 
- Mon, 03 Feb 2020 03:42:15 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzSTL6+geAQe5aI3sJoCcU87/RLjM4eE1N3cxaewIHvWajFAJraO3cjVenlWAaTEe+TPGXk0Q==
-X-Received: by 2002:a7b:c93a:: with SMTP id h26mr30291440wml.83.1580730134825; 
- Mon, 03 Feb 2020 03:42:14 -0800 (PST)
-Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
- [83.52.55.162])
- by smtp.gmail.com with ESMTPSA id u14sm24766608wrm.51.2020.02.03.03.42.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Feb 2020 03:42:14 -0800 (PST)
-Subject: Re: [PATCH v2 1/4] Add the NVMM vcpu API
-To: Kamil Rytarowski <n54@gmx.com>, rth@twiddle.net, ehabkost@redhat.com,
- slp@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org,
- max@m00nbsd.net
-References: <20200107124903.16505-1-n54@gmx.com>
- <20200128140945.929-1-n54@gmx.com> <20200128140945.929-2-n54@gmx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <36e595b7-e72e-e216-3fa8-dd7d8fd17f5c@redhat.com>
-Date: Mon, 3 Feb 2020 12:42:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=NgtKPEP8ZdRA53CRUqcLQzq0EY5wXSOQj/FEO/MsvOs=;
+ b=ET+YGndxBQLUGwKV3HvUNgkZtWWWyRh0ZnLF+GwhjrEiDQODgrg5YjeRoxnMVnMRef
+ gtlOgDCnzc3EcoYHLMBaPaFrnW9kZBwRAjMLvfk2JreEutriQBvhxvMFp+epCFp5DGrH
+ mIPO9iLPc6r4KwoM60hxSWnaFOkIprhPU+iqUW9Gt0VALEYiWD2IqCPMFPHn6LW3nCYr
+ c0ejEMDubSQhBFzIn0XKnRSJvpTgaqxykj4oqeAHV5CRhkcHpoNx6Zn3vZ00yUw+ViZq
+ sqJUxrCdKCnKH6OefAXWDLGCZ+j5XU1/dkKaJztvW9tP1LM0DXD/YAszN3yaYq6/zi28
+ bC8A==
+X-Gm-Message-State: APjAAAUFddn3i5AZQtCrFqxctDFBkbN3FY/Vw2CyMD1GM87uoNRYAZsp
+ 0/DWd786i8bYT/D4A2DaCkodEjukK4U=
+X-Google-Smtp-Source: APXvYqy8FuDMAV5KNu4W2BPOvVptCJycnoKqznBVOeDP9ww3P5tNCIHnYm7Qwb5N6cCBwPyApRDcNQ==
+X-Received: by 2002:a1c:7717:: with SMTP id t23mr30034276wmi.17.1580730385606; 
+ Mon, 03 Feb 2020 03:46:25 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l15sm24615246wrv.39.2020.02.03.03.46.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Feb 2020 03:46:24 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 939FD1FF87;
+ Mon,  3 Feb 2020 11:46:23 +0000 (GMT)
+References: <20200202010439.6410-1-richard.henderson@linaro.org>
+ <20200202010439.6410-2-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 01/14] target/arm: Add arm_mmu_idx_is_stage1_of_2
+In-reply-to: <20200202010439.6410-2-richard.henderson@linaro.org>
+Date: Mon, 03 Feb 2020 11:46:23 +0000
+Message-ID: <87v9onao6o.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200128140945.929-2-n54@gmx.com>
-Content-Language: en-US
-X-MC-Unique: M_OViaNnOgClxo3uS_L1FQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,136 +97,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org,
+ Philippe =?utf-8?Q?Ma?= =?utf-8?Q?thieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/28/20 3:09 PM, Kamil Rytarowski wrote:
-> From: Maxime Villard <max@m00nbsd.net>
->=20
-> Adds support for the NetBSD Virtual Machine Monitor (NVMM) stubs and
-> introduces the nvmm.h sysemu API for managing the vcpu scheduling and
-> management.
->=20
-> Signed-off-by: Maxime Villard <max@m00nbsd.net>
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> Reviewed-by: Sergio Lopez <slp@redhat.com>
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Use a common predicate for querying stage1-ness.
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->   accel/stubs/Makefile.objs |  1 +
->   accel/stubs/nvmm-stub.c   | 43 +++++++++++++++++++++++++++++++++++++++
->   include/sysemu/nvmm.h     | 35 +++++++++++++++++++++++++++++++
->   3 files changed, 79 insertions(+)
->   create mode 100644 accel/stubs/nvmm-stub.c
->   create mode 100644 include/sysemu/nvmm.h
->=20
-> diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
-> index 3894caf95d..09f2d3e1dd 100644
-> --- a/accel/stubs/Makefile.objs
-> +++ b/accel/stubs/Makefile.objs
-> @@ -1,5 +1,6 @@
->   obj-$(call lnot,$(CONFIG_HAX))  +=3D hax-stub.o
->   obj-$(call lnot,$(CONFIG_HVF))  +=3D hvf-stub.o
->   obj-$(call lnot,$(CONFIG_WHPX)) +=3D whpx-stub.o
-> +obj-$(call lnot,$(CONFIG_NVMM)) +=3D nvmm-stub.o
->   obj-$(call lnot,$(CONFIG_KVM))  +=3D kvm-stub.o
->   obj-$(call lnot,$(CONFIG_TCG))  +=3D tcg-stub.o
-> diff --git a/accel/stubs/nvmm-stub.c b/accel/stubs/nvmm-stub.c
-> new file mode 100644
-> index 0000000000..c2208b84a3
-> --- /dev/null
-> +++ b/accel/stubs/nvmm-stub.c
-> @@ -0,0 +1,43 @@
-> +/*
-> + * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
+> v2: Rename from arm_mmu_idx_is_stage1 to arm_mmu_idx_is_stage1_of_2
+> ---
+>  target/arm/internals.h | 18 ++++++++++++++++++
+>  target/arm/helper.c    |  8 +++-----
+>  2 files changed, 21 insertions(+), 5 deletions(-)
+>
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index 6d4a942bde..1f8ee5f573 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -1034,6 +1034,24 @@ static inline ARMMMUIdx arm_stage1_mmu_idx(CPUARMS=
+tate *env)
+>  ARMMMUIdx arm_stage1_mmu_idx(CPUARMState *env);
+>  #endif
+>=20=20
+> +/**
+> + * arm_mmu_idx_is_stage1_of_2:
+> + * @mmu_idx: The ARMMMUIdx to test
 > + *
-> + * NetBSD Virtual Machine Monitor (NVMM) accelerator stub.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
+> + * Return true if @mmu_idx is a NOTLB mmu_idx that is the
+> + * first stage of a two stage regime.
 > + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "cpu.h"
-> +#include "sysemu/nvmm.h"
-> +
-> +int nvmm_init_vcpu(CPUState *cpu)
+> +static inline bool arm_mmu_idx_is_stage1_of_2(ARMMMUIdx mmu_idx)
 > +{
-> +    return -1;
+> +    switch (mmu_idx) {
+> +    case ARMMMUIdx_Stage1_E0:
+> +    case ARMMMUIdx_Stage1_E1:
+> +        return true;
+> +    default:
+> +        return false;
+> +    }
 > +}
 > +
-> +int nvmm_vcpu_exec(CPUState *cpu)
-> +{
-> +    return -1;
-> +}
-> +
-> +void nvmm_destroy_vcpu(CPUState *cpu)
-> +{
-> +}
-> +
-> +void nvmm_cpu_synchronize_state(CPUState *cpu)
-> +{
-> +}
-> +
-> +void nvmm_cpu_synchronize_post_reset(CPUState *cpu)
-> +{
-> +}
-> +
-> +void nvmm_cpu_synchronize_post_init(CPUState *cpu)
-> +{
-> +}
-> +
-> +void nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu)
-> +{
-> +}
-> diff --git a/include/sysemu/nvmm.h b/include/sysemu/nvmm.h
-> new file mode 100644
-> index 0000000000..10496f3980
-> --- /dev/null
-> +++ b/include/sysemu/nvmm.h
-> @@ -0,0 +1,35 @@
-> +/*
-> + * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
-> + *
-> + * NetBSD Virtual Machine Monitor (NVMM) accelerator support.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef QEMU_NVMM_H
-> +#define QEMU_NVMM_H
-> +
-> +#include "config-host.h"
-> +#include "qemu-common.h"
-> +
-> +int nvmm_init_vcpu(CPUState *);
-> +int nvmm_vcpu_exec(CPUState *);
-> +void nvmm_destroy_vcpu(CPUState *);
-> +
-> +void nvmm_cpu_synchronize_state(CPUState *);
-> +void nvmm_cpu_synchronize_post_reset(CPUState *);
-> +void nvmm_cpu_synchronize_post_init(CPUState *);
-> +void nvmm_cpu_synchronize_pre_loadvm(CPUState *);
-> +
-> +#ifdef CONFIG_NVMM
-> +
-> +int nvmm_enabled(void);
-> +
-> +#else /* CONFIG_NVMM */
-> +
-> +#define nvmm_enabled() (0)
-> +
-> +#endif /* CONFIG_NVMM */
-> +
-> +#endif /* CONFIG_NVMM */
-> --
-> 2.24.1
->=20
+>  /*
+>   * Parameters of a given virtual address, as extracted from the
+>   * translation control register (TCR) for a given regime.
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 70b10428c5..852fd71dcc 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3261,8 +3261,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint=
+64_t value,
+>          bool take_exc =3D false;
+>=20=20
+>          if (fi.s1ptw && current_el =3D=3D 1 && !arm_is_secure(env)
+> -            && (mmu_idx =3D=3D ARMMMUIdx_Stage1_E1 ||
+> -                mmu_idx =3D=3D ARMMMUIdx_Stage1_E0)) {
+> +            && arm_mmu_idx_is_stage1_of_2(mmu_idx)) {
+>              /*
+>               * Synchronous stage 2 fault on an access made as part of the
+>               * translation table walk for AT S1E0* or AT S1E1* insn
+> @@ -9294,8 +9293,7 @@ static inline bool regime_translation_disabled(CPUA=
+RMState *env,
+>          }
+>      }
+>=20=20
+> -    if ((env->cp15.hcr_el2 & HCR_DC) &&
+> -        (mmu_idx =3D=3D ARMMMUIdx_Stage1_E0 || mmu_idx =3D=3D ARMMMUIdx_=
+Stage1_E1)) {
+> +    if ((env->cp15.hcr_el2 & HCR_DC) && arm_mmu_idx_is_stage1_of_2(mmu_i=
+dx)) {
+>          /* HCR.DC means SCTLR_EL1.M behaves as 0 */
+>          return true;
+>      }
+> @@ -9604,7 +9602,7 @@ static hwaddr S1_ptw_translate(CPUARMState *env, AR=
+MMMUIdx mmu_idx,
+>                                 hwaddr addr, MemTxAttrs txattrs,
+>                                 ARMMMUFaultInfo *fi)
+>  {
+> -    if ((mmu_idx =3D=3D ARMMMUIdx_Stage1_E0 || mmu_idx =3D=3D ARMMMUIdx_=
+Stage1_E1) &&
+> +    if (arm_mmu_idx_is_stage1_of_2(mmu_idx) &&
+>          !regime_translation_disabled(env, ARMMMUIdx_Stage2)) {
+>          target_ulong s2size;
+>          hwaddr s2pa;
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+--=20
+Alex Benn=C3=A9e
 
