@@ -2,78 +2,91 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE72C35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 18:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE68C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 18:11:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1147D20838
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 18:11:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9127220838
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 18:11:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SuZzEXNx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1147D20838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gxFCP2H/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9127220838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iygBu-0003dN-8J
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 13:11:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45037)
+	id 1iygBx-0003oW-NM
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 13:11:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45556)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1iyg9u-0001TQ-DN
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:09:19 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iygA6-0001w7-QD
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:09:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1iyg9s-0004Ml-QZ
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:09:18 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35422)
+ (envelope-from <alex.bennee@linaro.org>) id 1iygA5-00059Q-Gt
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:09:30 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39297)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1iyg9l-0003xg-V0; Mon, 03 Feb 2020 13:09:10 -0500
-Received: by mail-pf1-x443.google.com with SMTP id y73so7988107pfg.2;
- Mon, 03 Feb 2020 10:09:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id;
- bh=svzEfdyLNLIk6ITuiz8ooWfYFBglfvrE37Vr4sIWzI8=;
- b=SuZzEXNxyCuD2l0LP0/1mrgUQ2rsiTC63wspO9lhBkXGUebGmb5eHSFJQlCuQXE7X/
- NJUPxkKtHNF9rzBAHz6G2Nsh4QR+SmKAhL2O84kpHe153Blt34Za8byEK03pLxDAhRR6
- kAVj8d9zu0VbvT35Ky781IrXxXM8WhgPOJvUD5w3KhWa3pKoWayLCMco8n3xiQG06Z2+
- xeibbhp61xDZmsxcthwDzJYFHIAR1hSVlfzIqJvrNwbH9lNCVvSa8aYMO5lacz1X3nqq
- vJOxC7JW1S0mg6430EIYOvZ5CX4RtLuRIyoAq7IiLAn5ZZmnccS+aci1D4ksGzAEoyeK
- YDHg==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iygA5-00053u-91
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 13:09:29 -0500
+Received: by mail-wr1-x441.google.com with SMTP id y11so19483979wrt.6
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 10:09:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=EbpxSrriZA9kNXvoDhil1LWfBx0aG5U90532wLNVC60=;
+ b=gxFCP2H/RX+X6FGp3r+32yh/oGOy46zhKEm8oTt7fuvpBIaxgL3KawvcDqEOcSlsLH
+ EUqFGuk4af4TmJB7MH6rrWo6YZzDPaFUy9SFbQc0VXimPSqryCUwoJkIPUYyCGZ1DfaN
+ i1rQwk9/GhrRVl+eleCuDFPv3K5mdCI6+LCYQWgIgj3G4kwpvdwVxt4qQmxB6M7PKlfp
+ QKlU988SIYvZFzI9vedbmAoePduXpxFxQbfaGYgDYY8erfF9dCSKX8qiSqHugwSLdWeN
+ mUvDRD57VRQypWGOvMGMg7D5GOI3zzfNZueQyo4HPNKKL31xEgEJCkpXKkdpMt8/xgCE
+ o/CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=svzEfdyLNLIk6ITuiz8ooWfYFBglfvrE37Vr4sIWzI8=;
- b=WjsdDwPyK69T34wsJ2w9xcE7qGk76UUujfKOd29Ckk1niY4lQnYf/6KN7M4tpKNGsU
- ucDwjm2IagPa0YDc6cm+w73MSoCWkOsqapa47QaSxSWrKVBEAgEDO0TlvM6zuAKkxQPL
- 4uDhDlmRuUW3sdEgzMYj5EvSpe/CzkDN8oSvdY6qqLkFifwntdC9lHwFwA4TpKuleMyN
- QWG8DBXeNSseOAFkhlZk27wxmKkMgJTWxNY9wY6K+4KaYSBvUu5ZTus33rYrGukxtSWM
- dr6Zwtlk/O8K2pP8x7z5+TauR8nooyjpJefFP7R0pxmGjCwPvgHl+WFfpsWrwnD6zZoT
- jHtw==
-X-Gm-Message-State: APjAAAXm3wVUpBs+Y30xhPGBXv+7X45RIT3c1cZzQOni1uRI6+Z5EI8I
- VP2ohui7lhjiSfj/swY2iuo=
-X-Google-Smtp-Source: APXvYqyT/537pJyDsMMLQ5bnF9ghrnoW2pftnWMkr7jBv2QtrPSL/N7ReuidoBoIpsG4voKug2aGhQ==
-X-Received: by 2002:a63:6407:: with SMTP id y7mr1568865pgb.45.1580753346564;
- Mon, 03 Feb 2020 10:09:06 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id s5sm10738885pgc.73.2020.02.03.10.09.05
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 03 Feb 2020 10:09:05 -0800 (PST)
-From: Guenter Roeck <linux@roeck-us.net>
-To: Alistair Francis <alistair@alistair23.me>
-Subject: [PATCH 1/3] m25p80: Convert to support tracing
-Date: Mon,  3 Feb 2020 10:09:02 -0800
-Message-Id: <20200203180904.2727-1-linux@roeck-us.net>
-X-Mailer: git-send-email 2.17.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=EbpxSrriZA9kNXvoDhil1LWfBx0aG5U90532wLNVC60=;
+ b=f0wT/kEmvI8fV7KQ+O7mfD8pTAyZRoYBuqi/lSM2lykANpERd2vR9JZzky4rJ/UJMS
+ hMrXMbEPcH+MyyErAzuQq5RnaDKwLZD4bhOVFnEDPjX2pO7QE7imaDlL2mdPWTQFERLD
+ 6UTpNsSxgjOW/eGmxcwqDP+0xYDL/yukNuHvLNl0ZZ+D0olAK7O81yIb/vqZx5i7eNrn
+ psVdpJ/vwrxn/OxNnt5xs45ScyJFqzcv9GhCNo2qLs6HKF4FWpP0oUK6iOaUANhqYeDK
+ rlW9SKysXjm7IZudDLM/0hfaFmwBnJIMLCotuNaDdaPKuEgbFyUqW53GyDggbLKM9s6n
+ uBzg==
+X-Gm-Message-State: APjAAAVETnCnEcvtAiEttLgWkPItj64OQnFYEf/Bqz39fS8+7rS8QGgP
+ 8gzwLNjIU8IqfsAtFuCc3lG1CA==
+X-Google-Smtp-Source: APXvYqx2D1VpLs0PEo8hxSF/GWcL2AHDazLsiWSPcEhF7VhvBREeIYv/rugdzbxVXBciVC8mJb2iXg==
+X-Received: by 2002:a05:6000:8c:: with SMTP id
+ m12mr17306713wrx.142.1580753367769; 
+ Mon, 03 Feb 2020 10:09:27 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c13sm16939236wrn.46.2020.02.03.10.09.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Feb 2020 10:09:26 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F29571FF87;
+ Mon,  3 Feb 2020 18:09:25 +0000 (GMT)
+References: <20200203132533.21850-1-peter.maydell@linaro.org>
+ <20200203132533.21850-3-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 2/2] configure: Check that sphinx-build is using Python 3
+In-reply-to: <20200203132533.21850-3-peter.maydell@linaro.org>
+Date: Mon, 03 Feb 2020 18:09:25 +0000
+Message-ID: <8736bra6ga.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,202 +98,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Guenter Roeck <linux@roeck-us.net>, Joel Stanley <joel@jms.id.au>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While at it, add some trace messages to help debug problems
-seen when running the latest Linux kernel.
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
- hw/block/m25p80.c     | 48 ++++++++++++++++++++-----------------------
- hw/block/trace-events | 16 +++++++++++++++
- 2 files changed, 38 insertions(+), 26 deletions(-)
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index 11ff5b9ad7..63e050d7d3 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -32,17 +32,7 @@
- #include "qemu/module.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
--
--#ifndef M25P80_ERR_DEBUG
--#define M25P80_ERR_DEBUG 0
--#endif
--
--#define DB_PRINT_L(level, ...) do { \
--    if (M25P80_ERR_DEBUG > (level)) { \
--        fprintf(stderr,  ": %s: ", __func__); \
--        fprintf(stderr, ## __VA_ARGS__); \
--    } \
--} while (0)
-+#include "trace.h"
- 
- /* Fields for FlashPartInfo->flags */
- 
-@@ -574,7 +564,8 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
-         abort();
-     }
- 
--    DB_PRINT_L(0, "offset = %#x, len = %d\n", offset, len);
-+    trace_m25p80_flash_erase(offset, len);
-+
-     if ((s->pi->flags & capa_to_assert) != capa_to_assert) {
-         qemu_log_mask(LOG_GUEST_ERROR, "M25P80: %d erase size not supported by"
-                       " device\n", len);
-@@ -607,8 +598,7 @@ void flash_write8(Flash *s, uint32_t addr, uint8_t data)
-     }
- 
-     if ((prev ^ data) & data) {
--        DB_PRINT_L(1, "programming zero to one! addr=%" PRIx32 "  %" PRIx8
--                   " -> %" PRIx8 "\n", addr, prev, data);
-+        trace_m25p80_programming_zero_to_one(addr, prev, data);
-     }
- 
-     if (s->pi->flags & EEPROM) {
-@@ -662,6 +652,9 @@ static void complete_collecting_data(Flash *s)
- 
-     s->state = STATE_IDLE;
- 
-+    trace_m25p80_complete_collecting(s->cmd_in_progress, n, s->ear,
-+                                     s->cur_addr);
-+
-     switch (s->cmd_in_progress) {
-     case DPP:
-     case QPP:
-@@ -825,7 +818,7 @@ static void reset_memory(Flash *s)
-         break;
-     }
- 
--    DB_PRINT_L(0, "Reset done.\n");
-+    trace_m25p80_reset_done();
- }
- 
- static void decode_fast_read_cmd(Flash *s)
-@@ -941,9 +934,10 @@ static void decode_qio_read_cmd(Flash *s)
- 
- static void decode_new_cmd(Flash *s, uint32_t value)
- {
--    s->cmd_in_progress = value;
-     int i;
--    DB_PRINT_L(0, "decoded new command:%x\n", value);
-+
-+    s->cmd_in_progress = value;
-+    trace_m25p80_command_decoded(value);
- 
-     if (value != RESET_MEMORY) {
-         s->reset_enable = false;
-@@ -1042,7 +1036,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-         break;
- 
-     case JEDEC_READ:
--        DB_PRINT_L(0, "populated jedec code\n");
-+        trace_m25p80_populated_jedec();
-         for (i = 0; i < s->pi->id_len; i++) {
-             s->data[i] = s->pi->id[i];
-         }
-@@ -1063,7 +1057,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-     case BULK_ERASE_60:
-     case BULK_ERASE:
-         if (s->write_enable) {
--            DB_PRINT_L(0, "chip erase\n");
-+            trace_m25p80_chip_erase();
-             flash_erase(s, 0, BULK_ERASE);
-         } else {
-             qemu_log_mask(LOG_GUEST_ERROR, "M25P80: chip erase with write "
-@@ -1184,7 +1178,7 @@ static int m25p80_cs(SSISlave *ss, bool select)
-         s->data_read_loop = false;
-     }
- 
--    DB_PRINT_L(0, "%sselect\n", select ? "de" : "");
-+    trace_m25p80_select(select ? "de" : "");
- 
-     return 0;
- }
-@@ -1194,19 +1188,20 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
-     Flash *s = M25P80(ss);
-     uint32_t r = 0;
- 
-+    trace_m25p80_transfer(s->state, s->len, s->needed_bytes, s->pos,
-+                          s->cur_addr, (uint8_t)tx);
-+
-     switch (s->state) {
- 
-     case STATE_PAGE_PROGRAM:
--        DB_PRINT_L(1, "page program cur_addr=%#" PRIx32 " data=%" PRIx8 "\n",
--                   s->cur_addr, (uint8_t)tx);
-+        trace_m25p80_page_program(s->cur_addr, (uint8_t)tx);
-         flash_write8(s, s->cur_addr, (uint8_t)tx);
-         s->cur_addr = (s->cur_addr + 1) & (s->size - 1);
-         break;
- 
-     case STATE_READ:
-         r = s->storage[s->cur_addr];
--        DB_PRINT_L(1, "READ 0x%" PRIx32 "=%" PRIx8 "\n", s->cur_addr,
--                   (uint8_t)r);
-+        trace_m25p80_read_byte(s->cur_addr, (uint8_t)r);
-         s->cur_addr = (s->cur_addr + 1) & (s->size - 1);
-         break;
- 
-@@ -1244,6 +1239,7 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
-         }
- 
-         r = s->data[s->pos];
-+        trace_m25p80_read_data(s->pos, (uint8_t)r);
-         s->pos++;
-         if (s->pos == s->len) {
-             s->pos = 0;
-@@ -1281,7 +1277,7 @@ static void m25p80_realize(SSISlave *ss, Error **errp)
-             return;
-         }
- 
--        DB_PRINT_L(0, "Binding to IF_MTD drive\n");
-+        trace_m25p80_binding();
-         s->storage = blk_blockalign(s->blk, s->size);
- 
-         if (blk_pread(s->blk, 0, s->storage, s->size) != s->size) {
-@@ -1289,7 +1285,7 @@ static void m25p80_realize(SSISlave *ss, Error **errp)
-             return;
-         }
-     } else {
--        DB_PRINT_L(0, "No BDRV - binding to RAM\n");
-+        trace_m25p80_binding_no_bdrv();
-         s->storage = blk_blockalign(NULL, s->size);
-         memset(s->storage, 0xFF, s->size);
-     }
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index c03e80c2c9..d052f7578c 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -134,3 +134,19 @@ xen_block_blockdev_add(char *str) "%s"
- xen_block_blockdev_del(const char *node_name) "%s"
- xen_block_device_create(unsigned int number) "%u"
- xen_block_device_destroy(unsigned int number) "%u"
-+
-+# m25p80.c
-+m25p80_flash_erase(int offset, uint32_t len) "offset = 0x%"PRIx32", len = %u"
-+m25p80_programming_zero_to_one(uint32_t addr, uint8_t prev, uint8_t data) "programming zero to one! addr=0x%"PRIx32"  0x%"PRIx8" -> 0x%"PRIx8
-+m25p80_reset_done(void) "Reset done."
-+m25p80_command_decoded(uint32_t cmd) "new command:0x%"PRIx32
-+m25p80_complete_collecting(uint32_t cmd, int n, uint8_t ear, uint32_t cur_addr) "decode cmd: 0x%"PRIx32" len %d ear 0x%"PRIx8" addr 0x%"PRIx32
-+m25p80_populated_jedec(void) "populated jedec code"
-+m25p80_chip_erase(void) "chip erase"
-+m25p80_select(const char *what) "%sselect"
-+m25p80_page_program(uint32_t addr, uint8_t tx) "page program cur_addr=0x%"PRIx32" data=0x%"PRIx8
-+m25p80_transfer(uint8_t state, uint32_t len, uint8_t needed, uint32_t pos, uint32_t cur_addr, uint8_t t) "Transfer state 0x%"PRIx8" len 0x%"PRIx32" needed 0x%"PRIx8" pos 0x%"PRIx32" addr 0x%"PRIx32" tx 0x%"PRIx8
-+m25p80_read_byte(uint32_t addr, uint8_t v) "Read byte 0x%"PRIx32"=0x%"PRIx8
-+m25p80_read_data(uint32_t pos, uint8_t v) "Read data 0x%"PRIx32"=0x%"PRIx8
-+m25p80_binding(void) "Binding to IF_MTD drive"
-+m25p80_binding_no_bdrv(void) "No BDRV - binding to RAM"
--- 
-2.17.1
+> Currently configure's has_sphinx_build() check simply runs a dummy
+> sphinx-build and either passes or fails.  This means that "no
+> sphinx-build at all" and "sphinx-build exists but is too old" are
+> both reported the same way.
+>
+> Further, we want to assume that all the Python we write is running
+> with at least Python 3.5; configure checks that for our scripts, but
+> Sphinx extensions run with whatever Python version sphinx-build
+> itself is using.
+>
+> Add a check to our conf.py which makes sphinx-build fail if it would
+> be running our extensions with an old Python, and handle this
+> in configure so we can report failure helpfully to the user.
+> This will mean that configure --enable-docs will fail like this
+> if the sphinx-build provided is not suitable:
+>
+> Warning: sphinx-build exists but it is either too old or uses too old a P=
+ython version
+>
+> ERROR: User requested feature docs
+>        configure was not able to find it.
+>        Install texinfo, Perl/perl-podlators and a Python 3 version of pyt=
+hon-sphinx
+>
+> (As usual, the default is to simply not build the docs, as we would
+> if sphinx-build wasn't present at all.)
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+> At the moment our Sphinx extensions all work under Python 2;
+> but the one for handling parsing QAPI docs out of the JSON is going
+> to want to include some of the scripts/qapi Python which is more
+> complicated and definitely now 3-only.  In any case it's nicer to
+> fail cleanly rather than let users stumble into corner cases we don't
+> test and don't want to support even if they happen to work today.
+> ---
+>  configure    | 12 ++++++++++--
+>  docs/conf.py | 10 ++++++++++
+>  2 files changed, 20 insertions(+), 2 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 830f325822a..95055f2e9dd 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4808,11 +4808,19 @@ has_sphinx_build() {
+>=20=20
+>  # Check if tools are available to build documentation.
+>  if test "$docs" !=3D "no" ; then
+> -  if has makeinfo && has pod2man && has_sphinx_build; then
+> +  if has_sphinx_build; then
+> +    sphinx_ok=3Dyes
+> +  else
+> +    sphinx_ok=3Dno
+> +  fi
+> +  if has makeinfo && has pod2man && test "$sphinx_ok" =3D "yes"; then
+>      docs=3Dyes
+>    else
+>      if test "$docs" =3D "yes" ; then
+> -      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and=
+ python-sphinx"
+> +      if has $sphinx_build && test "$sphinx_ok" !=3D "yes"; then
+> +        echo "Warning: $sphinx_build exists but it is either too old or =
+uses too old a Python version" >&2
+> +      fi
+> +      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and=
+ a Python 3 version of python-sphinx"
+>      fi
+>      docs=3Dno
+>    fi
+> diff --git a/docs/conf.py b/docs/conf.py
+> index ee7faa6b4e7..7588bf192ee 100644
+> --- a/docs/conf.py
+> +++ b/docs/conf.py
+> @@ -28,6 +28,16 @@
+>=20=20
+>  import os
+>  import sys
+> +import sphinx
+> +from sphinx.errors import VersionRequirementError
+> +
+> +# Make Sphinx fail cleanly if using an old Python, rather than obscurely
+> +# failing because some code in one of our extensions doesn't work there.
+> +# Unfortunately this doesn't display very neatly (there's an unavoidable
+> +# Python backtrace) but at least the information gets printed...
+> +if sys.version_info < (3,5):
+> +    raise VersionRequirementError(
+> +        "QEMU requires a Sphinx that uses Python 3.5 or better\n")
+>=20=20
+>  # The per-manual conf.py will set qemu_docdir for a single-manual build;
+>  # otherwise set it here if this is an entire-manual-set build.
+
+
+--=20
+Alex Benn=C3=A9e
 
