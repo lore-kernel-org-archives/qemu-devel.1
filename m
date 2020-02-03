@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA4BC35249
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB1FC35249
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:20:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1010820679
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:19:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1010820679
+	by mail.kernel.org (Postfix) with ESMTPS id E111020679
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:20:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E111020679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyPSh-0003N1-9Q
-	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 19:19:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33129)
+	id 1iyPTr-0004pR-31
+	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 19:20:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33047)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iyPQX-00071O-V2
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:22 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1iyPQT-0006p9-Hz
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iyPQW-0004Dx-TI
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:21 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:38210 helo=huawei.com)
+ (envelope-from <guoheyi@huawei.com>) id 1iyPQS-00048m-B2
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:17 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2691 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iyPQU-00048B-Ey; Sun, 02 Feb 2020 19:17:18 -0500
+ id 1iyPQP-00041B-97; Sun, 02 Feb 2020 19:17:13 -0500
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 626D8FD170912DF4A5B2;
- Mon,  3 Feb 2020 08:17:14 +0800 (CST)
+ by Forcepoint Email with ESMTP id 53ECE588DA811476CAAC;
+ Mon,  3 Feb 2020 08:17:09 +0800 (CST)
 Received: from linux-TFkxOR.huawei.com (10.175.104.212) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 3 Feb 2020 08:17:03 +0800
+ 14.3.439.0; Mon, 3 Feb 2020 08:17:02 +0800
 From: Heyi Guo <guoheyi@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 5/7] arm/acpi: fix duplicated _UID of PCI interrupt link
- devices
-Date: Mon, 3 Feb 2020 08:15:03 +0800
-Message-ID: <20200203001505.52573-6-guoheyi@huawei.com>
+Subject: [PATCH v2 3/7] arm/virt/acpi: remove _ADR from devices identified by
+ _HID
+Date: Mon, 3 Feb 2020 08:15:01 +0800
+Message-ID: <20200203001505.52573-4-guoheyi@huawei.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20200203001505.52573-1-guoheyi@huawei.com>
 References: <20200203001505.52573-1-guoheyi@huawei.com>
@@ -54,7 +54,7 @@ X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,45 +68,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- qemu-arm@nongnu.org, Igor
- Mammedov <imammedo@redhat.com>, Heyi Guo <guoheyi@huawei.com>,
- wanghaibin.wang@huawei.com
+ qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using _UID of 0 for all PCI interrupt link devices absolutely violates
-the spec. Simply increase one by one.
+According to ACPI spec, _ADR should be used for device on a bus that
+has a standard enumeration algorithm, but not for device which is on
+system bus and must be enumerated by OSPM. And it is not recommended
+to contain both _HID and _ADR in a single device.
+
+See ACPI 6.3, section 6.1, top of page 343:
+
+A device object must contain either an _HID object or an _ADR object,
+but should not contain both.
+
+(https://uefi.org/sites/default/files/resources/ACPI_6_3_May16.pdf)
 
 Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 
 ---
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 Cc: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org
 ---
- hw/arm/virt-acpi-build.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/arm/virt-acpi-build.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 5d157a9dd5..f3e340b172 100644
+index 9f4c7d1889..be752c0ad8 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -189,7 +189,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
+@@ -78,11 +78,6 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMa=
+pEntry *uart_memmap,
+                              AML_EXCLUSIVE, &uart_irq, 1));
+     aml_append(dev, aml_name_decl("_CRS", crs));
+=20
+-    /* The _ADR entry is used to link this device to the UART described
+-     * in the SPCR table, i.e. SPCR.base_address.address =3D=3D _ADR.
+-     */
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(uart_memmap->base)));
+-
+     aml_append(scope, dev);
+ }
+=20
+@@ -170,7 +165,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
 pEntry *memmap,
-         uint32_t irqs =3D  irq + i;
-         Aml *dev_gsi =3D aml_device("GSI%d", i);
-         aml_append(dev_gsi, aml_name_decl("_HID", aml_string("PNP0C0F"))=
-);
--        aml_append(dev_gsi, aml_name_decl("_UID", aml_int(0)));
-+        aml_append(dev_gsi, aml_name_decl("_UID", aml_int(i)));
-         crs =3D aml_resource_template();
-         aml_append(crs,
-                    aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIG=
-H,
+     aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
+     aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
+     aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+     aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
+     aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
+;
+     aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+@@ -334,7 +328,6 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemM=
+apEntry *gpio_memmap,
+ {
+     Aml *dev =3D aml_device("GPO0");
+     aml_append(dev, aml_name_decl("_HID", aml_string("ARMH0061")));
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+     aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+=20
+     Aml *crs =3D aml_resource_template();
+@@ -364,7 +357,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+ {
+     Aml *dev =3D aml_device(ACPI_POWER_BUTTON_DEVICE);
+     aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+     aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+     aml_append(scope, dev);
+ }
 --=20
 2.19.1
 
