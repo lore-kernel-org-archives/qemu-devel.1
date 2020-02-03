@@ -2,79 +2,122 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5134AC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 21:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E45EDC35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 21:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08DB120658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 21:33:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC9E920838
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 21:50:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfhmzVGA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08DB120658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="0NM2LRLp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9E920838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyjLi-000423-2u
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 16:33:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40770)
+	id 1iyjc4-0007MW-Sx
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 16:50:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45170)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <waynli329@gmail.com>) id 1iyjKf-00035U-0V
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:32:38 -0500
+ (envelope-from <Babu.Moger@amd.com>) id 1iyjbA-0006rr-Dj
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:49:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <waynli329@gmail.com>) id 1iyjKd-0008Uq-45
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:32:36 -0500
-Received: from mail-il1-x135.google.com ([2607:f8b0:4864:20::135]:34915)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <waynli329@gmail.com>) id 1iyjKc-0008Rg-NL
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:32:34 -0500
-Received: by mail-il1-x135.google.com with SMTP id g12so14019277ild.2
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 13:32:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SYtoshaQQXOkE0Yk37PrULqhWMPDHxUPqauAc2js6t0=;
- b=kfhmzVGAx+nKt7TLW1WeCsb7ojThuHDCFkJJ9IHrc8a0ni7fss4GPSRFsmRD6aBYBx
- 59/uPSx7qzuP35PGn3NOmZStjP01vCGacuZ2ACBNvy52w5CbXIs3GthIzVNgpAZMFO8M
- ODjHFDiaUGnaXP9MpHB/admFA3bi8xWl6JOxZ2BVq6UQhluIFsjnlcoJf9QtaUuVXGb/
- qiwwIYTKT0/OAvw2ltWJ+JynlK/kre9UOJwvYMgBgyXM4ogar4CgEL1hZtUxqpfz2UhW
- n5XAqatYxmzr2fXKw7ZpcU3r2TN4uJRyfb/y3uaTYMEMYo5M8763qyfDaKruyWXjEOby
- gTIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SYtoshaQQXOkE0Yk37PrULqhWMPDHxUPqauAc2js6t0=;
- b=R6qgC2yYVRUCzxxzGTCXbbLbwZc5rcu7OQ0fjCy3rPkQDFs4E6YKAI+A8RUn3GI1PM
- tYjJK6uqDyGGLpgOVtxtA5GbNHwLGBM82dUvp4/WFDulAmkMrk5cTIfsEUTNeoKwoWyt
- 0KOoFUK1Por9HcawjVQubcqWib44R5FHuVcSKlzK0gcFOcpC0HEq8UAnpVoifO6rqWTQ
- 7ZbDeQ+8gppc/PZBI3OAfiTteXvwoQemGNFuqaqLOrkyxE2bxUsmew/vcfV796S3+rit
- VExTeLwEMsGgsRQhmMGcEoCFwNh7xf771USnZUsL6/TehgRtwNq7/nGW5Y+A62JHCRDa
- aBRg==
-X-Gm-Message-State: APjAAAVN5UtUDI0Nk223wbaJJk5sdaAdRolr4T5TY691EXP33uRSMiQP
- J8/+zZKp/VToPpiC/v4w/t+m4jv6KMPm8XZT9fk=
-X-Google-Smtp-Source: APXvYqxgkDrpa8YX1UpkPVxcsv5ryFM+4FKz2xKuwlztX2R5nyDbNQN+YlKhsJOQUZsCcszk3yKY4zdk33bULIpKBOw=
-X-Received: by 2002:a92:8108:: with SMTP id e8mr25508828ild.138.1580765553863; 
- Mon, 03 Feb 2020 13:32:33 -0800 (PST)
+ (envelope-from <Babu.Moger@amd.com>) id 1iyjb8-0001AJ-Pk
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:49:40 -0500
+Received: from mail-mw2nam12on2061.outbound.protection.outlook.com
+ ([40.107.244.61]:6139 helo=NAM12-MW2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1iyjb8-00012C-Ec
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:49:38 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k6oUFIH9tmHZpprGMnrowvQsU8rvx8Y8pGU/FYb+Gy7ji1oPcCoGDh+FhgO0w7//V4OcsZJ5EZRcv9TO0BY15jdZtsjkW5Lu2SFLYU4UmctjQlOWeQ9PX6OAYNzQmIwT+C/RkmChvFRx4yo/6SYdoO0x5W/rTpykul/yyhzHPI72lLQdovdR6wUGYe9P9IG9f+GLdpRvM4aWyXSnhCR31QM52no6hU8KHfoM6dQU7F7KXyhYeGc/Rl4LSo3aRKCMsq5ELi6eZ+XxYksvRGkjtmSsp383v80UGuPQDpdtGaVZKaA3kosuyplD0BUI9Ox9cyyq/hCCoPUoRaqULGS2uA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sK+RkKemLKkxufSXDXGSxYz4dSyelA51uCZDJnFomm4=;
+ b=mAlfYxVmoFWUHxU4oqac0EqPbkDLHSrq1lJCmh8gWw/DU/VgLxV/jUQWk3vjpKML1kcPDPnImKCacHQQzIUEQ5Wfw0MmnIcXkxHAGK7HatHP1xlOfiSr0aSLPbqmSvLPxogyCuJQxzleDV/P+sSXMvAVLFY4jCIM0GsCD2qNkOCSzKdkA1/yaFwYiWedmh6fZd6eGN3Sdyq9Ed2DksD3LlX/0PV8iSVyB4q7MrmJKiIIltCM21dDQdXYuwshfG77XPTQ59WQmQbEDUnVMjDUjxUmNtdh4VM5Ut7i9AJLDC8qvVsd9NaQjdpblJN9OhQ4+hNh/9Z65h2tdBAy6i3Ynw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sK+RkKemLKkxufSXDXGSxYz4dSyelA51uCZDJnFomm4=;
+ b=0NM2LRLpqaGPX9NUGHrFSeTnGkUNOSd7GbzZxoz1Df/w2FdYqZ89BePF+B3NSHqYd0HjkNKAbunhLtIl+xXDN2ip4lNLA94FEe6j/97gHNwEQEHNkR468PkbEamUwxdy/6qYZ7daXh12pV+trG5meGosC0tZBS+qPCBvT7cO4B0=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com (10.172.71.23) by
+ CY4PR12MB1749.namprd12.prod.outlook.com (10.175.60.144) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.27; Mon, 3 Feb 2020 21:49:33 +0000
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd]) by CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::610a:6908:1e18:49fd%7]) with mapi id 15.20.2686.031; Mon, 3 Feb 2020
+ 21:49:33 +0000
+Subject: Re: [PATCH v3 07/18] machine: Add a new function init_apicid_fn in
+ MachineClass
+To: Igor Mammedov <imammedo@redhat.com>
+References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
+ <157541986210.46157.5082551407581177819.stgit@naples-babu.amd.com>
+ <20200128172919.4ecb5896@redhat.com>
+ <e5271e1c-55bc-e3d2-eb4c-2329eef07c9f@amd.com>
+ <20200129101458.6a108431@redhat.com>
+ <b75928ec-c062-7edf-bc24-8dc0ccd7439b@amd.com>
+ <20200203161758.3eb85046@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <192836b5-bd1c-0ad5-b650-e33c6e3bc84d@amd.com>
+Date: Mon, 3 Feb 2020 15:49:31 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+In-Reply-To: <20200203161758.3eb85046@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM5PR12CA0013.namprd12.prod.outlook.com (2603:10b6:4:1::23)
+ To CY4PR12MB1574.namprd12.prod.outlook.com
+ (2603:10b6:910:e::23)
 MIME-Version: 1.0
-References: <CAM2K0nr7+6NRW6CRYRdejS_BPjizV5yX7ykfctEFTyPzh=kSVA@mail.gmail.com>
- <CAFEAcA_0RxRUkmU3YGCF2RXmJu=vP1D8SQunhdPdwW88oreCvQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA_0RxRUkmU3YGCF2RXmJu=vP1D8SQunhdPdwW88oreCvQ@mail.gmail.com>
-From: Wayne Li <waynli329@gmail.com>
-Date: Mon, 3 Feb 2020 15:32:22 -0600
-Message-ID: <CAM2K0nq1xw9XnJuCJD83vWx1DXi3DrHh8ku0d=0Ny6E6WNqJNA@mail.gmail.com>
-Subject: Re: Need help understanding assertion fail.
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000004fb082059db2a9b4"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::135
+Received: from [10.236.30.87] (165.204.77.1) by
+ DM5PR12CA0013.namprd12.prod.outlook.com (2603:10b6:4:1::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.29 via Frontend Transport; Mon, 3 Feb 2020 21:49:32 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 7ff676ae-d92d-4b4a-a088-08d7a8f2f440
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1749:
+X-Microsoft-Antispam-PRVS: <CY4PR12MB17490574199B5AF9A2040BBE95000@CY4PR12MB1749.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0302D4F392
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(366004)(346002)(376002)(39860400002)(396003)(136003)(189003)(199004)(16526019)(53546011)(186003)(6486002)(44832011)(2616005)(4326008)(36756003)(66476007)(31696002)(5660300002)(66556008)(86362001)(956004)(26005)(66946007)(45080400002)(6916009)(966005)(31686004)(16576012)(8936002)(316002)(8676002)(81166006)(2906002)(478600001)(81156014)(52116002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:CY4PR12MB1749;
+ H:CY4PR12MB1574.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: w9bnAaEUEkbQRChAcEE0vFEWJp7LYHVJPxbFgZLq8Qs51vniMmQVwFx8+DEOHSGj24SsufezFCHCNfM0rV1biClkeoM6OenBGT7U7wwX27KemMH2AfxsFU4M557oPmJ7ZlDpsOR+nL6hMamC9KEiUNZOmJ5AdT2vjzan40N54+pWHrNpFkR4A8KZOt24SQZi2M85gvvvwqZqiqSiViDPSCZ6svZR5xoK2syvJViZQB0A9wca5XAX8aucypLeRhM3/4L/LXsaHThUdWhgCLsgJ8A+fvANpyH0wwSy/90w1CBSnByrvAo+bb/dcscPgstVUa+wirondhZ2DifBXMQU33uiw7R36WRoO85Q8ao+mzK8QfWJIXfQeODusMh5nm3hc7NL9EoZEkUo5xvYg32kbOF91me/F6ScDreghdta18Wxde+NTzQKXTDsEbpprgamNbxhLLPSDUuziMVMRI4O3GDkzpx8a+FM0SIanWHpr5ePWGSQdIBHPmb/MyhiJ/HbJWjcXl7w5OnKGD9s3hlBOA==
+X-MS-Exchange-AntiSpam-MessageData: rFA+otNR0Cf710RjITUz0VYdGZlt2ZjhgJqiQA/dAFzqEqoxFtmY2GGrFx61oiFztirdG+bX57Qrg1ZoXyI9QR3EfhUHKvPaGvmEFLmgdMIbY1YJKLj1CAWtucgmOpoYlADsZdO3vJTxmRM+Nqs8Tw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ff676ae-d92d-4b4a-a088-08d7a8f2f440
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2020 21:49:33.2301 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 54Zi3GsDDBY1DdFUqRnW+5EIn4ybyTWzbhmqp6epr8hLRtBFDUGTjMSadkjjXEmu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1749
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.244.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,200 +129,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004fb082059db2a9b4
-Content-Type: text/plain; charset="UTF-8"
 
-I see.  So you're saying that it might be possible that my guest could be
-generating TCG ops that can't be translated into PPC instructions because
-the displacement value is to big.  While the same TCG ops can be translated
-into x86 instructions because x86 allows for a bigger displacement value.
-But on the other hand it could be some other problem causing me to have a
-large displacement value.
 
-In that case, I think it'd be super helpful if I print out this
-displacement value in the TCG ops when running on PPC versus x86 because
-they should be the same right?  What option in QEMU -d allows me to see
-generated TCG ops?  Doing a -d --help shows the following options:
-
-out_asm    show generated host assembly code for each compiled TB
-in_asm     show target assembly code for each compiled TB
-op         show micro ops for each compiled TB
-op_opt     show micro ops (x86 only: before eflags optimization) and
-after liveness analysis
-int        show interrupts/exceptions in short format
-exec       show trace before each executed TB (lots of logs)
-cpu        show CPU state before block translation
-mmu        log MMU-related activities
-pcall      x86 only: show protected mode far calls/returns/exceptions
-cpu_reset  show CPU state before CPU resets
-ioport     show all i/o ports accesses
-unimp      log unimplemented functionality
-guest_errors log when the guest OS does something invalid (eg accessing a
-non-existent register)
-
-There doesn't seem to be any option to print out the TCG ops specifically?
-Maybe I'll have to go into the code to add print statements that print out
-the TCG ops?
-
--Thanks!, Wayne Li
-
-On Mon, Feb 3, 2020 at 10:56 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On Mon, 3 Feb 2020 at 16:39, Wayne Li <waynli329@gmail.com> wrote:
-> > Anyway that's the background.  The specific problem I'm having right now
-> is I get the following assertion error during some of the setup stuff our
-> OS does post boot-up (the OS is also custom-made):
-> >
-> > qemu_programs/qemu/tcg/ppc/tcg-target.inc.c:224: reloc_pc14_val:
-> Assertion `disp == (int16_t) disp' failed.
-> >
-> > Looking at the QEMU code, "disp" is the difference between two pointers
-> named "target" and "pc".  I'm not sure exactly what either of those names
-> mean.  And it looks like since the assertion is checking if casting "disp"
-> as a short changes the value, it's checking if the "disp" value is too
-> big?  I'm just not very sure what this assertion means.
->
-> This assertion is checking that we're not trying to fit too
-> large a value into the host PPC branch instruction we just emitted.
-> That is, tcg_out_bc() emits a PPC conditional branch instruction,
-> which has a 14 bit field for the offset (it's a relative branch),
-> and we know the bottom 2 bits of the target will be 0 (PPC insns
-> being 4-aligned), so the distance between the current host PC
-> and the target of the branch must fit in a signed 16-bit field.
->
-> "disp" here stands for "displacement".
->
-> The PPC TCG backend only uses this for the TCG 'brcond' and
-> 'brcond2' TCG intermediate-representation ops. It seems likely
-> that the code for your target is generating TCG ops which have
-> too large a gap between a brcond/brcond2 and the destination label.
-> You could try using the various QEMU -d options to print out the
-> guest instructions and the generated TCG ops to pin down what
-> part of your target is trying to generate branches over too
-> much code like this.
->
-> > Anyway, the thing is this problem has to be somehow related to
-> > the transfer of the code from a little-endian platform to a
-> > big-endian platform as our project works without any problem on
-> > little-endian platforms.
->
-> In this case it isn't necessarily directly an endianness issue.
-> The x86 instruction set provides conditional branch instructions
-> which allow a 32-bit displacement value, so you're basically never
-> going to overflow a conditional-branch there. PPC, being RISC,
-> has more limited branch insns. You might also run into this
-> if you tried to use aarch64 (64-bit) arm hosts, which are
-> little-endian but have a 19-bit branch displacement limit,
-> depending on just how big you've managed to make your jumps.
-> On the other hand, a 16-bit displacement is a jump over
-> 64K of generated code, which is huge for a single TCG
-> generated translation block, so it could well be that you
-> have an endianness bug in your TCG frontend which is causing
-> you to generate an enormous TB by accident.
->
-> thanks
-> -- PMM
->
-
---0000000000004fb082059db2a9b4
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>I see.=C2=A0 So you&#39;re saying that it might be po=
-ssible that my guest could be generating TCG ops that can&#39;t be translat=
-ed into PPC instructions because the displacement value is to big.=C2=A0 Wh=
-ile the same TCG ops can be translated into x86 instructions because x86 al=
-lows for a bigger displacement value.=C2=A0 But on the other hand it could =
-be some other problem causing me to have a large displacement value.<br></d=
-iv><div><br></div><div>In that case, I think it&#39;d be super helpful if I=
- print out this displacement value in the TCG ops when running on PPC versu=
-s x86 because they should be the same right?=C2=A0 What option in QEMU -d a=
-llows me to see generated TCG ops?=C2=A0 Doing a -d --help shows the follow=
-ing options:</div><div><br></div><div>out_asm =C2=A0 =C2=A0show generated h=
-ost assembly code for each compiled TB<br>in_asm =C2=A0 =C2=A0 show target =
-assembly code for each compiled TB<br>op =C2=A0 =C2=A0 =C2=A0 =C2=A0 show m=
-icro ops for each compiled TB<br>op_opt =C2=A0 =C2=A0 show micro ops (x86 o=
-nly: before eflags optimization) and<br>after liveness analysis<br>int =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0show interrupts/exceptions in short format<br>exec =
-=C2=A0 =C2=A0 =C2=A0 show trace before each executed TB (lots of logs)<br>c=
-pu =C2=A0 =C2=A0 =C2=A0 =C2=A0show CPU state before block translation<br>mm=
-u =C2=A0 =C2=A0 =C2=A0 =C2=A0log MMU-related activities<br>pcall =C2=A0 =C2=
-=A0 =C2=A0x86 only: show protected mode far calls/returns/exceptions<br>cpu=
-_reset =C2=A0show CPU state before CPU resets<br>ioport =C2=A0 =C2=A0 show =
-all i/o ports accesses<br>unimp =C2=A0 =C2=A0 =C2=A0log unimplemented funct=
-ionality<br>guest_errors log when the guest OS does something invalid (eg a=
-ccessing a<br>non-existent register)</div><div><br></div><div>There doesn&#=
-39;t seem to be any option to print out the TCG ops specifically?=C2=A0 May=
-be I&#39;ll have to go into the code to add print statements that print out=
- the TCG ops?<br></div><div><br></div><div>-Thanks!, Wayne Li<br></div></di=
-v><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On M=
-on, Feb 3, 2020 at 10:56 AM Peter Maydell &lt;<a href=3D"mailto:peter.mayde=
-ll@linaro.org">peter.maydell@linaro.org</a>&gt; wrote:<br></div><blockquote=
- class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px so=
-lid rgb(204,204,204);padding-left:1ex">On Mon, 3 Feb 2020 at 16:39, Wayne L=
-i &lt;<a href=3D"mailto:waynli329@gmail.com" target=3D"_blank">waynli329@gm=
-ail.com</a>&gt; wrote:<br>
-&gt; Anyway that&#39;s the background.=C2=A0 The specific problem I&#39;m h=
-aving right now is I get the following assertion error during some of the s=
-etup stuff our OS does post boot-up (the OS is also custom-made):<br>
-&gt;<br>
-&gt; qemu_programs/qemu/tcg/ppc/tcg-target.inc.c:224: reloc_pc14_val: Asser=
-tion `disp =3D=3D (int16_t) disp&#39; failed.<br>
-&gt;<br>
-&gt; Looking at the QEMU code, &quot;disp&quot; is the difference between t=
-wo pointers named &quot;target&quot; and &quot;pc&quot;.=C2=A0 I&#39;m not =
-sure exactly what either of those names mean.=C2=A0 And it looks like since=
- the assertion is checking if casting &quot;disp&quot; as a short changes t=
-he value, it&#39;s checking if the &quot;disp&quot; value is too big?=C2=A0=
- I&#39;m just not very sure what this assertion means.<br>
-<br>
-This assertion is checking that we&#39;re not trying to fit too<br>
-large a value into the host PPC branch instruction we just emitted.<br>
-That is, tcg_out_bc() emits a PPC conditional branch instruction,<br>
-which has a 14 bit field for the offset (it&#39;s a relative branch),<br>
-and we know the bottom 2 bits of the target will be 0 (PPC insns<br>
-being 4-aligned), so the distance between the current host PC<br>
-and the target of the branch must fit in a signed 16-bit field.<br>
-<br>
-&quot;disp&quot; here stands for &quot;displacement&quot;.<br>
-<br>
-The PPC TCG backend only uses this for the TCG &#39;brcond&#39; and<br>
-&#39;brcond2&#39; TCG intermediate-representation ops. It seems likely<br>
-that the code for your target is generating TCG ops which have<br>
-too large a gap between a brcond/brcond2 and the destination label.<br>
-You could try using the various QEMU -d options to print out the<br>
-guest instructions and the generated TCG ops to pin down what<br>
-part of your target is trying to generate branches over too<br>
-much code like this.<br>
-<br>
-&gt; Anyway, the thing is this problem has to be somehow related to<br>
-&gt; the transfer of the code from a little-endian platform to a<br>
-&gt; big-endian platform as our project works without any problem on<br>
-&gt; little-endian platforms.<br>
-<br>
-In this case it isn&#39;t necessarily directly an endianness issue.<br>
-The x86 instruction set provides conditional branch instructions<br>
-which allow a 32-bit displacement value, so you&#39;re basically never<br>
-going to overflow a conditional-branch there. PPC, being RISC,<br>
-has more limited branch insns. You might also run into this<br>
-if you tried to use aarch64 (64-bit) arm hosts, which are<br>
-little-endian but have a 19-bit branch displacement limit,<br>
-depending on just how big you&#39;ve managed to make your jumps.<br>
-On the other hand, a 16-bit displacement is a jump over<br>
-64K of generated code, which is huge for a single TCG<br>
-generated translation block, so it could well be that you<br>
-have an endianness bug in your TCG frontend which is causing<br>
-you to generate an enormous TB by accident.<br>
-<br>
-thanks<br>
--- PMM<br>
-</blockquote></div>
-
---0000000000004fb082059db2a9b4--
+On 2/3/20 9:17 AM, Igor Mammedov wrote:
+> On Wed, 29 Jan 2020 10:17:11 -0600
+> Babu Moger <babu.moger@amd.com> wrote:
+> 
+>> On 1/29/20 3:14 AM, Igor Mammedov wrote:
+>>> On Tue, 28 Jan 2020 13:45:31 -0600
+>>> Babu Moger <babu.moger@amd.com> wrote:
+>>>   
+>>>> On 1/28/20 10:29 AM, Igor Mammedov wrote:  
+>>>>> On Tue, 03 Dec 2019 18:37:42 -0600
+>>>>> Babu Moger <babu.moger@amd.com> wrote:
+>>>>>     
+>>>>>> Add a new function init_apicid_fn in MachineClass to initialize the mode
+>>>>>> specific handlers to decode the apic ids.
+>>>>>>
+>>>>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+>>>>>> ---
+>>>>>>  include/hw/boards.h |    1 +
+>>>>>>  vl.c                |    3 +++
+>>>>>>  2 files changed, 4 insertions(+)
+>>>>>>
+>>>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>>>>>> index d4fab218e6..ce5aa365cb 100644
+>>>>>> --- a/include/hw/boards.h
+>>>>>> +++ b/include/hw/boards.h
+>>>>>> @@ -238,6 +238,7 @@ struct MachineClass {
+>>>>>>                                                           unsigned cpu_index);
+>>>>>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
+>>>>>>      int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
+>>>>>> +    void (*init_apicid_fn)(MachineState *ms);    
+>>>>> it's x86 specific, so why it wasn put into PCMachineClass?    
+>>>>
+>>>> Yes. It is x86 specific for now. I tried to make it generic function so
+>>>> other OSes can use it if required(like we have done in
+>>>> possible_cpu_arch_ids). It initializes functions required to build the
+>>>> apicid for each CPUs. We need these functions much early in the
+>>>> initialization. It should be initialized before parse_numa_opts or
+>>>> machine_run_board_init(in v1.c) which are called from generic context. We
+>>>> cannot use PCMachineClass at this time.  
+>>>
+>>> could you point to specific patches in this series that require
+>>> apic ids being initialized before parse_numa_opts and elaborate why?
+>>>
+>>> we already have possible_cpu_arch_ids() which could be called very
+>>> early and calculates APIC IDs in x86 case, so why not reuse it?  
+>>
+>>
+>> The current code(before this series) parses the numa information and then
+>> sequentially builds the apicid. Both are done together.
+>>
+>> But this series separates the numa parsing and apicid generation. Numa
+>> parsing is done first and after that the apicid is generated. Reason is we
+>> need to know the number of numa nodes in advance to decode the apicid.
+>>
+>> Look at this patch.
+>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fqemu-devel%2F157541988471.46157.6587693720990965800.stgit%40naples-babu.amd.com%2F&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C0a643dd978f149acf9d108d7a8bc487a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637163398941923379&amp;sdata=sP2TnNaqNXRGEeQNhJMna3wyeBqN0XbNKqgsCTVDaOQ%3D&amp;reserved=0
+>>
+>> static inline apic_id_t apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info,
+>> +                                                  const X86CPUTopoIDs
+>> *topo_ids)
+>> +{
+>> +    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
+>> +           (topo_ids->llc_id << apicid_llc_offset_epyc(topo_info)) |
+>> +           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
+>> +           (topo_ids->core_id << apicid_core_offset(topo_info)) |
+>> +           topo_ids->smt_id;
+>> +}
+>>
+>>
+>> The function apicid_from_topo_ids_epyc builds the apicid. New decode adds
+>> llc_id(which is numa id here) to the current decoding. Other fields are
+>> mostly remains same.
+> 
+> If llc_id is the same as numa id, why not reuse CpuInstanceProperties::node-id
+> instead of llc_id you are adding in previous patch 6/18?
+> 
+I tried to use that earlier. But dropped the idea as it required some
+changes. Don't remember exactly now. I am going to investigate again if we
+can use the node_id for our purpose here. Will let you know if I have any
+issues.
 
