@@ -2,129 +2,93 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85CA0C35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 22:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2DCC35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 22:57:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F44620674
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 22:51:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01C8320674
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 22:57:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="aS8KobTu";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="ZCeVdx/B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F44620674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSVpcCiu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C8320674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iykZG-000056-F7
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 17:51:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45468)
+	id 1iykf4-0002H6-5i
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 17:57:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@quicinc.com>) id 1iykYR-00087q-Jx
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:50:56 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iykeD-0001eY-GW
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:56:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@quicinc.com>) id 1iykYL-00048r-8O
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:50:53 -0500
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:63691)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
- id 1iykYK-0003yX-Cd
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:50:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1580770248; x=1612306248;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=AxxBSsF92jj+Bwas0tBW3Y+OKmmz+fllyByNhC85/Tc=;
- b=aS8KobTuXrAhdq3541KmwvM4g4/kOX0GQM761hSxauLBOc/SjQrxSCb7
- 5w5ntVEK+AMQfJC9co08McJW1VHWw9F/16QpbCFAGYW5H0WYsfFj8r5s1
- bbcIL/R0V1LAPVknkWSHU73KEQw9LxfZ49AiMcs05IVgpyDAfUuTNfA59 E=;
-Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 03 Feb 2020 14:50:44 -0800
-Received: from nasanexm01h.na.qualcomm.com ([10.85.0.34])
- by ironmsg05-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 03 Feb 2020 14:50:44 -0800
-Received: from nasanexm03g.na.qualcomm.com (10.85.0.49) by
- NASANEXM01H.na.qualcomm.com (10.85.0.34) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Mon, 3 Feb 2020 14:50:43 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
- by nasanexm03g.na.qualcomm.com (10.85.0.49) with Microsoft SMTP Server (TLS)
- id 15.0.1473.3 via Frontend Transport; Mon, 3 Feb 2020 14:50:43 -0800
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
- BYAPR02MB4326.namprd02.prod.outlook.com (52.135.237.27) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.32; Mon, 3 Feb 2020 22:50:42 +0000
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62]) by BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62%6]) with mapi id 15.20.2686.030; Mon, 3 Feb 2020
- 22:50:42 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: Laurent Vivier <laurent@vivier.eu>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 0/4] linux-user: fix use of SIGRTMIN
-Thread-Topic: [PATCH 0/4] linux-user: fix use of SIGRTMIN
-Thread-Index: AQHV2PsOQ5OGpSzrB0qHpMHFVDfcjagKFgww
-Date: Mon, 3 Feb 2020 22:50:42 +0000
-Message-ID: <BYAPR02MB48864D9855037D87FF647E00DE000@BYAPR02MB4886.namprd02.prod.outlook.com>
-References: <20200201122746.1478003-1-laurent@vivier.eu>
-In-Reply-To: <20200201122746.1478003-1-laurent@vivier.eu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=tsimpson@quicinc.com; 
-x-originating-ip: [199.106.103.59]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f19174ce-fd66-4634-2d16-08d7a8fb7f75
-x-ms-traffictypediagnostic: BYAPR02MB4326:
-x-microsoft-antispam-prvs: <BYAPR02MB43269EC5824F47A1FD678A05DE000@BYAPR02MB4326.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0302D4F392
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(376002)(39860400002)(366004)(346002)(396003)(189003)(199004)(6506007)(53546011)(55016002)(9686003)(316002)(8676002)(26005)(186003)(4326008)(478600001)(7696005)(33656002)(2906002)(8936002)(81156014)(52536014)(110136005)(54906003)(86362001)(66946007)(76116006)(71200400001)(66556008)(66476007)(66446008)(64756008)(5660300002)(81166006);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4326;
- H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: mO62GnJ9PtpoO4zptVLsCyQfKpc/k9E7aoxi1a1P52fBNMfl0RLLnaMBrQNXACTgfk00UnHLk8a2rXiYfInHIVzv8Eqs+3moYDPuBA/iuYBTZpPZ6yST1xbsNygxC2X8KmJUV9iB5R+qRUo0L/cPvBuuVXiTm33i10nnaINnMFxhHnBUNXLGexb00Xqajf4SnABmId7Z9Kb5qvN4HxXX7GBjMq6dWU7wOMDRIhtVICLLDFAQdzax6TX/WfJ271xH4aiSK9VSmIzaVuP7MAMKR4+slv4CBZHo4GlifwFeGg80e2s1ckPqVP92jwRIlkMnhBL4uBYqtsJl6+aXd2GUc58llm3h3uNdLhS8y0Nl2abGT4dCRBMO6I+b2FrpVyt3AHp/Gx7hFV3ipS41qaw8KNY9965BvidtFqA6rbqR6LpCIPbfO4PpGmkw3GlV4/qM
-x-ms-exchange-antispam-messagedata: /VIXPCOmxy0U6JlOimd+PR+PqgjfwuX5lV43cvFQvplKbnN0UO0CegGvtQEGOeDjwXzxBZv0dV8WhSNKIPQHaLe6JRXWKwwXTz8I0vl0wwFMhn27jR3xvxOOuQMS9H63HJsBqH5KkhnzWyC759oBPg==
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vv4hsdhS0d4LoQ+CyNQ04W1MUFRRrJjylJcRNU+q8eWJ31SnZU8rXsCV9u25pr9+jWNp1Jicgyhy/ftjctc+N5UcC/Kt8ZaWSCU2vl+cFAFNrRl68bqhvJf1vZ08QhZIc1eQ4HQEjdlWU/+bsk1K8Hwg/ep+5IITMX4Hej58D/Mkj0FmWvrkO2tTSt7N6ZEbP//wElkM3KzpdrpVwJCS9RPcVVSI///ZNohs2vWdM7sxyXcJ1v7GKoRUvcLMJL7mbg6TgG2ht26912M8hkdUOThJl100CjrhRP6MB5MVGtbMU1QG4l/+arRmqORzU6JGJOfkYP6NojP2cYn/p6d9Nw==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=15TSrGMm6yEP4SCsj0uL01GrZOWoaFqGUX8mjAE5CKI=;
- b=mFU67xi512dHJ1TwazJzNFSO11PSoj1c3XNAnoHADOdCVdXEuhvamO7RE7zq+AA9wtV+mWRCXklvq8fK0ADGdWW7d9GPKOUBHZI4zlVbfITG+e79Z5Grtw+m7PPopAVvx1dYzP9OYBg87Y8h3XnDtJtt0gwn8YWjUp8tdSsG+ZWSAI0LwUtunT1Z39NMuQxYQuqg86MDfaFQGF5LfQp+p6/XLJb+rOvgG8d+Yl8Z6N7+WdlAdJHbnIeKl8xCdaSKtXk0yMDj63JgDDwE00605aqU9C7XMJ0nzZU2Lt3pL+vHYzjT1XPqRI5fcWHrXqsLN6My2bKagnlIvERNmkWthQ==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=15TSrGMm6yEP4SCsj0uL01GrZOWoaFqGUX8mjAE5CKI=;
- b=ZCeVdx/Bhu7uzH9k7lXVEEx2V/r6fEJbil4/CmkZN+avNkkmiv3quLMyUwqUjbS6L7HBgt6rkX2aP/YA5bEH84MLJ+Q/berZoXXMAiRWXIcl9gueStAiSIu5pmAwoKu74KVAYWe7Jk5ptOx2+kZxmpSsIyqBX8CjRf5iesViDOw=
-x-ms-exchange-crosstenant-network-message-id: f19174ce-fd66-4634-2d16-08d7a8fb7f75
-x-ms-exchange-crosstenant-originalarrivaltime: 03 Feb 2020 22:50:42.2928 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: 0vzMN/NBNsllNxS/ftv1WT9ucyXxn+RACsLgp6tinzGLQLv7ZZprx7KCUqWbarSdscMux20lgU8fTSsbZ4Gzhg==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4326
-x-originatororg: quicinc.com
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <pbonzini@redhat.com>) id 1iykeA-00032b-E6
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:56:52 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45176
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iyke9-0002yU-8f
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:56:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580770607;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ooyf6kTf8yYia5cYQQQiOqPh9V69vI0ZYvx6GetJlQ8=;
+ b=iSVpcCiuNAKue2tY7RIF7eRU+TKfkhXXuUai8+knj8gvuPM2bqGlITgVkVoKFKifQ0uYPX
+ W/e1M1y3dzPUkwTW6kqRtPJr5O9/uZbSWVbOip2lo4WRK+96bgvlNxLZqwuRPxwPP3VIET
+ QLn6I3aeY/WIvm0XZKatvqXKcUGY5f4=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-KT_kbwfYPN6usWA-H94Pxg-1; Mon, 03 Feb 2020 17:56:44 -0500
+Received: by mail-ed1-f72.google.com with SMTP id l19so11381796edq.19
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 14:56:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=+oq2IgrZ3aksNSBuo2adjOMSYhMX3SYfglvXBcO7dqA=;
+ b=pcypgTq4P+WxUrmIIAiK+inwoWLjzuUQD9PvrMuUXlXfCw2vDnaETeBXE6GyJ5F9EZ
+ MM7NCrAuLiet69VqJ0zXpgy+6MQp7UjPqjXKrdfbHQQJki7yTOKHLP0NH/9Tw5/SH9Dv
+ +Z1AIL/GA5ybr4OVZtqBTSemDEY5ZAQmeH9hC8Jqn/0ffibBubV5zc0EMwa50sijWk8D
+ DAeDoSC68OsiF85ld/Nmu/BIJoCwzVZVmR+PtW+DUGqk1wI/vTBoVxrEIVPk0HM6cL17
+ 8meyUMSafxiBwdBMVGrxYb7PnV5D1s0xjjpPwKFwGZXgYpQpk5Rb49E+AqgqSc6ySzhO
+ 8wrg==
+X-Gm-Message-State: APjAAAVe97ehN+/gox+eHsNb8e5y0aXF8zDlP0Yu9CZcFlxpBSwPONim
+ fllg0P/qAjfJRsspPispWh9ZgBe8iVd4a6oBFusgQvUUz5Qf+TAgUUvuRMhamySAU3+/RDZzE+4
+ iLNrCkZSYgEzWGPuGLWU5onVdPvNUUh8=
+X-Received: by 2002:a50:c04e:: with SMTP id u14mr14048234edd.193.1580770603491; 
+ Mon, 03 Feb 2020 14:56:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwnD+OaRxOkxVkq3Qwe6ioKvnxQGkxOREJfdTHMUhCO89TRQ43FzDeu9JjOZY4s2rvDmD6qhhWwLatWM1YTHcU=
+X-Received: by 2002:a50:c04e:: with SMTP id u14mr14048211edd.193.1580770603167; 
+ Mon, 03 Feb 2020 14:56:43 -0800 (PST)
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.39
+References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
+ <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
+ <20200203012842.GD52446@umbus.fritz.box>
+ <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
+ <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
+ <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
+ <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
+In-Reply-To: <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 3 Feb 2020 23:56:31 +0100
+Message-ID: <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
+Subject: Re: VW ELF loader
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+X-MC-Unique: KT_kbwfYPN6usWA-H94Pxg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="000000000000462e97059db3d69a"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,70 +100,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Marlies Ruck <marlies.ruck@gmail.com>, Riku
- Voipio <riku.voipio@iki.fi>, Aleksandar
- Markovic <aleksandar.markovic@rt-rk.com>, Josh Kunz <jkz@google.com>,
- Matus Kysel <mkysel@tachyum.com>,
- "milos.stojanovic@rt-rk.com" <milos.stojanovic@rt-rk.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Cornelia Huck <conny@cornelia-huck.de>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-FWIW, this removes the need for the target-specific code for Hexagon in sig=
-nal.c.
+--000000000000462e97059db3d69a
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Taylor
+Il lun 3 feb 2020, 23:36 Alexey Kardashevskiy <aik@ozlabs.ru> ha scritto:
 
-PS  Stay tuned for a Hexagon target patch series once this is merged.
+>
+> > What partition formats would have to be supported?
+>
+> MBR, GPT, is there anything else? "Support" is limited to converting a
+> number after command to [start, size] couple. I am not going for file
+> systems.
+>
+> > But honestly I'm
+> > more worried about the networking part.
+>
+> Fair enough.
+>
+> > Yes, SLOF is big and slow.  petitboot is not petit at all either, and
+> > has the disadvantage that you have to find a way to run GRUB afterwards=
+.
+> >  But would a similarly minimal OF implementation (no network, almost no
+> > interpret so no Forth, device tree built entirely in the host, etc.)
+> > be just as big and slow?
+>
+> I doubt. We will be getting rid of unnecessary drivers, bus scanning
+> code (SCSI, PCI), device tree synchronization.
+>
 
-> -----Original Message-----
-> From: Laurent Vivier <laurent@vivier.eu>
-> Sent: Saturday, February 1, 2020 6:28 AM
-> To: qemu-devel@nongnu.org
-> Cc: Josh Kunz <jkz@google.com>; milos.stojanovic@rt-rk.com; Matus Kysel
-> <mkysel@tachyum.com>; Aleksandar Markovic <aleksandar.markovic@rt-
-> rk.com>; Marlies Ruck <marlies.ruck@gmail.com>; Laurent Vivier
-> <laurent@vivier.eu>; Peter Maydell <peter.maydell@linaro.org>; Taylor
-> Simpson <tsimpson@quicinc.com>; Riku Voipio <riku.voipio@iki.fi>
-> Subject: [PATCH 0/4] linux-user: fix use of SIGRTMIN
+What I mean is, if you write a firmware that exposes a minimal OF device
+interface but runs it in the guest, and does a hypercall for everything
+else, would it be as big and slow as SLOF?
+
+Paolo
+
 >
-> This series fixes the problem of the first real-time signals already in u=
-se by
-> the glibc that are not available for the target glibc.
->
-> Instead of reverting the first and last real-time signals we rely on the =
-value
-> provided by the glibc (SIGRTMIN) to know the first available signal and w=
-e
-> map all the signals from this value to SIGRTMAX on top of
-> TARGET_SIGRTMIN. So the consequence is we have less available signals in
-> the target (generally 2) but all seems fine as at least 30 signals are st=
-ill
-> available.
->
-> This has been tested with Go (golang 1.10.1 linux/arm64, bionic) on x86_6=
-4
-> fedora 31. We can avoid the failure in this case allowing the unsupported
-> signals when we don't provide the "act" parameters to sigaction, only the
-> "oldact" one. I have also run the LTP suite with several target and debia=
-n
-> based distros.
->
-> Laurent Vivier (4):
->   linux-user: add missing TARGET_SIGRTMIN for hppa
->   linux-user: cleanup signal.c
->   linux-user: fix TARGET_NSIG and _NSIG uses
->   linux-user: fix use of SIGRTMIN
->
->  linux-user/hppa/target_signal.h |   1 +
->  linux-user/signal.c             | 110 +++++++++++++++++++++++---------
->  linux-user/trace-events         |   3 +
->  3 files changed, 85 insertions(+), 29 deletions(-)
 >
 > --
-> 2.24.1
+> Alexey
 >
+>
+
+--000000000000462e97059db3d69a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il lun 3 feb 2020, 23:36 Alexey Kardashevskiy &lt;<a h=
+ref=3D"mailto:aik@ozlabs.ru">aik@ozlabs.ru</a>&gt; ha scritto:<br></div><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
+ccc solid;padding-left:1ex"><br>&gt; What partition formats would have to b=
+e supported? <br>
+<br>
+MBR, GPT, is there anything else? &quot;Support&quot; is limited to convert=
+ing a<br>
+number after command to [start, size] couple. I am not going for file<br>
+systems.<br>
+<br>
+&gt; But honestly I&#39;m<br>
+&gt; more worried about the networking part.<br>
+<br>
+Fair enough.<br>
+<br>&gt; Yes, SLOF is big and slow.=C2=A0 petitboot is not petit at all eit=
+her, and<br>
+&gt; has the disadvantage that you have to find a way to run GRUB afterward=
+s.<br>
+&gt;=C2=A0 But would a similarly minimal OF implementation (no network, alm=
+ost no<br>
+&gt; interpret so no Forth, device tree built entirely in the host, etc.)<b=
+r>&gt; be just as big and slow?<br>
+<br>
+I doubt. We will be getting rid of unnecessary drivers, bus scanning<br>
+code (SCSI, PCI), device tree synchronization.<br></blockquote></div></div>=
+<div dir=3D"auto"><br></div><div dir=3D"auto">What I mean is, if you write =
+a firmware that exposes a minimal OF device interface but runs it in the gu=
+est, and does a hypercall for everything else, would it be as big and slow =
+as SLOF?</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div=
+ dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" =
+style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+<br>
+<br>
+-- <br>
+Alexey<br>
+<br>
+</blockquote></div></div></div>
+
+--000000000000462e97059db3d69a--
 
 
