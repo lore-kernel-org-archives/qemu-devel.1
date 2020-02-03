@@ -2,85 +2,97 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB29C35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 315D8C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B5F020721
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:27:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F003E20721
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VLjfWtwo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B5F020721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U9a81LrW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F003E20721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iybl2-00083q-6N
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 08:27:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45360)
+	id 1iybmg-0001i7-6i
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 08:29:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iybjS-0006om-Ow
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:25:44 -0500
+ (envelope-from <mst@redhat.com>) id 1iybm2-00019z-IH
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:28:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iybjR-0000LL-IL
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:25:42 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:39294)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iybjR-0000KE-By
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:25:41 -0500
-Received: by mail-wm1-x336.google.com with SMTP id c84so17056160wme.4
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 05:25:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=CJfpWUmNUfHJ0flee+mwQ9IL4sv3dOkTSa9lfSyOoQc=;
- b=VLjfWtwogLYWLMrhlZ6lXf3zBNcflQWrdAaWb28VQQ28cTfTqFc4ufxyi/R9qfp0FD
- TXSZ/19IjlK4oUi/TFym/tusanJCc44Z3lp0Cx/IGX2vB2M/KvmrldMXAZkKWfOaYhhd
- fpkqWoRVBFfaF4EC6+9vGpGoAgCX9z5EMclTUKp4fKTemkB9BbrQTaZ64yZvJMd70F1T
- IzNZt21tgYrORh0VKs5d5VSixvFxQRQEHnScXaWwpdCgS9uDnVUkDWdd0O3hBowNHGap
- Rvej9WUHRl1hAwQNVuLUlWWAeb+p4yYDNqnW/dj+iIv27uuN1UmyCbESE3hjb7n0d124
- ofeA==
+ (envelope-from <mst@redhat.com>) id 1iybm0-0002c7-Rx
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:28:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29146
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iybm0-0002bb-Lz
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:28:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580736500;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=y0srS6pVABld/qNGZdsEBNeHQohddXIhkSCO6I5J1bM=;
+ b=U9a81LrWe7rgKgnShKtPXovOqgc9K9BMcKorVRo85mOQLwps+zStbYxyBqY1gZRsl8JeYt
+ yXghnnUIqzj7LV7a1jINIXrjDlgLdfJLufESSJ4AFwshr1f9kknEHo0Lqo5kp+p7d5Za7T
+ UgIEXzKQMvL8SnWVnYyaI/DUch4L/U4=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-A0xksueWNqKNJx2Rs5q5CQ-1; Mon, 03 Feb 2020 08:28:18 -0500
+Received: by mail-qt1-f198.google.com with SMTP id c22so9834476qtn.23
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 05:28:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=CJfpWUmNUfHJ0flee+mwQ9IL4sv3dOkTSa9lfSyOoQc=;
- b=VtP7uDdYYobUbbQSLdT4e9gmqjTtSEWJ3ENhqOgV19+gkHyxmnK1gckWcPkbeKdsL1
- f/79byqsPAPI+WZc5Ahd3APbzg9mXtS8vqDU6psWOeYL+G9J5K9JC5tHy1NEUb1+ol2q
- VBWVZ8oFoamiDnmzlrmCAPhDC9vHuc+dSbSpkbxF2wfqW1X1kpHrEYvOsZyePFrJme6R
- rVOgcCfbv/IdpPEN/8QfQ0/6Hw0RIMye3qJuErkChzW5x09rjT//xpjAiBm1sAm9YHP0
- wvSGXC92XeavqzGIAS3y1RtKakWpIKfLs1C/Mbzy41yTxKlk8beF882CmH7DVrF32nOD
- 1Y+A==
-X-Gm-Message-State: APjAAAV38As3s4QII1ghoQkw9X35lNSAn52R0jmHFmM5WkV2fOJs7XSG
- s2VWKbOwWvqOAW/iIuLwhlRGNpS2kYIicw==
-X-Google-Smtp-Source: APXvYqwYPQNzTj6KUzqedUXYMfXI1o7ywQZMhNqwMaHc+tzmByGmM+GQEuIyjoQZ5c0plIYdFTGGzw==
-X-Received: by 2002:a05:600c:242:: with SMTP id 2mr28171428wmj.2.1580736338910; 
- Mon, 03 Feb 2020 05:25:38 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s16sm26100534wrn.78.2020.02.03.05.25.37
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=NZdtt/bGxJKWPx8gwLXEibCe3fEV92G0oZRadmu+eu8=;
+ b=O5oRzgVcIALMxm4jR/QSOvdFr+dOXjXWkbhtscP5YWRg0F4KBmxU9JITM2YQKzijCR
+ +82i+zT9kJp5Xsy+P7uoEshvi0m3QYsAYvAJYtQUX3PO0toEVD5S/ngz+2YhR4toBeWm
+ ElnnmFe6Asxnp6yBFtp2EXhTSIkwpD4WmdpOwSHaEot+KMoHFOoRshheKpu2UIZFX3Au
+ Q57ZP1B4/5v81NMyJFJN0zldtqLZ/RtFFPQJCzh8PIiy7V4ZslPWw6miS+puEMkoIAeL
+ BGTxRhix33qSTPLU5vxg82RRkbe3eUOW8BEbNTnQsi2rZz8ibHR0DDK2btWjYB9n+J78
+ N34g==
+X-Gm-Message-State: APjAAAWgfn2ato8n9h8MPFERXy135t2b91ib1zHcwWIfGSMWHhQ7a0y1
+ SLy/fmiGOszYjRGBIRylMiXB04l+vEZAil5gBM2DO6Rbdp2c/M6ArhZAN2Yn9TD9G89mztQa8oB
+ MTlhJHfkjxPAa3D8=
+X-Received: by 2002:ac8:6ec5:: with SMTP id f5mr23796556qtv.137.1580736497651; 
+ Mon, 03 Feb 2020 05:28:17 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyP4jzDiQCO8fYzSf/G6PZn956mbLr4gCf9v2GICalsQxWEtMNHRxb5PMJGSvPkC1blrFcH6g==
+X-Received: by 2002:ac8:6ec5:: with SMTP id f5mr23796523qtv.137.1580736497337; 
+ Mon, 03 Feb 2020 05:28:17 -0800 (PST)
+Received: from redhat.com (bzq-109-64-11-187.red.bezeqint.net. [109.64.11.187])
+ by smtp.gmail.com with ESMTPSA id w134sm9463350qka.127.2020.02.03.05.28.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 05:25:38 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] configure: Check that sphinx-build is using Python 3
-Date: Mon,  3 Feb 2020 13:25:33 +0000
-Message-Id: <20200203132533.21850-3-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200203132533.21850-1-peter.maydell@linaro.org>
-References: <20200203132533.21850-1-peter.maydell@linaro.org>
+ Mon, 03 Feb 2020 05:28:16 -0800 (PST)
+Date: Mon, 3 Feb 2020 08:28:11 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v13 07/10] virtio-iommu-pci: Add virtio iommu pci support
+Message-ID: <20200203082637-mutt-send-email-mst@kernel.org>
+References: <20200125171955.12825-1-eric.auger@redhat.com>
+ <20200125171955.12825-8-eric.auger@redhat.com>
+ <20200203080122-mutt-send-email-mst@kernel.org>
+ <037666c2-6124-0db6-3688-a134f9f0845a@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::336
+In-Reply-To: <037666c2-6124-0db6-3688-a134f9f0845a@redhat.com>
+X-MC-Unique: A0xksueWNqKNJx2Rs5q5CQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,97 +104,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ jean-philippe@linaro.org, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently configure's has_sphinx_build() check simply runs a dummy
-sphinx-build and either passes or fails.  This means that "no
-sphinx-build at all" and "sphinx-build exists but is too old" are
-both reported the same way.
+On Mon, Feb 03, 2020 at 02:20:55PM +0100, Auger Eric wrote:
+> Hi Michael,
+>=20
+> On 2/3/20 2:03 PM, Michael S. Tsirkin wrote:
+> > On Sat, Jan 25, 2020 at 06:19:52PM +0100, Eric Auger wrote:
+> >> This patch adds virtio-iommu-pci, which is the pci proxy for
+> >> the virtio-iommu device.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> >=20
+> > I commented on v11 of this patch:
+> >>> Could you send a smaller patchset without pci/acpi bits for now?
+> > And you answered:
+> >> Yes I am about to send v12.
+> >=20
+> > I guess this patch is here by mistake then?
+> >=20
+> > I think PCI devices should always have config space so guests are
+> > not tempted to find work-arounds. Right?
+> No it is not here by mistake. I removed everything related non DT
+> integration as we discussed.
+>=20
+> DT support is fully upstream even for virtio-iommu-pci.
+> https://github.com/torvalds/linux/blob/master/Documentation/devicetree/bi=
+ndings/virtio/iommu.txt
+>=20
+> So what's wrong implementing that at the moment. As we discussed we
+> would use the PCIe config space integration for non DT.
+>=20
+> If I use the MMIO based device, I am forced to lock an MMIO region for
+> it in the machvirt memory map:
+> https://elixir.bootlin.com/linux/latest/source/Documentation/devicetree/b=
+indings/virtio/mmio.txt
+>=20
+> I guess Peter (Maydell) will not be happy with this situation either.
+>=20
+> Thanks
+>=20
+> Eric
 
-Further, we want to assume that all the Python we write is running
-with at least Python 3.5; configure checks that for our scripts, but
-Sphinx extensions run with whatever Python version sphinx-build
-itself is using.
+I see. Can't we limit this to DT platforms for now then?
 
-Add a check to our conf.py which makes sphinx-build fail if it would
-be running our extensions with an old Python, and handle this
-in configure so we can report failure helpfully to the user.
-This will mean that configure --enable-docs will fail like this
-if the sphinx-build provided is not suitable:
 
-Warning: sphinx-build exists but it is either too old or uses too old a Python version
 
-ERROR: User requested feature docs
-       configure was not able to find it.
-       Install texinfo, Perl/perl-podlators and a Python 3 version of python-sphinx
-
-(As usual, the default is to simply not build the docs, as we would
-if sphinx-build wasn't present at all.)
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-At the moment our Sphinx extensions all work under Python 2;
-but the one for handling parsing QAPI docs out of the JSON is going
-to want to include some of the scripts/qapi Python which is more
-complicated and definitely now 3-only.  In any case it's nicer to
-fail cleanly rather than let users stumble into corner cases we don't
-test and don't want to support even if they happen to work today.
----
- configure    | 12 ++++++++++--
- docs/conf.py | 10 ++++++++++
- 2 files changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/configure b/configure
-index 830f325822a..95055f2e9dd 100755
---- a/configure
-+++ b/configure
-@@ -4808,11 +4808,19 @@ has_sphinx_build() {
- 
- # Check if tools are available to build documentation.
- if test "$docs" != "no" ; then
--  if has makeinfo && has pod2man && has_sphinx_build; then
-+  if has_sphinx_build; then
-+    sphinx_ok=yes
-+  else
-+    sphinx_ok=no
-+  fi
-+  if has makeinfo && has pod2man && test "$sphinx_ok" = "yes"; then
-     docs=yes
-   else
-     if test "$docs" = "yes" ; then
--      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and python-sphinx"
-+      if has $sphinx_build && test "$sphinx_ok" != "yes"; then
-+        echo "Warning: $sphinx_build exists but it is either too old or uses too old a Python version" >&2
-+      fi
-+      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and a Python 3 version of python-sphinx"
-     fi
-     docs=no
-   fi
-diff --git a/docs/conf.py b/docs/conf.py
-index ee7faa6b4e7..7588bf192ee 100644
---- a/docs/conf.py
-+++ b/docs/conf.py
-@@ -28,6 +28,16 @@
- 
- import os
- import sys
-+import sphinx
-+from sphinx.errors import VersionRequirementError
+> >=20
+> >> ---
+> >>
+> >> v11 -> v12:
+> >> - added Jean's R-b
+> >> - remove the array of intervals. Will be introduced later?
+> >>
+> >> v10 -> v11:
+> >> - add the reserved_regions array property
+> >>
+> >> v9 -> v10:
+> >> - include "hw/qdev-properties.h" header
+> >>
+> >> v8 -> v9:
+> >> - add the msi-bypass property
+> >> - create virtio-iommu-pci.c
+> >> ---
+> >>  hw/virtio/Makefile.objs          |  1 +
+> >>  hw/virtio/virtio-iommu-pci.c     | 88 +++++++++++++++++++++++++++++++=
 +
-+# Make Sphinx fail cleanly if using an old Python, rather than obscurely
-+# failing because some code in one of our extensions doesn't work there.
-+# Unfortunately this doesn't display very neatly (there's an unavoidable
-+# Python backtrace) but at least the information gets printed...
-+if sys.version_info < (3,5):
-+    raise VersionRequirementError(
-+        "QEMU requires a Sphinx that uses Python 3.5 or better\n")
- 
- # The per-manual conf.py will set qemu_docdir for a single-manual build;
- # otherwise set it here if this is an entire-manual-set build.
--- 
-2.20.1
+> >>  include/hw/pci/pci.h             |  1 +
+> >>  include/hw/virtio/virtio-iommu.h |  1 +
+> >>  qdev-monitor.c                   |  1 +
+> >>  5 files changed, 92 insertions(+)
+> >>  create mode 100644 hw/virtio/virtio-iommu-pci.c
+> >>
+> >> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+> >> index 2fd9da7410..4e4d39a0a4 100644
+> >> --- a/hw/virtio/Makefile.objs
+> >> +++ b/hw/virtio/Makefile.objs
+> >> @@ -29,6 +29,7 @@ obj-$(CONFIG_VIRTIO_INPUT_HOST) +=3D virtio-input-ho=
+st-pci.o
+> >>  obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-pci.o
+> >>  obj-$(CONFIG_VIRTIO_RNG) +=3D virtio-rng-pci.o
+> >>  obj-$(CONFIG_VIRTIO_BALLOON) +=3D virtio-balloon-pci.o
+> >> +obj-$(CONFIG_VIRTIO_IOMMU) +=3D virtio-iommu-pci.o
+> >>  obj-$(CONFIG_VIRTIO_9P) +=3D virtio-9p-pci.o
+> >>  obj-$(CONFIG_VIRTIO_SCSI) +=3D virtio-scsi-pci.o
+> >>  obj-$(CONFIG_VIRTIO_BLK) +=3D virtio-blk-pci.o
+> >> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci=
+.c
+> >> new file mode 100644
+> >> index 0000000000..4cfae1f9df
+> >> --- /dev/null
+> >> +++ b/hw/virtio/virtio-iommu-pci.c
+> >> @@ -0,0 +1,88 @@
+> >> +/*
+> >> + * Virtio IOMMU PCI Bindings
+> >> + *
+> >> + * Copyright (c) 2019 Red Hat, Inc.
+> >> + * Written by Eric Auger
+> >> + *
+> >> + *  This program is free software; you can redistribute it and/or mod=
+ify
+> >> + *  it under the terms of the GNU General Public License version 2 or
+> >> + *  (at your option) any later version.
+> >> + */
+> >> +
+> >> +#include "qemu/osdep.h"
+> >> +
+> >> +#include "virtio-pci.h"
+> >> +#include "hw/virtio/virtio-iommu.h"
+> >> +#include "hw/qdev-properties.h"
+> >> +
+> >> +typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
+> >> +
+> >> +/*
+> >> + * virtio-iommu-pci: This extends VirtioPCIProxy.
+> >> + *
+> >> + */
+> >> +#define VIRTIO_IOMMU_PCI(obj) \
+> >> +        OBJECT_CHECK(VirtIOIOMMUPCI, (obj), TYPE_VIRTIO_IOMMU_PCI)
+> >> +
+> >> +struct VirtIOIOMMUPCI {
+> >> +    VirtIOPCIProxy parent_obj;
+> >> +    VirtIOIOMMU vdev;
+> >> +};
+> >> +
+> >> +static Property virtio_iommu_pci_properties[] =3D {
+> >> +    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
+> >> +    DEFINE_PROP_END_OF_LIST(),
+> >> +};
+> >> +
+> >> +static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error =
+**errp)
+> >> +{
+> >> +    VirtIOIOMMUPCI *dev =3D VIRTIO_IOMMU_PCI(vpci_dev);
+> >> +    DeviceState *vdev =3D DEVICE(&dev->vdev);
+> >> +
+> >> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+> >> +    object_property_set_link(OBJECT(dev),
+> >> +                             OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
+> >> +                             "primary-bus", errp);
+> >> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
+> >> +}
+> >> +
+> >> +static void virtio_iommu_pci_class_init(ObjectClass *klass, void *dat=
+a)
+> >> +{
+> >> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> >> +    VirtioPCIClass *k =3D VIRTIO_PCI_CLASS(klass);
+> >> +    PCIDeviceClass *pcidev_k =3D PCI_DEVICE_CLASS(klass);
+> >> +    k->realize =3D virtio_iommu_pci_realize;
+> >> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> >> +    dc->props =3D virtio_iommu_pci_properties;
+> >> +    pcidev_k->vendor_id =3D PCI_VENDOR_ID_REDHAT_QUMRANET;
+> >> +    pcidev_k->device_id =3D PCI_DEVICE_ID_VIRTIO_IOMMU;
+> >> +    pcidev_k->revision =3D VIRTIO_PCI_ABI_VERSION;
+> >> +    pcidev_k->class_id =3D PCI_CLASS_OTHERS;
+> >> +}
+> >> +
+> >> +static void virtio_iommu_pci_instance_init(Object *obj)
+> >> +{
+> >> +    VirtIOIOMMUPCI *dev =3D VIRTIO_IOMMU_PCI(obj);
+> >> +
+> >> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
+> >> +                                TYPE_VIRTIO_IOMMU);
+> >> +}
+> >> +
+> >> +static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info =3D {
+> >> +    .base_name             =3D TYPE_VIRTIO_IOMMU_PCI,
+> >> +    .generic_name          =3D "virtio-iommu-pci",
+> >> +    .transitional_name     =3D "virtio-iommu-pci-transitional",
+> >> +    .non_transitional_name =3D "virtio-iommu-pci-non-transitional",
+> >> +    .instance_size =3D sizeof(VirtIOIOMMUPCI),
+> >> +    .instance_init =3D virtio_iommu_pci_instance_init,
+> >> +    .class_init    =3D virtio_iommu_pci_class_init,
+> >> +};
+> >> +
+> >> +static void virtio_iommu_pci_register(void)
+> >> +{
+> >> +    virtio_pci_types_register(&virtio_iommu_pci_info);
+> >> +}
+> >> +
+> >> +type_init(virtio_iommu_pci_register)
+> >> +
+> >> +
+> >> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> >> index 2acd8321af..cfedf5a995 100644
+> >> --- a/include/hw/pci/pci.h
+> >> +++ b/include/hw/pci/pci.h
+> >> @@ -86,6 +86,7 @@ extern bool pci_available;
+> >>  #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
+> >>  #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
+> >>  #define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
+> >> +#define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1014
+> >> =20
+> >>  #define PCI_VENDOR_ID_REDHAT             0x1b36
+> >>  #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
+> >> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virt=
+io-iommu.h
+> >> index 2a2c2ecf83..f39aa0fbb4 100644
+> >> --- a/include/hw/virtio/virtio-iommu.h
+> >> +++ b/include/hw/virtio/virtio-iommu.h
+> >> @@ -25,6 +25,7 @@
+> >>  #include "hw/pci/pci.h"
+> >> =20
+> >>  #define TYPE_VIRTIO_IOMMU "virtio-iommu-device"
+> >> +#define TYPE_VIRTIO_IOMMU_PCI "virtio-iommu-device-base"
+> >>  #define VIRTIO_IOMMU(obj) \
+> >>          OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
+> >> =20
+> >> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> >> index 3465a1e2d0..97f4022b51 100644
+> >> --- a/qdev-monitor.c
+> >> +++ b/qdev-monitor.c
+> >> @@ -66,6 +66,7 @@ static const QDevAlias qdev_alias_table[] =3D {
+> >>      { "virtio-input-host-ccw", "virtio-input-host", QEMU_ARCH_S390X }=
+,
+> >>      { "virtio-input-host-pci", "virtio-input-host",
+> >>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
+> >> +    { "virtio-iommu-pci", "virtio-iommu", QEMU_ARCH_ALL & ~QEMU_ARCH_=
+S390X },
+> >>      { "virtio-keyboard-ccw", "virtio-keyboard", QEMU_ARCH_S390X },
+> >>      { "virtio-keyboard-pci", "virtio-keyboard",
+> >>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
+> >> --=20
+> >> 2.20.1
+> >=20
+> >=20
 
 
