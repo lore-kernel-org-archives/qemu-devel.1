@@ -2,81 +2,82 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6220C33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A88C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:08:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 819AE2080D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:04:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E4612082E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:08:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="CddWl4m8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819AE2080D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="USeRZVau"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4612082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyaSW-00058m-L0
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:04:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45606)
+	id 1iyaWR-0006JJ-S5
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:08:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46738)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cminyard@mvista.com>) id 1iyaRm-0004hN-A6
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:03:23 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iyaVs-0005rw-PP
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cminyard@mvista.com>) id 1iyaRk-0004Wk-4X
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:03:21 -0500
-Received: from mail-io1-xd32.google.com ([2607:f8b0:4864:20::d32]:36247)
+ (envelope-from <peter.maydell@linaro.org>) id 1iyaVr-000110-Hi
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:07:36 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42697)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1iyaRj-0004Uk-QM
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:03:20 -0500
-Received: by mail-io1-xd32.google.com with SMTP id d15so16439850iog.3
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 04:03:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mvista-com.20150623.gappssmtp.com; s=20150623;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iyaVr-00010K-AO
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:07:35 -0500
+Received: by mail-oi1-x243.google.com with SMTP id j132so14440266oih.9
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 04:07:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Qkb5jeFlmWvhiEbbzIc4ZXFRs3rgR9xgmq4JyjuCiig=;
- b=CddWl4m8MKC5EBlBY3V+9rpv53g7bpA2rkqWU+ix9wzblm+h+0DwPxuOm/M7OdyMDm
- b0rhKMdMLH807i8RgqkydjI6D57Zx44PWu2O5niBUjGQLpAY2WS/aJR0zkG4aVbdS+j2
- FcdskZSV8CQehVmcZQxjVt1iRlM7USWB00rxaFRb6xdU9ciy4dMoe6Mw+X08G/tCbzjd
- uGAtin2xKvSUWXsEsxVdxvNCqM0KAYz12V+4Ai3Sw7CtDkgdWqEGDAkfQKJ/hlj09Sor
- Hq1HoojYYG9OxRTv9VlDY1HefgNtbk/yl2D0hqKkSCzf2e9JNiTjM2GASQdM0hPfAOup
- D8qw==
+ :cc; bh=jrVX8j/oY7iUefkJ9apS0Y19zELiugyhpZGMOluw4QM=;
+ b=USeRZVau/cKUKwbrfy/uw6Ukas0OPfQuku36dQzhiYIdj0Fp+isEgzve8TijvsTFDV
+ mwOk9TQd9+4EEqtv2Bx41Dmbhw+M5uCldYWSR2adyN9YI5PUvmw7xwWVwONV2hBoMaal
+ QBSZOlwSYKALmhkO50gCYUjFDXiPRrMMk5Vr3mPB+NzVzgaSfck8OtCoiMNbd4oppqWv
+ 1WczTJaMAZ0DAawVRltgyXexcMNrpD6t6j3foY4OP7Wjr/4FMLeiWK2EbyhoOsPbTyaA
+ tTIKJUmFFaHwZULS+ikLmCi2+1yZxT90j7C60/a7Lr+yr6N97Na11HOCO8Rq1Vyv1Fzw
+ 40rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Qkb5jeFlmWvhiEbbzIc4ZXFRs3rgR9xgmq4JyjuCiig=;
- b=kVUhleBsRdSbhW/GGNdvIEBnUvd0vNLrrRgbct2k21uDMB5WakJ/XgTyCQbdOSz7/A
- osXFRKyefAPL/x38JPLrn4Rlai9bohiXcDR+F6zAJDfEWOs6rTyhXBVVDqF/p+cz75r9
- l5OefBLdLmcwyJ9kxF4P+QTN2QW+zjDlGLX927gHQs+Xjl1zOUelaq9eCxPjV6w56Uom
- fXbtdK/04EHbY94DxxnxTDleGy1Dy+t12fBgd8JCSQXZHUYapxHk1onUlV1yDP3q/BSX
- 65HlddkQ6atRDBqLRp1exp4ghPmChZVokjoc1xa+VFWLf05mJeyS6c31hviTnTtTUGuP
- U9HQ==
-X-Gm-Message-State: APjAAAVFEuiUT9+vgX9MVGLLRXj4KL9Un44qtiq7NwEm1nblFhly+IDQ
- LsizggDzcQDMdZVf4KiBFHypmBTkZ74E6hGdx5j80w==
-X-Google-Smtp-Source: APXvYqx5XCPCZ4KYgbRqPI1scSwTJLvIXQurpl30ilUIpftV2OWMZZ9mVcnCbcS81cFfyPAp9GukCuQ/OOs5mpXZMw4=
-X-Received: by 2002:a02:6a10:: with SMTP id l16mr18880367jac.77.1580731396784; 
- Mon, 03 Feb 2020 04:03:16 -0800 (PST)
+ bh=jrVX8j/oY7iUefkJ9apS0Y19zELiugyhpZGMOluw4QM=;
+ b=XyaZO2Y5GChTMzFhfmT2xbHNqWk/TE7nTW99lQAOm4EtHMA2JPW2EpVIdcWKsBvfnk
+ 5rglbofL/wDZijgV3AQxseue76OLNXwRsFl104fQjrh8MP/MO+DcpTt3oTTGIHAq9jpl
+ jQp5BkUy91SKysunxQ6CM5oVEjgOARFQQ04TUmhjCQlsEoT85FM4WtAoKPWGXNWn54IG
+ kJVAx5aY/f54EVW96YHui4PAcq+UY6qh1LlRJTMtXw6g23zmerEGMN8rNpIlzFmpnJDF
+ LCvyCdbFo02Xe2ecwlzW0tqPe8oUi0PCaOzitLa6FmDEF5sJLMYi3H1ylY65jBsEBkW5
+ yygQ==
+X-Gm-Message-State: APjAAAUzTswgEDsn8DOnNGisXh9bjVhyl5/GWQxBP+iR+ZM3BMfS+x/t
+ oKrj9q08DC1UEQyyd9iJ/6SnswMB4avuvcoMCVyEow==
+X-Google-Smtp-Source: APXvYqwgiUvHyHWPceMioPGWrxA9Wf1fKrN25NHLJJhTF6ImY2EsqEeOBFylOc+dGAEGJz4anw0q7XKBwUw++pIMf4Y=
+X-Received: by 2002:aca:3d7:: with SMTP id 206mr14438921oid.98.1580731654190; 
+ Mon, 03 Feb 2020 04:07:34 -0800 (PST)
 MIME-Version: 1.0
-References: <20200123070913.626488-1-mst@redhat.com>
- <20200123070913.626488-18-mst@redhat.com>
- <CAFEAcA98iqJkTp4F6qmO5f4VYNhE3Fs4toBuV1qNtujAo6=OJg@mail.gmail.com>
- <20200203013334-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200203013334-mutt-send-email-mst@kernel.org>
-From: Corey Minyard <cminyard@mvista.com>
-Date: Mon, 3 Feb 2020 12:03:04 +0000
-Message-ID: <CALQyB5EtG2SZ2EBpwXkcAEzkpMNJxjw5s-ZmNJGK-cV9FFKogw@mail.gmail.com>
-Subject: Re: [PULL v3 17/18] i386:acpi: Remove _HID from the SMBus ACPI entry
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000064215a059daab5ac"
+References: <20200113103550.1133-1-alex.bennee@linaro.org>
+ <2331e0b7-cad9-7b53-3d30-7fb88d692c8a@redhat.com>
+ <20200115111042.GA163546@stefanha-x1.localdomain>
+ <CAFEAcA9Q5nsD5iTPwsVVx73HPUD6aGKd0Sf2FUkAFqjAZhGMGw@mail.gmail.com>
+ <82f0aa8e-b445-ad7f-1b17-03f4bb180a85@redhat.com>
+In-Reply-To: <82f0aa8e-b445-ad7f-1b17-03f4bb180a85@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Feb 2020 12:07:23 +0000
+Message-ID: <CAFEAcA8pHXeqtC3WT67vwC=g4Vw7BsYpDxUih1XWYzC+dAjoGg@mail.gmail.com>
+Subject: Re: [qemu-web PATCH] documentation: update links to readthedocs
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d32
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,88 +89,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000064215a059daab5ac
-Content-Type: text/plain; charset="UTF-8"
-
-I checked a few days ago and someone had already beat me to it.
-
--corey
-
-On Mon, Feb 3, 2020, 06:34 Michael S. Tsirkin <mst@redhat.com> wrote:
-
-> On Thu, Jan 30, 2020 at 07:05:16PM +0000, Peter Maydell wrote:
-> > On Thu, 23 Jan 2020 at 07:11, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > From: Corey Minyard <cminyard@mvista.com>
-> > >
-> > > Per the ACPI spec (version 6.1, section 6.1.5 _HID) it is not required
-> > > on enumerated buses (like PCI in this case), _ADR is required (and is
-> > > already there).  And the _HID value is wrong.  Linux appears to ignore
-> > > the _HID entry, but Windows 10 detects it as 'Unknown Device' and there
-> > > is no driver available.  See
-> https://bugs.launchpad.net/qemu/+bug/1856724
+On Mon, 3 Feb 2020 at 11:55, Thomas Huth <thuth@redhat.com> wrote:
+>
+> On 03/02/2020 12.46, Peter Maydell wrote:
+> > On Wed, 15 Jan 2020 at 11:11, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >> The qemu.git/master docs are built nightly here (index.html is now
+> >> visible!):
+> >> https://www.qemu.org/docs/master/
+> >>
+> >> qemu.org's docs are more useful at the moment since they include the
+> >> user documentation in addition to the developer documentation.
 > >
-> > Is this commit in fact a fix for LP:1856724 ? If so, we could
-> > usefully add a comment to that bug noting the commit which
-> > fixes it and mark the bug 'fix committed', since it seems
-> > to affect various users who would like to know the status.
-> >
-> > thanks
-> > -- PMM
+> > Our top-level documentation page https://www.qemu.org/documentation/
+> > still points to https://qemu.weilnetz.de/qemu-doc.html -- should
+> > we update that now to link to https://www.qemu.org/docs/master/
+> > instead ?
 >
-> Right. Corey could you do that pls?
+> Sure, but I'm still waiting for someone to suggest a final patch here.
 >
+> Open questions:
 >
+> - Do we also want to link to readthedocs as suggested by Alex, or is our
+>   own docs on www.qemu.org enough?
 
---00000000000064215a059daab5ac
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I think if we're hosting our own docs we should just link to
+our own docs (which include the not-yet-converted-to-rST
+parts, which readthedocs doesn't); linking to two different
+versions of the same thing is just going to confuse users.
 
-<div dir=3D"auto">I checked a few days ago and someone had already beat me =
-to it.<div dir=3D"auto"><br></div><div dir=3D"auto">-corey</div></div><br><=
-div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Feb=
- 3, 2020, 06:34 Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com">ms=
-t@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" styl=
-e=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On Thu,=
- Jan 30, 2020 at 07:05:16PM +0000, Peter Maydell wrote:<br>
-&gt; On Thu, 23 Jan 2020 at 07:11, Michael S. Tsirkin &lt;<a href=3D"mailto=
-:mst@redhat.com" target=3D"_blank" rel=3D"noreferrer">mst@redhat.com</a>&gt=
-; wrote:<br>
-&gt; &gt;<br>
-&gt; &gt; From: Corey Minyard &lt;<a href=3D"mailto:cminyard@mvista.com" ta=
-rget=3D"_blank" rel=3D"noreferrer">cminyard@mvista.com</a>&gt;<br>
-&gt; &gt;<br>
-&gt; &gt; Per the ACPI spec (version 6.1, section 6.1.5 _HID) it is not req=
-uired<br>
-&gt; &gt; on enumerated buses (like PCI in this case), _ADR is required (an=
-d is<br>
-&gt; &gt; already there).=C2=A0 And the _HID value is wrong.=C2=A0 Linux ap=
-pears to ignore<br>
-&gt; &gt; the _HID entry, but Windows 10 detects it as &#39;Unknown Device&=
-#39; and there<br>
-&gt; &gt; is no driver available.=C2=A0 See <a href=3D"https://bugs.launchp=
-ad.net/qemu/+bug/1856724" rel=3D"noreferrer noreferrer" target=3D"_blank">h=
-ttps://bugs.launchpad.net/qemu/+bug/1856724</a><br>
-&gt; <br>
-&gt; Is this commit in fact a fix for LP:1856724 ? If so, we could<br>
-&gt; usefully add a comment to that bug noting the commit which<br>
-&gt; fixes it and mark the bug &#39;fix committed&#39;, since it seems<br>
-&gt; to affect various users who would like to know the status.<br>
-&gt; <br>
-&gt; thanks<br>
-&gt; -- PMM<br>
-<br>
-Right. Corey could you do that pls?<br>
-<br>
-</blockquote></div>
+> - Do we still want to link to weilnetz.de (as it was the case with
+>   StefanH's original patch https://patchwork.kernel.org/patch/11234545/)
+>   or should that link be removed?
 
---00000000000064215a059daab5ac--
+We should remove it; it's been really helpful for the project
+that Stefan Weil has provided built-documentation we can link
+to for all these years, but now we finally have an "authoritative"
+built version on qemu.org that's what we should link to.
+Again, having multiple links to different versions of the
+same thing would just confuse people. (The exception is that
+if we ever decide to provide "version 5.0 docs", "version 5.1
+docs", "current master docs" on qemu.org we can do that, because
+that's an understandable-to-end-users easily-describable reason
+for there being different docs links).
+
+> - Do we only link to https://www.qemu.org/docs/master/ or shall we
+>   link to the individual docs (qemu-doc, qemu-qmp-ref, ...) ?
+
+Just link to master/ would be my advice. Otherwise when we
+add a new top-level manual (eg the under-discussion tools/
+manual) we'll need to update this web page as well.
+
+thanks
+-- PMM
 
