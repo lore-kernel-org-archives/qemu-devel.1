@@ -2,102 +2,84 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D044C35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA88C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:19:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7CDE2080C
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:18:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D84FE2080C
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:19:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIiq669m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7CDE2080C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XTsJhItL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D84FE2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iydUO-0001QP-0M
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:18:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55322)
+	id 1iydVe-0002IH-0M
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:19:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iydTn-0000zA-N3
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:17:40 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iydUX-0001ea-5L
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:18:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iydTl-0008Lr-Hf
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:17:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53131
+ (envelope-from <imammedo@redhat.com>) id 1iydUV-0000N8-H6
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:18:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51028
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iydTl-0008LR-DX
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:17:37 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iydUV-0000MB-BL
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:18:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580743056;
+ s=mimecast20190719; t=1580743101;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ijUnaA88XZmeieqXuxE4nS5+BigBFEtPIwxCebnqcPM=;
- b=CIiq669mkO0/TNkdg3SKHF7dg0SE48c/Axy7iUsO/ia89RBlHxFsXeN2ZLvoVMdscJQqup
- gCBf5SyVaErR66O1UnN07i2RiN/JVZYJIAa8WHO8Bllf8g2jDlcqlM8kyv0DdXST42sxxV
- uXj3SfF/P+Hoqc1iVUdqWGFKsiUlv4Y=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-v3rI4GAzNQ2lOdFrpXwzYg-1; Mon, 03 Feb 2020 10:17:33 -0500
-Received: by mail-wr1-f72.google.com with SMTP id w6so8410028wrm.16
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 07:17:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ijUnaA88XZmeieqXuxE4nS5+BigBFEtPIwxCebnqcPM=;
- b=Jzxrfc3sgp0T6XVMv9NWKokD0nfmEUnoJaOeMg91eR7xGSxz7O98PQ6OBwZwG/E2o1
- yPXOnj+8puLIgD1tsJSLtegUR7XqQvxo8Lfc1c+UCPLUh7uc01PW6vp8YRY/Vnqwe/qY
- 2xFrYN3d6Nr8+NAaLPpJPrTuhbtlEE5jZxBEpdqUxwn2hlQyIs/xnCcNLr/PBKKuue+f
- 4AuboJLjmradaO1KaETzJ8g0p663/MrlZItPjGfql4hvxu+Ak0tIwmAIThzi4+sHrqrD
- YWCUv4leeLrF/KCM+zvAyxMS2wdSL2Gzs4PN6r2wlHcOH2pxZpiWxVG8P8oQsgritSXi
- es2w==
-X-Gm-Message-State: APjAAAVTTOMJIFRAYgLff56iEUxeH2mb9ULnPmAcq610cmi1jkpyr3Y2
- BJ4BXLf2qB0nrvTcitqCnWGfSnxTtudotkz6TuPF4l0Boiagr+3F6m8MKYIbEKbmz0dr7BUg80Z
- Kp8lglcVCESt6CRM=
-X-Received: by 2002:adf:f10a:: with SMTP id r10mr16183551wro.202.1580743051854; 
- Mon, 03 Feb 2020 07:17:31 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxFGh2jlzxlQbnYTRPxbWA3mE5iCax9adpBZzADX4/g626ajHTpG5DgThBwCnte1XoSpBbr1A==
-X-Received: by 2002:adf:f10a:: with SMTP id r10mr16183528wro.202.1580743051641; 
- Mon, 03 Feb 2020 07:17:31 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56?
- ([2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56])
- by smtp.gmail.com with ESMTPSA id n12sm24289384wmi.18.2020.02.03.07.17.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Feb 2020 07:17:31 -0800 (PST)
-Subject: Re: [PULL 00/13] qtests, kconfig and misc patches
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-References: <20200203123811.8651-1-thuth@redhat.com>
- <CAFEAcA_1KYRA=87k34zCRLqCf1tWHrULGZPcHeKwJZhDUx0=kw@mail.gmail.com>
- <2fd63018-b9f9-ab88-2d65-009c54bb6cf2@redhat.com>
- <CAFEAcA_XKAeT10p+XNRjQeOjoGYX1Q-D+kj9E0kFx2AxtktACg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fedbec35-51c7-cf1b-ef55-e2a582620781@redhat.com>
-Date: Mon, 3 Feb 2020 16:17:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=Fr1qo0tcKlU0XkMFTfSUDUM4OoABRenZmWRLVTdXpos=;
+ b=XTsJhItL+OHz7beIIadSCvz05HeYA0WIOMPlC1r+TMfASYePGGlAY3bBy2g2dhrnbwnTnb
+ AEyJLt/Rw3nH3LpAtso1hH7GCKwLfFT1rXfwf8F1E0ATbTrB/Qo+Fi0Awo/6aXUFNKIPOX
+ pUQCFya3emE8FX7RnMU4EM8Dfp2QnG4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-jOP7rcctNvOIOH3rPdc0mg-1; Mon, 03 Feb 2020 10:18:04 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7655108839E;
+ Mon,  3 Feb 2020 15:18:03 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A19C290F5D;
+ Mon,  3 Feb 2020 15:17:59 +0000 (UTC)
+Date: Mon, 3 Feb 2020 16:17:58 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v3 07/18] machine: Add a new function init_apicid_fn in
+ MachineClass
+Message-ID: <20200203161758.3eb85046@redhat.com>
+In-Reply-To: <b75928ec-c062-7edf-bc24-8dc0ccd7439b@amd.com>
+References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
+ <157541986210.46157.5082551407581177819.stgit@naples-babu.amd.com>
+ <20200128172919.4ecb5896@redhat.com>
+ <e5271e1c-55bc-e3d2-eb4c-2329eef07c9f@amd.com>
+ <20200129101458.6a108431@redhat.com>
+ <b75928ec-c062-7edf-bc24-8dc0ccd7439b@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_XKAeT10p+XNRjQeOjoGYX1Q-D+kj9E0kFx2AxtktACg@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: v3rI4GAzNQ2lOdFrpXwzYg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: jOP7rcctNvOIOH3rPdc0mg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,25 +91,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/02/20 15:50, Peter Maydell wrote:
-> 
-> An extremely cheesy workaround would be if the commit which
-> removes the hw/bt/Kconfig also touches configure; then Make
-> will know it needs to rerun configure, which will (among
-> other things) blow away all the config-devices.mak.d and
-> force rerunning of minikconf.
-> 
-> I don't know what the correct additional makefile magic
-> would be that would cause us to automatically get deletion
-> of a Kconfig file right; maybe Paolo does?
+On Wed, 29 Jan 2020 10:17:11 -0600
+Babu Moger <babu.moger@amd.com> wrote:
 
-Nope, sorry. :(
+> On 1/29/20 3:14 AM, Igor Mammedov wrote:
+> > On Tue, 28 Jan 2020 13:45:31 -0600
+> > Babu Moger <babu.moger@amd.com> wrote:
+> >  =20
+> >> On 1/28/20 10:29 AM, Igor Mammedov wrote: =20
+> >>> On Tue, 03 Dec 2019 18:37:42 -0600
+> >>> Babu Moger <babu.moger@amd.com> wrote:
+> >>>    =20
+> >>>> Add a new function init_apicid_fn in MachineClass to initialize the =
+mode
+> >>>> specific handlers to decode the apic ids.
+> >>>>
+> >>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> >>>> ---
+> >>>>  include/hw/boards.h |    1 +
+> >>>>  vl.c                |    3 +++
+> >>>>  2 files changed, 4 insertions(+)
+> >>>>
+> >>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> >>>> index d4fab218e6..ce5aa365cb 100644
+> >>>> --- a/include/hw/boards.h
+> >>>> +++ b/include/hw/boards.h
+> >>>> @@ -238,6 +238,7 @@ struct MachineClass {
+> >>>>                                                           unsigned c=
+pu_index);
+> >>>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *mac=
+hine);
+> >>>>      int64_t (*get_default_cpu_node_id)(const MachineState *ms, int =
+idx);
+> >>>> +    void (*init_apicid_fn)(MachineState *ms);   =20
+> >>> it's x86 specific, so why it wasn put into PCMachineClass?   =20
+> >>
+> >> Yes. It is x86 specific for now. I tried to make it generic function s=
+o
+> >> other OSes can use it if required(like we have done in
+> >> possible_cpu_arch_ids). It initializes functions required to build the
+> >> apicid for each CPUs. We need these functions much early in the
+> >> initialization. It should be initialized before parse_numa_opts or
+> >> machine_run_board_init(in v1.c) which are called from generic context.=
+ We
+> >> cannot use PCMachineClass at this time. =20
+> >=20
+> > could you point to specific patches in this series that require
+> > apic ids being initialized before parse_numa_opts and elaborate why?
+> >=20
+> > we already have possible_cpu_arch_ids() which could be called very
+> > early and calculates APIC IDs in x86 case, so why not reuse it? =20
+>=20
+>=20
+> The current code(before this series) parses the numa information and then
+> sequentially builds the apicid. Both are done together.
+>=20
+> But this series separates the numa parsing and apicid generation. Numa
+> parsing is done first and after that the apicid is generated. Reason is w=
+e
+> need to know the number of numa nodes in advance to decode the apicid.
+>=20
+> Look at this patch.
+> https://lore.kernel.org/qemu-devel/157541988471.46157.6587693720990965800=
+.stgit@naples-babu.amd.com/
+>=20
+> static inline apic_id_t apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_in=
+fo,
+> +                                                  const X86CPUTopoIDs
+> *topo_ids)
+> +{
+> +    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
+> +           (topo_ids->llc_id << apicid_llc_offset_epyc(topo_info)) |
+> +           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
+> +           (topo_ids->core_id << apicid_core_offset(topo_info)) |
+> +           topo_ids->smt_id;
+> +}
+>=20
+>=20
+> The function apicid_from_topo_ids_epyc builds the apicid. New decode adds
+> llc_id(which is numa id here) to the current decoding. Other fields are
+> mostly remains same.
 
-Paolo
+If llc_id is the same as numa id, why not reuse CpuInstanceProperties::node=
+-id
+instead of llc_id you are adding in previous patch 6/18?
+
+
+>=20
+>=20
+> Details from the bug https://bugzilla.redhat.com/show_bug.cgi?id=3D172816=
+6
+>=20
+> Processor Programming Reference (PPR) for AMD Family 17h Model 01h,
+> Revision B1 Processors:
+>=20
+> """
+> 2.1.10.2.1.3
+> ApicId Enumeration Requirements
+> Operating systems are expected to use
+> Core::X86::Cpuid::SizeId[ApicIdCoreIdSize], the number of least
+> significant bits in the Initial APIC ID that indicate core ID within a
+> processor, in constructing per-core CPUID
+> masks. Core::X86::Cpuid::SizeId[ApicIdCoreIdSize] determines the maximum
+> number of cores (MNC) that the
+> processor could theoretically support, not the actual number of cores tha=
+t
+> are actually implemented or enabled on
+> the processor, as indicated by Core::X86::Cpuid::SizeId[NC].
+> Each Core::X86::Apic::ApicId[ApicId] register is preset as follows:
+> =E2=80=A2 ApicId[6] =3D Socket ID.
+> =E2=80=A2 ApicId[5:4] =3D Node ID.
+> =E2=80=A2 ApicId[3] =3D Logical CCX L3 complex ID
+> =E2=80=A2 ApicId[2:0]=3D (SMT) ? {LogicalCoreID[1:0],ThreadId} :
+> {1'b0,LogicalCoreID[1:0]}.
+> """
+>=20
+> >  =20
+> >> =20
+> >>>
+> >>>    =20
+> >>>>  };
+> >>>> =20
+> >>>>  /**
+> >>>> diff --git a/vl.c b/vl.c
+> >>>> index a42c24a77f..b6af604e11 100644
+> >>>> --- a/vl.c
+> >>>> +++ b/vl.c
+> >>>> @@ -4318,6 +4318,9 @@ int main(int argc, char **argv, char **envp)
+> >>>>      current_machine->cpu_type =3D machine_class->default_cpu_type;
+> >>>>      if (cpu_option) {
+> >>>>          current_machine->cpu_type =3D parse_cpu_option(cpu_option);
+> >>>> +        if (machine_class->init_apicid_fn) {
+> >>>> +            machine_class->init_apicid_fn(current_machine);
+> >>>> +        }
+> >>>>      }
+> >>>>      parse_numa_opts(current_machine);
+> >>>> =20
+> >>>>
+> >>>>   =20
+> >>>    =20
+> >> =20
+> >  =20
+>=20
 
 
