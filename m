@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD20C3F68F
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D9CC35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:52:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DEC92082E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:52:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E71A62082E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:52:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="amx+EMl5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DEC92082E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NRMGruGr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E71A62082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyd5P-00076E-M0
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 09:52:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44553)
+	id 1iyd5S-0007Cm-41
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 09:52:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44737)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iyd0X-0006dM-A5
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:26 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iyd0h-00073o-9U
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iyd0W-00038Q-3d
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:25 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33583)
+ (envelope-from <richard.henderson@linaro.org>) id 1iyd0f-0003Ka-HZ
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:35 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43390)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iyd0V-00036z-Tc
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:24 -0500
-Received: by mail-wr1-x444.google.com with SMTP id u6so5256987wrt.0
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 06:47:23 -0800 (PST)
+ id 1iyd0f-0003Jl-BX
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:33 -0500
+Received: by mail-wr1-x444.google.com with SMTP id z9so6315190wrs.10
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 06:47:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rcege1rdFln5muDzfVSDtjPu75r3ILD97R1ciS/AOgA=;
- b=amx+EMl5MXhSrDDM1ZFSxPxcO0+OkPK0A2scXiRGdXU3AVHs4ZBU9cWfSkR1jHsELM
- um+A1zkrcVRHPvbc2jAn+jYc59/v8PZSfPt0wQf3aTGpxOPyApdI9nRCWPv9bvsgEH7b
- FmYOyzhMhNNkgoJ9mBY1ctnq9oBBy2yDMITTF4kWXkr/Nyg8VPE7XPZBDZxkMiLmlSxB
- cqxJvnTvx70rIPrgWQLvSoSxgpgaK6OCJ1J7Ld8rtIJxfUz2y/P3TW748JFKJaXVEI/8
- 8tRooDY8KpOGGrwQObxSVzHN3NdreyGu8wf1Yi2ajufvEA9qNzlj6pdIbth0tDrDkWs7
- NpOQ==
+ bh=ABlKw+Ee4niadP/JeYKLANZAwZirqXwkkASseIFrEXM=;
+ b=NRMGruGroHf7AClzZs+T+myM+48vTTnzH8EKIDhAJ0hhN6mdEn3XgR0N2xWfouDVyw
+ +HA4O4eoF91xAPBn4q33CoXgQ2KJnGQ5MkcEyLNquNNXvknLyaCnO9SlHsCVLv7tCpTH
+ EyqeZy9/E7OdqW5qyRKQBVckQL6rt1y4xZAGSB2wXrxs4f0EoBI2J1aeJiPeFMQhLuSM
+ 0N9Lw3SYgeIT1lGEjdYcjqxdsj0NJ85TBzN35ol6RfsiiAD+z5XotnO10LvHZSsjEfUz
+ SdRb8Oz5sjbtE5H9zwi0izxDuRSn9yCwZgTnjozwRh4dC5K4MYRwI8Il6CItluU9LBNw
+ RjSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rcege1rdFln5muDzfVSDtjPu75r3ILD97R1ciS/AOgA=;
- b=nJ3Kfj6mS0RVYk9hqz+EdlfAe7UdIUn/hBFx8p/nivrS62Z4BEIQIhE2sIKVyvADE1
- sZPYh0h7LOb/8NhqNiRlogCNgIxq+1gk38qwtST8O4n+wiLlleZ3DzaT7koxzcSwJmsS
- pfUowIOfPS7cR9CbIsdGVgNzy2gQNG+raR8RDxKBLWHba44fkNkYFcrKxLqArr2Pn137
- YQn/dGKwZDoJpOhqhRC+lFia5U64+ZV/EV0k+zw5K9C4YdVrXX1/UALOBBJSyzy0J59P
- xQ4jLy5TD04HYBpNbW+0BUeSAp1q8ph8M5JAGDcF60q6v7Yh/pIWamPoH4xpsrqREXPx
- RzUw==
-X-Gm-Message-State: APjAAAVvGxuZBw4XfTEQqjQ8px2L9+vWNTAAToM10F4+6N/z77KMoeYo
- kWQTZ9xoOOnn9It4N+KxiE2VUdj6431SKw==
-X-Google-Smtp-Source: APXvYqzZrSn59xpf0uxJ72KCLFL1NvLd9x8bUMo8eRVFuT6gwtwwL/Wqad4zHkNqjq/3f6ZARGHvfQ==
-X-Received: by 2002:a5d:438c:: with SMTP id i12mr15580983wrq.51.1580741242760; 
- Mon, 03 Feb 2020 06:47:22 -0800 (PST)
+ bh=ABlKw+Ee4niadP/JeYKLANZAwZirqXwkkASseIFrEXM=;
+ b=hKQso2eefT4SPuxaKowVhrBeHQrHd4o2Hj/DOheDvnRU5b6S9Znat0f7No0VwEOSiA
+ MjEEWzkhXo+jzh9jZLL1ZBCOGCg9n1i+UdLpUBRbbBJODJ8EvdIRp8mXSSG8D5Gmy09n
+ KW1B2nnuk1LgWM2epff+LfM5G/0i7PUHqhfMvJsXsyTWqmDAYuXf+lDz1OAhgRiFu5kV
+ HneYonoAKXxjGAXj0jJp9IO3SEYzAGnqyIIRb8dL8OcS1+GIUveKhGYyGneB6fJPG2Xh
+ pQgXU/u4ot4vd0y5+67RYmfG9beJNm88A/883pErngaiRVXFX2UPpROZKeRPs8W6HJst
+ MMSw==
+X-Gm-Message-State: APjAAAWdzpuinYBDi8cUF4lyRrbndIJ3IleWM/vLm5doVI6uZusCJZ6V
+ zqPZyDXinrCWtzwJLni2qkf/+TUO2l4jaQ==
+X-Google-Smtp-Source: APXvYqxRuehRWyOBqfCo0Cd2eNaFY8UuVVZ8pHUhVRBa3nxnNb0ozjUJvQi3pP7KnQ685WbTMPaJiA==
+X-Received: by 2002:adf:f18e:: with SMTP id h14mr14627191wro.265.1580741252117; 
+ Mon, 03 Feb 2020 06:47:32 -0800 (PST)
 Received: from cloudburst.c.hoisthospitality.com ([135.196.99.211])
- by smtp.gmail.com with ESMTPSA id h2sm26429739wrt.45.2020.02.03.06.47.21
+ by smtp.gmail.com with ESMTPSA id h2sm26429739wrt.45.2020.02.03.06.47.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 06:47:21 -0800 (PST)
+ Mon, 03 Feb 2020 06:47:31 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 05/20] target/arm: Split out aarch32_cpsr_valid_mask
-Date: Mon,  3 Feb 2020 14:47:01 +0000
-Message-Id: <20200203144716.32204-6-richard.henderson@linaro.org>
+Subject: [PATCH v3 15/20] target/arm: Implement ATS1E1 system registers
+Date: Mon,  3 Feb 2020 14:47:11 +0000
+Message-Id: <20200203144716.32204-16-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200203144716.32204-1-richard.henderson@linaro.org>
 References: <20200203144716.32204-1-richard.henderson@linaro.org>
@@ -97,81 +97,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Split this helper out of msr_mask in translate.c.  At the same time,
-transform the negative reductive logic to positive accumulative logic.
-It will be usable along the exception paths.
+This is a minor enhancement over ARMv8.1-PAN.
+The *_PAN mmu_idx are used with the existing do_ats_write.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/internals.h | 24 ++++++++++++++++++++++++
- target/arm/translate.c | 17 +++--------------
- 2 files changed, 27 insertions(+), 14 deletions(-)
+v2: Move regdefs to file scope (pmm).
+---
+ target/arm/helper.c | 56 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 50 insertions(+), 6 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 6be8b2d1a9..0569c96fd9 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1061,6 +1061,30 @@ static inline bool arm_mmu_idx_is_stage1_of_2(ARMMMUIdx mmu_idx)
-     }
- }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 4c0eb7e7d9..e69cde801f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -3409,16 +3409,21 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
  
-+static inline uint32_t aarch32_cpsr_valid_mask(uint64_t features,
-+                                               const ARMISARegisters *id)
-+{
-+    uint32_t valid = CPSR_M | CPSR_AIF | CPSR_IL | CPSR_NZCV;
-+
-+    if ((features >> ARM_FEATURE_V4T) & 1) {
-+        valid |= CPSR_T;
-+    }
-+    if ((features >> ARM_FEATURE_V5) & 1) {
-+        valid |= CPSR_Q; /* V5TE in reality*/
-+    }
-+    if ((features >> ARM_FEATURE_V6) & 1) {
-+        valid |= CPSR_E | CPSR_GE;
-+    }
-+    if ((features >> ARM_FEATURE_THUMB2) & 1) {
-+        valid |= CPSR_IT;
-+    }
-+    if (isar_feature_jazelle(id)) {
-+        valid |= CPSR_J;
-+    }
-+
-+    return valid;
-+}
-+
- /*
-  * Parameters of a given virtual address, as extracted from the
-  * translation control register (TCR) for a given regime.
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d58c328e08..032f7074cb 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -2747,22 +2747,11 @@ static uint32_t msr_mask(DisasContext *s, int flags, int spsr)
-         mask |= 0xff000000;
+     switch (ri->opc2 & 6) {
+     case 0:
+-        /* stage 1 current state PL1: ATS1CPR, ATS1CPW */
++        /* stage 1 current state PL1: ATS1CPR, ATS1CPW, ATS1CPRP, ATS1CPWP */
+         switch (el) {
+         case 3:
+             mmu_idx = ARMMMUIdx_SE3;
+             break;
+         case 2:
+-            mmu_idx = ARMMMUIdx_Stage1_E1;
+-            break;
++            g_assert(!secure);  /* TODO: ARMv8.4-SecEL2 */
++            /* fall through */
+         case 1:
+-            mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
++            if (ri->crm == 9 && (env->uncached_cpsr & CPSR_PAN)) {
++                mmu_idx = (secure ? ARMMMUIdx_SE10_1_PAN
++                           : ARMMMUIdx_Stage1_E1_PAN);
++            } else {
++                mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
++            }
+             break;
+         default:
+             g_assert_not_reached();
+@@ -3487,8 +3492,13 @@ static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
+     switch (ri->opc2 & 6) {
+     case 0:
+         switch (ri->opc1) {
+-        case 0: /* AT S1E1R, AT S1E1W */
+-            mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
++        case 0: /* AT S1E1R, AT S1E1W, AT S1E1RP, AT S1E1WP */
++            if (ri->crm == 9 && (env->pstate & PSTATE_PAN)) {
++                mmu_idx = (secure ? ARMMMUIdx_SE10_1_PAN
++                           : ARMMMUIdx_Stage1_E1_PAN);
++            } else {
++                mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
++            }
+             break;
+         case 4: /* AT S1E2R, AT S1E2W */
+             mmu_idx = ARMMMUIdx_E2;
+@@ -6692,6 +6702,32 @@ static const ARMCPRegInfo vhe_reginfo[] = {
+     REGINFO_SENTINEL
+ };
  
-     /* Mask out undefined bits.  */
--    mask &= ~CPSR_RESERVED;
--    if (!arm_dc_feature(s, ARM_FEATURE_V4T)) {
--        mask &= ~CPSR_T;
--    }
--    if (!arm_dc_feature(s, ARM_FEATURE_V5)) {
--        mask &= ~CPSR_Q; /* V5TE in reality*/
--    }
--    if (!arm_dc_feature(s, ARM_FEATURE_V6)) {
--        mask &= ~(CPSR_E | CPSR_GE);
--    }
--    if (!arm_dc_feature(s, ARM_FEATURE_THUMB2)) {
--        mask &= ~CPSR_IT;
--    }
-+    mask &= aarch32_cpsr_valid_mask(s->features, s->isar);
++#ifndef CONFIG_USER_ONLY
++static const ARMCPRegInfo ats1e1_reginfo[] = {
++    { .name = "AT_S1E1R", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 0,
++      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
++      .writefn = ats_write64 },
++    { .name = "AT_S1E1W", .state = ARM_CP_STATE_AA64,
++      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 1,
++      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
++      .writefn = ats_write64 },
++    REGINFO_SENTINEL
++};
 +
-     /* Mask out execution state and reserved bits.  */
-     if (!spsr) {
--        mask &= ~(CPSR_EXEC | CPSR_RESERVED);
-+        mask &= ~CPSR_EXEC;
++static const ARMCPRegInfo ats1cp_reginfo[] = {
++    { .name = "ATS1CPRP",
++      .cp = 15, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 0,
++      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
++      .writefn = ats_write },
++    { .name = "ATS1CPWP",
++      .cp = 15, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 1,
++      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
++      .writefn = ats_write },
++    REGINFO_SENTINEL
++};
++#endif
++
+ void register_cp_regs_for_features(ARMCPU *cpu)
+ {
+     /* Register all the coprocessor registers based on feature bits */
+@@ -7629,6 +7665,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+     if (cpu_isar_feature(aa64_pan, cpu)) {
+         define_one_arm_cp_reg(cpu, &pan_reginfo);
      }
-     /* Mask out privileged bits.  */
-     if (IS_USER(s))
++#ifndef CONFIG_USER_ONLY
++    if (cpu_isar_feature(aa64_ats1e1, cpu)) {
++        define_arm_cp_regs(cpu, ats1e1_reginfo);
++    }
++    if (cpu_isar_feature(aa32_ats1e1, cpu)) {
++        define_arm_cp_regs(cpu, ats1cp_reginfo);
++    }
++#endif
+ 
+     if (arm_feature(env, ARM_FEATURE_EL2) && cpu_isar_feature(aa64_vh, cpu)) {
+         define_arm_cp_regs(cpu, vhe_reginfo);
 -- 
 2.20.1
 
