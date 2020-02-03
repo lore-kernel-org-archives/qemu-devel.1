@@ -2,80 +2,83 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66972C33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A9FEC33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36B4520658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:54:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4692F20658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+WHbK8i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36B4520658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tKKJoAwj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4692F20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyZNA-0005ju-DK
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 05:54:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51363)
+	id 1iyZPA-0006wr-FD
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 05:56:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52278)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ovoshcha@redhat.com>) id 1iyZLT-0003GF-AD
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:52:48 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iyZOY-0006PY-GJ
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:55:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ovoshcha@redhat.com>) id 1iyZLS-0008Jq-93
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:52:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20549
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1iyZLS-0008JV-5Z
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:52:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580727165;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vC5WzixymZF9u+k1pZcqk8Ix1KQUjRIK+BOj9Q19EkA=;
- b=b+WHbK8iZqXjGiX5OOJwA1FtG2m3Yi94cJl2ilRWGrY96x1UvG7RBZhipeBNkbmFs3ktSG
- xboe49L4c+vRPB3giRqdhnRkyRA8xMpfCfAb7SgZMQf6NieNHFX4Qz6rFsUrlud702C1uW
- f44KW0UFtlCywm8enRXV1pj4cxpauQM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-byxLAwttNNWXMCY-gAAS0g-1; Mon, 03 Feb 2020 05:52:44 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66D58107ACC4
- for <qemu-devel@nongnu.org>; Mon,  3 Feb 2020 10:52:43 +0000 (UTC)
-Received: from kh066.redhat.com (ovpn-116-185.ams2.redhat.com [10.36.116.185])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4815F10013A7;
- Mon,  3 Feb 2020 10:52:42 +0000 (UTC)
-From: Oksana Vohchana <ovoshcha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] Acceptance test: provides to use different transport
- for migration
-Date: Mon,  3 Feb 2020 12:52:33 +0200
-Message-Id: <20200203105233.15692-3-ovoshcha@redhat.com>
-In-Reply-To: <20200203105233.15692-1-ovoshcha@redhat.com>
-References: <20200203105233.15692-1-ovoshcha@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iyZOX-0004Sc-2N
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:55:58 -0500
+Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:41488)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iyZOW-0004RV-T5
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:55:57 -0500
+Received: by mail-ot1-x32a.google.com with SMTP id r27so13170778otc.8
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 02:55:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=PyBI2DBErOycQqYQiTbHQsaYOYZLDqNJ6bKfKvFdY5Y=;
+ b=tKKJoAwj5kLDiuMq+lsmVn3DBLJkvvzupZB0TqoGOLYg8td1OKR4yILDkv2pOnSuh2
+ jjB9bqy2e7cU858RUnp9lT3HS5hFPVbf8DZe+YyT5Wb+PUsCM9zUoa6Hg9shv0W4Hfxv
+ tgj7UgE4iCjj/aewJ0dDREjrZrjvt56lHo9RQmwvHJVxWdSGVghEj4AicfGI3uEpGDJ+
+ QDtrCplZfHjqkb1tg7ElY5Fvwv9ynbgVIVp4ntqyQNv9Qt2yxM1H3KvjTR6exaA6o4Od
+ mwr3Kv5ncG6UWznOQAKQJdHUh26KXrXkAazlAQUmqdNQloPj/I9Bl+fhb7K4lXZ1ZJhv
+ SOOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=PyBI2DBErOycQqYQiTbHQsaYOYZLDqNJ6bKfKvFdY5Y=;
+ b=HAnUky+Mamtt+W+uIBApMCUHROHaYxgAg5DAqFsCRNnp5gzLZetl2ntzMgnfepv3aF
+ +mjHewHex5j8fo/RabOgbLD7I1s0JdRtsvR5sxgqjF/1uCPgGmPNwLbXGleiC14euddi
+ 50Sxh3eGe/JAzeBtYxyRZkDl7BQ2EZZm6a5CeZ+ZNWQ5lhOrJLUvCEwCreCNbtK6tB51
+ 9l4OyjyZ+UBs47u3WuZuL1yyKTsNlMTWBULMdCM+fpG4l2W4al/Tyw2wsLKXi0UYbwCB
+ Ohy4EIq69Rpl3HdoFtBmuYp4uvIqlXgFdpVdxsJSA7V4jwP90S7TXoNQIn64dUr3PPyZ
+ 45vA==
+X-Gm-Message-State: APjAAAVX6QeDC8R66JJWskoWEef+grHOV4Pdjp3azHNB+uvy8EhuSDWU
+ wDz0UfyFgKGgSC2w4s+jh78pkDgYiv6SWrMnFaHqJg==
+X-Google-Smtp-Source: APXvYqx8OvJxPf8G4QRbhuZSi7+ln42a9K/cVQCXx48Z15KBwKd2oSYAIc9bgTaah7rrvrBCPkaxLr2N2slRXpmzjlA=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr17417981otq.135.1580727355716; 
+ Mon, 03 Feb 2020 02:55:55 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: byxLAwttNNWXMCY-gAAS0g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+References: <20200130213114.325157-1-stefanha@redhat.com>
+ <20200130213114.325157-16-stefanha@redhat.com>
+In-Reply-To: <20200130213114.325157-16-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Feb 2020 10:55:45 +0000
+Message-ID: <CAFEAcA8J-nFZFawn49uDzDtQVMYM4qhXnT7Pb41gS-n_GjofiA@mail.gmail.com>
+Subject: Re: [PULL 15/18] qemu-img: adds option to use aio engine for
+ benchmarking
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,66 +90,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, wainersm@redhat.com, crosa@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Qemu-block <qemu-block@nongnu.org>, Julia Suvorova <jusual@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Along with VM migration via TCP, we can use migration through EXEC
-and UNIX transport protocol
+On Thu, 30 Jan 2020 at 21:32, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> From: Aarushi Mehta <mehta.aaru20@gmail.com>
+>
+> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Message-id: 20200120141858.587874-13-stefanha@redhat.com
+> Message-Id: <20200120141858.587874-13-stefanha@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
----
-v2:
-  - Removes unnecessary symbols and unused method
+> --- a/qemu-img-cmds.hx
+> +++ b/qemu-img-cmds.hx
+> @@ -20,9 +20,9 @@ STEXI
+>  ETEXI
+>
+>  DEF("bench", img_bench,
+> -    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_inte=
+rval] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buffer_s=
+ize] [-S step_size] [-t cache] [-w] [-U] filename")
+> +    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_inte=
+rval] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buffer_s=
+ize] [-S step_size] [-t cache] [-i aio] [-w] [-U] filename")
+>  STEXI
+> -@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-in=
+terval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--patte=
+rn=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @v=
+ar{cache}] [-w] [-U] @var{filename}
+> +@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-in=
+terval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--patte=
+rn=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @v=
+ar{cache}] [-i @var{aio}] [-w] [-U] @var{filename}
+>  ETEXI
 
-v3:
- - Makes refactoring and split into 2 patches
- - Provides TCP and EXEC migration
-Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
----
- tests/acceptance/migration.py | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index b5156d6316..20136fcb94 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -206,7 +206,7 @@ Command description:
+>  Amends the image format specific @var{options} for the image file
+>  @var{filename}. Not all file formats support this operation.
+>
+> -@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-in=
+terval=3D@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--patte=
+rn=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @v=
+ar{cache}] [-w] [-U] @var{filename}
+> +@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-in=
+terval=3D@var{flush_interval}] [-n] [-i @var{aio}] [--no-drain] [-o @var{of=
+fset}] [--pattern=3D@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{ste=
+p_size}] [-t @var{cache}] [-w] [-U] @var{filename}
 
-diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
-index 34263d8eeb..4419e38384 100644
---- a/tests/acceptance/migration.py
-+++ b/tests/acceptance/migration.py
-@@ -10,10 +10,13 @@
- # later.  See the COPYING file in the top-level directory.
-=20
-=20
-+import tempfile
- from avocado_qemu import Test
-+from avocado import skipUnless
-=20
- from avocado.utils import network
- from avocado.utils import wait
-+from avocado.utils.path import find_command
-=20
-=20
- class Migration(Test):
-@@ -54,3 +57,16 @@ class Migration(Test):
-     def test_migration_with_tcp_localhost(self):
-         dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
-         self.do_migrate(dest_uri)
-+
-+    def test_migration_with_unix(self):
-+        with tempfile.TemporaryDirectory(prefix=3D'socket_') as socket_pat=
-h:
-+            dest_uri =3D 'unix:%s/qemu-test.sock' % socket_path
-+            self.do_migrate(dest_uri)
-+
-+    @skipUnless(find_command('nc', default=3DFalse), "nc command not found=
- on the system")
-+    def test_migration_with_exec(self):
-+        """
-+        The test works for both netcat-traditional and netcat-openbsd pack=
-ages
-+        """
-+        free_port =3D self._get_free_port()
-+        dest_uri =3D 'exec:nc -l localhost %u' % free_port
---=20
-2.21.1
+Is there a reason why the new '-i aio' option is added to the synopsis
+line after '-t cache' in the DEF() line and the STEXI/ETEXI fragment,
+but after '-n' in the line in the qemu-img.texi file ?
 
+All the other options here are in alphabetical order, so logically
+'-i aio' should go in neither of those two places but after
+'--flush-interval'...
+
+(This change is a conflict with the in-flight qemu-img conversion
+to rST; to fix that up I'm going to just change the rST conversion
+to exactly follow the texi here; we can fix the option ordering
+as a followup patch.)
+
+thanks
+-- PMM
 
