@@ -2,122 +2,78 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E45EDC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 21:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E41A0C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 22:22:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC9E920838
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 21:50:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD75920732
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 22:22:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="0NM2LRLp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9E920838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K0/B2V85"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD75920732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyjc4-0007MW-Sx
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 16:50:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45170)
+	id 1iyk6p-00069j-Qf
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 17:22:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1iyjbA-0006rr-Dj
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:49:42 -0500
+ (envelope-from <laine@redhat.com>) id 1iyk5p-0005i2-Md
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:21:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1iyjb8-0001AJ-Pk
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:49:40 -0500
-Received: from mail-mw2nam12on2061.outbound.protection.outlook.com
- ([40.107.244.61]:6139 helo=NAM12-MW2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1iyjb8-00012C-Ec
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 16:49:38 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k6oUFIH9tmHZpprGMnrowvQsU8rvx8Y8pGU/FYb+Gy7ji1oPcCoGDh+FhgO0w7//V4OcsZJ5EZRcv9TO0BY15jdZtsjkW5Lu2SFLYU4UmctjQlOWeQ9PX6OAYNzQmIwT+C/RkmChvFRx4yo/6SYdoO0x5W/rTpykul/yyhzHPI72lLQdovdR6wUGYe9P9IG9f+GLdpRvM4aWyXSnhCR31QM52no6hU8KHfoM6dQU7F7KXyhYeGc/Rl4LSo3aRKCMsq5ELi6eZ+XxYksvRGkjtmSsp383v80UGuPQDpdtGaVZKaA3kosuyplD0BUI9Ox9cyyq/hCCoPUoRaqULGS2uA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sK+RkKemLKkxufSXDXGSxYz4dSyelA51uCZDJnFomm4=;
- b=mAlfYxVmoFWUHxU4oqac0EqPbkDLHSrq1lJCmh8gWw/DU/VgLxV/jUQWk3vjpKML1kcPDPnImKCacHQQzIUEQ5Wfw0MmnIcXkxHAGK7HatHP1xlOfiSr0aSLPbqmSvLPxogyCuJQxzleDV/P+sSXMvAVLFY4jCIM0GsCD2qNkOCSzKdkA1/yaFwYiWedmh6fZd6eGN3Sdyq9Ed2DksD3LlX/0PV8iSVyB4q7MrmJKiIIltCM21dDQdXYuwshfG77XPTQ59WQmQbEDUnVMjDUjxUmNtdh4VM5Ut7i9AJLDC8qvVsd9NaQjdpblJN9OhQ4+hNh/9Z65h2tdBAy6i3Ynw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sK+RkKemLKkxufSXDXGSxYz4dSyelA51uCZDJnFomm4=;
- b=0NM2LRLpqaGPX9NUGHrFSeTnGkUNOSd7GbzZxoz1Df/w2FdYqZ89BePF+B3NSHqYd0HjkNKAbunhLtIl+xXDN2ip4lNLA94FEe6j/97gHNwEQEHNkR468PkbEamUwxdy/6qYZ7daXh12pV+trG5meGosC0tZBS+qPCBvT7cO4B0=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-Received: from CY4PR12MB1574.namprd12.prod.outlook.com (10.172.71.23) by
- CY4PR12MB1749.namprd12.prod.outlook.com (10.175.60.144) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.27; Mon, 3 Feb 2020 21:49:33 +0000
-Received: from CY4PR12MB1574.namprd12.prod.outlook.com
- ([fe80::610a:6908:1e18:49fd]) by CY4PR12MB1574.namprd12.prod.outlook.com
- ([fe80::610a:6908:1e18:49fd%7]) with mapi id 15.20.2686.031; Mon, 3 Feb 2020
- 21:49:33 +0000
-Subject: Re: [PATCH v3 07/18] machine: Add a new function init_apicid_fn in
- MachineClass
-To: Igor Mammedov <imammedo@redhat.com>
-References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
- <157541986210.46157.5082551407581177819.stgit@naples-babu.amd.com>
- <20200128172919.4ecb5896@redhat.com>
- <e5271e1c-55bc-e3d2-eb4c-2329eef07c9f@amd.com>
- <20200129101458.6a108431@redhat.com>
- <b75928ec-c062-7edf-bc24-8dc0ccd7439b@amd.com>
- <20200203161758.3eb85046@redhat.com>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <192836b5-bd1c-0ad5-b650-e33c6e3bc84d@amd.com>
-Date: Mon, 3 Feb 2020 15:49:31 -0600
+ (envelope-from <laine@redhat.com>) id 1iyk5k-0005o8-Pa
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:21:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43134
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <laine@redhat.com>) id 1iyk5k-0005ih-0B
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 17:21:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580768470;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ai3RVoE1TG0a/Rx2LKoUeOR37qCR/j/lgzRY2cEbE18=;
+ b=K0/B2V8514vhydG6QnTuEXK7pUJcpdBvt++OSNBDU2UgDYBXQgyrIOiGUXTViM8Qx830U7
+ g77Gu6aI+x62iiBCmzbFKLHlPlnHkZhP8SP2wQGcYY/DvNYHlvI9KS53CxzE7OJgILXPZ9
+ xT9wsYeprjNz2uJNrB+2vE6YaKRnHOc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-khqj7gooOm2k-_4Zp1sKHg-1; Mon, 03 Feb 2020 17:19:57 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07747800D41
+ for <qemu-devel@nongnu.org>; Mon,  3 Feb 2020 22:19:57 +0000 (UTC)
+Received: from [10.10.121.233] (ovpn-121-233.rdu2.redhat.com [10.10.121.233])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 219C790F4D;
+ Mon,  3 Feb 2020 22:19:51 +0000 (UTC)
+From: Laine Stump <laine@redhat.com>
+Subject: Disabling PCI "hot-unplug" for a guest (and/or a single PCI device)
+To: libvir-list@redhat.com
+Message-ID: <16db1dcd-d1a3-5bd9-2daa-d16a0f2d168e@redhat.com>
+Date: Mon, 3 Feb 2020 17:19:51 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-In-Reply-To: <20200203161758.3eb85046@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR12CA0013.namprd12.prod.outlook.com (2603:10b6:4:1::23)
- To CY4PR12MB1574.namprd12.prod.outlook.com
- (2603:10b6:910:e::23)
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Received: from [10.236.30.87] (165.204.77.1) by
- DM5PR12CA0013.namprd12.prod.outlook.com (2603:10b6:4:1::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.29 via Frontend Transport; Mon, 3 Feb 2020 21:49:32 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 7ff676ae-d92d-4b4a-a088-08d7a8f2f440
-X-MS-TrafficTypeDiagnostic: CY4PR12MB1749:
-X-Microsoft-Antispam-PRVS: <CY4PR12MB17490574199B5AF9A2040BBE95000@CY4PR12MB1749.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 0302D4F392
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(366004)(346002)(376002)(39860400002)(396003)(136003)(189003)(199004)(16526019)(53546011)(186003)(6486002)(44832011)(2616005)(4326008)(36756003)(66476007)(31696002)(5660300002)(66556008)(86362001)(956004)(26005)(66946007)(45080400002)(6916009)(966005)(31686004)(16576012)(8936002)(316002)(8676002)(81166006)(2906002)(478600001)(81156014)(52116002);
- DIR:OUT; SFP:1101; SCL:1; SRVR:CY4PR12MB1749;
- H:CY4PR12MB1574.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: w9bnAaEUEkbQRChAcEE0vFEWJp7LYHVJPxbFgZLq8Qs51vniMmQVwFx8+DEOHSGj24SsufezFCHCNfM0rV1biClkeoM6OenBGT7U7wwX27KemMH2AfxsFU4M557oPmJ7ZlDpsOR+nL6hMamC9KEiUNZOmJ5AdT2vjzan40N54+pWHrNpFkR4A8KZOt24SQZi2M85gvvvwqZqiqSiViDPSCZ6svZR5xoK2syvJViZQB0A9wca5XAX8aucypLeRhM3/4L/LXsaHThUdWhgCLsgJ8A+fvANpyH0wwSy/90w1CBSnByrvAo+bb/dcscPgstVUa+wirondhZ2DifBXMQU33uiw7R36WRoO85Q8ao+mzK8QfWJIXfQeODusMh5nm3hc7NL9EoZEkUo5xvYg32kbOF91me/F6ScDreghdta18Wxde+NTzQKXTDsEbpprgamNbxhLLPSDUuziMVMRI4O3GDkzpx8a+FM0SIanWHpr5ePWGSQdIBHPmb/MyhiJ/HbJWjcXl7w5OnKGD9s3hlBOA==
-X-MS-Exchange-AntiSpam-MessageData: rFA+otNR0Cf710RjITUz0VYdGZlt2ZjhgJqiQA/dAFzqEqoxFtmY2GGrFx61oiFztirdG+bX57Qrg1ZoXyI9QR3EfhUHKvPaGvmEFLmgdMIbY1YJKLj1CAWtucgmOpoYlADsZdO3vJTxmRM+Nqs8Tw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ff676ae-d92d-4b4a-a088-08d7a8f2f440
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2020 21:49:33.2301 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 54Zi3GsDDBY1DdFUqRnW+5EIn4ybyTWzbhmqp6epr8hLRtBFDUGTjMSadkjjXEmu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1749
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.244.61
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: khqj7gooOm2k-_4Zp1sKHg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,92 +85,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- armbru@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Although I've never experienced it, due to not running Windows guests, 
+I've recently learned that a Windows guest permits a user (hopefully 
+only one with local admin privileges??!) to "hot-unplug" any PCI device. 
+I've also learned that some hypervisor admins don't want to permit 
+admins of the virtual machines they're managing to unplug PCI devices. I 
+believe this is impossible to prevent on an i440fx-based machinetype, 
+and can only be done on a q35-based machinetype by assigning the devices 
+to the root bus (so that they are seen as integrated devices) rather 
+than to a pcie-root-port. But when libvirt is assigning PCI addresses to 
+devices in a q35-base guest, it will *always* assign a PCIe device to a 
+pcie-root-port specifically so that hotplug is possible (this was done 
+to maintain functional parity with i440fx guests, where all PCI slots 
+support hotplug).
 
 
-On 2/3/20 9:17 AM, Igor Mammedov wrote:
-> On Wed, 29 Jan 2020 10:17:11 -0600
-> Babu Moger <babu.moger@amd.com> wrote:
-> 
->> On 1/29/20 3:14 AM, Igor Mammedov wrote:
->>> On Tue, 28 Jan 2020 13:45:31 -0600
->>> Babu Moger <babu.moger@amd.com> wrote:
->>>   
->>>> On 1/28/20 10:29 AM, Igor Mammedov wrote:  
->>>>> On Tue, 03 Dec 2019 18:37:42 -0600
->>>>> Babu Moger <babu.moger@amd.com> wrote:
->>>>>     
->>>>>> Add a new function init_apicid_fn in MachineClass to initialize the mode
->>>>>> specific handlers to decode the apic ids.
->>>>>>
->>>>>> Signed-off-by: Babu Moger <babu.moger@amd.com>
->>>>>> ---
->>>>>>  include/hw/boards.h |    1 +
->>>>>>  vl.c                |    3 +++
->>>>>>  2 files changed, 4 insertions(+)
->>>>>>
->>>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
->>>>>> index d4fab218e6..ce5aa365cb 100644
->>>>>> --- a/include/hw/boards.h
->>>>>> +++ b/include/hw/boards.h
->>>>>> @@ -238,6 +238,7 @@ struct MachineClass {
->>>>>>                                                           unsigned cpu_index);
->>>>>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
->>>>>>      int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
->>>>>> +    void (*init_apicid_fn)(MachineState *ms);    
->>>>> it's x86 specific, so why it wasn put into PCMachineClass?    
->>>>
->>>> Yes. It is x86 specific for now. I tried to make it generic function so
->>>> other OSes can use it if required(like we have done in
->>>> possible_cpu_arch_ids). It initializes functions required to build the
->>>> apicid for each CPUs. We need these functions much early in the
->>>> initialization. It should be initialized before parse_numa_opts or
->>>> machine_run_board_init(in v1.c) which are called from generic context. We
->>>> cannot use PCMachineClass at this time.  
->>>
->>> could you point to specific patches in this series that require
->>> apic ids being initialized before parse_numa_opts and elaborate why?
->>>
->>> we already have possible_cpu_arch_ids() which could be called very
->>> early and calculates APIC IDs in x86 case, so why not reuse it?  
->>
->>
->> The current code(before this series) parses the numa information and then
->> sequentially builds the apicid. Both are done together.
->>
->> But this series separates the numa parsing and apicid generation. Numa
->> parsing is done first and after that the apicid is generated. Reason is we
->> need to know the number of numa nodes in advance to decode the apicid.
->>
->> Look at this patch.
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fqemu-devel%2F157541988471.46157.6587693720990965800.stgit%40naples-babu.amd.com%2F&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C0a643dd978f149acf9d108d7a8bc487a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637163398941923379&amp;sdata=sP2TnNaqNXRGEeQNhJMna3wyeBqN0XbNKqgsCTVDaOQ%3D&amp;reserved=0
->>
->> static inline apic_id_t apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info,
->> +                                                  const X86CPUTopoIDs
->> *topo_ids)
->> +{
->> +    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
->> +           (topo_ids->llc_id << apicid_llc_offset_epyc(topo_info)) |
->> +           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
->> +           (topo_ids->core_id << apicid_core_offset(topo_info)) |
->> +           topo_ids->smt_id;
->> +}
->>
->>
->> The function apicid_from_topo_ids_epyc builds the apicid. New decode adds
->> llc_id(which is numa id here) to the current decoding. Other fields are
->> mostly remains same.
-> 
-> If llc_id is the same as numa id, why not reuse CpuInstanceProperties::node-id
-> instead of llc_id you are adding in previous patch 6/18?
-> 
-I tried to use that earlier. But dropped the idea as it required some
-changes. Don't remember exactly now. I am going to investigate again if we
-can use the node_id for our purpose here. Will let you know if I have any
-issues.
+To make the above-mentioned admins happy, we need to make it possible to 
+(easily) create guest configurations for q35-based virtual machines 
+where the PCI devices can't be hot-unplugged by the guest OS.
+
+
+Thinking in the context of a management platform (e.g. OpenStack or 
+ovirt) that goes through libvirt to use QEMU (and forgetting about 
+i440fx, concentrating only on q35), I can think of a few different ways 
+this could be done:
+
+
+1) Rather than leaving the task of assignung the PCI addresses of 
+devices to libvirt (which is what essentially *all* management apps that 
+use libvirt currently do), the management application could itself 
+directly assign the PCI addressed of all devices to be slots on pcie.0.
+
+
+This is problematic because once a management application has taken over 
+the PCI address assignment of a single device, it must learn the rules 
+of what type of device can be plugged into what type of PCI controller 
+(including plugging in new controllers when necessary), and keep track 
+of which slots on which PCI controllers are already in use - effectively 
+tossing that part of libvirt's functionality / embedded knowledge / 
+usefulness to management applications out the window. It's even more of 
+a problem for management applications that have no provision for 
+manually assigning PCI addresses - virt-manager for example only 
+supports this by using "XML mode" where the froopy point-click UI is 
+swapped out for an edit window where the user is simply presented with 
+the full XML for a device and allowed to tweak it around as they see fit 
+(including duplicate addresses, plugging the wrong kind of device into 
+the wrong slot, referencing non-existent controllers, etc). (NB: you 
+could argue that management could just take over PCI address assignment 
+in the case of wanting hotplug disabled, and only care about / support 
+pcie.0 (which makes the task much easier, since you just ignore the 
+existence of any other PCI controllers, leaving you with a homogenous 
+array of 32 slot x 8 functions, but becomes much more complicated if you 
+want to allow a mix of hotpluggable and non-hotpluggable devices, and 
+you *know* someone will)
+
+
+2) libvirt could gain a knob "somewhere" in the domain XML to force a 
+single device, or all devices, to be assigned to a PCI address on pcie.0 
+rather than on a pcie-root-port. This could be thought of as a "hint" 
+about device placement, as well as extra validation in the case that a 
+PCI address has been manually assigned. So, for example, let's say a 
+"hotplug='disable'" option is added somewhere at the top level of the 
+domain (maybe "<hotplug enable='no'/>" inside <features> or something 
+like that); when PCI addresses are assigned by libvirt, it would attempt 
+to find a slot on a controller that didn't support hotplug. And/or a 
+similar knob could be added to each device. In both cases, the setting 
+would be used both when assigning PCI addresses and also to validate 
+user-provided PCI addresses to assure that the desired criterion was met 
+(otherwise someone would manually select a PCI address on a controller 
+that supported hotplug, but then set "hotplug='disabled'" and expect 
+hotplug to be magically disabled on the slot).
+
+
+Some of you will remember that I proposed such a knob for libvirt a few 
+years ago when we were first fleshing out support for QEMU's PCI Express 
+controllers and the Q35 machinetype, and it was rejected as "libvirt 
+dictating policy". Of course at that time there weren't actual users 
+demanding the functionality, and now there are. Aside from that, all I 
+can say is that it isn't libvirt dictating this policy, it's the user of 
+libvirt, and libvirt is just following directions :-) (and that I really 
+really dislike the idea of a forced handover of the entire task of 
+assigning/managing device PCI addresses to management apps just because 
+they decide they want to disable guest-initiated hotplug
+
+
+3) qemu could add a "hotpluggable=no" commandline option to all PCI 
+devices (including vfio-pci) and then do whatever is necessary to make 
+sure this is honored in the emulated hardware (is it possible to set 
+this on a per-slot basis in a PCI controller? Or must it be done for an 
+entire controller? I suppose it's not as much of an issue for 
+pcie-root-port, as long as you're not using multiple functions). libvirt 
+would then need to add this option to the XML for each device, and 
+management applications would need to set it - it would essentially look 
+the same to the management application, but it would be implemented 
+differently - instead of libvirt using that flag to make a choice about 
+which slot to assign, it would assign PCI addresses in the same manner 
+as before, and use the libvirt XML flag to set a QEMU commandline flag 
+for the device.
+
+
+The upside of this is that we would be disabling hotplug by "disabling 
+hotplug" rather than by "assigning the device to a slot that 
+coincidentally doesn't support hotplug", making it all more orthogonal - 
+everything else in a guest's config could remain exactly the same while 
+enabling/disabling hotplug. (Another upside is that it could possibly be 
+made to work for i440fx machine types, but we're not supposed to care 
+about that any more, so I won't mention it :-)) The downside is that it 
+requires a new feature in QEMU (whose difficulty/feasibility I have 0 
+knowledge of), so there are 3 layers of work rather than 2.
+
+
+So does anyone have any different (and hopefully better) idea of how to 
+do this? Arguments for/against the 3 possibilities I've listed here?
+
+
 
