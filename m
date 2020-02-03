@@ -2,97 +2,77 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D040C33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D101C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:02:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A55620721
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:56:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evCVqG8c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A55620721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 70C562082E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:02:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C562082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iycDY-0008Hw-7i
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 08:56:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55570)
+	id 1iycIb-0001bC-Ke
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 09:02:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iycC0-0006nE-QG
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:55:13 -0500
+ (envelope-from <bounces@canonical.com>) id 1iycHd-00010U-W9
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:01:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iycBz-00084y-R7
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:55:12 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56282
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iycBz-00084p-Nc
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:55:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580738111;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qg93xFhEGkdmIT3K3LTNem1fl2cYCQhQan2pX+lCxMw=;
- b=evCVqG8cef5s/NGIw+w/jK8JmVdlspqV2NDqIa6uAsOGDlP7BXTRAUboKqJvxb5vLrRdQD
- 9s2mwxbqDgXbsHnGvLC986VJDtEWssxlQk4q+01mEoTMo9J+GgOY3j5k4PtbMGGVd+A/1Q
- Ef69NqHYmZCHBl/TncF6u194HnxAjjI=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-fkbKMQKENw6e91nKRvae5Q-1; Mon, 03 Feb 2020 08:55:07 -0500
-Received: by mail-qv1-f69.google.com with SMTP id p3so9484163qvt.9
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 05:55:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=OX9/undf1GE3j16kXlHknGzXZFn72TP46ty60q477W0=;
- b=FVgrDWyQOkPqbcGtJ8yS/miJtAb5QZtHPlm78upXCv4tJ73ynPeerDAWRALikdz25w
- GDovDPo527GdKlInXYsw1+tKhG1lWuvL4j0l6jZFeUdTRtBswe2UwCLyCx9rs5lNk1zI
- TTTxTwUZ5DGxB9r5PQoSpTyAch3L2R6VVEQuZzZuTtqRQ0LC8U/oOJjZgVjKujVhCbwA
- Q4KgXKLXuJ7Y/UgVu2URpdHMIGww0GHi0rlhLmDYscthvtXGpFYZMieCtsBbGN4JdIi9
- JDQBhAj0qP0Tczi3AM3kISG9YKayMmOB4mcPcHF9VYitnHSMv6HG2+34stK3+u2t7AT1
- hVew==
-X-Gm-Message-State: APjAAAUdptLj0C4EeFetEKQYag0lWv2XLCkHu82lvqZXLAy5+0jTtL31
- Djctvk97tj98+vfVtBSzNtfpgwzIxBxlNetBPOpN0OB9E8QiwGIVMbpr9IXZqsySpvyTDfyzLzQ
- VKxmccwDnnyqLxj8=
-X-Received: by 2002:ae9:e109:: with SMTP id g9mr23410942qkm.141.1580738106627; 
- Mon, 03 Feb 2020 05:55:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwoxO16Sp2ljh1ReMYm6DCws3MoRu1G+rXlC9JNw//PMhRJerjXB/71rb8wqA/99ZEJ1c8sxQ==
-X-Received: by 2002:ae9:e109:: with SMTP id g9mr23410919qkm.141.1580738106410; 
- Mon, 03 Feb 2020 05:55:06 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
- by smtp.gmail.com with ESMTPSA id w60sm9760352qte.39.2020.02.03.05.55.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 05:55:05 -0800 (PST)
-Date: Mon, 3 Feb 2020 08:55:03 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v13 06/10] virtio-iommu: Implement fault reporting
-Message-ID: <20200203135503.GC155875@xz-x1>
-References: <20200125171955.12825-1-eric.auger@redhat.com>
- <20200125171955.12825-7-eric.auger@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iycHW-0004Pe-SF
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:00:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40072)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iycHW-0004Nh-Mn
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:00:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iycHV-0002Hl-8a
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 14:00:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 39EEA2E8048
+ for <qemu-devel@nongnu.org>; Mon,  3 Feb 2020 14:00:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200125171955.12825-7-eric.auger@redhat.com>
-X-MC-Unique: fkbKMQKENw6e91nKRvae5Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Mon, 03 Feb 2020 13:54:03 -0000
+From: =?utf-8?q?Matthias_L=C3=BCscher?= <1823790@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=Laurent@vivier.eu; 
+X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fritz-the-cat laurent-vivier m-luescher pmaydell
+ tobijk
+X-Launchpad-Bug-Reporter: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
+References: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
+ <158050391153.19408.2270800998696422828.malone@wampee.canonical.com>
+Message-Id: <CAMhkXVMDhfiOqqD9JKWvbkFtayC2YrQNoXMdi5BRp6q-F4ZGGw@mail.gmail.com>
+Subject: Re: [Bug 1823790] Re: QEMU mishandling of SO_PEERSEC forces systemd
+ into tight loop
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: d47a9023c5a85cf6cf82a0e304dccba8e509bcb3
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -101,57 +81,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- jean-philippe@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- mst@redhat.com, eric.auger.pro@gmail.com
+Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jan 25, 2020 at 06:19:51PM +0100, Eric Auger wrote:
+> Could you test the attached patch?
+>
 
-[...]
+Works great!
 
-> +static void virtio_iommu_report_fault(VirtIOIOMMU *viommu, uint8_t reaso=
-n,
-> +                                      int flags, uint32_t endpoint,
-> +                                      uint64_t address)
-> +{
-> +    VirtIODevice *vdev =3D &viommu->parent_obj;
-> +    VirtQueue *vq =3D viommu->event_vq;
-> +    struct virtio_iommu_fault fault;
-> +    VirtQueueElement *elem;
-> +    size_t sz;
-> +
-> +    memset(&fault, 0, sizeof(fault));
-> +    fault.reason =3D reason;
-> +    fault.flags =3D cpu_to_le32(flags);
-> +    fault.endpoint =3D cpu_to_le32(endpoint);
-> +    fault.address =3D cpu_to_le64(address);
-> +
-> +    for (;;) {
-> +        elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement));
-> +
-> +        if (!elem) {
-> +            error_report_once(
-> +                "no buffer available in event queue to report event");
-> +            return;
-> +        }
-> +
-> +        if (iov_size(elem->in_sg, elem->in_num) < sizeof(fault)) {
-> +            virtio_error(vdev, "error buffer of wrong size");
-> +            virtqueue_detach_element(vq, elem, 0);
-> +            g_free(elem);
-> +            return;
-> +        }
-> +        break;
+This is my test setup:
 
-This for loop is not needed any more?  Other than that:
+Host machine: Ubuntu 18.04, amd64
+LXD container: Debian Buster, arm64, systemd 241
+QEMU: qemu-aarch64(-static), compiled from source (4.2.0), patched with
+your patch.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Many thanks!
+Matthias
 
---=20
-Peter Xu
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823790
+
+Title:
+  QEMU mishandling of SO_PEERSEC forces systemd into tight loop
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  While building Debian images for embedded ARM target systems I
+  detected that QEMU seems to force newer systemd daemons into a tight
+  loop.
+
+  My setup is the following:
+
+  Host machine: Ubuntu 18.04, amd64
+  LXD container: Debian Buster, arm64, systemd 241
+  QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3=
+.1+dfsg-7)
+
+  To easily reproduce the issue I have created the following repository:
+  https://github.com/lueschem/edi-qemu
+
+  The call where systemd gets looping is the following:
+  2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 err=
+no=3D34 (Numerical result out of range)
+
+  Furthermore I also verified that the issue is not related to LXD.
+  The same behavior can be reproduced using systemd-nspawn.
+
+  This issue reported against systemd seems to be related:
+  https://github.com/systemd/systemd/issues/11557
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1823790/+subscriptions
 
