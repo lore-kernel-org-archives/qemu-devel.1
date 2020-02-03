@@ -3,63 +3,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37288C3524D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 061A4C3524D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:55:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03B0D2070A
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4F992070A
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:55:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Mfkehnl+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03B0D2070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3c2eu1C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F992070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyYOm-0005xA-6T
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 04:52:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59107)
+	id 1iyYS2-000813-Uz
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 04:55:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59911)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iyYNq-0005Uy-8X
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:51:12 -0500
+ (envelope-from <armbru@redhat.com>) id 1iyYRF-0007KP-PV
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:54:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iyYNo-0002xs-0t
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:51:09 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:48965 helo=ozlabs.org)
+ (envelope-from <armbru@redhat.com>) id 1iyYRC-0007Qo-GD
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:54:40 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36543
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iyYNm-0002fQ-Uy
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:51:07 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48B33y2198z9sRt; Mon,  3 Feb 2020 20:50:54 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580723454;
- bh=5W49rq1W0sJNHH+SdisZ44Wbd77zaLtmVhiFkJ48OKo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Mfkehnl+9hsVCuP4dOE2G41bb2z87WpOkRdqEBLYUN2pZD8AjsyeCeYfJueKfTIa5
- vZXTxVrCRMp2eIGaKn6S0ZdaAN1WKg0LCYKRxTodbQqvCLa0RMazwLgCHzMYG/G0DZ
- G9S7f8b366ir5axoN9zsL7O6WhUAKA/qKJQFpsLM=
-Date: Mon, 3 Feb 2020 20:50:48 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iyYRC-0007Ph-CV
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:54:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580723677;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oAH/RTgSgPdmG2oXN/9sILCeGVRdYkGqY9YTw9lo8g8=;
+ b=R3c2eu1CGc04ojPiO2DxGyPGSx+WJrsb9gdnepypiHAuNwpiXRFR05BWkKgpsHPpZTgFGf
+ ywKdyXf1YJWm8enq+V8sUF9KVA54j+vBD/ntmEyYksotr3yAczz03nMff5/mvyTooQ41HR
+ 1FxImvPH9YnRpP7WH7GfOrJw0C7H0vk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-DhwemwaDPC-3fO3i1zw9Ew-1; Mon, 03 Feb 2020 04:54:36 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A88028010CC;
+ Mon,  3 Feb 2020 09:54:34 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4931090F51;
+ Mon,  3 Feb 2020 09:54:26 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C5E711138404; Mon,  3 Feb 2020 10:54:24 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: VW ELF loader
-Message-ID: <20200203095048.GA60221@umbus.fritz.box>
-References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
- <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
- <20200203012842.GD52446@umbus.fritz.box>
- <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
+Subject: Re: Improving QOM documentation [Was: Re: Making QEMU easier for
+ management tools and applications]
+References: <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200115121953.GJ93923@redhat.com>
+ <874kwwvmuv.fsf@dusky.pond.sub.org> <20200130210902.GA25927@paraplu>
+ <87y2toi29o.fsf@dusky.pond.sub.org>
+ <CAFEAcA-545QS9mnM6hwa6TxUpw_pDQ3Pa8tkf4qtzWS1Zi_fxQ@mail.gmail.com>
+ <CABgObfaB=wHXyJbQR163bZdFHhWdCc4D8sWRHzte019_hSTuhA@mail.gmail.com>
+ <20200131152243.GA24572@paraplu> <87sgjvbkvj.fsf@dusky.pond.sub.org>
+ <b2a329bf-4795-14f0-473c-2a7cdfa4d262@redhat.com>
+Date: Mon, 03 Feb 2020 10:54:24 +0100
+In-Reply-To: <b2a329bf-4795-14f0-473c-2a7cdfa4d262@redhat.com> (Paolo
+ Bonzini's message of "Mon, 3 Feb 2020 09:56:24 +0100")
+Message-ID: <87mua02dyn.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="tThc/1wpZn/ma/RB"
-Content-Disposition: inline
-In-Reply-To: <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: DhwemwaDPC-3fO3i1zw9Ew-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,106 +101,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Cornelia Huck <conny@cornelia-huck.de>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang?= =?utf-8?Q?=C3=A9?=" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Kashyap Chamarthy <kchamart@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>, John Snow <jsnow@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
---tThc/1wpZn/ma/RB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 31/01/20 18:23, Markus Armbruster wrote:
+>> Kashyap Chamarthy <kchamart@redhat.com> writes:
+>> docs/devel/qapi-code-gen.txt has the same problem: it's mostly internal
+>> stuff, but there's also introspection, which is an external interface.
+>
+> We should move introspection to docs/interop.  Any takers?
+>
+>>>     Rigorous support for introspection both of runtime objects and type
+>>>     capabilities
+>>=20
+>> For a value of "rigorous".
+>>=20
+>> Let me propose QAPI's query-qmp-schema as the tin standard[*] of
+>> introspection:
+>>=20
+>> * It's documented
+>>=20
+>> * It comes with something that can pass as a type system
+>>=20
+>> * It actually tells you the full truth.
+>
+> Well, not all statements age equally well.  But compared to netdev_add=20
+> and device_add, it was still an improvement. :)
 
-On Mon, Feb 03, 2020 at 10:12:02AM +0100, Paolo Bonzini wrote:
-> On 03/02/20 02:28, David Gibson wrote:
-> > But "pseries" is different.  We're implementing the PAPR platform,
-> > which describes an OS environment that's presented by a combination of
-> > a hypervisor and firmware.  The features it specifies *require*
-> > collaboration between the firmware and the hypervisor.
->=20
-> Which features are these?
+I think "rigorous" is to be read as ambition, not description.  Sadly,
+QOM stagnated before getting close to realizing its ambitions.
 
-Too many to list really.  In the whole of PAPR, there are probably
-dozens of RTAS calls that require hypervisor privilege at some point
-along the way.  We probably don't implement that many of them -
-there's a bunch of stuff we've never bothered with because Linux
-doesn't care.
+> It's certainly worse than QAPI *now*, but it's not nonexistent:
+>
+>> * Documentation
+>>=20
+>>   QAPI: docs/devel/qapi-code-gen.txt section "Client JSON Protocol
+>>   introspection"
+>>=20
+>>   QOM: Nada
+>
+> Well, there is qom.json.  So slightly more than nothing, though I have=20
+> already found an off-by-one error and it could definitely be improved:
+>
+>  @type: the type of the property.  This will typically come in one of fou=
+r
+>         forms:
+>
+>         1) A primitive type such as 'u8', 'u16', 'bool', 'str', or 'doubl=
+e'.
+>            These types are mapped to the appropriate JSON type.
+>
+>         2) A child type in the form 'child<subtype>' where subtype is a q=
+dev
+>            device type name.  Child properties create the composition tre=
+e.
+>
+>         3) A link type in the form 'link<subtype>' where subtype is a qde=
+v
+>            device type name.  Link properties form the device model graph=
+.
 
-> > So really, the question isn't whether we implement things in firmware
-> > or in qemu.  It's whether we implement the firmware functionality as
-> > guest cpu code, which needs to be coded to work with a limited
-> > environment, built with a special toolchain, then emulated with TCG.
-> > Or, do we just implement it in normal C code, with a full C library,
-> > and existing device and backend abstractions inside qemu.
->=20
-> ... which is adding almost 2000 lines of new code to the host despite
-> the following limitations:
+If the off-by-one you found is "four forms" followed by a list of three,
+then the error isn't "four", it's the omitted fourth list item.
 
-Well.. yeah.. it is kinda larger than I hoped.
+Anyway, I grant you "nada" was an exaggeration for effect.
 
-But in comparison *just* the qemu specific parts of SLOF are >4000
-lines of Forth.  Overall there's about 20k lines of Forth and 33k
-lines of C.  And the number of people who both understand Forth and
-have the slightest interest in SLOF is, like.. 2 people?  Maybe 3 if
-you count Segher's occasional drive-by rants.
+Note that the doc comments are reference documentation.  QAPI got that,
+too.  Reference documentation is useful, but no replacement for an
+explainer like qapi-code-gen.txt.
 
-> > 4. no networking in OF CI at all;
-> > 5. no vga;
-> > 6. no disk partitions in CI, i.e. no commas to select a partition -
-> > this relies on a bootloader accessing the disk as a whole;
->=20
-> and of course:
->=20
-> > 7. "interpret" (executes passed forth expression) does nothing as in th=
-is
-> > environment grub only uses it for switching cursor off and similar task=
-s.
->=20
-> In other words you're not dropping SLOF, you're really dropping
-> OpenFirmware completely.
+>> * Type system
+>>=20
+>>   QAPI: A few built-in types specified in the documentation, type
+>>   constructors for complex types.
+>>=20
+>>   QOM: Types are strings, and you just need to know what they mean.
+>>   Some string patterns are special: link<STR>, child<STR>, STR[INT], and
+>>   you just need to know what that means, too.
+>
+> str[int] is not a type as far as I understood it, it's a property name. =
+=20
 
-No argument there.  That is absolutely true, and absolutely
-intentional.  The idea is to maintain just what we need of the
-OS-facing OF interface.
+You're right.
 
-Frankly, while it has some good ideas, I don't think Open Firmware
-wasn't that great a concept overall in the 90s[0] - and it has not really
-improved with age.
+> Types are documented as above; however types other than link<> and=20
+> child<>, which are QAPI types, can be user-defined types (structs,=20
+> enums) and this is not included in (1).
 
-[0] Incidentally I also think EFI's a pretty crappy concept for almost
-    exactly the same reasons, but it has the huge advantage of a much
-    more actively developed codebase.
+Specifically, three of four kinds of type names are documented:
+primitive, child, scalar.  The fourth kind is not, and it can be
+anything.  It need not be a QAPI type name.  In any case, you just have
+to know what the type name means.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+In contrast, QAPI introspection defines all types in terms of type
+constructors and primitive types.  It completely hides user-defined QAPI
+type names, so they don't become ABI.
 
---tThc/1wpZn/ma/RB
-Content-Type: application/pgp-signature; name="signature.asc"
+Do you think we could somehow appropriate QAPI's type system for QOM
+introspection?
 
------BEGIN PGP SIGNATURE-----
+>> * Full truth
+>>=20
+>>   QAPI: If you can access it at the interface, you can also see it in
+>>   introspection.
+>>=20
+>>   QOM: Type introspection can show you only the properties of a freshly
+>>   created object.  Properties that get created only later are invisible.
+>>   Properties that depend on global state are unreliable.  Object
+>>   introspection is reliable, but only for that object in its current
+>>   state.
+>
+> Right, that's array properties and at least theoretically child=20
+> properties (I don't know if there are examples).
+>
+> Paolo
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl437PYACgkQbDjKyiDZ
-s5ICGQ//Yaq7FDbf7soLzmG1XwdolOrdZy42I+451YvmebMs0shs1uUNL5EfTWj9
-H22cYIWeB7/dV5HJT6Jv8NFgqyPVgkfBRiezh3l0WGIGRjPq125GjJ/L2/DIIi7p
-aTyX+1P0VsWK6WKBBhpjfGiowOzMIBXGqKLjx7YYuW137F2FLqrpDX20/qtE5s4I
-9edF/qiwgUQ/3PY/K1qX/CQmviQwCPwFu24Y5Xa0U7q5uXWgx7IV4eN1Li7lwOlb
-FlqsssTngj4gE7ZlIfDYzwEVSx/owvFOIdwwmUYWB+7fkoc5QL+WQIYOn7/q3QGf
-gHXd9t3Gi6XPHLroR4WAmG/thzLJ/4Rn5koCaQX00yeVg5MGLrs+jl7yc/1z/lfb
-q/z4e1z5U9DoOXQ9tl8Vb0LZ2X70DrgO0ALy0jfb6vGGL7ofcI/wumhf5XX3tAM5
-EzsK6Twz4SSTyQUoGudUcJbE62v2URPSWCsuJNCjz4D6nVk48hzi1AHahy5OCRLD
-ev1Tnxhekx6Rw4BWjnZvdKXCBInqx+6oNC+/t16vEZwH+v+T0i9TTTf5Yje+u7K1
-6d2TPmKNrA2qJKxbMWt+QxS+juzE6vmcWXBwWf6tM9h+YODZYqmcpYkLppbOoDIl
-6F1wTpR8RNJipfSwWHEtyuY2p0YpnMajyxHO3g2xa6NltjI7YnI=
-=w+N9
------END PGP SIGNATURE-----
-
---tThc/1wpZn/ma/RB--
 
