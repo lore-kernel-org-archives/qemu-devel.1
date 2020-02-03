@@ -2,86 +2,88 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CBCCC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 17:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F31AC35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 17:52:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C3C92086A
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 17:48:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6209420721
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 17:52:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gIKANshO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C3C92086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N8jMoAHR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6209420721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyfpN-00054T-8U
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 12:48:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51874)
+	id 1iyfts-0006eJ-E3
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 12:52:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1iyfoO-0004RC-F5
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:47:06 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iyft4-0006FL-D4
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:51:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1iyfoM-0000yd-H4
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:47:04 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23972
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1iyfoM-0000we-Dh
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:47:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580752021;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BgUsDubewWfhB9JEAWF32v0uX7MoEWZRa0C9Yrwfj+M=;
- b=gIKANshOztdnxgyLSIXuBvNceN6BUSpYsMc8pD8yvgMiB+asVQojBJ77b18cWr/hpSjkf+
- ZLmPXA5xgu9jzUwakZw6q12fOXiQny9ri27ENSDyaM2JhDfl2AZ8wGnboubAnrJngi5jv0
- GJs1ticQdKHg0pJeprCYlqgaDGJGwKE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-F9XVggoSNdmWljG0Rg-KvQ-1; Mon, 03 Feb 2020 12:46:51 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CDC01005F7E;
- Mon,  3 Feb 2020 17:46:50 +0000 (UTC)
-Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E380C60BE0;
- Mon,  3 Feb 2020 17:46:38 +0000 (UTC)
-Subject: Re: [PATCH v13 03/10] virtio-iommu: Implement attach/detach command
-To: Peter Xu <peterx@redhat.com>
-References: <20200125171955.12825-1-eric.auger@redhat.com>
- <20200125171955.12825-4-eric.auger@redhat.com>
- <20200203134915.GA155875@xz-x1>
- <ce49f691-d944-2e5e-87a3-7e7c9651c2af@redhat.com>
- <20200203151917.GD155875@xz-x1>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <5289913a-43fc-aaae-5b82-151922de93bf@redhat.com>
-Date: Mon, 3 Feb 2020 18:46:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <alex.bennee@linaro.org>) id 1iyft2-0007o9-HK
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:51:54 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44178)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iyft2-0007ja-7F
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 12:51:52 -0500
+Received: by mail-wr1-x443.google.com with SMTP id m16so19392579wrx.11
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 09:51:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=xcPOlY6NnaMtfaZwmhIIq/8SjB6GXVUdK6Rgd0shcpU=;
+ b=N8jMoAHRj9wbhy4Ufbf+es1jKGyJX+3E+/q8bR/uE6+/OPM7cNzzA2pKS6ajI1WM4d
+ cs5Esvkp4+BTE7HuJ8rOU0Gye7gXsQ0nEaSBUhF36O+DiVjESiTiGoB8qSQlOd3GZ1yz
+ mxr0ag8KbvgC5OI9Sxen2VpIT3vaE+X8Oi1as4oKhiehfsiKIfBaPAhZGAdkI8zNNZbH
+ +51aLUT0Jnykn2byZBhZXvazSWydcX+6PUI+i80vC5/6SPE5ZkQNOOQjKfCdqoR+lDW0
+ gl9y96Waf0x05vnrJIQutjN4PfGXtNvk90JwOshwUamggyvarLExe3qWMeU/JtvNjtYs
+ ahgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=xcPOlY6NnaMtfaZwmhIIq/8SjB6GXVUdK6Rgd0shcpU=;
+ b=TPlbyhQSp81toooRTsCkxNV2qdtQun9SuYM6I9m2UuzV2cuf+HbEN780iHnTe7rajB
+ piCQ5pE54LsD3qZcsuAoFFM/YFfqUfc1Mmtz8GmVNsOqRTeuXd6ynLeGi5jL+oTnbyB0
+ 3vc3yTrFG9jqhTl2v9PZ6RTd0k3/IYQrWAolGXAQsmPAp/eLJyTPHup3Pf4RBjvAf2Om
+ 2xSbZ8Z5OjUf15p7OlDihSSOmzE/BzNt+3KvtEP3bS/iOR3DeVbzWCwffD0UO5wz1mAu
+ hKLA4SlvQUtZxHqXK5U4QphSvchIUMlOAWzz5IBko+jIs3r8zbRzwWVGlJ6SPB5GiJye
+ QaqA==
+X-Gm-Message-State: APjAAAUudZADHW1jdUSxUpkewqkqyKKmhptvn0hV6y5IJ6hg7KrgPmEe
+ gkxLtrFhXNElwVID58zSFa6ZibNFBX8=
+X-Google-Smtp-Source: APXvYqzryot5xVaCMiCNePoz8Tkj+WwpacVzjprsw6t9h8m0MMmxGdshqoARDBYTVtzsKRzEjBL/Hg==
+X-Received: by 2002:a5d:510f:: with SMTP id s15mr16516896wrt.408.1580752310709; 
+ Mon, 03 Feb 2020 09:51:50 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id d23sm26925483wra.30.2020.02.03.09.51.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Feb 2020 09:51:49 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 98D221FF87;
+ Mon,  3 Feb 2020 17:51:48 +0000 (GMT)
+References: <20200201192916.31796-1-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v6 00/41] target/arm: Implement ARMv8.1-VHE
+In-reply-to: <20200201192916.31796-1-richard.henderson@linaro.org>
+Date: Mon, 03 Feb 2020 17:51:48 +0000
+Message-ID: <878slja79n.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200203151917.GD155875@xz-x1>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: F9XVggoSNdmWljG0Rg-KvQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,70 +95,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- mst@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- jean-philippe@linaro.org, eric.auger.pro@gmail.com
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
 
-On 2/3/20 4:19 PM, Peter Xu wrote:
-> On Mon, Feb 03, 2020 at 03:59:00PM +0100, Auger Eric wrote:
-> 
-> [...]
-> 
->>>> +static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
->>>> +{
->>>> +    QLIST_REMOVE(ep, next);
->>>> +    g_tree_unref(ep->domain->mappings);
->>>
->>> Here domain->mapping is unreferenced for each endpoint, while at [1]
->>> below you only reference the domain->mappings if it's the first
->>> endpoint.  Is that problematic?
->> in [1] I take a ref to the domain->mappings if it is *not* the 1st
->> endpoint. This aims at deleting the mappings gtree when the last EP is
->> detached from the domain.
->>
->> This fixes the issue reported by Jean in:
->> https://patchwork.kernel.org/patch/11258267/#23046313
-> 
-> Ah OK. :)
-> 
-> However this is tricky.  How about do explicit g_tree_destroy() in
-> virtio_iommu_detach() when it's the last endpoint?  I see that you
-> have:
-> 
->     /*
->      * when the last EP is detached, simply remove the domain for
->      * the domain list and destroy it. Note its mappings were already
->      * freed by the ref count mechanism. Next operation involving
->      * the same domain id will re-create one domain object.
->      */
->     if (QLIST_EMPTY(&domain->endpoint_list)) {
->         g_tree_remove(s->domains, GUINT_TO_POINTER(domain->id));
->     }
-> 
-> Then it becomes:
-> 
->     if (QLIST_EMPTY(&domain->endpoint_list)) {
->         g_tree_destroy(domain->mappings);
->         g_tree_remove(s->domains, GUINT_TO_POINTER(domain->id));
->     }
-> 
-> And also remove the trick in attach() so you take the domain ref
-> unconditionally.  Would that work?
-Yes I think so. On the other hand this ref counting mechanism is also
-made for that purpose of destroying objects without being forced to
-explicitly call the destroy function.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Thanks
+> Version 6 moves vhe_reginfo[] to file scope, and one tweak
+> to the vhe register access masking that Peter asked for.
+>
+> All patches now have reviews.
 
-Eric
-> 
-> Thanks,
-> 
+I was re-testing and I was able to boot my guest Image+buildroot.
+However the busybox crashes after login so I'm unable to do stuff in the
+guests userspace. I seem to recall we saw this last time but I can't
+remember what the problem was.
 
+>
+>
+> r~
+>
+>
+> Alex Benn=C3=A9e (1):
+>   target/arm: check TGE and E2H flags for EL0 pauth traps
+>
+> Richard Henderson (40):
+>   target/arm: Define isar_feature_aa64_vh
+>   target/arm: Enable HCR_E2H for VHE
+>   target/arm: Add CONTEXTIDR_EL2
+>   target/arm: Add TTBR1_EL2
+>   target/arm: Update CNTVCT_EL0 for VHE
+>   target/arm: Split out vae1_tlbmask
+>   target/arm: Split out alle1_tlbmask
+>   target/arm: Simplify tlb_force_broadcast alternatives
+>   target/arm: Rename ARMMMUIdx*_S12NSE* to ARMMMUIdx*_E10_*
+>   target/arm: Rename ARMMMUIdx_S2NS to ARMMMUIdx_Stage2
+>   target/arm: Rename ARMMMUIdx_S1NSE* to ARMMMUIdx_Stage1_E*
+>   target/arm: Rename ARMMMUIdx_S1SE[01] to ARMMMUIdx_SE10_[01]
+>   target/arm: Rename ARMMMUIdx*_S1E3 to ARMMMUIdx*_SE3
+>   target/arm: Rename ARMMMUIdx_S1E2 to ARMMMUIdx_E2
+>   target/arm: Recover 4 bits from TBFLAGs
+>   target/arm: Expand TBFLAG_ANY.MMUIDX to 4 bits
+>   target/arm: Rearrange ARMMMUIdxBit
+>   target/arm: Tidy ARMMMUIdx m-profile definitions
+>   target/arm: Reorganize ARMMMUIdx
+>   target/arm: Add regime_has_2_ranges
+>   target/arm: Update arm_mmu_idx for VHE
+>   target/arm: Update arm_sctlr for VHE
+>   target/arm: Update aa64_zva_access for EL2
+>   target/arm: Update ctr_el0_access for EL2
+>   target/arm: Add the hypervisor virtual counter
+>   target/arm: Update timer access for VHE
+>   target/arm: Update define_one_arm_cp_reg_with_opaque for VHE
+>   target/arm: Add VHE system register redirection and aliasing
+>   target/arm: Add VHE timer register redirection and aliasing
+>   target/arm: Flush tlb for ASID changes in EL2&0 translation regime
+>   target/arm: Flush tlbs for E2&0 translation regime
+>   target/arm: Update arm_phys_excp_target_el for TGE
+>   target/arm: Update {fp,sve}_exception_el for VHE
+>   target/arm: Update get_a64_user_mem_index for VHE
+>   target/arm: Update arm_cpu_do_interrupt_aarch64 for VHE
+>   target/arm: Enable ARMv8.1-VHE in -cpu max
+>   target/arm: Move arm_excp_unmasked to cpu.c
+>   target/arm: Pass more cpu state to arm_excp_unmasked
+>   target/arm: Use bool for unmasked in arm_excp_unmasked
+>   target/arm: Raise only one interrupt in arm_cpu_exec_interrupt
+>
+>  target/arm/cpu-param.h     |    2 +-
+>  target/arm/cpu-qom.h       |    1 +
+>  target/arm/cpu.h           |  423 +++++--------
+>  target/arm/internals.h     |   73 ++-
+>  target/arm/translate.h     |    4 +-
+>  target/arm/cpu.c           |  162 ++++-
+>  target/arm/cpu64.c         |    1 +
+>  target/arm/debug_helper.c  |   50 +-
+>  target/arm/helper-a64.c    |    2 +-
+>  target/arm/helper.c        | 1220 +++++++++++++++++++++++++++---------
+>  target/arm/pauth_helper.c  |   14 +-
+>  target/arm/translate-a64.c |   47 +-
+>  target/arm/translate.c     |   74 ++-
+>  13 files changed, 1392 insertions(+), 681 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
 
