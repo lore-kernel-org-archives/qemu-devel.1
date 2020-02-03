@@ -2,80 +2,84 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8757AC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 646F8C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:02:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5671D20721
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:01:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EA7320661
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:02:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AtggjQyj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5671D20721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="glY3SHCh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EA7320661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyYXY-0004EZ-Ij
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 05:01:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34175)
+	id 1iyYYd-0005EJ-B8
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 05:02:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34713)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iyYWr-0003lj-27
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:00:29 -0500
+ (envelope-from <thuth@redhat.com>) id 1iyYXl-0004YL-CG
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iyYWq-0005oM-2o
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:00:28 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43589)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iyYWp-0005nR-Uw
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:00:28 -0500
-Received: by mail-oi1-x243.google.com with SMTP id p125so14138244oif.10
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 02:00:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=uhsw1BYBpFGbuKUHVCaxTP7nhysB0Kx8XsRggqHx0GY=;
- b=AtggjQyjSXq6nvAFc60fPF+bpBoy+5vPCXl/NN7XyFLo1Qwp84IGPTEUeW6lzzABB7
- fQW2g5ncfkoosJXv8n7kOgwEW2FyAGeKI2wYhF9Htoi5dkyBk2USewH7qI2JCQY5OD9W
- 7hg6aqK3N99e3wwK+p0ZnyIYUBrcGawi8pCNsRz0dZ/oHWYO4pb+kaP3xmwxCd8xsS1F
- K6sBpF+pL1PEshYJe5LXlnOrnfeGJk5DwauR9ylULU+b7IurQ1FdHFB4W74xhons/fyO
- H0p2svCTTgusEkygeAbKS46vSpWbxDRLiypUjWq8qHxJ15tQQGXOWNUVEglIWDr5knlV
- LmOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=uhsw1BYBpFGbuKUHVCaxTP7nhysB0Kx8XsRggqHx0GY=;
- b=Hs24C0hsS36M4P4evy73SiPW67Sbv/6qTn61OtqLem+N1RSv4PF45rgKRVo8e49Lvh
- 91QH/C8VvpVS8iNutjhrPo8Lwj4wsP+pjVoWhDwD3JD4/FWzjyGKWhggBgR3EwPDZwHX
- NeQmx9x3MkYP2mE3IHKjhcoLe3md/omoW5+I1DMUVLRUfls4OZW/Sh2zk5/pJ8YXYlEM
- G+rSbigLyxQCk3R72tLt0QyU4HZOUG25IaT0FzPC1BIOfHZaTLcfpXwa2mQbuyli/Dda
- G7//RiA8+vSKUjA/ADhzTWCnstTjqBSLxYiAva2AgXrtXSFyxpvC+Wij40AB7wlrxBC/
- AbMQ==
-X-Gm-Message-State: APjAAAVVx2d+3WeL0HmNonPJFmCJ5xsSH6KVFa4oY+GfrbSFUfwKAZtw
- EQEKtqON79GU4ybtrWx0e07QS+q+ADPDr+UY3Bjd1Q==
-X-Google-Smtp-Source: APXvYqzfExVUgUe0XwgjRV199aL6qM9cV/bUYKwl/Otfc/f37Bsk/SAXJnEo4/KIwT1Oj9wuKKITzoyqF+PHqQ9z7do=
-X-Received: by 2002:aca:3d7:: with SMTP id 206mr14149909oid.98.1580724027145; 
- Mon, 03 Feb 2020 02:00:27 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1iyYXk-0006gI-59
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:01:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43393
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iyYXk-0006fm-0X
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:01:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580724083;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=WbkSeQ7dIG80xlHLDtt2syhRQw3GfD/1ps6gcsUGOac=;
+ b=glY3SHChf2CxDNK5pSoMqD0TXg9kCeoSw2Y8ot/DFfy+J8EcQ9rBgamWbZzmRxZc+H3TRr
+ /9GSbC+VeLmFsZy0nM4kBoHBFhI9JbYuMyACotuyyRZ2KPc3myFIa6oghp5a0DnzU9Szwt
+ EvEsuyDnMVo3cTeiOr3BB2/XKXs1paQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-338-vVRLvXZAM-u7eJANZHW1qw-1; Mon, 03 Feb 2020 05:01:21 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E476A800D53;
+ Mon,  3 Feb 2020 10:01:19 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-129.ams2.redhat.com [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BCE7A8E610;
+ Mon,  3 Feb 2020 10:01:07 +0000 (UTC)
+Subject: Re: [PATCH v3 17/17] .travis.yml: single thread build-tcg
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200203090932.19147-1-alex.bennee@linaro.org>
+ <20200203090932.19147-18-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <e1f501e7-b3c4-5d88-3f10-cd2c1c7a1cd6@redhat.com>
+Date: Mon, 3 Feb 2020 11:01:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <8a8b0b5698401b78d3c4c8ec90aef83b95babb06.1580672076.git.DirtY.iCE.hu@gmail.com>
-In-Reply-To: <8a8b0b5698401b78d3c4c8ec90aef83b95babb06.1580672076.git.DirtY.iCE.hu@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 3 Feb 2020 10:00:16 +0000
-Message-ID: <CAFEAcA_8-0wqQX8KEK_zFRufoaEQkaeaXu4DLx08KazxTZ5fxQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] audio: proper support for float samples in mixeng
-To: =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200203090932.19147-18-alex.bennee@linaro.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: vVRLvXZAM-u7eJANZHW1qw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,24 +91,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, pbonzini@redhat.com, marcandre.lureau@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 2 Feb 2020 at 19:39, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.=
-hu@gmail.com> wrote:
->
-> This adds proper support for float samples in mixeng by adding a new
-> audio format for it.
->
-> Limitations: only native endianness is supported.
+On 03/02/2020 10.09, Alex Benn=C3=A9e wrote:
+> I've theorised that a parallel build-tcg is somehow getting confused
+> when two fedora-30 based cross compilers attempt to build at the same
+> time. From one data-point so far this may fix the problem although the
+> plugins job runs quite close to timeout.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  .travis.yml | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index c1c6df475a8..3b35b7cf04d 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -380,7 +380,7 @@ matrix:
+>      - name: "GCC check-tcg (user)"
+>        env:
+>          - CONFIG=3D"--disable-system --enable-debug-tcg"
+> -        - TEST_BUILD_CMD=3D"make -j${JOBS} build-tcg"
+> +        - TEST_BUILD_CMD=3D"make build-tcg"
+>          - TEST_CMD=3D"make check-tcg"
+>          - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+> =20
+> @@ -391,7 +391,7 @@ matrix:
+>      - name: "GCC plugins check-tcg (user)"
+>        env:
+>          - CONFIG=3D"--disable-system --enable-plugins --enable-debug-tcg=
+ --target-list-exclude=3Dsparc64-linux-user,cris-linux-user"
+> -        - TEST_BUILD_CMD=3D"make -j${JOBS} build-tcg"
+> +        - TEST_BUILD_CMD=3D"make build-tcg"
+>          - TEST_CMD=3D"make check-tcg"
+>          - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
 
-Could you explain a bit more what this limitation means, please?
-In general QEMU behaviour shouldn't depend on the endianness
-of the host, ie we should byteswap where necessary.
+Squash it into patch 14/17 ?
 
-thanks
--- PMM
+ Thomas
+
 
