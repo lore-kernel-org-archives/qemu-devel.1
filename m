@@ -2,79 +2,81 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 636ADC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 19:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAB1C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 20:01:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B16320658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 19:59:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57B4C20658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 20:01:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5QvkGLs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B16320658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EU0otcbj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B4C20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyhsN-0002ZI-9l
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 14:59:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34635)
+	id 1iyhuD-0003c5-H1
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 15:01:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38575)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iyhrL-0001vQ-VZ
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 14:58:18 -0500
+ (envelope-from <programmingkidx@gmail.com>) id 1iyhsy-000329-7r
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 14:59:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iyhrK-0004yN-7M
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 14:58:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50476
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iyhrJ-0004sy-Uk
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 14:58:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580759891;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=45fIiQhqfx6h2dcNW+nIO7O2qlN9Y5+6YCwpuLx4Jtc=;
- b=N5QvkGLsOtv28ADSL89CRKXY5V3Nh8xxmpmAl0glBpZP8yBeseWyVoMoESiCtJ8EDXANKc
- PvWohIrfAD+9sOPEFjIs7r4bsIoVxJS7gIyCYzd7JZN2drVN1jaoMW+Mx6ef7diorfu18E
- d+Xlr6A+5F5p5rgylvgvlO17K7/Akx4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-yL25ohTGP5q9SxNark0-dQ-1; Mon, 03 Feb 2020 14:58:06 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BF141B2C981;
- Mon,  3 Feb 2020 19:58:05 +0000 (UTC)
-Received: from work-vm (ovpn-117-103.ams2.redhat.com [10.36.117.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F201C8CCC2;
- Mon,  3 Feb 2020 19:58:00 +0000 (UTC)
-Date: Mon, 3 Feb 2020 19:57:58 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v4 00/11] RFC: [for 5.0]: HMP monitor handlers refactoring
-Message-ID: <20200203195758.GQ2822@work-vm>
-References: <20200130123448.21093-1-mlevitsk@redhat.com>
+ (envelope-from <programmingkidx@gmail.com>) id 1iyhsw-00017H-Ag
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 14:59:56 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:40188)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+ id 1iyhsw-0000xW-21
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 14:59:54 -0500
+Received: by mail-wm1-x332.google.com with SMTP id t14so747857wmi.5
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 11:59:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=Q0Qpsc4ajx70nsjo8Y7n5ggESfY1EYrPKrkiBnSMMoQ=;
+ b=EU0otcbj59jTHXzoezptrJg+qqjXm/KB0HObpccEmfVuFDVn1T1QAUb5JOzRvIxd+2
+ 5nnveDkaLo8p5fw0DA86ajjZxMuH3pU2ratyW/E/o7kZNSpo7RV6yC+HsuErJ0BodnXF
+ F/mBT+FznRiZag2gRUxURcY16akRgBR6FEsb+C9wCQ7qarvTqZIrVSwC5qRTTetQZ+OL
+ MuSW0Ovum4ccII6rPsm+laaPWDgWvLNx/sY+T73E+VbiU42HdiFwr8UT3Lw0w2ea/KGw
+ kYnMJ4FH8m4/f5lxjFdaYXwoEwcFMHG/2d3QUZH5bouvomIo33IZ3ebBW4q/39UKbJoo
+ hX4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=Q0Qpsc4ajx70nsjo8Y7n5ggESfY1EYrPKrkiBnSMMoQ=;
+ b=qrtO+X4ju8XLvMUHl00NBD+tlzzUBzOHEu5/oQZVgCRSVIp4y8Lq99j8wrN6cmm70s
+ yhqB+V9eiuW3UKZvlHrsJn7wkmPwG7/x+3okQYLVILcaYbDYNZikeApmfpW4bQ1uMbTN
+ B0j4Mr7lc7tSW/8ANHHPERXsi9WBQZT6lplJoX5fHPaQkJagnOrtdsKL7EiWqe6bsbG1
+ HX6NnoWIZhkH1DNiZ/SE4jLErw6xQwCxaN6GebsuxuNPjy8xKr+oS5suP+Cmd5f1pznA
+ OAUuSBo8eoIwwCreGDrVknSFIkiIoWNMb1sPCKrA4/fPqxSKOd3gxp6FZs/YJNy9BJtY
+ auTw==
+X-Gm-Message-State: APjAAAUnoYBfpxxUgEC/f9g5BsnmDWYuOelz20jZ8XWw9eH7PK1k9MS2
+ 6uKqRdYwob/dEHMgdGAEMpjrWOkl3sEDRYWyWHV0pg==
+X-Google-Smtp-Source: APXvYqwapkXMkVXp1eF/W2IVDJL2CdVGbaNoU5WdP52eCsKbzuvrMlhW9iSeHlQcywm0XEUfcI/4OE40PQV1fGWulE8=
+X-Received: by 2002:a7b:cb91:: with SMTP id m17mr643198wmi.146.1580759991808; 
+ Mon, 03 Feb 2020 11:59:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200130123448.21093-1-mlevitsk@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: yL25ohTGP5q9SxNark0-dQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <mailman.343.1580584897.2411.qemu-devel@nongnu.org>
+In-Reply-To: <mailman.343.1580584897.2411.qemu-devel@nongnu.org>
+From: G 3 <programmingkidx@gmail.com>
+Date: Mon, 3 Feb 2020 14:59:40 -0500
+Message-ID: <CAKyx-3NZ9Tne+WKkA7wAtyFqZ6roN_gS7rF59ZRjECCkx0qKaQ@mail.gmail.com>
+Subject: Re: [PATCH] ui/cocoa: Drop workarounds for pre-10.12 OSX
+To: qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000c97679059db15d9a"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,104 +88,332 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Maxim Levitsky (mlevitsk@redhat.com) wrote:
-> This patch series is bunch of cleanups to the hmp monitor code.
-> It mostly moves the blockdev related hmp handlers to its own file,
-> and does some minor refactoring.
->=20
-> No functional changes expected.
+--000000000000c97679059db15d9a
+Content-Type: text/plain; charset="UTF-8"
 
-You've still got the title marked as RFC - are you actually ready for
-this log?
+> Date: Sat,  1 Feb 2020 17:05:34 +0000
+> From: Peter Maydell <peter.maydell@linaro.org>
+> To: qemu-devel@nongnu.org
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Subject: [PATCH] ui/cocoa: Drop workarounds for pre-10.12 OSX
+> Message-ID: <20200201170534.22123-1-peter.maydell@linaro.org>
+>
+> Our official OSX support policy covers the last two released versions.
+> Currently that is 10.14 and 10.15.  We also may work on older versions, but
+> don't guarantee it.
+>
+> In commit 50290c002c045280f8d in mid-2019 we introduced some uses of
+> CLOCK_MONOTONIC which incidentally broke compilation for pre-10.12 OSX
+> versions (see LP:1861551). We don't intend to fix that, so we might
+> as well drop the code in ui/cocoa.m which caters for pre-10.12
+> versions as well. (For reference, 10.11 fell out of Apple extended
+> security support in September 2018.)
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> The bug report is recent, but this was also pointed out on
+> the mailing list back in June 2019. Since nobody has cared
+> to try to fix it, we clearly don't care about 10.11 in
+> practice as well as in theory.]
+> ---
+>  ui/cocoa.m | 59 ------------------------------------------------------
+>  1 file changed, 59 deletions(-)
+>
+> diff --git a/ui/cocoa.m b/ui/cocoa.m
+> index fbb5b1b45f..f9945bc712 100644
+> --- a/ui/cocoa.m
+> +++ b/ui/cocoa.m
+> @@ -42,60 +42,10 @@
+>  #include <Carbon/Carbon.h>
+>  #include "hw/core/cpu.h"
+>
+> -#ifndef MAC_OS_X_VERSION_10_5
+> -#define MAC_OS_X_VERSION_10_5 1050
+> -#endif
+> -#ifndef MAC_OS_X_VERSION_10_6
+> -#define MAC_OS_X_VERSION_10_6 1060
+> -#endif
+> -#ifndef MAC_OS_X_VERSION_10_9
+> -#define MAC_OS_X_VERSION_10_9 1090
+> -#endif
+> -#ifndef MAC_OS_X_VERSION_10_10
+> -#define MAC_OS_X_VERSION_10_10 101000
+> -#endif
+> -#ifndef MAC_OS_X_VERSION_10_12
+> -#define MAC_OS_X_VERSION_10_12 101200
+> -#endif
+>  #ifndef MAC_OS_X_VERSION_10_13
+>  #define MAC_OS_X_VERSION_10_13 101300
+>  #endif
+>
+> -/* macOS 10.12 deprecated many constants, #define the new names for older
+> SDKs */
+> -#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12
+> -#define NSEventMaskAny                  NSAnyEventMask
+> -#define NSEventModifierFlagCapsLock     NSAlphaShiftKeyMask
+> -#define NSEventModifierFlagShift        NSShiftKeyMask
+> -#define NSEventModifierFlagCommand      NSCommandKeyMask
+> -#define NSEventModifierFlagControl      NSControlKeyMask
+> -#define NSEventModifierFlagOption       NSAlternateKeyMask
+> -#define NSEventTypeFlagsChanged         NSFlagsChanged
+> -#define NSEventTypeKeyUp                NSKeyUp
+> -#define NSEventTypeKeyDown              NSKeyDown
+> -#define NSEventTypeMouseMoved           NSMouseMoved
+> -#define NSEventTypeLeftMouseDown        NSLeftMouseDown
+> -#define NSEventTypeRightMouseDown       NSRightMouseDown
+> -#define NSEventTypeOtherMouseDown       NSOtherMouseDown
+> -#define NSEventTypeLeftMouseDragged     NSLeftMouseDragged
+> -#define NSEventTypeRightMouseDragged    NSRightMouseDragged
+> -#define NSEventTypeOtherMouseDragged    NSOtherMouseDragged
+> -#define NSEventTypeLeftMouseUp          NSLeftMouseUp
+> -#define NSEventTypeRightMouseUp         NSRightMouseUp
+> -#define NSEventTypeOtherMouseUp         NSOtherMouseUp
+> -#define NSEventTypeScrollWheel          NSScrollWheel
+> -#define NSTextAlignmentCenter           NSCenterTextAlignment
+> -#define NSWindowStyleMaskBorderless     NSBorderlessWindowMask
+> -#define NSWindowStyleMaskClosable       NSClosableWindowMask
+> -#define NSWindowStyleMaskMiniaturizable NSMiniaturizableWindowMask
+> -#define NSWindowStyleMaskTitled         NSTitledWindowMask
+> -#endif
+> -/* 10.13 deprecates NSFileHandlingPanelOKButton in favour of
+> - * NSModalResponseOK, which was introduced in 10.9. Define
+> - * it for older versions.
+> - */
+> -#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_9
+> -#define NSModalResponseOK NSFileHandlingPanelOKButton
+> -#endif
+>  /* 10.14 deprecates NSOnState and NSOffState in favor of
+>   * NSControlStateValueOn/Off, which were introduced in 10.13.
+>   * Define for older versions
+> @@ -465,11 +415,7 @@ - (void) drawRect:(NSRect) rect
+>      COCOA_DEBUG("QemuCocoaView: drawRect\n");
+>
+>      // get CoreGraphic context
+> -#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_10
+> -    CGContextRef viewContextRef = [[NSGraphicsContext currentContext]
+> graphicsPort];
+> -#else
+>      CGContextRef viewContextRef = [[NSGraphicsContext currentContext]
+> CGContext];
+> -#endif
+>
+>      CGContextSetInterpolationQuality (viewContextRef,
+> kCGInterpolationNone);
+>      CGContextSetShouldAntialias (viewContextRef, NO);
+> @@ -1075,9 +1021,7 @@ - (void) raiseAllKeys
+>   ------------------------------------------------------
+>  */
+>  @interface QemuCocoaAppController : NSObject
+> -#if (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6)
+>                                         <NSWindowDelegate,
+> NSApplicationDelegate>
+> -#endif
+>  {
+>  }
+>  - (void)doToggleFullScreen:(id)sender;
+> @@ -1126,9 +1070,6 @@ - (id) init
+>          [normalWindow setAcceptsMouseMovedEvents:YES];
+>          [normalWindow setTitle:@"QEMU"];
+>          [normalWindow setContentView:cocoaView];
+> -#if (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_10)
+> -        [normalWindow useOptimizedDrawing:YES];
+> -#endif
+>          [normalWindow makeKeyAndOrderFront:self];
+>          [normalWindow center];
+>          [normalWindow setDelegate: self];
+> --
+> 2.17.2 (Apple Git-113)
+>
+>
+> Why would you want to inconvenience the Mac users? This is unacceptable. I
+and many other Mac users would not be able to use the newer versions of
+QEMU anymore. Keeping Mac OS 10.10 and up support doesn't seem like a
+burden. This patch should not be applied.
 
-Dave
+--000000000000c97679059db15d9a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->=20
-> Changes from V1:
->    * move the handlers to block/monitor/block-hmp-cmds.c
->    * tiny cleanup for the commit messages
->=20
-> Changes from V2:
->    * Moved all the function prototypes to new header (blockdev-hmp-cmds.h=
-)
->    * Set the license of blockdev-hmp-cmds.c to GPLv2+
->    * Moved hmp_snapshot_* functions to blockdev-hmp-cmds.c
->    * Moved hmp_drive_add_node to blockdev-hmp-cmds.c
->      (this change needed some new exports, thus in separate new patch)
->    * Moved hmp_qemu_io and hmp_eject to blockdev-hmp-cmds.c
->    * Added 'error:' prefix to vreport, and updated the iotests
->      This is invasive change, but really feels like the right one
->    * Added minor refactoring patch that drops an unused #include
->=20
-> Changes from V3:
->    * Dropped the error prefix patches for now due to fact that it seems
->      that libvirt doesn't need that after all. Oh well...
->      I'll send them in a separate series.
->=20
->    * Hopefully correctly merged the copyright info the new files
->      Both files are GPLv2 now (due to code from hmp.h/hmp-cmds.c)
->=20
->    * Addressed review feedback
->    * Renamed the added header to block-hmp-cmds.h
->=20
->    * Got rid of checkpatch.pl warnings in the moved code
->      (cosmetic code changes only)
->=20
->    * I kept the reviewed-by tags, since the changes I did are minor.
->      I hope that this is right thing to do.
->=20
-> Best regards,
-> =09Maxim Levitsky
->=20
-> Maxim Levitsky (11):
->   usb/dev-storage: remove unused include
->   monitor/hmp: uninline add_init_drive
->   monitor/hmp: rename device-hotplug.c to block/monitor/block-hmp-cmds.c
->   monitor/hmp: move hmp_drive_del and hmp_commit to block-hmp-cmds.c
->   monitor/hmp: move hmp_drive_mirror and hmp_drive_backup to
->     block-hmp-cmds.c Moved code was added after 2012-01-13, thus under
->     GPLv2+
->   monitor/hmp: move hmp_block_job* to block-hmp-cmds.c
->   monitor/hmp: move hmp_snapshot_* to block-hmp-cmds.c
->     hmp_snapshot_blkdev is from GPLv2 version of the hmp-cmds.c thus
->     have to change the licence to GPLv2
->   monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c
->   monitor/hmp: move remaining hmp_block* functions to block-hmp-cmds.c
->   monitor/hmp: move hmp_info_block* to block-hmp-cmds.c
->   monitor/hmp: Move hmp_drive_add_node to block-hmp-cmds.c
->=20
->  MAINTAINERS                    |    1 +
->  Makefile.objs                  |    2 +-
->  block/Makefile.objs            |    1 +
->  block/monitor/Makefile.objs    |    1 +
->  block/monitor/block-hmp-cmds.c | 1002 ++++++++++++++++++++++++++++++++
->  blockdev.c                     |  137 +----
->  device-hotplug.c               |   91 ---
->  hw/usb/dev-storage.c           |    1 -
->  include/block/block-hmp-cmds.h |   54 ++
->  include/block/block_int.h      |    5 +-
->  include/monitor/hmp.h          |   24 -
->  include/sysemu/blockdev.h      |    4 -
->  include/sysemu/sysemu.h        |    3 -
->  monitor/hmp-cmds.c             |  769 ------------------------
->  monitor/misc.c                 |    1 +
->  15 files changed, 1072 insertions(+), 1024 deletions(-)
->  create mode 100644 block/monitor/Makefile.objs
->  create mode 100644 block/monitor/block-hmp-cmds.c
->  delete mode 100644 device-hotplug.c
->  create mode 100644 include/block/block-hmp-cmds.h
->=20
-> --=20
-> 2.17.2
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><div class=3D"gmail_quote"><blo=
+ckquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left=
+:1px solid rgb(204,204,204);padding-left:1ex">
+Date: Sat,=C2=A0 1 Feb 2020 17:05:34 +0000<br>
+From: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=
+=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
+To: <a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blank">qemu-devel@n=
+ongnu.org</a><br>
+Cc: Gerd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.com" target=3D"_blank=
+">kraxel@redhat.com</a>&gt;<br>
+Subject: [PATCH] ui/cocoa: Drop workarounds for pre-10.12 OSX<br>
+Message-ID: &lt;<a href=3D"mailto:20200201170534.22123-1-peter.maydell@lina=
+ro.org" target=3D"_blank">20200201170534.22123-1-peter.maydell@linaro.org</=
+a>&gt;<br>
+<br>
+Our official OSX support policy covers the last two released versions.<br>
+Currently that is 10.14 and 10.15.=C2=A0 We also may work on older versions=
+, but<br>
+don&#39;t guarantee it.<br>
+<br>
+In commit 50290c002c045280f8d in mid-2019 we introduced some uses of<br>
+CLOCK_MONOTONIC which incidentally broke compilation for pre-10.12 OSX<br>
+versions (see LP:1861551). We don&#39;t intend to fix that, so we might<br>
+as well drop the code in ui/cocoa.m which caters for pre-10.12<br>
+versions as well. (For reference, 10.11 fell out of Apple extended<br>
+security support in September 2018.)<br>
+<br>
+Signed-off-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org=
+" target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
+---<br>
+The bug report is recent, but this was also pointed out on<br>
+the mailing list back in June 2019. Since nobody has cared<br>
+to try to fix it, we clearly don&#39;t care about 10.11 in<br>
+practice as well as in theory.]<br>
+---<br>
+=C2=A0ui/cocoa.m | 59 -----------------------------------------------------=
+-<br>
+=C2=A01 file changed, 59 deletions(-)<br>
+<br>
+diff --git a/ui/cocoa.m b/ui/cocoa.m<br>
+index fbb5b1b45f..f9945bc712 100644<br>
+--- a/ui/cocoa.m<br>
++++ b/ui/cocoa.m<br>
+@@ -42,60 +42,10 @@<br>
+=C2=A0#include &lt;Carbon/Carbon.h&gt;<br>
+=C2=A0#include &quot;hw/core/cpu.h&quot;<br>
+<br>
+-#ifndef MAC_OS_X_VERSION_10_5<br>
+-#define MAC_OS_X_VERSION_10_5 1050<br>
+-#endif<br>
+-#ifndef MAC_OS_X_VERSION_10_6<br>
+-#define MAC_OS_X_VERSION_10_6 1060<br>
+-#endif<br>
+-#ifndef MAC_OS_X_VERSION_10_9<br>
+-#define MAC_OS_X_VERSION_10_9 1090<br>
+-#endif<br>
+-#ifndef MAC_OS_X_VERSION_10_10<br>
+-#define MAC_OS_X_VERSION_10_10 101000<br>
+-#endif<br>
+-#ifndef MAC_OS_X_VERSION_10_12<br>
+-#define MAC_OS_X_VERSION_10_12 101200<br>
+-#endif<br>
+=C2=A0#ifndef MAC_OS_X_VERSION_10_13<br>
+=C2=A0#define MAC_OS_X_VERSION_10_13 101300<br>
+=C2=A0#endif<br>
+<br>
+-/* macOS 10.12 deprecated many constants, #define the new names for older =
+SDKs */<br>
+-#if MAC_OS_X_VERSION_MAX_ALLOWED &lt; MAC_OS_X_VERSION_10_12<br>
+-#define NSEventMaskAny=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 NSAnyEventMask<br>
+-#define NSEventModifierFlagCapsLock=C2=A0 =C2=A0 =C2=A0NSAlphaShiftKeyMask=
+<br>
+-#define NSEventModifierFlagShift=C2=A0 =C2=A0 =C2=A0 =C2=A0 NSShiftKeyMask=
+<br>
+-#define NSEventModifierFlagCommand=C2=A0 =C2=A0 =C2=A0 NSCommandKeyMask<br=
+>
+-#define NSEventModifierFlagControl=C2=A0 =C2=A0 =C2=A0 NSControlKeyMask<br=
+>
+-#define NSEventModifierFlagOption=C2=A0 =C2=A0 =C2=A0 =C2=A0NSAlternateKey=
+Mask<br>
+-#define NSEventTypeFlagsChanged=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0NSFlagsCh=
+anged<br>
+-#define NSEventTypeKeyUp=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 NSKeyUp<br>
+-#define NSEventTypeKeyDown=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ NSKeyDown<br>
+-#define NSEventTypeMouseMoved=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0NSMo=
+useMoved<br>
+-#define NSEventTypeLeftMouseDown=C2=A0 =C2=A0 =C2=A0 =C2=A0 NSLeftMouseDow=
+n<br>
+-#define NSEventTypeRightMouseDown=C2=A0 =C2=A0 =C2=A0 =C2=A0NSRightMouseDo=
+wn<br>
+-#define NSEventTypeOtherMouseDown=C2=A0 =C2=A0 =C2=A0 =C2=A0NSOtherMouseDo=
+wn<br>
+-#define NSEventTypeLeftMouseDragged=C2=A0 =C2=A0 =C2=A0NSLeftMouseDragged<=
+br>
+-#define NSEventTypeRightMouseDragged=C2=A0 =C2=A0 NSRightMouseDragged<br>
+-#define NSEventTypeOtherMouseDragged=C2=A0 =C2=A0 NSOtherMouseDragged<br>
+-#define NSEventTypeLeftMouseUp=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 NSLeftMou=
+seUp<br>
+-#define NSEventTypeRightMouseUp=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0NSRightMo=
+useUp<br>
+-#define NSEventTypeOtherMouseUp=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0NSOtherMo=
+useUp<br>
+-#define NSEventTypeScrollWheel=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 NSScrollW=
+heel<br>
+-#define NSTextAlignmentCenter=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0NSCe=
+nterTextAlignment<br>
+-#define NSWindowStyleMaskBorderless=C2=A0 =C2=A0 =C2=A0NSBorderlessWindowM=
+ask<br>
+-#define NSWindowStyleMaskClosable=C2=A0 =C2=A0 =C2=A0 =C2=A0NSClosableWind=
+owMask<br>
+-#define NSWindowStyleMaskMiniaturizable NSMiniaturizableWindowMask<br>
+-#define NSWindowStyleMaskTitled=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0NSTitledW=
+indowMask<br>
+-#endif<br>
+-/* 10.13 deprecates NSFileHandlingPanelOKButton in favour of<br>
+- * NSModalResponseOK, which was introduced in 10.9. Define<br>
+- * it for older versions.<br>
+- */<br>
+-#if MAC_OS_X_VERSION_MAX_ALLOWED &lt; MAC_OS_X_VERSION_10_9<br>
+-#define NSModalResponseOK NSFileHandlingPanelOKButton<br>
+-#endif<br>
+=C2=A0/* 10.14 deprecates NSOnState and NSOffState in favor of<br>
+=C2=A0 * NSControlStateValueOn/Off, which were introduced in 10.13.<br>
+=C2=A0 * Define for older versions<br>
+@@ -465,11 +415,7 @@ - (void) drawRect:(NSRect) rect<br>
+=C2=A0 =C2=A0 =C2=A0COCOA_DEBUG(&quot;QemuCocoaView: drawRect\n&quot;);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0// get CoreGraphic context<br>
+-#if MAC_OS_X_VERSION_MAX_ALLOWED &lt; MAC_OS_X_VERSION_10_10<br>
+-=C2=A0 =C2=A0 CGContextRef viewContextRef =3D [[NSGraphicsContext currentC=
+ontext] graphicsPort];<br>
+-#else<br>
+=C2=A0 =C2=A0 =C2=A0CGContextRef viewContextRef =3D [[NSGraphicsContext cur=
+rentContext] CGContext];<br>
+-#endif<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0CGContextSetInterpolationQuality (viewContextRef, kCGIn=
+terpolationNone);<br>
+=C2=A0 =C2=A0 =C2=A0CGContextSetShouldAntialias (viewContextRef, NO);<br>
+@@ -1075,9 +1021,7 @@ - (void) raiseAllKeys<br>
+=C2=A0 ------------------------------------------------------<br>
+=C2=A0*/<br>
+=C2=A0@interface QemuCocoaAppController : NSObject<br>
+-#if (MAC_OS_X_VERSION_MAX_ALLOWED &gt;=3D MAC_OS_X_VERSION_10_6)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &lt;NSWi=
+ndowDelegate, NSApplicationDelegate&gt;<br>
+-#endif<br>
+=C2=A0{<br>
+=C2=A0}<br>
+=C2=A0- (void)doToggleFullScreen:(id)sender;<br>
+@@ -1126,9 +1070,6 @@ - (id) init<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[normalWindow setAcceptsMouseMovedEvents:=
+YES];<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[normalWindow setTitle:@&quot;QEMU&quot;]=
+;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[normalWindow setContentView:cocoaView];<=
+br>
+-#if (MAC_OS_X_VERSION_MAX_ALLOWED &lt; MAC_OS_X_VERSION_10_10)<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 [normalWindow useOptimizedDrawing:YES];<br>
+-#endif<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[normalWindow makeKeyAndOrderFront:self];=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[normalWindow center];<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[normalWindow setDelegate: self];<br>
+-- <br>
+2.17.2 (Apple Git-113)<br>
+<br>
+<br></blockquote><div>Why would you want to inconvenience the Mac users? Th=
+is is unacceptable. I and many other Mac users would not be able to use the=
+ newer versions of QEMU anymore. Keeping Mac OS 10.10 and up support doesn&=
+#39;t seem like a burden. This patch should not be applied.<br></div></div>=
+</div>
 
+--000000000000c97679059db15d9a--
 
