@@ -2,75 +2,95 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC1FC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67998C3524D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:38:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55B7E207E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:36:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B7E207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mps.mpg.de
+	by mail.kernel.org (Postfix) with ESMTPS id 36CA22080D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:38:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JHVRiXIt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36CA22080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iycqC-00080Q-G2
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 09:36:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60772)
+	id 1iycrZ-0000V1-F1
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 09:38:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40595)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iycQD-0002Ad-W1
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:09:55 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iycqy-0008TW-N7
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iycQC-0002b2-CB
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:09:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42312)
+ (envelope-from <alex.bennee@linaro.org>) id 1iycqx-0003m0-O4
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:37:32 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45769)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iycQC-0002T8-5e
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:09:52 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iycQA-0003mh-Id
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 14:09:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7928B2E80CC
- for <qemu-devel@nongnu.org>; Mon,  3 Feb 2020 14:09:50 +0000 (UTC)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iycqx-0003lN-I3
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:37:31 -0500
+Received: by mail-wr1-x442.google.com with SMTP id a6so18444746wrx.12
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 06:37:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=mwIRasez9hCiSvnmviaUwI1WpgIorlmt2wVR/XzX058=;
+ b=JHVRiXIteI2anpwjmdf6RGRgXoptyox9fXhL+pgdHOZ3b98f+Yg76neDZT8mk3vckO
+ w4VVk3Pq6iD77zJgfAmb+khVxJkS7kil1kpf4m5n98AQeh4TNCdfmDWC/wIxW8ghRidU
+ J2FfyIYLexmJuyUZKEiM2rzt3sYuebmCd6JCg/15VPdJ0Q2n2mpms+3c2CTwZf2sBpXz
+ FsInZZ0fAJDpyJHicNCpNHwcTJHhFKEwpMxJitJNvNgIY64aVCNs4Ox2rPmZpy5Qr2x7
+ Is8cHt+hPfzOxqqIiUqP4ens0ksZes3KIEQbwNGhpPwTrd2r3QmyJC+DPlG237O+Yexf
+ x+eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=mwIRasez9hCiSvnmviaUwI1WpgIorlmt2wVR/XzX058=;
+ b=P0dI8zu2KOYZM6Ajbq/FmzqD482qS/dO7NUTCK3w5OdXF1MBxpUMrpLnDEt0E1VSkN
+ HfxL7ukT9EqpAbK9WiCz1REyz6R0wM0RmCeM6lif9AL4S8FMdgC36/2+7U8FWNSPdWdC
+ 8HAvhZR8kmqf9YOCHumsDTgoC7vDR4CVlYCfDG4sHoUc6dGSLoR1KdoZlmfE9YsGRdmz
+ PC7z4SAzLNmQv6kYRRE8H+05hwExurNOl2ZAGpmcofiLUZ+VYBZK+UN6SUIsgLWmQDyM
+ /Ggt9xGzNoxLqJjcU8hkLO3VSheDnUVMItRulB4Gf/sh0L35Dqa39a1dv1HvtH+8JG3O
+ G02A==
+X-Gm-Message-State: APjAAAV7QKDfsP1RsFVdgfrfbtqFGtMO8+fWmryveKvlrlYvZLfEFrz4
+ iKjPIM6/BXs9iJSWOfEojEaPlQ==
+X-Google-Smtp-Source: APXvYqxIeJMOx1bI9Xac6S960AZWW66SozOIEG6yx7LiGfkhRFsc5WnQORYL13pn9DX07ni7XWhh8A==
+X-Received: by 2002:adf:edd0:: with SMTP id v16mr15667667wro.310.1580740650594; 
+ Mon, 03 Feb 2020 06:37:30 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y20sm22750133wmi.25.2020.02.03.06.37.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Feb 2020 06:37:29 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 7F68F1FF87;
+ Mon,  3 Feb 2020 14:37:28 +0000 (GMT)
+References: <20200203090932.19147-1-alex.bennee@linaro.org>
+ <20200203090932.19147-18-alex.bennee@linaro.org>
+ <e1f501e7-b3c4-5d88-3f10-cd2c1c7a1cd6@redhat.com>
+ <21b86fba-8f28-736e-89d1-f7548e1f92e2@redhat.com>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v3 17/17] .travis.yml: single thread build-tcg
+In-reply-to: <21b86fba-8f28-736e-89d1-f7548e1f92e2@redhat.com>
+Date: Mon, 03 Feb 2020 14:37:28 +0000
+Message-ID: <87blqfag9j.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Feb 2020 13:56:38 -0000
-From: Borut Podlipnik <podlipnik@mps.mpg.de>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Triaged; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: happykvm michal-nowak-b podlipnik sledge-sulaweyo
- th-huth
-X-Launchpad-Bug-Reporter: showrun (happykvm)
-X-Launchpad-Bug-Modifier: Borut Podlipnik (podlipnik)
-References: <20110810053253.11269.76752.malonedeb@gac.canonical.com>
-Message-Id: <158073819884.8645.10605539593864941827.malone@chaenomeles.canonical.com>
-Subject: [Bug 823733] Re: Soloaris can't be poweroff
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d149054756ccb13ae4e60ff37267f98f18dbff33
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Mon, 03 Feb 2020 09:34:40 -0500
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,179 +99,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 823733 <823733@bugs.launchpad.net>
+Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
+ stefanb@linux.vnet.ibm.com, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, f4bug@amsat.org, cota@braap.org, stefanha@redhat.com,
+ pbonzini@redhat.com, marcandre.lureau@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bug was reported almost 9 years ago and still nobody take care
-about it...
 
-# kvm -version
-QEMU emulator version 4.1.1 (pve-qemu-kvm_4.1.1)
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-# more /etc/os-release =
+> On 2/3/20 11:01 AM, Thomas Huth wrote:
+>> On 03/02/2020 10.09, Alex Benn=C3=A9e wrote:
+>>> I've theorised that a parallel build-tcg is somehow getting confused
+>>> when two fedora-30 based cross compilers attempt to build at the same
+>>> time. From one data-point so far this may fix the problem although the
+>>> plugins job runs quite close to timeout.
+>>>
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> ---
+>>>   .travis.yml | 4 ++--
+>>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/.travis.yml b/.travis.yml
+>>> index c1c6df475a8..3b35b7cf04d 100644
+>>> --- a/.travis.yml
+>>> +++ b/.travis.yml
+>>> @@ -380,7 +380,7 @@ matrix:
+>>>       - name: "GCC check-tcg (user)"
+>>>         env:
+>>>           - CONFIG=3D"--disable-system --enable-debug-tcg"
+>>> -        - TEST_BUILD_CMD=3D"make -j${JOBS} build-tcg"
+>>> +        - TEST_BUILD_CMD=3D"make build-tcg"
+>>>           - TEST_CMD=3D"make check-tcg"
+>>>           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+>>>   @@ -391,7 +391,7 @@ matrix:
+>>>       - name: "GCC plugins check-tcg (user)"
+>>>         env:
+>>>           - CONFIG=3D"--disable-system --enable-plugins --enable-debug-=
+tcg --target-list-exclude=3Dsparc64-linux-user,cris-linux-user"
+>>> -        - TEST_BUILD_CMD=3D"make -j${JOBS} build-tcg"
+>>> +        - TEST_BUILD_CMD=3D"make build-tcg"
+>>>           - TEST_CMD=3D"make check-tcg"
+>>>           - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+>> Squash it into patch 14/17 ?
+>
+> I'd rather not, ideally we will revert this patch once the issue is
+> fixed.
 
-PRETTY_NAME=3D"Debian GNU/Linux 10 (buster)"
-NAME=3D"Debian GNU/Linux"
-VERSION_ID=3D"10"
-VERSION=3D"10 (buster)"
-VERSION_CODENAME=3Dbuster
-ID=3Ddebian
-HOME_URL=3D"https://www.debian.org/"
-SUPPORT_URL=3D"https://www.debian.org/support"
-BUG_REPORT_URL=3D"https://bugs.debian.org/"
+Yeah - there should be no reason that we can't build all the tcg tests
+in parallel. For some reason I think the two fedora30 based images have
+an issue, despite there not being a common base.
 
-Guest OS: Solaris 11.4
-
-# /usr/sbin/qm shutdown 101
-VM quit/powerdown failed - got timeout
-
-# /usr/sbin/qm reboot 101
-VM quit/powerdown failed - got timeout
-
-Not able to shutdown/reboot Solaris 11
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/823733
-
-Title:
-  Soloaris can't be poweroff
-
-Status in QEMU:
-  Triaged
-
-Bug description:
-  Thank you forgive my poor English.
-
-  It seems KVM can=E2=80=99t poweroff solairs 10 or sloalrs 11 VM.
-  I have created solaris 10 and 11 as usual. Everything in VM is running OK=
-, but finally I use shell command =E2=80=98poweroff=E2=80=99 or =E2=80=98in=
-it 5=E2=80=99, the solaris VM (both 10 & 11) system could=E2=80=99t be powe=
-roff but with promoting me the message: perss any key to reboot =E2=80=A6..=
-  ,I pressed any key in vnc client, solaris VM reboot immediately. Endless =
-reboot loop above.
-
-  the solaris 10 & 11 from oracle iso file name :
-  sol-10-u9-ga-x86-dvd.iso
-  sol-11-exp-201011-text-x86.iso
-
-  the solaris 10 & 11 from oracle iso file name :
-  sol-10-u9-ga-x86-dvd.iso
-  sol-11-exp-201011-text-x86.iso
-
-  1. On my real physical machine,the solaris can be poweroff
-  2. On vmware ,the solaris can be poweroff
-  3. On my real physical machine,I have try to disbale the ACPI opiton in B=
-OIS, then the solaris can't be poweroff,Like the problem I have described a=
-bove
-  so ,I doubt the KVM has a little problem in ACPI =
-
-
-  I have try the suggestion as follows, but I can=E2=80=99t solve the probl=
-em.
-  7.2 Solaris reboot all the time on grub menu
-  =E2=80=A2	Run through the installer as usual =
-
-  =E2=80=A2	On completion and reboot, the VM will perpetually reboot. "Stop=
-" the VM. =
-
-  =E2=80=A2	Start it up again, and immediately open a vnc console and selec=
-t the Safe Boot from the options screen =
-
-  =E2=80=A2	When prompted if you want to try and recover the boot block, sa=
-y yes =
-
-  =E2=80=A2	You should now have a Bourne terminal with your existing filesy=
-stem mounted on /a =
-
-  =E2=80=A2	Run /a/usr/bin/bash (my preferred shell) =
-
-  =E2=80=A2	export TERM=3Dxterm =
-
-  =E2=80=A2	vi /a/boot/grub/menu.1st (editing the bootloader on your mounte=
-d filesystem), to add "kernel/unix" to the kernel options for the non-safe-=
-mode boot. Ex : =
-
-  Config File : /a/boot/grub/menu.lst =
-
-  kernel$ /platform/i86pc/multiboot -B $ZFS-BOOTFS kernel/unix
-
-  According to KVM requirements, I collected the following information:
-  CPU model name
-  model name      : Intel(R) Xeon(R) CPU           X3450  @ 2.67GHz
-
-  kvm -version
-  QEMU PC emulator version 0.12.3 (qemu-kvm-0.12.3), Copyright (c) 2003-200=
-8 Fabrice Bellard
-
-  Host kernel version
-  Ubuntu 10.04.1 LTS   2.6.32-25-server =
-
-
-  What host kernel arch you are using (i386 or x86_64)
-  X86_64
-
-  Guest OS
-  Solaris 10 and Solaris 11=EF=BC=8Cboth can not shutdown
-
-  The qemu command line you are using to start the guest
-
-  First, I used the command line as follows:
-  kvm -m 1024 -drive file=3Dsolaris10.img,cache=3Dwriteback -net nic -net u=
-ser -nographic -vnc :1
-  then I try to use -no-kvm-irqchip or -no-kvm ,but the problem also appear=
-s!
-
-  Secondly, have created and run solaris 10&11 by using Virsh, still solari=
-s can't be poweroff, the XML file content is :
-  <domain type=3D'kvm'>
-      <name>solairs</name>
-      <uuid>85badf15-244d-4719-a2da-8c3de064137d</uuid>
-      <memory>1677721</memory>
-      <currentMemory>1677721</currentMemory>
-      <vcpu>1</vcpu>
-      <os>
-      <type arch=3D'i686' machine=3D'pc-0.12'>hvm</type>
-        <boot dev=3D'hd'/>
-     </os>
-     <features>
-      <acpi/>
-      <apic/>
-     </features>
-    <clock offset=3D'utc'/>
-     <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-     <on_crash>destroy</on_crash>
-     <devices>
-       <emulator>/usr/bin/kvm</emulator>
-       <disk type=3D'file' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'qcow2' cache=3D'writeback'/>
-         <source file=3D'/opt/GuestOS/solaris10.img'/>
-         <target dev=3D'hda' bus=3D'ide'/>
-       </disk>
-      <interface type=3D'bridge'>
-        <mac address=3D'00:0c:29:d0:36:c3'/>
-        <source bridge=3D'br1'/>
-        <target dev=3D'vnet0'/>
-       </interface>
-       <input type=3D'mouse' bus=3D'ps2'/>
-       <graphics type=3D'vnc' port=3D'5901' autoport=3D'no' keymap=3D'en-us=
-'/>
-      <video>
-        <model type=3D'vga' vram=3D'65536' heads=3D'1'/>
-      </video>
-    </devices>
-    <seclabel type=3D'dynamic' model=3D'apparmor'>
-      <label>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</label>
-      <imagelabel>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</imagelabel>
-    </seclabel>
-   </domain>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/823733/+subscriptions
+--=20
+Alex Benn=C3=A9e
 
