@@ -2,84 +2,63 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB81C33CB2
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7B9C33C9E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E31AE20658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:25:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D15C20658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 06:26:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HW5gv/t1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E31AE20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IKukQ0R2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D15C20658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyVB0-00053Z-3R
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 01:25:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59875)
+	id 1iyVBh-0005qe-Gk
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 01:26:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iyV7W-0006Fp-Hp
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:22:07 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iyUxo-0003Yy-0q
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:12:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iyV7T-0006mF-CI
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:22:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41568
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1iyUxm-0003Oy-6g
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:12:03 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:50389 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iyV7T-0006ls-7v
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 01:22:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580710922;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VkbQrF2WfUpy8+yqOcKpvTOCPv4IYCyKT4/TcAlEJP8=;
- b=HW5gv/t1dcZFtolKSWTcAXls1xLnoGKC82Ct6RlSdoxH0bjkO+inn5AIHuogFDmb2tn4K6
- TFnwkUSgqhU4Qqxg1J/hKhdOvyObBJ4nc+oDTrbhonx/D5jkqIL6U34o22ejDh2jVCqHOF
- CuQBmJDtMFXQSTK+qzNfTnS/6oqRW9A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-bjF-ddPRNkik0WEqMw0v6Q-1; Mon, 03 Feb 2020 01:21:59 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2065D1800D41;
- Mon,  3 Feb 2020 06:21:58 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B9B990F47;
- Mon,  3 Feb 2020 06:21:54 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id F3F591138404; Mon,  3 Feb 2020 07:21:52 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
-Subject: Re: [RFC PATCH] audio: proper support for float samples in mixeng
-References: <8a8b0b5698401b78d3c4c8ec90aef83b95babb06.1580672076.git.DirtY.iCE.hu@gmail.com>
-Date: Mon, 03 Feb 2020 07:21:52 +0100
-In-Reply-To: <8a8b0b5698401b78d3c4c8ec90aef83b95babb06.1580672076.git.DirtY.iCE.hu@gmail.com>
- (=?utf-8?B?IkvFkXbDoWfDsywgWm9sdMOhbiIncw==?= message of "Sun, 2 Feb 2020
- 20:38:07 +0100")
-Message-ID: <87h8086vi7.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iyUxl-0002db-RX; Mon, 03 Feb 2020 01:12:02 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 489yBr2F2mz9sSx; Mon,  3 Feb 2020 17:11:32 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1580710292;
+ bh=b+jEKCcOsZP9lpCTW7dR8B27vCgt7Ad6CoaXidvsZDI=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=IKukQ0R27n+cB3GxdDIYR9wzDrRQxFtZu/cjS/r7npzp2QpMYXgFZVUXYEYHS/955
+ skyZbOpY9TG2H/jO4r7a9pDQ+Mi2QK20wEGA+iyb96F9hic8ety/LWgLVsRrfym8n+
+ BkWAmRNEFrbAp+EzPJD4pOS6LNuZrPKLeYd2y+kQ=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 21/35] ppc/pnv: change the PowerNV machine devices to be non
+ user creatable
+Date: Mon,  3 Feb 2020 17:11:09 +1100
+Message-Id: <20200203061123.59150-22-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200203061123.59150-1-david@gibson.dropbear.id.au>
+References: <20200203061123.59150-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: bjF-ddPRNkik0WEqMw0v6Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,57 +70,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ groug@kaod.org, qemu-ppc@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com> writes:
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-> This adds proper support for float samples in mixeng by adding a new
-> audio format for it.
->
-> Limitations: only native endianness is supported.
->
-> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
->
-> ---
->
-> This patch is meant to be applied on top of "[PATCH] coreaudio: fix corea=
-udio
-> playback" by Volker R=C3=BCmelin, available at:
-> https://lists.nongnu.org/archive/html/qemu-devel/2020-02/msg00114.html
->
-> For more information, please refer to that thread.
->
-> ---
->  qapi/audio.json        |  2 +-
->  audio/audio_int.h      |  3 +-
->  audio/audio_template.h | 41 ++++++++++++--------
->  audio/mixeng.h         |  8 ++--
->  audio/alsaaudio.c      | 17 ++++++++
->  audio/audio.c          | 56 ++++++++++++++++++---------
->  audio/coreaudio.c      |  7 +---
->  audio/mixeng.c         | 88 ++++++++++++++++++++++++++----------------
->  audio/paaudio.c        |  9 +++++
->  audio/sdlaudio.c       | 28 ++++++++++++++
->  10 files changed, 180 insertions(+), 79 deletions(-)
->
-> diff --git a/qapi/audio.json b/qapi/audio.json
-> index 83312b2339..d8c507cced 100644
-> --- a/qapi/audio.json
-> +++ b/qapi/audio.json
-> @@ -276,7 +276,7 @@
->  # Since: 4.0
->  ##
->  { 'enum': 'AudioFormat',
-> -  'data': [ 'u8', 's8', 'u16', 's16', 'u32', 's32' ] }
-> +  'data': [ 'u8', 's8', 'u16', 's16', 'u32', 's32', 'f32' ] }
-> =20
->  ##
->  # @AudiodevDriver:
+The PowerNV machine emulates an OpenPOWER system and the PowerNV chip
+devices are models of the internal logic of the POWER processor. They
+can not be instantiated by the user on the QEMU command line.
 
-For QAPI:
-Acked-by: Markus Armbruster <armbru@redhat.com>
+The PHB3/PHB4 devices could be an exception in the future after some
+rework on how the device tree is built. For the moment, exclude them
+also.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20200129113720.7404-1-clg@kaod.org>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/pci-host/pnv_phb3.c      | 2 ++
+ hw/pci-host/pnv_phb3_pbcq.c | 1 +
+ hw/pci-host/pnv_phb4.c      | 3 ++-
+ hw/pci-host/pnv_phb4_pec.c  | 2 ++
+ hw/ppc/pnv_core.c           | 2 ++
+ hw/ppc/pnv_homer.c          | 1 +
+ hw/ppc/pnv_lpc.c            | 1 +
+ hw/ppc/pnv_occ.c            | 1 +
+ 8 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/hw/pci-host/pnv_phb3.c b/hw/pci-host/pnv_phb3.c
+index f03399c406..74618fadf0 100644
+--- a/hw/pci-host/pnv_phb3.c
++++ b/hw/pci-host/pnv_phb3.c
+@@ -1115,6 +1115,7 @@ static void pnv_phb3_class_init(ObjectClass *klass,=
+ void *data)
+     dc->realize =3D pnv_phb3_realize;
+     device_class_set_props(dc, pnv_phb3_properties);
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_phb3_type_info =3D {
+@@ -1168,6 +1169,7 @@ static void pnv_phb3_root_port_class_init(ObjectCla=
+ss *klass, void *data)
+=20
+     device_class_set_parent_realize(dc, pnv_phb3_root_port_realize,
+                                     &rpc->parent_realize);
++    dc->user_creatable =3D false;
+=20
+     k->vendor_id =3D PCI_VENDOR_ID_IBM;
+     k->device_id =3D 0x03dc;
+diff --git a/hw/pci-host/pnv_phb3_pbcq.c b/hw/pci-host/pnv_phb3_pbcq.c
+index 6f0c05be68..f232228b0e 100644
+--- a/hw/pci-host/pnv_phb3_pbcq.c
++++ b/hw/pci-host/pnv_phb3_pbcq.c
+@@ -335,6 +335,7 @@ static void pnv_pbcq_class_init(ObjectClass *klass, v=
+oid *data)
+     xdc->dt_xscom =3D pnv_pbcq_dt_xscom;
+=20
+     dc->realize =3D pnv_pbcq_realize;
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_pbcq_type_info =3D {
+diff --git a/hw/pci-host/pnv_phb4.c b/hw/pci-host/pnv_phb4.c
+index 61235d13a6..23cf093928 100644
+--- a/hw/pci-host/pnv_phb4.c
++++ b/hw/pci-host/pnv_phb4.c
+@@ -1290,7 +1290,7 @@ static void pnv_phb4_class_init(ObjectClass *klass,=
+ void *data)
+     dc->realize         =3D pnv_phb4_realize;
+     device_class_set_props(dc, pnv_phb4_properties);
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+-    dc->user_creatable  =3D true;
++    dc->user_creatable  =3D false;
+     dc->reset           =3D pnv_phb4_reset;
+=20
+     xfc->notify         =3D pnv_phb4_xive_notify;
+@@ -1368,6 +1368,7 @@ static void pnv_phb4_root_port_class_init(ObjectCla=
+ss *klass, void *data)
+     PCIERootPortClass *rpc =3D PCIE_ROOT_PORT_CLASS(klass);
+=20
+     dc->desc     =3D "IBM PHB4 PCIE Root Port";
++    dc->user_creatable =3D false;
+=20
+     device_class_set_parent_realize(dc, pnv_phb4_root_port_realize,
+                                     &rpc->parent_realize);
+diff --git a/hw/pci-host/pnv_phb4_pec.c b/hw/pci-host/pnv_phb4_pec.c
+index fd92041d69..68e1db3eac 100644
+--- a/hw/pci-host/pnv_phb4_pec.c
++++ b/hw/pci-host/pnv_phb4_pec.c
+@@ -490,6 +490,7 @@ static void pnv_pec_class_init(ObjectClass *klass, vo=
+id *data)
+=20
+     dc->realize =3D pnv_pec_realize;
+     device_class_set_props(dc, pnv_pec_properties);
++    dc->user_creatable =3D false;
+=20
+     pecc->xscom_nest_base =3D pnv_pec_xscom_nest_base;
+     pecc->xscom_pci_base  =3D pnv_pec_xscom_pci_base;
+@@ -568,6 +569,7 @@ static void pnv_pec_stk_class_init(ObjectClass *klass=
+, void *data)
+=20
+     device_class_set_props(dc, pnv_pec_stk_properties);
+     dc->realize =3D pnv_pec_stk_realize;
++    dc->user_creatable =3D false;
+=20
+     /* TODO: reset regs ? */
+ }
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index f7247222bc..234562040d 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -325,6 +325,7 @@ static void pnv_core_class_init(ObjectClass *oc, void=
+ *data)
+     dc->realize =3D pnv_core_realize;
+     dc->unrealize =3D pnv_core_unrealize;
+     device_class_set_props(dc, pnv_core_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ #define DEFINE_PNV_CORE_TYPE(family, cpu_model) \
+@@ -423,6 +424,7 @@ static void pnv_quad_class_init(ObjectClass *oc, void=
+ *data)
+=20
+     dc->realize =3D pnv_quad_realize;
+     device_class_set_props(dc, pnv_quad_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_quad_info =3D {
+diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
+index 93ae42f7e4..9a262629b7 100644
+--- a/hw/ppc/pnv_homer.c
++++ b/hw/ppc/pnv_homer.c
+@@ -360,6 +360,7 @@ static void pnv_homer_class_init(ObjectClass *klass, =
+void *data)
+     dc->realize =3D pnv_homer_realize;
+     dc->desc =3D "PowerNV HOMER Memory";
+     device_class_set_props(dc, pnv_homer_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_homer_type_info =3D {
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index d1de98f04c..5989d723c5 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -762,6 +762,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
+id *data)
+     dc->realize =3D pnv_lpc_realize;
+     dc->desc =3D "PowerNV LPC Controller";
+     device_class_set_props(dc, pnv_lpc_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_lpc_info =3D {
+diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
+index 2173fac0e7..5a716c256e 100644
+--- a/hw/ppc/pnv_occ.c
++++ b/hw/ppc/pnv_occ.c
+@@ -280,6 +280,7 @@ static void pnv_occ_class_init(ObjectClass *klass, vo=
+id *data)
+     dc->realize =3D pnv_occ_realize;
+     dc->desc =3D "PowerNV OCC Controller";
+     device_class_set_props(dc, pnv_occ_properties);
++    dc->user_creatable =3D false;
+ }
+=20
+ static const TypeInfo pnv_occ_type_info =3D {
+--=20
+2.24.1
 
 
