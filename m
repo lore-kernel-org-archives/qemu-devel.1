@@ -2,80 +2,82 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6177BC33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4EE9C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:43:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E3E520661
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:42:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE6EF20661
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 10:43:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a/CVKebo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E3E520661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BCojKYW4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE6EF20661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37719 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyZBf-0007OO-EZ
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 05:42:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48361)
+	id 1iyZCq-0008Ss-RX
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 05:43:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iyZB5-0006oe-8p
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:42:04 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iyZCH-0007xC-Lt
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:43:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iyZB3-0004Rk-VF
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:42:02 -0500
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:38655)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iyZB3-0004RI-QQ
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:42:01 -0500
-Received: by mail-ot1-x332.google.com with SMTP id z9so13153746oth.5
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 02:42:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4kbH7oAw4MB2j4vJjVfRLNrYecpPEu2KOdpXXC7phis=;
- b=a/CVKeboFHiAP2UhllyMk9gmVztwx9DQL6lseZBDMBznsHzx/6U6Ezy6FU0Er1Vtfc
- RT5joPKbi2AUuEX0Rzy0gTHqvDwz1l/aJAzxJLfLep55bxYBA+m2iqjWm3WL/0EVcQCF
- 4eUcHGd0B3bq75LqIVTtjDlcZcbHbI6dDhEe4KthNdr3+CpKGbdLo3R7Mtzv/DU5mUXQ
- EOQiS9d6hUfVGuohfZKb/NdwNMSLnG34fuAd4NVZjo29Zvmo/AXNZQh72Z2WALZKlg2X
- KPMtm6d0xKpEBNCvHtj9zF7QsOXaHJD+7jlwupmDh3Hs6kxQqiErsIZsS6U73VnmZ0uK
- u+pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4kbH7oAw4MB2j4vJjVfRLNrYecpPEu2KOdpXXC7phis=;
- b=K8ZC5X7RpFBbukfIiYLrwGZsS6wWyarA0lnUTkG6yxMMPNbhdCsJZ1BgkDNCpVcapp
- DjBenGjt6TAd+lBXz7EMy0aOxp796ZE+dSSwrWOXyJdcXoxt9uI6cL2l6ROr6dKwGBSi
- a8g4Tu/dJWrLytrl5gWGrjuB7n2t52He+InrcHoXYfPKXPE0Gm+1qz4vhhreQofxnl+f
- 33aSnn2OYtPL8q4ewGuGa9uhAPhg/FUeReKB5Z4NlJ8bj0TIE3pc39HzlfwT7EPvpEnG
- vlKDkkzIJAQeFsTgHZdRDRiM5XCAIutPmKEdyJJqB6+yye9mDhnhuhd4TDj+7LrA04pK
- 7Vqg==
-X-Gm-Message-State: APjAAAWzfPKmGec6mVZH0vmwIVbUgDDx1MBmfFqN1Da3fiXLqPhVsUHM
- 3cXvjb87phe0q616gVRF8BB87sgzp54EA/ZmVQ+MXQ==
-X-Google-Smtp-Source: APXvYqzb6AEWCa00jOEHrRzqX9gPfhS3HCCOzCVQmPSCLtHC26utwlU5V3X0w4hMa0wA/Lby9PFAEdBbkCqAUsTIg9I=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr17378808otd.91.1580726520770; 
- Mon, 03 Feb 2020 02:42:00 -0800 (PST)
+ (envelope-from <cohuck@redhat.com>) id 1iyZCG-0005Kk-6t
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:43:17 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48646
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iyZCF-0005Jb-Qi
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 05:43:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580726595;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0G0MrmAiruKjFt5vLzFIt8vi8JLTjhD/YZjyKBVbm4o=;
+ b=BCojKYW4Iwqe/3iF6JUatBzZrX64zGGtYTLT+ZXUx5x4x1bwbHhVVlz4wa7eDBFctUQ292
+ W5dCtSFbr/eApUCEz8gWV8ccukyipXp1QFu2Ahuh/A+xF7+8g1dnSL93ol60opikyE/Qj8
+ HeQujJq+vPMy2f2rEo8Rle3zMoSkXEk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-327-fRkHbrLWOB2KYGitM8hjEw-1; Mon, 03 Feb 2020 05:43:11 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A162D107ACC7;
+ Mon,  3 Feb 2020 10:43:09 +0000 (UTC)
+Received: from gondolin (ovpn-117-79.ams2.redhat.com [10.36.117.79])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4669B89A82;
+ Mon,  3 Feb 2020 10:43:08 +0000 (UTC)
+Date: Mon, 3 Feb 2020 11:43:05 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eric Farman <farman@linux.ibm.com>
+Subject: Re: [RFC PATCH v1 5/8] vfio-ccw: Add support for the schib region
+Message-ID: <20200203114305.7fd301c0.cohuck@redhat.com>
+In-Reply-To: <70370f47-b36b-d36a-c8b7-f7cace7f47b4@linux.ibm.com>
+References: <20191115033437.37926-1-farman@linux.ibm.com>
+ <20191115033437.37926-6-farman@linux.ibm.com>
+ <20191120121329.73dbddc2.cohuck@redhat.com>
+ <70370f47-b36b-d36a-c8b7-f7cace7f47b4@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200203061123.59150-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20200203061123.59150-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 3 Feb 2020 10:41:49 +0000
-Message-ID: <CAFEAcA8zRdA9MfXShZkX3NkrKk+YKk-dHBFqjd-0PtYM6SpJXQ@mail.gmail.com>
-Subject: Re: [PULL 00/35] ppc-for-5.0 queue 20200203
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::332
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: fRkHbrLWOB2KYGitM8hjEw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,56 +89,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ Jared Rossi <jrossi@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 3 Feb 2020 at 06:11, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> The following changes since commit 28db64fce555a03b4ca256d5b6f4290abdfbd9e8:
->
->   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2020-01-31 17:37:00 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-5.0-20200203
->
-> for you to fetch changes up to 63d57c8f91d0d0e62fc4d91db6340a662b36a3c0:
->
->   tests: Silence various warnings with pseries (2020-02-03 11:33:11 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2020-02093
->
-> This pull request supersedes ppc-for-5.0-20200131.  The only changes
-> are one extra patch to suppress some irritating warnings during tests
-> under TCG, and an extra Tested-by in one of the other patches.
->
-> Here's the next batch of patches for ppc and associated machine types.
-> Highlights includes:
->  * Remove the deprecated "prep" machine type and its OpenHackware
->    firmware
->  * Add TCG emulation of the msgsndp etc. supervisor privileged
->    doorbell instructions
->  * Allow "pnv" machine type to run Hostboot style firmwares
->  * Add a virtual TPM device for spapr machines
->  * Implement devices for POWER8 PHB3 and POWER9 PHB4 host bridges for
->    the pnv machine type
->  * Use faster Spectre mitigation by default for POWER9 DD2.3 machines
->  * Introduce Firmware Assisted NMI dump facility for spapr machines
->  * Fix a performance regression with load/store multiple instructions
->    in TCG
->
-> as well as some other assorted cleanups and fixes.
->
+On Fri, 31 Jan 2020 15:15:00 -0500
+Eric Farman <farman@linux.ibm.com> wrote:
 
+> [Had two un-addressed QEMU comments on my todo list; let's do that now.]
+> 
+> On 11/20/19 6:13 AM, Cornelia Huck wrote:
+> > On Fri, 15 Nov 2019 04:34:34 +0100
+> > Eric Farman <farman@linux.ibm.com> wrote:
 
-Applied, thanks.
+Oh, that was some time ago... hope I can still recall what I was
+thinking back then.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+> >   
+> >> From: Farhan Ali <alifm@linux.ibm.com>
+> >>
+> >> The schib region can be used to obtain the latest SCHIB from the host
+> >> passthrough subchannel. Since the guest SCHIB is virtualized,
+> >> we currently only update the path related information so that the
+> >> guest is aware of any path related changes when it issues the
+> >> 'stsch' instruction.  
+> > 
+> > One important information here is that you tweak the generic stsch
+> > handling, although the behaviour remains the same for non-vfio
+> > subchannels.
+> >   
+> >>
+> >> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> >> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> >> ---
+> >>
+> >> Notes:
+> >>     v0->v1: [EF]
+> >>      - Change various incarnations of "update chp status" to
+> >>        "handle_store", to reflect the STSCH instruction that will
+> >>        drive this code
+> >>      - Remove temporary variable for casting/testing purposes in
+> >>        s390_ccw_store(), and add a block comment of WHY its there.
+> >>      - Add a few comments to vfio_ccw_handle_store()
+> >>
+> >>  hw/s390x/css.c              |  8 ++++--
+> >>  hw/s390x/s390-ccw.c         | 20 +++++++++++++
+> >>  hw/vfio/ccw.c               | 57 +++++++++++++++++++++++++++++++++++++
+> >>  include/hw/s390x/css.h      |  3 +-
+> >>  include/hw/s390x/s390-ccw.h |  1 +
+> >>  target/s390x/ioinst.c       |  3 +-
+> >>  6 files changed, 87 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >> index 844caab408..6ee6a96d75 100644
+> >> --- a/hw/s390x/css.c
+> >> +++ b/hw/s390x/css.c
+> >> @@ -1335,11 +1335,15 @@ static void copy_schib_to_guest(SCHIB *dest, const SCHIB *src)
+> >>      }
+> >>  }
+> >>  
+> >> -int css_do_stsch(SubchDev *sch, SCHIB *schib)
+> >> +IOInstEnding css_do_stsch(SubchDev *sch, SCHIB *schib)
+> >>  {
+> >> +    int ret = IOINST_CC_EXPECTED;  
+> > 
+> > It's a bit useless initializing ret here, given that you use it right
+> > below :)
+> >   
+> >> +  
+> > 
+> > Maybe add a comment here:
+> > 
+> >        /*
+> >         * For some subchannels, we may want to update parts of
+> >         * the schib (e.g. update path masks from the host device
+> >         * for passthrough subchannels).
+> >         */
+> >   
+> >> +    ret = s390_ccw_store(sch);
+> >> +
+> >>      /* Use current status. */
+> >>      copy_schib_to_guest(schib, &sch->curr_status);
+> >> -    return 0;
+> >> +    return ret;
+> >>  }
+> >>  
+> >>  static void copy_pmcw_from_guest(PMCW *dest, const PMCW *src)
+> >> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+> >> index 0c5a5b60bd..be0b379338 100644
+> >> --- a/hw/s390x/s390-ccw.c
+> >> +++ b/hw/s390x/s390-ccw.c
+> >> @@ -51,6 +51,26 @@ int s390_ccw_clear(SubchDev *sch)
+> >>      return cdc->handle_clear(sch);
+> >>  }
+> >>  
+> >> +IOInstEnding s390_ccw_store(SubchDev *sch)
+> >> +{
+> >> +    S390CCWDeviceClass *cdc = NULL;
+> >> +    int ret = IOINST_CC_EXPECTED;
+> >> +
+> >> +    /*
+> >> +     * This only applies to passthrough devices, so we can't unconditionally
+> >> +     * set this variable like we would for halt/clear.  
+> > 
+> > Hm, can we maybe handle this differently? We have a generic ccw_cb in
+> > the subchannel structure for ccw interpretation; would it make sense to
+> > add a generic callback for stsch there as well?  
+> 
+> Might make things a little cleaner, but I am not sure.  I'm going to
+> leave a todo here while we sort out the rest of the kernel code, so I
+> can try to put something more beneficial together.
 
--- PMM
+Yes, this looks like something that can be sorted out later.
+
+What bothers me most here, I guess, is that it is not very obvious why
+the functions above can assume the presence of the cdc object, while
+this one can't. The secret sauce is in the different
+do_subchannel_work_* callbacks, which reside in another file... maybe
+amend the comment here to mention that? That would help and doesn't
+involve code refactoring :)
+
+> 
+> > 
+> > (This works fine, though. Might want to add the check for halt/clear as
+> > well, but that might be a bit overkill.)
+> >   
+> >> +     */
+> >> +    if (object_dynamic_cast(OBJECT(sch->driver_data), TYPE_S390_CCW)) {
+> >> +        cdc = S390_CCW_DEVICE_GET_CLASS(sch->driver_data);
+> >> +    }
+> >> +
+> >> +    if (cdc && cdc->handle_store) {
+> >> +        ret = cdc->handle_store(sch);
+> >> +    }
+> >> +
+> >> +    return ret;
+> >> +}
+> >> +
+> >>  static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
+> >>                                    char *sysfsdev,
+> >>                                    Error **errp)
+> >> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> >> index 3e32bc1819..2ff223470f 100644
+> >> --- a/hw/vfio/ccw.c
+> >> +++ b/hw/vfio/ccw.c
+> >> @@ -41,6 +41,9 @@ struct VFIOCCWDevice {
+> >>      uint64_t async_cmd_region_size;
+> >>      uint64_t async_cmd_region_offset;
+> >>      struct ccw_cmd_region *async_cmd_region;
+> >> +    uint64_t schib_region_size;
+> >> +    uint64_t schib_region_offset;
+> >> +    struct ccw_schib_region *schib_region;
+> >>      EventNotifier io_notifier;
+> >>      bool force_orb_pfch;
+> >>      bool warned_orb_pfch;
+> >> @@ -124,6 +127,45 @@ again:
+> >>      }
+> >>  }
+> >>  
+> >> +static IOInstEnding vfio_ccw_handle_store(SubchDev *sch)
+> >> +{
+> >> +    S390CCWDevice *cdev = sch->driver_data;
+> >> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> >> +    SCHIB *schib = &sch->curr_status;
+> >> +    struct ccw_schib_region *region = vcdev->schib_region;
+> >> +    SCHIB *s = (SCHIB *)region->schib_area;  
+> > 
+> > You probably don't want to access region until after you checked it's
+> > not NULL :)  
+> 
+> :)
+> 
+> >   
+> >> +    int ret;
+> >> +
+> >> +    /* schib region not available so nothing else to do */
+> >> +    if (!region) {
+> >> +        return IOINST_CC_EXPECTED;
+> >> +    }
+> >> +
+> >> +    memset(region, 0, sizeof(*region));
+> >> +    ret = pread(vcdev->vdev.fd, region, vcdev->schib_region_size,
+> >> +                vcdev->schib_region_offset);
+> >> +
+> >> +    if (ret == -1) {
+> >> +        /* Assume device is damaged, regardless of errno */
+> >> +        return IOINST_CC_NOT_OPERATIONAL;  
+> > 
+> > Not sure that's correct; cc 3 for stsch indicates that there are no
+> > more subchannels with higher ids?  
+> 
+> POPS says cc=3 on stsch if the subchannel is not operational, and it's
+> not operational if it's not provided to the channel subsystem.  So,
+> basically yes.  I guess his idea was to call out a problem on the kvm
+> side, so should we just return CC_EXPECTED here, as if there's no region?
+
+Yes, that looks like the better choice (out of the two possible
+condition codes...) And also log a moan somewhere?
+
+> 
+> >   
+> >> +    }
+> >> +
+> >> +    /*
+> >> +     * Selectively copy path-related bits of the SCHIB,
+> >> +     * rather than copying the entire struct.
+> >> +     */
+> >> +    schib->pmcw.pnom = s->pmcw.pnom;
+> >> +    schib->pmcw.lpum = s->pmcw.lpum;
+> >> +    schib->pmcw.pam = s->pmcw.pam;
+> >> +    schib->pmcw.pom = s->pmcw.pom;
+> >> +
+> >> +    if (s->scsw.flags & SCSW_FLAGS_MASK_PNO) {
+> >> +        schib->scsw.flags |= SCSW_FLAGS_MASK_PNO;
+> >> +    }
+> >> +
+> >> +    return IOINST_CC_EXPECTED;
+> >> +}
+> >> +  
+> > 
+> > The rest of the patch looks good to me.
+> >   
+> 
+
 
