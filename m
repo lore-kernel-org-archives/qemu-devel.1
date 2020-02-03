@@ -2,81 +2,81 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A57CC3524D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E5CC3524D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:28:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24F4720658
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F8DF20658
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 09:28:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jihSQak6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24F4720658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OrXgjWqs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8DF20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyXzo-0003n7-7P
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 04:26:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52608)
+	id 1iyY1b-0005P2-CN
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 04:28:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53086)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hsp.cat7@gmail.com>) id 1iyXz0-0002rq-Kr
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:25:32 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iyY10-0004wI-Tf
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:27:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1iyXyv-0001FL-Hs
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:25:30 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46238)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1iyXyv-0001Bx-9r
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:25:25 -0500
-Received: by mail-oi1-x242.google.com with SMTP id a22so14016757oid.13
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 01:25:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BkjaGOGKFLkPM0/O2/S8fZzMc67x76zdsnueF80BDEk=;
- b=jihSQak6NepXJXK1FRk7sMpcMyQKBoaG5U+FuUZQeJ0WO0AIWRV6zIeBAkmktmBF4c
- BDe/Fh3nAwEoA4xytunyhs6SLkqUkG2s63fV0WaCadoaVQH9gV09meLqpiVvivS8Jduq
- shoZProUfbqlUZBYt+xQlVFiPyzcnoJal1DwBb0XE+WPOuUNJt9YI6lAvrZh2fdPR+kX
- XrIP8p25kQq/NzTbePokVV4wphBdlhm/vgTSJS0UNzz9rrK0c4yGQXI3uLd0d758zHLv
- PFBKWhVtgkYdV5Kwj4ujYg0JMs8ofAzvGiTfpx1c0sPKHvHDthjGdKDngqiHE7hIpaYy
- Y8zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BkjaGOGKFLkPM0/O2/S8fZzMc67x76zdsnueF80BDEk=;
- b=ic/ex5XfNXeQ7lTC5FovZ8Mcusyh5SNkm9dGFo/TGhbiDYp3SYGae9fOqygCJakPB2
- 5bAOTqwgdzDpo78hascd3lBmtZBSL0ZIuFoPS8xIofEWEkJvnQt2kPwaSMQPmiEAIgNJ
- C35XMzFuYcJIjphBm0ASHuaR1zjnnekoJoSAARvg60vFqzSIhgoCE2fq/OnGoHEys6uE
- 3CAje3juU3dRlletzwYqDxJEx5QrwM0kcKc+d3zxZ1WX6zPQmuiX8HOIVpz4MfW7FPaU
- AJ9HXoEtA3ByGJXNl1gPK02iZxphlJ+sNLrBCEoTI7Ahqavx20G6jqrd7veCPVkUsJDe
- gMwQ==
-X-Gm-Message-State: APjAAAUtIq0GbcWO1/TyDQdNokZUQCDm9rGtr4gxNUo7rzsC9bNiEGJ8
- B5iAJL5ZDm/7gf4jWxwrQ1/TrmhKunn6eilbsLY=
-X-Google-Smtp-Source: APXvYqx+K+66P4sdZ5SZ0SIn2K7xfFhFSBwEzS9AH6pf5zvn6Pm2maYlRJicJ2CaG8uQUMTuPOnew0ogCpRFWiINcV8=
-X-Received: by 2002:aca:1314:: with SMTP id e20mr6643926oii.112.1580721924279; 
- Mon, 03 Feb 2020 01:25:24 -0800 (PST)
+ (envelope-from <imammedo@redhat.com>) id 1iyY0y-0004f4-4t
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:27:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44002
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iyY0x-0004eD-Rs
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 04:27:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580722051;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sk8SOhbhhvaIkONZar9WfUifzwk1I4cbsoXHpjVaenE=;
+ b=OrXgjWqswu7ExJ3vCe+Q0MggFGNzejEUFgaZY+pxbDTNQF8XjLmCn5+99CN9Cgzgr7pU5K
+ 16q5G7rP6pYAeV+iR2eOUGHYaJBiJP8QUaX8LxLYvFcNbCE7o8uJ0wto6C89Q1OkWh2wbd
+ PLkSzOltyt3Y4a1kLQrOe62Z5p7tTb4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-_Uym_YC7OVSVWpHRLcZUrg-1; Mon, 03 Feb 2020 04:27:29 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6247DDBBB;
+ Mon,  3 Feb 2020 09:27:28 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7521019E9C;
+ Mon,  3 Feb 2020 09:27:21 +0000 (UTC)
+Date: Mon, 3 Feb 2020 10:27:20 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v4 03/80] machine: alias -mem-path and -mem-prealloc
+ into memory-foo backend
+Message-ID: <20200203102720.6de2374e@redhat.com>
+In-Reply-To: <20200203040204-mutt-send-email-mst@kernel.org>
+References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+ <1580483390-131164-4-git-send-email-imammedo@redhat.com>
+ <20200203040204-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <fe9744216d9d421a2dbb09bcf5fa0dbd18f77ac5.1580684275.git.DirtY.iCE.hu@gmail.com>
- <CABLmASG5J0AcB7khUfK1G2tTw97ng0HRonaejo-SReAznyekCQ@mail.gmail.com>
- <38e3dd27-a6d6-ffeb-8637-0bb57caa9710@redhat.com>
-In-Reply-To: <38e3dd27-a6d6-ffeb-8637-0bb57caa9710@redhat.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Mon, 3 Feb 2020 10:25:12 +0100
-Message-ID: <CABLmASE-DaA_KDTFHJ2eMmyrDS5Qp61q3K-nrh4+keMq=NRQOg@mail.gmail.com>
-Subject: Re: [PATCH] audio/dsound: fix invalid parameters error
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000ca3151059da880ec"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: _Uym_YC7OVSVWpHRLcZUrg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,443 +88,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: KJ Liew <liewkj@yahoo.com>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
+Cc: pasic@linux.ibm.com, pbonzini@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ca3151059da880ec
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Mon, 3 Feb 2020 04:04:15 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Cher Philippe,
+> On Fri, Jan 31, 2020 at 04:08:33PM +0100, Igor Mammedov wrote:
+> > Allow machine to opt in for hostmem backend based initial RAM
+> > even if user uses old -mem-path/prealloc options by providing
+> >   MachineClass::default_ram_id
+> > Follow up patches will incrementally convert machines to new API,
+> > by dropping memory_region_allocate_system_memory() and setting
+> > default_ram_id that board used to use before conversion to keep
+> > migration stream the same.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>  
+> 
+> What about non-versioned machines though?
+> Why do these need to set default_ram_id?
+> Seems redundant as they don't need to support cross-version
+> migration ...
 
-On Mon, Feb 3, 2020 at 10:18 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
+They need at least some id for migration to work,
+so this series reuses id that they are using today.
 
-> Hi Howard,
->
-> On 2/3/20 8:56 AM, Howard Spoelstra wrote:
-> > On Mon, Feb 3, 2020 at 12:02 AM K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dir=
-ty.ice.hu@gmail.com
-> > <mailto:dirty.ice.hu@gmail.com>> wrote:
-> >
-> >     Windows (unlike wine) bails out when IDirectSoundBuffer8::Lock is
-> called
-> >     with zero length.  Also, hw->pos_emul handling was incorrect when
-> >     calling this function for the first time.
-> >
-> >     Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gma=
-il.com
-> >     <mailto:DirtY.iCE.hu@gmail.com>>
-> >     Reported-by: KJ Liew <liewkj@yahoo.com <mailto:liewkj@yahoo.com>>
-> >     ---
-> >
-> >     I've tested this patch on wine and a borrowed Windows 8.1 laptop, I
-> >     could only test audio playback, not recording.  I've cross-compiled
-> qemu
-> >     using the docker image, for 64-bit.
-> >
-> >     ---
-> >       audio/dsound_template.h |  1 +
-> >       audio/audio.c           |  6 ++----
-> >       audio/dsoundaudio.c     | 27 +++++++++++++++++++++++----
-> >       3 files changed, 26 insertions(+), 8 deletions(-)
-> >
-> >     diff --git a/audio/dsound_template.h b/audio/dsound_template.h
-> >     index 7a15f91ce5..9c5ce625ab 100644
-> >     --- a/audio/dsound_template.h
-> >     +++ b/audio/dsound_template.h
-> >     @@ -244,6 +244,7 @@ static int dsound_init_out(HWVoiceOut *hw,
-> >     struct audsettings *as,
-> >               goto fail0;
-> >           }
-> >
-> >     +    ds->first_time =3D true;
-> >           obt_as.endianness =3D 0;
-> >           audio_pcm_init_info (&hw->info, &obt_as);
-> >
-> >     diff --git a/audio/audio.c b/audio/audio.c
-> >     index f63f39769a..cb1efc6dc5 100644
-> >     --- a/audio/audio.c
-> >     +++ b/audio/audio.c
-> >     @@ -1076,10 +1076,8 @@ static size_t audio_pcm_hw_run_out(HWVoiceOu=
-t
-> >     *hw, size_t live)
-> >           while (live) {
-> >               size_t size, decr, proc;
-> >               void *buf =3D hw->pcm_ops->get_buffer_out(hw, &size);
-> >     -        if (!buf) {
-> >     -            /* retrying will likely won't help, drop everything. *=
-/
-> >     -            hw->mix_buf->pos =3D (hw->mix_buf->pos + live) %
-> >     hw->mix_buf->size;
-> >     -            return clipped + live;
-> >     +        if (!buf || size =3D=3D 0) {
-> >     +            break;
-> >               }
-> >
-> >               decr =3D MIN(size / hw->info.bytes_per_frame, live);
-> >     diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
-> >     index c265c0094b..bd57082a8d 100644
-> >     --- a/audio/dsoundaudio.c
-> >     +++ b/audio/dsoundaudio.c
-> >     @@ -53,12 +53,14 @@ typedef struct {
-> >       typedef struct {
-> >           HWVoiceOut hw;
-> >           LPDIRECTSOUNDBUFFER dsound_buffer;
-> >     +    bool first_time;
-> >           dsound *s;
-> >       } DSoundVoiceOut;
-> >
-> >       typedef struct {
-> >           HWVoiceIn hw;
-> >           LPDIRECTSOUNDCAPTUREBUFFER dsound_capture_buffer;
-> >     +    bool first_time;
-> >           dsound *s;
-> >       } DSoundVoiceIn;
-> >
-> >     @@ -414,21 +416,32 @@ static void *dsound_get_buffer_out(HWVoiceOut
-> >     *hw, size_t *size)
-> >           DSoundVoiceOut *ds =3D (DSoundVoiceOut *) hw;
-> >           LPDIRECTSOUNDBUFFER dsb =3D ds->dsound_buffer;
-> >           HRESULT hr;
-> >     -    DWORD ppos, act_size;
-> >     +    DWORD ppos, wpos, act_size;
-> >           size_t req_size;
-> >           int err;
-> >           void *ret;
-> >
-> >     -    hr =3D IDirectSoundBuffer_GetCurrentPosition(dsb, &ppos, NULL)=
-;
-> >     +    hr =3D IDirectSoundBuffer_GetCurrentPosition(
-> >     +        dsb, &ppos, ds->first_time ? &wpos : NULL);
-> >           if (FAILED(hr)) {
-> >               dsound_logerr(hr, "Could not get playback buffer
-> position\n");
-> >               *size =3D 0;
-> >               return NULL;
-> >           }
-> >
-> >     +    if (ds->first_time) {
-> >     +        hw->pos_emul =3D wpos;
-> >     +        ds->first_time =3D false;
-> >     +    }
-> >     +
-> >           req_size =3D audio_ring_dist(ppos, hw->pos_emul, hw->size_emu=
-l);
-> >           req_size =3D MIN(req_size, hw->size_emul - hw->pos_emul);
-> >
-> >     +    if (req_size =3D=3D 0) {
-> >     +        *size =3D 0;
-> >     +        return NULL;
-> >     +    }
-> >     +
-> >           err =3D dsound_lock_out(dsb, &hw->info, hw->pos_emul, req_siz=
-e,
-> >     &ret, NULL,
-> >                                 &act_size, NULL, false, ds->s);
-> >           if (err) {
-> >     @@ -508,18 +521,24 @@ static void *dsound_get_buffer_in(HWVoiceIn
-> >     *hw, size_t *size)
-> >           DSoundVoiceIn *ds =3D (DSoundVoiceIn *) hw;
-> >           LPDIRECTSOUNDCAPTUREBUFFER dscb =3D ds->dsound_capture_buffer=
-;
-> >           HRESULT hr;
-> >     -    DWORD cpos, act_size;
-> >     +    DWORD cpos, rpos, act_size;
-> >           size_t req_size;
-> >           int err;
-> >           void *ret;
-> >
-> >     -    hr =3D IDirectSoundCaptureBuffer_GetCurrentPosition(dscb, &cpo=
-s,
-> >     NULL);
-> >     +    hr =3D IDirectSoundCaptureBuffer_GetCurrentPosition(
-> >     +        dscb, &cpos, ds->first_time ? &rpos : NULL);
-> >           if (FAILED(hr)) {
-> >               dsound_logerr(hr, "Could not get capture buffer
-> position\n");
-> >               *size =3D 0;
-> >               return NULL;
-> >           }
-> >
-> >     +    if (ds->first_time) {
-> >     +        hw->pos_emul =3D rpos;
-> >     +        ds->first_time =3D false;
-> >     +    }
-> >     +
-> >           req_size =3D audio_ring_dist(cpos, hw->pos_emul, hw->size_emu=
-l);
-> >           req_size =3D MIN(req_size, hw->size_emul - hw->pos_emul);
-> >
-> >     --
-> >     2.25.0
-> >
-> >
-> > Hi,
-> >
-> > I tested this patch running qemu-system-ppc with MacOS 9.2 and OSX 10.5=
-.
-> > Qemu was cross-compiled on Fedora 31 from
-> > https://github.com/mcayland/qemu/tree/screamer. Host was Windows 10.
-> >
-> > The dsound locking errors are gone, so for this test case all seems OK.
->
-> Thanks for testing!
->
-> Does that mean we can add your tag to this patch?
->
->
-> Regards,
->
-> Phil.
->
->
-Yes, so:
+Basically default_ram_id is a means to optin into hostmem
+based allocation with (-m).
 
-Tested-by: Howard Spoelstra <hsp.cat7@gmail.com>
+> 
+> > ---
+> > v3:
+> >    * rename "ram-memdev" property to "memory-backend"
+> >      (Paolo Bonzini <pbonzini@redhat.com>)
+> > v4:
+> >    * previous patch changed memory-backend property from link
+> >      to string to allow for delayed backend creation, when
+> >      backend comes explicitly from CLI.
+> >      So s/object_property_set_link()/object_property_set_str()/
+> >      to account for that.
+> > 
+> > CC: ehabkost@redhat.com
+> > CC: pbonzini@redhat.com
+> > CC: philmd@redhat.com
+> > CC: pasic@linux.ibm.com
+> > ---
+> >  include/hw/boards.h      |  5 +++++
+> >  include/sysemu/hostmem.h | 16 ++++++++++++++++
+> >  backends/hostmem-file.c  |  7 -------
+> >  backends/hostmem-ram.c   |  2 --
+> >  vl.c                     | 25 +++++++++++++++++++++++++
+> >  5 files changed, 46 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > index 7b4b6b7..106de87 100644
+> > --- a/include/hw/boards.h
+> > +++ b/include/hw/boards.h
+> > @@ -170,6 +170,10 @@ typedef struct {
+> >   *    false is returned, an error must be set to show the reason of
+> >   *    the rejection.  If the hook is not provided, all hotplug will be
+> >   *    allowed.
+> > + * @default_ram_id:
+> > + *    Specifies inital RAM MemoryRegion name to be used for default backend
+> > + *    creation if user explicitly hasn't specified backend with "memory-backend"
+> > + *    property.
+> >   */
+> >  struct MachineClass {
+> >      /*< private >*/
+> > @@ -226,6 +230,7 @@ struct MachineClass {
+> >      bool nvdimm_supported;
+> >      bool numa_mem_supported;
+> >      bool auto_enable_numa;
+> > +    const char *default_ram_id;
+> >  
+> >      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+> >                                             DeviceState *dev);
+> > diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+> > index 4dbdadd..5db0d66 100644
+> > --- a/include/sysemu/hostmem.h
+> > +++ b/include/sysemu/hostmem.h
+> > @@ -27,6 +27,22 @@
+> >  #define MEMORY_BACKEND_CLASS(klass) \
+> >      OBJECT_CLASS_CHECK(HostMemoryBackendClass, (klass), TYPE_MEMORY_BACKEND)
+> >  
+> > +/* hostmem-ram.c */
+> > +/**
+> > + * @TYPE_MEMORY_BACKEND_RAM:
+> > + * name of backend that uses mmap on the anonymous RAM
+> > + */
+> > +
+> > +#define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
+> > +
+> > +/* hostmem-file.c */
+> > +/**
+> > + * @TYPE_MEMORY_BACKEND_FILE:
+> > + * name of backend that uses mmap on a file descriptor
+> > + */
+> > +#define TYPE_MEMORY_BACKEND_FILE "memory-backend-file"
+> > +
+> > +typedef struct HostMemoryBackend HostMemoryBackend;
+> >  typedef struct HostMemoryBackendClass HostMemoryBackendClass;
+> >  
+> >  /**
+> > diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+> > index be64020..cb319a9 100644
+> > --- a/backends/hostmem-file.c
+> > +++ b/backends/hostmem-file.c
+> > @@ -18,13 +18,6 @@
+> >  #include "sysemu/sysemu.h"
+> >  #include "qom/object_interfaces.h"
+> >  
+> > -/* hostmem-file.c */
+> > -/**
+> > - * @TYPE_MEMORY_BACKEND_FILE:
+> > - * name of backend that uses mmap on a file descriptor
+> > - */
+> > -#define TYPE_MEMORY_BACKEND_FILE "memory-backend-file"
+> > -
+> >  #define MEMORY_BACKEND_FILE(obj) \
+> >      OBJECT_CHECK(HostMemoryBackendFile, (obj), TYPE_MEMORY_BACKEND_FILE)
+> >  
+> > diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
+> > index 6aab8d3..5cc53e7 100644
+> > --- a/backends/hostmem-ram.c
+> > +++ b/backends/hostmem-ram.c
+> > @@ -16,8 +16,6 @@
+> >  #include "qemu/module.h"
+> >  #include "qom/object_interfaces.h"
+> >  
+> > -#define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
+> > -
+> >  static void
+> >  ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+> >  {
+> > diff --git a/vl.c b/vl.c
+> > index 24951b5..2367cb6 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -75,6 +75,7 @@ int main(int argc, char **argv)
+> >  #include "ui/input.h"
+> >  #include "sysemu/sysemu.h"
+> >  #include "sysemu/numa.h"
+> > +#include "sysemu/hostmem.h"
+> >  #include "exec/gdbstub.h"
+> >  #include "qemu/timer.h"
+> >  #include "chardev/char.h"
+> > @@ -2839,6 +2840,26 @@ static void configure_accelerators(const char *progname)
+> >      }
+> >  }
+> >  
+> > +static void create_default_memdev(MachineState *ms, const char *path,
+> > +                                  bool prealloc)
+> > +{
+> > +    Object *obj;
+> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> > +
+> > +    obj = object_new(path ? TYPE_MEMORY_BACKEND_FILE : TYPE_MEMORY_BACKEND_RAM);
+> > +    if (path) {
+> > +        object_property_set_str(obj, path, "mem-path", &error_fatal);
+> > +    }
+> > +    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
+> > +    object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
+> > +    object_property_add_child(object_get_objects_root(), mc->default_ram_id,
+> > +                              obj, &error_fatal);
+> > +    user_creatable_complete(USER_CREATABLE(obj), &error_fatal);
+> > +    object_unref(obj);
+> > +    object_property_set_str(OBJECT(ms), mc->default_ram_id, "memory-backend",
+> > +                            &error_fatal);
+> > +}
+> > +
+> >  int main(int argc, char **argv, char **envp)
+> >  {
+> >      int i;
+> > @@ -4302,6 +4323,10 @@ int main(int argc, char **argv, char **envp)
+> >      }
+> >      parse_numa_opts(current_machine);
+> >  
+> > +    if (machine_class->default_ram_id && current_machine->ram_size &&
+> > +        !current_machine->ram_memdev_id) {
+> > +        create_default_memdev(current_machine, mem_path, mem_prealloc);
+> > +    }
+> >      /* do monitor/qmp handling at preconfig state if requested */
+> >      main_loop();  
+> 
+> So this check for default_ram_id will become redundant after the
+> patchset is fully applied, this is just for bisect to work well, right?
+> I couldn't find patches that drop this check though.
 
-Best,
-Howard
+there was a patch to that effect in earlier versions,
+but I dropped it for following reasons (from cover letter):
 
---000000000000ca3151059da880ec
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+"
+v3:
+[...]
+  - drop "[PATCH v2 76/86] post conversion default_ram_id cleanup"
+    so that default memory-backedend won't be created for boards that do not care
+    about -m. Which makes -m optin feature. We should decide  what do in  case
+    board doesn't use -m (but that's out of scope of this series)
+[...]
+"
 
-<div dir=3D"ltr"><div>Cher Philippe,<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Feb 3, 2020 at 10:18 AM Phi=
-lippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@re=
-dhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D=
-"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-le=
-ft:1ex">Hi Howard,<br>
-<br>
-On 2/3/20 8:56 AM, Howard Spoelstra wrote:<br>
-&gt; On Mon, Feb 3, 2020 at 12:02 AM K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n &lt=
-;<a href=3D"mailto:dirty.ice.hu@gmail.com" target=3D"_blank">dirty.ice.hu@g=
-mail.com</a> <br>
-&gt; &lt;mailto:<a href=3D"mailto:dirty.ice.hu@gmail.com" target=3D"_blank"=
->dirty.ice.hu@gmail.com</a>&gt;&gt; wrote:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Windows (unlike wine) bails out when IDirectSoundBu=
-ffer8::Lock is called<br>
-&gt;=C2=A0 =C2=A0 =C2=A0with zero length.=C2=A0 Also, hw-&gt;pos_emul handl=
-ing was incorrect when<br>
-&gt;=C2=A0 =C2=A0 =C2=A0calling this function for the first time.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n &=
-lt;<a href=3D"mailto:DirtY.iCE.hu@gmail.com" target=3D"_blank">DirtY.iCE.hu=
-@gmail.com</a><br>
-&gt;=C2=A0 =C2=A0 =C2=A0&lt;mailto:<a href=3D"mailto:DirtY.iCE.hu@gmail.com=
-" target=3D"_blank">DirtY.iCE.hu@gmail.com</a>&gt;&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Reported-by: KJ Liew &lt;<a href=3D"mailto:liewkj@y=
-ahoo.com" target=3D"_blank">liewkj@yahoo.com</a> &lt;mailto:<a href=3D"mail=
-to:liewkj@yahoo.com" target=3D"_blank">liewkj@yahoo.com</a>&gt;&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0---<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0I&#39;ve tested this patch on wine and a borrowed W=
-indows 8.1 laptop, I<br>
-&gt;=C2=A0 =C2=A0 =C2=A0could only test audio playback, not recording.=C2=
-=A0 I&#39;ve cross-compiled qemu<br>
-&gt;=C2=A0 =C2=A0 =C2=A0using the docker image, for 64-bit.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0---<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0audio/dsound_template.h |=C2=A0 1 +<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0audio/audio.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0|=C2=A0 6 ++----<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0audio/dsoundaudio.c=C2=A0 =C2=A0 =C2=A0| 27 =
-+++++++++++++++++++++++----<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A03 files changed, 26 insertions(+), 8 deletio=
-ns(-)<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0diff --git a/audio/dsound_template.h b/audio/dsound=
-_template.h<br>
-&gt;=C2=A0 =C2=A0 =C2=A0index 7a15f91ce5..9c5ce625ab 100644<br>
-&gt;=C2=A0 =C2=A0 =C2=A0--- a/audio/dsound_template.h<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+++ b/audio/dsound_template.h<br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -244,6 +244,7 @@ static int dsound_init_out(HWVo=
-iceOut *hw,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0struct audsettings *as,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto fail0;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 ds-&gt;first_time =3D true;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0obt_as.endianness =3D 0;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0audio_pcm_init_info (&amp;hw-&=
-gt;info, &amp;obt_as);<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0diff --git a/audio/audio.c b/audio/audio.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0index f63f39769a..cb1efc6dc5 100644<br>
-&gt;=C2=A0 =C2=A0 =C2=A0--- a/audio/audio.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+++ b/audio/audio.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -1076,10 +1076,8 @@ static size_t audio_pcm_hw_r=
-un_out(HWVoiceOut<br>
-&gt;=C2=A0 =C2=A0 =C2=A0*hw, size_t live)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0while (live) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0size_t size, dec=
-r, proc;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *buf =3D hw=
--&gt;pcm_ops-&gt;get_buffer_out(hw, &amp;size);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!buf) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* retry=
-ing will likely won&#39;t help, drop everything. */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;m=
-ix_buf-&gt;pos =3D (hw-&gt;mix_buf-&gt;pos + live) %<br>
-&gt;=C2=A0 =C2=A0 =C2=A0hw-&gt;mix_buf-&gt;size;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return c=
-lipped + live;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!buf || size =3D=
-=3D 0) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<b=
-r>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0decr =3D MIN(siz=
-e / hw-&gt;info.bytes_per_frame, live);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0diff --git a/audio/dsoundaudio.c b/audio/dsoundaudi=
-o.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0index c265c0094b..bd57082a8d 100644<br>
-&gt;=C2=A0 =C2=A0 =C2=A0--- a/audio/dsoundaudio.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+++ b/audio/dsoundaudio.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -53,12 +53,14 @@ typedef struct {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0typedef struct {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0HWVoiceOut hw;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0LPDIRECTSOUNDBUFFER dsound_buf=
-fer;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 bool first_time;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dsound *s;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0} DSoundVoiceOut;<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0typedef struct {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0HWVoiceIn hw;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0LPDIRECTSOUNDCAPTUREBUFFER dso=
-und_capture_buffer;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 bool first_time;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dsound *s;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0} DSoundVoiceIn;<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -414,21 +416,32 @@ static void *dsound_get_buffe=
-r_out(HWVoiceOut<br>
-&gt;=C2=A0 =C2=A0 =C2=A0*hw, size_t *size)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DSoundVoiceOut *ds =3D (DSound=
-VoiceOut *) hw;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0LPDIRECTSOUNDBUFFER dsb =3D ds=
--&gt;dsound_buffer;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0HRESULT hr;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 DWORD ppos, act_size;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 DWORD ppos, wpos, act_size;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0size_t req_size;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int err;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *ret;<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 hr =3D IDirectSoundBuffer_GetCurrent=
-Position(dsb, &amp;ppos, NULL);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 hr =3D IDirectSoundBuffer_GetCurrent=
-Position(<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 dsb, &amp;ppos, ds-&gt=
-;first_time ? &amp;wpos : NULL);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (FAILED(hr)) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dsound_logerr(hr=
-, &quot;Could not get playback buffer position\n&quot;);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*size =3D 0;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return NULL;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (ds-&gt;first_time) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;pos_emul =3D wp=
-os;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ds-&gt;first_time =3D =
-false;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 }<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0req_size =3D audio_ring_dist(p=
-pos, hw-&gt;pos_emul, hw-&gt;size_emul);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0req_size =3D MIN(req_size, hw-=
-&gt;size_emul - hw-&gt;pos_emul);<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (req_size =3D=3D 0) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 *size =3D 0;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return NULL;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 }<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0err =3D dsound_lock_out(dsb, &=
-amp;hw-&gt;info, hw-&gt;pos_emul, req_size,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&amp;ret, NULL,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;act_size, NULL, false,=
- ds-&gt;s);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (err) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -508,18 +521,24 @@ static void *dsound_get_buffe=
-r_in(HWVoiceIn<br>
-&gt;=C2=A0 =C2=A0 =C2=A0*hw, size_t *size)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DSoundVoiceIn *ds =3D (DSoundV=
-oiceIn *) hw;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0LPDIRECTSOUNDCAPTUREBUFFER dsc=
-b =3D ds-&gt;dsound_capture_buffer;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0HRESULT hr;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 DWORD cpos, act_size;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 DWORD cpos, rpos, act_size;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0size_t req_size;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int err;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0void *ret;<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 hr =3D IDirectSoundCaptureBuffer_Get=
-CurrentPosition(dscb, &amp;cpos,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0NULL);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 hr =3D IDirectSoundCaptureBuffer_Get=
-CurrentPosition(<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 dscb, &amp;cpos, ds-&g=
-t;first_time ? &amp;rpos : NULL);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (FAILED(hr)) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dsound_logerr(hr=
-, &quot;Could not get capture buffer position\n&quot;);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*size =3D 0;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return NULL;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (ds-&gt;first_time) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw-&gt;pos_emul =3D rp=
-os;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ds-&gt;first_time =3D =
-false;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 }<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0req_size =3D audio_ring_dist(c=
-pos, hw-&gt;pos_emul, hw-&gt;size_emul);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0req_size =3D MIN(req_size, hw-=
-&gt;size_emul - hw-&gt;pos_emul);<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0-- <br>
-&gt;=C2=A0 =C2=A0 =C2=A02.25.0<br>
-&gt; <br>
-&gt; <br>
-&gt; Hi,<br>
-&gt; <br>
-&gt; I tested this patch running qemu-system-ppc with MacOS 9.2 and OSX 10.=
-5. <br>
-&gt; Qemu was cross-compiled on Fedora 31 from <br>
-&gt; <a href=3D"https://github.com/mcayland/qemu/tree/screamer" rel=3D"nore=
-ferrer" target=3D"_blank">https://github.com/mcayland/qemu/tree/screamer</a=
->. Host was Windows 10.<br>
-&gt; <br>
-&gt; The dsound locking errors are gone, so for this test case all seems OK=
-.<br>
-<br>
-Thanks for testing!<br>
-<br>
-Does that mean we can add your tag to this patch?<br>
-<br>
-<br>
-Regards,<br>
-<br>
-Phil.<br>
-<br></blockquote><div><br></div><div>Yes, so:</div><div><br></div><div>
-Tested-by: Howard Spoelstra &lt;<a href=3D"mailto:hsp.cat7@gmail.com" targe=
-t=3D"_blank">hsp.cat7@gmail.com</a>&gt; <br></div><div><br></div><div>Best,=
-</div><div>Howard<br></div><div>=C2=A0</div></div></div>
+> 
+> > -- 
+> > 2.7.4
+> > 
+> >   
+> 
 
---000000000000ca3151059da880ec--
 
