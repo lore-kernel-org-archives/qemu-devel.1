@@ -2,78 +2,78 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCDAC33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA91C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45C7620721
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:15:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0465420721
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 11:16:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SIuIsK6z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45C7620721
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KHT98PYM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0465420721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyZhu-0001ge-Ee
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 06:15:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57495)
+	id 1iyZiY-0002fM-5p
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 06:16:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iyZfe-0005YI-NF
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:13:40 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iyZfY-0005Fq-55
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:13:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iyZfc-0000qs-Ii
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:13:38 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:38277)
+ (envelope-from <peter.maydell@linaro.org>) id 1iyZfW-0000kG-H8
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:13:32 -0500
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:38935)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iyZfc-0000qS-BH
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:13:36 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id y17so17491107wrh.5
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 03:13:36 -0800 (PST)
+ id 1iyZfW-0000im-Aa
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 06:13:30 -0500
+Received: by mail-wm1-x32b.google.com with SMTP id c84so16450365wme.4
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 03:13:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=FN6IYNmjTWTwD9RZgEK9RNt2Qj2Z8oostqa0BMBlrpo=;
- b=SIuIsK6zrzjx3vqb6Ui7Lm+IJ3kS/eRuEGWleM5h3Yt0kVeNcwg+JUHpd/1fxOb7rt
- pUD2cw0TJJOkPL50JRxBjSH9rGcaAGMA/QuqzWrsN1RV4A5SfOwWAglMSwdF4LNzfD98
- 43KD3/e878182wnia5lLbu2uDQz9c5mGOVqdeCLuyzCTwJ4uC+dWI2CfrVasID+RxcI9
- GvSDEnOc+8PF/cES9kwsnDC6aHDXjGST8vtDS/qVRyjghUe0MJXsTnOr5iTUbikJGzX8
- i10Urd/9IF2n+w6ebOb1DFvIbLUpPBkMse59Q3H1NXqTsZyXK40hEEuG9IAPXWMn3/k6
- rzdQ==
+ bh=byyo0i4MTXILv2QCvRwLsCxAFUJQBD5Tl5kOrKMI8mM=;
+ b=KHT98PYMI/+pxZZAgmNF4wTXquJZVgNqNUOgP9eYzGoj3WaITqMUZzx149jq0iZ3IE
+ zhkDSAOOZIJBH3D8uG/aqBU2AedSbQB+anBMtclIgpyqYSzBmlntOHXoiVyG2jyhIla1
+ lhOvyjekb76f851mp8f/rz81rRk/PCxsAzLUMjCIf/FwglZ/JI5pXjs+ByXmSb5s0bN9
+ eu90FanOCII0WY5athB1d7rjRfnMkmkMi7OxrjiU3XcYcTO5644S2ZJjJMdpgy6AzPV1
+ /8nE3xbPP1QpuYu1PwKGnzjwehOJvvZwu/++JLg7YxxggvH7wPLYOy4qeKoDxLXDaKVK
+ 2QOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FN6IYNmjTWTwD9RZgEK9RNt2Qj2Z8oostqa0BMBlrpo=;
- b=bnYHGcZ4MoV54tgKWFPlHlhlMKoNkqbg3oJ0UOe4BLHmPKfY/LSh+HIeG1L0fhAbTy
- 7fiF9kus8awTbEvZqOBAQVJrO2umpczKbSMNITOXRX8PwtREcd9Au2tSeUtgxLyf++IC
- mZ99Hn4QljVRqQc8XywNClCl+WQ78xPy7Cl+ogUKpen4DENvnvPBMHqT78MoNKotlYjw
- e3j7hgvPZUdmmQbRqnH2Z6J2msgp3rMIVUQi6ypKhetZ/o+v5zEDASFXKRhhF8yEo21T
- WcpgFT6t+6OOFbfbIXRNwczD2V9V75w09TYnJlaXualdvvargZipV2qB+cbzfTwRm/OQ
- XE8A==
-X-Gm-Message-State: APjAAAWt/nyA8T+NFjRukKGUJ9L6Gbv2xNa7+pvremwSkJrx+6ARLiKR
- k23IBkjCsQZrVVRFuG8NvOWoCcS1JWA8Tw==
-X-Google-Smtp-Source: APXvYqxY+J/AvJ0bUTaZG6j1ryF52ruSo2Fk1L7gbHWi7r8D5xjgB28T5UT5LaKujOCEPf8Z3HmX/A==
-X-Received: by 2002:adf:b648:: with SMTP id i8mr14801623wre.91.1580728414829; 
- Mon, 03 Feb 2020 03:13:34 -0800 (PST)
+ bh=byyo0i4MTXILv2QCvRwLsCxAFUJQBD5Tl5kOrKMI8mM=;
+ b=dwV55YXXhXV2/2x4ha+gRWPIJcCLJeD1tizXqo2raE79P08taKS3Z3x3obFnbQ+9Fc
+ 67p+IaeIAaHxwZOK4AGosWCG07s/2FCAwezDnXBkkoPWEljgdDzgEptHYlHDUvIxaSbj
+ IZq+72SFoZdCUacar1lZ7YZj4SP3RtytMQaDfFoAQF0ALl0gJzdSZzEaq0z5qb7p0ogz
+ tJHKrb/KRYolJ+9WfH+8DHl2B7QYDHPg8gkYQLXt8ibEx9efPcZ2VHQGBDEwh9TmJJJa
+ F9qDc7/GOOeJzs1O/DhLF7ffg8w6JFe+C3hrB9lrrAL2enU14ERHTTqsSVROuWL3/DiC
+ sNBg==
+X-Gm-Message-State: APjAAAWiO5GzwLpVU4Sqb2jQffzMHN0pImWN43rNBy3moduzQYZcPJrm
+ b4b4rEZHmPTWpLxBc/hxIj/JnwIjHC/X4g==
+X-Google-Smtp-Source: APXvYqycxoCjK/WsstsQzZ9GB/KwNqD+2zC83INZwDE/2HkDn3jAXPeoOGdCYcd+32LiNROgtWki7A==
+X-Received: by 2002:a7b:c147:: with SMTP id z7mr28215804wmi.168.1580728408866; 
+ Mon, 03 Feb 2020 03:13:28 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s139sm24028917wme.35.2020.02.03.03.13.33
+ by smtp.gmail.com with ESMTPSA id s139sm24028917wme.35.2020.02.03.03.13.25
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 03:13:34 -0800 (PST)
+ Mon, 03 Feb 2020 03:13:26 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 8/8] virtfs-proxy-helper: Convert documentation to rST
-Date: Mon,  3 Feb 2020 11:13:18 +0000
-Message-Id: <20200203111318.23378-9-peter.maydell@linaro.org>
+Subject: [PULL 4/8] qemu-img-cmds.hx: Add rST documentation fragments
+Date: Mon,  3 Feb 2020 11:13:14 +0000
+Message-Id: <20200203111318.23378-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200203111318.23378-1-peter.maydell@linaro.org>
 References: <20200203111318.23378-1-peter.maydell@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,256 +97,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The virtfs-proxy-helper documentation is currently in
-fsdev/qemu-trace-stap.texi in Texinfo format, which we
-present to the user as:
- * a virtfs-proxy-helper manpage
- * but not (unusually for QEMU) part of the HTML docs
+Add the rST versions of the documentation fragments.
+Once we've converted qemu-img.texi to rST we can delete
+the texi fragments; for the moment we leave them in place.
 
-Convert the documentation to rST format that lives in
-the docs/ subdirectory, and present it to the user as:
- * a virtfs-proxy-helper manpage
- * part of the interop/ Sphinx manual
-
-There are minor formatting changes to suit Sphinx, but no
-content changes. In particular I've split the -u and -g
-options into each having their own description text.
+(Commit created with the aid of emacs query-replace-regexp
+from "@var{\([^}]*\)}" to "\,(upcase \1))".)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Acked-by: Greg Kurz <groug@kaod.org>
-Message-id: 20200124162606.8787-9-peter.maydell@linaro.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200124162606.8787-5-peter.maydell@linaro.org
 ---
- Makefile                             |  7 ++-
- MAINTAINERS                          |  1 +
- docs/interop/conf.py                 |  5 +-
- docs/interop/index.rst               |  1 +
- docs/interop/virtfs-proxy-helper.rst | 72 ++++++++++++++++++++++++++++
- fsdev/virtfs-proxy-helper.texi       | 63 ------------------------
- 6 files changed, 81 insertions(+), 68 deletions(-)
- create mode 100644 docs/interop/virtfs-proxy-helper.rst
- delete mode 100644 fsdev/virtfs-proxy-helper.texi
+ qemu-img-cmds.hx | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 1e0440c3738..a6f5d440828 100644
---- a/Makefile
-+++ b/Makefile
-@@ -354,7 +354,7 @@ DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qe
- DOCS+=docs/qemu-cpu-models.7
- DOCS+=$(MANUAL_BUILDDIR)/index.html
- ifdef CONFIG_VIRTFS
--DOCS+=fsdev/virtfs-proxy-helper.1
-+DOCS+=$(MANUAL_BUILDDIR)/interop/virtfs-proxy-helper.1
- endif
- ifdef CONFIG_TRACE_SYSTEMTAP
- DOCS+=$(MANUAL_BUILDDIR)/interop/qemu-trace-stap.1
-@@ -859,7 +859,7 @@ endif
- endif
- ifdef CONFIG_VIRTFS
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
--	$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
-+	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
- endif
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 77b5a8dda8a..850fd9d4fe7 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -18,84 +18,125 @@ DEF("amend", img_amend,
+ STEXI
+ @item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
+ ETEXI
++SRST
++.. option:: amend [--object OBJECTDEF] [--image-opts] [-p] [-q] [-f FMT] [-t CACHE] -o OPTIONS FILENAME
++ERST
  
- install-datadir:
-@@ -1051,7 +1051,7 @@ $(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system)
- 	$(call build-manual,system,html)
+ DEF("bench", img_bench,
+     "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-i aio] [-w] [-U] filename")
+ STEXI
+ @item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-i @var{aio}] [-w] [-U] @var{filename}
+ ETEXI
+-
++SRST
++.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=FLUSH_INTERVAL] [-n] [--no-drain] [-o OFFSET] [--pattern=PATTERN] [-q] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-i AIO] [-w] [-U] FILENAME
++ERST
+ DEF("check", img_check,
+     "check [--object objectdef] [--image-opts] [-q] [-f fmt] [--output=ofmt] [-r [leaks | all]] [-T src_cache] [-U] filename")
+ STEXI
+ @item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
+ ETEXI
++SRST
++.. option:: check [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [--output=OFMT] [-r [leaks | all]] [-T SRC_CACHE] [-U] FILENAME
++ERST
  
- $(call define-manpage-rule,interop,\
--       qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1,\
-+       qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1 virtfs-proxy-helper.1,\
-        $(SRC_PATH/qemu-img-cmds.hx))
+ DEF("commit", img_commit,
+     "commit [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
+ STEXI
+ @item commit [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [-t @var{cache}] [-b @var{base}] [-d] [-p] @var{filename}
+ ETEXI
++SRST
++.. option:: commit [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [-t CACHE] [-b BASE] [-d] [-p] FILENAME
++ERST
  
- $(call define-manpage-rule,system,qemu-block-drivers.7)
-@@ -1078,7 +1078,6 @@ docs/interop/qemu-ga-qapi.texi: qga/qapi-generated/qga-qapi-doc.texi
+ DEF("compare", img_compare,
+     "compare [--object objectdef] [--image-opts] [-f fmt] [-F fmt] [-T src_cache] [-p] [-q] [-s] [-U] filename1 filename2")
+ STEXI
+ @item compare [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-F @var{fmt}] [-T @var{src_cache}] [-p] [-q] [-s] [-U] @var{filename1} @var{filename2}
+ ETEXI
++SRST
++.. option:: compare [--object OBJECTDEF] [--image-opts] [-f FMT] [-F FMT] [-T SRC_CACHE] [-p] [-q] [-s] [-U] FILENAME1 FILENAME2
++ERST
  
- qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
- qemu.1: qemu-option-trace.texi
--fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
- docs/qemu-cpu-models.7: docs/qemu-cpu-models.texi
+ DEF("convert", img_convert,
+     "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_filename")
+ STEXI
+ @item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] [--salvage] @var{filename} [@var{filename2} [...]] @var{output_filename}
+ ETEXI
++SRST
++.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] [--salvage] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
++ERST
  
- html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html sphinxdocs
-diff --git a/MAINTAINERS b/MAINTAINERS
-index db3cbc18c92..1f0bc72f218 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1574,6 +1574,7 @@ S: Odd Fixes
- F: hw/9pfs/
- X: hw/9pfs/xen-9p*
- F: fsdev/
-+F: docs/interop/virtfs-proxy-helper.rst
- F: tests/qtest/virtio-9p-test.c
- T: git https://github.com/gkurz/qemu.git 9p-next
+ DEF("create", img_create,
+     "create [--object objectdef] [-q] [-f fmt] [-b backing_file] [-F backing_fmt] [-u] [-o options] filename [size]")
+ STEXI
+ @item create [--object @var{objectdef}] [-q] [-f @var{fmt}] [-b @var{backing_file}] [-F @var{backing_fmt}] [-u] [-o @var{options}] @var{filename} [@var{size}]
+ ETEXI
++SRST
++.. option:: create [--object OBJECTDEF] [-q] [-f FMT] [-b BACKING_FILE] [-F BACKING_FMT] [-u] [-o OPTIONS] FILENAME [SIZE]
++ERST
  
-diff --git a/docs/interop/conf.py b/docs/interop/conf.py
-index baea7fb50ee..b0f322207ca 100644
---- a/docs/interop/conf.py
-+++ b/docs/interop/conf.py
-@@ -24,5 +24,8 @@ man_pages = [
-     ('qemu-nbd', 'qemu-nbd', u'QEMU Disk Network Block Device Server',
-      ['Anthony Liguori <anthony@codemonkey.ws>'], 8),
-     ('qemu-trace-stap', 'qemu-trace-stap', u'QEMU SystemTap trace tool',
--     [], 1)
-+     [], 1),
-+    ('virtfs-proxy-helper', 'virtfs-proxy-helper',
-+     u'QEMU 9p virtfs proxy filesystem helper',
-+     ['M. Mohan Kumar'], 1)
- ]
-diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-index d756a826b26..3b763b1eebe 100644
---- a/docs/interop/index.rst
-+++ b/docs/interop/index.rst
-@@ -23,3 +23,4 @@ Contents:
-    qemu-trace-stap
-    vhost-user
-    vhost-user-gpu
-+   virtfs-proxy-helper
-diff --git a/docs/interop/virtfs-proxy-helper.rst b/docs/interop/virtfs-proxy-helper.rst
-new file mode 100644
-index 00000000000..6cdeedf8e93
---- /dev/null
-+++ b/docs/interop/virtfs-proxy-helper.rst
-@@ -0,0 +1,72 @@
-+QEMU 9p virtfs proxy filesystem helper
-+======================================
-+
-+Synopsis
-+--------
-+
-+**virtfs-proxy-helper** [*OPTIONS*]
-+
-+Description
-+-----------
-+
-+Pass-through security model in QEMU 9p server needs root privilege to do
-+few file operations (like chown, chmod to any mode/uid:gid).  There are two
-+issues in pass-through security model:
-+
-+- TOCTTOU vulnerability: Following symbolic links in the server could
-+  provide access to files beyond 9p export path.
-+
-+- Running QEMU with root privilege could be a security issue.
-+
-+To overcome above issues, following approach is used: A new filesystem
-+type 'proxy' is introduced. Proxy FS uses chroot + socket combination
-+for securing the vulnerability known with following symbolic links.
-+Intention of adding a new filesystem type is to allow qemu to run
-+in non-root mode, but doing privileged operations using socket IO.
-+
-+Proxy helper (a stand alone binary part of qemu) is invoked with
-+root privileges. Proxy helper chroots into 9p export path and creates
-+a socket pair or a named socket based on the command line parameter.
-+QEMU and proxy helper communicate using this socket. QEMU proxy fs
-+driver sends filesystem request to proxy helper and receives the
-+response from it.
-+
-+The proxy helper is designed so that it can drop root privileges except
-+for the capabilities needed for doing filesystem operations.
-+
-+Options
-+-------
-+
-+The following options are supported:
-+
-+.. program:: virtfs-proxy-helper
-+
-+.. option:: -h
-+
-+  Display help and exit
-+
-+.. option:: -p, --path PATH
-+
-+  Path to export for proxy filesystem driver
-+
-+.. option:: -f, --fd SOCKET_ID
-+
-+  Use given file descriptor as socket descriptor for communicating with
-+  qemu proxy fs drier. Usually a helper like libvirt will create
-+  socketpair and pass one of the fds as parameter to this option.
-+
-+.. option:: -s, --socket SOCKET_FILE
-+
-+  Creates named socket file for communicating with qemu proxy fs driver
-+
-+.. option:: -u, --uid UID
-+
-+  uid to give access to named socket file; used in combination with -g.
-+
-+.. option:: -g, --gid GID
-+
-+  gid to give access to named socket file; used in combination with -u.
-+
-+.. option:: -n, --nodaemon
-+
-+  Run as a normal program. By default program will run in daemon mode
-diff --git a/fsdev/virtfs-proxy-helper.texi b/fsdev/virtfs-proxy-helper.texi
-deleted file mode 100644
-index f4cbb60623b..00000000000
---- a/fsdev/virtfs-proxy-helper.texi
-+++ /dev/null
-@@ -1,63 +0,0 @@
--@example
--@c man begin SYNOPSIS
--@command{virtfs-proxy-helper} @var{options}
--@c man end
--@end example
--
--@c man begin DESCRIPTION
--@table @description
--Pass-through security model in QEMU 9p server needs root privilege to do
--few file operations (like chown, chmod to any mode/uid:gid).  There are two
--issues in pass-through security model
--
--1) TOCTTOU vulnerability: Following symbolic links in the server could
--provide access to files beyond 9p export path.
--
--2) Running QEMU with root privilege could be a security issue.
--
--To overcome above issues, following approach is used: A new filesystem
--type 'proxy' is introduced. Proxy FS uses chroot + socket combination
--for securing the vulnerability known with following symbolic links.
--Intention of adding a new filesystem type is to allow qemu to run
--in non-root mode, but doing privileged operations using socket IO.
--
--Proxy helper(a stand alone binary part of qemu) is invoked with
--root privileges. Proxy helper chroots into 9p export path and creates
--a socket pair or a named socket based on the command line parameter.
--QEMU and proxy helper communicate using this socket. QEMU proxy fs
--driver sends filesystem request to proxy helper and receives the
--response from it.
--
--The proxy helper is designed so that it can drop root privileges except
--for the capabilities needed for doing filesystem operations.
--
--@end table
--@c man end
--
--@c man begin OPTIONS
--The following options are supported:
--@table @option
--@item -h
--@findex -h
--Display help and exit
--@item -p|--path path
--Path to export for proxy filesystem driver
--@item -f|--fd socket-id
--Use given file descriptor as socket descriptor for communicating with
--qemu proxy fs drier. Usually a helper like libvirt will create
--socketpair and pass one of the fds as parameter to -f|--fd
--@item -s|--socket socket-file
--Creates named socket file for communicating with qemu proxy fs driver
--@item -u|--uid uid -g|--gid gid
--uid:gid combination to give access to named socket file
--@item -n|--nodaemon
--Run as a normal program. By default program will run in daemon mode
--@end table
--@c man end
--
--@setfilename virtfs-proxy-helper
--@settitle QEMU 9p virtfs proxy filesystem helper
--
--@c man begin AUTHOR
--M. Mohan Kumar
--@c man end
+ DEF("dd", img_dd,
+     "dd [--image-opts] [-U] [-f fmt] [-O output_fmt] [bs=block_size] [count=blocks] [skip=blocks] if=input of=output")
+ STEXI
+ @item dd [--image-opts] [-U] [-f @var{fmt}] [-O @var{output_fmt}] [bs=@var{block_size}] [count=@var{blocks}] [skip=@var{blocks}] if=@var{input} of=@var{output}
+ ETEXI
++SRST
++.. option:: dd [--image-opts] [-U] [-f FMT] [-O OUTPUT_FMT] [bs=BLOCK_SIZE] [count=BLOCKS] [skip=BLOCKS] if=INPUT of=OUTPUT
++ERST
+ 
+ DEF("info", img_info,
+     "info [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [--backing-chain] [-U] filename")
+ STEXI
+ @item info [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [--backing-chain] [-U] @var{filename}
+ ETEXI
++SRST
++.. option:: info [--object OBJECTDEF] [--image-opts] [-f FMT] [--output=OFMT] [--backing-chain] [-U] FILENAME
++ERST
+ 
+ DEF("map", img_map,
+     "map [--object objectdef] [--image-opts] [-f fmt] [--output=ofmt] [-U] filename")
+ STEXI
+ @item map [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--output=@var{ofmt}] [-U] @var{filename}
+ ETEXI
++SRST
++.. option:: map [--object OBJECTDEF] [--image-opts] [-f FMT] [--output=OFMT] [-U] FILENAME
++ERST
+ 
+ DEF("measure", img_measure,
+ "measure [--output=ofmt] [-O output_fmt] [-o options] [--size N | [--object objectdef] [--image-opts] [-f fmt] [-l snapshot_param] filename]")
+ STEXI
+ @item measure [--output=@var{ofmt}] [-O @var{output_fmt}] [-o @var{options}] [--size @var{N} | [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [-l @var{snapshot_param}] @var{filename}]
+ ETEXI
++SRST
++.. option:: measure [--output=OFMT] [-O OUTPUT_FMT] [-o OPTIONS] [--size N | [--object OBJECTDEF] [--image-opts] [-f FMT] [-l SNAPSHOT_PARAM] FILENAME]
++ERST
+ 
+ DEF("snapshot", img_snapshot,
+     "snapshot [--object objectdef] [--image-opts] [-U] [-q] [-l | -a snapshot | -c snapshot | -d snapshot] filename")
+ STEXI
+ @item snapshot [--object @var{objectdef}] [--image-opts] [-U] [-q] [-l | -a @var{snapshot} | -c @var{snapshot} | -d @var{snapshot}] @var{filename}
+ ETEXI
++SRST
++.. option:: snapshot [--object OBJECTDEF] [--image-opts] [-U] [-q] [-l | -a SNAPSHOT | -c SNAPSHOT | -d SNAPSHOT] FILENAME
++ERST
+ 
+ DEF("rebase", img_rebase,
+     "rebase [--object objectdef] [--image-opts] [-U] [-q] [-f fmt] [-t cache] [-T src_cache] [-p] [-u] -b backing_file [-F backing_fmt] filename")
+ STEXI
+ @item rebase [--object @var{objectdef}] [--image-opts] [-U] [-q] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-p] [-u] -b @var{backing_file} [-F @var{backing_fmt}] @var{filename}
+ ETEXI
++SRST
++.. option:: rebase [--object OBJECTDEF] [--image-opts] [-U] [-q] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-p] [-u] -b BACKING_FILE [-F BACKING_FMT] FILENAME
++ERST
+ 
+ DEF("resize", img_resize,
+     "resize [--object objectdef] [--image-opts] [-f fmt] [--preallocation=prealloc] [-q] [--shrink] filename [+ | -]size")
+ STEXI
+ @item resize [--object @var{objectdef}] [--image-opts] [-f @var{fmt}] [--preallocation=@var{prealloc}] [-q] [--shrink] @var{filename} [+ | -]@var{size}
+ ETEXI
++SRST
++.. option:: resize [--object OBJECTDEF] [--image-opts] [-f FMT] [--preallocation=PREALLOC] [-q] [--shrink] FILENAME [+ | -]SIZE
++ERST
+ 
+ STEXI
+ @end table
 -- 
 2.20.1
 
