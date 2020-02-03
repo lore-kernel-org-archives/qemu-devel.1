@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32579C35249
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74597C35249
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:18:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0719620679
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:18:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0719620679
+	by mail.kernel.org (Postfix) with ESMTPS id 4DA8720679
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 00:18:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DA8720679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyPRa-0000fL-7P
-	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 19:18:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33012)
+	id 1iyPRe-0000sa-FP
+	for qemu-devel@archiver.kernel.org; Sun, 02 Feb 2020 19:18:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iyPQS-0006lf-1J
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:16 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1iyPQX-00071N-Ve
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iyPQQ-00047I-Ui
- for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:15 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2690 helo=huawei.com)
+ (envelope-from <guoheyi@huawei.com>) id 1iyPQW-0004Dj-PY
+ for qemu-devel@nongnu.org; Sun, 02 Feb 2020 19:17:21 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38208 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iyPQO-000419-Hl; Sun, 02 Feb 2020 19:17:12 -0500
+ id 1iyPQU-00048G-9a; Sun, 02 Feb 2020 19:17:18 -0500
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 5961495E92C981BD13A2;
- Mon,  3 Feb 2020 08:17:09 +0800 (CST)
+ by Forcepoint Email with ESMTP id 67CB4D6B5B1CFFB84D44;
+ Mon,  3 Feb 2020 08:17:14 +0800 (CST)
 Received: from linux-TFkxOR.huawei.com (10.175.104.212) by
  DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 3 Feb 2020 08:17:00 +0800
+ 14.3.439.0; Mon, 3 Feb 2020 08:17:04 +0800
 From: Heyi Guo <guoheyi@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 1/7] bios-tables-test: prepare to change ARM virt ACPI DSDT
-Date: Mon, 3 Feb 2020 08:14:59 +0800
-Message-ID: <20200203001505.52573-2-guoheyi@huawei.com>
+Subject: [PATCH v2 6/7] arm/acpi: simplify the description of PCI _CRS
+Date: Mon, 3 Feb 2020 08:15:04 +0800
+Message-ID: <20200203001505.52573-7-guoheyi@huawei.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20200203001505.52573-1-guoheyi@huawei.com>
 References: <20200203001505.52573-1-guoheyi@huawei.com>
@@ -53,7 +53,7 @@ X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,9 +74,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to change ARM virt ACPI DSDT table, which will cause make
-check to fail, so temporarily add related golden masters to ignore
-list.
+The original code defines a named object for the resource template but
+then returns the resource template object itself; the resulted output
+is like below:
+
+Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource Settings
+{
+    Name (RBUF, ResourceTemplate ()
+    {
+        WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
+            0x0000,             // Granularity
+            0x0000,             // Range Minimum
+            0x00FF,             // Range Maximum
+            0x0000,             // Translation Offset
+            0x0100,             // Length
+            ,, )
+        ......
+    })
+    Return (ResourceTemplate ()
+    {
+        WordBusNumber (ResourceProducer, MinFixed, MaxFixed, PosDecode,
+            0x0000,             // Granularity
+            0x0000,             // Range Minimum
+            0x00FF,             // Range Maximum
+            0x0000,             // Translation Offset
+            0x0100,             // Length
+            ,, )
+        ......
+    })
+}
+
+So the named object "RBUF" is actually useless. The more natural way
+is to return RBUF instead, or simply drop RBUF definition.
+
+Choose the latter one to simplify the code.
 
 Signed-off-by: Heyi Guo <guoheyi@huawei.com>
 
@@ -88,19 +119,22 @@ Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 Cc: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org
 ---
- tests/qtest/bios-tables-test-allowed-diff.h | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/arm/virt-acpi-build.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bi=
-os-tables-test-allowed-diff.h
-index dfb8523c8b..32a401ae35 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,4 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/virt/DSDT",
-+"tests/data/acpi/virt/DSDT.memhp",
-+"tests/data/acpi/virt/DSDT.numamem",
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index f3e340b172..fb4b166f82 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -236,7 +236,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
+pEntry *memmap,
+                              size_mmio_high));
+     }
+=20
+-    aml_append(method, aml_name_decl("RBUF", rbuf));
+     aml_append(method, aml_return(rbuf));
+     aml_append(dev, method);
+=20
 --=20
 2.19.1
 
