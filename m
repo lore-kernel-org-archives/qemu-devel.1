@@ -7,112 +7,112 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD4FEC33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BEDC33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:19:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84D1B2082E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:18:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07C472084E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:19:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QtdWU8de"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84D1B2082E
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RRuL79+0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C472084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyafv-0005J2-NY
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:17:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49158)
+	id 1iyahF-0006FI-7v
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:19:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49427)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iyafG-0004jB-O7
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:17:20 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iyagN-0005hC-Ak
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:18:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iyafF-00031S-HF
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:17:18 -0500
-Received: from mail-eopbgr140104.outbound.protection.outlook.com
- ([40.107.14.104]:39301 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iyagL-0004KG-VF
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:18:27 -0500
+Received: from mail-eopbgr140115.outbound.protection.outlook.com
+ ([40.107.14.115]:37538 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iyafC-0002vL-VY; Mon, 03 Feb 2020 07:17:15 -0500
+ id 1iyagF-00045I-2v; Mon, 03 Feb 2020 07:18:19 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lxGQfoP8SAAaHNZ5r8sWJjVgMvAHPH8HtmbsTSq7pfKaliQahphniVfHbL5lnDq/kxKzycay082tg8XSOsTpWbAHpfBincUrnlinKbRLu6sRyxOuWhiEZedJvIEuJYb6KhCIKcZz1VRTk0k2/CLcGRCmhRNiNKHd9c+mi3Dp2ndancwn2FZvylc2UIQmW2lHg8TlB45yXb1maEkL+eQ1aXOCxniPo4crj73dwDTt9l8FB2VBP0Ti/UxLcxSZqCDbaPQ1qIDY7eEKsdFoneTr2k28+UDWlTPXtAGXO6lKCQPOre/bdCwjVha7CWvltFLut+r2E3yr3uCxbATjrUYZTQ==
+ b=iN8Osiv9NN5Dk6ljEJtydfQF8qv7b3XnsL1jC0ClvnDvreyAKd3Bbj8+2EeLTN3lyuopzjPOAEDxtegIrxaddZ6CozO4kq0rXr2idkh9a9taqPwlfLyqU2c65dqX+pjQTRN/PLP/O/yvrUG7T3mu/M21fSevCCvi3p7XzSzw881AqODFVe5u3GQXmtC39+aRb2L2IMn3UoYMPfVMAGZK8LuNC4SVmMDUiTz5spo6nHu877NGB0/NFDIpYwNrw4cZNBF5qG5quZgGkRL1Bf8FC/5WtuzDoIBs5bWmTFVJPbLCuAx/E6xvrZzOU+39Y4E6+SVk+Qt2KErZ/8o32/grfw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UROMo3X7M240eluFlpmPRGhG+zDafOIlGb6FQw326eo=;
- b=hIXQuw+i2XJq0zFTP56h9dMAIBfnEfm0C7FFWQKsD/yeP1/gO56fDX9lXt1WICjbWUvT8T2fVQ4mmWq9N4FBSmDleiVF/Ib4FmBauAWzudypHGRbXz8cjOppYMtMt4EGVL77jbq+33udlpT8rZzyxwrCrDN5T5mdLHVXpIR79+MMDxZmkgkWw7H6iIRE8vJPspj4fy4BomvMo4W0Me1bJZiCdPoO5dMX4HKm9Tpnlbs4Dw7QEkAtyF4I8XyvK/P2iIIcT52mcUKTWre3g+cZ5IchDzLcNJdLDdwoxXkTjXA4sjFzwQZuA9rvvpcffo/JPVrydlH0TQaSgWE7ahvxvA==
+ bh=v9popD9sHmdKxwP8LN1QH5/Za/LeozRtlEeumjesoLs=;
+ b=kolw8ylVSPAJD0U5PNO4oquGhCRjniAhLoUFg3djCk0gGb1mBUaPwN7m+et2zmriq8vwne1qnhb8rRuCXB2J0nX77uiaDJZnzvHM0U2U6uhmFMzelr11/+f47BijEQ6+ruYLImP4q/hM+NWoWx3Ner6uy5M2IusV7vhlyOzZ30TUA8YH3KfECFOxue69/L8S2V0LEDDLD82FknBH0sxl1W9NOXT0i941BHHeH1JpPxjM8nAQ6GpRCwO6G4FrstrbJOclaax80JkpXIcG1WGaQ2OZDmW7w92yoPqycyQrZ43spoiB362gexpU8h2YToLbUgxCRXDIYPYmeYaRWQDPyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UROMo3X7M240eluFlpmPRGhG+zDafOIlGb6FQw326eo=;
- b=QtdWU8deNAEdljL8MjkWi0WYzKGBjrUu3KQaXg+iFBVHmNBcqssq44ZwZlPHUowZSZLKvrxnGvp5mfMPB5T3s2j3DjPqK6dQNsA1aubsQ65RY66wKv0eNMh0elY2Bcvr4otZqsfmCRXQ9ykPkqsP15LMpElPXQ2eYNt5ifGq2x4=
+ bh=v9popD9sHmdKxwP8LN1QH5/Za/LeozRtlEeumjesoLs=;
+ b=RRuL79+0bnVYFRnXLltiaTdu3UI8zCXoxjrnkzFGoSqfOkF7Ct61ONhPcP59LZSOCYFnMcQB+2os5I3Z7UyAVjeTBjPRVw7tkCV7tn+Nb31TmHbnqeYGAolI0+f0A8CK7GeFzjaaQlQkvxr7DCS5I96/wFezYjit4Q4xZU1UaL0=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=dplotnikov@virtuozzo.com; 
 Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
  AM0PR08MB4500.eurprd08.prod.outlook.com (20.179.36.10) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.29; Mon, 3 Feb 2020 12:17:11 +0000
+ 15.20.2686.29; Mon, 3 Feb 2020 12:18:14 +0000
 Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
  ([fe80::5558:d9d2:7f7d:e4]) by AM0PR08MB3745.eurprd08.prod.outlook.com
  ([fe80::5558:d9d2:7f7d:e4%2]) with mapi id 15.20.2686.031; Mon, 3 Feb 2020
- 12:17:11 +0000
-Subject: Re: [PATCH v1 1/4] virtio: introduce VIRTQUEUE_DEFUALT_SIZE instead
- of hardcoded constants
+ 12:18:14 +0000
+Subject: Re: [PATCH v1 2/4] virtio: increase virtuqueue size for virtio-scsi
+ and virtio-blk
 To: "Michael S. Tsirkin" <mst@redhat.com>
 References: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
- <20200129140702.5411-2-dplotnikov@virtuozzo.com>
- <20200130083800-mutt-send-email-mst@kernel.org>
+ <20200129140702.5411-3-dplotnikov@virtuozzo.com>
+ <20200130084000-mutt-send-email-mst@kernel.org>
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <ad737ab5-2931-0a56-20d2-abc2bbf1838a@virtuozzo.com>
-Date: Mon, 3 Feb 2020 15:17:07 +0300
+Message-ID: <4f866f22-34ea-e70e-4f41-22c10ea610b0@virtuozzo.com>
+Date: Mon, 3 Feb 2020 15:18:11 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
-In-Reply-To: <20200130083800-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200130084000-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-ClientProxiedBy: HE1PR09CA0081.eurprd09.prod.outlook.com
- (2603:10a6:7:3d::25) To AM0PR08MB3745.eurprd08.prod.outlook.com
+X-ClientProxiedBy: HE1PR09CA0071.eurprd09.prod.outlook.com
+ (2603:10a6:7:3d::15) To AM0PR08MB3745.eurprd08.prod.outlook.com
  (2603:10a6:208:ff::27)
 MIME-Version: 1.0
 Received: from [192.168.1.63] (46.63.156.34) by
- HE1PR09CA0081.eurprd09.prod.outlook.com (2603:10a6:7:3d::25) with Microsoft
+ HE1PR09CA0071.eurprd09.prod.outlook.com (2603:10a6:7:3d::15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.32 via Frontend Transport; Mon, 3 Feb 2020 12:17:09 +0000
+ 15.20.2686.30 via Frontend Transport; Mon, 3 Feb 2020 12:18:12 +0000
 X-Originating-IP: [46.63.156.34]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b1acdf6c-3119-4b9c-0393-08d7a8a2fe9b
+X-MS-Office365-Filtering-Correlation-Id: 16919d63-aa2d-4cf2-ed99-08d7a8a3245b
 X-MS-TrafficTypeDiagnostic: AM0PR08MB4500:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR08MB45001EA3DA03C692BC1D2BB2CF000@AM0PR08MB4500.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:913;
+X-Microsoft-Antispam-PRVS: <AM0PR08MB4500E2AB673B1A037009C382CF000@AM0PR08MB4500.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-Forefront-PRVS: 0302D4F392
 X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(346002)(39840400004)(136003)(366004)(396003)(376002)(189003)(199004)(86362001)(26005)(16526019)(186003)(107886003)(6916009)(66556008)(66946007)(66476007)(31686004)(7416002)(2616005)(956004)(36756003)(4326008)(52116002)(8676002)(8936002)(2906002)(316002)(31696002)(16576012)(5660300002)(81166006)(81156014)(53546011)(6486002)(478600001);
+ SFS:(10019020)(136003)(376002)(396003)(366004)(39850400004)(346002)(199004)(189003)(8676002)(8936002)(956004)(2616005)(36756003)(4326008)(52116002)(53546011)(81156014)(81166006)(6486002)(478600001)(316002)(2906002)(31696002)(16576012)(5660300002)(6916009)(107886003)(31686004)(66556008)(66476007)(66946007)(86362001)(966005)(26005)(16526019)(186003)(7416002);
  DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4500;
  H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
+ PTR:InfoNoRecords; A:1; MX:1; 
 Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MLyPsIY2mQH7olUSDtQ4yAUUY8GRmEIUO4Yn6u9A0MQaSqfsCPTA61l/hMmlmXB8b7rCWND9LCOq5Wl95PUNY1JXE1k/nekDWLM3tqvC+SLpIy6og3iNK+ckb1lBqptgQs6D9lTFjzgMJnoccCX167l4GE6Kts/QxHtcYy0B6Fzxb5ju118Hy2TYLzK6HfFqAERKF75qR0WKsHjUT/qvzkWI2Jvz4PL7ZkZ70ZQ+jBorr1ElX2onrBG+JDZ8SeXkhqeKJ2tWUFCWVv2mv/ci48Mhp/TE+DUVnjSjDOdECvpJBmcaEtaDW0sA7q5DOFMM/JaLqQnsulR1Ggzs+ryn8CMUs0ZgOdcu44EPlD3VgfqQKwOpuPaoSUW4ibuzyYTh1ngnthN67waZ+alOJD2GJ1DtnvzealBwglwK8MiTfsQR4qvDG/HvMr5ILn0UibNU
-X-MS-Exchange-AntiSpam-MessageData: JDU6tCAKf5Be8G+3dS/cHbXlGc8JncLKoE7z3UeNsYOCR4n6WfMcX8ollGfU1VeJ4wJxaxAz+pEV+l1AS10AOPkBwYjTBMegVnfVRnZgegm+aq0tMENOuEozKoKvv4m2ppgEv4aX37ZaOa0YySQsYQ==
+X-Microsoft-Antispam-Message-Info: lAKnc81RcATC3vlXtqRFGGYzNwTgJ6SmH34r8QsycynsLuBYsMI36VHYymiGoIOrCBU+w21suy5DNx683FiahT+4egyMk27TSGCZFrnmnwsHhI01giFY6bKxMsJcJIeT/v9b325JjFsPtbxFCgKUWYPHUnD7fEhsZajBdHQtkSm0xRPmS4C/HHxIMraTE6bArYzDNHzCUCA1zP4EUTyaiU84nvid8Yh8YpKCSvOMZehzeNpEuayB6JOGssu69Kq/epgmIRA6IV+CGt3eigExAM233Hf44iiO4kkKs6nSIJnv4ws2SIYoEI3psSaDqZvz+hC+CLasedpOZDgn3JHdrEfyQhI+kIqQV5WKn8dIb+Som3FRd8eeaxGcAHTs54sNZbrpsgZOiR0pUFkysCqEOLrSRu6LBFKI2MnaIg7UkM+2rov1wgNbmpIhAamUO2YFf/tJJ8jXCISbgNo02xCWR/RXdtlAyWEHy7Vvnhxc4mBWabugcy6G6uPmM2vSmVKlaRDVSIwKmBAqQXcwMUZzmQ==
+X-MS-Exchange-AntiSpam-MessageData: 97U3Edq8TNni/pEyhzsj7PKlLXfnpuNEvpoOwPoRrvta1eaqvjYoxaRd/Y/4u9WtMg3BOwr9KWyTspspbBepgyYNwq2sUrY3qMXa98Cvx5V+TbEwd2ue2SUQPmsNVNCteTJY4tnSuXdopmW4gUKQ9A==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1acdf6c-3119-4b9c-0393-08d7a8a2fe9b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2020 12:17:10.9772 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 16919d63-aa2d-4cf2-ed99-08d7a8a3245b
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2020 12:18:14.0343 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4FbQxdaDyrL4Ja8bxs3r1Ok6lDmkzw7WBbnVsuchWMZIMZGKWdcuxbJeL0w9NtaJszjzahjEq3n6OuHHaTZk19cdwczTQBpj6jS/U7baRd0=
+X-MS-Exchange-CrossTenant-UserPrincipalName: Xg3FQmDWME//3Pgz+0v0u9xk06Hf3fnkedZUit8fPQ2tQUTcbJUHX8YC7YvY+W1FYR80SXqvBf2ZMWzMLb91qTFwoX9Oa8FJCK4WsHlLan0=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4500
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.14.104
+X-Received-From: 40.107.14.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,81 +134,59 @@ Sender: "Qemu-devel"
 
 
 
-On 30.01.2020 16:38, Michael S. Tsirkin wrote:
-> On Wed, Jan 29, 2020 at 05:06:59PM +0300, Denis Plotnikov wrote:
+On 30.01.2020 16:40, Michael S. Tsirkin wrote:
+> On Wed, Jan 29, 2020 at 05:07:00PM +0300, Denis Plotnikov wrote:
+>> The goal is to reduce the amount of requests issued by a guest on
+>> 1M reads/writes. This rises the performance up to 4% on that kind of
+>> disk access pattern.
+>>
+>> The maximum chunk size to be used for the guest disk accessing is
+>> limited with seg_max parameter, which represents the max amount of
+>> pices in the scatter-geather list in one guest disk request.
+>>
+>> Since seg_max is virqueue_size dependent, increasing the virtqueue
+>> size increases seg_max, which, in turn, increases the maximum size
+>> of data to be read/write from guest disk.
+>>
+>> More details in the original problem statment:
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03721.html
+>>
+>> Suggested-by: Denis V. Lunev <den@openvz.org>
 >> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 >
-> I'm not sure what the point is. It's more or less an accident that
-> these two devices share the queue size, this constance
-> makes no sense to me.
-Ok, then let's just make a separate queue length constant for each type.
-(Will redo and send in the next series)
-Thanks!
-
+> looks good but let's just patch each device separately.
+Ok
 Denis
 >
 >> ---
->>   hw/block/virtio-blk.c      | 6 ++++--
->>   hw/scsi/virtio-scsi.c      | 5 +++--
->>   include/hw/virtio/virtio.h | 1 +
->>   3 files changed, 8 insertions(+), 4 deletions(-)
+>>   hw/core/machine.c          | 3 +++
+>>   include/hw/virtio/virtio.h | 2 +-
+>>   2 files changed, 4 insertions(+), 1 deletion(-)
 >>
->> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
->> index 09f46ed85f..72f935033f 100644
->> --- a/hw/block/virtio-blk.c
->> +++ b/hw/block/virtio-blk.c
->> @@ -914,7 +914,8 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
->>       memset(&blkcfg, 0, sizeof(blkcfg));
->>       virtio_stq_p(vdev, &blkcfg.capacity, capacity);
->>       virtio_stl_p(vdev, &blkcfg.seg_max,
->> -                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 : 128 - 2);
->> +                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 :
->> +                                          VIRTQUEUE_DEFAULT_SIZE - 2);
->>       virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
->>       virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
->>       virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
->> @@ -1272,7 +1273,8 @@ static Property virtio_blk_properties[] = {
->>       DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging, 0,
->>                       true),
->>       DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
->> -    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
->> +    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size,
->> +                       VIRTQUEUE_DEFAULT_SIZE),
->>       DEFINE_PROP_BOOL("seg-max-adjust", VirtIOBlock, conf.seg_max_adjust, true),
->>       DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
->>                        IOThread *),
->> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
->> index 3b61563609..36f66046ae 100644
->> --- a/hw/scsi/virtio-scsi.c
->> +++ b/hw/scsi/virtio-scsi.c
->> @@ -660,7 +660,8 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
+>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+>> index 3e288bfceb..8bc401d8b7 100644
+>> --- a/hw/core/machine.c
+>> +++ b/hw/core/machine.c
+>> @@ -28,6 +28,9 @@
+>>   #include "hw/mem/nvdimm.h"
 >>   
->>       virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
->>       virtio_stl_p(vdev, &scsiconf->seg_max,
->> -                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 : 128 - 2);
->> +                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 :
->> +                                          VIRTQUEUE_DEFAULT_SIZE - 2);
->>       virtio_stl_p(vdev, &scsiconf->max_sectors, s->conf.max_sectors);
->>       virtio_stl_p(vdev, &scsiconf->cmd_per_lun, s->conf.cmd_per_lun);
->>       virtio_stl_p(vdev, &scsiconf->event_info_size, sizeof(VirtIOSCSIEvent));
->> @@ -965,7 +966,7 @@ static void virtio_scsi_device_unrealize(DeviceState *dev, Error **errp)
->>   static Property virtio_scsi_properties[] = {
->>       DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
->>       DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
->> -                                         parent_obj.conf.virtqueue_size, 128),
->> +                       parent_obj.conf.virtqueue_size, VIRTQUEUE_DEFAULT_SIZE),
->>       DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSI,
->>                         parent_obj.conf.seg_max_adjust, true),
->>       DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_sectors,
+>>   GlobalProperty hw_compat_4_2[] = {
+>> +    { "virtio-blk-device", "queue-size", "128"},
+>> +    { "virtio-scsi-device", "virtqueue_size", "128"},
+>> +    { "vhost-blk-device", "virtqueue_size", "128"},
+>>       { "virtio-blk-device", "x-enable-wce-if-config-wce", "off" },
+>>       { "virtio-blk-device", "seg-max-adjust", "off"},
+>>       { "virtio-scsi-device", "seg_max_adjust", "off"},
 >> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
->> index b69d517496..a66ea2368b 100644
+>> index a66ea2368b..16d540e390 100644
 >> --- a/include/hw/virtio/virtio.h
 >> +++ b/include/hw/virtio/virtio.h
->> @@ -48,6 +48,7 @@ size_t virtio_feature_get_config_size(VirtIOFeature *features,
+>> @@ -48,7 +48,7 @@ size_t virtio_feature_get_config_size(VirtIOFeature *features,
 >>   typedef struct VirtQueue VirtQueue;
 >>   
 >>   #define VIRTQUEUE_MAX_SIZE 1024
->> +#define VIRTQUEUE_DEFAULT_SIZE 128
+>> -#define VIRTQUEUE_DEFAULT_SIZE 128
+>> +#define VIRTQUEUE_DEFAULT_SIZE 256
 >>   
 >>   typedef struct VirtQueueElement
 >>   {
