@@ -2,101 +2,84 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FBFC33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D217C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:13:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60DF92082E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:12:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBDBE2082E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:13:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bxeAYG1R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60DF92082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Egz5OJa0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDBE2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyaa7-0000c2-Ib
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:11:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47397)
+	id 1iyabE-0001st-Vd
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:13:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47605)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iyaZ7-0008AR-O9
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:10:58 -0500
+ (envelope-from <thuth@redhat.com>) id 1iyaaU-0001Cw-8F
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:12:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iyaZ6-0004FR-OT
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:10:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56680
+ (envelope-from <thuth@redhat.com>) id 1iyaaS-0005JP-Td
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:12:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53494
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iyaZ6-0004FJ-L1
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:10:56 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iyaaS-0005J6-PN
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:12:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580731856;
+ s=mimecast20190719; t=1580731940;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EgXyIc9yJgt99aTXmAsn6Ote3c7lAnT4TIkX8vWTrh4=;
- b=bxeAYG1REgO/akwd/R4XhOdn0EsbUP/ZK6ESMVOruaCorIKoPnbleQnfnpvkH9iPgp2/WJ
- fFitGWwITcWxnbwnv/oTbyne6DbbT9w6vvDDWqcGguk9Z6aCLN+qdM3+wrzZWzOi1BYzyR
- JJQQ5g0XaFMct2k2LbZ6KCF4YWezCU0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-3eI0sc08M6K1UjmhTgyCPQ-1; Mon, 03 Feb 2020 07:10:52 -0500
-Received: by mail-wm1-f69.google.com with SMTP id d4so3935274wmd.7
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 04:10:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MQd+Sg+CCsPuGVmbbl2Xu50bbinJ05N2ivB/V2mVvYM=;
- b=eBq2Yug/8kyNb7b/IBBuHgw3BH2loaxTIc/nTqccLIhA4eaElLAMhgakP0BM6xuX7F
- o/FMBWnGXg4ItMur0Zp9oFIP75vjlCwhZH292JT4sBFPXQp5LzhZieBbgOlzrve9n6zo
- bG9tmRNLzZoGY9iQtIbDE9ROvlJt3RdSJ1/y4Lg6hJEFLdTBiStr5IHIGNGf9NyrLerM
- JOu97sCY/p/wbveytyJ8FeyjmntluaUiBWUFq6vQ3R3t6Z6M1E9F04+rGNxQKBqyV9eM
- JIO6DKZC9edqhuEU1zm0FYQYNQQcBhMZAqtDN4nEykp+E6FwVwnETXwGZdx6lRlsHZK7
- 1v9A==
-X-Gm-Message-State: APjAAAVDNHD5MBgsGifT9aYb+BGi5LSOzC4NORCPZ1QP2/tnJLu2Cl+7
- 2fRy6ZKbF2KLmWo3GGV5o43nXL/8UwVOSB7vPk2z8kyWUDW9J0+wXzPo1OnfY07ffdB7+V69fL/
- vwc/US9sg217B4F0=
-X-Received: by 2002:a1c:9c52:: with SMTP id f79mr28831373wme.30.1580731851123; 
- Mon, 03 Feb 2020 04:10:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxpuL9aZtQ35WRSc2Em3Us9bK+D3CGZQbvovqdReD95Glkvi5nLwGl49Ena3WrusvIlW7CAEg==
-X-Received: by 2002:a1c:9c52:: with SMTP id f79mr28831357wme.30.1580731850954; 
- Mon, 03 Feb 2020 04:10:50 -0800 (PST)
-Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
- [83.52.55.162])
- by smtp.gmail.com with ESMTPSA id w22sm22569375wmk.34.2020.02.03.04.10.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Feb 2020 04:10:50 -0800 (PST)
-Subject: Re: [PATCH v2 2/4] Add the NetBSD Virtual Machine Monitor accelerator.
-To: Kamil Rytarowski <n54@gmx.com>, rth@twiddle.net, ehabkost@redhat.com,
- slp@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org,
- max@m00nbsd.net
-References: <20200107124903.16505-1-n54@gmx.com>
- <20200128140945.929-1-n54@gmx.com> <20200128140945.929-3-n54@gmx.com>
- <e3279b9d-e6f9-43f3-3ebb-b31ba8ff5f7e@redhat.com>
- <4e29b732-ce95-02f1-ec9c-31f1ce33cda0@gmx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <703fb9e6-a4c6-ec21-ecfe-fa99834f8ea7@redhat.com>
-Date: Mon, 3 Feb 2020 13:10:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=aDjh0V7A/COEZzeOOV9AtMhXwGPs1fvTSzz9Zx0DIHs=;
+ b=Egz5OJa0SK1PHcUVMFMS9lokv3+EpBP3PJVdlCTmt2rdpvEct45v0kmboehw2WwGApKs1G
+ jWVuxzwiKFtipBm3+QrL81wjTffRBjPzvAagAnVVXjpdp3+db138P5j8StIcL/adLRCUjt
+ NTMwqZt6ecTV48DDQWXX0IT2Sbm2v0U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-EqNrQ_XUMQSq4lFAQdHiJQ-1; Mon, 03 Feb 2020 07:12:18 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C20488010D6;
+ Mon,  3 Feb 2020 12:12:17 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-129.ams2.redhat.com [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 12EA1277B5;
+ Mon,  3 Feb 2020 12:12:13 +0000 (UTC)
+Subject: Re: [qemu-web PATCH] documentation: update links to readthedocs
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200113103550.1133-1-alex.bennee@linaro.org>
+ <2331e0b7-cad9-7b53-3d30-7fb88d692c8a@redhat.com>
+ <20200115111042.GA163546@stefanha-x1.localdomain>
+ <CAFEAcA9Q5nsD5iTPwsVVx73HPUD6aGKd0Sf2FUkAFqjAZhGMGw@mail.gmail.com>
+ <82f0aa8e-b445-ad7f-1b17-03f4bb180a85@redhat.com>
+ <CAFEAcA8pHXeqtC3WT67vwC=g4Vw7BsYpDxUih1XWYzC+dAjoGg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <31ba2839-a7c1-28dd-8319-1ea6defb5daa@redhat.com>
+Date: Mon, 3 Feb 2020 13:12:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <4e29b732-ce95-02f1-ec9c-31f1ce33cda0@gmx.com>
+In-Reply-To: <CAFEAcA8pHXeqtC3WT67vwC=g4Vw7BsYpDxUih1XWYzC+dAjoGg@mail.gmail.com>
 Content-Language: en-US
-X-MC-Unique: 3eI0sc08M6K1UjmhTgyCPQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: EqNrQ_XUMQSq4lFAQdHiJQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,44 +93,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/3/20 12:56 PM, Kamil Rytarowski wrote:
-> On 03.02.2020 12:41, Philippe Mathieu-Daud=C3=A9 wrote:
->>> @@ -1768,6 +1785,7 @@ disabled with --disable-FEATURE, default is
->>> enabled if available:
->>>  =C2=A0=C2=A0=C2=A0 hax=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 HAX acceleration support
->>>  =C2=A0=C2=A0=C2=A0 hvf=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 Hypervisor.framework acceleration support
->>>  =C2=A0=C2=A0=C2=A0 whpx=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 Windows Hypervisor Platform acceleration support
->>> +=C2=A0 nvmm=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 NetBSD Virtual Machine Monitor acceleration support
->>>  =C2=A0=C2=A0=C2=A0 rdma=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 Enable RDMA-based migration
->>>  =C2=A0=C2=A0=C2=A0 pvrdma=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 Enable PVRDMA support
->>>  =C2=A0=C2=A0=C2=A0 vde=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 support for vde network
->>> @@ -2757,6 +2775,20 @@ if test "$whpx" !=3D "no" ; then
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fi
->>>  =C2=A0 fi
+On 03/02/2020 13.07, Peter Maydell wrote:
+> On Mon, 3 Feb 2020 at 11:55, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>> On 03/02/2020 12.46, Peter Maydell wrote:
+>>> On Wed, 15 Jan 2020 at 11:11, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>>>> The qemu.git/master docs are built nightly here (index.html is now
+>>>> visible!):
+>>>> https://www.qemu.org/docs/master/
+>>>>
+>>>> qemu.org's docs are more useful at the moment since they include the
+>>>> user documentation in addition to the developer documentation.
 >>>
+>>> Our top-level documentation page https://www.qemu.org/documentation/
+>>> still points to https://qemu.weilnetz.de/qemu-doc.html -- should
+>>> we update that now to link to https://www.qemu.org/docs/master/
+>>> instead ?
 >>
->> Maybe you can add something like:
+>> Sure, but I'm still waiting for someone to suggest a final patch here.
 >>
->> if test "$targetos" =3D "NetBSD"; then
->>  =C2=A0=C2=A0=C2=A0 nvmm=3D"check"
->> fi
+>> Open questions:
 >>
->> to build by default with NVMM if available.
->=20
-> I will add nvmm=3Dyes to the NetBSD) targetos check section.
+>> - Do we also want to link to readthedocs as suggested by Alex, or is our
+>>   own docs on www.qemu.org enough?
+> 
+> I think if we're hosting our own docs we should just link to
+> our own docs (which include the not-yet-converted-to-rST
+> parts, which readthedocs doesn't); linking to two different
+> versions of the same thing is just going to confuse users.
+> 
+>> - Do we still want to link to weilnetz.de (as it was the case with
+>>   StefanH's original patch https://patchwork.kernel.org/patch/11234545/)
+>>   or should that link be removed?
+> 
+> We should remove it; it's been really helpful for the project
+> that Stefan Weil has provided built-documentation we can link
+> to for all these years, but now we finally have an "authoritative"
+> built version on qemu.org that's what we should link to.
+> Again, having multiple links to different versions of the
+> same thing would just confuse people. (The exception is that
+> if we ever decide to provide "version 5.0 docs", "version 5.1
+> docs", "current master docs" on qemu.org we can do that, because
+> that's an understandable-to-end-users easily-describable reason
+> for there being different docs links).
+> 
+>> - Do we only link to https://www.qemu.org/docs/master/ or shall we
+>>   link to the individual docs (qemu-doc, qemu-qmp-ref, ...) ?
+> 
+> Just link to master/ would be my advice. Otherwise when we
+> add a new top-level manual (eg the under-discussion tools/
+> manual) we'll need to update this web page as well.
 
-Ah yes, clever :)
+Ok. Should we then just remove https://www.qemu.org/documentation/
+completely and make the "Documentation" link in the "menu" point
+directly to https://www.qemu.org/docs/master/ instead?
+We could simply mention the Wiki in docs/index.html.in, too, I think?
+
+ Thomas
 
 
