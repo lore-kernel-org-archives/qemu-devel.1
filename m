@@ -4,71 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 831C5C33CAC
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 916D7C3524D
 	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:41:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47DAA20721
+	by mail.kernel.org (Postfix) with ESMTPS id 617382082E
 	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 12:41:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZ2T02JM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47DAA20721
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZvIgMAcn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 617382082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39375 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyb2R-0000UI-EV
+	id 1iyb2R-0000Tw-Jw
 	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 07:41:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56400)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56445)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iyazh-0004Af-DL
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:38:27 -0500
+ (envelope-from <thuth@redhat.com>) id 1iyazl-0004Db-RD
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:38:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iyazg-0005tR-6d
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:38:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46617
+ (envelope-from <thuth@redhat.com>) id 1iyazk-0005vd-ON
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:38:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30646
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iyazg-0005tG-2j
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:38:24 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iyazk-0005vM-Kv
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 07:38:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580733503;
+ s=mimecast20190719; t=1580733508;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JBL9YxUk9otLkAzIzzLN7sC1OctGE8a3LO68IHZ9IY8=;
- b=iZ2T02JMVAvGQLBMednB3k8qyM9QNwwMWM+s1rd57x9qDahgE7gSwIfFOk3AJHR8VjjU9r
- KJuxrNOGyNbUWv7UXjvoYEPhI1KTtnnagHWzpcdAiipikqtPCiK6FnaoSiqfAJQxUucUma
- PEHeN/U2JYzin/GIcvPSoPePaB1rNiI=
+ bh=jvNIvJNOvgqKCmAOhgSNVoFRz83zRgIq0oQyVrP6NSA=;
+ b=ZvIgMAcn3ZUkTsfZjU/M1VimL6BYJbfa/n4Su5U4vylmEQFiZucmTl5nayDx+/oJ9xkHK+
+ 4bCFfvFDbCYDA5oH+trQ9Y/r29wZRG/8++iNu9JUA+ljINui5vLfx8pCG8o0PAJ/KbfJ+8
+ mkp6z3JGr1bX5TIDhG+H08816iYv/6U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-JBz9lyIfNWm7GlCUmGKF1g-1; Mon, 03 Feb 2020 07:38:21 -0500
+ us-mta-16-LLtTCEODMpmxMqH5OmdkGw-1; Mon, 03 Feb 2020 07:38:25 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B256C1800D41;
- Mon,  3 Feb 2020 12:38:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E47B913E6;
+ Mon,  3 Feb 2020 12:38:24 +0000 (UTC)
 Received: from thuth.com (ovpn-116-129.ams2.redhat.com [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BEC0E61070;
- Mon,  3 Feb 2020 12:38:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D63C461070;
+ Mon,  3 Feb 2020 12:38:23 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 03/13] docs/devel: Fix qtest paths and info about check-block
- in testing.rst
-Date: Mon,  3 Feb 2020 13:38:01 +0100
-Message-Id: <20200203123811.8651-4-thuth@redhat.com>
+Subject: [PULL 06/13] tests/qtest: update comments about
+ bios-tables-test-allowed-diff.h
+Date: Mon,  3 Feb 2020 13:38:04 +0100
+Message-Id: <20200203123811.8651-7-thuth@redhat.com>
 In-Reply-To: <20200203123811.8651-1-thuth@redhat.com>
 References: <20200203123811.8651-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: JBz9lyIfNWm7GlCUmGKF1g-1
+X-MC-Unique: LLtTCEODMpmxMqH5OmdkGw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -86,101 +86,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Heyi Guo <guoheyi@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The qtests have recently been moved to a separate subdirectory, so
-the paths that are mentioned in the documentation have to be adjusted
-accordingly. And some of the iotests are now always run as part of
-"make check", so this information has to be adjusted here, too.
+From: Heyi Guo <guoheyi@huawei.com>
 
-Message-Id: <20200122134511.23806-1-thuth@redhat.com>
+Update comments in tests/qtest/bios-tables-test.c to reflect the
+current path of bios-tables-test-allowed-diff.h, which is now under
+tests/qtest/ as well.
+
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+Message-Id: <20200202110009.51479-1-guoheyi@huawei.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- docs/devel/testing.rst | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ tests/qtest/bios-tables-test.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index ab5be0c729..770a987ea4 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -16,8 +16,8 @@ The usual way to run these tests is:
+diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.=
+c
+index 3ab4872bd7..b4752c644c 100644
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -14,14 +14,14 @@
+  * How to add or update the tests:
+  * Contributor:
+  * 1. add empty files for new tables, if any, under tests/data/acpi
+- * 2. list any changed files in tests/bios-tables-test-allowed-diff.h
++ * 2. list any changed files in tests/qtest/bios-tables-test-allowed-diff.=
+h
+  * 3. commit the above *before* making changes that affect the tables
+  *
+  * Contributor or ACPI Maintainer (steps 4-7 need to be redone to resolve =
+conflicts
+  * in binary commit created in step 6):
+  *
+  * After 1-3 above tests will pass but ignore differences with the expecte=
+d files.
+- * You will also notice that tests/bios-tables-test-allowed-diff.h lists
++ * You will also notice that tests/qtest/bios-tables-test-allowed-diff.h l=
+ists
+  * a bunch of files. This is your hint that you need to do the below:
+  * 4. Run
+  *      make check V=3D1
+@@ -40,14 +40,14 @@
+  *    in commit log.
+  * 7. Before sending patches to the list (Contributor)
+  *    or before doing a pull request (Maintainer), make sure
+- *    tests/bios-tables-test-allowed-diff.h is empty - this will ensure
++ *    tests/qtest/bios-tables-test-allowed-diff.h is empty - this will ens=
+ure
+  *    following changes to ACPI tables will be noticed.
+  *
+  * The resulting patchset/pull request then looks like this:
+- * - patch 1: list changed files in tests/bios-tables-test-allowed-diff.h.
++ * - patch 1: list changed files in tests/qtest/bios-tables-test-allowed-d=
+iff.h.
+  * - patches 2 - n: real changes, may contain multiple patches.
+  * - patch n + 1: update golden master binaries and empty
+- *   tests/bios-tables-test-allowed-diff.h
++ *   tests/qtest/bios-tables-test-allowed-diff.h
+  */
 =20
-   make check
-=20
--which includes QAPI schema tests, unit tests, and QTests. Different sub-ty=
-pes
--of "make check" tests will be explained below.
-+which includes QAPI schema tests, unit tests, QTests and some iotests.
-+Different sub-types of "make check" tests will be explained below.
-=20
- Before running tests, it is best to build QEMU programs first. Some tests
- expect the executables to exist and will fail with obscure messages if the=
-y
-@@ -79,8 +79,8 @@ QTest cases can be executed with
-=20
-    make check-qtest
-=20
--The QTest library is implemented by ``tests/libqtest.c`` and the API is de=
-fined
--in ``tests/libqtest.h``.
-+The QTest library is implemented by ``tests/qtest/libqtest.c`` and the API=
- is
-+defined in ``tests/qtest/libqtest.h``.
-=20
- Consider adding a new QTest case when you are introducing a new virtual
- hardware, or extending one if you are adding functionalities to an existin=
-g
-@@ -94,20 +94,20 @@ libqos instead of directly calling into libqtest.
- Steps to add a new QTest case are:
-=20
- 1. Create a new source file for the test. (More than one file can be added=
- as
--   necessary.) For example, ``tests/test-foo-device.c``.
-+   necessary.) For example, ``tests/qtest/foo-test.c``.
-=20
- 2. Write the test code with the glib and libqtest/libqos API. See also exi=
-sting
-    tests and the library headers for reference.
-=20
--3. Register the new test in ``tests/Makefile.include``. Add the test execu=
-table
--   name to an appropriate ``check-qtest-*-y`` variable. For example:
-+3. Register the new test in ``tests/qtest/Makefile.include``. Add the test
-+   executable name to an appropriate ``check-qtest-*-y`` variable. For exa=
-mple:
-=20
--   ``check-qtest-generic-y =3D tests/test-foo-device$(EXESUF)``
-+   ``check-qtest-generic-y =3D tests/qtest/foo-test$(EXESUF)``
-=20
- 4. Add object dependencies of the executable in the Makefile, including th=
-e
-    test source file(s) and other interesting objects. For example:
-=20
--   ``tests/test-foo-device$(EXESUF): tests/test-foo-device.o $(libqos-obj-=
-y)``
-+   ``tests/qtest/foo-test$(EXESUF): tests/qtest/foo-test.o $(libqos-obj-y)=
-``
-=20
- Debugging a QTest failure is slightly harder than the unit test because th=
-e
- tests look up QEMU program names in the environment variables, such as
-@@ -152,8 +152,9 @@ parser (either fixing a bug or extending/modifying the =
-syntax). To do this:
- check-block
- -----------
-=20
--``make check-block`` is a legacy command to invoke block layer iotests and=
- is
--rarely used. See "QEMU iotests" section below for more information.
-+``make check-block`` runs a subset of the block layer iotests (the tests t=
-hat
-+are in the "auto" group in ``tests/qemu-iotests/group``).
-+See the "QEMU iotests" section below for more information.
-=20
- GCC gcov support
- ----------------
+ #include "qemu/osdep.h"
 --=20
 2.18.1
 
