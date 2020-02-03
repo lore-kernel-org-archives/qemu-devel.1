@@ -2,84 +2,84 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 086AAC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEA1C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:43:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7D4A21582
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:43:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB48321582
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:43:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NK+1cT7n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7D4A21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qpy1MNqL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB48321582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iydsx-0005lT-2Q
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:43:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34067)
+	id 1iydt8-00063C-Vm
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:43:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iydrh-0003DG-82
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:42:22 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iydrx-0003dn-BI
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:42:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iydrg-0003AG-9z
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:42:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49107
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iydrg-00038w-5s
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:42:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580744539;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=p+Cn5oG+xWZibEU04owE46pVxJEhd9qc+G+O42uF4sM=;
- b=NK+1cT7nd/J/UPcxFnH9aMvN9f7iTV50U7r/Zg2bj4O59zKy2RFcufU47HeSnRFJSmuGVP
- 5pk/6/xl3w5qUgDPDuY8NriRZnUiIRegSNgbmEz/BV2IOXs+3CBkqySPhgvRo9BRiR8g7j
- +/B0yTNmuyr9GMgH+1oeg/wIhFGuMqA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-8RW5sF5GMjeirqgPQOkqwg-1; Mon, 03 Feb 2020 10:42:12 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CAAB10CE792;
- Mon,  3 Feb 2020 15:42:11 +0000 (UTC)
-Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08F3D1BC6D;
- Mon,  3 Feb 2020 15:42:10 +0000 (UTC)
-Subject: Re: [PATCH v2] block/backup-top: fix flags handling
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200203134213.2173-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e93d8452-cb06-0342-be9f-176e2b50e24f@redhat.com>
-Date: Mon, 3 Feb 2020 09:42:10 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iydrw-0003YR-4h
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:42:37 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44138)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iydrv-0003Wj-NJ
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:42:35 -0500
+Received: by mail-wr1-x444.google.com with SMTP id m16so18787055wrx.11
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 07:42:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=CubTYAdlw2JZ1kD9hOQqp0i2EbDYf9CKZbJcxpFI38I=;
+ b=Qpy1MNqLN2ShDShR/N2Os6Ous8/b8mWSh0CzYors+Zq997H0ID/DGY5MM0ZiyBgTcN
+ NWelZh+mCNw/V8rex38C4i6isZB8EGcmSL03mHopyW0r1CZ4ApYiaHTywQnBBkKvLV5A
+ sfJtWK2pR1zKU/DytRRWflxjCsObNeEwFdCB9Lbp7k+bI8XOI3f5rDjozpZViedP2nWn
+ HFebTokg5Z0Ok4u5A/CHRrwovUlT6xnxk47PnAra55AEmWfdN88u36OWTTOqGddhQzeJ
+ HxjNOyoRuWgVLuYnFejuPVk4L00lB7bAf2W87jjDZG/+9fNwOdFLu3yQgxO9GtBcjiH6
+ HCFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=CubTYAdlw2JZ1kD9hOQqp0i2EbDYf9CKZbJcxpFI38I=;
+ b=SEvOcLujyWLEhj4gPfalKjfECXL1KjEW7L7nkEadCxlEALlJhSkTl5ksquLgz4fY6M
+ 8GYf25qMP/0i/6VFnzQ0ILG6Lht2I3d24mnZwdpIjkYdHrbvYciWNBCkTh9dpwAV+wiK
+ KuOwC0npoIdxBgqrIPQQ4RvlWNq8A8p22RzgvaN8nr0FtlFP8s/TJZD9P7iyR1/0hNSe
+ ovx8kLpmY0FKRnrxweYexecqoDJuQ7jKh8LLdjmAyFPLnjM5dRQ2bGlaJ9yKqyPvcMyP
+ IwiGB9yogJ9gGwoqSq6AhOiVTPnHt4XCAXOBSp2Hf/YpuGfZ61BYoIS7Z1hfKsr1qETb
+ 6xSg==
+X-Gm-Message-State: APjAAAUI0iADhcj7D/1YY/G4SlcZVgyBImkyZiwbcQbCJMxFvpybF1uN
+ cZA1Uw052TlgY9k/SPFvPD8oWt1ObyjHIA==
+X-Google-Smtp-Source: APXvYqyLA234ry0JdoGgx9hVGJW01KVbx8CCjjr+efe/eyRzmnwnf+raaLH5P3O1N91/HW08R5lzdQ==
+X-Received: by 2002:a05:6000:4:: with SMTP id h4mr6390435wrx.403.1580744554316; 
+ Mon, 03 Feb 2020 07:42:34 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id s139sm24914476wme.35.2020.02.03.07.42.33
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Feb 2020 07:42:33 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Makefile: Fix typo in dependency list for interop manpages
+Date: Mon,  3 Feb 2020 15:42:32 +0000
+Message-Id: <20200203154232.10648-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200203134213.2173-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 8RW5sF5GMjeirqgPQOkqwg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,28 +91,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/3/20 7:42 AM, Vladimir Sementsov-Ogievskiy wrote:
-> backup-top "supports" write-unchanged, by skipping CBW operation in
-> backup_top_co_pwritev. But it forgets to do the same in
-> backup_top_co_pwrite_zeroes, as well as declare support for
-> BDRV_REQ_WRITE_UNCHANGED.
-> 
-> Fix this, and, while being here, declare also support for flags
-> supported by source child.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+Fix a typo in the dependency list for the manpages built from the
+'interop' manual, which meant we were accidentally not including
+the .hx file in the dependency list.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Fixes: e13c59fa4414215500e6
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Oops...
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/Makefile b/Makefile
+index 1f37523b528..588a2993d93 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1052,7 +1052,7 @@ $(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system)
+ 
+ $(call define-manpage-rule,interop,\
+        qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1 virtfs-proxy-helper.1,\
+-       $(SRC_PATH/qemu-img-cmds.hx))
++       $(SRC_PATH)/qemu-img-cmds.hx)
+ 
+ $(call define-manpage-rule,system,qemu-block-drivers.7)
+ 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.20.1
 
 
