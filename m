@@ -2,104 +2,126 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA992C3524D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 16:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F9BC35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 16:09:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAC432082E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 16:08:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 712B82080D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 16:09:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YATQE5ja"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAC432082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="HAXxznB4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712B82080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyeHL-0003wq-Su
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 11:08:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41703)
+	id 1iyeHg-0004a1-LS
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 11:09:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iyeGg-0003LM-GE
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 11:08:12 -0500
+ (envelope-from <felipe@nutanix.com>) id 1iyeGy-0003bh-E6
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 11:08:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iyeGe-0002QF-DI
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 11:08:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42144
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iyeGe-0002Oq-8p
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 11:08:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580746087;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QRiVg9JWxyuSYYX1hq/kXf+nP/mO4Z4DN9flepn/J7k=;
- b=YATQE5jaLLZcvk6oqpJ1s2zwPquzeE82OE7nzBOB8mju6H/Bmz9MmJxQ9K3q84YyFuilRH
- zh1vVKUsZUn6CxZsbzAgBu6ydcJN8tQ2VxTxBj6tJpnMcOdeiHGTvQlCTyLkON5/Ui1dxt
- 0zSDUHKgkTvCy4ulzNgUgZj3yTjQqZk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-mrLx_hKHPfu9XYrJf7bYWg-1; Mon, 03 Feb 2020 11:08:05 -0500
-Received: by mail-wr1-f71.google.com with SMTP id u8so7492252wrp.10
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 08:08:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EcdA3xLgoEZ6hYGiSKiEGv8kVnkfLQhBGi5qQkd4q0Q=;
- b=hssEalqcht2+ct/NBiB51OZsTmKIFmvkO9jLxH5vYVQpDqUtg5i93DtUrMGpZWWk80
- v6rL5pB+6ZYSOr3rtXKWieDyqpNVxGglBvORT/gjq8EJNxfLLRDKUiGu+KUZyJAR8+jD
- EW2vWHBmHSVYvHxshSCO3xeesubL5IO+PBQz2GVcXYfw7ccdOL/ziiTraBC4fVUQ+Cje
- Vp2zMvkekI/lW/01xilvAJGL8BoEYeqMZiSpkj4/COBDrvkT0UbosoCMTb8Qqul8Nz/m
- CAzdlBzVhLHv66FLsMSBwHQuxjLUvaU+IYcvRngu7BwATX2B20yyDEzkaOo3vF5vfIo9
- ZFgg==
-X-Gm-Message-State: APjAAAUItas0W0S8jM8vaLNhXbyKRt/48dtrWMzIMLz78sEEJBfJKYV5
- dhGxaA5LRLPb+z5S+oRuZEbel8CPNWlxu/Krav64SSkxSZSrXuN/xJ+UPLT5VrLNbeRnit0xF4G
- 7NOPUvoECPdUr8X0=
-X-Received: by 2002:adf:cd11:: with SMTP id w17mr16054841wrm.66.1580746083220; 
- Mon, 03 Feb 2020 08:08:03 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw4wFZC5XDidYwuyJtHUKb8wPOjpjdZsbV9r5UUgF1bhtv1RnD5+h4ay3NJaxu+64rCNLUQRg==
-X-Received: by 2002:adf:cd11:: with SMTP id w17mr16054816wrm.66.1580746082954; 
- Mon, 03 Feb 2020 08:08:02 -0800 (PST)
-Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
- [83.52.55.162])
- by smtp.gmail.com with ESMTPSA id y7sm23990771wrr.56.2020.02.03.08.08.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Feb 2020 08:08:02 -0800 (PST)
-Subject: Re: [PATCH 1/1] tests/acceptance: Count Raspberry Pi logos displayed
- on framebuffer
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200131232436.23548-1-f4bug@amsat.org>
- <20200131232436.23548-2-f4bug@amsat.org>
- <ad5d50ff-acc8-247f-74d9-7854605baaca@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3ba16ccb-108b-8721-2e04-b00630bcb7d5@redhat.com>
-Date: Mon, 3 Feb 2020 17:08:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <ad5d50ff-acc8-247f-74d9-7854605baaca@redhat.com>
+ (envelope-from <felipe@nutanix.com>) id 1iyeGw-0002tu-0v
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 11:08:27 -0500
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:31978)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1iyeGv-0002sH-R2
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 11:08:25 -0500
+Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 013G4Bnp016250; Mon, 3 Feb 2020 08:08:24 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=lvmCNF/1hw2ribxFadvRCRQNpi/J8hQoOmAxjc+bmdw=;
+ b=HAXxznB4P1baBrPVJ2pnfKMemDY6kyrhlHVYpgRz4vb1AjNTKlDje0j0Xe0CTn5ph2Ee
+ 3PuCyZeijOG5RlKut2tvT4zGK/GPv6pI6A2obAKBneOqKV9ljXBwn6Mi3LGgZBvSaiCN
+ iVO5xgPabGrtn8JvOw0kBdflWBHCn7wHS9tOuvsK7poMwmMIshJOZhi9aBHx+382mp40
+ U+OaDTB/81lJ0uyhCbAur2EfLdbpY8HJjyEzN4Uhu75M4cqUnK7riWTJmk8bAz1tmvpx
+ 0R6XfnZ8NNxIr+HqIdjWlO+63SUY1ASj6kXYKQhWDyCLujvxxkg+gx7x67FvWIyay2n2 AQ== 
+Received: from nam12-dm6-obe.outbound.protection.outlook.com
+ (mail-dm6nam12lp2172.outbound.protection.outlook.com [104.47.59.172])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 2xx3ejsy09-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 03 Feb 2020 08:08:24 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lQaTTL7JZAlZ7HjG4X8K3c7VIrwAhfEDrW8ktqtb13uSBS11qya/xHMESu2O9YocxBs2r5uQaoxH57ZDNyQuSjI2m6txBQ4H1DYiLAmBHbs0+E+rI+DT5ffhftZ2icyjQIlGS5CNBJW+9Pb8KyQSF191rNUwbxYIKwybcC5yFEBj0QAso59Wav7tNBknrrCekvza0zuH82urUUjdc5+qtElHy1LpaxXpPn5nVEeYlJ9VAo5j9V24bSZfkZgSrNpYHOH1m1ajwUNVFCLvgI4DQ+oCxQLtHNTdoa2TM4oCl3ZnWA0Q/tIiN+uw0uAfjJq4Eu8siKJ/CVFTrIfliyLitA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lvmCNF/1hw2ribxFadvRCRQNpi/J8hQoOmAxjc+bmdw=;
+ b=Z0u9ngPHSvs/r/196ph0D1y2PvR+0vGMfIj9QAfzp+r2EKl6/m1tQh90ksN7bxSY4NflJkJUO6EAPdyYb8bLnFuFj+Cfd7fx53vftKuQmicl+iHLAQcon0o/LgaD7RQsVsr5DQRNIjXHaLw5+0wUoCJVS3YQZ8jTFycMxsar94/8qdysC70MAyzom9kQ1xvwxixt6YZ6tDPgV0Ya0bvfXbGYgtRAUJ1yQN4TFjo0Ksk5HhrGG8PFyPNV/xsW4zObwAX18iVYx4RJiBNaiQNm6RY74L4H6t5cfhQh3xlpBzdvoNOq3Fpunr6P9I5Kd1sEHFeUu7yX0+OYXcVoe5rgFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
+ MWHPR02MB3295.namprd02.prod.outlook.com (10.164.133.154) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.32; Mon, 3 Feb 2020 16:08:21 +0000
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::c4c8:b406:7827:8a2b]) by MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::c4c8:b406:7827:8a2b%6]) with mapi id 15.20.2686.031; Mon, 3 Feb 2020
+ 16:08:21 +0000
+From: Felipe Franciosi <felipe@nutanix.com>
+To: Marc-Andre Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH 0/4] Improve default object property_add uint helpers
+Thread-Topic: [PATCH 0/4] Improve default object property_add uint helpers
+Thread-Index: AQHV2qpB4YOPAuNSFkKomvr5MQ1voKgJoviA
+Date: Mon, 3 Feb 2020 16:08:21 +0000
+Message-ID: <22DFA157-0F41-4657-A165-D625210B87A7@nutanix.com>
+References: <20200203155412.7706-1-felipe@nutanix.com>
+In-Reply-To: <20200203155412.7706-1-felipe@nutanix.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-X-MC-Unique: mrLx_hKHPfu9XYrJf7bYWg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [62.254.189.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6674fb0c-3239-4d7f-ccb3-08d7a8c34a37
+x-ms-traffictypediagnostic: MWHPR02MB3295:
+x-microsoft-antispam-prvs: <MWHPR02MB32958E72EBE4ADFBDCFA7A30D7000@MWHPR02MB3295.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0302D4F392
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(39860400002)(136003)(396003)(376002)(366004)(189003)(199004)(53546011)(6512007)(6506007)(6486002)(316002)(6916009)(8676002)(26005)(186003)(4326008)(36756003)(478600001)(33656002)(2906002)(54906003)(81156014)(8936002)(81166006)(966005)(86362001)(66946007)(76116006)(71200400001)(91956017)(66446008)(66556008)(66476007)(5660300002)(64756008)(2616005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB3295;
+ H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: C9NLMxSbUW4lnP49ILoG8ls1/o6raUCCwYgN3r7BWWrK/UbtGHRM9WltzpcQOTjzDWjB5b3/U0ssLkH3NDLs2r22B1hGIJ+wrqZgHYw/6bzt3+9y2F4aMuPd4LEGjD4P3WXK1hUyPhjA4bkR22uXPfrzA18rVkAtk3vFr8q4Id1RbuS2BJITUDmucaq6JHEJYNC5GPMQQLxmu1T9Asy8JToyVOOlT9EB3si0fCW+QoT5KTxdQMNbz8urbMCbeWS9m9nQ0qVccO+Iyyda45tePXfV6NhGDZoWnYoLZU0kH9PTOBmdWbdn3aXoVMTBHJSGX+5CN0rxplBR5wIS8Q60KWd86qtlCKOi2CtqZ1qkxhTbnAKfZmmr0CmZq2XXGM4v9RnVYGdVx+YQhxFv5x8nxIkb4WYk7ZHOlpe+9jXKM+d/paTOFbSjpJev1dd6/6qRwSCbSt5ON/ZW+VhwX0HBH2vIO/+pyJ6MMoEtT5P4cb7g3VbUoc8l7OkktxomYpTB5zQjBOvJlY6LSbCcfvuNEA==
+x-ms-exchange-antispam-messagedata: 7AiDE31UQhmzJUS1ZGfoPo33QPvgomBzgq72Fa4volE3Md6tp4LoxSZBv+Bzj1XqJGSO7Drc5m0G/KF1jXnu+qffXUNe8Ebb3glcRwelnFej9wbFwrHSbPxOqNlkHhBNsltbz7pCAzym5Jv43JVyAA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <17F9772454BAA141839A5885DBAE6428@namprd02.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6674fb0c-3239-4d7f-ccb3-08d7a8c34a37
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Feb 2020 16:08:21.2165 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4Wm5laDvxU4PuUlJMFs4zvziPsS+qGQm1XIFBR+6lcu3UMqIoWlrhz25bXqO33utPXEjxy4xs+u8DcY1UA+duL9dCCTDMwkoJDoraKZqc3c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB3295
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-03_05:2020-02-02,
+ 2020-02-03 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,220 +133,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-arm@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Phillipe Mathieu-Daude <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/3/20 3:21 PM, Wainer dos Santos Moschetta wrote:
-> On 1/31/20 9:24 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Add a test that verifies that each core properly displays the
->> Raspberry Pi logo on the framebuffer device.
->>
->> We simply follow the OpenCV "Template Matching with Multiple Objects"
->> tutorial, replacing Lionel Messi by a raspberrry:
->> https://docs.opencv.org/4.2.0/d4/dc6/tutorial_py_template_matching.html
->>
->> When OpenCV and NumPy are installed, this test can be run using:
->>
->> =C2=A0=C2=A0 $ avocado --show=3Dapp,framebuffer run -t device:bcm2835-fb=
-=20
->> tests/acceptance/
->> =C2=A0=C2=A0 JOB ID=C2=A0=C2=A0=C2=A0=C2=A0 : 9bbbc54c0a6fa180348d0b5305=
-507f76852b4da2
->> =C2=A0=C2=A0 JOB LOG=C2=A0=C2=A0=C2=A0 : avocado/job-results/job-2020-01=
--31T23.48-9bbbc54/job.log
->> =C2=A0=C2=A0=C2=A0 (1/1)=20
->> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_raspi2_=
-framebuffer_logo:=20
->>
->> =C2=A0=C2=A0 framebuffer: found raspberry at position (x, y) =3D (0, 0)
->> =C2=A0=C2=A0 framebuffer: found raspberry at position (x, y) =3D (71, 0)
->> =C2=A0=C2=A0 framebuffer: found raspberry at position (x, y) =3D (142, 0=
-)
->> =C2=A0=C2=A0 framebuffer: found raspberry at position (x, y) =3D (213, 0=
-)
->> =C2=A0=C2=A0 PASS (11.06 s)
->> =C2=A0=C2=A0 RESULTS=C2=A0=C2=A0=C2=A0 : PASS 1 | ERROR 0 | FAIL 0 | SKI=
-P 0 | WARN 0 |=20
->> INTERRUPT 0 | CANCEL 0
->> =C2=A0=C2=A0 JOB TIME=C2=A0=C2=A0 : 11.39 s
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->> The resulting match can be visualised at=20
->> https://pasteboard.co/ISzNHtx.png
->> ---
->> =C2=A0 tests/acceptance/boot_linux_console.py | 62 +++++++++++++++++++++=
-+++++
->> =C2=A0 1 file changed, 62 insertions(+)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py=20
->> b/tests/acceptance/boot_linux_console.py
->> index e40b84651b..4e69a83a12 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -12,6 +12,7 @@ import os
->> =C2=A0 import lzma
->> =C2=A0 import gzip
->> =C2=A0 import shutil
->> +import logging
->> =C2=A0 from avocado import skipUnless
->> =C2=A0 from avocado_qemu import Test
->> @@ -21,6 +22,19 @@ from avocado.utils import process
->> =C2=A0 from avocado.utils import archive
->> +NUMPY_AVAILABLE =3D True
->> +try:
->> +=C2=A0=C2=A0=C2=A0 import numpy as np
->> +except ImportError:
->> +=C2=A0=C2=A0=C2=A0 NUMPY_AVAILABLE =3D False
->> +
->> +CV2_AVAILABLE =3D True
->> +try:
->> +=C2=A0=C2=A0=C2=A0 import cv2
->> +except ImportError:
->> +=C2=A0=C2=A0=C2=A0 CV2_AVAILABLE =3D False
->> +
->> +
->=20
->=20
-> Those Python packages are only needed by this new test case, and the=20
-> test is likely to be moved to a separate file soon. So I suggest to put=
-=20
-> those availability checks inside the test method, so easing the future=20
-> removal. And use self.cancel() to cancel the test (if the case).
+Oops, I completely forgot to add a "v5" on the subject line.
 
-Yes I'll move (actually the series is ready, I'll add this on top).
+(The changelog is there.)
 
->=20
->=20
->> =C2=A0 class BootLinuxConsole(Test):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Boots a Linux kernel and checks that the =
-console is operational=20
->> and the
->> @@ -360,6 +374,54 @@ class BootLinuxConsole(Test):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.do_test_arm_=
-raspi2(0)
->> +=C2=A0=C2=A0=C2=A0 @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not insta=
-lled')
->> +=C2=A0=C2=A0=C2=A0 @skipUnless(CV2_AVAILABLE, 'Python OpenCV not instal=
-led')
->> +=C2=A0=C2=A0=C2=A0 def test_arm_raspi2_framebuffer_logo(self):
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Darch:arm
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Dmachine:ras=
-pi2
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Ddevice:bcm2=
-835-fb
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 screendump_path =3D os.path.=
-join(self.workdir, 'screendump.pbm')
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rpilogo_url =3D ('https://gi=
-thub.com/raspberrypi/linux/raw/'
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'raspberryp=
-i-kernel_1.20190517-1/'
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'drivers/vi=
-deo/logo/logo_linux_clut224.ppm')
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rpilogo_hash =3D 'fff3cc20c6=
-030acce0953147f9baac43f44ed6b0'
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rpilogo_path =3D self.fetch_=
-asset(rpilogo_url,=20
->> asset_hash=3Drpilogo_hash)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 deb_url =3D ('http://archive=
-.raspberrypi.org/debian/'
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'pool/main/r/raspberrypi-firmware/'
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'raspberrypi-kernel_1.20190215-1_ar=
-mhf.deb')
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 deb_hash =3D 'cd284220b32128=
-c5084037553db3c482426f3972'
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 deb_path =3D self.fetch_asse=
-t(deb_url, asset_hash=3Ddeb_hash)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kernel_path =3D self.extract=
-_from_deb(deb_path,=20
->> '/boot/kernel7.img')
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dtb_path =3D self.extract_fr=
-om_deb(deb_path,=20
->> '/boot/bcm2709-rpi-2-b.dtb')
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.set_console()
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kernel_command_line =3D (sel=
-f.KERNEL_COMMON_COMMAND_LINE +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'earlycon=3Dpl011,0x3f201000=20
->> console=3DttyAMA0')
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.add_args('-kernel', =
-kernel_path,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- '-dtb', dtb_path,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- '-append', kernel_command_line)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.launch()
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 framebuffer_ready =3D 'Conso=
-le: switching to colour frame=20
->> buffer device'
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wait_for_console_pattern(sel=
-f, framebuffer_ready)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.command('human-monit=
-or-command', command_line=3D'stop')
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.command('human-monit=
-or-command',
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 comma=
-nd_line=3D'screendump %s' % screendump_path)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 logger =3D logging.getLogger=
-('framebuffer')
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cpu_cores_count =3D 4
->=20
->=20
-> Won't this fail if host cpu cores are less than 4?
+Let me know if I should resend.
 
-This count the TCG vCPU guest emulated by QEMU, and are not related to=20
-the host cores.
+F.
 
-I.E. you can run this test on a single-core powerpc host cpu, QEMU will=20
-instantiate 4 virtual cores for the raspberry pi.
-
-Also, the Raspberry Pi 2/3 machines are forced to 4 cores, because they=20
-only run a certain type of system-on-chip which has 4 cores built-in.
-
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 match_threshold =3D 0.95
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 screendump_bgr =3D cv2.imrea=
-d(screendump_path, cv2.IMREAD_COLOR)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rpilogo_bgr =3D cv2.imread(r=
-pilogo_path, cv2.IMREAD_COLOR)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D cv2.matchTemplate=
-(screendump_bgr, rpilogo_bgr,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cv2.TM_CCOEFF_=
-NORMED)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 loc =3D np.where(result >=3D=
- match_threshold)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rpilogo_count =3D 0
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for rpilogo_count, pt in enu=
-merate(zip(*loc[::-1]), start=3D1):
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 logg=
-er.debug('found raspberry at position (x, y) =3D %s', pt)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertGreaterEqual(rpil=
-ogo_count, cpu_cores_count)
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def test_arm_exynos4210_initrd(self):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3D=
-arch:arm
+> On Feb 3, 2020, at 3:54 PM, Felipe Franciosi <felipe@nutanix.com> wrote:
 >=20
+> This improves the family of object_property_add_uintXX_ptr helpers by ena=
+bling
+> a default getter/setter only when desired. To prevent an API behavioural =
+change
+> (from clients that already used these helpers and did not want a setter),=
+ we
+> add a OBJ_PROP_FLAG_READ flag that allow clients to only have a getter. P=
+atch 1
+> enhances the API and modify current users.
 >=20
+> While modifying the clients of the API, a couple of improvement opportuni=
+ties
+> were observed in ich9. These were added in separate patches (2 and 3).
+>=20
+> Patch 4 cleans up a lot of existing code by moving various objects to the
+> enhanced API. Previously, those objects had their own getters/setters tha=
+t only
+> updated the values without further checks. Some of them actually lacked a=
+ check
+> for setting overflows, which could have resulted in undesired values bein=
+g set.
+> The new default setters include a check for that, not updating the values=
+ in
+> case of errors (and propagating them). If they did not provide an error
+> pointer, then that behaviour was maintained.
+>=20
+> Felipe Franciosi (4):
+>  qom/object: enable setter for uint types
+>  ich9: fix getter type for sci_int property
+>  ich9: Simplify ich9_lpc_initfn
+>  qom/object: Use common get/set uint helpers
+>=20
+> hw/acpi/ich9.c       |  99 ++------------------
+> hw/acpi/pcihp.c      |   7 +-
+> hw/acpi/piix4.c      |  12 +--
+> hw/isa/lpc_ich9.c    |  27 ++----
+> hw/misc/edu.c        |  13 +--
+> hw/pci-host/q35.c    |  14 +--
+> hw/ppc/spapr.c       |  18 +---
+> hw/ppc/spapr_drc.c   |   3 +-
+> include/qom/object.h |  48 ++++++++--
+> memory.c             |  15 +--
+> qom/object.c         | 214 ++++++++++++++++++++++++++++++++++++++-----
+> target/arm/cpu.c     |  22 +----
+> target/i386/sev.c    | 106 ++-------------------
+> ui/console.c         |   4 +-
+> 14 files changed, 283 insertions(+), 319 deletions(-)
+>=20
+> --=20
+> 2.20.1
+>=20
+> Changelog:
+> v1->v2:
+> - Update sci_int directly instead of using stack variable
+> - Defining an enhanced ObjectPropertyFlags instead of just 'readonly'
+> - Erroring out directly (instead of using gotos) on default setters
+> - Retaining lack of errp passing when it wasn't there
+> v2->v3:
+> - Rename flags _RD to _READ and _WR to _WRITE
+> - Add a convenience _READWRITE flag
+> - Drop the usage of UL in the bit flag definitions
+> v3->v4:
+> - Drop changes to hw/vfio/pci-quirks.c
+> v4->v5:
+> - Rebase on latest master
+> - Available here: https://github.com/franciozzy/qemu/tree/autosetters
 
 
