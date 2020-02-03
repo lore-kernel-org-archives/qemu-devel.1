@@ -2,100 +2,75 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 767CEC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B21C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 439F52080C
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:20:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IaEOFscW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439F52080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C2AF2166E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:20:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C2AF2166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iydWQ-0003X6-Cz
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:20:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55632)
+	id 1iydWo-0003rP-44
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:20:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iydVV-0002Jh-5L
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:19:26 -0500
+ (envelope-from <bounces@canonical.com>) id 1iydVh-0002hD-C6
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:19:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iydVU-0001G2-2W
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:19:25 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27580
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iydVT-0001E3-Rw
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:19:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580743163;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RlFIj4DI9wFk+wxoebdBLLHLRZp8ZSyr2deFmmZbems=;
- b=IaEOFscWDKWI2A2G6H3PFapcZjnLj8aIEJiHAZ4Lh2b0klYTeqnrdrpdZIyMYJO9l2yPwW
- LWFvTHvbDZSGd+YthG/+XE5JTk0HgA3TQ2tfPD3yd/Y46n4kRCPwSNE+QZVVbo3v9bVQnc
- 2cDhBc+bso5VG/aSdhhBl/1QZyq4EjQ=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-FTeSUc57PQKOqH-4j7BjMg-1; Mon, 03 Feb 2020 10:19:21 -0500
-Received: by mail-qk1-f200.google.com with SMTP id f22so9615134qka.10
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 07:19:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=rJ3sKqXuDt9hRqfvlS1b0ePFFWqQ5OZ6wqtBD+VGOGY=;
- b=IGT67Ns2OaVBYRg110eTvgZHY8dQaA5nY45HmO4qzuFzlKn/lkL49Ol9hu8k+rMLYh
- Ydfu+3piR7vUKNTmktSCSMNwG/+uPJOpWsJsTE4BgxnxTrX8pdXI/EychpwjZNG/Orvm
- LiHzh/7nIk0VGjv/7mtIUKEoWKame2WiJ6EZHtmuf+Ype5VhDx/PKZr0uNu25XcsBaa1
- td3FosO5QsdnGjRdcYOu0/QpFJJF6RCs/0te3xq0OE2igPRl0ATkKtGWC8vFD08hXpTo
- /zI5U+BzFRCDOJRXRd3dtzI8oVTf1hpIiRfw5jDT5snpNCCbwIJusYJqLAZ37RsZnUWp
- yUew==
-X-Gm-Message-State: APjAAAXfc1YkQNtuIJNtHiROY10PH/Ej/Ba7nVebYfxvqz8ocKDKlNvC
- 39c+dkXrBW8JMH+l3/BcSHt8YPIQmgOmv9Pry8NsFX8KpDGYuCY2eRcQmSLZ9GueXdYUA5mvcnf
- RTuAM00KMPEUAwXw=
-X-Received: by 2002:ae9:f408:: with SMTP id y8mr23059164qkl.97.1580743161062; 
- Mon, 03 Feb 2020 07:19:21 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxcXZiQI3j3qlZCj6HQTFVm9yIEdFXLp4yciH/Q0NwqJEzI3VJ4k2xOlopkYu3U/nfMdBDujQ==
-X-Received: by 2002:ae9:f408:: with SMTP id y8mr23059134qkl.97.1580743160784; 
- Mon, 03 Feb 2020 07:19:20 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
- by smtp.gmail.com with ESMTPSA id r13sm9802840qtt.70.2020.02.03.07.19.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 07:19:20 -0800 (PST)
-Date: Mon, 3 Feb 2020 10:19:17 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v13 03/10] virtio-iommu: Implement attach/detach command
-Message-ID: <20200203151917.GD155875@xz-x1>
-References: <20200125171955.12825-1-eric.auger@redhat.com>
- <20200125171955.12825-4-eric.auger@redhat.com>
- <20200203134915.GA155875@xz-x1>
- <ce49f691-d944-2e5e-87a3-7e7c9651c2af@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iydVf-0001e6-SK
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:19:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57650)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iydVf-0001bR-MK
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:19:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iydVe-00043g-34
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 15:19:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1032F2E80C0
+ for <qemu-devel@nongnu.org>; Mon,  3 Feb 2020 15:19:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <ce49f691-d944-2e5e-87a3-7e7c9651c2af@redhat.com>
-X-MC-Unique: FTeSUc57PQKOqH-4j7BjMg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Mon, 03 Feb 2020 15:09:42 -0000
+From: Daniel Berrange <823733@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Triaged; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: happykvm michal-nowak-b podlipnik sledge-sulaweyo
+ th-huth
+X-Launchpad-Bug-Reporter: showrun (happykvm)
+X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
+References: <20110810053253.11269.76752.malonedeb@gac.canonical.com>
+Message-Id: <158074258355.26789.4678500421306309201.launchpad@soybean.canonical.com>
+Subject: [Bug 823733] Re: Solaris can't be powered off with ACPI
+ shutdown/poweroff
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 463e0dfd9ff9d100291d85a751459ff570dd4fc0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -104,63 +79,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- quintela@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- jean-philippe@linaro.org, eric.auger.pro@gmail.com
+Reply-To: Bug 823733 <823733@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 03, 2020 at 03:59:00PM +0100, Auger Eric wrote:
+** Summary changed:
 
-[...]
+- Soloaris can't be poweroff
++ Solaris can't be powered off with ACPI shutdown/poweroff
 
-> >> +static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpo=
-int *ep)
-> >> +{
-> >> +    QLIST_REMOVE(ep, next);
-> >> +    g_tree_unref(ep->domain->mappings);
-> >=20
-> > Here domain->mapping is unreferenced for each endpoint, while at [1]
-> > below you only reference the domain->mappings if it's the first
-> > endpoint.  Is that problematic?
-> in [1] I take a ref to the domain->mappings if it is *not* the 1st
-> endpoint. This aims at deleting the mappings gtree when the last EP is
-> detached from the domain.
->=20
-> This fixes the issue reported by Jean in:
-> https://patchwork.kernel.org/patch/11258267/#23046313
+-- =
 
-Ah OK. :)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/823733
 
-However this is tricky.  How about do explicit g_tree_destroy() in
-virtio_iommu_detach() when it's the last endpoint?  I see that you
-have:
+Title:
+  Solaris can't be powered off with ACPI shutdown/poweroff
 
-    /*
-     * when the last EP is detached, simply remove the domain for
-     * the domain list and destroy it. Note its mappings were already
-     * freed by the ref count mechanism. Next operation involving
-     * the same domain id will re-create one domain object.
-     */
-    if (QLIST_EMPTY(&domain->endpoint_list)) {
-        g_tree_remove(s->domains, GUINT_TO_POINTER(domain->id));
-    }
+Status in QEMU:
+  Triaged
 
-Then it becomes:
+Bug description:
+  Thank you forgive my poor English.
 
-    if (QLIST_EMPTY(&domain->endpoint_list)) {
-        g_tree_destroy(domain->mappings);
-        g_tree_remove(s->domains, GUINT_TO_POINTER(domain->id));
-    }
+  It seems KVM can=E2=80=99t poweroff solairs 10 or sloalrs 11 VM.
+  I have created solaris 10 and 11 as usual. Everything in VM is running OK=
+, but finally I use shell command =E2=80=98poweroff=E2=80=99 or =E2=80=98in=
+it 5=E2=80=99, the solaris VM (both 10 & 11) system could=E2=80=99t be powe=
+roff but with promoting me the message: perss any key to reboot =E2=80=A6..=
+  ,I pressed any key in vnc client, solaris VM reboot immediately. Endless =
+reboot loop above.
 
-And also remove the trick in attach() so you take the domain ref
-unconditionally.  Would that work?
+  the solaris 10 & 11 from oracle iso file name :
+  sol-10-u9-ga-x86-dvd.iso
+  sol-11-exp-201011-text-x86.iso
 
-Thanks,
+  the solaris 10 & 11 from oracle iso file name :
+  sol-10-u9-ga-x86-dvd.iso
+  sol-11-exp-201011-text-x86.iso
 
---=20
-Peter Xu
+  1. On my real physical machine,the solaris can be poweroff
+  2. On vmware ,the solaris can be poweroff
+  3. On my real physical machine,I have try to disbale the ACPI opiton in B=
+OIS, then the solaris can't be poweroff,Like the problem I have described a=
+bove
+  so ,I doubt the KVM has a little problem in ACPI =
 
+
+  I have try the suggestion as follows, but I can=E2=80=99t solve the probl=
+em.
+  7.2 Solaris reboot all the time on grub menu
+  =E2=80=A2	Run through the installer as usual =
+
+  =E2=80=A2	On completion and reboot, the VM will perpetually reboot. "Stop=
+" the VM. =
+
+  =E2=80=A2	Start it up again, and immediately open a vnc console and selec=
+t the Safe Boot from the options screen =
+
+  =E2=80=A2	When prompted if you want to try and recover the boot block, sa=
+y yes =
+
+  =E2=80=A2	You should now have a Bourne terminal with your existing filesy=
+stem mounted on /a =
+
+  =E2=80=A2	Run /a/usr/bin/bash (my preferred shell) =
+
+  =E2=80=A2	export TERM=3Dxterm =
+
+  =E2=80=A2	vi /a/boot/grub/menu.1st (editing the bootloader on your mounte=
+d filesystem), to add "kernel/unix" to the kernel options for the non-safe-=
+mode boot. Ex : =
+
+  Config File : /a/boot/grub/menu.lst =
+
+  kernel$ /platform/i86pc/multiboot -B $ZFS-BOOTFS kernel/unix
+
+  According to KVM requirements, I collected the following information:
+  CPU model name
+  model name      : Intel(R) Xeon(R) CPU           X3450  @ 2.67GHz
+
+  kvm -version
+  QEMU PC emulator version 0.12.3 (qemu-kvm-0.12.3), Copyright (c) 2003-200=
+8 Fabrice Bellard
+
+  Host kernel version
+  Ubuntu 10.04.1 LTS   2.6.32-25-server =
+
+
+  What host kernel arch you are using (i386 or x86_64)
+  X86_64
+
+  Guest OS
+  Solaris 10 and Solaris 11=EF=BC=8Cboth can not shutdown
+
+  The qemu command line you are using to start the guest
+
+  First, I used the command line as follows:
+  kvm -m 1024 -drive file=3Dsolaris10.img,cache=3Dwriteback -net nic -net u=
+ser -nographic -vnc :1
+  then I try to use -no-kvm-irqchip or -no-kvm ,but the problem also appear=
+s!
+
+  Secondly, have created and run solaris 10&11 by using Virsh, still solari=
+s can't be poweroff, the XML file content is :
+  <domain type=3D'kvm'>
+      <name>solairs</name>
+      <uuid>85badf15-244d-4719-a2da-8c3de064137d</uuid>
+      <memory>1677721</memory>
+      <currentMemory>1677721</currentMemory>
+      <vcpu>1</vcpu>
+      <os>
+      <type arch=3D'i686' machine=3D'pc-0.12'>hvm</type>
+        <boot dev=3D'hd'/>
+     </os>
+     <features>
+      <acpi/>
+      <apic/>
+     </features>
+    <clock offset=3D'utc'/>
+     <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+     <on_crash>destroy</on_crash>
+     <devices>
+       <emulator>/usr/bin/kvm</emulator>
+       <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'qcow2' cache=3D'writeback'/>
+         <source file=3D'/opt/GuestOS/solaris10.img'/>
+         <target dev=3D'hda' bus=3D'ide'/>
+       </disk>
+      <interface type=3D'bridge'>
+        <mac address=3D'00:0c:29:d0:36:c3'/>
+        <source bridge=3D'br1'/>
+        <target dev=3D'vnet0'/>
+       </interface>
+       <input type=3D'mouse' bus=3D'ps2'/>
+       <graphics type=3D'vnc' port=3D'5901' autoport=3D'no' keymap=3D'en-us=
+'/>
+      <video>
+        <model type=3D'vga' vram=3D'65536' heads=3D'1'/>
+      </video>
+    </devices>
+    <seclabel type=3D'dynamic' model=3D'apparmor'>
+      <label>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</label>
+      <imagelabel>libvirt-f36f5289-692e-6f1c-fe71-c6ed19453e2f</imagelabel>
+    </seclabel>
+   </domain>
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/823733/+subscriptions
 
