@@ -2,85 +2,86 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C53FC35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8447CC35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:59:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03A0E20838
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:57:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50AB22082E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 14:59:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RzAX5rZP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A0E20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tt5ksPk6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50AB22082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iydAR-0001pK-86
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 09:57:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44755)
+	id 1iydC0-0003n0-1d
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 09:59:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iyd0i-000761-AA
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:37 -0500
+ (envelope-from <thuth@redhat.com>) id 1iydAu-0002Sy-A9
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:58:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iyd0h-0003Lj-9i
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:36 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37182)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iyd0g-0003L8-Jp
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:47:35 -0500
-Received: by mail-wr1-x444.google.com with SMTP id w15so18557027wru.4
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 06:47:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=pbTFZCO7ADOXNmgFtzr7ygDnLBWMHSNndfGhWIzZQwI=;
- b=RzAX5rZP5/FBD+yNLHkwMSd679Kwq78O9fLcdmxWoX84EZT6LgKiqA+BqzMJ4v6yXv
- b4n7SPSFpeFUXYIF9Bn1Yxb7oL7FcNWfXgA39wPGPyhp2MR3nOcAc8HX0tkoMcGKy7d3
- Jw+/0xkPHTvbACleBLlk0m/dbNBC64+RBuwlYm6cAnPpR6eeKNp4d6axI9dSb5ramOf0
- bLRZUnUMJEZDF/GWGFH1iCDLsWILjHramcxVCvnE40vtrMI3N1poh3Tu4YmKWtFbX+53
- LycjB8ux8nVQO4zT7AHgzeLhlafnIgKW0A+SMqqLx0bCXrnBndbDHoEhyrEnuztORM4M
- OuHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=pbTFZCO7ADOXNmgFtzr7ygDnLBWMHSNndfGhWIzZQwI=;
- b=qCL63cgrNdhHl3bx18dTXeqMeXUY1dvOZMRQoFqv3bYCafzl+aRA6eyqZVclJQKEpA
- MOnkE4+td50geh2CTu7ZU8ZB4IHxCMKisti9wqoO8X1CkX73r/+yfq/D+OYqVMey8TNF
- f9gCbApxBQbOo7JTegAD7mmrnwpyjQY6ig7a2RioPQ9wZZME8sg3zsvfkXK//5y85gOl
- qEIQttWCRfRplTv7Mwt7PBFlLY6ol0EmUHZ/RdnWpuF6JdI09qPjTI7Ss/qb120JqBYq
- cpsVO9B33V1M6EX5FILzcDorLNfW5n8/ZpWdgzil6kgtusgOnWASt1oUjIGlEBqJ4Lm5
- 6OKg==
-X-Gm-Message-State: APjAAAVmYc2dmrfKIBJZ2BjwuLh6VXhFu3jfpUW2lNcnszn0ySrolq1r
- 5WL3mW//mDtAFTloe7MIfY2/K4vljZUQ5g==
-X-Google-Smtp-Source: APXvYqzG+CCELV5hLIIj8g4ne/4b7VD24A+RUsT87T/yAId+tY2iBh/KHpmO3qCjbX+Q9CX/TUHTaw==
-X-Received: by 2002:adf:de0b:: with SMTP id b11mr13585826wrm.89.1580741253484; 
- Mon, 03 Feb 2020 06:47:33 -0800 (PST)
-Received: from cloudburst.c.hoisthospitality.com ([135.196.99.211])
- by smtp.gmail.com with ESMTPSA id h2sm26429739wrt.45.2020.02.03.06.47.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Feb 2020 06:47:32 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 16/20] target/arm: Enable ARMv8.2-ATS1E1 in -cpu max
-Date: Mon,  3 Feb 2020 14:47:12 +0000
-Message-Id: <20200203144716.32204-17-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200203144716.32204-1-richard.henderson@linaro.org>
-References: <20200203144716.32204-1-richard.henderson@linaro.org>
+ (envelope-from <thuth@redhat.com>) id 1iydAr-0005IZ-R8
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:58:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26452
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iydAr-0005H9-JG
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 09:58:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580741884;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=W+gjqQnI9kUpgMCKGC/8vCxlQu5hdZ3F+y5y9o4LZAs=;
+ b=Tt5ksPk6/NTLnrZw2OpxS2H/c1FgkbYLLWxd8A0QWEg7WlJyaJkLwtRtHqS6RyFeYDT4re
+ nPgMZtt50NTZfGdLQJMuDT9Ug1drOlw+Dj6coH5cBNTx2CJn3VEnP5qIO9QHFezLKTtuTJ
+ Hv9TvMpdujioVIfHplhNN5yV0HDFeQc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-juRkoRywPsKYOJ739_Wetw-1; Mon, 03 Feb 2020 09:58:03 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7C6C1413;
+ Mon,  3 Feb 2020 14:58:01 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-129.ams2.redhat.com [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 13D421000322;
+ Mon,  3 Feb 2020 14:58:00 +0000 (UTC)
+Subject: Re: [PULL 00/13] qtests, kconfig and misc patches
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200203123811.8651-1-thuth@redhat.com>
+ <CAFEAcA_1KYRA=87k34zCRLqCf1tWHrULGZPcHeKwJZhDUx0=kw@mail.gmail.com>
+ <2fd63018-b9f9-ab88-2d65-009c54bb6cf2@redhat.com>
+ <CAFEAcA_XKAeT10p+XNRjQeOjoGYX1Q-D+kj9E0kFx2AxtktACg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <276a50ab-3e63-1542-5715-d61e238fd2d5@redhat.com>
+Date: Mon, 3 Feb 2020 15:57:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <CAFEAcA_XKAeT10p+XNRjQeOjoGYX1Q-D+kj9E0kFx2AxtktACg@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: juRkoRywPsKYOJ739_Wetw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,59 +93,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes enablement of ARMv8.1-PAN.
+On 03/02/2020 15.50, Peter Maydell wrote:
+> On Mon, 3 Feb 2020 at 14:30, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>> On 03/02/2020 15.04, Peter Maydell wrote:
+>>> On Mon, 3 Feb 2020 at 12:38, Thomas Huth <thuth@redhat.com> wrote:
+>>>>
+>>>>  Hi Peter,
+>>>>
+>>>> the following changes since commit 28db64fce555a03b4ca256d5b6f4290abdfbd9e8:
+>>>>
+>>>>   Merge remote-tracking branch 'remotes/stefanha/tags/tracing-pull-request' into staging (2020-01-31 17:37:00 +0000)
+>>>>
+>>>> are available in the Git repository at:
+>>>>
+>>>>   https://gitlab.com/huth/qemu.git tags/pull-request-2020-02-03
+>>>>
+>>>> for you to fetch changes up to 585c138628bbf22ea8e740b2f4f1a3ed0274ebe8:
+>>>>
+>>>>   trivial: Remove xenfb_enabled from sysemu.h (2020-02-03 10:33:57 +0100)
+>>>>
+>>>> ----------------------------------------------------------------
+>>>> * Current qtests queue
+>>>> * Some Kconfig updates
+>>>> * Some trivial clean-ups here and there
+>>>> ----------------------------------------------------------------
+>>>
+>>> All the incremental rebuilds failed:
+>>>
+>>> Linux cam-vm-266 4.15.0-70-generic x86_64
+>>> From git://git-us.linaro.org/people/pmaydell/qemu-arm
+>>>    f31160c7d1..f9e931a1d9  staging    -> pmaydell/staging
+>>> make: Entering directory '/home/petmay01/qemu-for-merges/build/w64'
+>>> make[1]: Entering directory '/home/petmay01/qemu-for-merges/slirp'
+>>> make[1]: Nothing to be done for 'all'.
+>>> make[1]: Leaving directory '/home/petmay01/qemu-for-merges/slirp'
+>>>   CC      qga/main.o
+>>>   CC      stubs/machine-init-done.o
+>>>   CC      stubs/replay-user.o
+>>>   CC      stubs/semihost.o
+>>>   CC      qemu-img.o
+>>>   CC      qemu-io.o
+>>>   CC      chardev/char.o
+>>> make: *** No rule to make target
+>>> '/home/petmay01/qemu-for-merges/hw/bt/Kconfig', needed by
+>>> 'aarch64-softmmu/config-devices.mak'.  Stop.
+>>> make: *** Waiting for unfinished jobs....
+>>>   CC      chardev/char-mux.o
+>>> make: Leaving directory '/home/petmay01/qemu-for-merges/build/w64'
+>>
+>> Oh, they are still failing??? Why are there still references to
+>> hw/bt/Kconfig in these config-devices.mak files, I'd expect that they
+>> would have been regenerated at least once during the past week?
+> 
+> build/all/aarch64-softmmu/config-devices.mak.d was most recently
+> touched this morning, and it still includes hw/bt/Kconfig in its
+> dependency list. I think this is because minikconf will still put
+> a Kconfig file into the .d file it generates even if the Kconfig
+> file happens to be empty.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.c   | 4 ++++
- target/arm/cpu64.c | 5 +++++
- 2 files changed, 9 insertions(+)
+Oh, that's very weird. minikconf should only do that if the file is
+included somewhere, but the inclusion of hw/bt/Kconfig has been removed
+in 1d4ffe8dc77cbc9aafe8bcf514ca0e43f85aaae3 already, so this really
+should not happen anymore...
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index b0762a76c4..de733aceeb 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2709,6 +2709,10 @@ static void arm_max_initfn(Object *obj)
-             t = FIELD_DP32(t, MVFR2, FPMISC, 4);   /* FP MaxNum */
-             cpu->isar.mvfr2 = t;
- 
-+            t = cpu->id_mmfr3;
-+            t = FIELD_DP32(t, ID_MMFR3, PAN, 2); /* ATS1E1 */
-+            cpu->id_mmfr3 = t;
-+
-             t = cpu->id_mmfr4;
-             t = FIELD_DP32(t, ID_MMFR4, HPDS, 1); /* AA32HPD */
-             cpu->id_mmfr4 = t;
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index c80fb5fd43..57fbc5eade 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -673,6 +673,7 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
-         t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
-         t = FIELD_DP64(t, ID_AA64MMFR1, VH, 1);
-+        t = FIELD_DP64(t, ID_AA64MMFR1, PAN, 2); /* ATS1E1 */
-         cpu->isar.id_aa64mmfr1 = t;
- 
-         /* Replicate the same data to the 32-bit id registers.  */
-@@ -693,6 +694,10 @@ static void aarch64_max_initfn(Object *obj)
-         u = FIELD_DP32(u, ID_ISAR6, SPECRES, 1);
-         cpu->isar.id_isar6 = u;
- 
-+        u = cpu->id_mmfr3;
-+        u = FIELD_DP32(u, ID_MMFR3, PAN, 2); /* ATS1E1 */
-+        cpu->id_mmfr3 = u;
-+
-         /*
-          * FIXME: We do not yet support ARMv8.2-fp16 for AArch32 yet,
-          * so do not set MVFR1.FPHP.  Strictly speaking this is not legal,
--- 
-2.20.1
+ Thomas
 
 
