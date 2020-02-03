@@ -2,148 +2,83 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC280C35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F41C3524D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:33:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0E5B20838
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:32:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75BEE20838
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:33:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KBCkHq2v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0E5B20838
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mfa/eyO9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75BEE20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iydht-0002to-Ry
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:32:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59248)
+	id 1iydj2-0004B2-NY
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:33:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iydh7-00021H-31
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:31:25 -0500
+ (envelope-from <eblake@redhat.com>) id 1iydiQ-0003Xe-4W
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:32:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iydh6-0007Ha-2J
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:31:25 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45070)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iydh5-0007GC-SJ
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:31:24 -0500
-Received: by mail-wr1-x441.google.com with SMTP id a6so18713367wrx.12
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 07:31:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=U+pdaoUhOXRLODPm3RR4nmItyTGEJ4V9M9wOVs5PX9k=;
- b=KBCkHq2vaY92wmFH05+lEoYO1SrQeVLPblaYhTjajzqTsmgvVwjJG0Iebbq3leEiMg
- 0oR/OTWh3H6RYU7bsCK8ZmLx8zIiYOIQPw0kgiKAA91ysX1tvatPna/ksqKBoNsfgmK6
- EAvXPxgOc4Hjx11OBbTQg6/QUS9Oj4xfeFY5JV9DXi+It6fGv7NIY4j0t7ujrmMo009d
- LCQ+xa2hkHJWMCMz3mnIpA8pz6+lba9NP6hHSap/mce2z21R/bN8g7lZn7xjNXFU/6+/
- E34EopMsJGHpG4bAwtm+8K04MSQSmSt5/pF3767rs1mMYcZneArc0mRRjv8xrCIWSRoG
- aJmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=U+pdaoUhOXRLODPm3RR4nmItyTGEJ4V9M9wOVs5PX9k=;
- b=j7NQckbeywOFVuHZMANxRwlonfQcZBL4AwyguCLG5lafiX32rtuaZ3YljoAWju1bdd
- jDdUObXiPS3JT8fdWXFt8EcDxCwV8ROEZ5RGxM3372wqHhRS8DSm7pXDP7tM3fYTxLeH
- PI/viW0wiQRte6fw1RsdHYJ7CIy1nZEaYtO4jnAlpnSUc9gqWNgq/0QvzOU/Frgw3E9S
- VCVMI9g0M0zu6sPHVJRPwVKJJ5Yha1vORe4nV8Ig7mqmYiwCXEbjx1pJNPBFAZ1xarYx
- 84shXXFD5ZGibrqrn5lLgkIxx5nzQM6rXakyuWsEcPl2lseulEievTaf2KXs+XRqggCn
- apPg==
-X-Gm-Message-State: APjAAAVDxNXnwqkNm9+798lsFYf3MBgdqo+iVhrpsl/CLdD+lYbkz76/
- M8ywP/HsesEKPpKmStMT57yL62/a
-X-Google-Smtp-Source: APXvYqzrKpXJs/siLR9qM6k41dsyGhwxb6Scqmqr8lXslVv91gItpHDFF93z8rKJxQ/LxOEDku603w==
-X-Received: by 2002:adf:ab54:: with SMTP id r20mr16348725wrc.370.1580743882252; 
- Mon, 03 Feb 2020 07:31:22 -0800 (PST)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.googlemail.com with ESMTPSA id l29sm2425708wrb.64.2020.02.03.07.31.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Feb 2020 07:31:21 -0800 (PST)
-Subject: Re: [PULL 00/13] qtests, kconfig and misc patches
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-References: <20200203123811.8651-1-thuth@redhat.com>
- <CAFEAcA_1KYRA=87k34zCRLqCf1tWHrULGZPcHeKwJZhDUx0=kw@mail.gmail.com>
- <2fd63018-b9f9-ab88-2d65-009c54bb6cf2@redhat.com>
- <CAFEAcA_XKAeT10p+XNRjQeOjoGYX1Q-D+kj9E0kFx2AxtktACg@mail.gmail.com>
- <fedbec35-51c7-cf1b-ef55-e2a582620781@redhat.com>
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
- uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <a40afb1e-0f36-e4c0-918c-9d3c88cd511d@redhat.com>
-Date: Mon, 3 Feb 2020 16:29:11 +0100
+ (envelope-from <eblake@redhat.com>) id 1iydiM-0008J8-Qz
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:32:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31900
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iydiM-0008IN-Mg
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:32:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580743961;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hPUm+G72d3KpQXr5lxWrMSx55UskECvATVb/9dFJxJs=;
+ b=Mfa/eyO9tFfkOJFnCdIucjEWowNecGo+WMgr6njx3oKN81Q7BJ31lWpw5Uqcr/PF1lgYcW
+ iGJ0zMFw3m13dNc7/7ANOK18JjQeH5VV8E5AwJbxXVZI4hrDTLrUtosg6rXN/+wWpkMzjJ
+ AbvQ+wGycA52XXNKeWl6x0uS9eAqoA4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310--btEwXSUN9iqReu1jJ4Ttw-1; Mon, 03 Feb 2020 10:32:31 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33DC4194E168;
+ Mon,  3 Feb 2020 15:32:30 +0000 (UTC)
+Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B6BEB5DA84;
+ Mon,  3 Feb 2020 15:32:29 +0000 (UTC)
+Subject: Re: [PATCH] tests/qemu_iotests: Minimize usage of used ports
+To: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ qemu-block@nongnu.org
+References: <20200203075955.28861-1-ldoktor@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <fd77ffab-6c6c-03f2-2982-a6e14c1f16d4@redhat.com>
+Date: Mon, 3 Feb 2020 09:32:29 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <fedbec35-51c7-cf1b-ef55-e2a582620781@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200203075955.28861-1-ldoktor@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: -btEwXSUN9iqReu1jJ4Ttw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,30 +90,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/02/20 16:17, Paolo Bonzini wrote:
-> On 03/02/20 15:50, Peter Maydell wrote:
->>
->> An extremely cheesy workaround would be if the commit which
->> removes the hw/bt/Kconfig also touches configure; then Make
->> will know it needs to rerun configure, which will (among
->> other things) blow away all the config-devices.mak.d and
->> force rerunning of minikconf.
->>
->> I don't know what the correct additional makefile magic
->> would be that would cause us to automatically get deletion
->> of a Kconfig file right; maybe Paolo does?
-> 
-> Nope, sorry. :(
+On 2/3/20 1:59 AM, Luk=C3=A1=C5=A1 Doktor wrote:
+> Using a range of ports from 32768 to 65538 is dangerous as some
+> application might already be listening there and interfere with the
+> testing. There is no way to reserve ports, but let's decrease the chance
+> of interactions by only using ports that were free at the time of
+> importing this module.
+>=20
+> Without this patch CI occasionally fails with used ports. Additionally I
+> tried listening on the first port to be tried via "nc -l localhost
+> $port" and no matter how many other ports were available it always
+> hanged for infinity.
+>=20
+> Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> ---
+>   tests/qemu-iotests/147        | 43 ++++++++++++++++-------
+>   tests/qemu-iotests/iotests.py | 64 +++++++++++++++++++++++++++++++++++
+>   2 files changed, 94 insertions(+), 13 deletions(-)
 
-Wait, hw/*/Kconfig should not have to be added to minikconf.py's
-arguments.  There are "source" lines in hw/Kconfig to do so.  It does
-not fail because minikconf skips multiple includes of the same file, but
-it should be possible to remove it.
+Is it worth sharing the logic already present in common.nbd's=20
+nbd_server_start_tcp_socket shell function?  (Oh right, that's shell,=20
+this is python).  It seems like we keep reinventing logic to pick a safe=20
+port.
 
-Paolo
+>=20
+> diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+> index 2b6f859a09..4d0e1418bb 100755
+> --- a/tests/qemu-iotests/147
+> +++ b/tests/qemu-iotests/147
+> @@ -26,10 +26,8 @@ import time
+>   import iotests
+>   from iotests import cachemode, aiomode, imgfmt, qemu_img, qemu_nbd, qem=
+u_nbd_early_pipe
+>  =20
+> -NBD_PORT_START      =3D 32768
+> -NBD_PORT_END        =3D NBD_PORT_START + 1024
+> -NBD_IPV6_PORT_START =3D NBD_PORT_END
+> -NBD_IPV6_PORT_END   =3D NBD_IPV6_PORT_START + 1024
+> +NBD_PORTS =3D iotests.find_free_ports(32768, 65536, 1024)
+> +NBD_IPV6_PORTS =3D iotests.find_free_ports(NBD_PORTS[-1] + 1, 65536, 102=
+4)
+
+The changes here look sane...
+
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -20,6 +20,7 @@ from __future__ import print_function
+>   import errno
+>   import os
+>   import re
+> +import socket
+>   import subprocess
+>   import string
+>   import unittest
+> @@ -75,6 +76,69 @@ luks_default_secret_object =3D 'secret,id=3Dkeysec0,da=
+ta=3D' + \
+>   luks_default_key_secret_opt =3D 'key-secret=3Dkeysec0'
+>  =20
+>  =20
+> +def is_port_free(port, address):
+
+...and I'm glad you're adding a reusable method here.
+
+> +    """
+> +    Return True if the given port is available for use.
+> +
+> +    Currently we only check for TCP/UDP connections on IPv4/6
+> +    Backported from avocado.utils.network
+> +
+> +    :param port: Port number
+> +    :param address: Socket address to bind or connect
+> +    """
+> +    families =3D (socket.AF_INET, socket.AF_INET6)
+> +    if address =3D=3D "localhost" or not address:
+> +        localhost =3D True
+> +        protocols =3D (socket.SOCK_STREAM, socket.SOCK_DGRAM)
+> +    else:
+> +        localhost =3D False
+> +        # sock.connect always connects for UDP
+> +        protocols =3D (socket.SOCK_STREAM, )
+> +    sock =3D None
+> +    try:
+> +        for family in families:
+> +            for protocol in protocols:
+> +                try:
+> +                    sock =3D socket.socket(family, protocol)
+> +                    if localhost:
+> +                        sock.bind(("", port))
+> +                    else:
+> +                        sock.connect((address, port))
+> +                        return False
+> +                except socket.error as exc:
+> +                    if exc.errno in (93, 94):   # Unsupported combinatio=
+ns
+
+Ouch - that seems rather hard-coded (not all the world uses the same=20
+errno values as Linux).  Does python have symbolic names for=20
+EPROTONOSUPPORT and ESOCKTNOSUPPORT?
+
+> +                        continue
+> +                    if localhost:
+> +                        return False
+> +                sock.close()
+> +        return True
+> +    finally:
+> +        if sock is not None:
+> +            sock.close()
+> +
+> +
+> +def find_free_ports(start_port, end_port, count, address=3D"localhost"):
+> +    """
+> +    Return count of host free ports in the range [start_port, end_port].
+> +
+> +    Backported from avocado.utils.network
+> +
+> +    :param start_port: header of candidate port range
+> +    :param end_port: ender of candidate port range
+
+s/ender/end/
+
+> +    :param count: Initial number of ports known to be free in the range.
+> +    :param address: Socket address to bind or connect
+> +    """
+> +    ports =3D []
+> +    port_range =3D range(start_port, end_port)
+> +    for i in port_range:
+> +        if is_port_free(i, address):
+> +            ports.append(i)
+> +        if len(ports) >=3D count:
+> +            break
+> +
+> +    return ports
+> +
+> +
+>   def qemu_img(*args):
+>       '''Run qemu-img and return the exit code'''
+>       devnull =3D open('/dev/null', 'r+')
+>=20
+
+I'd like a second review on this (my python is tolerable, but not=20
+strong), but I'm happy to take it through my NBD tree if no one else=20
+speaks up first.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
