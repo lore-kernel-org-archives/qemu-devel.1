@@ -2,89 +2,77 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E022C35247
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DF4C35247
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:40:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD81F20CC7
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:39:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80A8F20CC7
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 15:40:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F3DtOnOG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD81F20CC7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JsrEijIg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80A8F20CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iydp5-0000CJ-0V
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:39:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33075)
+	id 1iydpQ-0000px-L5
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 10:40:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iydoS-00086a-6Z
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:39:01 -0500
+ (envelope-from <thuth@redhat.com>) id 1iydol-0008OH-Br
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:39:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iydoR-0005z4-A9
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:39:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34349
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iydok-0006Fp-Ds
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:39:19 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29602
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iydoR-0005yY-6B
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:38:59 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iydok-0006FQ-AK
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 10:39:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580744338;
+ s=mimecast20190719; t=1580744357;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=3/5tSFoSXGY1O20yBO3A0oHEhFBq92j5f6chfEhaGjw=;
- b=F3DtOnOGYizxEgZcZRSzllGTG1U5ONZmam5hQyFmWay6H9vqSAfYZxt64lGkED7PT36CLI
- JEXflxQ9zM/1wA0N9xWkFRA9P7nE4rq0Tz5tnZjie3/zHB2vPP70l9FsdUOTtZKINybsIN
- ZUiq4dE+rZRhN+69ASaccS5p3B7SAgY=
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=eXEIG6iFtdRBfowazDT2POm+H3hVQ/L0WJhbXU28mUk=;
+ b=JsrEijIgOzPKMflqZgti4C+UHBlfg/yP/yr94q2ZKV1Ho5Jq70btxRi7tG3vfD5ADA08rJ
+ EBflZT7G7NclZ/YkbJNF6+8C8VjQp+5lJy8xJOFqn9FyFyBzUIobkgBTzwOl7RIeuPNyuK
+ e//T56saKeSZnuzfR18dBYg09Iir6b4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-fzsjVqYsMpe5iWrx6Y5oYw-1; Mon, 03 Feb 2020 10:38:47 -0500
+ us-mta-165-UJlzWScsPeuPY5wU7rPN_w-1; Mon, 03 Feb 2020 10:39:13 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 500F619082C5;
- Mon,  3 Feb 2020 15:38:46 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-129.ams2.redhat.com [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74F458EA0B;
- Mon,  3 Feb 2020 15:38:45 +0000 (UTC)
-Subject: Re: [PULL 00/13] qtests, kconfig and misc patches
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200203123811.8651-1-thuth@redhat.com>
- <CAFEAcA_1KYRA=87k34zCRLqCf1tWHrULGZPcHeKwJZhDUx0=kw@mail.gmail.com>
- <2fd63018-b9f9-ab88-2d65-009c54bb6cf2@redhat.com>
- <CAFEAcA_XKAeT10p+XNRjQeOjoGYX1Q-D+kj9E0kFx2AxtktACg@mail.gmail.com>
- <fedbec35-51c7-cf1b-ef55-e2a582620781@redhat.com>
- <a40afb1e-0f36-e4c0-918c-9d3c88cd511d@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3958B108C303;
+ Mon,  3 Feb 2020 15:39:12 +0000 (UTC)
+Received: from thuth.com (ovpn-116-129.ams2.redhat.com [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 87AD486C4A;
+ Mon,  3 Feb 2020 15:39:08 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <2bbe8de3-9555-4111-c66a-671bdef635c0@redhat.com>
-Date: Mon, 3 Feb 2020 16:38:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <a40afb1e-0f36-e4c0-918c-9d3c88cd511d@redhat.com>
-Content-Language: en-US
+To: qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] Makefile: Do not use wildcard hw/*/Kconfig as input for
+ minikconf
+Date: Mon,  3 Feb 2020 16:39:05 +0100
+Message-Id: <20200203153905.20544-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: fzsjVqYsMpe5iWrx6Y5oYw-1
+X-MC-Unique: UJlzWScsPeuPY5wU7rPN_w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,34 +84,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/02/2020 16.29, Paolo Bonzini wrote:
-> On 03/02/20 16:17, Paolo Bonzini wrote:
->> On 03/02/20 15:50, Peter Maydell wrote:
->>>
->>> An extremely cheesy workaround would be if the commit which
->>> removes the hw/bt/Kconfig also touches configure; then Make
->>> will know it needs to rerun configure, which will (among
->>> other things) blow away all the config-devices.mak.d and
->>> force rerunning of minikconf.
->>>
->>> I don't know what the correct additional makefile magic
->>> would be that would cause us to automatically get deletion
->>> of a Kconfig file right; maybe Paolo does?
->>
->> Nope, sorry. :(
-> 
-> Wait, hw/*/Kconfig should not have to be added to minikconf.py's
-> arguments.  There are "source" lines in hw/Kconfig to do so.  It does
-> not fail because minikconf skips multiple includes of the same file, but
-> it should be possible to remove it.
+The hw/*/Kconfig files should be sourced from hw/Kconfig, so there
+is no need to pass them along as input files to minikconfig. We should
+use the hw/*/Kconfig wildcard only for build dependencies in the Makefile.
 
-Right, I came to the same conclusion. Patch is on the way...
+With this change, there are now no duplicate entries in the generated
+*-softmmu/config-devices.mak.d files anymore, and there is finally a
+chance to get rid of stale Kconfig file like hw/bt/Kconfig, too (once
+they do not show up in the config-devices.mak.d files now anymore).
 
- Thomas
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 9a5a1e689c..a29ecc38f0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -396,11 +396,11 @@ MINIKCONF_ARGS =3D \
+     CONFIG_LINUX=3D$(CONFIG_LINUX) \
+     CONFIG_PVRDMA=3D$(CONFIG_PVRDMA)
+=20
+-MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host $(SRC_PATH)/hw/Kconfig \
+-                   $(wildcard $(SRC_PATH)/hw/*/Kconfig)
++MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host $(SRC_PATH)/hw/Kconfig
++MINIKCONF_DEPS =3D $(MINIKCONF_INPUTS) $(wildcard $(SRC_PATH)/hw/*/Kconfig=
+)
+ MINIKCONF =3D $(PYTHON) $(SRC_PATH)/scripts/minikconf.py \
+=20
+-$(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak $(MINIK=
+CONF_INPUTS) $(BUILD_DIR)/config-host.mak
++$(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak $(MINIK=
+CONF_DEPS) $(BUILD_DIR)/config-host.mak
+ =09$(call quiet-command, $(MINIKCONF) $(MINIKCONF_ARGS) > $@.tmp, "GEN", "=
+$@.tmp")
+ =09$(call quiet-command, if test -f $@; then \
+ =09  if cmp -s $@.old $@; then \
+--=20
+2.18.1
 
 
