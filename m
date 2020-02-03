@@ -2,84 +2,115 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 181ECC33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0C2C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D750120721
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:44:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="igSlgjPr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D750120721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E682920721
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:45:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E682920721
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyc1o-00067A-2E
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 08:44:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51660)
+	id 1iyc2O-0007Rj-5M
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 08:45:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51760)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iyc1D-0005hw-5A
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:44:04 -0500
+ (envelope-from <LYan@suse.com>) id 1iyc1g-00069L-Ik
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:44:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iyc1B-0004me-Qn
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:44:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51491
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iyc1B-0004mF-N4
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:44:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580737440;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=v7BVoP5q1bx7LrSMb1WmDPoayQtUUmcEZ4S2b7UKaFw=;
- b=igSlgjPrs35ZDJ16OkBnNxz8yCT/73ogMJpExuF1fJ81N/r39i/9FGeAc9aVdCl89WdstM
- Sp/zwSNPEcgUPEHiQLq1vqMbU3NxIzOWEghEp7FPpxTfjwT0rwdn1amz6qBHNuUi2MfpCk
- YDAaARj9a+yDsgRMnOXHATsacJ3Fe1o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-8SZ4u-lmMrifDFCM_U9KKw-1; Mon, 03 Feb 2020 08:43:59 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AE64801E6C;
- Mon,  3 Feb 2020 13:43:58 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-129.ams2.redhat.com [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FBBA5D9CA;
- Mon,  3 Feb 2020 13:43:54 +0000 (UTC)
-Subject: Re: [qemu-web PATCH] Update the documentation links to point to our
- generated docs
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200203131919.9972-1-thuth@redhat.com>
- <CAFEAcA8gzuukXwrLLAyYfP3kNVRNZCXwhPNNhWothXiWfqghOA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <31632598-1fbd-5cfb-a899-1c81a8c04c48@redhat.com>
-Date: Mon, 3 Feb 2020 14:43:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <LYan@suse.com>) id 1iyc1f-0004x8-IG
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:44:32 -0500
+Received: from m4a0072g.houston.softwaregrp.com ([15.124.2.130]:59448)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <LYan@suse.com>)
+ id 1iyc1Y-0004sd-J2; Mon, 03 Feb 2020 08:44:24 -0500
+Received: FROM m4a0072g.houston.softwaregrp.com (15.120.17.147) BY
+ m4a0072g.houston.softwaregrp.com WITH ESMTP; 
+ Mon,  3 Feb 2020 13:42:55 +0000
+Received: from M4W0334.microfocus.com (2002:f78:1192::f78:1192) by
+ M4W0335.microfocus.com (2002:f78:1193::f78:1193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10; Mon, 3 Feb 2020 13:43:05 +0000
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (15.124.8.10) by
+ M4W0334.microfocus.com (15.120.17.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10 via Frontend Transport; Mon, 3 Feb 2020 13:43:04 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TeLGZH65Fq+FDv+nSilVSzaaaOaPmuWR6HNMyx2fE2oLapvIJD2kGOf7Cfu4vzW9E/S7yXfhCc+6n1zgng7h3oJAXC1zMrquBi7KvqmrZSYum+oAlhQEQBtM82Jka+5xXPEdr15kSqJzfI2QugyKoIcDG5PX+3gni6nSKDezYYxxTMycpglDFpHSjcP6JAlcrIcI6Eh2Tz3qCpc+AT6oEucpz0n+R36Iyj9Zxh8fROtTOUGpcFYcO5zeYNJz+PVwglHw1HTvsID/2JDWRlNGRtEc38M1ouiIVT7DrrLiNyA37sDqktwhFCzi/QZbxhcJur7M+OLbsqVwN4o96FjEog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zKeA6PrE6qdosN8awR6fawlD7jpcvjHWgfjOzOZJdr8=;
+ b=U8jLNTCuu1BCdRpUFISRPOfIqd4jr1b630LSfwKXxd5IREGgbIf1BOSv3wjvocpjqk9KTFHOrEouLcTnTHhwffIv9LOUhMVxOyAJnXmKjJasiXKJC3IrrRaZzJ8bgsPC40DOAJfDojnt8MXEJ0luOJBL57/fGVsSUWt0Dd9/pDHbdP6j0Ls5qHEPh250knsZRky3TD4jqa7d9Ob9MMeD4EN8TWnz8FxuWIi4UQwzKAKzA6o/or+7hGOCFxssJweBmMsY5TCORAp/Oa7ogGJv5sv6GHZhE9JXgPu0q5RU0rtzCCfYWhkCb7kbsbMmZig9tF8dbvOmxk3OsH5oilnNhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: spf=none (sender IP is ) smtp.mailfrom=LYan@suse.com; 
+Received: from BYAPR18MB2888.namprd18.prod.outlook.com (20.179.58.203) by
+ BYAPR18MB2983.namprd18.prod.outlook.com (20.179.58.93) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.27; Mon, 3 Feb 2020 13:43:03 +0000
+Received: from BYAPR18MB2888.namprd18.prod.outlook.com
+ ([fe80::70c4:1802:725e:e829]) by BYAPR18MB2888.namprd18.prod.outlook.com
+ ([fe80::70c4:1802:725e:e829%7]) with mapi id 15.20.2686.030; Mon, 3 Feb 2020
+ 13:43:03 +0000
+From: Liang Yan <lyan@suse.com>
+To: <peter.maydell@linaro.org>, <drjones@redhat.com>, <qemu-arm@nongnu.org>
+Subject: [PATCH v4] target/arm/monitor: query-cpu-model-expansion crashed qemu
+ when using machine type none
+Date: Mon, 3 Feb 2020 08:42:51 -0500
+Message-ID: <20200203134251.12986-1-lyan@suse.com>
+X-Mailer: git-send-email 2.25.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR15CA0036.namprd15.prod.outlook.com
+ (2603:10b6:208:1b4::49) To BYAPR18MB2888.namprd18.prod.outlook.com
+ (2603:10b6:a03:10d::11)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8gzuukXwrLLAyYfP3kNVRNZCXwhPNNhWothXiWfqghOA@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 8SZ4u-lmMrifDFCM_U9KKw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from leonstudio.lan (2605:a000:160e:228::5ca) by
+ MN2PR15CA0036.namprd15.prod.outlook.com (2603:10b6:208:1b4::49) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2686.29 via Frontend
+ Transport; Mon, 3 Feb 2020 13:43:02 +0000
+X-Mailer: git-send-email 2.25.0
+X-Originating-IP: [2605:a000:160e:228::5ca]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0e369d23-7325-485b-3c41-08d7a8aefe07
+X-MS-TrafficTypeDiagnostic: BYAPR18MB2983:
+X-Microsoft-Antispam-PRVS: <BYAPR18MB29836F51F8F2D2FD970F4E14BF000@BYAPR18MB2983.namprd18.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:741;
+X-Forefront-PRVS: 0302D4F392
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(4636009)(376002)(136003)(346002)(366004)(396003)(39860400002)(199004)(189003)(6486002)(52116002)(6512007)(2616005)(316002)(478600001)(1076003)(36756003)(8936002)(8886007)(8676002)(81166006)(81156014)(6506007)(86362001)(6666004)(66556008)(66476007)(16526019)(5660300002)(186003)(4326008)(66946007)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR18MB2983;
+ H:BYAPR18MB2888.namprd18.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: suse.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: f/GaQA8WiTyqQhDDk3mA3FbXHQLIoFqzmVXacjpDQMoyiwTq6Dy8C0wKfveEFOdyoxIBxNydFqBl4uPdnIDcxFVvLfRribz6LFRCMDdzKEjKyzUrRWnpDOmRsZr0m4GYufK+cP3l5LtWQQ+grihEXbmI/6NbkQxbw9izUrSDkKd4ctkZRQwns8SBwWGbxdF51BBT8lZ/Y7gagrUMXlIgjj36qZ/gDpIpfYB5qC89QwPnxggEWgreL2CMkuARHdNHRZ6GQkmyNnXN9ZAWl7ZEsm746uL6AuPHlgj9bGO+hhvKsi7rtKugpiWh7cIUJZlYHWkDQEf1a2rJVKjrNtA+ySGeStIGd+hs2tnY1q9xQ93/JTWZVPlSsuaG1uZ/fIqfEcFNIWbDscoSs0dF/XqJNH297LWKOijQQJUP5zNUZa6TDDc7UH2VIN2UkjUlOfUi
+X-MS-Exchange-AntiSpam-MessageData: /IlYZ3fdPnWb5wVNw7LRbd6bjmehu23e+cFwHUVAz7zpOkcPyfEsQKbJTaTC4kYPY5k6aTIXRidMmQ+noAMNDV80cGWyb1q19zHwcd+XPEdaSUV00Uq7ZJ3ixJMQKllDlNotivQxmZCrQDUzmQILwLYZpBpo3UXxLO4gKmvFF2g=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0e369d23-7325-485b-3c41-08d7a8aefe07
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2020 13:43:03.7526 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 856b813c-16e5-49a5-85ec-6f081e13b527
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: atWIldCYMQM0pooAC1p8PaKjqxIecaSL4gaL4IeEqtcSBxngF71wf9X3WJp7eGdY
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR18MB2983
+X-OriginatorOrg: suse.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 15.124.2.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,51 +122,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/02/2020 14.28, Peter Maydell wrote:
-> On Mon, 3 Feb 2020 at 13:19, Thomas Huth <thuth@redhat.com> wrote:
->>
->> We are now providing the generated QEMU documentation files directly
->> on our www.qemu.org webserver, so we should link to these files now.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  _includes/footer.html |  2 +-
->>  documentation.md      | 14 +++++++++++---
->>  2 files changed, 12 insertions(+), 4 deletions(-)
->>
->> diff --git a/_includes/footer.html b/_includes/footer.html
->> index 1669ef7..e67ffd7 100644
->> --- a/_includes/footer.html
->> +++ b/_includes/footer.html
->> @@ -14,7 +14,7 @@
->>                 </ul>
->>                 <ul class="style">
->>                         <li><a href="/documentation">Documentation</a></li>
->> -                       <li><a href="https://qemu.weilnetz.de/qemu-doc.html">Manual</a></li>
->> +                       <li><a href="https://www.qemu.org/docs/master/qemu-doc.html">User manual</a></li>
-> 
-> This is the old texinfo user manual, and it no longer contains
-> all the information it used to (as we have been moving parts of
-> it out to the rST manuals). It's going to go away entirely
-> at some point. The equivalent "here's the top level of the docs"
-> in the new rST world is https://www.qemu.org/docs/master/,
-> which has links to the various rST manuals (and also the
-> qemu-doc.html).
+Commit e19afd566781 mentioned that target-arm only supports queryable
+cpu models 'max', 'host', and the current type when KVM is in use.
+The logic works well until using machine type none.
 
-Oh, ok, thanks, I see now your point in the previous thread.
+For machine type none, cpu_type will be null if cpu option is not
+set by command line, strlen(cpu_type) will terminate process.
+So We add a check above it.
 
-I'll change this to point to https://www.qemu.org/docs/master/ ...
-(but in the long run, I wonder whether we should keep this big footer on
-each page at all, or whether we should rather replace it with something
-smaller)
+This won't affect i386 and s390x since they do not use current_cpu.
 
- Thomas
+Signed-off-by: Liang Yan <lyan@suse.com>
+---
+ v4: change code style based on the review from Andrew Jones
+ v3: change git commit message
+ v2: fix code style issue
+---
+ target/arm/monitor.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+index 9725dfff16..c2dc7908de 100644
+--- a/target/arm/monitor.c
++++ b/target/arm/monitor.c
+@@ -137,17 +137,20 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(=
+CpuModelExpansionType type,
+     }
+=20
+     if (kvm_enabled()) {
+-        const char *cpu_type =3D current_machine->cpu_type;
+-        int len =3D strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
+         bool supported =3D false;
+=20
+         if (!strcmp(model->name, "host") || !strcmp(model->name, "max")) {
+             /* These are kvmarm's recommended cpu types */
+             supported =3D true;
+-        } else if (strlen(model->name) =3D=3D len &&
+-                   !strncmp(model->name, cpu_type, len)) {
+-            /* KVM is enabled and we're using this type, so it works. */
+-            supported =3D true;
++        } else if (current_machine->cpu_type) {
++            const char *cpu_type =3D current_machine->cpu_type;
++            int len =3D strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
++
++            if (strlen(model->name) =3D=3D len &&
++                !strncmp(model->name, cpu_type, len)) {
++                /* KVM is enabled and we're using this type, so it works. =
+*/
++                supported =3D true;
++            }
+         }
+         if (!supported) {
+             error_setg(errp, "We cannot guarantee the CPU type '%s' works =
+"
+--=20
+2.25.0
 
 
