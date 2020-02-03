@@ -2,161 +2,116 @@ Return-Path: <SRS0=cs6B=3X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51838C33CAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA06C33CAC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:33:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 296E820721
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:30:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 296E820721
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
+	by mail.kernel.org (Postfix) with ESMTPS id 65EAA2086A
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Feb 2020 13:33:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KNLZzcQm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65EAA2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyboP-0003ed-CG
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 08:30:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46249)
+	id 1iybrB-0004on-KW
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 08:33:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <LYan@suse.com>) id 1iybnU-0002k2-ES
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:29:53 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iybqR-0004L7-5G
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:32:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <LYan@suse.com>) id 1iybnR-0003Pw-Th
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:29:51 -0500
-Received: from m9a0013g.houston.softwaregrp.com ([15.124.64.91]:59408)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <LYan@suse.com>)
- id 1iybnR-0003Kg-Lk; Mon, 03 Feb 2020 08:29:49 -0500
-Received: FROM m9a0013g.houston.softwaregrp.com (15.121.0.190) BY
- m9a0013g.houston.softwaregrp.com WITH ESMTP; 
- Mon,  3 Feb 2020 13:28:43 +0000
-Received: from M9W0067.microfocus.com (2002:f79:be::f79:be) by
- M9W0067.microfocus.com (2002:f79:be::f79:be) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1591.10; Mon, 3 Feb 2020 13:29:33 +0000
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (15.124.72.14) by
- M9W0067.microfocus.com (15.121.0.190) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1591.10 via Frontend Transport; Mon, 3 Feb 2020 13:29:33 +0000
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iybqP-0004q3-Mj
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 08:32:54 -0500
+Received: from mail-db8eur05on2139.outbound.protection.outlook.com
+ ([40.107.20.139]:62144 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iybqO-0004kY-W3; Mon, 03 Feb 2020 08:32:53 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JeeVew633w3V9RQam8Rav07FLOB8Reirg0tVjo6AfKceLV6fCYin5wwXN7HJcyn3hdnMvIPLVNDS9K0YAxrCyOkQu1cRdLga3LkM0H5tim/PlMkPxIWhKJFFl0PV4tfrwhMspvLTt1mHQ5mZJHAp8w9zY1M337uNLbavLkM0rPNHa56QTdrsZRDPpmZXpncvsxXzslJ3NzdIPLI9J/Bp6XrBWgvGajmA5fQCLY7C5SvS8xN9tWv3yWGWyFmLDt+Pg4BrqoNvtdj8ZoDcrw6fjbhUhUcLEArkSkyTUduQIUubkndy0HgRqBstDR3WwhVSXqwNucZWEX6IFYBv/eVPfw==
+ b=OsLbOfZPmGrVe+GE2jMXPCjhMAhm04XZ6QYv6AXieE3wxxge7Oob7WYgO26639kwdQE54uONqBaNRsW3PsIokmJaygoY/XA8SvAQWJX6TIq7q/svu8NaYAL/PfSuqD2HHtNr+AM7TQV8ldOgT/Hjw9UfMBb87hDRcaCyV28mqMOZn6tJd2rN8p1xByUntkaVF8DCCDXjM6ZKQGT4Edo1Q/gJ5QL5oKWqVcI3HA+Es6PyiIpZ67XMCgfDZEYvhrf5k8h1OtNGyjmmdfuyepDLjmMlhrS4romGzwyU/5R8jfoY6vwhyWHrgoiZ3Hfq986lHs5mPdpeO+aPcwCkM2s3qA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EbYiIoXLdlzVyjpwXPEp5CPxIW3FNBKA1zLdWQO/KSw=;
- b=JDIJccRGnE5Bd0Rl/MKvtemMQrWBYDWPHFKQR0Gmlteggd7SKC5DNCCiZAbnJrMPvWcl6cZpenK/Cs/EkiXyAA8XoaXrMVLqwbp2K4r1EVGjPa8Ex/xC8YyodK/b/EqyAxXt8Uli3U9aW6GitmGVhKFH+xVXnw2Wn33URtnLTBnPoW2T6gzalMLqngNfk4+xF0X/RE+JrYer3x4hwk9OZ0nbsDWgog9NBZdiFUkpj1p7myd3rW5oyJSCwdknV4/io2/aJ5aDMQ6aSY/VjQ3/+nZj1eYlqg/TPfKeFY1NnsAKjB3R+YRTzi7R7BqqR/vp9/QPUKJsa4G1w0yKOfeL5w==
+ bh=Ojigzsq6WMBeGNdfbrY1zAd6VHPTZKhTDGJoC7ssxow=;
+ b=jHQ4HwA5fsHq6DHIQO3IuzCAMcr5iW6MzOAFalfgtGz0r/RQyz8PloOA5pYGC3I0Xt6D2Y9CnC29EWHCsV+AKatznDNhTmBGGA2pGlyMMyI4GcimGxWHXfEZdLX0/HrD0DTvj6+M/Ci33tyS6B479l6CuEJ2/zJo8RbUBwdm0Si7nFFVYOazvH5at1oXbfyZp7YfIugXiW06as5P448aHEY6jSBEpV+E4wqby+CPrBnZAfEGpNUblSX4A+OK84BEq2Su6PSGXcjfhKrrwooPH1hZlNqiq8IEBOS2qLzh5EGftzSuLCehwNvRK9Wbh94Nm++3hV6UQneRoMScCu+5YQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: spf=none (sender IP is ) smtp.mailfrom=LYan@suse.com; 
-Received: from BYAPR18MB2888.namprd18.prod.outlook.com (20.179.58.203) by
- BYAPR18MB2950.namprd18.prod.outlook.com (20.179.59.154) with Microsoft SMTP
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ojigzsq6WMBeGNdfbrY1zAd6VHPTZKhTDGJoC7ssxow=;
+ b=KNLZzcQmgcJjwIdKZEQxbAG59s0DPyIeNr043gzWGWRa5O8+HmAjIsOe1mVIaQ9LCr0DqIk8/gVPJz2C7JOGopIA09rLgq82ekTxsrFLL5gRai/ZVFtftmpWV9OyXog1864TMO1SWU8EVra9cZqm0/4ogWw4HYVJ0qxRQ7Wk/Kw=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3413.eurprd08.prod.outlook.com (20.177.113.10) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.32; Mon, 3 Feb 2020 13:29:31 +0000
-Received: from BYAPR18MB2888.namprd18.prod.outlook.com
- ([fe80::70c4:1802:725e:e829]) by BYAPR18MB2888.namprd18.prod.outlook.com
- ([fe80::70c4:1802:725e:e829%7]) with mapi id 15.20.2686.030; Mon, 3 Feb 2020
- 13:29:31 +0000
-Subject: Re: [PATCH v3] target/arm/monitor: query-cpu-model-expansion crashed
- qemu when using machine type none
-To: Andrew Jones <drjones@redhat.com>
-References: <20200201034649.26815-1-lyan@suse.com>
- <20200203130846.gihtrf72inyf33wh@kamzik.brq.redhat.com>
-From: Liang Yan <lyan@suse.com>
-Autocrypt: addr=lyan@suse.com; prefer-encrypt=mutual; keydata=
- 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
- yMQQ+LPXfanS4w==
-Message-ID: <f608c744-b416-5815-2b35-9a8b72556259@suse.com>
-Date: Mon, 3 Feb 2020 08:29:28 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200203130846.gihtrf72inyf33wh@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset="utf-8"
+ 15.20.2686.29; Mon, 3 Feb 2020 13:32:49 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.030; Mon, 3 Feb 2020
+ 13:32:49 +0000
+Subject: Re: [PATCH] block/backup-top: fix flags handling
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200131184805.7033-1-vsementsov@virtuozzo.com>
+ <f442ed27-044e-f293-8955-74798b581ab4@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200203163246841
+Message-ID: <a89e1c7b-0376-7168-5fe6-4ce5a878ef04@virtuozzo.com>
+Date: Mon, 3 Feb 2020 16:32:46 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <f442ed27-044e-f293-8955-74798b581ab4@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL0PR02CA0117.namprd02.prod.outlook.com
- (2603:10b6:208:35::22) To BYAPR18MB2888.namprd18.prod.outlook.com
- (2603:10b6:a03:10d::11)
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: HE1P189CA0013.EURP189.PROD.OUTLOOK.COM (2603:10a6:7:53::26)
+ To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
-Received: from [IPv6:2605:a000:160e:228::5ca] (2605:a000:160e:228::5ca) by
- BL0PR02CA0117.namprd02.prod.outlook.com (2603:10b6:208:35::22) with Microsoft
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1P189CA0013.EURP189.PROD.OUTLOOK.COM (2603:10a6:7:53::26) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.27 via Frontend Transport; Mon, 3 Feb 2020 13:29:30 +0000
-X-Originating-IP: [2605:a000:160e:228::5ca]
+ 15.20.2686.29 via Frontend Transport; Mon, 3 Feb 2020 13:32:48 +0000
+X-Tagtoolbar-Keys: D20200203163246841
+X-Originating-IP: [185.231.240.5]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2842c562-7b31-4cec-319e-08d7a8ad19e3
-X-MS-TrafficTypeDiagnostic: BYAPR18MB2950:
-X-Microsoft-Antispam-PRVS: <BYAPR18MB29504874699DBA04E807C37DBF000@BYAPR18MB2950.namprd18.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1201;
+X-MS-Office365-Filtering-Correlation-Id: b37c71ae-e59e-4d74-2a3f-08d7a8ad8fe5
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3413:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3413C36FC43F3FBEDAA900B6C1000@AM6PR08MB3413.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-Forefront-PRVS: 0302D4F392
 X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(346002)(136003)(396003)(376002)(366004)(39860400002)(189003)(199004)(52116002)(2906002)(31686004)(86362001)(36756003)(16526019)(81156014)(81166006)(8676002)(186003)(2616005)(4326008)(8936002)(316002)(53546011)(478600001)(5660300002)(66946007)(66476007)(66556008)(6486002)(31696002)(6916009);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR18MB2950;
- H:BYAPR18MB2888.namprd18.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: suse.com does not designate
+ SFS:(10019020)(346002)(396003)(136003)(376002)(39850400004)(366004)(199004)(189003)(4326008)(478600001)(31686004)(81156014)(2616005)(956004)(81166006)(8676002)(16576012)(316002)(6486002)(66476007)(66556008)(52116002)(53546011)(31696002)(186003)(16526019)(86362001)(5660300002)(26005)(36756003)(8936002)(66946007)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3413;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0gf1YiNPU81Kv8OsZW1CkmqVL4zB6y5EQotosU3yQ+Nmo/NdJVG48uNvMcXe/uTvtMu/oK5ufNERQn0rLLylM0aOZeMLnkMcCRJU9ebPOfLoZRX6ju3eckBY2myJni80jvzLiIa5j77aZ5Z2iCFZP9O8EVPzCe3Qh274h6aIPkp0+PuijGLG3L8NE047bfO8eesbschyz61WlATgsdPdnbn/PH8ClkDM1Q/HRZdxqvtk84rMoUYWB4J1dPRhxegi/lxKvpDTscXRJkl81X99gNkSgLaqXl3A0ADojHd5wV7e8mb4+ePWK5xk7vvpIDl+OXz5QhLbXcM1/4gq6QnTr0JUff1NyokrrUKcv2nMmHOLNpBfwTI/6NmyXicmkRuzqOd0r5Z1NN2b+SQyaHmDJlV0sXFZoXKbQUsRWwE5ZLMEkaygM69BcjYlIyT0akiZ
-X-MS-Exchange-AntiSpam-MessageData: 1ina8rf3rUd+Rw1qK/eY0XBmDQb4WPGz9/IwncfT135t4dpY8V1qhCkyAih359k2GGe0z2cNGmImsvq6JrKRqdM0u0CmJ8PZXnQzG0I+j2YoMShmREHYjXvECEopHg0oHTx9Z0PdoaNHOuztA/2asMqhqa3MW5l9+gN2occQIPU=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2842c562-7b31-4cec-319e-08d7a8ad19e3
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2020 13:29:31.5061 (UTC)
+X-Microsoft-Antispam-Message-Info: xUWyaFQLTRfFRuX9DFB6K3LzXFdwBKg7z49ncOnkfJYf4Lf00IX402aN9KJVbyjmn8aUkisiggd0Q/BmEw7PYitsocZwIgeeD+S+J9LK5XIpDmSbMXTsMzyHxrxWyKt7JJU0AfdzqQLpmyi183G40ohhBVMRuesnDJW9MusY/JUi2givV0/E+6YxlYTmz0ETqKH5lWbuyDIPqucp7y3uDVvKj+NsJbGsVrOt0QdEbBVOMaSfUws52ry6BijohnsqMeVIOqVbplhO8wDleMT3QCkewxxaDQmXSzObS4jgQO7mgcbtnEfYK1b/TffjfstndJKtW7fmNjuz0nQtUwcXm9K0V1xmRjPAOUgtCKnbZWnYcCPEFFNIuQp9+lv+9MThKNhlXnOaNy1Am3MYmv8mroSdlhGgme6pTdgLUwMsMNqS/c10KuVkgEyplVa4PsWP
+X-MS-Exchange-AntiSpam-MessageData: m5m8gatsm9KWWW5jQfnUzuB2kBkUuaVZ9cpYCnlNDkoPvzMiaA0eqiO6zSszyz12ewurjpnEDcV+yp1MiTUHJLvrGZfMH308uC3FdSkwggnihlYw0HQckk2xTtbbdT21xA6x9lwI/u0VRATXBEGmag==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b37c71ae-e59e-4d74-2a3f-08d7a8ad8fe5
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2020 13:32:49.5092 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 856b813c-16e5-49a5-85ec-6f081e13b527
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 398+Qna8jU8gzx3HH0Ji5LeqJr0GgW5Pzy1nHcmRKwO6uF/DDnogwb41wBNyfa77
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR18MB2950
-X-OriginatorOrg: suse.com
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 15.124.64.91
+X-MS-Exchange-CrossTenant-UserPrincipalName: vyLo2xvapkNr9xjil6lloFUdwTlakHHSfD95HXEfLY2f/sW48AVpsYuN//Icw+e0988uLy32YsTZQ8fFZP+nRrlNnRId+myoGb783XIizVU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3413
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.20.139
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -168,99 +123,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2/3/20 8:08 AM, Andrew Jones wrote:
-> On Fri, Jan 31, 2020 at 10:46:49PM -0500, Liang Yan wrote:
->> Commit e19afd56 mentioned that target-arm only supports queryable
-> 
-> Please use more hexdigits. I'm not sure QEMU has a policy for that,
-> but I'd go with 12.
-> 
->> cpu models 'max', 'host', and the current type when KVM is in use.
->> The logic works well until using machine type none.
+31.01.2020 22:38, Eric Blake wrote:
+> On 1/31/20 12:48 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> backup-top "supports" write-unchanged, by skipping CBW operation in
+>> backup_top_co_pwritev. But it forgets to do the same in
+>> backup_top_co_pwrite_zeroes, as well as declare support for
+>> BDRV_REQ_WRITE_UNCHANGED.
 >>
->> For machine type none, cpu_type will be null if cpu option is not
->> set by command line, strlen(cpu_type) will terminate process.
->> So We add a check above it.
+>> Fix this, and, while being here, declare also support for flags
+>> supported by source child.
 >>
->> This won't affect i386 and s390x since they do not use current_cpu.
->>
->> Signed-off-by: Liang Yan <lyan@suse.com>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >> ---
->>  v3: change git commit message
->>  v2: fix code style issue
->> ---
->>  target/arm/monitor.c | 14 ++++++++------
->>  1 file changed, 8 insertions(+), 6 deletions(-)
->>
->> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
->> index 9725dfff16..3350cd65d0 100644
->> --- a/target/arm/monitor.c
->> +++ b/target/arm/monitor.c
->> @@ -137,17 +137,19 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
->>      }
->>  
->>      if (kvm_enabled()) {
->> -        const char *cpu_type = current_machine->cpu_type;
->> -        int len = strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
->>          bool supported = false;
->>  
->>          if (!strcmp(model->name, "host") || !strcmp(model->name, "max")) {
->>              /* These are kvmarm's recommended cpu types */
->>              supported = true;
->> -        } else if (strlen(model->name) == len &&
->> -                   !strncmp(model->name, cpu_type, len)) {
->> -            /* KVM is enabled and we're using this type, so it works. */
->> -            supported = true;
->> +        } else if (current_machine->cpu_type) {
->> +            const char *cpu_type = current_machine->cpu_type;
->> +            int len = strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
-> 
-> Need a blank line here.
-> 
->> +            if (strlen(model->name) == len &&
->> +                    !strncmp(model->name, cpu_type, len)) {
-> 
-> Four spaces of indent too many on the line above.
-> 
->> +                /* KVM is enabled and we're using this type, so it works. */
->> +                supported = true;
->> +            }
->>          }
->>          if (!supported) {
->>              error_setg(errp, "We cannot guarantee the CPU type '%s' works "
->> -- 
->> 2.25.0
->>
->>
-> 
-> With the three changes above
-> 
-> 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Tested-by: Andrew Jones <drjones@redhat.com>
-> 
+>> =A0 block/backup-top.c | 28 ++++++++++++++++++----------
+>> =A0 1 file changed, 18 insertions(+), 10 deletions(-)
+>=20
+>=20
+>> @@ -197,6 +201,10 @@ BlockDriverState *bdrv_backup_top_append(BlockDrive=
+rState *source,
+>> =A0=A0=A0=A0=A0 top->total_sectors =3D source->total_sectors;
+>> =A0=A0=A0=A0=A0 state =3D top->opaque;
+>> +=A0=A0=A0 top->supported_write_flags =3D
+>> +=A0=A0=A0=A0=A0=A0=A0 BDRV_REQ_WRITE_UNCHANGED | source->supported_writ=
+e_flags;
+>> +=A0=A0=A0 top->supported_zero_flags =3D
+>> +=A0=A0=A0=A0=A0=A0=A0 BDRV_REQ_WRITE_UNCHANGED | source->supported_zero=
+_flags;
+>=20
+> Elsewhere, in block/filter-compress.c we do:
+>=20
+>  =A0=A0=A0 bs->supported_write_flags =3D BDRV_REQ_WRITE_UNCHANGED |
+>  =A0=A0=A0=A0=A0=A0=A0 (BDRV_REQ_FUA & bs->file->bs->supported_write_flag=
+s);
+>=20
+>  =A0=A0=A0 bs->supported_zero_flags =3D BDRV_REQ_WRITE_UNCHANGED |
+>  =A0=A0=A0=A0=A0=A0=A0 ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_=
+FALLBACK) &
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bs->file->bs->supported_zero_flags);
+>=20
 
-Thanks for the review, I will update soon.
+I've looked at this too, but didn't understand, why we need it. Now with yo=
+ur description, I see that this make sense. I'll resend with same pattern, =
+thanks.
 
-> 
-> It'd be nice to extend tests/qtest/arm-cpu-features.c to also do
-> some checks with machine='none' with and without KVM.
-> 
+> That's slightly more robust (if the block layer adds new BDRV_REQ_ bits, =
+we don't have to revisit filter-compress.c to decide if blindly exposing th=
+ose bits breaks for some reason, but rahter DO have to amend the line to op=
+t-in to supporting the new bits).=A0 Whereas your code does NOT need editin=
+g if passing on the new bit is safe, but risks a subtle breakage if we forg=
+et to filter out the new bit when passing it on would be unsafe.=A0 I tend =
+to lean towards safety and opt-in over blind pass-through that works with t=
+he current set of defined bits, but not enough to withhold:
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
-Will do it later, thanks for the suggestion.
 
-Best,
-Liang
-
-> Thanks,
-> drew
-> 
+--=20
+Best regards,
+Vladimir
 
