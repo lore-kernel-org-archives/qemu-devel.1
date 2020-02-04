@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA2EC35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 18:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FCCDC3524D
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 18:43:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27D9E218AC
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 18:43:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CBE7217F4
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 18:43:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p93AzM4T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27D9E218AC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Glsj5X5B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CBE7217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz3AY-0007ec-8m
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 13:43:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49571)
+	id 1iz3AZ-0007fr-Fm
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 13:43:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iz37m-0002Aj-SA
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 13:40:39 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iz37t-0002Oh-3V
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 13:40:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iz37l-0002rN-Jg
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 13:40:38 -0500
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:50791)
+ (envelope-from <alex.bennee@linaro.org>) id 1iz37s-0003MD-0Y
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 13:40:45 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:39354)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iz37l-0002nF-CW
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 13:40:37 -0500
-Received: by mail-wm1-x330.google.com with SMTP id a5so4463938wmb.0
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 10:40:37 -0800 (PST)
+ id 1iz37r-0003I9-P8
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 13:40:43 -0500
+Received: by mail-wm1-x332.google.com with SMTP id c84so4947190wme.4
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 10:40:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=L4X7cX+gH4YtMrZHTiaSgjBu9vQtfciJis+jW4CKLig=;
- b=p93AzM4TgdC14NnjSb1DfeYADoK8kBVJ29G+8pz9+LoHDiuxE1dqOIESk3nxHqlQWI
- e34nufYr/xmOMyRC84/n03aYxpMufzF+VwB0MFSQOR7+K2aECE4gAWR+CDX2WBvMx6kz
- uDfYrayhuaLs5STL14wXInpwJpQcgda9cLNgacsKth6V9k9DjRcjXc2kZTBGVygkxmcp
- cQLenTdvKzAb9mUfRFrRHqUGJhqgQP0EQbS4VzsVCnCOkuk67kRqaWTEGnYBA0bV+5nU
- hHJ55QWNdEnylafZ62bShKBqPlXEZ3SZgpRYEBzQsOdocKc0YEfEGQkGCkiZbWp8eIVX
- BT3Q==
+ bh=L9HvZyNljZHrK9e1hH9vtDVXa3gENY0R3TzqxIQy+mE=;
+ b=Glsj5X5B3HpHfSssSUXc+gB+PTp8p24Veify96KAXbRnkMnHESWFa0UqU1THIKfNCG
+ TLuIK8fQRp2VX//JDNw1LrOuc0w+5c6ZKtzwmbJWdnnZtjF4WF+d9VwKCxxg4k2PfWkB
+ dhtFU9vuouxGIVuQOudqCCb7YYXlNj6P63DGANN4E1Zhogss/Rd1WTd82idiCqwk8Xst
+ 15Doe6eCtLCD250dAFa0cO39/n6IV05nBVFFHsZO04OdU8FrupqIQed1BXRJKwiAkimi
+ 2RShcwzxBiajP6qGom8L+fCibCJnUriiJp6XAHEWU08M17/E/3odZPw8A9dV6/MC+MvN
+ uXvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=L4X7cX+gH4YtMrZHTiaSgjBu9vQtfciJis+jW4CKLig=;
- b=SBCims2pig1dlXGTUTusSQy8HiUknD499mVbw+aMKkv45NQ1Xj6dYfWNH6ffYBMGDP
- Nn924NZQ9E6vCuZw3PmNdqSC8Axj7DBiMYh5GhCKkgq0cswEtcDYbwUtb8fwjxKw2muA
- Vxm7a0j/iF04uwoR64iufDFupjKrixYhKxhyhGRsDDcRMFLrCGPFC9K/tOyvFzFC629l
- Q0R0vYnZwOoxcQJ2nN5DElNjuydYBa0PAGCXMaXLjb/nm/ybPZuqLGrRzi0o06aFEi5q
- 2/KmQAE+7v6hA/Rem961FZDWrXWxeCIIMROiP7/KAk3UXa2/izNGaEf3amwuCIdMZZUc
- jV0A==
-X-Gm-Message-State: APjAAAXtQSk9q/0FmN3+j9wuvPzjFdyoYQ/EuSMrwjt6I1AzsKYL+SID
- S145dVByAllCuH9wvatYWIdq8A==
-X-Google-Smtp-Source: APXvYqy0eevZqVZCmrJ/XwhtqD6tx/1YF4satBaklXXJYLvFxuAlt4oDbyIPLaCz0M14hpxJtCoflQ==
-X-Received: by 2002:a1c:8156:: with SMTP id c83mr362636wmd.164.1580841636306; 
- Tue, 04 Feb 2020 10:40:36 -0800 (PST)
+ bh=L9HvZyNljZHrK9e1hH9vtDVXa3gENY0R3TzqxIQy+mE=;
+ b=j9cTZYXCya9NQjH8gzqcICDpwoTX6hOjL5yktwIb0WwWxF1Syw3piXSkg9wi8uU6ZE
+ i2lJLcqkO9wHoCqONXlS4L56gZMPnWFG9+L4XHj+ZE9I6KXs3aZJOJuldIE+FXlzbFXh
+ vHS/IHlO2hYnJdqskLynt2vf8A2WsBeYUWmYEkSkfM5+nDZfIPdG0tMJUhANXbExRV4w
+ oAd1PclOBKKcD3gH31BAVl+W6ugqCPPsJ79ycD+3snSz5oAD0xzjAl9Rntunjd5gG0ZE
+ 8u/vICt49i0Xf1UAEMc2T6WmRjOtS5eRSN72Z41CV5ktaHL85ECOZcgOoQt1AU4IHZyM
+ eFJA==
+X-Gm-Message-State: APjAAAUXqBVEP/pbHWSnvfmBFIBCTY+ejXNHhA/fqDgXSPgaIa2ilghD
+ 7yLT+p2bYEUwe8GTh6NvIFDgmQ==
+X-Google-Smtp-Source: APXvYqwoArh4Q4wL7zmW/NG3TgJwq0J0UgwmdxV4+IgkkFYqel4v0VA6Cd2Kq8K3cnAV7SWtIdtHUA==
+X-Received: by 2002:a7b:c8d7:: with SMTP id f23mr324659wml.173.1580841642687; 
+ Tue, 04 Feb 2020 10:40:42 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 11sm5524304wmb.14.2020.02.04.10.40.31
+ by smtp.gmail.com with ESMTPSA id c9sm4712061wmc.47.2020.02.04.10.40.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 04 Feb 2020 10:40:31 -0800 (PST)
+ Tue, 04 Feb 2020 10:40:37 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D62311FF92;
- Tue,  4 Feb 2020 18:40:28 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 60E371FF9B;
+ Tue,  4 Feb 2020 18:40:29 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 05/16] .travis.yml: Drop superfluous use of --python=python3
- parameter
-Date: Tue,  4 Feb 2020 18:40:17 +0000
-Message-Id: <20200204184028.13708-6-alex.bennee@linaro.org>
+Subject: [PULL 11/16] tests/tcg: gate pauth-% tests on having compiler support
+Date: Tue,  4 Feb 2020 18:40:23 +0000
+Message-Id: <20200204184028.13708-12-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200204184028.13708-1-alex.bennee@linaro.org>
 References: <20200204184028.13708-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::330
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,38 +96,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Otherwise we end up failing to build our tests on CI which may have
+older compilers that the user expects. We can get rid of this once we
+can fallback to multiarch containers.
 
-As we require Python3 since commit ddf9069963, we don't need to
-explicit it with the --python=/usr/bin/python3 configure option.
-
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200125184217.30034-1-f4bug@amsat.org>
-Message-Id: <20200203090932.19147-8-alex.bennee@linaro.org>
+Message-Id: <20200203090932.19147-14-alex.bennee@linaro.org>
 
-diff --git a/.travis.yml b/.travis.yml
-index e75c979b6c5..75269678476 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -270,7 +270,7 @@ matrix:
+diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
+index f6b5121f5ce..d2299b98b76 100644
+--- a/tests/tcg/aarch64/Makefile.softmmu-target
++++ b/tests/tcg/aarch64/Makefile.softmmu-target
+@@ -61,7 +61,13 @@ run-memory-replay: memory-replay run-memory-record
+ 	   	  $(QEMU_OPTS) memory, \
+ 	  "$< on $(TARGET_NAME)")
  
-     # Acceptance (Functional) tests
-     - env:
--        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
-+        - CONFIG="--target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
-         - TEST_CMD="make check-acceptance"
-       after_script:
-         - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
+-run-pauth-3: pauth-3
+-pauth-3: CFLAGS += -march=armv8.3-a
++EXTRA_TESTS+=memory-record memory-replay
+ 
+-EXTRA_TESTS+=memory-record memory-replay pauth-3
++ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_ARMV8_3),)
++pauth-3: CFLAGS += -march=armv8.3-a
++else
++pauth-3:
++	$(call skip-test, "BUILD of $@", "missing compiler support")
++run-pauth-3:
++	$(call skip-test, "RUN of pauth-3", "not built")
++endif
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index efa67cf1e9e..8ed477d0d51 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -18,9 +18,11 @@ run-fcvt: fcvt
+ 	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
+ 
+ # Pauth Tests
++ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_ARMV8_3),)
+ AARCH64_TESTS += pauth-1 pauth-2 pauth-4
+ run-pauth-%: QEMU_OPTS += -cpu max
+ pauth-%: CFLAGS += -march=armv8.3-a
++endif
+ 
+ # Semihosting smoke test for linux-user
+ AARCH64_TESTS += semihosting
+diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
+index e0d1fbb182f..9eb6ba3b7ea 100755
+--- a/tests/tcg/configure.sh
++++ b/tests/tcg/configure.sh
+@@ -227,6 +227,10 @@ for target in $target_list; do
+                -march=armv8.1-a+sve -o $TMPE $TMPC; then
+                 echo "CROSS_CC_HAS_SVE=y" >> $config_target_mak
+             fi
++            if do_compiler "$target_compiler" $target_compiler_cflags \
++               -march=-march=armv8.3-a -o $TMPE $TMPC; then
++                echo "CROSS_CC_HAS_ARMV8_3=y" >> $config_target_mak
++            fi
+         ;;
+     esac
+ 
 -- 
 2.20.1
 
