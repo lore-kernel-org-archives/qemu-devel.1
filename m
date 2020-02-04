@@ -2,96 +2,65 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9787FC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C4EC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:54:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 625BD21582
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:43:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/6J/ohg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 625BD21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C7742087E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:54:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C7742087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iytnz-0002qc-HL
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 03:43:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56402)
+	id 1iytyc-000849-8N
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 03:54:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36361)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iytnL-0002NP-1Z
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:42:57 -0500
+ (envelope-from <clg@kaod.org>) id 1iytxx-0007I7-KQ
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:53:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iytnJ-0005X3-1a
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:42:53 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42659
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iytxw-00024R-C4
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:53:53 -0500
+Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:43009)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iytnI-0005SI-PH
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:42:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580805771;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aeCiGzmpjDcmLowLHYWjAxqi3vNkM75Mj7CTVaZ0uCk=;
- b=Y/6J/ohgGLLsmJ2Z6WTbuEgy28MJf4NC673j4w3aSf/MTBs+JXFrcs7u/Vsv9vKw9Ie3Xt
- Gpq6H0CmXU75Mk1JQpA0OtR1MLzAPGAHG/i73GJLE9bEmGR5TreNYcTpv/iHZ3DCor6xxT
- q8XTVX9FPqXQed5z23Gxhsz5rX/P+ss=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-cWSVr3wuOEekTBBmbU7-QA-1; Tue, 04 Feb 2020 03:42:49 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C089910509A3;
- Tue,  4 Feb 2020 08:42:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
- [10.36.116.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D0604610DC;
- Tue,  4 Feb 2020 08:42:20 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5F22011386A7; Tue,  4 Feb 2020 09:42:19 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Improving QOM documentation [Was: Re: Making QEMU easier for
- management tools and applications]
-References: <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200115121953.GJ93923@redhat.com>
- <874kwwvmuv.fsf@dusky.pond.sub.org> <20200130210902.GA25927@paraplu>
- <87y2toi29o.fsf@dusky.pond.sub.org>
- <CAFEAcA-545QS9mnM6hwa6TxUpw_pDQ3Pa8tkf4qtzWS1Zi_fxQ@mail.gmail.com>
- <CABgObfaB=wHXyJbQR163bZdFHhWdCc4D8sWRHzte019_hSTuhA@mail.gmail.com>
- <20200131152243.GA24572@paraplu> <87sgjvbkvj.fsf@dusky.pond.sub.org>
- <b2a329bf-4795-14f0-473c-2a7cdfa4d262@redhat.com>
- <87mua02dyn.fsf@dusky.pond.sub.org>
- <b1e1e489-9db4-383f-9734-a99626a2d548@redhat.com>
-Date: Tue, 04 Feb 2020 09:42:19 +0100
-In-Reply-To: <b1e1e489-9db4-383f-9734-a99626a2d548@redhat.com> (Paolo
- Bonzini's message of "Mon, 3 Feb 2020 16:21:51 +0100")
-Message-ID: <875zgmbv6c.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iytxw-00021r-5m
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:53:52 -0500
+Received: from player718.ha.ovh.net (unknown [10.110.115.67])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id DEE4D80971
+ for <qemu-devel@nongnu.org>; Tue,  4 Feb 2020 09:53:49 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player718.ha.ovh.net (Postfix) with ESMTPSA id D3E9AEDFDA9A;
+ Tue,  4 Feb 2020 08:53:38 +0000 (UTC)
+Subject: Re: [PATCH 2/3] m25p80: Improve command handling for Jedec and
+ unsupported commands
+To: Guenter Roeck <linux@roeck-us.net>,
+ Alistair Francis <alistair@alistair23.me>
+References: <20200203180904.2727-1-linux@roeck-us.net>
+ <20200203180904.2727-2-linux@roeck-us.net>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <accf297f-0c54-7475-8817-c1014999a57d@kaod.org>
+Date: Tue, 4 Feb 2020 09:53:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: cWSVr3wuOEekTBBmbU7-QA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200203180904.2727-2-linux@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 3538984882239867872
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrgeekgdduvdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.42.102
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,34 +73,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Kashyap Chamarthy <kchamart@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+ qemu-block@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 2/3/20 7:09 PM, Guenter Roeck wrote:
+> Always report 6 bytes of JEDEC data. Fill remaining data with 0.
+> 
+> For unsupported commands, keep sending a value of 0 until the chip
+> is deselected.
+> 
+> Both changes avoid attempts to decode random commands. Up to now this
+> happened if the reported Jedec data was shorter than 6 bytes but the
+> host read 6 bytes, and with all unsupported commands.
 
-> On 03/02/20 10:54, Markus Armbruster wrote:
->>> Types are documented as above; however types other than link<> and=20
->>> child<>, which are QAPI types, can be user-defined types (structs,=20
->>> enums) and this is not included in (1).
->> Specifically, three of four kinds of type names are documented:
->> primitive, child, scalar.  The fourth kind is not, and it can be
->> anything.  It need not be a QAPI type name.  In any case, you just have
->> to know what the type name means.
->
-> It is not enforced, but it is supposed to be only QAPI type names
-> (primitive or not), child or link.
+Do you have a concrete example for that ? machine and flash model.
 
-It's not even documented.
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> ---
+>  hw/block/m25p80.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+> index 63e050d7d3..aca75edcc1 100644
+> --- a/hw/block/m25p80.c
+> +++ b/hw/block/m25p80.c
+> @@ -1040,8 +1040,11 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+>          for (i = 0; i < s->pi->id_len; i++) {
+>              s->data[i] = s->pi->id[i];
+>          }
+> +        for (; i < SPI_NOR_MAX_ID_LEN; i++) {
+> +            s->data[i] = 0;
+> +        }
 
-Actual names include "struct tm", "guest statistics", and (my
-favourite) "struct".
+It seems that data should be reseted in m25p80_cs() also.
+
+>  
+> -        s->len = s->pi->id_len;
+> +        s->len = SPI_NOR_MAX_ID_LEN;
+>          s->pos = 0;
+>          s->state = STATE_READING_DATA;
+>          break;
+> @@ -1158,6 +1161,11 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+>          s->quad_enable = false;
+>          break;
+>      default:
+> +        s->pos = 0;
+> +        s->len = 1;
+> +        s->state = STATE_READING_DATA;
+> +        s->data_read_loop = true;
+> +        s->data[0] = 0;
+>          qemu_log_mask(LOG_GUEST_ERROR, "M25P80: Unknown cmd %x\n", value);
+>          break;
+>      }
+> 
 
 
