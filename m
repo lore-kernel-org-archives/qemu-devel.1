@@ -2,84 +2,100 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B0CC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 11:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB48C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 11:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C24020730
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 11:57:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7589720730
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 11:58:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNnt2y3n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C24020730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+U/Fga2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7589720730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iywq5-0000Wg-8n
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 06:57:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41161)
+	id 1iywqI-0000wV-N1
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 06:58:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41357)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iywpN-000879-6V
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 06:57:14 -0500
+ (envelope-from <philmd@redhat.com>) id 1iywpZ-0008S2-CR
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 06:57:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iywpK-0004aU-LC
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 06:57:13 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34931)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iywpK-0004Vc-Ga
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 06:57:10 -0500
-Received: by mail-oi1-x244.google.com with SMTP id b18so18178706oie.2
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 03:57:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=9Y7ZSwoSok8OXqF+QI4LjdGdBmJ9hVGeWUMnqhvKP90=;
- b=iNnt2y3nmnlkUajJDxpJmYA8YC2hFPpE5NS54tV7kiUSAOk/pK8guQKV5VdaUftVQz
- JtoePXuJ4AtYrNqyncet4uOIl0190jjzVrXNwtMn7npZDzhjoFnHcH8h7EQeMDE3OXvE
- 1yfyC04x+3BEGu+077Qmizhtw41q7GkvMOYmao3l40CFaFkj6IeS46DDiT3Mc0WlMktn
- PRpX9qCtLbAIA+GY8pwKHsBMETOoWsFy7HIIZnpxwL3bwMD8pA719mbA1RzYBm0GFsi7
- KkBLq3Ry3LgdNJ9VQLzIYFGrVPTjhprv9EkNpZ2dt7wyO0zEn21q00J06wC5s6JrLiDV
- qyHg==
+ (envelope-from <philmd@redhat.com>) id 1iywpW-0005jk-IO
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 06:57:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21717
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iywpW-0005dQ-Da
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 06:57:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580817441;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8VD0ohgWUap4ZR9v21UW0mFMEbDBvNR7eEh3rFIciSY=;
+ b=T+U/Fga2p1ZPlmQDVhL6uwl+4SrvbDkb6AngsVGnCpAhpBz3JJ6NNZC99sGnAJWZ75o5U3
+ iHQd/MKANp+4fXMOc5qm/6zi3kLP8ghL9l+1QF7afFkKeLP1pQD6jWkOos78G8zwlyzPcK
+ 4BLctsphiWsNr8Ip/UkG/+V47zGd/dY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-I95UmdYZOJWUaJkcUKu3xw-1; Tue, 04 Feb 2020 06:57:19 -0500
+Received: by mail-wr1-f69.google.com with SMTP id m15so5786970wrs.22
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 03:57:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=9Y7ZSwoSok8OXqF+QI4LjdGdBmJ9hVGeWUMnqhvKP90=;
- b=lG2u0ICZSnmzjXRZYiOq0yuQZpuK26xJcm6PAmBEd4viDW7GUewVKZupIq7BlZQftf
- 9iSgdRuyz6C5cjFvuo79OXNrsYdfZpRF0qlFf6Ab1gQOz24G7yYDMoeRprJJSmmuBmTk
- /VpgzSj5qWDIuo3JdeceW3K21pIv7CpNiNdR5rcW4sp3y2vBISMGOXsAnHnYE4X/QpOw
- 8E7PaF+zPjZko7GHAIelf5lXgTrx7bHSYNbfrY9/k/aNr+C8XTndEGwRmUIYUJ7pjipv
- Rdmw7E9XOcZJ+Al81tGAksriLaus1WPZOZeRJFWw0+cdbU8h+/dmCF9+0UValLmKk53C
- BZJQ==
-X-Gm-Message-State: APjAAAWCsFK8eMeuTxXMpnX0yc2CZD8j+L2EjFeCVlH3EJOP9JQMpbWH
- zwT5AWjQdH5GMFMv7CDwwyAg6P6KQzjXs7ANgos=
-X-Google-Smtp-Source: APXvYqzeY9HgozgTcIZ70rDRSUJo4Z7wOty9ZxnnGbhfWNSe2r3V9B4siw5EpOvh7mlQxDizN0NdgVvfow7nXyF0wZk=
-X-Received: by 2002:aca:5844:: with SMTP id m65mr3203068oib.136.1580817429525; 
- Tue, 04 Feb 2020 03:57:09 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fjMyt7C72bxQ+hnFp6naT+0f4Iyvx9mzUZBjNISrnUg=;
+ b=j8ADaoQXmAzsmbPkf6LOOWYzjP3G5jNfwzTFu7L6AyIfTNL40PmnJQmwmvWXgVxmnm
+ 4MoVJtMi29UM+JqOPYCpmjFTcBsHRS8RAEuRT8g6t0huDwXedLbb8vAjUdaI3ak/Rhy2
+ qXEjVTOieKzI2RTMADi+Qdr0BybmyE1lqb7nhCKNYk8VBQ7LWSKn9ij3CGOCryJ7b3Hm
+ yncwniZA+TF8Da+CUVqB0WdE4XYCiYgPJFzBmkW0ppKZd0u5i8dlXvFo75cStcccAXlz
+ +UETUB+SwCxhaWL4o66jkV7/m+qgZgxTB9idXFNGKZTUC3S3Zjw9Ri2yKxGu4OBwjWA7
+ TK9A==
+X-Gm-Message-State: APjAAAX3xRP3N5MQrOazdKZ1UKl3FlDAgOPucP2uHOE2wLiRZKCWgm8U
+ /VWfyOt4BsF6l9fHBbUjcGPTUYx36B9myTqY+ggAN5I1UtTboC1Cfbti2Bl0/6DTnQBl3SsW0iY
+ za+fg0YqDY34B0fI=
+X-Received: by 2002:adf:f1cb:: with SMTP id z11mr21045287wro.375.1580817438618; 
+ Tue, 04 Feb 2020 03:57:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzzTaFcAxaErXzudaDi1vt0fVI92nMDyrUTW4g6f1J9mIKeNMczjXu2qIu9o6S+n5WfA7HhmQ==
+X-Received: by 2002:adf:f1cb:: with SMTP id z11mr21045272wro.375.1580817438459; 
+ Tue, 04 Feb 2020 03:57:18 -0800 (PST)
+Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
+ [83.52.55.162])
+ by smtp.gmail.com with ESMTPSA id c9sm3413334wmc.47.2020.02.04.03.57.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Feb 2020 03:57:17 -0800 (PST)
+Subject: Re: [PATCH] .travis.yml: ensure python3-sphinx installed for docs
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org, peter.maydell@linaro.org
+References: <20200204105142.21845-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <66c6ba92-9f4c-846f-14b3-18fe5b29a102@redhat.com>
+Date: Tue, 4 Feb 2020 12:57:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-6-git-send-email-aleksandar.markovic@rt-rk.com>
- <93e1c210-2f0d-2ab1-d933-2889939396db@vivier.eu>
-In-Reply-To: <93e1c210-2f0d-2ab1-d933-2889939396db@vivier.eu>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 4 Feb 2020 12:56:58 +0100
-Message-ID: <CAL1e-=hMS0-E7c_gW-m9Mk6ZeCSzdDwmhmYnNUGhor2o_KEhBQ@mail.gmail.com>
-Subject: Re: [PATCH v5 05/20] linux-user: mips: Update syscall numbers to
- kernel 5.5 rc3 level
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200204105142.21845-1-alex.bennee@linaro.org>
+Content-Language: en-US
+X-MC-Unique: I95UmdYZOJWUaJkcUKu3xw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,64 +107,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Fam Zheng <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 14, 2020 at 5:40 PM Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Le 13/01/2020 =C3=A0 21:34, Aleksandar Markovic a =C3=A9crit :
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > Update mips syscall numbers based on Linux kernel tag v5.5-rc3
-> > (commit 46cf053e).
-> >
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > ---
-> >  linux-user/mips/cpu_loop.c     | 78 ++++++++++++++++++++++++++++++++++=
-+++++++-
-> >  linux-user/mips/syscall_nr.h   | 45 ++++++++++++++++++++++++
-> >  linux-user/mips64/syscall_nr.h | 13 +++++++
-> >  3 files changed, 135 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-> > index 39915b3..b81479b 100644
-> > --- a/linux-user/mips/cpu_loop.c
-> > +++ b/linux-user/mips/cpu_loop.c
-> > @@ -25,8 +25,9 @@
-> >  #include "internal.h"
-> >
-> >  # ifdef TARGET_ABI_MIPSO32
-> > +#  define MIPS_SYSCALL_NUMBER_UNUSED -1
->
-> I'm not sure you need to introduce this change.
->
-> The case already exists (stat, fstat, old_select, lstat, ...) and the
-> entry that was used is:
->
->            MIPS_SYS(sys_ni_syscall , 0)
->
-> perhaps you can do the same ?
->
+On 2/4/20 11:51 AM, Alex Benn=C3=A9e wrote:
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>   .travis.yml | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index c1c6df475a8..8bdebd36c1f 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -194,7 +194,7 @@ matrix:
+>         addons:
+>           apt:
+>             packages:
+> -            - python-sphinx
+> +            - python3-sphinx
+>               - texinfo
+>               - perl
+>  =20
+>=20
 
-I like better the new way of dealing with this (like in this patch), since =
-it is
-more explicit. For now, I won't change this patch, if you agree, and later =
-on
-I will synchronize all such cases to be the same (but this is not critical =
-for
-the time being).
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Yours,
-Aleksandar
-
-> I think the do_syscall() will return -ENOSYS as the TARGET_NR_XXX is not
-> defined for o32 in linux-user/mips/syscall_nr.h.
->
-> Thanks,
-> Laurent
->
 
