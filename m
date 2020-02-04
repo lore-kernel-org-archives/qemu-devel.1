@@ -2,100 +2,96 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1038C3524A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9787FC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A95820730
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 625BD21582
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:43:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EYTKZ05U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A95820730
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/6J/ohg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 625BD21582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iytc9-000747-Mz
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 03:31:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42686)
+	id 1iytnz-0002qc-HL
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 03:43:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iytbF-0006Wm-AZ
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:30:26 -0500
+ (envelope-from <armbru@redhat.com>) id 1iytnL-0002NP-1Z
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:42:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iytbC-0001kG-1k
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:30:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55196
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1iytnJ-0005X3-1a
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:42:53 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42659
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iytbB-0001cO-Pz
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:30:21 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iytnI-0005SI-PH
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:42:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580805020;
+ s=mimecast20190719; t=1580805771;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/0uLEQrzB6ntki5PcUAW9CpQiUejHzhvQgZdb9aKa/o=;
- b=EYTKZ05UFM+fcQMh8Ya0ljnj1kJCkbD4JLnlREa666fs5cNvJlRe/WrI5Yzov0JV2YAJzq
- bWAAVaFNwjz53pUzzZfL6UBBfSJDkumW24tnziNM5laE+EzOgAVR/6osvIJC1fBQBIvYdx
- eGxmYrjAdRS0jFxda4VVNDIpGU+uUOY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-tKx0-27oPLmd8dDMSbyoVA-1; Tue, 04 Feb 2020 03:30:19 -0500
-Received: by mail-wm1-f71.google.com with SMTP id g26so1005329wmk.6
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 00:30:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=/0uLEQrzB6ntki5PcUAW9CpQiUejHzhvQgZdb9aKa/o=;
- b=A+62gfwbO4rajtMatkni0CAkUK+XTzDcDbXESf00ad8ItNyBIVLjGCvxHEm0cWCHSD
- Q46Eok5uIk5Ue3MCZK2cB4DKK3+FuhbVXWthxSfiuM7aw0tnOofVGIFO0MnWz8NyCYxq
- ddFOP+QpOBVgF0g+lslN0NAGJegqQM+joIlaSPS1/vIuLzuYYayEOzvYV6/zzKSTRZkr
- kT7cCdEvPDnzR+ig9G6LNXJqOvFi2A9DH1+/JBkSE+qZfSsV1PoNRtRiEDzRJwyKDpZD
- VMDnqnGS9lK+rZA9CipBognOSeucWQG4EoTLRa7eV/7vNbJj+tK2ZxSAI21kMX4G0Fi4
- u4/w==
-X-Gm-Message-State: APjAAAXVRu34Lwl5GPSSUByW8O3Pwx7INAm06tNLU8Fpqs5ExJOo4pSC
- ppUxSguSHYXac9LyuGvifLxPYiXLNUU/B7D7pw23M7a0gltwF3rL8OAwxFbHEyu0AUOg/ozSBhd
- IGyq1OgmsguLcX1c=
-X-Received: by 2002:a7b:c119:: with SMTP id w25mr3937529wmi.112.1580805018095; 
- Tue, 04 Feb 2020 00:30:18 -0800 (PST)
-X-Google-Smtp-Source: APXvYqytLggFZA9a97emJNFVdU2mujdvWl0Wp+0tpfZsTv25oW4DmfzLNFe+N3QoB+gMKpcJDvkI6Q==
-X-Received: by 2002:a7b:c119:: with SMTP id w25mr3937487wmi.112.1580805017763; 
- Tue, 04 Feb 2020 00:30:17 -0800 (PST)
-Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
- [83.52.55.162])
- by smtp.gmail.com with ESMTPSA id o189sm2889984wme.1.2020.02.04.00.30.16
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 04 Feb 2020 00:30:17 -0800 (PST)
-Subject: Re: [PULL 3/3] target/mips: Separate FPU-related helpers into their
- own file
-To: Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>
-References: <764d-5e392600-1-7d355c00@99977617>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <88648c41-8825-6063-acb3-9f27f07c011e@redhat.com>
-Date: Tue, 4 Feb 2020 09:30:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=aeCiGzmpjDcmLowLHYWjAxqi3vNkM75Mj7CTVaZ0uCk=;
+ b=Y/6J/ohgGLLsmJ2Z6WTbuEgy28MJf4NC673j4w3aSf/MTBs+JXFrcs7u/Vsv9vKw9Ie3Xt
+ Gpq6H0CmXU75Mk1JQpA0OtR1MLzAPGAHG/i73GJLE9bEmGR5TreNYcTpv/iHZ3DCor6xxT
+ q8XTVX9FPqXQed5z23Gxhsz5rX/P+ss=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-133-cWSVr3wuOEekTBBmbU7-QA-1; Tue, 04 Feb 2020 03:42:49 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C089910509A3;
+ Tue,  4 Feb 2020 08:42:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
+ [10.36.116.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D0604610DC;
+ Tue,  4 Feb 2020 08:42:20 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 5F22011386A7; Tue,  4 Feb 2020 09:42:19 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Improving QOM documentation [Was: Re: Making QEMU easier for
+ management tools and applications]
+References: <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
+ <87o8v52hz9.fsf@dusky.pond.sub.org>
+ <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
+ <87r200zzje.fsf@dusky.pond.sub.org>
+ <20200115121953.GJ93923@redhat.com>
+ <874kwwvmuv.fsf@dusky.pond.sub.org> <20200130210902.GA25927@paraplu>
+ <87y2toi29o.fsf@dusky.pond.sub.org>
+ <CAFEAcA-545QS9mnM6hwa6TxUpw_pDQ3Pa8tkf4qtzWS1Zi_fxQ@mail.gmail.com>
+ <CABgObfaB=wHXyJbQR163bZdFHhWdCc4D8sWRHzte019_hSTuhA@mail.gmail.com>
+ <20200131152243.GA24572@paraplu> <87sgjvbkvj.fsf@dusky.pond.sub.org>
+ <b2a329bf-4795-14f0-473c-2a7cdfa4d262@redhat.com>
+ <87mua02dyn.fsf@dusky.pond.sub.org>
+ <b1e1e489-9db4-383f-9734-a99626a2d548@redhat.com>
+Date: Tue, 04 Feb 2020 09:42:19 +0100
+In-Reply-To: <b1e1e489-9db4-383f-9734-a99626a2d548@redhat.com> (Paolo
+ Bonzini's message of "Mon, 3 Feb 2020 16:21:51 +0100")
+Message-ID: <875zgmbv6c.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <764d-5e392600-1-7d355c00@99977617>
-Content-Language: en-US
-X-MC-Unique: tKx0-27oPLmd8dDMSbyoVA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: cWSVr3wuOEekTBBmbU7-QA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,58 +103,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, amarkovic@wavecomp.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Kashyap Chamarthy <kchamart@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Christophe de Dinechin <dinechin@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/4/20 9:06 AM, Aleksandar Markovic wrote:
->  > > For clarity and easier maintenence, create 
-> target/mips/fpu_helper.c, and
->  > > move all FPU-related content form target/mips/op_helper.c to that file.
->  > >
->  > > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->  > > Reviewed-by: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
->  > > Message-Id: 
-> <1580745443-24650-3-git-send-email-aleksandar.markovic@rt-rk.com>
->  > > ---
->  > > target/mips/Makefile.objs | 2 +-
->  > > target/mips/fpu_helper.c | 1911 
-> +++++++++++++++++++++++++++++++++++++++++++++
->  > > target/mips/op_helper.c | 1877 
-> --------------------------------------------
->  > > 3 files changed, 1912 insertions(+), 1878 deletions(-)
->  > > create mode 100644 target/mips/fpu_helper.c
->  > >
->  > > diff --git a/target/mips/Makefile.objs b/target/mips/Makefile.objs
->  > > index 3ca2bde..91eb691 100644
->  > > --- a/target/mips/Makefile.objs
->  > > +++ b/target/mips/Makefile.objs
->  > > @@ -1,5 +1,5 @@
->  > > obj-y += translate.o cpu.o gdbstub.o helper.o
->  > > -obj-y += op_helper.o cp0_helper.o
->  > > +obj-y += op_helper.o cp0_helper.o fpu_helper.o
->  > > obj-y += dsp_helper.o lmi_helper.o msa_helper.o
->  > > obj-$(CONFIG_SOFTMMU) += mips-semi.o
->  > > obj-$(CONFIG_SOFTMMU) += machine.o cp0_timer.o
->  > > diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
->  > > new file mode 100644
->  > > index 0000000..0d5769e
->  > > --- /dev/null
->  > > +++ b/target/mips/fpu_helper.c
->  > > @@ -0,0 +1,1911 @@
->  > > +/*
->  > > + * Helpers for emulation of CP0-related MIPS instructions.
->  >
->  > Isn't it "FPU"?
->  >
-> 
-> Damn, I did the change, but forgot to do "commit --amend", and that 
-> passed unnoticed during the rest of procedure.
-> 
-> I just sent PULL v2.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-This was not a big deal, we could have updated the comment with another 
-patch. I was just wondering. Thanks for caring to send a quick v2!
+> On 03/02/20 10:54, Markus Armbruster wrote:
+>>> Types are documented as above; however types other than link<> and=20
+>>> child<>, which are QAPI types, can be user-defined types (structs,=20
+>>> enums) and this is not included in (1).
+>> Specifically, three of four kinds of type names are documented:
+>> primitive, child, scalar.  The fourth kind is not, and it can be
+>> anything.  It need not be a QAPI type name.  In any case, you just have
+>> to know what the type name means.
+>
+> It is not enforced, but it is supposed to be only QAPI type names
+> (primitive or not), child or link.
+
+It's not even documented.
+
+Actual names include "struct tm", "guest statistics", and (my
+favourite) "struct".
 
 
