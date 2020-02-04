@@ -2,67 +2,85 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E82C35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 21:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF23C35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 21:27:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D95DF2082E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 21:20:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D95DF2082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 9532C2166E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 21:27:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxrI2n5M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9532C2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz5cc-00084a-UD
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 16:20:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51523)
+	id 1iz5j1-00023S-R4
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 16:27:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iz5bH-0007EQ-QO
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 16:19:16 -0500
+ (envelope-from <wainersm@redhat.com>) id 1iz5i1-0001WS-Hd
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 16:26:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iz5bG-0008QX-Gu
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 16:19:15 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:41075)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iz5bF-0008Ex-EE
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 16:19:14 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M8hlZ-1iuOdd3edN-004hVN; Tue, 04 Feb 2020 22:19:05 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] linux-user: implement TARGET_SO_PEERSEC
-Date: Tue,  4 Feb 2020 22:19:01 +0100
-Message-Id: <20200204211901.1731821-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <wainersm@redhat.com>) id 1iz5hy-00062x-Jv
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 16:26:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41431
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iz5hy-0005yc-DB
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 16:26:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580851565;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ugf0hOAug47Ysq+4N/ZhBMMeO5GcATezY+KP9ir+g9A=;
+ b=OxrI2n5MGq449CBj6QdAbgm+iFtY8rR2Pv++BJOoX9MaA1Blx8xK4WUDJGLUB9Nze5r7o/
+ WJWQ/vQffwi1MFnjljMYCL7jRG/FQsIxIvxTr9qSty9sWwjmLA4BQjNbP+FNEjjjFj4BqV
+ 82YuV5g4xiWeRdAyRzZWUSICmtSqyms=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-QnB8me10Neuxnaq54fn4Vg-1; Tue, 04 Feb 2020 16:25:58 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B75C4107B7D5;
+ Tue,  4 Feb 2020 21:25:57 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-4.gru2.redhat.com [10.97.116.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A3F3C857A8;
+ Tue,  4 Feb 2020 21:25:50 +0000 (UTC)
+Subject: Re: [PATCH v3 2/4] tests/acceptance: boot_linux_console: Add boot
+ Linux with kvm tests
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, crosa@redhat.com
+References: <20200122012753.9846-1-wainersm@redhat.com>
+ <20200122012753.9846-3-wainersm@redhat.com>
+ <75a9cd31-a978-0b31-1d6d-1b34800e13a6@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <10433721-2784-b88a-2ee0-c4600b52503d@redhat.com>
+Date: Tue, 4 Feb 2020 19:25:47 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:5eErrupiYmsKUulWaHIpMq++a/iqtWgwPK9P0ZZRVbL+d28F0Fr
- 7BNw+0rRBNWDVe2Ebt4u4cx6yGpDQJrhev2GbWv3+XAPLfGvAd2cTUpxWV/w0igbeLenRUv
- d24uNE6qhXC5gesisizpqKb6fKJxBFJC94S0hm6R8Ny63+wQkwjHmFvSF7jdP/nsHOAYuFx
- TAOz/lukqlX1wi0i4YEXQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zQ0oSMqNtI0=:c8CFX7Zscjn6iLlWmfjV3h
- xEaBpYp5qA6T/eJXkKHe+rwTMNmpkjHQOBVVJX00T8UEHaVKjp/k5+cjiXqafskQscoglkJYK
- ysefsfOgYcboqU6MjAdJIUhVoRmrTmkoY4ItFLmW+OetMOfq07aKsIU9ChjHWKknhJj1YqIV+
- U/hIpZaVds9aqcoo3iPnw8K431c22u0hqQ45NUbJ6hTuQzWzYldGav4TXuZkqslSrQxCWbqjV
- iJFGxoKpmcd9WXXlp7vgzXP1VGaHujKEIwQT1+5ErM1/ljHJmG3vIUDM+N4/OYLvYnaI0FFPL
- 4eVAOLEi8G26+CpUD8hbeBApUyj2uCkDJBXTl2VDM4Ra3GtS71spXHvwWHrB6basy5fz6ent/
- qO7xCB1gMQvMftmxl0AWrnaRwimSPTn52Yl8P1WqEUk1WVreycNZWvq2rWPsizT1ESx5D+2HK
- aibXfV4ZVC2hEo11sFVfQDHTjUl0F5WkqLgSVMvQW6K9Ncmbhc9yvTxNZfaEzaXhEvw6Z+TlO
- 5o6OEEhdgntd4fES4oWnocNqo1/7sq+gC5cQlKZp7W8XmTAxk7dICJIfNTNswsUG/omoHiV0+
- VNqh359yGAKUQCDNpsa+X0n0N1h2zsdk58E3RcczH0gVHAz7DXxKt4dtK0iyQb6SfkrqUAZoz
- OPF8vSHLu77Tn5PDb3k2ywZ26iArpOxEaKmXmk3pSbeZm2on+X39S++f165waXe3mwF7OYJ6h
- Olhdg9hcEIH9AoNLoEZbLHz70TUiGhKyzmAMq3GDy1EYnkfYy4rB8UvkI8kJqqyuzGSKH9Gg8
- F5x+SkEB3+jvINhhR7jwLDKg7zpPyW5D7xtx2mi5dfiHXhMLN2VMfSjwpnyOiX3iX0OOMdJ
+In-Reply-To: <75a9cd31-a978-0b31-1d6d-1b34800e13a6@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: QnB8me10Neuxnaq54fn4Vg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,127 +92,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Matthias=20L=C3=BCscher?= <lueschem@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, thuth@redhat.com,
+ alex.bennee@linaro.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"The purpose of this option is to allow an application to obtain the
-security credentials of a Unix stream socket peer.  It is analogous to
-SO_PEERCRED (which provides authentication using standard Unix credentials
-of pid, uid and gid), and extends this concept to other security
-models." -- https://lwn.net/Articles/62370/
 
-Until now it was passed to the kernel with an "int" argument and
-fails when it was supported by the host because the parameter is
-like a filename: it is always a \0-terminated string with no embedded
-\0 characters, but is not guaranteed to be ASCII or UTF-8.
+On 1/24/20 1:45 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/22/20 2:27 AM, Wainer dos Santos Moschetta wrote:
+>> Added boot Linux test cases that launch QEMU with kvm
+>> enabled. Likewise it was added tests for tcg.
+>>
+>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>> ---
+>> =C2=A0 tests/acceptance/boot_linux_console.py | 88 ++++++++++++++++++++-=
+-----
+>> =C2=A0 1 file changed, 68 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/tests/acceptance/boot_linux_console.py=20
+>> b/tests/acceptance/boot_linux_console.py
+>> index e40b84651b..a36eae630c 100644
+>> --- a/tests/acceptance/boot_linux_console.py
+>> +++ b/tests/acceptance/boot_linux_console.py
+>> @@ -51,11 +51,7 @@ class BootLinuxConsole(Test):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 os.chdir(cwd)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return self.workd=
+ir + path
+>> =C2=A0 -=C2=A0=C2=A0=C2=A0 def test_x86_64_pc(self):
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Darch:x86_64
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Dmachine:pc
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>> +=C2=A0=C2=A0=C2=A0 def do_test_x86_64_pc(self):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kernel_url =3D=20
+>> ('https://archives.fedoraproject.org/pub/archive/fedora'
+>> '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '/vmlinu=
+z')
+>> @@ -70,6 +66,22 @@ class BootLinuxConsole(Test):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 console_pattern =
+=3D 'Kernel command line: %s' %=20
+>> kernel_command_line
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.wait_for_con=
+sole_pattern(console_pattern)
+>> =C2=A0 +=C2=A0=C2=A0=C2=A0 def test_x86_64_pc_kvm(self):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Darch:x86_64
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Dmachine:pc
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Daccel:kvm
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.do_test_x86_64_pc()
+>> +
+>> +=C2=A0=C2=A0=C2=A0 def test_x86_64_pc_tcg(self):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Darch:x86_64
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Dmachine:pc
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Daccel:tcg
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.do_test_x86_64_pc()
+> [...]
+> So you want to test a binary linked with multiple accelerators.
+>
+> Isn't it possible to have something clever/simpler?
 
-I've tested the option with the following program:
 
-    /*
-     * cc -o getpeercon getpeercon.c
-     */
+It is feasible using Avocado's CIT [1] or PICT [2] plug-ins. This work=20
+is suggested by Cleber in [3] and I've it on my radar for future work.
 
-    #include <stdio.h>
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <arpa/inet.h>
+But, for the moment, I would like to have those simple boot with KVM=20
+tests merged so that they are executed in our Travis CI.
 
-    int main(void)
-    {
-        int fd;
-        struct sockaddr_in server, addr;
-        int ret;
-        socklen_t len;
-        char buf[256];
+[1]=20
+https://avocado-framework.readthedocs.io/en/75.1/plugins/optional/varianter=
+_cit.html
 
-        fd = socket(PF_INET, SOCK_STREAM, 0);
-        if (fd == -1) {
-            perror("socket");
-            return 1;
-        }
+[2]=20
+https://avocado-framework.readthedocs.io/en/75.1/plugins/optional/varianter=
+_pict.html
 
-        server.sin_family = AF_INET;
-        inet_aton("127.0.0.1", &server.sin_addr);
-        server.sin_port = htons(40390);
+[3]=20
+https://trello.com/c/1wvzcxHY/105-create-cit-parameter-for-acceptance-tests
 
-        connect(fd, (struct sockaddr*)&server, sizeof(server));
+>
+>
+> =C2=A0=C2=A0 def test_x86_64_pc(self):
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Darch:x86_64
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Dmachine:pc
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Daccel:kvm
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :avocado: tags=3Daccel:tcg
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.do_test_x86_64_pc()
+>
+> And use a mux config?
+>
+> Because else we are duplicating a lot of code, and there are various=20
+> accelerators available:
+>
+> $ git grep ACCEL_CLASS_NAME
+> accel/qtest.c:41:#define TYPE_QTEST_ACCEL ACCEL_CLASS_NAME("qtest")
+> accel/tcg/tcg-all.c:46:#define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
+> hw/xen/xen-common.c:200:#define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+> include/sysemu/hvf.h:100:#define TYPE_HVF_ACCEL ACCEL_CLASS_NAME("hvf")
+> include/sysemu/kvm_int.h:36:#define TYPE_KVM_ACCEL=20
+> ACCEL_CLASS_NAME("kvm")
+> target/i386/hax-all.c:1127:=C2=A0=C2=A0=C2=A0 .name =3D ACCEL_CLASS_NAME(=
+"hax"),
+> target/i386/whpx-all.c:1533:=C2=A0=C2=A0=C2=A0 .name =3D ACCEL_CLASS_NAME=
+("whpx"),
 
-        len = sizeof(buf);
-        ret = getsockopt(fd, SOL_SOCKET, SO_PEERSEC, buf, &len);
-        if (ret == -1) {
-            perror("getsockopt");
-            return 1;
-        }
-        printf("%d %s\n", len, buf);
-        return 0;
-    }
+Unfortunately I don't have enough time, resources and knowledge to work=20
+on accelerators other than kvm and tcg. I appreciate if others could=20
+contribute here, and I'm happy to review the patches.
 
-On host:
+Another point is how those tests could be ran on our CI.
 
-  $ ./getpeercon
-  33 system_u:object_r:unlabeled_t:s0
+Thanks for bringing those points!
 
-With qemu-aarch64/bionic without the patch:
+- Wainer
 
-  $ ./getpeercon
-  getsockopt: Numerical result out of range
-
-With the patch:
-
-  $ ./getpeercon
-  33 system_u:object_r:unlabeled_t:s0
-
-Bug: https://bugs.launchpad.net/qemu/+bug/1823790
-Reported-by: Matthias Lüscher <lueschem@gmail.com>
-Tested-by: Matthias Lüscher <lueschem@gmail.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
-
-Notes:
-    v2: use correct length in unlock_user()
-
- linux-user/syscall.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index d60142f0691c..c930577686da 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2344,6 +2344,28 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-             }
-             break;
-         }
-+        case TARGET_SO_PEERSEC: {
-+            char *name;
-+
-+            if (get_user_u32(len, optlen)) {
-+                return -TARGET_EFAULT;
-+            }
-+            if (len < 0) {
-+                return -TARGET_EINVAL;
-+            }
-+            name = lock_user(VERIFY_WRITE, optval_addr, len, 0);
-+            if (!name) {
-+                return -TARGET_EFAULT;
-+            }
-+            lv = len;
-+            ret = get_errno(getsockopt(sockfd, level, SO_PEERSEC,
-+                                       name, &lv));
-+            if (put_user_u32(lv, optlen)) {
-+                ret = -TARGET_EFAULT;
-+            }
-+            unlock_user(name, optval_addr, lv);
-+            break;
-+        }
-         case TARGET_SO_LINGER:
-         {
-             struct linger lg;
--- 
-2.24.1
+>
+>
+> And also pending:
+> target/i386/nvmm-all.c:=C2=A0=C2=A0 .name =3D ACCEL_CLASS_NAME("nvmm"),
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg668697.html
+>
 
 
