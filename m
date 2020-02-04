@@ -2,105 +2,100 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D24A7C35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3101BC35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:57:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F2252084E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECF9D2084E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:57:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxAt7amf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F2252084E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0bi8aRx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECF9D2084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz2Ot-0005gt-TV
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 12:54:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53667)
+	id 1iz2S2-0003Al-63
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 12:57:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iz2OH-0004n4-3P
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:53:38 -0500
+ (envelope-from <philmd@redhat.com>) id 1iz2RG-0001wS-Ul
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:56:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iz2OF-0000tC-Kb
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:53:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23466
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iz2RF-0008EM-Dw
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:56:42 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22897
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iz2OF-0000ou-FQ
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:53:35 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iz2RF-0008As-9g
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:56:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580838815;
+ s=mimecast20190719; t=1580839000;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=kURUGdOpD7Ps4pareka7Ki6PKRWwLaKO7Txlsez8nTE=;
- b=JxAt7amfr/mKYlkNtchFbJW+S4OIWFsRWIt6N/nqg8ej3pNL5K+EeJQaxSsw3Z1hQHjfFT
- sJMcVYBXoNAOWTvuJLoh0erqdUIw4usvkazXtEWfUtuJ0U5vCqW1PwBv+naAnluwHduMCL
- uFM/OFUDyAwJJadtC3tdpRyZtoqQ9O8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-rCwmObF7NYyRSOL6tEgjJQ-1; Tue, 04 Feb 2020 12:53:19 -0500
-X-MC-Unique: rCwmObF7NYyRSOL6tEgjJQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C991800D5C;
- Tue,  4 Feb 2020 17:53:18 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-98.ams2.redhat.com
- [10.36.117.98])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CA14F5D9C5;
- Tue,  4 Feb 2020 17:53:07 +0000 (UTC)
-Subject: Re: [PATCH 09/17] block: Refactor bdrv_has_zero_init{,_truncate}
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200131174436.2961874-1-eblake@redhat.com>
- <20200131174436.2961874-10-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a857dce1-ef71-d62b-016e-ff9486af361b@redhat.com>
-Date: Tue, 4 Feb 2020 18:53:06 +0100
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qmcGq+SeBYRzWEd2gMUMrRdVDVrFurJLZf8w4rkubU0=;
+ b=Y0bi8aRx5KHWXt4dRM/385JcBl9FgsSzTKZCLE6yn5pl6pXgZTv6ahWf3Bl9hqWH18DpoS
+ PvlAu7qU2CeDNrjCRrQO/nFjgOv/ueLjUiTkEPaqJlzx2Uaunlhpu+3a64h88lUrOvNMW5
+ YXF6nR4fVELH2WCUjAGDLL7vpgCcbbE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-399-8-fDHgEePOKJQqm94tO5WA-1; Tue, 04 Feb 2020 12:56:38 -0500
+Received: by mail-wr1-f72.google.com with SMTP id 50so9825448wrc.2
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 09:56:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FWLAeBJJDvy7HDRJabaYjJ8UaikqOpX3lQqItgxvTDE=;
+ b=QegpQF9V/yjPZTpZ0ni8kpKlqY9YNnWPWQYhXr5B/YZUqe2iFqv6KaLivWbcWpZ45l
+ /5uGjlTb7VhrJa3WkfhxvPskXKfjZnR8PfDOiOLOuxNccdEI3HJn3hSn5D63bOS2QomU
+ 6WPCvinzzJf5u8735kVtT4tuJGGddrKz6kYmJ7Fmi34DlhBVsnuMrkRa/iCQzGscoVT1
+ Q6xh4BOj6eUGOGJgSZA8LlEHo4pCoGsZURhPA3dGInsig9+dKqOyX9kiDmSOYaH4izX2
+ qXyGpnBc5aXgka9OU30sn1sUi+NBlmQE8P+kU2jaxA3c592CphJMcCfZlSdJEs9Kz0UH
+ YdLA==
+X-Gm-Message-State: APjAAAWVrUjr8rNndwCCVFgV1mdSeSCVtY5gvdRMUYuOOy6vHt6H0yIh
+ JPnY6e24vm8Alg453jKO+SpVIyIgT2Z1Kc2JOmvamAJwVyLMl4h0xFN6uDZn5SPUTrU10JHLBmH
+ rNmUj6/acMNbhhKU=
+X-Received: by 2002:a7b:c759:: with SMTP id w25mr192226wmk.15.1580838997647;
+ Tue, 04 Feb 2020 09:56:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw4l1GgCdBzqxTi4PFPPjH/6FeuobEF1VpavtS8wV8KqveJ0bhk1HKJDaAzFtkr1O5Ff/DZJQ==
+X-Received: by 2002:a7b:c759:: with SMTP id w25mr192206wmk.15.1580838997386;
+ Tue, 04 Feb 2020 09:56:37 -0800 (PST)
+Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
+ [83.52.55.162])
+ by smtp.gmail.com with ESMTPSA id x17sm30466930wrt.74.2020.02.04.09.56.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Feb 2020 09:56:36 -0800 (PST)
+Subject: Re: [PATCH v2 2/4] linux-user: cleanup signal.c
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20200204171053.1718013-1-laurent@vivier.eu>
+ <20200204171053.1718013-3-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6079dfe8-754b-632b-4f0c-42fb0cd11380@redhat.com>
+Date: Tue, 4 Feb 2020 18:56:35 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200131174436.2961874-10-eblake@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200204171053.1718013-3-laurent@vivier.eu>
+Content-Language: en-US
+X-MC-Unique: 8-fDHgEePOKJQqm94tO5WA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="mcNtRbTJyxEzFFgvTzhjAfvdlfnBmckts"
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,101 +107,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
- Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
- Peter Lieven <pl@kamp.de>, "Richard W.M. Jones" <rjones@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, david.edmondson@oracle.com,
- Stefan Hajnoczi <stefanha@redhat.com>, Liu Yuan <namei.unix@gmail.com>,
- "Denis V. Lunev" <den@openvz.org>, Jason Dillaman <dillaman@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Marlies Ruck <marlies.ruck@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Josh Kunz <jkz@google.com>, Taylor Simpson <tsimpson@quicinc.com>,
+ Matus Kysel <mkysel@tachyum.com>, milos.stojanovic@rt-rk.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mcNtRbTJyxEzFFgvTzhjAfvdlfnBmckts
-Content-Type: multipart/mixed; boundary="pEyBuylh0h0sgqhMuUuyxYgD8QUbA3PtC"
+On 2/4/20 6:10 PM, Laurent Vivier wrote:
+> No functional changes. Prepare the field for future fixes.
+>=20
+> Remove memset(.., 0, ...) that is useless on a static array
+>=20
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>=20
+> Notes:
+>      v2: replace i, j by target_sig, host_sig
+>=20
+>   linux-user/signal.c | 48 ++++++++++++++++++++++++++-------------------
+>   1 file changed, 28 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/linux-user/signal.c b/linux-user/signal.c
+> index 5ca6d62b15d3..246315571c09 100644
+> --- a/linux-user/signal.c
+> +++ b/linux-user/signal.c
+> @@ -66,12 +66,6 @@ static uint8_t host_to_target_signal_table[_NSIG] =3D =
+{
+>       [SIGPWR] =3D TARGET_SIGPWR,
+>       [SIGSYS] =3D TARGET_SIGSYS,
+>       /* next signals stay the same */
+> -    /* Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
+> -       host libpthread signals.  This assumes no one actually uses SIGRT=
+MAX :-/
+> -       To fix this properly we need to do manual signal delivery multipl=
+exed
+> -       over a single host signal.  */
+> -    [__SIGRTMIN] =3D __SIGRTMAX,
+> -    [__SIGRTMAX] =3D __SIGRTMIN,
+>   };
+>   static uint8_t target_to_host_signal_table[_NSIG];
+>  =20
+> @@ -480,31 +474,45 @@ static int core_dump_signal(int sig)
+>       }
+>   }
+>  =20
+> +static void signal_table_init(void)
+> +{
+> +    int host_sig, target_sig;
+> +
+> +    /*
+> +     * Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
+> +     * host libpthread signals.  This assumes no one actually uses SIGRT=
+MAX :-/
+> +     * To fix this properly we need to do manual signal delivery multipl=
+exed
+> +     * over a single host signal.
+> +     */
+> +    host_to_target_signal_table[__SIGRTMIN] =3D __SIGRTMAX;
+> +    host_to_target_signal_table[__SIGRTMAX] =3D __SIGRTMIN;
+> +
+> +    /* generate signal conversion tables */
+> +    for (host_sig =3D 1; host_sig < _NSIG; host_sig++) {
+> +        if (host_to_target_signal_table[host_sig] =3D=3D 0) {
+> +            host_to_target_signal_table[host_sig] =3D host_sig;
+> +        }
+> +    }
+> +    for (host_sig =3D 1; host_sig < _NSIG; host_sig++) {
+> +        target_sig =3D host_to_target_signal_table[host_sig];
+> +        target_to_host_signal_table[target_sig] =3D host_sig;
+> +    }
+> +}
+> +
+>   void signal_init(void)
+>   {
+>       TaskState *ts =3D (TaskState *)thread_cpu->opaque;
+>       struct sigaction act;
+>       struct sigaction oact;
+> -    int i, j;
+> +    int i;
+>       int host_sig;
+>  =20
+> -    /* generate signal conversion tables */
+> -    for(i =3D 1; i < _NSIG; i++) {
+> -        if (host_to_target_signal_table[i] =3D=3D 0)
+> -            host_to_target_signal_table[i] =3D i;
+> -    }
+> -    for(i =3D 1; i < _NSIG; i++) {
+> -        j =3D host_to_target_signal_table[i];
+> -        target_to_host_signal_table[j] =3D i;
+> -    }
+> +    /* initialize signal conversion tables */
+> +    signal_table_init();
+>  =20
+>       /* Set the signal mask from the host mask. */
+>       sigprocmask(0, 0, &ts->signal_mask);
+>  =20
+> -    /* set all host signal handlers. ALL signals are blocked during
+> -       the handlers to serialize them. */
+> -    memset(sigact_table, 0, sizeof(sigact_table));
+> -
+>       sigfillset(&act.sa_mask);
+>       act.sa_flags =3D SA_SIGINFO;
+>       act.sa_sigaction =3D host_signal_handler;
+>=20
 
---pEyBuylh0h0sgqhMuUuyxYgD8QUbA3PtC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 31.01.20 18:44, Eric Blake wrote:
-> Having two slightly-different function names for related purposes is
-> unwieldy, especially since I envision adding yet another notion of
-> zero support in an upcoming patch.  It doesn't help that
-> bdrv_has_zero_init() is a misleading name (I originally thought that a
-> driver could only return 1 when opening an already-existing image
-> known to be all zeroes; but in reality many drivers always return 1
-> because it only applies to a just-created image).
-
-I don=E2=80=99t find it misleading, I just find it meaningless, which then =
-makes
-it open to interpretation (or maybe rather s/interpretation/wishful
-thinking/).
-
-> Refactor all uses
-> to instead have a single function that returns multiple bits of
-> information, with better naming and documentation.
-
-It doesn=E2=80=99t make sense to me.  How exactly is it unwieldy?  In the s=
-ense
-that we have to deal with multiple rather small implementation functions
-rather than a big one per driver?  Actually, multiple small functions
-sounds better to me =E2=80=93 unless the three implementations share common=
- code.
-
-As for the callers, they only want a single flag out of the three, don=E2=
-=80=99t
-they?  If so, it doesn=E2=80=99t really matter for them.
-
-In fact, I can imagine that drivers can trivially return
-BDRV_ZERO_TRUNCATE information (because the preallocation mode is
-fixed), whereas BDRV_ZERO_CREATE can be a bit more involved, and
-BDRV_ZERO_OPEN could take even more time because some (constant-time)
-inquiries have to be done.
-
-And thus callers which just want the trivially obtainable
-BDRV_ZERO_TRUNCATE info have to wait for the BDRV_ZERO_OPEN inquiry,
-even though they don=E2=80=99t care about that flag.
-
-So I=E2=80=99d leave it as separate functions so drivers can feel free to h=
-ave
-implementations for BDRV_ZERO_OPEN that take more than mere microseconds
-but that are more accurate.
-
-(Or maybe if you really want it to be a single functions, callers could
-pass the mask of flags they care about.  If all flags are trivially
-obtainable, the implementations would then simply create their result
-mask and & it with the caller-given mask.  For implementations where
-some branches could take a bit more time, those branches are only taken
-when the caller cares about the given flag.  But again, I don=E2=80=99t
-necessarily think having a single function is more easily handleable
-than three smaller ones.)
-
-Max
-
-
---pEyBuylh0h0sgqhMuUuyxYgD8QUbA3PtC--
-
---mcNtRbTJyxEzFFgvTzhjAfvdlfnBmckts
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl45r4IACgkQ9AfbAGHV
-z0Ayewf/fjWttivEx39XPnxIRUgyyuaP0zku08KhfqqJptr6FjrKLFYlhPlWo92Z
-zti356HSIC4YyY+bxWYvealh+YONBqVR960wJy0fRybq0k4Oi4M4VYTLj6AjF2BW
-kFDfoPsBToyrdpQOyb+6EWC+hTZtKyTHUiJZSjJJGHZjjvNX7h/Oo/sr+2D8pJmO
-5NIcKbbKe9HvpSta2XqsxaSapM6Sm1vSEYxjWIeiCtr9utYS4qcHQ8foTE8u8nU/
-0vmOYWfhvyCMKcOYgWnoe0vY+gIhJ3JoxP8xpDIe1uTE0hx/KUq+n8C+qW63LZ4f
-xTL7mvfYZTe5f/oemFGeTBwkv0oxJA==
-=ADGL
------END PGP SIGNATURE-----
-
---mcNtRbTJyxEzFFgvTzhjAfvdlfnBmckts--
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
 
