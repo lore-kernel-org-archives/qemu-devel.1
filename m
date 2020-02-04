@@ -2,68 +2,98 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 615B9C35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BA4C35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:33:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 392732082E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:32:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 392732082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 112A22082E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:33:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wq4armG5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 112A22082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz23P-0005ns-DM
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 12:32:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54928)
+	id 1iz24d-0007JS-7P
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 12:33:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60001)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iz1jh-0007ET-OJ
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:11:42 -0500
+ (envelope-from <philmd@redhat.com>) id 1iz1sE-0006H2-5x
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:20:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iz1jg-0001g9-I7
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:11:41 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:52539)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iz1jg-0001dh-8l
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:11:40 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MWzXd-1j10k811lR-00XIGO; Tue, 04 Feb 2020 18:11:09 +0100
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <philmd@redhat.com>) id 1iz1sD-0002Oh-0n
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:20:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32349
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iz1sC-0002Lm-SS
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:20:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580836828;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Uay9vOc45R64OG+s9E9RNNcWolH4KZJ+MaCE0Bf6LpQ=;
+ b=Wq4armG5qlJnY1IdNB1ylZP3Id78lsJpLfokpoFV9TzchJwXJ2Qf2W59G4kkvXg2O1bxPb
+ smNZjCJGVEpp0ThfY4BG4K6uuC0va0aYDi6gGM5aX5/BAs9k+/lW8lIpa5XMiYtgZanohi
+ 7VvE0ZbSMlnbmFQk04sjB2WOQmKnmPc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-gszQtiHoOni6UNNu615zGA-1; Tue, 04 Feb 2020 12:20:11 -0500
+Received: by mail-wm1-f69.google.com with SMTP id u11so1607458wmb.4
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 09:20:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hw6+Wu4uyD789kyPxb+U85AivhJLuap+29+WsIGmLOk=;
+ b=TABpTfA0a1Ll6iLESL9WEXN9OxNxhpP6Xsdfp1DQK+poIJU2eGNSJkb4Cn8OdzW4hU
+ +0jwcqzsq9TuNobps3r+wvz1st6o47zf1a8hvDJXWtVjpi/FyvEJuOnv1b9zunn/b5c6
+ EMsbOGqOpXx0ETYIsY+y/N3xbvBk+FCFxzk6VUiNMvg8C+jyRcl9oNADp05bifZGWicy
+ CJWkIT9xzGMjUg4kEA9UcP/YfzbVj+jgkzfob2kbif1SWveRi3CD6wwAVT7L8a3H+/Y0
+ 1oAe8cR71UYYJdfrgsRGkj00EREiI0GcziuhIiZoCYWvKHnt0uTa03D7d03dr1aaEJ1m
+ 2tNg==
+X-Gm-Message-State: APjAAAUC7j0Oj2UV07OPNOKyDKnoSyyoe7WPeCWhZyd0QwG3H5qmaLrq
+ b4wB9suL8+CXPamVnl3YQfhTL7DH1bByPu5dq9ft8HzTlbx9Kk7R2L/7FQxN10zlDpbSPAOri9Z
+ dUBhu8N58jxGQAKE=
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr28205wmk.131.1580836810502;
+ Tue, 04 Feb 2020 09:20:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxbro2tqGgYpNhs3142offvNXpPRxeBmpIjZwerMVMvgRuzLuB19WVpuA2rEayfC7paM+nNVQ==
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr28168wmk.131.1580836810223;
+ Tue, 04 Feb 2020 09:20:10 -0800 (PST)
+Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
+ [83.52.55.162])
+ by smtp.gmail.com with ESMTPSA id h13sm19865065wrw.54.2020.02.04.09.20.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Feb 2020 09:20:09 -0800 (PST)
+Subject: Re: [PATCH v2 00/12] python: Explicit usage of Python 3
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/4] linux-user: fix TARGET_NSIG and _NSIG uses
-Date: Tue,  4 Feb 2020 18:10:52 +0100
-Message-Id: <20200204171053.1718013-4-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200204171053.1718013-1-laurent@vivier.eu>
-References: <20200204171053.1718013-1-laurent@vivier.eu>
+References: <20200130163232.10446-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <36f9ee1f-03e1-beb5-6f2f-80b17a30ef79@redhat.com>
+Date: Tue, 4 Feb 2020 18:20:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:89wBAKLTrp+zE9n8im8ri/9yJNtqGZYzXt8qUsE6KXQlMfNu2oh
- UuwYixD6UQ3NIQ99Eam1WxfBV5mqRrfVSdaimdgs4WEnZkfW2XXwU/H45Jbq25r3Wn8s1Vo
- QwKi4TokRVvuJClEIVg39AN2LL2FVzOeFA13rj7+hK60bT5wPC4o0XAYnBvWyCgS8OMxL0D
- uY/QiR4qySyXW9QpABBPg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:d4XJ6fcvKvY=:Wx0oyMpPw3fsH+LhQhwbnb
- SH8UrckX18+W0/t0cShLetRBA0/K5kqHkuRDZb2a6rkPkIzcu01zaj0eiC8bZ5XeyKKxnVYnR
- 5OkbZ/jUvvA4S9OWa3Ded8PmJ7nTLL+nMWbD+63omzG+svXGEJlri8lkaYx68wAGMpfGIH7Kg
- 60w0dkymF4crKCGa6RSm1riI48UiqlrSWR7PFe8huFB+qfurCGJVf2rzG3RcW9WsBlyCu6HUx
- BhpXkl91orLf26hzjfVpXICuThD2Tl9Nzsxq3JjHxvtoa5Nq2HjOufte/xJv8QJVFh3O/UgmY
- jRbRGI9Ckq578t6BwRTPNR4n5JWrKstyXCEqMFB07S41X2MLUKL/+rpjnlDceNv6RjyuwOrfL
- OW6d84KPpFxaNYpJwtr5RRDMlEVkCDFX3kwZCyihwcYWIpZqnceU2lx38DaVn6TJ+30XLaTJu
- eNGuCynNMiYnBcG1K4OyzAiougEn4iAwLhgMCAhu/b5pE1zZB2+mcLChqFD8hLBx7B+/I932q
- mSTNLqllsNBU9NNxDo9W877YKN2i3kvrkzpQqXdHpEOwOmCC3JhDbI+rhv+hggviB4iwuD3af
- d0ONxWizbEFaW4jdaAb20koqKTQkrqIs0vMoObAiK0w2lFP0O/SOMtqtGDQdYUNVOTpxAwXtU
- YsPo7feAhPaxy5uja7TNEow3mnxTYJJYmzeaWWWzhBqjQUiyrlBcFwqhHcnhI5aq+qtaKaHM9
- 0C9R8LsTrKIXYfWjNozusLIDwjOzU2dg/Ex+rMpW8esxCRhPSDSNseMu3qv4FW8y/v8skw3jn
- KXvuaDt0Qo9T65dZaSE1EP2HqeSfqPjuFhSYrDa3/DlFR0i2O/jfM0LfrcyY53FbUQPCkUw
+In-Reply-To: <20200130163232.10446-1-philmd@redhat.com>
+Content-Language: en-US
+X-MC-Unique: gszQtiHoOni6UNNu615zGA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,144 +105,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Marlies Ruck <marlies.ruck@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Josh Kunz <jkz@google.com>, Taylor Simpson <tsimpson@quicinc.com>,
- Matus Kysel <mkysel@tachyum.com>, milos.stojanovic@rt-rk.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, kvm@vger.kernel.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Valid signal numbers are between 1 (SIGHUP) and SIGRTMAX.
+On 1/30/20 5:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hello,
+>=20
+> These are mechanical sed patches used to convert the
+> code base to Python 3, as suggested on this thread:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675024.html
+>=20
+> Since v1:
+> - new checkpatch.pl patch
+> - addressed Kevin and Vladimir review comments
+> - added R-b/A-b tags
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Philippe Mathieu-Daud=C3=A9 (12):
+>    scripts/checkpatch.pl: Only allow Python 3 interpreter
+>    tests/qemu-iotests/check: Allow use of python3 interpreter
+>    tests/qemu-iotests: Explicit usage of Python 3 (scripts with __main__)
+>    tests: Explicit usage of Python 3
+>    scripts: Explicit usage of Python 3 (scripts with __main__)
+>    scripts/minikconf: Explicit usage of Python 3
+>    tests/acceptance: Remove shebang header
+>    scripts/tracetool: Remove shebang header
+>    tests/vm: Remove shebang header
+>    tests/qemu-iotests: Explicit usage of Python3 (scripts without
+>      __main__)
+>    scripts: Explicit usage of Python 3 (scripts without __main__)
+>    tests/qemu-iotests/check: Only check for Python 3 interpreter
 
-System includes define _NSIG to SIGRTMAX + 1, but
-QEMU (like kernel) defines TARGET_NSIG to TARGET_SIGRTMAX.
-
-Fix all the checks involving the signal range.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
-
-Notes:
-    v2: replace i, j by target_sig, host_sig
-
- linux-user/signal.c | 52 ++++++++++++++++++++++++++++++++-------------
- 1 file changed, 37 insertions(+), 15 deletions(-)
-
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 246315571c09..c1e664f97a7c 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -30,6 +30,15 @@ static struct target_sigaction sigact_table[TARGET_NSIG];
- static void host_signal_handler(int host_signum, siginfo_t *info,
-                                 void *puc);
- 
-+
-+/*
-+ * System includes define _NSIG as SIGRTMAX + 1,
-+ * but qemu (like the kernel) defines TARGET_NSIG as TARGET_SIGRTMAX
-+ * and the first signal is SIGHUP defined as 1
-+ * Signal number 0 is reserved for use as kill(pid, 0), to test whether
-+ * a process exists without sending it a signal.
-+ */
-+QEMU_BUILD_BUG_ON(__SIGRTMAX + 1 != _NSIG);
- static uint8_t host_to_target_signal_table[_NSIG] = {
-     [SIGHUP] = TARGET_SIGHUP,
-     [SIGINT] = TARGET_SIGINT,
-@@ -67,19 +76,24 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
-     [SIGSYS] = TARGET_SIGSYS,
-     /* next signals stay the same */
- };
--static uint8_t target_to_host_signal_table[_NSIG];
- 
-+static uint8_t target_to_host_signal_table[TARGET_NSIG + 1];
-+
-+/* valid sig is between 1 and _NSIG - 1 */
- int host_to_target_signal(int sig)
- {
--    if (sig < 0 || sig >= _NSIG)
-+    if (sig < 1 || sig >= _NSIG) {
-         return sig;
-+    }
-     return host_to_target_signal_table[sig];
- }
- 
-+/* valid sig is between 1 and TARGET_NSIG */
- int target_to_host_signal(int sig)
- {
--    if (sig < 0 || sig >= _NSIG)
-+    if (sig < 1 || sig > TARGET_NSIG) {
-         return sig;
-+    }
-     return target_to_host_signal_table[sig];
- }
- 
-@@ -100,11 +114,15 @@ static inline int target_sigismember(const target_sigset_t *set, int signum)
- void host_to_target_sigset_internal(target_sigset_t *d,
-                                     const sigset_t *s)
- {
--    int i;
-+    int host_sig, target_sig;
-     target_sigemptyset(d);
--    for (i = 1; i <= TARGET_NSIG; i++) {
--        if (sigismember(s, i)) {
--            target_sigaddset(d, host_to_target_signal(i));
-+    for (host_sig = 1; host_sig < _NSIG; host_sig++) {
-+        target_sig = host_to_target_signal(host_sig);
-+        if (target_sig < 1 || target_sig > TARGET_NSIG) {
-+            continue;
-+        }
-+        if (sigismember(s, host_sig)) {
-+            target_sigaddset(d, target_sig);
-         }
-     }
- }
-@@ -122,11 +140,15 @@ void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
- void target_to_host_sigset_internal(sigset_t *d,
-                                     const target_sigset_t *s)
- {
--    int i;
-+    int host_sig, target_sig;
-     sigemptyset(d);
--    for (i = 1; i <= TARGET_NSIG; i++) {
--        if (target_sigismember(s, i)) {
--            sigaddset(d, target_to_host_signal(i));
-+    for (target_sig = 1; target_sig <= TARGET_NSIG; target_sig++) {
-+        host_sig = target_to_host_signal(target_sig);
-+        if (host_sig < 1 || host_sig >= _NSIG) {
-+            continue;
-+        }
-+        if (target_sigismember(s, target_sig)) {
-+            sigaddset(d, host_sig);
-         }
-     }
- }
-@@ -492,10 +514,10 @@ static void signal_table_init(void)
-         if (host_to_target_signal_table[host_sig] == 0) {
-             host_to_target_signal_table[host_sig] = host_sig;
-         }
--    }
--    for (host_sig = 1; host_sig < _NSIG; host_sig++) {
-         target_sig = host_to_target_signal_table[host_sig];
--        target_to_host_signal_table[target_sig] = host_sig;
-+        if (target_sig <= TARGET_NSIG) {
-+            target_to_host_signal_table[target_sig] = host_sig;
-+        }
-     }
- }
- 
-@@ -518,7 +540,7 @@ void signal_init(void)
-     act.sa_sigaction = host_signal_handler;
-     for(i = 1; i <= TARGET_NSIG; i++) {
- #ifdef TARGET_GPROF
--        if (i == SIGPROF) {
-+        if (i == TARGET_SIGPROF) {
-             continue;
-         }
- #endif
--- 
-2.24.1
+Series applied to my python-next tree:
+https://gitlab.com/philmd/qemu/commits/python-next
 
 
