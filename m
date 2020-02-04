@@ -2,56 +2,81 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC00C3524A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7A8C3524A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:12:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A15E2087E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:11:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A15E2087E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 273202087E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 08:12:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJRsniL3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 273202087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iytIr-000368-Oi
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 03:11:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47916)
+	id 1iytJV-0003ti-Bb
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 03:12:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47213)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iytHe-0001qb-OS
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:10:12 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iytH4-0001L0-BT
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:09:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iytHc-0003W6-Pt
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:10:09 -0500
-Resent-Date: Tue, 04 Feb 2020 03:10:09 -0500
-Resent-Message-Id: <E1iytHc-0003W6-Pt@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21143)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iytHc-0003Lc-H1
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:10:08 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1580803786992508.43394377546963;
- Tue, 4 Feb 2020 00:09:46 -0800 (PST)
-In-Reply-To: <1580803317-4422-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: Re: [PULL v2 0/3] MIPS queue for February 4th, 2020
-Message-ID: <158080378583.10925.13488810561515333869@a1bbccc8075a>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iytH2-00085g-VG
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:09:33 -0500
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:46466)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iytH2-0007xg-QM
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 03:09:32 -0500
+Received: by mail-oi1-x230.google.com with SMTP id a22so17522770oid.13
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 00:09:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=y/hic+1/P7Wf9mIgio8dFV0elgsobIybXOU4vvDyYLU=;
+ b=aJRsniL3K3INMPvbrBfSCv1RwYDmrtF9RQRA4wQ8Gw4O++4ugKzpo9E0cYeqr5eaBR
+ +2JV7fhQ+DF5oqfqMsfM0lwLoW1eNRlSSf6y76OoKj5QTA5Hb0aZYBKjFKAJsKyasTOF
+ G9JqDlnLj2eQPB6gsq8yTx/J+MTk+dfEihYtcmWtntc8cTlGBhfK8zmZWQRCFf0mmItQ
+ /K6P1DzWkNMd6v1IC8Pz3kmWOYeI2EPR2UlD5PhV/H1Osv4lSOZjyPv+Iwz6vvWFSj37
+ FK5YXafhCJZp2fm9smP2sebMFNwOoohs3HOIvMBxirprEtVJGGKQpSteHV9NyNigr9yi
+ +HZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=y/hic+1/P7Wf9mIgio8dFV0elgsobIybXOU4vvDyYLU=;
+ b=Kt6s6ABp0X9nmLvYNWECBdmkW+Q4xW4kvD4IZ1d0IgF8qrEsIdlW7fvsdOdIQsDF0d
+ cm0XtHqb6D6jI7tH4ZTnZe26UoOkikAY0xMYy4D9hMA/xwIA8eVmr94nVko1ySqdj6ax
+ to0brP+P6KjF+qL7hkl/kYSbAMO+AzuAPqayR4yV4pAdaH0lCgyzz8VJMwFqT36ItrVB
+ qlrU16f1ece8FH66mrFXFz5Xc2zATuTg8X03x+2+C5uKIasS/HLXPzvTpy/o3H+4G4RE
+ FirFFaIoQ9CMvAv2VzzBt3yHOsHdOX02UYf9zDm5XUzUTRmjXlYd1akMplTW4ebTUhdF
+ xLcA==
+X-Gm-Message-State: APjAAAXb0eIV1puY4WWgGa2Kuv9R32sZnAC9kFVBSf1AxEwObyhYhXMZ
+ N6l8aVf6duqP2bkU6PnOkcLQt6r7ynyZ5v1X4Sk4yV0K
+X-Google-Smtp-Source: APXvYqwwH1hO/fqb10D2ksUIvc7bNsesKKjY+xwC5A/I/uez9MQ+NJQK9HdfTCd+dpMD7sdKfpt/5zOQYnyx1pB+zSc=
+X-Received: by 2002:a05:6808:64e:: with SMTP id
+ z14mr2500749oih.79.1580803771688; 
+ Tue, 04 Feb 2020 00:09:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: aleksandar.markovic@rt-rk.com
-Date: Tue, 4 Feb 2020 00:09:46 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+References: <1580798552-703-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1580798552-703-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 4 Feb 2020 09:09:20 +0100
+Message-ID: <CAL1e-=g+_3MeZfA5Hj2exBB2SZfFDuuC9UAOATuL79Yaakpiig@mail.gmail.com>
+Subject: Re: [PULL 0/3] MIPS queue for February 4th, 2020
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::230
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,70 +88,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, amarkovic@wavecomp.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTgwODAzMzE3LTQ0MjItMS1n
-aXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS8KCgoKSGksCgpUaGlz
-IHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0
-cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgdjIgMC8zXSBN
-SVBTIHF1ZXVlIGZvciBGZWJydWFyeSA0dGgsIDIwMjAKTWVzc2FnZS1pZDogMTU4MDgwMzMxNy00
-NDIyLTEtZ2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20KVHlwZTog
-c2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFy
-c2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczov
-L2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0
-Y2hldy8xNTgwODAzMzE3LTQ0MjItMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmlj
-QHJ0LXJrLmNvbSAtPiBwYXRjaGV3LzE1ODA4MDMzMTctNDQyMi0xLWdpdC1zZW5kLWVtYWlsLWFs
-ZWtzYW5kYXIubWFya292aWNAcnQtcmsuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKNTkzNTYyYiB0YXJnZXQvbWlwczogU2VwYXJhdGUgRlBVLXJlbGF0ZWQgaGVscGVycyBpbnRv
-IHRoZWlyIG93biBmaWxlCmJlMDQxMGEgdGFyZ2V0L21pcHM6IFNlcGFyYXRlIENQMC1yZWxhdGVk
-IGhlbHBlcnMgaW50byB0aGVpciBvd24gZmlsZQoxOWRlMzcxIHRhcmdldC9taXBzOiBGaXggaGFu
-ZGxpbmcgb2YgTEwvU0MgaW5zdHJ1Y3Rpb25zIGFmdGVyIDdkZDU0N2U1YWIKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CjEvMyBDaGVja2luZyBjb21taXQgMTlkZTM3MWFjZTk1ICh0YXJnZXQvbWlwczog
-Rml4IGhhbmRsaW5nIG9mIExML1NDIGluc3RydWN0aW9ucyBhZnRlciA3ZGQ1NDdlNWFiKQoyLzMg
-Q2hlY2tpbmcgY29tbWl0IGJlMDQxMGE3ZmQ1NSAodGFyZ2V0L21pcHM6IFNlcGFyYXRlIENQMC1y
-ZWxhdGVkIGhlbHBlcnMgaW50byB0aGVpciBvd24gZmlsZSkKV0FSTklORzogYWRkZWQsIG1vdmVk
-IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjk6
-IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhh
-dCAnJicgKGN0eDpXeFcpCiMyMDI6IEZJTEU6IHRhcmdldC9taXBzL2NwMF9oZWxwZXIuYzoxNjk6
-CisgICAgdGN1ID0gKHYgPj4gQ1AwVENTdF9UQ1UwKSAmIDB4ZjsKICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYnIChj
-dHg6V3hXKQojMjAzOiBGSUxFOiB0YXJnZXQvbWlwcy9jcDBfaGVscGVyLmM6MTcwOgorICAgIHRt
-eCA9ICh2ID4+IENQMFRDU3RfVE1YKSAmIDB4MTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiMy
-MDU6IEZJTEU6IHRhcmdldC9taXBzL2NwMF9oZWxwZXIuYzoxNzI6CisgICAgdGtzdSA9ICh2ID4+
-IENQMFRDU3RfVEtTVSkgJiAweDM7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
-RVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiMxNjc4OiBG
-SUxFOiB0YXJnZXQvbWlwcy9jcDBfaGVscGVyLmM6MTY0NToKKyAgICBpZiAoISgoZW52LT5DUDBf
-VlBDb250cm9sID4+IENQMFZQQ3RsX0RJUykgJiAxKSkgewogICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRl
-ciB0aGF0ICcmJyAoY3R4Old4VykKIzE2OTY6IEZJTEU6IHRhcmdldC9taXBzL2NwMF9oZWxwZXIu
-YzoxNjYzOgorICAgIGlmICgoZW52LT5DUDBfVlBDb250cm9sID4+IENQMFZQQ3RsX0RJUykgJiAx
-KSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3Rh
-bDogNSBlcnJvcnMsIDEgd2FybmluZ3MsIDMzNTggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8zIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgozLzMgQ2hlY2tpbmcgY29tbWl0IDU5MzU2MmJlZTQ3
-ZCAodGFyZ2V0L21pcHM6IFNlcGFyYXRlIEZQVS1yZWxhdGVkIGhlbHBlcnMgaW50byB0aGVpciBv
-d24gZmlsZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
-QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjc6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJS
-T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxMTY0OiBGSUxF
-OiB0YXJnZXQvbWlwcy9mcHVfaGVscGVyLmM6MTEzMzoKKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBmbG9hdF9zdGF0dXMgKnN0YXR1cykgICAgICAgICAgICAgIFwKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCAzODA2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMyBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
-b3JnL2xvZ3MvMTU4MDgwMzMxNy00NDIyLTEtZ2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJr
-b3ZpY0BydC1yay5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Tue, Feb 4, 2020 at 7:43 AM Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> The following changes since commit f31160c7d1b89cfb4dd4001a23575b42141cb0ec:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-20200203' into staging (2020-02-03 11:14:24 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/AMarkovic/qemu tags/mips-queue-feb-04-2020
+>
+> for you to fetch changes up to 78e91b612eb746c7916cce3ea91f709b916b007c:
+>
+>   target/mips: Separate FPU-related helpers into their own file (2020-02-03 23:55:53 +0100)
+>
+> ----------------------------------------------------------------
+>
+> MIPS queue for February 4th, 2020
+
+Peter, please discard this pull request.
+
+I just sent PULL v2 that corrects a mistake in a comment and improves
+a commit message.
+
+Sorry about this.
+
+Aleksandar
+
+>
+>   Content:
+>
+>     - fix for a recent regression in LL/SC
+>     - mechanical reorganization of files containing helpers
+>
+>   Note:
+>
+>     - six checkpatch errors and two warnings are benign and should be
+>       ignored
+>
+> ----------------------------------------------------------------
+>
+> Aleksandar Markovic (2):
+>   target/mips: Separate CP0-related helpers into their own file
+>   target/mips: Separate FPU-related helpers into their own file
+>
+> Alex Richardson (1):
+>   target/mips: Fix ll/sc after 7dd547e5ab6b31e7a0cfc182d3ad131dd55a948f
+>
+>  target/mips/Makefile.objs |    5 +-
+>  target/mips/cp0_helper.c  | 1678 +++++++++++++++++
+>  target/mips/fpu_helper.c  | 1911 ++++++++++++++++++++
+>  target/mips/op_helper.c   | 4422 +++++----------------------------------------
+>  4 files changed, 4044 insertions(+), 3972 deletions(-)
+>  create mode 100644 target/mips/cp0_helper.c
+>  create mode 100644 target/mips/fpu_helper.c
+>
+> --
+> 2.7.4
+>
+>
 
