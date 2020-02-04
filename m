@@ -2,104 +2,76 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0BFC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 12:37:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D17C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:02:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA58F2082E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 12:37:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrH0zAVx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA58F2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 152A920730
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:02:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 152A920730
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyxSj-0003el-W2
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 07:37:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44146)
+	id 1iyxq9-00016t-7U
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 08:02:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33414)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iyxS1-0003Du-BD
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:37:10 -0500
+ (envelope-from <bounces@canonical.com>) id 1iyxpC-0000er-7v
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:01:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iyxRz-0008TW-8a
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:37:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22281
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iyxRz-0008Ps-3B
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:37:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580819826;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=v0IVNVijPEAGVo676KSbJRLq87b3zRTX9Lpy3WdWpng=;
- b=MrH0zAVxX1SeoUVv9qUFMI1zBLkrYwvl6YWO4rpndfhE1pidOzSpbDmg5W+8zk+3D995tS
- pYw4dUciHxAiXnVM3ptWVczzoTmPKYEVosNytwLXL7z8A+ss4+0vCJESsECMRdcafu5TtW
- fQyRvJHI/QukotJPCJOhwfC/CMe2DPQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-s--FqP2mOcaYVhjMoqodsw-1; Tue, 04 Feb 2020 07:37:04 -0500
-Received: by mail-wr1-f72.google.com with SMTP id p8so3252170wrw.5
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 04:37:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=v0IVNVijPEAGVo676KSbJRLq87b3zRTX9Lpy3WdWpng=;
- b=FYWrfDmwuTsGyHfno3yhyZ4PdMpO64xwDl6sKhjSg0ET4qZ299rSRAB0MNo67BHZlM
- ebJNl7VP0q3uT7eExulwgQSg87INCxOZBZz3MsFfzjgjYJqjcv7t7eB3UWmodRrDKiLN
- G3Izk1ac8b9urmk+BB4m3wPDXTARX9c5nGPmgyYr1A+PBDugFeukxENR/8etrlwf/0dN
- 8YSlV4gyPlJnqvAlLAcWqSK3dccSEL2S8MvOEVzR7runlhlQ84KkV2KlaQ/DLTJLXZwT
- tVkfwqH+pfwYlwuFfB+IGSPFW2QSDIlI2OdiqB4JD8ERbg/djLxJZA5qxNmS4h0LYGsT
- cLhw==
-X-Gm-Message-State: APjAAAUPzTc0XaOt7f2SZDghe/m7rFPnjMM3Dp2yvo56OS5Kf/n3NRai
- mB7YpHRfdOZebCU2TTgLMmkWPpRVbELzIQAZtKuGYbXT6Il4FA5gkgZ/D9xQwhQzIg2ShG3MLWy
- 2bDacnLrhOhy+SQw=
-X-Received: by 2002:adf:face:: with SMTP id a14mr21559199wrs.284.1580819823687; 
- Tue, 04 Feb 2020 04:37:03 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwrDuGKhcVRaqf0Fcf8kPxNIdNJh2+2aFfiPvQEckVZX+d+CngIbZZ8qpoiuIGRT1Uo8ESiHg==
-X-Received: by 2002:adf:face:: with SMTP id a14mr21559180wrs.284.1580819823435; 
- Tue, 04 Feb 2020 04:37:03 -0800 (PST)
-Received: from [192.168.178.40] ([151.20.243.54])
- by smtp.gmail.com with ESMTPSA id y12sm3579679wmj.6.2020.02.04.04.37.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 04 Feb 2020 04:37:02 -0800 (PST)
-Subject: Re: [PATCH 1/2] configure: Allow user to specify sphinx-build binary
-To: Markus Armbruster <armbru@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200203132533.21850-1-peter.maydell@linaro.org>
- <20200203132533.21850-2-peter.maydell@linaro.org>
- <87d0au8wlh.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2ff980d6-bfa1-0db4-62cc-c10a3e0865e6@redhat.com>
-Date: Tue, 4 Feb 2020 13:37:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <bounces@canonical.com>) id 1iyxpA-0004Tl-RA
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:01:06 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50342)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iyxpA-0004Lx-LQ
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:01:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iyxp8-0004cZ-8v
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 13:01:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D388B2E808B
+ for <qemu-devel@nongnu.org>; Tue,  4 Feb 2020 13:01:01 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <87d0au8wlh.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-MC-Unique: s--FqP2mOcaYVhjMoqodsw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Feb 2020 12:51:07 -0000
+From: Tobias Koch <1823790@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=Laurent@vivier.eu; 
+X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fritz-the-cat laurent-vivier m-luescher pmaydell
+ tobijk
+X-Launchpad-Bug-Reporter: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
+X-Launchpad-Bug-Modifier: Tobias Koch (tobijk)
+References: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158082066725.19517.15681812128123723706.malone@gac.canonical.com>
+Subject: [Bug 1823790] Re: QEMU mishandling of SO_PEERSEC forces systemd into
+ tight loop
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 70e9cba8b26c3df513a6388fd8ee64d27c4c37ca
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -108,41 +80,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/02/20 11:39, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> 
->> Currently we insist on using 'sphinx-build' from the $PATH;
->> allow the user to specify the binary to use. This will be
->> more useful as we become pickier about the capabilities
->> we require (eg needing a Python 3 sphinx-build).
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> I went with the most common convention for specifying "here's
->> an executable", like --make=, --install=, --python=....
->>
->> The only odd one out for our current configure options seems to be
->> that we want --with-git=GIT, not --git=GIT. You could argue that
->> that's a better convention,
-> 
-> It's the one Autoconf uses.
-> 
->>                             but it makes more sense to me to
->> stick with the convention we currently mostly have. (Perhaps
->> we should even change --with-git= to --git= ?)
-> 
-> Paolo, any implications on the Meson conversion?
+I carried out the following test:
 
-Nope, there will still be a handwritten configure script (and in the
-beginning it will be pretty much the same as now; in due time, it will
-handle command line parsing only).
+* fetched the QEMU coming with 18.04,
+* added this patch,
+* built an LXD container with arch arm64 and the patched qemu-aarch64-stati=
+c inside,
+* launched it on amd64
 
-Paolo
+Previously various systemd services would not come up properly, now they
+are running like a charm. The only grief I have is that network
+configuration does not work, but that is due to
 
+    # ip addr
+    Unsupported setsockopt level=3D270 optname=3D11
+
+which is a different story.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823790
+
+Title:
+  QEMU mishandling of SO_PEERSEC forces systemd into tight loop
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  While building Debian images for embedded ARM target systems I
+  detected that QEMU seems to force newer systemd daemons into a tight
+  loop.
+
+  My setup is the following:
+
+  Host machine: Ubuntu 18.04, amd64
+  LXD container: Debian Buster, arm64, systemd 241
+  QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3=
+.1+dfsg-7)
+
+  To easily reproduce the issue I have created the following repository:
+  https://github.com/lueschem/edi-qemu
+
+  The call where systemd gets looping is the following:
+  2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 err=
+no=3D34 (Numerical result out of range)
+
+  Furthermore I also verified that the issue is not related to LXD.
+  The same behavior can be reproduced using systemd-nspawn.
+
+  This issue reported against systemd seems to be related:
+  https://github.com/systemd/systemd/issues/11557
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1823790/+subscriptions
 
