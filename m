@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A83C3524D
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A566FC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:39:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB5FD20730
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:36:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5FD20730
+	by mail.kernel.org (Postfix) with ESMTPS id 7BBA22084E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:39:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BBA22084E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyyNi-0006ut-4D
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 08:36:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33226)
+	id 1iyyQR-0008Ko-Mw
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 08:39:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36893)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iyyMl-0005wk-0C
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:35:48 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iyyPp-0007os-Bi
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:38:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iyyMj-0004hQ-0d
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:35:46 -0500
-Received: from mout.kundenserver.de ([212.227.17.24]:45487)
+ (envelope-from <laurent@vivier.eu>) id 1iyyPo-0000w8-0f
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:38:57 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:38027)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iyyMf-0004V7-IS
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:35:43 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iyyPn-0000tJ-Nq
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:38:55 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N6svJ-1jblye33bL-018J9S; Tue, 04 Feb 2020 14:35:07 +0100
-Subject: Re: [PATCH 2/4] linux-user: cleanup signal.c
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MvJjz-1jpYtc39e5-00rEtL; Tue, 04 Feb 2020 14:38:33 +0100
+Subject: Re: [PATCH 4/4] linux-user: fix use of SIGRTMIN
 To: Taylor Simpson <tsimpson@quicinc.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <20200201122746.1478003-1-laurent@vivier.eu>
- <20200201122746.1478003-3-laurent@vivier.eu>
- <BYAPR02MB48863971CD9E073FB98B130CDE000@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <20200201122746.1478003-5-laurent@vivier.eu>
+ <BYAPR02MB4886C76B91E2A07B47F819A9DE000@BYAPR02MB4886.namprd02.prod.outlook.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,33 +84,33 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <74a54fdb-6d2c-6912-55fa-b925e4c614d2@vivier.eu>
-Date: Tue, 4 Feb 2020 14:35:04 +0100
+Message-ID: <cc98bc69-5330-3708-901e-a4434013e59f@vivier.eu>
+Date: Tue, 4 Feb 2020 14:38:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB48863971CD9E073FB98B130CDE000@BYAPR02MB4886.namprd02.prod.outlook.com>
+In-Reply-To: <BYAPR02MB4886C76B91E2A07B47F819A9DE000@BYAPR02MB4886.namprd02.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:opqm33O9Yexu7oP+3FHQfvUpd52I3b8a6lNt067Gk4M4e6xsAZn
- H49WClBgterNWaPnUOZshqnb5bGe9bpUW/lRTM85YvTU3M8ELpg/3DaCLPVzTZUX2bApXfJ
- AjmlG/t1BiyVvRXVS68A3gMZWvbROU17s6kPhGCQHvxYll0iBrmtc/Er8FPhhx42qtHhVql
- ZIgxZNFDr2IwAQK4GEO5g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hYU1iT9XJGI=:jX6c87E3Lhl5+nVTwWBcrQ
- ZTgEu1aomiM7KGOvKKVSAl1mqZqV9icp+nQCaRf5A5NKhbmLgdtTFYJcR1W3R0ulVkP8dGW0g
- hUrKGcERiTUHhJ6gvumgpotTvMnQlwnHkZg8vToDCJM3xb8LEgNyNsBO4Q8GhLCao09F3+c0v
- H0FnffFcnxyVsfKVpJgOzpkKA08eCCfcEd6hecMXFEDzUp9DlUXtKQFrpuTHLrAzsYqnAIhKc
- //m2/0oynjb7VzURis2AL30oWBWCTvFcSzCS8Cg4AOl/BRDwe8dy3tRY5Xx/x24wQzDfJAuxe
- Tt9InWfF47rYmTR/3U+HB3itWuGwcJ3FixsJ6jEc/eRJvne6wSvT157UEClZabh/BKg44fr/J
- yzG/S3l9vAbwcl0AwGgi9sc1UGGlPNcWxX09VIqyZLEy8JDUZ+nkMwcTetzvL5ezQ2PaZtnGM
- lbMtX35xlnlIj66qEARaBvbMsyDz8JSy2hj2pvw53PGfevLXl6QDuc5XLybxsE1z3FIjQYLRy
- Esa9wfQpmY9CxSfcAWBERAZBS31nPItLwMIZQUEyyvEPpvSffvpzEGpoPliJYC3P9PfHZUDNi
- PwZORCXBaDN4Dpft7SrHPmaCk3nTFJMYTSK6lntm4ZJQ4/kuO5LOqOK2y7WHGP1i27i1xiest
- 1Rw6uXkgtkd4QWEBnNglBxg5xHJMVOULWIdRaZpUIBKnnn1td+6S+7iyFajCZ0GbgCegMtNPS
- Rg5cjOJH8pfKdkfnrYn2T2LVTncyAGt78+ZKWy/5rguxY0NEv+NkIY1uHoXMTUEr9gWqcQUAE
- PXNOjQVaiZVms4LyiSEbUky1n+JLlXTgxHsaF79CMKvubZuHhEIPBUB8e4l5mKXXDXtOHU03R
- q/MlV/5kS+mCsgaTL6AqufZ4JEQvorOVpaQS2iZfWV6aXeIwVhp4gpGfpMiXVE
+X-Provags-ID: V03:K1:F5WQV7iEK/lmSCVvabcXuOloPrKt9WYdv7OTTEzf5ZTcD58wYea
+ 1p2NuWZzbqtQw3nxcKEzK9qjud0kuXC71p5FU7jaTQBEnmjXUB8HZcEBsDyaijDhrRX3Lw0
+ WKJnNcrGhHUTwFfwX9igOc26Qq67YLECXIw1Tm7PTCB40GaCxNO4dl4Sd9modMoa4HbPdh7
+ eV3O1aQeF3hLM96ni7lnA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:14spSIulMiU=:wN1YdMQRIkL8O/6ZCz3WFc
+ 4gkLOefQCQcTbkt05600uhXLWIbkagXqE0DEHkaRjRlUvJGqd5RZoXtg7lnBeb2j4OjgBDalx
+ 7V+WgfU4qjCb3fjvgzs8rr80eP3YUv3U1Uw1oJIxNH++cBImt1f8o0VVdFzDOJg0Pvs18yCc6
+ iNk5YHsta5LomzztM0hPn7TyfTUMB/grxfWmoB23aTRjG8okB31HjFb11iERLng4uxhH9Cvcs
+ OoxmUBWasx/+4cBAJ+H3ASMSidJsvpiDY9DoHl5vFBiGuI44w5qBpaQnW5gwi1QO3iNH/SS7F
+ UkaxuqRNsdOni3D6EiZ3PXMShB6ftIWSoB4yxNbYXTvwSAe68t+y8+ocqgzn8aiI24jkdEwTI
+ ZIN9jilekdiFpazHfHESns2p3CJ0mjxOxWKk7cNn8YebkBnWPNnNsVvdmP4Nfy6mja6C9yCBZ
+ sPdXkzLegEMQM7YsXUUYF2ZM2UYLoRuI7fi4TWO8lVna3buWvxKZw9rF5cqYdl8f5W2D4mwVD
+ p2CZ4WQ6B0VrW1amXlr3w6QNnuGbQ8PMCox7pYj/DW2SE9LrRUul37+Os/9/YAe2MAMaz89JN
+ AvJiaJWHPNo676WCGRfsHfAtiKpmd5mIEQvf50VuZJHXrQZtNN48F2FwodsdCHnQlVoTyPlbI
+ f6CZXXWLdlv8fU1s66cSt/mHZWxJ25Qc43Ha/GAOhlkc5mkmKQJNCYOie4PhR8wDP/HjLMSv1
+ XDTYSMqjggn4hA09Sc0j4WF8PqxKi1UG2SB2xzacnYhVeFwG6mP+51vP2qJNNxbBJsCGI74eR
+ DTKR4ogYtBW0m4Vjb0LxNSDszokhitCaRaftfvIs0CSKfnuCotCt9u/+JEtqvd6lGdQRXt4ix
+ O1EZ8KgU098lMrd+g1DIFJZHqQuQ63vkEZXjrVGe3A1sBRaRXfybkvBY7G+ODA
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
@@ -133,7 +133,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 03/02/2020 à 23:58, Taylor Simpson a écrit :
+Le 04/02/2020 à 00:15, Taylor Simpson a écrit :
 > 
 > 
 >> -----Original Message-----
@@ -145,76 +145,90 @@ Le 03/02/2020 à 23:58, Taylor Simpson a écrit :
 >> rk.com>; Marlies Ruck <marlies.ruck@gmail.com>; Laurent Vivier
 >> <laurent@vivier.eu>; Peter Maydell <peter.maydell@linaro.org>; Taylor
 >> Simpson <tsimpson@quicinc.com>; Riku Voipio <riku.voipio@iki.fi>
->> Subject: [PATCH 2/4] linux-user: cleanup signal.c
+>> Subject: [PATCH 4/4] linux-user: fix use of SIGRTMIN
 >>
->> -------------------------------------------------------------------------
->> CAUTION: This email originated from outside of the organization.
->> -------------------------------------------------------------------------
+>> Some RT signals can be in use by glibc,
+>> it's why SIGRTMIN (34) is generally greater than __SIGRTMIN (32).
 >>
->> No functionnal changes. Prepare the field for future fixes.
-> 
-> 
-> Spelling error
-
-Sorry, french word. Will be changed by "functional"
-
-> 
+>> So SIGRTMIN cannot be mapped to TARGET_SIGRTMIN.
 >>
->> Remove memset(.., 0, ...) that is useless on a static array
+>> Instead of swapping only SIGRTMIN and SIGRTMAX, map all the range
+>> [TARGET_SIGRTMIN ... TARGET_SIGRTMAX - X] to
+>>       [__SIGRTMIN + X ... SIGRTMAX ]
+>> (SIGRTMIN is __SIGRTMIN + X).
 >>
 >> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 >> ---
->>  linux-user/signal.c | 37 ++++++++++++++++++++++---------------
->>  1 file changed, 22 insertions(+), 15 deletions(-)
+>>  linux-user/signal.c     | 34 ++++++++++++++++++++++++++++------
+>>  linux-user/trace-events |  3 +++
+>>  2 files changed, 31 insertions(+), 6 deletions(-)
 >>
 >> diff --git a/linux-user/signal.c b/linux-user/signal.c index
->> 5ca6d62b15d3..f42a2e1a82a5 100644
+>> 3491f0a7ecb1..c4abacde49a0 100644
 >> --- a/linux-user/signal.c
 >> +++ b/linux-user/signal.c
->> @@ -66,12 +66,6 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
->>      [SIGPWR] = TARGET_SIGPWR,
->>      [SIGSYS] = TARGET_SIGSYS,
->>      /* next signals stay the same */
->> -    /* Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
->> -       host libpthread signals.  This assumes no one actually uses SIGRTMAX :-/
->> -       To fix this properly we need to do manual signal delivery multiplexed
->> -       over a single host signal.  */
->> -    [__SIGRTMIN] = __SIGRTMAX,
->> -    [__SIGRTMAX] = __SIGRTMIN,
->>  };
->>  static uint8_t target_to_host_signal_table[_NSIG];
->>
->> @@ -480,13 +474,18 @@ static int core_dump_signal(int sig)
->>      }
->>  }
->>
->> -void signal_init(void)
->> +static void signal_table_init(void)
->>  {
->> -    TaskState *ts = (TaskState *)thread_cpu->opaque;
->> -    struct sigaction act;
->> -    struct sigaction oact;
+>> @@ -501,15 +501,20 @@ static void signal_table_init(void)
 >>      int i, j;
->> -    int host_sig;
->> +
->> +    /*
->> +     * Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
->> +     * host libpthread signals.  This assumes no one actually uses SIGRTMAX :-
->> /
->> +     * To fix this properly we need to do manual signal delivery multiplexed
->> +     * over a single host signal.
->> +     */
->> +    host_to_target_signal_table[__SIGRTMIN] = __SIGRTMAX;
->> +    host_to_target_signal_table[__SIGRTMAX] = __SIGRTMIN;
+>>
+>>      /*
+>> -     * Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
+>> -     * host libpthread signals.  This assumes no one actually uses SIGRTMAX :-/
+>> -     * To fix this properly we need to do manual signal delivery multiplexed
+>> -     * over a single host signal.
+>> +     * some RT signals can be in use by glibc,
+>> +     * it's why SIGRTMIN (34) is generally greater than __SIGRTMIN (32)
+>>       */
+>> -    host_to_target_signal_table[__SIGRTMIN] = __SIGRTMAX;
+>> -    host_to_target_signal_table[__SIGRTMAX] = __SIGRTMIN;
+>> +    for (i = SIGRTMIN; i <= SIGRTMAX; i++) {
+>> +        j = i - SIGRTMIN + TARGET_SIGRTMIN;
+>> +        if (j <= TARGET_NSIG) {
+>> +            host_to_target_signal_table[i] = j;
+>> +        }
+>> +    }
 >>
 >>      /* generate signal conversion tables */
->>      for(i = 1; i < _NSIG; i++) {
->> @@ -497,14 +496,22 @@ void signal_init(void)
->>          j = host_to_target_signal_table[i];
+>> +    for (i = 1; i <= TARGET_NSIG; i++) {
+>> +        target_to_host_signal_table[i] = _NSIG; /* poison */
+>> +    }
+>>      for (i = 1; i < _NSIG; i++) {
+>>          if (host_to_target_signal_table[i] == 0) {
+>>              host_to_target_signal_table[i] = i; @@ -519,6 +524,15 @@ static void
+>> signal_table_init(void)
+>>              target_to_host_signal_table[j] = i;
+>>          }
+>>      }
+>> +
+>> +    if (TRACE_SIGNAL_TABLE_INIT_BACKEND_DSTATE()) {
+>> +        for (i = 1, j = 0; i <= TARGET_NSIG; i++) {
+>> +            if (target_to_host_signal_table[i] == _NSIG) {
+>> +                j++;
+>> +            }
+>> +        }
+>> +        trace_signal_table_init(j);
 > 
-> Since you are cleaning up this code, let's give this a more descriptive name - target_sig would be consistent with host_sig used elsewhere.
+> It looks like j will have a count of the number of poison entries, but the message in trace_signal_table_init is "missing signal number".  Is that what you intend?
 
-I agree.
+Yes, poison entries are the entries that cannot be used for the guest.
+Perhaps it would be more correct as "Number of missing signals:"?
+
+> 
+>> +    }
+>>  }
+>>
+>>  void signal_init(void)
+>> @@ -817,6 +831,8 @@ int do_sigaction(int sig, const struct target_sigaction
+>> *act,
+>>      int host_sig;
+>>      int ret = 0;
+>>
+>> +    trace_signal_do_sigaction_guest(sig, TARGET_NSIG);
+> 
+> Shouldn't this be _NSIG, not TARGET_NSIG?
+
+No: do_sigaction() takes a number from the guest, so "sig" is a target
+signal number, and this trace displays also the maximum value for the
+target.
 
 Thanks,
 Laurent
