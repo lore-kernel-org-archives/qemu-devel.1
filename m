@@ -2,106 +2,117 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD912C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:35:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A83C3524D
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8A7120661
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:35:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="BuwmEVuI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8A7120661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB5FD20730
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:36:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5FD20730
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyyMP-0005EG-SD
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 08:35:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59907)
+	id 1iyyNi-0006ut-4D
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 08:36:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.merwick@oracle.com>) id 1iyyL3-0003uI-Ju
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:34:02 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iyyMl-0005wk-0C
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:35:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1iyyL2-00072i-0R
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:34:01 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:48854)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1iyyL1-0006pw-Mb
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:33:59 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014DX3g9128120;
- Tue, 4 Feb 2020 13:33:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=C1FpgTu958Ot9QqX2MPEuh7dI8cwGXIhQKe2dOvQhZQ=;
- b=BuwmEVuIZwIorJtJXNUB+25aUuMz0XPUSnzg5dA13v7kXn/qybaWulytIkE7VTU7HEZZ
- 95ttEd/qba6VqmKCbGLoXCIUv+C1kUs7KyOfzACPYIt5PM6tiAA4pGgOzrGTLTG7UW1N
- QZ5zHx/SVRdAeSkh79qFn0n2sryOyDC/Dj/uojuCAOPBQ6bcIj6DuzOthp7dK1auDY0G
- yW1UqP4dvQtWn1NqjH4M0U6hkdAtI6RB0aWnc5fDSpbv0eAUh5hppWOkWyrm//Ml0BQJ
- 3ULgWAAvS3cOmAMe7gbDtF1KxErqFD2PHkL6Ve+7Xp0QZs8PKnBR+ouY+fZc+44do1GF ag== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2xwyg9jv8r-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 04 Feb 2020 13:33:46 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 014DSc18011294;
- Tue, 4 Feb 2020 13:31:46 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 2xxw0wyx48-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 04 Feb 2020 13:31:45 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 014DVhV3011314;
- Tue, 4 Feb 2020 13:31:43 GMT
-Received: from [10.175.175.161] (/10.175.175.161)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 04 Feb 2020 05:31:43 -0800
-Subject: Re: [PATCH 5/6] tests/boot_linux_console: add extract_from_rpm method
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-References: <1580142994-1836-1-git-send-email-liam.merwick@oracle.com>
- <1580142994-1836-6-git-send-email-liam.merwick@oracle.com>
- <20200130120506.mq6tejv5i2k776k5@steredhat>
- <f60513b8-b974-a46b-f829-993e45a0cff9@oracle.com>
- <d6bed079-9e79-5e64-f7e2-76499f24454c@redhat.com>
- <027bfff2-ff27-3fc6-05e6-aa5940e7fc04@oracle.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <0902eab2-8ed2-9f44-4269-02f96d44fa76@oracle.com>
-Date: Tue, 4 Feb 2020 13:31:40 +0000
+ (envelope-from <laurent@vivier.eu>) id 1iyyMj-0004hQ-0d
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:35:46 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:45487)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iyyMf-0004V7-IS
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:35:43 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N6svJ-1jblye33bL-018J9S; Tue, 04 Feb 2020 14:35:07 +0100
+Subject: Re: [PATCH 2/4] linux-user: cleanup signal.c
+To: Taylor Simpson <tsimpson@quicinc.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20200201122746.1478003-1-laurent@vivier.eu>
+ <20200201122746.1478003-3-laurent@vivier.eu>
+ <BYAPR02MB48863971CD9E073FB98B130CDE000@BYAPR02MB4886.namprd02.prod.outlook.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <74a54fdb-6d2c-6912-55fa-b925e4c614d2@vivier.eu>
+Date: Tue, 4 Feb 2020 14:35:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <027bfff2-ff27-3fc6-05e6-aa5940e7fc04@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <BYAPR02MB48863971CD9E073FB98B130CDE000@BYAPR02MB4886.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9520
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=739
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002040096
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9520
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=794 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002040097
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
- 014DX3g9128120
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:opqm33O9Yexu7oP+3FHQfvUpd52I3b8a6lNt067Gk4M4e6xsAZn
+ H49WClBgterNWaPnUOZshqnb5bGe9bpUW/lRTM85YvTU3M8ELpg/3DaCLPVzTZUX2bApXfJ
+ AjmlG/t1BiyVvRXVS68A3gMZWvbROU17s6kPhGCQHvxYll0iBrmtc/Er8FPhhx42qtHhVql
+ ZIgxZNFDr2IwAQK4GEO5g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hYU1iT9XJGI=:jX6c87E3Lhl5+nVTwWBcrQ
+ ZTgEu1aomiM7KGOvKKVSAl1mqZqV9icp+nQCaRf5A5NKhbmLgdtTFYJcR1W3R0ulVkP8dGW0g
+ hUrKGcERiTUHhJ6gvumgpotTvMnQlwnHkZg8vToDCJM3xb8LEgNyNsBO4Q8GhLCao09F3+c0v
+ H0FnffFcnxyVsfKVpJgOzpkKA08eCCfcEd6hecMXFEDzUp9DlUXtKQFrpuTHLrAzsYqnAIhKc
+ //m2/0oynjb7VzURis2AL30oWBWCTvFcSzCS8Cg4AOl/BRDwe8dy3tRY5Xx/x24wQzDfJAuxe
+ Tt9InWfF47rYmTR/3U+HB3itWuGwcJ3FixsJ6jEc/eRJvne6wSvT157UEClZabh/BKg44fr/J
+ yzG/S3l9vAbwcl0AwGgi9sc1UGGlPNcWxX09VIqyZLEy8JDUZ+nkMwcTetzvL5ezQ2PaZtnGM
+ lbMtX35xlnlIj66qEARaBvbMsyDz8JSy2hj2pvw53PGfevLXl6QDuc5XLybxsE1z3FIjQYLRy
+ Esa9wfQpmY9CxSfcAWBERAZBS31nPItLwMIZQUEyyvEPpvSffvpzEGpoPliJYC3P9PfHZUDNi
+ PwZORCXBaDN4Dpft7SrHPmaCk3nTFJMYTSK6lntm4ZJQ4/kuO5LOqOK2y7WHGP1i27i1xiest
+ 1Rw6uXkgtkd4QWEBnNglBxg5xHJMVOULWIdRaZpUIBKnnn1td+6S+7iyFajCZ0GbgCegMtNPS
+ Rg5cjOJH8pfKdkfnrYn2T2LVTncyAGt78+ZKWy/5rguxY0NEv+NkIY1uHoXMTUEr9gWqcQUAE
+ PXNOjQVaiZVms4LyiSEbUky1n+JLlXTgxHsaF79CMKvubZuHhEIPBUB8e4l5mKXXDXtOHU03R
+ q/MlV/5kS+mCsgaTL6AqufZ4JEQvorOVpaQS2iZfWV6aXeIwVhp4gpGfpMiXVE
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,82 +124,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, slp@redhat.com, alex.bennee@linaro.org,
- qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Marlies Ruck <marlies.ruck@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Josh Kunz <jkz@google.com>, Matus Kysel <mkysel@tachyum.com>,
+ "milos.stojanovic@rt-rk.com" <milos.stojanovic@rt-rk.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/01/2020 15:02, Liam Merwick wrote:
-
-[... deleted ...]
-
+Le 03/02/2020 à 23:58, Taylor Simpson a écrit :
+> 
+> 
+>> -----Original Message-----
+>> From: Laurent Vivier <laurent@vivier.eu>
+>> Sent: Saturday, February 1, 2020 6:28 AM
+>> To: qemu-devel@nongnu.org
+>> Cc: Josh Kunz <jkz@google.com>; milos.stojanovic@rt-rk.com; Matus Kysel
+>> <mkysel@tachyum.com>; Aleksandar Markovic <aleksandar.markovic@rt-
+>> rk.com>; Marlies Ruck <marlies.ruck@gmail.com>; Laurent Vivier
+>> <laurent@vivier.eu>; Peter Maydell <peter.maydell@linaro.org>; Taylor
+>> Simpson <tsimpson@quicinc.com>; Riku Voipio <riku.voipio@iki.fi>
+>> Subject: [PATCH 2/4] linux-user: cleanup signal.c
 >>
->>>>>
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 :returns: path of the e=
-xtracted file
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cwd =3D os.getcwd()
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 os.chdir(self.workdir)
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 process.run("rpm2cpio %=
-s | cpio -id %s" % (rpm, path),=20
->>>>> shell=3DTrue)
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 os.chdir(cwd)
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return self.workdir + '=
-/' + path
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ^
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 Is the extra slash needed? (just because th=
-e extract_from_deb()
->>>> =C2=A0=C2=A0=C2=A0=C2=A0 doesn't put it)
->>>>
->>>
->>>
->>> Yes, I needed to put it in there because the 'path' passed in for
->>> processing by cpio is a relative patch unlike the deb arg so it
->>> couldn't be just appended to 'self.workdir' which doesn't end in a '/=
-'.
+>> -------------------------------------------------------------------------
+>> CAUTION: This email originated from outside of the organization.
+>> -------------------------------------------------------------------------
 >>
+>> No functionnal changes. Prepare the field for future fixes.
+> 
+> 
+> Spelling error
+
+Sorry, french word. Will be changed by "functional"
+
+> 
 >>
->> It is a good practice use the `os.path` module methods when dealing=20
->> with filesystem paths. So that can be replaced with:
+>> Remove memset(.., 0, ...) that is useless on a static array
 >>
->> =C2=A0>>> os.path.normpath(os.path.join('/path/to/workdir', './file/in=
-/rpm'))
->> '/path/to/workdir/file/in/rpm'
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>  linux-user/signal.c | 37 ++++++++++++++++++++++---------------
+>>  1 file changed, 22 insertions(+), 15 deletions(-)
 >>
->=20
->=20
-> Will do.=C2=A0 I'll add a patch to fix extract_from_deb() too.
+>> diff --git a/linux-user/signal.c b/linux-user/signal.c index
+>> 5ca6d62b15d3..f42a2e1a82a5 100644
+>> --- a/linux-user/signal.c
+>> +++ b/linux-user/signal.c
+>> @@ -66,12 +66,6 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
+>>      [SIGPWR] = TARGET_SIGPWR,
+>>      [SIGSYS] = TARGET_SIGSYS,
+>>      /* next signals stay the same */
+>> -    /* Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
+>> -       host libpthread signals.  This assumes no one actually uses SIGRTMAX :-/
+>> -       To fix this properly we need to do manual signal delivery multiplexed
+>> -       over a single host signal.  */
+>> -    [__SIGRTMIN] = __SIGRTMAX,
+>> -    [__SIGRTMAX] = __SIGRTMIN,
+>>  };
+>>  static uint8_t target_to_host_signal_table[_NSIG];
+>>
+>> @@ -480,13 +474,18 @@ static int core_dump_signal(int sig)
+>>      }
+>>  }
+>>
+>> -void signal_init(void)
+>> +static void signal_table_init(void)
+>>  {
+>> -    TaskState *ts = (TaskState *)thread_cpu->opaque;
+>> -    struct sigaction act;
+>> -    struct sigaction oact;
+>>      int i, j;
+>> -    int host_sig;
+>> +
+>> +    /*
+>> +     * Nasty hack: Reverse SIGRTMIN and SIGRTMAX to avoid overlap with
+>> +     * host libpthread signals.  This assumes no one actually uses SIGRTMAX :-
+>> /
+>> +     * To fix this properly we need to do manual signal delivery multiplexed
+>> +     * over a single host signal.
+>> +     */
+>> +    host_to_target_signal_table[__SIGRTMIN] = __SIGRTMAX;
+>> +    host_to_target_signal_table[__SIGRTMAX] = __SIGRTMIN;
+>>
+>>      /* generate signal conversion tables */
+>>      for(i = 1; i < _NSIG; i++) {
+>> @@ -497,14 +496,22 @@ void signal_init(void)
+>>          j = host_to_target_signal_table[i];
+> 
+> Since you are cleaning up this code, let's give this a more descriptive name - target_sig would be consistent with host_sig used elsewhere.
 
-Using the exact same code didn't work with extract_from_deb() because=20
-the callers set 'path' to an absolute path (so os.path.join() drops the=20
-self.workdir part).  I'll include a patch with the following change and=20
-it can be dropped if people think using os.path.relpath() is too much of=20
-a hack.
+I agree.
 
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -49,7 +49,12 @@ class BootLinuxConsole(Test):
-          process.run("ar x %s %s" % (deb, file_path))
-          archive.extract(file_path, self.workdir)
-          os.chdir(cwd)
--        return self.workdir + path
-+        # Return complete path to extracted file.  We need to use
-+        # os.path.relpath() because callers specify 'path' with a leadin=
-g
-+        # slash which causes os.path.join() to interpret it as an absolu=
-te
-+        # path and to drop self.workdir part.
-+        return os.path.normpath(os.path.join(self.workdir,
-+                                             os.path.relpath(path, '/'))=
-)
-
-      def extract_from_rpm(self, rpm, path):
-          """
-
-Regards,
-Liam
+Thanks,
+Laurent
 
