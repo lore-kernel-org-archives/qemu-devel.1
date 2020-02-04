@@ -2,80 +2,117 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E3D1C35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D30C35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:36:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC29E20730
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:24:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 849B620730
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:36:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GzPFNDmg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC29E20730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LusjqrUa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 849B620730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz049-0002vC-Uz
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 10:24:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41260)
+	id 1iz0FB-0007eH-KX
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 10:36:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46781)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iz03Q-0002IG-EN
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:23:57 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iz0EK-00074r-QY
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:35:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iz03O-0001xA-Mp
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:23:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28337
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iz03O-0001sj-GT
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:23:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580829833;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OGi9IIcyUk1XmiLj6EKWRUyxWG1emSceCAWGnoUxcJM=;
- b=GzPFNDmgBzJ08b92T/6MK9Q4Atp2DUUBM4zW1jmzBxCI2jnld6M6Od6cdiTY3VnkkZDOBw
- RCG8qVzgRO/X/LU+GXrWcTUmYCjG+2ckUJhucAtOOfEcaM6lEY2CgmfxHEN0KGSkSQ3Ruv
- nuURwjVWB/wXZ7iw3UnQV95LMb9tZEE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-x-K2vMQ1NKKmsXwTE68xIw-1; Tue, 04 Feb 2020 10:23:34 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B81B8010F1;
- Tue,  4 Feb 2020 15:23:32 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E94360BF7;
- Tue,  4 Feb 2020 15:23:22 +0000 (UTC)
-Date: Tue, 4 Feb 2020 16:23:20 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Message-ID: <20200204162320.67e5d353@redhat.com>
-In-Reply-To: <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
-References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
- <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: x-K2vMQ1NKKmsXwTE68xIw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iz0EJ-00045b-MT
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:35:12 -0500
+Received: from mail-eopbgr60090.outbound.protection.outlook.com
+ ([40.107.6.90]:55911 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iz0EF-0003fD-CC; Tue, 04 Feb 2020 10:35:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Vu5EfVRwL6ruPswPrF1LG5boUgjr2m+LNcm3OThsqVHCarE07NpDMr39kAIo+oG9Sve1Ggw+eBIzNkK8NFr2mZ8R5aTcwCZVqgm/FwKWAHNTl2Xm2a266Ww0yflxOwCyV476m8sAYtddPHFXsvvNjyk9OsqDpAmZ0JaNyv89PWwlEiI7wQF5SlPhNb/X4ufi0NcAEKuiy/lafpjTfAPR3WDaxjGPCPmAT2GTsLeehZVa71AcDXb3S64qpFjBy/synjLyjOorAB5QQPb8r58TNZQ5dwwKCC0EtDtlkEMMsMXf7wt0HLGAgg+n8/8O5VHjKt8Kt/4NqvmWvWwqE8Tl1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B+V4+6hh+80csyNS03XgKRRGTU1d0es9bABNVkrkbEE=;
+ b=gVAvQCpURj/TjTzW8/6mmX3K5Wz9xH7uXh6w8AjH4N8aJWc2Ne8v2UsrjrSzb58eY65+lDn7JyMpjtdKYqvkDyWHwqdu/C1jFivTN5YxOou9DYattziK5e34FrUBvuo7rugAaGqgA8HekyFCmbSpaSce1WOCO3ontglYXBXY3tF88507AO6HDw2UJi5rRAlVyXrpa3hosgUuvYGIRJwKS7YC407v0MuMCYJGwm1NtZgbbobwe2TZkNCwUSdKGg+4HUqTwKaBLax7MhjLneLhGX9UFo38MW4alKco7hNkv4Qz3XDQtJmJD8q7vX0iLg7XMSTPeTChd5n4729zSvU62A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B+V4+6hh+80csyNS03XgKRRGTU1d0es9bABNVkrkbEE=;
+ b=LusjqrUaYeYtYbgjJ6+lbj6/loqTGqoYAEHi8N4VoGKu8TyJoPyNeT+IFrMEBQvriFi6LFhqvx5zQqz2+Hor4vi/FSQVKHTJTezdpKLo6iYgp+q17xcYUQcpBqnx348y4hqPIwONlP5IXL2Cz1H26P4TCLLoK1oqlqwqN2ZhSJg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB5254.eurprd08.prod.outlook.com (10.255.34.79) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.32; Tue, 4 Feb 2020 15:35:04 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.034; Tue, 4 Feb 2020
+ 15:35:04 +0000
+Subject: Re: [PATCH 09/17] block: Refactor bdrv_has_zero_init{,_truncate}
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200131174436.2961874-1-eblake@redhat.com>
+ <20200131174436.2961874-10-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200204183501295
+Message-ID: <339f0a60-1e4f-286c-6594-1153bf284082@virtuozzo.com>
+Date: Tue, 4 Feb 2020 18:35:01 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200131174436.2961874-10-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-ClientProxiedBy: HE1P192CA0023.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::33)
+ To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+MIME-Version: 1.0
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1P192CA0023.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.27 via Frontend Transport; Tue, 4 Feb 2020 15:35:03 +0000
+X-Tagtoolbar-Keys: D20200204183501295
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d5c20a8a-410c-4f85-7a63-08d7a987ce3a
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5254:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB5254A74DCDD50507E0CA21A3C1030@AM6PR08MB5254.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 03030B9493
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(366004)(396003)(39850400004)(136003)(346002)(376002)(199004)(189003)(5660300002)(478600001)(66556008)(66946007)(16576012)(8936002)(54906003)(316002)(31696002)(7416002)(66476007)(6486002)(52116002)(2906002)(86362001)(31686004)(186003)(8676002)(4326008)(956004)(16526019)(36756003)(2616005)(81156014)(81166006)(26005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5254;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gcZ/+1lkzJ76S7gKbd2FE2aZY5u5m01OqSoPleQ4q6iwhBOKzTxU7J3mztIzfrmrZBCbUQFUqKTYcjhuorHsfgoEMbenXyCELp8dQnI1LeqvHwRYDJkuGSoVnB+X6lYmLcznw/+BoG7unoK3ELQZzn0aBXQnasjzHMAcv0wUFUHm6VM5+r+ht0ILVgk76ILBlogoA6j7u/vk3WWuitWoCUKOkHwl+4UKNLwoQ2t3CJSOvhOecpfGHYRWdIeLGMKjh/AJHQuPNpQA/n9Kp8EYlSBatLRZeL8KVmWNFfZdZHm9h+3DkoANMHzpK+p4wEb6vtWeO8xGhHecqqd2SpeXFs0MbXnYtRydm6fIdOq807J1K5kJX0wyEgE3nlv2U2mHHep54pXfMTc3XakSp8/v7sjUnOkPf06FucgdEnDmeFHqA0cmu1VUls0B+3Iqwv/w
+X-MS-Exchange-AntiSpam-MessageData: /6Xd7iLcrjSDo4AxJGBeQ3PDO9j+mrpgQPaYd38UL9UOxagF9ZuMgFVjPifx68B/HteBkfwblFU5/wBQ6MVqL25ZTvT8dn1NuMocywThHqQi22+Y6GBEZgPJQ0xVh/NOYkWH8cEOJBfbaesEgam5Bg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5c20a8a-410c-4f85-7a63-08d7a987ce3a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2020 15:35:04.3511 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nPxNerH9CjwJqsOjTHy3MHsPKNySc9+8AwH3coi1iwoT+AOsng4m4iXOEu2QhSlLnnTNzxFpQ7GA9bqB9XYqORDzywALmzYKb8Q9MQvyp+4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5254
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.90
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,139 +124,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, mst@redhat.com,
- shannon.zhaosl@gmail.com, David Hildenbrand <david@redhat.com>,
- qemu-devel@nongnu.org, xuwei5@hisilicon.com, linuxarm@huawei.com,
- eric.auger@redhat.com, qemu-arm@nongnu.org, lersek@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Peter Lieven <pl@kamp.de>, "Richard W.M. Jones" <rjones@redhat.com>,
+ mreitz@redhat.com, david.edmondson@oracle.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Liu Yuan <namei.unix@gmail.com>, Jason Dillaman <dillaman@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Jan 2020 17:45:16 +0000
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+31.01.2020 20:44, Eric Blake wrote:
+> Having two slightly-different function names for related purposes is
+> unwieldy, especially since I envision adding yet another notion of
+> zero support in an upcoming patch.  It doesn't help that
+> bdrv_has_zero_init() is a misleading name (I originally thought that a
+> driver could only return 1 when opening an already-existing image
+> known to be all zeroes; but in reality many drivers always return 1
+> because it only applies to a just-created image).  Refactor all uses
+> to instead have a single function that returns multiple bits of
+> information, with better naming and documentation.
 
-> If ACPI blob length modifications happens after the initial
-> virt_acpi_build() call, and the changed blob length is within
-> the PAGE size boundary, then the revised size is not seen by
-> the firmware on Guest reboot. The is because in the
-> virt_acpi_build_update() -> acpi_ram_update() -> qemu_ram_resize()
-> path, qemu_ram_resize() uses used_length (ram_block size which is
-> aligned to PAGE size) and the "resize callback" to update the size
-> seen by firmware is not getting invoked.
+Sounds good
+
 > 
-> Hence make sure callback is called if the new size is different
-> from original requested size.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
-> Please find the previous discussions on this issue here,
-> https://patchwork.kernel.org/patch/11174947/
-> 
-> But this one attempts a different solution to fix it by introducing
-> req_length var to RAMBlock struct. 
+> No semantic change, although some of the changes (such as to qcow2.c)
+> require a careful reading to see how it remains the same.
 > 
 
-looks fine to me, so
-Acked-by: Igor Mammedov <imammedo@redhat.com>
+...
 
-CCing David who touches this area in his latest series for and
-might have an opinion on how it should be handled.
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 6cd566324d95..a6a227f50678 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
 
-> ---
->  exec.c                  | 36 +++++++++++++++++++++++-------------
->  include/exec/ram_addr.h |  5 +++--
->  2 files changed, 26 insertions(+), 15 deletions(-)
+Hmm, header file in the middle of the patch, possibly you don't use
+[diff]
+     orderFile = scripts/git.orderfile
+
+in git config.. Or it is broken.
+
+> @@ -85,6 +85,28 @@ typedef enum {
+>       BDRV_REQ_MASK               = 0x3ff,
+>   } BdrvRequestFlags;
 > 
-> diff --git a/exec.c b/exec.c
-> index d4b769d0d4..9ce33992f8 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2123,16 +2123,18 @@ static int memory_try_enable_merging(void *addr, size_t len)
->   * resize callback to update device state and/or add assertions to detect
->   * misuse, if necessary.
->   */
-> -int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
-> +int qemu_ram_resize(RAMBlock *block, ram_addr_t size, Error **errp)
->  {
-> -    assert(block);
-> +    ram_addr_t newsize;
->  
-> -    newsize = HOST_PAGE_ALIGN(newsize);
-> +    assert(block);
->  
-> -    if (block->used_length == newsize) {
-> +    if (block->req_length == size) {
->          return 0;
->      }
->  
-> +    newsize = HOST_PAGE_ALIGN(size);
+> +typedef enum {
+> +    /*
+> +     * bdrv_known_zeroes() should include this bit if the contents of
+> +     * a freshly-created image with no backing file reads as all
+> +     * zeroes without any additional effort.  If .bdrv_co_truncate is
+> +     * set, then this must be clear if BDRV_ZERO_TRUNCATE is clear.
+
+I understand that this is preexisting logic, but could I ask: why? What's wrong
+if driver can guarantee that created file is all-zero, but is not sure about
+file resizing? I agree that it's normal for these flags to have the same value,
+but what is the reason for this restriction?..
+
+So, the only possible combination of flags, when they differs, is create=0 and
+truncate=1.. How is it possible?
+
+> +     * Since this bit is only reliable at image creation, a driver may
+> +     * return this bit even for existing images that do not currently
+> +     * read as zero.
+> +     */
+> +    BDRV_ZERO_CREATE        = 0x1,
 > +
->      if (!(block->flags & RAM_RESIZEABLE)) {
->          error_setg_errno(errp, EINVAL,
->                           "Length mismatch: %s: 0x" RAM_ADDR_FMT
-> @@ -2149,13 +2151,19 @@ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
->          return -EINVAL;
->      }
->  
-> -    cpu_physical_memory_clear_dirty_range(block->offset, block->used_length);
-> -    block->used_length = newsize;
-> -    cpu_physical_memory_set_dirty_range(block->offset, block->used_length,
-> -                                        DIRTY_CLIENTS_ALL);
-> -    memory_region_set_size(block->mr, newsize);
-> +    block->req_length = size;
+> +    /*
+> +     * bdrv_known_zeroes() should include this bit if growing an image
+> +     * with PREALLOC_MODE_OFF (either with no backing file, or beyond
+> +     * the size of the backing file) will read the new data as all
+> +     * zeroes without any additional effort.  This bit only matters
+> +     * for drivers that set .bdrv_co_truncate.
+> +     */
+> +    BDRV_ZERO_TRUNCATE      = 0x2,
+> +} BdrvZeroFlags;
 > +
-> +    if (newsize != block->used_length) {
-> +        cpu_physical_memory_clear_dirty_range(block->offset,
-> +                                              block->used_length);
-> +        block->used_length = newsize;
-> +        cpu_physical_memory_set_dirty_range(block->offset, block->used_length,
-> +                                            DIRTY_CLIENTS_ALL);
-> +        memory_region_set_size(block->mr, newsize);
-> +    }
-> +
->      if (block->resized) {
-> -        block->resized(block->idstr, newsize, block->host);
-> +        block->resized(block->idstr, block->req_length, block->host);
->      }
->      return 0;
->  }
-> @@ -2412,16 +2420,18 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, ram_addr_t max_size,
->                                    MemoryRegion *mr, Error **errp)
->  {
->      RAMBlock *new_block;
-> +    ram_addr_t newsize;
->      Error *local_err = NULL;
->  
-> -    size = HOST_PAGE_ALIGN(size);
-> +    newsize = HOST_PAGE_ALIGN(size);
->      max_size = HOST_PAGE_ALIGN(max_size);
->      new_block = g_malloc0(sizeof(*new_block));
->      new_block->mr = mr;
->      new_block->resized = resized;
-> -    new_block->used_length = size;
-> +    new_block->req_length = size;
-> +    new_block->used_length = newsize;
->      new_block->max_length = max_size;
-> -    assert(max_size >= size);
-> +    assert(max_size >= newsize);
->      new_block->fd = -1;
->      new_block->page_size = qemu_real_host_page_size;
->      new_block->host = host;
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index 5adebb0bc7..fd13082224 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -31,8 +31,9 @@ struct RAMBlock {
->      uint8_t *host;
->      uint8_t *colo_cache; /* For colo, VM's ram cache */
->      ram_addr_t offset;
-> -    ram_addr_t used_length;
-> -    ram_addr_t max_length;
-> +    ram_addr_t req_length; /* Original requested size, used if RAM_RESIZEABLE */
-> +    ram_addr_t used_length; /* aligned to qemu_host_page_size */
-> +    ram_addr_t max_length; /*  aligned to qemu_host_page_size */
->      void (*resized)(const char*, uint64_t length, void *host);
->      uint32_t flags;
->      /* Protected by iothread lock.  */
 
+...
+
+
+-- 
+Best regards,
+Vladimir
 
