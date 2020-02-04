@@ -2,119 +2,98 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B2BC35247
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D57C3524D
 	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 16:10:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C757920730
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 16:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 563BD20730
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 16:10:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="W9fC++vx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C757920730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NiOhRQcK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563BD20730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz0mk-0000Xs-SV
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 11:10:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37704)
+	id 1iz0ml-0000ao-ID
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 11:10:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37825)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iz0jq-0004Av-56
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:07:47 -0500
+ (envelope-from <philmd@redhat.com>) id 1iz0kA-0004vB-JZ
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iz0jo-0006VT-My
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:07:46 -0500
-Received: from mail-am6eur05on2129.outbound.protection.outlook.com
- ([40.107.22.129]:34016 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iz0jk-0006Id-2n; Tue, 04 Feb 2020 11:07:40 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IQmBSrjt+cc0vRaFnYzQS4iFc+YcoDlVywqiGVEcz+sYxYvFEiax6YbHpDT4WS6JmObr70gpd7MzY7V6Eqk5donJ94a/fsqVQSgO7ZApRHKeyUI3FX/kMHuaPfwOBUgDDYXkhgK1jh/u+ZrwYW9WoWBS9yoTt/t0vNf7hH2ve0NfQp2AMYUSjmzq5Pja4SfTOK/SmG1i1V3Cw9PRMsOTrWsbEysGPZUGZSF1T+hmhcc7EIPXSF3JZQ6liJ6zgBG1JLgo958PGsOyhr4hd9uq2+LfuuML2O7qA9Vbr1+4QaRVYRLfosRxS4Z3Hj/rLmUpQgypkKGvmIqUiSzcWTfXoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k5MbLq/1IIAnZSusS4gG/Z2Nm64wO1mskvP12pkA1us=;
- b=TbdlWXimrGyUahQ+9b9nmwDfg0emUxJaX+28pPdnn/mXeFwpgfmd5MgI0a7cTBJ9S9GrNiPvBZlA3+Bth1qh/Cmb6wsV6pv2W8RkFxi5FCK2Fk2y57ibB3xyPPbRAy0haiS72uvo04TQw3bgYhB3sp+uCqS4N2pRGn6PdBj17mAnwCV16uk+jkBOJFp3MyfpSPMJIMch30W48rzhTJkHfT/RWmqZnV9LWZoYjbnENLnJlJKXUZDD6+Xko+Kslj3FfSVs4+mjsG/sVCLQ3VhlMD44YmjEGt2XOKtAal0UIi9w+9aJrldbnc8zRsk9qJgCJeUE944cNEeF56eiOQ0Pjw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k5MbLq/1IIAnZSusS4gG/Z2Nm64wO1mskvP12pkA1us=;
- b=W9fC++vxDfQCmD78CYhJBKtC2nt5QuEiKd4BGUazj3ODFfr4rG/rUua3iJeIqbZvCWcLddZFfeYWAePI/7tUa9UofQgG4T6xHsNNGHCKTiA+LXjrUN76qU/ailBK2bwelquhuSYcR0mDTTiEhyULWu09CzpqfwObJSIbbp/VGJo=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3526.eurprd08.prod.outlook.com (20.177.115.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.33; Tue, 4 Feb 2020 16:07:37 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.034; Tue, 4 Feb 2020
- 16:07:37 +0000
-Subject: Re: [PATCH 09/17] block: Refactor bdrv_has_zero_init{,_truncate}
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200131174436.2961874-1-eblake@redhat.com>
- <20200131174436.2961874-10-eblake@redhat.com>
- <339f0a60-1e4f-286c-6594-1153bf284082@virtuozzo.com>
- <6247aca7-4a2e-ffa9-6336-4c1e71f63d96@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200204190734382
-Message-ID: <9ca73263-17bd-e72c-0c0e-ac7a54ba4578@virtuozzo.com>
-Date: Tue, 4 Feb 2020 19:07:34 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <6247aca7-4a2e-ffa9-6336-4c1e71f63d96@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1P18901CA0006.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:3:8b::16) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <philmd@redhat.com>) id 1iz0k8-0007KA-C5
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:08:06 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47437
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iz0k8-0007I5-7s
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:08:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580832483;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Mp4Gj/TzoHQZoGGJc2ktciNqWHdcRqjXeC6laX0gjl4=;
+ b=NiOhRQcKCBAQGS2EW6pr2gFCOTfPLFt5cQydl96vuXmaKUlHzJNgJxv0tNEUUes/efETQ6
+ UrVvHXzcnAhFBobD4NSM+/pqpqBwnsM4Srk0QuJzaxs9TJHIjeQRhX2vLQlO25vwcda6xO
+ xsy1D04UBDxigGl44IH1Az6mNHehxz0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-689S_zvLPDa3znbJ7hu8cA-1; Tue, 04 Feb 2020 11:08:00 -0500
+Received: by mail-wm1-f69.google.com with SMTP id y125so1149429wmg.1
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 08:07:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=GolQCDLcWStaY3lluMhv6Tsrkkt5aaGfx6eFswOajXE=;
+ b=A9NVCD/2IOzyktNaYLIpqZwI2ZYwsPJC+6IYjPampDOHhlD/3LqPlIaKSpIdx2cgS6
+ Dx7mkYdz3+oRNCIu+KKSEKSyo2+sAevJYMRr4UlQ87RJqKfBXwxY5K0xnkQitF3SfTvO
+ sdNtH3HQfgPTr0l69J6XRn87ZMTwogJfBO82xsGNlPQhLlcACgN3kgEmRS399pIXATaG
+ qQOQuc7b1oy8hg+nIMETM0JavOGtznDeYnelGhoqVeRV6yMLT+QTCLjcoiqCJsQbcdmc
+ LAalXm/5MGMslTfY8WA0zwxIFlqLEbmwwWQroOOXQfkZekGieDCSOODQexTy2Xa8TCeu
+ J6QA==
+X-Gm-Message-State: APjAAAW+hEcupppEmafJdfGIioc6rsZcappzTmyDAd65liJDYtkkN6hz
+ Ljm+A3DFocN5sx0URMB5hII5BthNUyLDzheQYJGkNE3YMq6BObcI3h7UnclwGeCPd5riaHr7pmj
+ eIptSL9Zq1J+2WHg=
+X-Received: by 2002:a7b:c652:: with SMTP id q18mr6406824wmk.123.1580832478620; 
+ Tue, 04 Feb 2020 08:07:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx9S/i4Mxfg5INZI9DMeoQI7RxqdRe3AtZUqSdS+K3rX6ORXXnmZN/A8jfKg/D2qTQQ+Otlng==
+X-Received: by 2002:a7b:c652:: with SMTP id q18mr6406804wmk.123.1580832478380; 
+ Tue, 04 Feb 2020 08:07:58 -0800 (PST)
+Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
+ [83.52.55.162])
+ by smtp.gmail.com with ESMTPSA id y1sm18159332wrq.16.2020.02.04.08.07.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Feb 2020 08:07:57 -0800 (PST)
+Subject: Re: [PATCH] drop "from __future__ import print_function"
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200204160604.19883-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <86185404-c4bc-b35d-eedc-9d95d1698379@redhat.com>
+Date: Tue, 4 Feb 2020 17:07:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1P18901CA0006.EURP189.PROD.OUTLOOK.COM (2603:10a6:3:8b::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.27 via Frontend Transport; Tue, 4 Feb 2020 16:07:36 +0000
-X-Tagtoolbar-Keys: D20200204190734382
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fec1dd19-5300-46aa-0d6a-08d7a98c5a96
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3526:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3526D0C420C8382A9C39DE26C1030@AM6PR08MB3526.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-Forefront-PRVS: 03030B9493
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(39850400004)(396003)(346002)(376002)(366004)(136003)(199004)(189003)(54906003)(956004)(2616005)(16576012)(316002)(2906002)(66556008)(5660300002)(66476007)(66946007)(478600001)(86362001)(8936002)(31686004)(8676002)(81166006)(81156014)(52116002)(7416002)(4326008)(16526019)(186003)(26005)(53546011)(36756003)(6486002)(31696002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3526;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Sp9frJSBsB3aZ77q0zMmqxtsZKJbZ9HZg/VuyLnsoVKeh5ps3a+x2i9sUZmvt9ybbAvN5F3/Y4ZxkeF2PHQlXVjOpEFjIQxGIGpP/KCA+rPo5u4r+m7rxfi38E5SxeZxq1vKfBvllyheOJKx9SeKWlKO4EyqUT3LDkjecqoUj8zJemQwn8bkY0KrVjRwbg2KytltDfNnxu6BKVRp/OLce7hQM0K4ccYBK46M/qhotOT12zbUCVcSr0htQ3a0/9BYhGWg84sJ+imlJooJfgpPXAxpPKe/wxNNdjLU4OC5ovSYPvtmiA/qDc4TfuGtFl5FoZG02sBttWyWtrbfyZ92PDni4cOtZZxW098xXIJCZ3967GDBVHlnnKhGeV288oud3m+kcm5+YXDVhq9e0TP7N+BUDA/ojdYNN44SYcs51mwJ59VGxp+O3/7x39WWZDHX
-X-MS-Exchange-AntiSpam-MessageData: R1bH51gFyF6HPn+L54Q+rsBuffa0srIpdDnHV9T/iJCqe6mvG2LqOfpYdyulcPZ/CbugLDPvcdxXgwy+lp+hLS8abocvTsLP5cHRFXKF4p9AhUzL8VporC1Fp/8XThynA06HQ/XWrT0C3gF+I9hqVg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fec1dd19-5300-46aa-0d6a-08d7a98c5a96
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2020 16:07:37.8362 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /2+PM/8uoTrXjZDantnmtSAed4kO7OZEb/pTsoU9mivL4B8/WcC023sJ6oVQ8HFa+/oizFxiivOXNnGaKGOK5c1ZKi4Zj4llC6tvOeU/VLo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3526
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.22.129
+In-Reply-To: <20200204160604.19883-1-pbonzini@redhat.com>
+Content-Language: en-US
+X-MC-Unique: 689S_zvLPDa3znbJ7hu8cA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,143 +105,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
- Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
- Peter Lieven <pl@kamp.de>, "Richard W.M. Jones" <rjones@redhat.com>,
- mreitz@redhat.com, david.edmondson@oracle.com,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
- Liu Yuan <namei.unix@gmail.com>, Jason Dillaman <dillaman@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-04.02.2020 18:49, Eric Blake wrote:
-> On 2/4/20 9:35 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 31.01.2020 20:44, Eric Blake wrote:
->>> Having two slightly-different function names for related purposes is
->>> unwieldy, especially since I envision adding yet another notion of
->>> zero support in an upcoming patch.=C2=A0 It doesn't help that
->>> bdrv_has_zero_init() is a misleading name (I originally thought that a
->>> driver could only return 1 when opening an already-existing image
->>> known to be all zeroes; but in reality many drivers always return 1
->>> because it only applies to a just-created image).=C2=A0 Refactor all us=
-es
->>> to instead have a single function that returns multiple bits of
->>> information, with better naming and documentation.
->>
->> Sounds good
->>
->>>
->>> No semantic change, although some of the changes (such as to qcow2.c)
->>> require a careful reading to see how it remains the same.
->>>
->>
->> ...
->>
->>> diff --git a/include/block/block.h b/include/block/block.h
->>> index 6cd566324d95..a6a227f50678 100644
->>> --- a/include/block/block.h
->>> +++ b/include/block/block.h
->>
->> Hmm, header file in the middle of the patch, possibly you don't use
->> [diff]
->> =C2=A0=C2=A0=C2=A0=C2=A0 orderFile =3D scripts/git.orderfile
->>
->> in git config.. Or it is broken.
+On 2/4/20 5:06 PM, Paolo Bonzini wrote:
+> This is only needed for Python 2, which we do not support anymore.
 >=20
-> I do have it set up, so I'm not sure why it didn't work as planned. I'll =
-make sure v2 follows the order I intended.
+> Based-on: <20200204160028.16211-1-pbonzini@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   scripts/analyse-9p-simpletrace.py        | 1 -
+>   scripts/analyse-locks-simpletrace.py     | 1 -
+>   scripts/device-crash-test                | 1 -
+>   scripts/dump-guest-memory.py             | 1 -
+>   scripts/kvm/kvm_flightrecorder           | 1 -
+>   scripts/kvm/vmxcap                       | 1 -
+>   scripts/minikconf.py                     | 1 -
+>   scripts/modules/module_block.py          | 1 -
+>   scripts/qapi-gen.py                      | 1 -
+>   scripts/qapi/doc.py                      | 1 -
+>   scripts/qmp/qemu-ga-client               | 1 -
+>   scripts/qmp/qmp                          | 1 -
+>   scripts/qmp/qmp-shell                    | 1 -
+>   scripts/qmp/qom-get                      | 1 -
+>   scripts/qmp/qom-list                     | 1 -
+>   scripts/qmp/qom-set                      | 1 -
+>   scripts/qmp/qom-tree                     | 1 -
+>   scripts/replay-dump.py                   | 1 -
+>   scripts/signrom.py                       | 1 -
+>   scripts/simpletrace.py                   | 1 -
+>   scripts/vmstate-static-checker.py        | 1 -
+>   tests/docker/travis.py                   | 1 -
+>   tests/guest-debug/test-gdbstub.py        | 1 -
+>   tests/migration/guestperf/engine.py      | 1 -
+>   tests/migration/guestperf/plot.py        | 1 -
+>   tests/migration/guestperf/shell.py       | 1 -
+>   tests/qapi-schema/test-qapi.py           | 1 -
+>   tests/qemu-iotests/149                   | 1 -
+>   tests/qemu-iotests/165                   | 1 -
+>   tests/qemu-iotests/iotests.py            | 1 -
+>   tests/qemu-iotests/nbd-fault-injector.py | 1 -
+>   tests/qemu-iotests/qcow2.py              | 1 -
+>   tests/qemu-iotests/qed.py                | 1 -
+>   tests/vm/basevm.py                       | 1 -
+>   34 files changed, 34 deletions(-)
 >=20
->>
->>> @@ -85,6 +85,28 @@ typedef enum {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_REQ_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0x3ff,
->>> =C2=A0 } BdrvRequestFlags;
->>>
->>> +typedef enum {
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * bdrv_known_zeroes() should include this bit=
- if the contents of
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * a freshly-created image with no backing fil=
-e reads as all
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * zeroes without any additional effort.=C2=A0=
- If .bdrv_co_truncate is
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * set, then this must be clear if BDRV_ZERO_T=
-RUNCATE is clear.
->>
->> I understand that this is preexisting logic, but could I ask: why? What'=
-s wrong
->> if driver can guarantee that created file is all-zero, but is not sure a=
-bout
->> file resizing? I agree that it's normal for these flags to have the same=
- value,
->> but what is the reason for this restriction?..
->=20
-> For _this_ patch, my goal is to preserve pre-existing practice. Where we =
-think pre-existing practice is wrong, we can then improve it in other patch=
-es (see patch 6, for example).
+> diff --git a/scripts/analyse-9p-simpletrace.py b/scripts/analyse-9p-simpl=
+etrace.py
+> index f20050fddd..7dfcb6ba2f 100755
+> --- a/scripts/analyse-9p-simpletrace.py
+> +++ b/scripts/analyse-9p-simpletrace.py
+> @@ -3,7 +3,6 @@
+>   # Usage: ./analyse-9p-simpletrace <trace-events> <trace-pid>
+>   #
+>   # Author: Harsh Prateek Bora
+> -from __future__ import print_function
+>   import os
+>   import simpletrace
 
-This is OK, of course, I'm just trying to understand existing logic.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
->=20
-> I _think_ the reason for this original limitation is as follows: If an im=
-age can be resized, we could choose to perform 'create(size=3D0), truncate(=
-size=3Dfinal)' instead of 'create(size=3Dfinal)', and we want to guarantee =
-the same behavior. If truncation can't guarantee a zero read, then why is c=
-reation doing so?
-
-If we want to guarantee the same behavior, we should restrict any differenc=
-e between these flags :)
-
->=20
-> But as I did not write the original patch, I would welcome Max's input wi=
-th regards to the thought behind commit ceaca56f.
->=20
->>
->> So, the only possible combination of flags, when they differs, is create=
-=3D0 and
->> truncate=3D1.. How is it possible?
->=20
-> qcow2 had that mode, at least before patch 5.
-
-yes, it reported even for encrypted images truncate=3D1...
-
->=20
->>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Since this bit is only reliable at image cr=
-eation, a driver may
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * return this bit even for existing images th=
-at do not currently
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * read as zero.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 BDRV_ZERO_CREATE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D 0x1,
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * bdrv_known_zeroes() should include this bit=
- if growing an image
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * with PREALLOC_MODE_OFF (either with no back=
-ing file, or beyond
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * the size of the backing file) will read the=
- new data as all
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * zeroes without any additional effort.=C2=A0=
- This bit only matters
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * for drivers that set .bdrv_co_truncate.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 BDRV_ZERO_TRUNCATE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-=3D 0x2,
->>> +} BdrvZeroFlags;
->>> +
->>
->> ...
->>
->>
->=20
-
-
---=20
-Best regards,
-Vladimir
 
