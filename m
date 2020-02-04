@@ -2,82 +2,124 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D4FC3524D
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AEEC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:53:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6AA620730
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:42:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D8CD2082E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 13:53:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JS488xAw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6AA620730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="uh61r0ev"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D8CD2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=partner.samsung.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyyTL-0001G2-Rh
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 08:42:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40807)
+	id 1iyyds-0005cs-B3
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 08:53:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51517)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iyySi-0000nn-94
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:41:57 -0500
+ (envelope-from <i.kotrasinsk@partner.samsung.com>)
+ id 1iyydH-0004yd-5e
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:52:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iyySg-0001m8-Sc
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:41:56 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55976)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iyySg-0001gk-MA
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:41:54 -0500
-Received: by mail-wm1-x344.google.com with SMTP id q9so3336014wmj.5
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 05:41:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=KZ1yjvCkqv8EnscBB8sv9Blg0R/jIrNsPMibRGIXBrk=;
- b=JS488xAwj7FDHJoLCXC8Krj8SYCE+pNrSavOVaX33gS1UtMd9fv5o4TwGENiDWl1y+
- Kkhgv330H1WJ6ksQQXhPY6cxQd6jmkHx6Z/5YCcqScDnZfNlWqCUCJerPwI/Vw/2izna
- wLizZoi/IwsFGDXLEDXoHk/4xSRtazAWoZxC5JRnzDJA+I00tVcVaOBmC179wA0kXIUN
- /dvBtRX9m4N2d+Hgdj/8ZHgJqgzoVAlFLGN/C8vLaUropbBEch1E3bWnQAXJe+HH+nNY
- LFcdqHBXyQmf/IghwOYOYJvk/JGhCM2P0aFS38nhcpJRvdi90lyZCaC3m/aSDeXHVhHa
- tAzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=KZ1yjvCkqv8EnscBB8sv9Blg0R/jIrNsPMibRGIXBrk=;
- b=fIsOieK7LBTpRjL0UZdA0vbyTIRl1wvFAEDFJEJGcY+FlPIGVaUWLi1pABh6dWOUP+
- Zlt4iW1xLadeV49JgUjymhpVHnOxOAQ26xCdwNT/ixUBwV9WaW85uxeK8oCrF6GR0dOs
- PFCSB1+Zkwmf9YlAKB7sLXZEAPzw9ogwEqcF+GKfDdJHtUqr2Irp2qVzmy7bleRSGDfU
- 8ZtRdU+CPNpfh7hM9xwTI+MdMiDR4ir+Yb63BSlPusnjZJSCOVamZQZkC3cZbMLxtExQ
- 9jObkl8Dwnu3tNdPjjhSXKi9pxkvUjoCK/QogvlkUYJSVKFlcPF7C+coAE9BwSL3cNgH
- cWLw==
-X-Gm-Message-State: APjAAAUIrTFExs7gSjL6iRrfLbh+5xdKJsHC6umsOkT9s/y5b5txS7Gr
- hz0wq76xCNM8/w7uyXsaE4uxnfChSELCHIsxiiI=
-X-Google-Smtp-Source: APXvYqwbm5SnOhUE4FpxjmhuPbLEJk1GtWQpJNa9tOWB+uZ/E8znpQvt4lAhXUp+79U3m7YzTv4VjQcCwKvlQMJL57Y=
-X-Received: by 2002:a7b:ce94:: with SMTP id q20mr6132560wmj.4.1580823713689;
- Tue, 04 Feb 2020 05:41:53 -0800 (PST)
+ (envelope-from <i.kotrasinsk@partner.samsung.com>)
+ id 1iyydG-00043o-34
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:52:51 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:54129)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <i.kotrasinsk@partner.samsung.com>)
+ id 1iyydF-0003pl-Rr
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 08:52:50 -0500
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+ by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
+ 20200204135246euoutp0271568f22ca7013bd6f3308205b9ec08b~wN2LV2xA62970929709euoutp02D
+ for <qemu-devel@nongnu.org>; Tue,  4 Feb 2020 13:52:46 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
+ 20200204135246euoutp0271568f22ca7013bd6f3308205b9ec08b~wN2LV2xA62970929709euoutp02D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+ s=mail20170921; t=1580824366;
+ bh=xjlXSJKRhLmXo312u29NGHLXgTrGAKzhiX3732kJ8aM=;
+ h=To:Subject:Cc:From:Date:References:From;
+ b=uh61r0evS6o96Vg2UniN0yHH82u+rOM/qKIOfbbq4eB+bnz39WuWjLCOjhjKM+QnE
+ /00TNHy/UVUNNpRrWGr9HIZwVkwlmWJytwvTqa3TICbdV57SWhZGhMbCZXZNkq4AFd
+ txs/lVUssujoOkLw2vwNA9hC9uE+RnsWC1I2hhlA=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+ eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+ 20200204135246eucas1p2882ea79765740fdc9133a60f1f74eba9~wN2LKcyDB0100401004eucas1p2W;
+ Tue,  4 Feb 2020 13:52:46 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+ eusmges1new.samsung.com (EUCPMTA) with SMTP id 81.55.61286.E27793E5; Tue,  4
+ Feb 2020 13:52:46 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+ eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+ 20200204135246eucas1p1a61f44fc7b057dd242d0d98d5b3e2414~wN2K4T84Q0242502425eucas1p1w;
+ Tue,  4 Feb 2020 13:52:46 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+ eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+ 20200204135246eusmtrp16f29b065c8508b453e8a8f9ade26a270~wN2K3w_4J0571105711eusmtrp15;
+ Tue,  4 Feb 2020 13:52:46 +0000 (GMT)
+X-AuditID: cbfec7f2-f0bff7000001ef66-26-5e39772e52c4
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+ eusmgms1.samsung.com (EUCPMTA) with SMTP id 2F.F0.08375.E27793E5; Tue,  4
+ Feb 2020 13:52:46 +0000 (GMT)
+Received: from [106.120.51.21] (unknown [106.120.51.21]) by
+ eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+ 20200204135246eusmtip2d01200730ed987fcef59eec02f6ae2ef~wN2KpzYcX2867328673eusmtip29;
+ Tue,  4 Feb 2020 13:52:46 +0000 (GMT)
+To: david@redhat.com
+Subject: Re: [PATCH v1 06/13] util/mmap-alloc: Factor out reserving of a
+ memory region to mmap_reserve()
+From: =?UTF-8?Q?Igor_Kotrasi=c5=84ski?= <i.kotrasinsk@partner.samsung.com>
+Message-ID: <f7a85b6b-71a9-4952-a406-a7be4edc2356@partner.samsung.com>
+Date: Tue, 4 Feb 2020 14:52:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200204131601.125677-1-felipe@nutanix.com>
-In-Reply-To: <20200204131601.125677-1-felipe@nutanix.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 4 Feb 2020 14:41:41 +0100
-Message-ID: <CAJ+F1CJLvKtSnFFurBUy4LcP+DqNTtqHd4oevJADfW8JEVuXXA@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] Improve default object property_add uint helpers
-To: Felipe Franciosi <felipe@nutanix.com>, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrHIsWRmVeSWpSXmKPExsWy7djPc7p65ZZxBu+/KVh8Xf+L2eJ47w4W
+ ByaPJ9c2M3m833eVLYApissmJTUnsyy1SN8ugStj284VbAX7mSv+fXZuYPzB1MXIySEhYCLR
+ 9eksWxcjF4eQwApGiaZbh1ggnC+MEu87X0E5nxklfs14wwzT8vT5dhYQW0hgOaPE7u2MEPZb
+ RokDU81BbBEBEYkfD1+CxYUFsiQ+HvzPDmIzC0hKLL56kRXEZhPwkrg/cSVYDa+Am8StZceB
+ 4hwcLAIqEv+bxEFMUYEIidNfEyEqBCVOznzCAjFFXmL72znMELa4xK0n85lAzpQQeM4m8fB4
+ B9RnLhKPm1eyQdjCEq+Ob2GHsGUkTk/uYYGw6yVa7uyAau5glOhbOR2qwVriy4alLCBHMAto
+ SqzfpQ9iSgg4SlzarQ1h8knceCsIcQKfxKRt05khwrwSHW1CEDP0JLqf3GSCWbqs8RHUUg+J
+ XZuusk5gVJyF5LFZSB6bheSxWQgnLGBkWcUonlpanJueWmyYl1quV5yYW1yal66XnJ+7iRGY
+ Kk7/O/5pB+PXS0mHGAU4GJV4eC/YWcQJsSaWFVfmHmKU4GBWEuE9r28ZJ8SbklhZlVqUH19U
+ mpNafIhRmoNFSZzXeNHLWCGB9MSS1OzU1ILUIpgsEwenVAOjRdBGw+lBrfcKq3rCbQ5Fei+5
+ PP3Wl37T8v8LfNb2OSz94FxZ0dX0O690gtLmi6/Wt+l1yQk+OZMSr3ptkew5P0OLglm9XxfG
+ 7M88GbfD4Zzimr9TK5hd+P4s8Vt9T2DLmsUGe2NyzxiUh2Uu3FCT8q3j5J6V0oeFs+ufzH9n
+ MOGbwj3BHSsNlFiKMxINtZiLihMB7sz3ohEDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpnkeLIzCtJLcpLzFFi42I5/e/4PV29css4g+UPBCy+rv/FbHG8dweL
+ A5PHk2ubmTze77vKFsAUpWdTlF9akqqQkV9cYqsUbWhhpGdoaaFnZGKpZ2hsHmtlZKqkb2eT
+ kpqTWZZapG+XoJexbecKtoL9zBX/Pjs3MP5g6mLk5JAQMJF4+nw7SxcjF4eQwFJGiYbpE9gh
+ EjISP06vYYOwhSX+XOtigyh6zSixdOUJsCIRARGJHw9fMnYxcgAluCVWNweBhIUFsiQ+HvwP
+ VsIsICmx+OpFVhCbTcBL4v7ElYwgNq+Am8StZcdZQVpZBFQk/jeJg4RFBSIknm+/AVUiKHFy
+ 5hMWiDFmEvM2P2SGsOUltr+dA2WLS9x6Mp9pAqPgLCQts5C0zELSMgtJywJGllWMIqmlxbnp
+ ucWGesWJucWleel6yfm5mxiBkbDt2M/NOxgvbQw+xCjAwajEw3vBziJOiDWxrLgy9xCjBAez
+ kgjveX3LOCHelMTKqtSi/Pii0pzU4kOMpkD/TGSWEk3OB0ZpXkm8oamhuYWlobmxubGZhZI4
+ b4fAwRghgfTEktTs1NSC1CKYPiYOTqkGxpkmER2V9/80Pk8xWyT7Or2oNt3Q+1fQshj7HWIJ
+ PCk9PMm/zDd/6t0sKs8j9zjwf1n8GYmGz9zr8+seritfUfjHKpJzivzbmJCC6RrWBxLZxVfW
+ FYtzduo7blJivHT//aE5eT4ejc6/j5Wxrz7xqW5SyZb0FfHnDqoUyGzKWrbL4uvq1AOblViK
+ MxINtZiLihMBd1rSJpoCAAA=
+X-CMS-MailID: 20200204135246eucas1p1a61f44fc7b057dd242d0d98d5b3e2414
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20200204135246eucas1p1a61f44fc7b057dd242d0d98d5b3e2414
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200204135246eucas1p1a61f44fc7b057dd242d0d98d5b3e2414
+References: <CGME20200204135246eucas1p1a61f44fc7b057dd242d0d98d5b3e2414@eucas1p1.samsung.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 210.118.77.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,95 +131,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Phillipe Mathieu-Daude <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
-
-On Tue, Feb 4, 2020 at 2:16 PM Felipe Franciosi <felipe@nutanix.com> wrote:
+> We want to reserve a memory region without actually populating memory.
+> Let's factor that out.
 >
-> This improves the family of object_property_add_uintXX_ptr helpers by ena=
-bling
-> a default getter/setter only when desired. To prevent an API behavioural =
-change
-> (from clients that already used these helpers and did not want a setter),=
- we
-> add a OBJ_PROP_FLAG_READ flag that allow clients to only have a getter. P=
-atch 1
-> enhances the API and modify current users.
->
-> While modifying the clients of the API, a couple of improvement opportuni=
-ties
-> were observed in ich9. These were added in separate patches (2 and 3).
->
-> Patch 4 cleans up a lot of existing code by moving various objects to the
-> enhanced API. Previously, those objects had their own getters/setters tha=
-t only
-> updated the values without further checks. Some of them actually lacked a=
- check
-> for setting overflows, which could have resulted in undesired values bein=
-g set.
-> The new default setters include a check for that, not updating the values=
- in
-> case of errors (and propagating them). If they did not provide an error
-> pointer, then that behaviour was maintained.
->
-> Felipe Franciosi (4):
->   qom/object: enable setter for uint types
->   ich9: fix getter type for sci_int property
->   ich9: Simplify ich9_lpc_initfn
->   qom/object: Use common get/set uint helpers
->
->  hw/acpi/ich9.c       |  99 ++------------------
->  hw/acpi/pcihp.c      |   7 +-
->  hw/acpi/piix4.c      |  12 +--
->  hw/isa/lpc_ich9.c    |  27 ++----
->  hw/misc/edu.c        |  13 +--
->  hw/pci-host/q35.c    |  14 +--
->  hw/ppc/spapr.c       |  18 +---
->  hw/ppc/spapr_drc.c   |   3 +-
->  include/qom/object.h |  48 ++++++++--
->  memory.c             |  15 +--
->  qom/object.c         | 212 ++++++++++++++++++++++++++++++++++++++-----
->  target/arm/cpu.c     |  22 +----
->  target/i386/sev.c    | 106 ++--------------------
->  ui/console.c         |   4 +-
->  14 files changed, 282 insertions(+), 318 deletions(-)
+> Cc: "Michael S. Tsirkin" <address@hidden>
+> Cc: Greg Kurz <address@hidden>
+> Cc: Murilo Opsfelder Araujo <address@hidden>
+> Cc: Eduardo Habkost <address@hidden>
+> Cc: "Dr. David Alan Gilbert" <address@hidden>
+> Signed-off-by: David Hildenbrand <address@hidden>
+> ---
+Reviewed-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
 
-Series:
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Paolo, would you queue it?
-
->
-> --
-> 2.20.1
->
-> Changelog:
-> v1->v2:
-> - Update sci_int directly instead of using stack variable
-> - Defining an enhanced ObjectPropertyFlags instead of just 'readonly'
-> - Erroring out directly (instead of using gotos) on default setters
-> - Retaining lack of errp passing when it wasn't there
-> v2->v3:
-> - Rename flags _RD to _READ and _WR to _WRITE
-> - Add a convenience _READWRITE flag
-> - Drop the usage of UL in the bit flag definitions
-> v3->v4:
-> - Drop changes to hw/vfio/pci-quirks.c
-> v4->v5:
-> - Rebase on latest master
-> - Available here: https://github.com/franciozzy/qemu/tree/autosetters
-> v5->v6:
-> - Fix build error introduced in rebase
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
 
