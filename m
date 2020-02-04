@@ -2,56 +2,91 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16342C3524A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 05:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC4B7C3524A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 06:17:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D949420674
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 05:11:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D949420674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9803D20674
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 06:17:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1KOgJvj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9803D20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyqUm-0003WP-3S
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 00:11:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48481)
+	id 1iyrWs-0005pE-P8
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 01:17:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhukeqian1@huawei.com>) id 1iyqU4-00030A-Kp
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 00:10:49 -0500
+ (envelope-from <thuth@redhat.com>) id 1iyrW5-0005QR-Sr
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:16:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhukeqian1@huawei.com>) id 1iyqU3-00046l-Dz
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 00:10:48 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:41470 helo=huawei.com)
+ (envelope-from <thuth@redhat.com>) id 1iyrW3-0001ub-Te
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:16:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45015
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhukeqian1@huawei.com>)
- id 1iyqU0-0002n0-Mu; Tue, 04 Feb 2020 00:10:44 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 68DF8C6E135F0EF27316;
- Tue,  4 Feb 2020 13:10:36 +0800 (CST)
-Received: from linux-TFkxOR.huawei.com (10.175.104.212) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 4 Feb 2020 13:10:29 +0800
-From: Keqian Zhu <zhukeqian1@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH] migration: Optimization about wait-unplug migration state
-Date: Tue, 4 Feb 2020 13:08:41 +0800
-Message-ID: <20200204050841.44453-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.19.1
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iyrW3-0001pv-HY
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:16:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580797014;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=nPNphcsFfpOPkbjI7mRdEurkvu2+BLbpS3usTYZoYY0=;
+ b=i1KOgJvjPoS4eEuzBhLcAoxEHPkbYMX9kbB2V0LamVb9WqW9bIxOFuoqU2whN41erof0zj
+ Vo58nubV3Pp1LasTU0kBJ8hIhSYu0O3kk1al+sHMgmXdvTHIYni7hZOjwnwO1Hr2eoUcBm
+ QKJLPSfbwIhh5ut7dgvzd8E/Z+sH9o0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-eNzkYEBxMfuuoghCUs3Ifw-1; Tue, 04 Feb 2020 01:16:53 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFD91DB23;
+ Tue,  4 Feb 2020 06:16:50 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-39.ams2.redhat.com [10.36.116.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 01E9A90F4D;
+ Tue,  4 Feb 2020 06:16:47 +0000 (UTC)
+Subject: Re: VW ELF loader
+To: Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
+ <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
+ <20200203012842.GD52446@umbus.fritz.box>
+ <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
+ <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
+ <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
+ <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
+ <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
+ <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
+ <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <d13eea1d-7942-47e0-6189-a66ce9639db4@redhat.com>
+Date: Tue, 4 Feb 2020 07:16:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.212]
-X-CFilter-Loop: Reflected
+In-Reply-To: <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: eNzkYEBxMfuuoghCUs3Ifw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,110 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- wanghaibin.wang@huawei.com, jfreimann@redhat.com,
- Keqian Zhu <zhukeqian1@huawei.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>, qemu-devel <qemu-devel@nongnu.org>,
+ Cornelia Huck <conny@cornelia-huck.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu_savevm_nr_failover_devices() is originally designed to
-get the number of failover devices, but it actually returns
-the number of "unplug-pending" failover devices now. Moreover,
-what drives migration state to wait-unplug should be the number
-of "unplug-pending" failover devices, not all failover devices.
+On 04/02/2020 00.26, Paolo Bonzini wrote:
+>=20
+>=20
+> Il mar 4 feb 2020, 00:20 Alexey Kardashevskiy <aik@ozlabs.ru
+> <mailto:aik@ozlabs.ru>> ha scritto:
+>=20
+>     Speaking seriously, what would I put into the guest?
+>=20
+> Only things that would be considered drivers. Ignore the partitions
+> issue for now so that you can just pass the device tree services to QEMU
+> with hypercalls.
+>=20
+>     Netboot's dhcp/tftp/ip/ipv6 client? It is going to be another SLOF,
+>     smaller but adhoc with only a couple of people knowing it.
+>=20
+>=20
+> You can generalize and reuse the s390 code. All you have to write is the
+> PCI scan and virtio-pci setup.
 
-We can also notice that qemu_savevm_state_guest_unplug_pending()
-and qemu_savevm_nr_failover_devices() is equivalent almost (from
-the code view). So the latter is incorrect semantically and
-useless, just delete it.
+Well, for netbooting, the s390-ccw bios uses the libnet code from SLOF,
+so re-using this for a slim netboot client on ppc64 would certainly be
+feasible (especially since there are also already virtio drivers in SLOF
+that are written in C), but I think it is not very future proof. The
+libnet from SLOF only supports UDP, and no TCP. So for advanced boot
+scenarios like booting from HTTP or even HTTPS, you need something else
+(i.e. maybe grub is the better option, indeed).
 
-In the qemu_savevm_state_guest_unplug_pending(), once hit a
-unplug-pending failover device, then it can return true right
-now to save cpu time.
-
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
-Cc: jfreimann@redhat.com
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
----
- migration/migration.c |  2 +-
- migration/savevm.c    | 24 +++---------------------
- migration/savevm.h    |  1 -
- 3 files changed, 4 insertions(+), 23 deletions(-)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index 3a21a4686c..deedc968cf 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3333,7 +3333,7 @@ static void *migration_thread(void *opaque)
-=20
-     qemu_savevm_state_setup(s->to_dst_file);
-=20
--    if (qemu_savevm_nr_failover_devices()) {
-+    if (qemu_savevm_state_guest_unplug_pending()) {
-         migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-                           MIGRATION_STATUS_WAIT_UNPLUG);
-=20
-diff --git a/migration/savevm.c b/migration/savevm.c
-index f19cb9ec7a..1d4220ece8 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1140,36 +1140,18 @@ void qemu_savevm_state_header(QEMUFile *f)
-     }
- }
-=20
--int qemu_savevm_nr_failover_devices(void)
-+bool qemu_savevm_state_guest_unplug_pending(void)
- {
-     SaveStateEntry *se;
--    int n =3D 0;
-=20
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-         if (se->vmsd && se->vmsd->dev_unplug_pending &&
-             se->vmsd->dev_unplug_pending(se->opaque)) {
--            n++;
--        }
--    }
--
--    return n;
--}
--
--bool qemu_savevm_state_guest_unplug_pending(void)
--{
--    SaveStateEntry *se;
--    int n =3D 0;
--
--    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
--        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
--            continue;
--        }
--        if (se->vmsd->dev_unplug_pending(se->opaque)) {
--            n++;
-+            return true;
-         }
-     }
-=20
--    return n > 0;
-+    return false;
- }
-=20
- void qemu_savevm_state_setup(QEMUFile *f)
-diff --git a/migration/savevm.h b/migration/savevm.h
-index c42b9c80ee..ba64a7e271 100644
---- a/migration/savevm.h
-+++ b/migration/savevm.h
-@@ -31,7 +31,6 @@
-=20
- bool qemu_savevm_state_blocked(Error **errp);
- void qemu_savevm_state_setup(QEMUFile *f);
--int qemu_savevm_nr_failover_devices(void);
- bool qemu_savevm_state_guest_unplug_pending(void);
- int qemu_savevm_state_resume_prepare(MigrationState *s);
- void qemu_savevm_state_header(QEMUFile *f);
---=20
-2.19.1
+ Thomas
 
 
