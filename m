@@ -3,60 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC54C35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7309FC35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:56:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7373C2084E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:55:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7373C2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 495392084E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:56:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 495392084E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz0Y1-0007BL-KL
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 10:55:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59306)
+	id 1iz0Yn-00083q-HS
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 10:56:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59871)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@pond.sub.org>) id 1iz0XQ-0006hB-C3
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:54:57 -0500
+ (envelope-from <bounces@canonical.com>) id 1iz0Y3-0007M7-Pz
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:55:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@pond.sub.org>) id 1iz0XO-0003dp-OU
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:54:56 -0500
-Received: from oxygen.pond.sub.org ([2a01:4f8:13b:3ad0:1::3]:39262)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@pond.sub.org>) id 1iz0XO-0003PU-Em
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:54:54 -0500
-Received: from blackfin.pond.sub.org (p4FD0571C.dip0.t-ipconnect.de
- [79.208.87.28])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (Client did not present a certificate)
- by oxygen.pond.sub.org (Postfix) with ESMTPSA id 50156715C3;
- Tue,  4 Feb 2020 16:54:51 +0100 (CET)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BDA4A11386A7; Tue,  4 Feb 2020 16:54:48 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Summary of Re: Making QEMU easier for management tools and
- applications
-References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
-Date: Tue, 04 Feb 2020 16:54:48 +0100
-Message-ID: <875zgm2vqv.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <bounces@canonical.com>) id 1iz0Y2-0006ot-Fj
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:55:35 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52982)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iz0Y2-0006lw-74
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:55:34 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iz0Y1-000304-9s
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 15:55:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3724B2E804A
+ for <qemu-devel@nongnu.org>; Tue,  4 Feb 2020 15:55:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:13b:3ad0:1::3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Feb 2020 15:48:42 -0000
+From: Maarten <1861884@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mvgijssel
+X-Launchpad-Bug-Reporter: Maarten (mvgijssel)
+X-Launchpad-Bug-Modifier: Maarten (mvgijssel)
+References: <158083099190.20144.2427615447806299744.malonedeb@wampee.canonical.com>
+Message-Id: <158083132308.27184.9025299138991480078.launchpad@soybean.canonical.com>
+Subject: [Bug 1861884] Re: qemu socket multicast not working
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: cc19c4d1c2d96c9d023b316b68e2fa154a45d394
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -65,126 +76,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-devel <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Reply-To: Bug 1861884 <1861884@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This thread has accumulated more than a hundred messages over seven
-weeks.  We need a summary.
+** Description changed:
 
-The conversation has gone in several directions.  In this message, I'll
-cover just the one I consider most important: machine-friendly initial
-configuration.  I'll do the rest later, if I have stamina left.
+  Running two qemu vms on the same socket multicast address:
+  =
 
-= QMP is fine for machines, CLI is not =
+  =C2=A0=C2=A0qemu-system-x86_64 -m 2048 -smp 2 -serial mon:stdio
+-     -display none -vga none
++ =C2=A0=C2=A0=C2=A0=C2=A0-display none -vga none
+  =C2=A0=C2=A0=C2=A0=C2=A0-nodefaults -accel hax
+  =C2=A0=C2=A0=C2=A0=C2=A0-netdev user,id=3Dmynet0
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dmynet0
+  =C2=A0=C2=A0=C2=A0=C2=A0-netdev socket,id=3Dvlan,mcast=3D239.192.0.1:1235
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dvlan
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-rng-pci
+  =C2=A0=C2=A0=C2=A0=C2=A0-drive file=3Dworker.qcow2,if=3Dvirtio
+  =C2=A0=C2=A0=C2=A0=C2=A0-drive file=3Dcloud-init.iso,format=3Draw,if=3Dvi=
+rtio
+  =
 
-We have two major external host interfaces: the CLI and QMP.  Compare:
+  The two machines have a static ip on the socket network interface,
+  192.168.100.11 and 192.168.100.12, but are unable to reach each other.
+  =
 
-QMP
-* Purpose: control at run-time
-* Commands with argument and return value
-* Events with argument value
-* Simple type system
-* Based on QAPI
-* Regular, well-defined syntax: QAPI schema on top of JSON
-* Documentation is required; actual documentation is of mixed quality
-* Introspectable, except for a few mostly QOM-related holes where we
-  bypass QAPI
-* Machine-friendly, complemented by human-only HMP
++ Result when using ping command
++ =
 
-CLI
-* Purpose: initial configuration
-* Options with argument
-* Based on a crazy zoo of QemuOpts (with and without dotted keys), QAPI
-  (only a few recent options), ad hoc parsers
-* Option argument syntax is mostly (variations of) key=value,...
-* QemuOpts' "type system" is "list of key-value pairs, where value can
-  be string, bool, (unsigned) integer, or size", optionally restricted
-  to known keys with known value types.
-* QAPI type system is the same as in QMP
-* Introspection is completely inadequate: misses options, incorrect
-  option names, misses option arguments partly or completely
-* Configuration files with INI-like syntax, completely inadequate: can't
-  do most options
-* Not machine-friendly
-* Maintaining it is a pain, evolving it is worse
++   PING 192.168.100.11 (192.168.100.11) 56(84) bytes of data.
++   From 192.168.100.12 icmp_seq=3D1 Destination Host Unreachable
++   From 192.168.100.12 icmp_seq=3D2 Destination Host Unreachable
++   From 192.168.100.12 icmp_seq=3D3 Destination Host Unreachable
++ =
 
-The inadequacy of the CLI has become a serious issue.
+  Is there additional configuration necessary on macos? Does this only
+- work on Linux?
++ work on Linux? Is there additional configuration required inside of the
++ guest OS?
+  =
 
-= Ways to provide machine-friendly initial configuration =
+  guest OS: Debian 10 (Buster)
+  host OS: macOS 10.15.2
+  qemu: 4.2.0
 
-Two ways to provide machine-friendly initial configuration on par with
-QMP have been proposed:
+-- =
 
-1. Extend QMP
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1861884
 
-   Machines use the CLI only to configure a QMP socket.  The remainder
-   of the CLI becomes human-only, with much relaxed compatibility rules.
+Title:
+  qemu socket multicast not working
 
-2. QAPIfy the CLI
+Status in QEMU:
+  New
 
-   Provide a machine-friendly CLI based on QAPI and JSON.  The current
-   CLI becomes human-only, with much relaxed compatibility rules.
+Bug description:
+  Running two qemu vms on the same socket multicast address:
 
-   Aside: I looked into cleaning up the human-only CLI at the same time,
-   but the need to maintain compatibility until the transition to the
-   machine-friendly CLI is complete makes this hard.  It needs to be
-   cleaned up, though.  More on that below.
+  =C2=A0=C2=A0qemu-system-x86_64 -m 2048 -smp 2 -serial mon:stdio
+  =C2=A0=C2=A0=C2=A0=C2=A0-display none -vga none
+  =C2=A0=C2=A0=C2=A0=C2=A0-nodefaults -accel hax
+  =C2=A0=C2=A0=C2=A0=C2=A0-netdev user,id=3Dmynet0
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dmynet0
+  =C2=A0=C2=A0=C2=A0=C2=A0-netdev socket,id=3Dvlan,mcast=3D239.192.0.1:1235
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dvlan
+  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-rng-pci
+  =C2=A0=C2=A0=C2=A0=C2=A0-drive file=3Dworker.qcow2,if=3Dvirtio
+  =C2=A0=C2=A0=C2=A0=C2=A0-drive file=3Dcloud-init.iso,format=3Draw,if=3Dvi=
+rtio
 
-To extend QMP, we wrap QMP commands around the internal initial
-configuration interfaces.  These QMP commands take arguments, but don't
-return anything.  Many of them will only make sense during initial
-configuration.  We'll want to express that in the schema, and enforce it
-in the QMP core.  Others will behave differently, e.g. cold plug during
-initial configuration, hot plug once the guest runs.
+  The two machines have a static ip on the socket network interface,
+  192.168.100.11 and 192.168.100.12, but are unable to reach each other.
 
-Configuration files are just QMP commands from the initial configuration
-subset read from a file instead of a chardev.  JSON is a poor choice for
-configuration files, and QMP's verbosity makes it poorer.  We'll want
-more suitable concrete syntax for configuration files.
+  Result when using ping command
 
-To improve the CLI, we wrap QAPI-based CLI options around the internal
-initial configuration interfaces.  We'll want some infrastructure to
-generate CLI option boilerplate, just like we generate QMP command
-boilerplate.
+    PING 192.168.100.11 (192.168.100.11) 56(84) bytes of data.
+    From 192.168.100.12 icmp_seq=3D1 Destination Host Unreachable
+    From 192.168.100.12 icmp_seq=3D2 Destination Host Unreachable
+    From 192.168.100.12 icmp_seq=3D3 Destination Host Unreachable
 
-Configuration files are just CLI options read from a file instead of
-argv[].  Again, we'll want a more suitable concrete syntax there.
+  Is there additional configuration necessary on macos? Does this only
+  work on Linux? Is there additional configuration required inside of
+  the guest OS?
 
-With an improved CLI, I'd expect machines to use configuration files so
-they don't have to mess with shell quoting.  With extended QMP, they'd
-perhaps rather reuse their existing QMP code to send the configuration
-down a socket.  Less efficient, but I doubt it'll matter.
+  guest OS: Debian 10 (Buster)
+  host OS: macOS 10.15.2
+  qemu: 4.2.0
 
-In both cases, the internal configuration interfaces need to be
-converted from QemuOpts to QAPI types.
-
-The one clear advantage of extending QMP is the ability to mix query
-commands with initial configuration.
-
-This is also a clear disadvantage: we need to make it work.  Existing
-QMP commands may rely on initial configuration to be complete.  We may
-have to allow only QMP commands we carefully checked.
-
-How important is the advantage?
-
-= Cleaning up the human-only CLI =
-
-In both cases, the existing CLI remains in a human-only role.  That's a
-truckload of messy code to maintain.  Not good.  Can we replace it by
-thin wrappers around the machine-friendly alternative, ideally
-incrementally?  Can we generate a useful part of these wrappers?
-
-If we QAPIfy the CLI, the QAPI generator already knows the CLI, and only
-has to be taught the general human-friendly key=value,... syntax, plus a
-way to specify exceptions.
-
-If we extend QMP, we'll additionally need some of the CLI QAPIfication
-infrastructure for this.  Hmm.
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1861884/+subscriptions
 
