@@ -2,79 +2,101 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 091C9C35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 16:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66887C35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 16:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8D9620730
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 16:13:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C70B20730
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 16:14:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e6BZWcto"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8D9620730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4uyG8N4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C70B20730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz0pR-0004KC-UO
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 11:13:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40065)
+	id 1iz0pu-0004vT-Ae
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 11:14:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39130)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iz0oP-0002xk-Ej
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:12:30 -0500
+ (envelope-from <philmd@redhat.com>) id 1iz0nU-0001as-8i
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:11:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iz0oO-00026b-1s
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:12:29 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:47066)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iz0oN-0001yz-RH
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:12:27 -0500
-Received: by mail-oi1-x242.google.com with SMTP id a22so18908434oid.13
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 08:12:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=XziSHugXOIjLqqAPsWOlY3trUdeMQp0RVEbYtjUUHCM=;
- b=e6BZWctoSe3Z0ZbvyEBpbo/NSyC66VaAwdOu8Ya0hrxB7DTMpuRsAJgGyd50auZydL
- lB6c9a6mxGZB2zoMiAMbMS6K/3TPX7+Q49wJDGsGmVFbEJpr/kYRCKiASPl0mRq9iG0h
- 0Th7qV2FrRZYgV7yfb83tkpY+FINexUmo8Dnlxz4ygjPTJ5ktPcrGn3RA4HUrhf6VdYc
- mibUqMRxEYyo0IH2M1s0HpcHkkIFJczzG3gZtCFzNdbUJo8M2TVhy9GdHy8pNlWg+wr7
- aYDyh4Kdru1ojQDjvG2eF+cXL1n+/mfo3oQp72XZ2X3TXMOYr8G5eIDF1V+Y4aStPHWt
- xP8A==
+ (envelope-from <philmd@redhat.com>) id 1iz0nS-0007Dm-Gi
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:11:31 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22935
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iz0nS-0007Ci-Cr
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 11:11:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580832689;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vDpB2ppW+BBB0Ii7NtkXQbKKpMQyhNIz+1zyHoo8rRc=;
+ b=h4uyG8N47wz1RuMMWYt0n0cLUjIei9UVHsj0WWM6Z9rcmE8rkaYEEwfFTAEiEnjw44ggOI
+ 5u0Qdg03yxHm/rmJ8UaRqAsqsQMyNAqQRH7GCktCEOdt5dKBFmfgQuk9QV9IlWfNjJYI6j
+ yy3gyAMMJR89pv5gF0nrW/G/AioX6MU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-LDapZWXtOF6bxJdgD-RxHw-1; Tue, 04 Feb 2020 11:11:14 -0500
+Received: by mail-wm1-f71.google.com with SMTP id y24so1466432wmj.8
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 08:11:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=XziSHugXOIjLqqAPsWOlY3trUdeMQp0RVEbYtjUUHCM=;
- b=OGJctWnt5JNL4XygxsCN3aaMjUGhm2XVDPxIGohHjyKOCgTGqsHgof3XyrE15Yr2SC
- rykO4iHhtEKB5dvJ8GEO9g4UV/5dXHt+qOUQRc0lZeQNYTdEfdA8mHZmE5g/s/yh53CX
- +wnLw0X7/6cazRQS/btO5JNB4o80MnfGV8Z2nTVtU89l1emuBZ0ErLEaL7FH59V2GU8F
- qnCPsseUl2+Bly8Yo1cpVKShmLwDfhG9XI0x8sgIXPWUdsBf3Jo7ZZHAgfzuXZto778i
- R8/CCFzNmRndnNv0S212sgQ1sR72t7XpnjI9y9m7/jcR7FQbMhw9fImVJlz8Z+fhBCvy
- Lp4g==
-X-Gm-Message-State: APjAAAWhxCJU9SRmgAv1m7Os7wTpxowHPiOnnjgX0r3oPvnA69CAGV7X
- uPBWiHgIwCpTvVqOecReBVx82o1zSW+PF8a1Sv7C9PAi
-X-Google-Smtp-Source: APXvYqySHDGLjpJeb80sT1Rk0+w8oLVVUH5V262XhZj0lBHyj2/WTBIqFvMQxgXNkjIcYqNWPm/5leIca4m7md+ToKk=
-X-Received: by 2002:aca:3d7:: with SMTP id 206mr3960405oid.98.1580832746502;
- Tue, 04 Feb 2020 08:12:26 -0800 (PST)
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fnIQPhTliso0rVmx+j5E8JyYeUSU4Es5zn7Q//Mu880=;
+ b=p6/BImgtKseFKTUtW7tA9Go5aKP1fxnbuugJxG4hy13eNtQI7dNhMBC8qGacUgQttO
+ F/IwuCiK7H4M3dT97TsAv+TmuTVe/TRNo7Ht58aKyjfGI0sLdH253to+iTHpvwX3cgx7
+ 2eDab2Xv9Ojr7p5jppoNFY4t297RbVxqx9Nr6uizIP/1RwAXf7jepSGBLtLKSsR5cwdt
+ CUrDh3L/CyKg/XnnT2DRCLix17SRSjzkwt6mvfVhkjSkXaV/71E/y4EkI0ouk1PYcdoe
+ d/7vWsTCwotMFTyg5vtfLOdjnldLLl498sTTB8FMkVF1gqKOMXc/Ukpn6pbhUadSAEjB
+ 9Xlw==
+X-Gm-Message-State: APjAAAVtHPTy5pF9Nq/toVVm5OdglQ5YCJclqYnnLCiEoNrOyBbfnMVI
+ ilXXwOaPG87uFs0i3E0K8FcutywhKUrW0LIEYnjzRydPZAHrXy3NOyB2bMiDd2swk4gWSfEUpkR
+ EG45GcsiG0LQyvCs=
+X-Received: by 2002:adf:a746:: with SMTP id e6mr22841253wrd.329.1580832673189; 
+ Tue, 04 Feb 2020 08:11:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwWB1anHXSyvamZx01dtS5aA8aRBQu6eINnrioed+BiIEx/ue+gmuzWnHubohXGi3zpFRdOEg==
+X-Received: by 2002:adf:a746:: with SMTP id e6mr22841241wrd.329.1580832672965; 
+ Tue, 04 Feb 2020 08:11:12 -0800 (PST)
+Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
+ [83.52.55.162])
+ by smtp.gmail.com with ESMTPSA id 133sm5130187wmd.5.2020.02.04.08.11.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Feb 2020 08:11:12 -0800 (PST)
+Subject: Re: [PATCH] scripts/signrom: remove Python 2 support, add shebang
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200204160028.16211-1-pbonzini@redhat.com>
+ <a1940860-ff53-ee17-bb28-bfae85bc4b98@redhat.com>
+ <ca7a1e44-8a8f-2e45-e6c3-37541648231d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8d18ae5a-031e-0ffc-01eb-befe0926e216@redhat.com>
+Date: Tue, 4 Feb 2020 17:11:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <1580803317-4422-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1580803317-4422-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Feb 2020 16:12:14 +0000
-Message-ID: <CAFEAcA86sDNv7hvbbTRc_u_7K1nDEOy5wASKm=Xd3AK9uoAQvA@mail.gmail.com>
-Subject: Re: [PULL v2 0/3] MIPS queue for February 4th, 2020
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <ca7a1e44-8a8f-2e45-e6c3-37541648231d@redhat.com>
+Content-Language: en-US
+X-MC-Unique: LDapZWXtOF6bxJdgD-RxHw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,51 +108,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 4 Feb 2020 at 08:02, Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> The following changes since commit f31160c7d1b89cfb4dd4001a23575b42141cb0ec:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-20200203' into staging (2020-02-03 11:14:24 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/AMarkovic/qemu tags/mips-queue-feb-04-2020
->
-> for you to fetch changes up to 7b77f048e21af71da7b82155f1f205ca7cebf1b4:
->
->   target/mips: Separate FPU-related helpers into their own file (2020-02-04 08:53:54 +0100)
->
-> ----------------------------------------------------------------
->
-> MIPS queue for February 4th, 2020
->
->   Content:
->
->     - fix for a recent regression in LL/SC
->     - mechanical reorganization of files containing helpers
->
->   Notes:
->
->     - v2 was sent because of a mistake in a comment in patch #3; the
->       commit message of patch #1 was improved as well
->     - six checkpatch errors and two warnings are benign and should be
->       ignored
->
+On 2/4/20 5:07 PM, Paolo Bonzini wrote:
+> On 04/02/20 17:02, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 2/4/20 5:00 PM, Paolo Bonzini wrote:
+>>> Based-on: <20200130163232.10446-1-philmd@redhat.com>
+>>> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>  =C2=A0 scripts/signrom.py | 12 ++++--------
+>>>  =C2=A0 1 file changed, 4 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/scripts/signrom.py b/scripts/signrom.py
+>>> index 313ee28a17..9be5dab1cf 100644
+>>> --- a/scripts/signrom.py
+>>> +++ b/scripts/signrom.py
+>>> @@ -1,3 +1,5 @@
+>>> +#!/usr/bin/env python3
+>>> +
+>>>  =C2=A0 from __future__ import print_function
+>>>  =C2=A0 #
+>>>  =C2=A0 # Option ROM signing utility
+>>> @@ -44,14 +46,8 @@ fout.write(data)
+>>>  =C2=A0 =C2=A0 checksum =3D 0
+>>>  =C2=A0 for b in data:
+>>> -=C2=A0=C2=A0=C2=A0 # catch Python 2 vs. 3 differences
+>>> -=C2=A0=C2=A0=C2=A0 if isinstance(b, int):
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 checksum +=3D b
+>>> -=C2=A0=C2=A0=C2=A0 else:
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 checksum +=3D ord(b)
+>>> -checksum =3D (256 - checksum) % 256
+>>> -
+>>> -# Python 3 no longer allows chr(checksum)
+>>> +=C2=A0=C2=A0=C2=A0 checksum =3D (checksum - b) & 255
+>>> +
+>>>  =C2=A0 fout.write(struct.pack('B', checksum))
+>>>  =C2=A0 =C2=A0 fin.close()
+>>>
+>>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>
+>> Also, applied to my python-next tree:
+>> https://gitlab.com/philmd/qemu/commits/python-next
+>=20
+> Oh, good.  So I've unqueued your series on which this is based.
 
+Aargh I received your "series queued" mail _after_ this patch.
 
-Applied, thanks.
+As you prefer, but I have various python patches pending already.
+If I keep "Explicit usage of Python 3" do you mind Acking it?
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+Thanks!
 
--- PMM
+Phil.
+
 
