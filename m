@@ -6,73 +6,76 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E79CC35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB5CC35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:52:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B08E20674
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88D262084E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 17:52:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jLXxoLm7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B08E20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0QTaPRP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88D262084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz2Lw-0001uZ-K1
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 12:51:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51493)
+	id 1iz2NJ-0003ed-Pp
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 12:52:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52737)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iz2LH-0001N6-W5
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:50:33 -0500
+ (envelope-from <eblake@redhat.com>) id 1iz2Me-0002vx-T3
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:51:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iz2LG-0008Ja-8p
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:50:31 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46630
+ (envelope-from <eblake@redhat.com>) id 1iz2Md-0001yB-NE
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:51:56 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60536
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iz2LG-0008Ch-4o
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:50:30 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iz2Md-0001wS-Im
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 12:51:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580838629;
+ s=mimecast20190719; t=1580838715;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6rilB3bwV8M0GR8ePKZw+TBs715slXw2YSNkh0DRKsA=;
- b=jLXxoLm7xYt+Xal0uImfp7MdOC+zCPjb7QZfeqHkidyLWGCcTDOiOP9EG/YHYwKZzv6asu
- 9kvbmGfecnemjueRJXryH849rJn4/TN67qpX3OjcxtnrtzJlgEQK0nHPrjqAj+qsiyzg3w
- sgcDGMEN29v6szuH8cATWMOTO0QSd2k=
+ bh=uHKU4SQodCHFPoWDOUHcEFmRUhJgjxIv1YDK6sY6tkc=;
+ b=U0QTaPRPvN2/TePBBhwklFU7bq7+S9mZRK3nTBoGcDeELTVia3XAAqXgkwkl+0NbjAk1Rs
+ J3oTfwMYXLDOqBK9ThIEerEJLy0kT+JKuxpB6A1LF2BihxK4XFJqaj7zQRZEFlwZtikAd2
+ xRrBugVYbvjDP0WVRZnzJtdurXJsxgE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-Plcqssz4OviADEFfqXsV6w-1; Tue, 04 Feb 2020 12:50:27 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-350-TieFpyBNNKKMVuCUviS1SA-1; Tue, 04 Feb 2020 12:51:53 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A87BD107BA98;
- Tue,  4 Feb 2020 17:50:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A625A8C0360;
+ Tue,  4 Feb 2020 17:51:51 +0000 (UTC)
 Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D000B867FD;
- Tue,  4 Feb 2020 17:50:22 +0000 (UTC)
-Subject: Re: [PATCH 10/17] block: Add new BDRV_ZERO_OPEN flag
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C05775C1B5;
+ Tue,  4 Feb 2020 17:51:33 +0000 (UTC)
+Subject: Re: [PATCH 09/17] block: Refactor bdrv_has_zero_init{,_truncate}
+To: Max Reitz <mreitz@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
 References: <20200131174436.2961874-1-eblake@redhat.com>
- <20200131174436.2961874-11-eblake@redhat.com>
- <d4df9a48-6fb6-3432-3189-54bb7c7bb20c@redhat.com>
+ <20200131174436.2961874-10-eblake@redhat.com>
+ <339f0a60-1e4f-286c-6594-1153bf284082@virtuozzo.com>
+ <62078ab7-b46f-cb70-ffb1-5e84c7e1bee5@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <5c19c0fe-f8d0-5011-7cc6-4bb46a46cedf@redhat.com>
-Date: Tue, 4 Feb 2020 11:50:22 -0600
+Message-ID: <89497824-33be-7238-982e-bd0edb2f5d00@redhat.com>
+Date: Tue, 4 Feb 2020 11:51:33 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <d4df9a48-6fb6-3432-3189-54bb7c7bb20c@redhat.com>
+In-Reply-To: <62078ab7-b46f-cb70-ffb1-5e84c7e1bee5@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Plcqssz4OviADEFfqXsV6w-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: TieFpyBNNKKMVuCUviS1SA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -90,59 +93,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david.edmondson@oracle.com, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Peter Lieven <pl@kamp.de>, "Richard W.M. Jones" <rjones@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, david.edmondson@oracle.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Liu Yuan <namei.unix@gmail.com>, Jason Dillaman <dillaman@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/4/20 11:34 AM, Max Reitz wrote:
+On 2/4/20 11:42 AM, Max Reitz wrote:
 
->> +++ b/include/block/block.h
->> @@ -105,6 +105,16 @@ typedef enum {
->>        * for drivers that set .bdrv_co_truncate.
->>        */
->>       BDRV_ZERO_TRUNCATE      =3D 0x2,
->> +
->> +    /*
->> +     * bdrv_known_zeroes() should include this bit if an image is
->> +     * known to read as all zeroes when first opened; this bit should
->> +     * not be relied on after any writes to the image.
+>>
+>> I understand that this is preexisting logic, but could I ask: why?
+>> What's wrong
+>> if driver can guarantee that created file is all-zero, but is not sure
+>> about
+>> file resizing? I agree that it's normal for these flags to have the same
+>> value,
+>> but what is the reason for this restriction?..
 >=20
-> Is there a good reason for this?  Because to me this screams like we are
-> going to check this flag without ensuring that the image has actually
-> not been written to yet.  So if it=E2=80=99s generally easy for drivers t=
-o stop
-> reporting this flag after a write, then maybe we should do so.
+> If areas added by truncation (or growth, rather) are always zero, then
+> the file can always be created with size 0 and grown from there.  Thus,
+> images where truncation adds zeroed areas will generally always be zero
+> after creation.
+>=20
+>> So, the only possible combination of flags, when they differs, is
+>> create=3D0 and
+>> truncate=3D1.. How is it possible?
+>=20
+> For preallocated qcow2 images, it depends on the storage whether they
+> are actually 0 after creation.  Hence qcow2_has_zero_init() then defers
+> to bdrv_has_zero_init() of s->data_file->bs.
+>=20
+> But when you truncate them (with PREALLOC_MODE_OFF, as
+> BlockDriver.bdrv_has_zero_init_truncate()=E2=80=99s comment explains), th=
+e new
+> area is always going to be 0, regardless of initial preallocation.
+>=20
+>=20
+> I just noticed a bug there, though: Encrypted qcow2 images will not see
+> areas added through growth as 0.  Hence, qcow2=E2=80=99s
+> bdrv_has_zero_init_truncate() implementation should not return true
+> unconditionally, but only for unencrypted images.
 
-In patch 15 (implementing things in qcow2), I actually wrote the driver=20
-to return live results, rather than just open-time results, in part=20
-because writing the bit to persistent storage in qcow2 means that the=20
-bit must be accurate, without relying on the block layer's help.
+Hence patch 5 earlier in the series :)
 
-But my pending NBD patch (not posted yet, but will be soon), the=20
-proposal I'm making for the NBD protocol itself is just open-time, not=20
-live, and so it would be more work than necessary to make the NBD driver=20
-report live results.
-
-But it seems like it should be easy enough to also patch the block layer=20
-itself to guarantee that callers of bdrv_known_zeroes() cannot see this=20
-bit set if the block layer has been used in any non-zero transaction, by=20
-repeating the same logic as used in qcow2 to kill the bit (any=20
-write/write_compressed/bdrv_copy clear the bit, any trim clears the bit=20
-if the driver does not guarantee trim reads as zero, any truncate clears=20
-the bit if the driver does not guarantee truncate reads as zero, etc).=20
-Basically, the block layer would cache the results of .bdrv_known_zeroes=20
-during .bdrv_co_open, bdrv_co_pwrite() and friends would update that=20
-cache, and and bdrv_known_zeroes() would report the cached value rather=20
-than a fresh call to .bdrv_known_zeroes.
-
-Are we worried enough about clients of this interface to make the block=20
-layer more robust?  (From the maintenance standpoint, the more the block=20
-layer guarantees, the easier it is to write code that uses the block=20
-layer; but there is the counter-argument that making the block layer=20
-track whether an image has been modified means a [slight] penalty to=20
-every write request to update the boolean.)
 
 --=20
 Eric Blake, Principal Software Engineer
