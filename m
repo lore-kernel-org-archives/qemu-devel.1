@@ -2,56 +2,81 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75989C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 10:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CCDC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 10:35:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DFFD20674
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 10:35:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DFFD20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 610CF20674
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 10:35:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gNRicseZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 610CF20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyvYF-0002ym-FJ
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 05:35:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58420)
+	id 1iyvYa-0003ZA-I7
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 05:35:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58609)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iyvXY-00028S-46
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 05:34:45 -0500
+ (envelope-from <drjones@redhat.com>) id 1iyvXm-0002Ua-E0
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 05:34:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iyvXW-0008HQ-Hj
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 05:34:44 -0500
-Resent-Date: Tue, 04 Feb 2020 05:34:44 -0500
-Resent-Message-Id: <E1iyvXW-0008HQ-Hj@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21186)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iyvXS-00085G-PZ; Tue, 04 Feb 2020 05:34:38 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1580812458075556.0112983862081;
- Tue, 4 Feb 2020 02:34:18 -0800 (PST)
-In-Reply-To: <20200204095208.269131-1-k.jensen@samsung.com>
-Subject: Re: [PATCH v5 00/26] nvme: support NVMe v1.3d,
- SGLs and multiple namespaces
-Message-ID: <158081245637.23546.13756536315779857970@a1bbccc8075a>
+ (envelope-from <drjones@redhat.com>) id 1iyvXl-0000Rb-7u
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 05:34:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20035
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iyvXl-0000P1-2d
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 05:34:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580812496;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=N2ppv8VdQFYEFb3YbQEdr4SJtjIEKEg19DLBErWYPcY=;
+ b=gNRicseZ0BtdEdDZOKj6sgX/5PJsM3ulQpVW/w/kPq75A5u3EGi7WqGvBZJ8KTOjU8dYIe
+ sh2Ng5vP29seEVCdIsJmu8jumZ9GRWcTuCrvoBF8z9HrGvhOPagbKXM27LVSj8HdNTQWlF
+ FebKOTufV8TT4XP38ADkmz5eadRj0mU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-Z-AHNODQMpS_xR1azR6Erw-1; Tue, 04 Feb 2020 05:34:52 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 443E9801A1F;
+ Tue,  4 Feb 2020 10:34:51 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A9DD8068E;
+ Tue,  4 Feb 2020 10:34:49 +0000 (UTC)
+Date: Tue, 4 Feb 2020 11:34:47 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Beata Michalska <beata.michalska@linaro.org>
+Subject: Re: [PATCH v2 1/2] target/arm: kvm: Inject events at the last stage
+ of sync
+Message-ID: <20200204103447.naw26xl2y2zbyrqb@kamzik.brq.redhat.com>
+References: <20200129202441.12745-1-beata.michalska@linaro.org>
+ <20200129202441.12745-2-beata.michalska@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: k.jensen@samsung.com
-Date: Tue, 4 Feb 2020 02:34:18 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20200129202441.12745-2-beata.michalska@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Z-AHNODQMpS_xR1azR6Erw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,114 +88,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, beata.michalska@linaro.org, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, kbusch@kernel.org, its@irrelevant.dk,
- javier.gonz@samsung.com
+Cc: peter.maydell@linaro.org, Christoffer.Dall@arm.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIwNDA5NTIwOC4yNjkx
-MzEtMS1rLmplbnNlbkBzYW1zdW5nLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHY1IDAwLzI2XSBudm1lOiBzdXBwb3J0IE5W
-TWUgdjEuM2QsIFNHTHMgYW5kIG11bHRpcGxlIG5hbWVzcGFjZXMKTWVzc2FnZS1pZDogMjAyMDAy
-MDQwOTUyMDguMjY5MTMxLTEtay5qZW5zZW5Ac2Ftc3VuZy5jb20KVHlwZTogc2VyaWVzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
-cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDIw
-NDA5NTIwOC4yNjkxMzEtMS1rLmplbnNlbkBzYW1zdW5nLmNvbSAtPiBwYXRjaGV3LzIwMjAwMjA0
-MDk1MjA4LjI2OTEzMS0xLWsuamVuc2VuQHNhbXN1bmcuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKYTcxMjhkYiBudm1lOiBtYWtlIGxiYSBkYXRhIHNpemUgY29uZmlndXJhYmxl
-CmEwZWIwYjUgbnZtZTogcmVtb3ZlIHJlZHVuZGFudCBOdm1lQ21kIHBvaW50ZXIgcGFyYW1ldGVy
-CjBlMWJkOGMgbnZtZTogY2hhbmdlIGNvbnRyb2xsZXIgcGNpIGlkCmYwNDZkYjQgcGNpOiBhbGxv
-Y2F0ZSBwY2kgaWQgZm9yIG52bWUKYTU5ZDU2MyBudm1lOiBzdXBwb3J0IG11bHRpcGxlIG5hbWVz
-cGFjZXMKZjZiNTdiYSBudm1lOiBhZGQgc3VwcG9ydCBmb3Igc2NhdHRlciBnYXRoZXIgbGlzdHMK
-NGY3ODAwNSBudm1lOiBoYW5kbGUgZG1hIGVycm9ycwo0ZTc1YjExIHBjaTogcGFzcyBhbG9uZyB0
-aGUgcmV0dXJuIHZhbHVlIG9mIGRtYV9tZW1vcnlfcncKYzA4MDY1ZCBudm1lOiB1c2UgcHJlYWxs
-b2NhdGVkIHFzZy9pb3YgaW4gbnZtZV9kbWFfcHJwCjNlYzBkOWYgbnZtZTogYWxsb3cgbXVsdGlw
-bGUgYWlvcyBwZXIgY29tbWFuZAo1NDBiOThmIG52bWU6IHJlZmFjdG9yIHBycCBtYXBwaW5nCjhm
-ZDRlNGMgbnZtZTogYnVtcCBzdXBwb3J0ZWQgc3BlY2lmaWNhdGlvbiB0byAxLjMKMTNmY2VhYiBu
-dm1lOiBtYWtlIHN1cmUgbmNxciBhbmQgbnNxciBpcyB2YWxpZAo2NmJmMzIxIG52bWU6IGFkZGl0
-aW9uYWwgdHJhY2luZwpiYmIzYzU4IG52bWU6IGFkZCBtaXNzaW5nIG1hbmRhdG9yeSBmZWF0dXJl
-cwo3N2I5NDU1IG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgYXN5bmNocm9ub3VzIGV2ZW50IHJl
-cXVlc3QgY29tbWFuZAo4Y2RjMTVjIG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgZ2V0IGxvZyBw
-YWdlIGNvbW1hbmQKZTYxMmU4MyBudm1lOiBhZGQgdGVtcGVyYXR1cmUgdGhyZXNob2xkIGZlYXR1
-cmUKZmZjMDM5YyBudm1lOiByZWZhY3RvciBkZXZpY2UgcmVhbGl6YXRpb24KMDYyMzAyNCBudm1l
-OiBhZGQgc3VwcG9ydCBmb3IgdGhlIGFib3J0IGNvbW1hbmQKMTFiODlkZiBudm1lOiByZWZhY3Rv
-ciBudm1lX2FkZHJfcmVhZApkOWY3YmYwIG52bWU6IHBvcHVsYXRlIHRoZSBtYW5kYXRvcnkgc3Vi
-bnFuIGFuZCB2ZXIgZmllbGRzCmY4NzE2ZDYgbnZtZTogYWRkIG1pc3NpbmcgZmllbGRzIGluIHRo
-ZSBpZGVudGlmeSBkYXRhIHN0cnVjdHVyZXMKNjdkOTFiMCBudm1lOiBtb3ZlIGRldmljZSBwYXJh
-bWV0ZXJzIHRvIHNlcGFyYXRlIHN0cnVjdAo1ZjcxMzk3IG52bWU6IHJlbW92ZSBzdXBlcmZsdW91
-cyBicmVha3MKZjgzZDY1YyBudm1lOiByZW5hbWUgdHJhY2UgZXZlbnRzIHRvIG52bWVfZGV2Cgo9
-PT0gT1VUUFVUIEJFR0lOID09PQoxLzI2IENoZWNraW5nIGNvbW1pdCBmODNkNjVjMzZhMTQgKG52
-bWU6IHJlbmFtZSB0cmFjZSBldmVudHMgdG8gbnZtZV9kZXYpCjIvMjYgQ2hlY2tpbmcgY29tbWl0
-IDVmNzEzOTdhMTA1NyAobnZtZTogcmVtb3ZlIHN1cGVyZmx1b3VzIGJyZWFrcykKMy8yNiBDaGVj
-a2luZyBjb21taXQgNjdkOTFiMDNlZGNlIChudm1lOiBtb3ZlIGRldmljZSBwYXJhbWV0ZXJzIHRv
-IHNlcGFyYXRlIHN0cnVjdCkKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3Vs
-ZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTc3OiBGSUxFOiBody9ibG9jay9udm1lLmg6
-NjoKKyNkZWZpbmUgREVGSU5FX05WTUVfUFJPUEVSVElFUyhfc3RhdGUsIF9wcm9wcykgXAorICAg
-IERFRklORV9QUk9QX1NUUklORygic2VyaWFsIiwgX3N0YXRlLCBfcHJvcHMuc2VyaWFsKSwgXAor
-ICAgIERFRklORV9QUk9QX1VJTlQzMigiY21iX3NpemVfbWIiLCBfc3RhdGUsIF9wcm9wcy5jbWJf
-c2l6ZV9tYiwgMCksIFwKKyAgICBERUZJTkVfUFJPUF9VSU5UMzIoIm51bV9xdWV1ZXMiLCBfc3Rh
-dGUsIF9wcm9wcy5udW1fcXVldWVzLCA2NCkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywg
-MTgxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDMvMjYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CjQvMjYgQ2hlY2tpbmcgY29tbWl0IGY4NzE2ZDZkNTc3YyAobnZtZTogYWRkIG1pc3NpbmcgZmll
-bGRzIGluIHRoZSBpZGVudGlmeSBkYXRhIHN0cnVjdHVyZXMpCjUvMjYgQ2hlY2tpbmcgY29tbWl0
-IGQ5ZjdiZjBiZWExMCAobnZtZTogcG9wdWxhdGUgdGhlIG1hbmRhdG9yeSBzdWJucW4gYW5kIHZl
-ciBmaWVsZHMpCjYvMjYgQ2hlY2tpbmcgY29tbWl0IDExYjg5ZGY3NTk5MSAobnZtZTogcmVmYWN0
-b3IgbnZtZV9hZGRyX3JlYWQpCjcvMjYgQ2hlY2tpbmcgY29tbWl0IDA2MjMwMjQxOTExYSAobnZt
-ZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBhYm9ydCBjb21tYW5kKQo4LzI2IENoZWNraW5nIGNvbW1p
-dCBmZmMwMzljNmE5OTAgKG52bWU6IHJlZmFjdG9yIGRldmljZSByZWFsaXphdGlvbikKOS8yNiBD
-aGVja2luZyBjb21taXQgZTYxMmU4M2Q1MTg5IChudm1lOiBhZGQgdGVtcGVyYXR1cmUgdGhyZXNo
-b2xkIGZlYXR1cmUpCjEwLzI2IENoZWNraW5nIGNvbW1pdCA4Y2RjMTVjODhkNTMgKG52bWU6IGFk
-ZCBzdXBwb3J0IGZvciB0aGUgZ2V0IGxvZyBwYWdlIGNvbW1hbmQpCjExLzI2IENoZWNraW5nIGNv
-bW1pdCA3N2I5NDU1NzM0MjEgKG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgYXN5bmNocm9ub3Vz
-IGV2ZW50IHJlcXVlc3QgY29tbWFuZCkKMTIvMjYgQ2hlY2tpbmcgY29tbWl0IGJiYjNjNTg2MjQx
-YSAobnZtZTogYWRkIG1pc3NpbmcgbWFuZGF0b3J5IGZlYXR1cmVzKQoxMy8yNiBDaGVja2luZyBj
-b21taXQgNjZiZjMyMThlN2YzIChudm1lOiBhZGRpdGlvbmFsIHRyYWNpbmcpCjE0LzI2IENoZWNr
-aW5nIGNvbW1pdCAxM2ZjZWFiMjc1Y2MgKG52bWU6IG1ha2Ugc3VyZSBuY3FyIGFuZCBuc3FyIGlz
-IHZhbGlkKQoxNS8yNiBDaGVja2luZyBjb21taXQgOGZkNGU0YzZmYjczIChudm1lOiBidW1wIHN1
-cHBvcnRlZCBzcGVjaWZpY2F0aW9uIHRvIDEuMykKMTYvMjYgQ2hlY2tpbmcgY29tbWl0IDU0MGI5
-OGYzYzk4ZCAobnZtZTogcmVmYWN0b3IgcHJwIG1hcHBpbmcpCjE3LzI2IENoZWNraW5nIGNvbW1p
-dCAzZWMwZDlmNzE4ZWEgKG52bWU6IGFsbG93IG11bHRpcGxlIGFpb3MgcGVyIGNvbW1hbmQpCjE4
-LzI2IENoZWNraW5nIGNvbW1pdCBjMDgwNjVkZWVmYTMgKG52bWU6IHVzZSBwcmVhbGxvY2F0ZWQg
-cXNnL2lvdiBpbiBudm1lX2RtYV9wcnApCjE5LzI2IENoZWNraW5nIGNvbW1pdCA0ZTc1YjExNzBh
-MmYgKHBjaTogcGFzcyBhbG9uZyB0aGUgcmV0dXJuIHZhbHVlIG9mIGRtYV9tZW1vcnlfcncpCjIw
-LzI2IENoZWNraW5nIGNvbW1pdCA0Zjc4MDA1YWE3M2YgKG52bWU6IGhhbmRsZSBkbWEgZXJyb3Jz
-KQoyMS8yNiBDaGVja2luZyBjb21taXQgZjZiNTdiYTNmM2Y4IChudm1lOiBhZGQgc3VwcG9ydCBm
-b3Igc2NhdHRlciBnYXRoZXIgbGlzdHMpCjIyLzI2IENoZWNraW5nIGNvbW1pdCBhNTlkNTYzMGE0
-NGYgKG52bWU6IHN1cHBvcnQgbXVsdGlwbGUgbmFtZXNwYWNlcykKV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-NDI6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFs
-dWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMjE4OiBGSUxFOiBody9ibG9j
-ay9udm1lLW5zLmg6ODoKKyNkZWZpbmUgREVGSU5FX05WTUVfTlNfUFJPUEVSVElFUyhfc3RhdGUs
-IF9wcm9wcykgXAorICAgIERFRklORV9QUk9QX0RSSVZFKCJkcml2ZSIsIF9zdGF0ZSwgYmxrKSwg
-XAorICAgIERFRklORV9QUk9QX1VJTlQzMigibnNpZCIsIF9zdGF0ZSwgX3Byb3BzLm5zaWQsIDAp
-Cgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDgxNiBsaW5lcyBjaGVja2VkCgpQYXRjaCAy
-Mi8yNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMjMvMjYgQ2hlY2tpbmcgY29tbWl0IGYw
-NDZkYjQxZjM0YiAocGNpOiBhbGxvY2F0ZSBwY2kgaWQgZm9yIG52bWUpCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzI5OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgMzEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjMvMjYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KMjQvMjYgQ2hlY2tpbmcgY29tbWl0IDBlMWJkOGM4MjgxZSAobnZtZTogY2hhbmdlIGNvbnRy
-b2xsZXIgcGNpIGlkKQoyNS8yNiBDaGVja2luZyBjb21taXQgYTBlYjBiNTVhZDVkIChudm1lOiBy
-ZW1vdmUgcmVkdW5kYW50IE52bWVDbWQgcG9pbnRlciBwYXJhbWV0ZXIpCjI2LzI2IENoZWNraW5n
-IGNvbW1pdCBhNzEyOGRiM2Y3YmYgKG52bWU6IG1ha2UgbGJhIGRhdGEgc2l6ZSBjb25maWd1cmFi
-bGUpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
-MjAwMjA0MDk1MjA4LjI2OTEzMS0xLWsuamVuc2VuQHNhbXN1bmcuY29tL3Rlc3RpbmcuY2hlY2tw
-YXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, Jan 29, 2020 at 08:24:40PM +0000, Beata Michalska wrote:
+> KVM_SET_VCPU_EVENTS might actually lead to vcpu registers being modified.
+> As such this should be the last step of sync to avoid potential overwriti=
+ng
+> of whatever changes KVM might have done.
+>=20
+> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> ---
+>  target/arm/kvm32.c | 20 ++++++++++----------
+>  target/arm/kvm64.c | 20 ++++++++++----------
+>  2 files changed, 20 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> index 32bf8d6..cf2b47f 100644
+> --- a/target/arm/kvm32.c
+> +++ b/target/arm/kvm32.c
+> @@ -386,17 +386,17 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+>          return ret;
+>      }
+> =20
+> -    ret =3D kvm_put_vcpu_events(cpu);
+> -    if (ret) {
+> -        return ret;
+> -    }
+> -
+>      write_cpustate_to_list(cpu, true);
+> =20
+>      if (!write_list_to_kvmstate(cpu, level)) {
+>          return EINVAL;
+>      }
+> =20
+> +    ret =3D kvm_put_vcpu_events(cpu);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+
+I think we should put a comment above this that says basically the same
+thing as the commit message in order to explain why kvm_put_vcpu_events()
+*must* be after write_list_to_kvmstate().
+
+>      kvm_arm_sync_mpstate_to_kvm(cpu);
+> =20
+>      return ret;
+> @@ -462,11 +462,6 @@ int kvm_arch_get_registers(CPUState *cs)
+>      }
+>      vfp_set_fpscr(env, fpscr);
+> =20
+> -    ret =3D kvm_get_vcpu_events(cpu);
+> -    if (ret) {
+> -        return ret;
+> -    }
+> -
+>      if (!write_kvmstate_to_list(cpu)) {
+>          return EINVAL;
+>      }
+> @@ -475,6 +470,11 @@ int kvm_arch_get_registers(CPUState *cs)
+>       */
+>      write_list_to_cpustate(cpu);
+> =20
+> +    ret =3D kvm_get_vcpu_events(cpu);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+
+Why are we moving kvm_get_vcpu_events()?
+
+>      kvm_arm_sync_mpstate_to_qemu(cpu);
+> =20
+>      return 0;
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 6344113..d06fd32 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -1043,17 +1043,17 @@ int kvm_arch_put_registers(CPUState *cs, int leve=
+l)
+>          return ret;
+>      }
+> =20
+> -    ret =3D kvm_put_vcpu_events(cpu);
+> -    if (ret) {
+> -        return ret;
+> -    }
+> -
+>      write_cpustate_to_list(cpu, true);
+> =20
+>      if (!write_list_to_kvmstate(cpu, level)) {
+>          return -EINVAL;
+>      }
+> =20
+> +    ret =3D kvm_put_vcpu_events(cpu);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+>      kvm_arm_sync_mpstate_to_kvm(cpu);
+> =20
+>      return ret;
+> @@ -1251,11 +1251,6 @@ int kvm_arch_get_registers(CPUState *cs)
+>      }
+>      vfp_set_fpcr(env, fpr);
+> =20
+> -    ret =3D kvm_get_vcpu_events(cpu);
+> -    if (ret) {
+> -        return ret;
+> -    }
+> -
+>      if (!write_kvmstate_to_list(cpu)) {
+>          return -EINVAL;
+>      }
+> @@ -1264,6 +1259,11 @@ int kvm_arch_get_registers(CPUState *cs)
+>       */
+>      write_list_to_cpustate(cpu);
+> =20
+> +    ret =3D kvm_get_vcpu_events(cpu);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+>      kvm_arm_sync_mpstate_to_qemu(cpu);
+> =20
+>      /* TODO: other registers */
+> --=20
+> 2.7.4
+>=20
+>=20
+
+Same comments for kvm64.c as for kvm32.c
+
+Thanks,
+drew
+
 
