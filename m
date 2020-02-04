@@ -2,76 +2,79 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77303C33CAC
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 02:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FA87C33CAC
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 02:55:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CDC620732
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 02:55:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F108920732
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 02:55:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YHAsmP0p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CDC620732
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wO6OYppp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F108920732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyoNA-0003by-E1
-	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 21:55:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60754)
+	id 1iyoNG-0003lZ-5G
+	for qemu-devel@archiver.kernel.org; Mon, 03 Feb 2020 21:55:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60819)
  by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
- <36dw4XgMKCn4lm1iqqing.eqosgow-fgxgnpqpipw.qti@flex--jkz.bounces.google.com>)
- id 1iyoMH-0002XH-BI
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 21:54:38 -0500
+ <37Nw4XgMKCoEop4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
+ id 1iyoMJ-0002XR-Nu
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 21:54:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from
- <36dw4XgMKCn4lm1iqqing.eqosgow-fgxgnpqpipw.qti@flex--jkz.bounces.google.com>)
- id 1iyoMG-0002ia-1S
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 21:54:37 -0500
-Received: from mail-pg1-x54a.google.com ([2607:f8b0:4864:20::54a]:32954)
+ <37Nw4XgMKCoEop4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
+ id 1iyoMH-0002wO-Se
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 21:54:39 -0500
+Received: from mail-ua1-x94a.google.com ([2607:f8b0:4864:20::94a]:37727)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from
- <36dw4XgMKCn4lm1iqqing.eqosgow-fgxgnpqpipw.qti@flex--jkz.bounces.google.com>)
- id 1iyoMF-0002ZD-PU
- for qemu-devel@nongnu.org; Mon, 03 Feb 2020 21:54:35 -0500
-Received: by mail-pg1-x54a.google.com with SMTP id 37so1754426pgq.0
- for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 18:54:35 -0800 (PST)
+ <37Nw4XgMKCoEop4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
+ id 1iyoMH-0002sL-Mh
+ for qemu-devel@nongnu.org; Mon, 03 Feb 2020 21:54:37 -0500
+Received: by mail-ua1-x94a.google.com with SMTP id f15so4464831uap.4
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 18:54:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=DpLt7V+1OL8Lj3N3GPKXUQ3O11Q0zkCbfAvIh2ChTY8=;
- b=YHAsmP0peqI4Q0lXZYOpEaLBMnL/ZbDadWF6DVQ7Z6PBp5fYGTFjdPJ/MVDEa08aH3
- 9VWI+RPREZVkOyqMPwb+VClxetD7+S40QLGufVMs2UTtQZzsoZXOKcehXONYhDX9glkv
- 46STbUNGWeoCoQ2YDuChtFgOIfUL9KJ7FETYXOjDdYJzys82+7vUEH52B8jyUc4n/6lZ
- cM3YAMh3bUjPa+Z0UW092ea4mbkg4gqbDrT05EvQqUS59ONTyA/kcqpbNm9eX2/NQCUg
- je3gfvyHVG9mVRDpjUwX/35cq68OGpj8CX1VAFqxniyy54u1ZoXMLdAkUKqJNL/+A0oF
- TFTg==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=jDLy4y7g4nLW8NWtQ8mTh8+T+7gif7mRZiEY+32+ELk=;
+ b=wO6OYppp7p3UsLaSWZCkb7Qg+ZfC8+Ilq1MWmxScGDdq1FSddn4KY6mFM0hfgt+px9
+ MIf9NeGSsDqs7a14GrlOX9zD6SNVSML6+rfGQ4ux+PwGA9cD7XEXU0a3SttqBdH4jIW1
+ XKtJPAltHqgyO2bgrHB3xMYTb2Yjm013/yEfZeuqMgod791PNagzcp/sW0T8BCwPpMD6
+ 49MnHYsjLKpJknmLDCZ1UBMzloqI7FNfaWqXTlsRnp9OBYSR79RwnNrwFvIpCj16kuw1
+ QHhADDdsXzMsecZ8PYRg7vYAR64dePcVDCympTJ5RcbHvRrXgqtvgAgQ95PqhObWzgr8
+ apKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=DpLt7V+1OL8Lj3N3GPKXUQ3O11Q0zkCbfAvIh2ChTY8=;
- b=hNhocU6lRrxiApLRHAQ6vkmzFNrfRcjSAQ8LFMYlOXZ7Sg8EJDSYtxum/ust9SuYlX
- e+xeonijWBMvvGvJIWpB1aauGsb9UdU+JH5v9kCnTrfIxMRcMmUJAS2N5nh8GtjmDLkI
- +iqIuSaf2nWkyrYzf8eLpieOFjz63D1+8eGwLfLfid0X/yj/mZKrTXSzu+CQ2nkSENzz
- NRmDq3Ap/YlywUXPXJcJdUl7BqedqkG1McqdLg2H/ZFWsnS1vHuGzgw4BOc6qYYFYc9z
- 8/FFaZ6w2eavxKQjsfLo2tstTd3e9stBL4JcMWu7on5rKwZ4XTl/O/maYvsRVk9TxJ7w
- p92g==
-X-Gm-Message-State: APjAAAWMyYTHkfiDpNBWnUf72lHeoAIFbop6dccSKT+Cjv9md/OxTviK
- Qq2RL2loPl6ATADiAV/SbIcVGynz6TQAv7xw/mYUEZgbN3kzHmq4Q7zDOwr48Sa4Xq9QWYNBeOL
- ec2ZvscpCMM0DLft4DalwlbwATOXs5TS8mki4jBFTrhIypIy79Z8j
-X-Google-Smtp-Source: APXvYqy++v937S8BKr725XnrxdtbRMbJtVqW58RCCqIBy36IeCQpS0xK4jxqspriWOlAyumh+WscMxQ=
-X-Received: by 2002:a63:6a02:: with SMTP id f2mr29351351pgc.219.1580784873939; 
- Mon, 03 Feb 2020 18:54:33 -0800 (PST)
-Date: Mon,  3 Feb 2020 18:54:12 -0800
-Message-Id: <20200204025416.111409-1-jkz@google.com>
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=jDLy4y7g4nLW8NWtQ8mTh8+T+7gif7mRZiEY+32+ELk=;
+ b=oZGkzMLEJNB8+o8WkNeTFhVjBpIl7DIxsmmWpzjVkwyH2Cu5d550blxQnX4k9XSFRJ
+ Kq+So0Qri+E1qY75zjlE2Wv+e7nAIkN44neC5Vant0XbKZwm5CtbTtY0xgSMTWM82yb8
+ TqgMjtj4mJ6HuoCubB6ARNsofOZ95czI+a1htyjibZRy56Y24P/gOg+RNnakHnwh8a87
+ 5x04zKeCGfuhSbmuxWmiD224ke9meBQZk6PyrThQ6FW9Rt7qWg8H21AoKR77u7DPfrDj
+ 1i2JMeecQA24DLIT4EYbYjrlRAFGFjpI+Ji+DojcpWNPZNwlyRmLdSv6bZ/PrN/voQkr
+ Odxw==
+X-Gm-Message-State: APjAAAVeO4qp3czcn8jOnEIYnh0eB35h27CMsqtjPop+cLSrD+PHyyOY
+ Tz0y7ANCAVu79GU/gvT9mgF7SBJEcrjISe0jvaj55DHxVM+ZSMiZTvjT/0V3g3idPehvIO2GSwi
+ bLvznYvUkjdK22gMq9yRn+fH9m9Jycvp24/uVLx/+bdpZepE8si6m
+X-Google-Smtp-Source: APXvYqxTeqxVQwWrQr1YP/iVGIcESZIpo1do2pB1r7hmVJ31j7DLKLseHUnbEuKb/Zo1gHg1q43Mqn0=
+X-Received: by 2002:ab0:6001:: with SMTP id j1mr16079873ual.56.1580784876611; 
+ Mon, 03 Feb 2020 18:54:36 -0800 (PST)
+Date: Mon,  3 Feb 2020 18:54:13 -0800
+In-Reply-To: <20200204025416.111409-1-jkz@google.com>
+Message-Id: <20200204025416.111409-2-jkz@google.com>
 Mime-Version: 1.0
+References: <20200204025416.111409-1-jkz@google.com>
 X-Mailer: git-send-email 2.25.0.341.g760bfbb309-goog
-Subject: [PATCH v3 0/4] migration: Replace gemu_log with qemu_log
+Subject: [PATCH v3 1/4] linux-user: Use `qemu_log' for non-strace logging
 From: Josh Kunz <jkz@google.com>
 To: qemu-devel@nongnu.org
 Cc: riku.voipio@iki.fi, laurent@vivier.eu, alex.bennee@linaro.org, 
@@ -79,7 +82,7 @@ Cc: riku.voipio@iki.fi, laurent@vivier.eu, alex.bennee@linaro.org,
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::54a
+X-Received-From: 2607:f8b0:4864:20::94a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,77 +98,336 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Summary of v2->v3 changes:
-  * Removed assert for CMSG handling, replaced with LOG_UNIMP. Will
-    switch to assert in follow-up patch.
-  * Fixed BSD-user build (dangling references to qemu_add_log), and
-    verified the user-mode build works.
+Since most calls to `gemu_log` are actually logging unimplemented features,
+this change replaces most non-strace calls to `gemu_log` with calls to
+`qemu_log_mask(LOG_UNIMP, ...)`.  This allows the user to easily log to
+a file, and to mask out these log messages if they desire.
 
-Summary of v1->v2 changes:
-  * Removed backwards-compatibility code for non-strace log statements.
-  * Removed new qemu_log interface for adding or removing fields from
-    the log mask.
-  * Removed LOG_USER and converted all uses (except one) to LOG_UNIMP.
-    * One gemu_log statement was converted to an assert.
-  * Some style cleanup.
+Note: This change is slightly backwards incompatible, since now these
+"unimplemented" log messages will not be logged by default.
 
-The linux-user and bsd-user trees both widely use a function called
-`gemu_log` (notice the 'g') for miscellaneous and strace logging. This
-function predates the newer `qemu_log` function, and has a few drawbacks
-compared to `qemu_log`:
+Signed-off-by: Josh Kunz <jkz@google.com>
+---
+ linux-user/arm/cpu_loop.c |  5 ++--
+ linux-user/fd-trans.c     | 55 +++++++++++++++++++++++++--------------
+ linux-user/syscall.c      | 35 ++++++++++++++++---------
+ linux-user/vm86.c         |  3 ++-
+ 4 files changed, 62 insertions(+), 36 deletions(-)
 
-  1. Always logs to `stderr`, no logging redirection.
-  2. "Miscellaneous" logging cannot be disabled, so it may mix with guest
-     logging.
-  3. Inconsistency with other parts of the QEMU codebase, and a
-     confusing name.
-
-The second issue is especially troubling because it can interfere with
-programs that expect to communicate via stderr.
-
-This change introduces one new logging masks to the `qemu_log` subsystem
-to support its use for user-mode logging: the `LOG_STRACE` mask for
-strace-specific logging. Further, it replaces all existing uses of
-`gemu_log` with the appropriate `qemu_log_mask(LOG_{UNIMP,STRACE}, ...)`
-based on the log message.
-
-Backwards incompatibility:
-  * Log messages for unimplemented user-mode features are no longer
-    logged by default. They have to be enabled by setting the LOG_UNIMP
-    mask.
-  * Log messages for strace/unimplemented user-mode features may be
-    redirected based on `-D`, instead of always logging to stderr.
-
-Tested:
-  * Built with clang 9 and g++ 8.3
-  * `make check` run with clang 9 build 
-  * Verified:
-    * QEMU_STRACE/-strace still works for linux-user
-  * `make vm-build-netbsd EXTRA_CONFIGURE_OPTS="--disable-system" \
-     BUILD_TARGET="all"` passed.
-
-Josh Kunz (4):
-  linux-user: Use `qemu_log' for non-strace logging
-  linux-user: Use `qemu_log' for strace
-  linux-user: remove gemu_log from the linux-user tree
-  bsd-user: Replace gemu_log with qemu_log
-
- bsd-user/main.c           |  29 ++-
- bsd-user/qemu.h           |   2 -
- bsd-user/strace.c         |  32 ++-
- bsd-user/syscall.c        |  31 ++-
- include/qemu/log.h        |   2 +
- linux-user/arm/cpu_loop.c |   5 +-
- linux-user/fd-trans.c     |  55 +++--
- linux-user/main.c         |  39 ++--
- linux-user/qemu.h         |   2 -
- linux-user/signal.c       |   2 +-
- linux-user/strace.c       | 479 +++++++++++++++++++-------------------
- linux-user/syscall.c      |  48 ++--
- linux-user/vm86.c         |   3 +-
- util/log.c                |   2 +
- 14 files changed, 387 insertions(+), 344 deletions(-)
-
+diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
+index 1fae90c6df..cf618daa1c 100644
+--- a/linux-user/arm/cpu_loop.c
++++ b/linux-user/arm/cpu_loop.c
+@@ -349,8 +349,9 @@ void cpu_loop(CPUARMState *env)
+                             env->regs[0] = cpu_get_tls(env);
+                             break;
+                         default:
+-                            gemu_log("qemu: Unsupported ARM syscall: 0x%x\n",
+-                                     n);
++                            qemu_log_mask(LOG_UNIMP,
++                                          "qemu: Unsupported ARM syscall: 0x%x\n",
++                                          n);
+                             env->regs[0] = -TARGET_ENOSYS;
+                             break;
+                         }
+diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
+index 9b92386abf..c0687c52e6 100644
+--- a/linux-user/fd-trans.c
++++ b/linux-user/fd-trans.c
+@@ -514,7 +514,8 @@ static abi_long host_to_target_data_bridge_nlattr(struct nlattr *nlattr,
+         u32[1] = tswap32(u32[1]); /* optmask */
+         break;
+     default:
+-        gemu_log("Unknown QEMU_IFLA_BR type %d\n", nlattr->nla_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_BR type %d\n",
++                      nlattr->nla_type);
+         break;
+     }
+     return 0;
+@@ -577,7 +578,8 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
+     case QEMU_IFLA_BRPORT_BRIDGE_ID:
+         break;
+     default:
+-        gemu_log("Unknown QEMU_IFLA_BRPORT type %d\n", nlattr->nla_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_BRPORT type %d\n",
++                      nlattr->nla_type);
+         break;
+     }
+     return 0;
+@@ -605,7 +607,8 @@ static abi_long host_to_target_data_tun_nlattr(struct nlattr *nlattr,
+         *u32 = tswap32(*u32);
+         break;
+     default:
+-        gemu_log("Unknown QEMU_IFLA_TUN type %d\n", nlattr->nla_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_TUN type %d\n",
++                      nlattr->nla_type);
+         break;
+     }
+     return 0;
+@@ -652,7 +655,8 @@ static abi_long host_to_target_data_linkinfo_nlattr(struct nlattr *nlattr,
+                                                   NULL,
+                                                 host_to_target_data_tun_nlattr);
+         } else {
+-            gemu_log("Unknown QEMU_IFLA_INFO_KIND %s\n", li_context->name);
++            qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_INFO_KIND %s\n",
++                          li_context->name);
+         }
+         break;
+     case QEMU_IFLA_INFO_SLAVE_DATA:
+@@ -663,12 +667,13 @@ static abi_long host_to_target_data_linkinfo_nlattr(struct nlattr *nlattr,
+                                                   NULL,
+                                        host_to_target_slave_data_bridge_nlattr);
+         } else {
+-            gemu_log("Unknown QEMU_IFLA_INFO_SLAVE_KIND %s\n",
++            qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_INFO_SLAVE_KIND %s\n",
+                      li_context->slave_name);
+         }
+         break;
+     default:
+-        gemu_log("Unknown host QEMU_IFLA_INFO type: %d\n", nlattr->nla_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown host QEMU_IFLA_INFO type: %d\n",
++                      nlattr->nla_type);
+         break;
+     }
+ 
+@@ -690,7 +695,8 @@ static abi_long host_to_target_data_inet_nlattr(struct nlattr *nlattr,
+         }
+         break;
+     default:
+-        gemu_log("Unknown host AF_INET type: %d\n", nlattr->nla_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown host AF_INET type: %d\n",
++                      nlattr->nla_type);
+     }
+     return 0;
+ }
+@@ -741,7 +747,8 @@ static abi_long host_to_target_data_inet6_nlattr(struct nlattr *nlattr,
+         }
+         break;
+     default:
+-        gemu_log("Unknown host AF_INET6 type: %d\n", nlattr->nla_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown host AF_INET6 type: %d\n",
++                      nlattr->nla_type);
+     }
+     return 0;
+ }
+@@ -759,7 +766,8 @@ static abi_long host_to_target_data_spec_nlattr(struct nlattr *nlattr,
+                                               NULL,
+                                              host_to_target_data_inet6_nlattr);
+     default:
+-        gemu_log("Unknown host AF_SPEC type: %d\n", nlattr->nla_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown host AF_SPEC type: %d\n",
++                      nlattr->nla_type);
+         break;
+     }
+     return 0;
+@@ -780,7 +788,8 @@ static abi_long host_to_target_data_xdp_nlattr(struct nlattr *nlattr,
+         *u32 = tswap32(*u32);
+         break;
+     default:
+-        gemu_log("Unknown host XDP type: %d\n", nlattr->nla_type);
++        qemu_log_mask(
++            LOG_UNIMP, "Unknown host XDP type: %d\n", nlattr->nla_type);
+         break;
+     }
+     return 0;
+@@ -920,7 +929,8 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
+                                               NULL,
+                                                 host_to_target_data_xdp_nlattr);
+     default:
+-        gemu_log("Unknown host QEMU_IFLA type: %d\n", rtattr->rta_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown host QEMU_IFLA type: %d\n",
++                      rtattr->rta_type);
+         break;
+     }
+     return 0;
+@@ -954,7 +964,8 @@ static abi_long host_to_target_data_addr_rtattr(struct rtattr *rtattr)
+         ci->tstamp = tswap32(ci->tstamp);
+         break;
+     default:
+-        gemu_log("Unknown host IFA type: %d\n", rtattr->rta_type);
++        qemu_log_mask(
++            LOG_UNIMP, "Unknown host IFA type: %d\n", rtattr->rta_type);
+         break;
+     }
+     return 0;
+@@ -996,7 +1007,8 @@ static abi_long host_to_target_data_route_rtattr(struct rtattr *rtattr)
+ #endif
+         break;
+     default:
+-        gemu_log("Unknown host RTA type: %d\n", rtattr->rta_type);
++        qemu_log_mask(
++            LOG_UNIMP, "Unknown host RTA type: %d\n", rtattr->rta_type);
+         break;
+     }
+     return 0;
+@@ -1111,7 +1123,8 @@ static abi_long target_to_host_data_link_rtattr(struct rtattr *rtattr)
+ {
+     switch (rtattr->rta_type) {
+     default:
+-        gemu_log("Unknown target QEMU_IFLA type: %d\n", rtattr->rta_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown target QEMU_IFLA type: %d\n",
++                      rtattr->rta_type);
+         break;
+     }
+     return 0;
+@@ -1125,7 +1138,8 @@ static abi_long target_to_host_data_addr_rtattr(struct rtattr *rtattr)
+     case IFA_ADDRESS:
+         break;
+     default:
+-        gemu_log("Unknown target IFA type: %d\n", rtattr->rta_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown target IFA type: %d\n",
++                      rtattr->rta_type);
+         break;
+     }
+     return 0;
+@@ -1147,7 +1161,8 @@ static abi_long target_to_host_data_route_rtattr(struct rtattr *rtattr)
+         *u32 = tswap32(*u32);
+         break;
+     default:
+-        gemu_log("Unknown target RTA type: %d\n", rtattr->rta_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown target RTA type: %d\n",
++                      rtattr->rta_type);
+         break;
+     }
+     return 0;
+@@ -1232,8 +1247,8 @@ static abi_long host_to_target_data_audit(struct nlmsghdr *nlh)
+ {
+     switch (nlh->nlmsg_type) {
+     default:
+-        gemu_log("Unknown host audit message type %d\n",
+-                 nlh->nlmsg_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown host audit message type %d\n",
++                      nlh->nlmsg_type);
+         return -TARGET_EINVAL;
+     }
+     return 0;
+@@ -1253,8 +1268,8 @@ static abi_long target_to_host_data_audit(struct nlmsghdr *nlh)
+     case AUDIT_FIRST_USER_MSG2 ... AUDIT_LAST_USER_MSG2:
+         break;
+     default:
+-        gemu_log("Unknown target audit message type %d\n",
+-                 nlh->nlmsg_type);
++        qemu_log_mask(LOG_UNIMP, "Unknown target audit message type %d\n",
++                      nlh->nlmsg_type);
+         return -TARGET_EINVAL;
+     }
+ 
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index d60142f069..c48c2a9a55 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1560,7 +1560,11 @@ static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
+              * something more intelligent than "twice the size of the
+              * target buffer we're reading from".
+              */
+-            gemu_log("Host cmsg overflow\n");
++            qemu_log_mask(LOG_UNIMP,
++                          ("Unsupported ancillary data %d/%d: "
++                           "unhandled msg size\n"),
++                          tswap32(target_cmsg->cmsg_level),
++                          tswap32(target_cmsg->cmsg_type));
+             break;
+         }
+ 
+@@ -1590,8 +1594,8 @@ static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
+             __get_user(cred->uid, &target_cred->uid);
+             __get_user(cred->gid, &target_cred->gid);
+         } else {
+-            gemu_log("Unsupported ancillary data: %d/%d\n",
+-                                        cmsg->cmsg_level, cmsg->cmsg_type);
++            qemu_log_mask(LOG_UNIMP, "Unsupported ancillary data: %d/%d\n",
++                          cmsg->cmsg_level, cmsg->cmsg_type);
+             memcpy(data, target_data, len);
+         }
+ 
+@@ -1812,8 +1816,8 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
+ 
+         default:
+         unimplemented:
+-            gemu_log("Unsupported ancillary data: %d/%d\n",
+-                                        cmsg->cmsg_level, cmsg->cmsg_type);
++            qemu_log_mask(LOG_UNIMP, "Unsupported ancillary data: %d/%d\n",
++                          cmsg->cmsg_level, cmsg->cmsg_type);
+             memcpy(target_data, data, MIN(len, tgt_len));
+             if (tgt_len > len) {
+                 memset(target_data + len, 0, tgt_len - len);
+@@ -2288,7 +2292,8 @@ set_timeout:
+ #endif /* SOL_NETLINK */
+     default:
+     unimplemented:
+-        gemu_log("Unsupported setsockopt level=%d optname=%d\n", level, optname);
++        qemu_log_mask(LOG_UNIMP, "Unsupported setsockopt level=%d optname=%d\n",
++                      level, optname);
+         ret = -TARGET_ENOPROTOOPT;
+     }
+     return ret;
+@@ -2641,8 +2646,9 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+ #endif /* SOL_NETLINK */
+     default:
+     unimplemented:
+-        gemu_log("getsockopt level=%d optname=%d not yet supported\n",
+-                 level, optname);
++        qemu_log_mask(LOG_UNIMP,
++                      "getsockopt level=%d optname=%d not yet supported\n",
++                      level, optname);
+         ret = -TARGET_EOPNOTSUPP;
+         break;
+     }
+@@ -3397,7 +3403,7 @@ static abi_long do_socketcall(int num, abi_ulong vptr)
+     case TARGET_SYS_SENDMMSG: /* sockfd, msgvec, vlen, flags */
+         return do_sendrecvmmsg(a[0], a[1], a[2], a[3], 1);
+     default:
+-        gemu_log("Unsupported socketcall: %d\n", num);
++        qemu_log_mask(LOG_UNIMP, "Unsupported socketcall: %d\n", num);
+         return -TARGET_EINVAL;
+     }
+ }
+@@ -4308,7 +4314,8 @@ static abi_long do_ipc(CPUArchState *cpu_env,
+         ret = do_shmctl(first, second, ptr);
+         break;
+     default:
+-	gemu_log("Unsupported ipc call: %d (version %d)\n", call, version);
++        qemu_log_mask(LOG_UNIMP, "Unsupported ipc call: %d (version %d)\n",
++                      call, version);
+ 	ret = -TARGET_ENOSYS;
+ 	break;
+     }
+@@ -5156,7 +5163,8 @@ static abi_long do_ioctl(int fd, int cmd, abi_long arg)
+     ie = ioctl_entries;
+     for(;;) {
+         if (ie->target_cmd == 0) {
+-            gemu_log("Unsupported ioctl: cmd=0x%04lx\n", (long)cmd);
++            qemu_log_mask(
++                LOG_UNIMP, "Unsupported ioctl: cmd=0x%04lx\n", (long)cmd);
+             return -TARGET_ENOSYS;
+         }
+         if (ie->target_cmd == cmd)
+@@ -5224,8 +5232,9 @@ static abi_long do_ioctl(int fd, int cmd, abi_long arg)
+         }
+         break;
+     default:
+-        gemu_log("Unsupported ioctl type: cmd=0x%04lx type=%d\n",
+-                 (long)cmd, arg_type[0]);
++        qemu_log_mask(LOG_UNIMP,
++                      "Unsupported ioctl type: cmd=0x%04lx type=%d\n",
++                      (long)cmd, arg_type[0]);
+         ret = -TARGET_ENOSYS;
+         break;
+     }
+diff --git a/linux-user/vm86.c b/linux-user/vm86.c
+index 2fa7a89edc..4412522c4c 100644
+--- a/linux-user/vm86.c
++++ b/linux-user/vm86.c
+@@ -402,7 +402,8 @@ int do_vm86(CPUX86State *env, long subfunction, abi_ulong vm86_addr)
+     case TARGET_VM86_FREE_IRQ:
+     case TARGET_VM86_GET_IRQ_BITS:
+     case TARGET_VM86_GET_AND_RESET_IRQ:
+-        gemu_log("qemu: unsupported vm86 subfunction (%ld)\n", subfunction);
++        qemu_log_mask(LOG_UNIMP, "qemu: unsupported vm86 subfunction (%ld)\n",
++                      subfunction);
+         ret = -TARGET_EINVAL;
+         goto out;
+     case TARGET_VM86_PLUS_INSTALL_CHECK:
 -- 
 2.25.0.341.g760bfbb309-goog
 
