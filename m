@@ -2,91 +2,116 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B83CC35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A411AC35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:04:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 061E620674
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:03:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EC3920674
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:04:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YG3jf78y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 061E620674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Q02aTfwZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC3920674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyzjq-0002BK-5z
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 10:03:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58075)
+	id 1iyzkO-00031g-GC
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 10:04:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ovoshcha@redhat.com>) id 1iyziz-0001gS-3E
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:02:54 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iyzjX-00027J-VP
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:03:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ovoshcha@redhat.com>) id 1iyzix-0002Wl-7d
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:02:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26235
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1iyziq-0001bk-6A
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:02:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580828557;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=xXybZnjOOP6fWdEgf/uL1pRuRodA1PKhnVNN3MRHPOQ=;
- b=YG3jf78yfFgf5ry5E/7bkJYCmFwdbF5LmyzUFO8CW1F8hN7FlMK6E9uXU/187+68194vz/
- PrM4eP4BF9/TeWqeIk3TGe6wgsHohrxqI3CvYdPc1DATo8dk5GCkRe84bVvYsj9XvfWNzo
- 6Ykuc61J93LzzhWxs2vPAwfpaB725Y8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-eoAIf-cxNAyw34pdfDYdUg-1; Tue, 04 Feb 2020 10:02:35 -0500
-Received: by mail-wr1-f72.google.com with SMTP id j4so10358553wrs.13
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 07:02:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xXybZnjOOP6fWdEgf/uL1pRuRodA1PKhnVNN3MRHPOQ=;
- b=L3b+6nqueVFg/fBjVOKGpW9+KasY9SDA1QE4GyFIVaJ3TWdbSYdo21YoDlwnk5j42d
- MNgoZhHJRFZCQym/83lw6AenwQJ9SaNP8ZWNhTh10/FPPeZT/+oZmAmXytBGVWlCSHs6
- kn9bXwUUh1C+3QU9wlB7ODdx/VKc1d1sX5i1kZJ67sezHeB0vK2v2AdcSkxfAtmpn7LB
- D1cxuWNIXq/4KQJkHwE3O5zQQI51lt1tQZFjJ9mSQPwAZKNAjY7m+6Wh2hgtZbjVGA2f
- DV2IBbFKdS1SZWh/g7HOc+HrS+w0nAFXMQZScdsOVRvB04G8Y6Fg4ChXnCFFX8B0nfHd
- l6qA==
-X-Gm-Message-State: APjAAAUyxvC8E1RANRNPBxbmKyjhcTDIcbiMureJNs246ArP8taDy7qq
- JosJhpOELBDG3Jo5JCK/0zyqv3MG6bBFq73ddLH0vJ9qbFGZnEfK8Hr5UcG9yWE7rPntM5Skjy2
- zhCOUv8iLf0FMn1NXwdNMF2aLImPXM/0=
-X-Received: by 2002:a1c:1f51:: with SMTP id f78mr6199030wmf.60.1580828554727; 
- Tue, 04 Feb 2020 07:02:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzhjUwUl1wiGHaFwQDHme5KwbyBJaeJqLaZDMw/TnG5JMd33gIjtLwb+qFaOQjtckMD4UxC0frQcH/6r0Rn+D0=
-X-Received: by 2002:a1c:1f51:: with SMTP id f78mr6198652wmf.60.1580828549920; 
- Tue, 04 Feb 2020 07:02:29 -0800 (PST)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iyzjT-0005Yg-2T
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:03:23 -0500
+Received: from mail-eopbgr20093.outbound.protection.outlook.com
+ ([40.107.2.93]:14147 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iyzjP-00054u-1P; Tue, 04 Feb 2020 10:03:15 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E56BWfAeUfIm+whlFYTfVQZF86gS9ahy8eIFhdb+bT8WnzVD/Jrc43tb4cfjafpCj+BNglcW2X7Ff2HkxTRjzvXsXCcBXfw0idF1qcGbekHm1ZOad+74+NHIL2dUj0upfWzreaHkF+J0E0MN28Gsa04kqcFsNv2Upxcx3JxOn6nKKtxiVhVlgC113M4eLsD8ifAnB53Ikfg1BRkmBHCv1+hFRUDv8HYbe6E5R2uD1HPxhwqcVvmIH3KJb3WorQXwdMhqZkSuEUZGPWJ9jkmaOgXp5DtLdez5wEDFq4XNG0SNshnTYZXHYX7zgxoaNOo+l3QY4fgKakEqM0NFC7+3sQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=96X2l3L4GSogLViIunL1NvnIaiNbiXSa0I2JALkhjXQ=;
+ b=naadm0surUsYs8APO2e/dJlb2E6obhLoh7SS1waQnmemtze2bSdMSzG/HeZEqbWaKQK+Q4Ce7DlQLHbi/PjtErWv0QO4U1RvaWBpLS3Zw/JEntCagKkH4nbtOVqsrbzMAf7bjetHAuXih8fWqzrx/l0jdNTGKTMIpX84dz5K3BcsayTzqOGG0QPpUciwm8azAdcJH4HxhsWoLZlwVlgQHUjJkhzQLq8C9gtsZmQVVJDT/O3ztldR/kwwvtFWWuUAXDyuFVNsGte8ikihF+D/OqCD3kyhxprOLdA3vVyNFvHsyAMP4KkVkVr0c9XkMeP8a8n5nMBdr1nh6mxrLYX4Bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=96X2l3L4GSogLViIunL1NvnIaiNbiXSa0I2JALkhjXQ=;
+ b=Q02aTfwZ6qHYD9PlThQjpnv6nhq6OooAobgrYhzFjJ6Zp3IWV8hQtH/rgSg9K/1JFTfQ8XU0ydvU9jPe1IVT2f4oL1GTYcLxFFeBM2Um+zQG6ZPAEhMA90Hg+iErWYZvdhvduMwxcW8kI22Av5M4JFTia1DDyZNG7NWWPqlkEkc=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB2981.eurprd08.prod.outlook.com (52.135.163.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.29; Tue, 4 Feb 2020 15:03:12 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.034; Tue, 4 Feb 2020
+ 15:03:12 +0000
+Subject: Re: [PATCH 04/17] block: Improve documentation of .bdrv_has_zero_init
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200131174436.2961874-1-eblake@redhat.com>
+ <20200131174436.2961874-5-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200204180309952
+Message-ID: <b223356c-8c90-e4c9-2db0-4a08717d559d@virtuozzo.com>
+Date: Tue, 4 Feb 2020 18:03:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <20200131174436.2961874-5-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1PR05CA0333.eurprd05.prod.outlook.com
+ (2603:10a6:7:92::28) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
-References: <20200203111631.18796-1-ovoshcha@redhat.com>
- <20200203111631.18796-3-ovoshcha@redhat.com>
- <45078d7a-d934-5238-511e-876e0eb56858@redhat.com>
-In-Reply-To: <45078d7a-d934-5238-511e-876e0eb56858@redhat.com>
-From: Oksana Voshchana <ovoshcha@redhat.com>
-Date: Tue, 4 Feb 2020 17:02:18 +0200
-Message-ID: <CAMXCgj6EVLAApuaqwEg28Kt-UvRxoW1dVFJWqDkZtxjF8vS92Q@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] Acceptance test: provides to use different
- transport for migration
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-MC-Unique: eoAIf-cxNAyw34pdfDYdUg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="0000000000002b4d65059dc1549f"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR05CA0333.eurprd05.prod.outlook.com (2603:10a6:7:92::28) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.30 via Frontend Transport; Tue, 4 Feb 2020 15:03:11 +0000
+X-Tagtoolbar-Keys: D20200204180309952
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3773aeda-0e66-4f21-9409-08d7a9835a60
+X-MS-TrafficTypeDiagnostic: AM6PR08MB2981:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB29811DE28257CBAD018F46F7C1030@AM6PR08MB2981.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 03030B9493
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(346002)(376002)(366004)(396003)(39850400004)(136003)(199004)(189003)(31696002)(26005)(66946007)(81156014)(81166006)(956004)(8676002)(186003)(16526019)(86362001)(2616005)(5660300002)(66556008)(66476007)(36756003)(2906002)(52116002)(6486002)(16576012)(316002)(478600001)(31686004)(4326008)(8936002)(142923001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB2981;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rJkZaqPGRszkGztNpFmyLnAhMfToCDd/ieYv8tEziXNfpx1XaUWy00GRn8GyseidjLPwYMPkknKdYocBrBakN+8rh/YMmmqL1Ps/8dlDbChcpKUM2wwS+njAHiISd2AhCDJP67PAihO6DsZvL6w4jyHKoOdzSqJbqF3ytuhKofTqrpHLugZr0nrMIAZk/qvSY3+Hna2BFH68lXpNuGZgqFYX/dwBgMPHUrGYyBCRH7h90oOIEFbcnFdThB421cuKwt6AFSmZKTNtNuf3126YwaRJU7RjTGpjbDmGuUI0JwXdU1laYr0uWpVDmR/3CMgWXxV3Yw2JMbXtAeOgLjPvChsNEE/Z0EjZND+R7IFe+vDi65O7zQvXxWkpbYh+dgW3muxSjPZTyPYxAoIT05cmWQ/Yk63T/dlRSzc0GlF+wUBdpgAsEgj7NKB2B3t6SjO/PooXGBoGn2if00CUTlpZCOczj9E0eJ29WFqTpUW6ZCd/ZvUAf/+ylr4/xQvhXwrD
+X-MS-Exchange-AntiSpam-MessageData: mbL/o1wrxFKyoVUr3nR0WfJjY17qpJBShXdhm+gP2dyFlJJ2tKZCt/mPSL1Acs9MmE+kxJSouyN5KExVMjmirnRntmc5htXJEGUxYd7FOBUWMPJM7YcYsUCpOvl/m+WZtW1ueLnVBQgelPGntXVk/Q==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3773aeda-0e66-4f21-9409-08d7a9835a60
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2020 15:03:11.9782 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +DHRI413TOU1n4YBl1R7PzkfEzAKuuSaqAPAy2+Yt6vtlLEgCXYYcnYqkRZXCCwQE/lgP4q7Lt11FQ9E+OoVdf8PkEC1PC+r7KqowL6YGLA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2981
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.2.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,185 +123,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: david.edmondson@oracle.com, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002b4d65059dc1549f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+31.01.2020 20:44, Eric Blake wrote:
+> Several drivers supply .bdrv_has_zero_init that returns 1, but lack
+> the .bdrv_has_zero_init_truncate callback (parallels and qed outright,
+> vdi in some scenarios).  A literal reading of the existing
+> documentation says such drivers are broken, because
+> bdrv_has_zero_init_truncate() defaults to zero if the callback is
+> missing; but in practice, the tie between the two functions is only
+> relevant when truncate is supported.  Clarify the documentation to
+> make it obvious that this is okay.
+> 
+> Fixes: 1dcaf527
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>   include/block/block_int.h | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 640fb82c789e..77ab45dc87cf 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -444,7 +444,8 @@ struct BlockDriver {
+>       /*
+>        * Returns 1 if newly created images are guaranteed to contain only
+>        * zeros, 0 otherwise.
+> -     * Must return 0 if .bdrv_has_zero_init_truncate() returns 0.
+> +     * Must return 0 if .bdrv_co_truncate is set and
+> +     * .bdrv_has_zero_init_truncate() returns 0.
+>        */
+>       int (*bdrv_has_zero_init)(BlockDriverState *bs);
+> 
 
-Hi Philippe
-You can do whatever it takes
-I appreciate you for a review
-Thanks
+I doubt, shouldn't 1dcaf527 be fixed by adding all needed bdrv_has_zero_init_truncate functions?
 
-On Tue, Feb 4, 2020 at 4:12 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om>
-wrote:
+(sorry, I started to dig in the code and patches around bdrv_has_zero_init_truncate and tired :(.,
+  hope Max will comment this).
 
-> On 2/3/20 12:16 PM, Oksana Vohchana wrote:
-> > Along with VM migration via TCP, we can use migration through EXEC
-> > and UNIX transport protocol
-> >
-> > Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
-> > ---
-> > v2:
-> >    - Removes unnecessary symbols and unused method
-> >
-> > v3:
-> >   - Makes refactoring and split into 2 patches
-> >   - Provides TCP and EXEC migration
-> > Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
-> > ---
-> >   tests/acceptance/migration.py | 16 ++++++++++++++++
-> >   1 file changed, 16 insertions(+)
-> >
-> > diff --git a/tests/acceptance/migration.py
-> b/tests/acceptance/migration.py
-> > index 34263d8eeb..4419e38384 100644
-> > --- a/tests/acceptance/migration.py
-> > +++ b/tests/acceptance/migration.py
-> > @@ -10,10 +10,13 @@
-> >   # later.  See the COPYING file in the top-level directory.
-> >
-> >
-> > +import tempfile
-> >   from avocado_qemu import Test
-> > +from avocado import skipUnless
-> >
-> >   from avocado.utils import network
-> >   from avocado.utils import wait
-> > +from avocado.utils.path import find_command
-> >
-> >
-> >   class Migration(Test):
-> > @@ -54,3 +57,16 @@ class Migration(Test):
-> >       def test_migration_with_tcp_localhost(self):
-> >           dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
-> >           self.do_migrate(dest_uri)
-> > +
-> > +    def test_migration_with_unix(self):
-> > +        with tempfile.TemporaryDirectory(prefix=3D'socket_') as
-> socket_path:
-> > +            dest_uri =3D 'unix:%s/qemu-test.sock' % socket_path
-> > +            self.do_migrate(dest_uri)
->
-> Similarly, do you mind if I split and update subjects to "Test the UNIX
-> transport when migrating" and "Test the TCP transport when migrating"?
->
-> Meanwhile:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-> > +
-> > +    @skipUnless(find_command('nc', default=3DFalse), "nc command not
-> found on the system")
-> > +    def test_migration_with_exec(self):
-> > +        """
-> > +        The test works for both netcat-traditional and netcat-openbsd
-> packages
-> > +        """
-> > +        free_port =3D self._get_free_port()
-> > +        dest_uri =3D 'exec:nc -l localhost %u' % free_port
-> > +        src_uri =3D 'exec:nc localhost %u' % free_port
-> > +        self.do_migrate(dest_uri, src_uri)
-> >
->
->
-
---0000000000002b4d65059dc1549f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi Philippe<div>You can do whatever it takes<br></div><div=
->I appreciate you for a review<br></div><div>Thanks</div></div><br><div cla=
-ss=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Feb 4, 202=
-0 at 4:12 PM Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redha=
-t.com">philmd@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail=
-_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204=
-,204);padding-left:1ex">On 2/3/20 12:16 PM, Oksana Vohchana wrote:<br>
-&gt; Along with VM migration via TCP, we can use migration through EXEC<br>
-&gt; and UNIX transport protocol<br>
-&gt; <br>
-&gt; Signed-off-by: Oksana Vohchana &lt;<a href=3D"mailto:ovoshcha@redhat.c=
-om" target=3D"_blank">ovoshcha@redhat.com</a>&gt;<br>
-&gt; ---<br>
-&gt; v2:<br>
-&gt;=C2=A0 =C2=A0 - Removes unnecessary symbols and unused method<br>
-&gt; <br>
-&gt; v3:<br>
-&gt;=C2=A0 =C2=A0- Makes refactoring and split into 2 patches<br>
-&gt;=C2=A0 =C2=A0- Provides TCP and EXEC migration<br>
-&gt; Signed-off-by: Oksana Vohchana &lt;<a href=3D"mailto:ovoshcha@redhat.c=
-om" target=3D"_blank">ovoshcha@redhat.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 =C2=A0tests/acceptance/migration.py | 16 ++++++++++++++++<br>
-&gt;=C2=A0 =C2=A01 file changed, 16 insertions(+)<br>
-&gt; <br>
-&gt; diff --git a/tests/acceptance/migration.py b/tests/acceptance/migratio=
-n.py<br>
-&gt; index 34263d8eeb..4419e38384 100644<br>
-&gt; --- a/tests/acceptance/migration.py<br>
-&gt; +++ b/tests/acceptance/migration.py<br>
-&gt; @@ -10,10 +10,13 @@<br>
-&gt;=C2=A0 =C2=A0# later.=C2=A0 See the COPYING file in the top-level direc=
-tory.<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; +import tempfile<br>
-&gt;=C2=A0 =C2=A0from avocado_qemu import Test<br>
-&gt; +from avocado import skipUnless<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0from avocado.utils import network<br>
-&gt;=C2=A0 =C2=A0from avocado.utils import wait<br>
-&gt; +from avocado.utils.path import find_command<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0class Migration(Test):<br>
-&gt; @@ -54,3 +57,16 @@ class Migration(Test):<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0def test_migration_with_tcp_localhost(self):=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dest_uri =3D &#39;tcp:localhos=
-t:%u&#39; % self._get_free_port()<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.do_migrate(dest_uri)<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 def test_migration_with_unix(self):<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 with tempfile.TemporaryDirectory(prefix=
-=3D&#39;socket_&#39;) as socket_path:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dest_uri =3D &#39;unix:%s/q=
-emu-test.sock&#39; % socket_path<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 self.do_migrate(dest_uri)<b=
-r>
-<br>
-Similarly, do you mind if I split and update subjects to &quot;Test the UNI=
-X <br>
-transport when migrating&quot; and &quot;Test the TCP transport when migrat=
-ing&quot;?<br>
-<br>
-Meanwhile:<br>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redha=
-t.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 @skipUnless(find_command(&#39;nc&#39;, default=3DFalse)=
-, &quot;nc command not found on the system&quot;)<br>
-&gt; +=C2=A0 =C2=A0 def test_migration_with_exec(self):<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;&quot;&quot;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 The test works for both netcat-traditiona=
-l and netcat-openbsd packages<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;&quot;&quot;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 free_port =3D self._get_free_port()<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 dest_uri =3D &#39;exec:nc -l localhost %u=
-&#39; % free_port<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 src_uri =3D &#39;exec:nc localhost %u&#39=
-; % free_port<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.do_migrate(dest_uri, src_uri)<br>
-&gt; <br>
-<br>
-</blockquote></div>
-
---0000000000002b4d65059dc1549f--
-
+-- 
+Best regards,
+Vladimir
 
