@@ -2,91 +2,96 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC4B7C3524A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 06:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D25B2C3524A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 06:36:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9803D20674
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 06:17:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 873692087E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 06:36:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1KOgJvj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9803D20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jCuRJfIR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 873692087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyrWs-0005pE-P8
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 01:17:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43455)
+	id 1iyrpC-00024Z-P4
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 01:36:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iyrW5-0005QR-Sr
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:16:58 -0500
+ (envelope-from <mst@redhat.com>) id 1iyroN-00016b-90
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:35:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iyrW3-0001ub-Te
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:16:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45015
+ (envelope-from <mst@redhat.com>) id 1iyroM-00064r-7j
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:35:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38790
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iyrW3-0001pv-HY
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:16:55 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iyroM-00064C-4B
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 01:35:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580797014;
+ s=mimecast20190719; t=1580798149;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=nPNphcsFfpOPkbjI7mRdEurkvu2+BLbpS3usTYZoYY0=;
- b=i1KOgJvjPoS4eEuzBhLcAoxEHPkbYMX9kbB2V0LamVb9WqW9bIxOFuoqU2whN41erof0zj
- Vo58nubV3Pp1LasTU0kBJ8hIhSYu0O3kk1al+sHMgmXdvTHIYni7hZOjwnwO1Hr2eoUcBm
- QKJLPSfbwIhh5ut7dgvzd8E/Z+sH9o0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-eNzkYEBxMfuuoghCUs3Ifw-1; Tue, 04 Feb 2020 01:16:53 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFD91DB23;
- Tue,  4 Feb 2020 06:16:50 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-39.ams2.redhat.com [10.36.116.39])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 01E9A90F4D;
- Tue,  4 Feb 2020 06:16:47 +0000 (UTC)
-Subject: Re: VW ELF loader
-To: Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
- <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
- <20200203012842.GD52446@umbus.fritz.box>
- <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
- <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
- <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
- <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
- <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
- <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
- <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <d13eea1d-7942-47e0-6189-a66ce9639db4@redhat.com>
-Date: Tue, 4 Feb 2020 07:16:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ in-reply-to:in-reply-to:references:references;
+ bh=wVqf0acbo6uek2evnAMsQCoUgPVt9B9GWsSlHwXLCUo=;
+ b=jCuRJfIRcJsQXZmsvsb97fo3gldTZZSermZ82glxrWppw+LG2GZagyFjJ3XZDISFDE07Nm
+ +0TIuEJc7Zf32VkpedesO8hy5N7qqeWmhBFERDvDcxmtd9bEB6d/N5QG3sOTtQyTEb5Jrp
+ cZOY3F+y8F5bKMaS3RcVPe8dWlTF/6A=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-344-0WufhnTEMjC6tw3Y74PuXw-1; Tue, 04 Feb 2020 01:35:46 -0500
+Received: by mail-qk1-f200.google.com with SMTP id s9so11159855qkg.21
+ for <qemu-devel@nongnu.org>; Mon, 03 Feb 2020 22:35:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=hNAbxjmT3EJKtjyG7rQniLNeqzdU/9mrDavT+lFPQ6o=;
+ b=mwstSPhAULVVJfNPYeHMYS831zICclr/YS4RAOjObqBN7Xe94s/vlEW6HqMa5rnSNl
+ iRfv749kjesYq6NN+/XUjZYtXRzd2uLqyCAC6K0xKhayiNXPh1W44ARTOe/o7SSG4YUA
+ foT0DezA6JpXQsJOTUQxlQmIfogPiRHTow8zQ+EhbP2nh8ZcEsTZ6hJRfsVt5skpASqK
+ v0IpTcRKdGeIEWLH/3ZW9mfKXzWtXfNnpCIAefFfXqsJvdf7HyRw+iKNGaU9GaJceGdK
+ hKFVBEdzVWBouYASCZMy5LFRu61cLIW0azTlXfYZ7IjoqjImww/ShvKMKjex8lMyS9V1
+ 61dw==
+X-Gm-Message-State: APjAAAXMOLN2QzkT6IdWzzX2vcvC3SDBQPHdJSc0d4nK1LxbkHbwsOjx
+ kvDQcKadgVJcXGAmIiE8Be0wW1GeXAzNFZprzoFY48EVuTBDzVmmcBKN8Lk4J/jp0qBM0YvL3qV
+ +C1FbVBgjUh9BIx8=
+X-Received: by 2002:ac8:754e:: with SMTP id b14mr27501059qtr.220.1580798145511; 
+ Mon, 03 Feb 2020 22:35:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzru7KKxcFmceQBfaXpNP8b0S6nl560HD1wEaeMj6RWZJbmbdxOAXBOEn5lIj74J2d9ISaDZA==
+X-Received: by 2002:ac8:754e:: with SMTP id b14mr27501046qtr.220.1580798145302; 
+ Mon, 03 Feb 2020 22:35:45 -0800 (PST)
+Received: from redhat.com (bzq-109-64-11-187.red.bezeqint.net. [109.64.11.187])
+ by smtp.gmail.com with ESMTPSA id t2sm10394260qkc.31.2020.02.03.22.35.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Feb 2020 22:35:44 -0800 (PST)
+Date: Tue, 4 Feb 2020 01:35:40 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [PATCH v3 2/7] arm/virt/acpi: remove meaningless sub device
+ "RP0" from PCI0
+Message-ID: <20200204013535-mutt-send-email-mst@kernel.org>
+References: <20200204014325.16279-1-guoheyi@huawei.com>
+ <20200204014325.16279-3-guoheyi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: eNzkYEBxMfuuoghCUs3Ifw-1
+In-Reply-To: <20200204014325.16279-3-guoheyi@huawei.com>
+X-MC-Unique: 0WufhnTEMjC6tw3Y74PuXw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,41 +103,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-devel <qemu-devel@nongnu.org>,
- Cornelia Huck <conny@cornelia-huck.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/02/2020 00.26, Paolo Bonzini wrote:
+On Tue, Feb 04, 2020 at 09:43:20AM +0800, Heyi Guo wrote:
+> The sub device "RP0" under PCI0 in ACPI/DSDT does not contain any
+> method or property other than "_ADR", so it is safe to remove it.
 >=20
->=20
-> Il mar 4 feb 2020, 00:20 Alexey Kardashevskiy <aik@ozlabs.ru
-> <mailto:aik@ozlabs.ru>> ha scritto:
->=20
->     Speaking seriously, what would I put into the guest?
->=20
-> Only things that would be considered drivers. Ignore the partitions
-> issue for now so that you can just pass the device tree services to QEMU
-> with hypercalls.
->=20
->     Netboot's dhcp/tftp/ip/ipv6 client? It is going to be another SLOF,
->     smaller but adhoc with only a couple of people knowing it.
->=20
->=20
-> You can generalize and reuse the s390 code. All you have to write is the
-> PCI scan and virtio-pci setup.
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> Acked-by: "Michael S. Tsirkin" <mst@redhat.com>
 
-Well, for netbooting, the s390-ccw bios uses the libnet code from SLOF,
-so re-using this for a slim netboot client on ppc64 would certainly be
-feasible (especially since there are also already virtio drivers in SLOF
-that are written in C), but I think it is not very future proof. The
-libnet from SLOF only supports UDP, and no TCP. So for advanced boot
-scenarios like booting from HTTP or even HTTPS, you need something else
-(i.e. maybe grub is the better option, indeed).
 
- Thomas
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
+> ---
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Cc: qemu-arm@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/arm/virt-acpi-build.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>=20
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index bd5f771e9b..9f4c7d1889 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -317,10 +317,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemM=
+apEntry *memmap,
+>      aml_append(method, aml_return(buf));
+>      aml_append(dev, method);
+> =20
+> -    Aml *dev_rp0 =3D aml_device("%s", "RP0");
+> -    aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+> -    aml_append(dev, dev_rp0);
+> -
+>      Aml *dev_res0 =3D aml_device("%s", "RES0");
+>      aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+>      crs =3D aml_resource_template();
+> --=20
+> 2.19.1
 
 
