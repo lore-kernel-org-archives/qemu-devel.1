@@ -2,83 +2,170 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0832C35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 22:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0A2BC35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 23:19:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51F5A2087E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 22:58:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75D6F21582
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 23:19:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ijWeA1B7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51F5A2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="JYuk77+Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75D6F21582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz79l-0002Av-3X
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 17:58:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57767)
+	id 1iz7U6-0008Kg-Me
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 18:19:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42358)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iz798-0001jz-3y
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 17:58:19 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1iz7TI-0007qZ-2M
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 18:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iz795-0001zT-Br
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 17:58:17 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41985)
+ (envelope-from <aik@ozlabs.ru>) id 1iz7TG-0001ey-Dl
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 18:19:07 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42911)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iz795-0001r9-4v
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 17:58:15 -0500
-Received: by mail-ot1-x342.google.com with SMTP id 66so108296otd.9
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 14:58:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=MCbTWNgC8kFvpblyDHfdiG+QJfgOIZhT7bqC0WGWykg=;
- b=ijWeA1B7hxyCAs+TEE16RyMCmBdsKUb8/GbzjoVN5su8Q7GD3CSP/uiV3DBQrwwcOU
- /kM1gBMhJl2y96Trt0XWjka6ivRLrorY0QJXPap3Lkl0NdX1vSF2YLeIMSi8Ub7fl0F2
- PjFicweVSrE9+YVt+ZRjvmDUjsAf7GF70SvAHunBpxbZIZx5C3bjLOjCD+Zq68f5lWbo
- rktbvUfOaoLEQwt8R0xfLygGb91wpC2BUSqZWZ7sKgA0oASWU9RyI6uqB1zRw4SJ+HDK
- NF5/RipT311glqtyADJz/Je3lwEEw5Kxj6BVDFxKvY1eLESqOBNgHJTOh1I/Ct3xO4hm
- DiTQ==
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iz7TF-0001O5-T1
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 18:19:06 -0500
+Received: by mail-pg1-x541.google.com with SMTP id w21so4685243pgl.9
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 15:19:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=v02aXfzMcEp76woGC7HkvwqEkFlK1hsNOBCtgK59PqQ=;
+ b=JYuk77+YfLnFEE61mE+KgRSw5YlGE2yW5EF6iSI1Yslm1E7Msmj/SFkkiQI2YKurog
+ Pcg/29yLwLWT7QVdK2NL9Kj6tQs18hLvN4aIf1atcEVQIpE3Lg/GzfkBHDoBYrj8NlaW
+ J5E9VjFk1PckiRLMg+cM0YQ1CmkT8RkNe3ke9xf1Nvyw9UsjrCw+Lp1ml714upWlcpIX
+ RZhf4NsGtDgoL40oXRg28lrQEz0SAhCqQfmjC/4LVGevIF60wvIZUGKqNpmc44OUzkRD
+ r4Hl//X+UEM/QTjlj9qR4pCh8HnpGypqmvza1GQDkbA9c/6zwKOWEwxTOpA6V2MoTNac
+ 7qgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=MCbTWNgC8kFvpblyDHfdiG+QJfgOIZhT7bqC0WGWykg=;
- b=tPadDzrm9toPy1I8XVaQTBOJgcv8trZFm7lbWN3K/RIADdCbiRjzxBQQbzRRlzsHqi
- JJXgVmdgdihI68VMadRsMPSxZyHYPnPDgHrKqGeHoXTMFQPrExBCUqHdNnKGFZFlXOEF
- znUzBms/52E40uzDQPlYAffc4D3gMJrzKYt8PPEJn9J69DK5f75BZphu10DvTx4jkyCg
- lfj8R0gvGaAFC5dRO61+JOdh+qWFEcRvYrMnWhCmZgG4uzCilzx3PSBv4RrvtUOaUyPi
- PXnxhN0N/1hZuc9u5XAWwudDe0OsLNH501IqA3h4ieSAmAQqdmVZhjV57dpOUl+v61D9
- +7dw==
-X-Gm-Message-State: APjAAAU7IsKKLFoz4FwbKN9RqLIIeU44cHYWiGJIS2qFrogbNtqoeZ29
- p7o0pwEgEJi6nJKbwTlj6HcCnR/7FskcRLdn1ds=
-X-Google-Smtp-Source: APXvYqykui7wysVOJm3bhVVG6Sbf2PuE75FCYhmV+ZjXQC/JeRr6/RcvqyJmE8VPiwAVYART9rglf3rW8wC5N/rq70A=
-X-Received: by 2002:a9d:7305:: with SMTP id e5mr22631018otk.64.1580857094284; 
- Tue, 04 Feb 2020 14:58:14 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=v02aXfzMcEp76woGC7HkvwqEkFlK1hsNOBCtgK59PqQ=;
+ b=CnObl7d5lRUZ9ZKtma4hm6npFoXycMiWGk64RGiZaeMcc0Yov3ltMBdJLHlZSTBmST
+ tzTleKq+na9HpAc7koo5D4T7B/N0fRpBdz8rYpDu4JwFoPtNIHNhEDOhTLnpU7709JUO
+ ek6OcYm70uCIjJ1T/vJ7gPc39SPGehNUR+IX+7Vx4l/3cMO1zOsWNpaF5vqOI+1FyJil
+ IqCFX/wi5k6G9uXNplav5rjNNHOrAo+AYaeib0zTcXf26u8xmuCoa4EIqS8FJIWcF4Sw
+ 3bkpMZtvUT0TH2ANQjUFn4tMhK8GeJhuKQ/CGabrXptFwulOza+ufdVUE+RuLwPVqiFV
+ g+fQ==
+X-Gm-Message-State: APjAAAWmx7FD6KvyN6/qq4xlPPzwEsj6ZS1VE5iCfQn+ytb9Fq8x+N/9
+ SfWOixl91rmsOabS52C5dddBgQ==
+X-Google-Smtp-Source: APXvYqww/MLIKphlUwIpoRktSRGcHljVairHvc1czIWh5oFh90/BeOiVxNhF3G7ArfHjfl4FNVYprQ==
+X-Received: by 2002:aa7:9510:: with SMTP id b16mr32958961pfp.65.1580858340058; 
+ Tue, 04 Feb 2020 15:19:00 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id n2sm26851516pfq.50.2020.02.04.15.18.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Feb 2020 15:18:59 -0800 (PST)
+Subject: Re: VW ELF loader
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
+ <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
+ <20200203012842.GD52446@umbus.fritz.box>
+ <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
+ <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
+ <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
+ <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
+ <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
+ <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
+ <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <ca993d28-e493-7a9a-55fd-db172dc34d14@ozlabs.ru>
+Date: Wed, 5 Feb 2020 10:18:54 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Tue, 4 Feb 2020 14:58:13 -0800 (PST)
-In-Reply-To: <1580428993-4767-27-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1580428993-4767-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1580428993-4767-27-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 4 Feb 2020 23:58:13 +0100
-Message-ID: <CAL1e-=jwG=nP7TF_j1eiZM=nOZ5kx4Zkt=SxFfYUnKdPOwxgGw@mail.gmail.com>
-Subject: Re: [PATCH rc4 26/29] target/avr: Update build system
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Content-Type: multipart/alternative; boundary="0000000000008bac0f059dc7f9aa"
+In-Reply-To: <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,263 +177,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Michael Rolnik <mrolnik@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Cornelia Huck <conny@cornelia-huck.de>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000008bac0f059dc7f9aa
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Friday, January 31, 2020, Aleksandar Markovic <
-aleksandar.markovic@rt-rk.com> wrote:
-
-> From: Michael Rolnik <mrolnik@gmail.com>
->
-> Make AVR support buildable.
->
-> [AM: Remove word 'Atmel' from filenames and all elements of code]
-> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-> ---
->  configure                       |  7 +++++++
->  default-configs/avr-softmmu.mak |  5 +++++
->  target/avr/Makefile.objs        | 34 ++++++++++++++++++++++++++++++++++
->  3 files changed, 46 insertions(+)
->  create mode 100644 default-configs/avr-softmmu.mak
->  create mode 100644 target/avr/Makefile.objs
->
-> diff --git a/configure b/configure
-> index a72a5de..51f0b9e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7640,6 +7640,10 @@ case "$target_name" in
->      mttcg=3D"yes"
->      gdb_xml_files=3D"aarch64-core.xml aarch64-fpu.xml arm-core.xml
-> arm-vfp.xml arm-vfp3.xml arm-neon.xml"
->    ;;
-> +  avr)
-> +    gdb_xml_files=3D"avr-cpu.xml"
-> +    target_compiler=3D$cross_cc_avr
-> +  ;;
->    cris)
->    ;;
->    hppa)
-> @@ -7859,6 +7863,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
->        disas_config "ARM_A64"
->      fi
->    ;;
-> +  avr)
-> +    disas_config "AVR"
-> +  ;;
->    cris)
->      disas_config "CRIS"
->    ;;
-> diff --git a/default-configs/avr-softmmu.mak
-> b/default-configs/avr-softmmu.mak
-> new file mode 100644
-> index 0000000..80218ad
-> --- /dev/null
-> +++ b/default-configs/avr-softmmu.mak
-> @@ -0,0 +1,5 @@
-> +# Default configuration for avr-softmmu
-> +
-> +# Boards:
-> +#
-> +CONFIG_ARDUINO=3Dy
-> diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
-> new file mode 100644
-> index 0000000..7523e0c
-> --- /dev/null
-> +++ b/target/avr/Makefile.objs
-> @@ -0,0 +1,34 @@
-> +#
-> +#  QEMU AVR CPU
-> +#
-> +#  Copyright (c) 2019 Michael Rolnik
-> +#
-> +#  This library is free software; you can redistribute it and/or
-> +#  modify it under the terms of the GNU Lesser General Public
-> +#  License as published by the Free Software Foundation; either
-> +#  version 2.1 of the License, or (at your option) any later version.
-> +#
-> +#  This library is distributed in the hope that it will be useful,
-> +#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> +#  Lesser General Public License for more details.
-> +#
-> +#  You should have received a copy of the GNU Lesser General Public
-> +#  License along with this library; if not, see
-> +#  <http://www.gnu.org/licenses/lgpl-2.1.html>
-> +#
-> +
-> +DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
-> +decode-y =3D $(SRC_PATH)/target/avr/insn.decode
-> +
-> +target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
-> +       $(call quiet-command, \
-> +         $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth
-> 16 $<, \
-> +         "GEN", $(TARGET_DIR)$@)
-> +
-> +target/avr/translate.o: target/avr/decode_insn.inc.c
-> +
-> +obj-y +=3D translate.o cpu.o helper.o
-> +obj-y +=3D gdbstub.o
-> +obj-y +=3D disas.o
-> +obj-$(CONFIG_SOFTMMU) +=3D machine.o
 
 
-The last line should not contain "-$(CONFIG_SOFTMMU)", since there is only
-softmmu case for avr. I will remove it in rc5, unless somebody tell me not
-to do so.
+On 04/02/2020 10:26, Paolo Bonzini wrote:
+> 
+> 
+> Il mar 4 feb 2020, 00:20 Alexey Kardashevskiy <aik@ozlabs.ru
+> <mailto:aik@ozlabs.ru>> ha scritto:
+> 
+> 
+> 
+>     Speaking seriously, what would I put into the guest?
+> 
+> 
+> Only things that would be considered drivers. Ignore the partitions
+> issue for now so that you can just pass the device tree services to QEMU
+> with hypercalls.
+> 
+>     Netboot's dhcp/tftp/ip/ipv6 client? It is going to be another SLOF,
+>     smaller but adhoc with only a couple of people knowing it.
+> 
+> 
+> You can generalize and reuse the s390 code. All you have to write is the
+> PCI scan and virtio-pci setup.
 
-Aleksandar
+Among with the device tree syncing, these are the things I really want
+to get rid of, especially drivers as today they do not support IOMMU so
+I will also have to implement that as well.
+
+I guess I could write a small firmware which would read MBR/GPT, find
+PReP, load GRUB elf and jump into it (although this seems unnecessary
+complicated for the task and definitely duplicates the code) but having
+drivers in what is defined as a driverless environment is just weird imho.
+
+However I am struggling with hooking network from CI to the network
+backend, not as easy as blockdev, need another temporary netclient :)
 
 
-> --
-> 2.7.4
->
->
-
---0000000000008bac0f059dc7f9aa
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Friday, January 31, 2020, Aleksandar Markovic &lt;<a href=3D"mai=
-lto:aleksandar.markovic@rt-rk.com">aleksandar.markovic@rt-rk.com</a>&gt; wr=
-ote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border=
--left:1px #ccc solid;padding-left:1ex">From: Michael Rolnik &lt;<a href=3D"=
-mailto:mrolnik@gmail.com">mrolnik@gmail.com</a>&gt;<br>
-<br>
-Make AVR support buildable.<br>
-<br>
-[AM: Remove word &#39;Atmel&#39; from filenames and all elements of code]<b=
-r>
-Suggested-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@g=
-mail.com">aleksandar.m.mail@gmail.com</a>&gt;<br>
-<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrol=
-nik@gmail.com</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com">philmd@redhat.com</a>&gt;<br>
-Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.c=
-om">amarkovic@wavecomp.com</a>&gt;<br>
-Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
-naro.org">richard.henderson@linaro.org</a>&gt;<br>
-Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@=
-gmail.com">aleksandar.m.mail@gmail.com</a>&gt;<br>
----<br>
-=C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 7 +++++++<br>
-=C2=A0default-configs/avr-softmmu.<wbr>mak |=C2=A0 5 +++++<br>
-=C2=A0target/avr/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 34 ++++++++++++=
-++++++++++++++++++<wbr>++++<br>
-=C2=A03 files changed, 46 insertions(+)<br>
-=C2=A0create mode 100644 default-configs/avr-softmmu.<wbr>mak<br>
-=C2=A0create mode 100644 target/avr/Makefile.objs<br>
-<br>
-diff --git a/configure b/configure<br>
-index a72a5de..51f0b9e 100755<br>
---- a/configure<br>
-+++ b/configure<br>
-@@ -7640,6 +7640,10 @@ case &quot;$target_name&quot; in<br>
-=C2=A0 =C2=A0 =C2=A0mttcg=3D&quot;yes&quot;<br>
-=C2=A0 =C2=A0 =C2=A0gdb_xml_files=3D&quot;aarch64-core.<wbr>xml aarch64-fpu=
-.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml&quot;<br>
-=C2=A0 =C2=A0;;<br>
-+=C2=A0 avr)<br>
-+=C2=A0 =C2=A0 gdb_xml_files=3D&quot;avr-cpu.xml&quot;<br>
-+=C2=A0 =C2=A0 target_compiler=3D$cross_cc_avr<br>
-+=C2=A0 ;;<br>
-=C2=A0 =C2=A0cris)<br>
-=C2=A0 =C2=A0;;<br>
-=C2=A0 =C2=A0hppa)<br>
-@@ -7859,6 +7863,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0disas_config &quot;ARM_A64&quot;<br>
-=C2=A0 =C2=A0 =C2=A0fi<br>
-=C2=A0 =C2=A0;;<br>
-+=C2=A0 avr)<br>
-+=C2=A0 =C2=A0 disas_config &quot;AVR&quot;<br>
-+=C2=A0 ;;<br>
-=C2=A0 =C2=A0cris)<br>
-=C2=A0 =C2=A0 =C2=A0disas_config &quot;CRIS&quot;<br>
-=C2=A0 =C2=A0;;<br>
-diff --git a/default-configs/avr-softmmu.<wbr>mak b/default-configs/avr-sof=
-tmmu.<wbr>mak<br>
-new file mode 100644<br>
-index 0000000..80218ad<br>
---- /dev/null<br>
-+++ b/default-configs/avr-softmmu.<wbr>mak<br>
-@@ -0,0 +1,5 @@<br>
-+# Default configuration for avr-softmmu<br>
-+<br>
-+# Boards:<br>
-+#<br>
-+CONFIG_ARDUINO=3Dy<br>
-diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs<br>
-new file mode 100644<br>
-index 0000000..7523e0c<br>
---- /dev/null<br>
-+++ b/target/avr/Makefile.objs<br>
-@@ -0,0 +1,34 @@<br>
-+#<br>
-+#=C2=A0 QEMU AVR CPU<br>
-+#<br>
-+#=C2=A0 Copyright (c) 2019 Michael Rolnik<br>
-+#<br>
-+#=C2=A0 This library is free software; you can redistribute it and/or<br>
-+#=C2=A0 modify it under the terms of the GNU Lesser General Public<br>
-+#=C2=A0 License as published by the Free Software Foundation; either<br>
-+#=C2=A0 version 2.1 of the License, or (at your option) any later version.=
-<br>
-+#<br>
-+#=C2=A0 This library is distributed in the hope that it will be useful,<br=
->
-+#=C2=A0 but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-+#=C2=A0 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the=
- GNU<br>
-+#=C2=A0 Lesser General Public License for more details.<br>
-+#<br>
-+#=C2=A0 You should have received a copy of the GNU Lesser General Public<b=
-r>
-+#=C2=A0 License along with this library; if not, see<br>
-+#=C2=A0 &lt;<a href=3D"http://www.gnu.org/licenses/lgpl-2.1.html" target=
-=3D"_blank">http://www.gnu.org/licenses/<wbr>lgpl-2.1.html</a>&gt;<br>
-+#<br>
-+<br>
-+DECODETREE =3D $(SRC_PATH)/scripts/<wbr>decodetree.py<br>
-+decode-y =3D $(SRC_PATH)/target/avr/insn.<wbr>decode<br>
-+<br>
-+target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0$(call quiet-command, \<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0$(PYTHON) $(DECODETREE) -o $@ --decode d=
-ecode_insn --insnwidth 16 $&lt;, \<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;GEN&quot;, $(TARGET_DIR)$@)<br>
-+<br>
-+target/avr/translate.o: target/avr/decode_insn.inc.c<br>
-+<br>
-+obj-y +=3D translate.o cpu.o helper.o<br>
-+obj-y +=3D gdbstub.o<br>
-+obj-y +=3D disas.o<br>
-+obj-$(CONFIG_SOFTMMU) +=3D machine.o</blockquote><div><br></div><div>The l=
-ast line should not contain &quot;-$(CONFIG_SOFTMMU)&quot;, since there is =
-only softmmu case for avr. I will remove it in rc5, unless somebody tell me=
- not to do so.</div><div><br></div><div>Aleksandar</div><div>=C2=A0</div><b=
-lockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px =
-#ccc solid;padding-left:1ex">
--- <br>
-2.7.4<br>
-<br>
-</blockquote>
-
---0000000000008bac0f059dc7f9aa--
+-- 
+Alexey
 
