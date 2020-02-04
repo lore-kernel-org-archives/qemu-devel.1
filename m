@@ -2,80 +2,101 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D353C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 12:31:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0BFC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 12:37:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 372972084E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 12:31:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA58F2082E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 12:37:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bfe+c+hr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 372972084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrH0zAVx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA58F2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyxMg-00026q-Ej
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 07:31:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40216)
+	id 1iyxSj-0003el-W2
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 07:37:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44146)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iyxLQ-0001Mp-BT
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:30:22 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iyxS1-0003Du-BD
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:37:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iyxLN-0005lj-6e
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:30:20 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46339)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iyxLL-0005j9-Gw
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:30:15 -0500
-Received: by mail-ot1-x344.google.com with SMTP id g64so16857269otb.13
- for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 04:30:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JbvKPkW9GRFjDx6pR0+UM4e26jfwL9MyJeS6U1mOaoI=;
- b=Bfe+c+hrTpuU0pfsFaSvT7NIk9sQyrcX1PVQVk7m9cjfGDatJZRKV5CBSQZlSQBetU
- ha1tK0jB397cEth44yegs71qtNTu3kNQkzk8TPI5vnW5woFXCUtos07In9ldM5mRi1/9
- xAk8pAww85dLwPAbIfP2sBVnLnaI81qNYnv+D2zu+OTykTij8soRXjXu2pRhJY4DwGmy
- pPVwMaJxbDzYDzTjdFOLUhW6U8ucYJQkWH+6yXw7v6K+0LpINi/BAlkqRNJQ6qw89m6N
- YUfxeCadtPdQ81t38tuqDma+s1qrKzbVjmcWrs643WOXqNRQOyzSZOgkPKNahm+Qt/a2
- ZRSQ==
+ (envelope-from <pbonzini@redhat.com>) id 1iyxRz-0008TW-8a
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:37:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22281
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iyxRz-0008Ps-3B
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 07:37:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580819826;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=v0IVNVijPEAGVo676KSbJRLq87b3zRTX9Lpy3WdWpng=;
+ b=MrH0zAVxX1SeoUVv9qUFMI1zBLkrYwvl6YWO4rpndfhE1pidOzSpbDmg5W+8zk+3D995tS
+ pYw4dUciHxAiXnVM3ptWVczzoTmPKYEVosNytwLXL7z8A+ss4+0vCJESsECMRdcafu5TtW
+ fQyRvJHI/QukotJPCJOhwfC/CMe2DPQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-s--FqP2mOcaYVhjMoqodsw-1; Tue, 04 Feb 2020 07:37:04 -0500
+Received: by mail-wr1-f72.google.com with SMTP id p8so3252170wrw.5
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 04:37:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JbvKPkW9GRFjDx6pR0+UM4e26jfwL9MyJeS6U1mOaoI=;
- b=kq2ie/f4ve5g3CtHySUZskmj1xud/J+t8O6LAKlcZGUARkhWgxfsfXspQjYdAXjxQa
- O6LFINsDE2s27+4Pf0yoBEkaCUHDNSXBdew2vNbWS0dU6ta0/Fupi6sH6rD5BzKbg/XS
- kAT6nigZ1JnkbHc55iHN5WTYCXM4/4TICxltgUYHtlxNz3r9/zXr3TTkoaYWVUCtrDxq
- wR7yILh5iqyjnJQ32RH/rmzR43MxEf5Hzo7tkayai1Q7g0Qxv2RsjwyMUuUUTcArdnXH
- H0ChETipg6zJnYO65MrGEYLSjOLaWB3yRySl+MrP07lwjGopX8Gjkgit46Lk56QbkP6F
- AHZQ==
-X-Gm-Message-State: APjAAAWM7gDxk3IkPoOLiCHo8oMCHJyknD1AoorIFlEwXVlew/jU3jBU
- wYTtyJyyZlYmOlhRVhMmJOKu3zqhT58WUQQs3RY=
-X-Google-Smtp-Source: APXvYqw5CTa3DKDgrmTKK7yjh8EGBGvfjTkwegECFqqtMh4eqJxL0UNiG0yxybwp7XcWBe46bJvE/eLsg/tYaF0PAQE=
-X-Received: by 2002:a05:6830:12c3:: with SMTP id
- a3mr22921786otq.341.1580819414487; 
- Tue, 04 Feb 2020 04:30:14 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=v0IVNVijPEAGVo676KSbJRLq87b3zRTX9Lpy3WdWpng=;
+ b=FYWrfDmwuTsGyHfno3yhyZ4PdMpO64xwDl6sKhjSg0ET4qZ299rSRAB0MNo67BHZlM
+ ebJNl7VP0q3uT7eExulwgQSg87INCxOZBZz3MsFfzjgjYJqjcv7t7eB3UWmodRrDKiLN
+ G3Izk1ac8b9urmk+BB4m3wPDXTARX9c5nGPmgyYr1A+PBDugFeukxENR/8etrlwf/0dN
+ 8YSlV4gyPlJnqvAlLAcWqSK3dccSEL2S8MvOEVzR7runlhlQ84KkV2KlaQ/DLTJLXZwT
+ tVkfwqH+pfwYlwuFfB+IGSPFW2QSDIlI2OdiqB4JD8ERbg/djLxJZA5qxNmS4h0LYGsT
+ cLhw==
+X-Gm-Message-State: APjAAAUPzTc0XaOt7f2SZDghe/m7rFPnjMM3Dp2yvo56OS5Kf/n3NRai
+ mB7YpHRfdOZebCU2TTgLMmkWPpRVbELzIQAZtKuGYbXT6Il4FA5gkgZ/D9xQwhQzIg2ShG3MLWy
+ 2bDacnLrhOhy+SQw=
+X-Received: by 2002:adf:face:: with SMTP id a14mr21559199wrs.284.1580819823687; 
+ Tue, 04 Feb 2020 04:37:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwrDuGKhcVRaqf0Fcf8kPxNIdNJh2+2aFfiPvQEckVZX+d+CngIbZZ8qpoiuIGRT1Uo8ESiHg==
+X-Received: by 2002:adf:face:: with SMTP id a14mr21559180wrs.284.1580819823435; 
+ Tue, 04 Feb 2020 04:37:03 -0800 (PST)
+Received: from [192.168.178.40] ([151.20.243.54])
+ by smtp.gmail.com with ESMTPSA id y12sm3579679wmj.6.2020.02.04.04.37.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Feb 2020 04:37:02 -0800 (PST)
+Subject: Re: [PATCH 1/2] configure: Allow user to specify sphinx-build binary
+To: Markus Armbruster <armbru@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200203132533.21850-1-peter.maydell@linaro.org>
+ <20200203132533.21850-2-peter.maydell@linaro.org>
+ <87d0au8wlh.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2ff980d6-bfa1-0db4-62cc-c10a3e0865e6@redhat.com>
+Date: Tue, 4 Feb 2020 13:37:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <1580818058-16159-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1580818058-16159-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 4 Feb 2020 13:30:03 +0100
-Message-ID: <CAL1e-=jSJvwsqMsZfxy-D255hZ6SWPMv_xTXeCEyX7DGjhVE3w@mail.gmail.com>
-Subject: Re: [PATCH 0/9] linux-user: Update syscall numbers to kernel 5.5 level
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <87d0au8wlh.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-MC-Unique: s--FqP2mOcaYVhjMoqodsw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,171 +108,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Chris Wulff <crwulff@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Stafford Horne <shorne@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 4, 2020 at 1:08 PM Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> Hello, folks!
->
-> This series is a spin-off of another larger linux-user series
-> that become too large to handle, hence these patches related to
-> syscall numbers are now in this, separate, series.
->
+On 04/02/20 11:39, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> 
+>> Currently we insist on using 'sphinx-build' from the $PATH;
+>> allow the user to specify the binary to use. This will be
+>> more useful as we become pickier about the capabilities
+>> we require (eg needing a Python 3 sphinx-build).
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> I went with the most common convention for specifying "here's
+>> an executable", like --make=, --install=, --python=....
+>>
+>> The only odd one out for our current configure options seems to be
+>> that we want --with-git=GIT, not --git=GIT. You could argue that
+>> that's a better convention,
+> 
+> It's the one Autoconf uses.
+> 
+>>                             but it makes more sense to me to
+>> stick with the convention we currently mostly have. (Perhaps
+>> we should even change --with-git= to --git= ?)
+> 
+> Paolo, any implications on the Meson conversion?
 
-I forgot to say that, compared to the previous larger linux-user
-series, two new patches are added (arm and sh4 related), and
-the remaining seven patches are identical (except that "R-b:"s
-and "A-b:"s are added when needed).
+Nope, there will still be a handwritten configure script (and in the
+beginning it will be pretty much the same as now; in due time, it will
+handle command line parsing only).
 
-Sincerely,
-Aleksandar
+Paolo
 
-> Now that kernel 5.5 is released few days ago, it is time to
-> reflect what can be updated in linux-user for upcomming QEMU 5.0.
->
-> An obvoius kernel change we should take into account are new
-> system calls, and the foirst step is updating syscall numbers
-> mainteined within QEMU linux-user.
->
-> Regarding kernel syscal numbers there is good news and bad news.
->
-> The good news is that kernel developers decided to make future
-> syscall numbers much more synchonized accross architectures than
-> before. They already reached that state.
->
-> The bad news is that we in QEMU did not reach that state yet, since
-> we lag after kernel significantly.
->
-> The good news again is that we will reach that state if we update
-> syscall numbers accross the board now. This is the main intention
-> and motivation of this series.
->
-> The bad news again is that in order to update syscall numebrs we
-> need to be very careful at this moment. There are a number of new
-> syscalls added to the kernel recently that QEMU doesn't know about
-> at all. Significant number of new syscalls deal with 32/64-bit
-> compatibility, traditionally a problematic area in kernel, and in
-> QEMU as well. Moreover, some of the new syscalls are applicable to
-> 32-bit architectures only.
->
-> This series covers updating syscall numbers defined in the following
-> files:
->
->   - linux-user/alpha/syscall_nr.h
->   - linux-user/arm/syscall_nr.h
->   - linux-user/m68k/syscall_nr.h
->   - linux-user/microblaze/syscall_nr.h
->   - linux-user/mips/cpu_loop.c
->   - linux-user/mips/syscall_nr.h
->   - linux-user/mips64/syscall_nr.h
->   - linux-user/sh4/syscall_nr.h
->   - linux-user/x86_64/syscall_nr.h
->   - linux-user/xtensa/syscall_nr.h
->
-> This series doesn't cover following files (since they use certain
-> proprietary rules for mapping between kernel source and qemu source,
-> I don't feel quite comfortable changing them - therefore I am asking
-> corresponding target maintainers or Lauren to update them, if
-> possible, before our 5.0 release):
->
->   - linux-user/aarch64/syscall_nr.h
->   - linux-user/i386/syscall_nr.h
->   - linux-user/nios2/syscall_nr.h
->   - linux-user/ppc/syscall_nr.h
->   - linux-user/riscv/syscall_nr.h
->   - linux-user/s390x/syscall_nr.h
->   - linux-user/sparc/syscall_nr.h
->   - linux-user/sparc64/syscall_nr.h
->
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Chris Wulff <crwulff@gmail.com>
-> CC: Marek Vasut <marex@denx.de>
-> CC: David Gibson <david@gibson.dropbear.id.au>
-> CC: Palmer Dabbelt <palmer@dabbelt.com>
-> CC: Alistair Francis <Alistair.Francis@wdc.com>
-> CC: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> CC: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> CC: David Hildenbrand <david@redhat.com>
-> CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> CC: Artyom Tarasenko <atar4qemu@gmail.com>
->
-> This series also doesn't cover following files (since I can't find
-> corresponding kernel code - and I am also asking corresponding
-> target maintainers or Lauren to update them, if possible, before
-> our 5.0 release):
->
->   - linux-user/cris/cpu_loop.c
->   - linux-user/hppa/syscall_nr.h
->   - linux-user/openrisc/syscall_nr.h
->   - linux-user/tilegx/syscall_nr.h
->
-> CC: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-> CC: Richard Henderson <rth@twiddle.net>
-> CC: Stafford Horne <shorne@gmail.com>
->
-> Again, I don't plan (I am really running out of time resources) to
-> work in a significant way on this issue any more, and I am asking
-> you guys other maintainers to help finish updating syscall numbers
-> before QEMU 5.0 release.
->
-> Once we do that, updating syscall numbers in QEMU should and will
-> be significantly easier.
->
-> Thanks in advance!
->
-> Truly yours,
-> Aleksandar
->
-> -----------------------------------------------------------------------
->
-> Aleksandar Markovic (9):
->   linux-user: alpha: Update syscall numbers to kernel 5.5 level
->   linux-user: arm: Update syscall numbers to kernel 5.5 level
->   linux-user: m68k: Update syscall numbers to kernel 5.5 level
->   linux-user: microblaze: Update syscall numbers to kernel 5.5 level
->   linux-user: mips: Update syscall numbers to kernel 5.5 level
->   linux-user: sh4: Update syscall numbers to kernel 5.5 level
->   linux-user: x86_64: Update syscall numbers to kernel 5.5 level
->   linux-user: xtensa: Update syscall numbers to kernel 5.5 level
->   linux-user: xtensa: Remove unused constant TARGET_NR_syscall_count
->
->  linux-user/alpha/syscall_nr.h      | 35 +++++++++++++++++
->  linux-user/arm/syscall_nr.h        | 44 +++++++++++++++++++++
->  linux-user/m68k/syscall_nr.h       | 50 +++++++++++++++++++++++-
->  linux-user/microblaze/syscall_nr.h | 45 ++++++++++++++++++++++
->  linux-user/mips/cpu_loop.c         | 78 +++++++++++++++++++++++++++++++++++++-
->  linux-user/mips/syscall_nr.h       | 45 ++++++++++++++++++++++
->  linux-user/mips64/syscall_nr.h     | 13 +++++++
->  linux-user/sh4/syscall_nr.h        | 48 +++++++++++++++++++++++
->  linux-user/x86_64/syscall_nr.h     | 24 ++++++++++++
->  linux-user/xtensa/syscall_nr.h     | 36 +++++++++++++++++-
->  10 files changed, 414 insertions(+), 4 deletions(-)
->
-> --
-> 2.7.4
->
->
 
