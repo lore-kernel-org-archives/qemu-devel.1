@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E7EC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 09:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D04A7C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 09:26:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C66B2166E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 09:22:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B8552166E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 09:26:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AmrpkMeq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C66B2166E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bREFtOP+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B8552166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyuPi-0002UT-Eu
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 04:22:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60480)
+	id 1iyuT4-0003gb-SI
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 04:26:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36567)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iyuOz-0001sk-VR
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:21:51 -0500
+ (envelope-from <berrange@redhat.com>) id 1iyuSA-0003AP-69
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:25:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iyuOv-0001rm-HB
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:21:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52283
+ (envelope-from <berrange@redhat.com>) id 1iyuS8-0002IJ-On
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:25:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31669
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iyuOv-0001lE-CK
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:21:45 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iyuS7-00028M-K0
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:25:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580808104;
+ s=mimecast20190719; t=1580808302;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mXl9bfRqPxyrnUbZc9elsHQCaQNqyZrAVF5dEXo77I8=;
- b=AmrpkMeq1Wa8djdKpjqSWzQ0aryIZA/BWgvnwEGyL6eYXnO9a1oyM703EsFbG8nox1Rjv+
- dPHgJ2wU2+nqBoecJTO8w1pYBc/HEM3ZXG5aZsZZApWLXQIW0uOis7znZgPNsfH7hZPaUl
- 3yVdvG0O8LaOBGaB1am7Cseel1S9Qn0=
+ bh=F4DtaN164akoN1Uf1ADsrUmp5p+IPW6HV8SS2r10XXo=;
+ b=bREFtOP+owGaVSJkPyBnkaRpLJroSiQDHgiMnNQqg43+xVItRAAWSjCVt8zmN8PrLSOg6Q
+ pifTdTDDcYHCNfb3Uv712S6sq7Vwij209G5E9nv4GAJB6zliO9NdsfSBlMRA+b4UHtLCYn
+ ojhaCC+hsPFoeQjPbbFMzYjq1IauWdk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-gx1b7kLrOzOkEpq6A951Fw-1; Tue, 04 Feb 2020 04:21:40 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-50-n_7Wz8qQOmydE0bZ6SuDiQ-1; Tue, 04 Feb 2020 04:24:58 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D00A18A6EC2;
- Tue,  4 Feb 2020 09:21:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7968EDBF5;
+ Tue,  4 Feb 2020 09:24:57 +0000 (UTC)
 Received: from redhat.com (ovpn-112-55.ams2.redhat.com [10.36.112.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A84B387B1A;
- Tue,  4 Feb 2020 09:21:33 +0000 (UTC)
-Date: Tue, 4 Feb 2020 09:21:30 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 441FDF6C1;
+ Tue,  4 Feb 2020 09:24:52 +0000 (UTC)
+Date: Tue, 4 Feb 2020 09:24:50 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
 Subject: Re: Does Libvirt's json parser support single quoted string in qmp
  json string?
-Message-ID: <20200204092130.GA2205287@redhat.com>
+Message-ID: <20200204092450.GB2205287@redhat.com>
 References: <ADDDD4B8-45AD-4D79-9332-06F2A50B26CE@sina.com>
  <9bac386b-5a90-3c10-b63b-d45a2e8c2d58@redhat.com>
  <20200203101352.GB1922177@redhat.com>
@@ -72,16 +72,15 @@ References: <ADDDD4B8-45AD-4D79-9332-06F2A50B26CE@sina.com>
 MIME-Version: 1.0
 In-Reply-To: <87eevabwls.fsf@dusky.pond.sub.org>
 User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: gx1b7kLrOzOkEpq6A951Fw-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: n_7Wz8qQOmydE0bZ6SuDiQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,44 +128,44 @@ ition
 > >>> whatever it wants.
 > >>
 > >> Can we deprecate & remove this extension in QEMU ?
-
-[snip]
-
-> >> On the flip side, if we're going to support extensions like single quo=
-ting,
-> >> then we should make it clear to applications that this is not really J=
-SON
-> >> and that they need to provide an impl that is 100% matching QEMU's dia=
-lect.
-> >> This effectively means they need just import a copy of QEMU's code.
 >=20
-> To the best of my knowledge, the JSON parser interprets any valid strict
-> JSON input in accordance to RFC 8259.  In other words, you don't notice
-> the extensions unless you use them, or rely on invalid strict JSON to be
-> rejected.
+> I think deprecating the extension makes sense only if we can actually
+> kill it.
 >=20
-> Peter Luo's input uses one of QEMU's JSON parser's extensions like this:
+> We could try to make the extension opt-in, and have only the intermal
+> users opt in.  Can't say offhand whether that's practical.
 >=20
->     "base":'json:{...}'
+> > We could start a deprecation clock, if desired, but I don't know how
+> > many external users would be impacted (at least qemu's testsuite
+> > heavily relies on the extension of single quotes).
 >=20
-> This is not valid strict JSON.  Libvirt's JSON parser doesn't accept it.
+> Looks like this:
 >=20
-> The problem is not presence of extensions in QEMU, it's the use of these
-> extensions in input for libvirt.  Removing the extensions from QEMU will
-> not affect the error.  Removing their use from the input will.
+>     rsp =3D qdict_from_jsonf_nofail("{ 'error': { 'class': %s, 'desc': %s=
+ } }",
+>                                   QapiErrorClass_str(error_get_class(err)=
+),
+>                                   error_get_pretty(err));
+>=20
+> Without the extension, we'd suffer from a mild case of leaning toothpick
+> syndrome:
+>=20
+>     rsp =3D qdict_from_jsonf_nofail("{ \"error\": { \"class\": %s, \"desc=
+\": %s } }",
+>                                   QapiErrorClass_str(error_get_class(err)=
+),
+>                                   error_get_pretty(err));
+>=20
+> I intentionally picked an example outside tests/ :)
 
-The issue that I see is that QEMU accepts this input string when it
-parsers JSON provided by the user.  This in turn means the user has
-an expectation that other tools based on QEMU will accept this exact
-same document. This is not the case because the other tools are
-using a stricter impl of JSON.=20
+This is purely QEMU internal code. That is fine to use whatever
+extensions are desired, as it isn't exposed to end users or mgmt
+apps.=20
 
-IOW QEMU's extensions have mislead the users into believing their=20
-JSON input is valid for any tool based on QEMU.=20
+The harm from JSON extensions comes in places where our public API
+accepts it - CLI, QMP, JSON inside disk images, etc, as those are
+all places where interoperability with third party apps is relevant
 
-Thus overall I think it would be beneficial for any places where
-QEMU accepts JSON from external users or apps, to be restricted to
-common JSON syntax only, without any QEMU specific extensions.
 
 Regards,
 Daniel
