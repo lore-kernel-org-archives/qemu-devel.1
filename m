@@ -2,116 +2,129 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CC1C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 10:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A956C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 10:03:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69609217BA
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 10:02:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72BBC2192A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 10:03:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="iuXm7+hz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69609217BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Kt76E1fH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72BBC2192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=samsung.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyv25-0005qS-JT
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 05:02:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59640)
+	id 1iyv34-0007V5-Ei
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 05:03:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56084)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iyux1-0005b1-60
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:57:00 -0500
+ (envelope-from <k.jensen@samsung.com>) id 1iyusw-0004ph-5U
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:52:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iyuwz-0007lu-Tk
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:56:58 -0500
-Received: from mail-am6eur05on2108.outbound.protection.outlook.com
- ([40.107.22.108]:15889 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iyuwz-0007j5-Nk; Tue, 04 Feb 2020 04:56:57 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ccCKVCm7/bamPlELwUiTpdAiGoMbN77Ziw7N8ofrA1op9lxS8CLSy1kQhf2lC1+qQ+5k5S2OxQwNSBnT7jhakeL8PtgUF9K0Qxo14Z8FXO7szJFqBzF/+X9vyIl8YgN82AZINxD7keSyGzJLsXCBxvwluJg1EYOBuazQl+mdgfb9j4EwHeSAoL+Vz2fL6TnDxVtgu6aigyiEy5o4PSSX09k1gUIVthF/wV4b1f1fFu60xdQ4kw2172aS5cfZdyB8iZcCk+eTFBnd3Ow8MlNLM5Ljn9tXIZ3L4UiHghYIgV5fAYm3R6SKyg1f2gr4NfGRgqQwcmp7U60yODOxu3MHFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=twOksCFA/yFOk85MTajzb+lRH7v6w6mC8QGhZdR+PTY=;
- b=PzYrA91LeoZs0ZLSFR4yPDz8ylE2Hmyb4FoVa8sS2INa4Y1A3ToB5dJs747ksDcRKtcIf1PRqOGXqJAQW3GMf61sw1BT70awDIvNDuY63YDwJr32oIYo0y1E0L7P95MC+4zyrbmABF0ddEO2mkQkDhQsjT8sE01Fgf/3zgj3eSz/9nbs1oszQDw9qwQz9AUNfniih1zuvylqPdUftdSoHpsPjGBF0ZoVCLiAdBd5Qf4PLT/D1EGlUFvS8sWxcGt4lr616mAjytBF296h3PL/djdHca9ExQPwSnafGin+8VdjWr66kGPw3jtnQmDfTcIOec7+9YKy8Bn2go/1NPHdpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=twOksCFA/yFOk85MTajzb+lRH7v6w6mC8QGhZdR+PTY=;
- b=iuXm7+hzHIDzIzdZ/rrW1N3fwucOZNLvHaLxkBHS2tGZh1SJW/0CekyAn7NEcqkY9ya0u+GmxAxaPceVd1Z+Jw+esNFR6vLXOja94kygqR+KSSwp8W6Kqh542b/ISoeCrEO0MfAdd/58xR4xLAhbVgtqaQpBRiJYLhTLfVJh9tY=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3958.eurprd08.prod.outlook.com (20.179.1.94) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.27; Tue, 4 Feb 2020 09:56:55 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.034; Tue, 4 Feb 2020
- 09:56:55 +0000
-Subject: Re: [PATCH v3 21/21] iotests: Check that @replaces can replace filters
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200130214431.333510-1-mreitz@redhat.com>
- <20200130214431.333510-22-mreitz@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200204125653927
-Message-ID: <0d5a3ef4-851f-9217-b879-55d1e0427708@virtuozzo.com>
-Date: Tue, 4 Feb 2020 12:56:53 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200130214431.333510-22-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1PR0701CA0084.eurprd07.prod.outlook.com
- (2603:10a6:3:64::28) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <k.jensen@samsung.com>) id 1iyusu-0007tn-F6
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:52:46 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:35450)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <k.jensen@samsung.com>)
+ id 1iyusu-0007V1-9e
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 04:52:44 -0500
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+ by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id
+ 20200204095229euoutp0196134d115964356a2e46b504a5772045~wKkXynfQ73058130581euoutp018
+ for <qemu-devel@nongnu.org>; Tue,  4 Feb 2020 09:52:29 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com
+ 20200204095229euoutp0196134d115964356a2e46b504a5772045~wKkXynfQ73058130581euoutp018
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+ s=mail20170921; t=1580809949;
+ bh=0KcinR+iyMvgGfNh06dyhM/PTx5OKou+X1kwk4kqwVk=;
+ h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+ b=Kt76E1fHyvE3sH/DY0/gvcD51N8MiePHKbE8W25/EDR7SIBg/WpP1N9xzUK2HtRTk
+ xYJrwD3EIlLHuaRGv2ndYjEnvYVWERs37TsqS3C6Jv6prEJkXMXY25NSIMqFMoUkvh
+ 8cGnwDnZoB4egkP2KXBF4X4CQAquzjOIoDZgWlxc=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+ eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+ 20200204095228eucas1p2a17909b4d410210e44e8393bb9581eff~wKkXnEWdS1139911399eucas1p21;
+ Tue,  4 Feb 2020 09:52:28 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+ eusmges3new.samsung.com (EUCPMTA) with SMTP id D6.EF.60698.CDE393E5; Tue,  4
+ Feb 2020 09:52:28 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+ eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+ 20200204095228eucas1p2878eb150a933bb196fe5ca10a0b76eaf~wKkXPUDux2201922019eucas1p2J;
+ Tue,  4 Feb 2020 09:52:28 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+ eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+ 20200204095228eusmtrp22d5a9b165ea90ebf293550ef81ac069b~wKkXOp_GM0487104871eusmtrp2t;
+ Tue,  4 Feb 2020 09:52:28 +0000 (GMT)
+X-AuditID: cbfec7f5-a29ff7000001ed1a-0b-5e393edce655
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+ eusmgms2.samsung.com (EUCPMTA) with SMTP id 9F.6A.07950.CDE393E5; Tue,  4
+ Feb 2020 09:52:28 +0000 (GMT)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+ eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+ 20200204095228eusmtip1868b4308b3109cd07a4abf8739bc26eb~wKkXIYra93064230642eusmtip10;
+ Tue,  4 Feb 2020 09:52:28 +0000 (GMT)
+Received: from CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) by
+ CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) with Microsoft SMTP
+ Server (TLS) id 15.0.1320.4; Tue, 4 Feb 2020 09:52:27 +0000
+Received: from apples.local (106.110.32.41) by CAMSVWEXC01.scsc.local
+ (106.1.227.71) with Microsoft SMTP Server id 15.0.1320.4 via Frontend
+ Transport; Tue, 4 Feb 2020 09:52:27 +0000
+From: Klaus Jensen <k.jensen@samsung.com>
+To: <qemu-block@nongnu.org>
+Subject: [PATCH v5 20/26] nvme: handle dma errors
+Date: Tue, 4 Feb 2020 10:52:02 +0100
+Message-ID: <20200204095208.269131-21-k.jensen@samsung.com>
+X-Mailer: git-send-email 2.25.0
+In-Reply-To: <20200204095208.269131-1-k.jensen@samsung.com>
 MIME-Version: 1.0
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0701CA0084.eurprd07.prod.outlook.com (2603:10a6:3:64::28) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.12 via Frontend Transport; Tue, 4 Feb 2020 09:56:55 +0000
-X-Tagtoolbar-Keys: D20200204125653927
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cc95b862-40be-4668-418d-08d7a958913c
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3958:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB39587DF3D5648D9CDF664DB0C1030@AM6PR08MB3958.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:277;
-X-Forefront-PRVS: 03030B9493
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(376002)(346002)(39850400004)(136003)(396003)(366004)(189003)(199004)(956004)(31696002)(6486002)(5660300002)(478600001)(66946007)(86362001)(66476007)(31686004)(66556008)(26005)(2616005)(2906002)(316002)(4326008)(16526019)(186003)(16576012)(81156014)(81166006)(8936002)(558084003)(8676002)(52116002)(36756003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3958;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1XuslV2h8Tt8r61/Nt8vOppGQFPHIA/ggXN6r5dFgyV/nhSs3zhKUSNu7L6g7EpIyoGYrdfIfkecKG9eWpTOSqmDAeOiOp1fhQIGGwGz3PMOTEO5/xmKUum3295FUEsWS51+PCPzFBGO8ZzvQ/8RoB0Gf7vmhxDu9sMhuXO7QbpCGXw0m9bqk6q+VAJZBNZ25q9lwzWDmXGRWvDXf3KT4JaYzFstMiEKaBe7UjEMDVe1esAxl1Izjsyyf2mIXSJWLch5y+cHtk140+NUJEjgWGbzQnrV3UuQcvhZvBVywWtO5IngM3MPgReZZHsIJNXgXMCoMQt1XDOrCOX0SyOzacV1iVcnbPZERjeQwhC15IHxVjkAMP5ojgQsA2kJ7Si0EvKuPfJRfFwLbe7ypEQu2fmNPpxbTJiJiqqF1+JaHP3zrrgx9cIx9sDD9G5ioM2y
-X-MS-Exchange-AntiSpam-MessageData: CluQiFKc5qn/8FkQ0aUFITSY9oXfvAzwO6k46V35x3zA+acZCBMBbvR3SG+KdC15Lt7+VwxukHTXICYnabjpCUianSASTbwehKRSftHmtnDERNe8jvSr83wkei9wSpVVFXyfGWBgaiF3hf7VIS2eCw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc95b862-40be-4668-418d-08d7a958913c
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2020 09:56:55.6804 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mn/v0D+amv2yEXoHF2IXkYSsHGb07Y62+5fDcE/2GMhqB7c0mCosMI11TG74p1IkcKm5sQ5DLKxVvHOaSuV+UNgAOhFSvtNpQ21yKz3GnZ8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3958
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.22.108
+Content-Type: text/plain
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrAKsWRmVeSWpSXmKPExsWy7djPc7p37CzjDLafNLHY3N/OaLH/4DdW
+ i0mHrjFaLLmYajHvlrLFrHftbBbHe3ewOLB7nNtxnt1j06pONo871/aweTy5tpnJ4/2+q2wB
+ rFFcNimpOZllqUX6dglcGe19PUwFB0wqns98y9jAuEeti5GTQ0LARGL62qNsXYxcHEICKxgl
+ vj56zQzhfGGUmHz7AxOE85lR4vi8r0wwLfPf9zNCJJYzSnza/oQVrmrDoeVQ/acZJe6saWYD
+ aRES2MkocXoa2EY2AU2J7X/+s4DYIgLSEu1XJ4F1Mwv8ZpSY2zgRrEFYwFDi9LK57CA2i4CK
+ xJtpp4FsDg5eAWuJ/mO5EGfIS8xuPA1WzgkU3r/qBNh5vAKCEidnPgGbzwxU07x1NjOELSFx
+ 8MULsOMkBHaxS9xv38UIMlNCwEVi6dVwiJnCEq+Ob2GHsGUk/u+czwRR380o0ffhK1TzDEaJ
+ 6cu+s0E0W0v0ncmBaHCUOPfjPjNEmE/ixltBiL18EpO2TYcK80p0tAlBVKtJ7GjayjiBUXkW
+ kqtnIbl6FpKrFzAyr2IUTy0tzk1PLTbOSy3XK07MLS7NS9dLzs/dxAhMN6f/Hf+6g3Hfn6RD
+ jAIcjEo8vBqOFnFCrIllxZW5hxglOJiVRHjP61vGCfGmJFZWpRblxxeV5qQWH2KU5mBREuc1
+ XvQyVkggPbEkNTs1tSC1CCbLxMEpBUws5fnzMpgTJVu6P7h6nvlSl77n6aWFGh5uri9NmEMe
+ TopRTjg7zat8XmJ72FebrisdEf4+l1L/vT/95MHRyT6mYoVV+16dWNuu9Fsg7+DMk3UaCQa5
+ 82W5ay+1XTrvW1pp2iOg+vOHPkv9Qj9DFsttnO8eNXyVO3WTi+/xfM6sMOmY2Zf11iuxFGck
+ GmoxFxUnAgAvpNZiMwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDIsWRmVeSWpSXmKPExsVy+t/xu7p37CzjDCaflrPY3N/OaLH/4DdW
+ i0mHrjFaLLmYajHvlrLFrHftbBbHe3ewOLB7nNtxnt1j06pONo871/aweTy5tpnJ4/2+q2wB
+ rFF6NkX5pSWpChn5xSW2StGGFkZ6hpYWekYmlnqGxuaxVkamSvp2NimpOZllqUX6dgl6Ge19
+ PUwFB0wqns98y9jAuEeti5GTQ0LARGL++37GLkYuDiGBpYwSz6ceY4RIyEh8uvKRHcIWlvhz
+ rYsNougjo0THiXdMEM5pRomXX84zQzg7GSVmfN/GAtLCJqApsf3PfzBbREBaov3qJFYQm1ng
+ N6PEn75AEFtYwFDi9LK5YCtYBFQk3kw7DWRzcPAKWEv0H8uF2CwvMbvxNBuIzQkU3r/qBBNI
+ iZCAlUTrUW6QMK+AoMTJmU9YIKbLSzRvnc0MYUtIHHzxgnkCo/AsJGWzkJTNQlK2gJF5FaNI
+ amlxbnpusZFecWJucWleul5yfu4mRmDMbTv2c8sOxq53wYcYBTgYlXh4NRwt4oRYE8uKK3MP
+ MUpwMCuJ8J7Xt4wT4k1JrKxKLcqPLyrNSS0+xGgK9NpEZinR5HxgOsgriTc0NTS3sDQ0NzY3
+ NrNQEuftEDgYIySQnliSmp2aWpBaBNPHxMEp1cB4ZIea27xbO/4fuJGXZhww/evbGM/3bHY3
+ 8rcpxr0QZ7oWb3n9erDT52mLir/YXZ17OmO5+TZWjqPLuL18t55Wq3kV3KjgocTY25fs/5Vt
+ drKh4KT6dEvDzc0Z+St8lx6+mvpK4cCTjp/vM/4wloiG+R7xL1W6G9unbPWloVZulaS/rrwy
+ z0wlluKMREMt5qLiRACNpBQzzwIAAA==
+X-CMS-MailID: 20200204095228eucas1p2878eb150a933bb196fe5ca10a0b76eaf
+X-Msg-Generator: CA
+X-RootMTR: 20200204095228eucas1p2878eb150a933bb196fe5ca10a0b76eaf
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200204095228eucas1p2878eb150a933bb196fe5ca10a0b76eaf
+References: <20200204095208.269131-1-k.jensen@samsung.com>
+ <CGME20200204095228eucas1p2878eb150a933bb196fe5ca10a0b76eaf@eucas1p2.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 210.118.77.11
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,19 +136,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-31.01.2020 0:44, Max Reitz wrote:
-> Signed-off-by: Max Reitz<mreitz@redhat.com>
+Handling DMA errors gracefully is required for the device to pass the
+block/011 test ("disable PCI device while doing I/O") in the blktests
+suite.
 
-You forget my r-b:
+With this patch the device passes the test by retrying "critical"
+transfers (posting of completion entries and processing of submission
+queue entries).
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+If DMA errors occur at any other point in the execution of the command
+(say, while mapping the PRPs), the command is aborted with a Data
+Transfer Error status code.
 
--- 
-Best regards,
-Vladimir
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ hw/block/nvme.c       | 42 +++++++++++++++++++++++++++++++++---------
+ hw/block/trace-events |  2 ++
+ include/block/nvme.h  |  2 +-
+ 3 files changed, 36 insertions(+), 10 deletions(-)
+
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index f8c81b9e2202..204ae1d33234 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -73,14 +73,14 @@ static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwad=
+dr addr)
+     return addr >=3D low && addr < hi;
+ }
+=20
+-static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size=
+)
++static int nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
+ {
+     if (n->cmbsz && nvme_addr_is_cmb(n, addr)) {
+         memcpy(buf, (void *) &n->cmbuf[addr - n->ctrl_mem.addr], size);
+-        return;
++        return 0;
+     }
+=20
+-    pci_dma_read(&n->parent_obj, addr, buf, size);
++    return pci_dma_read(&n->parent_obj, addr, buf, size);
+ }
+=20
+ static int nvme_check_sqid(NvmeCtrl *n, uint16_t sqid)
+@@ -168,6 +168,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList =
+*qsg, QEMUIOVector *iov,
+     uint16_t status =3D NVME_SUCCESS;
+     bool is_cmb =3D false;
+     bool prp_list_in_cmb =3D false;
++    int ret;
+=20
+     trace_nvme_dev_map_prp(nvme_cid(req), req->cmd.opcode, trans_len, le=
+n,
+         prp1, prp2, num_prps);
+@@ -218,7 +219,12 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList=
+ *qsg, QEMUIOVector *iov,
+=20
+             nents =3D (len + n->page_size - 1) >> n->page_bits;
+             prp_trans =3D MIN(n->max_prp_ents, nents) * sizeof(uint64_t)=
+;
+-            nvme_addr_read(n, prp2, (void *) prp_list, prp_trans);
++            ret =3D nvme_addr_read(n, prp2, (void *) prp_list, prp_trans=
+);
++            if (ret) {
++                trace_nvme_dev_err_addr_read(prp2);
++                status =3D NVME_DATA_TRANSFER_ERROR;
++                goto unmap;
++            }
+             while (len !=3D 0) {
+                 uint64_t prp_ent =3D le64_to_cpu(prp_list[i]);
+=20
+@@ -237,7 +243,13 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList=
+ *qsg, QEMUIOVector *iov,
+                     i =3D 0;
+                     nents =3D (len + n->page_size - 1) >> n->page_bits;
+                     prp_trans =3D MIN(n->max_prp_ents, nents) * sizeof(u=
+int64_t);
+-                    nvme_addr_read(n, prp_ent, (void *) prp_list, prp_tr=
+ans);
++                    ret =3D nvme_addr_read(n, prp_ent, (void *) prp_list=
+,
++                        prp_trans);
++                    if (ret) {
++                        trace_nvme_dev_err_addr_read(prp_ent);
++                        status =3D NVME_DATA_TRANSFER_ERROR;
++                        goto unmap;
++                    }
+                     prp_ent =3D le64_to_cpu(prp_list[i]);
+                 }
+=20
+@@ -443,6 +455,7 @@ static void nvme_post_cqes(void *opaque)
+     NvmeCQueue *cq =3D opaque;
+     NvmeCtrl *n =3D cq->ctrl;
+     NvmeRequest *req, *next;
++    int ret;
+=20
+     QTAILQ_FOREACH_SAFE(req, &cq->req_list, entry, next) {
+         NvmeSQueue *sq;
+@@ -452,15 +465,21 @@ static void nvme_post_cqes(void *opaque)
+             break;
+         }
+=20
+-        QTAILQ_REMOVE(&cq->req_list, req, entry);
+         sq =3D req->sq;
+         req->cqe.status =3D cpu_to_le16((req->status << 1) | cq->phase);
+         req->cqe.sq_id =3D cpu_to_le16(sq->sqid);
+         req->cqe.sq_head =3D cpu_to_le16(sq->head);
+         addr =3D cq->dma_addr + cq->tail * n->cqe_size;
+-        nvme_inc_cq_tail(cq);
+-        pci_dma_write(&n->parent_obj, addr, (void *)&req->cqe,
++        ret =3D pci_dma_write(&n->parent_obj, addr, (void *)&req->cqe,
+             sizeof(req->cqe));
++        if (ret) {
++            trace_nvme_dev_err_addr_write(addr);
++            timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++                100 * SCALE_MS);
++            break;
++        }
++        QTAILQ_REMOVE(&cq->req_list, req, entry);
++        nvme_inc_cq_tail(cq);
+         nvme_req_clear(req);
+         QTAILQ_INSERT_TAIL(&sq->req_list, req, entry);
+     }
+@@ -1588,7 +1607,12 @@ static void nvme_process_sq(void *opaque)
+=20
+     while (!(nvme_sq_empty(sq) || QTAILQ_EMPTY(&sq->req_list))) {
+         addr =3D sq->dma_addr + sq->head * n->sqe_size;
+-        nvme_addr_read(n, addr, (void *)&cmd, sizeof(cmd));
++        if (nvme_addr_read(n, addr, (void *)&cmd, sizeof(cmd))) {
++            trace_nvme_dev_err_addr_read(addr);
++            timer_mod(sq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
++                100 * SCALE_MS);
++            break;
++        }
+         nvme_inc_sq_head(sq);
+=20
+         req =3D QTAILQ_FIRST(&sq->req_list);
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 90a57fb6099a..09bfb3782dd0 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -83,6 +83,8 @@ nvme_dev_mmio_shutdown_cleared(void) "shutdown bit clea=
+red"
+ nvme_dev_err_mdts(uint16_t cid, size_t mdts, size_t len) "cid %"PRIu16" =
+mdts %"PRIu64" len %"PRIu64""
+ nvme_dev_err_prinfo(uint16_t cid, uint16_t ctrl) "cid %"PRIu16" ctrl %"P=
+RIu16""
+ nvme_dev_err_aio(uint16_t cid, void *aio, const char *blkname, uint64_t =
+offset, const char *opc, void *req, uint16_t status) "cid %"PRIu16" aio %=
+p blk \"%s\" offset %"PRIu64" opc \"%s\" req %p status 0x%"PRIx16""
++nvme_dev_err_addr_read(uint64_t addr) "addr 0x%"PRIx64""
++nvme_dev_err_addr_write(uint64_t addr) "addr 0x%"PRIx64""
+ nvme_dev_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
+ nvme_dev_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is nu=
+ll or not page aligned: 0x%"PRIx64""
+ nvme_dev_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned=
+: 0x%"PRIx64""
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index c1de92179596..a873776d98b8 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -418,7 +418,7 @@ enum NvmeStatusCodes {
+     NVME_INVALID_OPCODE         =3D 0x0001,
+     NVME_INVALID_FIELD          =3D 0x0002,
+     NVME_CID_CONFLICT           =3D 0x0003,
+-    NVME_DATA_TRAS_ERROR        =3D 0x0004,
++    NVME_DATA_TRANSFER_ERROR    =3D 0x0004,
+     NVME_POWER_LOSS_ABORT       =3D 0x0005,
+     NVME_INTERNAL_DEV_ERROR     =3D 0x0006,
+     NVME_CMD_ABORT_REQ          =3D 0x0007,
+--=20
+2.25.0
+
 
