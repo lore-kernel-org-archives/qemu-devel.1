@@ -2,116 +2,100 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07BA1C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 14:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CED1C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 14:12:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C724420661
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 14:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0800520661
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 14:12:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fWeyLzli"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C724420661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cd+6OBNN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0800520661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyyup-0003Bs-0X
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 09:10:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42426)
+	id 1iyyvt-0004MX-Rx
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 09:12:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iyytl-0002ZI-4v
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 09:09:54 -0500
+ (envelope-from <philmd@redhat.com>) id 1iyytu-0002fM-Q2
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 09:10:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iyyti-0004mo-Vy
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 09:09:52 -0500
-Received: from mail-eopbgr20091.outbound.protection.outlook.com
- ([40.107.2.91]:24847 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iyyti-0004U5-5u; Tue, 04 Feb 2020 09:09:50 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Bazph1i5lhvtPEytvhsdV61Rwmvf32RMUYwx1L/ikqumlNuCv2LYwsolm+eczWN4fJ4qwTm9CMx72YeL4eQUERf7DBq6JWZVpUt38cJrdA5dRI3+cWqyFeOkjtmsS33FtBdIAOz03qFWhYljiP/kH6FCwS2YnRo128hfeUVWy0pUGBkbMO1I7855evvIvHww1IVHupNMBj/vYwB/fIMQavhRxEK9r/fsegG0owOF30Z7thbcnHX0c5EMFv8N/+zy7o/axsf0G20S9XSttfOggOdpNDPd97O00KlVuMViD6O2lq3IDci0Yx3WptDTkstbFNXDDy/xU0pe6PJE+pnpxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qVp8vGflJnJWJsmb49WFK6LiIpo7EdEWqGfjOchTIzE=;
- b=mRtmP+RtsVEofPtAKi/8zY3hGqy6tQL2PbdMDaJr4FM39FkrWhOPIIIRvCR9Bx4xvIR6HgT9ajT8f9g7SHHZPiCZoJ/ghXByGdn3J3NLTxXJabO/6aVxn+Gi1oo0kYNVp2XTtctbxKCIzmSrq9VIztngOI6lyTvwfP2ClVpU30o1UIMp6vyUfoBKUiaKm3FLnQjkM3aXcJlK0Bruh+ZgHSn+uWk2GD/o3MUtD4jQAe15u9PQmNeu6Ei2jI2ZPQ48v/OkEmIlcdrP8jSSKP4sajm1gDEsnj5Yn+ivC/YaZNflPym0PjqNTeEUh0BUyKwv3e4+Ooeo6PkOiH51hneXrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qVp8vGflJnJWJsmb49WFK6LiIpo7EdEWqGfjOchTIzE=;
- b=fWeyLzli7sffZZvqRXI10J3/xoxsvafBw2jZwthG7QO+Um5jSt4S/DiR4GY7j+U+/cqXPKy0OiHmBzPJHhG7PsSn/VZh1si/pFKz12KDyfuSGlvbQpdcFzJAMH4W0jALHBbyN6luzYlRDlD+wNI+mTgW+hTAhj6vu3SYnLjkAWU=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB5208.eurprd08.prod.outlook.com (10.255.122.155) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.32; Tue, 4 Feb 2020 14:09:47 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2686.034; Tue, 4 Feb 2020
- 14:09:47 +0000
-Subject: Re: [PATCH v3 16/21] iotests: Add VM.assert_block_path()
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200130214431.333510-1-mreitz@redhat.com>
- <20200130214431.333510-17-mreitz@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200204170945282
-Message-ID: <978b5d21-ccd9-7cef-3d39-585c5764c788@virtuozzo.com>
-Date: Tue, 4 Feb 2020 17:09:45 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200130214431.333510-17-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1P191CA0010.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::20)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <philmd@redhat.com>) id 1iyyts-0005jR-Le
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 09:10:01 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26065
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iyyts-0005WI-FQ
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 09:10:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580825399;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XhFvY/d9RGzMkCS1ZnjSvRY/TsulWyn0WzMNun3rIQk=;
+ b=cd+6OBNNqV/57CtKnBWkxKB8jcR01+zSm5ZrfB0aXVAJcoY6r85d/OmMvhjbtVk3DZmszl
+ GgTlRwlhGpG6chcvhILUU1x27DJgE/TnGs5yXLY9hqE58IKPju0ogK5+fnTTU86P01rj9B
+ 9n5UhbtPbm/fYAIqB45Z+BPIeJGsrVA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-V7NmI2v3PyCq0QEwfBqGzQ-1; Tue, 04 Feb 2020 09:09:57 -0500
+Received: by mail-wm1-f69.google.com with SMTP id o193so1390466wme.8
+ for <qemu-devel@nongnu.org>; Tue, 04 Feb 2020 06:09:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=oMHhLntIOzNpL++qY18PVuef0q6WtaIdCfxJHESAXHk=;
+ b=PJfYf/o44ShWEmOvKufq5E0j6t8kFy9gmLyIp5jRdprgxNHTFkTWwqR0XWDmW35DC9
+ hlUqfzeKeXbLU4njsnh4M4i5h8vueUXbDhMOqUOtS+T50F/aCoT6OzIbbuqgkv6dJHy6
+ 5HXcz+QrnRnQXNDHZgrRSB4wn2qsB6lWnY4GPYar/w0kikr89jzUY2mP8J1cpwzz7Idt
+ /M+Io2WDkenQrvNcuaCQ4NjhdWmbGP9WOl8ni/V1MSBqLpa6rx5AeBvjiZr9xbpOw1iN
+ 9ygugFiOdWAE9Vjp/+lw0pEbjeHSpitZYopYjx9yFedCCFHO3l87VSHmRhOUWGaev5eg
+ 8A6Q==
+X-Gm-Message-State: APjAAAWxJ1BLD4O18WP03w1uYIPqPXZFHg3HATE4tamnnQuQYPXGYTwT
+ F0nfj9NvsygRjyHuivXQ/6Be/RCePrLNE81B4BK4eU6ppglsCmQqi7JWgzJ9cMwlTz/HgD1SLIQ
+ MIunzSGuUfzLqDVg=
+X-Received: by 2002:a5d:640d:: with SMTP id z13mr21366011wru.181.1580825396441; 
+ Tue, 04 Feb 2020 06:09:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwE8SNBK5thyDhuugHReQ/uk///q8wzXzigRrRNOW5M8dgtzQrWDJPMGVmYkpqUoeGKWQVWhw==
+X-Received: by 2002:a5d:640d:: with SMTP id z13mr21365985wru.181.1580825396221; 
+ Tue, 04 Feb 2020 06:09:56 -0800 (PST)
+Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
+ [83.52.55.162])
+ by smtp.gmail.com with ESMTPSA id f14sm10943766wrt.7.2020.02.04.06.09.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Feb 2020 06:09:55 -0800 (PST)
+Subject: Re: [PATCH v3 1/2] Acceptance test: provides to use different
+ transport for migration
+To: Oksana Vohchana <ovoshcha@redhat.com>, qemu-devel@nongnu.org
+References: <20200203111631.18796-1-ovoshcha@redhat.com>
+ <20200203111631.18796-2-ovoshcha@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <de189681-bf7b-be83-ee0a-1a0bb0302a3f@redhat.com>
+Date: Tue, 4 Feb 2020 15:09:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1P191CA0010.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.34 via Frontend Transport; Tue, 4 Feb 2020 14:09:47 +0000
-X-Tagtoolbar-Keys: D20200204170945282
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: def7df48-49bc-4219-ac0a-08d7a97be462
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5208:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB5208AE5DE64FA6229EAAB272C1030@AM6PR08MB5208.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-Forefront-PRVS: 03030B9493
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(376002)(346002)(136003)(39850400004)(366004)(396003)(189003)(199004)(478600001)(2906002)(2616005)(86362001)(956004)(4326008)(6486002)(5660300002)(52116002)(16576012)(316002)(31686004)(8936002)(66946007)(8676002)(81166006)(81156014)(16526019)(186003)(31696002)(26005)(66556008)(66476007)(36756003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5208;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: obaGxRX5DY18ADo1Ai4v3cqQXQNtzEq9h6GDDAywc1SjKK841OtN6WBOk8thWV00EUI+BgIBzor1c+1AHtyB6VcG0gdDcyEplBWBIiOsQtBTFN/mFsZZ6Zu2g7dTkMVjaRCXPXs5dx2ktWUvIhXFazuCZeASaP/Uzc1Wz2GfqVKbb0DvqNPaRACWdQmq9pjUxENZO8hzDd5HPu41YRQf1AO6Tjn7dSNbM0bCI09VOnH76R8hX3ETx47oxwilKqh1rHYpFndQ9V/zX3erLrbK2MO8jFA1BPq7t5SxZNmzzNnugWjCS/yg2Tl2gBdQUG+tgvnOLnG0MHovhkCR5Wg2Mgeocx4sg9+6ovrfVFEZIveo/8b6nWGs9igR3+91UbYRfJS2M9xW7eyBhCxf8YFs1ikawHi9LaT7fbA3zY5Dy59QfqOtNA8U+2vauouP20e0
-X-MS-Exchange-AntiSpam-MessageData: FttHie+zkmR0uTlLc2KevfZP4h3LdjRfyNWyt1tB3gehd9ouEf9i0Sliv5WR2TyAf8/6PGpN7jO5W6tFH0SnCedH6g/NUe+XDLaL9z2mcT8mjrqPM/73Z4GDGxFoRhuMzZF9MwvOENI8UTV0FxhG8Q==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: def7df48-49bc-4219-ac0a-08d7a97be462
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2020 14:09:47.6476 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EtXIQUZOnVXzqzIflW2s8HseEmrsEgzPyv0mqHIRizKvvO9q2SvFOUX+uYAfFs4WrQch2FVcRAaP6eewpd+VZCCTo27an6hXOD1Tneh3Hnw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5208
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.2.91
+In-Reply-To: <20200203111631.18796-2-ovoshcha@redhat.com>
+Content-Language: en-US
+X-MC-Unique: V7NmI2v3PyCq0QEwfBqGzQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,96 +107,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: wainersm@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-31.01.2020 0:44, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+Hi Oksana,
+
+On 2/3/20 12:16 PM, Oksana Vohchana wrote:
+> Along with VM migration via TCP, we can use migration through EXEC
+> and UNIX transport protocol
+>=20
+> Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
+>=20
 > ---
->   tests/qemu-iotests/iotests.py | 56 +++++++++++++++++++++++++++++++++++
->   1 file changed, 56 insertions(+)
-> 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 01b58dcb50..69861cf05e 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -713,6 +713,62 @@ class VM(qtest.QEMUQtestMachine):
->   
->           return fields.items() <= ret.items()
->   
-> +    def assert_block_path(self, root, path, expected_node, graph=None):
-> +        """
-> +        Check whether the node under the given path in the block graph
-> +        is @expected_node.
+> v2:
+>    - Removes unnecessary symbols and unused method
+>=20
+> v3:
+>   - Makes refactoring and split into 2 patches
+> Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
+> ---
+>   tests/acceptance/migration.py | 36 ++++++++++++++++++++---------------
+>   1 file changed, 21 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.p=
+y
+> index a44c1ae58f..34263d8eeb 100644
+> --- a/tests/acceptance/migration.py
+> +++ b/tests/acceptance/migration.py
+> @@ -24,6 +24,26 @@ class Migration(Test):
+>       def migration_finished(vm):
+>           return vm.command('query-migrate')['status'] in ('completed', '=
+failed')
+>  =20
+> +    def assert_migration(self, source_vm, dest_vm):
+> +        wait.wait_for(self.migration_finished,
+> +                      timeout=3Dself.timeout,
+> +                      step=3D0.1,
+> +                      args=3D(source_vm,))
+> +        self.assertEqual(source_vm.command('query-migrate')['status'], '=
+completed')
+> +        self.assertEqual(dest_vm.command('query-migrate')['status'], 'co=
+mpleted')
+> +        self.assertEqual(dest_vm.command('query-status')['status'], 'run=
+ning')
+> +        self.assertEqual(source_vm.command('query-status')['status'], 'p=
+ostmigrate')
 > +
-> +        @root is the node name of the node where the @path is rooted.
+> +    def do_migrate(self, dest_uri, src_uri=3DNone):
+> +        source_vm =3D self.get_vm()
+> +        dest_vm =3D self.get_vm('-incoming', dest_uri)
+> +        dest_vm.launch()
+> +        if src_uri is None:
+> +            src_uri =3D dest_uri
+> +        source_vm.launch()
+> +        source_vm.qmp('migrate', uri=3Dsrc_uri)
+> +        self.assert_migration(source_vm, dest_vm)
 > +
-> +        @path is a string that consists of child names separated by
-> +        slashes.  It must begin with a slash.
-> +
-> +        Examples for @root + @path:
-> +          - root="qcow2-node", path="/backing/file"
-> +          - root="quorum-node", path="/children.2/file"
-> +
-> +        Hypothetically, @path could be empty, in which case it would
-> +        point to @root.  However, in practice this case is not useful
-> +        and hence not allowed.
-> +
-> +        @expected_node may be None.  (All elements of the path but the
-> +        leaf must still exist.)
-> +
-> +        @graph may be None or the result of an x-debug-query-block-graph
-> +        call that has already been performed.
-> +        """
-> +        if graph is None:
-> +            graph = self.qmp('x-debug-query-block-graph')['return']
-> +
-> +        iter_path = iter(path.split('/'))
-> +
-> +        # Must start with a /
-> +        assert next(iter_path) == ''
-> +
-> +        node = next((node for node in graph['nodes'] if node['name'] == root),
-> +                    None)
-> +
-> +        for child_name in iter_path:
-> +            assert node is not None, 'Cannot follow path %s' % path
 
-this error message will be a bit misleading if we failed to find root node. So,
-may be add additional assert for root node, or at least
-'Cannot follow path %s%s'.format(root, path)
+Do you mind if I split this patch in 2 when applying to python-next, and=20
+change the subjects as "Extract Migration::assert_migration" and=20
+"Extract Migration::do_migrate"?
 
+Meanwhile:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-It doesn't worth to resend only for this, apply it if you want and keep my r-b anyway.
+>       def _get_free_port(self):
+>           port =3D network.find_free_port()
+>           if port is None:
+> @@ -32,19 +52,5 @@ class Migration(Test):
+>  =20
+>  =20
+>       def test_migration_with_tcp_localhost(self):
+> -        source_vm =3D self.get_vm()
+>           dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
+> -        dest_vm =3D self.get_vm('-incoming', dest_uri)
+> -        dest_vm.launch()
+> -        source_vm.launch()
+> -        source_vm.qmp('migrate', uri=3Ddest_uri)
+> -        wait.wait_for(
+> -            self.migration_finished,
+> -            timeout=3Dself.timeout,
+> -            step=3D0.1,
+> -            args=3D(source_vm,)
+> -        )
+> -        self.assertEqual(dest_vm.command('query-migrate')['status'], 'co=
+mpleted')
+> -        self.assertEqual(source_vm.command('query-migrate')['status'], '=
+completed')
+> -        self.assertEqual(dest_vm.command('query-status')['status'], 'run=
+ning')
+> -        self.assertEqual(source_vm.command('query-status')['status'], 'p=
+ostmigrate')
+> +        self.do_migrate(dest_uri)
+>=20
 
-> +
-> +            try:
-> +                node_id = next(edge['child'] for edge in graph['edges'] \
-> +                                             if edge['parent'] == node['id'] and
-> +                                                edge['name'] == child_name)
-> +
-> +                node = next(node for node in graph['nodes'] \
-> +                                 if node['id'] == node_id)
-> +            except StopIteration:
-> +                node = None
-> +
-> +        if node is None:
-> +            assert expected_node is None, \
-> +                   'No node found under %s (but expected %s)' % \
-> +                   (path, expected_node)
-> +        else:
-> +            assert node['name'] == expected_node, \
-> +                   'Found node %s under %s (but expected %s)' % \
-> +                   (node['name'], path, expected_node)
->   
->   index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
->   
-> 
-
-
--- 
-Best regards,
-Vladimir
 
