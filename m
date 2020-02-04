@@ -2,86 +2,80 @@ Return-Path: <SRS0=QduX=3Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C22D6C35247
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E3D1C35247
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:24:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9217420730
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC29E20730
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Feb 2020 15:24:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OsTd/eS3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9217420730
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GzPFNDmg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC29E20730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iyzxT-0000i0-QW
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 10:17:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36932)
+	id 1iz049-0002vC-Uz
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 10:24:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iyzwV-0008Gi-5W
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:16:48 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iz03Q-0002IG-EN
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iyzwU-0005lS-0z
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:16:47 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28382
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1iz03O-0001xA-Mp
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:23:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28337
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iyzwT-0005fN-TZ
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:16:45 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iz03O-0001sj-GT
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 10:23:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580829405;
+ s=mimecast20190719; t=1580829833;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=L8CrNrhBDrEK7OFjhoGeldkhzYhJDK7VVrXkAcE3CJU=;
- b=OsTd/eS3CJsChxDSlDN0zAdrAPUdc7OmmOdqZyWEHrkhhZFDCq9jMJCR60yz4AFbvmGjbH
- C5oiSrY3B80KetI+SF/83y2kVvRQ2OHllPhnzNi31Ux0Gm4hJGn/DKuA07Z/MWmlQzKuwR
- zA6dGGeEoHk1aq6cKLnwgy70bHvSj58=
+ bh=OGi9IIcyUk1XmiLj6EKWRUyxWG1emSceCAWGnoUxcJM=;
+ b=GzPFNDmgBzJ08b92T/6MK9Q4Atp2DUUBM4zW1jmzBxCI2jnld6M6Od6cdiTY3VnkkZDOBw
+ RCG8qVzgRO/X/LU+GXrWcTUmYCjG+2ckUJhucAtOOfEcaM6lEY2CgmfxHEN0KGSkSQ3Ruv
+ nuURwjVWB/wXZ7iw3UnQV95LMb9tZEE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-7S1ry94oND6CGTZU5I85Fg-1; Tue, 04 Feb 2020 10:16:24 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-231-x-K2vMQ1NKKmsXwTE68xIw-1; Tue, 04 Feb 2020 10:23:34 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44A068010E6;
- Tue,  4 Feb 2020 15:16:23 +0000 (UTC)
-Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A9A761001920;
- Tue,  4 Feb 2020 15:16:22 +0000 (UTC)
-Subject: Re: [PATCH 04/17] block: Improve documentation of .bdrv_has_zero_init
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200131174436.2961874-1-eblake@redhat.com>
- <20200131174436.2961874-5-eblake@redhat.com>
- <b223356c-8c90-e4c9-2db0-4a08717d559d@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <ea8a5d97-95bf-4d2d-59a5-e61c9d171678@redhat.com>
-Date: Tue, 4 Feb 2020 09:16:20 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B81B8010F1;
+ Tue,  4 Feb 2020 15:23:32 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8E94360BF7;
+ Tue,  4 Feb 2020 15:23:22 +0000 (UTC)
+Date: Tue, 4 Feb 2020 16:23:20 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
+Message-ID: <20200204162320.67e5d353@redhat.com>
+In-Reply-To: <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
+References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
+ <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <b223356c-8c90-e4c9-2db0-4a08717d559d@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 7S1ry94oND6CGTZU5I85Fg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: x-K2vMQ1NKKmsXwTE68xIw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,73 +87,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david.edmondson@oracle.com, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com, mst@redhat.com,
+ shannon.zhaosl@gmail.com, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, xuwei5@hisilicon.com, linuxarm@huawei.com,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/4/20 9:03 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 31.01.2020 20:44, Eric Blake wrote:
->> Several drivers supply .bdrv_has_zero_init that returns 1, but lack
->> the .bdrv_has_zero_init_truncate callback (parallels and qed outright,
->> vdi in some scenarios).=C2=A0 A literal reading of the existing
->> documentation says such drivers are broken, because
->> bdrv_has_zero_init_truncate() defaults to zero if the callback is
->> missing; but in practice, the tie between the two functions is only
->> relevant when truncate is supported.=C2=A0 Clarify the documentation to
->> make it obvious that this is okay.
->>
->> Fixes: 1dcaf527
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->> =C2=A0 include/block/block_int.h | 3 ++-
->> =C2=A0 1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index 640fb82c789e..77ab45dc87cf 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -444,7 +444,8 @@ struct BlockDriver {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Returns 1 if newly created images=
- are guaranteed to contain only
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * zeros, 0 otherwise.
->> -=C2=A0=C2=A0=C2=A0=C2=A0 * Must return 0 if .bdrv_has_zero_init_truncat=
-e() returns 0.
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * Must return 0 if .bdrv_co_truncate is set an=
-d
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * .bdrv_has_zero_init_truncate() returns 0.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int (*bdrv_has_zero_init)(BlockDriverStat=
-e *bs);
->>
->=20
-> I doubt, shouldn't 1dcaf527 be fixed by adding all needed=20
-> bdrv_has_zero_init_truncate functions?
+On Fri, 17 Jan 2020 17:45:16 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-That was my original thought. But looking at callers of=20
-bdrv_has_zero_init_truncate() shows that they all plan to perform=20
-bdrv_co_truncate(PREALLOC_MODE_OFF) and want to know if that will leak=20
-non-zero data; if you can't truncate, it doesn't matter what=20
-init_truncate() returns, but since init_truncate() defaults to 0, it=20
-shouldn't invalidate init() returning 1 - fixing the docs was easier=20
-than adding useless callbacks to parallels, qed, and vdi just to rip=20
-them back out again in patch 9.
+> If ACPI blob length modifications happens after the initial
+> virt_acpi_build() call, and the changed blob length is within
+> the PAGE size boundary, then the revised size is not seen by
+> the firmware on Guest reboot. The is because in the
+> virt_acpi_build_update() -> acpi_ram_update() -> qemu_ram_resize()
+> path, qemu_ram_resize() uses used_length (ram_block size which is
+> aligned to PAGE size) and the "resize callback" to update the size
+> seen by firmware is not getting invoked.
+> 
+> Hence make sure callback is called if the new size is different
+> from original requested size.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+> Please find the previous discussions on this issue here,
+> https://patchwork.kernel.org/patch/11174947/
+> 
+> But this one attempts a different solution to fix it by introducing
+> req_length var to RAMBlock struct. 
+> 
 
-As you noted later, sheepdog was the only driver that violated this rule=20
-(and it is fixed in patch 8).  I could reorder the series to get the bug=20
-fix in before the documentation change, if that would help.
+looks fine to me, so
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 
->=20
-> (sorry, I started to dig in the code and patches around=20
-> bdrv_has_zero_init_truncate and tired :(.,
->  =C2=A0hope Max will comment this).
->=20
+CCing David who touches this area in his latest series for and
+might have an opinion on how it should be handled.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> ---
+>  exec.c                  | 36 +++++++++++++++++++++++-------------
+>  include/exec/ram_addr.h |  5 +++--
+>  2 files changed, 26 insertions(+), 15 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index d4b769d0d4..9ce33992f8 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2123,16 +2123,18 @@ static int memory_try_enable_merging(void *addr, size_t len)
+>   * resize callback to update device state and/or add assertions to detect
+>   * misuse, if necessary.
+>   */
+> -int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
+> +int qemu_ram_resize(RAMBlock *block, ram_addr_t size, Error **errp)
+>  {
+> -    assert(block);
+> +    ram_addr_t newsize;
+>  
+> -    newsize = HOST_PAGE_ALIGN(newsize);
+> +    assert(block);
+>  
+> -    if (block->used_length == newsize) {
+> +    if (block->req_length == size) {
+>          return 0;
+>      }
+>  
+> +    newsize = HOST_PAGE_ALIGN(size);
+> +
+>      if (!(block->flags & RAM_RESIZEABLE)) {
+>          error_setg_errno(errp, EINVAL,
+>                           "Length mismatch: %s: 0x" RAM_ADDR_FMT
+> @@ -2149,13 +2151,19 @@ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
+>          return -EINVAL;
+>      }
+>  
+> -    cpu_physical_memory_clear_dirty_range(block->offset, block->used_length);
+> -    block->used_length = newsize;
+> -    cpu_physical_memory_set_dirty_range(block->offset, block->used_length,
+> -                                        DIRTY_CLIENTS_ALL);
+> -    memory_region_set_size(block->mr, newsize);
+> +    block->req_length = size;
+> +
+> +    if (newsize != block->used_length) {
+> +        cpu_physical_memory_clear_dirty_range(block->offset,
+> +                                              block->used_length);
+> +        block->used_length = newsize;
+> +        cpu_physical_memory_set_dirty_range(block->offset, block->used_length,
+> +                                            DIRTY_CLIENTS_ALL);
+> +        memory_region_set_size(block->mr, newsize);
+> +    }
+> +
+>      if (block->resized) {
+> -        block->resized(block->idstr, newsize, block->host);
+> +        block->resized(block->idstr, block->req_length, block->host);
+>      }
+>      return 0;
+>  }
+> @@ -2412,16 +2420,18 @@ RAMBlock *qemu_ram_alloc_internal(ram_addr_t size, ram_addr_t max_size,
+>                                    MemoryRegion *mr, Error **errp)
+>  {
+>      RAMBlock *new_block;
+> +    ram_addr_t newsize;
+>      Error *local_err = NULL;
+>  
+> -    size = HOST_PAGE_ALIGN(size);
+> +    newsize = HOST_PAGE_ALIGN(size);
+>      max_size = HOST_PAGE_ALIGN(max_size);
+>      new_block = g_malloc0(sizeof(*new_block));
+>      new_block->mr = mr;
+>      new_block->resized = resized;
+> -    new_block->used_length = size;
+> +    new_block->req_length = size;
+> +    new_block->used_length = newsize;
+>      new_block->max_length = max_size;
+> -    assert(max_size >= size);
+> +    assert(max_size >= newsize);
+>      new_block->fd = -1;
+>      new_block->page_size = qemu_real_host_page_size;
+>      new_block->host = host;
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 5adebb0bc7..fd13082224 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -31,8 +31,9 @@ struct RAMBlock {
+>      uint8_t *host;
+>      uint8_t *colo_cache; /* For colo, VM's ram cache */
+>      ram_addr_t offset;
+> -    ram_addr_t used_length;
+> -    ram_addr_t max_length;
+> +    ram_addr_t req_length; /* Original requested size, used if RAM_RESIZEABLE */
+> +    ram_addr_t used_length; /* aligned to qemu_host_page_size */
+> +    ram_addr_t max_length; /*  aligned to qemu_host_page_size */
+>      void (*resized)(const char*, uint64_t length, void *host);
+>      uint32_t flags;
+>      /* Protected by iothread lock.  */
 
 
