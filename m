@@ -2,92 +2,88 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDD6C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E92C35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:48:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D185021741
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:44:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3563A21741
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:48:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="byJiCR9W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D185021741
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4QuHY0F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3563A21741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izOjC-0003qY-3h
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 12:44:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52772)
+	id 1izOmN-0005Y6-DM
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 12:47:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54443)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1izOiO-0003Jb-DW
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:43:53 -0500
+ (envelope-from <thuth@redhat.com>) id 1izOlA-0004em-TN
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:46:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1izOiN-0002Ix-AS
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:43:52 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36310)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1izOiK-0002DQ-Pp; Wed, 05 Feb 2020 12:43:48 -0500
-Received: by mail-pg1-x542.google.com with SMTP id k3so1314244pgc.3;
- Wed, 05 Feb 2020 09:43:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=m20qCS/ov/7+NPhM7zIEUTKoyl4bHuA+F0liqTdvC8A=;
- b=byJiCR9W/Myhs5sIIiQltATEvcrRCXdcCQxbOvneSvB/epzHzmU/JUY2sVomXt8FvF
- E8SF4yg7rEdtKrpDcam+i0LtGWrpG8MAgQRxPPPniWVSi0jy1MS5f9x6iVX+DEgsiSPa
- D1x1TiTFDFacMLIn+ZQiQut41Kp83MkGzSM6cycbkkX1K+C/OZKhXHFaNbPl2jqpkS0i
- sNnlgkmy3Gpql+iZ4GumjxOY+Li/3wm9FkLjv3Ry/z/r/OT0QljEjuKvK8CKVElRBsfO
- fnqLQTz2jzraWI9ic3SDxlTTvs4xGrnBZFqTZifYUmsQvx7C00jVdN8vbxJ3AgDatPvP
- 4yMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
- :references:mime-version:content-disposition
- :content-transfer-encoding:in-reply-to:user-agent;
- bh=m20qCS/ov/7+NPhM7zIEUTKoyl4bHuA+F0liqTdvC8A=;
- b=dBc/CQnDIQSXTMkCrN6GTzRHSm5wvJJRZZXSBv66a+pTVG+7Mm4UBfSiUsir2WX0Ro
- /1z6FZxn2RoqRlRzbCDZyteetoGVyPcldqtBhHMTcycMJ7WmTlMg3JH0b4+Z99eGJeWg
- /u2nhAROH1htChfo8m1b4Yr0gUF3TOtMEpPtZqLRYsFJ8aaR2DwAW0lDV8ukaNhUwOd0
- zJhLc0+Cw461uQTuMRUuonilhbeR+jLPui4kDeF4TSgUkyFR82GHJPxMpiiA9nigb+tI
- 9n0xcQgMBMJvdPK+GDHLXLAEOo3XoNtUYETU8ia4tHrr1oeOcT+1lGunBUlULqOO8AiC
- ZbDA==
-X-Gm-Message-State: APjAAAXrg0wCLEsCjYTVsuDf5Ml4Xkqt7W2JerL9TrNL9oVgMplX2S3/
- hdbasqICgdsApX/kuUNZJ0E=
-X-Google-Smtp-Source: APXvYqx2czZ49r7Yu4FGrK2FmvUQc9iXDy9Bbei9Zzpq8GOWgIskOKOH4tONbIH0EES8iiQj6iARIQ==
-X-Received: by 2002:a63:3154:: with SMTP id x81mr27267470pgx.32.1580924627389; 
- Wed, 05 Feb 2020 09:43:47 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id i6sm139610pfk.38.2020.02.05.09.43.45
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 05 Feb 2020 09:43:46 -0800 (PST)
-Date: Wed, 5 Feb 2020 09:43:45 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 2/3] m25p80: Improve command handling for Jedec and
- unsupported commands
-Message-ID: <20200205174345.GA7754@roeck-us.net>
-References: <20200203180904.2727-1-linux@roeck-us.net>
- <20200203180904.2727-2-linux@roeck-us.net>
- <accf297f-0c54-7475-8817-c1014999a57d@kaod.org>
- <7fe70871-c0e3-4ff6-bfda-17b45aa50c5e@roeck-us.net>
- <22a96987-9548-1335-8b04-00167ed9491d@kaod.org>
+ (envelope-from <thuth@redhat.com>) id 1izOl8-0003op-FT
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:46:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47446
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1izOl8-0003lc-5z
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:46:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580924799;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=cpZVDW56FIWkvRLgqqNwJwiwLtYQMm/ibYzvKJ3dCJw=;
+ b=N4QuHY0FFefwlxNJg76zIy6q+6pcpEluYn1CK3PB3GAgVQlsVc/z1xBbW7Fj7RrqsB+0V9
+ fRzpyfh+jB6iqbiZccprtfJTgf08+lJCbrQMgwDjg37NO8T+51QwRfw3M5ocBvRQWfIg7q
+ FFoYHcaTgbEyysFdZVAbLUujR+b4eV8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-68-oQENjGqPPBSfb_aF0ZKf8w-1; Wed, 05 Feb 2020 12:46:36 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A4DF800D54;
+ Wed,  5 Feb 2020 17:46:35 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-186.ams2.redhat.com [10.36.116.186])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0751460BF7;
+ Wed,  5 Feb 2020 17:46:25 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 3/4] Remove the core bluetooth code
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20191120091014.16883-1-thuth@redhat.com>
+ <20191120091014.16883-4-thuth@redhat.com>
+ <7a775153-f18d-e766-1d8f-33607f5fa05b@amsat.org>
+ <2396dfd4-6c85-d17a-b358-bd058c757f14@redhat.com>
+ <CAAdtpL7vPCQ8k91nvBWc_NLrmhu6OPVprUSL8uzi_v6HMiSrnw@mail.gmail.com>
+ <CAL1e-=gd-ymYd3_cods8BAtwbQeJFodmnmsNo-gLx381rXHKxQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9c1f04bd-a0e7-6fbc-68d7-fd5babf1e8d0@redhat.com>
+Date: Wed, 5 Feb 2020 18:46:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <22a96987-9548-1335-8b04-00167ed9491d@kaod.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+In-Reply-To: <CAL1e-=gd-ymYd3_cods8BAtwbQeJFodmnmsNo-gLx381rXHKxQ@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: oQENjGqPPBSfb_aF0ZKf8w-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,102 +95,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, libvir-list@redhat.com,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 05, 2020 at 11:08:07AM +0100, Cédric Le Goater wrote:
-> On 2/4/20 3:28 PM, Guenter Roeck wrote:
-> > On 2/4/20 12:53 AM, Cédric Le Goater wrote:
-> >> On 2/3/20 7:09 PM, Guenter Roeck wrote:
-> >>> Always report 6 bytes of JEDEC data. Fill remaining data with 0.
-> >>>
-> >>> For unsupported commands, keep sending a value of 0 until the chip
-> >>> is deselected.
-> >>>
-> >>> Both changes avoid attempts to decode random commands. Up to now this
-> >>> happened if the reported Jedec data was shorter than 6 bytes but the
-> >>> host read 6 bytes, and with all unsupported commands.
-> >>
-> >> Do you have a concrete example for that ? machine and flash model.
-> >>
-> > 
-> > I noticed it while tracking down the bug fixed in patch 3 of the series,
-> > ie with AST2500 evb using w25q256 flash, but it happens with all machines
-> > using SPI NOR flash (ie all aspeed bmc machines) when running the Linux
-> > kernel. Most of the time it doesn't cause harm, unless the host sends
-> > an "address" as part of an unsupported command which happens to include
-> > a valid command code.
-> 
-> ok. we will need to model SFDP one day.
-> 
-> Are you using the OpenBMC images or do you have your own ? 
-> 
+On 05/02/2020 18.40, Aleksandar Markovic wrote:
+> On Sat, Feb 1, 2020 at 7:53 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+>>
+>> On Sat, Feb 1, 2020 at 7:51 PM Thomas Huth <thuth@redhat.com> wrote:
+>>> On 01/02/2020 17.09, Philippe Mathieu-Daud=C3=A9 wrote:
+[...]
+>>>>> index 6099be1d84..ecce4ada2d 100755
+>>>>> --- a/configure
+>>>>> +++ b/configure
+>>>>> @@ -349,7 +349,6 @@ unset target_list_exclude
+>>>>>  # Distributions want to ensure that several features are compiled in=
+, and it
+>>>>>  # is impossible without a --enable-foo that exits if a feature is no=
+t found.
+>>>>>
+>>>>> -bluez=3D""
+>>>>>  brlapi=3D""
+>>>>>  curl=3D""
+>>>>>  curses=3D""
+>>>>> @@ -1151,10 +1150,6 @@ for opt do
+>>>>>    ;;
+>>>>>    --enable-brlapi) brlapi=3D"yes"
+>>>>>    ;;
+>>>>> -  --disable-bluez) bluez=3D"no"
+>>>>> -  ;;
+>>>>> -  --enable-bluez) bluez=3D"yes"
+>>>>> -  ;;
+>>>>
+>>>> Now than I'm bisecting over this commit, I realize removing this
+>>>> option was not a good idea, we should have done like commit
+>>>> cb6414dfec8 or 315d3184525:
+>>>>
+>>>>   @@ -886,10 +885,6 @@ for opt do
+>>>>   -  --disable-uuid) uuid=3D"no"
+>>>>   -  ;;
+>>>>   -  --enable-uuid) uuid=3D"yes"
+>>>>   -  ;;
+>>>>   ...
+>>>>   +  --enable-uuid|--disable-uuid)
+>>>>   +      echo "$0: $opt is obsolete, UUID support is always built" >&2
+>>>>   +  ;;
+>>>
+>>> Looks trivial ... so if it bugs you, just send a patch?
+>>
+>> I thought about it but this won't fix much, it is too late now.
+>>
+>> I simply wanted to share this bugged me so we try to avoid doing the
+>> same mistake again.
+>>
+>=20
+> I vote for addition of a change similar to what Philippe described.
 
-I am running images built from upstream/stable kernel branches.
+Feel free to send a patch if it bugs you.
 
-Guenter
+> Furthermore, it looks to me the correct way would be to now do full
+> deprecation of --enable-bluez and --disable-bluez. This means adding
+> this to documentation (not related to bluetooth devices support), not
+> only a change in "configure". This also means that only after two next
+> full cycles these options could be removed.
+>=20
+> True, this could have been done together with bluetooth devices
+> support deprecation (and in that case we could have deleted these
+> options right away), but it wasn't. Users don't have a crystal ball to
+> know that we assumed that --enable-bluez and --disable-bluez were part
+> of bluetooth devices support, and could rightfully complain about an
+> abrupt elimination of a compile time option.
 
-> > 
-> >>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> >>> ---
-> >>>   hw/block/m25p80.c | 10 +++++++++-
-> >>>   1 file changed, 9 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> >>> index 63e050d7d3..aca75edcc1 100644
-> >>> --- a/hw/block/m25p80.c
-> >>> +++ b/hw/block/m25p80.c
-> >>> @@ -1040,8 +1040,11 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-> >>>           for (i = 0; i < s->pi->id_len; i++) {
-> >>>               s->data[i] = s->pi->id[i];
-> >>>           }
-> >>> +        for (; i < SPI_NOR_MAX_ID_LEN; i++) {
-> >>> +            s->data[i] = 0;
-> >>> +        }
-> >>
-> >> It seems that data should be reseted in m25p80_cs() also.
-> >>
-> > Are you sure ?
-> > 
-> > The current implementation sets s->data[] as needed when command decode
-> > is complete. That seems less costly to me.
-> 
-> ok.
-> Reviewed-by: Cédric Le Goater <clg@kaod.org>
-> 
-> 
-> Thanks,
-> 
-> C.
->  
-> > Thanks,
-> > Guenter
-> > 
-> >>>   -        s->len = s->pi->id_len;
-> >>> +        s->len = SPI_NOR_MAX_ID_LEN;
-> >>>           s->pos = 0;
-> >>>           s->state = STATE_READING_DATA;
-> >>>           break;
-> >>> @@ -1158,6 +1161,11 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-> >>>           s->quad_enable = false;
-> >>>           break;
-> >>>       default:
-> >>> +        s->pos = 0;
-> >>> +        s->len = 1;
-> >>> +        s->state = STATE_READING_DATA;
-> >>> +        s->data_read_loop = true;
-> >>> +        s->data[0] = 0;
-> >>>           qemu_log_mask(LOG_GUEST_ERROR, "M25P80: Unknown cmd %x\n", value);
-> >>>           break;
-> >>>       }
-> >>>
-> >>
-> > 
-> 
+I disagree. If you don't know that "bluez" is about bluetooth, then you
+should likely not use these options anyway.
+
+ Thomas
+
 
