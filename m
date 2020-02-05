@@ -2,68 +2,67 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 113FBC35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 23:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB8AC35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 23:29:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFF0F2082E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 23:26:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 359F02082E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 23:29:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V38Ie1Sl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFF0F2082E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="di8jJE1T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359F02082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izU4O-0004nh-7J
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 18:26:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51316)
+	id 1izU6m-0006Nc-C4
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 18:29:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1izU3Z-0004KU-W3
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 18:26:07 -0500
+ (envelope-from <jsnow@redhat.com>) id 1izU65-0005nA-D3
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 18:28:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1izU3Y-0003Hh-LH
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 18:26:05 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55262
+ (envelope-from <jsnow@redhat.com>) id 1izU64-0007nP-5I
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 18:28:41 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48684
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1izU3Y-0003BS-FH
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 18:26:04 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1izU64-0007iZ-0k
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 18:28:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580945162;
+ s=mimecast20190719; t=1580945319;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3Ef2fW+eef1MdPsdSimpMMU1VXpVchuLgfto+uQHtf0=;
- b=V38Ie1SlVGOSmTxCHbnUv9T+EAkmbwEcHRj/2OYrwnTx6ONtdWrOWfcETshICTL6KmX8/f
- 8gPjyW4JlmpY63E0vZK/HpJAkqiSW4ud0k3NG750Vtjh0obAj7ak1hcoZjerMMD84/JGYi
- j/LTOMQ+wo0LVi72JwCqkk/ws+kYMe4=
+ bh=BOjV3YlfslAgL3WKkjXThiLUrqpccnTOFGjroqOefcw=;
+ b=di8jJE1Tvr9j9KCayOGt9MZzhJqkSrnD+RGL0Jqaml5YBI9qY6IaP7JJYpXFfBoKIm1j1m
+ pT0/4lC99o1e12N8SesTGWfxfQE137RcWJQ1Yi2pRozkGInPQ5BQzssOTahghyu2zErpJ/
+ AQZkLCpvMUovI5q7Bhzompj6jYTHzDU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-QHKd-7b_OGaqgvmOZmviHg-1; Wed, 05 Feb 2020 18:26:00 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-374-yGdBVSK7PemRXp3FmEyNpg-1; Wed, 05 Feb 2020 18:28:32 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E180F801FB0;
- Wed,  5 Feb 2020 23:25:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 734F2108838B
+ for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 23:28:31 +0000 (UTC)
 Received: from [10.18.17.116] (dhcp-17-116.bos.redhat.com [10.18.17.116])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3B91DF6E8;
- Wed,  5 Feb 2020 23:25:49 +0000 (UTC)
-Subject: Re: [PATCH v3 00/13] RFC: [for 5.0]: HMP monitor handlers cleanups
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20200127103647.17761-1-mlevitsk@redhat.com>
- <2e885a1d-94c7-53b5-44f7-feffe70f57c3@redhat.com>
- <20200127204355.GE4544@andariel.pipo.sk>
- <12217cd6-7866-ce9c-c0da-24775f9d045d@redhat.com>
- <20200128164717.GT3215@work-vm>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 05A6F790D9;
+ Wed,  5 Feb 2020 23:28:25 +0000 (UTC)
+Subject: Re: [PATCH v2 3/5] python/qemu: qmp: Make accept()'s timeout
+ configurable
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+References: <20200204141111.3207-1-wainersm@redhat.com>
+ <20200204141111.3207-4-wainersm@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -139,19 +138,19 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <68242a4a-1904-db1b-769d-3ab7b91a993b@redhat.com>
-Date: Wed, 5 Feb 2020 18:25:49 -0500
+Message-ID: <0c6e08f8-6ec7-4fe7-7135-d90ed9bd82fa@redhat.com>
+Date: Wed, 5 Feb 2020 18:28:24 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200128164717.GT3215@work-vm>
+In-Reply-To: <20200204141111.3207-4-wainersm@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: QHKd-7b_OGaqgvmOZmviHg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: yGdBVSK7PemRXp3FmEyNpg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -165,93 +164,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- Jan Tomko <jtomko@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: philmd@redhat.com, ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 1/28/20 11:47 AM, Dr. David Alan Gilbert wrote:
-> * John Snow (jsnow@redhat.com) wrote:
->>
->>
->> On 1/27/20 3:43 PM, Peter Krempa wrote:
->>> On Mon, Jan 27, 2020 at 14:39:02 -0500, John Snow wrote:
->>>>
->>>>
->>>> On 1/27/20 5:36 AM, Maxim Levitsky wrote:
->>>>> This patch series is bunch of cleanups
->>>>> to the hmp monitor code.
->>>>>
->>>>> This series only touched blockdev related hmp handlers.
->>>>>
->>>>> No functional changes expected other that
->>>>> light error message changes by the last patch.
->>>>>
->>>>> This was inspired by this bugzilla:
->>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1719169
->>>>>
->>>>> Basically some users still parse hmp error messages,
->>>>> and they would like to have them prefixed with 'Error:'
->>>>>
->>>>
->>>> HMP isn't meant to be parsed. It's explicitly *not* API or ABI. I do
->>>> like consistency in my UIs (it's useful for human eyes, too), but I'd
->>>> like to know more about the request.
->>>
->>> That's true as long as there's an stable replacement ... see below.
->>>
->>
->> Thanks for the context!
->>
->>>>
->>>> Is this request coming from libvirt? Can we wean them off of this
->>>> interface? What do they need as a replacement?
->>>
->>> There are 5 commands that libvirt still has HMP interfaces for:
->>>
->>> drive_add
->>> drive_del
->>>
->>> savevm
->>> loadvm
->>> delvm
->>>
->>> From upstream point of view there's no value in adding the 'error'
->>> prefix to drive_add/drive_del as libvirt now uses blockdev-add/del QMP
->>> command instead which have implicit error propagation.
->>>
->>
->> As thought.
->>
->>> There are no replacements for the internal snapshot commands, but they
->>> reported the 'error' prefix for some time even before this series.
->>>
->>> Said that, please don't break savevm/loadvm/delvm until a QMP
->>> replacement is added.
->>>
->>
->> Yes, noted. I wonder where userfaultfd write support is these days...
-> 
-> How would that help you there?
-> 
+On 2/4/20 9:11 AM, Wainer dos Santos Moschetta wrote:
+> Currently the timeout of QEMUMonitorProtocol.accept() is
+> hard-coded to 15.0 seconds. This added the parameter `timeout`
+> so the value can be configured by the user.
+>=20
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Left at the traffic lights, but there was a thought that we'd be able to
-get transactionable save-memory support in QMP if we could use
-userfaultfd to do just-in-time copies of memory as needed, until the job
-is complete.
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-This way we could support it properly in QMP and we'd have a replacement
-for the HMP version which -- from memory -- is not appropriate for the
-QMP channel.
+> ---
+>  python/qemu/qmp.py | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+> index f4e04a6683..0e07d80e2a 100644
+> --- a/python/qemu/qmp.py
+> +++ b/python/qemu/qmp.py
+> @@ -154,16 +154,23 @@ class QEMUMonitorProtocol:
+>              return self.__negotiate_capabilities()
+>          return None
+> =20
+> -    def accept(self):
+> +    def accept(self, timeout=3D15.0):
+>          """
+>          Await connection from QMP Monitor and perform capabilities negot=
+iation.
+> =20
+> +        @param timeout: timeout in seconds (nonnegative float number, or
+> +                        None). The value passed will set the behavior of=
+ the
+> +                        underneath QMP socket as described in [1]. Defau=
+lt value
+> +                        is set to 15.0.
+>          @return QMP greeting dict
+>          @raise OSError on socket connection errors
+>          @raise QMPConnectError if the greeting is not received
+>          @raise QMPCapabilitiesError if fails to negotiate capabilities
+> +
+> +        [1]
+> +        https://docs.python.org/3/library/socket.html#socket.socket.sett=
+imeout
+>          """
+> -        self.__sock.settimeout(15)
+> +        self.__sock.settimeout(timeout)
+>          self.__sock, _ =3D self.__sock.accept()
+>          self.__sockfile =3D self.__sock.makefile()
+>          return self.__negotiate_capabilities()
+>=20
 
-Maybe I imagined this restriction.
-
---js
+--=20
+=E2=80=94js
 
 
