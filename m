@@ -2,64 +2,85 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D284C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 02:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 564B9C35249
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 03:10:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 217C9214AF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 02:21:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2211A2085B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 03:10:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PN0sDap8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 217C9214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OoSnevlR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2211A2085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izAJg-0003fJ-A1
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 21:21:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36385)
+	id 1izB4z-0004a5-6s
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 22:10:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1izAIx-00037j-JN
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 21:20:41 -0500
+ (envelope-from <shan.gavin@gmail.com>) id 1izB4J-00048t-Ez
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 22:09:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1izAIv-0001pm-NX
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 21:20:38 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:51757 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1izAIt-0001JY-QR; Tue, 04 Feb 2020 21:20:37 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48C4zK1c2Rz9sSR; Wed,  5 Feb 2020 13:20:29 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1580869229;
- bh=clN/iZ7l+cjfhQHuLH/v295pD9eU52Rd3W3Ar0Xk9/Y=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=PN0sDap8zlH0hmpoAq636XUFZx4GY37kVHqoBOrpASv3f0ALrrvKrkvBn3h1n4+rH
- rCRybzH2jAm2N0Jr+kWXgnYrRYHIObd3OcN4MWVkoXJMboayLPEp7zBhYfqVBm8uUF
- Lq9Q4vUmHtCGwbVbd5aOuhvzf4HpXWFtQVE54WpI=
-Date: Wed, 5 Feb 2020 11:49:17 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v5 2/4] nvdimm: add uuid property to nvdimm
-Message-ID: <20200205004917.GE60221@umbus.fritz.box>
-References: <158038485571.16440.14734905006978949612.stgit@lep8c.aus.stglabs.ibm.com>
- <158038487514.16440.10078356123772690069.stgit@lep8c.aus.stglabs.ibm.com>
- <20200204155523.16d551d5@redhat.com>
+ (envelope-from <shan.gavin@gmail.com>) id 1izB4H-0006nH-DE
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 22:09:35 -0500
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:44683)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <shan.gavin@gmail.com>)
+ id 1izB4F-0006g0-7k; Tue, 04 Feb 2020 22:09:31 -0500
+Received: by mail-qv1-xf42.google.com with SMTP id n8so442188qvg.11;
+ Tue, 04 Feb 2020 19:09:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0PE2uu4ZBM2cwypMrN5QyWKooyeC7GQaJC62Y5Zgbc4=;
+ b=OoSnevlRXNwVaZtJd/vmiaRJFn/Pt6OxAKuN+IWYTuMyPyB2rxjfSFamFs5qbci0Xb
+ 6PuWQDoY4ZTpOMFCmZ+Yw5Li7Bl6AGVwlUjx56QoXzUYI28nGEl8XLPc5TntrbyFNRGx
+ YqCfJB7oPjv6OoXzRpNGxiZz96ojQfeT/CZGwSx331WGF/AtosuqTFh2MjyqB+8x3TZh
+ pSJhaxrSuWX/TQpxmxUorqMqLtJvaaVwSQQIQ2i3NPNSXgsGyGm0OZZ51HjIZY1aGJrc
+ k2D3qFb6lPdWw/Y96oFCR6DS2rVQbDme0lmWDaxh8/BtEDwNF/K6qaSDicIwedvrErZu
+ h1pQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0PE2uu4ZBM2cwypMrN5QyWKooyeC7GQaJC62Y5Zgbc4=;
+ b=mMrHiDDew1dXq7syGIwTEVEeIJNjeJhYrqJxEWC+/w4BhMx/15svOSdhhAuE5XoGSH
+ BeEABlsT3ZNxW36EtshIB/3ohAovcwpyjtQyW6fkStEYvLd6fzjFXW2xLViCGgXco9ac
+ 1xd/7hundoMAkyRK/64jGcAvyoHtlySAk0bPv1L6qGhPd6NJ8GyGQQllHHcONN5rshoH
+ fpHu6NZ5EpbaxymVlnPX4gG9WcgWAvmfvQqrUAK8FruP482gT36fzxKHUaghYl0IbCVv
+ 4gxDp0bf8hC9uURIydapEazlasKeFTF91rMa9uTYEset1u+2CG9gKWOqQISyImY73fCR
+ PCwA==
+X-Gm-Message-State: APjAAAXARnpgzqHfkOjcTBeFes2MboYHhy3bhRDmq2AipBmsXSw0GOr1
+ Q2r69BSh2PS68yWuP2VQzfqp4OuVJhB65rvS0zA=
+X-Google-Smtp-Source: APXvYqzuvjw6pkrNp/xOeiEVRMBLTzHpcihuy+LVoldUqAJDx3fw42vPX6H/WcNGE/EYTnhCc/BHgGGjbbli7IfhBBU=
+X-Received: by 2002:a0c:fe10:: with SMTP id x16mr30285840qvr.188.1580872170282; 
+ Tue, 04 Feb 2020 19:09:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="JBi0ZxuS5uaEhkUZ"
-Content-Disposition: inline
-In-Reply-To: <20200204155523.16d551d5@redhat.com>
+References: <20191219040612.28431-1-gshan@redhat.com>
+ <d972631d-7db7-b6d5-61b8-244ae2c85882@redhat.com>
+ <7f6e29e6-1df9-4513-79ba-b53873b0735e@ozlabs.ru>
+ <544f261e4b9c97f1d3a5fb64cef42ba5@kernel.org>
+ <ff584722-1b51-e538-7c45-c71cdc40105f@redhat.com>
+ <c61c95c434dbcf97a0c946f0993d4843@kernel.org>
+ <8a286e1c-c3f3-3052-e497-d44a90667451@redhat.com>
+ <CAFEAcA-wKbF7mYToaAsxDxahuJ_X3_i3Z+8DqXmj8mKySmTW7Q@mail.gmail.com>
+In-Reply-To: <CAFEAcA-wKbF7mYToaAsxDxahuJ_X3_i3Z+8DqXmj8mKySmTW7Q@mail.gmail.com>
+From: Shan Gavin <shan.gavin@gmail.com>
+Date: Wed, 5 Feb 2020 14:09:19 +1100
+Message-ID: <CAOL5Tw=CQ-oWd1=+xtFHyLEieAENt83d27iK11SwtsF7qhOy9Q@mail.gmail.com>
+Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000252431059dcb7c4a"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2607:f8b0:4864:20::f42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,158 +92,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xiaoguangrong.eric@gmail.com, Shivaprasad G Bhat <sbhat@linux.ibm.com>,
- mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- sbhat@linux.vnet.ibm.com
+Cc: Andrew Jones <drjones@redhat.com>, Gavin Shan <gshan@redhat.com>,
+ jthierry@redhat.com, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Marc Zyngier <maz@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---JBi0ZxuS5uaEhkUZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--000000000000252431059dcb7c4a
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 04, 2020 at 03:55:23PM +0100, Igor Mammedov wrote:
-> On Thu, 30 Jan 2020 05:47:59 -0600
-> Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
->=20
-> > For ppc64, PAPR requires the nvdimm device to have UUID property
-> > set in the device tree. Add an option to get it from the user.
-> >=20
-> > Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/mem/nvdimm.c         |   40 ++++++++++++++++++++++++++++++++++++++++
-> >  include/hw/mem/nvdimm.h |    7 +++++++
-> >  2 files changed, 47 insertions(+)
-> >=20
-> > diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> > index 39f1426d1f..8e426d24bb 100644
-> > --- a/hw/mem/nvdimm.c
-> > +++ b/hw/mem/nvdimm.c
-> > @@ -69,11 +69,51 @@ out:
-> >      error_propagate(errp, local_err);
-> >  }
-> > =20
-> > +static void nvdimm_get_uuid(Object *obj, Visitor *v, const char *name,
-> > +                                  void *opaque, Error **errp)
-> > +{
-> > +    NVDIMMDevice *nvdimm =3D NVDIMM(obj);
-> > +    char *value =3D NULL;
-> > +
-> > +    value =3D qemu_uuid_unparse_strdup(&nvdimm->uuid);
-> > +
-> > +    visit_type_str(v, name, &value, errp);
-> > +    g_free(value);
-> > +}
-> > +
-> > +
-> > +static void nvdimm_set_uuid(Object *obj, Visitor *v, const char *name,
-> > +                                  void *opaque, Error **errp)
-> > +{
-> > +    NVDIMMDevice *nvdimm =3D NVDIMM(obj);
-> > +    Error *local_err =3D NULL;
-> > +    char *value;
-> > +
-> > +    visit_type_str(v, name, &value, &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> > +
-> > +    if (qemu_uuid_parse(value, &nvdimm->uuid) !=3D 0) {
-> > +        error_setg(errp, "Property '%s.%s' has invalid value",
-> > +                   object_get_typename(obj), name);
-> > +        goto out;
-> > +    }
-> > +    g_free(value);
-> > +
-> > +out:
-> > +    error_propagate(errp, local_err);
-> > +}
-> > +
-> > +
-> >  static void nvdimm_init(Object *obj)
-> >  {
-> >      object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
-> >                          nvdimm_get_label_size, nvdimm_set_label_size, =
-NULL,
-> >                          NULL, NULL);
-> > +
-> > +    object_property_add(obj, NVDIMM_UUID_PROP, "QemuUUID", nvdimm_get_=
-uuid,
-> why it's named "QemuUUID" and not just "uuid"
+Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B42=E6=9C=884=
+=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:22=E5=86=99=E9=81=93=EF=BC=
+=9A
 
-I almost got caught by that one.  The name is NVDIMM_UUID_PROP, which
-is indeed just "uuid".  The "QemuUUID" is the property type identifier.
+> On Tue, 4 Feb 2020 at 03:51, Gavin Shan <gshan@redhat.com> wrote:
+> > Note: I'm still investigating the code to see how SError can be injecte=
+d
+> when TCG
+> > is used. I think we need same function when TCG is enabled, or it's
+> something for
+> > future.
+>
+> TCG doesn't currently implement SError -- it could be added, but
+> there's a bit of plumbing you'd need to do to get it to work and to
+> ensure the exception is taken, routed and masked correctly.
+>
+>
+Thanks, Peter. Yeah, I will post v2 RFC patch shortly. Please let me
+know if there are anything wrong :)
 
->=20
->=20
-> > +                        nvdimm_set_uuid, NULL, NULL, NULL);
-> >  }
-> > =20
-> >  static void nvdimm_finalize(Object *obj)
-> > diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-> > index 523a9b3d4a..4807ca615b 100644
-> > --- a/include/hw/mem/nvdimm.h
-> > +++ b/include/hw/mem/nvdimm.h
-> > @@ -25,6 +25,7 @@
-> > =20
-> >  #include "hw/mem/pc-dimm.h"
-> >  #include "hw/acpi/bios-linker-loader.h"
-> > +#include "qemu/uuid.h"
-> > =20
-> >  #define NVDIMM_DEBUG 0
-> >  #define nvdimm_debug(fmt, ...)                                \
-> > @@ -49,6 +50,7 @@
-> >                                                 TYPE_NVDIMM)
-> > =20
-> >  #define NVDIMM_LABEL_SIZE_PROP "label-size"
-> > +#define NVDIMM_UUID_PROP       "uuid"
-> >  #define NVDIMM_UNARMED_PROP    "unarmed"
-> > =20
-> >  struct NVDIMMDevice {
-> > @@ -83,6 +85,11 @@ struct NVDIMMDevice {
-> >       * the guest write persistence.
-> >       */
-> >      bool unarmed;
-> > +
-> > +    /*
-> > +     * The PPC64 - spapr requires each nvdimm device have a uuid.
-> > +     */
-> > +    QemuUUID uuid;
-> >  };
-> >  typedef struct NVDIMMDevice NVDIMMDevice;
-> > =20
-> >=20
->=20
+Thanks,
+Gavin
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---JBi0ZxuS5uaEhkUZ
-Content-Type: application/pgp-signature; name="signature.asc"
+> thanks
+> -- PMM
+>
 
------BEGIN PGP SIGNATURE-----
+--000000000000252431059dcb7c4a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl46EQgACgkQbDjKyiDZ
-s5LEiBAAx777OUjSF45qHEabJ5+vmbru4vWVijvBZTWBgudQrolNxIDh8WKjTTv5
-PQMKoy+0hS9u1RWqBoFaq0mB71Wv4JwAnMLmA5XsWVmIFe4dh7JawylrNxHM8LzY
-uMkGWjeU/rIzDKpbviE0taSItgYoSdmM/vZwzW1SZ3G5CNqzgeIqTgG0uzvOPn7z
-93BpKn9LH8BW2ul+JC4lojf4y1vNTdAsNWR2POJEy1go1M6BHD4DSlcFfsl7/QKX
-JVK4sX3sUFWJL7kxlCJL9cbAWKY+G0hWNTQ+IztoRmhSzmDFJyBYa9KHlZ3OgLq8
-SJ0rJy5wcDitSUVkOlkAN3oCrjg+308q0FWbEy/0ji9aetvT4UXrtcDb4tOFzUeb
-cd3R1DcvY8+xex9/yiHdZ2f5kr5tYUnk6EPdZ3lewCYGeuQnkmMn5Uf7gtT+UT7Z
-V6xI/P3jLGgGRT169JWJDVD5xa5HKnZ7I1t+984WqQhz89rYn9i2aid9EPsP1yKs
-ub/hoLhYaX5iECIj+RvnkXt1YvPllMEOToBTn0LiZcTdKshhoJyAfvI7B3cRrL7g
-HjdI/epbH+lucchgdRdYM9Q0DLmdJbNS8lz96VOMy3lq8DxaP54FLSrTh9nHkb08
-x+C4WM/DdZ3FE4y0tlZSq8265IMXxscxx6DlrsDYjhJBPeV2v2c=
-=9mOQ
------END PGP SIGNATURE-----
+<div dir=3D"ltr"><div dir=3D"ltr">Peter Maydell &lt;<a href=3D"mailto:peter=
+.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; =E4=BA=8E2020=E5=B9=
+=B42=E6=9C=884=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:22=E5=86=99=
+=E9=81=93=EF=BC=9A<br></div><div class=3D"gmail_quote"><blockquote class=3D=
+"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(2=
+04,204,204);padding-left:1ex">On Tue, 4 Feb 2020 at 03:51, Gavin Shan &lt;<=
+a href=3D"mailto:gshan@redhat.com" target=3D"_blank">gshan@redhat.com</a>&g=
+t; wrote:<br>
+&gt; Note: I&#39;m still investigating the code to see how SError can be in=
+jected when TCG<br>
+&gt; is used. I think we need same function when TCG is enabled, or it&#39;=
+s something for<br>
+&gt; future.<br>
+<br>
+TCG doesn&#39;t currently implement SError -- it could be added, but<br>
+there&#39;s a bit of plumbing you&#39;d need to do to get it to work and to=
+<br>
+ensure the exception is taken, routed and masked correctly.<br>
+<br></blockquote><div><br></div><div>Thanks, Peter. Yeah, I will post v2 RF=
+C patch shortly. Please let me</div><div>know if there are anything wrong :=
+)</div><div><br>Thanks,<br>Gavin</div><div>=C2=A0</div><blockquote class=3D=
+"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(2=
+04,204,204);padding-left:1ex">
+thanks<br>
+-- PMM<br>
+</blockquote></div></div>
 
---JBi0ZxuS5uaEhkUZ--
+--000000000000252431059dcb7c4a--
 
