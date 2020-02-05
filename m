@@ -2,140 +2,76 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB672C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCF4C352A1
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:30:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB50220730
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:30:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X14VKtqa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB50220730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C95A521741
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:30:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C95A521741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52387 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izNZI-0007q4-S1
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 11:30:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33869)
+	id 1izNZi-0008Rb-Tf
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 11:30:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1izNYJ-0006p2-6L
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:29:24 -0500
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1izNYp-0007OR-Ed
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:29:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1izNYH-0007mj-Vp
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:29:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33798
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1izNYn-0000L7-JA
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:29:55 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2070 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1izNYH-0007lk-RK
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:29:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580920161;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vvr9dOzGOTH7hp7N1b9bWe5tvVnUcRnX8b9kuyBP5aA=;
- b=X14VKtqaQ6kKZ4aqWnv99He/uKkGgzH7yWg6SXtWXGMwZd0fkk6/1Aqsch3jLmjW9xJoOg
- 5IX0jv4OvBEHhrFj8UFRErzfdyXxZK8799fJSwC3DLqLpqNhCcz+/UkkVmn+Lvfdrs83lP
- o03wkNA7xasA1MV0RDtpTYVulp5X2xs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-D65S9krYO0OE7mqBl8_fZg-1; Wed, 05 Feb 2020 11:29:19 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 090168010E6;
- Wed,  5 Feb 2020 16:29:18 +0000 (UTC)
-Received: from [10.36.116.229] (ovpn-116-229.ams2.redhat.com [10.36.116.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA6DE5C545;
- Wed,  5 Feb 2020 16:29:14 +0000 (UTC)
-Subject: Re: [PULL 19/35] ppc/pnv: Add models for POWER9 PHB4 PCIe Host bridge
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
-References: <20200203061123.59150-1-david@gibson.dropbear.id.au>
- <20200203061123.59150-20-david@gibson.dropbear.id.au>
- <bbb36281-287b-70cf-80ab-9ac54eeca8de@redhat.com>
- <ba1e6cd7-083d-5d98-e802-1e828a13c467@kaod.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <254167f7-baca-24fa-e2e0-cf78d5e50234@redhat.com>
-Date: Wed, 5 Feb 2020 17:29:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <ba1e6cd7-083d-5d98-e802-1e828a13c467@kaod.org>
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1izNYi-0008QL-6x; Wed, 05 Feb 2020 11:29:48 -0500
+Received: from LHREML710-CAH.china.huawei.com (unknown [172.18.7.107])
+ by Forcepoint Email with ESMTP id 6D8BB9E4C216A4032FEF;
+ Wed,  5 Feb 2020 16:29:42 +0000 (GMT)
+Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
+ LHREML710-CAH.china.huawei.com (10.201.108.33) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Wed, 5 Feb 2020 16:29:41 +0000
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml703-chm.china.huawei.com (10.201.108.52) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Wed, 5 Feb 2020 16:29:41 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1713.004; Wed, 5 Feb 2020 16:29:41 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Subject: RE: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
+Thread-Topic: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
+Thread-Index: AQHVzV43w2nN4JnxQEOUTwT8NpSKx6gLQ1MAgAAWtoCAACc+AIABYS3w
+Date: Wed, 5 Feb 2020 16:29:41 +0000
+Message-ID: <8e0b2c762e914c64bebfab5fc7441661@huawei.com>
+References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
+ <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
+ <20200204162320.67e5d353@redhat.com>
+ <74eaaa45-0d20-9a21-fbf8-6d29deb248eb@redhat.com>
+ <4ce41554-8b8e-dbb5-5fe9-43af09950f23@redhat.com>
+In-Reply-To: <4ce41554-8b8e-dbb5-5fe9-43af09950f23@redhat.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: D65S9krYO0OE7mqBl8_fZg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,106 +83,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Linuxarm <linuxarm@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
+ "lersek@redhat.com" <lersek@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/02/2020 16:27, C=C3=A9dric Le Goater wrote:
-> On 2/5/20 2:26 PM, Laurent Vivier wrote:
->> On 03/02/2020 07:11, David Gibson wrote:
->>> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>>
->>> These changes introduces models for the PCIe Host Bridge (PHB4) of the
->>> POWER9 processor. It includes the PowerBus logic interface (PBCQ),
->>> IOMMU support, a single PCIe Gen.4 Root Complex, and support for MSI
->>> and LSI interrupt sources as found on a POWER9 system using the XIVE
->>> interrupt controller.
->>>
->>> POWER9 processor comes with 3 PHB4 PEC (PCI Express Controller) and
->>> each PEC can have several PHBs. By default,
->>>
->>>   * PEC0 provides 1 PHB  (PHB0)
->>>   * PEC1 provides 2 PHBs (PHB1 and PHB2)
->>>   * PEC2 provides 3 PHBs (PHB3, PHB4 and PHB5)
->>>
->>> Each PEC has a set  "global" registers and some "per-stack" (per-PHB)
->>> registers. Those are organized in two XSCOM ranges, the "Nest" range
->>> and the "PCI" range, each range contains both some "PEC" registers and
->>> some "per-stack" registers.
->>>
->>> No default device layout is provided and PCI devices can be added on
->>> any of the available PCIe Root Port (pcie.0 .. 2 of a Power9 chip)
->>> with address 0x0 as the firwware (skiboot) only accepts a single
->>> device per root port. To run a simple system with a network and a
->>> storage adapters, use a command line options such as :
->>>
->>>   -device e1000e,netdev=3Dnet0,mac=3DC0:FF:EE:00:00:02,bus=3Dpcie.0,add=
-r=3D0x0
->>>   -netdev bridge,id=3Dnet0,helper=3D/usr/libexec/qemu-bridge-helper,br=
-=3Dvirbr0,id=3Dhostnet0
->>>
->>>   -device megasas,id=3Dscsi0,bus=3Dpcie.1,addr=3D0x0
->>>   -drive file=3D$disk,if=3Dnone,id=3Ddrive-scsi0-0-0-0,format=3Dqcow2,c=
-ache=3Dnone
->>>   -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=
-=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2
->>>
->>> If more are needed, include a bridge.
->>>
->>> Multi chip is supported, each chip adding its set of PHB4 controllers
->>> and its PCI busses. The model doesn't emulate the EEH error handling.
->>>
->>> This model is not ready for hotplug yet.
->>>
->>> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>> [ clg: - numerous cleanups
->>>        - commit log
->>>        - fix for broken LSI support
->>>        - PHB pic printinfo
->>>        - large QOM rework ]
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>> Message-Id: <20200127144506.11132-2-clg@kaod.org>
->>> [dwg: Use device_class_set_props()]
->>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>> ---
->>>  hw/pci-host/Makefile.objs           |    1 +
->>>  hw/pci-host/pnv_phb4.c              | 1438 +++++++++++++++++++++++++++
->>>  hw/pci-host/pnv_phb4_pec.c          |  593 +++++++++++
->>>  hw/ppc/Kconfig                      |    2 +
->>>  hw/ppc/pnv.c                        |  107 ++
->>>  include/hw/pci-host/pnv_phb4.h      |  230 +++++
->>>  include/hw/pci-host/pnv_phb4_regs.h |  553 ++++++++++
->>>  include/hw/pci/pcie_port.h          |    1 +
->>>  include/hw/ppc/pnv.h                |    7 +
->>>  include/hw/ppc/pnv_xscom.h          |   11 +
->>>  10 files changed, 2943 insertions(+)
->>>  create mode 100644 hw/pci-host/pnv_phb4.c
->>>  create mode 100644 hw/pci-host/pnv_phb4_pec.c
->>>  create mode 100644 include/hw/pci-host/pnv_phb4.h
->>>  create mode 100644 include/hw/pci-host/pnv_phb4_regs.h
->>>
->> ...
->>> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
->>> index e27efe9a24..354828bf13 100644
->>> --- a/hw/ppc/Kconfig
->>> +++ b/hw/ppc/Kconfig
->>> @@ -135,6 +135,8 @@ config XIVE_SPAPR
->>>      default y
->>>      depends on PSERIES
->>>      select XIVE
->>> +    select PCI
->>> +    select PCIE_PORT
->>
->> This patch is about PowerNV, why do we add dependencies for pseries
->> configuration?
->=20
-> Bogus leftovers from the past. I think we can drop them.
-
-I will prepare a patch for that.
-
-Thanks,
-Laurent
-
-
+SGkgRGF2aWQsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUWVtdS1k
+ZXZlbA0KPiBbbWFpbHRvOnFlbXUtZGV2ZWwtYm91bmNlcytzaGFtZWVyYWxpLmtvbG90aHVtLnRo
+b2RpPWh1YXdlaS5jb21Abm9uZ24NCj4gdS5vcmddIE9uIEJlaGFsZiBPZiBEYXZpZCBIaWxkZW5i
+cmFuZA0KPiBTZW50OiAwNCBGZWJydWFyeSAyMDIwIDE5OjA1DQo+IFRvOiBJZ29yIE1hbW1lZG92
+IDxpbWFtbWVkb0ByZWRoYXQuY29tPjsgU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaQ0KPiA8c2hh
+bWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiBDYzogcGV0ZXIubWF5ZGVsbEBs
+aW5hcm8ub3JnOyB4aWFvZ3Vhbmdyb25nLmVyaWNAZ21haWwuY29tOw0KPiBtc3RAcmVkaGF0LmNv
+bTsgc2hhbm5vbi56aGFvc2xAZ21haWwuY29tOyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+IHh1
+d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNv
+bT47DQo+IGVyaWMuYXVnZXJAcmVkaGF0LmNvbTsgcWVtdS1hcm1Abm9uZ251Lm9yZzsgbGVyc2Vr
+QHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAxLzddIGV4ZWM6IEZpeCBmb3Ig
+cWVtdV9yYW1fcmVzaXplKCkgY2FsbGJhY2sNCj4gDQo+IE9uIDA0LjAyLjIwIDE3OjQ0LCBEYXZp
+ZCBIaWxkZW5icmFuZCB3cm90ZToNCj4gPiBPbiAwNC4wMi4yMCAxNjoyMywgSWdvciBNYW1tZWRv
+diB3cm90ZToNCj4gPj4gT24gRnJpLCAxNyBKYW4gMjAyMCAxNzo0NToxNiArMDAwMA0KPiA+PiBT
+aGFtZWVyIEtvbG90aHVtIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+IHdy
+b3RlOg0KPiA+Pg0KPiA+Pj4gSWYgQUNQSSBibG9iIGxlbmd0aCBtb2RpZmljYXRpb25zIGhhcHBl
+bnMgYWZ0ZXIgdGhlIGluaXRpYWwNCj4gPj4+IHZpcnRfYWNwaV9idWlsZCgpIGNhbGwsIGFuZCB0
+aGUgY2hhbmdlZCBibG9iIGxlbmd0aCBpcyB3aXRoaW4NCj4gPj4+IHRoZSBQQUdFIHNpemUgYm91
+bmRhcnksIHRoZW4gdGhlIHJldmlzZWQgc2l6ZSBpcyBub3Qgc2VlbiBieQ0KPiA+Pj4gdGhlIGZp
+cm13YXJlIG9uIEd1ZXN0IHJlYm9vdC4gVGhlIGlzIGJlY2F1c2UgaW4gdGhlDQo+ID4+PiB2aXJ0
+X2FjcGlfYnVpbGRfdXBkYXRlKCkgLT4gYWNwaV9yYW1fdXBkYXRlKCkgLT4gcWVtdV9yYW1fcmVz
+aXplKCkNCj4gPj4+IHBhdGgsIHFlbXVfcmFtX3Jlc2l6ZSgpIHVzZXMgdXNlZF9sZW5ndGggKHJh
+bV9ibG9jayBzaXplIHdoaWNoIGlzDQo+ID4+PiBhbGlnbmVkIHRvIFBBR0Ugc2l6ZSkgYW5kIHRo
+ZSAicmVzaXplIGNhbGxiYWNrIiB0byB1cGRhdGUgdGhlIHNpemUNCj4gPj4+IHNlZW4gYnkgZmly
+bXdhcmUgaXMgbm90IGdldHRpbmcgaW52b2tlZC4NCj4gPj4+DQo+ID4+PiBIZW5jZSBtYWtlIHN1
+cmUgY2FsbGJhY2sgaXMgY2FsbGVkIGlmIHRoZSBuZXcgc2l6ZSBpcyBkaWZmZXJlbnQNCj4gPj4+
+IGZyb20gb3JpZ2luYWwgcmVxdWVzdGVkIHNpemUuDQo+ID4+Pg0KPiA+Pj4gU2lnbmVkLW9mZi1i
+eTogU2hhbWVlciBLb2xvdGh1bQ0KPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWku
+Y29tPg0KPiA+Pj4gLS0tDQo+ID4+PiBQbGVhc2UgZmluZCB0aGUgcHJldmlvdXMgZGlzY3Vzc2lv
+bnMgb24gdGhpcyBpc3N1ZSBoZXJlLA0KPiA+Pj4gaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9y
+Zy9wYXRjaC8xMTE3NDk0Ny8NCj4gPj4+DQo+ID4+PiBCdXQgdGhpcyBvbmUgYXR0ZW1wdHMgYSBk
+aWZmZXJlbnQgc29sdXRpb24gdG8gZml4IGl0IGJ5IGludHJvZHVjaW5nDQo+ID4+PiByZXFfbGVu
+Z3RoIHZhciB0byBSQU1CbG9jayBzdHJ1Y3QuDQo+ID4+Pg0KPiA+Pg0KPiA+PiBsb29rcyBmaW5l
+IHRvIG1lLCBzbw0KPiA+PiBBY2tlZC1ieTogSWdvciBNYW1tZWRvdiA8aW1hbW1lZG9AcmVkaGF0
+LmNvbT4NCj4gPg0KPiA+IFRoYW5rcyBmb3IgQ0NpbmcuDQo+ID4NCj4gPiBUaGlzIGluIGZhY3Qg
+Y29sbGlkZXMgd2l0aCBteSBjaGFuZ2VzIC4uLiBidXQgbm90IHNldmVyZWx5IDopDQo+ID4NCj4g
+Pj4NCj4gPj4gQ0NpbmcgRGF2aWQgd2hvIHRvdWNoZXMgdGhpcyBhcmVhIGluIGhpcyBsYXRlc3Qg
+c2VyaWVzIGZvciBhbmQNCj4gPj4gbWlnaHQgaGF2ZSBhbiBvcGluaW9uIG9uIGhvdyBpdCBzaG91
+bGQgYmUgaGFuZGxlZC4NCj4gPj4NCj4gPg0KPiA+IFNvIHdlIGFyZSB0YWxraW5nIGFib3V0IHN1
+Yi1wYWdlIHNpemUgY2hhbmdlcz8gSSBzb21ld2hhdCBkaXNsaWtlDQo+ID4gc3RvcmluZyAicmVx
+X2xlbmd0aCIgaW4gcmFtIGJsb2Nrcy4gTG9va3MgbGlrZSBzdWItcGFnZXMgc3R1ZmYgZG9lcyBu
+b3QNCj4gPiBiZWxvbmcgdGhlcmUuDQoNClRoYW5rcyBmb3IgdGFraW5nIGEgbG9vayBhdCB0aGlz
+LiBBZ3JlZSwgSSBkaWRu4oCZdCBsaWtlIHRoYXQgInJlcV9sZW5ndGgiIGVpdGhlci4NCg0KPiA+
+IFJhbSBibG9ja3Mgb25seSBvcGVyYXRlIG9uIHBhZ2UgZ3JhbnVsYXJpdHkuIFJhbSBibG9jayBu
+b3RpZmllcnMgb25seQ0KPiA+IG9wZXJhdGUgb24gcGFnZSBncmFudWxhcml0eS4gTWVtb3J5IHJl
+Z2lvbnMgb25seSBvcGVyYXRlIG9uIHBhZ2UNCj4gPiBncmFudWxhcml0eS4gRGlydHkgYml0bWFw
+cyBvcGVyYXRlIG9uIHBhZ2UgZ3JhbnVsYXJpdHkuIEVzcGVjaWFsbHksDQo+ID4gbWVtb3J5X3Jl
+Z2lvbl9zaXplKG1yKSB3aWxsIGFsd2F5cyByZXR1cm4gYWxpZ25lZCB2YWx1ZXMuDQo+ID4NCj4g
+PiBJIHRoaW5rIHVzZXJzL293bmVyIHNob3VsZCBkZWFsIHdpdGggYW55dGhpbmcgc21hbGxlciBt
+YW51YWxseSBpZg0KPiA+IHRoZXkgcmVhbGx5IG5lZWQgaXQuDQo+ID4NCj4gPiBXaGF0IGFib3V0
+IGFsd2F5cyBjYWxsaW5nIHRoZSByZXNpemVkKCkgY2FsbGJhY2sgYW5kIGxldHRpbmcgdGhlDQo+
+ID4gYWN0dWFsIG93bmVyIGZpZ3VyZSBvdXQgaWYgdGhlIHNpemUgY2hhbmdlZCBvbiBzdWItcGFn
+ZSBncmFudWxhcml0eQ0KPiA+IG9yIG5vdD8gKGJ5IGxvb2tpbmcgdXAgdGhlIHNpemUgbWFudWFs
+bHkgdXNpbmcgc29tZSBtZWNoYW5pc20gbm90IGdsdWVkIHRvDQo+ID4gbWVtb3J5IHJlZ2lvbnMv
+cmFtIGJsb2Nrcy93aGF0ZXZlcikNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9leGVjLmMgYi9leGVj
+LmMNCj4gPiBpbmRleCA2N2U1MjBkMThlLi41OWQ0NmNjMzg4IDEwMDY0NA0KPiA+IC0tLSBhL2V4
+ZWMuYw0KPiA+ICsrKyBiL2V4ZWMuYw0KPiA+IEBAIC0yMTMwLDYgKzIxMzAsMTMgQEAgaW50IHFl
+bXVfcmFtX3Jlc2l6ZShSQU1CbG9jayAqYmxvY2ssDQo+IHJhbV9hZGRyX3QgbmV3c2l6ZSwgRXJy
+b3IgKiplcnJwKQ0KPiA+ICAgICAgbmV3c2l6ZSA9IEhPU1RfUEFHRV9BTElHTihuZXdzaXplKTsN
+Cj4gPg0KPiA+ICAgICAgaWYgKGJsb2NrLT51c2VkX2xlbmd0aCA9PSBuZXdzaXplKSB7DQo+ID4g
+KyAgICAgICAgLyoNCj4gPiArICAgICAgICAgKiBUaGUgb3duZXIgbWlnaHQgd2FudCB0byBoYW5k
+bGUgc3ViLXBhZ2UgcmVzaXplcy4gV2Ugb25seQ0KPiBwcm92aWRlDQo+ID4gKyAgICAgICAgICog
+dGhlIGFsaWduZWQgc2l6ZSAtIGJlY2F1c2UgcmFtIGJsb2NrcyBhcmUgYWx3YXlzIHBhZ2UgYWxp
+Z25lZC4NCj4gPiArICAgICAgICAgKi8NCj4gPiArICAgICAgICBpZiAoYmxvY2stPnJlc2l6ZWQp
+IHsNCj4gPiArICAgICAgICAgICAgYmxvY2stPnJlc2l6ZWQoYmxvY2stPmlkc3RyLCBuZXdzaXpl
+LCBibG9jay0+aG9zdCk7DQoNCkRvZXMgaXQgbWFrZSBzZW5zZSB0byBwYXNzIHRoZSByZXF1ZXN0
+ZWQgc2l6ZSBpbiB0aGUgY2FsbGJhY2sgdGhhbiB0aGUgYWxpZ25lZCBzaXplDQphcyB0aGUgb3du
+ZXIgbWlnaHQgYmUgaW50ZXJlc3RlZCBtb3JlIGluIHRoZSBvcmdfcmVxX3NpemUgdnMgbmV3X3Jl
+cSBfc2l6ZSBjYXNlPw0KDQo+ID4gKyAgICAgICAgfQ0KPiA+ICAgICAgICAgIHJldHVybiAwOw0K
+PiA+ICAgICAgfQ0KPiA+DQoNCiANCj4gT2gsIGFuZCBvbmUgbW9yZSByZWFzb24gd2h5IHRoZSBw
+cm9wb3NhbCBpbiB0aGlzIHBhdGNoIGlzIGluY29uc2lzdGVudDoNCj4gDQo+IFdoZW4gbWlncmF0
+aW5nIHJlc2l6YWJsZSBtZW1vcnkgcmVnaW9ucyAoUkFNX1NBVkVfRkxBR19NRU1fU0laRSkgd2UN
+Cj4gc3RvcmUgdGhlIGJsb2NrLT51c2VkX2xlbmd0aCAocmFtX3NhdmVfc2V0dXAoKSkgYW5kIHVz
+ZSB0aGF0IHZhbHVlIHRvDQo+IHJlc2l6ZSB0aGUgcmVnaW9uIG9uIHRoZSB0YXJnZXQgKHJhbV9s
+b2FkX3ByZWNvcHkoKSAtPiBxZW11X3JhbV9yZXNpemUoKSkuDQo+IA0KPiBUaGlzIHdpbGwgYmUg
+dGhlIHZhbHVlIHRoZSBjYWxsYmFjayB3aWxsIGJlIGNhbGxlZCB3aXRoLiBQYWdlIGFsaWduZWQu
+DQo+IA0KDQpTb3JyeSwgSSBkaWRu4oCZdCBxdWl0ZSBnZXQgdGhhdCBwb2ludCBhbmQgbm90IHN1
+cmUgaG93ICJyZXFfbGVuZ3RoIiBhcHByb2FjaCANCndpbGwgYWZmZWN0IHRoZSBtaWdyYXRpb24u
+DQoNCkFueXdheSwgSSBoYXZlIHJld29ya2VkIHRoZSBwYXRjaChiZWxvdykgd2l0aCB0aGUgYWJv
+dmUgc3VnZ2VzdGlvbiwgdGhhdCBpcw0KYWx3YXlzIGNhbGxpbmcgdGhlIHJlc2l6ZWQoKSBjYWxs
+YmFjaywgYnV0IG1vZGlmaWVkIGl0IHRvIHBhc3MgdGhlIHJlcXVlc3RlZCBzaXplDQppbnN0ZWFk
+IG9mIHRoZSBwYWdlIGFsaWduZWQgc2l6ZS4gUGxlYXNlIGxldCBtZSBrbm93IHlvdXIgZmVlZGJh
+Y2suDQoNClRoYW5rcywNClNoYW1lZXINCg0KZGlmZiAtLWdpdCBhL2V4ZWMuYyBiL2V4ZWMuYw0K
+aW5kZXggNjdlNTIwZDE4ZS4uYzljYjlhNTRmYSAxMDA2NDQNCi0tLSBhL2V4ZWMuYw0KKysrIGIv
+ZXhlYy5jDQpAQCAtMjEyMywxMyArMjEyMywyMiBAQCBzdGF0aWMgaW50IG1lbW9yeV90cnlfZW5h
+YmxlX21lcmdpbmcodm9pZCAqYWRkciwgc2l6ZV90IGxlbikNCiAgKiByZXNpemUgY2FsbGJhY2sg
+dG8gdXBkYXRlIGRldmljZSBzdGF0ZSBhbmQvb3IgYWRkIGFzc2VydGlvbnMgdG8gZGV0ZWN0DQog
+ICogbWlzdXNlLCBpZiBuZWNlc3NhcnkuDQogICovDQotaW50IHFlbXVfcmFtX3Jlc2l6ZShSQU1C
+bG9jayAqYmxvY2ssIHJhbV9hZGRyX3QgbmV3c2l6ZSwgRXJyb3IgKiplcnJwKQ0KK2ludCBxZW11
+X3JhbV9yZXNpemUoUkFNQmxvY2sgKmJsb2NrLCByYW1fYWRkcl90IHNpemUsIEVycm9yICoqZXJy
+cCkNCiB7DQorICAgIHJhbV9hZGRyX3QgbmV3c2l6ZTsNCiAgICAgYXNzZXJ0KGJsb2NrKTsNCiAN
+Ci0gICAgbmV3c2l6ZSA9IEhPU1RfUEFHRV9BTElHTihuZXdzaXplKTsNCisgICAgbmV3c2l6ZSA9
+IEhPU1RfUEFHRV9BTElHTihzaXplKTsNCiANCiAgICAgaWYgKGJsb2NrLT51c2VkX2xlbmd0aCA9
+PSBuZXdzaXplKSB7DQorICAgICAgICAvKg0KKyAgICAgICAgICogUkFNIGJsb2NrcyBhcmUgYWx3
+YXlzIHBhZ2UgYWxpZ25lZCwgYnV0IHRoZSBvd25lciBtaWdodCB3YW50DQorICAgICAgICAgKiB0
+byBoYW5kbGUgc3ViLXBhZ2UgcmVzaXplcy4gTGV0IHRoZSBvd25lciBrbm93IGFib3V0IGFueQ0K
+KyAgICAgICAgICogc3ViLXBhZ2UgY2hhbmdlcy4NCisgICAgICAgICAqLw0KKyAgICAgICAgaWYg
+KGJsb2NrLT5yZXNpemVkKSB7DQorICAgICAgICAgICAgYmxvY2stPnJlc2l6ZWQoYmxvY2stPmlk
+c3RyLCBzaXplLCBibG9jay0+aG9zdCk7DQorICAgICAgICB9DQogICAgICAgICByZXR1cm4gMDsN
+CiAgICAgfQ0KIA0KQEAgLTIxNTUsNyArMjE2NCw3IEBAIGludCBxZW11X3JhbV9yZXNpemUoUkFN
+QmxvY2sgKmJsb2NrLCByYW1fYWRkcl90IG5ld3NpemUsIEVycm9yICoqZXJycCkNCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRElSVFlfQ0xJRU5UU19BTEwpOw0KICAg
+ICBtZW1vcnlfcmVnaW9uX3NldF9zaXplKGJsb2NrLT5tciwgbmV3c2l6ZSk7DQogICAgIGlmIChi
+bG9jay0+cmVzaXplZCkgew0KLSAgICAgICAgYmxvY2stPnJlc2l6ZWQoYmxvY2stPmlkc3RyLCBu
+ZXdzaXplLCBibG9jay0+aG9zdCk7DQorICAgICAgICBibG9jay0+cmVzaXplZChibG9jay0+aWRz
+dHIsIHNpemUsIGJsb2NrLT5ob3N0KTsNCiAgICAgfQ0KICAgICByZXR1cm4gMDsNCiB9DQpkaWZm
+IC0tZ2l0IGEvaHcvbnZyYW0vZndfY2ZnLmMgYi9ody9udnJhbS9md19jZmcuYw0KaW5kZXggMTc5
+YjMwMmYwMS4uZWM5Y2ZhNGQxMCAxMDA2NDQNCi0tLSBhL2h3L252cmFtL2Z3X2NmZy5jDQorKysg
+Yi9ody9udnJhbS9md19jZmcuYw0KQEAgLTkzNCw5ICs5MzQsMTEgQEAgdm9pZCAqZndfY2ZnX21v
+ZGlmeV9maWxlKEZXQ2ZnU3RhdGUgKnMsIGNvbnN0IGNoYXIgKmZpbGVuYW1lLA0KIA0KICAgICBm
+b3IgKGkgPSAwOyBpIDwgaW5kZXg7IGkrKykgew0KICAgICAgICAgaWYgKHN0cmNtcChmaWxlbmFt
+ZSwgcy0+ZmlsZXMtPmZbaV0ubmFtZSkgPT0gMCkgew0KLSAgICAgICAgICAgIHB0ciA9IGZ3X2Nm
+Z19tb2RpZnlfYnl0ZXNfcmVhZChzLCBGV19DRkdfRklMRV9GSVJTVCArIGksDQotICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRhdGEsIGxlbik7DQotICAgICAgICAg
+ICAgcy0+ZmlsZXMtPmZbaV0uc2l6ZSAgID0gY3B1X3RvX2JlMzIobGVuKTsNCisgICAgICAgICAg
+ICBpZiAocy0+ZmlsZXMtPmZbaV0uc2l6ZSAhPSBjcHVfdG9fYmUzMihsZW4pKSB7DQorICAgICAg
+ICAgICAgICAgIHB0ciA9IGZ3X2NmZ19tb2RpZnlfYnl0ZXNfcmVhZChzLCBGV19DRkdfRklMRV9G
+SVJTVCArIGksDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBkYXRhLCBsZW4pOw0KKyAgICAgICAgICAgICAgICBzLT5maWxlcy0+ZltpXS5zaXplICAgPSBj
+cHVfdG9fYmUzMihsZW4pOw0KKyAgICAgICAgICAgIH0NCiAgICAgICAgICAgICByZXR1cm4gcHRy
+Ow0KICAgICAgICAgfQ0KICAgICB9DQotLS0NCg==
 
