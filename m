@@ -2,89 +2,102 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD68C35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14FE3C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:13:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58BBC217BA
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:12:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4E03217BA
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:13:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bI1viVtC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58BBC217BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F65fhlra"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E03217BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izKTk-0005OM-CA
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:12:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55537)
+	id 1izKUF-0005uB-V1
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:12:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55961)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1izKRh-00049V-KO
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:23 -0500
+ (envelope-from <mst@redhat.com>) id 1izKS6-0004ZW-Pu
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1izKRd-0001zt-JP
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:18 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44895
+ (envelope-from <mst@redhat.com>) id 1izKS5-00045m-Dv
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44265
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1izKRd-0001sf-6A
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:17 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1izKS5-0003tm-3f
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580908213;
+ s=mimecast20190719; t=1580908243;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KnBC7FiBfB4t2JU3nYKzZZYEuld5OwAD+bBu0TYQ7fI=;
- b=bI1viVtCWsiOklqSANoxar5o+RD6JEj1YZStaA3BMELNPotj4YqGXRVmSkgF7ybJPb/vp4
- QxBBG5jiMiIsFrpGXp71VRYsLGzwRuFNTpPNKl+8XZLDilPzYBaeq0hmi/6TVWFIzxWImT
- QLsrAQ4+258PBbMZ/GR8MqfkheVSnzI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-5FTPrfSzNPmLikHfv14xgQ-1; Wed, 05 Feb 2020 08:10:05 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93A7CA0CDC;
- Wed,  5 Feb 2020 13:10:04 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1188F5DA7C;
- Wed,  5 Feb 2020 13:09:47 +0000 (UTC)
-Date: Wed, 5 Feb 2020 14:09:46 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: Making QEMU easier for management tools and applications
-Message-ID: <20200205130946.GC5768@dhcp-200-226.str.redhat.com>
-References: <20191224134139.GD2710539@redhat.com>
- <30664f6e-81da-a6e6-9b20-037fc91290fb@redhat.com>
- <878slyej29.fsf@dusky.pond.sub.org>
- <a41ae09b-021f-2fda-0b03-7b37c5624ab3@redhat.com>
- <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <20200124095027.GA824327@redhat.com>
- <20200127143505.GD5669@linux.fritz.box>
- <20200127202925.GE3419@work-vm>
- <20200128105932.GC6431@linux.fritz.box>
+ bh=//iO38SNUFBf2sVgdCFlvKEtY7M2nNpSz7rbex5YuOY=;
+ b=F65fhlrat8qabgLpT1eXlbuWrA4WVzkRPrlga5Eq2XEon2Ke/K7aNx66CRlINUH/xSksfY
+ fHsbdfvKgBoJd5loM4Mv9/v2Qp9QeH1LFmf+fEyLohjMId+vA0/V+JjbrXXoP7+zqhzOkR
+ ph3rUZ9PChEzo+FZJe9u5mAt+MrvJ5M=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-1Q321mvgO56yezy61NHZwg-1; Wed, 05 Feb 2020 08:10:36 -0500
+Received: by mail-qk1-f200.google.com with SMTP id v2so1235785qkf.4
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 05:10:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=XNwzOL1zKzZ/u0+0Rk4vNAB9be5A442O/9OkSVKGp5c=;
+ b=gjUzNLhZbJ/stes/WL+sv0SS/5Hd3RRIVUK+p7sQuBis0/BivV+t7YwXKDUcpl6qgq
+ u64VBNo5tAQvBGmy3BWK//u+1y5rR2+RpDCnxFhvcF7MHdDAMk3vQLAiNt1mlr725NzX
+ yNfhJXXFZj8qguWg+kDJAQfYflIRSC6qYvFEFePApVgJ4j3oxPUrZf8npXNSUXBJEtGI
+ 99kbUcvbgyJsmKsw5n88aIuq0kYkygUSvApV159nHKMeWe3c4bIlW0bd9R3oIkxhfqxa
+ QV5xMHmN8tMivJeu0MsxtwWQ7vKVmMaVllDiMGEQM/vmU/AQ8dCMiWecz+0KPQLkXpAR
+ hyxA==
+X-Gm-Message-State: APjAAAUkFUU0d+GU3+c1YoNTr/6Ue0XeKxpY3BFnyo6TgifOasKTY4wy
+ suR4HglpWQlsylT2itaHGi0K0pgUqmsG+c0WoF7W7JhUbsOSsPbj4iGRz/4+nmxYci83kVP1ArX
+ cDrmNB2aJJQgIbCo=
+X-Received: by 2002:a05:620a:1005:: with SMTP id
+ z5mr33150174qkj.26.1580908235714; 
+ Wed, 05 Feb 2020 05:10:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx08oiq6vHhHUfIemMGEHEvI7zsMwVnWKjPCWYpQXjQtnqoTy4wf0muRbLjq0g76qZDPXAcjQ==
+X-Received: by 2002:a05:620a:1005:: with SMTP id
+ z5mr33150151qkj.26.1580908235435; 
+ Wed, 05 Feb 2020 05:10:35 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+ by smtp.gmail.com with ESMTPSA id 63sm12791963qki.57.2020.02.05.05.10.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 05 Feb 2020 05:10:34 -0800 (PST)
+Date: Wed, 5 Feb 2020 08:10:30 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: Disabling PCI "hot-unplug" for a guest (and/or a single PCI
+ device)
+Message-ID: <20200205080952-mutt-send-email-mst@kernel.org>
+References: <16db1dcd-d1a3-5bd9-2daa-d16a0f2d168e@redhat.com>
+ <20200204013947-mutt-send-email-mst@kernel.org>
+ <CAMDeoFVkoTZSQ=PV=mc_AGoZ445Wug4F+RV5utaYb+jhPEtkJg@mail.gmail.com>
+ <20200204113457-mutt-send-email-mst@kernel.org>
+ <20200205113637.GE2221087@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200128105932.GC6431@linux.fritz.box>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 5FTPrfSzNPmLikHfv14xgQ-1
+In-Reply-To: <20200205113637.GE2221087@redhat.com>
+X-MC-Unique: 1Q321mvgO56yezy61NHZwg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,71 +109,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Cc: libvir-list@redhat.com, Julia Suvorova <jusual@redhat.com>,
+ qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.01.2020 um 11:59 hat Kevin Wolf geschrieben:
-> > > The other part that it needs to solve is how to be available by defau=
-lt
-> > > without specifying anything on the command line. Basically, if I pres=
-s
-> > > Ctrl-Alt-2, I want to get to a monitor shell. If that shell is
-> > > implemented internally or by an external Python process, I don't mind=
-.
+On Wed, Feb 05, 2020 at 11:36:37AM +0000, Daniel P. Berrang=E9 wrote:
+> On Tue, Feb 04, 2020 at 11:35:37AM -0500, Michael S. Tsirkin wrote:
+> > On Tue, Feb 04, 2020 at 05:13:54PM +0100, Julia Suvorova wrote:
+> > > On Tue, Feb 4, 2020 at 11:26 AM Michael S. Tsirkin <mst@redhat.com> w=
+rote:
+> > > >
+> > > > On Mon, Feb 03, 2020 at 05:19:51PM -0500, Laine Stump wrote:
+> > > > > 3) qemu could add a "hotpluggable=3Dno" commandline option to all=
+ PCI devices
+> > > > > (including vfio-pci) and then do whatever is necessary to make su=
+re this is
+> > > > > honored in the emulated hardware (is it possible to set this on a=
+ per-slot
+> > > > > basis in a PCI controller? Or must it be done for an entire contr=
+oller?
+> > > >
+> > > > I think it's possible on a per-slot basis, yes.
+> > >=20
+> > > There's a "Hot-Plug Capable" option in Slot Capability register, so w=
+e
+> > > can switch it off. But it's only for pcie devices, can't say anything
+> > > about conventional pci.
+> > >=20
+> > > Best regards, Julia Suvorova.
 > >=20
-> > That is a harder part. (I rarely use Ctrl-Alt-2 actually; I mostly
-> > use HMP on stdin).
+> > For conventional PCI, we can drop SHPC capability and remove
+> > the eject method from ACPI.
 >=20
-> I don't think it would be that hard, actually.
->=20
-> If you have a -qmp-shell option that takes a chardev and defaults to vc,
-> you've solved the part with both stdio and Ctrl-Alt-2. Now all you need
-> to do is launch the Python child process, pass it a pair of pipes for
-> communication and forward everything between the pipes and the chardev.
->=20
-> (That's the theory anyway.)
+> Before considering this, is there any compelling reason to care about
+> this for PCI ?
 
-If someone is interested, I did a quick proof-of-concept hack:
+Not that I know. I simply answered Julia's question.
 
-    https://repo.or.cz/qemu/kevin.git/shortlog/refs/heads/qmp-shell
+> Currently with i440fx there's no direct representation
+> of the 32 slots as objects in either QEMU or libvirt. So extending this
+> to allow disabling hotplug for i440fx PCI slots is going to need much
+> more config work for QEMU, libvirt and mgmt apps.  Personally I'd only
+> do this for PCIe until there's a clear requirement given for legacy PCI
+> support too.
 
-It doesn't clean up anything properly (including the qmp-shell processes
-it starts), but it spawns a usable qmp-shell on a user-specified
-character device. stdio seems to work, though without readline
-functionality (I suppose I still have line-buffering somewhere), vc
-doesn't really work at all yet.
+Makes sense to me.
 
-Try it out like this:
-
-    $ ./qemu-storage-daemon --chardev stdio,id=3Dm --monitor m,mode=3Dqmp-s=
-hell
-    monitor_qmp_event: 1
-    Welcome to the QMP low-level shell!
-    Connected to QEMU 4.2.50
-
-    (QEMU) query-version
-    {"return": {"qemu": {"micro": 50, "major": 4, "minor": 2}, "package": "=
-v4.2.0-1188-gd95a3885a9"}}
-    (QEMU) quit
-
-(Or use x86_64-softmmu/qemu-system-x86_64, but it's based on the
-refactorings in the storage daemon branch, so why not try both at once?)
-
-Polishing this to make it mergable would still require substantial work,
-so at the moment I'm not planning to do this. But if someone wants to
-pick it up, feel free (just let us know).
-
-Hm, in fact... A qmp-shell GSoC project?
-
-Kevin
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
 
