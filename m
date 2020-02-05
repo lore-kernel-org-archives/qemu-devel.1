@@ -2,58 +2,96 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80632C352A1
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E39DFC35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:19:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59710217BA
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:17:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59710217BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFA8921741
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:19:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HoHelwjg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFA8921741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izLUv-0000wp-J5
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 09:17:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44969)
+	id 1izLWN-0002rD-S3
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 09:19:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuzenghui@huawei.com>) id 1izLTm-0000Lq-Li
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:16:35 -0500
+ (envelope-from <peterx@redhat.com>) id 1izLV9-0001HQ-IE
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:18:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuzenghui@huawei.com>) id 1izLTl-0005GE-6x
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:16:34 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:42386 helo=huawei.com)
+ (envelope-from <peterx@redhat.com>) id 1izLV8-0003kA-JP
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:17:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20491
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuzenghui@huawei.com>)
- id 1izLTk-0004pd-No
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:16:33 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id EFF299B72F34D230DB18;
- Wed,  5 Feb 2020 22:16:26 +0800 (CST)
-Received: from DESKTOP-8RFUVS3.china.huawei.com (10.173.222.27) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 5 Feb 2020 22:16:19 +0800
-From: Zenghui Yu <yuzenghui@huawei.com>
-To: <pbonzini@redhat.com>, <richard.henderson@linaro.org>, <tony.nguyen@bt.com>
-Subject: [PATCH v2] compiler.h: Don't use compile-time assert when
- __NO_INLINE__ is defined
-Date: Wed, 5 Feb 2020 22:15:45 +0800
-Message-ID: <20200205141545.180-1-yuzenghui@huawei.com>
-X-Mailer: git-send-email 2.23.0.windows.1
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1izLV8-0003iH-FF
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:17:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580912278;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gwnOjzlxPiLrUtXS9/Js+Kwd14a7kfPZ/UhB56CISFs=;
+ b=HoHelwjghXicfJkw8nVdth8YmzH0952GVIDH6q+rIjz+D4N4ChyHbs1Fib41w99w78/cE7
+ SxCiHTGhgIPKfvUWmkJT3uUaEJTat3ebTjdx8fhorXmQkQlxyiiogi/yg7NgbQgfC873WH
+ 8PcqYleCDxWqeGwyXPt2aTQxCbE/Va0=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-IZdwwqIkNUaD9xpu-mq9KA-1; Wed, 05 Feb 2020 09:17:56 -0500
+Received: by mail-qt1-f199.google.com with SMTP id a13so1419635qtp.8
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 06:17:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=vPwF7koEOtFK/v1GMHKbe9mr0XFSrZCmlysXssYQcTU=;
+ b=uEieijiNqNzvwnhkV57EhPPceZYShI/WwYKNFb3FsmqsSz14ZGWFWkLUjEI43nI60k
+ TlixF93JwUfSLU7MtRMv3KWWu6bl8Cvg1GviMpZslJAZi3G5Pj/hw/tsbmamOjguhDND
+ pIVlhjsY696jOwRP2+12g21HIjnqQNMl9y2Y/nZHUmQVJq6mSwwzVxiBq5aYZycEoXtX
+ EcrSNhhWUR10tJ5Ra6St1w4oF+lhGRHfneBXvIfm6zZTpbhTLYuEfeJtp8quPDnVwZEq
+ H5qG5y3OqnlL8TeF/bEuVRcDtjibusEVvw5+kbfoX/A9kMb0FHbUVeVcZqCwEusVZ7jz
+ 3GMQ==
+X-Gm-Message-State: APjAAAWzqjSYftJZrHU76C61/5lO3JDEfJu8PkfIHsTfEmexszhfKvT4
+ pZPWEdh6jS6wF4wpuLP3ZrUb7VogCCMBoa4iHsR0OwPRMn0acvjhxzH4dW+KlezEFqVl882Erkc
+ OwdCemSwosKgbOis=
+X-Received: by 2002:a37:bfc5:: with SMTP id
+ p188mr30637316qkf.283.1580912275968; 
+ Wed, 05 Feb 2020 06:17:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyd9oiXw+azTzKyugkFI9dxzMAUXdBlv4TSa5kfh+LkumO2XqNNYevrYWNKCPVxWMhOJJKjHg==
+X-Received: by 2002:a37:bfc5:: with SMTP id
+ p188mr30637294qkf.283.1580912275744; 
+ Wed, 05 Feb 2020 06:17:55 -0800 (PST)
+Received: from xz-x1.redhat.com ([2607:9880:19c8:32::2])
+ by smtp.gmail.com with ESMTPSA id q5sm12833489qkf.14.2020.02.05.06.17.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 05 Feb 2020 06:17:54 -0800 (PST)
+From: Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH RFC 1/9] KVM: Fixup kvm_log_clear_one_slot() ioctl return check
+Date: Wed,  5 Feb 2020 09:17:41 -0500
+Message-Id: <20200205141749.378044-2-peterx@redhat.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200205141749.378044-1-peterx@redhat.com>
+References: <20200205141749.378044-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.222.27]
-X-CFilter-Loop: Reflected
+X-MC-Unique: IZdwwqIkNUaD9xpu-mq9KA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,61 +103,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zenghui Yu <yuzenghui@huawei.com>, wanghaibin.wang@huawei.com,
- qemu-devel@nongnu.org, Euler Robot <euler.robot@huawei.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Our robot reported the following compile-time warning while compiling
-Qemu with -fno-inline cflags:
+kvm_vm_ioctl() handles the errno trick already for ioctl() on
+returning -1 for errors.  Fix this.
 
-In function 'load_memop',
-    inlined from 'load_helper' at /qemu/accel/tcg/cputlb.c:1578:20,
-    inlined from 'full_ldub_mmu' at /qemu/accel/tcg/cputlb.c:1624:12:
-/qemu/accel/tcg/cputlb.c:1502:9: error: call to 'qemu_build_not_reached' =
-declared with attribute error: code path is reachable
-         qemu_build_not_reached();
-         ^~~~~~~~~~~~~~~~~~~~~~~~
-    [...]
-
-It looks like a false-positive because only (MO_UB ^ MO_BSWAP) will
-hit the default case in load_memop() while need_swap (size > 1) has
-already ensured that MO_UB is not involved.
-
-So the thing is that compilers get confused by the -fno-inline and
-just can't accurately evaluate memop_size(op) at compile time, and
-then the qemu_build_not_reached() is wrongly triggered by (MO_UB ^
-MO_BSWAP).  Let's carefully don't use the compile-time assert when
-no functions will be inlined into their callers.
-
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
+ accel/kvm/kvm-all.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-v2 is actually written by Richard Henderson.
-
-v1: https://lore.kernel.org/r/20200205081703.631-1-yuzenghui@huawei.com
-
- include/qemu/compiler.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
-index 85c02c16d3..c76281f354 100644
---- a/include/qemu/compiler.h
-+++ b/include/qemu/compiler.h
-@@ -236,7 +236,7 @@
-  * supports QEMU_ERROR, this will be reported at compile time; otherwise
-  * this will be reported at link time due to the missing symbol.
-  */
--#ifdef __OPTIMIZE__
-+#if defined(__OPTIMIZE__) && !defined(__NO_INLINE__)
- extern void QEMU_NORETURN QEMU_ERROR("code path is reachable")
-     qemu_build_not_reached(void);
- #else
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index c111312dfd..4be3cd2352 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -688,14 +688,13 @@ static int kvm_log_clear_one_slot(KVMSlot *mem, int a=
+s_id, uint64_t start,
+     d.num_pages =3D bmap_npages;
+     d.slot =3D mem->slot | (as_id << 16);
+=20
+-    if (kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d) =3D=3D -1) {
+-        ret =3D -errno;
++    ret =3D kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d);
++    if (ret) {
+         error_report("%s: KVM_CLEAR_DIRTY_LOG failed, slot=3D%d, "
+                      "start=3D0x%"PRIx64", size=3D0x%"PRIx32", errno=3D%d"=
+,
+                      __func__, d.slot, (uint64_t)d.first_page,
+                      (uint32_t)d.num_pages, ret);
+     } else {
+-        ret =3D 0;
+         trace_kvm_clear_dirty_log(d.slot, d.first_page, d.num_pages);
+     }
+=20
 --=20
-2.19.1
-
+2.24.1
 
 
