@@ -4,117 +4,116 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 046E2C35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D48BDC35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:15:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C314821741
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:01:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DDA821927
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:15:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WhQqZpj3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C314821741
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UjuyrDSF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DDA821927
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izMBd-00052x-W9
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 10:01:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47208)
+	id 1izMOl-0005Bj-R6
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 10:15:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1izM90-0002M9-Bn
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:59:12 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1izMNj-00040v-2b
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:14:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1izM8y-0006cd-OL
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:59:10 -0500
-Received: from mail-vi1eur05on2070e.outbound.protection.outlook.com
- ([2a01:111:f400:7d00::70e]:7648
- helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1izMNh-0001cA-Tb
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:14:23 -0500
+Received: from mail-eopbgr80117.outbound.protection.outlook.com
+ ([40.107.8.117]:36481 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1izM8s-0006ID-Ka; Wed, 05 Feb 2020 09:59:03 -0500
+ id 1izMNe-0001Fp-1u; Wed, 05 Feb 2020 10:14:18 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cNkkl9P6P0L8S6rbSis28OGF3srdi3uzjPKKECJLTBsbj5uaFED1dWyfTz3DsqcA7zchiomwUa9RqbqWpycx+CKERmqf2LpAtsFYaPsgQSLWSrRLbufIWVxrske2L0RPsroDysxlNhQfxlsUvg5vZoBBaxIjlsujS70BO7ureP3Fibyxuncqq84jkwwx2jo/nOIIpvshY25AtHGtdyPl7651V0qnz1jsMGyoToNo71gPeIHMYe6DRWpsdbt6JJxFFXeB1U4uB9sYY7k6Nwn7ACG+7f1YGjsKoQ86zIs3Ubfu7TqrD5hp1KY8rrr8Wt+syMlqKubFyn9Ckvzpg3UQtA==
+ b=kBZ8HzvieMyW3359uhevi4Aejh4lvBnRjRJs2OWOUs5wLFGI52XqQtH850T4zQ5S7OFdiMoNx0yPZhRUfaccXZvS6VdIp0VlqfhdWde+uXQz50MFfiM/CUAm2SInHRI88oJ4JuWUzvL5MdU3mYfPfh5BAmNPEzf4NBIY3jo0yuJ3+0GFepwDtwR3HgEoGEU4vgP1Gg1RWMNW8MDGf7b1DoOgIvUivRKiPRtCIinMxhYUj6t0Jgk7IKX/wSs7JXVy67K4/CPmOU8VJUvIN9+m+igp7KajZIgbOqb3jtQb+GARybzO6rQa5uNmKV0mpGdnQsq7g9Zg4QL+3t+9ZzeS7A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V9r1rZsYJXrox6BhivjGzVbfhR7Ep83cYc1xQdEILaM=;
- b=ne3UWP7UxJ1n/jW2m7V/1ISrzJepkAY/CIa/2W2UMVp28zJ1k3E9pOB/LYrBDiLCNAqh78NrdnauKfU0wMPad7oFLt6glAFX8PCVR0QYMnH8PvrrVo1d++KzpSNiM/U6+U+D8jIYEE6qmwFezqpImKXUIO7KLM9pd6SZhtmWp4g4EKYdau53uKKYb7x7ngzG4w9dJ3maJjFMxt7YW6GKqKahakeRRuMqbzJ/64SAeeHGYChK4riJyNycjhnKVwEnbU2ndetw/cOIZJIvHjlgE53heFRqGgt13vJRjW4yZP4LZObRgolljfbZZlt60OxgvbRsLk76qjZc/MNVC2rgmw==
+ bh=lrOJIkQ5CUAuwXJKadhDcN/cegdBChY+4CV9/PKKnKE=;
+ b=JJvVd7hSInIRH/lrIFrK2O3kSb0R344+RicSC0WxC29hWZRDVHzCSu+BcuGJmU9e90iF9yl9vt3s09K1XR6LIzM0xiQ/9VJ4XqaAzD/FOcUp2+EdoFDbA0+teDcyiauZDVIa9AZ/iAoAquhwuz5p87SHJxoYzWNLgP+aS9DdlLWchGp4qpFA4XxNXGltDEJX3FoEGalutAAFFRx7MYwXZNP1/QuNMWKfW4bkc9U1Gm+U/z02fDjWJX8yt5iSZMNlDG5yh022Cr8iJWXSPR9yKV1JftEVzbqS/xkMOiS4BHNNlgBZA+hiBzmfJjzOItn90EviVMroSIlI57nbLq2SXA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V9r1rZsYJXrox6BhivjGzVbfhR7Ep83cYc1xQdEILaM=;
- b=WhQqZpj3L1uWYUrFRUALUMOPly0/5vT1h2+upMiLpXD7+X26BxPn2d/l6GfpZXrWlvxD8WovPlrqQoJ1Ua7Un0lzRYV89AqlF8vVzyNaIjypniRd8PCNsjz8H7Q698i95W5t0K2omKV3r7l7q/qgWitI0ZGT9sRo9P69WAs0YsE=
+ bh=lrOJIkQ5CUAuwXJKadhDcN/cegdBChY+4CV9/PKKnKE=;
+ b=UjuyrDSFhsOMHCHG44VBzBSp7g+CiOotmEMt9+wtLPcbYBFUZzrR4jTSJ7wn7IyLAS7GahJ7Ot//88bEAxWiXu9CXDN0KAueo1VZTwYbbWHEXD6CUh0RyTwjfQWjbcMohZl0zCyBbPh47AE+tHWn7ihM9cAnFTy+6Oo9YdGDzyA=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=vsementsov@virtuozzo.com; 
 Received: from VI1PR08MB4432.eurprd08.prod.outlook.com (20.179.28.138) by
- VI1PR08MB3584.eurprd08.prod.outlook.com (20.177.62.22) with Microsoft SMTP
+ VI1PR08MB2878.eurprd08.prod.outlook.com (10.170.236.147) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Wed, 5 Feb 2020 14:58:59 +0000
+ 15.20.2686.32; Wed, 5 Feb 2020 15:14:15 +0000
 Received: from VI1PR08MB4432.eurprd08.prod.outlook.com
  ([fe80::9c56:6d95:76d1:d0]) by VI1PR08MB4432.eurprd08.prod.outlook.com
  ([fe80::9c56:6d95:76d1:d0%2]) with mapi id 15.20.2686.034; Wed, 5 Feb 2020
- 14:58:59 +0000
+ 15:14:15 +0000
 Subject: Re: [PATCH 00/17] Improve qcow2 all-zero detection
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 References: <20200131174436.2961874-1-eblake@redhat.com>
  <3bad82d4-4d60-4341-d87e-af37e1dd680e@virtuozzo.com>
- <9f2d8730-23ca-f070-52dd-0cbcbb08913b@redhat.com>
- <c7ff64b0-2916-aa51-f655-44adccee40e2@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200205175857111
-Message-ID: <944de4cd-a279-17aa-16f4-bbd44e707ea4@virtuozzo.com>
-Date: Wed, 5 Feb 2020 17:58:57 +0300
+ <99576c66-00d2-14a3-5f1f-6d7cebfa6553@virtuozzo.com>
+ <8b650616-ff80-c430-5d4e-6c9311bec2f6@redhat.com>
+ <5494fd19-3dbe-8878-628b-20b3c0a0c6cd@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200205181412366
+Message-ID: <d5bed92b-0351-7ae7-6b18-f814fe1533ba@virtuozzo.com>
+Date: Wed, 5 Feb 2020 18:14:12 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
-In-Reply-To: <c7ff64b0-2916-aa51-f655-44adccee40e2@virtuozzo.com>
+In-Reply-To: <5494fd19-3dbe-8878-628b-20b3c0a0c6cd@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1PR07CA0020.eurprd07.prod.outlook.com
- (2603:10a6:7:67::30) To VI1PR08MB4432.eurprd08.prod.outlook.com
- (2603:10a6:803:102::10)
+X-ClientProxiedBy: HE1PR02CA0098.eurprd02.prod.outlook.com (10.170.249.27) To
+ VI1PR08MB4432.eurprd08.prod.outlook.com (20.179.28.138)
 MIME-Version: 1.0
 Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR07CA0020.eurprd07.prod.outlook.com (2603:10a6:7:67::30) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.12 via Frontend Transport; Wed, 5 Feb 2020 14:58:58 +0000
-X-Tagtoolbar-Keys: D20200205175857111
+ HE1PR02CA0098.eurprd02.prod.outlook.com (10.170.249.27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21 via Frontend Transport; Wed, 5 Feb 2020 15:14:14 +0000
+X-Tagtoolbar-Keys: D20200205181412366
 X-Originating-IP: [185.231.240.5]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cf66c582-c457-4223-38fd-08d7aa4bee46
-X-MS-TrafficTypeDiagnostic: VI1PR08MB3584:
-X-Microsoft-Antispam-PRVS: <VI1PR08MB358464DB75D1599775ABEE70C1020@VI1PR08MB3584.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Office365-Filtering-Correlation-Id: 3891c185-6388-4017-6a86-08d7aa4e101b
+X-MS-TrafficTypeDiagnostic: VI1PR08MB2878:
+X-Microsoft-Antispam-PRVS: <VI1PR08MB2878DA6E522499FE03CDD2C5C1020@VI1PR08MB2878.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-Forefront-PRVS: 0304E36CA3
 X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(396003)(39850400004)(136003)(346002)(376002)(366004)(189003)(199004)(66476007)(53546011)(2906002)(5660300002)(31696002)(966005)(478600001)(31686004)(86362001)(66946007)(26005)(186003)(16526019)(66556008)(956004)(2616005)(316002)(16576012)(6486002)(52116002)(36756003)(8676002)(81156014)(81166006)(8936002)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3584;
+ SFS:(10019020)(39850400004)(346002)(136003)(376002)(396003)(366004)(199004)(189003)(26005)(956004)(2616005)(316002)(186003)(16526019)(6486002)(2906002)(53546011)(8676002)(36756003)(81156014)(81166006)(8936002)(31696002)(86362001)(478600001)(66946007)(31686004)(66556008)(66476007)(4326008)(52116002)(16576012)(5660300002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB2878;
  H:VI1PR08MB4432.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
+ PTR:InfoNoRecords; A:1; MX:1; 
 Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nzCRYygsSXObmsDenUUYdmIY9vaJPI7/2vIM17v4jwo1vOmar5V+kSNiNcGl9sCpYyifJysio2pxrk3gDYbMlpjUD64IcdLtdTMeJ1otX25bEi6T3BcBS9B7Kvqjh4XRP735jikfRxvPS8h5a8w/hix+TAnSy8E0fBwBlsI19TZIXUCEU2BJt2MEhWB/uIDpGU6hiPk8j4qD2VFt0N5kjbr7FVlRs6FU11NUp4AMwASvK5VMvGkt97hOZB01amg65ARXMIKIJC7JOQBv2LUYvkVc7FQzKxldsuSNnCcpbaewOQNrQXrgtZkABt7QGSY3/66GefJcaqTogC7QBl3+kDeR6QV9tf70la3zkk1Zw9GJ32ZqBNLhUWYiQ29XkTEnAVHr2I8ZsPqcs3i/10Ic54OaQL8jAluUpw/CLbgD1v07cqWxCtf9aDJmY4LicU9+JuiICD6+5UCSj+h0Fm9MVvK6nl/aVN7QgIHfCf9sdN3++hv8EeGVX3pDL/OpxD/HGeQB2733u6plY/HbQyHSGA==
-X-MS-Exchange-AntiSpam-MessageData: tPw5hZt3i2tDrb/9s+0codZk2bePIYKBOcJnMNiUAnz00P4BZr5MInFB3xuK8N1hPvtoaPhcw3iAGs1TPZmMpMg60mw0IChghlN7JSyOBOsm1Qupd/LHDjkyWg9nZFkbwUioLubG015eii4Xoh6gzg==
+X-Microsoft-Antispam-Message-Info: FYrWfHr2tDk99N5Cqf38g19UOxtqL/8XhC+dnA2QIRBbinbFZZbRMqsE0j5tcxpBIvl5lg4mvrQUI39eTvuv/koNrPHrRcUczfDfhKQQIhe+W/fQjDXrLu7aPdVWCnHMEHACv5V+pRS8LczmejFPsSV5SKHX/mFMLrcahFsIAYmIirjFmNlc8nntI+lcfPiM8RsvDC0rG97f33Vw75gxY5m/Z5uJE6eokhERGwwMiq6/7bM9y+W+EnC3bdxhobdVlDfSWYhof39Xtvo5cdpc0NtXGxX1qOtyX/Wux8VzPwypCwUWVKVp4KLgUgfWukOVW60QzGi9J0gXTZmExqEucU/ftFQzSLIqbqx76zCvjOFAflDtLBuJxTgvXBCtoj3jQf0zPjHmBF61bMuGjCZJ99Sz9b6uJpI7CUSqaonKhWHYwjO/2tCOusQ16+xoImnl
+X-MS-Exchange-AntiSpam-MessageData: FN7WfEJC7jbYxf9HOsfH8yn/OjksHVKBEu+zP8QDFS8sGYizT7YtvFvMSQLt0LI8cWeXwH3cStinSIZwUGTPqhVkoe0rFmyz7lO19Xs2zjY+VtpWRYGkPBK/vjcV7DXeibdLZulN6WOgTUT5Se41aA==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf66c582-c457-4223-38fd-08d7aa4bee46
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2020 14:58:59.3942 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3891c185-6388-4017-6a86-08d7aa4e101b
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2020 15:14:15.1437 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: j0WyWuM6YGdYl4Nj7BnHXczZt1+qmRgWyyGtwhs960OtI50Rdk05hrLEhFK5Z1EvlragioReOQ/FEvxltoe+DlWKoy8e9j0buGCXvbyWpyU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3584
+X-MS-Exchange-CrossTenant-UserPrincipalName: y0sGNpF8DPYAq+5HzUvJDj0YL9AbNRm4QxdVlTzCudyftFNgI4yV4xG4OOj59iAVJm23qeZFrGv1IMaBZHCzD16hN1YvSYjgcI2eqZrUYMg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB2878
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:7d00::70e
+X-Received-From: 40.107.8.117
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,103 +130,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-05.02.2020 17:43, Vladimir Sementsov-Ogievskiy wrote:
-> 05.02.2020 17:22, Eric Blake wrote:
->> On 2/5/20 3:04 AM, Vladimir Sementsov-Ogievskiy wrote:
+05.02.2020 17:47, Vladimir Sementsov-Ogievskiy wrote:
+> 05.02.2020 17:26, Eric Blake wrote:
+>> On 2/5/20 3:25 AM, Vladimir Sementsov-Ogievskiy wrote:
 >>
->>>> [repo.or.cz appears to be down as I type this; I'll post a link to a
->>>> repository later when it comes back up]
->>
->> Now up
->> https://repo.or.cz/qemu/ericb.git/shortlog/refs/tags/qcow2-all-zero-v1
->>
+>>>> 3. For qcow2
+>>>> Hmm. Here, as I understand, than main case is freshly created qcow2,
+>>>> which is fully-unallocated. To understand that it is empty, we
+>>>> need only to check all L1 entries. And for empty L1 table it is fast.
+>>>> So we don't need any qcow2 format improvement to check it.
 >>>>
 >>>
->>> I have several ideas around it.
->>>
->>> 1. For generic block layer.
->>> Did you consider as alternative to BDRV_ZEO_OPEN, to export the
->>> information through normal block_status? So, if we have the
->>> information, that disk is all-zero, we can always add _ZERO
->>> flag to block-status result.
+>>> Ah yes, I forget about preallocated case. Hmm. For preallocated cluster=
+s,
+>>> we have zero bits in L2 entries. And with them, we even don't need
+>>> preallocated to be filled by zeros, as we never read them (but just ret=
+urn
+>>> zeros on read)..
 >>
->> Makes sense.
->>
->>> And in generic bdrv_is_all_zeroes(),
->>> we can just call block_status(0, disk_size), which will return
->>> ZERO and n=3Ddisk_size if driver supports all-zero feature and is
->>> all-zero now.
->>
->> Less obvious.=C2=A0 block_status is not required to visit the entire dis=
-k, even if the entire disk is all zero.=C2=A0 For example, qcow2 visits at =
-most one L2 page in a call (if the request spans L1 entries, it will be tru=
-ncated at the boundary, even if the region before and after the boundary ha=
-ve the same status).=C2=A0 I'm also worried if we still have 32-bit limitat=
-ions in block_status (ideally, we've fixed things to support 64-bit status =
-where possible, but I'm not counting on it).
->=20
-> Not required, but why not doing it? If we have information that all disk =
-is of the same ZERO status, no reasons to not reply on block_status(0, disk=
-_size) with smaller n.
->=20
->>
->>> I think block-status is a native way for such information, and I
->>> think that we anyway want to come to support of 64bit block-status
->>> for qcow2 and nbd.
->>
->> Block status requires an O(n) loop over the disk, where n is the number =
-of distinct extents possible.=C2=A0 If you get lucky, and block_status(0,si=
-ze) returns a single extent, then yes that can feed the 'is_zeroes' request=
-.=C2=A0 Similarly, a single return of non-zero data can instantly tell you =
-that 'is_zeroes' is false.=C2=A0 But given that drivers may break up their =
-response on convenient boundaries, such as qcow2 on L1 entry granularity, y=
-ou cannot blindly assume that a return of zero data for smaller than the re=
-quested size implies non-zero data, only that there is insufficient informa=
-tion to tell if the disk is all_zeroes without querying further block_statu=
-s calls, and that's where you lose out on the speed compared to just being =
-told up-front from an 'is_zero' call.
->=20
-> Yes. But how is it worse than BDRV_ZERO_OPEN? With one block_status call =
-we have the same information. If on block_status(0, disk_size) driver repli=
-es with ZERO but smaller than disk_size, it means that either disk is not a=
-ll-zero, or driver doesn't support 'fast whole-disk zero check' feature, wh=
-ich is equal to not supporting BDRV_ZERO_OPEN.
->=20
+>> Scanning all L2 entries is O(n), while an autoclear bit properly maintai=
+ned is O(1).
 >>
 >>>
->>> 2. For NBD
->>> Again, possible alternative is BLOCK_STATUS, but we need 64bit
->>> commands for it. I plan to send a proposal anyway. Still, nothing
->>> bad in two possible path of receiving all-zero information.
->>> And even with your NBD extension, we can export this information
->>> through block-status [1.]
+>>> Then, may be we want similar flag for L1 entry (this will enable large
+>>> fast write-zero). And may be we want flag which marks the whole image
+>>> as read-zero (it's your flag). So, now I think, my previous idea
+>>> of "all allocated is zero" is worse. As for fully-preallocated images
+>>> we are sure that all clusters are allocated, and it is more native to
+>>> have flags similar to ZERO bit in L2 entry.
 >>
->> Yes, having 64-bit BLOCK_STATUS in NBD is orthogonal to this, but both i=
-deas are independently useful, and as the level of difficulty in implementi=
-ng things may vary, it is conceivable to have both a server that provides '=
-is_zero' but not BLOCK_STATUS, and a server that provides 64-bit BLOCK_STAT=
-US but not 'is_zero'.
+>> Right now, we don't have any L1 entry flags.=C2=A0 Adding one would requ=
+ire adding an incompatible feature flag (if older qemu would choke to see u=
+nexpected flags in an L1 entry), or at best an autoclear feature flag (if t=
+he autoclear bit gets cleared because an older qemu opened the image and co=
+uldn't maintain L1 entry flags correctly, then newer qemu knows it cannot t=
+rust those L1 entry flags).=C2=A0 But as soon as you are talking about addi=
+ng a feature bit, then why add one that still requires O(n) traversal to ch=
+eck (true, the 'n' in an O(n) traversal of L1 tables is much smaller than t=
+he 'n' in an O(n) traversal of L2 tables), when you can instead just add an=
+ O(1) autoclear bit that maintains all_zero status for the image as a whole=
+?
 >>
->>>
->>> 3. For qcow2
->>> Hmm. Here, as I understand, than main case is freshly created qcow2,
->>> which is fully-unallocated. To understand that it is empty, we
->>> need only to check all L1 entries. And for empty L1 table it is fast.
->>> So we don't need any qcow2 format improvement to check it.
->>
->> The benefit of this patch series is that it detects preallocated qcow2 i=
-mages as all_zero.=C2=A0 What's more, scanning all L1 entries is O(n), but =
-detecting an autoclear all_zero bit is O(1).=C2=A0 Your proposed L1 scan is=
- accurate for fewer cases, and costs more time.
 >=20
-> Ah yes, somehow I thought that L1 is not allocated for fresh image..
+> My suggestion about L1 entry flag is side thing, I understand difference =
+between O(n) and O(1) :) Still additional L1 entry will help to make effici=
+ent large block-status and write-zero requests.
 >=20
-> Hmm, than possibly we need two new top-level flags: "all-zero" and "all-u=
-nallocated"..
+> And I agree that we need top level flag.. I just try to say, that it seem=
+s good to make it similar with existing L2 flag. But yes, it would be incom=
+aptible change, as it marks all clusters as ZERO, and older Qemu can't unde=
+rstand it and may treat all clusters as unallocated.
 >=20
 
-It make sense only with incompatible semantics. With autoclean semantics it=
-'s better to have one 'all-allocated-are-zero' and don't care.
+Still, how long is this O(n) ? We load the whole L1 into memory anyway. For=
+ example, 16Tb disk with 64K granularity, we'll have 32768 L1 entries. Will=
+ we get sensible performance benefit with an extension? I doubt in it now. =
+And anyway, if we have an extension, we should fallback to this O(n) if we =
+don't have the flag set.
+
+So, I think the flag is beneficial only for preallocated images.
+
+Hmm. and for such images, if we want, we can define this flag as 'all clust=
+ers are allocated zeroes', if we want. Which will prove that image reads as=
+ zero independently of any backing relations.
 
 
 --=20
