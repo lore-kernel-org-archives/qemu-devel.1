@@ -2,164 +2,72 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4B8C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 00:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D8B7C35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 00:46:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90FCF2085B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 00:10:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhcW2KzQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90FCF2085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46DAB214AF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 00:46:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46DAB214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iz8HF-0005qO-Lf
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 19:10:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41640)
+	id 1iz8q1-00049Q-Ce
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 19:46:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59819)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iz8GO-0005Ew-3z
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 19:09:53 -0500
+ (envelope-from <bounces@canonical.com>) id 1iz8p3-0003iL-Fu
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 19:45:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iz8GL-0004wP-JZ
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 19:09:51 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40627
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iz8GL-0004g6-6g
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 19:09:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580861388;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=rmEukLmQDQemnTeCg+5ZqN0WAHrjzQKPneiGTILf3pw=;
- b=dhcW2KzQGAKUEcD5N0Tfuguu+Ir2KuHHpAcioIXbi71rjYQiwUwHqUL9xW24vZH3QHWOUV
- XWwC0xNuflyW/9DPx+DVKDKTylQXaXlTYVF19bwEa74mnz6cETzhJQ/HB8iZGwSlpb5FWG
- lWr8rScI/285tA/i9jBI7wlvh8/04uY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-MAnAgEdROuW5fJ7smBtYTw-1; Tue, 04 Feb 2020 19:09:41 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3F8A102CE14;
- Wed,  5 Feb 2020 00:09:40 +0000 (UTC)
-Received: from [10.18.17.116] (dhcp-17-116.bos.redhat.com [10.18.17.116])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1BA50194BB;
- Wed,  5 Feb 2020 00:09:34 +0000 (UTC)
-Subject: Re: Does Libvirt's json parser support single quoted string in qmp
- json string?
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>
-References: <ADDDD4B8-45AD-4D79-9332-06F2A50B26CE@sina.com>
- <9bac386b-5a90-3c10-b63b-d45a2e8c2d58@redhat.com>
- <20200203101352.GB1922177@redhat.com>
- <1f285f58-7a8f-0656-4f0a-8acfe56bad43@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <f6db3e44-4e79-d405-a840-eaae5cf486b8@redhat.com>
-Date: Tue, 4 Feb 2020 19:09:34 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <bounces@canonical.com>) id 1iz8p0-0008QI-K5
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 19:45:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42490)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iz8p0-0008JQ-At
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 19:45:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iz8oy-0006MH-JD
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 00:45:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8DFC32E806B
+ for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 00:45:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1f285f58-7a8f-0656-4f0a-8acfe56bad43@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: MAnAgEdROuW5fJ7smBtYTw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 05 Feb 2020 00:39:06 -0000
+From: Pedro Pablo Lopez Rodriguez <1861946@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: plopezr
+X-Launchpad-Bug-Reporter: Pedro Pablo Lopez Rodriguez (plopezr)
+X-Launchpad-Bug-Modifier: Pedro Pablo Lopez Rodriguez (plopezr)
+Message-Id: <158086314699.19555.9540843580021637812.malonedeb@gac.canonical.com>
+Subject: [Bug 1861946] [NEW] qemu-4.2.0 qemu-system-i386 not receive scancode
+ 86 of spanish keyboard (ascii chars '<' & '>')
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 824142d6818961f108d82e92ea020b392f87c3c6
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -168,101 +76,541 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvirt-users@redhat.com, Peter Luo <d8514@sina.com>,
- Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>
+Reply-To: Bug 1861946 <1861946@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Public bug reported:
 
+Hello.
 
-On 2/3/20 11:27 AM, Eric Blake wrote:
-> [adding Markus]
->=20
-> On 2/3/20 4:13 AM, Daniel P. Berrang=C3=A9 wrote:
->> On Fri, Jan 31, 2020 at 06:44:42AM -0600, Eric Blake wrote:
->>> On 1/31/20 4:38 AM, Peter Luo wrote:
->>>
->>>> error: internal error: cannot parse json {"execute": "block-commit",
->>>> "arguments": { "device": "drive-virtio-disk2", "job-id": "job100",
->>>> "base":'json:{"encrypt.key-secret":"vol-38973xjl.secret","driver":"qco=
-w2","file":{"driver":"file","filename":"/pitrix/data/container/vol-38973xjl=
-.img"}}',
->>>> "top": "/pitrix/data/container/vol-38973xjl_ss-2tw7v0mm.img"}}:
->>>> lexical error: invalid char in json text.
->>>>
->>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 , "job-i=
-d": "job100",
->>>> "base":'json:{"encrypt.key-secret":"vo
->>>>
->>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (right here) ----=
---^
->>>>
->>>
->>> qemu's QMP language has an extension where it accepts 'string' in
->>> addition
->>> to the JSON "string".=C2=A0 But it uses a hand-rolled parser, so it can=
- do
->>> whatever it wants.
->>
->> Can we deprecate & remove this extension in QEMU ?
->=20
-> We could start a deprecation clock, if desired, but I don't know how
-> many external users would be impacted (at least qemu's testsuite heavily
-> relies on the extension of single quotes).
->=20
-> Are there any third-party libraries that parse JSON5? https://json5.org/
-> documents that one of the nice features of JSON5 is that single quotes
-> work out of the box.=C2=A0 Right now, even though qemu does NOT parse the
-> same thing as pure JSON (which is
-> https://datatracker.ietf.org/doc/rfc8259/), it does appear to parse a
-> subset of JSON5, where the additional features of JSON5 (such as
-> allowing a trailing comma, escaped newlines within strings, allowing
-> bareword key:"value" syntax, a larger set of accepted numeric values,
-> allowing comments) don't seem that onerous.
->=20
->>
->> If we're going to call QMP protocol JSON, then IMHO QEMU should follow
->> the JSON spec as closely as possible, without extensions.
->=20
-> As it is, qemu explicitly does NOT parse all valid JSON - it rejects
-> non-ASCII bytes (whether as UTF-8 or as \u escape sequences) in strings.
-> =C2=A0So the fact that it already extensions in some places and limitatio=
-ns
-> in others is a burden for clients to be aware of.
->=20
->>
->> On the flip side, if we're going to support extensions like single
->> quoting,
->> then we should make it clear to applications that this is not really JSO=
-N
->> and that they need to provide an impl that is 100% matching QEMU's
->> dialect.
->> This effectively means they need just import a copy of QEMU's code.
->>
->> Regards,
->> Daniel
->>
->=20
+I am using qemu-4.2.0 for Windows 64 downloaded from https://qemu.weilnetz.=
+de/w64/,
+and I use qemu-system-i386.exe for run Minix 3.1.2a:
 
-More anecdata: qmp-shell will also accept either strict JSON or what it
-calls "fuzzy" JSON, which allows single quotes, Python spellings for
-boolean constants, and other deviations.
+  C:\Program Files\qemu> qemu-system-i386 minix3hd.qcow
 
-However, when using pretty-print, it will always show you the *strict*
-json form of your input.
+All is Ok except the keyboard (spanish).
 
-If we are confusing users, that's bad; but there's some use for the
-single quotes in our code base. Following a standard would be nice.
+Actually the Spanish keyboard has always worked well until the version
+qemu-2.11.0 included. But after that version and until the current
+version the Spanish keyboard has worked with some very annoying bugs.
 
-JSON5 might be "niche", but so what? If we happen to more closely adhere
-to JSON5 than vanilla JSON, we could still make sure we adhere to it and
-we get to say that we accept "strict JSON5." This is at least unambiguous.
+The bugs that I encountered in the current version 4.2.0 on Windows are:
 
-I'm more inclined to head towards JSON5 instead of heading back to
-strict JSON.
+1) Scancode 86 (ascii '<') is not received from the Spanish keyboard.
 
---js
+2) Scancode 41 should be interpreted as 39 (41 -> 39).
 
+3) in the same way:
+12 -> 53
+13 -> 27
+26 -> 12
+27 -> 13
+43 -> 41
+53 -> 43
+
+4) Finally and very important in Spain is that scancode 39 should
+produce the national characters '=C3=B1' and '=C3=91'
+
+I have checked the scancodes sent by running a floppy disk image with a
+boot sector that echoed the scancodes sent by pressing the different
+keys, so the errors are not due in any case to the operating system, but
+to the virtual machine or at most to the BIOS.
+
+In Minix 3.1.2a I tried to alleviate the errors by modifying the keymap:
+/usr/lib/keymaps/spanish.map. I have managed to solve all the errors
+except the one corresponding to scancode 86 (ascii '<') since when the
+key is pressed on the Spanish keyboard the scancode 86 is not sent.
+
+I accompany the modified keymap: https://github.com/Stichting-MINIX-
+Research-Foundation/minix/blob/R3.1.2/drivers/tty/keymaps/spanish.src
+for it could be clarifying in any way.
+
+Thank you very much for qemu and the new version 4.2.0. Apart from these
+small details, all the improvements that have been included are greatly
+appreciated.
+
+Greetings. Pedro Pablo.
+
+------------------------- spanish.src (modified #if 0 #else #endif)
+-------------------------
+
+/* Keymap for Spanish MF-2 keyboard. */
+/* Modified by Javier Garcia Martin jawa@inf.deusto.es */
+
+u16_t keymap[NR_SCAN_CODES * MAP_COLS] =3D {
+
+/* scan-code		!Shift	Shift	Alt	AltGr	Alt+Sh	Ctrl	*/
+/* =
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =
+
+*/
+/* 00 - none	*/	0,	0,	0,	0,	0,	0,	=
+
+/* 01 - ESC	*/	C('['),	C('['),	CA('['),C('['),	C('['),	C('['),
+/* 02 - '1'	*/	'1',	'!',	A('1'),	'|',	'!',	C('A'),
+/* 03 - '2'	*/	'2',	'"',	A('2'),	'@',	'"',	C('@'),
+/* 04 - '3'	*/	'3',	0372,	A('3'),	'#',	0372,	C('C'),
+/* 05 - '4'	*/	'4',	'$',	A('4'),	'4',	'$',	C('D'),
+/* 06 - '5'	*/	'5',	'%',	A('5'),	'5',	'%',	C('E'),
+/* 07 - '6'	*/	'6',	'&',	A('6'),	0252,	'&',	C('F'),
+/* 08 - '7'	*/	'7',	'/',	A('7'),	'{',	'/',	C('G'),
+/* 09 - '8'	*/	'8',	'(',	A('8'),	'(',	'(',	C('H'),
+/* 10 - '9'	*/	'9',	')',	A('9'),	')',	')',	C('I'),
+/* 11 - '0'	*/	'0',	'=3D',	A('0'),	'=3D',	'=3D',	C('@'),
+#if 0
+/* 12 - '-'	*/	'\'',	'?',	A('\''),'?',	'?',	C('_'),     /* deber=C3=ADa ser=
+ como la (53) */
+#else =
+
+/* 53 - '/'	*/	'-',	'_',	A('-'), '-',	'_',	C('@'),  =
+
+#endif
+#if 0
+/* 13 - '=3D'	*/	0255,	0250,	A(0255),0250,	0250,	C('@'),     /* deberia ser=
+ como la (27) */
+#else
+/* 27 - ']'	*/	'+',	'*',	A('+'),	']',	'*',	C(']'),     =
+
+#endif
+/* 14 - BS	*/	C('H'),	C('H'),	CA('H'),C('H'),	C('H'),	0177,	=
+
+/* 15 - TAB	*/	C('I'),	C('I'),	CA('I'),C('I'),	C('I'),	C('I'),
+/* 16 - 'q'	*/	L('q'),	'Q',	A('q'),	'q',	'Q',	C('Q'),
+/* 17 - 'w'	*/	L('w'),	'W',	A('w'),	'w',	'W',	C('W'),
+/* 18 - 'e'	*/	L('e'),	'E',	A('e'),	'e',	'E',	C('E'),
+/* 19 - 'r'	*/	L('r'),	'R',	A('r'),	'r',	'R',	C('R'),
+/* 20 - 't'	*/	L('t'),	'T',	A('t'),	't',	'T',	C('T'),
+/* 21 - 'y'	*/	L('y'),	'Y',	A('y'),	'y',	'Y',	C('Y'),
+/* 22 - 'u'	*/	L('u'),	'U',	A('u'),	'u',	'U',	C('U'),
+/* 23 - 'i'	*/	L('i'),	'I',	A('i'),	'i',	'I',	C('I'),
+/* 24 - 'o'	*/	L('o'),	'O',	A('o'),	'o',	'O',	C('O'),
+/* 25 - 'p'	*/	L('p'),	'P',	A('p'),	'p',	'P',	C('P'),
+#if 0
+/* 26 - '['	*/	'`',	'^',	A('`'),'[',	'^',	C('['),         /* deber=C3=ADa s=
+er como la (12) */
+#else =
+
+/* 12 - '-'	*/	'\'',	'?',	A('\''),'?',	'?',	C('_'),     =
+
+#endif
+#if 0
+/* 27 - ']'	*/	'+',	'*',	A('+'),	']',	'*',	C(']'),     /* deberia ser como =
+la (13) */
+#else
+/* 13 - '=3D'	*/	0255,	0250,	A(0255),0250,	0250,	C('@'),
+#endif
+/* 28 - CR/LF	*/	C('M'),	C('M'),	CA('M'),C('M'),	C('M'),	C('J'),
+/* 29 - Ctrl	*/	CTRL,	CTRL,	CTRL,	CTRL,	CTRL,	CTRL,
+/* 30 - 'a'	*/	L('a'),	'A',	A('a'),	'a',	'A',	C('A'),
+/* 31 - 's'	*/	L('s'),	'S',	A('s'),	's',	'S',	C('S'),
+/* 32 - 'd'	*/	L('d'),	'D',	A('d'),	'd',	'D',	C('D'),
+/* 33 - 'f'	*/	L('f'),	'F',	A('f'),	'f',	'F',	C('F'),
+/* 34 - 'g'	*/	L('g'),	'G',	A('g'),	'g',	'G',	C('G'),
+/* 35 - 'h'	*/	L('h'),	'H',	A('h'),	'h',	'H',	C('H'),
+/* 36 - 'j'	*/	L('j'),	'J',	A('j'),	'j',	'J',	C('J'),
+/* 37 - 'k'	*/	L('k'),	'K',	A('k'),	'k',	'K',	C('K'),
+/* 38 - 'l'	*/	L('l'),	'L',	A('l'),	'l',	'L',	C('L'),
+#if 0
+/* 39 - ';'	*/	L(0244),0245,	A(0244),0244,	0245,	C('@'),     /* deberia ser=
+ como la (26) */
+#else =
+
+/* 26 - '['	*/	'`',	'^',	A('`'),'[',	'^',	C('['),         =
+
+#endif
+/* 40 - '\''	*/	'\'',	'"',	A('\''),'{',	'"',	C('@'), =
+
+#if 0
+/* 41 - '`'	*/	0247,	0246,	A(0247),'\\',	0246,	C('@'),     /* deberia ser c=
+omo la (=C3=B1=C3=91) */
+#else
+/* 39 - ';'	*/	L(0244),0245,	A(0244),0244,	0245,	C('@'),  =
+
+#endif
+/* 42 - l. SHIFT*/	SHIFT,	SHIFT,	SHIFT,	SHIFT,	SHIFT,	SHIFT,
+#if 0
+/* 43 - '\\'	*/	L(0207),0200,	A(0207),'}',	0200,	C('@'),     /* deberia ser=
+ como la (41) */
+#elif 0
+/* 41 - '`'	*/	0247,	0246,	A(0247),'\\',	0246,	C('@'), =
+
+#else
+/* 41 - '`'	*/	'<',	'>',	A('<'),  '\\',	0246,	C('@'),     /* a=C3=B1adimos =
+< y > */
+#endif
+/* 44 - 'z'	*/	L('z'),	'Z',	A('z'),	'z',	'Z',	C('Z'),
+/* 45 - 'x'	*/	L('x'),	'X',	A('x'),	'x',	'X',	C('X'),
+/* 46 - 'c'	*/	L('c'),	'C',	A('c'),	'c',	'C',	C('C'),
+/* 47 - 'v'	*/	L('v'),	'V',	A('v'),	'v',	'V',	C('V'),
+/* 48 - 'b'	*/	L('b'),	'B',	A('b'),	'b',	'B',	C('B'),
+/* 49 - 'n'	*/	L('n'),	'N',	A('n'),	'n',	'N',	C('N'),
+/* 50 - 'm'	*/	L('m'),	'M',	A('m'),	'm',	'M',	C('M'),
+/* 51 - ','	*/	',',	';',	A(','),	',',	';',	C('@'),
+/* 52 - '.'	*/	'.',	':',	A('.'),	'.',	':',	C('@'),
+#if 0
+/* 53 - '/'	*/	'-',	'_',	A('-'), '-',	'_',	C('@'),     /* deberia ser como =
+la (43) */
+#else
+/* 43 - '\\'	*/	L(0207),0200,	A(0207),'}',	0200,	C('@'), =
+
+#endif
+/* 54 - r. SHIFT*/	SHIFT,	SHIFT,	SHIFT,	SHIFT,	SHIFT,	SHIFT,
+/* 55 - '*'	*/	'*',	'*',	A('*'),	'*',	'*',	C('M'),
+/* 56 - ALT	*/	ALT,	ALT,	ALT,	ALT,	ALT,	ALT,
+/* 57 - ' '	*/	' ',	' ',	A(' '),	' ',	' ',	C('@'),
+/* 58 - CapsLck	*/	CALOCK,	CALOCK,	CALOCK,	CALOCK,	CALOCK,	CALOCK,
+/* 59 - F1	*/	F1,	SF1,	AF1,	AF1,	ASF1,	CF1,
+/* 60 - F2	*/	F2,	SF2,	AF2,	AF2,	ASF2,	CF2,
+/* 61 - F3	*/	F3,	SF3,	AF3,	AF3,	ASF3,	CF3,
+/* 62 - F4	*/	F4,	SF4,	AF4,	AF4,	ASF4,	CF4,
+/* 63 - F5	*/	F5,	SF5,	AF5,	AF5,	ASF5,	CF5,
+/* 64 - F6	*/	F6,	SF6,	AF6,	AF6,	ASF6,	CF6,
+/* 65 - F7	*/	F7,	SF7,	AF7,	AF7,	ASF7,	CF7,
+/* 66 - F8	*/	F8,	SF8,	AF8,	AF8,	ASF8,	CF8,
+/* 67 - F9	*/	F9,	SF9,	AF9,	AF9,	ASF9,	CF9,
+/* 68 - F10	*/	F10,	SF10,	AF10,	AF10,	ASF10,	CF10,
+/* 69 - NumLock	*/	NLOCK,	NLOCK,	NLOCK,	NLOCK,	NLOCK,	NLOCK,
+/* 70 - ScrLock */	SLOCK,	SLOCK,	SLOCK,	SLOCK,	SLOCK,	SLOCK,
+/* 71 - Home	*/	HOME,	'7',	AHOME,	AHOME,	'7',	CHOME,	=
+
+/* 72 - CurUp	*/	UP,	'8',	AUP,	AUP,	'8',	CUP,
+/* 73 - PgUp	*/	PGUP,	'9',	APGUP,	APGUP,	'9',	CPGUP,
+/* 74 - '-'	*/	NMIN,	'-',	ANMIN,	ANMIN,	'-',	CNMIN,
+/* 75 - Left	*/	LEFT,	'4',	ALEFT,	ALEFT,	'4',	CLEFT,
+/* 76 - MID	*/	MID,	'5',	AMID,	AMID,	'5',	CMID,
+/* 77 - Right	*/	RIGHT,	'6',	ARIGHT,	ARIGHT,	'6',	CRIGHT,
+/* 78 - '+'	*/	PLUS,	'+',	APLUS,	APLUS,	'+',	CPLUS,
+/* 79 - End	*/	END,	'1',	AEND,	AEND,	'1',	CEND,
+/* 80 - Down	*/	DOWN,	'2',	ADOWN,	ADOWN,	'2',	CDOWN,
+/* 81 - PgDown	*/	PGDN,	'3',	APGDN,	APGDN,	'3',	CPGDN,
+/* 82 - Insert	*/	INSRT,	'0',	AINSRT,	AINSRT,	'0',	CINSRT,
+/* 83 - Delete	*/	0177,	'.',	A(0177),0177,	'.',	0177,
+/* 84 - Enter	*/	C('M'),	C('M'),	CA('M'),C('M'),	C('M'),	C('J'),
+/* 85 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 86 - ???	*/	'<',	'>',	A('<'),	'<',	'>',	C('@'),
+/* 87 - F11	*/	F11,	SF11,	AF11,	AF11,	ASF11,	CF11,
+/* 88 - F12	*/	F12,	SF12,	AF12,	AF12,	ASF12,	CF12,
+/* 89 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 90 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 91 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 92 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 93 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 94 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 95 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 96 - EXT_KEY	*/	EXTKEY,	EXTKEY,	EXTKEY,	EXTKEY,	EXTKEY,	EXTKEY,
+/* 97 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 98 - ???	*/	0,	0,	0,	0,	0,	0,
+/* 99 - ???	*/	0,	0,	0,	0,	0,	0,
+/*100 - ???	*/	0,	0,	0,	0,	0,	0,
+/*101 - ???	*/	0,	0,	0,	0,	0,	0,
+/*102 - ???	*/	0,	0,	0,	0,	0,	0,
+/*103 - ???	*/	0,	0,	0,	0,	0,	0,
+/*104 - ???	*/	0,	0,	0,	0,	0,	0,
+/*105 - ???	*/	0,	0,	0,	0,	0,	0,
+/*106 - ???	*/	0,	0,	0,	0,	0,	0,
+/*107 - ???	*/	0,	0,	0,	0,	0,	0,
+/*108 - ???	*/	0,	0,	0,	0,	0,	0,
+/*109 - ???	*/	0,	0,	0,	0,	0,	0,
+/*110 - ???	*/	0,	0,	0,	0,	0,	0,
+/*111 - ???	*/	0,	0,	0,	0,	0,	0,
+/*112 - ???	*/	0,	0,	0,	0,	0,	0,
+/*113 - ???	*/	0,	0,	0,	0,	0,	0,
+/*114 - ???	*/	0,	0,	0,	0,	0,	0,
+/*115 - ???	*/	0,	0,	0,	0,	0,	0,
+/*116 - ???	*/	0,	0,	0,	0,	0,	0,
+/*117 - ???	*/	0,	0,	0,	0,	0,	0,
+/*118 - ???	*/	0,	0,	0,	0,	0,	0,
+/*119 - ???	*/	0,	0,	0,	0,	0,	0,
+/*120 - ???	*/	0,	0,	0,	0,	0,	0,
+/*121 - ???	*/	0,	0,	0,	0,	0,	0,
+/*122 - ???	*/	0,	0,	0,	0,	0,	0,
+/*123 - ???	*/	0,	0,	0,	0,	0,	0,
+/*124 - ???	*/	0,	0,	0,	0,	0,	0,
+/*125 - ???	*/	0,	0,	0,	0,	0,	0,
+/*126 - ???	*/	0,	0,	0,	0,	0,	0,
+/*127 - ???	*/	0,	0,	0,	0,	0,	0
+};
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1861946
+
+Title:
+  qemu-4.2.0 qemu-system-i386 not receive scancode 86 of spanish
+  keyboard  (ascii chars '<' & '>')
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello.
+
+  I am using qemu-4.2.0 for Windows 64 downloaded from https://qemu.weilnet=
+z.de/w64/,
+  and I use qemu-system-i386.exe for run Minix 3.1.2a:
+
+    C:\Program Files\qemu> qemu-system-i386 minix3hd.qcow
+
+  All is Ok except the keyboard (spanish).
+
+  Actually the Spanish keyboard has always worked well until the version
+  qemu-2.11.0 included. But after that version and until the current
+  version the Spanish keyboard has worked with some very annoying bugs.
+
+  The bugs that I encountered in the current version 4.2.0 on Windows
+  are:
+
+  1) Scancode 86 (ascii '<') is not received from the Spanish keyboard.
+
+  2) Scancode 41 should be interpreted as 39 (41 -> 39).
+
+  3) in the same way:
+  12 -> 53
+  13 -> 27
+  26 -> 12
+  27 -> 13
+  43 -> 41
+  53 -> 43
+
+  4) Finally and very important in Spain is that scancode 39 should
+  produce the national characters '=C3=B1' and '=C3=91'
+
+  I have checked the scancodes sent by running a floppy disk image with
+  a boot sector that echoed the scancodes sent by pressing the different
+  keys, so the errors are not due in any case to the operating system,
+  but to the virtual machine or at most to the BIOS.
+
+  In Minix 3.1.2a I tried to alleviate the errors by modifying the
+  keymap: /usr/lib/keymaps/spanish.map. I have managed to solve all the
+  errors except the one corresponding to scancode 86 (ascii '<') since
+  when the key is pressed on the Spanish keyboard the scancode 86 is not
+  sent.
+
+  I accompany the modified keymap: https://github.com/Stichting-MINIX-
+  Research-Foundation/minix/blob/R3.1.2/drivers/tty/keymaps/spanish.src
+  for it could be clarifying in any way.
+
+  Thank you very much for qemu and the new version 4.2.0. Apart from
+  these small details, all the improvements that have been included are
+  greatly appreciated.
+
+  Greetings. Pedro Pablo.
+
+  ------------------------- spanish.src (modified #if 0 #else #endif)
+  -------------------------
+
+  /* Keymap for Spanish MF-2 keyboard. */
+  /* Modified by Javier Garcia Martin jawa@inf.deusto.es */
+
+  u16_t keymap[NR_SCAN_CODES * MAP_COLS] =3D {
+
+  /* scan-code		!Shift	Shift	Alt	AltGr	Alt+Sh	Ctrl	*/
+  /* =
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =
+
+  */
+  /* 00 - none	*/	0,	0,	0,	0,	0,	0,	=
+
+  /* 01 - ESC	*/	C('['),	C('['),	CA('['),C('['),	C('['),	C('['),
+  /* 02 - '1'	*/	'1',	'!',	A('1'),	'|',	'!',	C('A'),
+  /* 03 - '2'	*/	'2',	'"',	A('2'),	'@',	'"',	C('@'),
+  /* 04 - '3'	*/	'3',	0372,	A('3'),	'#',	0372,	C('C'),
+  /* 05 - '4'	*/	'4',	'$',	A('4'),	'4',	'$',	C('D'),
+  /* 06 - '5'	*/	'5',	'%',	A('5'),	'5',	'%',	C('E'),
+  /* 07 - '6'	*/	'6',	'&',	A('6'),	0252,	'&',	C('F'),
+  /* 08 - '7'	*/	'7',	'/',	A('7'),	'{',	'/',	C('G'),
+  /* 09 - '8'	*/	'8',	'(',	A('8'),	'(',	'(',	C('H'),
+  /* 10 - '9'	*/	'9',	')',	A('9'),	')',	')',	C('I'),
+  /* 11 - '0'	*/	'0',	'=3D',	A('0'),	'=3D',	'=3D',	C('@'),
+  #if 0
+  /* 12 - '-'	*/	'\'',	'?',	A('\''),'?',	'?',	C('_'),     /* deber=C3=ADa s=
+er como la (53) */
+  #else =
+
+  /* 53 - '/'	*/	'-',	'_',	A('-'), '-',	'_',	C('@'),  =
+
+  #endif
+  #if 0
+  /* 13 - '=3D'	*/	0255,	0250,	A(0255),0250,	0250,	C('@'),     /* deberia s=
+er como la (27) */
+  #else
+  /* 27 - ']'	*/	'+',	'*',	A('+'),	']',	'*',	C(']'),     =
+
+  #endif
+  /* 14 - BS	*/	C('H'),	C('H'),	CA('H'),C('H'),	C('H'),	0177,	=
+
+  /* 15 - TAB	*/	C('I'),	C('I'),	CA('I'),C('I'),	C('I'),	C('I'),
+  /* 16 - 'q'	*/	L('q'),	'Q',	A('q'),	'q',	'Q',	C('Q'),
+  /* 17 - 'w'	*/	L('w'),	'W',	A('w'),	'w',	'W',	C('W'),
+  /* 18 - 'e'	*/	L('e'),	'E',	A('e'),	'e',	'E',	C('E'),
+  /* 19 - 'r'	*/	L('r'),	'R',	A('r'),	'r',	'R',	C('R'),
+  /* 20 - 't'	*/	L('t'),	'T',	A('t'),	't',	'T',	C('T'),
+  /* 21 - 'y'	*/	L('y'),	'Y',	A('y'),	'y',	'Y',	C('Y'),
+  /* 22 - 'u'	*/	L('u'),	'U',	A('u'),	'u',	'U',	C('U'),
+  /* 23 - 'i'	*/	L('i'),	'I',	A('i'),	'i',	'I',	C('I'),
+  /* 24 - 'o'	*/	L('o'),	'O',	A('o'),	'o',	'O',	C('O'),
+  /* 25 - 'p'	*/	L('p'),	'P',	A('p'),	'p',	'P',	C('P'),
+  #if 0
+  /* 26 - '['	*/	'`',	'^',	A('`'),'[',	'^',	C('['),         /* deber=C3=ADa=
+ ser como la (12) */
+  #else =
+
+  /* 12 - '-'	*/	'\'',	'?',	A('\''),'?',	'?',	C('_'),     =
+
+  #endif
+  #if 0
+  /* 27 - ']'	*/	'+',	'*',	A('+'),	']',	'*',	C(']'),     /* deberia ser com=
+o la (13) */
+  #else
+  /* 13 - '=3D'	*/	0255,	0250,	A(0255),0250,	0250,	C('@'),
+  #endif
+  /* 28 - CR/LF	*/	C('M'),	C('M'),	CA('M'),C('M'),	C('M'),	C('J'),
+  /* 29 - Ctrl	*/	CTRL,	CTRL,	CTRL,	CTRL,	CTRL,	CTRL,
+  /* 30 - 'a'	*/	L('a'),	'A',	A('a'),	'a',	'A',	C('A'),
+  /* 31 - 's'	*/	L('s'),	'S',	A('s'),	's',	'S',	C('S'),
+  /* 32 - 'd'	*/	L('d'),	'D',	A('d'),	'd',	'D',	C('D'),
+  /* 33 - 'f'	*/	L('f'),	'F',	A('f'),	'f',	'F',	C('F'),
+  /* 34 - 'g'	*/	L('g'),	'G',	A('g'),	'g',	'G',	C('G'),
+  /* 35 - 'h'	*/	L('h'),	'H',	A('h'),	'h',	'H',	C('H'),
+  /* 36 - 'j'	*/	L('j'),	'J',	A('j'),	'j',	'J',	C('J'),
+  /* 37 - 'k'	*/	L('k'),	'K',	A('k'),	'k',	'K',	C('K'),
+  /* 38 - 'l'	*/	L('l'),	'L',	A('l'),	'l',	'L',	C('L'),
+  #if 0
+  /* 39 - ';'	*/	L(0244),0245,	A(0244),0244,	0245,	C('@'),     /* deberia s=
+er como la (26) */
+  #else =
+
+  /* 26 - '['	*/	'`',	'^',	A('`'),'[',	'^',	C('['),         =
+
+  #endif
+  /* 40 - '\''	*/	'\'',	'"',	A('\''),'{',	'"',	C('@'), =
+
+  #if 0
+  /* 41 - '`'	*/	0247,	0246,	A(0247),'\\',	0246,	C('@'),     /* deberia ser=
+ como la (=C3=B1=C3=91) */
+  #else
+  /* 39 - ';'	*/	L(0244),0245,	A(0244),0244,	0245,	C('@'),  =
+
+  #endif
+  /* 42 - l. SHIFT*/	SHIFT,	SHIFT,	SHIFT,	SHIFT,	SHIFT,	SHIFT,
+  #if 0
+  /* 43 - '\\'	*/	L(0207),0200,	A(0207),'}',	0200,	C('@'),     /* deberia s=
+er como la (41) */
+  #elif 0
+  /* 41 - '`'	*/	0247,	0246,	A(0247),'\\',	0246,	C('@'), =
+
+  #else
+  /* 41 - '`'	*/	'<',	'>',	A('<'),  '\\',	0246,	C('@'),     /* a=C3=B1adimo=
+s < y > */
+  #endif
+  /* 44 - 'z'	*/	L('z'),	'Z',	A('z'),	'z',	'Z',	C('Z'),
+  /* 45 - 'x'	*/	L('x'),	'X',	A('x'),	'x',	'X',	C('X'),
+  /* 46 - 'c'	*/	L('c'),	'C',	A('c'),	'c',	'C',	C('C'),
+  /* 47 - 'v'	*/	L('v'),	'V',	A('v'),	'v',	'V',	C('V'),
+  /* 48 - 'b'	*/	L('b'),	'B',	A('b'),	'b',	'B',	C('B'),
+  /* 49 - 'n'	*/	L('n'),	'N',	A('n'),	'n',	'N',	C('N'),
+  /* 50 - 'm'	*/	L('m'),	'M',	A('m'),	'm',	'M',	C('M'),
+  /* 51 - ','	*/	',',	';',	A(','),	',',	';',	C('@'),
+  /* 52 - '.'	*/	'.',	':',	A('.'),	'.',	':',	C('@'),
+  #if 0
+  /* 53 - '/'	*/	'-',	'_',	A('-'), '-',	'_',	C('@'),     /* deberia ser com=
+o la (43) */
+  #else
+  /* 43 - '\\'	*/	L(0207),0200,	A(0207),'}',	0200,	C('@'), =
+
+  #endif
+  /* 54 - r. SHIFT*/	SHIFT,	SHIFT,	SHIFT,	SHIFT,	SHIFT,	SHIFT,
+  /* 55 - '*'	*/	'*',	'*',	A('*'),	'*',	'*',	C('M'),
+  /* 56 - ALT	*/	ALT,	ALT,	ALT,	ALT,	ALT,	ALT,
+  /* 57 - ' '	*/	' ',	' ',	A(' '),	' ',	' ',	C('@'),
+  /* 58 - CapsLck	*/	CALOCK,	CALOCK,	CALOCK,	CALOCK,	CALOCK,	CALOCK,
+  /* 59 - F1	*/	F1,	SF1,	AF1,	AF1,	ASF1,	CF1,
+  /* 60 - F2	*/	F2,	SF2,	AF2,	AF2,	ASF2,	CF2,
+  /* 61 - F3	*/	F3,	SF3,	AF3,	AF3,	ASF3,	CF3,
+  /* 62 - F4	*/	F4,	SF4,	AF4,	AF4,	ASF4,	CF4,
+  /* 63 - F5	*/	F5,	SF5,	AF5,	AF5,	ASF5,	CF5,
+  /* 64 - F6	*/	F6,	SF6,	AF6,	AF6,	ASF6,	CF6,
+  /* 65 - F7	*/	F7,	SF7,	AF7,	AF7,	ASF7,	CF7,
+  /* 66 - F8	*/	F8,	SF8,	AF8,	AF8,	ASF8,	CF8,
+  /* 67 - F9	*/	F9,	SF9,	AF9,	AF9,	ASF9,	CF9,
+  /* 68 - F10	*/	F10,	SF10,	AF10,	AF10,	ASF10,	CF10,
+  /* 69 - NumLock	*/	NLOCK,	NLOCK,	NLOCK,	NLOCK,	NLOCK,	NLOCK,
+  /* 70 - ScrLock */	SLOCK,	SLOCK,	SLOCK,	SLOCK,	SLOCK,	SLOCK,
+  /* 71 - Home	*/	HOME,	'7',	AHOME,	AHOME,	'7',	CHOME,	=
+
+  /* 72 - CurUp	*/	UP,	'8',	AUP,	AUP,	'8',	CUP,
+  /* 73 - PgUp	*/	PGUP,	'9',	APGUP,	APGUP,	'9',	CPGUP,
+  /* 74 - '-'	*/	NMIN,	'-',	ANMIN,	ANMIN,	'-',	CNMIN,
+  /* 75 - Left	*/	LEFT,	'4',	ALEFT,	ALEFT,	'4',	CLEFT,
+  /* 76 - MID	*/	MID,	'5',	AMID,	AMID,	'5',	CMID,
+  /* 77 - Right	*/	RIGHT,	'6',	ARIGHT,	ARIGHT,	'6',	CRIGHT,
+  /* 78 - '+'	*/	PLUS,	'+',	APLUS,	APLUS,	'+',	CPLUS,
+  /* 79 - End	*/	END,	'1',	AEND,	AEND,	'1',	CEND,
+  /* 80 - Down	*/	DOWN,	'2',	ADOWN,	ADOWN,	'2',	CDOWN,
+  /* 81 - PgDown	*/	PGDN,	'3',	APGDN,	APGDN,	'3',	CPGDN,
+  /* 82 - Insert	*/	INSRT,	'0',	AINSRT,	AINSRT,	'0',	CINSRT,
+  /* 83 - Delete	*/	0177,	'.',	A(0177),0177,	'.',	0177,
+  /* 84 - Enter	*/	C('M'),	C('M'),	CA('M'),C('M'),	C('M'),	C('J'),
+  /* 85 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 86 - ???	*/	'<',	'>',	A('<'),	'<',	'>',	C('@'),
+  /* 87 - F11	*/	F11,	SF11,	AF11,	AF11,	ASF11,	CF11,
+  /* 88 - F12	*/	F12,	SF12,	AF12,	AF12,	ASF12,	CF12,
+  /* 89 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 90 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 91 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 92 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 93 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 94 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 95 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 96 - EXT_KEY	*/	EXTKEY,	EXTKEY,	EXTKEY,	EXTKEY,	EXTKEY,	EXTKEY,
+  /* 97 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 98 - ???	*/	0,	0,	0,	0,	0,	0,
+  /* 99 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*100 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*101 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*102 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*103 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*104 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*105 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*106 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*107 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*108 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*109 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*110 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*111 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*112 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*113 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*114 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*115 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*116 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*117 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*118 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*119 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*120 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*121 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*122 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*123 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*124 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*125 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*126 - ???	*/	0,	0,	0,	0,	0,	0,
+  /*127 - ???	*/	0,	0,	0,	0,	0,	0
+  };
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1861946/+subscriptions
 
