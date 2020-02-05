@@ -7,115 +7,114 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E60CC352A1
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E672AC35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:34:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D957217BA
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1F4521741
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:34:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="sweoQXvg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D957217BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="I3N1/6Ow"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F4521741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=partner.samsung.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izKnL-0004CO-ID
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:32:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36807)
+	id 1izKp9-0006rK-Tn
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:34:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKjZ-0007kO-S0
+ id 1izKjZ-0007kN-S6
  for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKjX-0004qb-4H
+ id 1izKjX-0004qP-3l
  for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:49 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:50239)
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:50229)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKjW-0004gd-RN
+ id 1izKjW-0004eX-RK
  for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:47 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
  by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
- 20200205132844euoutp02116d1f150751f6d3ebfecc9992de7f0b~whKeZuFVE0896308963euoutp02U
- for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 13:28:44 +0000 (GMT)
+ 20200205132843euoutp02a187a439e7362049af8e18bdfb64e4e5~whKd0Q0hZ0765407654euoutp02f
+ for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 13:28:43 +0000 (GMT)
 DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
- 20200205132844euoutp02116d1f150751f6d3ebfecc9992de7f0b~whKeZuFVE0896308963euoutp02U
+ 20200205132843euoutp02a187a439e7362049af8e18bdfb64e4e5~whKd0Q0hZ0765407654euoutp02f
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1580909324;
- bh=5R4nrCcLd2rZPxuKYcgQNp55I3lWJgCy5Tih85uN1Ug=;
+ s=mail20170921; t=1580909323;
+ bh=03o3yCccCxhdD1rH9hs4xTIKjls4LwW1ZtXaMwsmbBM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=sweoQXvgJqpUrGgJJ63/L74+MWxD6em4HZhiINj/FRy3qt8xUEsqOlgMDdBrtlvdV
- WTdI1978YLSW3ISfDVttEowxIL+ZEoBsBtpfplyg95XrXhuGHvXcQAD+M4duwO/ZpP
- ypjysTtmik8XRqugfqNMkm7YcgDsnQrKcRFIZM7E=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
- eucas1p2.samsung.com (KnoxPortal) with ESMTP id
- 20200205132844eucas1p2d9932432436700319f96c83ed4f1a2ca~whKeOuWMf0081500815eucas1p2S;
- Wed,  5 Feb 2020 13:28:44 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
- eusmges3new.samsung.com (EUCPMTA) with SMTP id 0B.9F.60698.C03CA3E5; Wed,  5
- Feb 2020 13:28:44 +0000 (GMT)
+ b=I3N1/6OwpPVYBPaWq8O3ey9w6sRbSmafhgssocra/bhaji7/K2VAXai1euvXuY2wG
+ KIhPOi392idg3RumMXhbJjqcA4dRQUYYInsvnvGHlQblvfz+sbfgC6XBmBZC9WELWy
+ XOOf2GCtpT5f9x0e22gKLqyuxaeCpqtZEddVGCgo=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+ eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+ 20200205132843eucas1p19a8bb84801ce06848c8ac6d9430d829b~whKdli5tB2963229632eucas1p1d;
+ Wed,  5 Feb 2020 13:28:43 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+ eusmges1new.samsung.com (EUCPMTA) with SMTP id B6.1E.61286.B03CA3E5; Wed,  5
+ Feb 2020 13:28:43 +0000 (GMT)
 Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
- eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
- 20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938~whKdwwoMv0490104901eucas1p2B;
+ eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+ 20200205132843eucas1p11260d148e32a9663d0b472ce3ab01cbd~whKdNOnko2967829678eucas1p1R;
  Wed,  5 Feb 2020 13:28:43 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
  eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
- 20200205132843eusmtrp2e8398cbd8ac7d1dc8cef7b2528f8a628~whKdhuLZk2992629926eusmtrp2j;
+ 20200205132843eusmtrp2527c02a178f6cf6b09aab6bd2bea66f7~whKdMqp4Z3037330373eusmtrp2V;
  Wed,  5 Feb 2020 13:28:43 +0000 (GMT)
-X-AuditID: cbfec7f5-a29ff7000001ed1a-23-5e3ac30c2bd4
+X-AuditID: cbfec7f2-ef1ff7000001ef66-9e-5e3ac30bcffb
 Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
- eusmgms1.samsung.com (EUCPMTA) with SMTP id C1.00.08375.B03CA3E5; Wed,  5
+ eusmgms2.samsung.com (EUCPMTA) with SMTP id 69.FC.07950.B03CA3E5; Wed,  5
  Feb 2020 13:28:43 +0000 (GMT)
 Received: from AMDC3304.digital.local (unknown [106.120.51.21]) by
  eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
- 20200205132843eusmtip27c63528900359f12c6f9e1001ca689b6~whKdLqoQ83135731357eusmtip2X;
- Wed,  5 Feb 2020 13:28:43 +0000 (GMT)
+ 20200205132842eusmtip28f466d97de5ab873cf56af2d1730c8a2~whKc0jjrB0153301533eusmtip21;
+ Wed,  5 Feb 2020 13:28:42 +0000 (GMT)
 From: i.kotrasinsk@partner.samsung.com
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v3 2/9] memory: Support mmap offset for fd-backed memory
- regions
-Date: Wed,  5 Feb 2020 14:28:30 +0100
-Message-Id: <1580909317-23884-3-git-send-email-i.kotrasinsk@partner.samsung.com>
+Subject: [RFC PATCH v3 1/9] memory: Add function for finding flat memory ranges
+Date: Wed,  5 Feb 2020 14:28:29 +0100
+Message-Id: <1580909317-23884-2-git-send-email-i.kotrasinsk@partner.samsung.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580909317-23884-1-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEIsWRmVeSWpSXmKPExsWy7djP87o8h63iDJY0cFrsufCYzeLezZvM
- Fvu3/WO1mHPmAYvF8d4dLA6sHneu7WHzeHJtM5PHwXd7mDze77vK5rH95CSmANYoLpuU1JzM
- stQifbsEroylC08yFcz1qLh08TVTA+M7/S5GTg4JAROJXY9fs3UxcnEICaxglFj0dz4rSEJI
- 4AujxOLleRCJz4wSDy8dYYTp+PhhCitEYjmjxJ+LX9khHKCOb6sfsIBUsQmoSew88hmsQ0RA
- UuJ312lmkCJmgQZGiUfXz4IlhAXCJJpu32IDsVkEVCUWHZkDZvMKBEgs7zzPDLFOTuLmuU4w
- m1MgUOLysymsEPHnbBIXH8VA2C4SHQd2skHYwhKvjm9hh7BlJP7vnM8EYddLtNzZwQRyhIRA
- B6NE38rpUA3WEl82LAW6mgPoOk2J9bugAeMosXPVKzaQsIQAn8SNt4IgYWYgc9K26cwQYV6J
- jjYhiGo9ie4nN5lgti5rfMQCYXtI/Lz6kAkSPksYJT5s7GabwCg/C2HZAkbGVYziqaXFuemp
- xcZ5qeV6xYm5xaV56XrJ+bmbGIEp4fS/4193MO77k3SIUYCDUYmHN2CCZZwQa2JZcWXuIUYJ
- DmYlEd7z+kAh3pTEyqrUovz4otKc1OJDjNIcLErivMaLXsYKCaQnlqRmp6YWpBbBZJk4OKUa
- GG9z37qgOu2DU1FUdMDEY/kesor+L6p27b5a78JzxO0Y4/X0I7VJ4k/Ps7Zwr2izir76M+Dh
- zaXL55lG6pdEzZ942PLQ12VTWmoNBCZcn9jel2cR0jfj7qsDYXemq7OVtzocFJx7pdf+T1UJ
- 4/1iiRcBm6f9e3qhWKqeg+V7/oODOyaurp7M+FyJpTgj0VCLuag4EQCCfqgZBQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKLMWRmVeSWpSXmKPExsVy+t/xe7rch63iDO6eVrHYc+Exm8W9mzeZ
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrIIsWRmVeSWpSXmKPExsWy7djPc7rch63iDM4cVbXYc+Exm8W9mzeZ
+ LfZv+8dqMefMAxaL4707WBxYPe5c28Pm8eTaZiaPg+/2MHm833eVzWP7yUlMAaxRXDYpqTmZ
+ ZalF+nYJXBktDy8zF3zRrDi0fBJjA+NcuS5GTg4JAROJT6s+snUxcnEICaxglNj+8QELhPOF
+ UeJa7xco5zOjRPOOw0wwLU8WnmaGSCxnlLizcBUrXMu7dffYQKrYBNQkdh75zAhiiwhISvzu
+ guhgFmhglHh0/SxQgoNDWCBQ4uE1L5AaFgFVibvzZoPV8woESDQcms4IsU1O4ua5TmYQmxOo
+ /PKzKWDLJAQes0lsvLWICWSOhICLxMErJRD1whKvjm9hh7BlJP7vnA91db1Ey50dTBC9HYwS
+ fSuns0EkrCW+bFjKAjKHWUBTYv0ufYiwo8SL6RtYIMbzSdx4KwgSZgYyJ22bzgwR5pXoaBOC
+ qNaT6H5ykwlm67LGR1CdHhJvf0GDagmjxJIdT5knMMrPQti1gJFxFaN4amlxbnpqsWFearle
+ cWJucWleul5yfu4mRmBCOP3v+KcdjF8vJR1iFOBgVOLhXTHJMk6INbGsuDL3EKMEB7OSCO95
+ faAQb0piZVVqUX58UWlOavEhRmkOFiVxXuNFL2OFBNITS1KzU1MLUotgskwcnFINjCv7Zc80
+ S+36o+P1OvvQG4MtHpUbLvW1f5jqu82gK0J9mjjfXxvp1/p7BYM8uVYcaZbr3RU68bxNb727
+ R3t0mK338r3Lfy3bxOs/6cfPuRWZ3k//BQW90Z9SdM7gifYx1zwl+e3/9mosU0jndJvlP+3C
+ 897rXyd/OeIoIjllY+iiXO63dwt3yCuxFGckGmoxFxUnAgAtt91QBAMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKLMWRmVeSWpSXmKPExsVy+t/xe7rch63iDM7P5LPYc+Exm8W9mzeZ
  LfZv+8dqMefMAxaL4707WBxYPe5c28Pm8eTaZiaPg+/2MHm833eVzWP7yUlMAaxRejZF+aUl
- qQoZ+cUltkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF+nYJehlLF55kKpjrUXHp
- 4mumBsZ3+l2MnBwSAiYSHz9MYe1i5OIQEljKKHGx4RgLREJG4sfpNWwQtrDEn2tdbBBFnxgl
- Ps1pZAdJsAmoSew88pkRxBYRkJT43XWaGaSIWaCFUeLZk3YmkISwQIjE1IkPwCaxCKhKLDoy
- B8zmFQiQWN55nhlig5zEzXOdYDanQKDE5WcgJ3ECbQuQeD3xCvMERr4FjAyrGEVSS4tz03OL
- DfWKE3OLS/PS9ZLzczcxAoN027Gfm3cwXtoYfIhRgINRiYd3xSTLOCHWxLLiytxDjBIczEoi
- vOf1gUK8KYmVValF+fFFpTmpxYcYTYGOmsgsJZqcD4ygvJJ4Q1NDcwtLQ3Njc2MzCyVx3g6B
- gzFCAumJJanZqakFqUUwfUwcnFINjIwSf2PMRFcvkPfU+nzxwpNVss/+7T/7cZHpN5Z5D/4H
- ucSXprxLbKvf9cWWpUB3UfADkQNLty9LVeWxvXA5VWGG7M/0tzu4r82VMYx8n3Hz/APei4UX
- 2BcILxfvqrH6cuIvT1jJvrWWMy418FwxUthwPWTp4oVlCpu9X6iuDz6oz96xYZLfSlUlluKM
- REMt5qLiRADg/K16aAIAAA==
-X-CMS-MailID: 20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938
+ qQoZ+cUltkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF+nYJehktDy8zF3zRrDi0
+ fBJjA+NcuS5GTg4JAROJJwtPM3cxcnEICSxllHjX84EFIiEj8eP0GjYIW1jiz7UuNoiiT4wS
+ L059BitiE1CT2HnkMyOILSIgKfG7C2ISs0ALo8SzJ+1MIAlhAX+Jfae+sIPYLAKqEnfnzQZr
+ 4BUIkGg4NJ0RYoOcxM1zncwgNqdAoMTlZ1NYQWwhoJrXE68wT2DkW8DIsIpRJLW0ODc9t9hI
+ rzgxt7g0L10vOT93EyMwSLcd+7llB2PXu+BDjAIcjEo8vAETLOOEWBPLiitzDzFKcDArifCe
+ 1wcK8aYkVlalFuXHF5XmpBYfYjQFOmois5Rocj4wgvJK4g1NDc0tLA3Njc2NzSyUxHk7BA7G
+ CAmkJ5akZqemFqQWwfQxcXBKNTDar680nZVf735M+NQBNuWVd0xz9M+ac2pqP4me0HMm2kfj
+ X5L2kgSF3Q1dBot/KjgIJE9+dJ+tVmPqf9kZLVcfu8ZOOBrufNaIJztvyyXFn03y5/5c+2F/
+ Prnm1K4Wfg1ptYv7J/qGqalwcfH/WHa03/BeSV323u8mNa85Q2QObMmYsP9HloMSS3FGoqEW
+ c1FxIgBeHjPAaAIAAA==
+X-CMS-MailID: 20200205132843eucas1p11260d148e32a9663d0b472ce3ab01cbd
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938
+X-RootMTR: 20200205132843eucas1p11260d148e32a9663d0b472ce3ab01cbd
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938
+X-CMS-RootMailID: 20200205132843eucas1p11260d148e32a9663d0b472ce3ab01cbd
 References: <1580909317-23884-1-git-send-email-i.kotrasinsk@partner.samsung.com>
- <CGME20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938@eucas1p2.samsung.com>
+ <CGME20200205132843eucas1p11260d148e32a9663d0b472ce3ab01cbd@eucas1p1.samsung.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 210.118.77.12
 X-BeenThere: qemu-devel@nongnu.org
@@ -138,217 +137,156 @@ Sender: "Qemu-devel"
 
 From: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
 
-The memexpose device will receive shared memory from another VM and map
-parts of it as memory regions. For that, we need to be able to mmap the
-region at an offset from shared memory's start.
+Given an address this lets us find the largest contiguous memory range
+at that address.
 
 Signed-off-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
 ---
- backends/hostmem-memfd.c  |  2 +-
- exec.c                    | 10 ++++++----
- hw/misc/ivshmem.c         |  3 ++-
- include/exec/memory.h     |  2 ++
- include/exec/ram_addr.h   |  2 +-
- include/qemu/mmap-alloc.h |  1 +
- memory.c                  |  3 ++-
- util/mmap-alloc.c         |  7 ++++---
- util/oslib-posix.c        |  2 +-
- 9 files changed, 20 insertions(+), 12 deletions(-)
+ include/exec/memory.h | 19 +++++++++++++
+ memory.c              | 79 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 97 insertions(+), 1 deletion(-)
 
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index 26070b4..7cd6c53 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -56,7 +56,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
- 
-     name = host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
--                                   name, backend->size,
-+                                   name, backend->size, 0,
-                                    backend->share, fd, errp);
-     g_free(name);
- }
-diff --git a/exec.c b/exec.c
-index 67e520d..afcb3c9 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1839,6 +1839,7 @@ static int file_ram_open(const char *path,
- 
- static void *file_ram_alloc(RAMBlock *block,
-                             ram_addr_t memory,
-+                            size_t mmap_offset,
-                             int fd,
-                             bool truncate,
-                             Error **errp)
-@@ -1892,7 +1893,7 @@ static void *file_ram_alloc(RAMBlock *block,
-         perror("ftruncate");
-     }
- 
--    area = qemu_ram_mmap(fd, memory, block->mr->align,
-+    area = qemu_ram_mmap(fd, memory, mmap_offset, block->mr->align,
-                          block->flags & RAM_SHARED, block->flags & RAM_PMEM);
-     if (area == MAP_FAILED) {
-         error_setg_errno(errp, errno,
-@@ -2314,7 +2315,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
- 
- #ifdef CONFIG_POSIX
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
--                                 uint32_t ram_flags, int fd,
-+                                 uint32_t ram_flags, int fd, size_t mmap_offset,
-                                  Error **errp)
- {
-     RAMBlock *new_block;
-@@ -2360,7 +2361,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-     new_block->used_length = size;
-     new_block->max_length = size;
-     new_block->flags = ram_flags;
--    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
-+    new_block->host = file_ram_alloc(new_block, size, mmap_offset, fd,
-+                                     !file_size, errp);
-     if (!new_block->host) {
-         g_free(new_block);
-         return NULL;
-@@ -2390,7 +2392,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-         return NULL;
-     }
- 
--    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
-+    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, errp);
-     if (!block) {
-         if (created) {
-             unlink(mem_path);
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 1a0fad7..4967d4f 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -492,7 +492,8 @@ static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
- 
-     /* mmap the region and map into the BAR2 */
-     memory_region_init_ram_from_fd(&s->server_bar2, OBJECT(s),
--                                   "ivshmem.bar2", size, true, fd, &local_err);
-+                                   "ivshmem.bar2", size, 0, true, fd,
-+                                   &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index ac09221..c5554cc 100644
+index e85b7de..ac09221 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -906,6 +906,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
-  * @owner: the object that tracks the region's reference count
-  * @name: the name of the region.
-  * @size: size of the region.
-+ * @mmap_offset: offset at which the fd is to be mapped.
-  * @share: %true if memory must be mmaped with the MAP_SHARED flag
-  * @fd: the fd to mmap.
-  * @errp: pointer to Error*, to store an error if it happens.
-@@ -917,6 +918,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-                                     struct Object *owner,
-                                     const char *name,
-                                     uint64_t size,
-+                                    uint64_t mmap_offset,
-                                     bool share,
-                                     int fd,
-                                     Error **errp);
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 5e59a3d..1e85362 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -120,7 +120,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-                                    uint32_t ram_flags, const char *mem_path,
-                                    Error **errp);
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
--                                 uint32_t ram_flags, int fd,
-+                                 uint32_t ram_flags, int fd, size_t mmap_offset,
-                                  Error **errp);
+@@ -1915,6 +1915,25 @@ MemoryRegionSection memory_region_find(MemoryRegion *mr,
+                                        hwaddr addr, uint64_t size);
  
- RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index e786266..bd95504 100644
---- a/include/qemu/mmap-alloc.h
-+++ b/include/qemu/mmap-alloc.h
-@@ -23,6 +23,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
-  */
- void *qemu_ram_mmap(int fd,
-                     size_t size,
-+                    size_t mmap_offset,
-                     size_t align,
-                     bool shared,
-                     bool is_pmem);
+ /**
++ * memory_region_find_flat_range: translate an address/size relative to
++ * a MemoryRegion into a FlatRange containing it.
++ *
++ * Returns a #MemoryRegionSection that describes this FlatRange.
++ * It will have the following characteristics:
++ * - @size = 0 iff no containing FlatRange was found
++ * - @mr is non-%NULL iff a containing FlatRange was found
++ *
++ * Remember that in the return value the @offset_within_region is
++ * relative to the returned region (in the .@mr field), not to the
++ * @mr argument.
++ *
++ * @mr: a MemoryRegion within which @addr is a relative address
++ * @addr: start of the area within @as to be searched
++ * @size: size of the area to be searched
++ */
++MemoryRegionSection memory_region_find_flat_range(MemoryRegion *mr,
++                                                  hwaddr addr, uint64_t size);
++/**
+  * memory_global_dirty_log_sync: synchronize the dirty log for all memory
+  *
+  * Synchronizes the dirty page log for all address spaces.
 diff --git a/memory.c b/memory.c
-index 0973c44..93c2cd1 100644
+index aeaa8dc..0973c44 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -1584,6 +1584,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-                                     struct Object *owner,
-                                     const char *name,
-                                     uint64_t size,
-+                                    uint64_t mmap_offset,
-                                     bool share,
-                                     int fd,
-                                     Error **errp)
-@@ -1595,7 +1596,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-     mr->destructor = memory_region_destructor_ram;
-     mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
-                                            share ? RAM_SHARED : 0,
--                                           fd, &err);
-+                                           fd, mmap_offset, &err);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-     if (err) {
-         mr->size = int128_zero();
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 27dcccd..191db45 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -84,6 +84,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+@@ -2523,6 +2523,25 @@ static FlatRange *flatview_lookup(FlatView *view, AddrRange addr)
+                    sizeof(FlatRange), cmp_flatrange_addr);
+ }
  
- void *qemu_ram_mmap(int fd,
-                     size_t size,
-+                    size_t mmap_offset,
-                     size_t align,
-                     bool shared,
-                     bool is_pmem)
-@@ -127,7 +128,7 @@ void *qemu_ram_mmap(int fd,
-     flags = MAP_PRIVATE | MAP_ANONYMOUS;
- #endif
- 
--    guardptr = mmap(0, total, PROT_NONE, flags, guardfd, 0);
-+    guardptr = mmap(0, total, PROT_NONE, flags, guardfd, mmap_offset);
- 
-     if (guardptr == MAP_FAILED) {
-         return MAP_FAILED;
-@@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
-     offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
- 
-     ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
--               flags | map_sync_flags, fd, 0);
-+               flags | map_sync_flags, fd, mmap_offset);
- 
-     if (ptr == MAP_FAILED && map_sync_flags) {
-         if (errno == ENOTSUP) {
-@@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
-          * we will remove these flags to handle compatibility.
-          */
-         ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
--                   flags, fd, 0);
-+                   flags, fd, mmap_offset);
-     }
- 
-     if (ptr == MAP_FAILED) {
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 5a291cc..e4ffdc1 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -205,7 +205,7 @@ void *qemu_memalign(size_t alignment, size_t size)
- void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
++static int cmp_flatrange_addr_containing(const void *addr_, const void *fr_)
++{
++    const AddrRange *addr = addr_;
++    const FlatRange *fr = fr_;
++
++    if (int128_le(addr->start, fr->addr.start)) {
++        return -1;
++    } else if (int128_ge(addrrange_end(*addr), addrrange_end(fr->addr))) {
++        return 1;
++    }
++    return 0;
++}
++
++static FlatRange *flatview_lookup_containing(FlatView *view, AddrRange addr)
++{
++    return bsearch(&addr, view->ranges, view->nr,
++                   sizeof(FlatRange), cmp_flatrange_addr_containing);
++}
++
+ bool memory_region_is_mapped(MemoryRegion *mr)
  {
-     size_t align = QEMU_VMALLOC_ALIGN;
--    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
-+    void *ptr = qemu_ram_mmap(-1, size, 0, align, shared, false);
+     return mr->container ? true : false;
+@@ -2532,7 +2551,8 @@ bool memory_region_is_mapped(MemoryRegion *mr)
+  * returned region.  It must be called from an RCU critical section.
+  */
+ static MemoryRegionSection memory_region_find_rcu(MemoryRegion *mr,
+-                                                  hwaddr addr, uint64_t size)
++                                                  hwaddr addr,
++                                                  uint64_t size)
+ {
+     MemoryRegionSection ret = { .mr = NULL };
+     MemoryRegion *root;
+@@ -2576,6 +2596,50 @@ static MemoryRegionSection memory_region_find_rcu(MemoryRegion *mr,
+     return ret;
+ }
  
-     if (ptr == MAP_FAILED) {
-         return NULL;
++/*
++ * Same as memory_region_find_flat_range, but it does not add a reference to
++ * the returned region.  It must be called from an RCU critical section.
++ */
++static MemoryRegionSection memory_region_find_flat_range_rcu(MemoryRegion *mr,
++                                                             hwaddr addr,
++                                                             uint64_t size)
++{
++    MemoryRegionSection ret = { .size = int128_zero(), .mr = NULL };
++    MemoryRegion *root;
++    AddressSpace *as;
++    AddrRange range;
++    FlatView *view;
++    FlatRange *fr;
++
++    addr += mr->addr;
++    for (root = mr; root->container; ) {
++        root = root->container;
++        addr += root->addr;
++    }
++
++    as = memory_region_to_address_space(root);
++    if (!as) {
++        return ret;
++    }
++    range = addrrange_make(int128_make64(addr), int128_make64(size));
++
++    view = address_space_to_flatview(as);
++    fr = flatview_lookup_containing(view, range);
++    if (!fr) {
++        return ret;
++    }
++
++    ret.mr = fr->mr;
++    ret.fv = view;
++    range = fr->addr;
++    ret.offset_within_region = fr->offset_in_region;
++    ret.size = range.size;
++    ret.offset_within_address_space = int128_get64(range.start);
++    ret.readonly = fr->readonly;
++    ret.nonvolatile = fr->nonvolatile;
++    return ret;
++}
++
+ MemoryRegionSection memory_region_find(MemoryRegion *mr,
+                                        hwaddr addr, uint64_t size)
+ {
+@@ -2588,6 +2652,19 @@ MemoryRegionSection memory_region_find(MemoryRegion *mr,
+     return ret;
+ }
+ 
++MemoryRegionSection memory_region_find_flat_range(MemoryRegion *mr,
++                                                  hwaddr addr, uint64_t size)
++{
++    MemoryRegionSection ret;
++    rcu_read_lock();
++    ret = memory_region_find_flat_range_rcu(mr, addr, size);
++    if (ret.mr) {
++        memory_region_ref(ret.mr);
++    }
++    rcu_read_unlock();
++    return ret;
++}
++
+ bool memory_region_present(MemoryRegion *container, hwaddr addr)
+ {
+     MemoryRegion *mr;
 -- 
 2.7.4
 
