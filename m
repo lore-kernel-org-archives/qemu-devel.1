@@ -2,77 +2,77 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74505C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 22:20:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED385C35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 22:24:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EE0420730
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 22:20:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B282A2072B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 22:24:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9OJ0URj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EE0420730
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dg8wdQlH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B282A2072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izT1z-0005JM-7S
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 17:20:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45550)
+	id 1izT69-0006uY-RJ
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 17:24:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1izT1M-0004nW-TU
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:19:45 -0500
+ (envelope-from <eblake@redhat.com>) id 1izT5W-0006QO-MS
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:24:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1izT1L-0004AK-BO
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:19:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30278
+ (envelope-from <eblake@redhat.com>) id 1izT5V-0005gU-On
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:24:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46799
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1izT1L-0004A4-8A
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:19:43 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1izT5V-0005ey-L1
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:24:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580941182;
+ s=mimecast20190719; t=1580941441;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uyKUHiO084bMk2tEZj0vefGlP6XD6yCJjT9pdbM41lI=;
- b=K9OJ0URjcMJ4sPJ1Dn84uZT3skY/J4cCNBUpQmkB+wOs6vir3Bts4ADlG7ngCK2eR5T+lz
- xWNJKwE0E6i2xMBgzJ6Ttb0fSM+yIpKTc93n5vg7zAcBrQh/YUVLvmYnGMjoDWmslY4tzp
- ysyRIsVcvHLOcjVWx6JfFcDp4M9TWfA=
+ bh=vV/+Is+xjv+g8bJqK/HavixW/X96PGTBiTMLG9Z0rf8=;
+ b=Dg8wdQlHG4rGPTtL9o8Geyd3za+987n7cflygLuL2IBmOaEHE+oOgsQhE6zwb5pIuRj6vY
+ zkJScpszQPcM/7RxV79klkk5lkJZuQzU4DUckWqdbLp1Xy4AWHL0hnP4X34smsH0/lyN+r
+ wAhwR057q/Bwr91p/p9RYY4ds0BpEGw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-rCVBkEfdN9WujIHXVvOcnQ-1; Wed, 05 Feb 2020 17:19:38 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-334-7ne8X5hHPymT-xRPax0WGA-1; Wed, 05 Feb 2020 17:23:57 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCBCC100551A;
- Wed,  5 Feb 2020 22:19:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71AE18010E6;
+ Wed,  5 Feb 2020 22:23:56 +0000 (UTC)
 Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 57FA184DB8;
- Wed,  5 Feb 2020 22:19:37 +0000 (UTC)
-Subject: Re: [PATCH v2 21/33] block: Drop child_format
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200204170848.614480-1-mreitz@redhat.com>
- <20200204170848.614480-22-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5202860BF7;
+ Wed,  5 Feb 2020 22:23:50 +0000 (UTC)
+Subject: Re: [PATCH 1/5] ui: add show-cursor option
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200205110356.3491-1-kraxel@redhat.com>
+ <20200205110356.3491-2-kraxel@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <ca18a893-dc46-1249-f713-cf30a1e5ab38@redhat.com>
-Date: Wed, 5 Feb 2020 16:19:36 -0600
+Message-ID: <cc184d03-1dff-6b41-19e9-f009d02ab1e9@redhat.com>
+Date: Wed, 5 Feb 2020 16:23:49 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200204170848.614480-22-mreitz@redhat.com>
+In-Reply-To: <20200205110356.3491-2-kraxel@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: rCVBkEfdN9WujIHXVvOcnQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 7ne8X5hHPymT-xRPax0WGA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -90,25 +90,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, jpewhacker@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/4/20 11:08 AM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
+On 2/5/20 5:03 AM, Gerd Hoffmann wrote:
+> When enabled forces showing a the mouse cursor, i.e. do
 
-Sparse message, but the diffstat makes it obvious that it is ripping out 
-now-unused code, so there's not much more to say.
+When enabled, this forces showing the mouse...
 
->   block.c                   | 29 -----------------------------
->   include/block/block_int.h |  1 -
->   2 files changed, 30 deletions(-)
+> nowallow the guest to hide it.  Defaults to off.
+
+s/nowallow/not allow/
+
 > 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>   qapi/ui.json | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/qapi/ui.json b/qapi/ui.json
+> index e04525d8b44b..7c516a455631 100644
+> --- a/qapi/ui.json
+> +++ b/qapi/ui.json
+> @@ -1144,6 +1144,7 @@
+>   # @type:          Which DisplayType qemu should use.
+>   # @full-screen:   Start user interface in fullscreen mode (default: off).
+>   # @window-close:  Allow to quit qemu with window close button (default: on).
+> +# @show-cursor:   Force showing the mouse cursor (default: off).
+>   # @gl:            Enable OpenGL support (default: off).
+>   #
+>   # Since: 2.12
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Missing a '(since 5.0)' tag.
+
+> @@ -1153,6 +1154,7 @@
+>     'base'    : { 'type'           : 'DisplayType',
+>                   '*full-screen'   : 'bool',
+>                   '*window-close'  : 'bool',
+> +                '*show-cursor'   : 'bool',
+>                   '*gl'            : 'DisplayGLMode' },
+>     'discriminator' : 'type',
+>     'data'    : { 'gtk'            : 'DisplayGTK',
+> 
 
 -- 
 Eric Blake, Principal Software Engineer
