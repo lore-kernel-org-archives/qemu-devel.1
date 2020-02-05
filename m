@@ -2,90 +2,79 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5428C35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4903EC35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:17:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89A502082E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:16:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15B3A2082E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:17:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOAiXqCN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89A502082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CkVq9cH6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15B3A2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izIfo-0002Ye-OW
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 06:16:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50960)
+	id 1izIgg-0003VH-9a
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 06:17:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1izIfA-00029h-Hx
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:16:09 -0500
+ (envelope-from <jtomko@redhat.com>) id 1izIfm-0002eI-Tu
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:16:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1izIf9-0003Gj-93
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:16:08 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:52293)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1izIf8-0003GE-Vu
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:16:07 -0500
-Received: by mail-wm1-x329.google.com with SMTP id p9so2026438wmc.2
- for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 03:16:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=TsjkVIE55b4/FN35k7YjC7lFTodw1t6xrGOJ744UyRs=;
- b=WOAiXqCNrpOwXlJVMSAGU8ucc0ja1I8vrMWwkeFcp5iBC2yTwAaQA5l7KT2RSRbP8+
- 0tzwbKI4SLN1FPfiA62zZ3Cz4seB8h1/NI4V6oDBb/nqKNz4BGqhlc8R7jKb2pLj+xcr
- Bgewypj4S14YQfg4h9zsB98k8dQQlIYQWegIHweukcxFuvVEcZUiVRrMe6PrlFJdVQT4
- uQN6TBtmKA2lPwSAvQe3tu1EkRthRG88mFyf+glLdpCIdyiWs8t1LqXI+V8+z3DETVWY
- vYa2vwc3TSeaVLAQd79jbOJtl4dnY+HurIF4YKmO3PriRwZqlPXVb1bTsoz7C6GmTjtG
- cp3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=TsjkVIE55b4/FN35k7YjC7lFTodw1t6xrGOJ744UyRs=;
- b=mZ+XbncbQj0Tb7xpej0unZZRZCXbFcH/HGRuCPCuWakEPCI/ZAEX0EWlJO5n6KjpOh
- 64hldMVez9RjgSVbWMPMwNx3LWV+EPXJJF+zjx6W/PCve1M9wj9Zn1H6AzYW7NdsMkIK
- 1mrnyJzqaDpJxqky+8pS7eRgfEU6wqc6mb/YHy0rH8IsLoKBduj0COrzxnWhfbf/Fpyd
- qni+Lp+fxYyzg1kkErSgh6LDEtPRBBdPjjhFJbDwVDhGy5CoObKQrLQnNI6sN0EUXJcA
- 7DWnqGSdCHsuULPg+VhZ5xbBVaD+HdzWqiO1hNK6kettQVqm7pSAC0tFOIQZqIByz7DW
- Ssgw==
-X-Gm-Message-State: APjAAAXbR3LJ19NDFvMfZGsF+znKReI7zcRad3mHS8lBrG7rxt3oXrkt
- 4gmiDZgjIQsHfO6zyNy7xy4=
-X-Google-Smtp-Source: APXvYqyDrKzukea/tA5cshpUZNo4UuQyb0V0d/Sff0XDngO2uzJeJhgBd/hmhtdu+cHih7X/2WDFsw==
-X-Received: by 2002:a1c:a584:: with SMTP id o126mr4946117wme.163.1580901365565; 
- Wed, 05 Feb 2020 03:16:05 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id g7sm33979504wrq.21.2020.02.05.03.16.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 05 Feb 2020 03:16:04 -0800 (PST)
-Date: Wed, 5 Feb 2020 11:16:03 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Subject: Re: [GSoC/Outreachy QEMU proposal] Extend support for ioctls in QEMU
- linux-user mode
-Message-ID: <20200205111603.GD58062@stefanha-x1.localdomain>
-References: <CAL1e-=j5WJkV=X+KkfBuS3pjf6z3aJrtu4xpYeVbjEUYiWxxTQ@mail.gmail.com>
- <CAFEAcA8E9s2wZWVxanUDXu=5qcjn6XY5_6t8vUO+LjuJnA7nOQ@mail.gmail.com>
- <CAL1e-=j=nVJd9Q3JmZsimgSPy=noYhqE8hz4r5RjwgTPw9WwuA@mail.gmail.com>
- <CAFEAcA_FbFub4_z+e0YPMT8UTbm1SWmfovkKnLKODvMZMfGa+A@mail.gmail.com>
- <CAL1e-=jMnEpOw+fOqGfY2+uiUTYr0zgnMZxpVUK2Y=PA3YAFMQ@mail.gmail.com>
+ (envelope-from <jtomko@redhat.com>) id 1izIfl-0003RE-8c
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:16:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53962
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1izIfl-0003Qs-4c
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:16:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580901404;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=w/DbaBf7WPLM1IYy9qROL2ypWnvELw1W+/y8/wbiqJQ=;
+ b=CkVq9cH6nVbU1rW1lGCmf9nQLud3vle+5bh0/EmBMna1znHbN7Zn9/zJkukBACYDbpYgP5
+ CaQRkyIw21ps3Z06MBXJIGsBbEuNpi2CMsOGErywfMVPS1ugZ2fQDwvCNqiJwN8pTy6sFj
+ BDJcfL2adlqqXWpZpfC6VAxW5QAKG28=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-101-D0RNwZmAOTCr9Fv9jtZf3g-1; Wed, 05 Feb 2020 06:16:41 -0500
+X-MC-Unique: D0RNwZmAOTCr9Fv9jtZf3g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74B5F8018CD;
+ Wed,  5 Feb 2020 11:16:40 +0000 (UTC)
+Received: from lpt (ovpn-200-44.brq.redhat.com [10.40.200.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EE3355DA7B;
+ Wed,  5 Feb 2020 11:16:33 +0000 (UTC)
+Date: Wed, 5 Feb 2020 12:16:30 +0100
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH 5/5] ui: deprecate legacy -show-cursor option
+Message-ID: <20200205111630.GA26464@lpt>
+References: <20200205110356.3491-1-kraxel@redhat.com>
+ <20200205110356.3491-6-kraxel@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20200205110356.3491-6-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Qrgsu6vtpU/OV/zm"
+ protocol="application/pgp-signature"; boundary="uAKRQypu60I7Lcqm"
 Content-Disposition: inline
-In-Reply-To: <CAL1e-=jMnEpOw+fOqGfY2+uiUTYr0zgnMZxpVUK2Y=PA3YAFMQ@mail.gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,41 +86,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, jpewhacker@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---Qrgsu6vtpU/OV/zm
-Content-Type: text/plain; charset=us-ascii
+--uAKRQypu60I7Lcqm
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 28, 2020 at 09:48:33PM +0100, Aleksandar Markovic wrote:
-> How about this:
+On Wed, Feb 05, 2020 at 12:03:56PM +0100, Gerd Hoffmann wrote:
+>Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>---
+> vl.c                 | 2 ++
+> qemu-deprecated.texi | 5 +++++
+> 2 files changed, 7 insertions(+)
+>
 
-Thank you!  I have posted the idea here:
+libvirt does not use -show-cursor
 
-https://wiki.qemu.org/Google_Summer_of_Code_2020#Extend_linux-user_syscalls_and_ioctls
+Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
 
-Stefan
+Jano
 
---Qrgsu6vtpU/OV/zm
+--uAKRQypu60I7Lcqm
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl46o/MACgkQnKSrs4Gr
-c8g+xwf/Tjn5M0u05nrHajpRUqj4gJ5kBw04ll0VrK/bD3u+OXSbHRR7T8UdkCqA
-EavTIC3sOueXkzLH0BDpKmHTyGvTM2+aFoim4X0pRhzKbS0WMoNfMcsg6oIejLVq
-zwNRTPm/3RRP8M2XAJ5dKgzHpHJWeA9crDIM0DHtPfaR3/g+KBitdH5WopfGAkIz
-2MiXclm8h+iwkorxoBf3h9/t7Yw/o9o60ywUtiq2d/lM+9ZqSoEQdU6+vEjQwHyx
-+zUKiMTqYIs/owwTVgJu/4LvvAYfxFh1ge3oR3qB0lpIIwh5trnpEz4WNKbxnMcg
-75Um/gfw6U/zxOPEU2SNxpba9mgwWg==
-=jaZP
+iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl46pAoACgkQ+YPwO/Ma
+t50fsAf+JjkV+x3bjjaQ3sYGcLkE0KSKe7mY2010aTsssNoWGZEaW4C8LxCwHo5q
+URaWAnzMXpsjQgHmg7tzZUWhNqc6Bsax50eqyHagJNhHBo1JLWL6m/wAYOv41T2Y
+d+rvRpcGhh3tWVQfUWjZfB/p67m4qQWUliDF5dQgrxuKp4cmRGLkpCrpkRzJpyMd
+HB6p+aOnsYJqoeNxm48jROZO4EiCSAamL7Dd8kFVdCJuv/V0EHmlzmwOztkLshcD
+9DJI/a8QQKEvoNq71yYzPKiy/X52FsxdvqyXRNaXhnvTVGcZ7iiE4S/GHbthLFAm
+0Nz3dyxBcEXx+TqXPR6ZvSP7YaTRMQ==
+=+anq
 -----END PGP SIGNATURE-----
 
---Qrgsu6vtpU/OV/zm--
+--uAKRQypu60I7Lcqm--
+
 
