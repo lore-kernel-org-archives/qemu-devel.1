@@ -2,85 +2,81 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 564B9C35249
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 03:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D09CC35249
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 03:18:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2211A2085B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 03:10:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E41F2085B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 03:18:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OoSnevlR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2211A2085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C3Z/hI11"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E41F2085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izB4z-0004a5-6s
-	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 22:10:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44002)
+	id 1izBCb-0006VT-B3
+	for qemu-devel@archiver.kernel.org; Tue, 04 Feb 2020 22:18:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48997)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shan.gavin@gmail.com>) id 1izB4J-00048t-Ez
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 22:09:36 -0500
+ (envelope-from <jasowang@redhat.com>) id 1izBBu-00064S-3Q
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 22:17:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shan.gavin@gmail.com>) id 1izB4H-0006nH-DE
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 22:09:35 -0500
-Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:44683)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <shan.gavin@gmail.com>)
- id 1izB4F-0006g0-7k; Tue, 04 Feb 2020 22:09:31 -0500
-Received: by mail-qv1-xf42.google.com with SMTP id n8so442188qvg.11;
- Tue, 04 Feb 2020 19:09:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0PE2uu4ZBM2cwypMrN5QyWKooyeC7GQaJC62Y5Zgbc4=;
- b=OoSnevlRXNwVaZtJd/vmiaRJFn/Pt6OxAKuN+IWYTuMyPyB2rxjfSFamFs5qbci0Xb
- 6PuWQDoY4ZTpOMFCmZ+Yw5Li7Bl6AGVwlUjx56QoXzUYI28nGEl8XLPc5TntrbyFNRGx
- YqCfJB7oPjv6OoXzRpNGxiZz96ojQfeT/CZGwSx331WGF/AtosuqTFh2MjyqB+8x3TZh
- pSJhaxrSuWX/TQpxmxUorqMqLtJvaaVwSQQIQ2i3NPNSXgsGyGm0OZZ51HjIZY1aGJrc
- k2D3qFb6lPdWw/Y96oFCR6DS2rVQbDme0lmWDaxh8/BtEDwNF/K6qaSDicIwedvrErZu
- h1pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0PE2uu4ZBM2cwypMrN5QyWKooyeC7GQaJC62Y5Zgbc4=;
- b=mMrHiDDew1dXq7syGIwTEVEeIJNjeJhYrqJxEWC+/w4BhMx/15svOSdhhAuE5XoGSH
- BeEABlsT3ZNxW36EtshIB/3ohAovcwpyjtQyW6fkStEYvLd6fzjFXW2xLViCGgXco9ac
- 1xd/7hundoMAkyRK/64jGcAvyoHtlySAk0bPv1L6qGhPd6NJ8GyGQQllHHcONN5rshoH
- fpHu6NZ5EpbaxymVlnPX4gG9WcgWAvmfvQqrUAK8FruP482gT36fzxKHUaghYl0IbCVv
- 4gxDp0bf8hC9uURIydapEazlasKeFTF91rMa9uTYEset1u+2CG9gKWOqQISyImY73fCR
- PCwA==
-X-Gm-Message-State: APjAAAXARnpgzqHfkOjcTBeFes2MboYHhy3bhRDmq2AipBmsXSw0GOr1
- Q2r69BSh2PS68yWuP2VQzfqp4OuVJhB65rvS0zA=
-X-Google-Smtp-Source: APXvYqzuvjw6pkrNp/xOeiEVRMBLTzHpcihuy+LVoldUqAJDx3fw42vPX6H/WcNGE/EYTnhCc/BHgGGjbbli7IfhBBU=
-X-Received: by 2002:a0c:fe10:: with SMTP id x16mr30285840qvr.188.1580872170282; 
- Tue, 04 Feb 2020 19:09:30 -0800 (PST)
+ (envelope-from <jasowang@redhat.com>) id 1izBBt-0008JY-40
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 22:17:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43944
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1izBBs-0008GJ-VF
+ for qemu-devel@nongnu.org; Tue, 04 Feb 2020 22:17:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580872644;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wbC/LMn3Wj0dR1qUDFO9RwHNtoXTF47kIvsebIzMQq4=;
+ b=C3Z/hI11WiKEimUu7mtj2qhnej5Xe4rIJFl9JRkKcFR35LrNEdEn4nn4a/pS955HsK17jw
+ Mau6klIjgyYYWB8NFBs2s0GzKwLFCTGGjc1bFUsY3TK7g11/Qgli1zLJcKCZEm/Woh4RVx
+ wcNW4wJoPH6qlCpf7NW764yjlUBqKmE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-7t3YOPjyPyuHWFT-AGbipw-1; Tue, 04 Feb 2020 22:17:20 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78627800D55;
+ Wed,  5 Feb 2020 03:17:19 +0000 (UTC)
+Received: from [10.72.13.188] (ovpn-13-188.pek2.redhat.com [10.72.13.188])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7DCD785732;
+ Wed,  5 Feb 2020 03:17:17 +0000 (UTC)
+Subject: Re: [PATCH 0/1] Introduce Xlnx ZynqMP CAN controller for QEMU
+To: Vikram Garhwal <fnu.vikram@xilinx.com>, qemu-devel@nongnu.org
+References: <1580764010-310744-1-git-send-email-fnu.vikram@xilinx.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <9782ee22-c004-b569-66e8-071e8447e44e@redhat.com>
+Date: Wed, 5 Feb 2020 11:17:15 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20191219040612.28431-1-gshan@redhat.com>
- <d972631d-7db7-b6d5-61b8-244ae2c85882@redhat.com>
- <7f6e29e6-1df9-4513-79ba-b53873b0735e@ozlabs.ru>
- <544f261e4b9c97f1d3a5fb64cef42ba5@kernel.org>
- <ff584722-1b51-e538-7c45-c71cdc40105f@redhat.com>
- <c61c95c434dbcf97a0c946f0993d4843@kernel.org>
- <8a286e1c-c3f3-3052-e497-d44a90667451@redhat.com>
- <CAFEAcA-wKbF7mYToaAsxDxahuJ_X3_i3Z+8DqXmj8mKySmTW7Q@mail.gmail.com>
-In-Reply-To: <CAFEAcA-wKbF7mYToaAsxDxahuJ_X3_i3Z+8DqXmj8mKySmTW7Q@mail.gmail.com>
-From: Shan Gavin <shan.gavin@gmail.com>
-Date: Wed, 5 Feb 2020 14:09:19 +1100
-Message-ID: <CAOL5Tw=CQ-oWd1=+xtFHyLEieAENt83d27iK11SwtsF7qhOy9Q@mail.gmail.com>
-Subject: Re: [RFC PATCH] hw/arm/virt: Support NMI injection
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000252431059dcb7c4a"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f42
+In-Reply-To: <1580764010-310744-1-git-send-email-fnu.vikram@xilinx.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: 7t3YOPjyPyuHWFT-AGbipw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,77 +88,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, Gavin Shan <gshan@redhat.com>,
- jthierry@redhat.com, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Marc Zyngier <maz@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000252431059dcb7c4a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B42=E6=9C=884=
-=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:22=E5=86=99=E9=81=93=EF=BC=
-=9A
-
-> On Tue, 4 Feb 2020 at 03:51, Gavin Shan <gshan@redhat.com> wrote:
-> > Note: I'm still investigating the code to see how SError can be injecte=
-d
-> when TCG
-> > is used. I think we need same function when TCG is enabled, or it's
-> something for
-> > future.
+On 2020/2/4 =E4=B8=8A=E5=8D=885:06, Vikram Garhwal wrote:
+> Example for single CAN:
+>      -object can-bus,id=3Dcanbus0 \
+>      -global driver=3Dxlnx.zynqmp-can,property=3Dcanbus0,value=3Dcanbus0 =
+\
+>      -object can-host-socketcan,id=3Dsocketcan0,if=3Dvcan0,canbus=3Dcanbu=
+s0
 >
-> TCG doesn't currently implement SError -- it could be added, but
-> there's a bit of plumbing you'd need to do to get it to work and to
-> ensure the exception is taken, routed and masked correctly.
+> Example for connecting both CAN:
+>      -object can-bus,id=3Dcanbus0 -object can-bus,id=3Dcanbus1 \
+>      -global driver=3Dxlnx.zynqmp-can,property=3Dcanbus0,value=3Dcanbus0 =
+\
+>      -global driver=3Dxlnx.zynqmp-can,property=3Dcanbus1,value=3Dcanbus1 =
+\
+>      -object can-host-socketcan,id=3Dsocketcan0,if=3Dvcan0,canbus=3Dcanbu=
+s0 \
+>      -object can-host-socketcan,id=3Dsocketcan1,if=3Dvcan0,canbus=3Dcanbu=
+s1
 >
+> Vikram Garhwal (1):
+>    hw/net/can: Introduce Xlnx ZynqMP CAN controller for QEMU
 >
-Thanks, Peter. Yeah, I will post v2 RFC patch shortly. Please let me
-know if there are anything wrong :)
-
-Thanks,
-Gavin
-
-
-> thanks
-> -- PMM
+>   hw/net/can/Makefile.objs         |    1 +
+>   hw/net/can/xlnx-zynqmp-can.c     | 1106 +++++++++++++++++++++++++++++++=
++++++++
+>   include/hw/net/xlnx-zynqmp-can.h |   77 +++
+>   3 files changed, 1184 insertions(+)
+>   create mode 100644 hw/net/can/xlnx-zynqmp-can.c
+>   create mode 100644 include/hw/net/xlnx-zynqmp-can.h
 >
 
---000000000000252431059dcb7c4a
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Vikram:
 
-<div dir=3D"ltr"><div dir=3D"ltr">Peter Maydell &lt;<a href=3D"mailto:peter=
-.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; =E4=BA=8E2020=E5=B9=
-=B42=E6=9C=884=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:22=E5=86=99=
-=E9=81=93=EF=BC=9A<br></div><div class=3D"gmail_quote"><blockquote class=3D=
-"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(2=
-04,204,204);padding-left:1ex">On Tue, 4 Feb 2020 at 03:51, Gavin Shan &lt;<=
-a href=3D"mailto:gshan@redhat.com" target=3D"_blank">gshan@redhat.com</a>&g=
-t; wrote:<br>
-&gt; Note: I&#39;m still investigating the code to see how SError can be in=
-jected when TCG<br>
-&gt; is used. I think we need same function when TCG is enabled, or it&#39;=
-s something for<br>
-&gt; future.<br>
-<br>
-TCG doesn&#39;t currently implement SError -- it could be added, but<br>
-there&#39;s a bit of plumbing you&#39;d need to do to get it to work and to=
-<br>
-ensure the exception is taken, routed and masked correctly.<br>
-<br></blockquote><div><br></div><div>Thanks, Peter. Yeah, I will post v2 RF=
-C patch shortly. Please let me</div><div>know if there are anything wrong :=
-)</div><div><br>Thanks,<br>Gavin</div><div>=C2=A0</div><blockquote class=3D=
-"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(2=
-04,204,204);padding-left:1ex">
-thanks<br>
--- PMM<br>
-</blockquote></div></div>
+I would like to confirm that whether or not you would maintain this NIC.=20
+(I think the answer is yes). I tend not to merge a NIC model without a=20
+maintainer.
 
---000000000000252431059dcb7c4a--
+Thanks
+
 
