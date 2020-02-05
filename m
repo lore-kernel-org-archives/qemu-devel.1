@@ -2,91 +2,99 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD0AC35254
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBED1C3F68F
 	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:04:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67F6520674
+	by mail.kernel.org (Postfix) with ESMTPS id 9898C2072B
 	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:04:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fOpfwEkT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67F6520674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hxQ1Hzj6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9898C2072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izIUD-0005nz-HN
+	id 1izIUD-0005pB-M1
 	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 06:04:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45287)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1izISu-00041U-Jl
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:03:29 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1izISt-0002ep-9P
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:03:28 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51222)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1izISs-0002TG-Vu
+ (envelope-from <david.edmondson@oracle.com>) id 1izISs-0003wz-9A
  for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:03:27 -0500
-Received: by mail-wm1-x341.google.com with SMTP id t23so1980919wmi.1
- for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 03:03:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Es2aXQfRMIezlUraJGnt3K0JaMMJkyg+l7QDLSSVRNY=;
- b=fOpfwEkT+51kJLp+7+I9YmQYREBuF3bBAHmAuuiTyLmey2yfaFJEeQ/wJgGCi8jxqB
- GkEYOL5PLB4q2A3xq58sJXqQwT5g+7DO19YSS8Tm7cCZ8fsjgs/5Bpluh+HoCyWDBjof
- WP9vgvca3VBz3DUCCLONkTUekOQmL92ezN9Fy0kUB7IdYhsjmm113UpX/E0Hpnsdf3Ik
- ThJrnI2e9XQxJZvhuhXDmT47UG6LrOyvZOV2IaytoiGiWpxKjL1lH8ljzaOJBgvzfgcb
- QC8Pov5qFZ9x7yGZj+4QMQTCCYrfgCIPaI0pyLZKEbUui5EriAT81L0qduSO3BlDtZmO
- 9hrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Es2aXQfRMIezlUraJGnt3K0JaMMJkyg+l7QDLSSVRNY=;
- b=jGMvdB/JSdYgqOWQx8PIsuXZ0tcKbrFTyj9UfJ+/NOyH8v0GAl2sXQWSKepHZXz0tG
- MmBJVXishtuMWh+0oorgEUFEcV12H/BCR4ewpEzkJk/k9gNPYOTrR/3FViE01pz/6qrO
- r8cSviNvkvz+I//okqFHdqbO7MQGllW6uKZyZAbRBYHcrJ+3D3YF8n4tNUptISvk+ftz
- bvX++ARa3YS0sWb5YDedkNbhGaH/X7PlTTLViSsd9zKixXaCKTogORPU+ZK2hYGSSViK
- UvG5fps2aTdNMGQWEwFN5HtbNrLlAHiizc442MzM8GZTep+kokJnzd3IfVcKnpEqvLKo
- RFNg==
-X-Gm-Message-State: APjAAAXm1DO0QZ+IYngcDRddhkqxw9DPC7Lh9b3CO6fwq8KTOu0WFteN
- QxJg9Z0rX+1LNlxzZUjiT8G6qw==
-X-Google-Smtp-Source: APXvYqyjltM04267hs5WRr/KW/opTrGW/XJgHNH3Xx1XDlcgriHWu5frwK+6hToWhZ2D1dGrUwnGDA==
-X-Received: by 2002:a05:600c:2c50:: with SMTP id
- r16mr5049257wmg.74.1580900605701; 
- Wed, 05 Feb 2020 03:03:25 -0800 (PST)
-Received: from [172.27.246.193] ([212.187.182.166])
- by smtp.gmail.com with ESMTPSA id s8sm7664769wmh.26.2020.02.05.03.03.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 05 Feb 2020 03:03:25 -0800 (PST)
-Subject: Re: [PATCH] tcg: gdbstub: Fix missing breakpoint issue
-To: Changbin Du <changbin.du@gmail.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20200124021728.32518-1-changbin.du@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1c765091-54dc-1ea5-ef25-ec4786506fb4@linaro.org>
-Date: Wed, 5 Feb 2020 11:03:23 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <david.edmondson@oracle.com>) id 1izISq-0002Dc-NN
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:03:26 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:45610)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david.edmondson@oracle.com>)
+ id 1izISm-0001L6-LY; Wed, 05 Feb 2020 06:03:21 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015AwJPG185815;
+ Wed, 5 Feb 2020 11:03:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2019-08-05;
+ bh=X1fBIJsTAVtqLAS8MxRAC49vOAJ08A6yXbAdQ+Olk/8=;
+ b=hxQ1Hzj68Q7/mpXhuG2QOhCHAOAkm+IT7HUtz9wzVqZQzk5oDxLNw+qXXCnXp4St8NSQ
+ KXVIxGF1hPyJvKorQlsusX1zjywJkXyFXjaPPyWNOeoNW8g0zcQlbLsVjtVWyBegmyCM
+ SoH8EaqhgzxRFBJaclKGPBiH/8VhUVirV03ejvqh2KfYH022qJalPbus01yerEgjGpwk
+ aaEZYdK1DSpi3YaYXPmLpRZWdPSw/Bd9gH34krk3od9MIHj3xBY3KgNBhmnWyOkY74pY
+ Qqz+zKTzzI2yrm7mY74SIStFSjbZPJMBxdPelEomUgW2JvcMqxWUBC7GDa2c6TvGVDFy Cw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2xykbp29b3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 11:03:17 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015Awcfi123973;
+ Wed, 5 Feb 2020 11:03:16 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 2xykbrk3b2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 11:03:16 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 015B3GAl030526;
+ Wed, 5 Feb 2020 11:03:16 GMT
+Received: from disaster-area.hh.sledj.net (/81.149.164.25)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 05 Feb 2020 03:03:15 -0800
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id e1918ac3;
+ Wed, 5 Feb 2020 11:03:13 +0000 (UTC)
+From: David Edmondson <david.edmondson@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 1/1] qemu-img: Add --target-is-zero to convert
+Date: Wed,  5 Feb 2020 11:02:48 +0000
+Message-Id: <20200205110248.2009589-2-david.edmondson@oracle.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200205110248.2009589-1-david.edmondson@oracle.com>
+References: <20200205110248.2009589-1-david.edmondson@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200124021728.32518-1-changbin.du@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002050089
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002050089
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,81 +106,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org
+Cc: David Edmondson <david.edmondson@oracle.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/24/20 2:17 AM, Changbin Du wrote:
-> When inserting breakpoints, we need to invalidate related TBs to apply
-> helper call. This is done by breakpoint_invalidate(). But many users
-> found the BPs sometimes never hit.
-> 
-> In system mode emulation, the BPs are global in guest but not particular
-> address space. The issue is that the current implementation only trys to
-> invalidate TB of paddr corresponding to the target vaddr in current MMU
-> context. Then some cached TBs continue running without BPs applied.
-> 
-> To fix this issue, we can just invalidate all TBs as what step mode does.
-> (For old version users, issuing a step command can workaround this problem.)
-> 
-> Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> ---
->  exec.c | 29 +----------------------------
->  1 file changed, 1 insertion(+), 28 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 67e520d18e..9d9fd48519 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -997,36 +997,9 @@ static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
->      tb_invalidate_phys_addr(pc);
->  }
->  #else
-> -void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
+In many cases the target of a convert operation is a newly provisioned
+target that the user knows is blank (reads as zero). In this situation
+there is no requirement for qemu-img to wastefully zero out the entire
+device.
 
-You can't remove this function yet.
-You should have seen that xtensa-softmmu no longer builds.
+Add a new option, --target-is-zero, allowing the user to indicate that
+an existing target device will return zeros for all reads.
 
-I've cc'd you into Max Filippov's thread that addresses the same problem, and
-I'm going to apply his fix for now.
+Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+---
+ docs/interop/qemu-img.rst |  9 ++++++++-
+ qemu-img-cmds.hx          |  4 ++--
+ qemu-img.c                | 26 +++++++++++++++++++++++---
+ 3 files changed, 33 insertions(+), 6 deletions(-)
 
-
-r~
-
-> -{
-> -    ram_addr_t ram_addr;
-> -    MemoryRegion *mr;
-> -    hwaddr l = 1;
-> -
-> -    if (!tcg_enabled()) {
-> -        return;
-> -    }
-> -
-> -    RCU_READ_LOCK_GUARD();
-> -    mr = address_space_translate(as, addr, &addr, &l, false, attrs);
-> -    if (!(memory_region_is_ram(mr)
-> -          || memory_region_is_romd(mr))) {
-> -        return;
-> -    }
-> -    ram_addr = memory_region_get_ram_addr(mr) + addr;
-> -    tb_invalidate_phys_page_range(ram_addr, ram_addr + 1);
-> -}
-> -
->  static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
->  {
-> -    MemTxAttrs attrs;
-> -    hwaddr phys = cpu_get_phys_page_attrs_debug(cpu, pc, &attrs);
-> -    int asidx = cpu_asidx_from_attrs(cpu, attrs);
-> -    if (phys != -1) {
-> -        /* Locks grabbed by tb_invalidate_phys_addr */
-> -        tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
-> -                                phys | (pc & ~TARGET_PAGE_MASK), attrs);
-> -    }
-> +    tb_flush(cpu);
->  }
->  #endif
->  
-> 
+diff --git a/docs/interop/qemu-img.rst b/docs/interop/qemu-img.rst
+index fa27e5c7b453..763036857451 100644
+--- a/docs/interop/qemu-img.rst
++++ b/docs/interop/qemu-img.rst
+@@ -214,6 +214,13 @@ Parameters to convert subcommand:
+   will still be printed.  Areas that cannot be read from the source will be
+   treated as containing only zeroes.
+ 
++.. option:: --target-is-zero
++
++  Assume that reading the destination image will always return
++  zeros. This parameter is mutually exclusive with a destination image
++  that has a backing file. It is required to also use the ``-n``
++  parameter to skip image creation.
++
+ Parameters to dd subcommand:
+ 
+ .. program:: qemu-img-dd
+@@ -366,7 +373,7 @@ Command description:
+   4
+     Error on reading data
+ 
+-.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
++.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [--target-is-zero] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
+ 
+   Convert the disk image *FILENAME* or a snapshot *SNAPSHOT_PARAM*
+   to disk image *OUTPUT_FILENAME* using format *OUTPUT_FMT*. It can
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 3fd836ca9090..e6f98b75473f 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -39,9 +39,9 @@ SRST
+ ERST
+ 
+ DEF("convert", img_convert,
+-    "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_filename")
++    "convert [--object objectdef] [--image-opts] [--target-image-opts] [--target-is-zero] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_filename")
+ SRST
+-.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] [--salvage] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
++.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [--target-is-zero] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] [--salvage] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
+ ERST
+ 
+ DEF("create", img_create,
+diff --git a/qemu-img.c b/qemu-img.c
+index 2b4562b9d9f2..0faf2cd2f530 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -70,6 +70,7 @@ enum {
+     OPTION_PREALLOCATION = 265,
+     OPTION_SHRINK = 266,
+     OPTION_SALVAGE = 267,
++    OPTION_TARGET_IS_ZERO = 268,
+ };
+ 
+ typedef enum OutputFormat {
+@@ -1984,10 +1985,9 @@ static int convert_do_copy(ImgConvertState *s)
+     int64_t sector_num = 0;
+ 
+     /* Check whether we have zero initialisation or can get it efficiently */
+-    if (s->target_is_new && s->min_sparse && !s->target_has_backing) {
++    if (!s->has_zero_init && s->target_is_new && s->min_sparse &&
++        !s->target_has_backing) {
+         s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
+-    } else {
+-        s->has_zero_init = false;
+     }
+ 
+     if (!s->has_zero_init && !s->target_has_backing &&
+@@ -2086,6 +2086,7 @@ static int img_convert(int argc, char **argv)
+             {"force-share", no_argument, 0, 'U'},
+             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
+             {"salvage", no_argument, 0, OPTION_SALVAGE},
++            {"target-is-zero", no_argument, 0, OPTION_TARGET_IS_ZERO},
+             {0, 0, 0, 0}
+         };
+         c = getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
+@@ -2209,6 +2210,14 @@ static int img_convert(int argc, char **argv)
+         case OPTION_TARGET_IMAGE_OPTS:
+             tgt_image_opts = true;
+             break;
++        case OPTION_TARGET_IS_ZERO:
++            /*
++             * The user asserting that the target is blank has the
++             * same effect as the target driver supporting zero
++             * initialisation.
++             */
++            s.has_zero_init = true;
++            break;
+         }
+     }
+ 
+@@ -2247,6 +2256,11 @@ static int img_convert(int argc, char **argv)
+         warn_report("This will become an error in future QEMU versions.");
+     }
+ 
++    if (s.has_zero_init && !skip_create) {
++        error_report("--target-is-zero requires use of -n flag");
++        goto fail_getopt;
++    }
++
+     s.src_num = argc - optind - 1;
+     out_filename = s.src_num >= 1 ? argv[argc - 1] : NULL;
+ 
+@@ -2380,6 +2394,12 @@ static int img_convert(int argc, char **argv)
+     }
+     s.target_has_backing = (bool) out_baseimg;
+ 
++    if (s.has_zero_init && s.target_has_backing) {
++        error_report("Cannot use --target-is-zero when the destination "
++                     "image has a backing file");
++        goto out;
++    }
++
+     if (s.src_num > 1 && out_baseimg) {
+         error_report("Having a backing file for the target makes no sense when "
+                      "concatenating multiple input images");
+-- 
+2.24.1
 
 
