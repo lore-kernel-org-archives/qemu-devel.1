@@ -2,56 +2,94 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3CCFC35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB67C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:57:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A57321741
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:52:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A57321741
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5674821741
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:57:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NdL/+hpq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5674821741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izM2Z-000174-GR
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 09:52:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38968)
+	id 1izM7V-0007Dz-Fy
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 09:57:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1izM1n-0000K1-JU
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:51:44 -0500
+ (envelope-from <liam.merwick@oracle.com>) id 1izM6Y-0005h3-SX
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:56:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1izM1l-000809-IM
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:51:42 -0500
-Resent-Date: Wed, 05 Feb 2020 09:51:42 -0500
-Resent-Message-Id: <E1izM1l-000809-IM@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21106)
+ (envelope-from <liam.merwick@oracle.com>) id 1izM6X-00054K-Dj
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:56:38 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:52830)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1izM1l-0007xd-AH
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:51:41 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1580914288298769.6876424241237;
- Wed, 5 Feb 2020 06:51:28 -0800 (PST)
-In-Reply-To: <20200205141749.378044-1-peterx@redhat.com>
-Subject: Re: [PATCH RFC 0/9] KVM: Dirty ring support (QEMU part)
-Message-ID: <158091428682.7235.8783026210222890349@a1bbccc8075a>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: peterx@redhat.com
-Date: Wed, 5 Feb 2020 06:51:28 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+ (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+ id 1izM6X-0004mr-5b
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:56:37 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015ErH9m164776;
+ Wed, 5 Feb 2020 14:56:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2019-08-05;
+ bh=d+mE53yA6sxd7boFHFcdpnS9Vj2kugnjvOvA7GA5L7w=;
+ b=NdL/+hpqNH8dNjbdSHQr3ydjfpEFuwkmLC2GTuD53lFOlKfw1OJKVLPS8In0wcqRe8DS
+ BMRdmX7CWL/LWrPXC+N6wVUbHK8DccvqwU+uj5QuT0FIkuH7cgnWLbY+TwAm1vaPpnRM
+ APWwlDT+/LlRQm96OsnDnDHbuoUNSWT3D78ruq4VOfAkytD2fJYANJSN2K2OYH+CV3g4
+ F5Cok+IM+k2Nx/Afw34Zt2wd2tomXz3buDQYU9B7MEA9rCnFfAHCbe1Jx6PlQ84q2Om7
+ v73P0HsTQfTsjByir+1tFkPShzQUFNzdygnb1nyUsk5QenXjKyXPEPqsuJ92kgH+ryu/ 7g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 2xykbp3h8u-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 14:56:22 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015ErUGA173208;
+ Wed, 5 Feb 2020 14:56:21 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 2xymuswyp8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 14:56:21 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 015EuKxu031852;
+ Wed, 5 Feb 2020 14:56:20 GMT
+Received: from ol7.uk.oracle.com (/10.175.206.136)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 05 Feb 2020 06:56:19 -0800
+From: Liam Merwick <liam.merwick@oracle.com>
+To: alex.bennee@linaro.org, fam@euphon.net, philmd@redhat.com
+Subject: [PATCH v2 3/6] travis.yml: install rpm2cpio for acceptance tests
+Date: Wed,  5 Feb 2020 14:56:02 +0000
+Message-Id: <1580914565-19675-4-git-send-email-liam.merwick@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1580914565-19675-1-git-send-email-liam.merwick@oracle.com>
+References: <1580914565-19675-1-git-send-email-liam.merwick@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=862
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002050118
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=926 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002050118
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,49 +101,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- peterx@redhat.com, dgilbert@redhat.com
+Cc: slp@redhat.com, qemu-devel@nongnu.org, wainersm@redhat.com,
+ pbonzini@redhat.com, sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIwNTE0MTc0OS4zNzgw
-NDQtMS1wZXRlcnhAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
-Y2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1p
-bWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVk
-b3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgouL3FlbXUtb3B0aW9u
-cy50ZXhpOjg2OiB1bmtub3duIGNvbW1hbmQgYHZhbCcKLi9xZW11LW9wdGlvbnMudGV4aTo4Njog
-bWlzcGxhY2VkIHsKLi9xZW11LW9wdGlvbnMudGV4aTo4NjogbWlzcGxhY2VkIH0KbWFrZTogKioq
-IFtNYWtlZmlsZToxMDA3OiBxZW11LWRvYy50eHRdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcg
-Zm9yIHVuZmluaXNoZWQgam9icy4uLi4KLi9xZW11LW9wdGlvbnMudGV4aTo4NjogdW5rbm93biBj
-b21tYW5kIGB2YWwnCi4vcWVtdS1vcHRpb25zLnRleGk6ODY6IG1pc3BsYWNlZCB7Ci4vcWVtdS1v
-cHRpb25zLnRleGk6ODY6IG1pc3BsYWNlZCB9Cm1ha2U6ICoqKiBbTWFrZWZpbGU6MTAwMDogcWVt
-dS1kb2MuaHRtbF0gRXJyb3IgMQpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAg
-RmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+CiAg
-ICBzeXMuZXhpdChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNv
-ZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3Vkbycs
-ICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVp
-ZD00OGU4ZjJjZTkzY2I0ZGZlODA2NzM1NmQwNzVkOTI2YycsICctdScsICcxMDAxJywgJy0tc2Vj
-dXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9M
-SVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAn
-Sj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9E
-SVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9j
-a2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRl
-c3Rlci10bXAtN2tkdHpuZ20vc3JjL2RvY2tlci1zcmMuMjAyMC0wMi0wNS0wOS40Ny4zNC4zMDI2
-NTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4n
-LCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9
-LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD00OGU4ZjJjZTkzY2I0ZGZlODA2
-NzM1NmQwNzVkOTI2YwptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTog
-TGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC03a2R0em5nbS9z
-cmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVh
-bCAgICAzbTUxLjk1MHMKdXNlciAgICAwbTguMjY4cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAyMDUxNDE3NDkuMzc4MDQ0LTEtcGV0
-ZXJ4QHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+The extract_from_rpm() method added for the PVH acceptance tests needs
+rpm2cpio to extract a vmlinux binary from an RPM.
+
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ .travis.yml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/.travis.yml b/.travis.yml
+index 3b35b7cf04d3..59773365823e 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -323,6 +323,7 @@ matrix:
+             - python3-pil
+             - python3-pip
+             - python3.5-venv
++            - rpm2cpio
+             - tesseract-ocr
+             - tesseract-ocr-eng
+ 
+-- 
+1.8.3.1
+
 
