@@ -2,81 +2,117 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27861C35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D50C352A1
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:44:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7EF4217BA
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:42:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D421B217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:44:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YBxf/jvO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7EF4217BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="l6r1A/KL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D421B217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izLsi-0000av-2W
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 09:42:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60517)
+	id 1izLuV-0001z5-2G
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 09:44:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33259)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1izLs6-0008U1-PL
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:41:43 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1izLti-0001OQ-Sn
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1izLs5-0002fc-Ev
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:41:42 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25660
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1izLs5-0002dq-AP
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:41:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580913700;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0kyKvGWlr4sHpTV4rEePrOoocfQGRqpMub/4CaZCDWU=;
- b=YBxf/jvOF5OsbREWHueIuGqxg8EGWndDFGc0psXXpa4SpYletUs/AH7/uelW3SSx47QTjK
- o+Tnh4VE1c/PxEqgkot8yf09HkFFhH9qRNSmFQ4DqItjqynpbc8YP2lFQnsjhXVT2G+Z8Q
- OlkPsLKaaKu+AlUSR5hRcVFRmHHfy08=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-NuAAIiOrNUyN7Gis0Mgd1Q-1; Wed, 05 Feb 2020 09:40:30 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B48861268;
- Wed,  5 Feb 2020 14:40:29 +0000 (UTC)
-Received: from localhost (ovpn-116-52.ams2.redhat.com [10.36.116.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2748A1001B05;
- Wed,  5 Feb 2020 14:40:28 +0000 (UTC)
-Date: Wed, 5 Feb 2020 15:40:27 +0100
-From: Jens Freimann <jfreimann@redhat.com>
-To: Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH] migration: Optimization about wait-unplug migration state
-Message-ID: <20200205144027.55qsz3j7qf26pzfd@jenstp.localdomain>
-References: <20200204050841.44453-1-zhukeqian1@huawei.com>
-MIME-Version: 1.0
-In-Reply-To: <20200204050841.44453-1-zhukeqian1@huawei.com>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: NuAAIiOrNUyN7Gis0Mgd1Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii; format=flowed
+ (envelope-from <vsementsov@virtuozzo.com>) id 1izLth-0006b3-C3
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:43:22 -0500
+Received: from mail-eopbgr80129.outbound.protection.outlook.com
+ ([40.107.8.129]:51168 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1izLtc-0006Lk-Ge; Wed, 05 Feb 2020 09:43:17 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bBXnwXjXuF5/CQOtolxGY6GQYdKVzHjqp7Jt2vnQzY8fP601W6+edhSWLUerx7aamoX3Ge1Gs0qoonxPH7NmRHBoApL7Fup7KdlcHv3kfwuZb8K9pcZHBABPskQaFWWvmRuFbz2wB5t9nEcmYvvQpkYZd4K03cgNTE/Uxo+bUR1I/Rhs5A8LHxb7/75gXHE1yNt9scS2kVoc5X8meOnLZiKs+iRdV5EXoyaMRhPlzC2y0JGWvwVsCl/96F1F6EaxK/drP4HoA7w89NUe03sA7Nb02+qgFMgZAPP8zn1IB4o4s23fjYAcYBFx/c2GpId2RScfQherQLieNuTyC7W6Bg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f+8Eptl02ZzWxl39nZWtt/mPrThCuT/KLss8b12h/go=;
+ b=RMGI105O0hbjSYSxrI+TQIN+L1+y/DXU8CNEpdcfUgkaQhherJWXkiRcVJOWMozDOlezprBK8cZpVvnQGbY4i+EyDXVb54NORgQS2XIoNFtheF12pl6cCMSsB9K0FeS67Cwajg6RQK8UrNlGROXDKCxTFC2hDYnugMz5ENCaUN1+Bu8yiUM0uc7I1y1aw7WyMmvfH9py8dlwDkBFeDMY2gk4La78ViRkn1TKPiSwUq2TLjhUKfVyJvjG/eYyDQi9/BS6joChviHnwpuF5Ktu8WbEvFhBoZIZ2HYBvc3ZFHocbUco3BoF+ks2+VIZ8oBQ3SR/MHlmRVzrlhKhsflcoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f+8Eptl02ZzWxl39nZWtt/mPrThCuT/KLss8b12h/go=;
+ b=l6r1A/KLuhcyfqdV1jNys4HUuaA8n9fqvWW8QAArIUj3GL7RS33f7IMPkmFcgWhQ9KicSghH0Bpxt0V7co9UuIYlT/d/4WN99cznf+FaePS0A80pjy/YMbmZzYYMh/NZLe4JJUdrx4XIDuiOLMC3RTbFgCi2hVQ0U2vzAMIOQFs=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from VI1PR08MB4432.eurprd08.prod.outlook.com (20.179.28.138) by
+ VI1PR08MB4062.eurprd08.prod.outlook.com (20.178.127.32) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Wed, 5 Feb 2020 14:43:14 +0000
+Received: from VI1PR08MB4432.eurprd08.prod.outlook.com
+ ([fe80::9c56:6d95:76d1:d0]) by VI1PR08MB4432.eurprd08.prod.outlook.com
+ ([fe80::9c56:6d95:76d1:d0%2]) with mapi id 15.20.2686.034; Wed, 5 Feb 2020
+ 14:43:14 +0000
+Subject: Re: [PATCH 00/17] Improve qcow2 all-zero detection
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200131174436.2961874-1-eblake@redhat.com>
+ <3bad82d4-4d60-4341-d87e-af37e1dd680e@virtuozzo.com>
+ <9f2d8730-23ca-f070-52dd-0cbcbb08913b@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200205174311995
+Message-ID: <c7ff64b0-2916-aa51-f655-44adccee40e2@virtuozzo.com>
+Date: Wed, 5 Feb 2020 17:43:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <9f2d8730-23ca-f070-52dd-0cbcbb08913b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-ClientProxiedBy: HE1PR0902CA0036.eurprd09.prod.outlook.com
+ (2603:10a6:7:15::25) To VI1PR08MB4432.eurprd08.prod.outlook.com
+ (2603:10a6:803:102::10)
+MIME-Version: 1.0
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR0902CA0036.eurprd09.prod.outlook.com (2603:10a6:7:15::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.34 via Frontend Transport; Wed, 5 Feb 2020 14:43:13 +0000
+X-Tagtoolbar-Keys: D20200205174311995
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c138e4bc-1bd5-458b-1656-08d7aa49bb01
+X-MS-TrafficTypeDiagnostic: VI1PR08MB4062:
+X-Microsoft-Antispam-PRVS: <VI1PR08MB4062E6AFD8196076CCFF98E0C1020@VI1PR08MB4062.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 0304E36CA3
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(346002)(376002)(39850400004)(396003)(136003)(366004)(189003)(199004)(36756003)(2616005)(956004)(81156014)(81166006)(66476007)(66556008)(316002)(16526019)(52116002)(53546011)(26005)(8676002)(6486002)(2906002)(16576012)(31696002)(186003)(86362001)(8936002)(4326008)(5660300002)(66946007)(966005)(31686004)(478600001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB4062;
+ H:VI1PR08MB4432.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PAWZs1TpTWFa6boDZUZDEVFsQCItLqYMfnFoyAslU8djx9h3j/+ZF+0Z/9PbDdqAl+2HraA+BF4vQL0EUHqClFH8ptyiV0cMG+BpPYpdDM0+6lpraZmha4Y0JPVpo3ueJfSERdtpkQI3jt0apUUkuXiKGDU2dpuYNzs/zN1KZq0FU6At/lndnxtqPKM30ij3WYnjhBrof/noKGXPCxl/eyPa7esRyC6hqV6aq+yxXbJnWmGGBHUPh6111C8eriaji0yV3XWS0rVrrSeWxE2Kacvs9h7ZT+TLs3QOfpIdSahwIz3Io6v4YqHBBkqDmatIid6WeO/65HhOYjS7W9yoC/DpkhkYhZ+az/FNQmEUWG1cNtMWtOpw10M5BD8oEdaJ/g9n4CcIcui2kbr/EodHSe94g9OKI0wvOr2Askgrt2gzv5AFXz/gaWfmx75Y6d/ChP4ox5wpdVNVl64SBZjgNnlge14iwY/oKjDfwc/wL5SQsAU85zANcbGK8wvcV+gjpvrIxopfUK6ats3nB3fXXg==
+X-MS-Exchange-AntiSpam-MessageData: 5Ht6AIHa08MCEIb/fGtYZqLC4bPcxXQHX4qUXL42WjaJykNcscTTtWW7sF02TS+z6LVZxvgqpkOYu/tEwc1pkJ5SVuSZgKgqReUg5tGGiPQbIowVp2VOpR/Su4CUfSvYYzLAYX/SAVvbDtmei2+TsQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c138e4bc-1bd5-458b-1656-08d7aa49bb01
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2020 14:43:14.4538 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cuP6WZsVAekuBh82lVA06l/iV0zx+n3VJw5PzlVgApsvtPtPRejHLKJp9tR6AK3gbBbItsTgxiL6lROzXrsR4RTy9Gll/Nynl48kXhI5dFw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB4062
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.8.129
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,118 +124,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: david.edmondson@oracle.com, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 04, 2020 at 01:08:41PM +0800, Keqian Zhu wrote:
->qemu_savevm_nr_failover_devices() is originally designed to
->get the number of failover devices, but it actually returns
->the number of "unplug-pending" failover devices now. Moreover,
->what drives migration state to wait-unplug should be the number
->of "unplug-pending" failover devices, not all failover devices.
->
->We can also notice that qemu_savevm_state_guest_unplug_pending()
->and qemu_savevm_nr_failover_devices() is equivalent almost (from
->the code view). So the latter is incorrect semantically and
->useless, just delete it.
->
->In the qemu_savevm_state_guest_unplug_pending(), once hit a
->unplug-pending failover device, then it can return true right
->now to save cpu time.
->
->Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->---
->Cc: jfreimann@redhat.com
->Cc: Juan Quintela <quintela@redhat.com>
->Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->---
-> migration/migration.c |  2 +-
-> migration/savevm.c    | 24 +++---------------------
-> migration/savevm.h    |  1 -
-> 3 files changed, 4 insertions(+), 23 deletions(-)
->
->diff --git a/migration/migration.c b/migration/migration.c
->index 3a21a4686c..deedc968cf 100644
->--- a/migration/migration.c
->+++ b/migration/migration.c
->@@ -3333,7 +3333,7 @@ static void *migration_thread(void *opaque)
->
->     qemu_savevm_state_setup(s->to_dst_file);
->
->-    if (qemu_savevm_nr_failover_devices()) {
->+    if (qemu_savevm_state_guest_unplug_pending()) {
->         migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->                           MIGRATION_STATUS_WAIT_UNPLUG);
->
->diff --git a/migration/savevm.c b/migration/savevm.c
->index f19cb9ec7a..1d4220ece8 100644
->--- a/migration/savevm.c
->+++ b/migration/savevm.c
->@@ -1140,36 +1140,18 @@ void qemu_savevm_state_header(QEMUFile *f)
->     }
-> }
->
->-int qemu_savevm_nr_failover_devices(void)
->+bool qemu_savevm_state_guest_unplug_pending(void)
-> {
->     SaveStateEntry *se;
->-    int n =3D 0;
->
->     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
->         if (se->vmsd && se->vmsd->dev_unplug_pending &&
->             se->vmsd->dev_unplug_pending(se->opaque)) {
->-            n++;
->-        }
->-    }
->-
->-    return n;
->-}
->-
->-bool qemu_savevm_state_guest_unplug_pending(void)
->-{
->-    SaveStateEntry *se;
->-    int n =3D 0;
->-
->-    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
->-        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
->-            continue;
->-        }
->-        if (se->vmsd->dev_unplug_pending(se->opaque)) {
->-            n++;
->+            return true;
->         }
->     }
->
->-    return n > 0;
->+    return false;
-> }
->
-> void qemu_savevm_state_setup(QEMUFile *f)
->diff --git a/migration/savevm.h b/migration/savevm.h
->index c42b9c80ee..ba64a7e271 100644
->--- a/migration/savevm.h
->+++ b/migration/savevm.h
->@@ -31,7 +31,6 @@
->
-> bool qemu_savevm_state_blocked(Error **errp);
-> void qemu_savevm_state_setup(QEMUFile *f);
->-int qemu_savevm_nr_failover_devices(void);
-> bool qemu_savevm_state_guest_unplug_pending(void);
-> int qemu_savevm_state_resume_prepare(MigrationState *s);
-> void qemu_savevm_state_header(QEMUFile *f);
->--=20
->2.19.1
+05.02.2020 17:22, Eric Blake wrote:
+> On 2/5/20 3:04 AM, Vladimir Sementsov-Ogievskiy wrote:
+>=20
+>>> [repo.or.cz appears to be down as I type this; I'll post a link to a
+>>> repository later when it comes back up]
+>=20
+> Now up
+> https://repo.or.cz/qemu/ericb.git/shortlog/refs/tags/qcow2-all-zero-v1
+>=20
+>>>
+>>
+>> I have several ideas around it.
+>>
+>> 1. For generic block layer.
+>> Did you consider as alternative to BDRV_ZEO_OPEN, to export the
+>> information through normal block_status? So, if we have the
+>> information, that disk is all-zero, we can always add _ZERO
+>> flag to block-status result.
+>=20
+> Makes sense.
+>=20
+>> And in generic bdrv_is_all_zeroes(),
+>> we can just call block_status(0, disk_size), which will return
+>> ZERO and n=3Ddisk_size if driver supports all-zero feature and is
+>> all-zero now.
+>=20
+> Less obvious.=C2=A0 block_status is not required to visit the entire disk=
+, even if the entire disk is all zero.=C2=A0 For example, qcow2 visits at m=
+ost one L2 page in a call (if the request spans L1 entries, it will be trun=
+cated at the boundary, even if the region before and after the boundary hav=
+e the same status).=C2=A0 I'm also worried if we still have 32-bit limitati=
+ons in block_status (ideally, we've fixed things to support 64-bit status w=
+here possible, but I'm not counting on it).
 
-Looks good to me. I tested it and it still works, so=20
+Not required, but why not doing it? If we have information that all disk is=
+ of the same ZERO status, no reasons to not reply on block_status(0, disk_s=
+ize) with smaller n.
 
-Tested-by: Jens Freimann <jfreimann@redhat.com>
-Reviewed-by: Jens Freimann <jfreimann@redhat.com>=20
+>=20
+>> I think block-status is a native way for such information, and I
+>> think that we anyway want to come to support of 64bit block-status
+>> for qcow2 and nbd.
+>=20
+> Block status requires an O(n) loop over the disk, where n is the number o=
+f distinct extents possible.=C2=A0 If you get lucky, and block_status(0,siz=
+e) returns a single extent, then yes that can feed the 'is_zeroes' request.=
+=C2=A0 Similarly, a single return of non-zero data can instantly tell you t=
+hat 'is_zeroes' is false.=C2=A0 But given that drivers may break up their r=
+esponse on convenient boundaries, such as qcow2 on L1 entry granularity, yo=
+u cannot blindly assume that a return of zero data for smaller than the req=
+uested size implies non-zero data, only that there is insufficient informat=
+ion to tell if the disk is all_zeroes without querying further block_status=
+ calls, and that's where you lose out on the speed compared to just being t=
+old up-front from an 'is_zero' call.
 
-regards
-Jens
+Yes. But how is it worse than BDRV_ZERO_OPEN? With one block_status call we=
+ have the same information. If on block_status(0, disk_size) driver replies=
+ with ZERO but smaller than disk_size, it means that either disk is not all=
+-zero, or driver doesn't support 'fast whole-disk zero check' feature, whic=
+h is equal to not supporting BDRV_ZERO_OPEN.
 
+>=20
+>>
+>> 2. For NBD
+>> Again, possible alternative is BLOCK_STATUS, but we need 64bit
+>> commands for it. I plan to send a proposal anyway. Still, nothing
+>> bad in two possible path of receiving all-zero information.
+>> And even with your NBD extension, we can export this information
+>> through block-status [1.]
+>=20
+> Yes, having 64-bit BLOCK_STATUS in NBD is orthogonal to this, but both id=
+eas are independently useful, and as the level of difficulty in implementin=
+g things may vary, it is conceivable to have both a server that provides 'i=
+s_zero' but not BLOCK_STATUS, and a server that provides 64-bit BLOCK_STATU=
+S but not 'is_zero'.
+>=20
+>>
+>> 3. For qcow2
+>> Hmm. Here, as I understand, than main case is freshly created qcow2,
+>> which is fully-unallocated. To understand that it is empty, we
+>> need only to check all L1 entries. And for empty L1 table it is fast.
+>> So we don't need any qcow2 format improvement to check it.
+>=20
+> The benefit of this patch series is that it detects preallocated qcow2 im=
+ages as all_zero.=C2=A0 What's more, scanning all L1 entries is O(n), but d=
+etecting an autoclear all_zero bit is O(1).=C2=A0 Your proposed L1 scan is =
+accurate for fewer cases, and costs more time.
+
+Ah yes, somehow I thought that L1 is not allocated for fresh image..
+
+Hmm, than possibly we need two new top-level flags: "all-zero" and "all-una=
+llocated"..
+
+
+--=20
+Best regards,
+Vladimir
 
