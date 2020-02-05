@@ -2,87 +2,81 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 814A6C35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27861C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:42:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B91B2082E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:40:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7EF4217BA
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 14:42:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YW+C1jyJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B91B2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YBxf/jvO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7EF4217BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izLqT-0007dE-Hh
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 09:40:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58972)
+	id 1izLsi-0000av-2W
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 09:42:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60517)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1izLpk-000747-I9
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:39:18 -0500
+ (envelope-from <jfreimann@redhat.com>) id 1izLs6-0008U1-PL
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:41:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1izLpj-0006k1-7X
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:39:16 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44285)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1izLpi-0006f1-UJ
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:39:15 -0500
-Received: by mail-wr1-x442.google.com with SMTP id m16so2993651wrx.11
- for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 06:39:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=DOxkzKgZVI4/JpcCqaI2No5FrvN9Zhd4CWpcVIgS8oc=;
- b=YW+C1jyJKYV5gOtvrQ103fin3rSaHVi7JTePKHHPCiu1fMqdgkXujfb/TES7JbzwoY
- QTcNaTJez9Qg9ABPzSjeNrog+wUzL7VFdmjVWglTJldEfj+icQ9sf92qz+zxOxW1A/2p
- frStdK0/aR0EYi8UaWu2JVSmvef1bJiOmdiSRx3AmRCqJYdHoAFudBTsRtybdmvNOlXn
- ZH4K9meEIEQn0v2lujWSq+sIgk001f2tcxHQJSKKpNcVrh55xYTH8eGTgYdo33y7zm0q
- zjBvySy0q8eGMN8AhNpfbiRE5g8y12k8Tn40KWwoYGmt+LiAn5NIJpNFwAI0pPfVw6Ru
- RYLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=DOxkzKgZVI4/JpcCqaI2No5FrvN9Zhd4CWpcVIgS8oc=;
- b=hI+L0UR/Y0YyZTgw04pcEfVYfa0qhQigls8wFkixILbhwDO3aFUzxiLl+o9VQDy8DA
- g2aVsl2sbsuh+mqyA3itZzGcJlvK3ZSY86Dy/6Nf44UaRG3u2rm8+tz/wpNT6i5DNcEA
- oAPeucbXQNLHDb8qfreFng5WqIu2xdnh4hymiZfej98A4T8pyQmDWNO0/os7EbDXU/fl
- tiyEW7AdEprDI2ozmvdGlCEpJRD7H+KNeiYSaPPJ/2+GV8xVfvjWSlncs3GyTPYVGah0
- I3KrR+OQ/DuhwfRGXB1o5PkWQeAKJjKcLYXQjdtWJrN1BNJuHONjWTqWMBOYJ/rk/6OZ
- 9NoQ==
-X-Gm-Message-State: APjAAAU46Vs09jgW/dmS2GHpMNhYPfMC2i+HoYgYisoVVZ3T/AgPyTMz
- Zpfo85hct4nnBFNUdGZtd9A=
-X-Google-Smtp-Source: APXvYqw+UZBA4bhgXdrS1wgnJ39kb8TrdWovydN1UFMG01HRzfJqXG+s81relIv5gvC2HrTpnC9HoQ==
-X-Received: by 2002:a05:6000:367:: with SMTP id
- f7mr28190339wrf.174.1580913553627; 
- Wed, 05 Feb 2020 06:39:13 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id o2sm8149079wmh.46.2020.02.05.06.39.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 05 Feb 2020 06:39:12 -0800 (PST)
-Date: Wed, 5 Feb 2020 14:39:11 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: i.kotrasinsk@partner.samsung.com
-Subject: Re: [RFC 0/9] Add an interVM memory sharing device
-Message-ID: <20200205143911.GG58062@stefanha-x1.localdomain>
-References: <CGME20200204113102eucas1p172cfb883c70cfc8d7c2832682df3df2a@eucas1p1.samsung.com>
- <1580815851-28887-1-git-send-email-i.kotrasinsk@partner.samsung.com>
+ (envelope-from <jfreimann@redhat.com>) id 1izLs5-0002fc-Ev
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:41:42 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25660
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1izLs5-0002dq-AP
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 09:41:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580913700;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0kyKvGWlr4sHpTV4rEePrOoocfQGRqpMub/4CaZCDWU=;
+ b=YBxf/jvOF5OsbREWHueIuGqxg8EGWndDFGc0psXXpa4SpYletUs/AH7/uelW3SSx47QTjK
+ o+Tnh4VE1c/PxEqgkot8yf09HkFFhH9qRNSmFQ4DqItjqynpbc8YP2lFQnsjhXVT2G+Z8Q
+ OlkPsLKaaKu+AlUSR5hRcVFRmHHfy08=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-NuAAIiOrNUyN7Gis0Mgd1Q-1; Wed, 05 Feb 2020 09:40:30 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B48861268;
+ Wed,  5 Feb 2020 14:40:29 +0000 (UTC)
+Received: from localhost (ovpn-116-52.ams2.redhat.com [10.36.116.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2748A1001B05;
+ Wed,  5 Feb 2020 14:40:28 +0000 (UTC)
+Date: Wed, 5 Feb 2020 15:40:27 +0100
+From: Jens Freimann <jfreimann@redhat.com>
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH] migration: Optimization about wait-unplug migration state
+Message-ID: <20200205144027.55qsz3j7qf26pzfd@jenstp.localdomain>
+References: <20200204050841.44453-1-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="j2AXaZ4YhVcLc+PQ"
+In-Reply-To: <20200204050841.44453-1-zhukeqian1@huawei.com>
+User-Agent: NeoMutt/20180716-1376-5d6ed1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: NuAAIiOrNUyN7Gis0Mgd1Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <1580815851-28887-1-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,130 +88,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Igor Mammedov <imammedo@redhat.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: wanghaibin.wang@huawei.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Feb 04, 2020 at 01:08:41PM +0800, Keqian Zhu wrote:
+>qemu_savevm_nr_failover_devices() is originally designed to
+>get the number of failover devices, but it actually returns
+>the number of "unplug-pending" failover devices now. Moreover,
+>what drives migration state to wait-unplug should be the number
+>of "unplug-pending" failover devices, not all failover devices.
+>
+>We can also notice that qemu_savevm_state_guest_unplug_pending()
+>and qemu_savevm_nr_failover_devices() is equivalent almost (from
+>the code view). So the latter is incorrect semantically and
+>useless, just delete it.
+>
+>In the qemu_savevm_state_guest_unplug_pending(), once hit a
+>unplug-pending failover device, then it can return true right
+>now to save cpu time.
+>
+>Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>---
+>Cc: jfreimann@redhat.com
+>Cc: Juan Quintela <quintela@redhat.com>
+>Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>---
+> migration/migration.c |  2 +-
+> migration/savevm.c    | 24 +++---------------------
+> migration/savevm.h    |  1 -
+> 3 files changed, 4 insertions(+), 23 deletions(-)
+>
+>diff --git a/migration/migration.c b/migration/migration.c
+>index 3a21a4686c..deedc968cf 100644
+>--- a/migration/migration.c
+>+++ b/migration/migration.c
+>@@ -3333,7 +3333,7 @@ static void *migration_thread(void *opaque)
+>
+>     qemu_savevm_state_setup(s->to_dst_file);
+>
+>-    if (qemu_savevm_nr_failover_devices()) {
+>+    if (qemu_savevm_state_guest_unplug_pending()) {
+>         migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>                           MIGRATION_STATUS_WAIT_UNPLUG);
+>
+>diff --git a/migration/savevm.c b/migration/savevm.c
+>index f19cb9ec7a..1d4220ece8 100644
+>--- a/migration/savevm.c
+>+++ b/migration/savevm.c
+>@@ -1140,36 +1140,18 @@ void qemu_savevm_state_header(QEMUFile *f)
+>     }
+> }
+>
+>-int qemu_savevm_nr_failover_devices(void)
+>+bool qemu_savevm_state_guest_unplug_pending(void)
+> {
+>     SaveStateEntry *se;
+>-    int n =3D 0;
+>
+>     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>         if (se->vmsd && se->vmsd->dev_unplug_pending &&
+>             se->vmsd->dev_unplug_pending(se->opaque)) {
+>-            n++;
+>-        }
+>-    }
+>-
+>-    return n;
+>-}
+>-
+>-bool qemu_savevm_state_guest_unplug_pending(void)
+>-{
+>-    SaveStateEntry *se;
+>-    int n =3D 0;
+>-
+>-    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+>-        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
+>-            continue;
+>-        }
+>-        if (se->vmsd->dev_unplug_pending(se->opaque)) {
+>-            n++;
+>+            return true;
+>         }
+>     }
+>
+>-    return n > 0;
+>+    return false;
+> }
+>
+> void qemu_savevm_state_setup(QEMUFile *f)
+>diff --git a/migration/savevm.h b/migration/savevm.h
+>index c42b9c80ee..ba64a7e271 100644
+>--- a/migration/savevm.h
+>+++ b/migration/savevm.h
+>@@ -31,7 +31,6 @@
+>
+> bool qemu_savevm_state_blocked(Error **errp);
+> void qemu_savevm_state_setup(QEMUFile *f);
+>-int qemu_savevm_nr_failover_devices(void);
+> bool qemu_savevm_state_guest_unplug_pending(void);
+> int qemu_savevm_state_resume_prepare(MigrationState *s);
+> void qemu_savevm_state_header(QEMUFile *f);
+>--=20
+>2.19.1
 
---j2AXaZ4YhVcLc+PQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Looks good to me. I tested it and it still works, so=20
 
-On Tue, Feb 04, 2020 at 12:30:42PM +0100, i.kotrasinsk@partner.samsung.com =
-wrote:
-> From: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
->=20
-> This patchset adds a "memory exposing" device that allows two QEMU
-> instances to share arbitrary memory regions. Unlike ivshmem, it does not
-> create a new region of memory that's shared between VMs, but instead
-> allows one VM to access any memory region of the other VM we choose to
-> share.
->=20
-> The motivation for this device is a sort of ARM Trustzone "emulation",
-> where a rich system running on one machine (e.g. x86_64 linux) is able
-> to perform SMCs to a trusted system running on another (e.g. OpTEE on
-> ARM). With a device that allows sharing arbitrary memory between VMs,
-> this can be achieved with minimal changes to the trusted system and its
-> linux driver while allowing the rich system to run on a speedier x86
-> emulator. I prepared additional patches for linux, OpTEE OS and OpTEE
-> build system as a PoC that such emulation works and passes OpTEE tests;
-> I'm not sure what would be the best way to share them.
->=20
-> This patchset is my first foray into QEMU source code and I'm certain
-> it's not yet ready to be merged in. I'm not sure whether memory sharing
-> code has any race conditions or breaks rules of working with memory
-> regions, or if having VMs communicate synchronously via chardevs is the
-> right way to do it. I do believe the basic idea for sharing memory
-> regions is sound and that it could be useful for inter-VM communication.
+Tested-by: Jens Freimann <jfreimann@redhat.com>
+Reviewed-by: Jens Freimann <jfreimann@redhat.com>=20
 
-Hi,
-Without having looked into the patches yet, I'm already wondering if you
-can use the existing -object
-memory-backend-file,size=3D512M,mem-path=3D/my/shared/mem feature for your
-use case?
+regards
+Jens
 
-That's the existing mechanism for fully sharing guest RAM and if you
-want to share all of memory then maybe a device is not necessary - just
-share the memory.
-
-Stefan
-
-> Igor Kotrasinski (9):
->   memory: Add function for finding flat memory ranges
->   memory: Support mmap offset for fd-backed memory regions
->   memory: Hack - use shared memory when possible
->   hw/misc/memexpose: Add documentation
->   hw/misc/memexpose: Add core memexpose files
->   hw/misc/memexpose: Add memexpose pci device
->   hw/misc/memexpose: Add memexpose memory region device
->   hw/misc/memexpose: Add simple tests
->   hw/arm/virt: Hack in support for memexpose device
->=20
->  Kconfig.host                            |   3 +
->  MAINTAINERS                             |  12 +
->  Makefile                                |   1 +
->  backends/hostmem-memfd.c                |   2 +-
->  configure                               |   8 +
->  docs/specs/memexpose-spec.txt           | 168 +++++++++
->  exec.c                                  |  10 +-
->  hw/arm/virt.c                           | 110 +++++-
->  hw/core/numa.c                          |   4 +-
->  hw/mem/Kconfig                          |   3 +
->  hw/misc/Makefile.objs                   |   1 +
->  hw/misc/ivshmem.c                       |   3 +-
->  hw/misc/memexpose/Makefile.objs         |   4 +
->  hw/misc/memexpose/memexpose-core.c      | 630 ++++++++++++++++++++++++++=
-++++++
->  hw/misc/memexpose/memexpose-core.h      | 109 ++++++
->  hw/misc/memexpose/memexpose-memregion.c | 142 +++++++
->  hw/misc/memexpose/memexpose-memregion.h |  41 +++
->  hw/misc/memexpose/memexpose-msg.c       | 261 +++++++++++++
->  hw/misc/memexpose/memexpose-msg.h       | 161 ++++++++
->  hw/misc/memexpose/memexpose-pci.c       | 218 +++++++++++
->  include/exec/memory.h                   |  20 +
->  include/exec/ram_addr.h                 |   2 +-
->  include/hw/arm/virt.h                   |   5 +
->  include/qemu/mmap-alloc.h               |   1 +
->  memory.c                                |  82 ++++-
->  tests/qtest/Makefile.include            |   2 +
->  tests/qtest/memexpose-test.c            | 364 ++++++++++++++++++
->  util/mmap-alloc.c                       |   7 +-
->  util/oslib-posix.c                      |   2 +-
->  29 files changed, 2360 insertions(+), 16 deletions(-)
->  create mode 100644 docs/specs/memexpose-spec.txt
->  create mode 100644 hw/misc/memexpose/Makefile.objs
->  create mode 100644 hw/misc/memexpose/memexpose-core.c
->  create mode 100644 hw/misc/memexpose/memexpose-core.h
->  create mode 100644 hw/misc/memexpose/memexpose-memregion.c
->  create mode 100644 hw/misc/memexpose/memexpose-memregion.h
->  create mode 100644 hw/misc/memexpose/memexpose-msg.c
->  create mode 100644 hw/misc/memexpose/memexpose-msg.h
->  create mode 100644 hw/misc/memexpose/memexpose-pci.c
->  create mode 100644 tests/qtest/memexpose-test.c
->=20
-> --=20
-> 2.7.4
->=20
->=20
-
---j2AXaZ4YhVcLc+PQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl46048ACgkQnKSrs4Gr
-c8iddAgAuwnstz5oYM9PFNmKV/yZzJfgRbBn5QMiN+lVp+XgNvECeU+c6xsryMnA
-IuobpKF11b+cWd/bHlNR3rLQ3X73tLmTW3KEhiSE8APuYww1CE9/MwKBpIt9sIIA
-gUsnvGcegt/DDMGYBpzr/QPoxgj/V1j9njgLu4qNOFKOl0ShQxy3V/SOq/uFC9TP
-oSNhqEfvfJBjfFWYB4ZnHwTYrO00ZzWuYiJBK9k1mXvVrJCrNwpLoFJYYgd0o13F
-9lwvjLLsWcqaPg8dveMnse3bh3dVGhjQB6aMfqgCl7rXwNV8G+zGGh51a6/3CqKN
-JRuXBj9StxIWGNM/HcD8BdZbhF2aIA==
-=w/ta
------END PGP SIGNATURE-----
-
---j2AXaZ4YhVcLc+PQ--
 
