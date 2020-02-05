@@ -2,83 +2,102 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C38FAC35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:25:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A19C35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:28:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9074320659
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:25:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64C4120659
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:28:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AiiR2esy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9074320659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KHPHf1GW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64C4120659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izMYh-0005zQ-QG
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 10:25:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45359)
+	id 1izMav-0000O7-Ji
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 10:28:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50854)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1izMXu-00056a-RO
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:24:55 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1izMZz-0007ke-2L
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:27:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1izMXt-0000eu-Ew
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:24:54 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53863
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1izMZy-0003pA-3E
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:27:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31923
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1izMXt-0000YY-AC
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:24:53 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1izMZx-0003j9-VO
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:27:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580916292;
+ s=mimecast20190719; t=1580916421;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3luZKTz+GXtrf92Y7bP9KUq+bhyzmvAc+UxrWthEpwE=;
- b=AiiR2esyV7/FJG9YVDnOGnw4aZOYgdcP/svVOGlekpVF7O48kkKr4p2B8J1lVNAAnT7D5d
- VyagF9KdpSkA5gkChAnZHONSdmveIehWQoDSmFjITa3xbZm0xrRp76qY4r0pn3cNA+HF0Y
- 4/Edzy603Wlak7nDftLMnXnlDJqudTQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-k94l2tz7Mi-wXD7OECsvPw-1; Wed, 05 Feb 2020 10:24:48 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F3C4DBA3;
- Wed,  5 Feb 2020 15:24:47 +0000 (UTC)
-Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A8295D9E2;
- Wed,  5 Feb 2020 15:24:46 +0000 (UTC)
-Subject: Re: [PATCH v2 03/33] block: Add BdrvChildRole
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200204170848.614480-1-mreitz@redhat.com>
- <20200204170848.614480-4-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <ab321260-f03c-2540-e443-9b1f066f819f@redhat.com>
-Date: Wed, 5 Feb 2020 09:24:46 -0600
+ bh=0G934c4ezx5PqrNBWltm4RKTNT49Jlg/JBkQmGNu+dY=;
+ b=KHPHf1GWLGD03p6NertbcNXlRMRdGDuTLaDS7LJnULJFL2IB93PhZHtarttvVjwO2sPjKv
+ n1fh6TWBscM8ASdEKF+q6e2kXei/YRsKeC5yuwHxJ0/6najBr8S76FNjB9RYaGWqN8Q1a0
+ iaXsr8gugG0YL9N/FVqzkukHebH7R7s=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-421-p0_BhKzPMXqfakbkceRbiQ-1; Wed, 05 Feb 2020 10:26:54 -0500
+Received: by mail-wr1-f70.google.com with SMTP id 50so1361975wrc.2
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 07:26:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HFSvnF4h3RbLYLc/xxbbhYMLGqdBwO8aieKoCsyDA6E=;
+ b=r1Rh3GmctSPk6HCa0NPU9xVwGqYecskKAILdyZOfhzEVplrOWNpUZ+c87ofB5Nl1dD
+ Gr8PHretqK/SELSs2wp2IFSH4RNbW0sTvozrCuG2FayACS9LgEoqABiYlEXcsHZcBwq0
+ yTRPXgQkizK0uIv9RfdKh0Y8lNAFsp1YEX1jtgJY4XxSNyqmP2ow+bFIOw2V1CkaKLOY
+ zYonfp2GCVOEbriCaOnzBhX4m+NvkXDzPNAlanQLaDhROSr03ZpUJQljoU+EYSyizbPF
+ 7x4XnJV0+GluhE9rp8uk3Hw3AXwf73Jc0i/eByFP1ASVulHkmubMIWS/ZkOXUDjrrQoq
+ pD0w==
+X-Gm-Message-State: APjAAAVi9qf6iyAzwkfFFhyMPFMOD57Ck+/F1oSQm2WON5+/FLO0gsmI
+ mJ/GPvVbxgguHO3ZfNiJX2EPBbNq2/xZijI9J7OR3s4Rd/6kpPGszOelugU1P0fHtiMkvtcR0KT
+ W85kxIfSxZucPq44=
+X-Received: by 2002:a7b:c1d6:: with SMTP id a22mr6051446wmj.108.1580916412713; 
+ Wed, 05 Feb 2020 07:26:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzCNhle1f2m0Yb5svELIdy6DDTqoM2jUgxwEbTczID2vd6z0xxpn3jjxYQSMloKUucAfgdkYA==
+X-Received: by 2002:a7b:c1d6:: with SMTP id a22mr6051416wmj.108.1580916412427; 
+ Wed, 05 Feb 2020 07:26:52 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id b10sm173148wrt.90.2020.02.05.07.26.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 05 Feb 2020 07:26:51 -0800 (PST)
+Subject: Re: [PATCH for-5.0 3/4] Remove the core bluetooth code
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Thomas Huth <thuth@redhat.com>
+References: <20191120091014.16883-1-thuth@redhat.com>
+ <20191120091014.16883-4-thuth@redhat.com>
+ <7a775153-f18d-e766-1d8f-33607f5fa05b@amsat.org>
+ <2396dfd4-6c85-d17a-b358-bd058c757f14@redhat.com>
+ <CAAdtpL7vPCQ8k91nvBWc_NLrmhu6OPVprUSL8uzi_v6HMiSrnw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e90fb38e-bf41-c696-6c94-8626ecf69a8b@redhat.com>
+Date: Wed, 5 Feb 2020 16:26:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200204170848.614480-4-mreitz@redhat.com>
+In-Reply-To: <CAAdtpL7vPCQ8k91nvBWc_NLrmhu6OPVprUSL8uzi_v6HMiSrnw@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: k94l2tz7Mi-wXD7OECsvPw-1
+X-MC-Unique: p0_BhKzPMXqfakbkceRbiQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,74 +109,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, libvir-list@redhat.com,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/4/20 11:08 AM, Max Reitz wrote:
-> This enum will supplement BdrvChildClass when it comes to what role (or
-> combination of roles) a child takes for its parent.
-> 
-> Because empty enums are not allowed, let us just start with it filled.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   include/block/block.h | 27 +++++++++++++++++++++++++++
->   1 file changed, 27 insertions(+)
-> 
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 38963ef203..0f7e8caa5b 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -279,6 +279,33 @@ enum {
->       DEFAULT_PERM_UNCHANGED      = BLK_PERM_ALL & ~DEFAULT_PERM_PASSTHROUGH,
->   };
->   
-> +typedef enum BdrvChildRole {
-> +    /* Child stores data */
-> +    BDRV_CHILD_DATA         = (1 << 0),
-> +
-> +    /* Child stores metadata */
-> +    BDRV_CHILD_METADATA     = (1 << 1),
-> +
-> +    /* Filtered child */
-> +    BDRV_CHILD_FILTERED     = (1 << 2),
+On 01/02/20 19:53, Philippe Mathieu-Daud=C3=A9 wrote:
+> I thought about it but this won't fix much, it is too late now.
 
-I'm not sure this comment does justice for what the flag represents, but 
-am not sure of what longer comment to put in its place.
+It would help distros who are already disabling bluez, since they
+wouldn't incur a compile-time error.  Not a big deal though.
 
-> +
-> +    /* Child to COW from (backing child) */
-> +    BDRV_CHILD_COW          = (1 << 3),
-> +
-> +    /*
-> +     * The primary child.  For most drivers, this is the child whose
-> +     * filename applies best to the parent node.
-> +     * Each parent must give this flag to no more than one child at a
-> +     * time.
-> +     */
-> +    BDRV_CHILD_PRIMARY      = (1 << 4),
-> +
-> +    /* Useful combination of flags */
-> +    BDRV_CHILD_IMAGE        = BDRV_CHILD_DATA
-> +                              | BDRV_CHILD_METADATA
-> +                              | BDRV_CHILD_PRIMARY,
-> +} BdrvChildRole;
-> +
->   char *bdrv_perm_names(uint64_t perm);
->   uint64_t bdrv_qapi_perm_to_blk_perm(BlockPermission qapi_perm);
->   
-> 
-
-Whether or not you can improve the comment, the enum makes sense.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Paolo
 
 
