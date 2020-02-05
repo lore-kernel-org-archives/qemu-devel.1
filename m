@@ -2,76 +2,74 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCF4C352A1
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:30:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 408EFC35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:32:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C95A521741
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:30:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C95A521741
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0CE4521741
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:32:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FbExG4IZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CE4521741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52387 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izNZi-0008Rb-Tf
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 11:30:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34572)
+	id 1izNbK-0001XH-9F
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 11:32:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1izNYp-0007OR-Ed
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:29:57 -0500
+ (envelope-from <jusual@redhat.com>) id 1izNZJ-00087l-HF
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:30:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1izNYn-0000L7-JA
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:29:55 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2070 helo=huawei.com)
+ (envelope-from <jusual@redhat.com>) id 1izNZI-0001Vc-C3
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:30:25 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58207
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1izNYi-0008QL-6x; Wed, 05 Feb 2020 11:29:48 -0500
-Received: from LHREML710-CAH.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id 6D8BB9E4C216A4032FEF;
- Wed,  5 Feb 2020 16:29:42 +0000 (GMT)
-Received: from lhreml703-chm.china.huawei.com (10.201.108.52) by
- LHREML710-CAH.china.huawei.com (10.201.108.33) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Wed, 5 Feb 2020 16:29:41 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml703-chm.china.huawei.com (10.201.108.52) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 5 Feb 2020 16:29:41 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Wed, 5 Feb 2020 16:29:41 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Topic: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Index: AQHVzV43w2nN4JnxQEOUTwT8NpSKx6gLQ1MAgAAWtoCAACc+AIABYS3w
-Date: Wed, 5 Feb 2020 16:29:41 +0000
-Message-ID: <8e0b2c762e914c64bebfab5fc7441661@huawei.com>
-References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
- <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
- <20200204162320.67e5d353@redhat.com>
- <74eaaa45-0d20-9a21-fbf8-6d29deb248eb@redhat.com>
- <4ce41554-8b8e-dbb5-5fe9-43af09950f23@redhat.com>
-In-Reply-To: <4ce41554-8b8e-dbb5-5fe9-43af09950f23@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <jusual@redhat.com>) id 1izNZI-0001Sv-7t
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:30:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580920223;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=t6JJqOsIC0sjR5SET7Vkcoe5+YylPvMgXs6rhxviKlc=;
+ b=FbExG4IZf2IqcwFfBc+9DILQyAnTBX27O71zbbYIMq34pdNmUbTksobo9dqpiqxcrQUddG
+ ggeh5p1qPF+/uuHEVtSux7GW85Gh9wDC8Ro/SZGHHWTUmcmYVJB6CHsg2ufKO4QWYSb48B
+ TXRLy2Os3uWi0SeQwkku+srp1hR3m3w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-H1pXfWPuOxOkNpAYQ2B0Bw-1; Wed, 05 Feb 2020 11:30:21 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7A1D800D55;
+ Wed,  5 Feb 2020 16:30:20 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.43.2.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 55B2B8DC09;
+ Wed,  5 Feb 2020 16:30:13 +0000 (UTC)
+From: Julia Suvorova <jusual@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qemu-img: Place the '-i aio' option in alphabetical order
+Date: Wed,  5 Feb 2020 17:30:08 +0100
+Message-Id: <20200205163008.204493-1-jusual@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: H1pXfWPuOxOkNpAYQ2B0Bw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,138 +81,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Julia Suvorova <jusual@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgRGF2aWQsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUWVtdS1k
-ZXZlbA0KPiBbbWFpbHRvOnFlbXUtZGV2ZWwtYm91bmNlcytzaGFtZWVyYWxpLmtvbG90aHVtLnRo
-b2RpPWh1YXdlaS5jb21Abm9uZ24NCj4gdS5vcmddIE9uIEJlaGFsZiBPZiBEYXZpZCBIaWxkZW5i
-cmFuZA0KPiBTZW50OiAwNCBGZWJydWFyeSAyMDIwIDE5OjA1DQo+IFRvOiBJZ29yIE1hbW1lZG92
-IDxpbWFtbWVkb0ByZWRoYXQuY29tPjsgU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaQ0KPiA8c2hh
-bWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiBDYzogcGV0ZXIubWF5ZGVsbEBs
-aW5hcm8ub3JnOyB4aWFvZ3Vhbmdyb25nLmVyaWNAZ21haWwuY29tOw0KPiBtc3RAcmVkaGF0LmNv
-bTsgc2hhbm5vbi56aGFvc2xAZ21haWwuY29tOyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+IHh1
-d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNv
-bT47DQo+IGVyaWMuYXVnZXJAcmVkaGF0LmNvbTsgcWVtdS1hcm1Abm9uZ251Lm9yZzsgbGVyc2Vr
-QHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAxLzddIGV4ZWM6IEZpeCBmb3Ig
-cWVtdV9yYW1fcmVzaXplKCkgY2FsbGJhY2sNCj4gDQo+IE9uIDA0LjAyLjIwIDE3OjQ0LCBEYXZp
-ZCBIaWxkZW5icmFuZCB3cm90ZToNCj4gPiBPbiAwNC4wMi4yMCAxNjoyMywgSWdvciBNYW1tZWRv
-diB3cm90ZToNCj4gPj4gT24gRnJpLCAxNyBKYW4gMjAyMCAxNzo0NToxNiArMDAwMA0KPiA+PiBT
-aGFtZWVyIEtvbG90aHVtIDxzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+IHdy
-b3RlOg0KPiA+Pg0KPiA+Pj4gSWYgQUNQSSBibG9iIGxlbmd0aCBtb2RpZmljYXRpb25zIGhhcHBl
-bnMgYWZ0ZXIgdGhlIGluaXRpYWwNCj4gPj4+IHZpcnRfYWNwaV9idWlsZCgpIGNhbGwsIGFuZCB0
-aGUgY2hhbmdlZCBibG9iIGxlbmd0aCBpcyB3aXRoaW4NCj4gPj4+IHRoZSBQQUdFIHNpemUgYm91
-bmRhcnksIHRoZW4gdGhlIHJldmlzZWQgc2l6ZSBpcyBub3Qgc2VlbiBieQ0KPiA+Pj4gdGhlIGZp
-cm13YXJlIG9uIEd1ZXN0IHJlYm9vdC4gVGhlIGlzIGJlY2F1c2UgaW4gdGhlDQo+ID4+PiB2aXJ0
-X2FjcGlfYnVpbGRfdXBkYXRlKCkgLT4gYWNwaV9yYW1fdXBkYXRlKCkgLT4gcWVtdV9yYW1fcmVz
-aXplKCkNCj4gPj4+IHBhdGgsIHFlbXVfcmFtX3Jlc2l6ZSgpIHVzZXMgdXNlZF9sZW5ndGggKHJh
-bV9ibG9jayBzaXplIHdoaWNoIGlzDQo+ID4+PiBhbGlnbmVkIHRvIFBBR0Ugc2l6ZSkgYW5kIHRo
-ZSAicmVzaXplIGNhbGxiYWNrIiB0byB1cGRhdGUgdGhlIHNpemUNCj4gPj4+IHNlZW4gYnkgZmly
-bXdhcmUgaXMgbm90IGdldHRpbmcgaW52b2tlZC4NCj4gPj4+DQo+ID4+PiBIZW5jZSBtYWtlIHN1
-cmUgY2FsbGJhY2sgaXMgY2FsbGVkIGlmIHRoZSBuZXcgc2l6ZSBpcyBkaWZmZXJlbnQNCj4gPj4+
-IGZyb20gb3JpZ2luYWwgcmVxdWVzdGVkIHNpemUuDQo+ID4+Pg0KPiA+Pj4gU2lnbmVkLW9mZi1i
-eTogU2hhbWVlciBLb2xvdGh1bQ0KPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWku
-Y29tPg0KPiA+Pj4gLS0tDQo+ID4+PiBQbGVhc2UgZmluZCB0aGUgcHJldmlvdXMgZGlzY3Vzc2lv
-bnMgb24gdGhpcyBpc3N1ZSBoZXJlLA0KPiA+Pj4gaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9y
-Zy9wYXRjaC8xMTE3NDk0Ny8NCj4gPj4+DQo+ID4+PiBCdXQgdGhpcyBvbmUgYXR0ZW1wdHMgYSBk
-aWZmZXJlbnQgc29sdXRpb24gdG8gZml4IGl0IGJ5IGludHJvZHVjaW5nDQo+ID4+PiByZXFfbGVu
-Z3RoIHZhciB0byBSQU1CbG9jayBzdHJ1Y3QuDQo+ID4+Pg0KPiA+Pg0KPiA+PiBsb29rcyBmaW5l
-IHRvIG1lLCBzbw0KPiA+PiBBY2tlZC1ieTogSWdvciBNYW1tZWRvdiA8aW1hbW1lZG9AcmVkaGF0
-LmNvbT4NCj4gPg0KPiA+IFRoYW5rcyBmb3IgQ0NpbmcuDQo+ID4NCj4gPiBUaGlzIGluIGZhY3Qg
-Y29sbGlkZXMgd2l0aCBteSBjaGFuZ2VzIC4uLiBidXQgbm90IHNldmVyZWx5IDopDQo+ID4NCj4g
-Pj4NCj4gPj4gQ0NpbmcgRGF2aWQgd2hvIHRvdWNoZXMgdGhpcyBhcmVhIGluIGhpcyBsYXRlc3Qg
-c2VyaWVzIGZvciBhbmQNCj4gPj4gbWlnaHQgaGF2ZSBhbiBvcGluaW9uIG9uIGhvdyBpdCBzaG91
-bGQgYmUgaGFuZGxlZC4NCj4gPj4NCj4gPg0KPiA+IFNvIHdlIGFyZSB0YWxraW5nIGFib3V0IHN1
-Yi1wYWdlIHNpemUgY2hhbmdlcz8gSSBzb21ld2hhdCBkaXNsaWtlDQo+ID4gc3RvcmluZyAicmVx
-X2xlbmd0aCIgaW4gcmFtIGJsb2Nrcy4gTG9va3MgbGlrZSBzdWItcGFnZXMgc3R1ZmYgZG9lcyBu
-b3QNCj4gPiBiZWxvbmcgdGhlcmUuDQoNClRoYW5rcyBmb3IgdGFraW5nIGEgbG9vayBhdCB0aGlz
-LiBBZ3JlZSwgSSBkaWRu4oCZdCBsaWtlIHRoYXQgInJlcV9sZW5ndGgiIGVpdGhlci4NCg0KPiA+
-IFJhbSBibG9ja3Mgb25seSBvcGVyYXRlIG9uIHBhZ2UgZ3JhbnVsYXJpdHkuIFJhbSBibG9jayBu
-b3RpZmllcnMgb25seQ0KPiA+IG9wZXJhdGUgb24gcGFnZSBncmFudWxhcml0eS4gTWVtb3J5IHJl
-Z2lvbnMgb25seSBvcGVyYXRlIG9uIHBhZ2UNCj4gPiBncmFudWxhcml0eS4gRGlydHkgYml0bWFw
-cyBvcGVyYXRlIG9uIHBhZ2UgZ3JhbnVsYXJpdHkuIEVzcGVjaWFsbHksDQo+ID4gbWVtb3J5X3Jl
-Z2lvbl9zaXplKG1yKSB3aWxsIGFsd2F5cyByZXR1cm4gYWxpZ25lZCB2YWx1ZXMuDQo+ID4NCj4g
-PiBJIHRoaW5rIHVzZXJzL293bmVyIHNob3VsZCBkZWFsIHdpdGggYW55dGhpbmcgc21hbGxlciBt
-YW51YWxseSBpZg0KPiA+IHRoZXkgcmVhbGx5IG5lZWQgaXQuDQo+ID4NCj4gPiBXaGF0IGFib3V0
-IGFsd2F5cyBjYWxsaW5nIHRoZSByZXNpemVkKCkgY2FsbGJhY2sgYW5kIGxldHRpbmcgdGhlDQo+
-ID4gYWN0dWFsIG93bmVyIGZpZ3VyZSBvdXQgaWYgdGhlIHNpemUgY2hhbmdlZCBvbiBzdWItcGFn
-ZSBncmFudWxhcml0eQ0KPiA+IG9yIG5vdD8gKGJ5IGxvb2tpbmcgdXAgdGhlIHNpemUgbWFudWFs
-bHkgdXNpbmcgc29tZSBtZWNoYW5pc20gbm90IGdsdWVkIHRvDQo+ID4gbWVtb3J5IHJlZ2lvbnMv
-cmFtIGJsb2Nrcy93aGF0ZXZlcikNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9leGVjLmMgYi9leGVj
-LmMNCj4gPiBpbmRleCA2N2U1MjBkMThlLi41OWQ0NmNjMzg4IDEwMDY0NA0KPiA+IC0tLSBhL2V4
-ZWMuYw0KPiA+ICsrKyBiL2V4ZWMuYw0KPiA+IEBAIC0yMTMwLDYgKzIxMzAsMTMgQEAgaW50IHFl
-bXVfcmFtX3Jlc2l6ZShSQU1CbG9jayAqYmxvY2ssDQo+IHJhbV9hZGRyX3QgbmV3c2l6ZSwgRXJy
-b3IgKiplcnJwKQ0KPiA+ICAgICAgbmV3c2l6ZSA9IEhPU1RfUEFHRV9BTElHTihuZXdzaXplKTsN
-Cj4gPg0KPiA+ICAgICAgaWYgKGJsb2NrLT51c2VkX2xlbmd0aCA9PSBuZXdzaXplKSB7DQo+ID4g
-KyAgICAgICAgLyoNCj4gPiArICAgICAgICAgKiBUaGUgb3duZXIgbWlnaHQgd2FudCB0byBoYW5k
-bGUgc3ViLXBhZ2UgcmVzaXplcy4gV2Ugb25seQ0KPiBwcm92aWRlDQo+ID4gKyAgICAgICAgICog
-dGhlIGFsaWduZWQgc2l6ZSAtIGJlY2F1c2UgcmFtIGJsb2NrcyBhcmUgYWx3YXlzIHBhZ2UgYWxp
-Z25lZC4NCj4gPiArICAgICAgICAgKi8NCj4gPiArICAgICAgICBpZiAoYmxvY2stPnJlc2l6ZWQp
-IHsNCj4gPiArICAgICAgICAgICAgYmxvY2stPnJlc2l6ZWQoYmxvY2stPmlkc3RyLCBuZXdzaXpl
-LCBibG9jay0+aG9zdCk7DQoNCkRvZXMgaXQgbWFrZSBzZW5zZSB0byBwYXNzIHRoZSByZXF1ZXN0
-ZWQgc2l6ZSBpbiB0aGUgY2FsbGJhY2sgdGhhbiB0aGUgYWxpZ25lZCBzaXplDQphcyB0aGUgb3du
-ZXIgbWlnaHQgYmUgaW50ZXJlc3RlZCBtb3JlIGluIHRoZSBvcmdfcmVxX3NpemUgdnMgbmV3X3Jl
-cSBfc2l6ZSBjYXNlPw0KDQo+ID4gKyAgICAgICAgfQ0KPiA+ICAgICAgICAgIHJldHVybiAwOw0K
-PiA+ICAgICAgfQ0KPiA+DQoNCiANCj4gT2gsIGFuZCBvbmUgbW9yZSByZWFzb24gd2h5IHRoZSBw
-cm9wb3NhbCBpbiB0aGlzIHBhdGNoIGlzIGluY29uc2lzdGVudDoNCj4gDQo+IFdoZW4gbWlncmF0
-aW5nIHJlc2l6YWJsZSBtZW1vcnkgcmVnaW9ucyAoUkFNX1NBVkVfRkxBR19NRU1fU0laRSkgd2UN
-Cj4gc3RvcmUgdGhlIGJsb2NrLT51c2VkX2xlbmd0aCAocmFtX3NhdmVfc2V0dXAoKSkgYW5kIHVz
-ZSB0aGF0IHZhbHVlIHRvDQo+IHJlc2l6ZSB0aGUgcmVnaW9uIG9uIHRoZSB0YXJnZXQgKHJhbV9s
-b2FkX3ByZWNvcHkoKSAtPiBxZW11X3JhbV9yZXNpemUoKSkuDQo+IA0KPiBUaGlzIHdpbGwgYmUg
-dGhlIHZhbHVlIHRoZSBjYWxsYmFjayB3aWxsIGJlIGNhbGxlZCB3aXRoLiBQYWdlIGFsaWduZWQu
-DQo+IA0KDQpTb3JyeSwgSSBkaWRu4oCZdCBxdWl0ZSBnZXQgdGhhdCBwb2ludCBhbmQgbm90IHN1
-cmUgaG93ICJyZXFfbGVuZ3RoIiBhcHByb2FjaCANCndpbGwgYWZmZWN0IHRoZSBtaWdyYXRpb24u
-DQoNCkFueXdheSwgSSBoYXZlIHJld29ya2VkIHRoZSBwYXRjaChiZWxvdykgd2l0aCB0aGUgYWJv
-dmUgc3VnZ2VzdGlvbiwgdGhhdCBpcw0KYWx3YXlzIGNhbGxpbmcgdGhlIHJlc2l6ZWQoKSBjYWxs
-YmFjaywgYnV0IG1vZGlmaWVkIGl0IHRvIHBhc3MgdGhlIHJlcXVlc3RlZCBzaXplDQppbnN0ZWFk
-IG9mIHRoZSBwYWdlIGFsaWduZWQgc2l6ZS4gUGxlYXNlIGxldCBtZSBrbm93IHlvdXIgZmVlZGJh
-Y2suDQoNClRoYW5rcywNClNoYW1lZXINCg0KZGlmZiAtLWdpdCBhL2V4ZWMuYyBiL2V4ZWMuYw0K
-aW5kZXggNjdlNTIwZDE4ZS4uYzljYjlhNTRmYSAxMDA2NDQNCi0tLSBhL2V4ZWMuYw0KKysrIGIv
-ZXhlYy5jDQpAQCAtMjEyMywxMyArMjEyMywyMiBAQCBzdGF0aWMgaW50IG1lbW9yeV90cnlfZW5h
-YmxlX21lcmdpbmcodm9pZCAqYWRkciwgc2l6ZV90IGxlbikNCiAgKiByZXNpemUgY2FsbGJhY2sg
-dG8gdXBkYXRlIGRldmljZSBzdGF0ZSBhbmQvb3IgYWRkIGFzc2VydGlvbnMgdG8gZGV0ZWN0DQog
-ICogbWlzdXNlLCBpZiBuZWNlc3NhcnkuDQogICovDQotaW50IHFlbXVfcmFtX3Jlc2l6ZShSQU1C
-bG9jayAqYmxvY2ssIHJhbV9hZGRyX3QgbmV3c2l6ZSwgRXJyb3IgKiplcnJwKQ0KK2ludCBxZW11
-X3JhbV9yZXNpemUoUkFNQmxvY2sgKmJsb2NrLCByYW1fYWRkcl90IHNpemUsIEVycm9yICoqZXJy
-cCkNCiB7DQorICAgIHJhbV9hZGRyX3QgbmV3c2l6ZTsNCiAgICAgYXNzZXJ0KGJsb2NrKTsNCiAN
-Ci0gICAgbmV3c2l6ZSA9IEhPU1RfUEFHRV9BTElHTihuZXdzaXplKTsNCisgICAgbmV3c2l6ZSA9
-IEhPU1RfUEFHRV9BTElHTihzaXplKTsNCiANCiAgICAgaWYgKGJsb2NrLT51c2VkX2xlbmd0aCA9
-PSBuZXdzaXplKSB7DQorICAgICAgICAvKg0KKyAgICAgICAgICogUkFNIGJsb2NrcyBhcmUgYWx3
-YXlzIHBhZ2UgYWxpZ25lZCwgYnV0IHRoZSBvd25lciBtaWdodCB3YW50DQorICAgICAgICAgKiB0
-byBoYW5kbGUgc3ViLXBhZ2UgcmVzaXplcy4gTGV0IHRoZSBvd25lciBrbm93IGFib3V0IGFueQ0K
-KyAgICAgICAgICogc3ViLXBhZ2UgY2hhbmdlcy4NCisgICAgICAgICAqLw0KKyAgICAgICAgaWYg
-KGJsb2NrLT5yZXNpemVkKSB7DQorICAgICAgICAgICAgYmxvY2stPnJlc2l6ZWQoYmxvY2stPmlk
-c3RyLCBzaXplLCBibG9jay0+aG9zdCk7DQorICAgICAgICB9DQogICAgICAgICByZXR1cm4gMDsN
-CiAgICAgfQ0KIA0KQEAgLTIxNTUsNyArMjE2NCw3IEBAIGludCBxZW11X3JhbV9yZXNpemUoUkFN
-QmxvY2sgKmJsb2NrLCByYW1fYWRkcl90IG5ld3NpemUsIEVycm9yICoqZXJycCkNCiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRElSVFlfQ0xJRU5UU19BTEwpOw0KICAg
-ICBtZW1vcnlfcmVnaW9uX3NldF9zaXplKGJsb2NrLT5tciwgbmV3c2l6ZSk7DQogICAgIGlmIChi
-bG9jay0+cmVzaXplZCkgew0KLSAgICAgICAgYmxvY2stPnJlc2l6ZWQoYmxvY2stPmlkc3RyLCBu
-ZXdzaXplLCBibG9jay0+aG9zdCk7DQorICAgICAgICBibG9jay0+cmVzaXplZChibG9jay0+aWRz
-dHIsIHNpemUsIGJsb2NrLT5ob3N0KTsNCiAgICAgfQ0KICAgICByZXR1cm4gMDsNCiB9DQpkaWZm
-IC0tZ2l0IGEvaHcvbnZyYW0vZndfY2ZnLmMgYi9ody9udnJhbS9md19jZmcuYw0KaW5kZXggMTc5
-YjMwMmYwMS4uZWM5Y2ZhNGQxMCAxMDA2NDQNCi0tLSBhL2h3L252cmFtL2Z3X2NmZy5jDQorKysg
-Yi9ody9udnJhbS9md19jZmcuYw0KQEAgLTkzNCw5ICs5MzQsMTEgQEAgdm9pZCAqZndfY2ZnX21v
-ZGlmeV9maWxlKEZXQ2ZnU3RhdGUgKnMsIGNvbnN0IGNoYXIgKmZpbGVuYW1lLA0KIA0KICAgICBm
-b3IgKGkgPSAwOyBpIDwgaW5kZXg7IGkrKykgew0KICAgICAgICAgaWYgKHN0cmNtcChmaWxlbmFt
-ZSwgcy0+ZmlsZXMtPmZbaV0ubmFtZSkgPT0gMCkgew0KLSAgICAgICAgICAgIHB0ciA9IGZ3X2Nm
-Z19tb2RpZnlfYnl0ZXNfcmVhZChzLCBGV19DRkdfRklMRV9GSVJTVCArIGksDQotICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRhdGEsIGxlbik7DQotICAgICAgICAg
-ICAgcy0+ZmlsZXMtPmZbaV0uc2l6ZSAgID0gY3B1X3RvX2JlMzIobGVuKTsNCisgICAgICAgICAg
-ICBpZiAocy0+ZmlsZXMtPmZbaV0uc2l6ZSAhPSBjcHVfdG9fYmUzMihsZW4pKSB7DQorICAgICAg
-ICAgICAgICAgIHB0ciA9IGZ3X2NmZ19tb2RpZnlfYnl0ZXNfcmVhZChzLCBGV19DRkdfRklMRV9G
-SVJTVCArIGksDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBkYXRhLCBsZW4pOw0KKyAgICAgICAgICAgICAgICBzLT5maWxlcy0+ZltpXS5zaXplICAgPSBj
-cHVfdG9fYmUzMihsZW4pOw0KKyAgICAgICAgICAgIH0NCiAgICAgICAgICAgICByZXR1cm4gcHRy
-Ow0KICAgICAgICAgfQ0KICAgICB9DQotLS0NCg==
+The '-i AIO' option was accidentally placed after '-n' and '-t'. Move it
+after '--flush-interval'.
+
+Signed-off-by: Julia Suvorova <jusual@redhat.com>
+---
+ docs/interop/qemu-img.rst | 8 ++++----
+ qemu-img-cmds.hx          | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/docs/interop/qemu-img.rst b/docs/interop/qemu-img.rst
+index fa27e5c7b4..42e4451db4 100644
+--- a/docs/interop/qemu-img.rst
++++ b/docs/interop/qemu-img.rst
+@@ -247,7 +247,7 @@ Command description:
+   Amends the image format specific *OPTIONS* for the image file
+   *FILENAME*. Not all file formats support this operation.
+=20
+-.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=3DFLUSH=
+_INTERVAL] [-n] [-i AIO] [--no-drain] [-o OFFSET] [--pattern=3DPATTERN] [-q=
+] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
++.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=3DFLUSH=
+_INTERVAL] [-i AIO] [-n] [--no-drain] [-o OFFSET] [--pattern=3DPATTERN] [-q=
+] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
+=20
+   Run a simple sequential I/O benchmark on the specified image. If ``-w`` =
+is
+   specified, a write test is performed, otherwise a read test is performed=
+.
+@@ -264,13 +264,13 @@ Command description:
+   ``--no-drain`` is specified, a flush is issued without draining the requ=
+est
+   queue first.
+=20
++  if ``-i`` is specified, *AIO* option can be used to specify different
++  AIO backends: ``threads``, ``native`` or ``io_uring``.
++
+   If ``-n`` is specified, the native AIO backend is used if possible. On
+   Linux, this option only works if ``-t none`` or ``-t directsync`` is
+   specified as well.
+=20
+-  if ``-i`` is specified, *AIO* option can be used to specify different
+-  AIO backends: ``threads``, ``native`` or ``io_uring``.
+-
+   For write tests, by default a buffer filled with zeros is written. This =
+can be
+   overridden with a pattern byte specified by *PATTERN*.
+=20
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 3fd836ca90..d7fbc6b1f4 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -16,9 +16,9 @@ SRST
+ ERST
+=20
+ DEF("bench", img_bench,
+-    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_interv=
+al] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s buffer_siz=
+e] [-S step_size] [-t cache] [-i aio] [-w] [-U] filename")
++    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=3Dflush_interv=
+al] [-i aio] [-n] [--no-drain] [-o offset] [--pattern=3Dpattern] [-q] [-s b=
+uffer_size] [-S step_size] [-t cache] [-w] [-U] filename")
+ SRST
+-.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=3DFLUSH=
+_INTERVAL] [-n] [--no-drain] [-o OFFSET] [--pattern=3DPATTERN] [-q] [-s BUF=
+FER_SIZE] [-S STEP_SIZE] [-t CACHE] [-i AIO] [-w] [-U] FILENAME
++.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT] [--flush-interval=3DFLUSH=
+_INTERVAL] [-i AIO] [-n] [--no-drain] [-o OFFSET] [--pattern=3DPATTERN] [-q=
+] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE] [-w] [-U] FILENAME
+ ERST
+ DEF("check", img_check,
+     "check [--object objectdef] [--image-opts] [-q] [-f fmt] [--output=3Do=
+fmt] [-r [leaks | all]] [-T src_cache] [-U] filename")
+--=20
+2.24.1
+
 
