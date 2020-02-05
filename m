@@ -7,116 +7,117 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B040C352A2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E60CC352A1
 	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:32:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AD0821741
+	by mail.kernel.org (Postfix) with ESMTPS id 5D957217BA
 	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:32:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="dr2vky4W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD0821741
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="sweoQXvg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D957217BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=partner.samsung.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izKnL-0004BA-AI
+	id 1izKnL-0004CO-ID
 	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:32:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36821)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKja-0007kj-Dq
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:54 -0500
+ id 1izKjZ-0007kO-S0
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKjY-0004uH-2C
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:50 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:46835)
+ id 1izKjX-0004qb-4H
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:49 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:50239)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKjX-0004qN-LF
+ id 1izKjW-0004gd-RN
  for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:47 -0500
 Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
- by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id
- 20200205132846euoutp0162afb25b7511b36c74395055aeae58b6~whKgg2DS42968129681euoutp01d
- for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 13:28:46 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com
- 20200205132846euoutp0162afb25b7511b36c74395055aeae58b6~whKgg2DS42968129681euoutp01d
+ by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
+ 20200205132844euoutp02116d1f150751f6d3ebfecc9992de7f0b~whKeZuFVE0896308963euoutp02U
+ for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 13:28:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
+ 20200205132844euoutp02116d1f150751f6d3ebfecc9992de7f0b~whKeZuFVE0896308963euoutp02U
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1580909326;
- bh=v5HP50D6ioOR5ulyJBYlkL4pC4y3uMp9hQG5R8Nz3DQ=;
+ s=mail20170921; t=1580909324;
+ bh=5R4nrCcLd2rZPxuKYcgQNp55I3lWJgCy5Tih85uN1Ug=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=dr2vky4Wn4hoMRnJYWrLML+xwpLmkW/VSeENRGqh2veKBPgJRwBlBpsR8CT1qZGrx
- I2iuMW7vrTbYgwmpQGX9cfOk2tZyqp3sNsBWpgSnw7GSwB35H+zujOG/iilmBLjwSy
- dSgJo8ELnkERmeKElMpdgwcqbFc7z4ADktxuCxZM=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTP id
- 20200205132846eucas1p196a275e0b99232846414a189750e61c7~whKgRQuP92963229632eucas1p1m;
- Wed,  5 Feb 2020 13:28:46 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
- eusmges2new.samsung.com (EUCPMTA) with SMTP id 26.5F.60679.E03CA3E5; Wed,  5
- Feb 2020 13:28:46 +0000 (GMT)
+ b=sweoQXvgJqpUrGgJJ63/L74+MWxD6em4HZhiINj/FRy3qt8xUEsqOlgMDdBrtlvdV
+ WTdI1978YLSW3ISfDVttEowxIL+ZEoBsBtpfplyg95XrXhuGHvXcQAD+M4duwO/ZpP
+ ypjysTtmik8XRqugfqNMkm7YcgDsnQrKcRFIZM7E=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+ eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+ 20200205132844eucas1p2d9932432436700319f96c83ed4f1a2ca~whKeOuWMf0081500815eucas1p2S;
+ Wed,  5 Feb 2020 13:28:44 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+ eusmges3new.samsung.com (EUCPMTA) with SMTP id 0B.9F.60698.C03CA3E5; Wed,  5
+ Feb 2020 13:28:44 +0000 (GMT)
 Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
  eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
- 20200205132846eucas1p2aafe9a2377abfb6ad4e78b565e719aed~whKf0L_rO0081500815eucas1p2Z;
- Wed,  5 Feb 2020 13:28:46 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+ 20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938~whKdwwoMv0490104901eucas1p2B;
+ Wed,  5 Feb 2020 13:28:43 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
  eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
- 20200205132846eusmtrp28a79ad7da34aa7649533ae004c14e0c3~whKfznBUu3040630406eusmtrp2H;
- Wed,  5 Feb 2020 13:28:46 +0000 (GMT)
-X-AuditID: cbfec7f4-0e5ff7000001ed07-ff-5e3ac30e5a5d
+ 20200205132843eusmtrp2e8398cbd8ac7d1dc8cef7b2528f8a628~whKdhuLZk2992629926eusmtrp2j;
+ Wed,  5 Feb 2020 13:28:43 +0000 (GMT)
+X-AuditID: cbfec7f5-a29ff7000001ed1a-23-5e3ac30c2bd4
 Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
- eusmgms2.samsung.com (EUCPMTA) with SMTP id 6C.FC.07950.D03CA3E5; Wed,  5
- Feb 2020 13:28:45 +0000 (GMT)
+ eusmgms1.samsung.com (EUCPMTA) with SMTP id C1.00.08375.B03CA3E5; Wed,  5
+ Feb 2020 13:28:43 +0000 (GMT)
 Received: from AMDC3304.digital.local (unknown [106.120.51.21]) by
  eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
- 20200205132845eusmtip2896830231847c0af531e4bf93233fcbd~whKfZhEH10047800478eusmtip2a;
- Wed,  5 Feb 2020 13:28:45 +0000 (GMT)
+ 20200205132843eusmtip27c63528900359f12c6f9e1001ca689b6~whKdLqoQ83135731357eusmtip2X;
+ Wed,  5 Feb 2020 13:28:43 +0000 (GMT)
 From: i.kotrasinsk@partner.samsung.com
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v3 8/9] hw/misc/memexpose: Add simple tests
-Date: Wed,  5 Feb 2020 14:28:36 +0100
-Message-Id: <1580909317-23884-9-git-send-email-i.kotrasinsk@partner.samsung.com>
+Subject: [RFC PATCH v3 2/9] memory: Support mmap offset for fd-backed memory
+ regions
+Date: Wed,  5 Feb 2020 14:28:30 +0100
+Message-Id: <1580909317-23884-3-git-send-email-i.kotrasinsk@partner.samsung.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1580909317-23884-1-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEIsWRmVeSWpSXmKPExsWy7djPc7p8h63iDBYuk7HYc+Exm8W9mzeZ
- LfZv+8dqMefMAxaL4707WBxYPe5c28Pm8eTaZiaPg+/2MHm833eVzWP7yUlMAaxRXDYpqTmZ
- ZalF+nYJXBk/L/SzFtxLqXh8rJ+1gfGTTxcjJ4eEgInE842/mUFsIYEVjBL9JyW7GLmA7C+M
- Eu1HlzJDOJ8ZJfZuPMwE03F59UGoxHJGidU/frHCtdw//Y8RpIpNQE1i55HPYLaIgKTE767T
- YB3MAg2MEo+unwVLCAvYS/T8bQSzWQRUJa72NIMdwisQIPF36zY2iHVyEjfPdYLFOQUCJS4/
- mwK2TULgPpvEpvM3WboYOYAcF4mTTVIQ9cISr45vYYewZST+75wPdXa9RMudHUwQvR2MEn0r
- p0MtsJb4smEp2BxmAU2J9bv0IcKOEvvWt7FBjOeTuPFWECTMDGRO2jadGSLMK9HRJgRRrSfR
- /eQmE8zWZY2PWCBsD4kPK/rYIOGzhFHi173Z7BMY5WchLFvAyLiKUTy1tDg3PbXYKC+1XK84
- Mbe4NC9dLzk/dxMjMCWc/nf8yw7GXX+SDjEKcDAq8fCumGQZJ8SaWFZcmXuIUYKDWUmE97w+
- UIg3JbGyKrUoP76oNCe1+BCjNAeLkjiv8aKXsUIC6YklqdmpqQWpRTBZJg5OqQZGj2+rOIWd
- VA2PsVT9q0subv7qPGEhby/n/fKbcoVxk7d9zVlkFclc9uD5v959zuXTon4Ex3M++J54/wxL
- uojXXJPmh8lPUn6ab1ziULet7Pde7riacPnCkiBpp+N3p1T+M+ANOLht/74pi6fbhRWX/zv1
- /KT/05LkycGyerYFJY+1eT7a8TkosRRnJBpqMRcVJwIAiebGtwUDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKLMWRmVeSWpSXmKPExsVy+t/xe7q8h63iDKa/trbYc+Exm8W9mzeZ
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEIsWRmVeSWpSXmKPExsWy7djP87o8h63iDJY0cFrsufCYzeLezZvM
+ Fvu3/WO1mHPmAYvF8d4dLA6sHneu7WHzeHJtM5PHwXd7mDze77vK5rH95CSmANYoLpuU1JzM
+ stQifbsEroylC08yFcz1qLh08TVTA+M7/S5GTg4JAROJXY9fs3UxcnEICaxglFj0dz4rSEJI
+ 4AujxOLleRCJz4wSDy8dYYTp+PhhCitEYjmjxJ+LX9khHKCOb6sfsIBUsQmoSew88hmsQ0RA
+ UuJ312lmkCJmgQZGiUfXz4IlhAXCJJpu32IDsVkEVCUWHZkDZvMKBEgs7zzPDLFOTuLmuU4w
+ m1MgUOLysymsEPHnbBIXH8VA2C4SHQd2skHYwhKvjm9hh7BlJP7vnM8EYddLtNzZwQRyhIRA
+ B6NE38rpUA3WEl82LAW6mgPoOk2J9bugAeMosXPVKzaQsIQAn8SNt4IgYWYgc9K26cwQYV6J
+ jjYhiGo9ie4nN5lgti5rfMQCYXtI/Lz6kAkSPksYJT5s7GabwCg/C2HZAkbGVYziqaXFuemp
+ xcZ5qeV6xYm5xaV56XrJ+bmbGIEp4fS/4193MO77k3SIUYCDUYmHN2CCZZwQa2JZcWXuIUYJ
+ DmYlEd7z+kAh3pTEyqrUovz4otKc1OJDjNIcLErivMaLXsYKCaQnlqRmp6YWpBbBZJk4OKUa
+ GG9z37qgOu2DU1FUdMDEY/kesor+L6p27b5a78JzxO0Y4/X0I7VJ4k/Ps7Zwr2izir76M+Dh
+ zaXL55lG6pdEzZ942PLQ12VTWmoNBCZcn9jel2cR0jfj7qsDYXemq7OVtzocFJx7pdf+T1UJ
+ 4/1iiRcBm6f9e3qhWKqeg+V7/oODOyaurp7M+FyJpTgj0VCLuag4EQCCfqgZBQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKLMWRmVeSWpSXmKPExsVy+t/xe7rch63iDO6eVrHYc+Exm8W9mzeZ
  LfZv+8dqMefMAxaL4707WBxYPe5c28Pm8eTaZiaPg+/2MHm833eVzWP7yUlMAaxRejZF+aUl
- qQoZ+cUltkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF+nYJehk/L/SzFtxLqXh8
- rJ+1gfGTTxcjJ4eEgInE5dUHmbsYuTiEBJYySkyas5EVIiEj8eP0GjYIW1jiz7UuNoiiT4wS
- n5/dYgJJsAmoSew88pkRxBYRkJT43XUabBKzQAujxLMn7WBFwgL2Ej1/G8GKWARUJa72NDOD
- 2LwCARJ/t26D2iAncfNcJ1icUyBQ4vKzKWBXCAHVvJ54hXkCI98CRoZVjCKppcW56bnFRnrF
- ibnFpXnpesn5uZsYgUG67djPLTsYu94FH2IU4GBU4uENmGAZJ8SaWFZcmXuIUYKDWUmE97w+
- UIg3JbGyKrUoP76oNCe1+BCjKdBRE5mlRJPzgRGUVxJvaGpobmFpaG5sbmxmoSTO2yFwMEZI
- ID2xJDU7NbUgtQimj4mDU6qB0UdJYXXFRcv6w3taNvP7bgxdPY+5Tm+nnXL947wa/rDMazdl
- fKblHny1Lu+DsIWo9u9XySf+XC9a94Jv8WetlLJHbBJVNk6PvAPs/j4LPM38ReJpyIRZ9qYB
- h83TVlxo//vftLyV70UN8/UrH3XOh13/3xe15WJCb6DPE417MYmP/27QjuP/qMRSnJFoqMVc
- VJwIAASkBO9oAgAA
-X-CMS-MailID: 20200205132846eucas1p2aafe9a2377abfb6ad4e78b565e719aed
+ qQoZ+cUltkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF+nYJehlLF55kKpjrUXHp
+ 4mumBsZ3+l2MnBwSAiYSHz9MYe1i5OIQEljKKHGx4RgLREJG4sfpNWwQtrDEn2tdbBBFnxgl
+ Ps1pZAdJsAmoSew88pkRxBYRkJT43XWaGaSIWaCFUeLZk3YmkISwQIjE1IkPwCaxCKhKLDoy
+ B8zmFQiQWN55nhlig5zEzXOdYDanQKDE5WcgJ3ECbQuQeD3xCvMERr4FjAyrGEVSS4tz03OL
+ DfWKE3OLS/PS9ZLzczcxAoN027Gfm3cwXtoYfIhRgINRiYd3xSTLOCHWxLLiytxDjBIczEoi
+ vOf1gUK8KYmVValF+fFFpTmpxYcYTYGOmsgsJZqcD4ygvJJ4Q1NDcwtLQ3Njc2MzCyVx3g6B
+ gzFCAumJJanZqakFqUUwfUwcnFINjIwSf2PMRFcvkPfU+nzxwpNVss/+7T/7cZHpN5Z5D/4H
+ ucSXprxLbKvf9cWWpUB3UfADkQNLty9LVeWxvXA5VWGG7M/0tzu4r82VMYx8n3Hz/APei4UX
+ 2BcILxfvqrH6cuIvT1jJvrWWMy418FwxUthwPWTp4oVlCpu9X6iuDz6oz96xYZLfSlUlluKM
+ REMt5qLiRADg/K16aAIAAA==
+X-CMS-MailID: 20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200205132846eucas1p2aafe9a2377abfb6ad4e78b565e719aed
+X-RootMTR: 20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20200205132846eucas1p2aafe9a2377abfb6ad4e78b565e719aed
+X-CMS-RootMailID: 20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938
 References: <1580909317-23884-1-git-send-email-i.kotrasinsk@partner.samsung.com>
- <CGME20200205132846eucas1p2aafe9a2377abfb6ad4e78b565e719aed@eucas1p2.samsung.com>
+ <CGME20200205132843eucas1p2b706b812ee59a3ff37c9413179cde938@eucas1p2.samsung.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 210.118.77.11
+X-Received-From: 210.118.77.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,416 +138,217 @@ Sender: "Qemu-devel"
 
 From: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
 
+The memexpose device will receive shared memory from another VM and map
+parts of it as memory regions. For that, we need to be able to mmap the
+region at an offset from shared memory's start.
+
 Signed-off-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
 ---
- MAINTAINERS                  |   1 +
- tests/qtest/Makefile.include |   2 +
- tests/qtest/memexpose-test.c | 364 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 367 insertions(+)
- create mode 100644 tests/qtest/memexpose-test.c
+ backends/hostmem-memfd.c  |  2 +-
+ exec.c                    | 10 ++++++----
+ hw/misc/ivshmem.c         |  3 ++-
+ include/exec/memory.h     |  2 ++
+ include/exec/ram_addr.h   |  2 +-
+ include/qemu/mmap-alloc.h |  1 +
+ memory.c                  |  3 ++-
+ util/mmap-alloc.c         |  7 ++++---
+ util/oslib-posix.c        |  2 +-
+ 9 files changed, 20 insertions(+), 12 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e016cff..6f30382 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1650,6 +1650,7 @@ F: hw/misc/memexpose/memexpose-msg.c
- F: hw/misc/memexpose/memexpose-pci.c
- F: hw/misc/memexpose/memexpose-memregion.h
- F: hw/misc/memexpose/memexpose-memregion.c
-+F: tests/qtest/memexpose-test.c
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index 26070b4..7cd6c53 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -56,7 +56,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
  
- nvme
- M: Keith Busch <keith.busch@intel.com>
-diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
-index eb0f23b..f19da40 100644
---- a/tests/qtest/Makefile.include
-+++ b/tests/qtest/Makefile.include
-@@ -14,6 +14,7 @@ check-qtest-pci-$(CONFIG_RTL8139_PCI) += rtl8139-test
- check-qtest-pci-$(CONFIG_VGA) += display-vga-test
- check-qtest-pci-$(CONFIG_HDA) += intel-hda-test
- check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) += ivshmem-test
-+check-qtest-x86_64-$(CONFIG_MEMEXPOSE) += memexpose-test
+     name = host_memory_backend_get_name(backend);
+     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
+-                                   name, backend->size,
++                                   name, backend->size, 0,
+                                    backend->share, fd, errp);
+     g_free(name);
+ }
+diff --git a/exec.c b/exec.c
+index 67e520d..afcb3c9 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1839,6 +1839,7 @@ static int file_ram_open(const char *path,
  
- DBUS_DAEMON := $(shell which dbus-daemon 2>/dev/null)
- ifneq ($(GDBUS_CODEGEN),)
-@@ -289,6 +290,7 @@ tests/qtest/test-filter-mirror$(EXESUF): tests/qtest/test-filter-mirror.o $(qtes
- tests/qtest/test-filter-redirector$(EXESUF): tests/qtest/test-filter-redirector.o $(qtest-obj-y)
- tests/qtest/test-x86-cpuid-compat$(EXESUF): tests/qtest/test-x86-cpuid-compat.o $(qtest-obj-y)
- tests/qtest/ivshmem-test$(EXESUF): tests/qtest/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
-+tests/qtest/memexpose-test$(EXESUF): tests/qtest/memexpose-test.o $(libqos-pc-obj-y)
- tests/qtest/dbus-vmstate-test$(EXESUF): tests/qtest/dbus-vmstate-test.o tests/qtest/migration-helpers.o tests/qtest/dbus-vmstate1.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
- tests/qtest/test-arm-mptimer$(EXESUF): tests/qtest/test-arm-mptimer.o
- tests/qtest/numa-test$(EXESUF): tests/qtest/numa-test.o
-diff --git a/tests/qtest/memexpose-test.c b/tests/qtest/memexpose-test.c
-new file mode 100644
-index 0000000..70a8a73
---- /dev/null
-+++ b/tests/qtest/memexpose-test.c
-@@ -0,0 +1,364 @@
-+/*
-+ *  Memexpose PCI device
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <glib/gstdio.h>
-+#include "libqos/libqos-pc.h"
-+#include "libqtest-single.h"
-+#include "hw/misc/memexpose/memexpose-core.h"
-+
-+static char *tmpshm;
-+static char *tmpdir;
-+
-+static void save_fn(QPCIDevice *dev, int devfn, void *data)
-+{
-+    QPCIDevice **pdev = (QPCIDevice **) data;
-+
-+    *pdev = dev;
-+}
-+
-+static QPCIDevice *get_device(QPCIBus *pcibus)
-+{
-+    QPCIDevice *dev;
-+
-+    dev = NULL;
-+    qpci_device_foreach(pcibus, 0x1af4, 0x1111, save_fn, &dev);
-+    g_assert(dev != NULL);
-+
-+    return dev;
-+}
-+
-+typedef struct _MexpState {
-+    QOSState *qs;
-+    QPCIBar reg_bar, mem_bar;
-+    QPCIDevice *dev;
-+} MexpState;
-+
-+
-+static inline void read_mexp_mem(MexpState *s, uint64_t off,
-+                                 void *buf, size_t len)
-+{
-+    qpci_memread(s->dev, s->mem_bar, off, buf, len);
-+}
-+
-+static inline void write_mexp_mem(MexpState *s, uint64_t off,
-+                                  const void *buf, size_t len)
-+{
-+    qpci_memwrite(s->dev, s->mem_bar, off, buf, len);
-+}
-+
-+static inline void read_mem(MexpState *s, uint64_t off,
-+                            void *buf, size_t len)
-+{
-+    char *cbuf = buf;
-+    for (size_t i = 0; i < len; i++) {
-+        cbuf[i] = qtest_readb(s->qs->qts, off + i);
-+    }
-+}
-+
-+static inline void write_mem(MexpState *s, uint64_t off,
-+                             const void *buf, size_t len)
-+{
-+    const char *cbuf = buf;
-+    for (size_t i = 0; i < len; i++) {
-+        qtest_writeb(s->qs->qts, off + i, cbuf[i]);
-+    }
-+}
-+
-+static inline void write_mexp_reg(MexpState *s, uint64_t off,
-+                                  uint64_t val)
-+{
-+    qpci_io_writeq(s->dev, s->reg_bar, off, val);
-+}
-+
-+static inline uint64_t read_mexp_reg(MexpState *s, uint64_t off)
-+{
-+    return qpci_io_readq(s->dev, s->reg_bar, off);
-+}
-+
-+static void mexp_send_intr(MexpState *s, uint64_t type,
-+                           uint64_t data)
-+{
-+    uint64_t send = 1;
-+    write_mexp_reg(s, MEMEXPOSE_INTR_TX_TYPE_ADDR, type);
-+    write_mexp_reg(s, MEMEXPOSE_INTR_TX_DATA_ADDR, data);
-+    write_mexp_reg(s, MEMEXPOSE_INTR_SEND_ADDR, send);
-+}
-+
-+static uint64_t mexp_recv_intr(MexpState *s, uint64_t *type,
-+                               uint64_t *data)
-+{
-+    uint64_t recv = 0;
-+    int tries = 0;
-+    while (recv == 0 && tries < 100) {
-+        recv = read_mexp_reg(s, MEMEXPOSE_INTR_RECV_ADDR);
-+        if (recv) {
-+            break;
-+        }
-+        tries++;
-+        g_usleep(10000);
-+    }
-+    *type = read_mexp_reg(s, MEMEXPOSE_INTR_RX_TYPE_ADDR);
-+    *data = read_mexp_reg(s, MEMEXPOSE_INTR_RX_DATA_ADDR);
-+    return recv;
-+}
-+
-+static void setup_vm_cmd(MexpState *s, const char *cmd, bool msix)
-+{
-+    uint64_t barsize;
-+    const char *arch = qtest_get_arch();
-+
-+    if (strcmp(arch, "x86_64") == 0) {
-+        s->qs = qtest_pc_boot(cmd);
-+    } else {
-+        g_printerr("memexpose-test tests are only available on x86_64\n");
-+        exit(EXIT_FAILURE);
-+    }
-+    s->dev = get_device(s->qs->pcibus);
-+    s->reg_bar = qpci_iomap(s->dev, 0, &barsize);
-+    g_assert_cmpuint(barsize, ==, MEMEXPOSE_INTR_MEM_SIZE);
-+
-+    if (msix) {
-+        qpci_msix_enable(s->dev);
-+    }
-+
-+    s->mem_bar = qpci_iomap(s->dev, 1, &barsize);
-+
-+    qpci_device_enable(s->dev);
-+}
-+
-+static void remove_socks(char *tmp_path)
-+{
-+    char *memsock = g_strdup_printf("%s/qemu-mexp-mem", tmp_path);
-+    g_remove(memsock);
-+    g_free(memsock);
-+
-+    char *intsock = g_strdup_printf("%s/qemu-mexp-mem", tmp_path);
-+    g_remove(intsock);
-+    g_free(intsock);
-+}
-+static void add_socks(char *tmp_path)
-+{
-+    char *memsock = g_strdup_printf("%s/qemu-mexp-mem", tmp_path);
-+    mkfifo(memsock, 0700);
-+    g_free(memsock);
-+
-+    char *intsock = g_strdup_printf("%s/qemu-mexp-mem", tmp_path);
-+    mkfifo(intsock, 0700);
-+    g_free(intsock);
-+}
-+
-+static void setup_vm(MexpState *s, int server)
-+{
-+    unsigned long shm_size = 1 << 28;
-+    const char *socksrv = server ? "server,nowait," : "";
-+    char *cmd = g_strdup_printf("-mem-path %s "
-+                                "-device memexpose-pci,mem_chardev=mem-mem,"
-+                                "intr_chardev=mem-intr,shm_size=0x%lx "
-+                                "-chardev socket,%spath=%s/qemu-mexp-mem,id=mem-mem "
-+                                "-chardev socket,%spath=%s/qemu-mexp-intr,id=mem-intr",
-+                                tmpshm, shm_size,
-+                                socksrv, tmpdir, socksrv, tmpdir);
-+    setup_vm_cmd(s, cmd, false);
-+    g_free(cmd);
-+}
-+
-+static void cleanup_vm(MexpState *s)
-+{
-+    assert(!global_qtest);
-+    g_free(s->dev);
-+    qtest_shutdown(s->qs);
-+}
-+
-+static void setup_connected_vms(MexpState *s1, MexpState *s2)
-+{
-+    remove_socks(tmpdir);
-+    add_socks(tmpdir);
-+    setup_vm(s1, 1);
-+    setup_vm(s2, 0);
-+
-+    write_mexp_reg(s1, MEMEXPOSE_INTR_ENABLE_ADDR, 1);
-+    write_mexp_reg(s2, MEMEXPOSE_INTR_ENABLE_ADDR, 1);
-+}
-+
-+static void test_memexpose_simple_memshare(void)
-+{
-+    size_t sixty_four_megs = 1 << (20 + 6);
-+    uint32_t in, out;
-+
-+    MexpState s1, s2;
-+    setup_connected_vms(&s1, &s2);
-+
-+    in = 0xdeadbeef;
-+    write_mem(&s1, sixty_four_megs, &in, 4);
-+    read_mexp_mem(&s2, sixty_four_megs, &out, 4);
-+    g_assert_cmphex(in, ==, out);
-+    in = 0xbaba1510;
-+    write_mem(&s1, sixty_four_megs, &in, 4);
-+    read_mexp_mem(&s2, sixty_four_megs, &out, 4);
-+    g_assert_cmphex(in, ==, out);
-+
-+    in = 0xaaaaaaaa;
-+    write_mexp_mem(&s1, sixty_four_megs, &in, 4);
-+    read_mem(&s2, sixty_four_megs, &out, 4);
-+    g_assert_cmphex(in, ==, out);
-+    in = 0xbbbbbbbb;
-+    write_mexp_mem(&s1, sixty_four_megs, &in, 4);
-+    read_mem(&s2, sixty_four_megs, &out, 4);
-+    g_assert_cmphex(in, ==, out);
-+
-+    cleanup_vm(&s1);
-+    cleanup_vm(&s2);
-+}
-+
-+static void test_memexpose_simple_interrupts(void)
-+{
-+    MexpState s1, s2;
-+    setup_connected_vms(&s1, &s2);
-+
-+    mexp_send_intr(&s1, 0x1, 0xdeadbea7);
-+    mexp_send_intr(&s1, 0x2, 0xdeadbaba);
-+
-+    uint64_t type, data, received;
-+
-+    received = mexp_recv_intr(&s2, &type, &data);
-+    g_assert_cmpuint(received, ==, 1);
-+    g_assert_cmphex(type, ==, 0x1);
-+    g_assert_cmphex(data, ==, 0xdeadbea7);
-+
-+    received = mexp_recv_intr(&s2, &type, &data);
-+    g_assert_cmpuint(received, ==, 1);
-+    g_assert_cmphex(type, ==, 0x2);
-+    g_assert_cmphex(data, ==, 0xdeadbaba);
-+
-+    cleanup_vm(&s1);
-+    cleanup_vm(&s2);
-+}
-+
-+static void test_memexpose_overfull_intr_queue(void)
-+{
-+    MexpState s1, s2;
-+    setup_connected_vms(&s1, &s2);
-+
-+    unsigned int i, expected, runs = MEMEXPOSE_INTR_QUEUE_SIZE + 10;
-+    uint64_t type, data;
-+
-+    for (i = 0; i < runs; i++) {
-+        mexp_send_intr(&s1, i, i);
-+    }
-+
-+    expected = 0;
-+    while (mexp_recv_intr(&s2, &type, &data)) {
-+        if (expected < MEMEXPOSE_INTR_QUEUE_SIZE) {
-+            g_assert_cmphex(type, ==, expected);
-+            g_assert_cmphex(data, ==, expected);
-+            expected += 1;
-+        } else {
-+            g_assert_cmphex(type, >, expected);
-+            g_assert_cmphex(type, <, runs);
-+            g_assert_cmphex(data, >, expected);
-+            g_assert_cmphex(data, <, runs);
-+            expected = type;
-+        }
-+    }
-+    g_assert_cmpuint(expected, >=, MEMEXPOSE_INTR_QUEUE_SIZE - 1);
-+
-+    cleanup_vm(&s1);
-+    cleanup_vm(&s2);
-+}
-+
-+static void test_memexpose_intr_data(void)
-+{
-+    MexpState s1, s2;
-+    setup_connected_vms(&s1, &s2);
-+
-+    unsigned int i;
-+    uint64_t type, data, received;
-+
-+    uint64_t send = 1;
-+    write_mexp_reg(&s1, MEMEXPOSE_INTR_TX_TYPE_ADDR, 0);
-+    for (i = 0; i < MEMEXPOSE_MAX_INTR_DATA_SIZE; i += 8) {
-+        write_mexp_reg(&s1, MEMEXPOSE_INTR_TX_DATA_ADDR + i, i);
-+    }
-+    write_mexp_reg(&s1, MEMEXPOSE_INTR_SEND_ADDR, send);
-+
-+    received = mexp_recv_intr(&s2, &type, &data);
-+    g_assert_cmpuint(received, ==, 1);
-+    for (i = 0; i < MEMEXPOSE_MAX_INTR_DATA_SIZE; i += 8) {
-+        data = read_mexp_reg(&s1, MEMEXPOSE_INTR_TX_DATA_ADDR + i);
-+        g_assert_cmphex(data, ==, i);
-+    }
-+
-+    cleanup_vm(&s1);
-+    cleanup_vm(&s2);
-+}
-+
-+static void cleanup(void)
-+{
-+    if (tmpshm) {
-+        g_rmdir(tmpshm);
-+        tmpshm = NULL;
-+    }
-+
-+    if (tmpdir) {
-+        remove_socks(tmpdir);
-+        g_rmdir(tmpdir);
-+        tmpdir = NULL;
-+    }
-+}
-+
-+static void abrt_handler(void *data)
-+{
-+    cleanup();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+    gchar dir[] = "/tmp/memexpose-test.XXXXXX";
-+    gchar shmdir[] = "/dev/shm/memexpose-test.XXXXXX";
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_abrt_handler(abrt_handler, NULL);
-+
-+    if (mkdtemp(dir) == NULL) {
-+        g_error("mkdtemp: %s", g_strerror(errno));
-+        goto out;
-+    }
-+    tmpdir = dir;
-+    if (mkdtemp(shmdir) == NULL) {
-+        g_error("mkdtemp: %s", g_strerror(errno));
-+        goto out;
-+    }
-+    tmpshm = shmdir;
-+
-+    qtest_add_func("/memexpose/memory", test_memexpose_simple_memshare);
-+    qtest_add_func("/memexpose/interrupts", test_memexpose_simple_interrupts);
-+    qtest_add_func("/memexpose/interrupts_full_queue",
-+                   test_memexpose_overfull_intr_queue);
-+    qtest_add_func("/memexpose/interrupts_all_data", test_memexpose_intr_data);
-+    ret = g_test_run();
-+
-+out:
-+    cleanup();
-+    return ret;
-+}
+ static void *file_ram_alloc(RAMBlock *block,
+                             ram_addr_t memory,
++                            size_t mmap_offset,
+                             int fd,
+                             bool truncate,
+                             Error **errp)
+@@ -1892,7 +1893,7 @@ static void *file_ram_alloc(RAMBlock *block,
+         perror("ftruncate");
+     }
+ 
+-    area = qemu_ram_mmap(fd, memory, block->mr->align,
++    area = qemu_ram_mmap(fd, memory, mmap_offset, block->mr->align,
+                          block->flags & RAM_SHARED, block->flags & RAM_PMEM);
+     if (area == MAP_FAILED) {
+         error_setg_errno(errp, errno,
+@@ -2314,7 +2315,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
+ 
+ #ifdef CONFIG_POSIX
+ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+-                                 uint32_t ram_flags, int fd,
++                                 uint32_t ram_flags, int fd, size_t mmap_offset,
+                                  Error **errp)
+ {
+     RAMBlock *new_block;
+@@ -2360,7 +2361,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     new_block->used_length = size;
+     new_block->max_length = size;
+     new_block->flags = ram_flags;
+-    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
++    new_block->host = file_ram_alloc(new_block, size, mmap_offset, fd,
++                                     !file_size, errp);
+     if (!new_block->host) {
+         g_free(new_block);
+         return NULL;
+@@ -2390,7 +2392,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+         return NULL;
+     }
+ 
+-    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
++    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, errp);
+     if (!block) {
+         if (created) {
+             unlink(mem_path);
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index 1a0fad7..4967d4f 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -492,7 +492,8 @@ static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
+ 
+     /* mmap the region and map into the BAR2 */
+     memory_region_init_ram_from_fd(&s->server_bar2, OBJECT(s),
+-                                   "ivshmem.bar2", size, true, fd, &local_err);
++                                   "ivshmem.bar2", size, 0, true, fd,
++                                   &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index ac09221..c5554cc 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -906,6 +906,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+  * @owner: the object that tracks the region's reference count
+  * @name: the name of the region.
+  * @size: size of the region.
++ * @mmap_offset: offset at which the fd is to be mapped.
+  * @share: %true if memory must be mmaped with the MAP_SHARED flag
+  * @fd: the fd to mmap.
+  * @errp: pointer to Error*, to store an error if it happens.
+@@ -917,6 +918,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+                                     struct Object *owner,
+                                     const char *name,
+                                     uint64_t size,
++                                    uint64_t mmap_offset,
+                                     bool share,
+                                     int fd,
+                                     Error **errp);
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 5e59a3d..1e85362 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -120,7 +120,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+                                    uint32_t ram_flags, const char *mem_path,
+                                    Error **errp);
+ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+-                                 uint32_t ram_flags, int fd,
++                                 uint32_t ram_flags, int fd, size_t mmap_offset,
+                                  Error **errp);
+ 
+ RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
+diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+index e786266..bd95504 100644
+--- a/include/qemu/mmap-alloc.h
++++ b/include/qemu/mmap-alloc.h
+@@ -23,6 +23,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
+  */
+ void *qemu_ram_mmap(int fd,
+                     size_t size,
++                    size_t mmap_offset,
+                     size_t align,
+                     bool shared,
+                     bool is_pmem);
+diff --git a/memory.c b/memory.c
+index 0973c44..93c2cd1 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1584,6 +1584,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+                                     struct Object *owner,
+                                     const char *name,
+                                     uint64_t size,
++                                    uint64_t mmap_offset,
+                                     bool share,
+                                     int fd,
+                                     Error **errp)
+@@ -1595,7 +1596,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+     mr->destructor = memory_region_destructor_ram;
+     mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
+                                            share ? RAM_SHARED : 0,
+-                                           fd, &err);
++                                           fd, mmap_offset, &err);
+     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+     if (err) {
+         mr->size = int128_zero();
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index 27dcccd..191db45 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -84,6 +84,7 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+ 
+ void *qemu_ram_mmap(int fd,
+                     size_t size,
++                    size_t mmap_offset,
+                     size_t align,
+                     bool shared,
+                     bool is_pmem)
+@@ -127,7 +128,7 @@ void *qemu_ram_mmap(int fd,
+     flags = MAP_PRIVATE | MAP_ANONYMOUS;
+ #endif
+ 
+-    guardptr = mmap(0, total, PROT_NONE, flags, guardfd, 0);
++    guardptr = mmap(0, total, PROT_NONE, flags, guardfd, mmap_offset);
+ 
+     if (guardptr == MAP_FAILED) {
+         return MAP_FAILED;
+@@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
+     offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
+ 
+     ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
+-               flags | map_sync_flags, fd, 0);
++               flags | map_sync_flags, fd, mmap_offset);
+ 
+     if (ptr == MAP_FAILED && map_sync_flags) {
+         if (errno == ENOTSUP) {
+@@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
+          * we will remove these flags to handle compatibility.
+          */
+         ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
+-                   flags, fd, 0);
++                   flags, fd, mmap_offset);
+     }
+ 
+     if (ptr == MAP_FAILED) {
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 5a291cc..e4ffdc1 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -205,7 +205,7 @@ void *qemu_memalign(size_t alignment, size_t size)
+ void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+ {
+     size_t align = QEMU_VMALLOC_ALIGN;
+-    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
++    void *ptr = qemu_ram_mmap(-1, size, 0, align, shared, false);
+ 
+     if (ptr == MAP_FAILED) {
+         return NULL;
 -- 
 2.7.4
 
