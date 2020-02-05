@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AD3C352A3
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A38C352A1
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:22:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEC962072B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:22:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC962072B
+	by mail.kernel.org (Postfix) with ESMTPS id 4B96E2072B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:22:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B96E2072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izIlW-0007vV-4q
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 06:22:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52966)
+	id 1izIlb-00086s-Bs
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 06:22:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1izIjw-0005GE-UX
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:21:06 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1izIjz-0005Le-2W
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:21:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1izIjv-0001No-O1
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:21:04 -0500
-Received: from relay.sw.ru ([185.231.240.75]:41398)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1izIjx-0001Sh-1a
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:21:06 -0500
+Received: from relay.sw.ru ([185.231.240.75]:41416)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1izIjs-00015V-KA; Wed, 05 Feb 2020 06:21:00 -0500
+ id 1izIjs-00015X-KZ; Wed, 05 Feb 2020 06:21:00 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1izIjl-0006Jd-9v; Wed, 05 Feb 2020 14:20:53 +0300
+ id 1izIjk-0006Jd-P6; Wed, 05 Feb 2020 14:20:52 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 10/10] block/qcow2-bitmap: use bdrv_dirty_bitmap_next_dirty
-Date: Wed,  5 Feb 2020 14:20:41 +0300
-Message-Id: <20200205112041.6003-11-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 05/10] block/dirty-bitmap: switch _next_dirty_area and
+ _next_zero to int64_t
+Date: Wed,  5 Feb 2020 14:20:36 +0300
+Message-Id: <20200205112041.6003-6-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200205112041.6003-1-vsementsov@virtuozzo.com>
 References: <20200205112041.6003-1-vsementsov@virtuozzo.com>
@@ -65,70 +66,259 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-store_bitmap_data() loop does bdrv_set_dirty_iter() on each iteration,
-which means that we actually don't need iterator itself and we can use
-simpler bitmap API.
+We are going to introduce bdrv_dirty_bitmap_next_dirty so that same
+variable may be used to store its return value and to be its parameter,
+so it would int64_t.
+
+Similarly, we are going to refactor hbitmap_next_dirty_area to use
+hbitmap_next_dirty together with hbitmap_next_zero, therefore we want
+hbitmap_next_zero parameter type to be int64_t too.
+
+So, for convenience update all parameters of *_next_zero and
+*_next_dirty_area to be int64_t.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-bitmap.c | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
+ include/block/dirty-bitmap.h |  6 +++---
+ include/qemu/hbitmap.h       |  7 +++----
+ block/dirty-bitmap.c         |  6 +++---
+ nbd/server.c                 |  2 +-
+ tests/test-hbitmap.c         | 36 ++++++++++++++++++------------------
+ util/hbitmap.c               | 13 ++++++++-----
+ 6 files changed, 36 insertions(+), 34 deletions(-)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index d41f5d049b..82646c53bd 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1289,7 +1289,6 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-     uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
-     const char *bm_name = bdrv_dirty_bitmap_name(bitmap);
-     uint8_t *buf = NULL;
--    BdrvDirtyBitmapIter *dbi;
-     uint64_t *tb;
-     uint64_t tb_size =
-             size_to_clusters(s,
-@@ -1308,12 +1307,14 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-         return NULL;
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index e2b20ecab9..27c72cc56a 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -105,10 +105,10 @@ for (bitmap = bdrv_dirty_bitmap_first(bs); bitmap; \
+      bitmap = bdrv_dirty_bitmap_next(bitmap))
+ 
+ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
+-int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
+-                                    uint64_t bytes);
++int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
++                                    int64_t bytes);
+ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+-                                       uint64_t *offset, uint64_t *bytes);
++                                       int64_t *offset, int64_t *bytes);
+ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
+                                                   Error **errp);
+ 
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index df922d8517..b6e85f3d5d 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -304,10 +304,10 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
+  * @hb: The HBitmap to operate on
+  * @start: The bit to start from.
+  * @count: Number of bits to proceed. If @start+@count > bitmap size, the whole
+- * bitmap is looked through. You can use UINT64_MAX as @count to search up to
++ * bitmap is looked through. You can use INT64_MAX as @count to search up to
+  * the bitmap end.
+  */
+-int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count);
++int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count);
+ 
+ /* hbitmap_next_dirty_area:
+  * @hb: The HBitmap to operate on
+@@ -322,8 +322,7 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count);
+  * @offset and @bytes appropriately. Otherwise returns false and leaves @offset
+  * and @bytes unchanged.
+  */
+-bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *start,
+-                             uint64_t *count);
++bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t *start, int64_t *count);
+ 
+ /**
+  * hbitmap_iter_next:
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 7039e82520..af9f5411a6 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -860,14 +860,14 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
+     return hbitmap_sha256(bitmap->bitmap, errp);
+ }
+ 
+-int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
+-                                    uint64_t bytes)
++int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
++                                    int64_t bytes)
+ {
+     return hbitmap_next_zero(bitmap->bitmap, offset, bytes);
+ }
+ 
+ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+-                                       uint64_t *offset, uint64_t *bytes)
++                                       int64_t *offset, int64_t *bytes)
+ {
+     return hbitmap_next_dirty_area(bitmap->bitmap, offset, bytes);
+ }
+diff --git a/nbd/server.c b/nbd/server.c
+index 87fcd2e7bf..c422265041 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -2055,7 +2055,7 @@ static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
+         bool next_dirty = !dirty;
+ 
+         if (dirty) {
+-            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, UINT64_MAX);
++            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, INT64_MAX);
+         } else {
+             bdrv_set_dirty_iter(it, begin);
+             end = bdrv_dirty_iter_next(it);
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index aeaa0b3f22..9d210dc18c 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -817,8 +817,8 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
+ }
+ 
+ static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
+-                                               uint64_t start,
+-                                               uint64_t count)
++                                               int64_t start,
++                                               int64_t count)
+ {
+     int64_t ret1 = hbitmap_next_zero(data->hb, start, count);
+     int64_t ret2 = start;
+@@ -837,7 +837,7 @@ static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
+ 
+ static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
+ {
+-    test_hbitmap_next_zero_check_range(data, start, UINT64_MAX);
++    test_hbitmap_next_zero_check_range(data, start, INT64_MAX);
+ }
+ 
+ static void test_hbitmap_next_zero_do(TestHBitmapData *data, int granularity)
+@@ -905,11 +905,11 @@ static void test_hbitmap_next_zero_after_truncate(TestHBitmapData *data,
+ }
+ 
+ static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
+-                                               uint64_t offset,
+-                                               uint64_t count)
++                                               int64_t offset,
++                                               int64_t count)
+ {
+-    uint64_t off1, off2;
+-    uint64_t len1 = 0, len2;
++    int64_t off1, off2;
++    int64_t len1 = 0, len2;
+     bool ret1, ret2;
+     int64_t end;
+ 
+@@ -945,24 +945,24 @@ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
+                                             int granularity)
+ {
+     hbitmap_test_init(data, L3, granularity);
+-    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
+     test_hbitmap_next_dirty_area_check(data, 0, 1);
+     test_hbitmap_next_dirty_area_check(data, L3 - 1, 1);
+ 
+     hbitmap_set(data->hb, L2, 1);
+     test_hbitmap_next_dirty_area_check(data, 0, 1);
+     test_hbitmap_next_dirty_area_check(data, 0, L2);
+-    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
+-    test_hbitmap_next_dirty_area_check(data, L2 - 1, UINT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, L2 - 1, INT64_MAX);
+     test_hbitmap_next_dirty_area_check(data, L2 - 1, 1);
+     test_hbitmap_next_dirty_area_check(data, L2 - 1, 2);
+     test_hbitmap_next_dirty_area_check(data, L2 - 1, 3);
+-    test_hbitmap_next_dirty_area_check(data, L2, UINT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, L2, INT64_MAX);
+     test_hbitmap_next_dirty_area_check(data, L2, 1);
+     test_hbitmap_next_dirty_area_check(data, L2 + 1, 1);
+ 
+     hbitmap_set(data->hb, L2 + 5, L1);
+-    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
+     test_hbitmap_next_dirty_area_check(data, L2 - 2, 8);
+     test_hbitmap_next_dirty_area_check(data, L2 + 1, 5);
+     test_hbitmap_next_dirty_area_check(data, L2 + 1, 3);
+@@ -974,16 +974,16 @@ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
+     test_hbitmap_next_dirty_area_check(data, L2 + 1, 0);
+ 
+     hbitmap_set(data->hb, L2 * 2, L3 - L2 * 2);
+-    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
+-    test_hbitmap_next_dirty_area_check(data, L2, UINT64_MAX);
+-    test_hbitmap_next_dirty_area_check(data, L2 + 1, UINT64_MAX);
+-    test_hbitmap_next_dirty_area_check(data, L2 + 5 + L1 - 1, UINT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, L2, INT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, L2 + 1, INT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, L2 + 5 + L1 - 1, INT64_MAX);
+     test_hbitmap_next_dirty_area_check(data, L2 + 5 + L1, 5);
+     test_hbitmap_next_dirty_area_check(data, L2 * 2 - L1, L1 + 1);
+     test_hbitmap_next_dirty_area_check(data, L2 * 2, L2);
+ 
+     hbitmap_set(data->hb, 0, L3);
+-    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
+ }
+ 
+ static void test_hbitmap_next_dirty_area_0(TestHBitmapData *data,
+@@ -1010,7 +1010,7 @@ static void test_hbitmap_next_dirty_area_after_truncate(TestHBitmapData *data,
+     hbitmap_test_init(data, L1, 0);
+     hbitmap_test_truncate_impl(data, L1 * 2);
+     hbitmap_set(data->hb, L1 + 1, 1);
+-    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
++    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
+ }
+ 
+ int main(int argc, char **argv)
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index b6d4b99a06..df22f06be6 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -193,7 +193,7 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
      }
+ }
  
--    dbi = bdrv_dirty_iter_new(bitmap);
-     buf = g_malloc(s->cluster_size);
-     limit = bytes_covered_by_bitmap_cluster(s, bitmap);
-     assert(DIV_ROUND_UP(bm_size, limit) == tb_size);
+-int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count)
++int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count)
+ {
+     size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
+     unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
+@@ -202,6 +202,8 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count)
+     uint64_t end_bit, sz;
+     int64_t res;
  
--    while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
-+    offset = 0;
-+    while ((offset = bdrv_dirty_bitmap_next_dirty(bitmap, offset, INT64_MAX))
-+           >= 0)
-+    {
-         uint64_t cluster = offset / limit;
-         uint64_t end, write_size;
-         int64_t off;
-@@ -1356,23 +1357,17 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-             goto fail;
-         }
- 
--        if (end >= bm_size) {
--            break;
--        }
--
--        bdrv_set_dirty_iter(dbi, end);
-+        offset = end;
++    assert(start >= 0 && count >= 0);
++
+     if (start >= hb->orig_size || count == 0) {
+         return -1;
      }
+@@ -244,14 +246,15 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count)
+     return res;
+ }
  
-     *bitmap_table_size = tb_size;
-     g_free(buf);
--    bdrv_dirty_iter_free(dbi);
+-bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *start,
+-                             uint64_t *count)
++bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t *start, int64_t *count)
+ {
+     HBitmapIter hbi;
+     int64_t firt_dirty_off, area_end;
+     uint32_t granularity = 1UL << hb->granularity;
+     uint64_t end;
  
-     return tb;
++    assert(*start >= 0 && *count >= 0);
++
+     if (*start >= hb->orig_size || *count == 0) {
+         return false;
+     }
+@@ -834,8 +837,8 @@ bool hbitmap_can_merge(const HBitmap *a, const HBitmap *b)
+  */
+ static void hbitmap_sparse_merge(HBitmap *dst, const HBitmap *src)
+ {
+-    uint64_t offset = 0;
+-    uint64_t count = src->orig_size;
++    int64_t offset = 0;
++    int64_t count = src->orig_size;
  
- fail:
-     clear_bitmap_table(bs, tb, tb_size);
-     g_free(buf);
--    bdrv_dirty_iter_free(dbi);
-     g_free(tb);
- 
-     return NULL;
+     while (hbitmap_next_dirty_area(src, &offset, &count)) {
+         hbitmap_set(dst, offset, count);
 -- 
 2.21.0
 
