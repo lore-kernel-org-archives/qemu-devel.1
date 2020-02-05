@@ -2,136 +2,108 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 493BCC35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472B1C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:28:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 121C52072B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:27:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 075752072B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:28:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqDaw4RT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 121C52072B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jXIGV0p9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 075752072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izKih-0006Er-5x
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:27:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35625)
+	id 1izKjA-0006vQ-8e
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:28:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1izKhe-0005Jm-IF
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:26:51 -0500
+ (envelope-from <darren.kenny@oracle.com>) id 1izKhq-0005eQ-Aq
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:27:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1izKhd-0001pK-AG
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:26:50 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40652
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1izKhd-0001ir-5V
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:26:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580909208;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7o6w0pWy0s5W38K/p2AHTqPkumP6I2/tjtJC/tN3GN0=;
- b=MqDaw4RTlz4yFrdv0DvMZ7mQeOWy7VY9o19Kpmj8fum2JOYHI9OETHjgwcYMLwEFkg9weP
- V1wpMkY1l1v/REbsx+/AS5clhJNrFgvV5LQ514JTzVPYR1eqYpR8IXsMRyd9lXYi+eQQ9W
- bcsPKJ1EE3hkzadgGVFKWHihnSpJcgY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-nWE13_2iPXOZIxTzE_8v0w-1; Wed, 05 Feb 2020 08:26:46 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5C6D805754;
- Wed,  5 Feb 2020 13:26:44 +0000 (UTC)
-Received: from [10.36.116.229] (ovpn-116-229.ams2.redhat.com [10.36.116.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A7A8E81213;
- Wed,  5 Feb 2020 13:26:42 +0000 (UTC)
-Subject: Re: [PULL 19/35] ppc/pnv: Add models for POWER9 PHB4 PCIe Host bridge
-To: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
-References: <20200203061123.59150-1-david@gibson.dropbear.id.au>
- <20200203061123.59150-20-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <bbb36281-287b-70cf-80ab-9ac54eeca8de@redhat.com>
-Date: Wed, 5 Feb 2020 14:26:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <darren.kenny@oracle.com>) id 1izKho-00037w-Mf
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:27:02 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:59800)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+ id 1izKho-000316-DC
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:27:00 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015DO2uK105634;
+ Wed, 5 Feb 2020 13:26:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=/LVZim7N6b/mrqTWUC/HKFj/D55qTPQuXQY7Zzfr8Ws=;
+ b=jXIGV0p9xJCnhs4rnqX0eAiZRtpfFiHG8tpoicGmNl+zLq26cUteUleat6yp0ivh4mv4
+ rgbyMxnz3ySg2Qtxq/9t9pepMH5N6T51F+JK/UHrJrxydnXtU5hwzPo/OVEJd8y/KZ31
+ +H0GSZRs/2fXLsQjgMoDPCAeLbcgb+qkV+NDs+/ACIJUvIoXlYxtkyODy7gV6yqbDaU7
+ ERv69nGj03rJaw+nSbrJ89wlECe8FdbuyRj6SdK3+iMA84uIlwnQt+i8SrCyGND1D+c3
+ MM6hs+Af395chOw4tax9CnFKEnVnS7vnzIGxvidHkDg5HDwTzZfUIBGOBtpPmNY16/Dr 3Q== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2xykbp2y0v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 13:26:57 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015DICnn087769;
+ Wed, 5 Feb 2020 13:26:57 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2xykc2v56p-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 13:26:57 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 015DQsIx011534;
+ Wed, 5 Feb 2020 13:26:54 GMT
+Received: from starbug-mbp.localdomain (/10.169.111.17)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 05 Feb 2020 05:26:54 -0800
+Received: from starbug-mbp (localhost [127.0.0.1])
+ by starbug-mbp.localdomain (Postfix) with SMTP id 2FC5557DBB03;
+ Wed,  5 Feb 2020 13:26:51 +0000 (GMT)
+Date: Wed, 5 Feb 2020 13:26:50 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+To: "Bulekov, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v8 18/21] fuzz: add i440fx fuzz targets
+Message-ID: <20200205132650.yajwli5c5a6b7aur@starbug-mbp>
+Mail-Followup-To: "Bulekov, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
+References: <20200129053357.27454-1-alxndr@bu.edu>
+ <20200129053357.27454-19-alxndr@bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <20200203061123.59150-20-david@gibson.dropbear.id.au>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: nWE13_2iPXOZIxTzE_8v0w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200129053357.27454-19-alxndr@bu.edu>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002050107
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002050109
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -143,100 +115,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, groug@kaod.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/02/2020 07:11, David Gibson wrote:
-> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->=20
-> These changes introduces models for the PCIe Host Bridge (PHB4) of the
-> POWER9 processor. It includes the PowerBus logic interface (PBCQ),
-> IOMMU support, a single PCIe Gen.4 Root Complex, and support for MSI
-> and LSI interrupt sources as found on a POWER9 system using the XIVE
-> interrupt controller.
->=20
-> POWER9 processor comes with 3 PHB4 PEC (PCI Express Controller) and
-> each PEC can have several PHBs. By default,
->=20
->   * PEC0 provides 1 PHB  (PHB0)
->   * PEC1 provides 2 PHBs (PHB1 and PHB2)
->   * PEC2 provides 3 PHBs (PHB3, PHB4 and PHB5)
->=20
-> Each PEC has a set  "global" registers and some "per-stack" (per-PHB)
-> registers. Those are organized in two XSCOM ranges, the "Nest" range
-> and the "PCI" range, each range contains both some "PEC" registers and
-> some "per-stack" registers.
->=20
-> No default device layout is provided and PCI devices can be added on
-> any of the available PCIe Root Port (pcie.0 .. 2 of a Power9 chip)
-> with address 0x0 as the firwware (skiboot) only accepts a single
-> device per root port. To run a simple system with a network and a
-> storage adapters, use a command line options such as :
->=20
->   -device e1000e,netdev=3Dnet0,mac=3DC0:FF:EE:00:00:02,bus=3Dpcie.0,addr=
-=3D0x0
->   -netdev bridge,id=3Dnet0,helper=3D/usr/libexec/qemu-bridge-helper,br=3D=
-virbr0,id=3Dhostnet0
->=20
->   -device megasas,id=3Dscsi0,bus=3Dpcie.1,addr=3D0x0
->   -drive file=3D$disk,if=3Dnone,id=3Ddrive-scsi0-0-0-0,format=3Dqcow2,cac=
-he=3Dnone
->   -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Dd=
-rive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2
->=20
-> If more are needed, include a bridge.
->=20
-> Multi chip is supported, each chip adding its set of PHB4 controllers
-> and its PCI busses. The model doesn't emulate the EEH error handling.
->=20
-> This model is not ready for hotplug yet.
->=20
-> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> [ clg: - numerous cleanups
->        - commit log
->        - fix for broken LSI support
->        - PHB pic printinfo
->        - large QOM rework ]
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Message-Id: <20200127144506.11132-2-clg@kaod.org>
-> [dwg: Use device_class_set_props()]
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/pci-host/Makefile.objs           |    1 +
->  hw/pci-host/pnv_phb4.c              | 1438 +++++++++++++++++++++++++++
->  hw/pci-host/pnv_phb4_pec.c          |  593 +++++++++++
->  hw/ppc/Kconfig                      |    2 +
->  hw/ppc/pnv.c                        |  107 ++
->  include/hw/pci-host/pnv_phb4.h      |  230 +++++
->  include/hw/pci-host/pnv_phb4_regs.h |  553 ++++++++++
->  include/hw/pci/pcie_port.h          |    1 +
->  include/hw/ppc/pnv.h                |    7 +
->  include/hw/ppc/pnv_xscom.h          |   11 +
->  10 files changed, 2943 insertions(+)
->  create mode 100644 hw/pci-host/pnv_phb4.c
->  create mode 100644 hw/pci-host/pnv_phb4_pec.c
->  create mode 100644 include/hw/pci-host/pnv_phb4.h
->  create mode 100644 include/hw/pci-host/pnv_phb4_regs.h
->=20
-...
-> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-> index e27efe9a24..354828bf13 100644
-> --- a/hw/ppc/Kconfig
-> +++ b/hw/ppc/Kconfig
-> @@ -135,6 +135,8 @@ config XIVE_SPAPR
->      default y
->      depends on PSERIES
->      select XIVE
-> +    select PCI
-> +    select PCIE_PORT
+On Wed, Jan 29, 2020 at 05:34:26AM +0000, Bulekov, Alexander wrote:
+>These three targets should simply fuzz reads/writes to a couple ioports,
+>but they mostly serve as examples of different ways to write targets.
+>They demonstrate using qtest and qos for fuzzing, as well as using
+>rebooting and forking to reset state, or not resetting it at all.
+>
+>Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+>Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-This patch is about PowerNV, why do we add dependencies for pseries
-configuration?
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+
+A couple of nit below w.r.t. commenting on how the fuzzed data is
+being processed.
+
+>---
+> tests/qtest/fuzz/Makefile.include |   3 +
+> tests/qtest/fuzz/i440fx_fuzz.c    | 178 ++++++++++++++++++++++++++++++
+> 2 files changed, 181 insertions(+)
+> create mode 100644 tests/qtest/fuzz/i440fx_fuzz.c
+>
+>diff --git a/tests/qtest/fuzz/Makefile.include b/tests/qtest/fuzz/Makefile.include
+>index e3bdd33ff4..38b8cdd9f1 100644
+>--- a/tests/qtest/fuzz/Makefile.include
+>+++ b/tests/qtest/fuzz/Makefile.include
+>@@ -6,6 +6,9 @@ fuzz-obj-y += tests/qtest/fuzz/fuzz.o # Fuzzer skeleton
+> fuzz-obj-y += tests/qtest/fuzz/fork_fuzz.o
+> fuzz-obj-y += tests/qtest/fuzz/qos_fuzz.o
+>
+>+# Targets
+>+fuzz-obj-y += tests/qtest/fuzz/i440fx_fuzz.o
+>+
+> FUZZ_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
+>
+> # Linker Script to force coverage-counters into known regions which we can mark
+>diff --git a/tests/qtest/fuzz/i440fx_fuzz.c b/tests/qtest/fuzz/i440fx_fuzz.c
+>new file mode 100644
+>index 0000000000..c7791182b8
+>--- /dev/null
+>+++ b/tests/qtest/fuzz/i440fx_fuzz.c
+>@@ -0,0 +1,178 @@
+>+/*
+>+ * I440FX Fuzzing Target
+>+ *
+>+ * Copyright Red Hat Inc., 2019
+>+ *
+>+ * Authors:
+>+ *  Alexander Bulekov   <alxndr@bu.edu>
+>+ *
+>+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>+ * See the COPYING file in the top-level directory.
+>+ */
+>+
+>+#include "qemu/osdep.h"
+>+
+>+#include "qemu/main-loop.h"
+>+#include "tests/qtest/libqtest.h"
+>+#include "tests/qtest/libqos/pci.h"
+>+#include "tests/qtest/libqos/pci-pc.h"
+>+#include "fuzz.h"
+>+#include "fuzz/qos_fuzz.h"
+>+#include "fuzz/fork_fuzz.h"
+>+
+>+
+>+#define I440FX_PCI_HOST_BRIDGE_CFG 0xcf8
+>+#define I440FX_PCI_HOST_BRIDGE_DATA 0xcfc
+>+
+>+enum action_id {
+>+    WRITEB,
+>+    WRITEW,
+>+    WRITEL,
+>+    READB,
+>+    READW,
+>+    READL,
+>+    ACTION_MAX
+>+};
+>+
+
+While it eventually becomes clear what is happening in these
+functions, it does take several attempts at reading it to understand
+what is going on.
+
+For that reason, it might be worth a couple of comments for future
+maintainers as to what is going on.
 
 Thanks,
-Laurent
 
+Darren.
+
+>+static void i440fx_fuzz_qtest(QTestState *s,
+>+        const unsigned char *Data, size_t Size) {
+>+    typedef struct QTestFuzzAction {
+>+        uint32_t value;
+>+        uint8_t id;
+>+        uint8_t addr;
+>+    } QTestFuzzAction;
+>+    QTestFuzzAction a;
+>+
+>+    while (Size >= sizeof(a)) {
+>+        memcpy(&a, Data, sizeof(a));
+>+        uint16_t addr = a.addr % 2 ? I440FX_PCI_HOST_BRIDGE_CFG :
+>+                                      I440FX_PCI_HOST_BRIDGE_DATA;
+>+        switch (a.id % ACTION_MAX) {
+>+        case WRITEB:
+>+            qtest_outb(s, addr, (uint8_t)a.value);
+>+            break;
+>+        case WRITEW:
+>+            qtest_outw(s, addr, (uint16_t)a.value);
+>+            break;
+>+        case WRITEL:
+>+            qtest_outl(s, addr, (uint32_t)a.value);
+>+            break;
+>+        case READB:
+>+            qtest_inb(s, addr);
+>+            break;
+>+        case READW:
+>+            qtest_inw(s, addr);
+>+            break;
+>+        case READL:
+>+            qtest_inl(s, addr);
+>+            break;
+>+        }
+>+        Size -= sizeof(a);
+>+        Data += sizeof(a);
+>+    }
+>+    flush_events(s);
+>+}
+>+
+>+static void i440fx_fuzz_qos(QTestState *s,
+>+        const unsigned char *Data, size_t Size) {
+>+
+>+    typedef struct QOSFuzzAction {
+>+        uint32_t value;
+>+        int devfn;
+>+        uint8_t offset;
+>+        uint8_t id;
+>+    } QOSFuzzAction;
+>+
+>+    static QPCIBus *bus;
+>+    if (!bus) {
+>+        bus = qpci_new_pc(s, fuzz_qos_alloc);
+>+    }
+>+
+>+    QOSFuzzAction a;
+>+    while (Size >= sizeof(a)) {
+>+        memcpy(&a, Data, sizeof(a));
+>+        switch (a.id % ACTION_MAX) {
+>+        case WRITEB:
+>+            bus->config_writeb(bus, a.devfn, a.offset, (uint8_t)a.value);
+>+            break;
+>+        case WRITEW:
+>+            bus->config_writew(bus, a.devfn, a.offset, (uint16_t)a.value);
+>+            break;
+>+        case WRITEL:
+>+            bus->config_writel(bus, a.devfn, a.offset, (uint32_t)a.value);
+>+            break;
+>+        case READB:
+>+            bus->config_readb(bus, a.devfn, a.offset);
+>+            break;
+>+        case READW:
+>+            bus->config_readw(bus, a.devfn, a.offset);
+>+            break;
+>+        case READL:
+>+            bus->config_readl(bus, a.devfn, a.offset);
+>+            break;
+>+        }
+>+        Size -= sizeof(a);
+>+        Data += sizeof(a);
+>+    }
+>+    flush_events(s);
+>+}
+>+
+>+static void i440fx_fuzz_qos_fork(QTestState *s,
+>+        const unsigned char *Data, size_t Size) {
+>+    if (fork() == 0) {
+>+        i440fx_fuzz_qos(s, Data, Size);
+>+        _Exit(0);
+>+    } else {
+>+        wait(NULL);
+>+    }
+>+}
+>+
+>+static const char *i440fx_qtest_argv = TARGET_NAME " -machine accel=qtest"
+>+                                       "-m 0 -display none";
+>+static const char *i440fx_argv(FuzzTarget *t)
+>+{
+>+    return i440fx_qtest_argv;
+>+}
+>+
+>+static void fork_init(void)
+>+{
+>+    counter_shm_init();
+>+}
+>+
+>+static void register_pci_fuzz_targets(void)
+>+{
+>+    /* Uses simple qtest commands and reboots to reset state */
+>+    fuzz_add_target(&(FuzzTarget){
+>+                .name = "i440fx-qtest-reboot-fuzz",
+>+                .description = "Fuzz the i440fx using raw qtest commands and"
+>+                               "rebooting after each run",
+>+                .get_init_cmdline = i440fx_argv,
+>+                .fuzz = i440fx_fuzz_qtest});
+>+
+>+    /* Uses libqos and forks to prevent state leakage */
+>+    fuzz_add_qos_target(&(FuzzTarget){
+>+                .name = "i440fx-qos-fork-fuzz",
+>+                .description = "Fuzz the i440fx using raw qtest commands and"
+>+                               "rebooting after each run",
+>+                .pre_vm_init = &fork_init,
+>+                .fuzz = i440fx_fuzz_qos_fork,},
+>+                "i440FX-pcihost",
+>+                &(QOSGraphTestOptions){}
+>+                );
+>+
+>+    /*
+>+     * Uses libqos. Doesn't do anything to reset state. Note that if we were to
+>+     * reboot after each run, we would also have to redo the qos-related
+>+     * initialization (qos_init_path)
+>+     */
+>+    fuzz_add_qos_target(&(FuzzTarget){
+>+                .name = "i440fx-qos-noreset-fuzz",
+>+                .description = "Fuzz the i440fx using raw qtest commands and"
+>+                               "rebooting after each run",
+>+                .fuzz = i440fx_fuzz_qos,},
+>+                "i440FX-pcihost",
+>+                &(QOSGraphTestOptions){}
+>+                );
+>+}
+>+
+>+fuzz_target_init(register_pci_fuzz_targets);
+>-- 
+>2.23.0
+>
+>
 
