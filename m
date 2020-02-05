@@ -2,100 +2,83 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A00AC352A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 639F7C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:17:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38B10217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:13:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F888217BA
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:17:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMNfApFB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38B10217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="mw/CsqZn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F888217BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izKUG-0005v1-AH
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:13:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55615)
+	id 1izKYD-0007yR-Dt
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:17:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58969)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izKRl-0004E4-77
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:26 -0500
+ (envelope-from <maz@kernel.org>) id 1izKXL-0007Qx-Qs
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:16:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izKRk-0002QW-2j
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45556
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <maz@kernel.org>) id 1izKXK-00068K-UV
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:16:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39084)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izKRj-0002NQ-UB
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:10:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580908222;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JdVsCmfWYLq3X9BXHiwnkxB/k4srKjQEvuOIb3gBTJE=;
- b=QMNfApFBaO6JxHvGoGIIvWTNO4WAaCsWnq0aZFqt6iMGN/uGWzmcWGPZVBqnp6H9OQ95/d
- lnp5MECcxNWn2zzNJGjHcsw7qzGLrBxmB+d+y/zAfep2yFe7GAh40w6kaUMSrZcLF9KFNz
- 3we400MF/2PfJMbjxv7RJc11kf5R8Vo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-uH2CJWIiN0Cc9cqyp3OTaw-1; Wed, 05 Feb 2020 08:10:20 -0500
-Received: by mail-wr1-f70.google.com with SMTP id j4so1157874wrs.13
- for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 05:10:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=svyYRmjP0AjXWveCuPG76++AZlWwHFiM6YQLm1BvpMg=;
- b=tqDo4xRRFV45/NseuajDcN/7UBq9ELSlciOAGfS/HpJziewj3N+bYTJRaL6pfIqpp8
- BUsarSx/u936tUVC9ioRmTJ5GfAyI8DE+yGO9Db02WrrmuM61MrV8DrrwyqhCCFcahW9
- f2GFeoG8GcYM05HTaoqGZf4TRTzEHyOuiN7QDvN0zIOiTMh+ZbZUinrPXv5RjT+beM5/
- AgfATQ7hgyoJ6D+VD8+dtDOsVerh0MicFah+bt33iL/rG/z2dfwoZjGFZzROqF4bsl33
- yDSaW7AXFeeQyNDlMxNoU3D1LvQBgc+IKMWXAc5rV6lzraaDjLH7f7fQrJCWmL7R2rbh
- BapA==
-X-Gm-Message-State: APjAAAUIpQHk0LUwZpYE9VgZht409aAxZ5W9L9628kFLWhkGFSpYHMzy
- ES5yywIXUNrh4k5LlNU4tiyyVV4dNr/eMG3HN5MtuOkouaG3s92/MAHpajP3oZUIkSPmOpnx8n/
- eE4L0w41b8IHdDe0=
-X-Received: by 2002:a1c:4d07:: with SMTP id o7mr5903026wmh.174.1580908219540; 
- Wed, 05 Feb 2020 05:10:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwu/sIdXCm/OtyGRcfvk1ZbpWz4EU2hAyh/YTnLVCRl3D4QhrAH+/n5rlA/mA8XlzquXkC/Kw==
-X-Received: by 2002:a1c:4d07:: with SMTP id o7mr5903002wmh.174.1580908219312; 
- Wed, 05 Feb 2020 05:10:19 -0800 (PST)
-Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
- [83.52.55.162])
- by smtp.gmail.com with ESMTPSA id e17sm7909165wma.12.2020.02.05.05.10.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 05 Feb 2020 05:10:18 -0800 (PST)
-Subject: Re: [PATCH 3/3] stellaris: delay timer_new to avoid memleaks
-To: pannengyuan@huawei.com, peter.maydell@linaro.org
-References: <20200205070659.22488-1-pannengyuan@huawei.com>
- <20200205070659.22488-4-pannengyuan@huawei.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <71c5dc35-d2f2-6a7e-dde3-408fc24bb425@redhat.com>
-Date: Wed, 5 Feb 2020 14:10:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <maz@kernel.org>)
+ id 1izKXC-0005ik-KW; Wed, 05 Feb 2020 08:16:02 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 32CDC217BA;
+ Wed,  5 Feb 2020 13:16:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1580908561;
+ bh=0W0tsAYvuSVfdnkVoYJz9RA72eMKRnWbirCOKy4dgj4=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=mw/CsqZn3sB1tInzPuRPCNlNVaQNI8i89I1s/la4HB0tDL4cpBkL4a92BXQeJ8nzO
+ TxHYA9t3i+4fL9NewSZN1b0Ir8Vikf24fbQzEzPfBqwN/LTK5MuRM6q7Em4FdXDe7j
+ ZczcSmuNI+8jieLnICz0LVC3FCpmqw264fS80C/Q=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1izKX9-0038Qe-GA; Wed, 05 Feb 2020 13:15:59 +0000
 MIME-Version: 1.0
-In-Reply-To: <20200205070659.22488-4-pannengyuan@huawei.com>
-Content-Language: en-US
-X-MC-Unique: uH2CJWIiN0Cc9cqyp3OTaw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 05 Feb 2020 13:15:59 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [RFC v2 00/14] Add SDEI support for arm64
+In-Reply-To: <e8b93460-48e6-43cd-4608-370c07cb45ec@huawei.com>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <CAFEAcA-+tAbb9h2wZOm56TqUvjQJT0OYFLwTVS-UxKrF5PO3mQ@mail.gmail.com>
+ <5aece614-4341-35e5-53a6-2f3d788e6e8d@huawei.com>
+ <e8b93460-48e6-43cd-4608-370c07cb45ec@huawei.com>
+Message-ID: <350aa4ca1b57a466ed882236caf23051@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.8
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: guoheyi@huawei.com, peter.maydell@linaro.org,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org, wanghaibin.wang@huawei.com,
+ Dave.Martin@arm.com, mark.rutland@arm.com, james.morse@arm.com, mst@redhat.com,
+ cohuck@redhat.com, pbonzini@redhat.com, shannon.zhaosl@gmail.com,
+ imammedo@redhat.com, gshan@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 198.145.29.99
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,64 +90,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, zhang.zhanghailiang@huawei.com,
- Euler Robot <euler.robot@huawei.com>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Gavin Shan <gshan@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, wanghaibin.wang@huawei.com,
+ Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/5/20 8:06 AM, pannengyuan@huawei.com wrote:
-> From: Pan Nengyuan <pannengyuan@huawei.com>
->=20
-> There is a memory leak when we call 'device_list_properties' with typenam=
-e =3D stellaris-gptm. It's easy to reproduce as follow:
->=20
->    virsh qemu-monitor-command vm1 --pretty '{"execute": "device-list-prop=
-erties", "arguments": {"typename": "stellaris-gptm"}}'
->=20
-> This patch delay timer_new in realize to fix it.
->=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> Cc: qemu-arm@nongnu.org
-> ---
->   hw/arm/stellaris.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-> index bb025e0bd0..221a78674e 100644
-> --- a/hw/arm/stellaris.c
-> +++ b/hw/arm/stellaris.c
-> @@ -347,11 +347,15 @@ static void stellaris_gptm_init(Object *obj)
->       sysbus_init_mmio(sbd, &s->iomem);
->  =20
->       s->opaque[0] =3D s->opaque[1] =3D s;
-> +}
-> +
-> +static void stellaris_gptm_realize(DeviceState *dev, Error **errp)
-> +{
-> +    gptm_state *s =3D STELLARIS_GPTM(dev);
->       s->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, gptm_tick, &s->opa=
-que[0]);
->       s->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, gptm_tick, &s->opa=
-que[1]);
->   }
->  =20
-> -
->   /* System controller.  */
->  =20
->   typedef struct {
-> @@ -1536,6 +1540,7 @@ static void stellaris_gptm_class_init(ObjectClass *=
-klass, void *data)
->       DeviceClass *dc =3D DEVICE_CLASS(klass);
->  =20
->       dc->vmsd =3D &vmstate_stellaris_gptm;
-> +    dc->realize =3D stellaris_gptm_realize;
->   }
->  =20
->   static const TypeInfo stellaris_gptm_info =3D {
->=20
+Hi Heyi,
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 2020-02-04 08:26, Heyi Guo wrote:
+> Update Marc's email address.
+> 
+> +cc Gavin as he is posting a RFC for ARM NMI.
+> 
+> Hi Marc,
+> 
+> Really sorry for missing to update your email address, for the initial
+> topic was raised long time ago and I forgot to update the Cc list in
+> the commit message of the patches.
+> 
+> Thanks Gavin for forwarding current discussion on ARM NMI to me.
+> 
+> For you said SDEI is "horrible", does it mean we'd better never
+> implement SDEI in virtual world? Or do you have any advice on how to
+> implement it?
 
+My concern is that SDEI implies having EL3. EL3 not being virtualizable
+with KVM, you end-up baking SDEI in *hardware*. Of course, this hardware
+is actually software (it is QEMU), but this isn't the way it was 
+intended.
+
+It's not the first time we've done that (PSCI is another example), but 
+the
+logic behind SDEI looks much more invasive.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 
