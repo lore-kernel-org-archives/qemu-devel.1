@@ -2,49 +2,70 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5022C35249
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 05:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DED8CC35249
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 05:46:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AC132072B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 05:01:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AC132072B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id AA5982082E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 05:46:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="i7AILthF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA5982082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izCoo-0007bq-Jt
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 00:01:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42108)
+	id 1izDW7-0006rc-EM
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 00:46:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1izCn4-0006bZ-PO
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 23:59:56 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1izDV9-0006JU-9O
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 00:45:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1izCn2-0007gm-JN
- for qemu-devel@nongnu.org; Tue, 04 Feb 2020 23:59:54 -0500
-Received: from [107.174.27.60] (port=48574 helo=ozlabs.ru)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>)
- id 1izCn2-0007Uh-BC; Tue, 04 Feb 2020 23:59:52 -0500
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id 2F84DAE807DF;
- Tue,  4 Feb 2020 23:57:50 -0500 (EST)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH qemu v6] spapr: OF CI networking
-Date: Wed,  5 Feb 2020 15:59:14 +1100
-Message-Id: <20200205045914.11733-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200203032943.121178-1-aik@ozlabs.ru>
-References: <20200203032943.121178-1-aik@ozlabs.ru>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 107.174.27.60
+ (envelope-from <dgibson@ozlabs.org>) id 1izDV7-0006nC-NI
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 00:45:26 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:43251 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1izDV6-0006i2-JL; Wed, 05 Feb 2020 00:45:25 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48C9Wd17N4z9sSY; Wed,  5 Feb 2020 16:45:17 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1580881517;
+ bh=r0PpC8TdzXwyRsQBNlfqC3e5swdZylSIgsblP4mlPhU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=i7AILthFxRzPM6nya530crPgo5+cYlClkYrjI29670PPdV11fhim7rGyytP+AvtD0
+ ow1GIqBW08WV2Oq4/NiUSVpspgzzPnRWotHov397tNdRjlcWWkbdIez6eipOr5/P7z
+ pP54hq7lEC4/FDvrVx32C4DYN0jUXSEWTaIefDoc=
+Date: Wed, 5 Feb 2020 16:30:49 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: Restrictions of libnet (was: Re: VW ELF loader)
+Message-ID: <20200205053049.GF60221@umbus.fritz.box>
+References: <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
+ <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
+ <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
+ <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
+ <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
+ <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
+ <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
+ <d13eea1d-7942-47e0-6189-a66ce9639db4@redhat.com>
+ <20200204095403.04d9dd29.conny@cornelia-huck.de>
+ <4794cf7a-7b53-5fea-c89d-baa01d3ed0ce@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="MZf7D3rAEoQgPanC"
+Content-Disposition: inline
+In-Reply-To: <4794cf7a-7b53-5fea-c89d-baa01d3ed0ce@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,294 +77,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Cornelia Huck <conny@cornelia-huck.de>, qemu-devel <qemu-devel@nongnu.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a *hack* to demonstrate the idea.
 
-I am connecting the OF CI's "net" device to a corresponding network
-backend. Unlike blockdev with its simple API allowing to just read
-from a device, network requires a client and in presence of
-an existing device in QEMU, having another device-agnostinc receiver
-from the netdev backend is quite tricky.
+--MZf7D3rAEoQgPanC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Is this something that should never ever be done in such paravirtual
-setup? Is there a better way to do this within the existing QEMU besides
-implementing drivers in the guest space?
+On Tue, Feb 04, 2020 at 10:20:14AM +0100, Thomas Huth wrote:
+> On 04/02/2020 09.54, Cornelia Huck wrote:
+> > On Tue, 4 Feb 2020 07:16:46 +0100
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >=20
+> >> On 04/02/2020 00.26, Paolo Bonzini wrote:
+> >>>
+> >>>
+> >>> Il mar 4 feb 2020, 00:20 Alexey Kardashevskiy <aik@ozlabs.ru
+> >>> <mailto:aik@ozlabs.ru>> ha scritto:
+> >>>
+> >>>     Speaking seriously, what would I put into the guest?
+> >>>
+> >>> Only things that would be considered drivers. Ignore the partitions
+> >>> issue for now so that you can just pass the device tree services to Q=
+EMU
+> >>> with hypercalls.
+> >>>
+> >>>     Netboot's dhcp/tftp/ip/ipv6 client? It is going to be another SLO=
+F,
+> >>>     smaller but adhoc with only a couple of people knowing it.
+> >>>
+> >>>
+> >>> You can generalize and reuse the s390 code. All you have to write is =
+the
+> >>> PCI scan and virtio-pci setup. =20
+> >>
+> >> Well, for netbooting, the s390-ccw bios uses the libnet code from SLOF,
+> >> so re-using this for a slim netboot client on ppc64 would certainly be
+> >> feasible (especially since there are also already virtio drivers in SL=
+OF
+> >> that are written in C), but I think it is not very future proof. The
+> >> libnet from SLOF only supports UDP, and no TCP. So for advanced boot
+> >> scenarios like booting from HTTP or even HTTPS, you need something else
+> >> (i.e. maybe grub is the better option, indeed).
+> >=20
+> > That makes me wonder what that means for s390: We're inheriting
+> > libnet's limitations, but we don't have grub -- do we need to come up
+> > with something different? Or improve libnet?
+>=20
+> I don't think that it makes sense to re-invent the wheel yet another
+> time and write yet another TCP implementation (which is likely quite a
+> bit of work, too, especially if you also want to do secure HTTPS in the
+> end). So yes, in the long run (as soon as somebody seriously asks for
+> HTTP booting on s390x) we need something different here.
+>=20
+> Now looking at our standard s390x bootloader zipl - this has been giving
+> us a headache a couple of times in the past, too (from a distro point of
+> view since s390x is the only major platform left that does not use grub,
+> but also from a s390-ccw bios point of view, see e.g.
+> https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03046.html and
+> related discussions).
+>=20
+> So IMHO the s390x world should move towards grub2, too. We could e.g.
+> link it initially into the s390-ccw bios bios ... and if that works out
+> well, later also use it as normal bootloader instead of zipl (not sure
+> if that works in all cases, though, IIRC there were some size
+> constraints and stuff like that).
 
-This one manages to get DHCP config working in GRUB (compiled separately
-and loaded via "-kernel") but this is very unstable - needs syncronization,
-correct qemu_flush_queued_packets/qemu_purge_queued_packets in places,
-etc.
+petitboot would be another reasonable thing to consider here.  Since
+it's Linux based, you have all the drivers you have there.  It's not
+quite grub, but it does at least parse the same configuration files.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- hw/ppc/spapr_of_client.c | 150 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 142 insertions(+), 8 deletions(-)
+You do need kexec() of course, I don't know if you have that already
+for s390 or not.
 
-diff --git a/hw/ppc/spapr_of_client.c b/hw/ppc/spapr_of_client.c
-index 31555c356de8..a05d891eb452 100644
---- a/hw/ppc/spapr_of_client.c
-+++ b/hw/ppc/spapr_of_client.c
-@@ -15,6 +15,7 @@
- #include "elf.h"
- #include "hw/ppc/ppc.h"
- #include "hw/loader.h"
-+#include "net/net.h"
- #include "trace.h"
- 
- #define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
-@@ -211,12 +212,23 @@ static const uint8_t of_client_blob[] = {
-     0x4e, 0x80, 0x00, 0x20
- };
- 
-+typedef uint8_t SpaprOfNetBuffer[2048];
-+typedef struct {
-+    int head, tail, used;
-+    SpaprOfNetBuffer b[32];
-+} SpaprOfNetBuffers;
-+
- typedef struct {
-     DeviceState *dev;
-     CharBackend *cbe;
-     BlockBackend *blk;
-     uint64_t blk_pos;
-     uint16_t blk_physical_block_size;
-+    NICState *nic;
-+    NICConf nicconf;
-+    SpaprOfNetBuffers *netbufs;
-+    NetClientState *ncpeer;
-+    char *params;
-     char *path; /* the path used to open the instance */
-     uint32_t phandle;
- } SpaprOfInstance;
-@@ -612,6 +624,75 @@ static DeviceState *of_client_find_qom_dev(BusState *bus, const char *path)
-     return NULL;
- }
- 
-+static bool network_device_get_mac(DeviceState *qdev, MACAddr *mac)
-+{
-+    const char *macstr;
-+
-+    macstr = object_property_get_str(OBJECT(qdev), "mac", NULL);
-+    if (!macstr) {
-+        return false;
-+    }
-+
-+    return sscanf(macstr, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
-+                  &mac->a[0], &mac->a[1], &mac->a[2],
-+                  &mac->a[3], &mac->a[4], &mac->a[5]) == 6;
-+}
-+
-+static int of_client_net_can_receive(NetClientState *nc)
-+{
-+    SpaprOfInstance *inst = qemu_get_nic_opaque(nc);
-+    SpaprOfNetBuffers *nb = inst->netbufs;
-+
-+    return nb->used < ARRAY_SIZE(nb->b);
-+}
-+
-+static ssize_t of_client_net_receive(NetClientState *nc, const uint8_t *buf,
-+                                     size_t size)
-+{
-+    SpaprOfInstance *inst = qemu_get_nic_opaque(nc);
-+    SpaprOfNetBuffers *nb = inst->netbufs;
-+    int next;
-+
-+    next = (nb->head + 1) % ARRAY_SIZE(nb->b);
-+    g_assert(next != nb->tail);
-+    g_assert(size <= ARRAY_SIZE(nb->b[0]));
-+
-+    memcpy(nb->b[next], buf, size);
-+    nb->head = next;
-+    ++nb->used;
-+
-+    return size;
-+}
-+
-+static ssize_t of_client_net_read(SpaprOfInstance *inst, uint8_t *buf,
-+                                  size_t size)
-+{
-+    SpaprOfNetBuffers *nb = inst->netbufs;
-+
-+    if (!nb->used) {
-+        return 0;
-+    }
-+    g_assert(nb->head != nb->tail);
-+    memcpy(buf, nb->b[nb->tail], size);
-+    nb->tail = (nb->tail + 1) % ARRAY_SIZE(nb->b);
-+    --nb->used;
-+
-+    return size;
-+}
-+
-+static ssize_t of_client_net_write(SpaprOfInstance *inst, uint8_t *buf,
-+                                   size_t size)
-+{
-+    return qemu_send_packet(qemu_get_queue(inst->nic), buf, size);
-+}
-+
-+static NetClientInfo of_client_net_info = {
-+    .type = NET_CLIENT_DRIVER_NIC,
-+    .size = sizeof(NICState),
-+    .can_receive = of_client_net_can_receive,
-+    .receive = of_client_net_receive,
-+};
-+
- static uint32_t spapr_of_client_open(SpaprMachineState *spapr, const char *path)
- {
-     int offset;
-@@ -625,11 +706,6 @@ static uint32_t spapr_of_client_open(SpaprMachineState *spapr, const char *path)
-     }
- 
-     split_path(path, &node, &unit, &part);
--    if (part && strcmp(part, "0")) {
--        error_report("Error: Do not do partitions now");
--        g_free(part);
--        part = NULL;
--    }
- 
-     offset = of_client_fdt_path_offset(spapr->fdt_blob, node, unit);
-     if (offset < 0) {
-@@ -649,6 +725,7 @@ static uint32_t spapr_of_client_open(SpaprMachineState *spapr, const char *path)
-         g_free(tmp);
-     }
-     inst->path = g_strdup(path);
-+    inst->params = part;
-     g_hash_table_insert(spapr->of_instances,
-                         GINT_TO_POINTER(spapr->of_instance_last),
-                         inst);
-@@ -659,6 +736,8 @@ static uint32_t spapr_of_client_open(SpaprMachineState *spapr, const char *path)
-                                                       "chardev", NULL);
-         const char *blkstr = object_property_get_str(OBJECT(inst->dev),
-                                                      "drive", NULL);
-+        const char *ncstr = object_property_get_str(OBJECT(inst->dev),
-+                                                    "netdev", NULL);
- 
-         if (cdevstr) {
-             Chardev *cdev = qemu_chr_find(cdevstr);
-@@ -673,6 +752,28 @@ static uint32_t spapr_of_client_open(SpaprMachineState *spapr, const char *path)
-             conf.blk = inst->blk;
-             blkconf_blocksizes(&conf);
-             inst->blk_physical_block_size = conf.physical_block_size;
-+        } else if (ncstr && network_device_get_mac(inst->dev,
-+                                                   &inst->nicconf.macaddr)) {
-+            /*
-+             * We already have a NIC hooked to a netdev bachend. To bypass
-+             * the NIC, we temporarily replace the netdev's peer to our
-+             * OF NIC and revert it back when the instance is closed.
-+             */
-+            inst->nicconf.peers.ncs[0] = qemu_find_netdev(ncstr);
-+            if (inst->nicconf.peers.ncs[0]) {
-+                inst->nicconf.peers.queues = 1;
-+                inst->ncpeer = inst->nicconf.peers.ncs[0]->peer;
-+                qemu_flush_queued_packets(inst->ncpeer);
-+                inst->nicconf.peers.ncs[0]->peer = NULL;
-+                inst->nic = qemu_new_nic(&of_client_net_info, &inst->nicconf,
-+                                         "OF1275-CI", "ofnet", inst);
-+                qemu_purge_queued_packets(inst->nicconf.peers.ncs[0]);
-+            }
-+            if (inst->nic) {
-+                qemu_format_nic_info_str(qemu_get_queue(inst->nic),
-+                                         inst->nicconf.macaddr.a);
-+                inst->netbufs = g_malloc0(sizeof(inst->netbufs[0]));
-+            }
-         }
-     }
- 
-@@ -680,7 +781,6 @@ trace_exit:
-     trace_spapr_of_client_open(path, inst ? inst->phandle : 0, ret);
-     g_free(node);
-     g_free(unit);
--    g_free(part);
- 
-     return ret;
- }
-@@ -760,7 +860,7 @@ static uint32_t of_client_instance_to_path(SpaprMachineState *spapr,
- static uint32_t of_client_write(SpaprMachineState *spapr, uint32_t ihandle,
-                                 uint32_t buf, uint32_t len)
- {
--    char tmp[256];
-+    char tmp[1025];
-     int toread, toprint, cb = MIN(len, 1024);
-     SpaprOfInstance *inst = (SpaprOfInstance *)
-         g_hash_table_lookup(spapr->of_instances, GINT_TO_POINTER(ihandle));
-@@ -777,6 +877,8 @@ static uint32_t of_client_write(SpaprMachineState *spapr, uint32_t ihandle,
-                                                 toprint);
-             } else if (inst->blk) {
-                 trace_spapr_of_client_blk_write(ihandle, len);
-+            } else if (inst->nic) {
-+                toprint = of_client_net_write(inst, (uint8_t *) tmp, toread);
-             }
-         } else {
-             /* We normally open stdout so this is fallback */
-@@ -822,6 +924,8 @@ static uint32_t of_client_read(SpaprMachineState *spapr, uint32_t ihandle,
-                 if (rc > 0) {
-                     inst->blk_pos += rc;
-                 }
-+            } else if (inst->nic) {
-+                ret = of_client_net_read(inst, buf, len);
-             }
-         }
-     }
-@@ -1214,6 +1318,15 @@ static void of_instance_free(gpointer data)
- {
-     SpaprOfInstance *inst = (SpaprOfInstance *) data;
- 
-+    if (inst->ncpeer) {
-+        qemu_flush_queued_packets(inst->nicconf.peers.ncs[0]->peer);
-+        inst->nicconf.peers.ncs[0]->peer = inst->ncpeer;
-+        qemu_flush_queued_packets(inst->nicconf.peers.ncs[0]->peer);
-+
-+        qemu_del_nic(inst->nic);
-+    }
-+    g_free(inst->netbufs);
-+    g_free(inst->params);
-     g_free(inst->path);
-     g_free(inst);
- }
-@@ -1355,7 +1468,7 @@ void spapr_of_client_dt(SpaprMachineState *spapr, void *fdt)
-         _FDT(fdt_setprop_cell(fdt, offset, "real-mode?", 1));
-     }
- 
--    /* Add "disk" nodes to SCSI hosts */
-+    /* Add "disk" nodes to SCSI hosts, same for "network" */
-     for (offset = fdt_next_node(fdt, -1, NULL), phandle = 1;
-          offset >= 0;
-          offset = fdt_next_node(fdt, offset, NULL), ++phandle) {
-@@ -1366,6 +1479,27 @@ void spapr_of_client_dt(SpaprMachineState *spapr, void *fdt)
-             int disk_node_off = fdt_add_subnode(fdt, offset, "disk");
- 
-             fdt_setprop_string(fdt, disk_node_off, "device_type", "block");
-+        } else if (strncmp(nodename, "ethernet@", 9) == 0 ||
-+                   strncmp(nodename, "l-lan@", 6) == 0) {
-+
-+            char devpath[1024];
-+            DeviceState *qdev;
-+            MACAddr mac;
-+
-+            if (fdt_get_path(fdt, offset, devpath, sizeof(devpath) - 1) < 0) {
-+                continue;
-+            }
-+
-+            qdev = of_client_find_qom_dev(sysbus_get_default(), devpath);
-+            if (!qdev) {
-+                continue;
-+            }
-+            if (network_device_get_mac(qdev, &mac)) {
-+                fdt_setprop(fdt, offset, "local-mac-address", mac.a,
-+                            sizeof(mac));
-+            }
-+            fdt_setprop_string(fdt, offset, "device_type", "network");
-+            fdt_setprop_cell(fdt, offset, "max-frame-size", 1024);
-         }
-     }
- 
--- 
-2.17.1
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--MZf7D3rAEoQgPanC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl46UwcACgkQbDjKyiDZ
+s5ILkRAAnj1VjoulEKnFzs1npv00RDcnPDMwJmJkYUHu3MSb1YAPw2kWXoJJebUx
+jbKwfLjl6YafvyW75b7PUFwvr2jOFMDj17KuKj/Zfqdxce7qtXSf1zV7cg0NA2X6
+sQsg5GySfj5BljhebD6KAeQNyBAFI56cZl7TCYt+2T6xaYHJL0wji1nNGKBCGDIJ
+eU2uomgMtu7E1fBQdO2IEOpZdF4WKxvBBfK4v84A2ZzbwvVB7BkitFlv4igWMxZ0
+6UZTFfhuVl9jeUPJhvaK3jj+wYUpbi9r121uwlqRLBYh54X+2o2Nr80OToZnSvxg
+LUxDBShftsqK+o2nVud9izWNp4y9wG9/n2ts6Ez3X6aB6nKVxUHwwQiwtBRfKRbH
+u1QaqVBtztqSrDnzn6CqxeUd9Ng7N/x6E8wlx6L8jlBKq5rnAEaWRgyBGuJ7kpJI
+zBCbHIgdMJw02eQ84/Br1WAPCxu3rntZh23BCga+y/LhmLwde33d0UeQGK5/qj6o
+gkECYZ6dfCutSbPyg1M00uTCjiyzOGb7HEfvcPYlFJY5l2gKOEyE189UJzueE1+6
+5u7Pekq2Qsee2m2kHQRYvBn8KAMs8+y+mBPBRcszGN7V/58Kj1WD5EKx/jrnyl02
+QUG7iKJWB8D5B7zH5G4xDeNbdyZTli87RRIRUf3WGhMYpKtZGNQ=
+=X2Qv
+-----END PGP SIGNATURE-----
+
+--MZf7D3rAEoQgPanC--
 
