@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B841EC35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F3AC35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:13:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87BA6217BA
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:13:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A332221741
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:13:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iI3ODzXG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87BA6217BA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="grA72OqP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A332221741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izOEy-0001mD-OM
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 12:13:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34920)
+	id 1izOF0-0001r5-Qs
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 12:13:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34899)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1izOCJ-0004sH-SB
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:10:44 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1izOCI-000569-LQ
+ (envelope-from <alex.bennee@linaro.org>) id 1izOCI-0004qP-W7
  for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:10:43 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46349)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1izOCH-00050r-RU
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:10:42 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55241)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1izOCI-00051I-ED
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:10:42 -0500
-Received: by mail-wr1-x444.google.com with SMTP id z7so3639258wrl.13
- for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 09:10:42 -0800 (PST)
+ id 1izOCH-0004wj-L8
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:10:41 -0500
+Received: by mail-wm1-x341.google.com with SMTP id g1so3304735wmh.4
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 09:10:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5wBDeZKmYofKOsnZiNwMAFl1gvv88UQfd1fG073rc/U=;
- b=iI3ODzXGho/7WybVa4eA7Y35iEqLgJiH8OrYdKE+Gs5gcCCe7iFN2b8oOAYlV2Uamv
- BO3cyKETkW5gE3DRJVgBgoeBk0cpYQ07/p395bJ34nyWbvrBcFDql30+ApJtNWnayXyJ
- dm/nAkdsvq+EcpYC9hWPCmcRy0L3lpvhy0GIXxgsTk9W9gdeJCzmAZsCU3bEWlJAQhFu
- MaHvRNcxHPEvZGysdMoOaTowOUz/EtJxy5y8XGZFw/nrQ2fnIxH3T0GM8wUSVlocp2Ue
- 24yk126BraJ3k5gqafEjp7aQTfnMkbObFD721jxzUQfhkTFVJPtQwpwePPjmR3xh0usg
- MN3w==
+ bh=KcowZQvidWsL6K9vNr5PA0mK1ZdxCgzSQNRXFm9TCF8=;
+ b=grA72OqPGdCWZW1QEGhC+Nb8S3Niuc1geHth+N1LGYbNe5A5lZAlHORAozYIuLoHYx
+ 0B/d+umP3NZ5Gxz60d/REI/9ypRMLjyNxA9cRkaM/cQ7MXchTxD+WB8797j7lZm8hN1s
+ OkD5JXxXXsc3hhhecSlWm+6DtoS0QN8DZZKPaDs8Qql6ZGU/JHRxbFmYzvGfbrKoDy59
+ NApDiDWE5r3o2i0SslKFVJbgC4FUL71AIwIXGHJe8e3P+Qeh4C6+rK81aDxbzlh/KKaN
+ Rq3emWRQNRbUucozgy1M7RZ5+DYcmZFra4vb/4O+ROohsnYNKRVljJ6AQzIC3r6YH4sX
+ ibPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5wBDeZKmYofKOsnZiNwMAFl1gvv88UQfd1fG073rc/U=;
- b=ESoB79wKn2hPMSm65JtDABYbDCMQfpH0YmpQJ5hxvWOT6owIzvvTVLY32ti8PbzIc3
- U/bwHhiATIZo6SW9Xt6cZzD6R3+yTiwiQ+folzTgwhzoViNC067nRK2O/k1qroueCHXy
- Krhw61gKaXG0HwLMFFbcLe39V9MqtMANOiffU2gD0Yh60qGirhHuvEmyO8tkL6HqFQUE
- WheXjVbYUbHAK7/UO1MmaR/yD8adt7uBavlZaN2wzvlZ7fgbKCZbAhJqMvx4PfAkK1y6
- o2ej+UZdX8efELs+ONptNsgyCiqj6SHDgYiyMYS5nuwv6s1RSy4elDrBIb7wwv2gEP5o
- zTBA==
-X-Gm-Message-State: APjAAAVyhTNVVDJt/StBt+Yw1+dMtKx0rsP/mk/5UtdKDQ2hPy3UXFbV
- iOUYrp/1VwfVcSuPyTSYfi3jLQ==
-X-Google-Smtp-Source: APXvYqxeQsLxqqkjiiH7s8Dnc7ViFF831HE9iTBTCynzyA6shrqFVATfNssa0SkEoeKSXs9uIm+i/g==
-X-Received: by 2002:a05:6000:8c:: with SMTP id
- m12mr30160483wrx.142.1580922641558; 
- Wed, 05 Feb 2020 09:10:41 -0800 (PST)
+ bh=KcowZQvidWsL6K9vNr5PA0mK1ZdxCgzSQNRXFm9TCF8=;
+ b=Fb70R1nMRXwKudbETaH8nMgEbUvjACH/CxJYTSHNavea+fjLESkXT2OsFAPnUzTlKZ
+ BDmWyU9VV2SfuMtM1S9ccCQwuFDHoggMTZEW2pZSNZjX+wAP7jZW6hMFJvV7i7cIu8IA
+ POPjYOPld51NJMNSt8AGZag4HTFnuln9CP4CWbqoB4fX+z/DzuJCPO+26bg9hdjxHuPK
+ M3dH2zZdclu6ED0d5230IKsqTbI3bcMmbIYe7pfGZo0B+dI5BgFt+4U7ksubbHUfM2Pz
+ OuB61pkimBJ+Twv+z0wKJM2VkZ2jY4IfTX6V9QjJ4RlXJLC4uiwY4a4Ha1x1jM82y4OB
+ V/Tg==
+X-Gm-Message-State: APjAAAV0qs7AHZxX50rYbbqBlaW+v0QFerMco4zlC48EzchjpscdCcGW
+ yqLj9zwzWKSTGmXNdCeisV2hWQ==
+X-Google-Smtp-Source: APXvYqx6XlqQuBT/IhB4OsLUlfIV/1O6LxCulL311VTTHljUPGgh65k9ApWdaM/8RLbjtEoP2LizXg==
+X-Received: by 2002:a1c:610a:: with SMTP id v10mr6521729wmb.44.1580922640609; 
+ Wed, 05 Feb 2020 09:10:40 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z25sm259904wmf.14.2020.02.05.09.10.36
+ by smtp.gmail.com with ESMTPSA id 133sm238654wme.32.2020.02.05.09.10.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 05 Feb 2020 09:10:39 -0800 (PST)
+ Wed, 05 Feb 2020 09:10:38 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 321381FF96;
+ by zen.linaroharston (Postfix) with ESMTP id 08F121FF92;
  Wed,  5 Feb 2020 17:10:32 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v6 07/22] target/m68k: use gdb_get_reg helpers
-Date: Wed,  5 Feb 2020 17:10:16 +0000
-Message-Id: <20200205171031.22582-8-alex.bennee@linaro.org>
+Subject: [PATCH  v6 05/22] gdbstub: add helper for 128 bit registers
+Date: Wed,  5 Feb 2020 17:10:14 +0000
+Message-Id: <20200205171031.22582-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200205171031.22582-1-alex.bennee@linaro.org>
 References: <20200205171031.22582-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,84 +97,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: damien.hedde@greensocs.com, luis.machado@linaro.org,
- richard.henderson@linaro.org, Laurent Vivier <laurent@vivier.eu>,
- alan.hayward@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, alan.hayward@arm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is cleaner than poking memory directly and will make later
-clean-ups easier.
-
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-
 ---
-v3
-  - fix mem_buf references
-  - fix mem_buf + len cases
+v2
+  - take care of endianess of the whole 128 bit word
 ---
- target/m68k/helper.c | 29 +++++++++++------------------
- 1 file changed, 11 insertions(+), 18 deletions(-)
+ include/exec/gdbstub.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index baf7729af00..c23b70f854d 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -72,19 +72,15 @@ static int cf_fpu_gdb_get_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
- {
-     if (n < 8) {
-         float_status s;
--        stfq_p(mem_buf, floatx80_to_float64(env->fregs[n].d, &s));
--        return 8;
-+        return gdb_get_reg64(mem_buf, floatx80_to_float64(env->fregs[n].d, &s));
-     }
-     switch (n) {
-     case 8: /* fpcontrol */
--        stl_be_p(mem_buf, env->fpcr);
--        return 4;
-+        return gdb_get_reg32(mem_buf, env->fpcr);
-     case 9: /* fpstatus */
--        stl_be_p(mem_buf, env->fpsr);
--        return 4;
-+        return gdb_get_reg32(mem_buf, env->fpsr);
-     case 10: /* fpiar, not implemented */
--        memset(mem_buf, 0, 4);
--        return 4;
-+        return gdb_get_reg32(mem_buf, 0);
-     }
-     return 0;
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index 08363969c14..59e366ba3af 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -102,6 +102,19 @@ static inline int gdb_get_reg64(uint8_t *mem_buf, uint64_t val)
+     return 8;
  }
-@@ -112,21 +108,18 @@ static int cf_fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
- static int m68k_fpu_gdb_get_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
- {
-     if (n < 8) {
--        stw_be_p(mem_buf, env->fregs[n].l.upper);
--        memset(mem_buf + 2, 0, 2);
--        stq_be_p(mem_buf + 4, env->fregs[n].l.lower);
--        return 12;
-+        int len = gdb_get_reg16(mem_buf, env->fregs[n].l.upper);
-+        len += gdb_get_reg16(mem_buf + len, 0);
-+        len += gdb_get_reg64(mem_buf + len, env->fregs[n].l.lower);
-+        return len;
-     }
-     switch (n) {
-     case 8: /* fpcontrol */
--        stl_be_p(mem_buf, env->fpcr);
--        return 4;
-+        return gdb_get_reg32(mem_buf, env->fpcr);
-     case 9: /* fpstatus */
--        stl_be_p(mem_buf, env->fpsr);
--        return 4;
-+        return gdb_get_reg32(mem_buf, env->fpsr);
-     case 10: /* fpiar, not implemented */
--        memset(mem_buf, 0, 4);
--        return 4;
-+        return gdb_get_reg32(mem_buf, 0);
-     }
-     return 0;
- }
+ 
++static inline int gdb_get_reg128(uint8_t *mem_buf, uint64_t val_hi,
++                                 uint64_t val_lo)
++{
++#ifdef TARGET_WORDS_BIGENDIAN
++    stq_p(mem_buf, val_hi);
++    stq_p(mem_buf + 8, val_lo);
++#else
++    stq_p(mem_buf, val_lo);
++    stq_p(mem_buf + 8, val_hi);
++#endif
++    return 16;
++}
++
+ #if TARGET_LONG_BITS == 64
+ #define gdb_get_regl(buf, val) gdb_get_reg64(buf, val)
+ #define ldtul_p(addr) ldq_p(addr)
 -- 
 2.20.1
 
