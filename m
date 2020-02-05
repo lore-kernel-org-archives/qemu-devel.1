@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBE1C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:37:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE06C35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:41:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 668D420702
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:37:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 194F0217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:41:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R44UeW68"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 668D420702
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZsS78veU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 194F0217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izNgS-0006Cu-LE
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 11:37:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41265)
+	id 1izNjv-0000gK-7f
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 11:41:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43511)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1izNfM-00051s-7c
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:36:41 -0500
+ (envelope-from <eblake@redhat.com>) id 1izNio-00082H-Ty
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:40:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1izNfH-0008OU-DR
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:36:40 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53924
+ (envelope-from <eblake@redhat.com>) id 1izNin-0001iw-D0
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:40:14 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34284
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1izNfH-0008H6-7m
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:36:35 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1izNin-0001Uw-6b
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:40:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580920594;
+ s=mimecast20190719; t=1580920812;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FJnqENSwRlv6j9vMPvbmiTnpUS5/DH4CSGjD9A83d4g=;
- b=R44UeW68F9pAerICZB+pDX5cpM92lINuhFhuwIs+/sdIydIjOi1kMLbxUsp3VZL309fIQ5
- mcDaq4E3tQTJsUZwPMcXoQolB6NhofE8IwNUaSvxFCcvfwJ+s+8WPiupgbl9e9sjkmvho5
- Xp2lT2LngicAypsQSE5FnuifH/h5bnQ=
+ bh=d93s/pAEUsDg224bgENuVjn0OuVgdryCao8xuTYZ+cE=;
+ b=ZsS78veUKcEfQSz7GTBWy5vUMa6qvHfecW1CWL7XEnAGmPpDTQFk9+5UlbWcPcu97HIf9w
+ uHaclUdqaS0YcYQXLNe2helfcFyhQMxunk4kA/wsyYN4y1+Kd9T946o9F3BWRdNGAQe01C
+ SKxuMbj6tC4p2mDsIy65Hs2Yfn0ndto=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299--xV6CTHlOeqzVEZ3RUkYaA-1; Wed, 05 Feb 2020 11:36:26 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-169-oYWy0BmkMVOesaJdOidRTg-1; Wed, 05 Feb 2020 11:40:09 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35F7810CE791;
- Wed,  5 Feb 2020 16:36:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89EE88018A3;
+ Wed,  5 Feb 2020 16:40:08 +0000 (UTC)
 Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A505859BF;
- Wed,  5 Feb 2020 16:36:24 +0000 (UTC)
-Subject: Re: [PATCH v2 08/33] block: Rename bdrv_inherited_options()
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200204170848.614480-1-mreitz@redhat.com>
- <20200204170848.614480-9-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D4C329D52;
+ Wed,  5 Feb 2020 16:40:01 +0000 (UTC)
+Subject: Re: [PATCH] qemu-img: Place the '-i aio' option in alphabetical order
+To: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org
+References: <20200205163008.204493-1-jusual@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <9357ebd4-42c6-bcda-ee69-1489f30a73d5@redhat.com>
-Date: Wed, 5 Feb 2020 10:36:23 -0600
+Message-ID: <ed719cc3-22fa-59fb-1fbc-26c08381cc84@redhat.com>
+Date: Wed, 5 Feb 2020 10:40:01 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200204170848.614480-9-mreitz@redhat.com>
+In-Reply-To: <20200205163008.204493-1-jusual@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: -xV6CTHlOeqzVEZ3RUkYaA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: oYWy0BmkMVOesaJdOidRTg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -91,23 +90,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/4/20 11:08 AM, Max Reitz wrote:
-> The other two .inherit_options implementations specify exactly for what
-> case they are used in their name, so do it for this one as well.
+On 2/5/20 10:30 AM, Julia Suvorova wrote:
+> The '-i AIO' option was accidentally placed after '-n' and '-t'. Move it
+> after '--flush-interval'.
 > 
-> (The actual intention behind this patch is to follow it up with a
-> generic bdrv_inherited_options() that works for all three cases.)
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Julia Suvorova <jusual@redhat.com>
 > ---
->   block.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
+>   docs/interop/qemu-img.rst | 8 ++++----
+>   qemu-img-cmds.hx          | 4 ++--
+>   2 files changed, 6 insertions(+), 6 deletions(-)
+> 
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
