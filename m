@@ -2,114 +2,108 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9839FC35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56421C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:58:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E74F2082E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:57:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E74F2082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 0DF642082E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:58:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NzZkx6aD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DF642082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izLAr-0007ZK-JE
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:57:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56334)
+	id 1izLCO-0000ad-30
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:58:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57609)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1izL9z-00071J-JC
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:56:08 -0500
+ (envelope-from <darren.kenny@oracle.com>) id 1izLBh-0008Mx-Dk
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:57:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1izL9y-0003za-KV
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:56:07 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:57777)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1izL9u-0003n6-Ox
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:56:06 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N6bo8-1jb8C83xoE-0185o2; Wed, 05 Feb 2020 14:55:51 +0100
-Subject: Re: [PATCH v2] linux-user: implement TARGET_SO_PEERSEC
-To: Matthias Luescher <lueschem@gmail.com>
-References: <20200204211901.1731821-1-laurent@vivier.eu>
- <CAMhkXVNtm9e5Coxm1=n0-AU=fgYcwqMYmKupCL5ZCqDJqrK-Mw@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <ac7d60eb-cff5-6fe8-77ce-b29a41af5b3f@vivier.eu>
-Date: Wed, 5 Feb 2020 14:55:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <darren.kenny@oracle.com>) id 1izLBf-0003qg-HC
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:57:52 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:59010)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+ id 1izLBf-0003nW-3Q
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:57:51 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015DmAPQ114368;
+ Wed, 5 Feb 2020 13:57:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=C1bRGOAmb7DgCdzKEGg4B6wmnlI+0HhCTUiq2/2o7as=;
+ b=NzZkx6aD6Rv7M3pkc3msbFOT9B1UWSgiyXKz75G+KObAhEXhqBDTzRIyPYd/yB5k7tRO
+ w+ITKii7dkibu3HwvgedCrcZZh3hRo8Kjmu3nPu9WNZ3963mpRO/aVc9A5MGA9liehoM
+ YuH6l4BGzWGX7sey65EhfgsS5J7UXz0e8sKwWjUBC1uAoi/EObzaI352yhivNqHVSC5X
+ Y+Js+2pfQ4geIo5Yub6B0oomXI6aecZjC/UyV0/yc5EgLE8Vrbyt0i5+UfYwlNS74SJU
+ LrMJvoTLbcYNij0iph73zEquIocRLd0NUkrCHWnFL5oyG6Vx91rGnDhRFDXUAXGPX+m3 Ww== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 2xykbpb4c3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 13:57:48 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015DiMDi017867;
+ Wed, 5 Feb 2020 13:57:47 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 2xykbrwu0p-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 13:57:47 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 015Dvjw8014337;
+ Wed, 5 Feb 2020 13:57:46 GMT
+Received: from starbug-mbp.localdomain (/10.169.111.17)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 05 Feb 2020 05:57:45 -0800
+Received: from starbug-mbp (localhost [127.0.0.1])
+ by starbug-mbp.localdomain (Postfix) with SMTP id 110E157DC554;
+ Wed,  5 Feb 2020 13:57:40 +0000 (GMT)
+Date: Wed, 5 Feb 2020 13:57:40 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+To: "Bulekov, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v8 19/21] fuzz: add virtio-net fuzz target
+Message-ID: <20200205135740.f6o22uy5ss7bzoj2@starbug-mbp>
+Mail-Followup-To: "Bulekov, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
+References: <20200129053357.27454-1-alxndr@bu.edu>
+ <20200129053357.27454-20-alxndr@bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <CAMhkXVNtm9e5Coxm1=n0-AU=fgYcwqMYmKupCL5ZCqDJqrK-Mw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:7i2MfyNLtS9s3RqOgWyYwWS2ZrUd8FUKjIueK8A0bJsHPVZFJvY
- mY8CEgTT2sPcrEVvvY1OJyelnudk56R94uZHQnye87SJk2xY2+t69j2NYYLjXSCCSQTkKY2
- VMD4f3SpKDgJc/fEPJl09isRY8IHblAGyBTkFSvxyVwtMwDPI98C5B/UBFPnowW98fwFSr9
- yQY+os2J/szS3ePa9vvMw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:o+dZevMGPRA=:j3a6uunVxDJZCB8VYgihWo
- UqIfh1BM5fYfp1KeEcrEI+49k+4shkz7R7ZYqgDV5E3RGfcf+6mcoRJ2kiNeya5vr6JAObRfm
- 91XP2BNQzCNWEJlSfPR2FFgQnPebwXO54Su/hMzCbtzOmtia0eShuKE8fqjesT2iNXEoLrR7q
- 03fJ53p6ft5uq6opECVHUmVdO41+OTNu640Tyyoiu1xkWz3u3WIjpIsC3jOr5Y+kL/FTgNcIX
- Cap1ZqsSIf55c0IEvo8LoE6G0wyqo7+D2IzfYuFZsK0K274t1bCKgr6EVnz8gtRD8UHssTuSE
- tFBBkD/FAcBTDzN4xJavHr9lRXGwa7nsHADz35k9RF2PvYXk9ru7LQYNYgEtGh2KCM1SzE0wc
- sWp7jToykKjfBoGuERdxmhvgtueAw3/HQVGWvva44zWXPRPtgIX3duo8J2Fs5iQvY30sefEBu
- 1m/d96dfjWXqYUncYgU741fP2pplFQ6Cfs/85XsEgBcrR9ya0sVwXwy/x6aVeEHa3w4jj7p4k
- zQSJLXGVUQn/gHFlQ2wVXV9YxyXkCgjHKNzHq2l+WV9uYKc82ZTnyOCNKlG6ze2V1mEtJrsMF
- wGwrSkCAAVlQxa2TglRshg693FCeo6sKEKpl2gydsRxnBMTsaejf7Q1uqHeNAkd+VvacgsLA7
- le97DTLYZ/KhGdTMfLyTudFcty2yeDtln7IYLMUzw12CrZxqp7xxYA2oDFSiRoWA82bsajyGv
- yzKyZlxPJsMwnAL7/kGUNHbnAmYFrH/HoxlWmqxWm7g3uyRsL62Hye17wHFecqrbTVyDXicOd
- 9AnKPvv85CoIvFCMZ55ub9DwDbAdGkbVLwCTRkjr/osJ2bo6V36Sd22K7+7Py9KsOcQSoS4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200129053357.27454-20-alxndr@bu.edu>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002050110
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002050110
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,20 +115,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 05/02/2020 à 13:34, Matthias Luescher a écrit :
-> Hi
-> 
-> I also tested the v2 patch - works fine!
+On Wed, Jan 29, 2020 at 05:34:27AM +0000, Bulekov, Alexander wrote:
+>The virtio-net fuzz target feeds inputs to all three virtio-net
+>virtqueues, and uses forking to avoid leaking state between fuzz runs.
+>
+>Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+>---
+> tests/qtest/fuzz/Makefile.include  |   1 +
+> tests/qtest/fuzz/virtio_net_fuzz.c | 195 +++++++++++++++++++++++++++++
+> 2 files changed, 196 insertions(+)
+> create mode 100644 tests/qtest/fuzz/virtio_net_fuzz.c
+>
+>diff --git a/tests/qtest/fuzz/Makefile.include b/tests/qtest/fuzz/Makefile.include
+>index 38b8cdd9f1..77385777ef 100644
+>--- a/tests/qtest/fuzz/Makefile.include
+>+++ b/tests/qtest/fuzz/Makefile.include
+>@@ -8,6 +8,7 @@ fuzz-obj-y += tests/qtest/fuzz/qos_fuzz.o
+>
+> # Targets
+> fuzz-obj-y += tests/qtest/fuzz/i440fx_fuzz.o
+>+fuzz-obj-y += tests/qtest/fuzz/virtio_net_fuzz.o
+>
+> FUZZ_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
+>
+>diff --git a/tests/qtest/fuzz/virtio_net_fuzz.c b/tests/qtest/fuzz/virtio_net_fuzz.c
+>new file mode 100644
+>index 0000000000..e4e3e50865
+>--- /dev/null
+>+++ b/tests/qtest/fuzz/virtio_net_fuzz.c
+>@@ -0,0 +1,195 @@
+>+/*
+>+ * virtio-net Fuzzing Target
+>+ *
+>+ * Copyright Red Hat Inc., 2019
+>+ *
+>+ * Authors:
+>+ *  Alexander Bulekov   <alxndr@bu.edu>
+>+ *
+>+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>+ * See the COPYING file in the top-level directory.
+>+ */
+>+
+>+#include "qemu/osdep.h"
+>+
+>+#include "standard-headers/linux/virtio_config.h"
+>+#include "tests/qtest/libqtest.h"
+>+#include "tests/qtest/libqos/virtio-net.h"
+>+#include "fuzz.h"
+>+#include "fork_fuzz.h"
+>+#include "qos_fuzz.h"
+>+
+>+
+>+#define QVIRTIO_NET_TIMEOUT_US (30 * 1000 * 1000)
+>+#define QVIRTIO_RX_VQ 0
+>+#define QVIRTIO_TX_VQ 1
+>+#define QVIRTIO_CTRL_VQ 2
+>+
+>+static int sockfds[2];
+>+static bool sockfds_initialized;
+>+
+>+static void virtio_net_fuzz_multi(QTestState *s,
+>+        const unsigned char *Data, size_t Size, bool check_used)
+>+{
+>+    typedef struct vq_action {
+>+        uint8_t queue;
+>+        uint8_t length;
+>+        uint8_t write;
+>+        uint8_t next;
+>+        uint8_t rx;
+>+    } vq_action;
+>+
+>+    uint32_t free_head = 0;
+>+
+>+    QGuestAllocator *t_alloc = fuzz_qos_alloc;
+>+
+>+    QVirtioNet *net_if = fuzz_qos_obj;
+>+    QVirtioDevice *dev = net_if->vdev;
+>+    QVirtQueue *q;
+>+    vq_action vqa;
+>+    while (Size >= sizeof(vqa)) {
+>+        memcpy(&vqa, Data, sizeof(vqa));
+>+        Data += sizeof(vqa);
+>+        Size -= sizeof(vqa);
+>+
+>+        q = net_if->queues[vqa.queue % 3];
+>+
+>+        vqa.length = vqa.length >= Size ? Size :  vqa.length;
+>+
+>+        /*
+>+         * Only attempt to write incoming packets, when using the socket
+>+         * backend. Otherwise, always place the input on a virtqueue.
+>+         */
+>+        if (vqa.rx && sockfds_initialized) {
+>+            write(sockfds[0], Data, vqa.length);
+>+        } else {
+>+            vqa.rx = 0;
+>+            uint64_t req_addr = guest_alloc(t_alloc, vqa.length);
+>+            /*
+>+             * If checking used ring, ensure that the fuzzer doesn't trigger
+>+             * trivial asserion failure on zero-zied buffer
+>+             */
+>+            qtest_memwrite(s, req_addr, Data, vqa.length);
+>+
+>+
+>+            free_head = qvirtqueue_add(s, q, req_addr, vqa.length,
+>+                    vqa.write, vqa.next);
+>+            qvirtqueue_add(s, q, req_addr, vqa.length, vqa.write , vqa.next);
+>+            qvirtqueue_kick(s, dev, q, free_head);
+>+        }
+>+
+>+        /*
+>+         * normally, we could just use qvirtio_wait_used_elem, but since we
+>+         * must manually run the main-loop for all the bhs to run, we use
+>+         * this hack with flush_events(), to run the main_loop
+>+         */
+>+        gint64 start_time = g_get_monotonic_time();
 
-Thank you.
+NIT: It's a little unclear using a for(;;) when in reality, for most
+use-cases, other than virtio_net_fork_fuzz_check_used() it will
+never really loop around.
 
-As the parameter I added is ignored, it was expected :)
+Maybe it would be clearer if the parts that never repeat were
+outside the loop? e.g.
+
+    /* Run the main loop */
+    qtest_clock_step(s, 100);
+    flush_events(s);
+
+    /* Poll the used vring only if we added to the TX or CTRL vq */
+    while (check_used && !vqa.rx && q != net_if->queues[QVIRTIO_RX_VQ]) {
+        uint32_t got_desc_idx;
+        /* Input led to a virtio_error */
+        if (dev->bus->get_status(dev) & VIRTIO_CONFIG_S_NEEDS_RESET) {
+            break;
+        }
+        if (dev->bus->get_queue_isr_status(dev, q) &&
+                qvirtqueue_get_buf(s, q, &got_desc_idx, NULL)) {
+            g_assert_cmpint(got_desc_idx, ==, free_head);
+            break;
+        }
+        g_assert(g_get_monotonic_time() - start_time
+                 <= QVIRTIO_NET_TIMEOUT_US);
+
+        /* Run the main loop */
+        qtest_clock_step(s, 100);
+        flush_events(s);
+    }
+
+Unless I'm reading it incorrectly that should do the same thing.
 
 Thanks,
-Laurent
+
+Darren.
+
+>+        for (;;) {
+>+            /* Run the main loop */
+>+            qtest_clock_step(s, 100);
+>+            flush_events(s);
+>+            /* Poll the used vring only if we added to the TX or CTRL vq */
+>+            if (check_used && !vqa.rx && q != net_if->queues[QVIRTIO_RX_VQ]) {
+>+                uint32_t got_desc_idx;
+>+                /* Input led to a virtio_error */
+>+                if (dev->bus->get_status(dev) & VIRTIO_CONFIG_S_NEEDS_RESET) {
+>+                    break;
+>+                }
+>+                if (dev->bus->get_queue_isr_status(dev, q) &&
+>+                        qvirtqueue_get_buf(s, q, &got_desc_idx, NULL)) {
+>+                    g_assert_cmpint(got_desc_idx, ==, free_head);
+>+                    break;
+>+                }
+>+                g_assert(g_get_monotonic_time() - start_time
+>+                         <= QVIRTIO_NET_TIMEOUT_US);
+>+            } else {
+>+                break;
+>+            }
+>+        }
+>+        Data += vqa.length;
+>+        Size -= vqa.length;
+>+    }
+>+}
+>+
+>+static void virtio_net_fork_fuzz(QTestState *s,
+>+        const unsigned char *Data, size_t Size)
+>+{
+>+    if (fork() == 0) {
+>+        virtio_net_fuzz_multi(s, Data, Size, false);
+>+        flush_events(s);
+>+        _Exit(0);
+>+    } else {
+>+        wait(NULL);
+>+    }
+>+}
+>+
+>+static void virtio_net_fork_fuzz_check_used(QTestState *s,
+>+        const unsigned char *Data, size_t Size)
+>+{
+>+    if (fork() == 0) {
+>+        virtio_net_fuzz_multi(s, Data, Size, true);
+>+        flush_events(s);
+>+        _Exit(0);
+>+    } else {
+>+        wait(NULL);
+>+    }
+>+}
+>+
+>+static void virtio_net_pre_fuzz(QTestState *s)
+>+{
+>+    qos_init_path(s);
+>+    counter_shm_init();
+>+}
+>+
+>+static void *virtio_net_test_setup_socket(GString *cmd_line, void *arg)
+>+{
+>+    int ret = socketpair(PF_UNIX, SOCK_STREAM, 0, sockfds);
+>+    g_assert_cmpint(ret, !=, -1);
+>+    fcntl(sockfds[0], F_SETFL, O_NONBLOCK);
+>+    sockfds_initialized = true;
+>+    g_string_append_printf(cmd_line, " -netdev socket,fd=%d,id=hs0 ",
+>+                           sockfds[1]);
+>+    return arg;
+>+}
+>+
+>+static void *virtio_net_test_setup_user(GString *cmd_line, void *arg)
+>+{
+>+    g_string_append_printf(cmd_line, " -netdev user,id=hs0 ");
+>+    return arg;
+>+}
+>+
+>+static void register_virtio_net_fuzz_targets(void)
+>+{
+>+    fuzz_add_qos_target(&(FuzzTarget){
+>+            .name = "virtio-net-socket",
+>+            .description = "Fuzz the virtio-net virtual queues. Fuzz incoming "
+>+            "traffic using the socket backend",
+>+            .pre_fuzz = &virtio_net_pre_fuzz,
+>+            .fuzz = virtio_net_fork_fuzz,},
+>+            "virtio-net",
+>+            &(QOSGraphTestOptions){.before = virtio_net_test_setup_socket}
+>+            );
+>+
+>+    fuzz_add_qos_target(&(FuzzTarget){
+>+            .name = "virtio-net-socket-check-used",
+>+            .description = "Fuzz the virtio-net virtual queues. Wait for the "
+>+            "descriptors to be used. Timeout may indicate improperly handled "
+>+            "input",
+>+            .pre_fuzz = &virtio_net_pre_fuzz,
+>+            .fuzz = virtio_net_fork_fuzz_check_used,},
+>+            "virtio-net",
+>+            &(QOSGraphTestOptions){.before = virtio_net_test_setup_socket}
+>+            );
+>+    fuzz_add_qos_target(&(FuzzTarget){
+>+            .name = "virtio-net-slirp",
+>+            .description = "Fuzz the virtio-net virtual queues with the slirp "
+>+            " backend. Warning: May result in network traffic emitted from the "
+>+            " process. Run in an isolated network environment.",
+
+NIT: s/" /"/    (fix double-spaces)
+
+>+            .pre_fuzz = &virtio_net_pre_fuzz,
+>+            .fuzz = virtio_net_fork_fuzz,},
+>+            "virtio-net",
+>+            &(QOSGraphTestOptions){.before = virtio_net_test_setup_user}
+>+            );
+>+}
+>+
+>+fuzz_target_init(register_virtio_net_fuzz_targets);
+>-- 
+>2.23.0
+>
+>
 
