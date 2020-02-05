@@ -2,109 +2,101 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F5BC35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:20:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36BF8C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4901C217BA
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:20:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 034D92072B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:21:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UkqiSEPE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4901C217BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AWHXgnaA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 034D92072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izKbi-0003LP-Ew
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:20:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60538)
+	id 1izKce-0004Rt-82
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:21:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <darren.kenny@oracle.com>) id 1izKaZ-0002UM-NB
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:19:32 -0500
+ (envelope-from <philmd@redhat.com>) id 1izKbu-0003tQ-RE
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:20:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <darren.kenny@oracle.com>) id 1izKaY-0005vr-I8
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:19:31 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:42922)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
- id 1izKaY-0005u0-Bc
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:19:30 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015D8CHn072899;
- Wed, 5 Feb 2020 13:19:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to : content-transfer-encoding; s=corp-2019-08-05;
- bh=+Jb2bxZO3cM0XR+0cYUPcNGHKP8c84mxTXQzpn6R9mA=;
- b=UkqiSEPE1s4U/XLPf6zASJn2Vg8ZRTLeBSMHYkGU4KWf0Oa3rQ7FXaZwSq3KWYq6M41s
- dvuF7Q18uj4jUChJsRG3f0okUpot89JdB0EiwD+Tr7rzW7yOdX3kEvVzBzrF7e387ed8
- xyz+KhfREaeKF+eE7p8teeqKvyPEcOn188BF6D0YSJeFl1SGvUXDKy8MRa+vB74Zv2hY
- ekVxWaGdI5J8tDX9AkXAyzp8IcJUxeGHxEIiYJg7ZYPgRg37/OTwJEgMmu7HPDUR5JYP
- 14Z95Hmza7a7BpnoI97E+2woazXaxa+2dGVIno+ginEv2Sg2HOPPvDB5itFED0YWpIan pw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 2xykbp2x80-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 05 Feb 2020 13:19:28 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015DICVE088070;
- Wed, 5 Feb 2020 13:19:27 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3020.oracle.com with ESMTP id 2xykc2umm0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 05 Feb 2020 13:19:27 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 015DJQ9V007801;
- Wed, 5 Feb 2020 13:19:26 GMT
-Received: from starbug-mbp.localdomain (/10.169.111.17)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 05 Feb 2020 05:19:26 -0800
-Received: from starbug-mbp (localhost [127.0.0.1])
- by starbug-mbp.localdomain (Postfix) with ESMTP id DC82557DB9B2;
- Wed,  5 Feb 2020 13:19:23 +0000 (GMT)
-Date: Wed, 5 Feb 2020 13:19:23 +0000
-From: Darren Kenny <darren.kenny@oracle.com>
-To: "Bulekov, Alexander" <alxndr@bu.edu>
-Subject: Re: [PATCH v8 17/21] fuzz: add configure flag --enable-fuzzing
-Message-ID: <20200205131923.iuu3ajy7e3tlqom6@starbug-mbp>
-Mail-Followup-To: "Bulekov, Alexander" <alxndr@bu.edu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
-References: <20200129053357.27454-1-alxndr@bu.edu>
- <20200129053357.27454-18-alxndr@bu.edu>
+ (envelope-from <philmd@redhat.com>) id 1izKbt-0008Vt-QN
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:20:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21145
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izKbt-0008Ut-Lb
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:20:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580908853;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=s4TZdlWncRAr0Vhan4aAyu/vOXNaN3eNbVxaNVzW71s=;
+ b=AWHXgnaAC1zb2DFgHA2Asi63BW0Ym02/Ymhj4cw+TCj4cCvfSYBQ3OfzgZF/fxLP0XSi/i
+ m+SbCy6PsFiG24UzWqP8CajuyXwSW8dwn/xCwgYzFRYoRr4d9kaPzDUeDxnuZeq2fUlTGU
+ QTB7oi0ufz2OegbWSf/e/OwTRbCBWqk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-314-e9jyUu8OPqq8pWET7NGFeQ-1; Wed, 05 Feb 2020 08:20:51 -0500
+Received: by mail-wr1-f69.google.com with SMTP id a12so1168223wrn.19
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 05:20:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=s4TZdlWncRAr0Vhan4aAyu/vOXNaN3eNbVxaNVzW71s=;
+ b=WtsIuiyjqhEGToSLOO0EbDtR/k1n1oSbf6tshXN4BCnfTxLaw/Mk1E8+hb38BrmdeT
+ xBBRqpYvW125YUIqN/eubPMBTs+UXZ1N/1SI8hvwC41u1JLfJ0+0y1rKIWckMLUqDpi0
+ YuPMfd+Z8cc9zVkdKierxtCvPMA3mhlHdmv2vjDkliwmNKo5y/7smocowXwECZ7BzPAr
+ RVf+Vr3ww5Vl5EuA93fPJX6wHQNV0MmEuJ4ZKQxKY5CFOvn5au8XdG4Hf6TansQf3Z9s
+ bpqYVS1sAYDahjio5DSERxnfttHyEmBrj7yI+c3KCjFD7f63J62SgZnv9w8xaTu8UW26
+ EPTg==
+X-Gm-Message-State: APjAAAXGeEmajbp5Wqq3YFEjpErQfMq3t/5Jb1rJFfmSlU55lo5BMKbF
+ nWynpR8pl2yS7no34BEHGSvrKzG/SF0+rROZ+oBN4oCVo+XwuGpCKGO64J3+0YiPebGEeIca22q
+ 88cNSv+Kh2FYKVAA=
+X-Received: by 2002:a1c:1dd0:: with SMTP id d199mr5621319wmd.42.1580908850034; 
+ Wed, 05 Feb 2020 05:20:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzCR79U5jQ31IUs6z2Iw1l6dmB1Ji7PJn08ADeUEanef35zBTN5m7/w+RxJZ4zckRUvhe0LgA==
+X-Received: by 2002:a1c:1dd0:: with SMTP id d199mr5621309wmd.42.1580908849853; 
+ Wed, 05 Feb 2020 05:20:49 -0800 (PST)
+Received: from [192.168.1.35] (162.red-83-52-55.dynamicip.rima-tde.net.
+ [83.52.55.162])
+ by smtp.gmail.com with ESMTPSA id 4sm7887652wmg.22.2020.02.05.05.20.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 05 Feb 2020 05:20:49 -0800 (PST)
+Subject: Re: [PATCH v4 00/80] refactor main RAM allocation to use hostmem
+ backend
+To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
+ <20200204160830.02afbd2e@redhat.com> <20200204163909.5ce2cb2a@redhat.com>
+ <CABgObfZuzA7qNxp4KbaGJ4oVT1YX+1KLL=cZgCKa9sWSV2tFeQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2612f4db-d43e-f094-b259-f444d80a2aa3@redhat.com>
+Date: Wed, 5 Feb 2020 14:20:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <CABgObfZuzA7qNxp4KbaGJ4oVT1YX+1KLL=cZgCKa9sWSV2tFeQ@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: e9jyUu8OPqq8pWET7NGFeQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200129053357.27454-18-alxndr@bu.edu>
-User-Agent: NeoMutt/20180716
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002050107
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002050106
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,122 +108,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 29, 2020 at 05:34:25AM +0000, Bulekov, Alexander wrote:
->Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
->Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 2/4/20 11:05 PM, Paolo Bonzini wrote:
+> Sure! I probably won't send a pull request for a week or so though.
 
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Eh I need to rush to get my raspi series fixed/reviewed/merged before 
+that :(
 
->---
-> configure | 39 +++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 39 insertions(+)
->
->diff --git a/configure b/configure
->index 08c3a1c1f0..1a1e57eb61 100755
->--- a/configure
->+++ b/configure
->@@ -504,6 +504,7 @@ debug_mutex=3D"no"
-> libpmem=3D""
-> default_devices=3D"yes"
-> plugins=3D"no"
->+fuzzing=3D"no"
->
-> supported_cpu=3D"no"
-> supported_os=3D"no"
->@@ -634,6 +635,15 @@ int main(void) { return 0; }
-> EOF
-> }
->
->+write_c_fuzzer_skeleton() {
->+    cat > $TMPC <<EOF
->+#include <stdint.h>
->+#include <sys/types.h>
->+int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size);
->+int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) { return 0=
-; }
->+EOF
->+}
->+
-> if check_define __linux__ ; then
->   targetos=3D"Linux"
-> elif check_define _WIN32 ; then
->@@ -1540,6 +1550,10 @@ for opt do
->   ;;
->   --disable-containers) use_containers=3D"no"
->   ;;
->+  --enable-fuzzing) fuzzing=3Dyes
->+  ;;
->+  --disable-fuzzing) fuzzing=3Dno
->+  ;;
->   *)
->       echo "ERROR: unknown option $opt"
->       echo "Try '$0 --help' for more information"
->@@ -5992,6 +6006,15 @@ EOF
->   fi
-> fi
->
->+##########################################
->+# checks for fuzzer
->+if test "$fuzzing" =3D "yes" ; then
->+  write_c_fuzzer_skeleton
->+  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=3Daddress,fuzzer" "";=
- then
->+      have_fuzzer=3Dyes
->+  fi
->+fi
->+
-> ##########################################
-> # check for libpmem
->
->@@ -6576,6 +6599,7 @@ echo "libpmem support   $libpmem"
-> echo "libudev           $libudev"
-> echo "default devices   $default_devices"
-> echo "plugin support    $plugins"
->+echo "fuzzing support   $fuzzing"
->
-> if test "$supported_cpu" =3D "no"; then
->     echo
->@@ -7400,6 +7424,16 @@ fi
-> if test "$sheepdog" =3D "yes" ; then
->   echo "CONFIG_SHEEPDOG=3Dy" >> $config_host_mak
-> fi
->+if test "$fuzzing" =3D "yes" ; then
->+  if test "$have_fuzzer" =3D "yes"; then
->+    FUZZ_LDFLAGS=3D" -fsanitize=3Daddress,fuzzer"
->+    FUZZ_CFLAGS=3D" -fsanitize=3Daddress,fuzzer"
->+    CFLAGS=3D" -fsanitize=3Daddress,fuzzer-no-link"
->+  else
->+    error_exit "Your compiler doesn't support -fsanitize=3Daddress,fuzz=
-er"
->+    exit 1
->+  fi
->+fi
->
-> if test "$plugins" =3D "yes" ; then
->     echo "CONFIG_PLUGIN=3Dy" >> $config_host_mak
->@@ -7502,6 +7536,11 @@ if test "$libudev" !=3D "no"; then
->     echo "CONFIG_LIBUDEV=3Dy" >> $config_host_mak
->     echo "LIBUDEV_LIBS=3D$libudev_libs" >> $config_host_mak
-> fi
->+if test "$fuzzing" !=3D "no"; then
->+    echo "CONFIG_FUZZ=3Dy" >> $config_host_mak
->+    echo "FUZZ_CFLAGS=3D$FUZZ_CFLAGS" >> $config_host_mak
->+    echo "FUZZ_LDFLAGS=3D$FUZZ_LDFLAGS" >> $config_host_mak
->+fi
->
-> if test "$edk2_blobs" =3D "yes" ; then
->   echo "DECOMPRESS_EDK2_BLOBS=3Dy" >> $config_host_mak
->--=20
->2.23.0
->
+> 
+> Paolo
+> 
+> Il mar 4 feb 2020, 16:39 Igor Mammedov <imammedo@redhat.com 
+> <mailto:imammedo@redhat.com>> ha scritto:
+> 
+>     On Tue, 4 Feb 2020 16:08:30 +0100
+>     Igor Mammedov <imammedo@redhat.com <mailto:imammedo@redhat.com>> wrote:
+> 
+>      > On Fri, 31 Jan 2020 16:08:30 +0100
+>      > Igor Mammedov <imammedo@redhat.com <mailto:imammedo@redhat.com>>
+>     wrote:
+>      >
+>      > Paolo,
+> 
+>     forgot to add address to CC
+> 
+>      >
+>      > could you take a look at patches 1-7, 73,75-78 and
+>      > if series looks to be in acceptable shape, merge it via your tree
+>      >
+>      > > v4:
+>     [...]
+> 
+
 
