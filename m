@@ -2,120 +2,120 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BBDC352A1
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D8E5C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:45:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 146F020702
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:44:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Q8fX1lqt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 146F020702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54B7E20702
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:45:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54B7E20702
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izKyX-0000h1-A2
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:44:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45617)
+	id 1izKzd-0001bb-JL
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:45:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1izKxi-0008Rm-9k
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:43:27 -0500
+ (envelope-from <laurent@vivier.eu>) id 1izKyc-0000u8-ST
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:44:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1izKxg-0007PX-Pq
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:43:25 -0500
-Received: from mail-eopbgr10120.outbound.protection.outlook.com
- ([40.107.1.120]:41036 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1izKxg-0007I3-18; Wed, 05 Feb 2020 08:43:24 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WcMphGt9XpxLGbpbmQfOINw+xjSQJdjfWQqTIxxs0uvq0Ehb03Xt0s5tJ+6sZi9ufrjUIbyiXOX06WVJTrA95XRufgewJL1/v90eVjRysqjrJjdd0EAh1NoynIKyW6KWUEHbyd4WVCUPsDDtCUsazPa0capFwEX+jF8kIYNexELQtLk7mz6ljtWL0DOYAsbRDzOX9/Ui/pp4Oyn7DUA7UzmgAY1FiXUYBZnvyL8jaxSHFyKUoTuTuIRZCCKI66hQOC/E/V+HbkZyuDuViyiYl8b0Km9j7QkDf7zW4QSbiV30FQONcakYJzRp/+/hzzhLNRd7ubl7XuTHgo3K0DJLSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZgOkP49fAIzdUVoznSM+edkYuZYNuCAreL3sM0Ardyc=;
- b=FYgSGj8cWvird2oJw4TyBSTCc7fp4wRlRvUKokcA3DLx93Nxu+xC2xKdwdBtDhczW2tYFxEqEOsRELuNkAIYQOEoVvywACoj+rzXhPSAV8Ackx7sLEKX3lr/SZoKfnpP8XGaT2tgZwiR83mQZ53DkE0KTWZsBTsf2ylxsYCbigqCYsDW2udx9MIYVVEMvE3gz58P6rdQHAFAfpB7ouoRPorzVBNpNL2JBPCIR8TAd1ZubbBj3LkLX1sK6HVSjXrkxHESqj5hXQCoj9qx69Z3gwNCXgI5GYQxgaxHWjZdaJrETjk8BM6pTUGjfOlHGz/SZazWtWt5nTcxxzSRhJxQ9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZgOkP49fAIzdUVoznSM+edkYuZYNuCAreL3sM0Ardyc=;
- b=Q8fX1lqt5ckBZzJWvBp9c4+/lv3TzJ9N+eedOck7D0F3wxaM6Pi0mdwW3BS6+6DV9XdXDmReq5k77uuCTbfudug1DyVJT/PCwUGT+cZ9XYAERpeoV8NQiqUuD3aS6myABk62PcsG9Ff22hitQzR0JEQCGCZxGmTGRmdyT5ATJak=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from VI1PR08MB4432.eurprd08.prod.outlook.com (20.179.28.138) by
- VI1PR08MB3789.eurprd08.prod.outlook.com (20.178.15.96) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Wed, 5 Feb 2020 13:43:20 +0000
-Received: from VI1PR08MB4432.eurprd08.prod.outlook.com
- ([fe80::9c56:6d95:76d1:d0]) by VI1PR08MB4432.eurprd08.prod.outlook.com
- ([fe80::9c56:6d95:76d1:d0%2]) with mapi id 15.20.2686.034; Wed, 5 Feb 2020
- 13:43:20 +0000
-Subject: Re: [PATCH for-4.2? v3 0/8] block: Fix resize (extending) of short
- overlays
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20191122160511.8377-1-kwolf@redhat.com>
- <20191210174644.GC7103@linux.fritz.box>
- <eed0efba-aa38-4901-8f10-6ec3ee339437@virtuozzo.com>
- <20191219101312.GD5230@linux.fritz.box>
- <8a7cd617-6d34-8735-45a7-52431db1171c@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200205164317167
-Message-ID: <28b8f2b6-5520-10ce-cfb2-0ecdd7aee7aa@virtuozzo.com>
-Date: Wed, 5 Feb 2020 16:43:17 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <8a7cd617-6d34-8735-45a7-52431db1171c@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1P18901CA0017.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:3:8b::27) To VI1PR08MB4432.eurprd08.prod.outlook.com
- (2603:10a6:803:102::10)
+ (envelope-from <laurent@vivier.eu>) id 1izKyb-0001bt-5m
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:44:22 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:58001)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1izKya-0001Yv-Rk
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:44:21 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MpDRp-1jJsTR1HAN-00qg9B; Wed, 05 Feb 2020 14:44:14 +0100
+Subject: Re: [GSoC/Outreachy QEMU proposal] Extend support for ioctls in QEMU
+ linux-user mode
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <CAL1e-=j5WJkV=X+KkfBuS3pjf6z3aJrtu4xpYeVbjEUYiWxxTQ@mail.gmail.com>
+ <CAFEAcA8E9s2wZWVxanUDXu=5qcjn6XY5_6t8vUO+LjuJnA7nOQ@mail.gmail.com>
+ <CAL1e-=j=nVJd9Q3JmZsimgSPy=noYhqE8hz4r5RjwgTPw9WwuA@mail.gmail.com>
+ <CAFEAcA_FbFub4_z+e0YPMT8UTbm1SWmfovkKnLKODvMZMfGa+A@mail.gmail.com>
+ <CAL1e-=jMnEpOw+fOqGfY2+uiUTYr0zgnMZxpVUK2Y=PA3YAFMQ@mail.gmail.com>
+ <20200205111603.GD58062@stefanha-x1.localdomain>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <0299a57c-2b7f-22bd-ac12-5ce429c173c4@vivier.eu>
+Date: Wed, 5 Feb 2020 14:44:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1P18901CA0017.EURP189.PROD.OUTLOOK.COM (2603:10a6:3:8b::27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21 via Frontend Transport; Wed, 5 Feb 2020 13:43:19 +0000
-X-Tagtoolbar-Keys: D20200205164317167
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 76809057-67ac-410e-93a3-08d7aa415c85
-X-MS-TrafficTypeDiagnostic: VI1PR08MB3789:
-X-Microsoft-Antispam-PRVS: <VI1PR08MB3789F2C59ADDB83905D2944EC1020@VI1PR08MB3789.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 0304E36CA3
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(366004)(396003)(376002)(346002)(136003)(39850400004)(199004)(189003)(478600001)(6916009)(36756003)(8936002)(86362001)(31696002)(2616005)(956004)(81166006)(16526019)(4326008)(26005)(186003)(16576012)(316002)(54906003)(52116002)(31686004)(8676002)(81156014)(66946007)(6486002)(66476007)(66556008)(5660300002)(2906002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3789;
- H:VI1PR08MB4432.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nvMpn5oIafbf4mJOpD0+g5eNs7DSHM6CEcP566RV6DtEYL1Dj7sJenRNVKr60DsQVczgGIEq1YXPrQTdov/mjmgOnaMceBaeg5FjEwz0pWcz3rMKf5fSaZa5xPnu9dOAw15JDhNbY3Yi7LaZsKViomYeGY07Xxab1yk5LOOiuccEd7TjNNrz4Th7+fbIayrkq0b6FMGr2wSfqlNvV42RFQU0ClIzEXzVvS+psKr1ueoYuNlT6m4zPxl0UkT+uEvmvSqyU8MjfdcT3BeEVyfGbF3ZCm+cxZV7yYMvK0keqL3E0/GvniFs6QCb3iOUS27Rsu9iH2Ri5VOpzOBpXUUjyi78B9FyNFxyuuJyXVRREYwZlS5f0wixwIN9nWOGqwyySC/Tk3w7XiaJrZSI86xEfd1wpKzNbjiGjEopoaxHRi4yjSyEeB4JPfti7+zWaus5
-X-MS-Exchange-AntiSpam-MessageData: sAsWQ0JZ+jqWnCkggV41z1zO1bAkN+LgQC+6XFwoehtd5K+/Fru5wyG2HktDgv4F3bQUnJwGZYYUEzvwf2PcGzp25DBVGmo52dn+/w31wwldt967UzEf5WaK7nu6Xt0eLtdbrOndyiNsYRtBHpygSQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76809057-67ac-410e-93a3-08d7aa415c85
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2020 13:43:20.1126 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sc6ihn8WNjfWAOwXFVNpU/0sq0ptdbtL3zqipSNfbKVtyncyWDX9Qni7ma21orrIZ8OvW7hy41OWHTaekD6UWRojKd2lsu3eh2dhPK4zR2k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3789
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.120
+In-Reply-To: <20200205111603.GD58062@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="E99hCULAJK85AxLFLxxSyWPd8GTR1iGk8"
+X-Provags-ID: V03:K1:Z/iD9hEv+TO8jUhWR+Ck2uvkcUQbVX7jX/qGiguFmyMYi4wFp4r
+ hzdTl9m1YeuXrBs+8I3YlWdsOz0kuONxsMwUfCX3JuhIk5ch6xp0G4BO+03EWOs4kMo2hb4
+ cr6Le6qzTEcLciuMv8IvzWBCOUQX4zMfqVCA7DgaLd9kat89kD+gy17+6BVuvmobGJXao73
+ 5IFUKc1RTfmbiDch5VT9Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:z150p+oKIMg=:qINHVLnFIO26+Yvr0jD0s0
+ 2NXQS6MlzRIE0elwcVis/ddtuTv5ROrV2XY7h8uapo10Ty47sB4pGVgl4CZkqFckAIxNenB5s
+ Z66jezo0S7Ukpeoc0BD81bKSufgd988QXrl++ZcbTise9xQSL8Qxg8WvnWfP12dI8Zn1PHdxn
+ q2peTL9MYiaINzaaK/9W9l+E/RXZUENg9n9yb4PGrGM+Ae48ouHaIRC3pRpsPP+dUphbwE4nE
+ ajhn6uwDT6MWnaDkio5peF9ruMyIwyHmii5DhT0bFP5OTCHRKUi30f9EWq0RWmJt7JmZnJ6w2
+ vqRQ2+vwCWlHydHkPJ5OU3T3vUwDQ3XfmtMBxAzLd66rRm076DYBc3NXqzRSoIl9fnZhGhA9o
+ AYxiFkCZrELTUkAWhCNOiNiKAJ4u+2BTPGCJuQ203wXqjpYJR/EUjhilgHPqscbEk7GCfmrWV
+ mYmyGvwEWQmadW0WmDPOoL4QHJMzF2HuQWsBwHG5IrjAEqnZkA6uh/iLLxISoTDMGY4S9d3nX
+ oY1OZFGd1C+qpokP6otkCp0H0aGF3OOGY0R8C5ckTeXjH04RoLokBvjKrm+OVpu8OHV6/tYCd
+ i2meNwjm2W1uP2LqTyUCUWUgiftzijx3Kwcf5uhWybRpvfrAzGhQGag7rmV3C+JJxwNB44oqu
+ jDmDzQm4BOxfLZ1VJ26Z04HPpoLbXhfOnOpIbQ+dvAvfsP/5AUjZCj1fiRV5WW2frw10vnXjy
+ v+miyrcSlhWDpiivphcbt9vFb+zgoJRnwwm2KBQK20qZOVZQcFmTEKZVhcdOs/yUTkSSBgSdY
+ VaKlRIZ9I3U8AykbHnMVQXQzN2j/UJtDR/LwqB7W2GvsuBCSsW6qspFffC1x3v8IVG4TZUg
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,61 +127,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-19.12.2019 13:20, Vladimir Sementsov-Ogievskiy wrote:
-> 19.12.2019 13:13, Kevin Wolf wrote:
->> Am 19.12.2019 um 10:24 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>> 10.12.2019 20:46, Kevin Wolf wrote:
->>>> Am 22.11.2019 um 17:05 hat Kevin Wolf geschrieben:
->>>>> See patch 4 for the description of the bug fixed.
->>>>
->>>> I'm applying patches 3 and 5-7 to the block branch because they make
->>>> sense on their own.
->>>>
->>>> The real fix will need another approach because the error handling is
->>>> broken in this one: If zeroing out fails (either because of NO_FALLBACK
->>>> or because of some other I/O error), bdrv_co_truncate() will return
->>>> failure, but the image size has already been increased, with potentially
->>>> incorrect data in the new area.
->>>>
->>>> To fix this, we need to make sure that zeros will be read before we
->>>> commit the new image size to the image file (e.g. qcow2 header) and to
->>>> bs->total_sectors. In other words, it must become the responsibility of
->>>> the block driver.
->>>>
->>>> To this effect, I'm planning to introduce a PREALLOC_MODE_ZERO_INIT flag
->>>> that can be or'ed to the preallocation mode. This will fail by default
->>>> because it looks like just another unimplemented preallocation mode to
->>>> block drivers. It will be requested explicitly by commit jobs and
->>>> automatically added by bdrv_co_truncate() if the backing file would
->>>> become visible (like in this series, but now for all preallocation
->>>> modes). I'm planning to implement it for qcow2 and file-posix for now,
->>>> which should cover most interesting cases.
->>>>
->>>> Does this make sense to you?
->>>
->>> This should work. Do you still have this plan in a timeline?
->>
->> Still planning to do this, but tomorrow is my last working day for this
->> year. So I guess I'll get to it sometime in January.
->>
-> 
-> Good. Have a nice holiday!
-> 
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--E99hCULAJK85AxLFLxxSyWPd8GTR1iGk8
+Content-Type: multipart/mixed; boundary="mTtvYA7YXmhgbQsaiIbdaJG6Bg9OO12jI";
+ protected-headers="v1"
+From: Laurent Vivier <laurent@vivier.eu>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <0299a57c-2b7f-22bd-ac12-5ce429c173c4@vivier.eu>
+Subject: Re: [GSoC/Outreachy QEMU proposal] Extend support for ioctls in QEMU
+ linux-user mode
+References: <CAL1e-=j5WJkV=X+KkfBuS3pjf6z3aJrtu4xpYeVbjEUYiWxxTQ@mail.gmail.com>
+ <CAFEAcA8E9s2wZWVxanUDXu=5qcjn6XY5_6t8vUO+LjuJnA7nOQ@mail.gmail.com>
+ <CAL1e-=j=nVJd9Q3JmZsimgSPy=noYhqE8hz4r5RjwgTPw9WwuA@mail.gmail.com>
+ <CAFEAcA_FbFub4_z+e0YPMT8UTbm1SWmfovkKnLKODvMZMfGa+A@mail.gmail.com>
+ <CAL1e-=jMnEpOw+fOqGfY2+uiUTYr0zgnMZxpVUK2Y=PA3YAFMQ@mail.gmail.com>
+ <20200205111603.GD58062@stefanha-x1.localdomain>
+In-Reply-To: <20200205111603.GD58062@stefanha-x1.localdomain>
 
-Hi, didn't you forget? I just going to ping (or resend) my related
-"[PATCH 0/4] fix & merge block_status_above and is_allocated_above", so,
-pinging these patches too...
+--mTtvYA7YXmhgbQsaiIbdaJG6Bg9OO12jI
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Best regards,
-Vladimir
+Le 05/02/2020 =C3=A0 12:16, Stefan Hajnoczi a =C3=A9crit=C2=A0:
+> On Tue, Jan 28, 2020 at 09:48:33PM +0100, Aleksandar Markovic wrote:
+>> How about this:
+>=20
+> Thank you!  I have posted the idea here:
+>=20
+> https://wiki.qemu.org/Google_Summer_of_Code_2020#Extend_linux-user_sysc=
+alls_and_ioctls
+
+Thank you Stefan.
+
+Laurent
+
+
+--mTtvYA7YXmhgbQsaiIbdaJG6Bg9OO12jI--
+
+--E99hCULAJK85AxLFLxxSyWPd8GTR1iGk8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEzS913cjjpNwuT1Fz8ww4vT8vvjwFAl46xqwACgkQ8ww4vT8v
+vjyCbBAAs9+Va2y1MVvkqwgSTlTAvc1DomNlHbnVI8puKYf8K8xZkyj3bRenWawS
+TW/3fV9tD0L0SNBDSZhs5u3U9DentAVjbN9YaPC4uv4npgeVDj3xcAGafL4ThGQt
+Jaqm2CR8CHj4lJ8WOpqQrI68xbqrraNUwutQjGujImu894F7h5sGujxy5Q9iYKlc
+x9jOtuHFmHFuvAytLv3Rtn9UMUBptk31GonK3HjYKA+kEJEU1DucTpZjMeJy4d75
+T1L/jEGls+rgkvwV4nDm2up9culeQDLqsNmjpzqxRBrnq6ycFNnA6PIJ4SEyNanW
+4WSmnJMSNnDQCJv8TphMmftHhJjo4PjN0COL6YjgSS3cf+y0pf8Jgwuy0eL4WYvH
+T8Skd8Y5rf2jlXgMbA9nMHRDle02Od3OKuEcFXtmekpxJT/aMiFw5nAPU7+SvBg6
+9kZXQ48x/y14XHxDRccvz+vsaU6btUBSGBACPqMeW3hMIS56/5VAZ/55jGDAdu/4
+4aAkoqKVzu+6kPzlexMnabblhlKfkWFIU3CusEkuKHmhiYop+4mvEGnNi8awfHTA
+N0uqZ1/0od8ATVveUSs8bDWBk8OjITFH+oxsIpPmnQu1rdNnVc8VNpCJvaRnzE1C
+rfsescUJP61kYd/XmAGfx93wtXTNUhYf/WGSySIK+HB1k6XJT/4=
+=lnNq
+-----END PGP SIGNATURE-----
+
+--E99hCULAJK85AxLFLxxSyWPd8GTR1iGk8--
 
