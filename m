@@ -2,82 +2,84 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23CECC35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 21:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CF9AC35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 21:36:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E06982072B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 21:35:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D81112072B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 21:36:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oHAfiQMS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E06982072B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x1/A1f6B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D81112072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57171 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57209 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izSKf-0008QM-2E
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 16:35:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47345)
+	id 1izSLG-0001RZ-36
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 16:36:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1izSJ3-0005ME-RE
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 16:33:59 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1izSIu-00054H-E7
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 16:33:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1izSJ1-0006DQ-T4
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 16:33:57 -0500
-Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:33431)
+ (envelope-from <robert.foley@linaro.org>) id 1izSIs-0005wS-HD
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 16:33:48 -0500
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:42988)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1izSJ1-0006Bf-Kc
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 16:33:55 -0500
-Received: by mail-pg1-x52c.google.com with SMTP id 6so1612549pgk.0
- for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 13:33:55 -0800 (PST)
+ id 1izSIs-0005uR-71
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 16:33:46 -0500
+Received: by mail-pl1-x636.google.com with SMTP id e8so1400056plt.9
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 13:33:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=7GIcztAphvqkD0Pp3nbluYcOKPaeZeGBEwgC+UA1pto=;
- b=oHAfiQMS/aUfXYO1/tfz0x82ixNOz1AjJG7n44/gruVebwTzleAc75R+5ij6dU5N4y
- TMAS0dPvSoWlEc+e7v5TcxbMeWEgCnaDUQhX9b5wwDgt7J4zqk8fOMB9S/DklPgDxs6S
- XbrFTFOk3E38v5syiVbaPfyRWrrP2Ji9V1/ejGw+sRstZghGE2YQObMt8UBFnhPRrpNl
- htZPwtIo2a0KtjJbsnFPYEc8gT6TM4c7wkrj5Ut/ruFEk2OqnmARqUZv0HTEgAzAeoTH
- WGHd+U9GuBz6DP/nuG4MRLZXIxh+ArfONG8c/WG/8fRWo/9M2zmRPzydE01/ZQ0xnZLF
- fiAg==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=i9gFd9OhGJDTI6P0fwPk9gfrY87Nod7OotY7LxwWUQo=;
+ b=x1/A1f6BUb6yMPHmh3yZe7SIu/c+tdoS5tEQleH4o7FjyPMZK2Mu0YkElc1K/ZM+c2
+ KugCSF944VgIfeaCtbGEyGrpzMUcHE63LZ0N/n8JJA96VHJWGbZXohAcG7CvlbXshH7D
+ NRLz46ucS/qUykHiFg6tp7kbPqbUolsOhnkoq28wRA0q1N8F+QICnDqXWBWssPIZgtbt
+ 1QiFwDVHMkcCMh+PXda1fuVn/qnffz0uMLRPfpUTTUeEv7xuDop3tKEK7WoadkOHj5Ro
+ wX3inws77mmZddDpg7guQhh+8w/k3ADvBRArki+57HdNzpNdYDcZYCEDO7khviC8WB/f
+ 9Z1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=7GIcztAphvqkD0Pp3nbluYcOKPaeZeGBEwgC+UA1pto=;
- b=D+8nTx50viYGT8+xyhSFo29tjr8w4ANdteNA5tkYqGTzLQunxT4n97N79eSwaCvvLd
- sVn2aAkbtIaVjl/f59pmz5GdUJzXDHPsFeHn2sWlgDwRVqQaa2PYd1+JCkvNxo/Yh2at
- V5xQndUnVRTVOZ3rdxlvFf/X526m5JngX9XCezLjUybSfhOrutE8oHQ/TuYhfgjSigpa
- uCKm5F6C5vNMbtxZJHjFAR3nRBgR6AYXyKhdt9Fo33ZyZXWSB0rI9r1CDtNpu1zlX0Ax
- XWe8NDQ7d/rBSjZtWl8x6UhYlZqiH98IzHNogg5twninWsyQCOZ55Krqw4TTTiLPLxo1
- aSPA==
-X-Gm-Message-State: APjAAAUv97uwLt3bGhAE/iGsgzo95yReViFeAB03qWc40teJoe2Yz3wD
- WuZ3PbUZEMFGiDwfITlC3KVBxoY725M=
-X-Google-Smtp-Source: APXvYqxEitoFpDNd8Z+AVaagrmH1hy47EGUYSRCMRI80u8BA9jaqOeaui/T8Dsh0tEQSfbIRnrdERQ==
-X-Received: by 2002:a63:dc4f:: with SMTP id f15mr35580980pgj.300.1580938434121; 
- Wed, 05 Feb 2020 13:33:54 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=i9gFd9OhGJDTI6P0fwPk9gfrY87Nod7OotY7LxwWUQo=;
+ b=qAyTFOn7kt76MDfkPPYuqpovh4ULeyLlaCjUnOI16CWfk9H6pMMDDw5RpMGdd7y9uT
+ rTu+ZhBDte9pxvCvt6fTDP1G0p2RRhsBL2+ISJohcBfikMTwqcm4g48PjNdGCJEba2e4
+ L2GPDBmrcDRJu4geqykQLIphSMHJ/9cT5bbZReX+hsKa52CuQQOhuqCrf+yV7G3/8Hwl
+ 3ZpekTZHhIEnvX+bxS1o6qw70o3dEwxZKUFLif173tMBtm7Q8LLL8X4Lw4m0upcdNA91
+ Na16HGRxhoDG6y3JUxNnQqNSEwQ1hhsrG9vVMRqLtmNmwK3d2wXRheHECizyAulJKv3G
+ Ebtg==
+X-Gm-Message-State: APjAAAUYF2QMOZ6uUQhodIZzQmyLFQN54IhOskoaJS2ONWddJJQ4L+Wk
+ ttjLIYwf5Kph040ALes+QbBsckGCM/A=
+X-Google-Smtp-Source: APXvYqyLl5pJkzKHDLiy6uzFqu6ZXhyc3l54dEQWpGXqzRFQ8zRCM14XIE0FSFj83w1TZ1YfI5SHSw==
+X-Received: by 2002:a17:90a:9f83:: with SMTP id o3mr191303pjp.95.1580938423998; 
+ Wed, 05 Feb 2020 13:33:43 -0800 (PST)
 Received: from Rfoley-MA01.usrd.futurewei.com ([12.111.81.71])
- by smtp.gmail.com with ESMTPSA id p4sm724576pgh.14.2020.02.05.13.33.52
+ by smtp.gmail.com with ESMTPSA id p4sm724576pgh.14.2020.02.05.13.33.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 05 Feb 2020 13:33:53 -0800 (PST)
+ Wed, 05 Feb 2020 13:33:43 -0800 (PST)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 05/14] tests/vm: Added gen_cloud_init_iso() to basevm.py
-Date: Wed,  5 Feb 2020 16:29:11 -0500
-Message-Id: <20200205212920.467-6-robert.foley@linaro.org>
+Subject: [PATCH v1 00/14] tests/vm: Add support for aarch64 VMs
+Date: Wed,  5 Feb 2020 16:29:06 -0500
+Message-Id: <20200205212920.467-1-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200205212920.467-1-robert.foley@linaro.org>
-References: <20200205212920.467-1-robert.foley@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::52c
+X-Received-From: 2607:f8b0:4864:20::636
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,172 +97,141 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This method was located in both centos and ubuntu.i386.
+This is version 1 of the patch series to 
+add support for 2 aarch64 VMs.  
+ - Ubuntu 18.04 aarch64 VM
+ - CentOS 8 aarch64 VM
+ 
+Changes in version 1
+- Added environment variable QEMU_LOCAL=1 which means
+  use the appropriate QEMU binary from the current build.
+- Improved support of aarch64 VMs to be backwards compatible
+  by default with older versions of QEMU.
+- Fixed a locale issue with ubuntu.aarch64 VM.
+  The issue here was that we were not waiting for the cloud-init to finish,
+  prior to rebooting the VM.
+- Workaround of issue where the test hangs as QEMU is waiting for
+  the consumption of character device data.  Workaround adds a 
+  thread to the test framework to consume these characters and dump them
+  to a file. The test then consumes these characters from the file instead of
+  from the character device as it did previously.
+  One advantage of this change is that there is now a log file which 
+  contains the console output for debug.
+- Change creation of aarch64 flash files to be in temp directory.
+- Added changes to convert existing scripts to using self._config for
+  SSH_KEY_PUB, GUEST_USER, GUEST_PASS, ROOT_PASS.
+- Created example config file for x86, renamed existing 
+  example file to aarch64.
+- Make gen_cloud_init_iso() common to basevm.
+- Updated wait_ssh() to only extend time when we are under TCG.
+- Changed wait_ssh() to wait for root or wait for guest user, not both.
+- Removed SSH_KEY global as it is no longer needed.
+- Clarified use of ssh_key_file and ssh_pub_key_file,
+  added tmp to the names to clarify, and added a comment to explain use here.
+- Cleaned up handling of the boot_console option.
+- Moved tweak to Makefile.include to a separate patch.
+- Removed setting of tcg,thread=multi in aarch64 VMs.
+- Moved the validation of ssh keys to a common location.
+- Reworked the handling of the config file yaml to
+  simply set the values into the config dictionary in one step.
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
----
- tests/vm/basevm.py   | 40 ++++++++++++++++++++++++++++++++++++++++
- tests/vm/centos      | 33 +--------------------------------
- tests/vm/ubuntu.i386 | 37 +------------------------------------
- 3 files changed, 42 insertions(+), 68 deletions(-)
+More details on the patch in general:
+In order to add support for the two new aarch64 VMs, we
+generalized and parameterized basevm.py.  
+We added a new concept of a configuration, which is really just a 
+set of parameters which define how to configure the VM.  
+Some examples of parameters are "machine", "memory" and "cpu".
+We preserved current default parameters.
+Current configuration of pre-existing VMs is supported by default
+without need to override default parameters.
+ 
+For example, previously only the 'pc' machine was supported in basevm.py. 
+The new aarch64 VMs will override machine to use virt. 
+There are a few other examples where we needed to add parameters 
+in order to add support for these aarch64 VMs.
+In some other cases we added parameters that we thought would be useful
+in general, for example username/password, ssh keys, 
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index a29099f6f1..a926211da8 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -346,6 +346,46 @@ class BaseVM(object):
-     def qmp(self, *args, **kwargs):
-         return self._guest.qmp(*args, **kwargs)
+In the case of the aarch64 VMs, they override certain parameters
+by default.  However, it is also of value to be able to 
+dynamically specify other values for these parameters.
+Take the case where you create a new VM using vm-build,
+but then want to test it using various hardware configurations
+such as for example different NUMA topologies. 
+Or maybe you want to use a different amount of memory or a different cpu type.
+
+In order to support these use cases we added support
+for a configuration .yml file, which allows the user to
+specify certain values dynamically such as:
+ - machine
+ - cpu
+ - memory size
+ - other qemu args, which allow configuring alternate
+   hardware topologies such as NUMA nodes.
+ - username, password
+ - ssh keys
+ For an example of a .yml file, see the included config_example.yml
  
-+    def gen_cloud_init_iso(self):
-+        cidir = self._tmpdir
-+        mdata = open(os.path.join(cidir, "meta-data"), "w")
-+        name = self.name.replace(".","-")
-+        mdata.writelines(["instance-id: {}-vm-0\n".format(name),
-+                          "local-hostname: {}-guest\n".format(name)])
-+        mdata.close()
-+        udata = open(os.path.join(cidir, "user-data"), "w")
-+        print("guest user:pw {}:{}".format(self._config['guest_user'],
-+                                           self._config['guest_pass']))
-+        udata.writelines(["#cloud-config\n",
-+                          "chpasswd:\n",
-+                          "  list: |\n",
-+                          "    root:%s\n" % self._config['root_pass'],
-+                          "    %s:%s\n" % (self._config['guest_user'],
-+                                           self._config['guest_pass']),
-+                          "  expire: False\n",
-+                          "users:\n",
-+                          "  - name: %s\n" % self._config['guest_user'],
-+                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
-+                          "    ssh-authorized-keys:\n",
-+                          "    - %s\n" % self._config['ssh_pub_key'],
-+                          "  - name: root\n",
-+                          "    ssh-authorized-keys:\n",
-+                          "    - %s\n" % self._config['ssh_pub_key'],
-+                          "locale: en_US.UTF-8\n"])
-+        proxy = os.environ.get("http_proxy")
-+        if not proxy is None:
-+            udata.writelines(["apt:\n",
-+                              "  proxy: %s" % proxy])
-+        udata.close()
-+        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
-+                               "-volid", "cidata", "-joliet", "-rock",
-+                               "user-data", "meta-data"],
-+                               cwd=cidir,
-+                               stdin=self._devnull, stdout=self._stdout,
-+                               stderr=self._stdout)
-+
-+        return os.path.join(cidir, "cloud-init.iso")
-+
- def parse_args(vmcls):
+The main use case for using this config.yml file is for where we
+are testing/debugging with qemu (vm-build), and need to configure
+the VM differently.  However, there is another use case we have
+developed, which is a project called lisa-qemu 
+(https://github.com/rf972/lisa-qemu).  
+This project is an integration between the LISA tool and QEMU.  
+This project uses the VMs created by
+QEMU's vm-build scripts for use in testing with LISA.  
+This use case is similar to the vm-build case in that,
+the VM gets created once, and we want to launch the VM with different
+configurations (memory, cpu, etc.).
  
-     def get_default_jobs():
-diff --git a/tests/vm/centos b/tests/vm/centos
-index f2f0befd84..c108bd6799 100755
---- a/tests/vm/centos
-+++ b/tests/vm/centos
-@@ -31,37 +31,6 @@ class CentosVM(basevm.BaseVM):
-         make docker-test-mingw@fedora  {verbose} J={jobs} NETWORK=1;
-     """
- 
--    def _gen_cloud_init_iso(self):
--        cidir = self._tmpdir
--        mdata = open(os.path.join(cidir, "meta-data"), "w")
--        mdata.writelines(["instance-id: centos-vm-0\n",
--                          "local-hostname: centos-guest\n"])
--        mdata.close()
--        udata = open(os.path.join(cidir, "user-data"), "w")
--        udata.writelines(["#cloud-config\n",
--                          "chpasswd:\n",
--                          "  list: |\n",
--                          "    root:%s\n" % self.ROOT_PASS,
--                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
--                          "  expire: False\n",
--                          "users:\n",
--                          "  - name: %s\n" % self.GUEST_USER,
--                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
--                          "    ssh-authorized-keys:\n",
--                          "    - %s\n" % basevm.SSH_PUB_KEY,
--                          "  - name: root\n",
--                          "    ssh-authorized-keys:\n",
--                          "    - %s\n" % basevm.SSH_PUB_KEY,
--                          "locale: en_US.UTF-8\n"])
--        udata.close()
--        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
--                               "-volid", "cidata", "-joliet", "-rock",
--                               "user-data", "meta-data"],
--                               cwd=cidir,
--                               stdin=self._devnull, stdout=self._stdout,
--                               stderr=self._stdout)
--        return os.path.join(cidir, "cloud-init.iso")
--
-     def build_image(self, img):
-         cimg = self._download_with_cache("https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1802.qcow2.xz")
-         img_tmp = img + ".tmp"
-@@ -69,7 +38,7 @@ class CentosVM(basevm.BaseVM):
-         subprocess.check_call(["ln", "-f", cimg, img_tmp + ".xz"])
-         subprocess.check_call(["xz", "--keep", "-dvf", img_tmp + ".xz"])
-         self.exec_qemu_img("resize", img_tmp, "50G")
--        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
-+        self.boot(img_tmp, extra_args = ["-cdrom", self.gen_cloud_init_iso()])
-         self.wait_ssh()
-         self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
-         self.ssh_root_check("yum update -y")
-diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-index 3834cd7a8d..7df54ae094 100755
---- a/tests/vm/ubuntu.i386
-+++ b/tests/vm/ubuntu.i386
-@@ -29,41 +29,6 @@ class UbuntuX86VM(basevm.BaseVM):
-         make --output-sync {target} -j{jobs} {verbose};
-     """
- 
--    def _gen_cloud_init_iso(self):
--        cidir = self._tmpdir
--        mdata = open(os.path.join(cidir, "meta-data"), "w")
--        mdata.writelines(["instance-id: ubuntu-vm-0\n",
--                          "local-hostname: ubuntu-guest\n"])
--        mdata.close()
--        udata = open(os.path.join(cidir, "user-data"), "w")
--        udata.writelines(["#cloud-config\n",
--                          "chpasswd:\n",
--                          "  list: |\n",
--                          "    root:%s\n" % self.ROOT_PASS,
--                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
--                          "  expire: False\n",
--                          "users:\n",
--                          "  - name: %s\n" % self.GUEST_USER,
--                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
--                          "    ssh-authorized-keys:\n",
--                          "    - %s\n" % basevm.SSH_PUB_KEY,
--                          "  - name: root\n",
--                          "    ssh-authorized-keys:\n",
--                          "    - %s\n" % basevm.SSH_PUB_KEY,
--                          "locale: en_US.UTF-8\n"])
--        proxy = os.environ.get("http_proxy")
--        if not proxy is None:
--            udata.writelines(["apt:\n",
--                              "  proxy: %s" % proxy])
--        udata.close()
--        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
--                               "-volid", "cidata", "-joliet", "-rock",
--                               "user-data", "meta-data"],
--                               cwd=cidir,
--                               stdin=self._devnull, stdout=self._stdout,
--                               stderr=self._stdout)
--        return os.path.join(cidir, "cloud-init.iso")
--
-     def build_image(self, img):
-         cimg = self._download_with_cache(
-             "https://cloud-images.ubuntu.com/releases/bionic/release-20191114/ubuntu-18.04-server-cloudimg-i386.img",
-@@ -71,7 +36,7 @@ class UbuntuX86VM(basevm.BaseVM):
-         img_tmp = img + ".tmp"
-         subprocess.check_call(["cp", "-f", cimg, img_tmp])
-         self.exec_qemu_img("resize", img_tmp, "50G")
--        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
-+        self.boot(img_tmp, extra_args = ["-cdrom", self.gen_cloud_init_iso()])
-         self.wait_ssh()
-         self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
-         self.ssh_root_check("apt-get update")
+As part of developing the scripts for these VMs, we implemented
+a few enhancements to help with testing.
+For example, we added support for allowing debug mode to
+show the ssh output.
+We also added support for a new --boot-console option which
+will show the boot console as the VM boots up to aid in 
+debugging problems during VM boot.
+
+Robert Foley (14):
+  tests/vm: use $(PYTHON) consistently
+  tests/vm: Debug mode shows ssh output.
+  tests/vm: increased max timeout for vm boot.
+  tests/vm: give wait_ssh() option to wait for root
+  tests/vm: Added gen_cloud_init_iso() to basevm.py
+  tests/vm: Add logging of console to file.
+  tests/vm: Add configuration to basevm.py
+  tests/vm: Added configuration file support
+  tests/vm: add --boot-console switch
+  tests/vm: Add ability to select QEMU from current build.
+  tests/vm: allow wait_ssh() to specify command
+  tests/vm: Added a new script for ubuntu.aarch64.
+  tests/vm: Added a new script for centos.aarch64.
+  tests/vm: change scripts to use self._config
+
+ tests/vm/Makefile.include         |  16 +-
+ tests/vm/aarch64vm.py             | 100 +++++++++
+ tests/vm/basevm.py                | 324 +++++++++++++++++++++++++-----
+ tests/vm/centos                   |  33 +--
+ tests/vm/centos-8-aarch64.ks      |  51 +++++
+ tests/vm/centos.aarch64           | 221 ++++++++++++++++++++
+ tests/vm/conf_example_aarch64.yml |  51 +++++
+ tests/vm/conf_example_x86.yml     |  50 +++++
+ tests/vm/fedora                   |  17 +-
+ tests/vm/freebsd                  |  16 +-
+ tests/vm/netbsd                   |  19 +-
+ tests/vm/openbsd                  |  17 +-
+ tests/vm/socket_thread.py         |  73 +++++++
+ tests/vm/ubuntu.aarch64           | 113 +++++++++++
+ tests/vm/ubuntu.i386              |  37 +---
+ 15 files changed, 987 insertions(+), 151 deletions(-)
+ create mode 100644 tests/vm/aarch64vm.py
+ create mode 100644 tests/vm/centos-8-aarch64.ks
+ create mode 100755 tests/vm/centos.aarch64
+ create mode 100644 tests/vm/conf_example_aarch64.yml
+ create mode 100644 tests/vm/conf_example_x86.yml
+ create mode 100644 tests/vm/socket_thread.py
+ create mode 100755 tests/vm/ubuntu.aarch64
+
 -- 
 2.17.1
 
