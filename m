@@ -2,67 +2,111 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA51C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEDBC3F68F
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:44:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65DDA217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:44:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65DDA217F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=Huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9DD0D217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 16:44:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="egOXznpm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DD0D217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izNnD-0003Yr-Kk
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 11:44:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46599)
+	id 1izNnE-0003YW-QJ
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 11:44:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46591)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jonathan.cameron@huawei.com>) id 1izNmE-0002Qa-6E
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:43:47 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jonathan.cameron@huawei.com>) id 1izNmC-0003gz-FI
+ (envelope-from <mreitz@redhat.com>) id 1izNmD-0002QK-UL
  for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:43:46 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2071 helo=huawei.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <mreitz@redhat.com>) id 1izNmC-0003k1-TB
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:43:45 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33815
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jonathan.cameron@huawei.com>)
- id 1izNm9-0002N8-3b; Wed, 05 Feb 2020 11:43:41 -0500
-Received: from lhreml703-cah.china.huawei.com (unknown [172.18.7.106])
- by Forcepoint Email with ESMTP id 2BCBD87DFEB78505D9D6;
- Wed,  5 Feb 2020 16:43:30 +0000 (GMT)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml703-cah.china.huawei.com (10.201.108.44) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Wed, 5 Feb 2020 16:43:29 +0000
-Received: from localhost (10.202.226.57) by lhreml710-chm.china.huawei.com
- (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Wed, 5 Feb 2020
- 16:43:29 +0000
-Date: Wed, 5 Feb 2020 16:43:28 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Subject: Re: [PATCH v22 4/9] ACPI: Build Hardware Error Source Table
-Message-ID: <20200205164328.00006f1e@Huawei.com>
-In-Reply-To: <1578483143-14905-5-git-send-email-gengdongjiu@huawei.com>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-5-git-send-email-gengdongjiu@huawei.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izNmC-0003fa-Lg
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 11:43:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580921024;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ojd1ekvCDGjIcBuiHnkCw60DuW6QaKd0dTZjG46MCNs=;
+ b=egOXznpm1f30Qw+iyt59MMKLKnNkt6MilFT5CLLP7jOK6pTIiLjTWQB69AWK1DoSi6xYdM
+ iLoXDjpGL1h0Ed9beVWPGsk3fvivU2zVN0YJO9Q0jeXgXh0xEltQukZKxbqzeHt5o5qBqm
+ 4At/zR4tXwj6cTff6wCB1pElzAGL9BM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-G6mWUtdWPP-Spo1tsdaxZQ-1; Wed, 05 Feb 2020 11:43:42 -0500
+X-MC-Unique: G6mWUtdWPP-Spo1tsdaxZQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1813210054E3;
+ Wed,  5 Feb 2020 16:43:38 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-184.ams2.redhat.com
+ [10.36.117.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 62FAF5D9E2;
+ Wed,  5 Feb 2020 16:43:27 +0000 (UTC)
+Subject: Re: [PATCH 09/17] block: Refactor bdrv_has_zero_init{,_truncate}
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200131174436.2961874-1-eblake@redhat.com>
+ <20200131174436.2961874-10-eblake@redhat.com>
+ <339f0a60-1e4f-286c-6594-1153bf284082@virtuozzo.com>
+ <62078ab7-b46f-cb70-ffb1-5e84c7e1bee5@redhat.com>
+ <89497824-33be-7238-982e-bd0edb2f5d00@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <4ffeafb0-1dd9-720c-f6a5-9af6e95b5f62@redhat.com>
+Date: Wed, 5 Feb 2020 17:43:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.57]
-X-ClientProxiedBy: lhreml712-chm.china.huawei.com (10.201.108.63) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
+In-Reply-To: <89497824-33be-7238-982e-bd0edb2f5d00@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="JOOQSVLJEpcSCmqIop45tK2ZqEUIeuVov"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,154 +118,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com,
- kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
- qemu-devel@nongnu.org, linuxarm@huawei.com, shannon.zhaosl@gmail.com,
- zhengxiang9@huawei.com, qemu-arm@nongnu.org, james.morse@arm.com,
- xuwei5@huawei.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "open list:Sheepdog" <sheepdog@lists.wpkg.org>, qemu-block@nongnu.org,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Peter Lieven <pl@kamp.de>, "Richard W.M. Jones" <rjones@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, david.edmondson@oracle.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
+ Liu Yuan <namei.unix@gmail.com>, Jason Dillaman <dillaman@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jan 2020 19:32:18 +0800
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JOOQSVLJEpcSCmqIop45tK2ZqEUIeuVov
+Content-Type: multipart/mixed; boundary="QiVYX5FMapEiIxDDPn0pomZgNlUL6SgNe"
 
-> This patch builds Hardware Error Source Table(HEST) via fw_cfg blobs.
-> Now it only supports ARMv8 SEA, a type of Generic Hardware Error
-> Source version 2(GHESv2) error source. Afterwards, we can extend
-> the supported types if needed. For the CPER section, currently it
-> is memory section because kernel mainly wants userspace to handle
-> the memory errors.
-> 
-> This patch follows the spec ACPI 6.2 to build the Hardware Error
-> Source table. For more detailed information, please refer to
-> document: docs/specs/acpi_hest_ghes.rst
-> 
-> build_append_ghes_notify() will help to add Hardware Error Notification
-> to ACPI tables without using packed C structures and avoid endianness
-> issues as API doesn't need explicit conversion.
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
+--QiVYX5FMapEiIxDDPn0pomZgNlUL6SgNe
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Hi. 
+On 04.02.20 18:51, Eric Blake wrote:
+> On 2/4/20 11:42 AM, Max Reitz wrote:
+>=20
+>>>
+>>> I understand that this is preexisting logic, but could I ask: why?
+>>> What's wrong
+>>> if driver can guarantee that created file is all-zero, but is not sure
+>>> about
+>>> file resizing? I agree that it's normal for these flags to have the sam=
+e
+>>> value,
+>>> but what is the reason for this restriction?..
+>>
+>> If areas added by truncation (or growth, rather) are always zero, then
+>> the file can always be created with size 0 and grown from there.=C2=A0 T=
+hus,
+>> images where truncation adds zeroed areas will generally always be zero
+>> after creation.
+>>
+>>> So, the only possible combination of flags, when they differs, is
+>>> create=3D0 and
+>>> truncate=3D1.. How is it possible?
+>>
+>> For preallocated qcow2 images, it depends on the storage whether they
+>> are actually 0 after creation.=C2=A0 Hence qcow2_has_zero_init() then de=
+fers
+>> to bdrv_has_zero_init() of s->data_file->bs.
+>>
+>> But when you truncate them (with PREALLOC_MODE_OFF, as
+>> BlockDriver.bdrv_has_zero_init_truncate()=E2=80=99s comment explains), t=
+he new
+>> area is always going to be 0, regardless of initial preallocation.
+>>
+>>
+>> I just noticed a bug there, though: Encrypted qcow2 images will not see
+>> areas added through growth as 0.=C2=A0 Hence, qcow2=E2=80=99s
+>> bdrv_has_zero_init_truncate() implementation should not return true
+>> unconditionally, but only for unencrypted images.
+>=20
+> Hence patch 5 earlier in the series :)
 
-I was forwards porting my old series adding CCIX error injection support
-and came across a place this could 'possibly' be improved.
+Ah, good. :-)
 
-I say possibly because it's really about enabling more flexibility
-in how this code is reused than actually 'fixing' anything here.
-
-If you don't make the change here, I'll just add a precursor patch to my
-series.  Just seems nice to tidy it up at source.
-
-The rest of the parts of this series I am using seems to work great.
-
-Thanks!
-
-Jonathan
-
-> ---
->  hw/acpi/ghes.c           | 118 ++++++++++++++++++++++++++++++++++++++++++++++-
->  hw/arm/virt-acpi-build.c |   2 +
->  include/hw/acpi/ghes.h   |  40 ++++++++++++++++
->  3 files changed, 159 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-> index b7fdbbb..9d37798 100644
-> --- a/hw/acpi/ghes.c
-> +++ b/hw/acpi/ghes.c
-> @@ -34,9 +34,42 @@
-> +
-...
-> +/* Build Generic Hardware Error Source version 2 (GHESv2) */
-> +static void build_ghes_v2(GArray *table_data, int source_id, BIOSLinker *linker)
-This function takes source ID, which uses the enum of all sources registered.
-However, it doesn't use it to locate the actual physical addresses.
-
-Currently the code effectively assumes the value is 0.
-
-> +{
-> +    uint64_t address_offset;
-> +    /*
-> +     * Type:
-> +     * Generic Hardware Error Source version 2(GHESv2 - Type 10)
-> +     */
-> +    build_append_int_noprefix(table_data, ACPI_GHES_SOURCE_GENERIC_ERROR_V2, 2);
-> +    /* Source Id */
-> +    build_append_int_noprefix(table_data, source_id, 2);
-> +    /* Related Source Id */
-> +    build_append_int_noprefix(table_data, 0xffff, 2);
-> +    /* Flags */
-> +    build_append_int_noprefix(table_data, 0, 1);
-> +    /* Enabled */
-> +    build_append_int_noprefix(table_data, 1, 1);
-> +
-> +    /* Number of Records To Pre-allocate */
-> +    build_append_int_noprefix(table_data, 1, 4);
-> +    /* Max Sections Per Record */
-> +    build_append_int_noprefix(table_data, 1, 4);
-> +    /* Max Raw Data Length */
-> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
-> +
-> +    address_offset = table_data->len;
-> +    /* Error Status Address */
-> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
-> +                     4 /* QWord access */, 0);
-> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-> +        address_offset + GAS_ADDR_OFFSET,
-> +        sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
-
-The offset here would need to be source_id * sizeof(uint64_t) I think
-
-> +
-> +    /*
-> +     * Notification Structure
-> +     * Now only enable ARMv8 SEA notification type
-> +     */
-> +    build_ghes_hw_error_notification(table_data, ACPI_GHES_NOTIFY_SEA);
-Perhaps a switch for this to allow for other options later.
-
-	switch (source_id) {
-	case ACPI_HEST_SRC_ID_SEA:
-		...
-		break;
-	default:
-	//print some error message.
-
-	}
-> +
-> +    /* Error Status Block Length */
-> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
-> +
-> +    /*
-> +     * Read Ack Register
-> +     * ACPI 6.1: 18.3.2.8 Generic Hardware Error Source
-> +     * version 2 (GHESv2 - Type 10)
-> +     */
-> +    address_offset = table_data->len;
-> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
-> +                     4 /* QWord access */, 0);
-> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-> +        address_offset + GAS_ADDR_OFFSET,
-> +        sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
-> +        ACPI_GHES_ERROR_SOURCE_COUNT * sizeof(uint64_t));
-
-Offset of (ACPI_GHES_ERROR_SOURCE_COUNT + source_id) * sizeof(uint64_t)
-
-> +
-> +    /*
-> +     * Read Ack Preserve
-> +     * We only provide the first bit in Read Ack Register to OSPM to write
-> +     * while the other bits are preserved.
-> +     */
-> +    build_append_int_noprefix(table_data, ~0x1ULL, 8);
-> +    /* Read Ack Write */
-> +    build_append_int_noprefix(table_data, 0x1, 8);
-> +}
+Max
 
 
+--QiVYX5FMapEiIxDDPn0pomZgNlUL6SgNe--
+
+--JOOQSVLJEpcSCmqIop45tK2ZqEUIeuVov
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl468K0ACgkQ9AfbAGHV
+z0A0Iwf+J2kubZG9AR1FBI3Op2al2du7vPslaz3AsxrmsqEpoqu26vaotqPsUS0D
+poyyKXCiKznMYaWorVzAj+o4CY6zKCoghhoBieXINnXNUBufNt6X3UQZFxUflSC8
+xAmvEZU0tJHdpp4UpXeCNvDk3jT5yW863YbOziz2jQ7jFjt3MNHTuj0L+nsUVaII
+sbqwQ9QBp88t5zkrpm7oPBa2QOLcMpXlyHz5vKANpwlcwe3ZO9x2BNLviOAqUAky
+G3kszBxq8epovuYLy6ZTdDFhpSL7l7OQRBXcwqgUUKVpX7Uubz82E8fkOwXbB06E
++Lwx5Z6/EA01h9vEUNGAbs0k/EUO9A==
+=ZsMD
+-----END PGP SIGNATURE-----
+
+--JOOQSVLJEpcSCmqIop45tK2ZqEUIeuVov--
 
 
