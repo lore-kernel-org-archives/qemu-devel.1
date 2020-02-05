@@ -2,65 +2,84 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEC7C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12189C35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:34:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95B0020659
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:28:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B0020659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id CEC2720659
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 15:34:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZTkYkjG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEC2720659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izMbi-0001ek-R2
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 10:28:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52577)
+	id 1izMgm-0005VI-SL
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 10:34:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57596)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1izMb3-0000tb-Rv
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:28:11 -0500
+ (envelope-from <eblake@redhat.com>) id 1izMg7-00051H-0g
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:33:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1izMb2-0002VR-Bx
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:28:09 -0500
-Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:46509)
+ (envelope-from <eblake@redhat.com>) id 1izMg4-00035r-V0
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:33:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20014
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1izMb2-0002Mg-6Q
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:28:08 -0500
-Received: from player760.ha.ovh.net (unknown [10.110.208.89])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id 932888EED8
- for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 16:28:05 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player760.ha.ovh.net (Postfix) with ESMTPSA id F3713F0B3A4A;
- Wed,  5 Feb 2020 15:27:56 +0000 (UTC)
-Subject: Re: [PULL 19/35] ppc/pnv: Add models for POWER9 PHB4 PCIe Host bridge
-To: Laurent Vivier <lvivier@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
-References: <20200203061123.59150-1-david@gibson.dropbear.id.au>
- <20200203061123.59150-20-david@gibson.dropbear.id.au>
- <bbb36281-287b-70cf-80ab-9ac54eeca8de@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ba1e6cd7-083d-5d98-e802-1e828a13c467@kaod.org>
-Date: Wed, 5 Feb 2020 16:27:56 +0100
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1izMg4-0002wT-PN
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 10:33:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580916799;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VhXZe5o7bF9UgzA8G2Oatp8OJnWoaeFOGrGj+RdfDkE=;
+ b=VZTkYkjGS9a1TYDhou5l5S36tM2O8h9BiQ8O2nQoE9OHk2JnPsJvCvH3fpOkTCFTJ+/zUq
+ y0DtU8GOmMTMEOqGh1fZPWXP4O8wqUJhRqsJgQXTJMOmGthQ+3y7+HOG6BddhSS/rlcXF5
+ kqpOYnGJ/59jgPmg/mB+wcbDXprlhU4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-BE84hs68NhKhBGGh_i1lOQ-1; Wed, 05 Feb 2020 10:33:18 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E237F802683;
+ Wed,  5 Feb 2020 15:33:16 +0000 (UTC)
+Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F2D519C7F;
+ Wed,  5 Feb 2020 15:33:16 +0000 (UTC)
+Subject: Re: [PATCH v2 04/33] block: Add BdrvChildRole to BdrvChild
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200204170848.614480-1-mreitz@redhat.com>
+ <20200204170848.614480-5-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <3113019f-797f-fe89-abbd-280bbddded31@redhat.com>
+Date: Wed, 5 Feb 2020 09:33:15 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <bbb36281-287b-70cf-80ab-9ac54eeca8de@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200204170848.614480-5-mreitz@redhat.com>
 Content-Language: en-US
-X-Ovh-Tracer-Id: 16070250849180093297
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrhedugdejgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeitddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: BE84hs68NhKhBGGh_i1lOQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.76.150
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,104 +91,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/5/20 2:26 PM, Laurent Vivier wrote:
-> On 03/02/2020 07:11, David Gibson wrote:
->> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>
->> These changes introduces models for the PCIe Host Bridge (PHB4) of the
->> POWER9 processor. It includes the PowerBus logic interface (PBCQ),
->> IOMMU support, a single PCIe Gen.4 Root Complex, and support for MSI
->> and LSI interrupt sources as found on a POWER9 system using the XIVE
->> interrupt controller.
->>
->> POWER9 processor comes with 3 PHB4 PEC (PCI Express Controller) and
->> each PEC can have several PHBs. By default,
->>
->>   * PEC0 provides 1 PHB  (PHB0)
->>   * PEC1 provides 2 PHBs (PHB1 and PHB2)
->>   * PEC2 provides 3 PHBs (PHB3, PHB4 and PHB5)
->>
->> Each PEC has a set  "global" registers and some "per-stack" (per-PHB)
->> registers. Those are organized in two XSCOM ranges, the "Nest" range
->> and the "PCI" range, each range contains both some "PEC" registers and
->> some "per-stack" registers.
->>
->> No default device layout is provided and PCI devices can be added on
->> any of the available PCIe Root Port (pcie.0 .. 2 of a Power9 chip)
->> with address 0x0 as the firwware (skiboot) only accepts a single
->> device per root port. To run a simple system with a network and a
->> storage adapters, use a command line options such as :
->>
->>   -device e1000e,netdev=3Dnet0,mac=3DC0:FF:EE:00:00:02,bus=3Dpcie.0,ad=
-dr=3D0x0
->>   -netdev bridge,id=3Dnet0,helper=3D/usr/libexec/qemu-bridge-helper,br=
-=3Dvirbr0,id=3Dhostnet0
->>
->>   -device megasas,id=3Dscsi0,bus=3Dpcie.1,addr=3D0x0
->>   -drive file=3D$disk,if=3Dnone,id=3Ddrive-scsi0-0-0-0,format=3Dqcow2,=
-cache=3Dnone
->>   -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3D=
-drive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2
->>
->> If more are needed, include a bridge.
->>
->> Multi chip is supported, each chip adding its set of PHB4 controllers
->> and its PCI busses. The model doesn't emulate the EEH error handling.
->>
->> This model is not ready for hotplug yet.
->>
->> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> [ clg: - numerous cleanups
->>        - commit log
->>        - fix for broken LSI support
->>        - PHB pic printinfo
->>        - large QOM rework ]
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> Message-Id: <20200127144506.11132-2-clg@kaod.org>
->> [dwg: Use device_class_set_props()]
->> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->> ---
->>  hw/pci-host/Makefile.objs           |    1 +
->>  hw/pci-host/pnv_phb4.c              | 1438 ++++++++++++++++++++++++++=
-+
->>  hw/pci-host/pnv_phb4_pec.c          |  593 +++++++++++
->>  hw/ppc/Kconfig                      |    2 +
->>  hw/ppc/pnv.c                        |  107 ++
->>  include/hw/pci-host/pnv_phb4.h      |  230 +++++
->>  include/hw/pci-host/pnv_phb4_regs.h |  553 ++++++++++
->>  include/hw/pci/pcie_port.h          |    1 +
->>  include/hw/ppc/pnv.h                |    7 +
->>  include/hw/ppc/pnv_xscom.h          |   11 +
->>  10 files changed, 2943 insertions(+)
->>  create mode 100644 hw/pci-host/pnv_phb4.c
->>  create mode 100644 hw/pci-host/pnv_phb4_pec.c
->>  create mode 100644 include/hw/pci-host/pnv_phb4.h
->>  create mode 100644 include/hw/pci-host/pnv_phb4_regs.h
->>
-> ...
->> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
->> index e27efe9a24..354828bf13 100644
->> --- a/hw/ppc/Kconfig
->> +++ b/hw/ppc/Kconfig
->> @@ -135,6 +135,8 @@ config XIVE_SPAPR
->>      default y
->>      depends on PSERIES
->>      select XIVE
->> +    select PCI
->> +    select PCIE_PORT
->=20
-> This patch is about PowerNV, why do we add dependencies for pseries
-> configuration?
+On 2/4/20 11:08 AM, Max Reitz wrote:
+> For now, it is always set to 0.  Later patches in this series will
+> ensure that all callers pass an appropriate combination of flags.
 
-Bogus leftovers from the past. I think we can drop them.
+Sneaky - this re-adds the field you dropped as part of a rename in 2/33. 
+  Anyone doing backport had better be aware that they would need this 
+whole series, rather than cherry-picking later patches without the 
+earlier ones.  But that observation does not affect the patch validity.
 
-Thanks,
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
 
-C.
+> +++ b/block.c
+> @@ -2381,6 +2381,7 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
+>   BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+>                                     const char *child_name,
+>                                     const BdrvChildClass *child_class,
+> +                                  BdrvChildRole child_role,
+
+Hmm - C is loose enough to allow the declaration of a parameter as an 
+enum type even when its intended usage is to receive a bitwise-or 
+derived from that enum but not declared in the enum.  For example, if I 
+understand intent correctly, a caller might pass in 0x3 
+(BDRV_CHILD_DATA|BDRV_CHILD_METADATA) which does NOT appear in 
+BdrvChildRole.  It feels like it might be cleaner to document the 
+interface as taking an unsigned int (although then you've lost the 
+documentation that the int is derived from BdrvChildRole), than to abuse 
+the typesystem to pass values that are not BdrvChildRole through the 
+parameter.
+
+Otherwise, this patch is a mechanical addition.
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
