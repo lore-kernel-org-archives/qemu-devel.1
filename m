@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87681C35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F0A2C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 574172082E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:07:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEA592082E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:08:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ES2YU/Qu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 574172082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jCgvQKGu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEA592082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izIWX-00017M-He
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 06:07:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45776)
+	id 1izIXq-0003US-4y
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 06:08:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1izITW-0004zk-Pp
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:04:08 -0500
+ (envelope-from <kraxel@redhat.com>) id 1izITY-000512-AV
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:04:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1izITV-0000Eu-Mt
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:04:06 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30416
+ (envelope-from <kraxel@redhat.com>) id 1izITW-0000K1-6N
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:04:07 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20373
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1izITV-00008z-Hu
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:04:05 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1izITW-0000F5-0U
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:04:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1580900645;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qlxHxz0zsWQXA64ftvzgeTgLUBZNT7Gc2SdOZ8OYyN8=;
- b=ES2YU/QumkNFPNgQxDj+B2eKuQz9lKo9jcjyEQrJMVpvNfj3DFlD/oRmDA9k+uFwkcHO1p
- oWQ8gpBQ4UA/sBKSZZKtSPuPCYJG2DvTg44Lrsux0S/KTnjS+g13kDX3yLa+kmfAVVRDV+
- y8xcAlLGyhOCSqp8RzR+7oShgKSGvtY=
+ bh=ZVyc8HAjJeVJ4G3eNhyQFpiME3LD4DO/y41WEU9dTqg=;
+ b=jCgvQKGu0b4ud/VJ1QDp27KuZJ81Am23+1wd3i+s6jI3WopitkOKTVto0n4M8eJMbcH3xQ
+ pf+HrBaGpEpTokIGhiMFFXQpCccJbhsUhTe8BOjs7NFFXg0spk/3vV0AtTyhByVx511VNX
+ vTaALScT8L520PrwB4vb8/OLag3rX2I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-nCXWEgKiN-2WsxLDsBPnPw-1; Wed, 05 Feb 2020 06:04:03 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-122-KOQSnHulOcyRCr2ABH53Ew-1; Wed, 05 Feb 2020 06:04:03 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 883D61063BA1;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82D1F1063BA0;
  Wed,  5 Feb 2020 11:04:02 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-112.ams2.redhat.com
  [10.36.116.112])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 613DB86CCC;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 64D8260BF7;
  Wed,  5 Feb 2020 11:03:57 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 880799CAF; Wed,  5 Feb 2020 12:03:56 +0100 (CET)
+ id 924BA9C75; Wed,  5 Feb 2020 12:03:56 +0100 (CET)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/5] ui: add show-cursor option
-Date: Wed,  5 Feb 2020 12:03:52 +0100
-Message-Id: <20200205110356.3491-2-kraxel@redhat.com>
+Subject: [PATCH 2/5] ui/gtk: implement show-cursor option
+Date: Wed,  5 Feb 2020 12:03:53 +0100
+Message-Id: <20200205110356.3491-3-kraxel@redhat.com>
 In-Reply-To: <20200205110356.3491-1-kraxel@redhat.com>
 References: <20200205110356.3491-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: nCXWEgKiN-2WsxLDsBPnPw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: KOQSnHulOcyRCr2ABH53Ew-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -93,35 +93,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When enabled forces showing a the mouse cursor, i.e. do
-nowallow the guest to hide it.  Defaults to off.
-
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- qapi/ui.json | 2 ++
- 1 file changed, 2 insertions(+)
+ ui/gtk.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index e04525d8b44b..7c516a455631 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -1144,6 +1144,7 @@
- # @type:          Which DisplayType qemu should use.
- # @full-screen:   Start user interface in fullscreen mode (default: off).
- # @window-close:  Allow to quit qemu with window close button (default: on=
-).
-+# @show-cursor:   Force showing the mouse cursor (default: off).
- # @gl:            Enable OpenGL support (default: off).
- #
- # Since: 2.12
-@@ -1153,6 +1154,7 @@
-   'base'    : { 'type'           : 'DisplayType',
-                 '*full-screen'   : 'bool',
-                 '*window-close'  : 'bool',
-+                '*show-cursor'   : 'bool',
-                 '*gl'            : 'DisplayGLMode' },
-   'discriminator' : 'type',
-   'data'    : { 'gtk'            : 'DisplayGTK',
+diff --git a/ui/gtk.c b/ui/gtk.c
+index d18892d1de61..78b197ade4c1 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -247,6 +247,7 @@ static void gd_update_cursor(VirtualConsole *vc)
+ {
+     GtkDisplayState *s =3D vc->s;
+     GdkWindow *window;
++    bool allow_hide_cursor =3D true;
+=20
+     if (vc->type !=3D GD_VC_GFX ||
+         !qemu_console_is_graphic(vc->gfx.dcl.con)) {
+@@ -257,8 +258,13 @@ static void gd_update_cursor(VirtualConsole *vc)
+         return;
+     }
+=20
++    if (s->opts->has_show_cursor && s->opts->show_cursor) {
++        allow_hide_cursor =3D false;
++    }
++
+     window =3D gtk_widget_get_window(GTK_WIDGET(vc->gfx.drawing_area));
+-    if (s->full_screen || qemu_input_is_absolute() || s->ptr_owner =3D=3D =
+vc) {
++    if (allow_hide_cursor &&
++        (s->full_screen || qemu_input_is_absolute() || s->ptr_owner =3D=3D=
+ vc)) {
+         gdk_window_set_cursor(window, s->null_cursor);
+     } else {
+         gdk_window_set_cursor(window, NULL);
 --=20
 2.18.1
 
