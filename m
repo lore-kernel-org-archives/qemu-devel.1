@@ -2,121 +2,82 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 561EEC33CA1
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 09:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2E9C33CA1
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 09:40:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1290A2082E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 09:39:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 264EF2082E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 09:40:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="j4Jdmbob"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1290A2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=partner.samsung.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NEtGtgs7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264EF2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izH9v-0000oE-8C
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 04:39:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49890)
+	id 1izHAh-0001Oy-Bb
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 04:40:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52911)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izH3h-0000jL-9F
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:33:23 -0500
+ (envelope-from <imammedo@redhat.com>) id 1izH96-0008E9-OB
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:38:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izH3f-00054S-4a
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:33:21 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:41566)
+ (envelope-from <imammedo@redhat.com>) id 1izH92-00073i-SE
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:38:55 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52331
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izH3e-0004xZ-Pl
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:33:18 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
- by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
- 20200205093317euoutp0215c1cc0fbe42fa57edf6c038e154c329~wd85oHY1f1429014290euoutp02h
- for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 09:33:17 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
- 20200205093317euoutp0215c1cc0fbe42fa57edf6c038e154c329~wd85oHY1f1429014290euoutp02h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1580895197;
- bh=2EdIg2dqS4is2/71/wtKDkcAjFpedYTyvl4ZZh7iwes=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=j4JdmbobcWRIstHh552DYk5UOjm+m38MEJfxzJoQQdhEqZSd8vcBKKq779K7UrxN7
- jE31U+loVUg+8dy6WvkzE1d+Wk4+hmdOY5bJbogX9MtBKrlFTgPItdXYJhVyb4OyNP
- ijUcCMihRaGE5R06H8cTBX+hHyihPmrDz5SnyaKY=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
- eucas1p2.samsung.com (KnoxPortal) with ESMTP id
- 20200205093317eucas1p25d1445ba03cefeea41c146eb62ce70a8~wd85Sacka1343613436eucas1p25;
- Wed,  5 Feb 2020 09:33:17 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
- eusmges2new.samsung.com (EUCPMTA) with SMTP id 1F.39.60679.DDB8A3E5; Wed,  5
- Feb 2020 09:33:17 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
- eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
- 20200205093316eucas1p2b1b7b0cec7991ec53f26bd1444b7e596~wd85Adxar1341413414eucas1p29;
- Wed,  5 Feb 2020 09:33:16 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
- eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
- 20200205093316eusmtrp19f6f09f53f4e984eec28ec1f1649cc97~wd85ADF8l1029010290eusmtrp1k;
- Wed,  5 Feb 2020 09:33:16 +0000 (GMT)
-X-AuditID: cbfec7f4-0cbff7000001ed07-9b-5e3a8bdd4b7b
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
- eusmgms2.samsung.com (EUCPMTA) with SMTP id 9A.9A.07950.CDB8A3E5; Wed,  5
- Feb 2020 09:33:16 +0000 (GMT)
-Received: from AMDC3304.digital.local (unknown [106.120.51.21]) by
- eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
- 20200205093316eusmtip29c56a815c32c0e8bffd05bc6b6c4cde6~wd84uzYT00075700757eusmtip2M;
- Wed,  5 Feb 2020 09:33:16 +0000 (GMT)
-From: i.kotrasinsk@partner.samsung.com
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 9/9] hw/arm/virt: Hack in support for memexpose device
-Date: Wed,  5 Feb 2020 10:33:05 +0100
-Message-Id: <1580895185-24341-10-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1580895185-24341-1-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrOIsWRmVeSWpSXmKPExsWy7djPc7p3u63iDD6e4bbYc+Exm8X+bf9Y
- LeacecBicbx3B4sDi8eda3vYPJ5c28zkcfDdHiaP9/uusgWwRHHZpKTmZJalFunbJXBltO6Z
- x16w1q5iwWWuBsadul2MnBwSAiYSi67eZuli5OIQEljBKHHwfD8ThPOFUWLFt3VQzmdGiRuP
- trHBtGza85MZIrGcUeLe1TcsCC0dP8Cq2ATUJHYe+cwIYosISEr87jrNDGIzC2RIPJ/VDWYL
- C/hLnJr3DMxmEVCVuHV0Jlgvr0CgRNf080wQ2+Qkbp7rBKvhBIpv+vQR6orLbBJnJgVD2C4S
- y9/sZIawhSVeHd/CDmHLSJye3MMCYddLtNzZAfaOhEAHo0TfyulQg6wlvmxYClTEAXScpsT6
- XfoQYUeJDwuns4KEJQT4JG68FYQ4n09i0rbpzBBhXomONiGIaj2J7ic3mWC2Lmt8BLXVQ+Lm
- 5XvQsFrCKLGu5z3LBEb5WQjLFjAyrmIUTy0tzk1PLTbKSy3XK07MLS7NS9dLzs/dxAiM/tP/
- jn/ZwbjrT9IhRgEORiUe3hWTLOOEWBPLiitzDzFKcDArifCe1wcK8aYkVlalFuXHF5XmpBYf
- YpTmYFES5zVe9DJWSCA9sSQ1OzW1ILUIJsvEwSnVwMha/kg16Ep10F+xeW++rztyYGWWGedt
- jwcJnQ3cCjF/tS0c5Jcmyuv13GqK+nlk09NbSruf3XfTrLZnUymRtd3QXNb65kkZl4i79YaY
- JUUPtwk07cgNn3mzOvBpBsNC2yU/DVofyeSrrJn6q2rC/co3C17sFzl8MqbqRt8Ulmn1+xVq
- 8ov2T1diKc5INNRiLipOBAD/2Jep+gIAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJLMWRmVeSWpSXmKPExsVy+t/xe7p3uq3iDHa3mVnsufCYzWL/tn+s
- FnPOPGCxON67g8WBxePOtT1sHk+ubWbyOPhuD5PH+31X2QJYovRsivJLS1IVMvKLS2yVog0t
- jPQMLS30jEws9QyNzWOtjEyV9O1sUlJzMstSi/TtEvQyWvfMYy9Ya1ex4DJXA+NO3S5GTg4J
- AROJTXt+MncxcnEICSxllJi/6QAbREJG4sfpNVC2sMSfa11sEEWfGCV+fr3NDJJgE1CT2Hnk
- MyOILSIgKfG76zRYnFkgS2Ln7PtMILawgK/E+Xc/2UFsFgFViVtHZ4IN5RUIlOiafp4JYoGc
- xM1znWC9nEDxTZ8+gtUICQRIXPv6lXUCI98CRoZVjCKppcW56bnFRnrFibnFpXnpesn5uZsY
- gcG47djPLTsYu94FH2IU4GBU4uENmGAZJ8SaWFZcmXuIUYKDWUmE97w+UIg3JbGyKrUoP76o
- NCe1+BCjKdBRE5mlRJPzgZGSVxJvaGpobmFpaG5sbmxmoSTO2yFwMEZIID2xJDU7NbUgtQim
- j4mDU6qBcer0k60b6zQjD2Q1bz2ZOJsz2HGe3eY1qgGP3W+FBYpMqw//f3nFs5vCMVnLqta/
- 5xdacX591pEdzieFBI0Mi7xLV2hdcvvyI01v50/3FxvFb1zYNq84tEqbs/bf+6ZNmX18E57x
- 79sy8aL1+idZQekBy5zfXzn+ToX78xSn2RUeXDzpr4tE9iixFGckGmoxFxUnAgBycBdHXAIA
- AA==
-X-CMS-MailID: 20200205093316eucas1p2b1b7b0cec7991ec53f26bd1444b7e596
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200205093316eucas1p2b1b7b0cec7991ec53f26bd1444b7e596
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20200205093316eucas1p2b1b7b0cec7991ec53f26bd1444b7e596
-References: <1580895185-24341-1-git-send-email-i.kotrasinsk@partner.samsung.com>
- <CGME20200205093316eucas1p2b1b7b0cec7991ec53f26bd1444b7e596@eucas1p2.samsung.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 210.118.77.12
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1izH92-0006v1-MV
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:38:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580895531;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8mpjPmHPBUn9rPKM0uc3lVu2psMByPl0ZA5YJDwqZjQ=;
+ b=NEtGtgs7IRrENI7hbJCUE1F1kz0J8uREYgZd+GocRPBwTy9a6CvlfW8Do41gniBKdjIw8p
+ TSPczxjWIUhfAsapeH0QylvV5SH3hKPsAOHz+C+vpAc8WnGmJ+hVWcaISm5t1xq9M58ptn
+ 6M6PUTw41UZBseLC+RebZdLHNOILYqg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-eQWWhWx7OVCw2Sc7u6GwKQ-1; Wed, 05 Feb 2020 04:38:46 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0215086A079;
+ Wed,  5 Feb 2020 09:38:45 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7013D87B1B;
+ Wed,  5 Feb 2020 09:38:40 +0000 (UTC)
+Date: Wed, 5 Feb 2020 10:38:38 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v3 00/18] APIC ID fixes for AMD EPYC CPU models
+Message-ID: <20200205103838.424b40a9@redhat.com>
+In-Reply-To: <fec6193d-09f1-5609-28fb-d10122053610@amd.com>
+References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
+ <20200203155921.658d7765@redhat.com>
+ <b493a4f4-48de-79a7-00d5-119fbe789879@amd.com>
+ <20200204090230.28f31a87@redhat.com>
+ <fec6193d-09f1-5609-28fb-d10122053610@amd.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: eQWWhWx7OVCw2Sc7u6GwKQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,221 +89,315 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>, pbonzini@redhat.com
+Cc: ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
+On Tue, 4 Feb 2020 13:08:58 -0600
+Babu Moger <babu.moger@amd.com> wrote:
 
-Signed-off-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
----
- hw/arm/virt.c         | 110 +++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/arm/virt.h |   5 +++
- 2 files changed, 114 insertions(+), 1 deletion(-)
+> On 2/4/20 2:02 AM, Igor Mammedov wrote:
+> > On Mon, 3 Feb 2020 13:31:29 -0600
+> > Babu Moger <babu.moger@amd.com> wrote:
+> >  =20
+> >> On 2/3/20 8:59 AM, Igor Mammedov wrote: =20
+> >>> On Tue, 03 Dec 2019 18:36:54 -0600
+> >>> Babu Moger <babu.moger@amd.com> wrote:
+> >>>    =20
+> >>>> This series fixes APIC ID encoding problems on AMD EPYC CPUs.
+> >>>> https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2F=
+bugzilla.redhat.com%2Fshow_bug.cgi%3Fid%3D1728166&amp;data=3D02%7C01%7Cbabu=
+.moger%40amd.com%7Cbbd1693802184161c8c308d7a9489ee9%7C3dd8961fe4884e608e11a=
+82d994e183d%7C0%7C0%7C637164001686545394&amp;sdata=3DUtYAoTk4RfZZ1VfaP%2Fhc=
+YrCSNTcubEB7cB%2BoYlRLfhc%3D&amp;reserved=3D0
+> >>>>
+> >>>> Currently, the APIC ID is decoded based on the sequence
+> >>>> sockets->dies->cores->threads. This works for most standard AMD and =
+other
+> >>>> vendors' configurations, but this decoding sequence does not follow =
+that of
+> >>>> AMD's APIC ID enumeration strictly. In some cases this can cause CPU=
+ topology
+> >>>> inconsistency.  When booting a guest VM, the kernel tries to validat=
+e the
+> >>>> topology, and finds it inconsistent with the enumeration of EPYC cpu=
+ models.
+> >>>>
+> >>>> To fix the problem we need to build the topology as per the Processo=
+r
+> >>>> Programming Reference (PPR) for AMD Family 17h Model 01h, Revision B=
+1
+> >>>> Processors. It is available at https://nam11.safelinks.protection.ou=
+tlook.com/?url=3Dhttps%3A%2F%2Fwww.amd.com%2Fsystem%2Ffiles%2FTechDocs%2F55=
+570-B1_PUB.zip&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7Cbbd1693802184161=
+c8c308d7a9489ee9%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C6371640016865=
+55390&amp;sdata=3DoHONRiXtpstKqwrxyzqR20bYDDr3zvmwq91a%2Br6iDqc%3D&amp;rese=
+rved=3D0
+> >>>>
+> >>>> Here is the text from the PPR.
+> >>>> Operating systems are expected to use Core::X86::Cpuid::SizeId[ApicI=
+dSize], the
+> >>>> number of least significant bits in the Initial APIC ID that indicat=
+e core ID
+> >>>> within a processor, in constructing per-core CPUID masks.
+> >>>> Core::X86::Cpuid::SizeId[ApicIdSize] determines the maximum number o=
+f cores
+> >>>> (MNC) that the processor could theoretically support, not the actual=
+ number of
+> >>>> cores that are actually implemented or enabled on the processor, as =
+indicated
+> >>>> by Core::X86::Cpuid::SizeId[NC].
+> >>>> Each Core::X86::Apic::ApicId[ApicId] register is preset as follows:
+> >>>> =E2=80=A2 ApicId[6] =3D Socket ID.
+> >>>> =E2=80=A2 ApicId[5:4] =3D Node ID.
+> >>>> =E2=80=A2 ApicId[3] =3D Logical CCX L3 complex ID
+> >>>> =E2=80=A2 ApicId[2:0]=3D (SMT) ? {LogicalCoreID[1:0],ThreadId} : {1'=
+b0,LogicalCoreID[1:0]}   =20
+> >>>
+> >>>
+> >>> After checking out all patches and some pondering, used here approach
+> >>> looks to me too intrusive for the task at hand especially where it
+> >>> comes to generic code.
+> >>>
+> >>> (Ignore till =3D=3D=3D=3D to see suggestion how to simplify without r=
+eading
+> >>> reasoning behind it first)
+> >>>
+> >>> Lets look for a way to simplify it a little bit.
+> >>>
+> >>> So problem we are trying to solve,
+> >>>  1: calculate APIC IDs based on cpu type (to e more specific: for EPY=
+C based CPUs)
+> >>>  2: it depends on knowing total number of numa nodes.
+> >>>
+> >>> Externally workflow looks like following:
+> >>>   1. user provides -smp x,sockets,cores,...,maxcpus
+> >>>       that's used by possible_cpu_arch_ids() singleton to build list =
+of
+> >>>       possible CPUs (which is available to user via command 'hotplugg=
+able-cpus')
+> >>>
+> >>>       Hook could be called very early and possible_cpus data might be
+> >>>       not complete. It builds a list of possible CPUs which user coul=
+d
+> >>>       modify later.
+> >>>
+> >>>   2.1 user uses "-numa cpu,node-id=3Dx,..." or legacy "-numa node,nod=
+e_id=3Dx,cpus=3D"
+> >>>       options to assign cpus to nodes, which is one way or another ca=
+lling
+> >>>       machine_set_cpu_numa_node(). The later updates 'possible_cpus' =
+list
+> >>>       with node information. It happens early when total number of no=
+des
+> >>>       is not available.
+> >>>
+> >>>   2.2 user does not provide explicit node mappings for CPUs.
+> >>>       QEMU steps in and assigns possible cpus to nodes in machine_num=
+a_finish_cpu_init()
+> >>>       (using the same machine_set_cpu_numa_node()) right before calli=
+ng boards
+> >>>       specific machine init(). At that time total number of nodes is =
+known.
+> >>>
+> >>> In 1 -- 2.1 cases, 'arch_id' in 'possible_cpus' list doesn't have to =
+be defined before
+> >>> boards init() is run. =20
+>=20
+> In case of 2.1, we need to have the arch_id already generated. This is
+> done inside possible_cpu_arch_ids. The arch_id is used by
+> machine_set_cpu_numa_node to assign the cpus to correct numa node.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f788fe2..ba35b21 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -71,6 +71,8 @@
- #include "hw/mem/pc-dimm.h"
- #include "hw/mem/nvdimm.h"
- #include "hw/acpi/generic_event_device.h"
-+#include "hw/misc/memexpose/memexpose-core.h"
-+#include "hw/misc/memexpose/memexpose-memregion.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -168,6 +170,8 @@ static MemMapEntry extended_memmap[] = {
-     /* Additional 64 MB redist region (can contain up to 512 redistributors) */
-     [VIRT_HIGH_GIC_REDIST2] =   { 0x0, 64 * MiB },
-     [VIRT_HIGH_PCIE_ECAM] =     { 0x0, 256 * MiB },
-+    [VIRT_HIGH_MEMEXPOSE_MMIO] =     { 0x0, 256 * MiB },
-+    [VIRT_HIGH_MEMEXPOSE] =     { 0x0, 32 * GiB },
-     /* Second PCIe window */
-     [VIRT_HIGH_PCIE_MMIO] =     { 0x0, 512 * GiB },
- };
-@@ -179,6 +183,7 @@ static const int a15irqmap[] = {
-     [VIRT_GPIO] = 7,
-     [VIRT_SECURE_UART] = 8,
-     [VIRT_ACPI_GED] = 9,
-+    [VIRT_MEMEXPOSE] = 10,
-     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
-     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
-     [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
-@@ -763,6 +768,67 @@ static void create_uart(const VirtMachineState *vms, int uart,
-     g_free(nodename);
- }
- 
-+static void create_memexpose(const VirtMachineState *vms, MemoryRegion *mem,
-+                             Error **errp)
-+{
-+    if (!vms->memexpose_size) {
-+        error_setg(errp, "For memexpose support, memexpose_size "
-+                         "needs to be greater than zero");
-+        return;
-+    }
-+    if (!strcmp("", vms->memexpose_ep)) {
-+        error_setg(errp, "For memexpose support, memexpose_ep "
-+                         "needs to be non-empty");
-+        return;
-+    }
-+
-+    DeviceState *dev = qdev_create(NULL, "memexpose-memdev");
-+
-+    hwaddr base = vms->memmap[VIRT_HIGH_MEMEXPOSE].base;
-+    hwaddr size = vms->memexpose_size;
-+    hwaddr mmio_base = vms->memmap[VIRT_HIGH_MEMEXPOSE_MMIO].base;
-+    hwaddr mmio_size = MEMEXPOSE_INTR_MEM_SIZE;
-+    int irq = vms->irqmap[VIRT_MEMEXPOSE];
-+
-+    qdev_prop_set_uint64(dev, "shm_size", size);
-+
-+    char *intr_ep = g_strdup_printf("%s-intr", vms->memexpose_ep);
-+    char *mem_ep = g_strdup_printf("%s-mem", vms->memexpose_ep);
-+    Chardev *c = qemu_chr_find(mem_ep);
-+    if (!c) {
-+        error_setg(errp, "Failed to find memexpose memory endpoint");
-+        return;
-+    }
-+    qdev_prop_set_chr(dev, "mem_chardev", c);
-+    c = qemu_chr_find(intr_ep);
-+    if (!c) {
-+        error_setg(errp, "Failed to find memexpose interrupt endpoint");
-+        return;
-+    }
-+    qdev_prop_set_chr(dev, "intr_chardev", c);
-+    g_free(intr_ep);
-+    g_free(mem_ep);
-+
-+    qdev_init_nofail(dev);
-+    MemexposeMemdev *mdev = MEMEXPOSE_MEMDEV(dev);
-+    SysBusDevice *s = SYS_BUS_DEVICE(dev);
-+    memory_region_add_subregion(mem, mmio_base, &mdev->intr.shmem);
-+    memory_region_add_subregion(mem, base, &mdev->mem.shmem);
-+    sysbus_connect_irq(s, 0, qdev_get_gpio_in(vms->gic, irq));
-+
-+    char *nodename = g_strdup_printf("/memexpose@%" PRIx64, mmio_base);
-+    qemu_fdt_add_subnode(vms->fdt, nodename);
-+    qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
-+                            "memexpose-memregion");
-+    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-+                                 2, mmio_base, 2, mmio_size,
-+                                 2, base, 2, size);
-+    qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
-+                               GIC_FDT_IRQ_TYPE_SPI, irq,
-+                               GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-+    g_free(nodename);
-+}
-+
- static void create_rtc(const VirtMachineState *vms)
- {
-     char *nodename;
-@@ -1572,7 +1638,6 @@ static void machvirt_init(MachineState *machine)
-                            UINT64_MAX);
-         memory_region_add_subregion_overlap(secure_sysmem, 0, sysmem, -1);
-     }
--
-     firmware_loaded = virt_firmware_init(vms, sysmem,
-                                          secure_sysmem ?: sysmem);
- 
-@@ -1721,6 +1786,8 @@ static void machvirt_init(MachineState *machine)
-     fdt_add_pmu_nodes(vms);
- 
-     create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
-+    if (vms->memexpose_size > 0)
-+        create_memexpose(vms, sysmem, &error_abort);
- 
-     if (vms->secure) {
-         create_secure_ram(vms, secure_sysmem);
-@@ -1849,6 +1916,32 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
-     }
- }
- 
-+static char *virt_get_memexpose_ep(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+    return g_strdup(vms->memexpose_ep);
-+}
-+
-+static void virt_set_memexpose_ep(Object *obj, const char *value, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+    g_free(vms->memexpose_ep);
-+    vms->memexpose_ep = g_strdup(value);
-+}
-+
-+static char *virt_get_memexpose_size(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+    return g_strdup_printf("%" PRIx64, vms->memexpose_size);
-+}
-+
-+static void virt_set_memexpose_size(Object *obj, const char *value,
-+                                    Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
-+    parse_option_size("memexpose-size", value, &vms->memexpose_size, errp);
-+}
-+
- static char *virt_get_iommu(Object *obj, Error **errp)
- {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-@@ -2103,6 +2196,21 @@ static void virt_instance_init(Object *obj)
-                                     "Set GIC version. "
-                                     "Valid values are 2, 3 and host", NULL);
- 
-+    /* Memexpose disabled by default */
-+    vms->memexpose_ep = g_strdup("");
-+    object_property_add_str(obj, "memexpose-ep", virt_get_memexpose_ep,
-+                            virt_set_memexpose_ep, NULL);
-+    object_property_set_description(obj, "memexpose-ep",
-+                                    "Set path to memexpose server socket. "
-+                                    "Sockets used for communication will be "
-+                                    "<name>-intr and <name>-mem. Set to empty "
-+                                    "to disable memexpose.", NULL);
-+    vms->memexpose_size = 0;
-+    object_property_add_str(obj, "memexpose-size", virt_get_memexpose_size,
-+                            virt_set_memexpose_size, NULL);
-+    object_property_set_description(obj, "memexpose-size",
-+                                    "Size of the memexpose region to access.",
-+                                    NULL);
-     vms->highmem_ecam = !vmc->no_highmem_ecam;
- 
-     if (vmc->no_its) {
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 71508bf..d0aeb67 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -76,6 +76,7 @@ enum {
-     VIRT_PLATFORM_BUS,
-     VIRT_GPIO,
-     VIRT_SECURE_UART,
-+    VIRT_MEMEXPOSE,
-     VIRT_SECURE_MEM,
-     VIRT_PCDIMM_ACPI,
-     VIRT_ACPI_GED,
-@@ -86,6 +87,8 @@ enum {
- enum {
-     VIRT_HIGH_GIC_REDIST2 =  VIRT_LOWMEMMAP_LAST,
-     VIRT_HIGH_PCIE_ECAM,
-+    VIRT_HIGH_MEMEXPOSE_MMIO,
-+    VIRT_HIGH_MEMEXPOSE,
-     VIRT_HIGH_PCIE_MMIO,
- };
- 
-@@ -124,6 +127,8 @@ typedef struct {
-     bool its;
-     bool virt;
-     int32_t gic_version;
-+    char *memexpose_ep;
-+    uint64_t memexpose_size;
-     VirtIOMMUType iommu;
-     struct arm_boot_info bootinfo;
-     MemMapEntry *memmap;
--- 
-2.7.4
+I might have missed something but I don't see arch_id itself being used in
+machine_set_cpu_numa_node(). It only uses props part of possible_cpus
+
+=20
+> If we want to move the arch_id generation into board init(), then we need
+> to save the cpu indexes belonging to each node somewhere.
+
+when cpus are assigned explicitly, decision what cpus go to what nodes is
+up to user and user configured mapping is stored in MachineState::possible_=
+cpus
+which is accessed by via possible_cpu_arch_ids() callback.
+Hence I don see any reason to touch cpu indexes.
+
+>=20
+> >>>
+> >>> In 2.2 case it calls get_default_cpu_node_id() -> x86_get_default_cpu=
+_node_id()
+> >>> which uses arch_id calculate numa node.
+> >>> But then question is: does it have to use APIC id or could it infer '=
+pkg_id',
+> >>> it's after, from ms->possible_cpus->cpus[i].props data?   =20
+> >>
+> >> Not sure if I got the question right. In this case because the numa
+> >> information is not provided all the cpus are assigned to only one node=
+.
+> >> The apic id is used here to get the correct pkg_id. =20
+> >=20
+> > apicid was composed from socket/core/thread[/die] tuple which cpus[i].p=
+rops is.
+> >=20
+> > Question is if we can compose only pkg_id based on the same data withou=
+t
+> > converting it to apicid and then "reverse engineering" it back
+> > original data? =20
+>=20
+> Yes. It is possible.
+>=20
+> >=20
+> > Or more direct question: is socket-id the same as pkg_id? =20
+>=20
+> Yes. Socket_id and pkg_id is same.
+>=20
+> >=20
+> >  =20
+> >> =20
+> >>>  =20
+> >>> With that out of the way APIC ID will be used only during board's ini=
+t(),
+> >>> so board could update possible_cpus with valid APIC IDs at the start =
+of
+> >>> x86_cpus_init().
+> >>>
+> >>> =3D=3D=3D=3D
+> >>> in nutshell it would be much easier to do following:
+> >>>
+> >>>  1. make x86_get_default_cpu_node_id() APIC ID in-depended or
+> >>>     if impossible as alternative recompute APIC IDs there if cpu
+> >>>     type is EPYC based (since number of nodes is already known)
+> >>>  2. recompute APIC IDs in x86_cpus_init() if cpu type is EPYC based
+> >>>
+> >>> this way one doesn't need to touch generic numa code, introduce
+> >>> x86 specific init_apicid_fn() hook into generic code and keep
+> >>> x86/EPYC nuances contained within x86 code only.   =20
+> >>
+> >> I was kind of already working in the similar direction in v4.
+> >> 1. We already have split the numa initialization in patch #12(Split th=
+e
+> >> numa initialization). This way we know exactly how many numa nodes are
+> >> there before hand. =20
+> >=20
+> > I suggest to drop that patch, It's the one that touches generic numa
+> > code and adding more legacy based extensions like cpu_indexes.
+> > Which I'd like to get rid of to begin with, so only -numa cpu is left.
+> >=20
+> > I think it's not necessary to touch numa code at all for apicid generat=
+ion
+> > purpose, as I tried to explain above. We should be able to keep
+> > this x86 only business. =20
+>=20
+> This is going to be difficult without touching the generic numa code.
+
+Looking at current code I don't see why one would touch numa code.
+Care to explain in more details why you'd have to touch it?
+
+> >> 2. Planning to remove init_apicid_fn
+> >> 3. Insert the handlers inside X86CPUDefinition. =20
+> > what handlers do you mean? =20
+>=20
+> Apicid generation logic can be separated into 3 types of handlers.
+> x86_apicid_from_cpu_idx: Generate apicid from cpu index.
+> x86_topo_ids_from_apicid: Generate topo ids from apic id.
+> x86_apicid_from_topo_ids: Generate apicid from topo ids.
+>=20
+> We should be able to generate one id from other(you can see topology.h).
+>=20
+> X86CPUDefinition will have the handlers specific to each model like the
+> way we have features now. The above 3 handlers will be used as default
+> handler.
+
+it probably shouldn't be a part of X86CPUDefinition,
+as it's machines responsibility to generate and set APIC ID.
+
+What you are doing with this topo functions in this version
+looks more that enough to me.
+
+> The EPYC model will have its corresponding handlers.
+>=20
+> x86_apicid_from_cpu_idx_epyc
+> x86_topo_ids_from_apicid_epyc
+> x86_apicid_from_topo_ids_epyc.
+
+CPU might use call backs, but does it have to?
+I see cpu_x86_cpuid() uses these functions to decode apic_id back to topo
+info and then compose various leaves based on it.
+Within CPU code I'd just use
+ if (i_am_epyc)
+    x86_topo_ids_from_apicid_epyc()
+ else
+    x86_topo_ids_from_apicid()
+it's easier to read and one doesn't have to go figure
+indirection chain to figure out what code is called.
+  =20
+> >> 4. EPYC model will have its own apid id handlers. Everything else will=
+ be
+> >> initialized with a default handlers(current default handler).
+> >> 5. The function pc_possible_cpu_arch_ids will load the model definitio=
+n
+> >> and initialize the PCMachineState data structure with the model specif=
+ic
+> >> handlers. =20
+> > I'm not sure what do you mean here. =20
+>=20
+> PCMachineState will have the function pointers to the above handlers.
+> I was going to load the correct handler based on the mode type.
+
+Could be done like this, but considering that within machine we need
+to calculate apic_id only once, the same 'if' trick would be simpler
+
+x86_cpus_init() {
+
+  if (cpu =3D=3D epic) {
+     make_epyc_apic_ids(mc->possible_cpu_arch_ids(ms))
+  }
+
+  // go on with creating cpus ...
+}
+
+> >> Does that sound similar to what you are thinking. Thoughts? =20
+> > If you have something to share and can push it on github,
+> > I can look at, whether it has design issues to spare you a round trip o=
+n a list.
+> > (it won't be proper review but at least I can help to pinpoint most pro=
+blematic parts)
+> >  =20
+> My code for the current approach is kind of ready(yet to be tested). I ca=
+n
+> send it as v3.1 if you want to look. Or we can wait for our discussion to
+> settle. I will post it after our discussion.
+ok, lets wait till we finish this discussion
+
+> There is one more problem we need to address. I was going to address late=
+r
+> in v4 or v5.
+>=20
+> This works
+> -numa node,nodeid=3D0,cpus=3D0-3 -numa node,nodeid=3D1,cpus=3D4-7
+>=20
+> This does not work
+> -numa node,nodeid=3D0,cpus=3D0-5 -numa node,nodeid=3D1,cpus=3D6-7
+Is it supposed to work (i.e. can real hardware do such topology)?
+
+> This requires the generic code to pass the node information to the x86
+> code which requires some handler changes. I was thinking my code will
+> simplify the changes to address this issue.
+
+without more information, it's hard to comment on issue and whether
+extra complexity of callbacks is justificated.=20
+
+There could be 2 ways here, add fixes to this series so we could see the re=
+ason
+or make this series simple to solve apic_id problem only and then on top of
+it send the second series that solves another issue.
+
+Considering that this series is already big/complicated enough,
+personally I'd go for 2nd option. As it's easier to describe what patches a=
+re
+doing and easier to review =3D> should result in faster reaching consensus =
+and merging.
+[...]
 
 
