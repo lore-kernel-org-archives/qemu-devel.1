@@ -2,90 +2,83 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB03C3F68F
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0145C352A2
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2A6220702
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC2E5217BA
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 17:25:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vBSthV3Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2A6220702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HZKQbxts"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC2E5217BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izOP2-0001Vz-3i
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 12:23:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38058)
+	id 1izOQp-0004RP-VZ
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 12:25:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41792)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1izOIa-0007se-HS
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:17:13 -0500
+ (envelope-from <eblake@redhat.com>) id 1izOPN-0002gm-6R
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:24:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1izOIZ-0006nD-0V
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:17:12 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38072)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1izOIY-0006g2-NN
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:17:10 -0500
-Received: by mail-wr1-x442.google.com with SMTP id y17so3708981wrh.5
- for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 09:17:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=eSwmQ9XA2bwdY7fVj2P4vxFM2o9VugdkCcmqMvw8Uvk=;
- b=vBSthV3ZD4MVKGnGuvyLazWzQciPrPCI12GGugdBxFC7jIx94G0/CR41Pq4bzm6bQr
- dal+sLntS/Cc8orEYy8hCAYPtqFpphr+3Pc2e2TxI+O/I346N+c8E7VtF1pBx7GQ1wds
- R2nZzICFLNY+xJTvuG7DS5qdmcMlqNJ/Z9MjfhQrHhwJebW9Dh0cVBgp/NSjcnd802P8
- /veR43W3JvrNkY3v/qsm7HAwxZ2W3dYRphEiBTpa6nbSJoE07Fm2OH0qhe7QgmT4apvR
- QuzAlbqh6YRlDmEEPEc0E0dKv6/33dyHaPaEuYGgJY7HBLl3IdM/MqWDLbFxyQcYi1Dy
- P4MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=eSwmQ9XA2bwdY7fVj2P4vxFM2o9VugdkCcmqMvw8Uvk=;
- b=U6QmMcjIFwydS6n6RJ9aVv4rlDOKt+Ietl+GYf+B/Lb6QJSrEm/0agixjsdkyOcrxa
- dOB8iG93+OSlLxD5GlbH+Bn6ILwmdHmSGstg8k1BMc5QsytPrp5pg3PE7v8kB3dFvd5g
- KTMPaTL1DFzT6yJ+8a0QOrKIfAQr2CKpjJ5ztquhYbryPXvmzGHfmNsowsIQ6qc1e6+n
- 5HoL3eePyh8lcbPZHHU4AUntpbWYH1uXrj0dTSQ5+k9cxmoIdArczeI6KTDDuakWY7Fo
- IK8InqbyxibQiPJdpoTHtugGoPC/JFAhNlEM0lPYdg/0wXBZJ/VnVT8bHd44ojVXBvAI
- 1fOQ==
-X-Gm-Message-State: APjAAAXNFbToiiG9jtG720J5AfEgo2Pxo9DAlX9bPCqKn/0Zg7AZx2OL
- Hb6VG5UH4PMDXS1AzhTM/jeVgw==
-X-Google-Smtp-Source: APXvYqyIAVGnEqTfQohXMVYoSxQI7nrtilzN6b+2pTVGivralZPcqjXxEWdtNM4FiFoMUTyde66RvQ==
-X-Received: by 2002:a5d:6692:: with SMTP id l18mr28298324wru.382.1580923029753; 
- Wed, 05 Feb 2020 09:17:09 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a26sm301523wmm.18.2020.02.05.09.17.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 05 Feb 2020 09:17:02 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A1A671FFAB;
- Wed,  5 Feb 2020 17:10:33 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 20/22] tests/tcg/aarch64: add test-sve-ioctl guest-debug
- test
-Date: Wed,  5 Feb 2020 17:10:29 +0000
-Message-Id: <20200205171031.22582-21-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200205171031.22582-1-alex.bennee@linaro.org>
-References: <20200205171031.22582-1-alex.bennee@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1izOPM-0004x3-2z
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:24:13 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56162)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1izOPL-0004uH-Uh
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:24:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580923451;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Py0r0ZEM1kEV3z6f/8ruyMJDdagHM7u0RKM67T+Wqd8=;
+ b=HZKQbxtslDL62G/DCFyraJ/r9tjM8kb481/MJNFAkoiy7OfsigJcmwu9hb8UHAjP8DTqKD
+ e3HlxrjHz2hhWpdOi2VnWP78R5IMC2bFd+WqWoPKnbL+Ck2cuMVT70dN/cm15EQokiZQyt
+ dIRDTr3UnaYXZxALsBO9hpLub+St3II=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-R1WrQRrKM-ewJ9AwmnYzOQ-1; Wed, 05 Feb 2020 12:24:06 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61A8918A7DC4;
+ Wed,  5 Feb 2020 17:24:05 +0000 (UTC)
+Received: from [10.3.116.181] (ovpn-116-181.phx2.redhat.com [10.3.116.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F22055D9E2;
+ Wed,  5 Feb 2020 17:24:04 +0000 (UTC)
+Subject: Re: [PATCH v2 11/33] block: Unify bdrv_child_cb_attach()
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200204170848.614480-1-mreitz@redhat.com>
+ <20200204170848.614480-12-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <f6e6764b-1727-f166-55c5-605f8b1be2b7@redhat.com>
+Date: Wed, 5 Feb 2020 11:24:04 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <20200204170848.614480-12-mreitz@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: R1WrQRrKM-ewJ9AwmnYzOQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,149 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: damien.hedde@greensocs.com, Peter Maydell <peter.maydell@linaro.org>,
- luis.machado@linaro.org, richard.henderson@linaro.org,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, alan.hayward@arm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test exercises the gdbstub while runing the sve-iotcl test. I
-haven't plubmed it into make system as we need a way of verifying if
-gdb has the right support for SVE.
+On 2/4/20 11:08 AM, Max Reitz wrote:
+> Make bdrv_child_cb_attach() call bdrv_backing_attach() for children with
+> a COW role (and drop the reverse call from bdrv_backing_attach()), so it
+> can be used for any child (with a proper role set).
+> 
+> Because so far no child has a proper role set, we need a temporary new
+> callback for child_backing.attach that ensures bdrv_backing_attach() is
+> called for all COW children that do not have their role set yet.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   block.c | 16 +++++++++++++++-
+>   1 file changed, 15 insertions(+), 1 deletion(-)
+> 
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
----
-v4
-  - interrogate ZCR_EL1 directly as no longer have vg
-v5
-  - plumb in
-  - skip if fails to connect
-v6
-  - fix for vg
----
- tests/tcg/aarch64/Makefile.target           | 11 ++-
- tests/tcg/aarch64/gdbstub/test-sve-ioctl.py | 79 +++++++++++++++++++++
- 2 files changed, 88 insertions(+), 2 deletions(-)
- create mode 100644 tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
-
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index c879932ff6c..d99b2a9eced 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -54,15 +54,22 @@ sve-ioctls: CFLAGS+=-march=armv8.1-a+sve
- ifneq ($(HAVE_GDB_BIN),)
- GDB_SCRIPT=$(SRC_PATH)/tests/guest-debug/run-test.py
- 
--AARCH64_TESTS += gdbstub-sysregs
-+AARCH64_TESTS += gdbstub-sysregs gdbstub-sve-ioctls
- 
--.PHONY: gdbstub-sysregs
-+.PHONY: gdbstub-sysregs gdbstub-sve-ioctls
- run-gdbstub-sysregs: sysregs
- 	$(call run-test, $@, $(GDB_SCRIPT) \
- 		--gdb $(HAVE_GDB_BIN) \
- 		--qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
- 		--bin $< --test $(AARCH64_SRC)/gdbstub/test-sve.py, \
- 	"basic gdbstub SVE support")
-+
-+run-gdbstub-sve-ioctls: sve-ioctls
-+	$(call run-test, $@, $(GDB_SCRIPT) \
-+		--gdb $(HAVE_GDB_BIN) \
-+		--qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
-+		--bin $< --test $(AARCH64_SRC)/gdbstub/test-sve-ioctl.py, \
-+	"basic gdbstub SVE ZLEN support")
- endif
- 
- endif
-diff --git a/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py b/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
-new file mode 100644
-index 00000000000..c4425cc9462
---- /dev/null
-+++ b/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
-@@ -0,0 +1,79 @@
-+from __future__ import print_function
-+#
-+# Test the SVE ZReg reports the right amount of data. It uses the
-+# sve-ioctl test and examines the register data each time the
-+# __sve_ld_done breakpoint is hit.
-+#
-+# This is launched via tests/guest-debug/run-test.py
-+#
-+
-+import gdb
-+import sys
-+
-+initial_vlen = 0
-+failcount = 0
-+
-+def report(cond, msg):
-+    "Report success/fail of test"
-+    if cond:
-+        print ("PASS: %s" % (msg))
-+    else:
-+        print ("FAIL: %s" % (msg))
-+        global failcount
-+        failcount += 1
-+
-+class TestBreakpoint(gdb.Breakpoint):
-+    def __init__(self, sym_name="__sve_ld_done"):
-+        super(TestBreakpoint, self).__init__(sym_name)
-+        # self.sym, ok = gdb.lookup_symbol(sym_name)
-+
-+    def stop(self):
-+        val_i = gdb.parse_and_eval('i')
-+        global initial_vlen
-+        for i in range(0, int(val_i)):
-+            val_z = gdb.parse_and_eval("$z0.b.u[%d]" % i)
-+            report(int(val_z) == i, "z0.b.u[%d] == %d" % (i, i))
-+        for i in range(i + 1, initial_vlen):
-+            val_z = gdb.parse_and_eval("$z0.b.u[%d]" % i)
-+            report(int(val_z) == 0, "z0.b.u[%d] == 0" % (i))
-+
-+
-+def run_test():
-+    "Run through the tests one by one"
-+
-+    print ("Setup breakpoint")
-+    bp = TestBreakpoint()
-+
-+    global initial_vlen
-+    vg = gdb.parse_and_eval("$vg")
-+    initial_vlen = int(vg) * 16
-+
-+    gdb.execute("c")
-+
-+#
-+# This runs as the script it sourced (via -x, via run-test.py)
-+#
-+try:
-+    inferior = gdb.selected_inferior()
-+    arch = inferior.architecture()
-+    report(arch.name() == "aarch64", "connected to aarch64")
-+except (gdb.error, AttributeError):
-+    print("SKIPPING (not connected)", file=sys.stderr)
-+    exit(0)
-+
-+try:
-+    # These are not very useful in scripts
-+    gdb.execute("set pagination off")
-+    gdb.execute("set confirm off")
-+
-+    # Run the actual tests
-+    run_test()
-+except:
-+    print ("GDB Exception: %s" % (sys.exc_info()[0]))
-+    failcount += 1
-+    import code
-+    code.InteractiveConsole(locals=globals()).interact()
-+    raise
-+
-+print("All tests complete: %d failures" % failcount)
-+exit(failcount)
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
