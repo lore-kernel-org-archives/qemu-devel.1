@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2087C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 22:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D010C35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 22:48:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DC562082E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 22:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE55D217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 22:48:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PrUz9Ebv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DC562082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nk62To0l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE55D217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izTRR-0003BD-KG
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 17:46:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58139)
+	id 1izTT0-00052c-0v
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 17:48:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57982)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jtomko@redhat.com>) id 1izTQH-0001cF-Dt
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:45:30 -0500
+ (envelope-from <jtomko@redhat.com>) id 1izTQ0-0001IN-AZ
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:45:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jtomko@redhat.com>) id 1izTQG-0002Ud-Dw
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:45:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32547
+ (envelope-from <jtomko@redhat.com>) id 1izTPz-0001ed-Fh
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:45:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59936
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1izTQE-0002Rl-2W
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:45:27 -0500
+ (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1izTPz-0001cr-BJ
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 17:45:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580942725;
+ s=mimecast20190719; t=1580942711;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=T9yosY6UeqpiFEy8Ek2MJ/xWgBGS43g2n3fE9CvX818=;
- b=PrUz9Ebv3CqUYaqhYGP7xxiodq3MXOop3d8BZZamYBpikxbtJUVwwArx6h9TLmCnjZi1O5
- KczCd/nIA7XXL3aem6+XOa7qmUvmZixzXPuuFNyoC+yGwVxw3Zzmil63x6S3fOBg73ZNQa
- Y4guIGGqqSp725AF868Tc452UejqkEQ=
+ bh=I517xhC1v9YIwJ3bqUHEyybJBeC+JH4WPZ5oxc5CMns=;
+ b=Nk62To0lMMPP7+vg/YvmunixnT7TcxwIgdrmAr9B/5ubNsm/gJoVjyITAVRkF3HvfBAVuz
+ MLReb7HJPjxcS8oG7tWZdzOlOZwc01T2EICgOmVcbY326ZqeLfIYGyao7eoLYgRhNXDGqK
+ BwnaQM1TGMnIqh/w1MRGjK9QgqGcGqc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-fZOg21tyPc2zJ00_TqCtuw-1; Wed, 05 Feb 2020 17:45:23 -0500
-X-MC-Unique: fZOg21tyPc2zJ00_TqCtuw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-280-zCMnM3ZrNvaKkt8p9mzGQA-1; Wed, 05 Feb 2020 17:45:06 -0500
+X-MC-Unique: zCMnM3ZrNvaKkt8p9mzGQA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75AA5190D340;
- Wed,  5 Feb 2020 22:45:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FC371007278;
+ Wed,  5 Feb 2020 22:45:05 +0000 (UTC)
 Received: from lpt (ovpn-200-44.brq.redhat.com [10.40.200.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2543410013A1;
- Wed,  5 Feb 2020 22:45:15 +0000 (UTC)
-Date: Wed, 5 Feb 2020 23:45:12 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E575F6E8;
+ Wed,  5 Feb 2020 22:44:57 +0000 (UTC)
+Date: Wed, 5 Feb 2020 23:44:54 +0100
 From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH 3/5] ui/sdl: implement show-cursor option
-Message-ID: <20200205224512.GH31521@lpt>
+Subject: Re: [PATCH 2/5] ui/gtk: implement show-cursor option
+Message-ID: <20200205224454.GG31521@lpt>
 References: <20200205110356.3491-1-kraxel@redhat.com>
- <20200205110356.3491-4-kraxel@redhat.com>
+ <20200205110356.3491-3-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200205110356.3491-4-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200205110356.3491-3-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="uJrvpPjGB3z5kYrA"
+ protocol="application/pgp-signature"; boundary="MrRUTeZlqqNo1jQ9"
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -92,37 +92,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---uJrvpPjGB3z5kYrA
+--MrRUTeZlqqNo1jQ9
 Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 05, 2020 at 12:03:54PM +0100, Gerd Hoffmann wrote:
+On Wed, Feb 05, 2020 at 12:03:53PM +0100, Gerd Hoffmann wrote:
 >Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 >---
-> ui/sdl2.c | 28 ++++++++++++++++++++--------
-> 1 file changed, 20 insertions(+), 8 deletions(-)
+> ui/gtk.c | 8 +++++++-
+> 1 file changed, 7 insertions(+), 1 deletion(-)
 >
 
 Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
 
 Jano
 
---uJrvpPjGB3z5kYrA
+--MrRUTeZlqqNo1jQ9
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl47RXgACgkQ+YPwO/Ma
-t50LAQf+OGv9cW4901yB20F4YIFkanpQ2Bp0kYF7sIQOSGmGQ9vC3WharUPCmep7
-b4AugDNBNQmZX8V1I2lDjkpY37U4GczVJZA6dSvo/4oT42MZhM8bhIrY0DvVtNJx
-3xnXLbauTYwN51xvZOkuGBruvCQpd3v7xjSjmhLWIPT5W0wqlWWSA4F6Owfxzkmx
-x/0OSxjTuruETQW6pmxJbF9rI5LY493zNNVvVWegmJUDV+uGfoKhU8uNxVZ50XQu
-7QdcQTKUkCxEuygoILzBMY1Ybn/Nya3Vx9REV9XFGPd+rbAySzdT2O/IH/MQkGA1
-9deZEJ3/rvRcLopc5/lKN6DW8cpiGw==
-=6ATx
+iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl47RWYACgkQ+YPwO/Ma
+t51ligf/WpyYsQz14yQ3a2IHIag8sY/XDvL80WUyAQZpENJIa4+uU40yB5Y7nhIz
+jX2/Pc+xo2RAmoEe1t5prbqtXshlZlBoKQL6VUEB2ZM7jFsQsCI7Lip+v11v/Pyr
+2VHEm2UuWj2/poiF6WlwsGGBDEIhz4pVwDfFmn+0GbMKwDdsO8+QbOpCpNbljNOs
+e4wgfcl21vDUwy1M1e9BYvhKFETG6vz/FHEJlchyjedcWIcImhg9liNf7dQp5i9e
+Fk6ajuOiuW7ABk0oSuC5roz9StzUqIF4rHfSXr4paIQ88pOTBWAzZat3IxSniXQA
+zspvZvWDbN6bt2/PxVxECj8Kl3KEjQ==
+=1ZLf
 -----END PGP SIGNATURE-----
 
---uJrvpPjGB3z5kYrA--
+--MrRUTeZlqqNo1jQ9--
 
 
