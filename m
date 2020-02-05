@@ -2,121 +2,128 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B9BDC33CA1
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 09:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5743C33CA1
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 09:44:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 370BE2082E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 09:42:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80B212082E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 09:44:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Y+KgpVgu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 370BE2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=partner.samsung.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="rqUiMfhE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80B212082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izHCO-0003E7-Ck
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 04:42:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49977)
+	id 1izHEH-0004YS-M7
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 04:44:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izH3l-0000rB-Ki
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:33:31 -0500
+ (envelope-from <felipe@nutanix.com>) id 1izHDL-0003l9-GX
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:43:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izH3e-0004yP-Bg
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:33:25 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:38014)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izH3d-0004eN-UJ
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:33:18 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
- by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id
- 20200205093316euoutp018d0905840addc411a8378a5753466920~wd84PqF6U2272522725euoutp01w
- for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 09:33:16 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com
- 20200205093316euoutp018d0905840addc411a8378a5753466920~wd84PqF6U2272522725euoutp01w
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1580895196;
- bh=eA2VRTKHri+EcLrE9E0xX8BQK07jxM4QOEd083wQnCQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Y+KgpVguNSLTQgM8+JaXqB6Dmb+rMSH3Z7yEhv4akMR29AqGSVDZdnWHjTC9aCPT0
- D5Ybve+0DxcwYhbvgzICA74108TmlymgDZJTJV9COAl7XsVTOtc/PDED47LM6XBAHI
- DQl+FjoyKfVP04Y96+lP/jYO8dcEV5CP4ua8dhmg=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTP id
- 20200205093315eucas1p161b8aae2796f4857b0700c26d1920f6a~wd84Db7-u3063030630eucas1p1c;
- Wed,  5 Feb 2020 09:33:15 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
- eusmges2new.samsung.com (EUCPMTA) with SMTP id FD.39.60679.BDB8A3E5; Wed,  5
- Feb 2020 09:33:15 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
- 20200205093315eucas1p19f8f9a40b48b8917d5e2cd6c8a4f010e~wd83xBSFE3269132691eucas1p1a;
- Wed,  5 Feb 2020 09:33:15 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
- eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
- 20200205093315eusmtrp1020e979679240f3da540b84ac15a7a20~wd83wixEX1029010290eusmtrp1Y;
- Wed,  5 Feb 2020 09:33:15 +0000 (GMT)
-X-AuditID: cbfec7f4-0e5ff7000001ed07-96-5e3a8bdb0371
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
- eusmgms1.samsung.com (EUCPMTA) with SMTP id 5E.8D.08375.BDB8A3E5; Wed,  5
- Feb 2020 09:33:15 +0000 (GMT)
-Received: from AMDC3304.digital.local (unknown [106.120.51.21]) by
- eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
- 20200205093315eusmtip230fdffe31af0b2cabcf8d54bd59f8e7a~wd83b05cg0072900729eusmtip2M;
- Wed,  5 Feb 2020 09:33:15 +0000 (GMT)
-From: i.kotrasinsk@partner.samsung.com
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 5/9] hw/misc/memexpose: Add core memexpose files
-Date: Wed,  5 Feb 2020 10:33:01 +0100
-Message-Id: <1580895185-24341-6-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1580895185-24341-1-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrJIsWRmVeSWpSXmKPExsWy7djP87q3u63iDPafNbbYc+Exm8X+bf9Y
- LeacecBicbx3B4sDi8eda3vYPJ5c28zkcfDdHiaP9/uusgWwRHHZpKTmZJalFunbJXBlbD5w
- lqWg9RRTxburnxgbGFs/MXYxcnJICJhILN//lRnEFhJYwSixaGcZhP2FUeL0Ee8uRi4g+zOj
- RM/zX0wwDcenzWWBSCxnlNi/5i0jhAPUcfPkTjaQKjYBNYmdRz6DrRARkJT43XUabAWzQIbE
- 81ndYLawgLvEuwnfwaayCKhKvJzzEayeVyBAYsHXBhaIbXISN891gtVzCgRKbPr0kQ1kmYTA
- ZTaJYzu+Qp3kIvFv+TU2CFtY4tXxLewQtozE6ck9UIPqJVru7GCCaO5glOhbOR2qwVriy4al
- QEUcQNdpSqzfpQ8RdpQ4tfYfI0hYQoBP4sZbQYj7+SQmbZvODBHmlehoE4Ko1pPofnKTCWbr
- ssZHUFs9JPrXLmKDhM8SRomjP96yTmCUn4WwbAEj4ypG8dTS4tz01GKjvNRyveLE3OLSvHS9
- 5PzcTYzABHD63/EvOxh3/Uk6xCjAwajEw7tikmWcEGtiWXFl7iFGCQ5mJRHe8/pAId6UxMqq
- 1KL8+KLSnNTiQ4zSHCxK4rzGi17GCgmkJ5akZqemFqQWwWSZODilGhhjlqzucbnO1GrG9rS3
- NDfxbFl6+Lx/DEkbN9lfnr7LiPv6y8y+3oI0t4jgXvmlz7rYZS0XPSgQLBJhqliiH/TlQ1vH
- VNk7bxK9EiOaKjMsln4LZoqPaTbYU/rx5uL0XB/mSRpPjEJtS6brVTVfzig98fJrXBfnz2TX
- /UK+IYV/P8+919PSrMRSnJFoqMVcVJwIALvvzVr8AgAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrDLMWRmVeSWpSXmKPExsVy+t/xe7q3u63iDJpXKVnsufCYzWL/tn+s
- FnPOPGCxON67g8WBxePOtT1sHk+ubWbyOPhuD5PH+31X2QJYovRsivJLS1IVMvKLS2yVog0t
- jPQMLS30jEws9QyNzWOtjEyV9O1sUlJzMstSi/TtEvQyNh84y1LQeoqp4t3VT4wNjK2fGLsY
- OTkkBEwkjk+by9LFyMUhJLCUUeLGw19MEAkZiR+n17BB2MISf651sUEUfWKU2LdyDjNIgk1A
- TWLnkc9gk0QEJCV+d50GizMLZEnsnH0fbJCwgLvEuwnfwWwWAVWJl3M+gtXzCgRILPjawAKx
- QE7i5rlOsF5OgUCJTZ8+gi0WAqq59vUr6wRGvgWMDKsYRVJLi3PTc4sN9YoTc4tL89L1kvNz
- NzECQ3LbsZ+bdzBe2hh8iFGAg1GJh3fFJMs4IdbEsuLK3EOMEhzMSiK85/WBQrwpiZVVqUX5
- 8UWlOanFhxhNgY6ayCwlmpwPjJe8knhDU0NzC0tDc2NzYzMLJXHeDoGDMUIC6YklqdmpqQWp
- RTB9TBycUg2M85OE+Db8iDK8Km4QtU5XWPSHXu/PlbPfMJvwd5UkM2YvmDrhf8tZod+MM2yk
- 2LdwrC3I3j1z706/xVc9g9xvCpY+vG3h8YunJIDrA/c8xZRMd77Yf0aX40IdJv3uSfPkOTqR
- qX4Gw2xWvo1Tm63lT731ePi7WfmSu8JuQZdpu5aLzuu8O/2dEktxRqKhFnNRcSIAUMnCFV8C
- AAA=
-X-CMS-MailID: 20200205093315eucas1p19f8f9a40b48b8917d5e2cd6c8a4f010e
-X-Msg-Generator: CA
+ (envelope-from <felipe@nutanix.com>) id 1izHDI-00086T-7o
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:43:18 -0500
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:9100)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1izHDI-00083j-05
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 04:43:16 -0500
+Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0159dRVi031288; Wed, 5 Feb 2020 01:43:14 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=9oaL2ajpCZ5fZe83rvGHuMj46uHjuckMD70a+IS6Uuo=;
+ b=rqUiMfhEfvKfFtgR5JWzvlFlZqbDfVJUUBUsdLHgRtOklOxne5YHder6P4s1VmEU+fLS
+ hEb6WnEtWp/7hrJqTbRLEognlC7Ezjs+sHA6Yw2V03lxUjdFvzqJdX44pOYhU1hOYN5v
+ ipo34Ux9xehtuIJDlETxAb0QfKaiOyVEYTUQSJJLlBwNUvGFEmN1d3IhuLrohcihVasP
+ ZxCss/8CMomdO1S9mLMChCS/AHcXXW8wj61b5a0+wpi6YM5C4PzTCQeVi8eK+IzKVs5U
+ OGv+94ybq8FxE/0RhkNEVqDCK1NlhyU4ivD93lwkqzbOFEaWq7MRgu6Ujbt6j7WB0Vmb JQ== 
+Received: from nam02-cy1-obe.outbound.protection.outlook.com
+ (mail-cys01nam02lp2059.outbound.protection.outlook.com [104.47.37.59])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 2xyhprs61p-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 05 Feb 2020 01:43:14 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ILcbHsv2jZ8vq7fMcW/gZrPSZhCJ1dyVO1A+mESMqS5QE43dcsHJZGh9nowjdeBjyD5kQOFk/re34nm8YIRj9jMYIMDhYteLCBJA0C/U/4OmsCdB2Jx1HgOl0iSOS0WFU0Oza0YoA47VpsT3w0Pt8k14ZcRNn1/KltupYYbzOO/BHrqktZf+JxrS5Kh91Z+wtm0suwLFmtspl2ra8Nl/i4YC2R/5Ac9JEbOOj2EkKXfToDrPT17DXJsFGE1xtz/+gUKjEMsBT1HmfX3OIetnpINUPxGGQ7I4UPtxlrAz0uiHmZrmDjGNGhA5V4EWrhS2r0gL6ljXgFjWhlyXzNderw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9oaL2ajpCZ5fZe83rvGHuMj46uHjuckMD70a+IS6Uuo=;
+ b=cgDGIAlGeGIguplr93Ce9h9IAnNnFI3/bMGfPfF+UVwrdcA8oilVrFeelOAMmhOagmFqMEqC0NjdxJYyVgRsFP1PpQCDKFHmDqkkxVrAYbXFihG0dCXG+yIptT5rExB7O+4xyjlipnklFm1GyE9OkS8l1/MJNW23TGDgyj8nR1K44ulaehGJ6AxbtQg6WDhzpigwZXO/o+e+AbiQ6P36eZ+rEt2e4PxpU984yJIBxjIQ44t02gO1DBDQaH0Kcc+IQPO2+EK9ft1mjtPbM3+ujrYdcEUAa1nDZgtRvD4Jz3y7qqe003dEim2pAP9nbWMj2Lj0+8sZFOEzex8HlMgrDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from BN6PR02MB2643.namprd02.prod.outlook.com (10.173.145.9) by
+ BN6PR02MB2547.namprd02.prod.outlook.com (10.173.146.16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.27; Wed, 5 Feb 2020 09:43:11 +0000
+Received: from BN6PR02MB2643.namprd02.prod.outlook.com
+ ([fe80::8401:9618:837d:d44b]) by BN6PR02MB2643.namprd02.prod.outlook.com
+ ([fe80::8401:9618:837d:d44b%10]) with mapi id 15.20.2686.035; Wed, 5 Feb 2020
+ 09:43:10 +0000
+From: Felipe Franciosi <felipe@nutanix.com>
+To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH] fence: introduce a file-based self-fence mechanism
+Thread-Topic: [PATCH] fence: introduce a file-based self-fence mechanism
+Thread-Index: AQHVo6tgK6WTpsMO9UiL0xGIoXZMRqedTvsAgA5YhgCAYSKCAA==
+Date: Wed, 5 Feb 2020 09:43:10 +0000
+Message-ID: <67218E46-460D-47C6-833E-FAA4709DE63A@nutanix.com>
+References: <20191125161356.108054-1-felipe@nutanix.com>
+ <CAJ+F1CJP_+bcAMgFFv4nS9wNZcAAsT7BTHcyiLFr0yfF0j8XHw@mail.gmail.com>
+ <D503A2EF-70B6-4C9E-A0DB-889C915F1977@nutanix.com>
+In-Reply-To: <D503A2EF-70B6-4C9E-A0DB-889C915F1977@nutanix.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [62.254.189.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d8af1a1f-86f1-4212-ba3f-08d7aa1fd030
+x-ms-traffictypediagnostic: BN6PR02MB2547:
+x-microsoft-antispam-prvs: <BN6PR02MB2547A6FE661F14F3BA7C1A2CD7020@BN6PR02MB2547.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:346;
+x-forefront-prvs: 0304E36CA3
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39860400002)(396003)(136003)(376002)(366004)(346002)(189003)(199004)(478600001)(2906002)(26005)(2616005)(30864003)(186003)(54906003)(36756003)(6486002)(316002)(81166006)(71200400001)(6506007)(91956017)(53546011)(6916009)(81156014)(8676002)(5660300002)(86362001)(8936002)(4326008)(66946007)(64756008)(66476007)(76116006)(66556008)(6512007)(66446008)(33656002)(2004002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR02MB2547;
+ H:BN6PR02MB2643.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0XHNNn0OeEXPj/fgzoNfik3UaW5B4P5llNZRHJ2HpspAtA57zWjFeVtMc23Ai9aC3qWWzsUbE62iYS9WzvtpHmnjm3j8ZS2cjHWIGGgq4ghiT/zvhvseQ1Ch4Lme1w9/EmcN3cfekkN34yBuo2FdYjEckHgsBLhbcVVzIf36CrrAY8TQtBe7I8dzST5qcmb1XpvuZlAXs2aFj3KyC4s1XvZh+Pzux1fSz88WbD+Q73bmfQkjIbxizsvd/OM+z9T6iea7ZezwFcoCpIMw42+K8RDDGS22RhpIwB+vXdl7i+pYiGkJ3KqxXYJZR0/FVUE7LKkXaFPnNvLGEAj3JlOFfrpSJN3BvuhWil/5QIWQPB6avv+xcBUyvmpK0JmgpZs02GHrspBVyRHMMog9KSCfoGckEeOG8cGCUKN/kpcj7xrXQDyzN144G84nJsdRjuamyXJKo+KMXG2nbOERC10zTdkLa+KYW48aWaFbNlok/scWZ8QXrKMmhAZVekIWSNQ6CAtDIsYZLwyACJNHxIOUgU5W01MvFYEkgEIxtLFQkcRR9OxzJl+/KoOVwMi+2wxT
+x-ms-exchange-antispam-messagedata: mr4zwydpY2SMKuUy0JbxsP0A3ykc+WZCcMhf1SR6Crpy5+JVTU280tY/Ev8Tkv5RqYahgaEyuDxCec6muWgJwFJTopplKAcMZmk3Vs8CquulNZ4/wJ1zFaPzVr7R4GdO/fIW2zuJ5pSUPazAIpCRFw==
+x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200205093315eucas1p19f8f9a40b48b8917d5e2cd6c8a4f010e
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20200205093315eucas1p19f8f9a40b48b8917d5e2cd6c8a4f010e
-References: <1580895185-24341-1-git-send-email-i.kotrasinsk@partner.samsung.com>
- <CGME20200205093315eucas1p19f8f9a40b48b8917d5e2cd6c8a4f010e@eucas1p1.samsung.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 210.118.77.11
+Content-ID: <60BDD3CBCDC1DE45AF9CEBDC72B6B50F@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d8af1a1f-86f1-4212-ba3f-08d7aa1fd030
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Feb 2020 09:43:10.8387 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kUBzVynE34GDIim514wik8rz3FDdAtFX0HmXLIAsxiwVwjC1ilbQ0DoUffSIe6O1/clWkEOY8ijMGsi6H3zdjw1M7nek3ePo7OFHmvPtUtk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR02MB2547
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-05_02:2020-02-04,
+ 2020-02-05 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,1328 +135,351 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>, pbonzini@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>,
+ "Dr . David
+ Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
-
-Signed-off-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
----
- Kconfig.host                       |   3 +
- MAINTAINERS                        |   4 +
- Makefile                           |   1 +
- configure                          |   8 +
- hw/mem/Kconfig                     |   3 +
- hw/misc/Makefile.objs              |   1 +
- hw/misc/memexpose/Makefile.objs    |   2 +
- hw/misc/memexpose/memexpose-core.c | 630 +++++++++++++++++++++++++++++++++++++
- hw/misc/memexpose/memexpose-core.h | 109 +++++++
- hw/misc/memexpose/memexpose-msg.c  | 261 +++++++++++++++
- hw/misc/memexpose/memexpose-msg.h  | 161 ++++++++++
- 11 files changed, 1183 insertions(+)
- create mode 100644 hw/misc/memexpose/Makefile.objs
- create mode 100644 hw/misc/memexpose/memexpose-core.c
- create mode 100644 hw/misc/memexpose/memexpose-core.h
- create mode 100644 hw/misc/memexpose/memexpose-msg.c
- create mode 100644 hw/misc/memexpose/memexpose-msg.h
-
-diff --git a/Kconfig.host b/Kconfig.host
-index 55136e0..7470210 100644
---- a/Kconfig.host
-+++ b/Kconfig.host
-@@ -20,6 +20,9 @@ config SPICE
- config IVSHMEM
-     bool
- 
-+config MEMEXPOSE
-+    bool
-+
- config TPM
-     bool
- 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 73dd571..7c98fef 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1643,6 +1643,10 @@ memexpose
- M: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
- S: Maintained
- F: docs/specs/memexpose-spec.txt
-+F: hw/misc/memexpose/memexpose-core.h
-+F: hw/misc/memexpose/memexpose-core.c
-+F: hw/misc/memexpose/memexpose-msg.h
-+F: hw/misc/memexpose/memexpose-msg.c
- 
- nvme
- M: Keith Busch <keith.busch@intel.com>
-diff --git a/Makefile b/Makefile
-index 461d40b..82e7259 100644
---- a/Makefile
-+++ b/Makefile
-@@ -387,6 +387,7 @@ MINIKCONF_ARGS = \
-     CONFIG_KVM=$(CONFIG_KVM) \
-     CONFIG_SPICE=$(CONFIG_SPICE) \
-     CONFIG_IVSHMEM=$(CONFIG_IVSHMEM) \
-+    CONFIG_MEMEXPOSE=$(CONFIG_MEMEXPOSE) \
-     CONFIG_TPM=$(CONFIG_TPM) \
-     CONFIG_XEN=$(CONFIG_XEN) \
-     CONFIG_OPENGL=$(CONFIG_OPENGL) \
-diff --git a/configure b/configure
-index 115dc38..9c63c21 100755
---- a/configure
-+++ b/configure
-@@ -505,6 +505,7 @@ debug_mutex="no"
- libpmem=""
- default_devices="yes"
- plugins="no"
-+memexpose="no"
- 
- supported_cpu="no"
- supported_os="no"
-@@ -1020,6 +1021,10 @@ for opt do
-   ;;
-   --without-default-devices) default_devices="no"
-   ;;
-+  --enable-memexpose) memexpose="yes"
-+  ;;
-+  --disable-memexpose) memexpose="no"
-+  ;;
-   --enable-gprof) gprof="yes"
-   ;;
-   --enable-gcov) gcov="yes"
-@@ -7400,6 +7405,9 @@ fi
- if test "$ivshmem" = "yes" ; then
-   echo "CONFIG_IVSHMEM=y" >> $config_host_mak
- fi
-+if test "$memexpose" = "yes" ; then
-+  echo "CONFIG_MEMEXPOSE=y" >> $config_host_mak
-+fi
- if test "$capstone" != "no" ; then
-   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
- fi
-diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
-index 620fd4c..e377b05 100644
---- a/hw/mem/Kconfig
-+++ b/hw/mem/Kconfig
-@@ -5,6 +5,9 @@ config DIMM
- config MEM_DEVICE
-     bool
- 
-+config MEM_EXPOSE
-+    bool
-+
- config NVDIMM
-     bool
-     default y
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index da993f4..7e9a692 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -27,6 +27,7 @@ common-obj-$(CONFIG_PUV3) += puv3_pm.o
- common-obj-$(CONFIG_MACIO) += macio/
- 
- common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
-+common-obj-$(CONFIG_MEMEXPOSE) += memexpose/
- 
- common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- common-obj-$(CONFIG_NSERIES) += cbus.o
-diff --git a/hw/misc/memexpose/Makefile.objs b/hw/misc/memexpose/Makefile.objs
-new file mode 100644
-index 0000000..f405fe7
---- /dev/null
-+++ b/hw/misc/memexpose/Makefile.objs
-@@ -0,0 +1,2 @@
-+common-obj-y += memexpose-msg.o
-+common-obj-y += memexpose-core.o
-diff --git a/hw/misc/memexpose/memexpose-core.c b/hw/misc/memexpose/memexpose-core.c
-new file mode 100644
-index 0000000..3b6ef3c
---- /dev/null
-+++ b/hw/misc/memexpose/memexpose-core.c
-@@ -0,0 +1,630 @@
-+/*
-+ *  Memexpose core
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "memexpose-core.h"
-+#include "exec/address-spaces.h"
-+#include "exec/cpu-common.h"
-+
-+static int memexpose_pop_intr(MemexposeIntr *s)
-+{
-+    if (s->queue_count == 0) {
-+        MEMEXPOSE_DPRINTF("No queued interrupts\n");
-+        return 0;
-+    }
-+    struct memexpose_op_intr *head = &s->intr_queue[s->queue_start];
-+    s->intr_rx = *head;
-+    s->queue_start = (s->queue_start + 1) % MEMEXPOSE_INTR_QUEUE_SIZE;
-+    s->queue_count--;
-+
-+    if (!s->queue_count) {
-+        s->ops.intr(s->ops.parent, 0);
-+    }
-+    MEMEXPOSE_DPRINTF("Popped interrupt %lx\n", s->intr_rx.type);
-+    return 1;
-+}
-+
-+static void memexpose_push_intr(MemexposeIntr *s, struct memexpose_op_intr *msg)
-+{
-+    int signal = 0, free_slot;
-+
-+    if (s->queue_count == MEMEXPOSE_INTR_QUEUE_SIZE) {
-+        MEMEXPOSE_DPRINTF("Interrupt queue is already full!\n");
-+        return;
-+    }
-+    free_slot = (s->queue_start + s->queue_count) % MEMEXPOSE_INTR_QUEUE_SIZE;
-+    s->intr_queue[free_slot] = *msg;
-+    if (!s->queue_count) {
-+        signal = 1;
-+    }
-+    s->queue_count++;
-+
-+    if (signal) {
-+        s->ops.intr(s->ops.parent, 1);
-+    }
-+}
-+
-+static void process_intr(void *opaque, struct memexpose_op *op, Error **err)
-+{
-+    MemexposeIntr *s = opaque;
-+    switch (op->head.ot) {
-+    case MOP_INTR:
-+        memexpose_push_intr(s, &op->body.intr);
-+        break;
-+    default:
-+        error_setg(err, "Unknown memexpose intr command %u", op->head.ot);
-+    }
-+}
-+
-+static void memexpose_send_intr(MemexposeIntr *s)
-+{
-+    struct memexpose_op msg;
-+
-+    msg.head.ot = MOP_INTR;
-+    msg.head.size = sizeof(msg.head) + sizeof(msg.body.intr);
-+    msg.head.prio = 0;
-+    msg.body.intr = s->intr_tx;
-+    memexpose_ep_write_async(&s->ep, &msg);
-+    MEMEXPOSE_DPRINTF("Sending interrupt %lx\n", msg.body.intr.type);
-+}
-+
-+#define IN_INTR_DATA_RANGE(a, s, r) \
-+    (a >= r && \
-+     a < r + MEMEXPOSE_MAX_INTR_DATA_SIZE && \
-+     (s = MIN(s, r + MEMEXPOSE_MAX_INTR_DATA_SIZE - a), 1))
-+
-+static uint64_t memexpose_intr_read(void *opaque, hwaddr addr,
-+                                    unsigned size)
-+{
-+    MemexposeIntr *s = opaque;
-+    uint64_t ret = 0;
-+    unsigned int boff = 8 * (addr & 0x7);
-+
-+    switch (addr & (~0x7)) {
-+    case MEMEXPOSE_INTR_RX_TYPE_ADDR:
-+        ret = s->intr_rx.type;
-+        ret >>= boff;
-+        return ret;
-+    case MEMEXPOSE_INTR_TX_TYPE_ADDR:
-+        ret = s->intr_tx.type;
-+        ret >>= boff;
-+        return ret;
-+    case MEMEXPOSE_INTR_RECV_ADDR:
-+        /* Make multiple read calls in readq and such behave as expected */
-+        if (addr & 0x7) {
-+            return 0;
-+        }
-+
-+        ret = memexpose_pop_intr(s);
-+        return ret;
-+    case MEMEXPOSE_INTR_ENABLE_ADDR:
-+        if (addr & 0x7) {
-+            return 0;
-+        }
-+        return s->enabled;
-+    default:
-+        break;
-+    }
-+
-+    if (IN_INTR_DATA_RANGE(addr, size, MEMEXPOSE_INTR_RX_DATA_ADDR)) {
-+        uint64_t off = addr - MEMEXPOSE_INTR_RX_DATA_ADDR;
-+        memcpy(&ret, s->intr_rx.data + off, size);
-+        return ret;
-+    } else if (IN_INTR_DATA_RANGE(addr, size, MEMEXPOSE_INTR_TX_DATA_ADDR)) {
-+        uint64_t off = addr - MEMEXPOSE_INTR_TX_DATA_ADDR;
-+        memcpy(&ret, s->intr_tx.data + off, size);
-+        return ret;
-+    } else {
-+        MEMEXPOSE_DPRINTF("Invalid mmio read at " TARGET_FMT_plx "\n", addr);
-+        ret = 0;
-+        return ret;
-+    }
-+}
-+
-+static void memexpose_intr_write(void *opaque, hwaddr addr,
-+                                 uint64_t val, unsigned size)
-+{
-+    MemexposeIntr *s = opaque;
-+    unsigned int boff = 8 * (addr & 0x7);
-+    uint64_t mask = ((1LL << (size * 8)) - 1) << boff;
-+
-+    switch (addr & (~0x7)) {
-+    case MEMEXPOSE_INTR_RX_TYPE_ADDR:
-+        s->intr_rx.type &= ~mask;
-+        s->intr_rx.type |= (val << boff);
-+        return;
-+    case MEMEXPOSE_INTR_TX_TYPE_ADDR:
-+        s->intr_tx.type &= ~mask;
-+        s->intr_tx.type |= (val << boff);
-+        return;
-+    case MEMEXPOSE_INTR_SEND_ADDR:
-+        /* Make multiple write calls in writeq and such behave as expected */
-+        if (addr & 0x7) {
-+            return;
-+        }
-+        memexpose_send_intr(s);
-+        return;
-+    case MEMEXPOSE_INTR_ENABLE_ADDR:
-+        if (addr & 0x7) {
-+            return;
-+        }
-+        if (val) {
-+            if (s->ops.enable) {
-+                s->enabled = s->ops.enable(s->ops.parent) ? 0 : 1;
-+            } else {
-+                s->enabled = 1;
-+            }
-+        } else {
-+            if (s->ops.disable) {
-+                s->ops.disable(s->ops.parent);
-+            }
-+            s->enabled = 0;
-+        }
-+        return;
-+    }
-+
-+    if (IN_INTR_DATA_RANGE(addr, size, MEMEXPOSE_INTR_RX_DATA_ADDR)) {
-+        uint64_t off = addr - MEMEXPOSE_INTR_RX_DATA_ADDR;
-+        memcpy(s->intr_rx.data + off, &val, size);
-+    } else if (IN_INTR_DATA_RANGE(addr, size, MEMEXPOSE_INTR_TX_DATA_ADDR)) {
-+        uint64_t off = addr - MEMEXPOSE_INTR_TX_DATA_ADDR;
-+        memcpy(s->intr_tx.data + off, &val, size);
-+    } else {
-+        MEMEXPOSE_DPRINTF("Invalid mmio write at " TARGET_FMT_plx "\n", addr);
-+    }
-+}
-+
-+static const MemoryRegionOps memexpose_intr_ops = {
-+    .read = memexpose_intr_read,
-+    .write = memexpose_intr_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+void memexpose_intr_init(MemexposeIntr *s, struct memexpose_intr_ops *ops,
-+                         Object *parent, CharBackend *chr, Error **errp)
-+{
-+    if (!qemu_chr_fe_backend_connected(chr)) {
-+        error_setg(errp, "You must specify a 'intr_chardev'");
-+        return;
-+    }
-+
-+    s->parent = parent;
-+    s->ops = *ops;
-+    s->enabled = 0;
-+    s->queue_start = 0;
-+    s->queue_count = 0;
-+    memexpose_ep_init(&s->ep, chr, s, 0, process_intr);
-+    s->ep.is_async = true;
-+    memory_region_init_io(&s->shmem, parent, &memexpose_intr_ops, s,
-+                          "memexpose-intr", MEMEXPOSE_INTR_MEM_SIZE);
-+}
-+
-+int memexpose_intr_enable(MemexposeIntr *s)
-+{
-+    return memexpose_ep_connect(&s->ep);
-+}
-+
-+void memexpose_intr_disable(MemexposeIntr *s)
-+{
-+    memexpose_ep_disconnect(&s->ep);
-+}
-+
-+void memexpose_intr_destroy(MemexposeIntr *s)
-+{
-+    memexpose_intr_disable(s);
-+    /* Region will be collected with its parent */
-+    memexpose_ep_destroy(&s->ep);
-+}
-+
-+static bool memshare_region_overlaps(MemexposeMem *s,
-+                                     struct memexpose_memshare_info_fd *share)
-+{
-+    MemexposeRemoteMemory *mem;
-+    QLIST_FOREACH(mem, &s->remote_regions, list) {
-+        uint64_t start = memory_region_get_ram_addr(&mem->region);
-+        uint64_t size = memory_region_size(&mem->region);
-+        MEMEXPOSE_DPRINTF("Comparing regions: received %"PRIx64"-%"PRIx64", "\
-+                          "current mapped %"PRIx64"-%"PRIx64"\n",
-+                          share->start, share->start + share->size,
-+                          start, start + size);
-+        if (start < share->start + share->size ||
-+            share->start < start + size)
-+            return true;
-+    }
-+    return false;
-+}
-+
-+static void memshare_add_region(MemexposeMem *s, int fd,
-+                                struct memexpose_memshare_info_fd *share,
-+                                Error **errp)
-+{
-+    if (share->start >= s->shmem_size) {
-+        /* TODO - error out */
-+        MEMEXPOSE_DPRINTF("Shared memory start too high: "
-+                          "%" PRIx64 " >= %" PRIx64,
-+                          share->start, s->shmem_size);
-+        close(fd);
-+        return;
-+    }
-+
-+    if (memshare_region_overlaps(s, share)) {
-+        /* TODO - error out */
-+        MEMEXPOSE_DPRINTF("Shared memory %" PRIx64 "-%" PRIx64
-+                          " overlaps with existing region",
-+                          share->start, share->start + share->size);
-+        close(fd);
-+        return;
-+    }
-+
-+    uint64_t clamped_size = s->shmem_size - share->start;
-+    share->size = MIN(share->size, clamped_size);
-+
-+    MemexposeRemoteMemory *mem = g_malloc(sizeof(*mem));
-+    char *rname = g_strdup_printf("Memexpose shmem "
-+                                  "%" PRIx64 "-%" PRIx64" -> %" PRIx64,
-+                                  share->start, share->start + share->size,
-+                                  share->mmap_start);
-+
-+    MEMEXPOSE_DPRINTF("Mapping remote memory: %" PRIx64 \
-+                      "-%" PRIx64 ", fd offset %" PRIx64 "\n",
-+                      share->start, share->size, share->mmap_start);
-+
-+    memory_region_init_ram_from_fd(&mem->region, s->parent, rname,
-+                                   share->size, share->mmap_start,
-+                                   true, fd, errp);
-+    if (*errp) {
-+        error_report_err(*errp);
-+        close(fd);
-+        return;
-+    }
-+
-+    memory_region_set_nonvolatile(&mem->region, share->nonvolatile);
-+    memory_region_set_readonly(&mem->region, share->readonly);
-+    g_free(rname);
-+    memory_region_add_subregion_overlap(&s->shmem, share->start,
-+                                        &mem->region, 1);
-+    QLIST_INSERT_HEAD(&s->remote_regions, mem, list);
-+}
-+
-+static void memshare_remove_region(MemexposeMem *s, MemexposeRemoteMemory *reg)
-+{
-+    /* TODO is this correct? Docs warn about leaked refcounts */
-+    QLIST_REMOVE(reg, list);
-+    memory_region_del_subregion(&s->shmem, &reg->region);
-+    object_unparent(OBJECT(&reg->region));
-+}
-+
-+static void memshare_handle(MemexposeMem *s,
-+                            struct memexpose_memshare_info *share)
-+{
-+    int fd;
-+    switch (share->type) {
-+    case MEMSHARE_NONE:
-+        return;
-+    case MEMSHARE_FD:
-+        fd = memexpose_ep_recv_fd(&s->ep);
-+        MEMEXPOSE_DPRINTF("Received memshare fd: %d\n", fd);
-+        if (s->pending_invalidation) {
-+            close(fd);
-+            return;
-+        }
-+        Error *err = NULL;
-+        memshare_add_region(s, fd, &share->fd, &err); /* TODO - handle errors */
-+        return;
-+    default:
-+        MEMEXPOSE_DPRINTF("Invalid memshare type: %u\n", share->type);
-+        return;
-+    }
-+}
-+
-+static MemTxResult memexpose_read_slow(void *opaque, hwaddr addr,
-+                                       uint64_t *data, unsigned size,
-+                                       MemTxAttrs attrs)
-+{
-+    MemexposeMem *s = opaque;
-+
-+    struct memexpose_op msg;
-+    msg.head.size = sizeof(msg.head) + sizeof(msg.body.read);
-+    msg.head.ot = MOP_READ;
-+    msg.head.prio = memexpose_ep_msg_prio(&s->ep, msg.head.ot);
-+    msg.body.read.offset = addr;
-+    msg.body.read.size = size;
-+    memexpose_ep_write_sync(&s->ep, &msg);
-+
-+    MemTxResult res = msg.body.read_ret.ret;
-+    if (res == MEMTX_OK) {
-+        memshare_handle(s, &msg.body.read_ret.share);
-+    }
-+    memcpy(data, &msg.body.read_ret.value, size);
-+    return res;
-+}
-+
-+static MemTxResult memexpose_write_slow(void *opaque, hwaddr addr,
-+                                        uint64_t val, unsigned size,
-+                                        MemTxAttrs attrs)
-+{
-+    MemexposeMem *s = opaque;
-+    struct memexpose_op msg;
-+    msg.head.size = sizeof(msg.head) + sizeof(msg.body.write);
-+    msg.head.ot = MOP_WRITE;
-+    msg.head.prio = memexpose_ep_msg_prio(&s->ep, msg.head.ot);
-+    msg.body.write.offset = addr;
-+    msg.body.write.size = size;
-+    msg.body.write.value = val;
-+    memexpose_ep_write_sync(&s->ep, &msg);
-+
-+    MemTxResult res = msg.body.write_ret.ret;
-+    if (res == MEMTX_OK) {
-+        memshare_handle(s, &msg.body.write_ret.share);
-+    }
-+    return res;
-+}
-+
-+static const MemoryRegionOps memexpose_region_ops = {
-+    .read_with_attrs = memexpose_read_slow,
-+    .write_with_attrs = memexpose_write_slow,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 8,
-+    },
-+};
-+
-+static void prepare_memshare(MemexposeMem *s,
-+                             uint64_t size, uint64_t offset,
-+                             struct memexpose_memshare_info *info) {
-+    MemoryRegionSection section = memory_region_find_flat_range(
-+            s->as.root, offset, size);
-+    if (!section.mr) {
-+        MEMEXPOSE_DPRINTF("No memory region under %lu!\n", offset);
-+        goto unref;
-+    }
-+
-+    int fd = memory_region_get_fd(section.mr);
-+    if (fd != -1 && qemu_ram_is_shared(section.mr->ram_block)) {
-+        info->type = MEMSHARE_FD;
-+        info->fd.mmap_start = section.offset_within_region;
-+        info->fd.start = section.offset_within_address_space;
-+        info->fd.size = section.size;
-+        info->fd.readonly = memory_region_is_rom(section.mr);
-+        info->fd.nonvolatile = memory_region_is_nonvolatile(section.mr);
-+
-+        MEMEXPOSE_DPRINTF("Prepared a memshare fd: %" PRIx64 \
-+                          "-%" PRIx64 ", fd offset %" PRIx64 "\n",
-+                          info->fd.start, info->fd.size, info->fd.mmap_start);
-+        memexpose_ep_send_fd(&s->ep, fd);
-+        s->nothing_shared = false;
-+    } else {
-+        info->type = MEMSHARE_NONE;
-+    }
-+unref:
-+    memory_region_unref(section.mr);
-+}
-+
-+static void memexpose_perform_read_request(
-+        MemexposeMem *s, struct memexpose_op_read *in,
-+        struct memexpose_op *out)
-+{
-+    out->head.ot = MOP_READ_RET;
-+    out->head.size = sizeof(out->head) + sizeof(out->body.read_ret);
-+    out->body.read_ret.ret = 0;
-+    out->body.read_ret.share.type = MEMSHARE_NONE;
-+
-+    MEMEXPOSE_DPRINTF("Reading %u from %lx\n", in->size, in->offset);
-+    MemTxResult r = address_space_read(&s->as, in->offset,
-+                                       MEMTXATTRS_UNSPECIFIED,
-+                                       (uint8_t *) &out->body.read_ret.value,
-+                                       in->size);
-+    out->body.read_ret.ret = r;
-+    if (r != MEMTX_OK) {
-+        MEMEXPOSE_DPRINTF("Failed to read\n");
-+    } else {
-+        prepare_memshare(s, in->size, in->offset, &out->body.read_ret.share);
-+    }
-+}
-+
-+static void memexpose_perform_write_request(
-+        MemexposeMem *s, struct memexpose_op_write *in,
-+        struct memexpose_op *out)
-+{
-+    out->head.ot = MOP_WRITE_RET;
-+    out->head.size = sizeof(out->head) + sizeof(out->body.write_ret);
-+    out->body.write_ret.ret = 0;
-+    out->body.write_ret.share.type = MEMSHARE_NONE;
-+
-+    MEMEXPOSE_DPRINTF("Writing %u to %lx\n", in->size, in->offset);
-+    MemTxResult r = address_space_write(&s->as, in->offset,
-+                                        MEMTXATTRS_UNSPECIFIED,
-+                                        (uint8_t *) &in->value,
-+                                        in->size);
-+    if (r != MEMTX_OK) {
-+        out->body.write_ret.ret = -EIO;
-+        MEMEXPOSE_DPRINTF("Failed to write\n");
-+        return;
-+    }
-+
-+    out->body.write_ret.ret = r;
-+    if (r != MEMTX_OK) {
-+        MEMEXPOSE_DPRINTF("Failed to read\n");
-+    } else {
-+        prepare_memshare(s, in->size, in->offset, &out->body.write_ret.share);
-+    }
-+}
-+
-+static bool region_is_ours(MemexposeMem *s, MemoryRegion *mr)
-+{
-+    if (mr == &s->shmem) {
-+        return true;
-+    }
-+
-+    MemexposeRemoteMemory *mem;
-+    QLIST_FOREACH(mem, &s->remote_regions, list) {
-+        if (mr == &mem->region) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+static void memexpose_remote_invalidate(MemoryListener *inv,
-+                                        MemoryRegionSection *sect)
-+{
-+    MemexposeMem *s = container_of(inv, MemexposeMem, remote_invalidator);
-+    struct memexpose_op msg;
-+    struct memexpose_op_reg_inv *ri = &msg.body.reg_inv;
-+
-+    if (!sect->mr || region_is_ours(s, sect->mr)) {
-+        return;
-+    }
-+    if (s->nothing_shared) {
-+        return;
-+    }
-+
-+    msg.head.size = sizeof(msg.head) + sizeof(msg.body.reg_inv);
-+    msg.head.ot = MOP_REG_INV;
-+    msg.head.prio = memexpose_ep_msg_prio(&s->ep, msg.head.ot);
-+
-+    ri->start = sect->offset_within_address_space;
-+    ri->size = int128_get64(sect->size);
-+    MEMEXPOSE_DPRINTF("Region %"PRIx64"-%"PRIx64" changed, "
-+                      "sending invalidation request\n",
-+                      ri->start, ri->start + ri->size);
-+    memexpose_ep_write_sync(&s->ep, &msg);
-+}
-+
-+static void memexpose_invalidate_region(MemexposeMem *s,
-+                                        struct memexpose_op_reg_inv *ri,
-+                                        struct memexpose_op *out)
-+{
-+    MemexposeRemoteMemory *mem;
-+
-+    QLIST_FOREACH(mem, &s->remote_regions, list) {
-+        uint64_t start = memory_region_get_ram_addr(&mem->region);
-+        uint64_t size = memory_region_size(&mem->region);
-+        if (start < ri->start + ri->size ||
-+            start + size > ri->start) {
-+            mem->should_invalidate = true;
-+            s->pending_invalidation = true;
-+        }
-+    }
-+
-+    if (s->pending_invalidation) {
-+        qemu_bh_schedule(s->reg_inv_bh);
-+    }
-+
-+    out->head.ot = MOP_REG_INV_RET;
-+    out->head.size = sizeof(out->head);
-+}
-+
-+static void memexpose_do_reg_inv_bh(void *opaque)
-+{
-+    MemexposeMem *s = opaque;
-+
-+    MemexposeRemoteMemory *mem, *tmp;
-+    QLIST_FOREACH_SAFE(mem, &s->remote_regions, list, tmp) {
-+        if (mem->should_invalidate) {
-+            memshare_remove_region(s, mem);
-+        }
-+    }
-+    s->pending_invalidation = false;
-+}
-+
-+static void process_mem(void *opaque, struct memexpose_op *op, Error **err)
-+{
-+    MemexposeMem *s = opaque;
-+    struct memexpose_op resp;
-+    resp.head.prio = op->head.prio;
-+    switch (op->head.ot) {
-+    case MOP_READ:
-+        memexpose_perform_read_request(s, &op->body.read, &resp);
-+        break;
-+    case MOP_WRITE:
-+        memexpose_perform_write_request(s, &op->body.write, &resp);
-+        break;
-+    case MOP_REG_INV:
-+        memexpose_invalidate_region(s, &op->body.reg_inv, &resp);
-+        break;
-+    default:
-+        error_setg(err, "Unknown memexpose command %u", op->head.ot);
-+        return;
-+    }
-+    memexpose_ep_write_async(&s->ep, &resp);
-+}
-+
-+void memexpose_mem_init(MemexposeMem *s, Object *parent,
-+                        MemoryRegion *as_root,
-+                        CharBackend *chr, int prio, Error **errp)
-+{
-+    if (!qemu_chr_fe_backend_connected(chr)) {
-+        error_setg(errp, "You must specify a 'mem_chardev'");
-+        return;
-+    }
-+
-+    QLIST_INIT(&s->remote_regions);
-+    s->parent = parent;
-+    address_space_init(&s->as, as_root, "Memexpose");
-+
-+    memexpose_ep_init(&s->ep, chr, s, prio, process_mem);
-+    s->ep.is_async = false;
-+    memory_region_init_io(&s->shmem, parent, &memexpose_region_ops, s,
-+                          "memexpose-shmem", s->shmem_size);
-+    MEMEXPOSE_DPRINTF("Shmem size %lx\n", memory_region_size(&s->shmem));
-+
-+    s->nothing_shared = true;
-+    s->remote_invalidator = (MemoryListener) {
-+        .region_add = memexpose_remote_invalidate,
-+            .region_del = memexpose_remote_invalidate,
-+    };
-+    s->reg_inv_bh = qemu_bh_new(memexpose_do_reg_inv_bh, s);
-+    memory_listener_register(&s->remote_invalidator, &s->as);
-+}
-+
-+int memexpose_mem_enable(MemexposeMem *s)
-+{
-+    return memexpose_ep_connect(&s->ep);
-+}
-+
-+void memexpose_mem_disable(MemexposeMem *s)
-+{
-+    memexpose_ep_disconnect(&s->ep);
-+
-+    MemexposeRemoteMemory *mem, *tmp;
-+    QLIST_FOREACH_SAFE(mem, &s->remote_regions, list, tmp) {
-+        memshare_remove_region(s, mem);
-+    }
-+    qemu_bh_cancel(s->reg_inv_bh);
-+    s->pending_invalidation = false;
-+}
-+
-+void memexpose_mem_destroy(MemexposeMem *s)
-+{
-+    memexpose_mem_disable(s);
-+    /* Region will be collected with its parent */
-+    memory_listener_unregister(&s->remote_invalidator);
-+    memexpose_ep_destroy(&s->ep);
-+    qemu_bh_delete(s->reg_inv_bh);
-+    address_space_destroy(&s->as);
-+}
-diff --git a/hw/misc/memexpose/memexpose-core.h b/hw/misc/memexpose/memexpose-core.h
-new file mode 100644
-index 0000000..fd0ac60
---- /dev/null
-+++ b/hw/misc/memexpose/memexpose-core.h
-@@ -0,0 +1,109 @@
-+/*
-+ *  Memexpose core
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef _MEMEXPOSE_CORE_H_
-+#define _MEMEXPOSE_CORE_H_
-+#include "qemu/osdep.h"
-+
-+#include <inttypes.h>
-+#include "chardev/char-fe.h"
-+#include "hw/hw.h"
-+#include "exec/memory.h"
-+#include "memexpose-msg.h"
-+
-+#define MEMEXPOSE_INTR_QUEUE_SIZE 16
-+
-+#define MEMEXPOSE_DEBUG 1
-+#define MEMEXPOSE_DPRINTF(fmt, ...)                       \
-+    do {                                                \
-+        if (MEMEXPOSE_DEBUG) {                            \
-+            printf("MEMEXPOSE: " fmt, ## __VA_ARGS__);    \
-+        }                                               \
-+    } while (0)
-+
-+#define MEMEXPOSE_INTR_MEM_SIZE 0x1000
-+
-+
-+#define MEMEXPOSE_INTR_ENABLE_ADDR  0x0
-+#define MEMEXPOSE_INTR_RECV_ADDR    0x400
-+#define MEMEXPOSE_INTR_RX_TYPE_ADDR 0x408
-+#define MEMEXPOSE_INTR_RX_DATA_ADDR 0x410
-+#define MEMEXPOSE_INTR_SEND_ADDR    0x800
-+#define MEMEXPOSE_INTR_TX_TYPE_ADDR 0x808
-+#define MEMEXPOSE_INTR_TX_DATA_ADDR 0x810
-+
-+struct memexpose_intr_ops {
-+    void *parent;
-+    void (*intr) (void *opaque, int dir);
-+    int (*enable) (void *opaque);
-+    void (*disable) (void *opaque);
-+};
-+
-+typedef struct MemexposeIntr {
-+    Object *parent;
-+    struct memexpose_intr_ops ops;
-+    int enabled;
-+
-+    MemexposeEp ep;
-+    MemoryRegion shmem;
-+
-+    struct memexpose_op_intr intr_queue[MEMEXPOSE_INTR_QUEUE_SIZE];
-+    int queue_start;
-+    int queue_count;
-+    struct memexpose_op_intr intr_tx;
-+    struct memexpose_op_intr intr_rx;
-+} MemexposeIntr;
-+
-+typedef struct MemexposeMem {
-+    Object *parent;
-+    MemexposeEp ep;
-+
-+    AddressSpace as;
-+    MemoryRegion shmem;
-+    uint64_t shmem_size;
-+    QLIST_HEAD(, MemexposeRemoteMemory) remote_regions;
-+
-+    MemoryListener remote_invalidator;
-+    QEMUBH *reg_inv_bh;
-+    bool pending_invalidation;
-+    bool nothing_shared;
-+} MemexposeMem;
-+
-+typedef struct MemexposeRemoteMemory {
-+    MemoryRegion region;
-+    bool should_invalidate;
-+    QLIST_ENTRY(MemexposeRemoteMemory) list;
-+} MemexposeRemoteMemory;
-+
-+void memexpose_intr_init(MemexposeIntr *s, struct memexpose_intr_ops *ops,
-+                         Object *parent, CharBackend *chr, Error **errp);
-+void memexpose_intr_destroy(MemexposeIntr *s);
-+int memexpose_intr_enable(MemexposeIntr *s);
-+void memexpose_intr_disable(MemexposeIntr *s);
-+
-+void memexpose_mem_init(MemexposeMem *s, Object *parent,
-+                        MemoryRegion *as_root,
-+                        CharBackend *chr, int prio, Error **errp);
-+void memexpose_mem_destroy(MemexposeMem *s);
-+int memexpose_mem_enable(MemexposeMem *s);
-+void memexpose_mem_disable(MemexposeMem *s);
-+
-+#endif /* _MEMEXPOSE_CORE_H_ */
-diff --git a/hw/misc/memexpose/memexpose-msg.c b/hw/misc/memexpose/memexpose-msg.c
-new file mode 100644
-index 0000000..7205dd0
---- /dev/null
-+++ b/hw/misc/memexpose/memexpose-msg.c
-@@ -0,0 +1,261 @@
-+/*
-+ *  Memexpose core
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "memexpose-msg.h"
-+#include "memexpose-core.h"
-+
-+#define MIN_MSG_SIZE (sizeof(struct memexpose_op_head))
-+#define MAX_MSG_SIZE (sizeof(struct memexpose_op))
-+
-+int memexpose_ep_msg_prio(MemexposeEp *ep, enum memexpose_op_type ot)
-+{
-+    int ot_prio;
-+    switch (ot) {
-+    case MOP_READ:
-+    case MOP_READ_RET:
-+    case MOP_WRITE:
-+    case MOP_WRITE_RET:
-+        ot_prio = 2;
-+        break;
-+    default:
-+        ot_prio = 0;
-+    }
-+    return ot_prio + ep->prio;
-+}
-+
-+static int mep_can_receive(void *opaque)
-+{
-+    int sz;
-+    MemexposeEp *ep = opaque;
-+    MemexposeMsg *msg = &ep->msg;
-+
-+    switch (msg->read_state) {
-+    case MEMEXPOSE_MSG_BROKEN:
-+        return 0;
-+    case MEMEXPOSE_MSG_READ_SIZE:
-+        return sizeof(msg->buf.head.size) - msg->bytes;
-+    case MEMEXPOSE_MSG_READ_BODY:
-+        sz = msg->buf.head.size - msg->bytes;
-+        if (sz > MAX_MSG_SIZE) {
-+            return MAX_MSG_SIZE;  /* We'll handle this as an error later */
-+        }
-+        return sz;
-+    default:
-+        MEMEXPOSE_DPRINTF("Invalid read state %d\n", msg->read_state);
-+        return 0;
-+    }
-+}
-+
-+static int mep_do_receive(MemexposeMsg *msg,
-+                          const uint8_t *buf, int size)
-+{
-+    switch (msg->read_state) {
-+    case MEMEXPOSE_MSG_BROKEN:
-+        return -1;
-+    case MEMEXPOSE_MSG_READ_SIZE:
-+        memcpy((unsigned char *)&msg->buf + msg->bytes, buf, size);
-+        msg->bytes += size;
-+        if (msg->bytes == sizeof(msg->buf.head.size)) {
-+            msg->read_state = MEMEXPOSE_MSG_READ_BODY;
-+        }
-+        return 0;
-+    case MEMEXPOSE_MSG_READ_BODY:
-+        if (msg->buf.head.size < MIN_MSG_SIZE ||
-+            msg->buf.head.size > MAX_MSG_SIZE) {
-+            MEMEXPOSE_DPRINTF("Invalid message size %d, protocol broken!\n",
-+                              msg->buf.head.size);
-+            msg->read_state = MEMEXPOSE_MSG_BROKEN;
-+            return -1;
-+        }
-+        memcpy((unsigned char *)&msg->buf + msg->bytes, buf, size);
-+        msg->bytes += size;
-+        if (msg->bytes < msg->buf.head.size) {
-+            return 0;
-+        }
-+        msg->bytes = 0;
-+        msg->read_state = MEMEXPOSE_MSG_READ_SIZE;
-+        return 1;
-+    default:
-+        MEMEXPOSE_DPRINTF("Invalid read state %d\n", msg->read_state);
-+        return -1;
-+    }
-+}
-+
-+static void mep_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    MemexposeEp *ep = opaque;
-+    Error *err = NULL;
-+    int new_msg = mep_do_receive(&ep->msg, buf, size);
-+    if (new_msg) {
-+        ep->handle_msg(ep->data, &ep->msg.buf, &err);
-+        if (err) {
-+            error_report_err(err);
-+        }
-+    } else if (new_msg < 0) {
-+        error_setg(&err, "Failed to receive memexpose message"); /* FIXME */
-+        error_report_err(err);
-+    }
-+}
-+
-+static int mep_receive_sync(MemexposeEp *ep, struct memexpose_op *op)
-+{
-+    int ret = 0;
-+    MemexposeMsg *msg = &ep->msg;
-+    assert(!ep->is_async);
-+
-+    while (!ret) {
-+        int can_receive = mep_can_receive(ep);
-+        unsigned char *msgbuf = (unsigned char *)&msg->buf + msg->bytes;
-+        qemu_chr_fe_read_all(ep->chr, msgbuf, can_receive);
-+        ret = mep_do_receive(msg, msgbuf, can_receive);
-+        if (ret == -1) {
-+            return -1;
-+        }
-+    }
-+    *op = msg->buf;
-+    return 0;
-+}
-+
-+void memexpose_ep_write_async(MemexposeEp *ep, struct memexpose_op *op)
-+{
-+    qemu_chr_fe_write_all(ep->chr, (unsigned char *) op, op->head.size);
-+}
-+
-+static void mep_queue_msg(MemexposeEp *ep, struct memexpose_op *op)
-+{
-+    ep->queued_op = *op;
-+    qemu_bh_schedule(ep->queue_msg_bh);
-+}
-+
-+static void mep_queue_msg_bh(void *epp)
-+{
-+    Error *err = NULL;
-+    MemexposeEp *ep = epp;
-+    if (!ep->queued_op.head.size) {
-+        return;
-+    }
-+    ep->handle_msg(ep->data, &ep->queued_op, &err); /* FIXME - handle */
-+    ep->queued_op.head.size = 0;
-+}
-+
-+/*
-+ * Synchronously write a message to another QEMU and receive a response.
-+ * To avoid deadlocks, each message type has its priority and no more than one
-+ * message of each priority is in flight.
-+ *
-+ * After we send a message, we await a response while handling all messages of
-+ * higher priority and deferring messages of lower priority. This way each side
-+ * will have its requests handled until they have time to handle ours.
-+ *
-+ * The above means that a handler for a message must be able to run while an
-+ * operation that sends any other lower priority message is in progress. Make
-+ * sure to order operations in an order that does not upset QEMU!
-+ */
-+void memexpose_ep_write_sync(MemexposeEp *ep, struct memexpose_op *op)
-+{
-+    assert(!ep->is_async);
-+    qemu_chr_fe_write_all(ep->chr, (unsigned char *) op, op->head.size);
-+
-+    struct memexpose_op resp;
-+    int prio = op->head.prio;
-+
-+    /* FIXME - handle errors */
-+    while (true) {
-+        Error *err = NULL;
-+        mep_receive_sync(ep, &resp);
-+        int resp_prio = resp.head.prio;
-+        if (resp_prio > prio) {
-+            ep->handle_msg(ep->data, &resp, &err);
-+        } else if (resp_prio < prio) {
-+            mep_queue_msg(ep, &resp);
-+        } else {
-+            *op = resp;
-+            return;
-+        }
-+    }
-+}
-+
-+void memexpose_ep_init(MemexposeEp *ep, CharBackend *chr, void *data, int prio,
-+                       void (*handle_msg)(void *data, struct memexpose_op *op,
-+                                          Error **errp))
-+{
-+    ep->queue_msg_bh = qemu_bh_new(mep_queue_msg_bh, ep);
-+    ep->queued_op.head.size = 0;
-+    ep->handle_msg = handle_msg;
-+    ep->msg.bytes = 0;
-+    ep->msg.read_state = MEMEXPOSE_MSG_READ_SIZE;
-+    ep->chr = chr;
-+    ep->data = data;
-+    ep->prio = prio;
-+    ep->connected = 0;
-+
-+    if (handle_msg)
-+        qemu_chr_fe_set_handlers(ep->chr, mep_can_receive,
-+                                 mep_receive, NULL, NULL, ep, NULL, true);
-+    Chardev *chrd = qemu_chr_fe_get_driver(ep->chr);
-+    assert(chrd);
-+    MEMEXPOSE_DPRINTF("Memexpose endpoint at %s\n",
-+                      chrd->filename);
-+
-+}
-+
-+/* TODO - protocol for synchronously ending connection */
-+void memexpose_ep_destroy(MemexposeEp *ep)
-+{
-+    qemu_chr_fe_set_handlers(ep->chr, NULL, NULL, NULL, NULL, NULL, NULL, true);
-+}
-+
-+void memexpose_ep_send_fd(MemexposeEp *ep, int fd)
-+{
-+    qemu_chr_fe_set_msgfds(ep->chr, &fd, 1);
-+}
-+
-+int memexpose_ep_recv_fd(MemexposeEp *ep)
-+{
-+    return qemu_chr_fe_get_msgfd(ep->chr);
-+}
-+
-+int memexpose_ep_connect(MemexposeEp *ep)
-+{
-+    /* FIXME - report errors */
-+    Error *err = NULL;
-+    if (ep->connected) {
-+        return 0;
-+    }
-+
-+    int ret = qemu_chr_fe_wait_connected(ep->chr, &err);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ep->connected = 1;
-+    return 0;
-+}
-+
-+void memexpose_ep_disconnect(MemexposeEp *ep)
-+{
-+    if (ep->connected) {
-+        qemu_chr_fe_disconnect(ep->chr);
-+    }
-+    ep->connected = 0;
-+}
-diff --git a/hw/misc/memexpose/memexpose-msg.h b/hw/misc/memexpose/memexpose-msg.h
-new file mode 100644
-index 0000000..5543cd4
---- /dev/null
-+++ b/hw/misc/memexpose/memexpose-msg.h
-@@ -0,0 +1,161 @@
-+/*
-+ *  Memexpose core
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef _MEMEXPOSE_MSG_H_
-+#define _MEMEXPOSE_MSG_H_
-+
-+#include "qemu/osdep.h"
-+#include "qemu/typedefs.h"
-+#include "chardev/char-fe.h"
-+#include "exec/memattrs.h"
-+#include <inttypes.h>
-+
-+#define MEMEXPOSE_MAX_INTR_DATA_SIZE 128
-+
-+enum memexpose_op_type {
-+    MOP_READ,
-+    MOP_READ_RET,
-+    MOP_WRITE,
-+    MOP_WRITE_RET,
-+    MOP_REG_INV,
-+    MOP_REG_INV_RET,
-+    MOP_INTR,
-+};
-+
-+enum memexpose_memshare_type {
-+    MEMSHARE_NONE,
-+    MEMSHARE_FD,
-+};
-+
-+/*
-+ * TODO - we'll need to share more info here, like access permissions for
-+ * example
-+ */
-+struct memexpose_memshare_info_fd {
-+    uint64_t start;
-+    uint64_t mmap_start;
-+    uint64_t size;
-+    uint8_t readonly;
-+    uint8_t nonvolatile;
-+} __attribute__((packed));
-+
-+/* TODO - this might have variable size in the future */
-+struct memexpose_memshare_info {
-+    uint8_t type;
-+    union {
-+        struct memexpose_memshare_info_fd fd;
-+    };
-+} __attribute__((packed));
-+
-+/* TODO - endianness */
-+struct memexpose_op_head {
-+    uint32_t size;
-+    uint8_t ot;
-+    uint8_t prio;
-+} __attribute__((packed));
-+
-+struct memexpose_op_read {
-+    uint64_t offset;
-+    uint8_t size;
-+} __attribute__((packed));
-+
-+struct memexpose_op_write {
-+    uint64_t offset;
-+    uint64_t value;
-+    uint8_t size;
-+} __attribute__((packed));
-+
-+struct memexpose_op_read_ret {
-+    MemTxResult ret;
-+    uint64_t value;
-+    struct memexpose_memshare_info share;
-+} __attribute__((packed));
-+
-+struct memexpose_op_write_ret {
-+    MemTxResult ret;
-+    struct memexpose_memshare_info share;
-+} __attribute__((packed));
-+
-+struct memexpose_op_intr {
-+    uint64_t type;
-+    uint8_t data[MEMEXPOSE_MAX_INTR_DATA_SIZE];
-+} __attribute__((packed));
-+
-+struct memexpose_op_reg_inv {
-+    uint64_t start;
-+    uint64_t size;
-+} __attribute__((packed));
-+
-+union memexpose_op_all {
-+    struct memexpose_op_read read;
-+    struct memexpose_op_write write;
-+    struct memexpose_op_read_ret read_ret;
-+    struct memexpose_op_write_ret write_ret;
-+    struct memexpose_op_intr intr;
-+    struct memexpose_op_reg_inv reg_inv;
-+} __attribute__((packed));
-+
-+struct memexpose_op {
-+    struct memexpose_op_head head;
-+    union memexpose_op_all body;
-+} __attribute__((packed));
-+
-+enum MemexposeMsgState {
-+    MEMEXPOSE_MSG_READ_SIZE,
-+    MEMEXPOSE_MSG_READ_BODY,
-+    MEMEXPOSE_MSG_BROKEN,
-+};
-+
-+typedef struct MemexposeMsg {
-+    int read_state;
-+    int bytes;
-+    struct memexpose_op buf;
-+} MemexposeMsg;
-+
-+typedef struct MemexposeEp {
-+    CharBackend *chr;
-+    MemexposeMsg msg;
-+    bool is_async;
-+    int prio;
-+    void *data;
-+    void (*handle_msg)(void *data, struct memexpose_op *op, Error **err);
-+
-+    int connected;
-+    struct memexpose_op queued_op;
-+    QEMUBH *queue_msg_bh;
-+} MemexposeEp;
-+
-+void memexpose_ep_init(MemexposeEp *ep, CharBackend *chr, void *data, int prio,
-+                       void (*handle_msg)(void *data, struct memexpose_op *op,
-+                                          Error **errp));
-+void memexpose_ep_destroy(MemexposeEp *ep);
-+
-+int memexpose_ep_connect(MemexposeEp *ep);
-+void memexpose_ep_disconnect(MemexposeEp *ep);
-+
-+/* TODO - functions for header boilerplate */
-+void memexpose_ep_write_sync(MemexposeEp *ep, struct memexpose_op *op);
-+void memexpose_ep_write_async(MemexposeEp *ep, struct memexpose_op *op);
-+void memexpose_ep_send_fd(MemexposeEp *ep, int fd);
-+int memexpose_ep_recv_fd(MemexposeEp *ep);
-+int memexpose_ep_msg_prio(MemexposeEp *ep, enum memexpose_op_type);
-+
-+#endif /* _MEMEXPOSE_MSG_H_ */
--- 
-2.7.4
-
+SGV5LCBzb3JyeSBmb3IgdGhlIGRlbGF5IG9uIGZvbGxvd2luZyB1cCBvbiB0aGlzLiBJIHBpY2tl
+ZCBpdCB1cA0KYWdhaW4uIEhvcGVmdWxseSB3ZSBjYW4gZmluYWxpc2UgcXVpY2tseS4NCg0KPiBP
+biBEZWMgNSwgMjAxOSwgYXQgMjoyMiBQTSwgRmVsaXBlIEZyYW5jaW9zaSA8ZmVsaXBlQG51dGFu
+aXguY29tPiB3cm90ZToNCj4gDQo+IEhleWEsDQo+IA0KPj4gT24gTm92IDI2LCAyMDE5LCBhdCAx
+MjoxOCBQTSwgTWFyYy1BbmRyw6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QGdtYWlsLmNvbT4g
+d3JvdGU6DQo+PiANCj4+IE9uIE1vbiwgTm92IDI1LCAyMDE5IGF0IDg6MTQgUE0gRmVsaXBlIEZy
+YW5jaW9zaSA8ZmVsaXBlQG51dGFuaXguY29tPiB3cm90ZToNCj4+PiANCj4+PiBUaGlzIGludHJv
+ZHVjZXMgYSBzZWxmLWZlbmNlIG1lY2hhbmlzbSB0byBRZW11LCBjYXVzaW5nIGl0IHRvIGRpZSBp
+ZiBhDQo+Pj4gaGVhcnRiZWF0IGNvbmRpdGlvbiBpcyBub3QgbWV0LiBDdXJyZW50bHksIGEgZmls
+ZS1iYXNlZCBoZWFydGJlYXQgaXMNCj4+PiBhdmFpbGFibGUgYW5kIGNhbiBiZSBjb25maWd1cmVk
+IGFzIGZvbGxvd3M6DQo+Pj4gDQo+Pj4gLW9iamVjdCBmaWxlLWZlbmNlLGlkPWZmMCxmaWxlPS9m
+b28scXRpbWVvdXQ9MjAsa3RpbWVvdXQ9MjUsc2lnbmFsPWtpbGwNCj4+PiANCj4+PiBRZW11IHdp
+bGwgd2F0Y2ggJ2ZpbGUnIGZvciBhdHRyaWJ1dGUgY2hhbmdlcy4gVG91Y2hpbmcgdGhlIGZpbGUg
+d29ya3MgYXMNCj4+PiBhIGhlYXJ0YmVhdC4gVGhpcyBwYXJhbWV0ZXIgaXMgbWFuZGF0b3J5Lg0K
+Pj4+IA0KPj4+IEZlbmNpbmcgaGFwcGVucyBhZnRlciAncXRpbWVvdXQnIG9yICdrdGltZW91dCcg
+c2Vjb25kcyBlbGFwc2Ugd2l0aG91dCBhDQo+Pj4gaGVhcnRiZWF0LiBBdCBsZWFzdCBvbmUgb2Yg
+dGhlc2UgbXVzdCBiZSBzcGVjaWZpZWQuIEJvdGggbWF5IGJlIHVzZWQuDQo+Pj4gDQo+Pj4gV2hl
+biB1c2luZyAncXRpbWVvdXQnLCBhbiBpbnRlcm5hbCBRZW11IHRpbWVyIGlzIHVzZWQuIEZlbmNp
+bmcgd2l0aCB0aGlzDQo+Pj4gbWV0aG9kIGdpdmVzIFFlbXUgYSBjaGFuY2UgdG8gd3JpdGUgYSBs
+b2cgbWVzc2FnZSBpbmRpY2F0aW5nIHdoaWNoIGZpbGUNCj4+PiBjYXVzZWQgdGhlIGV2ZW50LiBJ
+ZiBRZW11J3MgbWFpbiBsb29wIGlzIGh1bmcgZm9yIHdoYXRldmVyIHJlYXNvbiwgdGhpcw0KPj4+
+IG1ldGhvZCB3b24ndCBzdWNjZXNzZnVsbHkga2lsbCBRZW11Lg0KPj4+IA0KPj4+IFdoZW4gdXNp
+bmcgJ2t0aW1lb3V0JywgYSBrZXJuZWwgdGltZXIgaXMgdXNlZC4gSW4gdGhpcyBjYXNlLCAnc2ln
+bmFsJw0KPj4+IGNhbiBiZSAna2lsbCcgKGZvciBTSUdLSUxMLCBkZWZhdWx0KSBvciAncXVpdCcg
+KGZvciBTSUdRVUlUKS4gVXNpbmcNCj4+PiBTSUdRVUlUIG1heSBiZSBwcmVmZXJyZWQgZm9yIG9i
+dGFpbmluZyBjb3JlIGR1bXBzLiBJZiBRZW11IGlzIGh1bmcNCj4+PiAoZWcuIHVuaW50ZXJydXB0
+YWJsZSBzbGVlcCksIHRoaXMgbWV0aG9kIHdvbid0IHN1Y2Nlc3NmdWxseSBraWxsIFFlbXUuDQo+
+Pj4gDQo+Pj4gSXQgaXMgd29ydGggbm90aW5nIHRoYXQgZXZlbiBzdWNjZXNzZnVsbHkga2lsbGlu
+ZyBRZW11IG1heSBub3QgYmUNCj4+PiBzdWZmaWNpZW50IHRvIGNvbXBsZXRlbHkgZmVuY2UgYSBW
+TSBhcyBjZXJ0YWluIG9wZXJhdGlvbnMgbGlrZSBuZXR3b3JrDQo+Pj4gcGFja2V0cyBvciBibG9j
+ayBjb21tYW5kcyBtYXkgYmUgcGVuZGluZyBpbiB0aGUga2VybmVsLiBJZiB0aGF0IGlzIGENCj4+
+PiBjb25jZXJuLCBzeXN0ZW1zIHNob3VsZCBjb25zaWRlciB1c2luZyBmdXJ0aGVyIGZlbmNpbmcg
+bWVjaGFuaXNtcyBsaWtlDQo+Pj4gaGFyZHdhcmUgd2F0Y2hkb2dzIGVpdGhlciBpbiBhZGRpdGlv
+biBvciBpbiBjb25qdW5jdGlvbiB3aXRoIHRoaXMgZm9yDQo+Pj4gYWRkaXRpb25hbCBwcm90ZWN0
+aW9uLg0KPj4+IA0KPj4+IFNpZ25lZC1vZmYtYnk6IEZlbGlwZSBGcmFuY2lvc2kgPGZlbGlwZUBu
+dXRhbml4LmNvbT4NCj4+PiAtLS0NCj4+PiBCYXNlZC1vbjogPDIwMTkxMTI1MTUzNjE5LjM5ODkz
+LTItZmVsaXBlQG51dGFuaXguY29tPg0KPj4+IA0KPj4+IE1ha2VmaWxlLm9ianMgICAgICAgfCAg
+IDEgKw0KPj4+IGZlbmNlL01ha2VmaWxlLm9ianMgfCAgIDEgKw0KPj4+IGZlbmNlL2ZpbGVfZmVu
+Y2UuYyAgfCAzODEgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysN
+Cj4+IA0KPj4gSSB0aGluayBpdCBjb3VsZCBiZSB1bmRlciBiYWNrZW5kcy8NCj4gDQo+IEkgdGhv
+dWdodCBhYm91dCBpdCBhbmQgY291bGRuJ3QgbWFrZSB1cCBteSBtaW5kLiBNeSBkZWNpc2lvbiB3
+YXMgYmFzZWQgb246DQo+IC0gRG9lc24ndCByZWFsbHkgZmVlbCBsaWtlIGEgImJhY2tlbmQiLg0K
+PiAtIEkgZW52aXNpb24gb3RoZXIgdHlwZXMgb2Ygc2VsZi1mZW5jaW5nIGhlYXJ0YmVhdHMgKGVn
+LiBuZXR3b3JrLWJhc2VkKSwNCj4gIGluIHdoaWNoIGNhc2UgdGhpcyB3b3VsZCBwcm9iYWJseSBi
+ZSBzcGxpdCBpbiBhICJjb21tb24iIGZpbGUuDQo+IA0KPiBBcmd1YWJseSBvdGhlciBvYmplY3Rz
+IGluIGJhY2tlbmRzLyBhbHNvIGZhbGwgd2l0aGluIHRoZXNlIGNhdGVnb3JpZXMsDQo+IHNvIEkn
+bSBoYXBweSB0byBtb3ZlIGlmIHlvdSB0aGluayBpdCdzIGJldHRlci4gTGV0IG1lIGtub3cuDQoN
+CkkgY2hhbmdlZCBpdCB0byBiYWNrZW5kcy8gZm9yIHYyLg0KDQo+IA0KPiANCj4+IEFuZCBhIHNs
+aWdodCBwcmVmZXJlbmNlIGZvciAtIHNlcGVyYXRlZCB3b3JkcyBpbiBmaWxlbmFtZXMgb3ZlciBx
+ZW11IGNvZGViYXNlLg0KPiANCj4gU3VyZSwgd2lsbCBjaGFuZ2UuDQoNCkRvbmUgZm9yIHYyLg0K
+DQo+IA0KPj4gDQo+Pj4gcWVtdS1vcHRpb25zLmh4ICAgICB8ICAyNyArKystDQo+Pj4gNCBmaWxl
+cyBjaGFuZ2VkLCA0MDkgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPj4+IGNyZWF0ZSBt
+b2RlIDEwMDY0NCBmZW5jZS9NYWtlZmlsZS5vYmpzDQo+Pj4gY3JlYXRlIG1vZGUgMTAwNjQ0IGZl
+bmNlL2ZpbGVfZmVuY2UuYw0KPj4+IA0KPj4+IGRpZmYgLS1naXQgYS9NYWtlZmlsZS5vYmpzIGIv
+TWFrZWZpbGUub2Jqcw0KPj4+IGluZGV4IDExYmExYTM2YmQuLjk5OGVlZDQ3OTYgMTAwNjQ0DQo+
+Pj4gLS0tIGEvTWFrZWZpbGUub2Jqcw0KPj4+ICsrKyBiL01ha2VmaWxlLm9ianMNCj4+PiBAQCAt
+NzUsNiArNzUsNyBAQCBjb21tb24tb2JqLSQoQ09ORklHX1RQTSkgKz0gdHBtLm8NCj4+PiANCj4+
+PiBjb21tb24tb2JqLXkgKz0gYmFja2VuZHMvDQo+Pj4gY29tbW9uLW9iai15ICs9IGNoYXJkZXYv
+DQo+Pj4gK2NvbW1vbi1vYmoteSArPSBmZW5jZS8NCj4+PiANCj4+PiBjb21tb24tb2JqLSQoQ09O
+RklHX1NFQ0NPTVApICs9IHFlbXUtc2VjY29tcC5vDQo+Pj4gcWVtdS1zZWNjb21wLm8tY2ZsYWdz
+IDo9ICQoU0VDQ09NUF9DRkxBR1MpDQo+Pj4gZGlmZiAtLWdpdCBhL2ZlbmNlL01ha2VmaWxlLm9i
+anMgYi9mZW5jZS9NYWtlZmlsZS5vYmpzDQo+Pj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQNCj4+PiBp
+bmRleCAwMDAwMDAwMDAwLi4yZWQyMDkyNTY4DQo+Pj4gLS0tIC9kZXYvbnVsbA0KPj4+ICsrKyBi
+L2ZlbmNlL01ha2VmaWxlLm9ianMNCj4+PiBAQCAtMCwwICsxIEBADQo+Pj4gK2NvbW1vbi1vYmot
+eSArPSBmaWxlX2ZlbmNlLm8NCj4+PiBkaWZmIC0tZ2l0IGEvZmVuY2UvZmlsZV9mZW5jZS5jIGIv
+ZmVuY2UvZmlsZV9mZW5jZS5jDQo+Pj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQNCj4+PiBpbmRleCAw
+MDAwMDAwMDAwLi41Yjc0M2U2OWQyDQo+Pj4gLS0tIC9kZXYvbnVsbA0KPj4+ICsrKyBiL2ZlbmNl
+L2ZpbGVfZmVuY2UuYw0KPj4+IEBAIC0wLDAgKzEsMzgxIEBADQo+Pj4gKy8qDQo+Pj4gKyAqIFFF
+TVUgZmlsZS1iYXNlZCBzZWxmLWZlbmNlIG1lY2hhbmlzbQ0KPj4+ICsgKg0KPj4+ICsgKiBDb3B5
+cmlnaHQgKGMpIDIwMTkgTnV0YW5peCBJbmMuIEFsbCByaWdodHMgcmVzZXJ2ZWQuDQo+Pj4gKyAq
+DQo+Pj4gKyAqIEF1dGhvcnM6DQo+Pj4gKyAqICAgIEZlbGlwZSBGcmFuY2lvc2kgPGZlbGlwZUBu
+dXRhbml4LmNvbT4NCj4+PiArICoNCj4+PiArICogVGhpcyBsaWJyYXJ5IGlzIGZyZWUgc29mdHdh
+cmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vcg0KPj4+ICsgKiBtb2RpZnkgaXQgdW5k
+ZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgTGVzc2VyIEdlbmVyYWwgUHVibGljDQo+Pj4gKyAqIExp
+Y2Vuc2UgYXMgcHVibGlzaGVkIGJ5IHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5kYXRpb247IGVpdGhl
+cg0KPj4+ICsgKiB2ZXJzaW9uIDIgb2YgdGhlIExpY2Vuc2UsIG9yIChhdCB5b3VyIG9wdGlvbikg
+YW55IGxhdGVyIHZlcnNpb24uDQo+Pj4gKyAqDQo+Pj4gKyAqIFRoaXMgbGlicmFyeSBpcyBkaXN0
+cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLA0KPj4+ICsgKiBidXQg
+V0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBv
+Zg0KPj4+ICsgKiBNRVJDSEFOVEFCSUxJVFkgb3IgRklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBV
+UlBPU0UuICBTZWUgdGhlIEdOVQ0KPj4+ICsgKiBMZXNzZXIgR2VuZXJhbCBQdWJsaWMgTGljZW5z
+ZSBmb3IgbW9yZSBkZXRhaWxzLg0KPj4+ICsgKg0KPj4+ICsgKiBZb3Ugc2hvdWxkIGhhdmUgcmVj
+ZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgTGVzc2VyIEdlbmVyYWwgUHVibGljDQo+Pj4gKyAqIExp
+Y2Vuc2UgYWxvbmcgd2l0aCB0aGlzIGxpYnJhcnk7IGlmIG5vdCwgc2VlIDxodHRwczovL3VybGRl
+ZmVuc2UucHJvb2Zwb2ludC5jb20vdjIvdXJsP3U9aHR0cC0zQV9fd3d3LmdudS5vcmdfbGljZW5z
+ZXNfJmQ9RHdJRmFRJmM9czg4M0dwVUNPQ2hLT0hpb2NZdEdjZyZyPUNDckpLVkM1ekdvdDhQcm5J
+LWlZZTAwTWRYNHBnZFFmTVJpZ3AxNFB0bWsmbT1lZHpYUTVQMEdDbW16WjQtMjB1dnNtZ3FJcmVW
+M0JLWUM4Sllpa2dIVkg0JnM9cTNHTXByYWtWb1JKdzh6a2JialhQcUFiRXh2OTNEekotSGdJMnow
+MDQwOCZlPSA+Lg0KPj4+ICsgKg0KPj4+ICsgKi8NCj4+PiArDQo+Pj4gKyNpbmNsdWRlICJxZW11
+L29zZGVwLmgiDQo+Pj4gKyNpbmNsdWRlICJxYXBpL2Vycm9yLmgiDQo+Pj4gKyNpbmNsdWRlICJx
+b20vb2JqZWN0X2ludGVyZmFjZXMuaCINCj4+PiArI2luY2x1ZGUgInFlbXUvZmlsZW1vbml0b3Iu
+aCINCj4+PiArI2luY2x1ZGUgInFlbXUvdGltZXIuaCINCj4+PiArDQo+Pj4gKyNpbmNsdWRlIDx0
+aW1lLmg+DQo+Pj4gKw0KPj4+ICsjZGVmaW5lIFRZUEVfRklMRV9GRU5DRSAiZmlsZS1mZW5jZSIN
+Cj4+PiArDQo+Pj4gK3R5cGVkZWYgc3RydWN0IEZpbGVGZW5jZSB7DQo+Pj4gKyAgICBPYmplY3Qg
+cGFyZW50X29iajsNCj4+PiArDQo+Pj4gKyAgICBnY2hhciAqZGlyOw0KPj4+ICsgICAgZ2NoYXIg
+KmZpbGU7DQo+Pj4gKyAgICB1aW50MzJfdCBxdGltZW91dDsNCj4+PiArICAgIHVpbnQzMl90IGt0
+aW1lb3V0Ow0KPj4+ICsgICAgaW50IHNpZ25hbDsNCj4+PiArDQo+Pj4gKyAgICB0aW1lcl90IGt0
+aW1lcjsNCj4+PiArICAgIFFFTVVUaW1lciAqcXRpbWVyOw0KPj4+ICsNCj4+PiArICAgIFFGaWxl
+TW9uaXRvciAqZm07DQo+Pj4gKyAgICB1aW50NjRfdCBpZDsNCj4+PiArfSBGaWxlRmVuY2U7DQo+
+Pj4gKw0KPj4+ICsjZGVmaW5lIEZJTEVfRkVOQ0Uob2JqKSBcDQo+Pj4gKyAgICBPQkpFQ1RfQ0hF
+Q0soRmlsZUZlbmNlLCAob2JqKSwgVFlQRV9GSUxFX0ZFTkNFKQ0KPj4+ICsNCj4+PiArc3RhdGlj
+IHZvaWQNCj4+PiArdGltZXJfdXBkYXRlKEZpbGVGZW5jZSAqZmYpDQo+Pj4gK3sNCj4+PiArICAg
+IHN0cnVjdCBpdGltZXJzcGVjIGl0cyA9IHsNCj4+PiArICAgICAgICAuaXRfdmFsdWUudHZfc2Vj
+ID0gZmYtPmt0aW1lb3V0LA0KPj4+ICsgICAgfTsNCj4+PiArICAgIGludCBlcnI7DQo+Pj4gKw0K
+Pj4+ICsgICAgaWYgKGZmLT5xdGltZW91dCkgew0KPj4+ICsgICAgICAgIHRpbWVyX21vZChmZi0+
+cXRpbWVyLCBxZW11X2Nsb2NrX2dldF9tcyhRRU1VX0NMT0NLX1JFQUxUSU1FKSArDQo+Pj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGZmLT5xdGltZW91dCAqIDEwMDApOw0KPj4+ICsg
+ICAgfQ0KPj4+ICsNCj4+PiArICAgIGlmIChmZi0+a3RpbWVvdXQpIHsNCj4+PiArICAgICAgICBl
+cnIgPSB0aW1lcl9zZXR0aW1lKGZmLT5rdGltZXIsIDAsICZpdHMsIE5VTEwpOw0KPj4+ICsgICAg
+ICAgIGdfYXNzZXJ0KGVyciA9PSAwKTsNCj4+PiArICAgIH0NCj4+PiArfQ0KPj4+ICsNCj4+PiAr
+c3RhdGljIHZvaWQNCj4+PiArZmlsZV9mZW5jZV9hYm9ydF9jYih2b2lkICpvcGFxdWUpDQo+Pj4g
+K3sNCj4+PiArICAgIEZpbGVGZW5jZSAqZmYgPSBvcGFxdWU7DQo+Pj4gKyAgICBwcmludGYoIkZl
+bmNpbmcgYWZ0ZXIgJXUgc2Vjb25kcyBvbiAnJXMnXG4iLA0KPj4+ICsgICAgICAgICAgIGZmLT5x
+dGltZW91dCwgZ19zdHJjb25jYXQoZmYtPmRpciwgIi8iLCBmZi0+ZmlsZSwgTlVMTCkpOw0KPj4g
+DQo+PiBNYXkgYmUgZXJyb3JfcHJpbnRmKCkgaW5zdGVhZC4NCj4gDQo+IE1ha2VzIHNlbnNlLg0K
+DQpEb25lIGZvciB2Mi4NCg0KPiANCj4+IA0KPj4+ICsgICAgYWJvcnQoKTsNCj4+PiArfQ0KPj4+
+ICsNCj4+PiArc3RhdGljIHZvaWQNCj4+PiArZmlsZV9mZW5jZV93YXRjaF9jYihpbnQ2NF90IGlk
+LCBRRmlsZU1vbml0b3JFdmVudCBldiwgY29uc3QgY2hhciAqZmlsZSwNCj4+PiArICAgICAgICAg
+ICAgICAgICAgICB2b2lkICpvcGFxdWUpDQo+Pj4gK3sNCj4+PiArICAgIEZpbGVGZW5jZSAqZmYg
+PSBvcGFxdWU7DQo+Pj4gKw0KPj4+ICsgICAgaWYgKGV2ICE9IFFGSUxFX01PTklUT1JfRVZFTlRf
+QVRUUklCVVRFUykgew0KPj4+ICsgICAgICAgIHJldHVybjsNCj4+PiArICAgIH0NCj4+PiArDQo+
+Pj4gKyAgICBpZiAoZ19zdHJjbXAwKGZpbGUsIGZmLT5maWxlKSAhPSAwKSB7DQo+PiANCj4+IERv
+ZXMgaXQgYWN0dWFsbHkgaGFwcGVuPyBBcHBhcmVudGx5IHRoZSBjb2RlIGluDQo+PiB1dGlsL2Zp
+bGVtb25pdG9yLWlub3RpZnkuYyBhbHJlYWR5IGNoZWNrcyBmb3IgZ19zdHJfZXF1YWwoZmlsZW5h
+bWUpDQo+IA0KPiBZb3UgYXJlIHJpZ2h0LCBpdCBkb2VzLiBJIHRoaW5rIEkgc2F3IGl0LCBidXQg
+Zm9yIHNvbWUgcmVhc29uIGRlY2lkZWQNCj4gdG8gYmUgb3ZlciBwcm90ZWN0aXZlLiBJIHdpbGwg
+cmVtb3ZlIHRoaXMgY2hlY2suDQoNCkkgcmVwbGFjZWQgaXQgd2l0aCBhbiBhc3NlcnQgZm9yIHYy
+LiBJdCdzIGZpbmUgdG8gcmVseSBvbiB0aGUgb3RoZXINCmNvbXBvbmVudCwgYnV0IGl0J3MgZWFz
+eSB0byBzZWUgaG93IHNvbWVvbmUgY2FuIGNoYW5nZSB0aGUgYmVoYXZpb3VyDQp0aGVyZSBhbmQg
+bWlzcyBzb21lIG9mIGl0cyB1c2Vycy4gQXNzZXJ0cyBhcmUgaGVscGZ1bCBpbiB0aGF0IHNlbnNl
+IGFzDQppdCBjYW4gY2F0Y2ggdGhlc2UgcHJvZ3JhbW1pbmcgZXJyb3JzIChpbmNsdWRpbmcgY2hh
+bmdlcyB0byBvdGhlcg0KcGFydHMgb2YgdGhlIGNvZGViYXNlIHdlIGFyZSBtYWtpbmcgYXNzdW1w
+dGlvbnMgYWJvdXQpLg0KDQo+IA0KPj4gDQo+Pj4gKyAgICAgICAgcmV0dXJuOw0KPj4+ICsgICAg
+fQ0KPj4+ICsNCj4+PiArICAgIHRpbWVyX3VwZGF0ZShmZik7DQo+Pj4gK30NCj4+PiArDQo+Pj4g
+K3N0YXRpYyB2b2lkDQo+Pj4gK2t0aW1lcl90ZWFyKEZpbGVGZW5jZSAqZmYpDQo+Pj4gK3sNCj4+
+PiArICAgIGludCBlcnI7DQo+Pj4gKw0KPj4+ICsgICAgaWYgKGZmLT5rdGltZXIpIHsNCj4+PiAr
+ICAgICAgICBlcnIgPSB0aW1lcl9kZWxldGUoZmYtPmt0aW1lcik7DQo+Pj4gKyAgICAgICAgZ19h
+c3NlcnQoZXJyID09IDApOw0KPj4+ICsgICAgICAgIGZmLT5rdGltZXIgPSBOVUxMOw0KPj4+ICsg
+ICAgfQ0KPj4+ICt9DQo+Pj4gKw0KPj4+ICtzdGF0aWMgdm9pZA0KPj4+ICtrdGltZXJfc2V0dXAo
+RmlsZUZlbmNlICpmZiwgRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+Pj4gKyAgICBpbnQgZXJyOw0K
+Pj4+ICsNCj4+PiArICAgIHN0cnVjdCBzaWdldmVudCBzZXYgPSB7DQo+Pj4gKyAgICAgICAgLnNp
+Z2V2X25vdGlmeSA9IFNJR0VWX1NJR05BTCwNCj4+PiArICAgICAgICAuc2lnZXZfc2lnbm8gPSBm
+Zi0+c2lnbmFsID8gZmYtPnNpZ25hbCA6IFNJR0tJTEwsDQo+Pj4gKyAgICB9Ow0KPj4+ICsNCj4+
+PiArICAgIGlmIChmZi0+a3RpbWVvdXQgPT0gMCkgew0KPj4+ICsgICAgICAgIHJldHVybjsNCj4+
+PiArICAgIH0NCj4+PiArDQo+Pj4gKyAgICBlcnIgPSB0aW1lcl9jcmVhdGUoQ0xPQ0tfTU9OT1RP
+TklDLCAmc2V2LCAmZmYtPmt0aW1lcik7DQo+Pj4gKyAgICBpZiAoZXJyID09IC0xKSB7DQo+Pj4g
+KyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiRXJyb3IgY3JlYXRpbmcga2VybmVsIHRpbWVyOiAl
+bSIpOw0KPj4+ICsgICAgICAgIHJldHVybjsNCj4+PiArICAgIH0NCj4+PiArfQ0KPj4+ICsNCj4+
+PiArc3RhdGljIHZvaWQNCj4+PiArcXRpbWVyX3RlYXIoRmlsZUZlbmNlICpmZikNCj4+PiArew0K
+Pj4+ICsgICAgaWYgKGZmLT5xdGltZXIpIHsNCj4+PiArICAgICAgICB0aW1lcl9kZWwoZmYtPnF0
+aW1lcik7DQo+Pj4gKyAgICAgICAgdGltZXJfZnJlZShmZi0+cXRpbWVyKTsNCj4+PiArICAgIH0N
+Cj4+PiArICAgIGZmLT5xdGltZXIgPSBOVUxMOw0KPj4+ICt9DQo+Pj4gKw0KPj4+ICtzdGF0aWMg
+dm9pZA0KPj4+ICtxdGltZXJfc2V0dXAoRmlsZUZlbmNlICpmZiwgRXJyb3IgKiplcnJwKQ0KPj4+
+ICt7DQo+Pj4gKyAgICBRRU1VVGltZXIgKnF0aW1lcjsNCj4+PiArDQo+Pj4gKyAgICBpZiAoZmYt
+PnF0aW1lb3V0ID09IDApIHsNCj4+PiArICAgICAgICByZXR1cm47DQo+Pj4gKyAgICB9DQo+Pj4g
+Kw0KPj4+ICsgICAgcXRpbWVyID0gdGltZXJfbmV3X21zKFFFTVVfQ0xPQ0tfUkVBTFRJTUUsIGZp
+bGVfZmVuY2VfYWJvcnRfY2IsIGZmKTsNCj4+PiArICAgIGlmIChxdGltZXIgPT0gTlVMTCkgew0K
+Pj4+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkVycm9yIGNyZWF0aW5nIFFlbXUgdGltZXIi
+KTsNCj4+PiArICAgICAgICByZXR1cm47DQo+Pj4gKyAgICB9DQo+Pj4gKw0KPj4+ICsgICAgZmYt
+PnF0aW1lciA9IHF0aW1lcjsNCj4+PiArfQ0KPj4+ICsNCj4+PiArc3RhdGljIHZvaWQNCj4+PiAr
+d2F0Y2hfdGVhcihGaWxlRmVuY2UgKmZmKQ0KPj4+ICt7DQo+Pj4gKyAgICBpZiAoZmYtPmZtKSB7
+DQo+Pj4gKyAgICAgICAgcWVtdV9maWxlX21vbml0b3JfcmVtb3ZlX3dhdGNoKGZmLT5mbSwgZmYt
+PmRpciwgZmYtPmlkKTsNCj4+PiArICAgICAgICBxZW11X2ZpbGVfbW9uaXRvcl9mcmVlKGZmLT5m
+bSk7DQo+Pj4gKyAgICAgICAgZmYtPmZtID0gTlVMTDsNCj4+PiArICAgICAgICBmZi0+aWQgPSAw
+Ow0KPj4+ICsgICAgfQ0KPj4+ICt9DQo+Pj4gKw0KPj4+ICtzdGF0aWMgdm9pZA0KPj4+ICt3YXRj
+aF9zZXR1cChGaWxlRmVuY2UgKmZmLCBFcnJvciAqKmVycnApDQo+Pj4gK3sNCj4+PiArICAgIFFG
+aWxlTW9uaXRvciAqZm07DQo+Pj4gKyAgICBpbnQ2NF90IGlkOw0KPj4+ICsNCj4+PiArICAgIGZt
+ID0gcWVtdV9maWxlX21vbml0b3JfbmV3KGVycnApOw0KPj4+ICsgICAgaWYgKCFmbSkgew0KPj4+
+ICsgICAgICAgIHJldHVybjsNCj4+PiArICAgIH0NCj4+PiArDQo+Pj4gKyAgICBpZCA9IHFlbXVf
+ZmlsZV9tb25pdG9yX2FkZF93YXRjaChmbSwgZmYtPmRpciwgZmYtPmZpbGUsDQo+Pj4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBmaWxlX2ZlbmNlX3dhdGNoX2NiLCBmZiwg
+ZXJycCk7DQo+Pj4gKyAgICBpZiAoaWQgPCAwKSB7DQo+Pj4gKyAgICAgICAgcWVtdV9maWxlX21v
+bml0b3JfZnJlZShmbSk7DQo+Pj4gKyAgICAgICAgcmV0dXJuOw0KPj4+ICsgICAgfQ0KPj4+ICsN
+Cj4+PiArICAgIGZmLT5mbSA9IGZtOw0KPj4+ICsgICAgZmYtPmlkID0gaWQ7DQo+Pj4gK30NCj4+
+PiArDQo+Pj4gK3N0YXRpYyB2b2lkDQo+Pj4gK2ZpbGVfZmVuY2VfY29tcGxldGUoVXNlckNyZWF0
+YWJsZSAqb2JqLCBFcnJvciAqKmVycnApDQo+Pj4gK3sNCj4+PiArICAgIEZpbGVGZW5jZSAqZmYg
+PSBGSUxFX0ZFTkNFKG9iaik7DQo+Pj4gKw0KPj4+ICsgICAgaWYgKGZmLT5kaXIgPT0gTlVMTCkg
+ew0KPj4+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkEgJ2ZpbGUnIG11c3QgYmUgc2V0Iik7
+DQo+Pj4gKyAgICAgICAgcmV0dXJuOw0KPj4+ICsgICAgfQ0KPj4+ICsNCj4+PiArICAgIGlmIChm
+Zi0+c2lnbmFsICE9IDAgJiYgZmYtPmt0aW1lb3V0ID09IDApIHsNCj4+PiArICAgICAgICBlcnJv
+cl9zZXRnKGVycnAsICJVc2luZyAnc2lnbmFsJyByZXF1aXJlcyAna3RpbWVvdXQnIHRvIGJlIHNl
+dCIpOw0KPj4+ICsgICAgICAgIHJldHVybjsNCj4+PiArICAgIH0NCj4+PiArDQo+Pj4gKyAgICBp
+ZiAoZmYtPmt0aW1lb3V0ID09IDAgJiYgZmYtPnF0aW1lb3V0ID09IDApIHsNCj4+PiArICAgICAg
+ICBlcnJvcl9zZXRnKGVycnAsICJPbmUgb3IgYm90aCBvZiAna3RpbWVvdXQnIG9yICdxdGltZW91
+dCcgbXVzdCBiZSBzZXQiKTsNCj4+PiArICAgICAgICByZXR1cm47DQo+Pj4gKyAgICB9DQo+Pj4g
+Kw0KPj4+ICsgICAgaWYgKGZmLT5xdGltZW91dCA+PSBmZi0+a3RpbWVvdXQpIHsNCj4+PiArICAg
+ICAgICBlcnJvcl9zZXRnKGVycnAsICJVc2luZyAncXRpbWVvdXQnID49ICdrdGltZW91dCcgZG9l
+c24ndCBtYWtlIHNlbnNlIik7DQo+Pj4gKyAgICAgICAgcmV0dXJuOw0KPj4+ICsgICAgfQ0KPj4+
+ICsNCj4+PiArICAgIHdhdGNoX3NldHVwKGZmLCBlcnJwKTsNCj4+PiArICAgIGlmICgqZXJycCAh
+PSBOVUxMKSB7DQo+Pj4gKyAgICAgICAgcmV0dXJuOw0KPj4+ICsgICAgfQ0KPj4+ICsNCj4+PiAr
+ICAgIHF0aW1lcl9zZXR1cChmZiwgZXJycCk7DQo+Pj4gKyAgICBpZiAoKmVycnAgIT0gTlVMTCkg
+ew0KPj4+ICsgICAgICAgIGdvdG8gZXJyX3dhdGNoOw0KPj4+ICsgICAgfQ0KPj4+ICsNCj4+PiAr
+ICAgIGt0aW1lcl9zZXR1cChmZiwgZXJycCk7DQo+Pj4gKyAgICBpZiAoKmVycnAgIT0gTlVMTCkg
+ew0KPj4+ICsgICAgICAgIGdvdG8gZXJyX3F0aW1lcjsNCj4+PiArICAgIH0NCj4+IA0KPj4gDQo+
+PiBJIHdvdWxkIHJhdGhlciByZXR1cm4gc3VjY2VzcyBvbiB0aGUgc2V0dXAgZnVuY3Rpb25zIGFu
+ZCB3cml0ZToNCj4+IA0KPj4gaWYgKCF3YXRjaF9zZXR1cChmZiwgZXJycCkgfHwNCj4+ICAgICAh
+cXRpbWVyX3NldHVwKC4uLikgfHwNCj4+ICAgICAhLi4uKSB7DQo+PiAgICAgcmV0dXJuOyAobm8g
+Y2xlYW51cCkNCj4+ICB9DQo+PiANCj4+IE9iamVjdCBjcmVhdGlvbiB3aWxsIGZhaWwsIGFuZCBm
+aW5hbGl6ZSBmdW5jdGlvbiB3aWxsIGJlIGNhbGxlZC4NCg0KTWFrZXMgc2Vuc2UuIERvbmUgZm9y
+IHYyLg0KDQo+PiANCj4+PiArDQo+Pj4gKyAgICB0aW1lcl91cGRhdGUoZmYpOw0KPj4+ICsNCj4+
+PiArICAgIHJldHVybjsNCj4+PiArDQo+Pj4gK2Vycl9xdGltZXI6DQo+Pj4gKyAgICBxdGltZXJf
+dGVhcihmZik7DQo+Pj4gK2Vycl93YXRjaDoNCj4+PiArICAgIHdhdGNoX3RlYXIoZmYpOw0KPj4+
+ICt9DQo+Pj4gKw0KPj4+ICtzdGF0aWMgdm9pZA0KPj4+ICtmaWxlX2ZlbmNlX3NldF9zaWduYWwo
+T2JqZWN0ICpvYmosIGNvbnN0IGNoYXIgKnZhbHVlLCBFcnJvciAqKmVycnApDQo+Pj4gK3sNCj4+
+PiArICAgIEZpbGVGZW5jZSAqZmYgPSBGSUxFX0ZFTkNFKG9iaik7DQo+Pj4gKyAgICBnY2hhciAq
+Z3NpZzsNCj4+PiArDQo+Pj4gKyAgICBpZiAoZmYtPnNpZ25hbCkgew0KPj4+ICsgICAgICAgIGVy
+cm9yX3NldGcoZXJycCwgIlNpZ25hbCBwcm9wZXJ0eSBhbHJlYWR5IHNldCIpOw0KPj4+ICsgICAg
+ICAgIHJldHVybjsNCj4+PiArICAgIH0NCj4+PiArDQo+Pj4gKyAgICBnc2lnID0gZ19hc2NpaV9z
+dHJ1cCh2YWx1ZSwgLTEpOw0KPj4+ICsNCj4+PiArICAgIGlmIChnX3N0cmNtcDAoZ3NpZywgIlFV
+SVQiKSA9PSAwKSB7DQo+Pj4gKyAgICAgICAgZmYtPnNpZ25hbCA9IFNJR1FVSVQ7DQo+Pj4gKyAg
+ICB9IGVsc2UNCj4+PiArICAgIGlmIChnX3N0cmNtcDAoZ3NpZywgIktJTEwiKSA9PSAwKSB7DQo+
+Pj4gKyAgICAgICAgZmYtPnNpZ25hbCA9IFNJR0tJTEw7DQo+Pj4gKyAgICB9IGVsc2Ugew0KPj4+
+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkludmFsaWQgc2lnbmFsLiBNdXN0IGJlICdxdWl0
+JyBvciAna2lsbCciKTsNCj4+PiArICAgIH0NCj4+IA0KPj4gT3IgYmFpbCBvdXQgZWFybHkgZm9y
+IE5VTEwgY2FzZSBhbmQgdXNlIGdfYXNjaWlfc3RyY2FzZWNtcCgpDQo+IA0KPiBTb3VuZHMgYmV0
+dGVyLiBMZXQgbWUgbG9vayBpbnRvIGl0Lg0KDQpJIGZvbGxvd2VkIHlvdXIgc3VnZ2VzdGlvbiBi
+dXQgaGFkIHRvIGFkZCBhIGdvdG8uIEkgaGF2ZSB0aGUgZmVlbGluZw0KeW91IGRvbid0IGxpa2Ug
+dGhlbSwgc28gbGV0IG1lIGtub3cgd2hhdCB5b3UgdGhpbmsuIDopDQoNCj4gDQo+PiANCj4+PiAr
+DQo+Pj4gKyAgICBnX2ZyZWUoZ3NpZyk7DQo+Pj4gK30NCj4+PiArDQo+Pj4gK3N0YXRpYyBjaGFy
+ICoNCj4+PiArZmlsZV9mZW5jZV9nZXRfc2lnbmFsKE9iamVjdCAqb2JqLCBFcnJvciAqKmVycnAp
+DQo+Pj4gK3sNCj4+PiArICAgIEZpbGVGZW5jZSAqZmYgPSBGSUxFX0ZFTkNFKG9iaik7DQo+Pj4g
+Kw0KPj4+ICsgICAgc3dpdGNoIChmZi0+c2lnbmFsKSB7DQo+Pj4gKyAgICBjYXNlIFNJR0tJTEw6
+DQo+Pj4gKyAgICAgICAgcmV0dXJuIGdfc3RyZHVwKCJraWxsIik7DQo+Pj4gKyAgICBjYXNlIFNJ
+R1FVSVQ6DQo+Pj4gKyAgICAgICAgcmV0dXJuIGdfc3RyZHVwKCJxdWl0Iik7DQo+Pj4gKyAgICB9
+DQo+Pj4gKw0KPj4+ICsgICAgLyogVW5yZWFjaGFibGUgKi8NCj4+PiArICAgIGFib3J0KCk7DQo+
+Pj4gK30NCj4+PiArDQo+Pj4gK3N0YXRpYyB2b2lkDQo+Pj4gK2ZpbGVfZmVuY2Vfc2V0X2ZpbGUo
+T2JqZWN0ICpvYmosIGNvbnN0IGNoYXIgKnZhbHVlLCBFcnJvciAqKmVycnApDQo+Pj4gK3sNCj4+
+PiArICAgIEZpbGVGZW5jZSAqZmYgPSBGSUxFX0ZFTkNFKG9iaik7DQo+Pj4gKyAgICBnY2hhciAq
+ZGlyLCAqZmlsZTsNCj4+IA0KPj4gZ19hdXRvZnJlZQ0KPiANCj4gU3dlZXQuDQoNCkRvbmUgZm9y
+IHYyLg0KDQo+IA0KPj4gDQo+Pj4gKw0KPj4+ICsgICAgaWYgKGZmLT5kaXIpIHsNCj4+PiArICAg
+ICAgICBlcnJvcl9zZXRnKGVycnAsICJGaWxlIHByb3BlcnR5IGFscmVhZHkgc2V0Iik7DQo+Pj4g
+KyAgICAgICAgcmV0dXJuOw0KPj4+ICsgICAgfQ0KPj4+ICsNCj4+PiArICAgIGRpciA9IGdfcGF0
+aF9nZXRfZGlybmFtZSh2YWx1ZSk7DQo+Pj4gKyAgICBpZiAoZ19zdHJfZXF1YWwoZGlyLCAiLiIp
+KSB7DQo+Pj4gKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiUGF0aCBmb3IgZmlsZS1mZW5jZSBt
+dXN0IGJlIGFic29sdXRlIik7DQo+Pj4gKyAgICAgICAgcmV0dXJuOw0KPj4+ICsgICAgfQ0KPj4+
+ICsNCj4+PiArICAgIGZpbGUgPSBnX3BhdGhfZ2V0X2Jhc2VuYW1lKHZhbHVlKTsNCj4+PiArICAg
+IGlmIChnX3N0cl9lcXVhbChmaWxlLCAiLiIpKSB7DQo+Pj4gKyAgICAgICAgZXJyb3Jfc2V0Zyhl
+cnJwLCAiUGF0aCBmb3IgZmlsZS1mZW5jZSBtdXN0IGJlIGEgZmlsZSIpOw0KPj4+ICsgICAgICAg
+IGdfZnJlZShkaXIpOw0KPj4+ICsgICAgICAgIHJldHVybjsNCj4+PiArICAgIH0NCj4+PiArDQo+
+Pj4gKyAgICBmZi0+ZGlyID0gZGlyOw0KPj4+ICsgICAgZmYtPmZpbGUgPSBmaWxlOw0KPj4gDQo+
+PiBnX3N0ZWFsX3BvaW50ZXIoKQ0KPiANCj4gQ29vbCEgQ2xlYXJseSBJIGNvdWxkIHNwZW5kIG1v
+cmUgdGltZSBpbiB0aGUgZ2xpYiBtYW51YWwuIDopDQoNCkRvbmUgZm9yIHYyLg0KDQo+IA0KPj4g
+DQo+Pj4gK30NCj4+PiArDQo+Pj4gK3N0YXRpYyBjaGFyICoNCj4+PiArZmlsZV9mZW5jZV9nZXRf
+ZmlsZShPYmplY3QgKm9iaiwgRXJyb3IgKiplcnJwKQ0KPj4+ICt7DQo+Pj4gKyAgICBGaWxlRmVu
+Y2UgKmZmID0gRklMRV9GRU5DRShvYmopOw0KPj4+ICsNCj4+PiArICAgIGlmIChmZi0+ZmlsZSkg
+ew0KPj4+ICsgICAgICAgIHJldHVybiBnX3N0cmNvbmNhdChmZi0+ZGlyLCAiLyIsIGZmLT5maWxl
+LCBOVUxMKTsNCj4+IA0KPj4gT3IgZ19idWlsZF9maWxlbmFtZSgpDQo+IA0KPiBNYWtlcyBzZW5z
+ZS4NCg0KRG9uZSBmb3IgdjIuDQoNCkkgd291bGQgbGlrZSB0byBhZGQgdGhhdCBJJ20gZm9sbG93
+aW5nIHlvdXIgZ3VpZGFuY2UgaW4gaG93IFFlbXUgdXNlcw0KZ2xpYiwgYnV0IHBlcnNvbmFsbHkg
+SSdtIG5vdCBhIGJpZyBmYW4gb2YgdGhlc2UgZmVhdHVyZXMuIEkgZG9uJ3Qga25vdw0KaG93IHdl
+bGwgY29tcGlsZXJzIGNhbiBvcHRpbWlzZSB0aGlzIGNvZGUsIGJ1dCB0aGVzZSAoc3BlY2lmaWMp
+DQpmdW5jdGlvbnMgYXJlIHJhdGhlciBzaW1wbGUgYW5kIEknZCBsaWtlIHRvIHRoaW5rIHdlIGNh
+biBjb3JyZWN0bHkNCmNvdmVyIGVycm9yIGNhc2VzLCBldmVudHVhbGx5IHByb2R1Y2luZyBtb3Jl
+IG9wdGltYWwgY29kZSB0aGFuIHdoYXQgSQ0KY2FuIHNlZSBiZWluZyBwcm9kdWNlZCB3aGVuIHVz
+aW5nIHRoZSBtZW1vcnkgKGRlKWFsbG9jYXRpb24gaGVscGVycy4NCg0KPiANCj4+IA0KPj4+ICsg
+ICAgfQ0KPj4+ICsNCj4+PiArICAgIHJldHVybiBOVUxMOw0KPj4+ICt9DQo+Pj4gKw0KPj4+ICtz
+dGF0aWMgdm9pZA0KPj4+ICtmaWxlX2ZlbmNlX2luc3RhbmNlX2ZpbmFsaXplKE9iamVjdCAqb2Jq
+KQ0KPj4+ICt7DQo+Pj4gKyAgICBGaWxlRmVuY2UgKmZmID0gRklMRV9GRU5DRShvYmopOw0KPj4+
+ICsNCj4+PiArICAgIGt0aW1lcl90ZWFyKGZmKTsNCj4+PiArICAgIHF0aW1lcl90ZWFyKGZmKTsN
+Cj4+PiArICAgIHdhdGNoX3RlYXIoZmYpOw0KPj4+ICsNCj4+PiArICAgIGdfZnJlZShmZi0+Zmls
+ZSk7DQo+Pj4gKyAgICBnX2ZyZWUoZmYtPmRpcik7DQo+Pj4gK30NCj4+PiArDQo+Pj4gK3N0YXRp
+YyB2b2lkDQo+Pj4gK2ZpbGVfZmVuY2VfaW5zdGFuY2VfaW5pdChPYmplY3QgKm9iaikNCj4+PiAr
+ew0KPj4+ICsgICAgRmlsZUZlbmNlICpmZiA9IEZJTEVfRkVOQ0Uob2JqKTsNCj4+PiArDQo+Pj4g
+KyAgICBvYmplY3RfcHJvcGVydHlfYWRkX3N0cihvYmosICJmaWxlIiwNCj4+PiArICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIGZpbGVfZmVuY2VfZ2V0X2ZpbGUsDQo+Pj4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBmaWxlX2ZlbmNlX3NldF9maWxlLA0KPj4+ICsgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgJmVycm9yX2Fib3J0KTsNCj4+PiArICAgIG9iamVjdF9wcm9wZXJ0eV9h
+ZGRfc3RyKG9iaiwgInNpZ25hbCIsDQo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBm
+aWxlX2ZlbmNlX2dldF9zaWduYWwsDQo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBm
+aWxlX2ZlbmNlX3NldF9zaWduYWwsDQo+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAm
+ZXJyb3JfYWJvcnQpOw0KPj4+ICsgICAgb2JqZWN0X3Byb3BlcnR5X2FkZF91aW50MzJfcHRyKG9i
+aiwgInF0aW1lb3V0IiwgJmZmLT5xdGltZW91dCwNCj4+PiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBmYWxzZSwgJmVycm9yX2Fib3J0KTsNCj4+PiArICAgIG9iamVjdF9wcm9w
+ZXJ0eV9hZGRfdWludDMyX3B0cihvYmosICJrdGltZW91dCIsICZmZi0+a3RpbWVvdXQsDQo+Pj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZmFsc2UsICZlcnJvcl9hYm9ydCk7
+DQo+PiANCj4+IE1ha2UgdGhlbSBjbGFzcyBwcm9wZXJ0aWVzICh0aGlzIHdpbGwgaGVscCB3aXRo
+IC1vYmplY3QNCj4+IGZpbGUtZmVuY2UsaGVscCBhbmQgc3VjaCkuIChmd2l3LCBJIGhhdmUgcGVu
+ZGluZyBwYXRjaGVzIHRvIHN1cHBvcnQNCj4+IGNsYXNzIHByb3BlcnR5IGRlc2NyaXB0aW9uICYg
+ZGVmYXVsdCB2YWx1ZXMuLikNCj4gDQo+IEkgdHJpZWQgdG8gZml0IHNvbWUgb2YgdGhlc2UgaW4g
+dGhlIGNsYXNzLCBhcyB3ZWxsIGFzIGp1c3RpZnkgYSBzcGxpdA0KPiBvZiB0aGUgZmlsZS1iYXNl
+ZCBmZW5jaW5nIHdpdGggYSBtb3JlIGdlbmVyaWMgc2VsZi1mZW5jZXIgcmlnaHQgb2ZmDQo+IHRo
+ZSBiYXQuIEJ1dCBpdCBkaWRuJ3QgbWFrZSBzZW5zZSBpbiB0aGUgZW5kLiBJIGVudmlzaW9uZWQg
+c2NlbmFyaW9zDQo+IHdoZXJlIHlvdSBtYXkgaGF2ZSBkaWZmZXJlbnQgaGVhcnRiZWF0cyBmb3Ig
+b25lIFFlbXUgd2l0aCBkaWZmZXJlbnQNCj4gdGltZW91dHMuIEluIHRoYXQgY2FzZSwgaXQgd291
+bGRuJ3Qgd29yayBhcyBhIGNsYXNzIHByb3BlcnR5LCByaWdodD8NCg0KSSBkaWRuJ3QgaGVhciBi
+YWNrIGZyb20geW91IG9uIHRoaXMgc28gSSBkaWRuJ3QgY2hhbmdlIGl0LiBMZXQgbWUga25vdw0K
+eW91ciB0aG91Z2h0cy4NCg0KPiANCj4+IA0KPj4+ICt9DQo+Pj4gKw0KPj4+ICtzdGF0aWMgdm9p
+ZA0KPj4+ICtmaWxlX2ZlbmNlX2NsYXNzX2luaXQoT2JqZWN0Q2xhc3MgKmtsYXNzLCB2b2lkICpj
+bGFzc19kYXRhKQ0KPj4+ICt7DQo+Pj4gKyAgICBVc2VyQ3JlYXRhYmxlQ2xhc3MgKnVjYyA9IFVT
+RVJfQ1JFQVRBQkxFX0NMQVNTKGtsYXNzKTsNCj4+PiArICAgIHVjYy0+Y29tcGxldGUgPSBmaWxl
+X2ZlbmNlX2NvbXBsZXRlOw0KPj4+ICt9DQo+Pj4gKw0KPj4+ICtzdGF0aWMgY29uc3QgVHlwZUlu
+Zm8gZmlsZV9mZW5jZV9pbmZvID0gew0KPj4+ICsgICAgLm5hbWUgPSBUWVBFX0ZJTEVfRkVOQ0Us
+DQo+Pj4gKyAgICAucGFyZW50ID0gVFlQRV9PQkpFQ1QsDQo+Pj4gKyAgICAuY2xhc3NfaW5pdCA9
+IGZpbGVfZmVuY2VfY2xhc3NfaW5pdCwNCj4+PiArICAgIC5pbnN0YW5jZV9zaXplID0gc2l6ZW9m
+KEZpbGVGZW5jZSksDQo+Pj4gKyAgICAuaW5zdGFuY2VfaW5pdCA9IGZpbGVfZmVuY2VfaW5zdGFu
+Y2VfaW5pdCwNCj4+PiArICAgIC5pbnN0YW5jZV9maW5hbGl6ZSA9IGZpbGVfZmVuY2VfaW5zdGFu
+Y2VfZmluYWxpemUsDQo+Pj4gKyAgICAuaW50ZXJmYWNlcyA9IChJbnRlcmZhY2VJbmZvW10pIHsN
+Cj4+PiArICAgICAgICB7IFRZUEVfVVNFUl9DUkVBVEFCTEUgfSwNCj4+PiArICAgICAgICB7IH0N
+Cj4+PiArICAgIH0NCj4+PiArfTsNCj4+PiArDQo+Pj4gK3N0YXRpYyB2b2lkDQo+Pj4gK3JlZ2lz
+dGVyX3R5cGVzKHZvaWQpDQo+Pj4gK3sNCj4+PiArICAgIHR5cGVfcmVnaXN0ZXJfc3RhdGljKCZm
+aWxlX2ZlbmNlX2luZm8pOw0KPj4+ICt9DQo+Pj4gKw0KPj4+ICt0eXBlX2luaXQocmVnaXN0ZXJf
+dHlwZXMpOw0KPj4+IGRpZmYgLS1naXQgYS9xZW11LW9wdGlvbnMuaHggYi9xZW11LW9wdGlvbnMu
+aHgNCj4+PiBpbmRleCA2NWM5NDczYjczLi45OTVkM2Q2YWJmIDEwMDY0NA0KPj4+IC0tLSBhL3Fl
+bXUtb3B0aW9ucy5oeA0KPj4+ICsrKyBiL3FlbXUtb3B0aW9ucy5oeA0KPj4+IEBAIC00OTI5LDgg
+KzQ5MjksMzMgQEAgQ049bGFwdG9wLmV4YW1wbGUuY29tLE89RXhhbXBsZSBIb21lLEw9TG9uZG9u
+LFNUPUxvbmRvbixDPUdCDQo+Pj4gDQo+Pj4gQGVuZCB0YWJsZQ0KPj4+IA0KPj4+IC1FVEVYSQ0K
+Pj4+ICtAaXRlbSAtb2JqZWN0IGZpbGUtZmVuY2UsaWQ9QHZhcntpZH0sZmlsZT1AdmFye2ZpbGV9
+LHF0aW1lb3V0PUB2YXJ7cXRpbWVvdXR9LGt0aW1lb3V0PUB2YXJ7a3RpbWVvdXR9LHNpZ25hbD1A
+e3NpZ25hbH0NCj4+PiArDQo+Pj4gK1NlbGYtZmVuY2UgUWVtdSBpZiBAdmFye2ZpbGV9IGlzIG5v
+dCBtb2RpZmllZCB3aXRoaW4gYSBnaXZlbiB0aW1lb3V0Lg0KPj4+ICsNCj4+PiArUWVtdSB3aWxs
+IHdhdGNoIEB2YXJ7ZmlsZX0gZm9yIGF0dHJpYnV0ZSBjaGFuZ2VzLiBUb3VjaGluZyB0aGUgZmls
+ZSB3b3JrcyBhcyBhDQo+Pj4gK2hlYXJ0YmVhdC4gVGhpcyBwYXJhbWV0ZXIgaXMgbWFuZGF0b3J5
+Lg0KPj4+ICsNCj4+PiArRmVuY2luZyBoYXBwZW5zIGFmdGVyIEB2YXJ7cXRpbWVvdXR9IG9yIEB2
+YXJ7a3RpbWVvdXR9IHNlY29uZHMgZWxhcHNlDQo+Pj4gK3dpdGhvdXQgYSBoZWFydGJlYXQuIEF0
+IGxlYXN0IG9uZSBvZiB0aGVzZSBtdXN0IGJlIHNwZWNpZmllZC4gQm90aCBtYXkgYmUgdXNlZC4N
+Cj4+PiANCj4+PiArV2hlbiB1c2luZyBAdmFye3F0aW1lb3V0fSwgYW4gaW50ZXJuYWwgUWVtdSB0
+aW1lciBpcyB1c2VkLiBGZW5jaW5nIHdpdGgNCj4+PiArdGhpcyBtZXRob2QgZ2l2ZXMgUWVtdSBh
+IGNoYW5jZSB0byB3cml0ZSBhIGxvZyBtZXNzYWdlIGluZGljYXRpbmcgd2hpY2ggZmlsZQ0KPj4+
+ICtjYXVzZWQgdGhlIGV2ZW50LiBJZiBRZW11J3MgbWFpbiBsb29wIGlzIGh1bmcgZm9yIHdoYXRl
+dmVyIHJlYXNvbiwgdGhpcyBtZXRob2QNCj4+PiArd29uJ3Qgc3VjY2Vzc2Z1bGx5IGtpbGwgUWVt
+dS4NCj4+PiArDQo+Pj4gK1doZW4gdXNpbmcgQHZhcntrdGltZW91dH0sIGEga2VybmVsIHRpbWVy
+IGlzIHVzZWQuIEluIHRoaXMgY2FzZSwgQHZhcntzaWduYWx9DQo+Pj4gK2NhbiBiZSAna2lsbCcg
+KGZvciBTSUdLSUxMLCBkZWZhdWx0KSBvciAncXVpdCcgKGZvciBTSUdRVUlUKS4gVXNpbmcgU0lH
+UVVJVCBtYXkNCj4+PiArYmUgcHJlZmVycmVkIGZvciBvYnRhaW5pbmcgY29yZSBkdW1wcy4gSWYg
+UWVtdSBpcyBodW5nIChlZy4gdW5pbnRlcnJ1cHRhYmxlDQo+Pj4gK3NsZWVwKSwgdGhpcyBtZXRo
+b2Qgd29uJ3Qgc3VjY2Vzc2Z1bGx5IGtpbGwgUWVtdS4NCj4+PiArDQo+Pj4gK0l0IGlzIHdvcnRo
+IG5vdGluZyB0aGF0IGV2ZW4gc3VjY2Vzc2Z1bGx5IGtpbGxpbmcgUWVtdSBtYXkgbm90IGJlIHN1
+ZmZpY2llbnQgdG8NCj4+PiArY29tcGxldGVseSBmZW5jZSBhIFZNIGFzIGNlcnRhaW4gb3BlcmF0
+aW9ucyBsaWtlIG5ldHdvcmsgcGFja2V0cyBvciBibG9jaw0KPj4+ICtjb21tYW5kcyBtYXkgYmUg
+cGVuZGluZyBpbiB0aGUga2VybmVsLiBJZiB0aGF0IGlzIGEgY29uY2Vybiwgc3lzdGVtcyBzaG91
+bGQNCj4+PiArY29uc2lkZXIgdXNpbmcgZnVydGhlciBmZW5jaW5nIG1lY2hhbmlzbXMgbGlrZSBo
+YXJkd2FyZSB3YXRjaGRvZ3MgZWl0aGVyIGluDQo+Pj4gK2FkZGl0aW9uIG9yIGluIGNvbmp1bmN0
+aW9uIHdpdGggdGhpcyBmZWF0dXJlIGZvciBhZGRpdGlvbmFsIHByb3RlY3Rpb24uDQo+Pj4gKw0K
+Pj4+ICtFVEVYSQ0KPj4+IA0KPj4+IEhYQ09NTSBUaGlzIGlzIHRoZSBsYXN0IHN0YXRlbWVudC4g
+SW5zZXJ0IG5ldyBvcHRpb25zIGJlZm9yZSB0aGlzIGxpbmUhDQo+Pj4gU1RFWEkNCj4+PiAtLQ0K
+Pj4+IDIuMjAuMQ0KPj4+IA0KPj4gDQo+PiBDb2RlIGxvb2tzIGZpbmUgdG8gbWUgb3RoZXJ3aXNl
+DQo+IA0KPiBMZXQgbWUgd29yayBvbiBhIHYyIG5leHQgd2Vlay4NCg0KIm5leHQgd2VlayIgaXMg
+ZmluYWxseSBoZXJlLiA6KQ0KDQpGLg0KDQo+IA0KPiBGLg0KPiANCj4+IA0KPj4gLS0gDQo+PiBN
+YXJjLUFuZHLDqSBMdXJlYXUNCj4gDQoNCg==
 
