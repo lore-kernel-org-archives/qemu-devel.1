@@ -2,94 +2,69 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57BDDC352A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 18:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 909ADC35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 18:32:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CFEF217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 18:22:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CFEF217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6644F20674
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 18:32:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6644F20674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m00nbsd.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izPJW-0004mi-Cp
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 13:22:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44599)
+	id 1izPTX-0000PC-Ej
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 13:32:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jjherne@linux.ibm.com>) id 1izPIq-0004GW-Oo
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 13:21:36 -0500
+ (envelope-from <max@m00nbsd.net>) id 1izOls-0005JZ-HM
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:47:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jjherne@linux.ibm.com>) id 1izPIp-0005PZ-MM
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 13:21:32 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35054)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
- id 1izPIp-0005J8-EO; Wed, 05 Feb 2020 13:21:31 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 015IItvP109544; Wed, 5 Feb 2020 13:21:29 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhpy31hn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Feb 2020 13:21:29 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 015IJYXk111091;
- Wed, 5 Feb 2020 13:21:29 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhpy31gv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Feb 2020 13:21:29 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 015IA3KO029868;
- Wed, 5 Feb 2020 18:21:28 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma02dal.us.ibm.com with ESMTP id 2xykc9gcmt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Feb 2020 18:21:28 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 015ILR3m45351250
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 5 Feb 2020 18:21:27 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3DA06112062;
- Wed,  5 Feb 2020 18:21:27 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1093F112063;
- Wed,  5 Feb 2020 18:21:27 +0000 (GMT)
-Received: from dhcp-9-60-75-200.endicott.ibm.com (unknown [9.60.75.200])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed,  5 Feb 2020 18:21:26 +0000 (GMT)
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com,
- borntraeger@de.ibm.com
-Subject: [PATCH] pc-bios/s390x: Pack ResetInfo struct
-Date: Wed,  5 Feb 2020 13:21:26 -0500
-Message-Id: <20200205182126.13010-1-jjherne@linux.ibm.com>
-X-Mailer: git-send-email 2.21.1
+ (envelope-from <max@m00nbsd.net>) id 1izOlr-0005tR-As
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:47:28 -0500
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:44803)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <max@m00nbsd.net>) id 1izOlr-0005MI-2T
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 12:47:27 -0500
+Received: from mxplan6.mail.ovh.net (unknown [10.108.1.10])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 42D551E19341;
+ Wed,  5 Feb 2020 18:47:17 +0100 (CET)
+Received: from m00nbsd.net (37.59.142.100) by DAG3EX2.mxp6.local (172.16.2.22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1779.2; Wed, 5 Feb 2020
+ 18:47:16 +0100
+Subject: Re: [PATCH v2 3/4] Introduce the NVMM impl
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Kamil
+ Rytarowski <n54@gmx.com>, <rth@twiddle.net>, <ehabkost@redhat.com>,
+ <slp@redhat.com>, <pbonzini@redhat.com>, <peter.maydell@linaro.org>
+References: <20200107124903.16505-1-n54@gmx.com>
+ <20200128140945.929-1-n54@gmx.com> <20200128140945.929-4-n54@gmx.com>
+ <c0b0fcb2-c370-52f9-b3ee-adc15455b902@redhat.com>
+From: Maxime Villard <max@m00nbsd.net>
+Message-ID: <60390e82-6168-b2e3-7e5d-149af82c726a@m00nbsd.net>
+Date: Wed, 5 Feb 2020 18:47:11 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-05_05:2020-02-04,
- 2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- impostorscore=0 mlxscore=0 phishscore=0 suspectscore=3 spamscore=0
- bulkscore=0 lowpriorityscore=0 mlxlogscore=999 clxscore=1011 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002050140
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <c0b0fcb2-c370-52f9-b3ee-adc15455b902@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+X-Originating-IP: [37.59.142.100]
+X-ClientProxiedBy: DAG3EX1.mxp6.local (172.16.2.21) To DAG3EX2.mxp6.local
+ (172.16.2.22)
+X-Ovh-Tracer-GUID: 73df9b9c-1fc2-4210-94cb-5c15d5b68d83
+X-Ovh-Tracer-Id: 18420848379673644908
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrhedugddutddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkfffgggjtgfgihesthekredttddtjeenucfhrhhomhepofgrgihimhgvucggihhllhgrrhguuceomhgrgiesmhdttdhnsghsugdrnhgvtheqnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghniedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehmrgigsehmtddtnhgsshgurdhnvghtpdhrtghpthhtohepphhhihhlmhgusehrvgguhhgrthdrtghomh
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.32.125.2
+X-Mailman-Approved-At: Wed, 05 Feb 2020 13:31:59 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,43 +76,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes vfio-ccw when booting non-Linux operating systems. Without this
-struct being packed, a few extra bytes of low core memory get overwritten when
-we  assign a value to memory address 0 in jump_to_IPL_2. This is enough to
-cause some non-Linux OSes of fail when booting.
+Hi
 
-The problem was introduced by:
-5c6f0d5f46a77d77 "pc-bios/s390x: Fix reset psw mask".
+Le 03/02/2020 =C3=A0 12:51, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=A0=
+:
+>> +static void
+>> +nvmm_io_callback(struct nvmm_io *io)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 MemTxAttrs attrs =3D { 0 };
+>> +=C2=A0=C2=A0=C2=A0 int ret;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 ret =3D address_space_rw(&address_space_io, io->po=
+rt, attrs, io->data,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 io->size, !io->in);
+>> +=C2=A0=C2=A0=C2=A0 if (ret !=3D MEMTX_OK) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("NVMM: I/O Tr=
+ansaction Failed "
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "[=
+%s, port=3D%u, size=3D%zu]", (io->in ? "in" : "out"),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 io=
+->port, io->size);
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* XXX Needed, otherwise infinite loop. */
+>=20
+> This seems OK, why the XXX in comment?
+>=20
+>> +=C2=A0=C2=A0=C2=A0 current_cpu->vcpu_dirty =3D false;
+>> +}
 
-The fix is to pack the struct thereby removing the 4 bytes of padding that get
-added at the end, likely to allow an array of these structs to naturally align
-on an 8-byte boundary.
+Because the other implementations don't do that and avoid the infinite lo=
+op
+somehow. I didn't completely understand why, so I left an XXX.
 
-Fixes: 5c6f0d5f46a7 ("pc-bios/s390x: Fix reset psw mask")
-CC: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
----
- pc-bios/s390-ccw/jump2ipl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>> +static int
+>> +nvmm_vcpu_loop(CPUState *cpu)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 struct CPUX86State *env =3D (CPUArchState *)cpu->e=
+nv_ptr;
+>> +=C2=A0=C2=A0=C2=A0 struct nvmm_machine *mach =3D get_nvmm_mach();
+>> +=C2=A0=C2=A0=C2=A0 struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
+>> +=C2=A0=C2=A0=C2=A0 struct nvmm_vcpu *vcpu =3D &qcpu->vcpu;
+>> +=C2=A0=C2=A0=C2=A0 X86CPU *x86_cpu =3D X86_CPU(cpu);
+>> +=C2=A0=C2=A0=C2=A0 struct nvmm_vcpu_exit *exit =3D vcpu->exit;
+>> +=C2=A0=C2=A0=C2=A0 int ret;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Some asynchronous events must be handled o=
+utside of the inner
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 * VCPU loop. They are handled here.
+>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0 if (cpu->interrupt_request & CPU_INTERRUPT_INIT) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nvmm_cpu_synchronize_state=
+(cpu);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 do_cpu_init(x86_cpu);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* XXX: reset the INT/NMI =
+windows */
+>=20
+> What is the problem?
 
-diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
-index da13c43cc0..1e9eaa037f 100644
---- a/pc-bios/s390-ccw/jump2ipl.c
-+++ b/pc-bios/s390-ccw/jump2ipl.c
-@@ -18,7 +18,7 @@
- typedef struct ResetInfo {
-     uint64_t ipl_psw;
-     uint32_t ipl_continue;
--} ResetInfo;
-+} __attribute__((packed)) ResetInfo;
- 
- static ResetInfo save;
- 
--- 
-2.21.1
+The int/nmi windows are not set back to the reset state. Not complicated
+to do but I never got around to doing it. This can easily be addressed
+in a future patch.
 
+Maxime
 
