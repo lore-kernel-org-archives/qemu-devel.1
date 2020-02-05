@@ -2,80 +2,90 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C68C35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 10:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BAFDC35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD2D120674
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 10:52:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38E0C20674
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 11:01:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KcoLZBaB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD2D120674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ucCV2ozk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E0C20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izII8-00011J-VY
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 05:52:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39669)
+	id 1izIQx-0002iX-AE
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 06:01:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43251)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1izIHR-0000Yc-Bc
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 05:51:38 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1izIQ2-0002DW-Nj
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:00:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1izIHQ-0006I6-8L
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 05:51:37 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25979
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1izIHQ-0006CJ-4j
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 05:51:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580899895;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hHOOP2tvO1zWdPfmHY+m0psxdSpxrlLoc2DvWc445dQ=;
- b=KcoLZBaBDEaQhz3pkqPsRnddWnn8hFPCIaApx/oe4z+b7O+HovqmTjZ3F3CwYj39QtJzLj
- iuYTflgamR5Gm/xEo+uA9jOCYqpcbv2FQ/7KR7X218TrAb9saQRdpRYp46zdnAgHczs9fU
- D56dD8BfQA8cGFXJWneOM82ux5bd1gU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-UNALZOEkPn6BP2iLVQ3D-Q-1; Wed, 05 Feb 2020 05:51:29 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A4238C1C0C;
- Wed,  5 Feb 2020 10:51:28 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C456E60BF4;
- Wed,  5 Feb 2020 10:51:26 +0000 (UTC)
-Date: Wed, 5 Feb 2020 11:51:24 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Tony Krowiak <akrowiak@linux.ibm.com>, "Jason J . Herne"
- <jjherne@linux.ibm.com>
-Subject: Re: [PATCH RFC 0/2] docs: rstfy some s390 docs
-Message-ID: <20200205115124.351e74df.cohuck@redhat.com>
-In-Reply-To: <20200128180142.15132-1-cohuck@redhat.com>
-References: <20200128180142.15132-1-cohuck@redhat.com>
-Organization: Red Hat GmbH
+ (envelope-from <richard.henderson@linaro.org>) id 1izIQ0-0004Kz-OD
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:00:30 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42197)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1izIQ0-0004CT-FO
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 06:00:28 -0500
+Received: by mail-wr1-x444.google.com with SMTP id k11so2118002wrd.9
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 03:00:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dVy++6v9qouCTYYN65FpPmGQX5wzx57HREdCZKRa/tQ=;
+ b=ucCV2ozk82jOaEYhgNz8a5wB/dx8WF4W2aX+BUxMd/R/PUYfQlvGLjCTPSayn8LoPV
+ RsiP2j/hTer0iV8JwXBhQAHBKy0ZcaMKyWspmFFe6d/MaZiXNmwdq51vy/MpDB1+ei57
+ w3yHOthbtEdJiivEX926X4BdGL5xO7HQDHDwzHg1Ey0WkdaSRgxbBS5eRrXnDkcaxiHl
+ eqaEsISEhkpZrLJrrwaxx8SqmCNGOAvOc3bDzhYmIcjIuc79ZsCwfGgIVfp8D1CTaf/Y
+ d2GzqzuBaJ8wDz4NDrGq6v08pG9bUdx6S+3m6T3jNR0UhzNObcS0tSiHUl4Q9G0N/Zy5
+ DYoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dVy++6v9qouCTYYN65FpPmGQX5wzx57HREdCZKRa/tQ=;
+ b=Q1p8OHKncRgiZBMPaTovJ7vQgtVBVsw4nbHCm01QONOnZfIJWbMvwYApTE6aeN9Csf
+ gm5fhtVdjjU8dbz39A6FfpVHsV/TfKRQcDFU0U4k3f+dda0z2StdKoa+vHdLB5Ye8Ym9
+ PUH2PmG5xOR5U6peUF+4hfix2um9LiGYQcA2uRiWa0LBUkppoZqe/7lKnveqI47lWVlr
+ JCt0oRN4+JnHsZ5raNb6qwZGubkmGgCA/2aR1THOGhZTDX004bPvJo1rTTJAYGwfuQcF
+ CO+5WYKMcECFYYu0JsfCzd78RVA2vVIYxejNl3NzKDLoliWwpxMhTb/wtSb/gP34eV3M
+ lujw==
+X-Gm-Message-State: APjAAAWSi9no/bWc7PA6p7mtqeTsUNwmEuOzo6x4vsjj/MLgAKlyNgkn
+ ogKkD7zo68fp74K2KuSy7lL+ZQ==
+X-Google-Smtp-Source: APXvYqwEfrUiA7bz1Ced3UpSIsIXcMLozy1gvsmQGzYGMofOU497P8IiV8HJxLTJiJrRtNQknOIzpg==
+X-Received: by 2002:adf:9c8c:: with SMTP id d12mr20589922wre.404.1580900427156; 
+ Wed, 05 Feb 2020 03:00:27 -0800 (PST)
+Received: from [172.27.246.193] ([212.187.182.166])
+ by smtp.gmail.com with ESMTPSA id j5sm24771943wrb.33.2020.02.05.03.00.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 05 Feb 2020 03:00:26 -0800 (PST)
+Subject: Re: [PATCH 1/2] exec: flush CPU TB cache in breakpoint_invalidate
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+References: <20191127220602.10827-1-jcmvbkbc@gmail.com>
+ <20191127220602.10827-2-jcmvbkbc@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bddff04f-3d48-a4d4-85ac-ca19ca7be90c@linaro.org>
+Date: Wed, 5 Feb 2020 11:00:25 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: UNALZOEkPn6BP2iLVQ3D-Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20191127220602.10827-2-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,47 +97,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, changbin.du@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jan 2020 19:01:40 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+On 11/27/19 10:06 PM, Max Filippov wrote:
+> When a breakpoint is inserted at location for which there's currently no
+> virtual to physical translation no action is taken on CPU TB cache. If a
+> TB for that virtual address already exists but is not visible ATM the
+> breakpoint won't be hit next time an instruction at that address will be
+> executed.
+> 
+> Flush entire CPU TB cache in breakpoint_invalidate to force
+> re-translation of all TBs for the breakpoint address.
+> 
+> This change fixes the following scenario:
+> - linux user application is running
+> - a breakpoint is inserted from QEMU gdbstub for a user address that is
+>   not currently present in the target CPU TLB
+> - an instruction at that address is executed, but the external debugger
+>   doesn't get control.
+> 
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> ---
+> Changes RFC->v1:
+> - do tb_flush in breakpoint_invalidate unconditionally
 
-> https://qemu.readthedocs.io/en/latest/index.html collects various
-> documents from the QEMU docs/ subdirectory; however, none of the
-> s390 files are currently included. Therefore, I set out to convert
-> the existing files to rst and hook them up.
-> 
-> s390-dasd-ipl was straightforward enough; I also found a numbering
-> issue.
-> 
-> vfio-ap was quite a bit more involved, but I hope I have produced
-> something readable (would benefit from some more review). I also
-> moved this into the system/ subdirectory; not sure if that is the
-> best resting place, but it seemed to be the most reasonable one.
-> 
-> Tested via running 'make html' and inspecting the output.
-> 
-> Branch: https://github.com/cohuck/qemu rstfy-s390
-> 
-> Cornelia Huck (2):
->   docs: rstfy s390 dasd ipl documentation
->   docs: rstfy vfio-ap documentation
-> 
->  MAINTAINERS                                   |   4 +-
->  docs/devel/index.rst                          |   1 +
->  .../{s390-dasd-ipl.txt => s390-dasd-ipl.rst}  |  65 +-
->  docs/system/index.rst                         |   1 +
->  docs/{vfio-ap.txt => system/vfio-ap.rst}      | 755 +++++++++---------
->  5 files changed, 424 insertions(+), 402 deletions(-)
->  rename docs/devel/{s390-dasd-ipl.txt => s390-dasd-ipl.rst} (77%)
->  rename docs/{vfio-ap.txt => system/vfio-ap.rst} (56%)
-> 
+I know I had reservations about this, but we now have two patches on list that
+fix the problem in this way.
 
-Friendly ping. Anybody got some spare cycles to look at this?
+What I would *like* is for each CPUBreakpoint to maintain a list of the TBs to
+which it has been applied, so that each can be invalidated.  Our current
+management of breakpoints are IMO sloppy.
+
+That said, I don't really have time to work on cleaning this up myself in the
+short term, and this is fixing a real bug.  Therefore, I am going to queue this
+to tcg-next.
+
+I would still like patch 2/2 to be split, and that can probably go through an
+xtensa branch.
+
+
+r~
+
+> 
+>  exec.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index ffdb5185353b..1709b760edc1 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1017,14 +1017,13 @@ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
+>  
+>  static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+>  {
+> -    MemTxAttrs attrs;
+> -    hwaddr phys = cpu_get_phys_page_attrs_debug(cpu, pc, &attrs);
+> -    int asidx = cpu_asidx_from_attrs(cpu, attrs);
+> -    if (phys != -1) {
+> -        /* Locks grabbed by tb_invalidate_phys_addr */
+> -        tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
+> -                                phys | (pc & ~TARGET_PAGE_MASK), attrs);
+> -    }
+> +    /*
+> +     * There may not be a virtual to physical translation for the pc
+> +     * right now, but there may exist cached TB for this pc.
+> +     * Flush the whole TB cache to force re-translation of such TBs.
+> +     * This is heavyweight, but we're debugging anyway.
+> +     */
+> +    tb_flush(cpu);
+>  }
+>  #endif
+>  
+> 
 
 
