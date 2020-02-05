@@ -2,121 +2,111 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A96FC35254
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A49A4C35254
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:35:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08D5A21741
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:34:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F46A21741
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 13:35:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="I9gZTgFq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D5A21741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=partner.samsung.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ESsAio+m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F46A21741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izKpB-0006tN-7i
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:34:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36871)
+	id 1izKpq-0008E4-Hk
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 08:35:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKjc-0007ld-Cv
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:57 -0500
+ (envelope-from <darren.kenny@oracle.com>) id 1izKoq-0006kw-KK
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:34:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKjY-0004uZ-2k
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:52 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:50250)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <i.kotrasinsk@partner.samsung.com>)
- id 1izKjX-0004kq-L6
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:28:47 -0500
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
- by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
- 20200205132845euoutp02d324d9148f2482ac6ffb776e494a44dc~whKfOQld60765407654euoutp02g
- for <qemu-devel@nongnu.org>; Wed,  5 Feb 2020 13:28:45 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
- 20200205132845euoutp02d324d9148f2482ac6ffb776e494a44dc~whKfOQld60765407654euoutp02g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1580909325;
- bh=eA2VRTKHri+EcLrE9E0xX8BQK07jxM4QOEd083wQnCQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=I9gZTgFqjuEvAPfx4rUbltG8BNrha4GpY3XCLYxCbxRC0Ksj7X7/pB/w3xb6ufdGl
- PdRWUitZ38Iz4zr5XWfnBfiBj36d3grTo2fwsA7Hn9GkVveFOS2N2DCeCgO2HCGn0b
- 1EJwSlJpFKnhxmacnuNgXn77d1ttPOsigd8zdNcc=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTP id
- 20200205132845eucas1p15adb929e0636020b2dfd16d16e84a657~whKfDPFSA0238002380eucas1p1w;
- Wed,  5 Feb 2020 13:28:45 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
- eusmges3new.samsung.com (EUCPMTA) with SMTP id AB.9F.60698.D03CA3E5; Wed,  5
- Feb 2020 13:28:45 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
- 20200205132844eucas1p1bee15f0215fc22b028a4afbf54885b56~whKesFMJj2964829648eucas1p1X;
- Wed,  5 Feb 2020 13:28:44 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
- eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
- 20200205132844eusmtrp2e5f978b87e5460aa9429072034e3f7cc~whKerbAtm3037330373eusmtrp2Z;
- Wed,  5 Feb 2020 13:28:44 +0000 (GMT)
-X-AuditID: cbfec7f5-a0fff7000001ed1a-28-5e3ac30d05fb
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
- eusmgms2.samsung.com (EUCPMTA) with SMTP id 5A.FC.07950.C03CA3E5; Wed,  5
- Feb 2020 13:28:44 +0000 (GMT)
-Received: from AMDC3304.digital.local (unknown [106.120.51.21]) by
- eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
- 20200205132844eusmtip20578fba585cb7f6f253e3cbdb86fbf23~whKeQHDyo3135731357eusmtip2Y;
- Wed,  5 Feb 2020 13:28:44 +0000 (GMT)
-From: i.kotrasinsk@partner.samsung.com
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v3 5/9] hw/misc/memexpose: Add core memexpose files
-Date: Wed,  5 Feb 2020 14:28:33 +0100
-Message-Id: <1580909317-23884-6-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1580909317-23884-1-git-send-email-i.kotrasinsk@partner.samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCIsWRmVeSWpSXmKPExsWy7djP87q8h63iDO5e47HYc+Exm8W9mzeZ
- LfZv+8dqMefMAxaL4707WBxYPe5c28Pm8eTaZiaPg+/2MHm833eVzWP7yUlMAaxRXDYpqTmZ
- ZalF+nYJXBmbD5xlKWg9xVTx7uonxgbG1k+MXYycHBICJhLLNk9h72Lk4hASWMEo8fBFDxuE
- 84VR4u3d3UwQzmdGif/73sG1rHozhRnEFhJYziixa7EuXMf9ay/AEmwCahI7j3wGaxARkJT4
- 3XWaGaSIWaCBUeLR9bNACQ4OYQF3idln+UFqWARUJV6+Ww1WzysQIHFg9jkWiGVyEjfPdYLN
- 5BQIlLj8bAoryBwJgedsElOWXmaHKHKReHT4MTOELSzx6vgWqLiMxP+d85kg7HqJljs7mCCa
- Oxgl+lZOZ4NIWEt82bCUBeQgZgFNifW79CHCjhKP1mxkBQlLCPBJ3HgrCBJmBjInbZvODBHm
- lehoE4Ko1pPofnKTCWbrssZHUOd7SOyZehYavEsYJaYuOMUygVF+FsKyBYyMqxjFU0uLc9NT
- i43zUsv1ihNzi0vz0vWS83M3MQLTwul/x7/uYNz3J+kQowAHoxIPb8AEyzgh1sSy4srcQ4wS
- HMxKIrzn9YFCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeY0XvYwVEkhPLEnNTk0tSC2CyTJxcEo1
- ME7auF/Q/pvZgWjvTY+0bLItCh4du3Kr/GbQa98vU0S+Pi0y/XTu6WqTTew/18WaP+tk1js9
- c+bNhfMuKDkcW6WvlxHIX8q9NKN+4l1j2387f/vkPtVmn18tJZnUwdnTvUvuhvodDp3N++76
- LTiUZXA73eqt5qRP8RcCjbY/nFK2Zlr4BrFFdreUWIozEg21mIuKEwFJyzhmBwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGLMWRmVeSWpSXmKPExsVy+t/xe7o8h63iDFY1G1vsufCYzeLezZvM
- Fvu3/WO1mHPmAYvF8d4dLA6sHneu7WHzeHJtM5PHwXd7mDze77vK5rH95CSmANYoPZui/NKS
- VIWM/OISW6VoQwsjPUNLCz0jE0s9Q2PzWCsjUyV9O5uU1JzMstQifbsEvYzNB86yFLSeYqp4
- d/UTYwNj6yfGLkZODgkBE4lVb6YwdzFycQgJLGWUuHR+HgtEQkbix+k1bBC2sMSfa11sEEWf
- GCVmdZ9mBkmwCahJ7DzyGWySiICkxO+u02CTmAVaGCWePWln6mLk4BAWcJeYfZYfpIZFQFXi
- 5bvVYPW8AgESB2afg1omJ3HzXCfYTE6BQInLz6awgthCQDWvJ15hnsDIt4CRYRWjSGppcW56
- brGRXnFibnFpXrpecn7uJkZgmG479nPLDsaud8GHGAU4GJV4eAMmWMYJsSaWFVfmHmKU4GBW
- EuE9rw8U4k1JrKxKLcqPLyrNSS0+xGgKdNREZinR5HxgDOWVxBuaGppbWBqaG5sbm1koifN2
- CByMERJITyxJzU5NLUgtgulj4uCUamC84FbD1vde/HjHzRmOqRv+/RJj6HS9cfrHrJtPBc1O
- KxzJ1Tz9jvke/69XkckHd340cnMy2bquMufJolvKkhslpq8uVImYI//hoNz8imh2H65Tnp4r
- 5fJM9npxWhlrp17jP1uxU7SqOfTgeYlVEb22rc6PTD70h/9Tf+5m+G5a/Oe/12IPn7BRYinO
- SDTUYi4qTgQAdjRp12kCAAA=
-X-CMS-MailID: 20200205132844eucas1p1bee15f0215fc22b028a4afbf54885b56
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20200205132844eucas1p1bee15f0215fc22b028a4afbf54885b56
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20200205132844eucas1p1bee15f0215fc22b028a4afbf54885b56
-References: <1580909317-23884-1-git-send-email-i.kotrasinsk@partner.samsung.com>
- <CGME20200205132844eucas1p1bee15f0215fc22b028a4afbf54885b56@eucas1p1.samsung.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 210.118.77.12
+ (envelope-from <darren.kenny@oracle.com>) id 1izKol-0005sD-Bd
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:34:14 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:38766)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+ id 1izKol-0005n8-0g
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 08:34:11 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015DO4pf105699;
+ Wed, 5 Feb 2020 13:34:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to : content-transfer-encoding; s=corp-2019-08-05;
+ bh=D8eIJcASggBxiUBNky+yzM6ZMGXo+jEEw3xCHm52rZk=;
+ b=ESsAio+muFv2wvWV/9AN+DsmRRp4fO+tsrzZPZh0U4klVWXViUQk76EOO72z+kcAzAN8
+ ysvljmGTom6zyqiX14zcggwwwtIf5vd0jNCSJUQCowljJgmeqKXjHYxP3dBRr4+hWxnY
+ /XXuvIikGMEIS5NbYUiY8/+7dJuOdWqY1NJHm2RORhF4R8fFJYQVY99c254R73+R0SnH
+ ojBw3I6X8t6LdvKZUtm+g934bgPXxocprAV3nT1yLMQTsuiZYzIXbl0rJyE5c3HCkd+z
+ X6c3iTQCvP/2yX32TMhAT9+8uxGDYAb0ud2EDyCiSZr3kGnfBr/aCz3sOuoKed1IgS1O nQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 2xykbp30dv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 13:34:08 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 015DT7Wg138597;
+ Wed, 5 Feb 2020 13:34:08 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 2xymusr8u3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 05 Feb 2020 13:34:07 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 015DY7k5013845;
+ Wed, 5 Feb 2020 13:34:07 GMT
+Received: from starbug-mbp.localdomain (/10.169.111.17)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 05 Feb 2020 05:34:06 -0800
+Received: from starbug-mbp (localhost [127.0.0.1])
+ by starbug-mbp.localdomain (Postfix) with ESMTP id 0239D57DBD14;
+ Wed,  5 Feb 2020 13:34:04 +0000 (GMT)
+Date: Wed, 5 Feb 2020 13:34:03 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+To: "Bulekov, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v8 10/21] libqos: move useful qos-test funcs to
+ qos_external
+Message-ID: <20200205133403.3dcbvoigtkevl3rb@starbug-mbp>
+Mail-Followup-To: "Bulekov, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20200129053357.27454-1-alxndr@bu.edu>
+ <20200129053357.27454-11-alxndr@bu.edu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20200129053357.27454-11-alxndr@bu.edu>
+User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002050109
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9521
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002050109
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,1329 +118,433 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>, jan.kiszka@siemens.com,
- pbonzini@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
+On Wed, Jan 29, 2020 at 05:34:19AM +0000, Bulekov, Alexander wrote:
+>The moved functions are not specific to qos-test and might be useful
+>elsewhere. For example the virtual-device fuzzer makes use of them for
+>qos-assisted fuzz-targets.
+>
+>Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+>Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
----
- Kconfig.host                       |   3 +
- MAINTAINERS                        |   4 +
- Makefile                           |   1 +
- configure                          |   8 +
- hw/mem/Kconfig                     |   3 +
- hw/misc/Makefile.objs              |   1 +
- hw/misc/memexpose/Makefile.objs    |   2 +
- hw/misc/memexpose/memexpose-core.c | 630 +++++++++++++++++++++++++++++++++++++
- hw/misc/memexpose/memexpose-core.h | 109 +++++++
- hw/misc/memexpose/memexpose-msg.c  | 261 +++++++++++++++
- hw/misc/memexpose/memexpose-msg.h  | 161 ++++++++++
- 11 files changed, 1183 insertions(+)
- create mode 100644 hw/misc/memexpose/Makefile.objs
- create mode 100644 hw/misc/memexpose/memexpose-core.c
- create mode 100644 hw/misc/memexpose/memexpose-core.h
- create mode 100644 hw/misc/memexpose/memexpose-msg.c
- create mode 100644 hw/misc/memexpose/memexpose-msg.h
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 
-diff --git a/Kconfig.host b/Kconfig.host
-index 55136e0..7470210 100644
---- a/Kconfig.host
-+++ b/Kconfig.host
-@@ -20,6 +20,9 @@ config SPICE
- config IVSHMEM
-     bool
- 
-+config MEMEXPOSE
-+    bool
-+
- config TPM
-     bool
- 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 73dd571..7c98fef 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1643,6 +1643,10 @@ memexpose
- M: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
- S: Maintained
- F: docs/specs/memexpose-spec.txt
-+F: hw/misc/memexpose/memexpose-core.h
-+F: hw/misc/memexpose/memexpose-core.c
-+F: hw/misc/memexpose/memexpose-msg.h
-+F: hw/misc/memexpose/memexpose-msg.c
- 
- nvme
- M: Keith Busch <keith.busch@intel.com>
-diff --git a/Makefile b/Makefile
-index 461d40b..82e7259 100644
---- a/Makefile
-+++ b/Makefile
-@@ -387,6 +387,7 @@ MINIKCONF_ARGS = \
-     CONFIG_KVM=$(CONFIG_KVM) \
-     CONFIG_SPICE=$(CONFIG_SPICE) \
-     CONFIG_IVSHMEM=$(CONFIG_IVSHMEM) \
-+    CONFIG_MEMEXPOSE=$(CONFIG_MEMEXPOSE) \
-     CONFIG_TPM=$(CONFIG_TPM) \
-     CONFIG_XEN=$(CONFIG_XEN) \
-     CONFIG_OPENGL=$(CONFIG_OPENGL) \
-diff --git a/configure b/configure
-index 115dc38..9c63c21 100755
---- a/configure
-+++ b/configure
-@@ -505,6 +505,7 @@ debug_mutex="no"
- libpmem=""
- default_devices="yes"
- plugins="no"
-+memexpose="no"
- 
- supported_cpu="no"
- supported_os="no"
-@@ -1020,6 +1021,10 @@ for opt do
-   ;;
-   --without-default-devices) default_devices="no"
-   ;;
-+  --enable-memexpose) memexpose="yes"
-+  ;;
-+  --disable-memexpose) memexpose="no"
-+  ;;
-   --enable-gprof) gprof="yes"
-   ;;
-   --enable-gcov) gcov="yes"
-@@ -7400,6 +7405,9 @@ fi
- if test "$ivshmem" = "yes" ; then
-   echo "CONFIG_IVSHMEM=y" >> $config_host_mak
- fi
-+if test "$memexpose" = "yes" ; then
-+  echo "CONFIG_MEMEXPOSE=y" >> $config_host_mak
-+fi
- if test "$capstone" != "no" ; then
-   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
- fi
-diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
-index 620fd4c..e377b05 100644
---- a/hw/mem/Kconfig
-+++ b/hw/mem/Kconfig
-@@ -5,6 +5,9 @@ config DIMM
- config MEM_DEVICE
-     bool
- 
-+config MEM_EXPOSE
-+    bool
-+
- config NVDIMM
-     bool
-     default y
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index da993f4..7e9a692 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -27,6 +27,7 @@ common-obj-$(CONFIG_PUV3) += puv3_pm.o
- common-obj-$(CONFIG_MACIO) += macio/
- 
- common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
-+common-obj-$(CONFIG_MEMEXPOSE) += memexpose/
- 
- common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- common-obj-$(CONFIG_NSERIES) += cbus.o
-diff --git a/hw/misc/memexpose/Makefile.objs b/hw/misc/memexpose/Makefile.objs
-new file mode 100644
-index 0000000..f405fe7
---- /dev/null
-+++ b/hw/misc/memexpose/Makefile.objs
-@@ -0,0 +1,2 @@
-+common-obj-y += memexpose-msg.o
-+common-obj-y += memexpose-core.o
-diff --git a/hw/misc/memexpose/memexpose-core.c b/hw/misc/memexpose/memexpose-core.c
-new file mode 100644
-index 0000000..3b6ef3c
---- /dev/null
-+++ b/hw/misc/memexpose/memexpose-core.c
-@@ -0,0 +1,630 @@
-+/*
-+ *  Memexpose core
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "memexpose-core.h"
-+#include "exec/address-spaces.h"
-+#include "exec/cpu-common.h"
-+
-+static int memexpose_pop_intr(MemexposeIntr *s)
-+{
-+    if (s->queue_count == 0) {
-+        MEMEXPOSE_DPRINTF("No queued interrupts\n");
-+        return 0;
-+    }
-+    struct memexpose_op_intr *head = &s->intr_queue[s->queue_start];
-+    s->intr_rx = *head;
-+    s->queue_start = (s->queue_start + 1) % MEMEXPOSE_INTR_QUEUE_SIZE;
-+    s->queue_count--;
-+
-+    if (!s->queue_count) {
-+        s->ops.intr(s->ops.parent, 0);
-+    }
-+    MEMEXPOSE_DPRINTF("Popped interrupt %lx\n", s->intr_rx.type);
-+    return 1;
-+}
-+
-+static void memexpose_push_intr(MemexposeIntr *s, struct memexpose_op_intr *msg)
-+{
-+    int signal = 0, free_slot;
-+
-+    if (s->queue_count == MEMEXPOSE_INTR_QUEUE_SIZE) {
-+        MEMEXPOSE_DPRINTF("Interrupt queue is already full!\n");
-+        return;
-+    }
-+    free_slot = (s->queue_start + s->queue_count) % MEMEXPOSE_INTR_QUEUE_SIZE;
-+    s->intr_queue[free_slot] = *msg;
-+    if (!s->queue_count) {
-+        signal = 1;
-+    }
-+    s->queue_count++;
-+
-+    if (signal) {
-+        s->ops.intr(s->ops.parent, 1);
-+    }
-+}
-+
-+static void process_intr(void *opaque, struct memexpose_op *op, Error **err)
-+{
-+    MemexposeIntr *s = opaque;
-+    switch (op->head.ot) {
-+    case MOP_INTR:
-+        memexpose_push_intr(s, &op->body.intr);
-+        break;
-+    default:
-+        error_setg(err, "Unknown memexpose intr command %u", op->head.ot);
-+    }
-+}
-+
-+static void memexpose_send_intr(MemexposeIntr *s)
-+{
-+    struct memexpose_op msg;
-+
-+    msg.head.ot = MOP_INTR;
-+    msg.head.size = sizeof(msg.head) + sizeof(msg.body.intr);
-+    msg.head.prio = 0;
-+    msg.body.intr = s->intr_tx;
-+    memexpose_ep_write_async(&s->ep, &msg);
-+    MEMEXPOSE_DPRINTF("Sending interrupt %lx\n", msg.body.intr.type);
-+}
-+
-+#define IN_INTR_DATA_RANGE(a, s, r) \
-+    (a >= r && \
-+     a < r + MEMEXPOSE_MAX_INTR_DATA_SIZE && \
-+     (s = MIN(s, r + MEMEXPOSE_MAX_INTR_DATA_SIZE - a), 1))
-+
-+static uint64_t memexpose_intr_read(void *opaque, hwaddr addr,
-+                                    unsigned size)
-+{
-+    MemexposeIntr *s = opaque;
-+    uint64_t ret = 0;
-+    unsigned int boff = 8 * (addr & 0x7);
-+
-+    switch (addr & (~0x7)) {
-+    case MEMEXPOSE_INTR_RX_TYPE_ADDR:
-+        ret = s->intr_rx.type;
-+        ret >>= boff;
-+        return ret;
-+    case MEMEXPOSE_INTR_TX_TYPE_ADDR:
-+        ret = s->intr_tx.type;
-+        ret >>= boff;
-+        return ret;
-+    case MEMEXPOSE_INTR_RECV_ADDR:
-+        /* Make multiple read calls in readq and such behave as expected */
-+        if (addr & 0x7) {
-+            return 0;
-+        }
-+
-+        ret = memexpose_pop_intr(s);
-+        return ret;
-+    case MEMEXPOSE_INTR_ENABLE_ADDR:
-+        if (addr & 0x7) {
-+            return 0;
-+        }
-+        return s->enabled;
-+    default:
-+        break;
-+    }
-+
-+    if (IN_INTR_DATA_RANGE(addr, size, MEMEXPOSE_INTR_RX_DATA_ADDR)) {
-+        uint64_t off = addr - MEMEXPOSE_INTR_RX_DATA_ADDR;
-+        memcpy(&ret, s->intr_rx.data + off, size);
-+        return ret;
-+    } else if (IN_INTR_DATA_RANGE(addr, size, MEMEXPOSE_INTR_TX_DATA_ADDR)) {
-+        uint64_t off = addr - MEMEXPOSE_INTR_TX_DATA_ADDR;
-+        memcpy(&ret, s->intr_tx.data + off, size);
-+        return ret;
-+    } else {
-+        MEMEXPOSE_DPRINTF("Invalid mmio read at " TARGET_FMT_plx "\n", addr);
-+        ret = 0;
-+        return ret;
-+    }
-+}
-+
-+static void memexpose_intr_write(void *opaque, hwaddr addr,
-+                                 uint64_t val, unsigned size)
-+{
-+    MemexposeIntr *s = opaque;
-+    unsigned int boff = 8 * (addr & 0x7);
-+    uint64_t mask = ((1LL << (size * 8)) - 1) << boff;
-+
-+    switch (addr & (~0x7)) {
-+    case MEMEXPOSE_INTR_RX_TYPE_ADDR:
-+        s->intr_rx.type &= ~mask;
-+        s->intr_rx.type |= (val << boff);
-+        return;
-+    case MEMEXPOSE_INTR_TX_TYPE_ADDR:
-+        s->intr_tx.type &= ~mask;
-+        s->intr_tx.type |= (val << boff);
-+        return;
-+    case MEMEXPOSE_INTR_SEND_ADDR:
-+        /* Make multiple write calls in writeq and such behave as expected */
-+        if (addr & 0x7) {
-+            return;
-+        }
-+        memexpose_send_intr(s);
-+        return;
-+    case MEMEXPOSE_INTR_ENABLE_ADDR:
-+        if (addr & 0x7) {
-+            return;
-+        }
-+        if (val) {
-+            if (s->ops.enable) {
-+                s->enabled = s->ops.enable(s->ops.parent) ? 0 : 1;
-+            } else {
-+                s->enabled = 1;
-+            }
-+        } else {
-+            if (s->ops.disable) {
-+                s->ops.disable(s->ops.parent);
-+            }
-+            s->enabled = 0;
-+        }
-+        return;
-+    }
-+
-+    if (IN_INTR_DATA_RANGE(addr, size, MEMEXPOSE_INTR_RX_DATA_ADDR)) {
-+        uint64_t off = addr - MEMEXPOSE_INTR_RX_DATA_ADDR;
-+        memcpy(s->intr_rx.data + off, &val, size);
-+    } else if (IN_INTR_DATA_RANGE(addr, size, MEMEXPOSE_INTR_TX_DATA_ADDR)) {
-+        uint64_t off = addr - MEMEXPOSE_INTR_TX_DATA_ADDR;
-+        memcpy(s->intr_tx.data + off, &val, size);
-+    } else {
-+        MEMEXPOSE_DPRINTF("Invalid mmio write at " TARGET_FMT_plx "\n", addr);
-+    }
-+}
-+
-+static const MemoryRegionOps memexpose_intr_ops = {
-+    .read = memexpose_intr_read,
-+    .write = memexpose_intr_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+void memexpose_intr_init(MemexposeIntr *s, struct memexpose_intr_ops *ops,
-+                         Object *parent, CharBackend *chr, Error **errp)
-+{
-+    if (!qemu_chr_fe_backend_connected(chr)) {
-+        error_setg(errp, "You must specify a 'intr_chardev'");
-+        return;
-+    }
-+
-+    s->parent = parent;
-+    s->ops = *ops;
-+    s->enabled = 0;
-+    s->queue_start = 0;
-+    s->queue_count = 0;
-+    memexpose_ep_init(&s->ep, chr, s, 0, process_intr);
-+    s->ep.is_async = true;
-+    memory_region_init_io(&s->shmem, parent, &memexpose_intr_ops, s,
-+                          "memexpose-intr", MEMEXPOSE_INTR_MEM_SIZE);
-+}
-+
-+int memexpose_intr_enable(MemexposeIntr *s)
-+{
-+    return memexpose_ep_connect(&s->ep);
-+}
-+
-+void memexpose_intr_disable(MemexposeIntr *s)
-+{
-+    memexpose_ep_disconnect(&s->ep);
-+}
-+
-+void memexpose_intr_destroy(MemexposeIntr *s)
-+{
-+    memexpose_intr_disable(s);
-+    /* Region will be collected with its parent */
-+    memexpose_ep_destroy(&s->ep);
-+}
-+
-+static bool memshare_region_overlaps(MemexposeMem *s,
-+                                     struct memexpose_memshare_info_fd *share)
-+{
-+    MemexposeRemoteMemory *mem;
-+    QLIST_FOREACH(mem, &s->remote_regions, list) {
-+        uint64_t start = memory_region_get_ram_addr(&mem->region);
-+        uint64_t size = memory_region_size(&mem->region);
-+        MEMEXPOSE_DPRINTF("Comparing regions: received %"PRIx64"-%"PRIx64", "\
-+                          "current mapped %"PRIx64"-%"PRIx64"\n",
-+                          share->start, share->start + share->size,
-+                          start, start + size);
-+        if (start < share->start + share->size ||
-+            share->start < start + size)
-+            return true;
-+    }
-+    return false;
-+}
-+
-+static void memshare_add_region(MemexposeMem *s, int fd,
-+                                struct memexpose_memshare_info_fd *share,
-+                                Error **errp)
-+{
-+    if (share->start >= s->shmem_size) {
-+        /* TODO - error out */
-+        MEMEXPOSE_DPRINTF("Shared memory start too high: "
-+                          "%" PRIx64 " >= %" PRIx64,
-+                          share->start, s->shmem_size);
-+        close(fd);
-+        return;
-+    }
-+
-+    if (memshare_region_overlaps(s, share)) {
-+        /* TODO - error out */
-+        MEMEXPOSE_DPRINTF("Shared memory %" PRIx64 "-%" PRIx64
-+                          " overlaps with existing region",
-+                          share->start, share->start + share->size);
-+        close(fd);
-+        return;
-+    }
-+
-+    uint64_t clamped_size = s->shmem_size - share->start;
-+    share->size = MIN(share->size, clamped_size);
-+
-+    MemexposeRemoteMemory *mem = g_malloc(sizeof(*mem));
-+    char *rname = g_strdup_printf("Memexpose shmem "
-+                                  "%" PRIx64 "-%" PRIx64" -> %" PRIx64,
-+                                  share->start, share->start + share->size,
-+                                  share->mmap_start);
-+
-+    MEMEXPOSE_DPRINTF("Mapping remote memory: %" PRIx64 \
-+                      "-%" PRIx64 ", fd offset %" PRIx64 "\n",
-+                      share->start, share->size, share->mmap_start);
-+
-+    memory_region_init_ram_from_fd(&mem->region, s->parent, rname,
-+                                   share->size, share->mmap_start,
-+                                   true, fd, errp);
-+    if (*errp) {
-+        error_report_err(*errp);
-+        close(fd);
-+        return;
-+    }
-+
-+    memory_region_set_nonvolatile(&mem->region, share->nonvolatile);
-+    memory_region_set_readonly(&mem->region, share->readonly);
-+    g_free(rname);
-+    memory_region_add_subregion_overlap(&s->shmem, share->start,
-+                                        &mem->region, 1);
-+    QLIST_INSERT_HEAD(&s->remote_regions, mem, list);
-+}
-+
-+static void memshare_remove_region(MemexposeMem *s, MemexposeRemoteMemory *reg)
-+{
-+    /* TODO is this correct? Docs warn about leaked refcounts */
-+    QLIST_REMOVE(reg, list);
-+    memory_region_del_subregion(&s->shmem, &reg->region);
-+    object_unparent(OBJECT(&reg->region));
-+}
-+
-+static void memshare_handle(MemexposeMem *s,
-+                            struct memexpose_memshare_info *share)
-+{
-+    int fd;
-+    switch (share->type) {
-+    case MEMSHARE_NONE:
-+        return;
-+    case MEMSHARE_FD:
-+        fd = memexpose_ep_recv_fd(&s->ep);
-+        MEMEXPOSE_DPRINTF("Received memshare fd: %d\n", fd);
-+        if (s->pending_invalidation) {
-+            close(fd);
-+            return;
-+        }
-+        Error *err = NULL;
-+        memshare_add_region(s, fd, &share->fd, &err); /* TODO - handle errors */
-+        return;
-+    default:
-+        MEMEXPOSE_DPRINTF("Invalid memshare type: %u\n", share->type);
-+        return;
-+    }
-+}
-+
-+static MemTxResult memexpose_read_slow(void *opaque, hwaddr addr,
-+                                       uint64_t *data, unsigned size,
-+                                       MemTxAttrs attrs)
-+{
-+    MemexposeMem *s = opaque;
-+
-+    struct memexpose_op msg;
-+    msg.head.size = sizeof(msg.head) + sizeof(msg.body.read);
-+    msg.head.ot = MOP_READ;
-+    msg.head.prio = memexpose_ep_msg_prio(&s->ep, msg.head.ot);
-+    msg.body.read.offset = addr;
-+    msg.body.read.size = size;
-+    memexpose_ep_write_sync(&s->ep, &msg);
-+
-+    MemTxResult res = msg.body.read_ret.ret;
-+    if (res == MEMTX_OK) {
-+        memshare_handle(s, &msg.body.read_ret.share);
-+    }
-+    memcpy(data, &msg.body.read_ret.value, size);
-+    return res;
-+}
-+
-+static MemTxResult memexpose_write_slow(void *opaque, hwaddr addr,
-+                                        uint64_t val, unsigned size,
-+                                        MemTxAttrs attrs)
-+{
-+    MemexposeMem *s = opaque;
-+    struct memexpose_op msg;
-+    msg.head.size = sizeof(msg.head) + sizeof(msg.body.write);
-+    msg.head.ot = MOP_WRITE;
-+    msg.head.prio = memexpose_ep_msg_prio(&s->ep, msg.head.ot);
-+    msg.body.write.offset = addr;
-+    msg.body.write.size = size;
-+    msg.body.write.value = val;
-+    memexpose_ep_write_sync(&s->ep, &msg);
-+
-+    MemTxResult res = msg.body.write_ret.ret;
-+    if (res == MEMTX_OK) {
-+        memshare_handle(s, &msg.body.write_ret.share);
-+    }
-+    return res;
-+}
-+
-+static const MemoryRegionOps memexpose_region_ops = {
-+    .read_with_attrs = memexpose_read_slow,
-+    .write_with_attrs = memexpose_write_slow,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 8,
-+    },
-+};
-+
-+static void prepare_memshare(MemexposeMem *s,
-+                             uint64_t size, uint64_t offset,
-+                             struct memexpose_memshare_info *info) {
-+    MemoryRegionSection section = memory_region_find_flat_range(
-+            s->as.root, offset, size);
-+    if (!section.mr) {
-+        MEMEXPOSE_DPRINTF("No memory region under %lu!\n", offset);
-+        goto unref;
-+    }
-+
-+    int fd = memory_region_get_fd(section.mr);
-+    if (fd != -1 && qemu_ram_is_shared(section.mr->ram_block)) {
-+        info->type = MEMSHARE_FD;
-+        info->fd.mmap_start = section.offset_within_region;
-+        info->fd.start = section.offset_within_address_space;
-+        info->fd.size = section.size;
-+        info->fd.readonly = memory_region_is_rom(section.mr);
-+        info->fd.nonvolatile = memory_region_is_nonvolatile(section.mr);
-+
-+        MEMEXPOSE_DPRINTF("Prepared a memshare fd: %" PRIx64 \
-+                          "-%" PRIx64 ", fd offset %" PRIx64 "\n",
-+                          info->fd.start, info->fd.size, info->fd.mmap_start);
-+        memexpose_ep_send_fd(&s->ep, fd);
-+        s->nothing_shared = false;
-+    } else {
-+        info->type = MEMSHARE_NONE;
-+    }
-+unref:
-+    memory_region_unref(section.mr);
-+}
-+
-+static void memexpose_perform_read_request(
-+        MemexposeMem *s, struct memexpose_op_read *in,
-+        struct memexpose_op *out)
-+{
-+    out->head.ot = MOP_READ_RET;
-+    out->head.size = sizeof(out->head) + sizeof(out->body.read_ret);
-+    out->body.read_ret.ret = 0;
-+    out->body.read_ret.share.type = MEMSHARE_NONE;
-+
-+    MEMEXPOSE_DPRINTF("Reading %u from %lx\n", in->size, in->offset);
-+    MemTxResult r = address_space_read(&s->as, in->offset,
-+                                       MEMTXATTRS_UNSPECIFIED,
-+                                       (uint8_t *) &out->body.read_ret.value,
-+                                       in->size);
-+    out->body.read_ret.ret = r;
-+    if (r != MEMTX_OK) {
-+        MEMEXPOSE_DPRINTF("Failed to read\n");
-+    } else {
-+        prepare_memshare(s, in->size, in->offset, &out->body.read_ret.share);
-+    }
-+}
-+
-+static void memexpose_perform_write_request(
-+        MemexposeMem *s, struct memexpose_op_write *in,
-+        struct memexpose_op *out)
-+{
-+    out->head.ot = MOP_WRITE_RET;
-+    out->head.size = sizeof(out->head) + sizeof(out->body.write_ret);
-+    out->body.write_ret.ret = 0;
-+    out->body.write_ret.share.type = MEMSHARE_NONE;
-+
-+    MEMEXPOSE_DPRINTF("Writing %u to %lx\n", in->size, in->offset);
-+    MemTxResult r = address_space_write(&s->as, in->offset,
-+                                        MEMTXATTRS_UNSPECIFIED,
-+                                        (uint8_t *) &in->value,
-+                                        in->size);
-+    if (r != MEMTX_OK) {
-+        out->body.write_ret.ret = -EIO;
-+        MEMEXPOSE_DPRINTF("Failed to write\n");
-+        return;
-+    }
-+
-+    out->body.write_ret.ret = r;
-+    if (r != MEMTX_OK) {
-+        MEMEXPOSE_DPRINTF("Failed to read\n");
-+    } else {
-+        prepare_memshare(s, in->size, in->offset, &out->body.write_ret.share);
-+    }
-+}
-+
-+static bool region_is_ours(MemexposeMem *s, MemoryRegion *mr)
-+{
-+    if (mr == &s->shmem) {
-+        return true;
-+    }
-+
-+    MemexposeRemoteMemory *mem;
-+    QLIST_FOREACH(mem, &s->remote_regions, list) {
-+        if (mr == &mem->region) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+static void memexpose_remote_invalidate(MemoryListener *inv,
-+                                        MemoryRegionSection *sect)
-+{
-+    MemexposeMem *s = container_of(inv, MemexposeMem, remote_invalidator);
-+    struct memexpose_op msg;
-+    struct memexpose_op_reg_inv *ri = &msg.body.reg_inv;
-+
-+    if (!sect->mr || region_is_ours(s, sect->mr)) {
-+        return;
-+    }
-+    if (s->nothing_shared) {
-+        return;
-+    }
-+
-+    msg.head.size = sizeof(msg.head) + sizeof(msg.body.reg_inv);
-+    msg.head.ot = MOP_REG_INV;
-+    msg.head.prio = memexpose_ep_msg_prio(&s->ep, msg.head.ot);
-+
-+    ri->start = sect->offset_within_address_space;
-+    ri->size = int128_get64(sect->size);
-+    MEMEXPOSE_DPRINTF("Region %"PRIx64"-%"PRIx64" changed, "
-+                      "sending invalidation request\n",
-+                      ri->start, ri->start + ri->size);
-+    memexpose_ep_write_sync(&s->ep, &msg);
-+}
-+
-+static void memexpose_invalidate_region(MemexposeMem *s,
-+                                        struct memexpose_op_reg_inv *ri,
-+                                        struct memexpose_op *out)
-+{
-+    MemexposeRemoteMemory *mem;
-+
-+    QLIST_FOREACH(mem, &s->remote_regions, list) {
-+        uint64_t start = memory_region_get_ram_addr(&mem->region);
-+        uint64_t size = memory_region_size(&mem->region);
-+        if (start < ri->start + ri->size ||
-+            start + size > ri->start) {
-+            mem->should_invalidate = true;
-+            s->pending_invalidation = true;
-+        }
-+    }
-+
-+    if (s->pending_invalidation) {
-+        qemu_bh_schedule(s->reg_inv_bh);
-+    }
-+
-+    out->head.ot = MOP_REG_INV_RET;
-+    out->head.size = sizeof(out->head);
-+}
-+
-+static void memexpose_do_reg_inv_bh(void *opaque)
-+{
-+    MemexposeMem *s = opaque;
-+
-+    MemexposeRemoteMemory *mem, *tmp;
-+    QLIST_FOREACH_SAFE(mem, &s->remote_regions, list, tmp) {
-+        if (mem->should_invalidate) {
-+            memshare_remove_region(s, mem);
-+        }
-+    }
-+    s->pending_invalidation = false;
-+}
-+
-+static void process_mem(void *opaque, struct memexpose_op *op, Error **err)
-+{
-+    MemexposeMem *s = opaque;
-+    struct memexpose_op resp;
-+    resp.head.prio = op->head.prio;
-+    switch (op->head.ot) {
-+    case MOP_READ:
-+        memexpose_perform_read_request(s, &op->body.read, &resp);
-+        break;
-+    case MOP_WRITE:
-+        memexpose_perform_write_request(s, &op->body.write, &resp);
-+        break;
-+    case MOP_REG_INV:
-+        memexpose_invalidate_region(s, &op->body.reg_inv, &resp);
-+        break;
-+    default:
-+        error_setg(err, "Unknown memexpose command %u", op->head.ot);
-+        return;
-+    }
-+    memexpose_ep_write_async(&s->ep, &resp);
-+}
-+
-+void memexpose_mem_init(MemexposeMem *s, Object *parent,
-+                        MemoryRegion *as_root,
-+                        CharBackend *chr, int prio, Error **errp)
-+{
-+    if (!qemu_chr_fe_backend_connected(chr)) {
-+        error_setg(errp, "You must specify a 'mem_chardev'");
-+        return;
-+    }
-+
-+    QLIST_INIT(&s->remote_regions);
-+    s->parent = parent;
-+    address_space_init(&s->as, as_root, "Memexpose");
-+
-+    memexpose_ep_init(&s->ep, chr, s, prio, process_mem);
-+    s->ep.is_async = false;
-+    memory_region_init_io(&s->shmem, parent, &memexpose_region_ops, s,
-+                          "memexpose-shmem", s->shmem_size);
-+    MEMEXPOSE_DPRINTF("Shmem size %lx\n", memory_region_size(&s->shmem));
-+
-+    s->nothing_shared = true;
-+    s->remote_invalidator = (MemoryListener) {
-+        .region_add = memexpose_remote_invalidate,
-+            .region_del = memexpose_remote_invalidate,
-+    };
-+    s->reg_inv_bh = qemu_bh_new(memexpose_do_reg_inv_bh, s);
-+    memory_listener_register(&s->remote_invalidator, &s->as);
-+}
-+
-+int memexpose_mem_enable(MemexposeMem *s)
-+{
-+    return memexpose_ep_connect(&s->ep);
-+}
-+
-+void memexpose_mem_disable(MemexposeMem *s)
-+{
-+    memexpose_ep_disconnect(&s->ep);
-+
-+    MemexposeRemoteMemory *mem, *tmp;
-+    QLIST_FOREACH_SAFE(mem, &s->remote_regions, list, tmp) {
-+        memshare_remove_region(s, mem);
-+    }
-+    qemu_bh_cancel(s->reg_inv_bh);
-+    s->pending_invalidation = false;
-+}
-+
-+void memexpose_mem_destroy(MemexposeMem *s)
-+{
-+    memexpose_mem_disable(s);
-+    /* Region will be collected with its parent */
-+    memory_listener_unregister(&s->remote_invalidator);
-+    memexpose_ep_destroy(&s->ep);
-+    qemu_bh_delete(s->reg_inv_bh);
-+    address_space_destroy(&s->as);
-+}
-diff --git a/hw/misc/memexpose/memexpose-core.h b/hw/misc/memexpose/memexpose-core.h
-new file mode 100644
-index 0000000..fd0ac60
---- /dev/null
-+++ b/hw/misc/memexpose/memexpose-core.h
-@@ -0,0 +1,109 @@
-+/*
-+ *  Memexpose core
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef _MEMEXPOSE_CORE_H_
-+#define _MEMEXPOSE_CORE_H_
-+#include "qemu/osdep.h"
-+
-+#include <inttypes.h>
-+#include "chardev/char-fe.h"
-+#include "hw/hw.h"
-+#include "exec/memory.h"
-+#include "memexpose-msg.h"
-+
-+#define MEMEXPOSE_INTR_QUEUE_SIZE 16
-+
-+#define MEMEXPOSE_DEBUG 1
-+#define MEMEXPOSE_DPRINTF(fmt, ...)                       \
-+    do {                                                \
-+        if (MEMEXPOSE_DEBUG) {                            \
-+            printf("MEMEXPOSE: " fmt, ## __VA_ARGS__);    \
-+        }                                               \
-+    } while (0)
-+
-+#define MEMEXPOSE_INTR_MEM_SIZE 0x1000
-+
-+
-+#define MEMEXPOSE_INTR_ENABLE_ADDR  0x0
-+#define MEMEXPOSE_INTR_RECV_ADDR    0x400
-+#define MEMEXPOSE_INTR_RX_TYPE_ADDR 0x408
-+#define MEMEXPOSE_INTR_RX_DATA_ADDR 0x410
-+#define MEMEXPOSE_INTR_SEND_ADDR    0x800
-+#define MEMEXPOSE_INTR_TX_TYPE_ADDR 0x808
-+#define MEMEXPOSE_INTR_TX_DATA_ADDR 0x810
-+
-+struct memexpose_intr_ops {
-+    void *parent;
-+    void (*intr) (void *opaque, int dir);
-+    int (*enable) (void *opaque);
-+    void (*disable) (void *opaque);
-+};
-+
-+typedef struct MemexposeIntr {
-+    Object *parent;
-+    struct memexpose_intr_ops ops;
-+    int enabled;
-+
-+    MemexposeEp ep;
-+    MemoryRegion shmem;
-+
-+    struct memexpose_op_intr intr_queue[MEMEXPOSE_INTR_QUEUE_SIZE];
-+    int queue_start;
-+    int queue_count;
-+    struct memexpose_op_intr intr_tx;
-+    struct memexpose_op_intr intr_rx;
-+} MemexposeIntr;
-+
-+typedef struct MemexposeMem {
-+    Object *parent;
-+    MemexposeEp ep;
-+
-+    AddressSpace as;
-+    MemoryRegion shmem;
-+    uint64_t shmem_size;
-+    QLIST_HEAD(, MemexposeRemoteMemory) remote_regions;
-+
-+    MemoryListener remote_invalidator;
-+    QEMUBH *reg_inv_bh;
-+    bool pending_invalidation;
-+    bool nothing_shared;
-+} MemexposeMem;
-+
-+typedef struct MemexposeRemoteMemory {
-+    MemoryRegion region;
-+    bool should_invalidate;
-+    QLIST_ENTRY(MemexposeRemoteMemory) list;
-+} MemexposeRemoteMemory;
-+
-+void memexpose_intr_init(MemexposeIntr *s, struct memexpose_intr_ops *ops,
-+                         Object *parent, CharBackend *chr, Error **errp);
-+void memexpose_intr_destroy(MemexposeIntr *s);
-+int memexpose_intr_enable(MemexposeIntr *s);
-+void memexpose_intr_disable(MemexposeIntr *s);
-+
-+void memexpose_mem_init(MemexposeMem *s, Object *parent,
-+                        MemoryRegion *as_root,
-+                        CharBackend *chr, int prio, Error **errp);
-+void memexpose_mem_destroy(MemexposeMem *s);
-+int memexpose_mem_enable(MemexposeMem *s);
-+void memexpose_mem_disable(MemexposeMem *s);
-+
-+#endif /* _MEMEXPOSE_CORE_H_ */
-diff --git a/hw/misc/memexpose/memexpose-msg.c b/hw/misc/memexpose/memexpose-msg.c
-new file mode 100644
-index 0000000..7205dd0
---- /dev/null
-+++ b/hw/misc/memexpose/memexpose-msg.c
-@@ -0,0 +1,261 @@
-+/*
-+ *  Memexpose core
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "memexpose-msg.h"
-+#include "memexpose-core.h"
-+
-+#define MIN_MSG_SIZE (sizeof(struct memexpose_op_head))
-+#define MAX_MSG_SIZE (sizeof(struct memexpose_op))
-+
-+int memexpose_ep_msg_prio(MemexposeEp *ep, enum memexpose_op_type ot)
-+{
-+    int ot_prio;
-+    switch (ot) {
-+    case MOP_READ:
-+    case MOP_READ_RET:
-+    case MOP_WRITE:
-+    case MOP_WRITE_RET:
-+        ot_prio = 2;
-+        break;
-+    default:
-+        ot_prio = 0;
-+    }
-+    return ot_prio + ep->prio;
-+}
-+
-+static int mep_can_receive(void *opaque)
-+{
-+    int sz;
-+    MemexposeEp *ep = opaque;
-+    MemexposeMsg *msg = &ep->msg;
-+
-+    switch (msg->read_state) {
-+    case MEMEXPOSE_MSG_BROKEN:
-+        return 0;
-+    case MEMEXPOSE_MSG_READ_SIZE:
-+        return sizeof(msg->buf.head.size) - msg->bytes;
-+    case MEMEXPOSE_MSG_READ_BODY:
-+        sz = msg->buf.head.size - msg->bytes;
-+        if (sz > MAX_MSG_SIZE) {
-+            return MAX_MSG_SIZE;  /* We'll handle this as an error later */
-+        }
-+        return sz;
-+    default:
-+        MEMEXPOSE_DPRINTF("Invalid read state %d\n", msg->read_state);
-+        return 0;
-+    }
-+}
-+
-+static int mep_do_receive(MemexposeMsg *msg,
-+                          const uint8_t *buf, int size)
-+{
-+    switch (msg->read_state) {
-+    case MEMEXPOSE_MSG_BROKEN:
-+        return -1;
-+    case MEMEXPOSE_MSG_READ_SIZE:
-+        memcpy((unsigned char *)&msg->buf + msg->bytes, buf, size);
-+        msg->bytes += size;
-+        if (msg->bytes == sizeof(msg->buf.head.size)) {
-+            msg->read_state = MEMEXPOSE_MSG_READ_BODY;
-+        }
-+        return 0;
-+    case MEMEXPOSE_MSG_READ_BODY:
-+        if (msg->buf.head.size < MIN_MSG_SIZE ||
-+            msg->buf.head.size > MAX_MSG_SIZE) {
-+            MEMEXPOSE_DPRINTF("Invalid message size %d, protocol broken!\n",
-+                              msg->buf.head.size);
-+            msg->read_state = MEMEXPOSE_MSG_BROKEN;
-+            return -1;
-+        }
-+        memcpy((unsigned char *)&msg->buf + msg->bytes, buf, size);
-+        msg->bytes += size;
-+        if (msg->bytes < msg->buf.head.size) {
-+            return 0;
-+        }
-+        msg->bytes = 0;
-+        msg->read_state = MEMEXPOSE_MSG_READ_SIZE;
-+        return 1;
-+    default:
-+        MEMEXPOSE_DPRINTF("Invalid read state %d\n", msg->read_state);
-+        return -1;
-+    }
-+}
-+
-+static void mep_receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    MemexposeEp *ep = opaque;
-+    Error *err = NULL;
-+    int new_msg = mep_do_receive(&ep->msg, buf, size);
-+    if (new_msg) {
-+        ep->handle_msg(ep->data, &ep->msg.buf, &err);
-+        if (err) {
-+            error_report_err(err);
-+        }
-+    } else if (new_msg < 0) {
-+        error_setg(&err, "Failed to receive memexpose message"); /* FIXME */
-+        error_report_err(err);
-+    }
-+}
-+
-+static int mep_receive_sync(MemexposeEp *ep, struct memexpose_op *op)
-+{
-+    int ret = 0;
-+    MemexposeMsg *msg = &ep->msg;
-+    assert(!ep->is_async);
-+
-+    while (!ret) {
-+        int can_receive = mep_can_receive(ep);
-+        unsigned char *msgbuf = (unsigned char *)&msg->buf + msg->bytes;
-+        qemu_chr_fe_read_all(ep->chr, msgbuf, can_receive);
-+        ret = mep_do_receive(msg, msgbuf, can_receive);
-+        if (ret == -1) {
-+            return -1;
-+        }
-+    }
-+    *op = msg->buf;
-+    return 0;
-+}
-+
-+void memexpose_ep_write_async(MemexposeEp *ep, struct memexpose_op *op)
-+{
-+    qemu_chr_fe_write_all(ep->chr, (unsigned char *) op, op->head.size);
-+}
-+
-+static void mep_queue_msg(MemexposeEp *ep, struct memexpose_op *op)
-+{
-+    ep->queued_op = *op;
-+    qemu_bh_schedule(ep->queue_msg_bh);
-+}
-+
-+static void mep_queue_msg_bh(void *epp)
-+{
-+    Error *err = NULL;
-+    MemexposeEp *ep = epp;
-+    if (!ep->queued_op.head.size) {
-+        return;
-+    }
-+    ep->handle_msg(ep->data, &ep->queued_op, &err); /* FIXME - handle */
-+    ep->queued_op.head.size = 0;
-+}
-+
-+/*
-+ * Synchronously write a message to another QEMU and receive a response.
-+ * To avoid deadlocks, each message type has its priority and no more than one
-+ * message of each priority is in flight.
-+ *
-+ * After we send a message, we await a response while handling all messages of
-+ * higher priority and deferring messages of lower priority. This way each side
-+ * will have its requests handled until they have time to handle ours.
-+ *
-+ * The above means that a handler for a message must be able to run while an
-+ * operation that sends any other lower priority message is in progress. Make
-+ * sure to order operations in an order that does not upset QEMU!
-+ */
-+void memexpose_ep_write_sync(MemexposeEp *ep, struct memexpose_op *op)
-+{
-+    assert(!ep->is_async);
-+    qemu_chr_fe_write_all(ep->chr, (unsigned char *) op, op->head.size);
-+
-+    struct memexpose_op resp;
-+    int prio = op->head.prio;
-+
-+    /* FIXME - handle errors */
-+    while (true) {
-+        Error *err = NULL;
-+        mep_receive_sync(ep, &resp);
-+        int resp_prio = resp.head.prio;
-+        if (resp_prio > prio) {
-+            ep->handle_msg(ep->data, &resp, &err);
-+        } else if (resp_prio < prio) {
-+            mep_queue_msg(ep, &resp);
-+        } else {
-+            *op = resp;
-+            return;
-+        }
-+    }
-+}
-+
-+void memexpose_ep_init(MemexposeEp *ep, CharBackend *chr, void *data, int prio,
-+                       void (*handle_msg)(void *data, struct memexpose_op *op,
-+                                          Error **errp))
-+{
-+    ep->queue_msg_bh = qemu_bh_new(mep_queue_msg_bh, ep);
-+    ep->queued_op.head.size = 0;
-+    ep->handle_msg = handle_msg;
-+    ep->msg.bytes = 0;
-+    ep->msg.read_state = MEMEXPOSE_MSG_READ_SIZE;
-+    ep->chr = chr;
-+    ep->data = data;
-+    ep->prio = prio;
-+    ep->connected = 0;
-+
-+    if (handle_msg)
-+        qemu_chr_fe_set_handlers(ep->chr, mep_can_receive,
-+                                 mep_receive, NULL, NULL, ep, NULL, true);
-+    Chardev *chrd = qemu_chr_fe_get_driver(ep->chr);
-+    assert(chrd);
-+    MEMEXPOSE_DPRINTF("Memexpose endpoint at %s\n",
-+                      chrd->filename);
-+
-+}
-+
-+/* TODO - protocol for synchronously ending connection */
-+void memexpose_ep_destroy(MemexposeEp *ep)
-+{
-+    qemu_chr_fe_set_handlers(ep->chr, NULL, NULL, NULL, NULL, NULL, NULL, true);
-+}
-+
-+void memexpose_ep_send_fd(MemexposeEp *ep, int fd)
-+{
-+    qemu_chr_fe_set_msgfds(ep->chr, &fd, 1);
-+}
-+
-+int memexpose_ep_recv_fd(MemexposeEp *ep)
-+{
-+    return qemu_chr_fe_get_msgfd(ep->chr);
-+}
-+
-+int memexpose_ep_connect(MemexposeEp *ep)
-+{
-+    /* FIXME - report errors */
-+    Error *err = NULL;
-+    if (ep->connected) {
-+        return 0;
-+    }
-+
-+    int ret = qemu_chr_fe_wait_connected(ep->chr, &err);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    ep->connected = 1;
-+    return 0;
-+}
-+
-+void memexpose_ep_disconnect(MemexposeEp *ep)
-+{
-+    if (ep->connected) {
-+        qemu_chr_fe_disconnect(ep->chr);
-+    }
-+    ep->connected = 0;
-+}
-diff --git a/hw/misc/memexpose/memexpose-msg.h b/hw/misc/memexpose/memexpose-msg.h
-new file mode 100644
-index 0000000..5543cd4
---- /dev/null
-+++ b/hw/misc/memexpose/memexpose-msg.h
-@@ -0,0 +1,161 @@
-+/*
-+ *  Memexpose core
-+ *
-+ *  Copyright (C) 2020 Samsung Electronics Co Ltd.
-+ *    Igor Kotrasinski, <i.kotrasinsk@partner.samsung.com>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify it
-+ *  under the terms of the GNU General Public License as published by the
-+ *  Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but WITHOUT
-+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ *  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ *  for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License along
-+ *  with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef _MEMEXPOSE_MSG_H_
-+#define _MEMEXPOSE_MSG_H_
-+
-+#include "qemu/osdep.h"
-+#include "qemu/typedefs.h"
-+#include "chardev/char-fe.h"
-+#include "exec/memattrs.h"
-+#include <inttypes.h>
-+
-+#define MEMEXPOSE_MAX_INTR_DATA_SIZE 128
-+
-+enum memexpose_op_type {
-+    MOP_READ,
-+    MOP_READ_RET,
-+    MOP_WRITE,
-+    MOP_WRITE_RET,
-+    MOP_REG_INV,
-+    MOP_REG_INV_RET,
-+    MOP_INTR,
-+};
-+
-+enum memexpose_memshare_type {
-+    MEMSHARE_NONE,
-+    MEMSHARE_FD,
-+};
-+
-+/*
-+ * TODO - we'll need to share more info here, like access permissions for
-+ * example
-+ */
-+struct memexpose_memshare_info_fd {
-+    uint64_t start;
-+    uint64_t mmap_start;
-+    uint64_t size;
-+    uint8_t readonly;
-+    uint8_t nonvolatile;
-+} __attribute__((packed));
-+
-+/* TODO - this might have variable size in the future */
-+struct memexpose_memshare_info {
-+    uint8_t type;
-+    union {
-+        struct memexpose_memshare_info_fd fd;
-+    };
-+} __attribute__((packed));
-+
-+/* TODO - endianness */
-+struct memexpose_op_head {
-+    uint32_t size;
-+    uint8_t ot;
-+    uint8_t prio;
-+} __attribute__((packed));
-+
-+struct memexpose_op_read {
-+    uint64_t offset;
-+    uint8_t size;
-+} __attribute__((packed));
-+
-+struct memexpose_op_write {
-+    uint64_t offset;
-+    uint64_t value;
-+    uint8_t size;
-+} __attribute__((packed));
-+
-+struct memexpose_op_read_ret {
-+    MemTxResult ret;
-+    uint64_t value;
-+    struct memexpose_memshare_info share;
-+} __attribute__((packed));
-+
-+struct memexpose_op_write_ret {
-+    MemTxResult ret;
-+    struct memexpose_memshare_info share;
-+} __attribute__((packed));
-+
-+struct memexpose_op_intr {
-+    uint64_t type;
-+    uint8_t data[MEMEXPOSE_MAX_INTR_DATA_SIZE];
-+} __attribute__((packed));
-+
-+struct memexpose_op_reg_inv {
-+    uint64_t start;
-+    uint64_t size;
-+} __attribute__((packed));
-+
-+union memexpose_op_all {
-+    struct memexpose_op_read read;
-+    struct memexpose_op_write write;
-+    struct memexpose_op_read_ret read_ret;
-+    struct memexpose_op_write_ret write_ret;
-+    struct memexpose_op_intr intr;
-+    struct memexpose_op_reg_inv reg_inv;
-+} __attribute__((packed));
-+
-+struct memexpose_op {
-+    struct memexpose_op_head head;
-+    union memexpose_op_all body;
-+} __attribute__((packed));
-+
-+enum MemexposeMsgState {
-+    MEMEXPOSE_MSG_READ_SIZE,
-+    MEMEXPOSE_MSG_READ_BODY,
-+    MEMEXPOSE_MSG_BROKEN,
-+};
-+
-+typedef struct MemexposeMsg {
-+    int read_state;
-+    int bytes;
-+    struct memexpose_op buf;
-+} MemexposeMsg;
-+
-+typedef struct MemexposeEp {
-+    CharBackend *chr;
-+    MemexposeMsg msg;
-+    bool is_async;
-+    int prio;
-+    void *data;
-+    void (*handle_msg)(void *data, struct memexpose_op *op, Error **err);
-+
-+    int connected;
-+    struct memexpose_op queued_op;
-+    QEMUBH *queue_msg_bh;
-+} MemexposeEp;
-+
-+void memexpose_ep_init(MemexposeEp *ep, CharBackend *chr, void *data, int prio,
-+                       void (*handle_msg)(void *data, struct memexpose_op *op,
-+                                          Error **errp));
-+void memexpose_ep_destroy(MemexposeEp *ep);
-+
-+int memexpose_ep_connect(MemexposeEp *ep);
-+void memexpose_ep_disconnect(MemexposeEp *ep);
-+
-+/* TODO - functions for header boilerplate */
-+void memexpose_ep_write_sync(MemexposeEp *ep, struct memexpose_op *op);
-+void memexpose_ep_write_async(MemexposeEp *ep, struct memexpose_op *op);
-+void memexpose_ep_send_fd(MemexposeEp *ep, int fd);
-+int memexpose_ep_recv_fd(MemexposeEp *ep);
-+int memexpose_ep_msg_prio(MemexposeEp *ep, enum memexpose_op_type);
-+
-+#endif /* _MEMEXPOSE_MSG_H_ */
--- 
-2.7.4
-
+>---
+> tests/qtest/Makefile.include      |   1 +
+> tests/qtest/libqos/qos_external.c | 168 ++++++++++++++++++++++++++++++
+> tests/qtest/libqos/qos_external.h |  28 +++++
+> tests/qtest/qos-test.c            | 132 +----------------------
+> 4 files changed, 198 insertions(+), 131 deletions(-)
+> create mode 100644 tests/qtest/libqos/qos_external.c
+> create mode 100644 tests/qtest/libqos/qos_external.h
+>
+>diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+>index 08a48c1252..bdc93d3866 100644
+>--- a/tests/qtest/Makefile.include
+>+++ b/tests/qtest/Makefile.include
+>@@ -172,6 +172,7 @@ libqos-usb-obj-y =3D $(libqos-spapr-obj-y) $(libqos-=
+pc-obj-y) tests/qtest/libqos/u
+> # qos devices:
+> libqos-obj-y =3D  $(libqgraph-obj-y)
+> libqos-obj-y +=3D $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+>+libqos-obj-y +=3D tests/qtest/libqos/qos_external.o
+> libqos-obj-y +=3D tests/qtest/libqos/e1000e.o
+> libqos-obj-y +=3D tests/qtest/libqos/i2c.o
+> libqos-obj-y +=3D tests/qtest/libqos/i2c-imx.o
+>diff --git a/tests/qtest/libqos/qos_external.c b/tests/qtest/libqos/qos_=
+external.c
+>new file mode 100644
+>index 0000000000..398556dde0
+>--- /dev/null
+>+++ b/tests/qtest/libqos/qos_external.c
+>@@ -0,0 +1,168 @@
+>+/*
+>+ * libqos driver framework
+>+ *
+>+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gm=
+ail.com>
+>+ *
+>+ * This library is free software; you can redistribute it and/or
+>+ * modify it under the terms of the GNU Lesser General Public
+>+ * License version 2 as published by the Free Software Foundation.
+>+ *
+>+ * This library is distributed in the hope that it will be useful,
+>+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>+ * Lesser General Public License for more details.
+>+ *
+>+ * You should have received a copy of the GNU Lesser General Public
+>+ * License along with this library; if not, see <http://www.gnu.org/lic=
+enses/>
+>+ */
+>+
+>+#include "qemu/osdep.h"
+>+#include <getopt.h>
+>+#include "libqtest.h"
+>+#include "qapi/qmp/qdict.h"
+>+#include "qapi/qmp/qbool.h"
+>+#include "qapi/qmp/qstring.h"
+>+#include "qemu/module.h"
+>+#include "qapi/qmp/qlist.h"
+>+#include "libqos/malloc.h"
+>+#include "libqos/qgraph.h"
+>+#include "libqos/qgraph_internal.h"
+>+#include "libqos/qos_external.h"
+>+
+>+
+>+
+>+void apply_to_node(const char *name, bool is_machine, bool is_abstract)
+>+{
+>+    char *machine_name =3D NULL;
+>+    if (is_machine) {
+>+        const char *arch =3D qtest_get_arch();
+>+        machine_name =3D g_strconcat(arch, "/", name, NULL);
+>+        name =3D machine_name;
+>+    }
+>+    qos_graph_node_set_availability(name, true);
+>+    if (is_abstract) {
+>+        qos_delete_cmd_line(name);
+>+    }
+>+    g_free(machine_name);
+>+}
+>+
+>+/**
+>+ * apply_to_qlist(): using QMP queries QEMU for a list of
+>+ * machines and devices available, and sets the respective node
+>+ * as true. If a node is found, also all its produced and contained
+>+ * child are marked available.
+>+ *
+>+ * See qos_graph_node_set_availability() for more info
+>+ */
+>+void apply_to_qlist(QList *list, bool is_machine)
+>+{
+>+    const QListEntry *p;
+>+    const char *name;
+>+    bool abstract;
+>+    QDict *minfo;
+>+    QObject *qobj;
+>+    QString *qstr;
+>+    QBool *qbool;
+>+
+>+    for (p =3D qlist_first(list); p; p =3D qlist_next(p)) {
+>+        minfo =3D qobject_to(QDict, qlist_entry_obj(p));
+>+        qobj =3D qdict_get(minfo, "name");
+>+        qstr =3D qobject_to(QString, qobj);
+>+        name =3D qstring_get_str(qstr);
+>+
+>+        qobj =3D qdict_get(minfo, "abstract");
+>+        if (qobj) {
+>+            qbool =3D qobject_to(QBool, qobj);
+>+            abstract =3D qbool_get_bool(qbool);
+>+        } else {
+>+            abstract =3D false;
+>+        }
+>+
+>+        apply_to_node(name, is_machine, abstract);
+>+        qobj =3D qdict_get(minfo, "alias");
+>+        if (qobj) {
+>+            qstr =3D qobject_to(QString, qobj);
+>+            name =3D qstring_get_str(qstr);
+>+            apply_to_node(name, is_machine, abstract);
+>+        }
+>+    }
+>+}
+>+
+>+QGuestAllocator *get_machine_allocator(QOSGraphObject *obj)
+>+{
+>+    return obj->get_driver(obj, "memory");
+>+}
+>+
+>+/**
+>+ * allocate_objects(): given an array of nodes @arg,
+>+ * walks the path invoking all constructors and
+>+ * passing the corresponding parameter in order to
+>+ * continue the objects allocation.
+>+ * Once the test is reached, return the object it consumes.
+>+ *
+>+ * Since the machine and QEDGE_CONSUMED_BY nodes allocate
+>+ * memory in the constructor, g_test_queue_destroy is used so
+>+ * that after execution they can be safely free'd.  (The test's
+>+ * ->before callback is also welcome to use g_test_queue_destroy).
+>+ *
+>+ * Note: as specified in walk_path() too, @arg is an array of
+>+ * char *, where arg[0] is a pointer to the command line
+>+ * string that will be used to properly start QEMU when executing
+>+ * the test, and the remaining elements represent the actual objects
+>+ * that will be allocated.
+>+ */
+>+void *allocate_objects(QTestState *qts, char **path, QGuestAllocator **=
+p_alloc)
+>+{
+>+    int current =3D 0;
+>+    QGuestAllocator *alloc;
+>+    QOSGraphObject *parent =3D NULL;
+>+    QOSGraphEdge *edge;
+>+    QOSGraphNode *node;
+>+    void *edge_arg;
+>+    void *obj;
+>+
+>+    node =3D qos_graph_get_node(path[current]);
+>+    g_assert(node->type =3D=3D QNODE_MACHINE);
+>+
+>+    obj =3D qos_machine_new(node, qts);
+>+    qos_object_queue_destroy(obj);
+>+
+>+    alloc =3D get_machine_allocator(obj);
+>+    if (p_alloc) {
+>+        *p_alloc =3D alloc;
+>+    }
+>+
+>+    for (;;) {
+>+        if (node->type !=3D QNODE_INTERFACE) {
+>+            qos_object_start_hw(obj);
+>+            parent =3D obj;
+>+        }
+>+
+>+        /* follow edge and get object for next node constructor */
+>+        current++;
+>+        edge =3D qos_graph_get_edge(path[current - 1], path[current]);
+>+        node =3D qos_graph_get_node(path[current]);
+>+
+>+        if (node->type =3D=3D QNODE_TEST) {
+>+            g_assert(qos_graph_edge_get_type(edge) =3D=3D QEDGE_CONSUME=
+D_BY);
+>+            return obj;
+>+        }
+>+
+>+        switch (qos_graph_edge_get_type(edge)) {
+>+        case QEDGE_PRODUCES:
+>+            obj =3D parent->get_driver(parent, path[current]);
+>+            break;
+>+
+>+        case QEDGE_CONSUMED_BY:
+>+            edge_arg =3D qos_graph_edge_get_arg(edge);
+>+            obj =3D qos_driver_new(node, obj, alloc, edge_arg);
+>+            qos_object_queue_destroy(obj);
+>+            break;
+>+
+>+        case QEDGE_CONTAINS:
+>+            obj =3D parent->get_device(parent, path[current]);
+>+            break;
+>+        }
+>+    }
+>+}
+>+
+>diff --git a/tests/qtest/libqos/qos_external.h b/tests/qtest/libqos/qos_=
+external.h
+>new file mode 100644
+>index 0000000000..7b44930c55
+>--- /dev/null
+>+++ b/tests/qtest/libqos/qos_external.h
+>@@ -0,0 +1,28 @@
+>+/*
+>+ * libqos driver framework
+>+ *
+>+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gm=
+ail.com>
+>+ *
+>+ * This library is free software; you can redistribute it and/or
+>+ * modify it under the terms of the GNU Lesser General Public
+>+ * License version 2 as published by the Free Software Foundation.
+>+ *
+>+ * This library is distributed in the hope that it will be useful,
+>+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>+ * Lesser General Public License for more details.
+>+ *
+>+ * You should have received a copy of the GNU Lesser General Public
+>+ * License along with this library; if not, see <http://www.gnu.org/lic=
+enses/>
+>+ */
+>+
+>+#ifndef QOS_EXTERNAL_H
+>+#define QOS_EXTERNAL_H
+>+#include "libqos/qgraph.h"
+>+
+>+void apply_to_node(const char *name, bool is_machine, bool is_abstract)=
+;
+>+void apply_to_qlist(QList *list, bool is_machine);
+>+QGuestAllocator *get_machine_allocator(QOSGraphObject *obj);
+>+void *allocate_objects(QTestState *qts, char **path, QGuestAllocator **=
+p_alloc);
+>+
+>+#endif
+>diff --git a/tests/qtest/qos-test.c b/tests/qtest/qos-test.c
+>index fd70d73ea5..ad193f43a5 100644
+>--- a/tests/qtest/qos-test.c
+>+++ b/tests/qtest/qos-test.c
+>@@ -27,65 +27,11 @@
+> #include "libqos/malloc.h"
+> #include "libqos/qgraph.h"
+> #include "libqos/qgraph_internal.h"
+>+#include "libqos/qos_external.h"
+>
+> static char *old_path;
+>
+>-static void apply_to_node(const char *name, bool is_machine, bool is_ab=
+stract)
+>-{
+>-    char *machine_name =3D NULL;
+>-    if (is_machine) {
+>-        const char *arch =3D qtest_get_arch();
+>-        machine_name =3D g_strconcat(arch, "/", name, NULL);
+>-        name =3D machine_name;
+>-    }
+>-    qos_graph_node_set_availability(name, true);
+>-    if (is_abstract) {
+>-        qos_delete_cmd_line(name);
+>-    }
+>-    g_free(machine_name);
+>-}
+>
+>-/**
+>- * apply_to_qlist(): using QMP queries QEMU for a list of
+>- * machines and devices available, and sets the respective node
+>- * as true. If a node is found, also all its produced and contained
+>- * child are marked available.
+>- *
+>- * See qos_graph_node_set_availability() for more info
+>- */
+>-static void apply_to_qlist(QList *list, bool is_machine)
+>-{
+>-    const QListEntry *p;
+>-    const char *name;
+>-    bool abstract;
+>-    QDict *minfo;
+>-    QObject *qobj;
+>-    QString *qstr;
+>-    QBool *qbool;
+>-
+>-    for (p =3D qlist_first(list); p; p =3D qlist_next(p)) {
+>-        minfo =3D qobject_to(QDict, qlist_entry_obj(p));
+>-        qobj =3D qdict_get(minfo, "name");
+>-        qstr =3D qobject_to(QString, qobj);
+>-        name =3D qstring_get_str(qstr);
+>-
+>-        qobj =3D qdict_get(minfo, "abstract");
+>-        if (qobj) {
+>-            qbool =3D qobject_to(QBool, qobj);
+>-            abstract =3D qbool_get_bool(qbool);
+>-        } else {
+>-            abstract =3D false;
+>-        }
+>-
+>-        apply_to_node(name, is_machine, abstract);
+>-        qobj =3D qdict_get(minfo, "alias");
+>-        if (qobj) {
+>-            qstr =3D qobject_to(QString, qobj);
+>-            name =3D qstring_get_str(qstr);
+>-            apply_to_node(name, is_machine, abstract);
+>-        }
+>-    }
+>-}
+>
+> /**
+>  * qos_set_machines_devices_available(): sets availability of qgraph
+>@@ -129,10 +75,6 @@ static void qos_set_machines_devices_available(void)
+>     qobject_unref(response);
+> }
+>
+>-static QGuestAllocator *get_machine_allocator(QOSGraphObject *obj)
+>-{
+>-    return obj->get_driver(obj, "memory");
+>-}
+>
+> static void restart_qemu_or_continue(char *path)
+> {
+>@@ -159,78 +101,6 @@ void qos_invalidate_command_line(void)
+>     old_path =3D NULL;
+> }
+>
+>-/**
+>- * allocate_objects(): given an array of nodes @arg,
+>- * walks the path invoking all constructors and
+>- * passing the corresponding parameter in order to
+>- * continue the objects allocation.
+>- * Once the test is reached, return the object it consumes.
+>- *
+>- * Since the machine and QEDGE_CONSUMED_BY nodes allocate
+>- * memory in the constructor, g_test_queue_destroy is used so
+>- * that after execution they can be safely free'd.  (The test's
+>- * ->before callback is also welcome to use g_test_queue_destroy).
+>- *
+>- * Note: as specified in walk_path() too, @arg is an array of
+>- * char *, where arg[0] is a pointer to the command line
+>- * string that will be used to properly start QEMU when executing
+>- * the test, and the remaining elements represent the actual objects
+>- * that will be allocated.
+>- */
+>-static void *allocate_objects(QTestState *qts, char **path, QGuestAlloc=
+ator **p_alloc)
+>-{
+>-    int current =3D 0;
+>-    QGuestAllocator *alloc;
+>-    QOSGraphObject *parent =3D NULL;
+>-    QOSGraphEdge *edge;
+>-    QOSGraphNode *node;
+>-    void *edge_arg;
+>-    void *obj;
+>-
+>-    node =3D qos_graph_get_node(path[current]);
+>-    g_assert(node->type =3D=3D QNODE_MACHINE);
+>-
+>-    obj =3D qos_machine_new(node, qts);
+>-    qos_object_queue_destroy(obj);
+>-
+>-    alloc =3D get_machine_allocator(obj);
+>-    if (p_alloc) {
+>-        *p_alloc =3D alloc;
+>-    }
+>-
+>-    for (;;) {
+>-        if (node->type !=3D QNODE_INTERFACE) {
+>-            qos_object_start_hw(obj);
+>-            parent =3D obj;
+>-        }
+>-
+>-        /* follow edge and get object for next node constructor */
+>-        current++;
+>-        edge =3D qos_graph_get_edge(path[current - 1], path[current]);
+>-        node =3D qos_graph_get_node(path[current]);
+>-
+>-        if (node->type =3D=3D QNODE_TEST) {
+>-            g_assert(qos_graph_edge_get_type(edge) =3D=3D QEDGE_CONSUME=
+D_BY);
+>-            return obj;
+>-        }
+>-
+>-        switch (qos_graph_edge_get_type(edge)) {
+>-        case QEDGE_PRODUCES:
+>-            obj =3D parent->get_driver(parent, path[current]);
+>-            break;
+>-
+>-        case QEDGE_CONSUMED_BY:
+>-            edge_arg =3D qos_graph_edge_get_arg(edge);
+>-            obj =3D qos_driver_new(node, obj, alloc, edge_arg);
+>-            qos_object_queue_destroy(obj);
+>-            break;
+>-
+>-        case QEDGE_CONTAINS:
+>-            obj =3D parent->get_device(parent, path[current]);
+>-            break;
+>-        }
+>-    }
+>-}
+>
+> /* The argument to run_one_test, which is the test function that is reg=
+istered
+>  * with GTest, is a vector of strings.  The first item is the initial c=
+ommand
+>--=20
+>2.23.0
+>
 
