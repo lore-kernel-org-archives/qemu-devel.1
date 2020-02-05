@@ -2,77 +2,86 @@ Return-Path: <SRS0=Tmh/=3Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3644C35247
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 18:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7DDC35247
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 18:54:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DB41214AF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 18:52:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB934214AF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Feb 2020 18:54:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9JtJSW1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DB41214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ka5K5z05"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB934214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izPmZ-0007Dc-M6
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 13:52:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33947)
+	id 1izPox-0008NB-Uh
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 13:54:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jusual@redhat.com>) id 1izPm1-0006mD-Ht
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 13:51:42 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1izPoM-0007qR-9U
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 13:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jusual@redhat.com>) id 1izPm0-0005rY-7s
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 13:51:41 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49429
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jusual@redhat.com>) id 1izPm0-0005nW-3t
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 13:51:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580928699;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=OzZGw3pGQJA9fRYahalq5zdPl+c8vv2sD9FXMnrzKb0=;
- b=Y9JtJSW1YT3o9yRYJg9adwz6SUgDv1jdiZKskiUBds8A4MfRNa3tDhzILW1UsS8D9nIAy2
- pba2dgWCrvX3tYPLzK2InkOu/zDeKzkQZsvlVbnxXYdw2xhrj94i1A8FjkVgHLMWzYdtWE
- bkWcjMZVeA1y1sH5K4j/pwgB/+LYLXg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-gtjIdYSBO523jTju9qQRZA-1; Wed, 05 Feb 2020 13:51:37 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03AC310CE782;
- Wed,  5 Feb 2020 18:51:36 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-204-83.brq.redhat.com
- [10.40.204.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 26CAC60C05;
- Wed,  5 Feb 2020 18:51:26 +0000 (UTC)
-From: Julia Suvorova <jusual@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-trivial@nongnu.org
-Subject: [PATCH] hw/pci/pci_bridge: Fix typo in comment
-Date: Wed,  5 Feb 2020 19:51:23 +0100
-Message-Id: <20200205185123.210209-1-jusual@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1izPoL-00085P-0j
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 13:54:06 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38453)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1izPoK-000831-PF; Wed, 05 Feb 2020 13:54:04 -0500
+Received: by mail-oi1-x244.google.com with SMTP id l9so1828775oii.5;
+ Wed, 05 Feb 2020 10:54:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UZ0bX6T6pi3Kt/fWzzu7atALwWihp9KxFsFA+tnR25Q=;
+ b=ka5K5z05vBeVpJqUQmtLw8DdEx0GTGXptUn8YP2xnvhWtfHusUZy7+EOwdqpEF9RZ4
+ hJKxn4qDEZOXT4FR67ukmVczBGqe8j4TH+zlgAVcQ7Xy2lwQ1msm22TKjWB00LBSg3Gb
+ /f/Ni8RUNZrxVBY1YWjCupCdkc0TVasBgdy75BjrE7eQqMCV/KiFqRkBesxM/pFV3qYl
+ wcOuK1ASWngr3H90awsv3xG4BiiIzeddZjReboYiHXvAIv/N7oilhV16CjCZLAs+TH7C
+ PNycdT5TP/tYjuVCYQLcTmMgl/fYOlzEKLTFBd0Vobm4wbBmTUXVL0eBiNWrqR3LSxNv
+ xPjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UZ0bX6T6pi3Kt/fWzzu7atALwWihp9KxFsFA+tnR25Q=;
+ b=iZiVc/ReYZhjzBFCYMq2hGDI2VgI661C5eZosfcuKq2tt+aag3/eXwiQX8H3ehEY4h
+ Cf9QQzKSQRAm1RTF34u9pBSxxuKuVHY5ZTiwzo52wsGP8hKl+L+2Glfg68A1pSR6j+4P
+ J2lpJ7ja1M9rshEhRUIwXKOonDLx7N+HvjLRQFhkr0rI9G19wnaeUmdgEFZKth4p+rC/
+ JJSxVa17cyd8hs2iA6J1eTvVEfAcaE/B3vZx1vGnWEVB0zE80b7XT6abR30Cn4bnp4mP
+ YikG0AUV1+1JDi2tbqPRd9xDvrkRfqQX0xjiEhXjghjPdvCVn33G94fKNMsAaIhOR0jW
+ VaJQ==
+X-Gm-Message-State: APjAAAU5Dc5PnaW6OAcRMkQfLlBxFglvhevSreFXnnoDXalAkeU0cL9+
+ XxrGNU76BzTZfQ6TjPci4qsV4BG1CemGf9lB+uo=
+X-Google-Smtp-Source: APXvYqzpQo0okBMnGOg80xOJBb6dPWqcz00FnrG0FT//Wk/ixsATKOfS4YBONMfIHEfuM3kaLDV3Et7eJHd79nCyHUA=
+X-Received: by 2002:a05:6808:64e:: with SMTP id
+ z14mr3815280oih.79.1580928843800; 
+ Wed, 05 Feb 2020 10:54:03 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: gtjIdYSBO523jTju9qQRZA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191120091014.16883-1-thuth@redhat.com>
+ <20191120091014.16883-4-thuth@redhat.com>
+ <7a775153-f18d-e766-1d8f-33607f5fa05b@amsat.org>
+ <2396dfd4-6c85-d17a-b358-bd058c757f14@redhat.com>
+ <CAAdtpL7vPCQ8k91nvBWc_NLrmhu6OPVprUSL8uzi_v6HMiSrnw@mail.gmail.com>
+ <CAL1e-=gd-ymYd3_cods8BAtwbQeJFodmnmsNo-gLx381rXHKxQ@mail.gmail.com>
+ <20200205175115.GT2221087@redhat.com>
+ <CAL1e-=jHpNmTdWSiHZ_StC0MXjLLsyq0cfSE=45=6SwoFnfiaA@mail.gmail.com>
+In-Reply-To: <CAL1e-=jHpNmTdWSiHZ_StC0MXjLLsyq0cfSE=45=6SwoFnfiaA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 5 Feb 2020 19:53:52 +0100
+Message-ID: <CAL1e-=ivAZCj990c+47kVdcaOUgU5sDvoWZNWAMHmVJWd9L3Vg@mail.gmail.com>
+Subject: Re: [PATCH for-5.0 3/4] Remove the core bluetooth code
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,33 +93,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Julia Suvorova <jusual@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ libvir-list@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Julia Suvorova <jusual@redhat.com>
----
- include/hw/pci/pci_bridge.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Feb 5, 2020 at 7:03 PM Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+>
+> > The deprecation policy is primarily intended for notifying of changes
+> > to QEMU's stable interfaces ( CLI, HMP, QMP) which affect behaviour
+> > and usage of QEMU at runtime & are liable to break apps managing
+> > QEMU.
+> >
+> > Changes to build time options have no strong reason to be subjected to
+> > the deprecation process.
+>
+> This sounds reasonable to me.
+>
+> But: Should our deprecation policy be clearer on what is subject to
+> our deprecation procedure, and what is not?
+>
+> Regards,
+> Aleksandar
+>
 
-diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
-index ba488818d2..99c674e949 100644
---- a/include/hw/pci/pci_bridge.h
-+++ b/include/hw/pci/pci_bridge.h
-@@ -108,7 +108,7 @@ void pci_bridge_dev_unplug_request_cb(HotplugHandler *h=
-otplug_dev,
-=20
- /*
-  * before qdev initialization(qdev_init()), this function sets bus_name an=
-d
-- * map_irq callback which are necessry for pci_bridge_initfn() to
-+ * map_irq callback which are necessary for pci_bridge_initfn() to
-  * initialize bus.
-  */
- void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
---=20
-2.24.1
+And, there is even a section devoted to the build system in
+https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features :
 
+    B.10 Build system
+
+    B.10.1 Python 2 support (since 4.1.0)
+
+    In the future, QEMU will require Python 3 to be available at build
+time. Support for Python 2 in scripts shipped with QEMU is deprecated.
+
+The wording above comes from the file in our source tree: qemu-deprecated.texi .
+
+Shouldn't the cases like "--enable-blues" be documented here? I think
+the deprecation of bluetooth devices support should have included a
+short section on involved configure options here.
+
+Why is Python 2 support different to "--enable-blues" support? There
+should not be some unknown and arbitrary criterium what do and what
+doesn't come in this subsection.
+
+Or, if our build system is not subject to our deprecation policy, than
+what is the entire subsection "B.10 Build system" doing here, in
+section "Deprecated features"?
+
+
+> > If we remove an option at build time the effect
+> > is noticed immediately and the solution is straightforward (stop passing
+> > the option). We have added / removed configure options at will with little
+> > negative feedback historically. We'll have far biggest changes coming to
+> > the build system in future too, with the introduction of meson.
+> >
+> > I don't think we want to constrain & complicate our work in modernizing
+> > the build system by declaring that any changes to it must go through
+> > deprecation.
+> >
+> > Regards,
+> > Daniel
+> > --
+> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> > |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> >
 
