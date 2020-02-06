@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE989C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C62A4C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:11:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A5D5206CC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:11:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95265214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:11:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qnlqFw+p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A5D5206CC
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LNz/25uq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95265214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izf4P-0000xK-Px
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:11:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50054)
+	id 1izf4S-00016L-PG
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:11:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1izeoV-0003Ix-Ew
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:17 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1izeoh-0003Ul-R5
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1izeoT-0007io-I4
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:15 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50248)
+ (envelope-from <richard.henderson@linaro.org>) id 1izeoe-00007d-6D
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:26 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52709)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1izeoT-0007cK-8K
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:13 -0500
-Received: by mail-wm1-x343.google.com with SMTP id a5so5802243wmb.0
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:55:13 -0800 (PST)
+ id 1izeoc-0008PQ-9T
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:22 -0500
+Received: by mail-wm1-x344.google.com with SMTP id p9so5801354wmc.2
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:55:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=upHYF1UMXzuY7YGdgMwFvDjEH+GvpeNijlwWGAtlcaE=;
- b=qnlqFw+p76jInhDSPdcAgJuAvEbBOOE6v+YY7TCYWjY7g6MaWzHDos/xvGRRxax9JI
- TDMHor4GKMkvyEjcwIxhYSLhTaXdd4sFzCSEl+lU1wYUql0nWrpddipMddOCKBrhjz24
- DsRTe0+sAbAoVudKR/M+fNaPGbOhjm9bHv0q8Rj689MA8K22zjss9Ax3Lz6xmu5Q0jM8
- HBxc7wmGywucKIJ9rYxn8tIzXw0lIjYIE3GgS+2aiY9VMAhW4cH2Cnb4vKgbQCzVb1g7
- 5RPm0Cv3I2Oly2BFvzf4YmcTiT9D10zacFp6m+kOhrYFXzICisM4+arrR4Lc8bmaI6Fm
- zy8w==
+ bh=YgnJTRdY4FfbIfCcdJNCBrzxflb5ZD/kYEjiNVohCOk=;
+ b=LNz/25uqwE8uFYfAFGSTgr1c1rsC6CcaLEAQpBKvhC/s9OfHIKOXUfzFvk5w1KnomF
+ 5/lg7VJnFWcR1l9/rbPt+TrfWnS4/lGflaeAT25g2fem4IcfAd3mqXQb6fqQATmeimV2
+ IgpdCrlA2KuQzQPzyUdC923yq+jaZY4XX17zRcox3rVhhStOH03RuI6xQxEI0yQNkkWm
+ /0aKrsAXTsN81gR2dHNez0WLs4xif1FH7ld8suG6htOwskFyF3puA/BcDAq3UJHL1gS3
+ 7p+H67ApzbZE3wIFLR21+8bF5L66678Gp+TeMZm81Kc/uGI+PexT45YTUKKvx9eJsHZG
+ H42g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=upHYF1UMXzuY7YGdgMwFvDjEH+GvpeNijlwWGAtlcaE=;
- b=PmgG2xLaCWYH1ByC3qIowcPkHPnKKL40GECA0ApTMqHUZN5+kIRluCW2iBf1r/kasq
- mLl6ENgobfd1XHnze8mUKT8//4pfYAgHPvJBvQhh6LZppBlLm5ludT2eG4dkJki7L5Mk
- hP5vFLcbbt2jqBdCFr6/erZCTt1g55NV/2G2IXMSHvatzv2uaMZyVWYXjH06u/LfbNxB
- hKX95iBCDB4cVnc7Q78ymztPkDQrrnab9WgvDsQyrp8CI8s3oad1GdOosWxpCVLXPgF4
- Bz3hb9fMDVPeMDuvD1RCWI+9eiliXFTt+YPR08xLPKVix8jH6EhBnVmPl5G6nvzxNlzA
- gyvg==
-X-Gm-Message-State: APjAAAUqKn5Eozg7N8Fe29BaiRQexauFXxWwYb4ibYlI4PUKb9rkm22Q
- CuJ5uJoDjsrkifRFmdoyiuhAW+cM3IKWhA==
-X-Google-Smtp-Source: APXvYqxQDPtVtcSO1VWSDsTuPlxkzG6TqhAYVT2HHOHScUvsb3QcVign/FCMwL4Y6VObq5Qh+QR2lw==
-X-Received: by 2002:a7b:cc97:: with SMTP id p23mr3890632wma.89.1580986511787; 
- Thu, 06 Feb 2020 02:55:11 -0800 (PST)
+ bh=YgnJTRdY4FfbIfCcdJNCBrzxflb5ZD/kYEjiNVohCOk=;
+ b=ADq6TujV5LZyvp+YnIQzcd8pmviAL4pmTwvT58a3St3N26lSolVk1oGol9SgABG7/2
+ S+sY+R8HN0uhWUiZ/8Z29ce7g3/W0scCPFaATwdQr0X23XCXt6sLrPwSBsfZjp9j9Kj7
+ iP1jN+0e1QDSkDa4m+OGPVCAe2BROTqAbvluj0UQZ/rwH2AeSN+2BPCORNJq7hvoKiWi
+ hgC/lIjSgCxrKaPis3akNPO1AVr/1JrepArWVB4KokFLxs5C5yAHVsqySa3EmSTXQ9zc
+ CtlQQIZrDkYPRp6YC3HEQ9TawsDdc5Dgg3LmHzBx25iX0l+COHqSurbOgojglLQSGQu8
+ eOqg==
+X-Gm-Message-State: APjAAAWKOS2KcOk7gjEg47q/048XV04Eo48rZS4CJfk0EidC2ZGt3rvA
+ fpk+DlsGEJ9cKPnayWYXCCx1J9akg1AwLA==
+X-Google-Smtp-Source: APXvYqwDRsRftz3GM+RbZsKFfrT0T5VlvHN/3Iw5wFjkCbqnFUeTxgROeb1+y+bytzgRR8ahNekt8w==
+X-Received: by 2002:a1c:7d92:: with SMTP id y140mr3758679wmc.145.1580986520603; 
+ Thu, 06 Feb 2020 02:55:20 -0800 (PST)
 Received: from cloudburst.c.hoisthospitality.com ([135.196.99.211])
- by smtp.gmail.com with ESMTPSA id m21sm3364995wmi.27.2020.02.06.02.55.10
+ by smtp.gmail.com with ESMTPSA id m21sm3364995wmi.27.2020.02.06.02.55.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 02:55:11 -0800 (PST)
+ Thu, 06 Feb 2020 02:55:20 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 26/41] target/arm: Update timer access for VHE
-Date: Thu,  6 Feb 2020 10:54:33 +0000
-Message-Id: <20200206105448.4726-27-richard.henderson@linaro.org>
+Subject: [PATCH v7 36/41] target/arm: Update arm_cpu_do_interrupt_aarch64 for
+ VHE
+Date: Thu,  6 Feb 2020 10:54:43 +0000
+Message-Id: <20200206105448.4726-37-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200206105448.4726-1-richard.henderson@linaro.org>
 References: <20200206105448.4726-1-richard.henderson@linaro.org>
@@ -81,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,147 +100,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When VHE is enabled, the exception level below EL2 is not EL1,
+but EL0, and so to identify the entry vector offset for exceptions
+targeting EL2 we need to look at the width of EL0, not of EL1.
+
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 102 +++++++++++++++++++++++++++++++++++---------
- 1 file changed, 81 insertions(+), 21 deletions(-)
+ target/arm/helper.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 996865a3a2..992ab2a15f 100644
+index ff2d957b7c..7d15d5c933 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -2324,10 +2324,18 @@ static CPAccessResult gt_cntfrq_access(CPUARMState *env, const ARMCPRegInfo *ri,
-      * Writable only at the highest implemented exception level.
-      */
-     int el = arm_current_el(env);
-+    uint64_t hcr;
-+    uint32_t cntkctl;
+@@ -9017,14 +9017,19 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+          * immediately lower than the target level is using AArch32 or AArch64
+          */
+         bool is_aa64;
++        uint64_t hcr;
  
-     switch (el) {
-     case 0:
--        if (!extract32(env->cp15.c14_cntkctl, 0, 2)) {
-+        hcr = arm_hcr_el2_eff(env);
-+        if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
-+            cntkctl = env->cp15.cnthctl_el2;
-+        } else {
-+            cntkctl = env->cp15.c14_cntkctl;
-+        }
-+        if (!extract32(cntkctl, 0, 2)) {
-             return CP_ACCESS_TRAP;
-         }
-         break;
-@@ -2355,17 +2363,47 @@ static CPAccessResult gt_counter_access(CPUARMState *env, int timeridx,
- {
-     unsigned int cur_el = arm_current_el(env);
-     bool secure = arm_is_secure(env);
-+    uint64_t hcr = arm_hcr_el2_eff(env);
- 
--    /* CNT[PV]CT: not visible from PL0 if ELO[PV]CTEN is zero */
--    if (cur_el == 0 &&
--        !extract32(env->cp15.c14_cntkctl, timeridx, 1)) {
--        return CP_ACCESS_TRAP;
--    }
-+    switch (cur_el) {
-+    case 0:
-+        /* If HCR_EL2.<E2H,TGE> == '11': check CNTHCTL_EL2.EL0[PV]CTEN. */
-+        if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
-+            return (extract32(env->cp15.cnthctl_el2, timeridx, 1)
-+                    ? CP_ACCESS_OK : CP_ACCESS_TRAP_EL2);
-+        }
- 
--    if (arm_feature(env, ARM_FEATURE_EL2) &&
--        timeridx == GTIMER_PHYS && !secure && cur_el < 2 &&
--        !extract32(env->cp15.cnthctl_el2, 0, 1)) {
--        return CP_ACCESS_TRAP_EL2;
-+        /* CNT[PV]CT: not visible from PL0 if EL0[PV]CTEN is zero */
-+        if (!extract32(env->cp15.c14_cntkctl, timeridx, 1)) {
-+            return CP_ACCESS_TRAP;
-+        }
-+
-+        /* If HCR_EL2.<E2H,TGE> == '10': check CNTHCTL_EL2.EL1PCTEN. */
-+        if (hcr & HCR_E2H) {
-+            if (timeridx == GTIMER_PHYS &&
-+                !extract32(env->cp15.cnthctl_el2, 10, 1)) {
-+                return CP_ACCESS_TRAP_EL2;
+         switch (new_el) {
+         case 3:
+             is_aa64 = (env->cp15.scr_el3 & SCR_RW) != 0;
+             break;
+         case 2:
+-            is_aa64 = (env->cp15.hcr_el2 & HCR_RW) != 0;
+-            break;
++            hcr = arm_hcr_el2_eff(env);
++            if ((hcr & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
++                is_aa64 = (hcr & HCR_RW) != 0;
++                break;
 +            }
-+        } else {
-+            /* If HCR_EL2.<E2H> == 0: check CNTHCTL_EL2.EL1PCEN. */
-+            if (arm_feature(env, ARM_FEATURE_EL2) &&
-+                timeridx == GTIMER_PHYS && !secure &&
-+                !extract32(env->cp15.cnthctl_el2, 1, 1)) {
-+                return CP_ACCESS_TRAP_EL2;
-+            }
-+        }
-+        break;
-+
-+    case 1:
-+        /* Check CNTHCTL_EL2.EL1PCTEN, which changes location based on E2H. */
-+        if (arm_feature(env, ARM_FEATURE_EL2) &&
-+            timeridx == GTIMER_PHYS && !secure &&
-+            (hcr & HCR_E2H
-+             ? !extract32(env->cp15.cnthctl_el2, 10, 1)
-+             : !extract32(env->cp15.cnthctl_el2, 0, 1))) {
-+            return CP_ACCESS_TRAP_EL2;
-+        }
-+        break;
-     }
-     return CP_ACCESS_OK;
- }
-@@ -2375,19 +2413,41 @@ static CPAccessResult gt_timer_access(CPUARMState *env, int timeridx,
- {
-     unsigned int cur_el = arm_current_el(env);
-     bool secure = arm_is_secure(env);
-+    uint64_t hcr = arm_hcr_el2_eff(env);
- 
--    /* CNT[PV]_CVAL, CNT[PV]_CTL, CNT[PV]_TVAL: not visible from PL0 if
--     * EL0[PV]TEN is zero.
--     */
--    if (cur_el == 0 &&
--        !extract32(env->cp15.c14_cntkctl, 9 - timeridx, 1)) {
--        return CP_ACCESS_TRAP;
--    }
-+    switch (cur_el) {
-+    case 0:
-+        if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
-+            /* If HCR_EL2.<E2H,TGE> == '11': check CNTHCTL_EL2.EL0[PV]TEN. */
-+            return (extract32(env->cp15.cnthctl_el2, 9 - timeridx, 1)
-+                    ? CP_ACCESS_OK : CP_ACCESS_TRAP_EL2);
-+        }
- 
--    if (arm_feature(env, ARM_FEATURE_EL2) &&
--        timeridx == GTIMER_PHYS && !secure && cur_el < 2 &&
--        !extract32(env->cp15.cnthctl_el2, 1, 1)) {
--        return CP_ACCESS_TRAP_EL2;
-+        /*
-+         * CNT[PV]_CVAL, CNT[PV]_CTL, CNT[PV]_TVAL: not visible from
-+         * EL0 if EL0[PV]TEN is zero.
-+         */
-+        if (!extract32(env->cp15.c14_cntkctl, 9 - timeridx, 1)) {
-+            return CP_ACCESS_TRAP;
-+        }
-+        /* fall through */
-+
-+    case 1:
-+        if (arm_feature(env, ARM_FEATURE_EL2) &&
-+            timeridx == GTIMER_PHYS && !secure) {
-+            if (hcr & HCR_E2H) {
-+                /* If HCR_EL2.<E2H,TGE> == '10': check CNTHCTL_EL2.EL1PTEN. */
-+                if (!extract32(env->cp15.cnthctl_el2, 11, 1)) {
-+                    return CP_ACCESS_TRAP_EL2;
-+                }
-+            } else {
-+                /* If HCR_EL2.<E2H> == 0: check CNTHCTL_EL2.EL1PCEN. */
-+                if (!extract32(env->cp15.cnthctl_el2, 1, 1)) {
-+                    return CP_ACCESS_TRAP_EL2;
-+                }
-+            }
-+        }
-+        break;
-     }
-     return CP_ACCESS_OK;
- }
++            /* fall through */
+         case 1:
+             is_aa64 = is_a64(env);
+             break;
 -- 
 2.20.1
 
