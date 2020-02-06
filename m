@@ -2,91 +2,72 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB168C33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 441DBC33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:27:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B0E1214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:20:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TOqXk+AU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B0E1214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2010420659
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:27:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2010420659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izlkw-00007t-M4
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:20:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58387)
+	id 1izlrt-00058G-A2
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:27:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1izljz-0007Os-FH
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:19:04 -0500
+ (envelope-from <bounces@canonical.com>) id 1izlqN-0003eB-GW
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1izljx-0001Pc-ST
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:19:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41340
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1izljx-0001N0-O8
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:19:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581013141;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ASPjptcycQvfYD9VSyp5SVH2V6vSXO+5fG95WXM7lBI=;
- b=TOqXk+AUKzfKQfUp6NaQ0N0uvakRQ/EuXHgklpV4yEvw2QJes5r/T1uTZUqUQjnn84Lp8w
- mYUdacVeju0zwuhTuNossnRw/5r4pa8I28rJE8rpn/wgHZD6eJweS1QMuucLAs+ZQmJtnl
- 0t2/XcnX+FIEYvfj9lBbCI7BTbAYIrc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-9Gt6LXvlNUeAhdjTknvcPw-1; Thu, 06 Feb 2020 13:18:52 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD4BA189F768;
- Thu,  6 Feb 2020 18:18:48 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.75])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AD5785DA7C;
- Thu,  6 Feb 2020 18:18:38 +0000 (UTC)
-Date: Thu, 6 Feb 2020 18:18:36 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: qmp-shell for GSoC/Outreachy?
-Message-ID: <20200206181836.GK3655@work-vm>
-References: <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <20200124095027.GA824327@redhat.com>
- <20200127143505.GD5669@linux.fritz.box>
- <20200127202925.GE3419@work-vm>
- <20200128105932.GC6431@linux.fritz.box>
- <20200205130946.GC5768@dhcp-200-226.str.redhat.com>
- <a45df5ab-3cad-0fbe-901f-4bc1ba28d38e@redhat.com>
- <20200205194944.GP3210@work-vm> <877e10xdd6.fsf@dusky.pond.sub.org>
+ (envelope-from <bounces@canonical.com>) id 1izlqM-0001IT-3l
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:25:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53750)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1izlqL-0001IF-UB
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:25:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1izlqJ-0004nb-1o
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 18:25:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id F32F82E80C7
+ for <qemu-devel@nongnu.org>; Thu,  6 Feb 2020 18:25:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <877e10xdd6.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 9Gt6LXvlNUeAhdjTknvcPw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Thu, 06 Feb 2020 18:20:13 -0000
+From: Chris Hoy <1862110@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: chrs-hoy
+X-Launchpad-Bug-Reporter: Chris Hoy (chrs-hoy)
+X-Launchpad-Bug-Modifier: Chris Hoy (chrs-hoy)
+References: <158096626936.9041.17441916407484515612.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158101321405.8518.10145910469180108963.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1862110] Re: qemu in script is not parsing properly
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f2da5c9b569258d4af573fcd52363fef7463a416
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,148 +76,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
- John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Bug 1862110 <1862110@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-  That I wrote:
-> >
-> > I believe it should be a python shell with added commands.
-> >
-> > Simple things should be simple.
-> >   e.g. adding a disk from a local file should be trivial.
-> >
-> > Complex things can be complex - but it would be better if they were
-> > simple.
-> >
-> >   It's OK if the worst case of a blockdev is a bit hairy, but
-> >   watch out for cases where the hairyness creeps in unnecessarily.
->=20
-> Designing interfaces to complex machinery is hard.  Experience tells
-> that we do okay when we focus on the building blocks first.  That's
-> -blockdev.  When we start with trying to make simple things simple, we
-> end in swamps.  That's -drive.
->=20
-> Focus on building blocks is of course no excuse for unnecessary
-> hairiness.
->=20
-> It's also no reason not to build more convenient things on top of the
-> building blocks.  I doubt they should go into QMP, though.
+** Description changed:
 
-I see where you're coming from, but I like -drive - it's simple for
-simple things; maybe it's a nightmare for some others, but if I just
-want a VM with a disk on virtio, it's easy.
+- Bug Report: =
 
-But I agree if you have good building blocks and they're easy to
-understand and easy to represent, it's not a bad start.
++ Bug Report:
+  >>qemu-system-x86_64 --version: QEMU emulator version 4.2.0
+  >>Arch-linux version 2020.02.01
+  I was following a tutorial on how to make a windows vm and i have encount=
+ered and issue in the settings of my script I have listed below.
+  =
 
-> > If the user screwsup, it should give an error that prompts the user
-> > to the parameter they got wrong.
-> >
-> > Output from commands should normally be pretty formatted (with an optio=
-n
-> > to display raw json for those needing it).
-> >   e.g. that 'query-version' should give either just the package
-> >   version (as info version currently does) or:
-> >       4.2.50  Package: v4.2.0-1188-gd95a3885a9
-> >
-> > We shouldn't lose any HMP commands that some people find useful
-> >   Ditching HMP isn't an option until we've got almost all of it
-> >   covered.
->=20
-> In particular, we currently use HMP for debugging and monitoring
-> purposes, where we don't need or want QMP's rigor, neither its rigorous
-> interface stability, nor its structured I/O.  We want the "whipuptitude"
-> we get from monitor_printf().  This is actually a point David has made
-> several times.
->=20
-> To have a qmp-shell replace HMP, I think it needs to be able to
->=20
-> * Go beyond 1:1
->=20
->   We tried a 1:1 mapping between HMP and QMP commands, and it didn't
->   work out.  HMP's replacement should let us build convenient commands
->   from QMP building blocks.
->=20
->   We tried a 1:1 mapping between HMP and QMP command arguments, guided
->   by @args_type.  Worked out for simple cases, but was too constricting.
+  The commented code directly above the uncommented qemu instance would
+  boot the Windows screen but the issue arises when I try to reach the
+  same code block under the commented setting lines which takes me to the
+  default SeaBIOS loader.
+  =
 
-Yes, it works for some things.
+-  =
 
-> * Preserve "whipuptitude" [David]
->=20
->   I figure that means allowing some in QMP.  Without compromising its
->   core mission, of course.
->=20
-> * As discoverable as HMP is now [Kevin]
->=20
-> * Help, completion and such at least on par with what HMP provides now
->=20
-> Highly desirable:
->=20
-> * Support transitioning to the machine interface [John]
->=20
->   Let humans start playing with the human interface, and when they feel
->   the need to automate, help them transition to QMP.
->=20
-> Back to John's question on qmp-shell syntax, which hasn't been answered
-> so far.
->=20
-> JSON is a data-interchange format.  It doesn't try to be a configuration
-> format or programming language syntax for human use.  It gets pressed
-> into these roles with entirely predictable poor results.
->=20
-> Pain points of JSON include having to count parenthesises and having to
-> quote so bloody much.  Additional QMP pain points include long names and
-> excessive nesting.
+  #!/bin/bash
+  =
 
-Some other pet hates:
-  a) Number formats are awful for our uses
-  b) Lack of room for comments
+  vmname=3D"windows10vm"
+  =
 
-> For the configuration format role, more usable alternatives exist.  YAML
-> is a popular one.
->=20
-> qmp-shell is a REPL.  It needs a REPL-friendly syntax.  I doubt YAML is
-> or even tries to be REPL-friendly.  I'd love to be wrong; the first rule
-> of language design is "don't".
->=20
-> Other language suggestions?
+  if ps -ef | grep qemu-system-x86_64 | grep -q multifunction=3Don; then
+  echo "A passthrough VM is already running." &
+  exit 1
+  =
 
-While I hate XML, there's a certain niceness in using the same thing as
-libvirt for places that mean the same thing; but that would have the bad
-requirement that things meant *exactly* the same thing.
+  else
+  =
 
-But, for machine representations, I'm not sure moving away from JSON is
-a requirement.
+  # use pulseaudio
+  =
 
-Dave
+  export QEMU_AUDIO_DRV=3Dpa
+  export QEMU_PA_SAMPLES=3D8192
+  export QEMU_AUDIO_TIMER_PERIOD=3D99
+  export QEMU_PA_SERVER=3D/run/user/1000/pulse/native
+  =
 
-> On making JSON suck less in this role:
->=20
-> LISP REPLs demonstrate that computers can assist effectively with
-> counting parenthesises, and with completing long names.
->=20
-> We could make quoting optional for sufficiently nice object member
-> names.  QAPI naming rules ensure niceness, actually.
->=20
-> We could make quoting optional for certain string literals.  Simple
-> enough for literals that can only be a string, like abc.  For literals
-> that could be something else like 123 or true, omitting quotes creates
-> ambiguity.  When the schema accepts only one of the possible types, the
-> ambiguity goes away.  Complexity stays, however.
->=20
-> Excessive nesting should ideally be attacked in QMP itself, but backward
-> compatibility makes that hard.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  cp /usr/share/ovmf/x64/OVMF_VARS.fd /tmp/my_vars.fd
+  =
 
+  #qemu-system-x86_64 \
+  #-drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../IMGs/=
+win.img \
+  #-drive file=3D.../ISOs/Win10_1909_English_x64.iso,index=3D1,media=3Dcdro=
+m \
+  =
+
+  qemu-system-x86_64 \
+  =
+
+  #-name $vmname,process=3D$vmname \
+  #-machine type=3Dq35,accel=3Dkvm \
+  #-cpu host,kvm=3Doff \
+  #-smp 4,sockets=3D1,cores=3D3,threads=3D1 \
+  #-m 8G \
+  #-balloon none \
+  #-rtc clock=3Dhost,base=3Dlocaltime \
+  #-vga none \
+  #-nographic \
+  #-serial none \
+  #-parallel none \
+  #-soundhw hda \
+  #-usb \
+  #-device usb-host,vendorid=3D...,productid=3D... \
+  #-device usb-host,vendorid=3D...,productid=3D... \
+  #-device vfio-pci,host=3D...,multifunction=3Don \
+  #-device vfio-pci,host=3D... \
+  #-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/ovmf/x64/OVMF=
+_VARS.fd \
+  #-drive if=3Dpflash,format=3Draw,file=3D/tmp/my_vars.fd \
+  #-boot order=3D dc \
+  =
+
+  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../IMGs/w=
+in.img \
+  -drive file=3D.../ISOs/Win10_1909_English_x64.iso,index=3D1,media=3Dcdrom=
+ \
+  -drive file=3D.../ISOs/virtio-0.1.171.iso,index=3D2,media=3Dcdrom \
+  =
+
+  #-netdev type=3Dtap,id=3Dnet0,ifname=3Dvmtap0,vhost=3Don \
+  #-device virtio-net-pci,netdev=3Dnet0,mac=3D... \
+  =
+
+  exit 0
+  =
+
+  fi
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1862110
+
+Title:
+  qemu in script is not parsing properly
+
+Status in QEMU:
+  New
+
+Bug description:
+  Bug Report:
+  >>qemu-system-x86_64 --version: QEMU emulator version 4.2.0
+  >>Arch-linux version 2020.02.01
+  I was following a tutorial on how to make a windows vm and i have encount=
+ered and issue in the settings of my script I have listed below.
+
+  The commented code directly above the uncommented qemu instance would
+  boot the Windows screen but the issue arises when I try to reach the
+  same code block under the commented setting lines which takes me to
+  the default SeaBIOS loader.
+
+  #!/bin/bash
+
+  vmname=3D"windows10vm"
+
+  if ps -ef | grep qemu-system-x86_64 | grep -q multifunction=3Don; then
+  echo "A passthrough VM is already running." &
+  exit 1
+
+  else
+
+  # use pulseaudio
+
+  export QEMU_AUDIO_DRV=3Dpa
+  export QEMU_PA_SAMPLES=3D8192
+  export QEMU_AUDIO_TIMER_PERIOD=3D99
+  export QEMU_PA_SERVER=3D/run/user/1000/pulse/native
+
+  cp /usr/share/ovmf/x64/OVMF_VARS.fd /tmp/my_vars.fd
+
+  #qemu-system-x86_64 \
+  #-drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../IMGs/=
+win.img \
+  #-drive file=3D.../ISOs/Win10_1909_English_x64.iso,index=3D1,media=3Dcdro=
+m \
+
+  qemu-system-x86_64 \
+
+  #-name $vmname,process=3D$vmname \
+  #-machine type=3Dq35,accel=3Dkvm \
+  #-cpu host,kvm=3Doff \
+  #-smp 4,sockets=3D1,cores=3D3,threads=3D1 \
+  #-m 8G \
+  #-balloon none \
+  #-rtc clock=3Dhost,base=3Dlocaltime \
+  #-vga none \
+  #-nographic \
+  #-serial none \
+  #-parallel none \
+  #-soundhw hda \
+  #-usb \
+  #-device usb-host,vendorid=3D...,productid=3D... \
+  #-device usb-host,vendorid=3D...,productid=3D... \
+  #-device vfio-pci,host=3D...,multifunction=3Don \
+  #-device vfio-pci,host=3D... \
+  #-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/ovmf/x64/OVMF=
+_VARS.fd \
+  #-drive if=3Dpflash,format=3Draw,file=3D/tmp/my_vars.fd \
+  #-boot order=3D dc \
+
+  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../IMGs/w=
+in.img \
+  -drive file=3D.../ISOs/Win10_1909_English_x64.iso,index=3D1,media=3Dcdrom=
+ \
+  -drive file=3D.../ISOs/virtio-0.1.171.iso,index=3D2,media=3Dcdrom \
+
+  #-netdev type=3Dtap,id=3Dnet0,ifname=3Dvmtap0,vhost=3Don \
+  #-device virtio-net-pci,netdev=3Dnet0,mac=3D... \
+
+  exit 0
+
+  fi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1862110/+subscriptions
 
