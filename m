@@ -2,101 +2,87 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1085C33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 098AFC352A2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:37:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F50B214AF
+	by mail.kernel.org (Postfix) with ESMTPS id D278E214AF
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:37:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ToVtm+RE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F50B214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MRYmMeMe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D278E214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izm20-0007AV-QT
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:37:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35141)
+	id 1izm21-0007BZ-14
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:37:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33911)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izm0q-0005dN-LG
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:36:29 -0500
+ (envelope-from <groeck7@gmail.com>) id 1izlx7-0000My-Sw
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:32:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izm0p-0002JP-Il
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:36:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36962
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izm0p-0002IR-BK
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:36:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581014184;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mo9yRQw1REoBA/MyFi8tTI1bRXGJ3OlE8vgJmMfM5a0=;
- b=ToVtm+REfTaN6Ut0rvWX6i2pDQfq4BS6D3nZ0GnaSUfGwhKDzGqfcuuLmnzv4laQU8FknP
- +jCRqVXI8GlvAtmTB0r6IYIo3mrAG5ls4V4xJ+nWHdYmbs0zQCVCDfg3ac7X7G4zcQUGey
- K7XHL5aPRAH54jynDzSr+62+9kER/Ds=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-AmVarzChPv2UPPFc8OdqJw-1; Thu, 06 Feb 2020 13:36:20 -0500
-Received: by mail-wr1-f71.google.com with SMTP id t3so3893444wrm.23
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 10:36:20 -0800 (PST)
+ (envelope-from <groeck7@gmail.com>) id 1izlx6-0003E2-Sk
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:32:37 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:43861)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1izlx0-0002rS-CN; Thu, 06 Feb 2020 13:32:30 -0500
+Received: by mail-pf1-x442.google.com with SMTP id s1so3529362pfh.10;
+ Thu, 06 Feb 2020 10:32:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=IilPI+Sl+B1I6W2BM0SWvCm9l7ZzLSY3Gh4DaMCNP84=;
+ b=MRYmMeMeK0LrfdlBnYA80D6ZOqlWW8huDdFcoVVb5HtB7oJkkCMiuUJ4isEtkJutMQ
+ g6p2VXaPGFBMSHjPxr1FvKs0uYe23MNJY+L7ztF9YpVhHbUhUP7Yn9xe0bhWObP2g4yR
+ WGFKdwS73OTGI1pajnq8ds+WlXrkosbcmusaV9VoD+hyssqfhbw2403nzx2h8BJyAh4U
+ OvPZyhmz/fItlKH4rHtkL5aO92zPEpCy3OcMQFTZSbQgW47e5765V5sGX8XxXMcLsqEm
+ b8ivxDdHuaOpjn+ooGcJdd/51couDDkQiMQ/QRIKi7gipP5zunAc0afqGeQkpVjb53fm
+ RD/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=d2CB3VjmYgy2Vv4LniaDWxlOYqVJgHczX0WcYY9SVVI=;
- b=SE8vX0fSzQy+nEiY/Jc/3os5t8g4QEHFN39Kc2QEDv2uuiwmB+0nzRt+RAtz9vUmsp
- M3h5l5sBYQXgSnUStxa/VQERDDiGloEZvzGZSj6bgrh4xiQxMb7GN8ORV5cQ/ZXWRV4i
- HiSWuUigg3c3dmqVi9k0vwr5lvCePihyw2qQog97P5UtrcxJnY0vp01fLFTBEwJIONb0
- E5N37CVRISWhs/lvF7apA7jlj9+NjjSEOwPk2blrjY0dn/hxCPEFFJEG73YOuCr9X1Gm
- 3x6dV+FRavgcDXXpdkPETCKQ3kisVN0iDchUz9juusSMQp6F7ISD7ygUTzvGQ/iK+eK4
- 7Asw==
-X-Gm-Message-State: APjAAAUIW98XoAdIR43ZMvPu88Q9vWsDc7MJfn3M1/nGawM8FoJOcV33
- NPpbP5e0XvXmnZ1KUHxp+AREg7NC24HuOu5BpwouhwQ/OxiqwZqxQkPg5YseH4PltAzU7DVUOj8
- C9dV/XqaAEu0hH6E=
-X-Received: by 2002:a5d:6708:: with SMTP id o8mr5403129wru.296.1581014179635; 
- Thu, 06 Feb 2020 10:36:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyurCrMueg881uyh0F3O/o3buJvQRPn8BB71aqpfjiCewVBs5YjglBdnUGqP4vt+8eR2/ZmHA==
-X-Received: by 2002:a5d:6708:: with SMTP id o8mr5403104wru.296.1581014179444; 
- Thu, 06 Feb 2020 10:36:19 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id s8sm159400wrt.57.2020.02.06.10.36.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 10:36:19 -0800 (PST)
-Subject: Re: [PATCH v2 2/4] m25p80: Improve command handling for Jedec commands
-To: Guenter Roeck <linux@roeck-us.net>,
- Alistair Francis <alistair@alistair23.me>, Kevin Wolf <kwolf@redhat.com>
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=IilPI+Sl+B1I6W2BM0SWvCm9l7ZzLSY3Gh4DaMCNP84=;
+ b=Jv07uvCVvoANmMmTKJAt8m/yzawU8m0dAM4+B27ToprGLlBhIayULYv1k4xXbnS9Vc
+ GOi0qquINFg3s5mfccDekg3QQEbRHEwVoidY2ZAKcPXq0TbXEwQaR7hH211uaHhS24Qs
+ tlb7vOManzD6FgdQ0Yu/inbtUx3DJIDyyK3/dlECPYQMDPGRLW33lo3sZQnF5B1C6sda
+ NUVlt9iybf12XhXs2f33odp0kjqlChaDlXY3PpL++NefnhCX9P/ju8GQfN/oLdsDoHYU
+ AlwfXhOKs/ETlHTLwkAUmmIgU3ywlLAASEIjLf2TyCPxqmPQ4+oJfCsQmpuXGPduCQdP
+ 9jOg==
+X-Gm-Message-State: APjAAAWz7vHDMM7K4VKh5gbitS+rLzrfvDrIhnYwUegRbQWB0hnArRer
+ j21goPfIRLmDGav5njGMvgo=
+X-Google-Smtp-Source: APXvYqwPzrYYEVvvds6kGd54V8A9rorEuu7jXADmNvh8HUjLrfMVFbUUwSHNlNdQ6f3lLCBup7oPXw==
+X-Received: by 2002:a63:6e8b:: with SMTP id j133mr5030071pgc.6.1581013949370; 
+ Thu, 06 Feb 2020 10:32:29 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id 28sm127082pgl.42.2020.02.06.10.32.28
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 06 Feb 2020 10:32:28 -0800 (PST)
+From: Guenter Roeck <linux@roeck-us.net>
+To: Alistair Francis <alistair@alistair23.me>,
+	Kevin Wolf <kwolf@redhat.com>
+Subject: [PATCH v2 4/4] aspeed/smc: Fix number of dummy cycles for FAST_READ_4
+ command
+Date: Thu,  6 Feb 2020 10:32:19 -0800
+Message-Id: <20200206183219.3756-4-linux@roeck-us.net>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200206183219.3756-1-linux@roeck-us.net>
 References: <20200206183219.3756-1-linux@roeck-us.net>
- <20200206183219.3756-2-linux@roeck-us.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a2755daa-6cf9-4858-4b0e-d160efc2fc8a@redhat.com>
-Date: Thu, 6 Feb 2020 19:36:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200206183219.3756-2-linux@roeck-us.net>
-Content-Language: en-US
-X-MC-Unique: AmVarzChPv2UPPFc8OdqJw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,47 +97,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
  Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
  Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+ Joel Stanley <joel@jms.id.au>, Guenter Roeck <linux@roeck-us.net>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/6/20 7:32 PM, Guenter Roeck wrote:
-> When requesting JEDEC data using the JEDEC_READ command, the Linux kernel
-> always requests 6 bytes. The current implementation only returns three
-> bytes, and interprets the remaining three bytes as new commands.
-> While this does not matter most of the time, it is at the very least
-> confusing. To avoid the problem, always report up to 6 bytes of JEDEC
-> data. Fill remaining data with 0.
->=20
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> ---
-> v2: Split patch into two parts; improved decription
->=20
->   hw/block/m25p80.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> index 5ff8d270c4..53bf63856f 100644
-> --- a/hw/block/m25p80.c
-> +++ b/hw/block/m25p80.c
-> @@ -1040,8 +1040,11 @@ static void decode_new_cmd(Flash *s, uint32_t valu=
-e)
->           for (i =3D 0; i < s->pi->id_len; i++) {
->               s->data[i] =3D s->pi->id[i];
->           }
-> +        for (; i < SPI_NOR_MAX_ID_LEN; i++) {
-> +            s->data[i] =3D 0;
-> +        }
->  =20
-> -        s->len =3D s->pi->id_len;
-> +        s->len =3D SPI_NOR_MAX_ID_LEN;
->           s->pos =3D 0;
->           s->state =3D STATE_READING_DATA;
->           break;
->=20
+The Linux kernel recently started using FAST_READ_4 commands.
+This results in flash read failures. At the same time, the m25p80
+emulation is seen to read 8 more bytes than expected. Adjusting the
+expected number of dummy cycles to match FAST_READ fixes the problem.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Fixes: f95c4bffdc4c ("aspeed/smc: snoop SPI transfers to fake dummy cycles")
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+v2: No change
+
+ hw/ssi/aspeed_smc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 23c8d2f062..0444570750 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -787,11 +787,11 @@ static int aspeed_smc_num_dummies(uint8_t command)
+     case FAST_READ:
+     case DOR:
+     case QOR:
++    case FAST_READ_4:
+     case DOR_4:
+     case QOR_4:
+         return 1;
+     case DIOR:
+-    case FAST_READ_4:
+     case DIOR_4:
+         return 2;
+     case QIOR:
+-- 
+2.17.1
 
 
