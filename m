@@ -2,82 +2,57 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFECC35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 19:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7596AC35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 19:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CB5521741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 19:55:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C6NggitM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB5521741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B0AD218AC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 19:58:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B0AD218AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iznFM-0003B5-QT
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 14:55:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34794)
+	id 1iznHs-0004xI-E1
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 14:58:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35256)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iznEj-0002iF-8Z
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:54:54 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iznHJ-0004NZ-Ts
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:57:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iznEg-0001CV-Va
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:54:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27243
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iznEg-00018S-Nv
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:54:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581018889;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vyIhwNNfZZZJ94VfGVRWmcRH3sOem+l0HcLkcjdUUpc=;
- b=C6NggitM31bm2m7y91DR/R1Q3U5I4aI+VMq8xPCrawhoAB+9l9BMcb3Dr1E8y1LBbETz0i
- RQ2S4TmPNpFzT9SZzDqFQyeE8OenZfZhBlMNjiN2ftQjVTDUX9XSz1c7fgmAIzmhQ4xsFg
- UQPaC9C0JxgHuTeh10Fbd/QF2w8eyvo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-9_VT89K2NamwKLKFbHSF4g-1; Thu, 06 Feb 2020 14:54:48 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6FC718B5FA1;
- Thu,  6 Feb 2020 19:54:46 +0000 (UTC)
-Received: from localhost (unused-10-15-17-6.yyz.redhat.com [10.15.17.6])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0F835867E2;
- Thu,  6 Feb 2020 19:54:41 +0000 (UTC)
-Date: Thu, 6 Feb 2020 14:54:41 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 17/29] tests/acceptance/virtio_check_params: Improve
- exception logging
-Message-ID: <20200206195441.GA412524@habkost.net>
-References: <20200129212345.20547-1-philmd@redhat.com>
- <20200129212345.20547-18-philmd@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iznHH-0003qH-Cc
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:57:33 -0500
+Resent-Date: Thu, 06 Feb 2020 14:57:33 -0500
+Resent-Message-Id: <E1iznHH-0003qH-Cc@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21128)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iznHH-0003kk-39
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:57:31 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1581018969935501.9666108356928;
+ Thu, 6 Feb 2020 11:56:09 -0800 (PST)
+In-Reply-To: <20200206173040.17337-1-peter.maydell@linaro.org>
+Subject: Re: [PATCH 00/29] Convert QAPI doc comments to generate rST instead
+ of texinfo
+Message-ID: <158101896929.19404.639362435298132958@a1bbccc8075a>
 MIME-Version: 1.0
-In-Reply-To: <20200129212345.20547-18-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 9_VT89K2NamwKLKFbHSF4g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: peter.maydell@linaro.org
+Date: Thu, 6 Feb 2020 11:56:09 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,44 +64,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com,
+ qemu-devel@nongnu.org, stefanha@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 29, 2020 at 10:23:33PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  tests/acceptance/virtio_check_params.py | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/acceptance/virtio_check_params.py b/tests/acceptance/v=
-irtio_check_params.py
-> index 4a417b8ef5..51a2dd76e8 100755
-> --- a/tests/acceptance/virtio_check_params.py
-> +++ b/tests/acceptance/virtio_check_params.py
-> @@ -77,8 +77,12 @@ class VirtioMaxSegSettingsCheck(Test):
->              vm.set_machine(mt["name"])
->              for s in VM_DEV_PARAMS[dev_type_name]:
->                  vm.add_args(s)
-> -            vm.launch()
-> -            query_ok, props, error =3D self.query_virtqueue(vm, dev_type=
-_name)
-> +            try:
-> +                vm.launch()
-> +                query_ok, props, error =3D self.query_virtqueue(vm, dev_=
-type_name)
-> +            except:
-> +                query_ok =3D False
-> +                error =3D sys.exc_info()[0]
-
-I would prefer to do this inside query_virtqueue(), but:
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
---=20
-Eduardo
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIwNjE3MzA0MC4xNzMz
+Ny0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
+dGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
+aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
+bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcg
+Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VO
+Vj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgdGVz
+dHMvdGVzdC1xYXBpLWNvbW1hbmRzLm8KICBDQyAgICAgIHRlc3RzL3Rlc3Qtc3RyaW5nLWlucHV0
+LXZpc2l0b3IubwogIENDICAgICAgdGVzdHMvdGVzdC1zdHJpbmctb3V0cHV0LXZpc2l0b3Iubwpk
+b2MtZ29vZCBGQUlMCi0tLSAvdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcWFwaS1zY2hlbWEvZG9j
+LWdvb2Qub3V0CisrKyAKQEAgLTEsMTk5ICswLDAgQEAKLS0tCisrKyAKQEAgLTAsMCArMSBAQAor
+ZG9jLWdvb2QuanNvbjoxMDQ6MTogdW5leHBlY3RlZCBkZS1pbmRlbnQKbWFrZTogKioqIFtjaGVj
+ay10ZXN0cy9xYXBpLXNjaGVtYS9mcm9udGVuZF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIENDICAgICAgdGVzdHMvdGVzdC1xbXAtZXZlbnQubwpU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
+Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
+bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
+bXUuaW5zdGFuY2UudXVpZD1hYzhlOGRiZjU5M2M0MmUzODU3MjE1NTQ3NTljYjI1MicsICctdScs
+ICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
+Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
+LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScs
+ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
+Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC15OWhfa3c0ci9zcmMvZG9ja2VyLXNyYy4yMDIwLTAy
+LTA2LTE0LjUzLjUxLjExNTM3Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAn
+L3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0
+IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1h
+YzhlOGRiZjU5M2M0MmUzODU3MjE1NTQ3NTljYjI1MgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5d
+IEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVz
+dGVyLXRtcC15OWhfa3c0ci9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNl
+bnRvczddIEVycm9yIDIKCnJlYWwgICAgMm0xNy42NTFzCnVzZXIgICAgMG03LjY1M3MKCgpUaGUg
+ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMjA2
+MTczMDQwLjE3MzM3LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnL3Rlc3RpbmcuZG9ja2VyLXF1
+aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
