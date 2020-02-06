@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D00E8C33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 16:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2E6C33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 16:46:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98C5220720
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 16:44:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE18E20720
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 16:46:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Do7oJQvj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98C5220720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9FvkeyI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE18E20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izkGr-0003Oh-OQ
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 11:44:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54597)
+	id 1izkIO-0004ti-2d
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 11:46:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1izkGA-0002gj-1V
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:44:11 -0500
+ (envelope-from <mreitz@redhat.com>) id 1izkH0-0003jQ-Na
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:45:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1izkG8-00057w-Ec
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:44:09 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52763
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1izkGz-0007l2-2J
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:45:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50197
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izkG8-00056u-8g
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:44:08 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izkGy-0007jj-SO
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:45:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581007447;
+ s=mimecast20190719; t=1581007500;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Dl3L7AwCWEeD8nsaf0dXL9VpMMIvIIB6XnJdif2cCWk=;
- b=Do7oJQvj/89y8H/AewYvbMS9spyxjuRlPkVPeHpMW13A2mbUcHPHZW2aO9m+0u3z+6I4jd
- UzT1csGIcmNnkqGWAqJ5Fycx2YGjc016bQZYWhGlYzWFPCd/1lPG/XDgkNyMIqFcfMMDL3
- yVM82vwWR1OHwcQ2JFClr2oW5jYOiPc=
+ bh=+5IlHcIR57s1sFd74A/p62QB9QOIaWE0Y0h7KixAUXs=;
+ b=f9FvkeyID47QZ2DJoLEDQrBP4I8gitg1ByER0JIhZLWDS5XyhvDCTt5dmtcG2QF66tLV2t
+ eK1KZZ5iEPxKfCrHQlPsHRI8h6x0CSPTixJFoCSdTBF9hKceBOkqqqRYdevs6XH9zdxBJl
+ Nqa2WHz9Ia0J3b9ReMkDCsUbh8qO2Pk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-wzONPR71Py2UON3GwM59Nw-1; Thu, 06 Feb 2020 11:44:03 -0500
-X-MC-Unique: wzONPR71Py2UON3GwM59Nw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-322-ZftVQnEZPR2c1I0VNYte5w-1; Thu, 06 Feb 2020 11:44:57 -0500
+X-MC-Unique: ZftVQnEZPR2c1I0VNYte5w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8778FDBBC;
- Thu,  6 Feb 2020 16:44:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BBE1197931E;
+ Thu,  6 Feb 2020 16:44:56 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.36.118.15])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 469C390064;
- Thu,  6 Feb 2020 16:44:01 +0000 (UTC)
-Subject: Re: [PATCH v3 09/21] quorum: Add QuorumChild.to_be_replaced
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DE5AE60BEC;
+ Thu,  6 Feb 2020 16:44:53 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v2 10/23] quorum: Implement
+ .bdrv_recurse_can_replace()
 To: Kevin Wolf <kwolf@redhat.com>
-References: <20200130214431.333510-1-mreitz@redhat.com>
- <20200130214431.333510-10-mreitz@redhat.com>
- <20200205153859.GE5768@dhcp-200-226.str.redhat.com>
- <92b951da-5e12-e08f-f8f7-a862790b51ac@redhat.com>
- <20200206145825.GD4926@linux.fritz.box>
- <9d767091-4590-9fce-c596-bda5865aa190@redhat.com>
- <20200206155110.GG4926@linux.fritz.box>
+References: <20191111160216.197086-1-mreitz@redhat.com>
+ <20191111160216.197086-11-mreitz@redhat.com>
+ <20200205155511.GF5768@dhcp-200-226.str.redhat.com>
+ <7429d107-63c0-b6e4-5047-d17e9d510efc@redhat.com>
+ <20200206144207.GC4926@linux.fritz.box>
+ <1bb2e344-e66d-de37-0d49-f4a8a5a6eb40@redhat.com>
+ <20200206154201.GF4926@linux.fritz.box>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -92,20 +93,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <78bd2830-9b10-9d66-afe1-783226b8edc5@redhat.com>
-Date: Thu, 6 Feb 2020 17:43:59 +0100
+Message-ID: <ba222d9b-f0a9-7d6c-bb98-710d743c6d7c@redhat.com>
+Date: Thu, 6 Feb 2020 17:44:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200206155110.GG4926@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200206154201.GF4926@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="TrHxucQCgeP0hoHTuB0j9n0xcmqp8NGWS"
+ boundary="8q1orth5i2LfKUowuKBKQULOvGCIdDqas"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,182 +119,219 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+ Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TrHxucQCgeP0hoHTuB0j9n0xcmqp8NGWS
-Content-Type: multipart/mixed; boundary="vXU5LiQ5M7FzOHFNUrw7xPB8izo3e1BUc"
+--8q1orth5i2LfKUowuKBKQULOvGCIdDqas
+Content-Type: multipart/mixed; boundary="M8WLGp7wvar6b9gsq9lDqBKSu049slQ2H"
 
---vXU5LiQ5M7FzOHFNUrw7xPB8izo3e1BUc
+--M8WLGp7wvar6b9gsq9lDqBKSu049slQ2H
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 06.02.20 16:51, Kevin Wolf wrote:
-> Am 06.02.2020 um 16:21 hat Max Reitz geschrieben:
->> On 06.02.20 15:58, Kevin Wolf wrote:
->>> Am 06.02.2020 um 11:11 hat Max Reitz geschrieben:
->>>> On 05.02.20 16:38, Kevin Wolf wrote:
->>>>> Am 30.01.2020 um 22:44 hat Max Reitz geschrieben:
->>>>>> We will need this to verify that Quorum can let one of its children =
-be
->>>>>> replaced without breaking anything else.
->>>>>>
+On 06.02.20 16:42, Kevin Wolf wrote:
+> Am 06.02.2020 um 16:19 hat Max Reitz geschrieben:
+>> On 06.02.20 15:42, Kevin Wolf wrote:
+>>> Am 06.02.2020 um 11:21 hat Max Reitz geschrieben:
+>>>> On 05.02.20 16:55, Kevin Wolf wrote:
+>>>>> Am 11.11.2019 um 17:02 hat Max Reitz geschrieben:
 >>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >>>>>> ---
->>>>>>  block/quorum.c | 25 +++++++++++++++++++++++++
->>>>>>  1 file changed, 25 insertions(+)
+>>>>>>  block/quorum.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++=
++++
+>>>>>>  1 file changed, 62 insertions(+)
 >>>>>>
 >>>>>> diff --git a/block/quorum.c b/block/quorum.c
->>>>>> index 59cd524502..6a7224c9e4 100644
+>>>>>> index 3a824e77e3..8ee03e9baf 100644
 >>>>>> --- a/block/quorum.c
 >>>>>> +++ b/block/quorum.c
->>>>>> @@ -67,6 +67,13 @@ typedef struct QuorumVotes {
+>>>>>> @@ -825,6 +825,67 @@ static bool quorum_recurse_is_first_non_filter(=
+BlockDriverState *bs,
+>>>>>>      return false;
+>>>>>>  }
 >>>>>> =20
->>>>>>  typedef struct QuorumChild {
->>>>>>      BdrvChild *child;
+>>>>>> +static bool quorum_recurse_can_replace(BlockDriverState *bs,
+>>>>>> +                                       BlockDriverState *to_replace=
+)
+>>>>>> +{
+>>>>>> +    BDRVQuorumState *s =3D bs->opaque;
+>>>>>> +    int i;
 >>>>>> +
->>>>>> +    /*
->>>>>> +     * If set, check whether this node can be replaced without any
->>>>>> +     * other parent noticing: Unshare CONSISTENT_READ, and take the
->>>>>> +     * WRITE permission.
->>>>>> +     */
->>>>>> +    bool to_be_replaced;
+>>>>>> +    for (i =3D 0; i < s->num_children; i++) {
+>>>>>> +        /*
+>>>>>> +         * We have no idea whether our children show the same data =
+as
+>>>>>> +         * this node (@bs).  It is actually highly likely that
+>>>>>> +         * @to_replace does not, because replacing a broken child i=
+s
+>>>>>> +         * one of the main use cases here.
+>>>>>> +         *
+>>>>>> +         * We do know that the new BDS will match @bs, so replacing
+>>>>>> +         * any of our children by it will be safe.  It cannot chang=
+e
+>>>>>> +         * the data this quorum node presents to its parents.
+>>>>>> +         *
+>>>>>> +         * However, replacing @to_replace by @bs in any of our
+>>>>>> +         * children's chains may change visible data somewhere in
+>>>>>> +         * there.  We therefore cannot recurse down those chains wi=
+th
+>>>>>> +         * bdrv_recurse_can_replace().
+>>>>>> +         * (More formally, bdrv_recurse_can_replace() requires that
+>>>>>> +         * @to_replace will be replaced by something matching the @=
+bs
+>>>>>> +         * passed to it.  We cannot guarantee that.)
+>>>>>> +         *
+>>>>>> +         * Thus, we can only check whether any of our immediate
+>>>>>> +         * children matches @to_replace.
+>>>>>> +         *
+>>>>>> +         * (In the future, we might add a function to recurse down =
+a
+>>>>>> +         * chain that checks that nothing there cares about a chang=
+e
+>>>>>> +         * in data from the respective child in question.  For
+>>>>>> +         * example, most filters do not care when their child's dat=
+a
+>>>>>> +         * suddenly changes, as long as their parents do not care.)
+>>>>>> +         */
+>>>>>> +        if (s->children[i].child->bs =3D=3D to_replace) {
+>>>>>> +            Error *local_err =3D NULL;
+>>>>>> +
+>>>>>> +            /*
+>>>>>> +             * We now have to ensure that there is no other parent
+>>>>>> +             * that cares about replacing this child by a node with
+>>>>>> +             * potentially different data.
+>>>>>> +             */
+>>>>>> +            s->children[i].to_be_replaced =3D true;
+>>>>>> +            bdrv_child_refresh_perms(bs, s->children[i].child, &loc=
+al_err);
+>>>>>> +
+>>>>>> +            /* Revert permissions */
+>>>>>> +            s->children[i].to_be_replaced =3D false;
+>>>>>> +            bdrv_child_refresh_perms(bs, s->children[i].child, &err=
+or_abort);
 >>>>>
->>>>> I don't understand these permission changes. How does (preparing for)
->>>>> detaching a node from quorum make its content invalid?
->>>>
->>>> It doesn=E2=80=99t, of course.  What we are preparing for is to replac=
-e it by
->>>> some other node with some other content.
->>>>
->>>>> And why do we
->>>>> suddenly need WRITE permissions even if the quorum node is only used
->>>>> read-only?
+>>>>> Quite a hack. The two obvious problems are:
 >>>>>
->>>>> The comment is a bit unclear, too. "check whether" implies that both
->>>>> outcomes could be true, but it doesn't say what happens in either cas=
-e.
->>>>> Is this really "make sure that"?
+>>>>> 1. We can't guarantee that we can actually revert the permissions. I
+>>>>>    think we ignore failure to loosen permissions meanwhile so that at
+>>>>>    least the &error_abort doesn't trigger, but bs could still be in t=
+he
+>>>>>    wrong state afterwards.
 >>>>
->>>> I think the comment is not only unclear, it is the problem.  (Well,
->>>> maybe the code is also.)
+>>>> I thought we guaranteed that loosening permissions never fails.
 >>>>
->>>> This series is about fixing at least some things about replacing nodes
->>>> by mirroring.  The original use cases this was introduced for was to f=
-ix
->>>> broken quorum children: The other children are still intact, so you re=
-ad
->>>> from the quorum node and replace the broken child (which maybe shows
->>>> invalid data, or maybe just EIO) by the fixed mirror result.
+>>>> (Well, you know.  It may =E2=80=9Cleak=E2=80=9D permissions, but we=E2=
+=80=99d never get an error
+>>>> here so there=E2=80=99s nothing to handle anyway.)
+>>>
+>>> This is what I meant. We ignore the failure (i.e. don't return an error=
+),
+>>> but the result still isn't completely correct ("leaked" permissions).
+>>>
+>>>>>    It would be cleaner to use check+abort instead of actually setting
+>>>>>    the new permission.
 >>>>
->>>> Replacing that broken node by the fixed one changes the data that=E2=
-=80=99s
->>>> visible on that node.
+>>>> Oh.  Yes.  Maybe.  It does require more code, though, because I=E2=80=
+=99d rather
+>>>> not use bdrv_check_update_perm() from here as-is.
 >>>
->>> Hm, yes, that's true. But I wonder if this is really something that the
->>> permission system must catch. Like other graph manipulations, it's
->>> essentially the user saying "trust me, I know what I'm doing, this node
->>> makes sense in this place".
->>>
->>> Because if you assume that the user could add a node with unsuitable
->>> content and you want to prevent this, where do we stop?
->>> blockdev-snapshot can insert a non-empty overlay, which would result in
->>> visible data change. Should we therefore only allow snapshots when
->>> shared writes are allowed? This doesn't work obviously.
->>>
->>> So I'm inclined to say that this is the user's responsibility and we
->>> don't have to jump through hoops to prevent every possible way that the
->>> user could mess up. (Which often also result in preventing legitimate
->>> cases like here a quorum of read-only nodes.)
+>>> I'm not saying you need to do it, just that it would be cleaner. :-)
 >>
->> Well, if you ask the question =E2=80=9Cwhere do we stop=E2=80=9D, we als=
-o have to ask
->> the question =E2=80=9Cwhere do we start=E2=80=9D.  If we say the user kn=
-ows what they=E2=80=99re
->> doing, we might as well drop the whole can_replace infrastructure
->> altogether and just assume that you can replace any node by anything.
+>> It would.  Thanks for the suggestion, I obviously didn=E2=80=99t think o=
+f it.
+>> (Or there=E2=80=99d be a comment on how this is not the best way in theo=
+ry, but
+>> in practice it=E2=80=99s good enough.)  I suppose I=E2=80=99ll see how w=
+hat I can do.
+>>
+>>>>> 2. As aborting the permission change makes more obvious, we're checki=
+ng
+>>>>>    something that might not be true any more when we actually make th=
+e
+>>>>>    change.
+>>>>
+>>>> True.  I tried to do it right by having a post-replace cleanup functio=
+n,
+>>>> but after a while that was just going nowhere, really.  So I just went
+>>>> with what=E2=80=99s patch 13 here.
+>>>>
+>>>> But isn=E2=80=99t 13 enough, actually?  It check can_replace right bef=
+ore
+>>>> replacing in a drained section.  I can=E2=80=99t imagine the permissio=
+ns to
+>>>> change there.
+>>>
+>>> Permissions are tied to file locks, so an external process can just gra=
+b
+>>> the locks in between.
+>>
+>> Ah, right, I didn=E2=80=99t think of that.
+>>
+>>> But if I understand correctly, all we try here is
+>>> to have an additional safeguard to prevent the user from doing stupid
+>>> things. So I guess not being 100% is fine as long as it's documented in
+>>> the code.
+>>
+>> Yes.  I just think it actually would be 100 % in practice, so I wondered
+>> whether it would need to be documented.
+>>
+>> You=E2=80=99re right, though, it isn=E2=80=99t 100 %, so it should defin=
+itely be
+>> documented.  Maybe something like
+>>
+>> In theory, we would have to keep the permissions tightened until the
+>> node is replaced.  In practice, that would require post-replacement
+>> cleanup infrastructure, which we do not have, and which would be
+>> unreasonably complex to implement.
 >=20
-> Well, I don't actually know if that would be completely unreasonable.
-> The idea was obviously to keep graph changes restricted to very specific
-> cases to avoid nasty surprises like triggering latent bugs. Meanwhile we
-> have quite a few more operations that allow changing the graph.
+> Sounds good until here.
 >=20
-> So if preventing some cases gives us headaches and is probably more work
-> than dealing with any bugs they might reveal, maybe preventing them is
-> wrong.
+>> Therefore, all we can do is require
+>> anyone who wants to replace one node by some potentially unrelated other
+>> node (i.e., the mirror job on completion) to invoke
+>> bdrv_recurse_can_replace() immediately before and thus minimize the time
+>> during which some condition may arise that might forbid the swap.
+>>
+>> ?
 >=20
-> I'm just afraid that we might be overengineering this and waste time on
-> things that we don't actually get much use from.
+> This second part of your suggested comment could be dropped, as far as
+> I'm concerned. If anything, it's part of the contract and would belong
+> in the bdrv_recurse_can_replace() documentation.
+>=20
+> However, I think I would mention why not being 100% is okay: The part
+> with "additional safeguard to prevent the user from doing stupid
+> things", and that it doesn't make a difference if the user runs the
+> correct command.
 
-That=E2=80=99s why I=E2=80=99m asking.
-
->> If the WRITE permission is the problem, then I suppose we can drop that.
->>  Unsharing CONSISTENT_READ is bad enough that it effectively deters all
->> other parents anyway.
->=20
-> WRITE is probably the more practical problem, though it's technically
-> the correct one to take.
->=20
-> CONSISTENT_READ is already a problem in theory because replacing a child
-> node with different content doesn't even match its definition:
->=20
->     /**
->      * A user that has the "permission" of consistent reads is guaranteed=
- that
->      * their view of the contents of the block device is complete and
->      * self-consistent, representing the contents of a disk at a specific
->      * point.
->      *
->      * For most block devices (including their backing files) this is tru=
-e, but
->      * the property cannot be maintained in a few situations like for
->      * intermediate nodes of a commit block job.
->      */
->     BLK_PERM_CONSISTENT_READ    =3D 0x01,
->=20
-> Replacing an image with a different image means that the node represents
-> the content of a different disk now, but it's probably still complete
-> and self-consistent.
-
-At any point in time yes, but not over the time span of the change.  The
-definition doesn=E2=80=99t say that the node represents the contents of a d=
-isk
-at a specific point, but the view from the parent.
-
-I argue that that view is always over some period of time, so if you
-suddenly switch out the whole disk, then it isn=E2=80=99t a self-consistent=
- view.
-
-Alternatively, we could of course also just forego the permission system
-here altogether and just check that there are no other parents at all.
-(Which is effectively the same as unsharing CONSISTENT_READ.)
+OK.
 
 Max
 
 
---vXU5LiQ5M7FzOHFNUrw7xPB8izo3e1BUc--
+--M8WLGp7wvar6b9gsq9lDqBKSu049slQ2H--
 
---TrHxucQCgeP0hoHTuB0j9n0xcmqp8NGWS
+--8q1orth5i2LfKUowuKBKQULOvGCIdDqas
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl48Qk8ACgkQ9AfbAGHV
-z0C6tQf8CcfYQYGrsRz709JdVZavlwDTtV3mt8+QKgjurFtoOFiIOhWiknAfszth
-e7gOjyPAQAFSIFePWvp5g7sm870Eh4hTafbEhoRPiTi4q4pxrgw42vnvQVQUj0qO
-cafnZ6nlhUunx0r2hrZN3iTaHgrDsrq0R7Alj9W0uHrXaz9QHxzo8+3jF6Q5zd2o
-xQBx6CU3248fi/80WdKyZ7/hWu/6gcasGCKplTxqdYNYZ3PsMtjO3HL2YWPjpr/V
-kZY3ieQYHrZMsxg6+p+zUucKcJYW4HRxSlLVMxg8iTepQKhZQAx0tHgHXoq5gd/J
-bHd2fmJ326xgvoyIJ9HW3MrsvmM8hg==
-=DwKZ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl48QoQACgkQ9AfbAGHV
+z0AgJQgAgRRCl/PooLOUj8AKttDvJ43Fgx4zmb1WQ1lGvu2Ht6iaWQmVQCsw9F3O
+SeHUuRNuttzXMQq2Gbqyv4G0K4wX3mt6wQqsA2t2ytbRilD56st0qdzgp8n2UFio
+cfYt77fubqOJ2x3VCkyN/yr3dhUetpTgJD1Xyyop0Z9Zz4fZZw1EHO/1awMPCNDV
+ACHTnvvgYyoqCg7QsXpJXLCT9eO88VPkn0L/Ia1WsnVGCziaX2f+8mXF6+ZnnCvz
+S/My1ujXfhCoor0xzRRK5+/XXEl0ePu1PjrqNH78KM7VJAM3CsXvvAlUUPVwFCdb
+W53Gju/ITNn+hkvnhf9VgpvKHANt9g==
+=9cdp
 -----END PGP SIGNATURE-----
 
---TrHxucQCgeP0hoHTuB0j9n0xcmqp8NGWS--
+--8q1orth5i2LfKUowuKBKQULOvGCIdDqas--
 
 
