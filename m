@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA796C352A2
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A66F1C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:57:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8A2C20659
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:56:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6ECE820659
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:57:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KPSRBJHw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8A2C20659
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H1pxkHgY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ECE820659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izepg-0004sj-RL
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:56:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49619)
+	id 1izeqw-00006h-GR
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:57:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49569)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1izeoB-0002nD-79
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:54:56 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1izeo9-0002mA-Fi
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1izeoA-0006AK-5b
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:54:55 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34763)
+ (envelope-from <richard.henderson@linaro.org>) id 1izeo8-0005wx-HF
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:54:53 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40001)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1izeo9-00065a-Uy
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:54:54 -0500
-Received: by mail-wm1-x341.google.com with SMTP id s144so611871wme.1
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:54:53 -0800 (PST)
+ id 1izeo8-0005qg-Ai
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:54:52 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t3so6559384wru.7
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:54:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=eznmV40028rpODdWwUUxQDx2BghUEVK7B/QLx5Y9Mw4=;
- b=KPSRBJHw4YE45hmPFVS3E7x9ZGqBcA5luo1dS2ICDFDRKnW8gC/UUw794/OE44/rWn
- x7+2jMVJxOGt699kgTjG2AEdQAYMANreZzUgfg2NqzqJAhfwnGZ4lK/miGmYA2MvULHe
- wzVkh5joSuPROYpHu5FoSAiXDYudN9wopVoOwKpb7HVMIi+Xz2eMl1cE0GS7HTmytNUm
- Qnv1cIaYXeTBNtrHt4MJjZesurD8j9TBlHK4ABEObhh4xbEYKgTQKEZcEsl+EyNNwPw8
- G/tqIrgd9Y9A5V7rad0kXF/QDpLTSypChQJ5BT3Br3FVRKGdwg7yRLoLsJRC8jyjoH+9
- qqGg==
+ bh=QYKU+SD8NVKPGAhIlG5/BkNy77M1mMPU6YzTLu1/WC0=;
+ b=H1pxkHgYU34fqQAzGYt0D56hRIMd8D5gSrHAIOIUUpg2VUIALLgLpBgsqb5fYWnOdL
+ nWwKARUdmDYe5smYTGKijAnvoHxV6HvO6bDFwPMW5hrSJcPAtV8Jw29D5sHRetejm6Rf
+ xaLcSUZ0rOj/a4tCxLNntvKhZhwaOdspAk+F/U+ElRGjROMLl4i9pd4eYaBabvEu/oEq
+ W/DJTnjYBmXF2kC7yQH3gEX6boc/FFhsHwIKpZN3VuC4kxsKtJh9CwYruzU2kwZ2tNGm
+ ISSKUoJskMdqYbX6P3ugnsLJ9KYhKKfU7me/GzjSvrJLePhEty4gkrWb9PbAXhqGAbqb
+ O3Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=eznmV40028rpODdWwUUxQDx2BghUEVK7B/QLx5Y9Mw4=;
- b=EpRXWlvzmicTOvP2BudoO9kEhymdUTC3n/aR+zTFJuATscqrzYDW3NeXOrMQEDF5ZQ
- nqsH72vyIGKuUo0glc0z6I8X83AD08LUyaySj5q0mf6lyxc9N46Hj9ivglA7I04TZlJ5
- HCWralChmq+4JherDQxbXbCnKfy33mo8CnZSRcEf+Xnb5s0V2WvYhRAt0hwJIIj1BY8n
- NeVVzUpT8QcMrBM8v1O+sXjXABbGRMrAD2Hz0cZSyA3oUWYm6ech4c+eeo89cxBlghkm
- 3Ca9F89WA7V9eizLKZX2Dhj6MFCOTszpfDhJ2vkx8a+1MBTuXBaVPpjCLahbKCdI0QOQ
- mZJg==
-X-Gm-Message-State: APjAAAWnD3ci4DUHLbWOEjZP01G+fTvK0sPJtINtw2Ib4YhXZxCihaej
- 1AQmBdbOVIiQexx1HDeU+j7BQH1WIM59hQ==
-X-Google-Smtp-Source: APXvYqzd/6qY5+aXaCUBcxrzPPLT344Cuek8W6k9F+nMaqEeCdoQ9/95q+tgm8xzdcNNgDO+V9gTIw==
-X-Received: by 2002:a1c:7717:: with SMTP id t23mr4067507wmi.17.1580986492716; 
- Thu, 06 Feb 2020 02:54:52 -0800 (PST)
+ bh=QYKU+SD8NVKPGAhIlG5/BkNy77M1mMPU6YzTLu1/WC0=;
+ b=B4zdu5Y3UhBEH+CtzeoPcKc2feX3fawwDD60T3SObOqBReVggHOPvNAbLFXPKm8M5M
+ jFKFOVkPiGcK9Io5YpPHePhtkw3cimJ4Cfo7ZWsJoYsrWV4Jy2cwAtJcmJflGiLsJSzn
+ PJt5J620DnFWDNMOKM4tY5lDCnt+28ahG0hjLCHDmOqxo9HXav6lBQOAZhIj6S9w+8kr
+ ukEF6HWqx9cvqN79mDNzy8gRH/n/lKKhenK3AfPo70c3Kc5R+sBvoyp+UJqtpgTT/0+3
+ AEYR68P8Z1/U4LL+yi5gMVaLHSD0pb4TUzs3rTAB5C0MatDBgDGS2DwgxEJiNcd4DZCa
+ Q0aQ==
+X-Gm-Message-State: APjAAAXimPWjONqMqbafmBdeTgKUsi0mCWCrT6XlKiJlh6bVa1uGbXpQ
+ MG8GbWmqsTyJ0zgWHsEOEkW+JdS/qA1hrQ==
+X-Google-Smtp-Source: APXvYqwdTNfzPJI48JYTwYJmd3G7q5gA4OGdcZzDog8FnuU/f5/nMErlPSNhfqBIdbCTtkpL6N0GMw==
+X-Received: by 2002:adf:ca07:: with SMTP id o7mr3116671wrh.49.1580986491024;
+ Thu, 06 Feb 2020 02:54:51 -0800 (PST)
 Received: from cloudburst.c.hoisthospitality.com ([135.196.99.211])
- by smtp.gmail.com with ESMTPSA id m21sm3364995wmi.27.2020.02.06.02.54.52
+ by smtp.gmail.com with ESMTPSA id m21sm3364995wmi.27.2020.02.06.02.54.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 02:54:52 -0800 (PST)
+ Thu, 06 Feb 2020 02:54:50 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 04/41] target/arm: Add TTBR1_EL2
-Date: Thu,  6 Feb 2020 10:54:11 +0000
-Message-Id: <20200206105448.4726-5-richard.henderson@linaro.org>
+Subject: [PATCH v7 02/41] target/arm: Enable HCR_E2H for VHE
+Date: Thu,  6 Feb 2020 10:54:09 +0000
+Message-Id: <20200206105448.4726-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200206105448.4726-1-richard.henderson@linaro.org>
 References: <20200206105448.4726-1-richard.henderson@linaro.org>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,56 +99,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At the same time, add writefn to TTBR0_EL2 and TCR_EL2.
-A later patch will update any ASID therein.
-
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v5: Do not update TCR_EL2 yet; delay that til we handle ASIDs.
----
- target/arm/helper.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ target/arm/cpu.h    | 7 -------
+ target/arm/helper.c | 6 +++++-
+ 2 files changed, 5 insertions(+), 8 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 2a53f5d09b..0e68704a90 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1424,13 +1424,6 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
+ #define HCR_ATA       (1ULL << 56)
+ #define HCR_DCT       (1ULL << 57)
+ 
+-/*
+- * When we actually implement ARMv8.1-VHE we should add HCR_E2H to
+- * HCR_MASK and then clear it again if the feature bit is not set in
+- * hcr_write().
+- */
+-#define HCR_MASK      ((1ULL << 34) - 1)
+-
+ #define SCR_NS                (1U << 0)
+ #define SCR_IRQ               (1U << 1)
+ #define SCR_FIQ               (1U << 2)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index fe7991864a..c7ee0d603f 100644
+index 19a57a17da..f5ce05fdf3 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -3533,6 +3533,13 @@ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     raw_write(env, ri, value);
- }
- 
-+static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                                    uint64_t value)
-+{
-+    /* TODO: There are ASID fields in here with HCR_EL2.E2H */
-+    raw_write(env, ri, value);
-+}
-+
- static void vttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                         uint64_t value)
+@@ -4721,7 +4721,8 @@ static const ARMCPRegInfo el3_no_el2_v8_cp_reginfo[] = {
+ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
  {
-@@ -4979,7 +4986,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
-       .fieldoffset = offsetof(CPUARMState, cp15.tpidr_el[2]) },
-     { .name = "TTBR0_EL2", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 0,
--      .access = PL2_RW, .resetvalue = 0,
-+      .access = PL2_RW, .resetvalue = 0, .writefn = vmsa_tcr_ttbr_el2_write,
-       .fieldoffset = offsetof(CPUARMState, cp15.ttbr0_el[2]) },
-     { .name = "HTTBR", .cp = 15, .opc1 = 4, .crm = 2,
-       .access = PL2_RW, .type = ARM_CP_64BIT | ARM_CP_ALIAS,
-@@ -6131,6 +6138,10 @@ static const ARMCPRegInfo vhe_reginfo[] = {
-       .opc0 = 3, .opc1 = 4, .crn = 13, .crm = 0, .opc2 = 1,
-       .access = PL2_RW,
-       .fieldoffset = offsetof(CPUARMState, cp15.contextidr_el[2]) },
-+    { .name = "TTBR1_EL2", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 1,
-+      .access = PL2_RW, .writefn = vmsa_tcr_ttbr_el2_write,
-+      .fieldoffset = offsetof(CPUARMState, cp15.ttbr1_el[2]) },
-     REGINFO_SENTINEL
- };
+     ARMCPU *cpu = env_archcpu(env);
+-    uint64_t valid_mask = HCR_MASK;
++    /* Begin with bits defined in base ARMv8.0.  */
++    uint64_t valid_mask = MAKE_64BIT_MASK(0, 34);
  
+     if (arm_feature(env, ARM_FEATURE_EL3)) {
+         valid_mask &= ~HCR_HCD;
+@@ -4735,6 +4736,9 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+          */
+         valid_mask &= ~HCR_TSC;
+     }
++    if (cpu_isar_feature(aa64_vh, cpu)) {
++        valid_mask |= HCR_E2H;
++    }
+     if (cpu_isar_feature(aa64_lor, cpu)) {
+         valid_mask |= HCR_TLOR;
+     }
 -- 
 2.20.1
 
