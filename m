@@ -2,134 +2,113 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FED8C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 05:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 040B4C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 06:03:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3618E20720
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 05:53:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1C5A20720
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 06:03:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="ZNHFsxvJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3618E20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DriB9G0K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C5A20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iza6t-0003wC-8k
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 00:53:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42178)
+	id 1izaGQ-0006UZ-Vd
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 01:03:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46343)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ani.sinha@nutanix.com>) id 1iza6I-0003Xh-Bp
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 00:53:19 -0500
+ (envelope-from <rth7680@gmail.com>) id 1izaFm-0005zt-3e
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 01:03:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ani.sinha@nutanix.com>) id 1iza6G-00013y-SR
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 00:53:17 -0500
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:59328)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ani.sinha@nutanix.com>)
- id 1iza6G-0000wd-Id
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 00:53:16 -0500
-Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
- by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0165ki2c006306; Wed, 5 Feb 2020 21:53:10 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=xa9s/t0g4fipSuvcLc5ZvnvCsOIF+3x1VfqmHAYl/Ps=;
- b=ZNHFsxvJ5fZtjLkxcAYrCg11v4IwL+pyvhY+2kdvyXH5eI9TARxgPwFlbhL+iY5m8xwN
- YNoPQXd1xLq4bVQpjsRxpDzwMvNjBoT4UO5s4OW/lydlvuLb6U+8xzz18Uphjy7Hp9a1
- T9igIRBX4TnncSXAT0oce8p9wousVE/sc2bjwRebXsybWlqYmPiFrDyzX5Wl97swnxH4
- BSIcBSQMbKygAAOfIKd98Xma6LDiVwOj692gob1UZaHDL0ElFah10oUXHQwAVgY5RiYr
- Q2PuXu2I24zzn8oRMDjHRmRrq1JyxvtoBDtRDZMlirN2dZRgo15wbfdfW6y3RLXrLxgn kw== 
-Received: from nam12-bn8-obe.outbound.protection.outlook.com
- (mail-bn8nam12lp2177.outbound.protection.outlook.com [104.47.55.177])
- by mx0a-002c1b01.pphosted.com with ESMTP id 2xyhnc3gq8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Feb 2020 21:53:10 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EjGoIymBwWh6letAp4mqni4rlmdV/fPBA32lRz0pnyHk85zYyvcQFpr9yHNd1f17gKFkhLxzbmWLCgkXZyTZ3PLjWTcQJGzq/73nyLA542rZXxrW2cWzgPQ5VDCClv6BjksJERM8Ok/rHbzad2qCkNELNtKTmFnHXLjhlEGCga7Z3+azBzDqKUuPztuUltOxPaefcUwlafHLABv9rz71ykjGqg5B5OSiJzOyhUlHwQGkkOd1pqYxrZBDtbo3YQP0IXNfU7xJWQAYw954ndm3TaEloWuEx/V3gytMTsq1sLEHWroBwfOMJpRtl1yyVqnBA+WxgugIS0FwXLhIZhrRjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xa9s/t0g4fipSuvcLc5ZvnvCsOIF+3x1VfqmHAYl/Ps=;
- b=nvj1Hfv+t61fwjoY9FzZJm4e2dlyrBQ2Laf2ebk781dxXwp+YK66XL+roBBDA+roty4hPfw8FeJWd6NV/iH2q+zzBkTlp25fLgnOBrBN/983DKi6ZtPG/y+8HsTH1fg8w1IH2gCa8lK+YGSyZGQ9pXDslayVXdRPqmwkC3MI99giB0Tsn2kpidBKCElTFnmnIKWTORF5rk5SZULO7YwPeppSvmg7gJcFfx+kVlkVS53TXvBE/XJ2TyR/jMHYzDxi5wMpAB9o6aBsnFV8wNTWAWy+Z9uClfNi7DXNB9eI6UFVJeQQgRCgL7lsjPxVOnbUDlMDIAk3Inhod/V6gsEcOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MN2PR02MB6303.namprd02.prod.outlook.com (52.132.174.13) by
- MN2PR02MB5998.namprd02.prod.outlook.com (20.179.99.12) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.29; Thu, 6 Feb 2020 05:53:08 +0000
-Received: from MN2PR02MB6303.namprd02.prod.outlook.com
- ([fe80::38a1:eb0a:926a:20ad]) by MN2PR02MB6303.namprd02.prod.outlook.com
- ([fe80::38a1:eb0a:926a:20ad%5]) with mapi id 15.20.2707.023; Thu, 6 Feb 2020
- 05:53:08 +0000
-From: Ani Sinha <ani.sinha@nutanix.com>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Subject: Re: [PATCH] i386: pass CLZERO to guests with EPYC CPU model on AMD
- ZEN platform
-Thread-Topic: [PATCH] i386: pass CLZERO to guests with EPYC CPU model on AMD
- ZEN platform
-Thread-Index: AQHVtYKm5uylcpuSJ0uEmLmhvuRW56e/yJSAgAA3UQCAM5WrAIAZ6R6AgAAXEQCAAGC8AIAAAeiA
-Date: Thu, 6 Feb 2020 05:53:08 +0000
-Message-ID: <60B21C9A-30BE-4DC0-8A1B-0BC7757BA9D7@nutanix.com>
-References: <1576659933-37123-1-git-send-email-ani.sinha@nutanix.com>
- <2883fd0e-191a-c5a4-be1c-04442c8de1c9@redhat.com>
- <20191218151144.GN498046@habkost.net>
- <D67E411E-4398-4F1B-A397-E637BCD4F666@nutanix.com>
- <20200205223731.GY25446@habkost.net>
- <CY4PR12MB157489B70F2AD26C97779E40951D0@CY4PR12MB1574.namprd12.prod.outlook.com>
- <FD52354F-2038-4829-A7D8-7513D601A2FF@nutanix.com>
-In-Reply-To: <FD52354F-2038-4829-A7D8-7513D601A2FF@nutanix.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [115.110.205.85]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e41dbd83-2137-405d-a556-08d7aac8d7b2
-x-ms-traffictypediagnostic: MN2PR02MB5998:
-x-microsoft-antispam-prvs: <MN2PR02MB5998E350A1F953617BB018EBF11D0@MN2PR02MB5998.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:612;
-x-forefront-prvs: 0305463112
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(396003)(376002)(39860400002)(346002)(136003)(189003)(199004)(26005)(4326008)(2906002)(36756003)(6512007)(186003)(71200400001)(54906003)(66556008)(76116006)(66476007)(64756008)(66446008)(66946007)(91956017)(316002)(966005)(5660300002)(6486002)(478600001)(4744005)(2616005)(8936002)(44832011)(8676002)(6506007)(53546011)(86362001)(6916009)(81156014)(81166006)(33656002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR02MB5998;
- H:MN2PR02MB6303.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: goGUJ2SijYmUZ089uPLNWjuajD89/bjg1Ih3Cs7X6gCBz9kvuL3SMg6LF5ocDXMFTo8AM86d5YYPPJKGHdJfUJiiCMkJ/MWF+9wCV+Ub25yTYZu2Tbqk3x5KIcxU7MvmO0JwA0EIYHPlU5SgJAc6aa6Yq/NmC+iT/jArTrMWDwSml9nYpgviW0PQ9sJ8zIgPV621IyP5l9Khv5ujSEIsqBwBGm0vhPZd00JeHOhQvLcUDVTS3nUslfA2FRPmV6j/jJjqUhYxkWsDjRRiU6zfLDG+k27lbGImKb0ZM7CpDbPFSTyWYiLAcLGkdT8xQ6IcgaCKg6TqZOh3VHZh566+kAObdIP8KL5ZuhVh2W//Ip8Ich24rgqPx2jQBy4nbaqHRdCL+M6lr0xeEKFvP9Q+hC6erjCRhlHagOqSWso+YPDL+p7LzwkTFOndn6Ucb5Kp9uo4Vvy8w8f7Mx8H2jfdxDp6XR67WkHYmyYTVBwfJP8RVIOe8ChUI13JJQUjUQk5X65XeiQXaSfhjUcQX5/8VA==
-x-ms-exchange-antispam-messagedata: AYjFFo76zd7x9/lvHSTS1+CMKMxk0ql/gqopUi3FkAOs3hAy+VXvxImYJOTlXljoC4tvMwb3rMg88G2fLIhhnctJiy5J21XWiMlNI4CslZlxBpdziSM1DQjM2wcPbz1w7yFAcO2yFFJaFyjr9TdN0w==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2B8F58FA4AAFB143BC24414A1EA544ED@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <rth7680@gmail.com>) id 1izaFk-0001EX-Us
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 01:03:05 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44179)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1izaFk-00017O-M5
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 01:03:04 -0500
+Received: by mail-wr1-x444.google.com with SMTP id m16so5611149wrx.11
+ for <qemu-devel@nongnu.org>; Wed, 05 Feb 2020 22:03:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FJr1hIYpZMSeJFrEInmsUsaiL35to52hGUHWw/HqVIU=;
+ b=DriB9G0KZZ5ZyxpUR9vC8Nwf6HmSV5d/R9ZO98d3iUDKPju35CnZxNUmLazwN0vKCY
+ 4PoUimnytjjXr90eNXPYX+sa/a94tFO0g84hqepz9J5JG6CSaH7V/jZfCfBtSvC/gxza
+ 29T7bTyBjR+Dd1yMOAVPjns5+J8atDVb557mHOH127gaRW2hNr7rtaG0CVay+65RRyLd
+ ikavbh6NWZmH1KTxJ0BHGHABsx4v9RCZYn22+wOkTGf+bcHQRcQVbgRe/uTBHg1j40Ru
+ vkOy4QpAHizc8e149JQG+Vp0ipC9irdCOsXV345YfX3ppvm+sM8utsLTFIvDlrPdrL1t
+ +d+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=FJr1hIYpZMSeJFrEInmsUsaiL35to52hGUHWw/HqVIU=;
+ b=tSdIvXO30QTyXScGSp84eJHH6hpngOKUcLwHHMchLikRDpWxkdC0C4WrbxYu+kNLAc
+ p8Jc0vT+m+KGHKHiT23XMi5rt204bPOI+f66SrECkggjZEr1e7c119zAkirHCT3VtIxz
+ xyRAn/LXeF11fiTsJ2ZQB7mfF/J3So1Tlw08gdbIQq9qxaJux3KCNOhhu8mdvg9j8/yJ
+ fWmzM9D9u6HLnzp5uXABGcrFr2c5hJSWQNqvcxfro2wyVrWeFHfOSgoLVu1k5km53rlC
+ 4yOje7cC/1hPzHi1BELouPA+EORIiOdVeqzx768jmVXaK8IWK/1V8GJXVyKL5f4XyCoO
+ Ni/g==
+X-Gm-Message-State: APjAAAWbRj2oRlMsJ1NALQ0TFiMqHWulHWDD2VlnVBGC7RZ+xWxmzewG
+ f7MiaGhOuv7LN5Axpn1rO9g=
+X-Google-Smtp-Source: APXvYqy1bG0n9+aK1Eo9Tcue+wYo7GklaSvJMkzUnF9oOJV+ReR0ZJrZHifecOStdDeIYLdVP3M2sA==
+X-Received: by 2002:a5d:558c:: with SMTP id i12mr1657555wrv.315.1580968983063; 
+ Wed, 05 Feb 2020 22:03:03 -0800 (PST)
+Received: from [10.43.13.93] ([135.196.99.211])
+ by smtp.googlemail.com with ESMTPSA id y20sm2348053wmi.23.2020.02.05.22.02.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 05 Feb 2020 22:03:02 -0800 (PST)
+Subject: Re: [PATCH] Add support for a helper with 7 arguments
+To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
+References: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
+From: Richard Henderson <rth@twiddle.net>
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+ mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+ n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+ rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+ Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+ n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+ AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFYBBMBAgBCAhsDBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAIZARYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweUY
+ BQkP1h/pAAoJEK0ScMxN0CebqDsH/0YyfnXk+Dc++H37VCEKgRet2i1ATFzxRnifkvmdxha0
+ V+PVptQ2fwSe+w3KxoFecD8W75nysmUjrU/FicW9yU5YRlGONPZjruG02/KzmhA5PzWJdYO3
+ i/t0qRayvWIcX2qA/flsXEbmb/BbAFM05LQIdcOu74eiBFe5CBCOWBDJeneE1urIE0hSYxoh
+ nCcG60ULrNj13ohZ4zAEluoY32qIo7/OPWmtR88cPrEbZT8k+RqgZbsotzaPT1/RlL74fL8k
+ ofYfTgKAFH7eEy6fF2nzDp2GThVn+3sA62xtpSXUf/X1m75B40KOcq1EQbHypNTmBc1wt13e
+ ibhPNEVX2am5AQ0EUa4sLwEIALITHfH3gciRNfQIe7awDTDvn6H3C6gDyCAnv5LiuLTLZiyK
+ NZp3lNO3rPowyKrGT2RIDlumlqPgdeHzqEEX91YK0yk2vdFvwU04rJ4D+qRgdUPoeICLD1zo
+ PwOv2FaY6Tf8dKYas1RHF5QU5yQNey8j7IYYoE2yGPn2PtBmvtmK4iLataUEvx0U385Zr+jf
+ HscqwTiToryeDC8Io/9BsMvAssE5Yf5URS2nJ7LFOvc4njsQJPF1i9egBXaIloqv7p2hVCKJ
+ Hl5UWIxitQ9QQIl6iU4LCpz8mVYTXwv48IAVpbUf7+ak9V9Kk3jCeQnlxCJBUHjUhoIzinbS
+ JHPHtkkAEQEAAYkBPAQYAQIAJgIbDBYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweVIBQkP
+ 1iAZAAoJEK0ScMxN0CebGHUH/RtouOlWl6To97tQsTJUq/2YwmRpFOsvV0/zCX4fKBGAbeZi
+ VaELSt2+3UEErA+n8HwbQmjJ6IrdhA9GustOpOyCcbLVSMwql/OlAwBtDzCcC8dTU4zcuY2a
+ rGG2A8i5krU85G9r1wowVcWZBsdmW7/dKiNoadLQiig4bHNiSaV4ograas5efyEjqTxiY+yG
+ hzPw5DK2kbp2co8iDF1vW0LWPeLFBinCgItcI9LvgHWaB3rwjOfvNpMn5m64SoQYHB8wbnid
+ erAjOzkBzmqnfS1tAUr8mtESStEwrEmNv0ZoA6S0Wt+c9pyTr+BpG4OFlhj7ZI+Eh7zOrr33
+ q9OBIdA=
+Message-ID: <09def3cf-6833-ccf5-457e-1755a7fd0e04@twiddle.net>
+Date: Thu, 6 Feb 2020 06:02:58 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e41dbd83-2137-405d-a556-08d7aac8d7b2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2020 05:53:08.4475 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qpCGx7pvRHWpzLqkQS4V4opZEbgi2GyqqEhFwVyXMGT2h30D/+Zgj43c0D/YKbBu9udn/duEWoxvFz/gr4Gd5g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB5998
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-05_06:2020-02-04,
- 2020-02-05 signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.151.68
+In-Reply-To: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -141,21 +120,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, "Singh, Brijesh" <brijesh.singh@amd.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gT24gRmViIDYsIDIwMjAsIGF0IDExOjE2IEFNLCBBbmkgU2luaGEgPGFuaS5zaW5oYUBu
-dXRhbml4LmNvbT4gd3JvdGU6DQo+IA0KPiANCj4gDQo+PiBPbiBGZWIgNiwgMjAyMCwgYXQgNToz
-MCBBTSwgTW9nZXIsIEJhYnUgPEJhYnUuTW9nZXJAYW1kLmNvbT4gd3JvdGU6DQo+PiANCj4+IEFu
-aSwgSSBhbSBhbHJlYWR5IHdvcmtpbmcgb24gaXQuDQo+IA0KPiBXb3csIEkgc2VlIGEgd2hvbGUg
-bmV3IEFNRC1Sb21lIENQVSBtb2RlbCB3aXRoIGl04oCZcyBvd24gY2FjaGUgaW5mbyBkYXRhIDog
-DQo+IA0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9xZW11LWRldmVsLzE1NzMxNDk2NjMxMi4y
-MzgyOC4xNzY4NDgyMTY2NjMzODA5MzkxMC5zdGdpdEBuYXBsZXMtYmFidS5hbWQuY29tLw0KDQpE
-byB5b3UgdGhpbmsgdGhlIFJPTUUgc3BlY2lmaWMgZ3Vlc3QgY3B1IGNhY2hlIGRhdGEgd2lsbCBo
-YXZlIHNpZ25pZmljYW50IGltcGFjdCBvbiBwZXJmb3JtYW5jZT8NCg0KPiANCj4gVGhhbmtzIQ0K
-PiANCj4gYW5pDQo+IA0KDQo=
+On 2/5/20 10:41 PM, Taylor Simpson wrote:
+> Currently, helpers can only take up to 6 arguments.  This patch adds the
+> capability for up to 7 arguments.  I have tested it with the Hexagon port
+> that I am preparing for submission.
+
+This is not safe, in general, without other changes.
+
+>From include/tcg/tcg.h:
+
+> /* While we limit helpers to 6 arguments, for 32-bit hosts, with padding,
+>    this imples a max of 6*2 (64-bit in) + 2 (64-bit out) = 14 operands.
+>    There are never more than 2 outputs, which means that we can store all
+>    dead + sync data within 16 bits.  */
+> #define DEAD_ARG  4
+> #define SYNC_ARG  1
+> typedef uint16_t TCGLifeData;
+
+Thus 7 uint64_t inputs, on a 32-bit host, will overflow TCGLifeData.
+
+What are you doing that requires so many arguments?
+
+
+r~
 
