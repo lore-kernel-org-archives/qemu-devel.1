@@ -2,80 +2,86 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89583C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CFFFC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:18:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53031214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:17:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06D70214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:18:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OokTOI3O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53031214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdPTOpy1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06D70214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izh2S-0001Uk-GY
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:17:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41662)
+	id 1izh34-0002UM-45
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:18:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1izh0l-0000Sp-GY
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:16:04 -0500
+ (envelope-from <armbru@redhat.com>) id 1izgrP-00081m-Rd
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:06:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1izh0i-0005tb-Lx
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:16:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35218
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1izgrO-0004tQ-US
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:06:23 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38607
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1izh0i-0005rL-C7
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:16:00 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1izgrO-0004tI-Ql
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:06:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580994958;
+ s=mimecast20190719; t=1580994382;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4/btJhu5BTV1w8aRcJPEDLMys62WT/cdXUmdyyFnRrA=;
- b=OokTOI3O7hAVKnlMITOFMfElE6qE7dt2YrfqTmnhnS8lpqQ+hyIRFSXzTRPO84wahDbJ5B
- 3Eth2mG8s/hnfhW4pXPIDQguMhdPCQxvGYXCM58YM5mv0fRIlsKFZRVmrAqxIaUNiMq245
- n26iHsAJGHWJkKQ9ma88LKLxoIRVgrU=
+ bh=V6HXzhNVBZVIknjU4RHEtR/eSgtmHlHskb3iHjFCwVg=;
+ b=TdPTOpy15GdgFANPRgws3YPJa+MRvbyI1sOizCFwdVP8tJ0tdMv+FV5PvJoE9hTpSpnTUs
+ JfVp8l6/GDKr7F2xRXfrJ6bBF0WwR/xW0gN3ZXHny/XbXDL0IEdb4XJNq/iNUeRKGqQf4h
+ U6IfWW1pROqQn4Qkr4uBWTdWq5gD2HU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-cHbk5HIjOpKo2kBdpDXQxA-1; Thu, 06 Feb 2020 08:15:56 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-309-n1LaLXYXOdWE_2vjWsnxRQ-1; Thu, 06 Feb 2020 08:06:20 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96622101FC68;
- Thu,  6 Feb 2020 13:15:55 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1B1325C1B0;
- Thu,  6 Feb 2020 13:15:54 +0000 (UTC)
-Date: Thu, 6 Feb 2020 14:15:53 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v4 38/80] s390x/s390-virtio-ccw: use memdev for RAM
-Message-ID: <20200206141553.706bc17b@redhat.com>
-In-Reply-To: <20200205211123.43914b0c.pasic@linux.ibm.com>
-References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
- <1580483390-131164-39-git-send-email-imammedo@redhat.com>
- <20200205211123.43914b0c.pasic@linux.ibm.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61E62800D6C;
+ Thu,  6 Feb 2020 13:06:19 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
+ [10.36.116.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BA368E9E5;
+ Thu,  6 Feb 2020 13:06:10 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 952C711386A7; Thu,  6 Feb 2020 14:06:08 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kamil Rytarowski <n54@gmx.com>
+Subject: Re: [PATCH v2 4/4] Add the NVMM acceleration enlightenments
+References: <20200107124903.16505-1-n54@gmx.com>
+ <20200128140945.929-1-n54@gmx.com> <20200128140945.929-5-n54@gmx.com>
+ <0ed12efa-eee4-b3ff-8f02-f9c3b80d0e21@redhat.com>
+ <2ae4caf9-05fd-b740-2612-e1c1ecafe277@gmx.com>
+Date: Thu, 06 Feb 2020 14:06:08 +0100
+In-Reply-To: <2ae4caf9-05fd-b740-2612-e1c1ecafe277@gmx.com> (Kamil
+ Rytarowski's message of "Thu, 6 Feb 2020 11:24:44 +0100")
+Message-ID: <87o8ubuapr.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: cHbk5HIjOpKo2kBdpDXQxA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: n1LaLXYXOdWE_2vjWsnxRQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,98 +93,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, max@m00nbsd.net,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Feb 2020 21:11:23 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Kamil Rytarowski <n54@gmx.com> writes:
 
-> On Fri, 31 Jan 2020 16:09:08 +0100
-> Igor Mammedov <imammedo@redhat.com> wrote:
->=20
-> > memory_region_allocate_system_memory() API is going away, so
-> > replace it with memdev allocated MemoryRegion. The later is
-> > initialized by generic code, so board only needs to opt in
-> > to memdev scheme by providing
-> >   MachineClass::default_ram_id
-> > and using MachineState::ram instead of manually initializing
-> > RAM memory region.
-> >=20
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > Reviewed-by: David Hildenbrand <david@redhat.com>
-> > Acked-by: Cornelia Huck <cohuck@redhat.com> =20
->=20
-> Hi Igor!
->=20
-> I gave=20
-> -object memory-backend-file,id=3Dmem=20
-> -machine type=3Ds390-ccw-virtio,memory-backend=3Dmem
-> a spin on s390x. Seems to largely work a expected. So I guess it is:
->=20
-> Tested-by: Halil Pasic <pasic@linux.ibm.com>
-> Acked-by: Halil Pasic <pasic@linux.ibm.com>
-Thanks,
+> On 03.02.2020 12:54, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> @@ -2029,6 +2072,19 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
+>>> =C2=A0 #endif
+>>> =C2=A0 }
+>>>
+>>> +static void qemu_nvmm_start_vcpu(CPUState *cpu)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 char thread_name[VCPU_THREAD_NAME_SIZE];
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 cpu->thread =3D g_malloc0(sizeof(QemuThread));
+>>> +=C2=A0=C2=A0=C2=A0 cpu->halt_cond =3D g_malloc0(sizeof(QemuCond));
+>>
+>> Nitpick, we prefer g_new0().
+>
+> In this file other qemu_*_start_vcpu() use  g_malloc0().
+>
+> I will leave this part unchanged and defer tor future style fixups if
+> someone is interested.
 
-Could you also take a look at patches 3-7/8o that makes this possible?
-(it never hurts to have second pair of eyes on a code that affects
-everyone).
-
->=20
-> Thanks!
->=20
-> Halil
->=20
-> > ---
-> > CC: pasic@linux.ibm.com
-> > ---
-> >  hw/s390x/s390-virtio-ccw.c | 7 +++----
-> >  1 file changed, 3 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > index e759eb5..a89cf4c 100644
-> > --- a/hw/s390x/s390-virtio-ccw.c
-> > +++ b/hw/s390x/s390-virtio-ccw.c
-> > @@ -154,14 +154,12 @@ static void virtio_ccw_register_hcalls(void)
-> >                                     virtio_ccw_hcall_early_printk);
-> >  }
-> > =20
-> > -static void s390_memory_init(ram_addr_t mem_size)
-> > +static void s390_memory_init(MemoryRegion *ram)
-> >  {
-> >      MemoryRegion *sysmem =3D get_system_memory();
-> > -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-> >      Error *local_err =3D NULL;
-> > =20
-> >      /* allocate RAM for core */
-> > -    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_si=
-ze);
-> >      memory_region_add_subregion(sysmem, 0, ram);
-> > =20
-> >      /*
-> > @@ -245,7 +243,7 @@ static void ccw_init(MachineState *machine)
-> > =20
-> >      s390_sclp_init();
-> >      /* init memory + setup max page size. Required for the CPU model *=
-/
-> > -    s390_memory_init(machine->ram_size);
-> > +    s390_memory_init(machine->ram);
-> > =20
-> >      /* init CPUs (incl. CPU model) early so s390_has_feature() works *=
-/
-> >      s390_init_cpus(machine);
-> > @@ -471,6 +469,7 @@ static void ccw_machine_class_init(ObjectClass *oc,=
- void *data)
-> >      hc->plug =3D s390_machine_device_plug;
-> >      hc->unplug_request =3D s390_machine_device_unplug_request;
-> >      nc->nmi_monitor_handler =3D s390_nmi;
-> > +    mc->default_ram_id =3D "s390.ram";
-> >  }
-> > =20
-> >  static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)=
- =20
->=20
+Time to re-run Coccinelle with the semantic patch from commit
+b45c03f585e.
 
 
