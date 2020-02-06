@@ -4,107 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 481B6C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DF9C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:22:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 110E421741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E82021741
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:22:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6S+BBF8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 110E421741
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="izXCIIlp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E82021741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izi2X-0001CF-6y
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 09:21:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50804)
+	id 1izi3V-0002Us-CN
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 09:22:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51239)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1izi1b-0000K8-VG
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:21:01 -0500
+ (envelope-from <kwolf@redhat.com>) id 1izi2v-0001zT-Ft
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:22:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1izi1X-0001i7-Gp
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:20:59 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49463
+ (envelope-from <kwolf@redhat.com>) id 1izi2t-0003dv-DY
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:22:21 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51474
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izi1X-0001g7-CZ
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:20:55 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1izi2t-0003bT-7D
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:22:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580998854;
+ s=mimecast20190719; t=1580998935;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Lz95xRktdP9KlbzaKPpgfKypflDSYX5X64lp4MhxmvQ=;
- b=d6S+BBF8dmq8/eS+ND/ct9D9up6U9aDyaHu2f3RkCJ4ITCxDPHtkYvMDkfr6CCmX4O/OWk
- F6LUIwlyVPm+mLw6gq08EXbj1SfpOQD7MOAHoiCfv2KJYkOME7QSDWyf8NiyPKu5xEhG3q
- jSInWBA5CTBzsmTOtxw3tqyqHv4AByk=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CfkJ8uILfNHEOUBqVhKjvxh8NqxSHE2X1in9z+HV7oE=;
+ b=izXCIIlpR1UQntIRx9YLsh0OpPGCAx90V9oSKtRYu+tHbd6qXmaxA8wwAL8DXSfQiZ3zv0
+ ZXvxQfuSGt3lZpqYZHHYTo2DtMKiDNlpU4uW+vnlkY8xlH5RUk3IwZV5F3mFsNb9B63MQu
+ X8d3jhSq1erZD3az19bJcekEkPyzvzI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-7hmfCGrWMfaQ5V2sTo3rqQ-1; Thu, 06 Feb 2020 09:20:50 -0500
-X-MC-Unique: 7hmfCGrWMfaQ5V2sTo3rqQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-250-wHFktFsdM_WL6V6JakCgAA-1; Thu, 06 Feb 2020 09:21:57 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C247918B6417;
- Thu,  6 Feb 2020 14:20:49 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.15])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 06588857BF;
- Thu,  6 Feb 2020 14:20:42 +0000 (UTC)
-Subject: Re: [PATCH 02/13] qcrypto-luks: implement encryption key management
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200130125319.GD1891831@redhat.com>
- <87zhe5ovbv.fsf@dusky.pond.sub.org> <20200130150108.GM1891831@redhat.com>
- <877e18oq76.fsf@dusky.pond.sub.org> <87mu9xxwzv.fsf@dusky.pond.sub.org>
- <20200205093011.GA5768@dhcp-200-226.str.redhat.com>
- <87tv45wdui.fsf@dusky.pond.sub.org>
- <20200205110250.GB5768@dhcp-200-226.str.redhat.com>
- <87blqdgl70.fsf@dusky.pond.sub.org> <87blqbu8xe.fsf@dusky.pond.sub.org>
- <20200206134918.GM2391707@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f5f7380d-d5b3-65ce-96c9-5fb3c75d050a@redhat.com>
-Date: Thu, 6 Feb 2020 15:20:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C07A91012020;
+ Thu,  6 Feb 2020 14:21:55 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-204.ams2.redhat.com [10.36.116.204])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CC8826E43;
+ Thu,  6 Feb 2020 14:21:45 +0000 (UTC)
+Date: Thu, 6 Feb 2020 15:21:43 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: qmp-shell for GSoC/Outreachy?
+Message-ID: <20200206142143.GA4926@linux.fritz.box>
+References: <20200123190145.GI657556@redhat.com>
+ <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
+ <20200124095027.GA824327@redhat.com>
+ <20200127143505.GD5669@linux.fritz.box>
+ <20200127202925.GE3419@work-vm>
+ <20200128105932.GC6431@linux.fritz.box>
+ <20200205130946.GC5768@dhcp-200-226.str.redhat.com>
+ <a45df5ab-3cad-0fbe-901f-4bc1ba28d38e@redhat.com>
+ <20200205194944.GP3210@work-vm> <877e10xdd6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20200206134918.GM2391707@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <877e10xdd6.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: wHFktFsdM_WL6V6JakCgAA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="E7yktZxFmwh8SAwUbGLngDe7SRG4t3B0p"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,138 +94,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E7yktZxFmwh8SAwUbGLngDe7SRG4t3B0p
-Content-Type: multipart/mixed; boundary="VMRZ2XI2Qqi10dU8LajXNHHYwt3HATCRW"
-
---VMRZ2XI2Qqi10dU8LajXNHHYwt3HATCRW
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 06.02.20 14:49, Daniel P. Berrang=C3=A9 wrote:
-> On Thu, Feb 06, 2020 at 02:44:45PM +0100, Markus Armbruster wrote:
->> Markus Armbruster <armbru@redhat.com> writes:
->>
->>> Kevin Wolf <kwolf@redhat.com> writes:
->>>
->>>> Am 05.02.2020 um 11:03 hat Markus Armbruster geschrieben:
->>>>> Kevin Wolf <kwolf@redhat.com> writes:
->> [...]
->>>>>> Adding a key gets more complicated with your proposed interface beca=
-use
->>>>>> state must be set explicitly now whereas before it was derived
->>>>>> automatically from the fact that if you give a key, only active make=
-s
->>>>>> sense.
->>>>>
->>>>> The explicitness could be viewed as an improvement :)
->>>>
->>>> Not really. I mean, I really know to appreciate the advantages of
->>>> -blockdev where needed, but usually I don't want to type all that stuf=
-f
->>>> for the most common tasks. qemu-img amend is similar.
->>>>
->>>> For deleting, I might actually agree that explicitness is an
->>>> improvement, but for creating it's just unnecessary verbosity.
->>>>
->>>>> If you'd prefer implicit here: Max has patches for making union tags
->>>>> optional with a default.  They'd let you default active to true.
->>>>
->>>> I guess this would improve the usability in this case.
->>
->> Thinking and writing in the "Making QEMU easier for management tools and
->> applications" monster thread have made me realize we're mixing up two
->> aspects that ought to be kept separate: machine-friendly QMP and
->> human-friendly CLI.
->>
->> You argue that
->>
->>     $ qemu-img amend -o encrypt.keys.0.new-secret=3Dsec0 test.qcow2
->>
->> is nicer than
->>
->>     $ qemu-img amend -o encrypt.keys.0.state=3Dactive,encrypt.keys.0.sec=
-ret=3Dsec0 test.qcow2
->>
->> and you do have a point: humans want their CLI terse.  Redundancy is
->> unwanted, except perhaps to protect users from dangerous accidents.  In
->> this example, state=3Dactive is redundant when a secret is given, becaus=
+Am 06.02.2020 um 10:40 hat Markus Armbruster geschrieben:
+> >> On 2/5/20 8:09 AM, Kevin Wolf wrote:
+> >> > Am 28.01.2020 um 11:59 hat Kevin Wolf geschrieben:
+> >> >>>> The other part that it needs to solve is how to be available by d=
+efault
+> >> >>>> without specifying anything on the command line. Basically, if I =
+press
+> >> >>>> Ctrl-Alt-2, I want to get to a monitor shell. If that shell is
+> >> >>>> implemented internally or by an external Python process, I don't =
+mind.
+> >> >>>
+> >> >>> That is a harder part. (I rarely use Ctrl-Alt-2 actually; I mostly
+> >> >>> use HMP on stdin).
+> >> >>
+> >> >> I don't think it would be that hard, actually.
+> >> >>
+> >> >> If you have a -qmp-shell option that takes a chardev and defaults t=
+o vc,
+> >> >> you've solved the part with both stdio and Ctrl-Alt-2. Now all you =
+need
+> >> >> to do is launch the Python child process, pass it a pair of pipes f=
+or
+> >> >> communication and forward everything between the pipes and the char=
+dev.
+> >> >>
+> >> >> (That's the theory anyway.)
+> >> >=20
+> >> > If someone is interested, I did a quick proof-of-concept hack:
+> >> >=20
+> >> >     https://repo.or.cz/qemu/kevin.git/shortlog/refs/heads/qmp-shell
+> >> >=20
+> >> > It doesn't clean up anything properly (including the qmp-shell proce=
+sses
+> >> > it starts), but it spawns a usable qmp-shell on a user-specified
+> >> > character device. stdio seems to work, though without readline
+> >> > functionality (I suppose I still have line-buffering somewhere), vc
+> >> > doesn't really work at all yet.
+> >> >=20
+> >> > Try it out like this:
+> >> >=20
+> >> >     $ ./qemu-storage-daemon --chardev stdio,id=3Dm --monitor m,mode=
+=3Dqmp-shell
+> >> >     monitor_qmp_event: 1
+> >> >     Welcome to the QMP low-level shell!
+> >> >     Connected to QEMU 4.2.50
+> >> >=20
+> >> >     (QEMU) query-version
+> >> >     {"return": {"qemu": {"micro": 50, "major": 4, "minor": 2}, "pack=
+age": "v4.2.0-1188-gd95a3885a9"}}
+> >> >     (QEMU) quit
+> >> >=20
+> >> > (Or use x86_64-softmmu/qemu-system-x86_64, but it's based on the
+> >> > refactorings in the storage daemon branch, so why not try both at on=
+ce?)
+> >> >=20
+> >> > Polishing this to make it mergable would still require substantial w=
+ork,
+> >> > so at the moment I'm not planning to do this. But if someone wants t=
+o
+> >> > pick it up, feel free (just let us know).
+> >> >=20
+> >> > Hm, in fact... A qmp-shell GSoC project?
+> >> >=20
+> >>=20
+> >> That would be great. I worry that we should have a clear vision for th=
 e
->> anything else would be an error.
->>
->> In QMP, however, we like things simple and explicit, and we eschew
->> magic.
->>
->> This particular magic might just be simple enough to be acceptable in
->> QMP.  We'd "merely" have to support explicit defaults in the schema (a
->> clear improvement if you ask me), and optional union tags (tolerable as
->> long as the default comes from the schema, I guess).
->>
->> My point is: QAPI schema design *must* focus on QMP and nothing else.
->> If we try to serve both QMP and human-friendly CLI, we'll likely botch
->> both.
->>
->> I believe a truly human-friendly CLI requires more than just
->> human-friendly concrete syntax for QMP.  Same as HMP, really.
+> >> syntax before we give this project to an intern, though. With a clear
+> >> vision and an outline for deliverables, it's an incredibly appropriate
+> >> project.
+> >>=20
+> >> Some things I think we want to define before we start:
+> >>=20
+> >> 1. What are we trying to achieve with a standalone shell?
 >=20
-> A human-friendly approach to this problem would never even
-> have the generic "amend" design IMHO. Friendly would be to
-> have a CLI that is approx the same as "cryptsetup" provides
-> eg
+> Projects without a clear goal rarely succeed.  Success within three
+> months is even rarer.
+>
+> >> 2. What syntax should it use?
 >=20
->     $ qemu-img add-key /path/to/disk
->     enter key>..
->     re-enter key>...
+> Leaving that to a GSoC student amounts to setting up for failure.
+
+I think this subthread shows that we actually have many separate
+projects that people wish to have someone work on. Each of them is
+probably a bit too small for a whole GSoC, but all of them together are
+probably too much. So I'll guess the student would pick maybe two of
+them, and if time is left at the end, more can be added as a bonus.
+
+1. Something like --monitor mode=3Dqmp-shell that just spawns an external
+   Python script and passes it a QMP socket. This is the fundamental
+   building block for having any kind of external monitor script
+   actually integrated in QEMU, so I think just running the existing
+   qmp-shell this way (with proper support for at least stdio and vc
+   chardevs) would make sense as a first milestone.
+
+2. Rewriting qmp-shell to use a better syntax for nested data
+   structures. This would have to be defined before the project starts.
+
+3. Improving qmp-shell UI-wise, e.g. by having better autocompletion,
+   support for counting brackets, or whatever else was mentioned. We
+   have a few ideas, and there's room for the student to add their own
+   ideas, too.
+
+4. Something HMP-like. This isn't QMP any more, so it could as well be a
+   separate script (hmp-shell?). But it could also be integrated in
+   qmp-shell in the form of additional commands that are implemented
+   client-side. Or maybe have a single shell, but have a QMP mode and an
+   HMP mode and the user can switch between these modes.
+
+   The syntax for the HMP shell/mode could be the same or different from
+   the QMP syntax. This would have to be defined beforehand, too.
+
+5. Probably more that I just forgot now.
+
+Suggesting the exact goals is part of the student application process,
+but for fundamental things like the syntax we should probably already
+know what we want.
+
+> >> I think those are the hardest parts.
+> >>
+> >> Below, some musings:
+> >>=20
+> >> - An integrated QMP shell would be a great usability boost to users of
+> >> bare QEMU.
+> >>=20
+> >> - It is undesirable in general to support two interfaces. Feature
+> >> disparity is a problem, as is needing to document and test two separat=
+e
+> >> interfaces. The quality disparity between the two is also an issue.
+> >>=20
+> >> - Offering HMP via the GTK interface but not QMP is a discoverability
+> >> problem. Unfamiliar users might assume that HMP is our flagship
+> >> interface. It is not.
+> >>=20
+> >> - We are unlikely to re-expand HMP to cover everything QMP does; writi=
+ng
+> >> a QMP shell that makes QMP easy to interface with is a better solution
+> >> for removing redundancy and complexity.
+
+I'm not entirely convinced of this because QMP is often too low-level to
+actually address the practical high-level needs of users.
+
+But these HMP-ish things are probably easier to maintain as scripts
+outside of the QEMU binary, so I think some kind of "QMP with
+extensions" for human could be the solution.
+
+Once it's an external script, it will also be easy to exchange the shell
+for another one depending on user preference, or to hack in whatever
+functionality they are missing.
+
+> >> - I suspect that the target audience for users of naked QEMU are:
+> >>   - QEMU developers
+> >>   - Upper-layer developers (RHV, oVirt, KubeVirt, libvirt, kata, et al=
+)
+> >> researching, testing, and debugging integration.
+> >>   - Devops professionals testing, implementing and debugging
+> >>     configuration & infrastructure
+> >>   - Security/infosec researchers
+> >>   - Embedded platform developers
+> >>   - Academic researchers
+
+Maybe kernel developers should be mentioned separately, but yes, this
+list looks plausible to me.
+
+> >> So please correct me if I am off the mark;
+> >>=20
+> >> Design Goals:
+> >>   - The removal of HMP
+> >>   - An easy-to-use interface that remains reasonably "close" to the
+> >> machine API such that it provides a smooth transition to scripting QEM=
+U.
+> >>   - Integration with our GTK interface for discoverability and conveni=
+ence
+
+As I listed above, I think these are actually three separate projects,
+rather than goals for a single big projects.
+
+> >> Syntax:
+> >>   - TBD? Do we agree that the current syntax in qmp-shell is "bad" and
+> >> should be replaced? If yes, what should it look like?
+> >
+> > I believe it should be a python shell with added commands.
+> >
+> > Simple things should be simple.
+> >   e.g. adding a disk from a local file should be trivial.
+> >
+> > Complex things can be complex - but it would be better if they were
+> > simple.
+> >
+> >   It's OK if the worst case of a blockdev is a bit hairy, but
+> >   watch out for cases where the hairyness creeps in unnecessarily.
 >=20
-> or
+> Designing interfaces to complex machinery is hard.  Experience tells
+> that we do okay when we focus on the building blocks first.  That's
+> -blockdev.  When we start with trying to make simple things simple, we
+> end in swamps.  That's -drive.
 >=20
->     qemu-img add-key --keyfile /some/file.txt /path/to/disk
+> Focus on building blocks is of course no excuse for unnecessary
+> hairiness.
+>=20
+> It's also no reason not to build more convenient things on top of the
+> building blocks.  I doubt they should go into QMP, though.
 
-I have only scanned through the discussion up until this point, but I
-agree that amend doesn=E2=80=99t need to be human-friendly at all cost.
+Right, they should be implemented in that external script, which would
+use the lower-level QMP building blocks to provide the functionality. I
+also think it's a good idea to keep QMP accessible for more exotic use
+cases when the simple thing just doesn't cut it any more.
 
-If we really want a human-friendly keyslot modification interface, we
-can always add a specific qemu-img subcommand that provides high-level
-succinct operations based on a low-level and more verbose amend interface.
+> > If the user screwsup, it should give an error that prompts the user
+> > to the parameter they got wrong.
+> >
+> > Output from commands should normally be pretty formatted (with an optio=
+n
+> > to display raw json for those needing it).
+> >   e.g. that 'query-version' should give either just the package
+> >   version (as info version currently does) or:
+> >       4.2.50  Package: v4.2.0-1188-gd95a3885a9
+> >
+> > We shouldn't lose any HMP commands that some people find useful
+> >   Ditching HMP isn't an option until we've got almost all of it
+> >   covered.
+>=20
+> In particular, we currently use HMP for debugging and monitoring
+> purposes, where we don't need or want QMP's rigor, neither its rigorous
+> interface stability, nor its structured I/O.  We want the "whipuptitude"
+> we get from monitor_printf().  This is actually a point David has made
+> several times.
+>=20
+> To have a qmp-shell replace HMP, I think it needs to be able to
+>=20
+> * Go beyond 1:1
+>=20
+>   We tried a 1:1 mapping between HMP and QMP commands, and it didn't
+>   work out.  HMP's replacement should let us build convenient commands
+>   from QMP building blocks.
+>=20
+>   We tried a 1:1 mapping between HMP and QMP command arguments, guided
+>   by @args_type.  Worked out for simple cases, but was too constricting.
 
-(Or just a script that isn=E2=80=99t even built into qemu-img, because I su=
-ppose
-such a operation =E2=80=9Ctranslation=E2=80=9D would be easier to implement=
- in a
-scripting language.  Maybe qemu-img could be extended to invoke external
-scripts for specific subcommands?  But anyway, those would all be ideas
-for the future.)
+We need to go beyond 1:1, but we probably want to be able to offer 1:1
+as a subset of commands accepted in that shell.
 
-Max
+Offering only 1:1 in a good way might already be a step forward.
 
+> * Preserve "whipuptitude" [David]
+>=20
+>   I figure that means allowing some in QMP.  Without compromising its
+>   core mission, of course.
 
---VMRZ2XI2Qqi10dU8LajXNHHYwt3HATCRW--
+As long as we confine it to x- commands, I think this is okay.
 
---E7yktZxFmwh8SAwUbGLngDe7SRG4t3B0p
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> * As discoverable as HMP is now [Kevin]
+>=20
+> * Help, completion and such at least on par with what HMP provides now
 
------BEGIN PGP SIGNATURE-----
+Will we want to add new annotations in the schema for this?
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl48ILkACgkQ9AfbAGHV
-z0AGqwf/f4KH6XLpvnk2wyqcPhFduiA2Y4RkNXFhmO7bI4WZG1Zfvk/1Xr3HPE+n
-M7tqfIACKgtzEFGVBTNvZRp6/Iz+dBMCXiNYrJBZWMSChurRr2D/bm173irmNTuY
-RlJ1BOACHOz2vu0KBNHxGUVCX9ehsFfFma9nka1RUckBM3yCu4LcQV0cpusw49b3
-zX0CTlg2RLqf9lAPFqa9Hb8WGk7sV9BwD6Ogx/FluwqASqujtyjts7ePLUEopeVV
-NxGcThRs7vxS8uUzz650XfGYWyfBR1jsa/sy/IoTosKt6IyCBaEQ68jDbKXzovHS
-rhq+IWCNToSq06PbBYlNN9lIpWJ4Dg==
-=PE9u
------END PGP SIGNATURE-----
+For example, HMP has completion support for block device names. In the
+QAPI schema, these are simply 'str'. We could bake the knowledge that
+in command 'foo' the parameter 'bar' is a block device name, but that
+would be a hack and would probably rarely be consistent with what QEMU
+actually does. It's really something that schema introspection should be
+able to tell us.
 
---E7yktZxFmwh8SAwUbGLngDe7SRG4t3B0p--
+Kevin
 
 
