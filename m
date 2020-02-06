@@ -2,62 +2,87 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E70C35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 01:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C99C35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 01:20:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C756D2082E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 01:16:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C756D2082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8721D2082E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 01:20:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rCCx5r18"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8721D2082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izVmb-0007zB-Ta
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 20:16:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51659)
+	id 1izVpu-00028L-O9
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 20:20:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1izVlQ-0007Wl-Q2
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:15:30 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1izVnw-00007V-G3
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:18:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1izVlP-00007x-9K
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:15:28 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2696 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1izVlO-0008RE-BU
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:15:26 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 5584C60521CBB73F985F;
- Thu,  6 Feb 2020 09:15:20 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.205) with Microsoft SMTP Server (TLS) id 14.3.439.0; Thu, 6 Feb 2020
- 09:15:09 +0800
-Subject: Re: [PATCH 0/3] delay timer_new to avoid memleaks
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- <peter.maydell@linaro.org>
-References: <20200205070659.22488-1-pannengyuan@huawei.com>
- <ef35a825-b1c8-84cf-a72a-3c4877b5ad98@redhat.com>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <f21be513-ed77-8a9d-f033-ad22c940c382@huawei.com>
-Date: Thu, 6 Feb 2020 09:14:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1izVnu-0001Cj-0m
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:18:04 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:43363)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1izVnt-00014z-Pn; Wed, 05 Feb 2020 20:18:01 -0500
+Received: by mail-wr1-x435.google.com with SMTP id z9so5097032wrs.10;
+ Wed, 05 Feb 2020 17:18:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=z1xR+0C5iuS2wN0NuNjbYnlECeDv4TSFHvruaFSgWQ8=;
+ b=rCCx5r18dNcTT2f6Jbau+M/SsPO+FkV0V3R2FgN1AKZzWzD7RruZRXAnlOAbUfwxoi
+ 3IbD4WoEG6NmV1JrW7yWjYp+tXRlSqAW1jPjZq9x8rerqah3+Rsg8rMu97NBEn0KqUoX
+ BdGFNg0Q872sEGINoX8n3egtPS7f+dikGQO8zPwssILGaMFaSC1JVkCV5AFsCCQ5KpZH
+ EBn+VQcWOzlOjKETMCGMWtzV73lyD1C10lqK+CRQvnzC0L/IhN+h7bagfZzKruicxO+x
+ BOs3jnReB7Um/9jyextxigsmjMAMWkgkYmyEPCWTj8/JplMrfbwRPA+K/x37YuMI/mwY
+ XLmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=z1xR+0C5iuS2wN0NuNjbYnlECeDv4TSFHvruaFSgWQ8=;
+ b=ksDKChMD7IfSKi5GBZx67mien/onaUnYw8vdpgClQ4ZC2jiXUKgiFqTKvKHHn7ET4/
+ 9fGkb38lD9j4UD1ptDzqicynFgopURm243+UTZ6Sd9nZaChHkDrwW1xchEZVHFYZASPP
+ i2Jqr3iyeM5BlbMYINVfKoEcX3eUZetIiTaD5DjfmKsFEONr8VV5x0GD6qh4MHIq2hWq
+ WYkksMJoNxqfOx+ZQqA2tKayR/ViDrp1iCAj/d08ZVRkcoCdVWSSpHGkefAellqnZAtS
+ WmsQM6bQuC1K7/ltcdR1vSqwDh+PVJdsTe/gzT2e4trsy0gYAOT2hvWfr52juRIpfC7S
+ Ol5Q==
+X-Gm-Message-State: APjAAAVdb5UhZrTjFxWHo+mDGujX/9xKMDDFa4SOIGm0T4IkuqrwE6fw
+ 6aDuiCCLAq0VG8xi67yV4Mo0BheD
+X-Google-Smtp-Source: APXvYqyJP++MC9R05whn7QRYY/xuy5beAu1NKmegEu4ItiJWObnlq1CLEoPHVXifTrS1+WJZbYC1Gg==
+X-Received: by 2002:adf:e692:: with SMTP id r18mr305949wrm.413.1580951880165; 
+ Wed, 05 Feb 2020 17:18:00 -0800 (PST)
+Received: from localhost.localdomain (2.red-95-127-156.staticip.rima-tde.net.
+ [95.127.156.2])
+ by smtp.gmail.com with ESMTPSA id w13sm2053526wru.38.2020.02.05.17.17.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 05 Feb 2020 17:17:59 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/30] hw/arm/raspi: Dynamically create machines based on
+ the board revision
+Date: Thu,  6 Feb 2020 02:17:26 +0100
+Message-Id: <20200206011756.2413-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <ef35a825-b1c8-84cf-a72a-3c4877b5ad98@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,38 +94,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
 
+These patches simplify adding the raspi0/raspi1/raspi4 boards.
 
-On 2/5/2020 9:16 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 2/5/20 8:06 AM, pannengyuan@huawei.com wrote:
->> From: Pan Nengyuan <pannengyuan@huawei.com>
->>
->> This series delay timer_new into realize() to fix some memleaks when w=
-e call 'device-list-properties'.
->>
->> Pan Nengyuan (3):
->> =C2=A0=C2=A0 armv7m_systick: delay timer_new to avoid memleaks
->> =C2=A0=C2=A0 stm32f2xx_timer: delay timer_new to avoid memleaks
->> =C2=A0=C2=A0 stellaris: delay timer_new to avoid memleaks
->>
->> =C2=A0 hw/arm/stellaris.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 7 ++++++-
->> =C2=A0 hw/timer/armv7m_systick.c=C2=A0 | 6 ++++++
->> =C2=A0 hw/timer/stm32f2xx_timer.c | 5 +++++
->> =C2=A0 3 files changed, 17 insertions(+), 1 deletion(-)
->=20
-> You might want to look at Coccinelle [*] and write a spatch script to c=
-heck/fix all the codebase at once. You can find some examples in scripts/=
-coccinelle/.
+Igor has been working in his "refactor main RAM allocation to use
+hostmem backend" series, and now v4 [1] is almost reviewed.
 
-Thanks for these tips. I will pay attention.
+His raspi patch [2] clashes with my work, Since it is easier for
+him to apply his on top of mine, I am sending these patches first.
 
->=20
-> [*] http://coccinelle.lip6.fr/
->=20
+Only the 4 first patches matter regarding Igor's refactor, to
+include "Extract the RAM size from the board revision" which
+should solve the problem he has to fix in [2].
+
+I finally finished the SoC code, so can add the raspi0/1.
+Avocado tests also include to demostrate the boards work.
+I will probably move the raspi tests out of boot_linux_console.py,
+but that is another series.
+
+Latest patches NOTFORMERGE are mostly to justify this refactor,
+like the raspi0 and 1, it is easy to add a new soc/board.
+However other bcm peripherals patches need to get merged first
+(on the list but old so I need to rebase/repost them).
+
+Please review, at least up to patch 21 (before the tests).
+
+Phil.
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg675738.html
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg675752.html
+Supersedes: <20200203082619.7426-1-f4bug@amsat.org>
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg676154.html
+
+Philippe Mathieu-Daudé (30):
+  hw/arm/raspi: Use BCM2708 machine type with pre Device Tree kernels
+  hw/arm/raspi: Correct the board descriptions
+  hw/arm/raspi: Extract the version from the board revision
+  hw/arm/raspi: Extract the RAM size from the board revision
+  hw/arm/raspi: Extract the processor type from the board revision
+  hw/arm/raspi: Trivial code movement
+  hw/arm/raspi: Make machines children of abstract RaspiMachineClass
+  hw/arm/raspi: Make board_rev a field of RaspiMachineClass
+  hw/arm/raspi: Let class_init() directly call raspi_machine_init()
+  hw/arm/raspi: Set default RAM size to size encoded in board revision
+  hw/arm/raspi: Extract the board model from the board revision
+  hw/arm/raspi: Use a unique raspi_machine_class_init() method
+  hw/arm/raspi: Extract the cores count from the board revision
+  hw/arm/bcm2836: Restrict BCM283XClass declaration to C source
+  hw/arm/bcm2836: QOM'ify more by adding class_init() to each SoC type
+  hw/arm/bcm2836: Introduce BCM283XClass::core_count
+  hw/arm/bcm2836: Only provide "enabled-cpus" property to multicore SoCs
+  hw/arm/bcm2836: Split out common realize() code
+  hw/arm/bcm2836: Introduce the BCM2835 SoC
+  hw/arm/raspi: Add the Raspberry Pi Zero machine
+  hw/arm/raspi: Add the Raspberry Pi B+ machine
+  tests/acceptance/boot_linux_console: Use raspi console model as key
+  tests/acceptance/boot_linux_console: Add raspi version=2 parameter
+  tests/acceptance/boot_linux_console: Test the raspi1 console
+  tests/acceptance/boot_linux_console: Test the raspi0 console
+  python/qemu/machine: Allow to use other serial consoles than default
+  tests/acceptance/boot_linux_console: Test the raspi1 AUX console
+  tests/acceptance: Count Raspberry Pi logos displayed on framebuffer
+  hw/arm/bcm2836: Add the ARMv8 BCM2838
+  hw/arm/raspi: Add the Raspberry Pi 4
+
+ include/hw/arm/bcm2836.h               |  16 +-
+ hw/arm/bcm2836.c                       | 396 +++++++++++++++++++++----
+ hw/arm/raspi.c                         | 204 ++++++++++---
+ python/qemu/machine.py                 |  10 +-
+ tests/acceptance/boot_linux_console.py | 154 +++++++++-
+ 5 files changed, 645 insertions(+), 135 deletions(-)
+
+-- 
+2.21.1
+
 
