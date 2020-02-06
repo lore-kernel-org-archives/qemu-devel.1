@@ -2,81 +2,69 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E493BC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E91A1C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:57:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0A5D21741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:57:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAAIhqc4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0A5D21741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BF50421741
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:57:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF50421741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izgix-0007Sx-R3
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 07:57:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56629)
+	id 1izgjD-0007vu-0D
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 07:57:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <npes87184@gmail.com>) id 1izgch-0001M8-4n
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:12 -0500
+ (envelope-from <laurent@vivier.eu>) id 1izgcj-0001TJ-Tf
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <npes87184@gmail.com>) id 1izgcf-0006Qo-SU
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:10 -0500
-Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:46732)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <npes87184@gmail.com>)
- id 1izgcf-0006Ox-Nl; Thu, 06 Feb 2020 07:51:09 -0500
-Received: by mail-ua1-x943.google.com with SMTP id l6so2175806uap.13;
- Thu, 06 Feb 2020 04:51:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4wbbT3sDiLt6K5vAjXkCNh/p1shP+NEI/m2Db4svv6k=;
- b=VAAIhqc4P2DvAm+t7GmvXQpTd6MmMittXl+j67LzqyQg9voDbwzO6RXK4bTEwNnQ2A
- ggTvpLaSchwKf5LgkH1G4ZAN6A6dg28VQSaax5d8LFwFWjhWTSw24LS1Zae0ntHYrKlt
- zu/2Ypx9J2FQ1uQmK5hGzfMZXA7hxG1YeQw+agpsFynQ9egbruJTxMPXQc9dWR7L83F4
- 39tbEimQufNq8NWWo5bHSdMD8eyqJHwGsiP4DqveZxpVze3HDqwWS7LGp8KIY61rjoj/
- L+P36vhdSdq0nVHYSZeI3aa3lOZxrCtE7v7gd6RjkwrtvEVDlqzLy0JLk0ELvxcR3En1
- ekLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4wbbT3sDiLt6K5vAjXkCNh/p1shP+NEI/m2Db4svv6k=;
- b=k47esAR48PwdHrhsaVe9/ls9dk3KqW76F5G1ey5LS24u/ANLziOLBMJ8RPxmBsAKnx
- urqsJlF1CI9WRl3jG6smxph2/KkZ94ChZkeT2C8r990+9fM82AGcUsyj/36D6dfbvk9p
- Yd2rbpxHYMVF7/hI4JFODRpjtz4/DkTl+W2P5EKHRrdRPMGR/nRAYsCouNJ7Q5hNJc2f
- P2+qeZUInh+7Uv+W3o7o22k6uCqDwQU989l7x0T1wQ73brB52eCwlF5HIYzdVPHLRYP4
- COgzKbdOw8BVVq3v6AKvgvI8n1mhSeZQV/8qrrKoUJQZA3TYUPEUVEnvhZfHZtk4RBHH
- +F2g==
-X-Gm-Message-State: APjAAAUdponhMe4aJvXFqhwLl4E1XIq/jdynPr70MqTAkStKdLVZ88u/
- Z5PlTzoNY+3It6qfiRPd5gObVXiyeR6MEED8rGQ=
-X-Google-Smtp-Source: APXvYqyyZxV4WmRhj7hZQBlw17yWJWeUQOJue5UMteQhUYmWLJlaPX1e16njSoUSkHc1J1eXMejrXmjEwYnZh63g6hY=
-X-Received: by 2002:ab0:48cf:: with SMTP id y15mr1469784uac.26.1580993468739; 
- Thu, 06 Feb 2020 04:51:08 -0800 (PST)
+ (envelope-from <laurent@vivier.eu>) id 1izgci-0006Vc-GF
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:13 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:59267)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1izgca-00069v-Ju; Thu, 06 Feb 2020 07:51:05 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MFbBO-1ijmZl2BLC-00H6yf; Thu, 06 Feb 2020 13:50:39 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 04/12] hw/timer/m48t59: Convert debug printf()s to trace events
+Date: Thu,  6 Feb 2020 13:50:19 +0100
+Message-Id: <20200206125027.1926263-5-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200206125027.1926263-1-laurent@vivier.eu>
+References: <20200206125027.1926263-1-laurent@vivier.eu>
 MIME-Version: 1.0
-References: <20191206140931.14133-1-npes87184@gmail.com>
- <bd91caac-86c5-54a6-080d-37909b91a656@redhat.com>
- <548b2024-f34e-f4cd-f3b9-c4575c918cbe@redhat.com>
-In-Reply-To: <548b2024-f34e-f4cd-f3b9-c4575c918cbe@redhat.com>
-From: Yu-Chen Lin <npes87184@gmail.com>
-Date: Thu, 6 Feb 2020 20:50:32 +0800
-Message-ID: <CAPTqjH2bd4z_fgHt243Nx9CyMPO57aJY_BT8_eB3mAJ2D=avOQ@mail.gmail.com>
-Subject: Re: [PATCH] mailmap: Add entry about me
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000018b506059de7ba18"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::943
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:T8c6Xi4Oh+lSDqXyVGgojm/O13ryMV6fZe0mJQxr7lgwYwLNDL2
+ OPTrCUs1HrLJZXsg8f55CFv8TVazxhfgqjs4k40byvJbQAwisPkRO1CrjyMzDXu+lCX6XU9
+ JWWaOBO/h7ATGwQGxxdP3w3+C5hMKQ8gIZj6NFyZDS30A22B3UMJxYYvVc+iaza7O6In5LC
+ umB7pmXDBD+pIe7t2J1+A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Ttucs+vMU28=:aj4RgeUwy8Pl2AoIl83l1R
+ o+w4GX+B0ADG5h1GjCpT9XWjLHuB5kuO36Sa5QNV4LdD0DpZ0L3mm3JxSiZWFBps91aV+xnC4
+ YdsAQotUdSuwS8iUauvhn0mAg0+Mhfe6lt9h4/7/vtocLF5twX3fKwOP8S91M7wb5YIFOKpG4
+ 56bEjouLuG3WS3ba3Kz0QH1KdGp1fQIw99Y568CWp7+crG4shypkasoUbT9Es1ue9oRB/NXuo
+ XVhhQiWdBZpUmoDIWvkBOPWo/dSGijIy6wkjrz58gSSj+tjjVBLFTkT/4/mukWOQ30LkTlg04
+ lJKSTCEI9DOq5sdTPp6HgEWP7Op01nltJWCWxCdRPOwj+8yuBj9rpkw2wgkwFoozR913HHPG4
+ ESsEpFUW+AQv8HVOdZWKmtF2eB5IexrQeKaQgy4NI9f7l9Q8G81Iw62A2kd4O7SrcVIqS6hAK
+ kG/eg+3c0HUiKy2knnFoxpTIDunBIXbTEPNwk1CKKTeit5ZUA+m4P2T3BKKTTRH03XGA4r7dm
+ lkE9PksLUkbYvLKuBU5pr2KH/LwQKtggkcHVvGl9sAMPvWPkCJ7+E70VjNWAZyTKuWsRU4dEg
+ YlcZVvj3uN8vyR2bKe0LAsnGco0jo9lbg5ljloLB5sEt6/0QZ+7l5EPPkqeoONmL5iSLl89S8
+ Cv+laRz3odlHlv9aboCOi1r+axOUfguz8sP/fuGUI5IL9WWXlR96uFX0sXOIt850vp4nA2SBk
+ EmNUJhnBQ+ZGx5ho3A/DrA65LeMvbJ9TcpLAlEYQVXY2aYeC34xaEPPriGNwO68Sp+TulRQ47
+ 3v9k+HgTpUKqZbEB6tFVDvmt9c+KGnhyVWZPxM8j8UdqzIDdvZBiUemDBTPHoG5J+BhI7+O
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,139 +76,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-trivial@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ qemu-arm@nongnu.org,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000018b506059de7ba18
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Hi,
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Message-Id: <20200117165809.31067-3-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/rtc/m48t59-internal.h |  5 -----
+ hw/rtc/m48t59.c          | 11 +++++------
+ hw/rtc/trace-events      |  6 ++++++
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-Thank you for your suggestion, I will send v2 with new subject. Also, I
-will ack in v2 mail by my Synology account.
+diff --git a/hw/rtc/m48t59-internal.h b/hw/rtc/m48t59-internal.h
+index 4d4f2a6fed94..cd648241e989 100644
+--- a/hw/rtc/m48t59-internal.h
++++ b/hw/rtc/m48t59-internal.h
+@@ -26,11 +26,6 @@
+ #ifndef HW_M48T59_INTERNAL_H
+ #define HW_M48T59_INTERNAL_H
+ 
+-#define M48T59_DEBUG 0
+-
+-#define NVRAM_PRINTF(fmt, ...) do { \
+-    if (M48T59_DEBUG) { printf(fmt , ## __VA_ARGS__); } } while (0)
+-
+ /*
+  * The M48T02, M48T08 and M48T59 chips are very similar. The newer '59 has
+  * alarm and a watchdog timer and related control registers. In the
+diff --git a/hw/rtc/m48t59.c b/hw/rtc/m48t59.c
+index 1269134bcbef..47d48054fdc1 100644
+--- a/hw/rtc/m48t59.c
++++ b/hw/rtc/m48t59.c
+@@ -35,6 +35,7 @@
+ #include "exec/address-spaces.h"
+ #include "qemu/bcd.h"
+ #include "qemu/module.h"
++#include "trace.h"
+ 
+ #include "m48t59-internal.h"
+ #include "migration/vmstate.h"
+@@ -192,8 +193,7 @@ void m48t59_write(M48t59State *NVRAM, uint32_t addr, uint32_t val)
+     struct tm tm;
+     int tmp;
+ 
+-    if (addr > 0x1FF8 && addr < 0x2000)
+-	NVRAM_PRINTF("%s: 0x%08x => 0x%08x\n", __func__, addr, val);
++    trace_m48txx_nvram_mem_write(addr, val);
+ 
+     /* check for NVRAM access */
+     if ((NVRAM->model == 2 && addr < 0x7f8) ||
+@@ -450,8 +450,7 @@ uint32_t m48t59_read(M48t59State *NVRAM, uint32_t addr)
+ 	}
+         break;
+     }
+-    if (addr > 0x1FF9 && addr < 0x2000)
+-       NVRAM_PRINTF("%s: 0x%08x <= 0x%08x\n", __func__, addr, retval);
++    trace_m48txx_nvram_mem_read(addr, retval);
+ 
+     return retval;
+ }
+@@ -462,7 +461,7 @@ static void NVRAM_writeb(void *opaque, hwaddr addr, uint64_t val,
+ {
+     M48t59State *NVRAM = opaque;
+ 
+-    NVRAM_PRINTF("%s: 0x%"HWADDR_PRIx" => 0x%"PRIx64"\n", __func__, addr, val);
++    trace_m48txx_nvram_io_write(addr, val);
+     switch (addr) {
+     case 0:
+         NVRAM->addr &= ~0x00FF;
+@@ -494,7 +493,7 @@ static uint64_t NVRAM_readb(void *opaque, hwaddr addr, unsigned size)
+         retval = -1;
+         break;
+     }
+-    NVRAM_PRINTF("%s: 0x%"HWADDR_PRIx" <= 0x%08x\n", __func__, addr, retval);
++    trace_m48txx_nvram_io_read(addr, retval);
+ 
+     return retval;
+ }
+diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
+index d6749f4616a0..52c1566198e8 100644
+--- a/hw/rtc/trace-events
++++ b/hw/rtc/trace-events
+@@ -17,3 +17,9 @@ pl031_set_alarm(uint32_t ticks) "alarm set for %u ticks"
+ # aspeed-rtc.c
+ aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
+ aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
++
++# m48t59.c
++m48txx_nvram_io_read(uint64_t addr, uint64_t value) "io read addr:0x%04" PRIx64 " value:0x%02" PRIx64
++m48txx_nvram_io_write(uint64_t addr, uint64_t value) "io write addr:0x%04" PRIx64 " value:0x%02" PRIx64
++m48txx_nvram_mem_read(uint32_t addr, uint32_t value) "mem read addr:0x%04x value:0x%02x"
++m48txx_nvram_mem_write(uint32_t addr, uint32_t value) "mem write addr:0x%04x value:0x%02x"
+-- 
+2.24.1
 
-Thanks.
-
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E6=96=BC 2020=E5=B9=B42=E6=
-=9C=886=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=887:08=E5=AF=AB=E9=81=
-=93=EF=BC=9A
-
-> Hello,
->
-> I suggest changing the subject to:
-> "mailmap: Add entry for Yu-Chen Lin"
->
-> On 12/6/19 3:15 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Cc'ing qemu-trivial@
-> >
-> > On 12/6/19 3:09 PM, Yu-Chen Lin wrote:
-> >> I have two mail address, add entries for
-> >> showing author and email correctly.
-> >>
-> >> Signed-off-by: Yu-Chen Lin <npes87184@gmail.com>
-> >> ---
-> >>   .mailmap | 3 ++-
-> >>   1 file changed, 2 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/.mailmap b/.mailmap
-> >> index 3816e4effe..3fbf3902a3 100644
-> >> --- a/.mailmap
-> >> +++ b/.mailmap
-> >> @@ -151,7 +151,8 @@ Xiaoqiang Zhao <zxq_yx_007@163.com>
-> >>   Xinhua Cao <caoxinhua@huawei.com>
-> >>   Xiong Zhang <xiong.y.zhang@intel.com>
-> >>   Yin Yin <yin.yin@cs2c.com.cn>
-> >> -yuchenlin <npes87184@gmail.com>
-> >> +Yu-Chen Lin <npes87184@gmail.com>
-> >> +Yu-Chen Lin <npes87184@gmail.com> <yuchenlin@synology.com>
->
-> Apparently the mailmap process is getting stricter,
-> can you Ack-by this patch from your Synology account?
->
-> >
-> > Thanks for updating your entry in .mailmap!
-> >
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >
-> >>   YunQiang Su <syq@debian.org>
-> >>   YunQiang Su <ysu@wavecomp.com>
-> >>   Yuri Pudgorodskiy <yur@virtuozzo.com>
-> >>
->
->
-
---00000000000018b506059de7ba18
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">Hi,</div><div dir=3D"ltr"><br></div><div =
-dir=3D"ltr">Thank you for your suggestion, I will send v2 with new subject.=
- Also, I will ack in v2 mail by my=C2=A0Synology account.</div><div dir=3D"=
-ltr"><br></div><div dir=3D"ltr">Thanks.</div><div dir=3D"ltr"><br></div><di=
-v class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Philippe Math=
-ieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redhat.com</=
-a>&gt; =E6=96=BC 2020=E5=B9=B42=E6=9C=886=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=
-=B8=8B=E5=8D=887:08=E5=AF=AB=E9=81=93=EF=BC=9A<br></div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex">Hello,<br>
-<br>
-I suggest changing the subject to:<br>
-&quot;mailmap: Add entry for Yu-Chen Lin&quot;<br>
-<br>
-On 12/6/19 3:15 PM, Philippe Mathieu-Daud=C3=A9 wrote:<br>
-&gt; Cc&#39;ing qemu-trivial@<br>
-&gt; <br>
-&gt; On 12/6/19 3:09 PM, Yu-Chen Lin wrote:<br>
-&gt;&gt; I have two mail address, add entries for<br>
-&gt;&gt; showing author and email correctly.<br>
-&gt;&gt;<br>
-&gt;&gt; Signed-off-by: Yu-Chen Lin &lt;<a href=3D"mailto:npes87184@gmail.c=
-om" target=3D"_blank">npes87184@gmail.com</a>&gt;<br>
-&gt;&gt; ---<br>
-&gt;&gt; =C2=A0 .mailmap | 3 ++-<br>
-&gt;&gt; =C2=A0 1 file changed, 2 insertions(+), 1 deletion(-)<br>
-&gt;&gt;<br>
-&gt;&gt; diff --git a/.mailmap b/.mailmap<br>
-&gt;&gt; index 3816e4effe..3fbf3902a3 100644<br>
-&gt;&gt; --- a/.mailmap<br>
-&gt;&gt; +++ b/.mailmap<br>
-&gt;&gt; @@ -151,7 +151,8 @@ Xiaoqiang Zhao &lt;<a href=3D"mailto:zxq_yx_00=
-7@163.com" target=3D"_blank">zxq_yx_007@163.com</a>&gt;<br>
-&gt;&gt; =C2=A0 Xinhua Cao &lt;<a href=3D"mailto:caoxinhua@huawei.com" targ=
-et=3D"_blank">caoxinhua@huawei.com</a>&gt;<br>
-&gt;&gt; =C2=A0 Xiong Zhang &lt;<a href=3D"mailto:xiong.y.zhang@intel.com" =
-target=3D"_blank">xiong.y.zhang@intel.com</a>&gt;<br>
-&gt;&gt; =C2=A0 Yin Yin &lt;<a href=3D"mailto:yin.yin@cs2c.com.cn" target=
-=3D"_blank">yin.yin@cs2c.com.cn</a>&gt;<br>
-&gt;&gt; -yuchenlin &lt;<a href=3D"mailto:npes87184@gmail.com" target=3D"_b=
-lank">npes87184@gmail.com</a>&gt;<br>
-&gt;&gt; +Yu-Chen Lin &lt;<a href=3D"mailto:npes87184@gmail.com" target=3D"=
-_blank">npes87184@gmail.com</a>&gt;<br>
-&gt;&gt; +Yu-Chen Lin &lt;<a href=3D"mailto:npes87184@gmail.com" target=3D"=
-_blank">npes87184@gmail.com</a>&gt; &lt;<a href=3D"mailto:yuchenlin@synolog=
-y.com" target=3D"_blank">yuchenlin@synology.com</a>&gt;<br>
-<br>
-Apparently the mailmap process is getting stricter,<br>
-can you Ack-by this patch from your Synology account?<br>
-<br>
-&gt; <br>
-&gt; Thanks for updating your entry in .mailmap!<br>
-&gt; <br>
-&gt; Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@=
-redhat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-&gt; <br>
-&gt;&gt; =C2=A0 YunQiang Su &lt;<a href=3D"mailto:syq@debian.org" target=3D=
-"_blank">syq@debian.org</a>&gt;<br>
-&gt;&gt; =C2=A0 YunQiang Su &lt;<a href=3D"mailto:ysu@wavecomp.com" target=
-=3D"_blank">ysu@wavecomp.com</a>&gt;<br>
-&gt;&gt; =C2=A0 Yuri Pudgorodskiy &lt;<a href=3D"mailto:yur@virtuozzo.com" =
-target=3D"_blank">yur@virtuozzo.com</a>&gt;<br>
-&gt;&gt;<br>
-<br>
-</blockquote></div></div>
-
---00000000000018b506059de7ba18--
 
