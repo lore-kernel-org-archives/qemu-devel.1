@@ -2,97 +2,98 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB15C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 947CEC352A2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:31:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65D8421775
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:30:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6343121741
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:31:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/nu0cI6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65D8421775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bksGrADY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6343121741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iziAR-0001N2-IG
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 09:30:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54862)
+	id 1iziBe-0002jO-Hf
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 09:31:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54519)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izi8M-0006rw-5N
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:27:59 -0500
+ (envelope-from <philmd@redhat.com>) id 1izi7n-0005pL-Hn
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:27:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izi8L-0003tM-82
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:27:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47844
+ (envelope-from <philmd@redhat.com>) id 1izi7m-00029y-Fj
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:27:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41740
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izi8L-0003t9-4Q
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:27:57 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izi7m-00028w-BF
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:27:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580999276;
+ s=mimecast20190719; t=1580999242;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5lpzGvS4Evi0F0VFTfU/xDT+BFqcMUG64/th2zcOBUk=;
- b=K/nu0cI6JNF4EhEe+lG3zIyqqvKvghK0MZxaZQFI9aq0QgSmWLuKpRXNyb2Ou6X2sl5yMx
- mEZnNR555DJcwqYgVVUjyKiPr+rnfmy286CMYmBsCNPJ5DojTLxMgTP/9CsNaxf4FIzo9w
- lLpMQC2Fh/ms/J9Lu37iProztk0BT9g=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-E6nTZRTwOyq_z8cu_LXGcQ-1; Thu, 06 Feb 2020 09:27:55 -0500
-Received: by mail-wr1-f70.google.com with SMTP id u18so3439771wrn.11
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 06:27:55 -0800 (PST)
+ bh=ABMImKJyQzQvIOVlESnKU5f8sZvt1PxYGJsvRN/2Ois=;
+ b=bksGrADYwikBXILLm/W/enoLNi/xORvzp0KIqSxmRuCVwRWicj816kXc1K/LZMVaUIv6Ew
+ g8suOHNQ/tFx5q9ueqSf0H8rA5W+ytyTeQ514bFkEDTbQxas8wo99hd7s3k/1beDXg387l
+ QeW8DLlBZn1pXymIB5D8NzZil+SQyAk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-FRia5xXNMQuBeCKLgAQbcw-1; Thu, 06 Feb 2020 09:27:17 -0500
+Received: by mail-wm1-f71.google.com with SMTP id u11so48969wmb.4
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 06:27:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=c2C7Qg6sOddmcl6RMRrfTJYESyA7AnRp1mqrpD6UTrE=;
- b=G4eqfsut1pWt4lsz7q4drsqjJAPXLGZiL0JvIBTmn+dCKtkFZ6jnEjr4gM0DZcWXVF
- saBD5Ai+CHamQ4EUz2LBlxzOmiBCWZ/HRHdiWHnXYEr1r3U3RUSbhnSNGcS2FE+dzMcp
- jf6hZM6rygWHvUzQZKtpf+x9+uYHM6CqkSfNyc/W3JXFomXu2S9L9eqI5FJAJUjv79nc
- n1q/EWy4lr1whdCSYtxRW2yDZ7PiZai4ldyQ762CtN1jHyZFtIraI08fIZ+VLRqQi+cj
- S9kokocwm4208A+VCFruBSjpaQ+WIFie8xfMh2o81dCu+/YPzOBwraQONowxV3Db6x24
- WCJA==
-X-Gm-Message-State: APjAAAUz17EkOssmJFPIHqqLOkUt/+xLYaus425E0WzgEltVA6rFpuDs
- cnOAnXNX5z9jNI1g5wlZq/ZEu2xDi8C2J+81ayrrKtAKSNhNWN7Xogim34PYkS5PS7wdhCmK+Xh
- wFb8RRNFSNdCGppQ=
-X-Received: by 2002:adf:f244:: with SMTP id b4mr3951842wrp.88.1580999270781;
- Thu, 06 Feb 2020 06:27:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwFIgz3GlX98gHIsDJfVVxYyGwc5U/v2TEsVuDvflGURTfjNYcBVCnw3ujT+rX1boT5xOEFSA==
-X-Received: by 2002:adf:f244:: with SMTP id b4mr3951824wrp.88.1580999270615;
- Thu, 06 Feb 2020 06:27:50 -0800 (PST)
+ bh=qvtAoDfnX633x4W6mvZaQHfQIKRnmpQGQ5cOySK7fKU=;
+ b=CW2GgKj0h/o4omyoYjF3hmxNG/frTrCCz8z91MzRsrTvi0dVzXhEOSGE0HtgKUdjlf
+ gvAEZiLAcPfOuwdwtv3qpWmFgcyX9QxL2MEjNbdAsmhwe1HwyfgpYoL9V6Ev9onestvV
+ 0FbRRlR5CzYWtBwhKfZ8KkauWAEcepnJzDfYPuD8xdTD7lYOHLMlm2ZvEeNP6ac8fgO+
+ B7mbZivGhDLbDXLb2tnRKy5h2V+H+fSq50DEttxf9q7DddO39V7w81xwE/T2FEWBT4RL
+ 3cPQGiMe20pRX5IzuxWd2hJXuSusjuVOQMfy4/fB2vm71aaBEVyCfjMdjOvm7MsEe63t
+ ZpLg==
+X-Gm-Message-State: APjAAAU/tHxxE123mhgIClR79rmIuORGdGYOkFlj0uX56d+rGQPbmosF
+ PgRlTnmb67AV/wJR9/Xd4piPwZZeZfscdo0l5NuNYyEhssZCPraxzXZdDMU6YrDhZeupy6cOG6z
+ by1IVEh5QKBihYNQ=
+X-Received: by 2002:adf:fd0e:: with SMTP id e14mr4042186wrr.127.1580999235953; 
+ Thu, 06 Feb 2020 06:27:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxggTcVGe3ZPrLpBkGb+RJ2AHYeBntZPZukw54qmuiko7cV7jS50aK9eltfoXPnOkaa7jhoFA==
+X-Received: by 2002:adf:fd0e:: with SMTP id e14mr4042154wrr.127.1580999235644; 
+ Thu, 06 Feb 2020 06:27:15 -0800 (PST)
 Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id y17sm4331770wrs.82.2020.02.06.06.27.49
+ by smtp.gmail.com with ESMTPSA id n3sm4197237wrs.8.2020.02.06.06.27.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 06:27:50 -0800 (PST)
-Subject: Re: [PATCH v2 3/6] travis.yml: install rpm2cpio for acceptance tests
+ Thu, 06 Feb 2020 06:27:15 -0800 (PST)
+Subject: Re: [PATCH v2 4/6] tests/boot_linux_console: add extract_from_rpm
+ method
 To: Liam Merwick <liam.merwick@oracle.com>, alex.bennee@linaro.org,
  fam@euphon.net
 References: <1580914565-19675-1-git-send-email-liam.merwick@oracle.com>
- <1580914565-19675-4-git-send-email-liam.merwick@oracle.com>
+ <1580914565-19675-5-git-send-email-liam.merwick@oracle.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ed96f242-44cd-a846-be06-971db6e7ef1d@redhat.com>
-Date: Thu, 6 Feb 2020 15:27:49 +0100
+Message-ID: <c7403e08-e18e-c914-b9b3-1de158cc5fca@redhat.com>
+Date: Thu, 6 Feb 2020 15:27:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <1580914565-19675-4-git-send-email-liam.merwick@oracle.com>
+In-Reply-To: <1580914565-19675-5-git-send-email-liam.merwick@oracle.com>
 Content-Language: en-US
-X-MC-Unique: E6nTZRTwOyq_z8cu_LXGcQ-1
+X-MC-Unique: FRia5xXNMQuBeCKLgAQbcw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -115,29 +116,50 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 2/5/20 3:56 PM, Liam Merwick wrote:
-> The extract_from_rpm() method added for the PVH acceptance tests needs
-> rpm2cpio to extract a vmlinux binary from an RPM.
+> Add a method to extract a specified file from an RPM to the test's
+> working directory and return the path to the extracted file.
 >=20
 > Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
 > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->   .travis.yml | 1 +
->   1 file changed, 1 insertion(+)
+>   tests/acceptance/boot_linux_console.py | 16 ++++++++++++++++
+>   1 file changed, 16 insertions(+)
 >=20
-> diff --git a/.travis.yml b/.travis.yml
-> index 3b35b7cf04d3..59773365823e 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -323,6 +323,7 @@ matrix:
->               - python3-pil
->               - python3-pip
->               - python3.5-venv
-> +            - rpm2cpio
->               - tesseract-ocr
->               - tesseract-ocr-eng
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+> index e9375590bc1c..6a473363a122 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -51,6 +51,22 @@ class BootLinuxConsole(Test):
+>           os.chdir(cwd)
+>           return self.workdir + path
 >  =20
+> +    def extract_from_rpm(self, rpm, path):
+> +        """
+> +        Extracts a file from an RPM package into the test workdir.
+> +
+> +        :param rpm: path to the rpm archive
+> +        :param path: path within the rpm archive of the file to be extra=
+cted
+> +                     needs to be a relative path (starting with './') be=
+cause
+> +                     cpio(1), which is used to extract the file, expects=
+ that.
+> +        :returns: path of the extracted file
+> +        """
+> +        cwd =3D os.getcwd()
+> +        os.chdir(self.workdir)
+> +        process.run("rpm2cpio %s | cpio -id %s" % (rpm, path), shell=3DT=
+rue)
+> +        os.chdir(cwd)
+> +        return os.path.normpath(os.path.join(self.workdir, path))
+> +
+>       def do_test_x86_64_machine(self):
+>           """
+>           Common routine to boot an x86_64 guest.
 >=20
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
