@@ -2,69 +2,68 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B635C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E1FC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:53:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00ADB214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E55EA20658
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:53:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ABb6FFkX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00ADB214AF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XkAe5Pl0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E55EA20658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izekL-0007pZ-64
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:50:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46932)
+	id 1izenF-0002A7-0p
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:53:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1izejS-0007Dr-KZ
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:50:03 -0500
+ (envelope-from <mreitz@redhat.com>) id 1izemW-0001NC-Ir
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:53:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1izejQ-0000iy-F3
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:50:02 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59844
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1izemV-00086B-FE
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:53:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56119
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izejQ-0000dD-9c
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:50:00 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izemV-0007xY-9C
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:53:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580986199;
+ s=mimecast20190719; t=1580986390;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ff/1FnPSDtp1EF8TZ3rUr8UHa1T0UTZ4hOsHAD3Qmyg=;
- b=ABb6FFkXFtHPILiLDM+C0cNyv89qsDBj159eZO3Un55+wH8S97YOeGxNyrKDVhhFud489h
- ymvNI2QJRhl7vlSIuwLA08Z1EmCwjD/RrlYnyw9Kgr6NgcmHM3I0rxI7Jb5ZQrkg+Mamj+
- KWl/W4FjXFBhHCCPCI0SFTjTFA92U8Y=
+ bh=uUnNGxogZxzisRMRmmFW5rBzmzoonBlsYRsk7dCVXnc=;
+ b=XkAe5Pl02SAWSGGR3RpzpqWHBaE9tApmeSAhs8gLOcet3ZdNaeZIMfS+GgIzvIASCNEEl0
+ gYNS3dQEZ/x5tzRo6PWlgdS1K9zX89ubSob00M+NC6D9/Q2bOJRbbdxNxTNDHUE1wM9u15
+ xfd40drGQhntbFoDZGjxExYMx7pdR0A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-163-c4-Bm69lNXWZb1WqrrxMJg-1; Thu, 06 Feb 2020 05:49:55 -0500
-X-MC-Unique: c4-Bm69lNXWZb1WqrrxMJg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-420-ggKNeXYSPhuJDHtrZF63ag-1; Thu, 06 Feb 2020 05:53:06 -0500
+X-MC-Unique: ggKNeXYSPhuJDHtrZF63ag-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 671DD800D54;
- Thu,  6 Feb 2020 10:49:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62EBF107B768;
+ Thu,  6 Feb 2020 10:53:05 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.36.118.15])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A80984DB4;
- Thu,  6 Feb 2020 10:49:52 +0000 (UTC)
-Subject: Re: [PATCH v2 03/33] block: Add BdrvChildRole
-From: Max Reitz <mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DF725DA7D;
+ Thu,  6 Feb 2020 10:53:03 +0000 (UTC)
+Subject: Re: [PATCH v2 04/33] block: Add BdrvChildRole to BdrvChild
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20200204170848.614480-1-mreitz@redhat.com>
- <20200204170848.614480-4-mreitz@redhat.com>
- <ab321260-f03c-2540-e443-9b1f066f819f@redhat.com>
- <f566b3d0-fe94-3e83-1d96-8d90324d5317@redhat.com>
+ <20200204170848.614480-5-mreitz@redhat.com>
+ <3113019f-797f-fe89-abbd-280bbddded31@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
  /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
@@ -89,21 +88,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f00b4c3b-2034-230a-376b-5b8b41a5a7a7@redhat.com>
-Date: Thu, 6 Feb 2020 11:49:51 +0100
+Message-ID: <61ad1ad4-e118-c92c-bbe2-cdd03d02a8d8@redhat.com>
+Date: Thu, 6 Feb 2020 11:53:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <f566b3d0-fe94-3e83-1d96-8d90324d5317@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <3113019f-797f-fe89-abbd-280bbddded31@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="DMkFMBcYP0AOy5YC9YRCXDMbv7bqEzByL"
+ boundary="t7lVMFJHsI9fnhDcMjCHzgCnSkRTYJ3x4"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,101 +120,93 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DMkFMBcYP0AOy5YC9YRCXDMbv7bqEzByL
-Content-Type: multipart/mixed; boundary="9LrJ2JzGdiQTKcjxE6hnwGSZlcSUX4W2u"
+--t7lVMFJHsI9fnhDcMjCHzgCnSkRTYJ3x4
+Content-Type: multipart/mixed; boundary="d5MZuXPrCRgOGL9c5ZOiMuNdOELT9P3el"
 
---9LrJ2JzGdiQTKcjxE6hnwGSZlcSUX4W2u
+--d5MZuXPrCRgOGL9c5ZOiMuNdOELT9P3el
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 06.02.20 11:47, Max Reitz wrote:
-> On 05.02.20 16:24, Eric Blake wrote:
->> On 2/4/20 11:08 AM, Max Reitz wrote:
->>> This enum will supplement BdrvChildClass when it comes to what role (or
->>> combination of roles) a child takes for its parent.
->>>
->>> Because empty enums are not allowed, let us just start with it filled.
->>>
->>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>> ---
->>> =C2=A0 include/block/block.h | 27 +++++++++++++++++++++++++++
->>> =C2=A0 1 file changed, 27 insertions(+)
->>>
->>> diff --git a/include/block/block.h b/include/block/block.h
->>> index 38963ef203..0f7e8caa5b 100644
->>> --- a/include/block/block.h
->>> +++ b/include/block/block.h
->>> @@ -279,6 +279,33 @@ enum {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DEFAULT_PERM_UNCHANGED=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 =3D BLK_PERM_ALL &
->>> ~DEFAULT_PERM_PASSTHROUGH,
->>> =C2=A0 };
->>> =C2=A0 +typedef enum BdrvChildRole {
->>> +=C2=A0=C2=A0=C2=A0 /* Child stores data */
->>> +=C2=A0=C2=A0=C2=A0 BDRV_CHILD_DATA=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 =3D (1 << 0),
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /* Child stores metadata */
->>> +=C2=A0=C2=A0=C2=A0 BDRV_CHILD_METADATA=C2=A0=C2=A0=C2=A0=C2=A0 =3D (1 =
-<< 1),
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /* Filtered child */
->>> +=C2=A0=C2=A0=C2=A0 BDRV_CHILD_FILTERED=C2=A0=C2=A0=C2=A0=C2=A0 =3D (1 =
-<< 2),
+On 05.02.20 16:33, Eric Blake wrote:
+> On 2/4/20 11:08 AM, Max Reitz wrote:
+>> For now, it is always set to 0.=C2=A0 Later patches in this series will
+>> ensure that all callers pass an appropriate combination of flags.
+>=20
+> Sneaky - this re-adds the field you dropped as part of a rename in 2/33.
+> =C2=A0Anyone doing backport had better be aware that they would need this
+> whole series, rather than cherry-picking later patches without the
+> earlier ones.=C2=A0 But that observation does not affect the patch validi=
+ty.
+>=20
 >>
->> I'm not sure this comment does justice for what the flag represents, but
->> am not sure of what longer comment to put in its place.
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
 >=20
-> You=E2=80=99re right.  I thought I could just rely on our .is_filter
-> documentation (at least after
-> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg01721.html),
-> but that doesn=E2=80=99t really apply here.
+>> +++ b/block.c
+>> @@ -2381,6 +2381,7 @@ static void bdrv_replace_child(BdrvChild *child,
+>> BlockDriverState *new_bs)
+>> =C2=A0 BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char =
+*child_name,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const BdrvC=
+hildClass *child_class,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BdrvChildRole child_=
+role,
 >=20
-> For example, this series makes raw (without further parameters) have a
-> CHILD_FILTERED child, without raw being a filter itself.
->=20
-> So there should indeed be some definition here.
->=20
-> Maybe:
->=20
-> A child to which the parent forwards all reads and writes.  Therefore,
-> this child presents exactly the same visible data as the parent.
+> Hmm - C is loose enough to allow the declaration of a parameter as an
+> enum type even when its intended usage is to receive a bitwise-or
+> derived from that enum but not declared in the enum.=C2=A0 For example, i=
+f I
+> understand intent correctly, a caller might pass in 0x3
+> (BDRV_CHILD_DATA|BDRV_CHILD_METADATA) which does NOT appear in
+> BdrvChildRole.=C2=A0 It feels like it might be cleaner to document the
+> interface as taking an unsigned int (although then you've lost the
+> documentation that the int is derived from BdrvChildRole), than to abuse
+> the typesystem to pass values that are not BdrvChildRole through the
+> parameter.
 
-On second thought, the =E2=80=9Ctherefore=E2=80=9D is wrong, because the fi=
-rst sentence
-applies to quorum, but the logical conclusion does not.
+I don=E2=80=99t necessarily disagree, but we have pre-existing examples of =
+such
+abuse, like BdrvRequestFlags.
 
-So maybe rather:
+The advantage of using BdrvChildRole as a type here is to show that we
+expect values from that enum.  I personally prefer that.
 
-A child to which the parent forwards all reads and writes.  It must
-present exactly the same visible data as the parent.
-Any node may have at most one filtered child at a time.
-
-?
+I mean, we could do something else entirely and name the enum
+=E2=80=9CBdrvChildRoleBits=E2=80=9D and add a =E2=80=9Ctypedef unsigned int=
+ BdrvChildRole;=E2=80=9D.  I
+don=E2=80=99t think we=E2=80=99ve ever done that before but maybe it=E2=80=
+=99d be the cleanest way?
 
 Max
 
 
---9LrJ2JzGdiQTKcjxE6hnwGSZlcSUX4W2u--
+--d5MZuXPrCRgOGL9c5ZOiMuNdOELT9P3el--
 
---DMkFMBcYP0AOy5YC9YRCXDMbv7bqEzByL
+--t7lVMFJHsI9fnhDcMjCHzgCnSkRTYJ3x4
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl47708ACgkQ9AfbAGHV
-z0AcLAgAr3pVFGiklIHTE0nh7BjeED3q+pJVLUs5BFjXhmreTjLmQ/tvmDCVAghw
-CHuvTerdPyIdK8JNYJnuQBTR+9tWnur61z1PDgcQhYFZ8ax4qp06EbHfrXW0ijp3
-CbkHeoGZZkxxoqQnOI+fiXNFnEG6oR29+miWA1atmfN/xG0cbqfIMSrAxR40+Jec
-3Bli5/j1So8DPEhzAIUuUndNyOUDuKefzEJ0YkvaQTQXMFW0j5fhJTs9tb/ubTlN
-79HsVdoV/fOdUPeqq1WZuq8H1pDFTIUAtn3rF5W9iLBmg1HTW2g3fngJ9rtn199H
-Dipv/Q2yF6kvNWKg+aWVzo7tByfjiQ==
-=aOjo
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl478A4ACgkQ9AfbAGHV
+z0Ab5QgAuLez/ZdVWt8IJQf0ymciu4cYx13JreSKLVxDtPqWngFeionl93UpcHte
+6EUPBUNupA9g/4865S8k2rpfpd7KfTMd2qG3+D8k8mKm89DLoZLQAEnKzV2xNRG5
+i7S9DRwfkHQITELKmdIeSSfYdv2LijIDmQRC1kdbLAZJlT1eXAqNrFxlBlewSDNq
+FUuAzUdNgKxzEJzQoDvtGLSepIKJJlQKuqMlnwVxy8YCt1LJ/+YNgwnk+Aze2m7O
+tWxHND1tIlf/VEi+z8zlnmSB71TJSF+9C+5CHlK3qjaW/ULJpf1Nl5UGQlxA63Gm
+U448j9pOdo0WzazIN1xJIHpa+gpeeg==
+=j6qT
 -----END PGP SIGNATURE-----
 
---DMkFMBcYP0AOy5YC9YRCXDMbv7bqEzByL--
+--t7lVMFJHsI9fnhDcMjCHzgCnSkRTYJ3x4--
 
 
