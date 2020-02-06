@@ -2,46 +2,45 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C25DC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 09:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 857B2C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 09:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6068F214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 09:48:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6068F214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 5B28320838
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 09:52:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B28320838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izdmI-0006I0-HO
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 04:48:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60692)
+	id 1izdqA-000085-HR
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 04:52:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42944)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1izdka-0004qf-LM
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:47:14 -0500
+ (envelope-from <laurent@vivier.eu>) id 1izdpR-00083r-1D
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:52:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1izdkR-0005QO-Qz
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:47:03 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:46301)
+ (envelope-from <laurent@vivier.eu>) id 1izdpN-0007xh-1u
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:52:08 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:59699)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1izdkM-00055n-6K; Thu, 06 Feb 2020 04:46:54 -0500
+ id 1izdpM-0007dR-NN; Thu, 06 Feb 2020 04:52:04 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N4yJ8-1jiV6j3gkm-010tiB; Thu, 06 Feb 2020 10:46:50 +0100
-Subject: Re: [EXTERNAL] Re: [PATCH] MAINTAINERS: update Leif Lindholm's address
-To: Leif Lindholm <leif@nuviainc.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200116174226.4780-1-leif@nuviainc.com>
- <a2fc8a4f-0b56-7868-0e52-51c2abfd97f7@redhat.com>
- <20200117131801.GI15141@bivouac.eciton.net>
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MBE3k-1ipAmU1YRa-00CiFf; Thu, 06 Feb 2020 10:52:00 +0100
+Subject: Re: [PATCH v3 2/2] hw/timer/m48t59: Convert debug printf()s to trace
+ events
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+References: <20200117165809.31067-1-philmd@redhat.com>
+ <20200117165809.31067-3-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -85,34 +84,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <4ba5872b-f5b2-4c9e-e326-bba6ebb5e58d@vivier.eu>
-Date: Thu, 6 Feb 2020 10:46:48 +0100
+Message-ID: <266f5004-8245-9a37-34a0-d3bebadf6ef7@vivier.eu>
+Date: Thu, 6 Feb 2020 10:51:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200117131801.GI15141@bivouac.eciton.net>
+In-Reply-To: <20200117165809.31067-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:h1eBbslxj2PhRSy86s1GVveEKLHK36Vhg8hp3pPfWMyNh382zMJ
- /KxL6QEOJBx5ClWmBWeygU22QRcGkmetioQq7fAY09ygdIjc1vBIbOn3Vh+6iiwm7rF5fwT
- 6aVdSROen7OjrV+++ZHXQWnYiRALaGgMf4HCYbFmftmVJViBCXHCZloyP+RU3q4eBSP67/u
- 7mE3376IW/sqRkUqGhq4g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Q1Vlo0iHVXw=:KOYeNj4vEueQSX39OBLFgk
- 0nSmVJNSEPJ3gi65Orp4iOQQJA5HKu9PS8bsT53uxvy9uTfJCWRuMfnfGpkShjbssE16BkVWh
- 5bVmsFMGAQVc12UCGnX9tFmuhKVJjflgkVui0OV35BFMnGWZyveQe/n/Mz5N9CMWTxrG1HnQ6
- PulUBLdFQBCUIxt/kiCMtqKleUnf3QZroswOm2YFZcIv1x1oju2CFw2V8wn7RP/Lv46NUtC6i
- lguXdExa7JwEtIyUUog/v2P60El13xO0Y29Un6tYhejo+p2/JA3Pz4jqCzkUq4/+lmdH0QtAd
- UnnX0qOCnxOyyLsx8ZqfwLb92pjwcc7wqPJ6kuSN7yLl4q4YV2ZdOyTme21kyNr9/W6S/Itls
- f9sLfbpCdpd1TFfJva/+2NYs5RcBt5XpDtIlCD7bJMZ+2pkSMAe1jO/14uzZEakGXiCnmzj0z
- XmyKVCkg0zGX69TA8iFx2p2zb1oj2hf32S6W3BaS0EbD0aKx8rHBe08FHUFI62CxlrQpWoOMA
- mJiaAUZtm1HRZ60BlWovyXWkkaGRcMlMcSgJuXqfIAUB2Ua9HeejFu/cCAl9W4C21QLBAqgrh
- MBiWWJa14gpuABL97k73aL8K9yzv3lL5M4MiyyTGVQbAQihHtiPFMqW5+H5lbWPNzr7bCRbZp
- 1gtjK9oHdSM8cthUICYVg8jmaSW86AnZlBVlF2HsGctdn/wRZ3xr4ET/wq8N+SE6KxMCuCpzr
- igjinDu9oraUTM+5JKaiuLz+anPnOzTO3/8yqx7n3THepEojARoJOW9z/ACq8cJ++zNLavwYl
- JJBZcDPSg3dlAtvk2cn7H8BNSnO5mAuoWPpDzCyXnTEOVV7xzPqmoPdXs2sz+fLL36ku5F0
+X-Provags-ID: V03:K1:JIpKapatKnxrDxKA0o/8c1XZ9p8SqRTzo5aacvKk+Pu7LyaRmfx
+ nqPYuE/B/OCwDGD1fi+WXIKhZI5woSnjwIkbIPRnh3OHrHXMmq0oFfBp5tCefsfpBPrjXEt
+ kgtl+HLe2ny7xw2rpJdUBaDYQpj02O8e8UQUiKQHbPSgqibrEaxmPzbmEW3wgG+6ounUFyq
+ oxKXZnEInqHMNl3rzBkyg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:DeeSZEVBDyk=:KWuv5EFtOh2xs8CJP3E0s0
+ DEPcsArrCosAx/8CvZOxCZGkgg1zMv/zdmACzHJaXx+l8gvBl9xEFpqgKothMzXXLmMP0oNSJ
+ dm0Rf9/Lvfp5M6ITT8TqOzr9zOOmCo0nJaZaV+aiJKVkQvqMWpiHn33soKsHqh2c+lmS3mAvI
+ 2N+Vcniu5ULhpx6R4ccBRNs9KM4Idt04KubTfiBDF1zQwEO5Ir47mWCDXKSfIazDNgE01oWei
+ LluvFKvd9kRDtO3zpSwgWXbzb2J/NMq7r1kpsqTG973hIBliTnap++ESwobc0mr6Uixudx326
+ DEYHrJnlmbezlVec9wjTaw9/4P2OBJtrjIKYvtMX9/u7iix4jdS1qdDD2WGl7pUzzOClqnkUV
+ oiUNatwIhF6demk4W68CBMR8rZmErSAtrdjj+H0oDdQNpOAj6mR31SjGax2jtNkmtfFvBiLi1
+ vNCksol0RpsXRAgAuEZNp/Rs/D0O/+BJNDImIWqELZgm3yC+tgWQCFo4NSh/GRL4egmBgAn8T
+ /smzSCepYYrHhzhmoEvwbBMg8uv5D0oVL+J/RT6f9i26YmL3Bol93hTYRWArICAqzqQQzQEEs
+ M4zWUw21hq/VVpZUKQ0vJ2cvEGxgM/DRrhO5jVC2Vp9y1YJZTOKMQIrBRv4wWdIm3cp3LBtGK
+ OX6rHZobfEn9ak+EyX2I9PNrnTdue5i9rmJZpMOLmHUsmDnn42lBSMRAXsuG1fUinPv2ZCQUu
+ hh+Bw2u+wEkSdE+b4uSNVaUAKc13N4qUor3tMQnaT91XVM/P/BrFOHSxb9CJ1CnkEc/YD2YOn
+ QNIkzr5Fto77POnRPI9vZX4JxpO2QW6ikH5a9NKY6fzAJUMQ1MxOsm3+YNpw8i44AT7F9Fl
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,74 +123,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- QEMU Trivial <qemu-trivial@nongnu.org>, qemu-devel@nongnu.org,
- Leif Lindholm <leif.lindholm@linaro.org>, qemu-arm@nongnu.org
+Cc: qemu-ppc@nongnu.org,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 17/01/2020 à 14:18, Leif Lindholm a écrit :
-> On Thu, Jan 16, 2020 at 19:25:52 +0100, Philippe Mathieu-Daudé wrote:
->> On 1/16/20 6:42 PM, Leif Lindholm wrote:
->>> Update address to reflect new employer.
->>>
->>> Signed-off-by: Leif Lindholm <leif@nuviainc.com>
->>> ---
->>>   MAINTAINERS | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 483edfbc0b..3c8653f26f 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -735,7 +735,7 @@ F: include/hw/ssi/imx_spi.h
->>>   SBSA-REF
->>>   M: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
->>>   M: Peter Maydell <peter.maydell@linaro.org>
->>> -R: Leif Lindholm <leif.lindholm@linaro.org>
->>> +R: Leif Lindholm <leif@nuviainc.com>
->>>   L: qemu-arm@nongnu.org
->>>   S: Maintained
->>>   F: hw/arm/sbsa-ref.c
->>>
->>
->> You might want to add yourself a .mailmap entry too:
->>
->> -- >8 --
->> diff --git a/.mailmap b/.mailmap
->> index 3816e4effe..a521c17b44 100644
->> --- a/.mailmap
->> +++ b/.mailmap
->> @@ -44,6 +44,7 @@ Aleksandar Markovic <amarkovic@wavecomp.com>
->> <aleksandar.markovic@imgtec.com>
->>  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com> <arikalo@wavecomp.com>
->>  Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori
->> <aliguori@us.ibm.com>
->>  James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
->> +Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
->>  Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
->>  Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
->>  Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
->> ---
+Le 17/01/2020 à 17:58, Philippe Mathieu-Daudé a écrit :
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/rtc/m48t59-internal.h |  5 -----
+>  hw/rtc/m48t59.c          | 11 +++++------
+>  hw/rtc/trace-events      |  6 ++++++
+>  3 files changed, 11 insertions(+), 11 deletions(-)
 > 
-> If that use of .mailmap is common for QEMU, that sounds like a good
-> idea. And the comment for that section of the file indeed suggests so,
-> so thanks!
-> 
->>
->> If you ack this snippet maybe a maintainer is willing to amend it to your
->> patch :)
->>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> Acked-by: Leif Lindholm <leif@nuviainc.com>
-> (The other guy agrees.)
+> diff --git a/hw/rtc/m48t59-internal.h b/hw/rtc/m48t59-internal.h
+> index 4d4f2a6fed..cd648241e9 100644
+> --- a/hw/rtc/m48t59-internal.h
+> +++ b/hw/rtc/m48t59-internal.h
+> @@ -26,11 +26,6 @@
+>  #ifndef HW_M48T59_INTERNAL_H
+>  #define HW_M48T59_INTERNAL_H
+>  
+> -#define M48T59_DEBUG 0
+> -
+> -#define NVRAM_PRINTF(fmt, ...) do { \
+> -    if (M48T59_DEBUG) { printf(fmt , ## __VA_ARGS__); } } while (0)
+> -
+>  /*
+>   * The M48T02, M48T08 and M48T59 chips are very similar. The newer '59 has
+>   * alarm and a watchdog timer and related control registers. In the
+> diff --git a/hw/rtc/m48t59.c b/hw/rtc/m48t59.c
+> index fc592b9fb1..ecc92ca476 100644
+> --- a/hw/rtc/m48t59.c
+> +++ b/hw/rtc/m48t59.c
+> @@ -35,6 +35,7 @@
+>  #include "exec/address-spaces.h"
+>  #include "qemu/bcd.h"
+>  #include "qemu/module.h"
+> +#include "trace.h"
+>  
+>  #include "m48t59-internal.h"
+>  #include "migration/vmstate.h"
+> @@ -192,8 +193,7 @@ void m48t59_write(M48t59State *NVRAM, uint32_t addr, uint32_t val)
+>      struct tm tm;
+>      int tmp;
+>  
+> -    if (addr > 0x1FF8 && addr < 0x2000)
+> -	NVRAM_PRINTF("%s: 0x%08x => 0x%08x\n", __func__, addr, val);
+> +    trace_m48txx_nvram_mem_write(addr, val);
+>  
+>      /* check for NVRAM access */
+>      if ((NVRAM->model == 2 && addr < 0x7f8) ||
+> @@ -450,8 +450,7 @@ uint32_t m48t59_read(M48t59State *NVRAM, uint32_t addr)
+>  	}
+>          break;
+>      }
+> -    if (addr > 0x1FF9 && addr < 0x2000)
+> -       NVRAM_PRINTF("%s: 0x%08x <= 0x%08x\n", __func__, addr, retval);
+> +    trace_m48txx_nvram_mem_read(addr, retval);
+>  
+>      return retval;
+>  }
+> @@ -462,7 +461,7 @@ static void NVRAM_writeb(void *opaque, hwaddr addr, uint64_t val,
+>  {
+>      M48t59State *NVRAM = opaque;
+>  
+> -    NVRAM_PRINTF("%s: 0x%"HWADDR_PRIx" => 0x%"PRIx64"\n", __func__, addr, val);
+> +    trace_m48txx_nvram_io_write(addr, val);
+>      switch (addr) {
+>      case 0:
+>          NVRAM->addr &= ~0x00FF;
+> @@ -494,7 +493,7 @@ static uint64_t NVRAM_readb(void *opaque, hwaddr addr, unsigned size)
+>          retval = -1;
+>          break;
+>      }
+> -    NVRAM_PRINTF("%s: 0x%"HWADDR_PRIx" <= 0x%08x\n", __func__, addr, retval);
+> +    trace_m48txx_nvram_io_read(addr, retval);
+>  
+>      return retval;
+>  }
+> diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
+> index d6749f4616..52c1566198 100644
+> --- a/hw/rtc/trace-events
+> +++ b/hw/rtc/trace-events
+> @@ -17,3 +17,9 @@ pl031_set_alarm(uint32_t ticks) "alarm set for %u ticks"
+>  # aspeed-rtc.c
+>  aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
+>  aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " value 0x%08" PRIx64
+> +
+> +# m48t59.c
+> +m48txx_nvram_io_read(uint64_t addr, uint64_t value) "io read addr:0x%04" PRIx64 " value:0x%02" PRIx64
+> +m48txx_nvram_io_write(uint64_t addr, uint64_t value) "io write addr:0x%04" PRIx64 " value:0x%02" PRIx64
+> +m48txx_nvram_mem_read(uint32_t addr, uint32_t value) "mem read addr:0x%04x value:0x%02x"
+> +m48txx_nvram_mem_write(uint32_t addr, uint32_t value) "mem write addr:0x%04x value:0x%02x"
 > 
 
-Applied to my trivial-patches branch, including .mailmap changes.
+Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
