@@ -2,101 +2,88 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD96C35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 20:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08822C35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:01:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CD4A21775
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 20:37:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFAA720720
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:01:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cE5l5mIX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CD4A21775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BlIIyEdC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFAA720720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iznu3-0003xN-E0
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 15:37:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48670)
+	id 1izoGi-0006iq-Sr
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 16:01:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izntU-0003Lh-K1
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:37:01 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1izoFn-000625-CO
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:00:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izntT-0005zH-M9
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:37:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43704
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <ehabkost@redhat.com>) id 1izoFk-0002kj-MF
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:00:02 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25551
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izntT-0005yh-J3
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:36:59 -0500
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1izoFk-0002jp-AC
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:00:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581021418;
+ s=mimecast20190719; t=1581022799;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=i3/QIxY9a4hGMUCO6ojEHPC6gW4y7NH0vxDHvs1NOo8=;
- b=cE5l5mIX9jKnG3fbRkJjskb1ChBruhzDQIyG7tCqtRriwOQ+oguqQGFMgDh0XsS3dgLYlP
- dv1eqFMfCMKFZgU7uY/BAnaMDBWDjh70bpftLYlg5ijunreb1YfhsCRRHMCn1W1WnVED+U
- BZoRtuYvSsdqAf2M2xLJ/O56TKLgFQQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-c0GQufzIPuiz35SirUMNpw-1; Thu, 06 Feb 2020 15:36:55 -0500
-Received: by mail-wm1-f71.google.com with SMTP id z7so609797wmi.0
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 12:36:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tDKxNiUakhkYL3yyLRKv4nW3ZKHDpH2FL/0Cbl5X/2c=;
- b=cOv013foeojCvD/F1ibRGRGDOMfy79QwrppcBS4rCe8TPKHIni3YFV8pCbHczrlGbq
- m7ea2H5xtoRhZOGIfoM1R5m9aUHG41xWah1CcsdJJfv35igETrXHNTJrsVpZdxPpnLa4
- 3iJ2qpbnGyReDcJen11i066FaukRFiTWGgsc3E9MoQuvHKqHgnBugKNUdj/DmmCLkqgm
- lSF69YY+/5mmafAQHfoT9TssQlEkq4pvu/a7rAwtkLAOzSBWiHOBBvYO2Xal6yDX5Fb+
- DSR/c47k5SBTz7lGP5zblySDhtTUxYkVoXVml1SAyQJh9nxegWTwde2oNbpzrffp7a8f
- mLOg==
-X-Gm-Message-State: APjAAAVvu4yxQjkZZ1P5DOohPVHBp6MTssljl3wFca4QghMXwDpvJ3cy
- EVqlor5uTP9/mHdW3SFPQ2KsQK0wCV1D5nVd73TAiskh9fOz3auSoY3tsvlHCJH41MwlF/OIBtF
- b1TjKcq8Dazo3D2Q=
-X-Received: by 2002:a1c:bdc5:: with SMTP id n188mr6484216wmf.124.1581021413753; 
- Thu, 06 Feb 2020 12:36:53 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwvrptNMOj6WMv/c38sGWTKZgvIPl7fEb3YY+AOdnvgjKdXYpD7bNLFnmusYP9Le6ec3FN7Wg==
-X-Received: by 2002:a1c:bdc5:: with SMTP id n188mr6484188wmf.124.1581021413419; 
- Thu, 06 Feb 2020 12:36:53 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id s16sm514636wrn.78.2020.02.06.12.36.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 12:36:52 -0800 (PST)
-Subject: Re: [PATCH v2 17/29] tests/acceptance/virtio_check_params: Improve
- exception logging
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20200129212345.20547-1-philmd@redhat.com>
- <20200129212345.20547-18-philmd@redhat.com>
- <20200206195441.GA412524@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <41dbf2d1-0c38-f483-fdc6-815015f1649d@redhat.com>
-Date: Thu, 6 Feb 2020 21:36:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=FKX/+/+HxxYqV6WWrevhNixSWrPTRBtEhzMwtMNSgqY=;
+ b=BlIIyEdCpjJKQhEvFSBpt/+L1salcuSMQJUIhf8rgNP7bsV7hvHEqiN8tQtigwG59AlXhI
+ 6tlVVMeTUMhskXzyZkTOeOgdMRAHDWeEpIiZkRX3FNbZim8isWEAQCh5abu7UQOT4rtNtf
+ bdiBIb6ABnPRfyMl4giPAL+tiOLowFQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-HwzfMRZXN3q2z_aJQj_tGw-1; Thu, 06 Feb 2020 15:59:55 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFF3018B6401;
+ Thu,  6 Feb 2020 20:59:53 +0000 (UTC)
+Received: from localhost (unused-10-15-17-6.yyz.redhat.com [10.15.17.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 377E260BEC;
+ Thu,  6 Feb 2020 20:59:48 +0000 (UTC)
+Date: Thu, 6 Feb 2020 15:59:48 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/6] machine: Convert the valid cpu types
+ to use cpu_model
+Message-ID: <20200206205948.GD412524@habkost.net>
+References: <62d7649e-e85d-43a2-2df8-85e2a0953e89@redhat.com>
+ <20190617170106.48d776ca@redhat.com>
+ <0a31228d-4d32-2c54-649b-6aef9953fffc@redhat.com>
+ <20190617173343.68e3c9ec@redhat.com>
+ <20190617162700.GC19178@habkost.net>
+ <20190618133410.18b93bcd@redhat.com>
+ <20190618135516.GH19178@habkost.net>
+ <20190620110239.6c4c092d@redhat.com>
+ <20190620144328.GA1862@habkost.net>
+ <87908f05-f14a-c502-db0b-96f849d018d1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200206195441.GA412524@habkost.net>
-Content-Language: en-US
-X-MC-Unique: c0GQufzIPuiz35SirUMNpw-1
+In-Reply-To: <87908f05-f14a-c502-db0b-96f849d018d1@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: HwzfMRZXN3q2z_aJQj_tGw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,56 +95,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>
+Cc: peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, alistair23@gmail.com, marcel@redhat.com,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/6/20 8:54 PM, Eduardo Habkost wrote:
-> On Wed, Jan 29, 2020 at 10:23:33PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>   tests/acceptance/virtio_check_params.py | 8 ++++++--
->>   1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/acceptance/virtio_check_params.py b/tests/acceptance/=
-virtio_check_params.py
->> index 4a417b8ef5..51a2dd76e8 100755
->> --- a/tests/acceptance/virtio_check_params.py
->> +++ b/tests/acceptance/virtio_check_params.py
->> @@ -77,8 +77,12 @@ class VirtioMaxSegSettingsCheck(Test):
->>               vm.set_machine(mt["name"])
->>               for s in VM_DEV_PARAMS[dev_type_name]:
->>                   vm.add_args(s)
->> -            vm.launch()
->> -            query_ok, props, error =3D self.query_virtqueue(vm, dev_typ=
-e_name)
->> +            try:
->> +                vm.launch()
->> +                query_ok, props, error =3D self.query_virtqueue(vm, dev=
-_type_name)
->> +            except:
->> +                query_ok =3D False
->> +                error =3D sys.exc_info()[0]
+On Thu, Jan 23, 2020 at 07:48:21PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 6/20/19 4:43 PM, Eduardo Habkost wrote:
+> > On Thu, Jun 20, 2019 at 11:02:39AM +0200, Igor Mammedov wrote:
+> > > On Tue, 18 Jun 2019 10:55:16 -0300
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >=20
+> > > > On Tue, Jun 18, 2019 at 01:34:10PM +0200, Igor Mammedov wrote:
+> > > > > On Mon, 17 Jun 2019 13:27:00 -0300
+> > > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > > > > > On Mon, Jun 17, 2019 at 05:33:43PM +0200, Igor Mammedov wrote:
+> > > > > > > On Mon, 17 Jun 2019 17:15:21 +0200
+> > > > > > > Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
+> > > > > > [...]
+> > > > > > > > Yes. Eduardo and you should write some lines to explain thi=
+s, and then
+> > > > > > > > we will follow :)
+> > > > > > > Unfortunately I don't recall details anymore. One could check=
+ out all
+> > > > > > > implementations of class_by_name callbacks to find out curren=
+t state.
+> > > > > >=20
+> > > > > > See this message for a summary of existing class_by_name quirks=
+:
+> > > > > >=20
+> > > > > >    https://www.mail-archive.com/qemu-devel@nongnu.org/msg615503=
+.html
+> > > > > >    Date: Wed, 08 May 2019 10:34:44 +0200
+> > > > > >    Message-ID: <877eb173a3.fsf@dusky.pond.sub.org>
+> > > > > >    Subject: Re: [Qemu-devel] [PATCH 0/7] Delete 16 *_cpu_class_=
+by_name() functions
+> > > > > >=20
+> > > > > > I'm unsure about Igor's suggestion to get rid of CPU model name=
+s
+> > > > > > and use only QOM type names in external interfaces.  In either
+> > > > > > case, we can still simplify the rules rules and reduce the amou=
+nt
+> > > > > > of arch-specific code.
+> > > > > as far as we have cpu_class_by_name, we have to watch over that
+> > > > > new patches/targets won't add some custom handling/fallbac/whatno=
+t.
+> > > >=20
+> > > > We can get rid of CPUClass::cpu_class_by_name() without changing
+> > > > the external interfaces provided by QEMU.
+> > > if you mean QMP, than it is possible to keep model there where
+> > > it already exists. Based on experiment [1](x86) I did, it's local to
+> > > affected target and doesn't pollute other code.
+> >=20
+> > I mean both command line and QMP.
+> >=20
+> > >=20
+> > > > I don't have a strong opinion about using only QOM types at -cpu,
+> > > > yet.  But first we need to get rid of the arch-specific CPU model
+> > > > name exceptions enumerated at the URL above (which would be very
+> > > > welcome).
+> > > One way to get rid of them is to deprecate them in favor of strict
+> > > match (no fallback/substitutions/aliases) to typename and when we
+> > > drop it make switch type based naming only.
+> >=20
+> > This is true, but is it desirable?  Aren't we just moving
+> > complexity elsewhere?  Management software would still need to
+> > translate CPU models from existing VM configurations to QOM type
+> > names.
+> >=20
+> > >=20
+> > > 1) I've just took a quick look at how much of duplicated/confusing
+> > > code we could get rid off if we drop cpu_class_by_name/*_cpu_list.
+> > > It amounts to >800LOC of trivial removal (not counting ppc/s390
+> > > that depend on model naming heavily and in need of some non
+> > > trivial refactoring)
+> >=20
+> > Removing the code might be trivial.  Coordinating with the
+> > maintainers of all architectures to confirm this is really
+> > something everybody wants is the difficult part.
+> >=20
+> > If you really want to do it, please make sure all the
+> > architecture maintainers (and libvirt developers) are involved in
+> > the discussion.
 >=20
-> I would prefer to do this inside query_virtqueue(), but:
-
-The problem is in vm.launch():
-
-DEBUG| Output: "xencall: error: Could not obtain handle on privileged=20
-command interface: No such file or directory\nxen be core: xen be core:=20
-can't open xen interface\ncan't open xen interface\nqemu-system-x86_64:=20
-failed to initialize xen: Operation not permitted\n"
-
+> From the previous link (summary of existing class_by_name quirks):
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg615737.html
 >=20
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>   "Deprecating unwanted stuff now is likely to make a
+>    later cleanup so much easier."
 >=20
+> This was 8 months ago :/
+>=20
+> IIUC we need to restart this topic addressing the libvirt community first=
+,
+> then see with the QEMU one?
 
-Thanks, I'll keep this patch queued.
+The next step is to deprecate the weird and pointless exceptions
+listed at the URL you mentioned.  Not all exceptions will affect libvirt (m=
+aybe most won't).
 
-Phil.
+In either case, we can just use qemu-deprecated.texi to
+communicate this to libvirt developers.  MAINTAINERS already has
+a "R: libvir-list" line for qemu-deprecated.texi.
+
+--=20
+Eduardo
 
 
