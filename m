@@ -2,87 +2,88 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B26C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A07C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:03:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3070F20661
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E461D20661
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:03:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="OEFB3/Q6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3070F20661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="EW93lZzN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E461D20661
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izfsN-00047k-5d
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 07:03:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56269)
+	id 1izfsP-000498-UP
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 07:03:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56329)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <n54@gmx.com>) id 1izfnq-0001eN-Mh
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:58:40 -0500
+ (envelope-from <n54@gmx.com>) id 1izfnu-0001ex-HB
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:58:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <n54@gmx.com>) id 1izfnp-0007w3-9F
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:58:38 -0500
-Received: from mout.gmx.net ([212.227.17.20]:56361)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <n54@gmx.com>) id 1izfno-0007ll-Rc
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:58:37 -0500
+ (envelope-from <n54@gmx.com>) id 1izfnt-0008Nt-BX
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:58:42 -0500
+Received: from mout.gmx.net ([212.227.17.22]:34287)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <n54@gmx.com>) id 1izfnt-0008DF-1h
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:58:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1580990304;
- bh=8UVtcPBjsdPXa6EDqfa2L9WWhzoahjerbl1XbZ50QEg=;
+ s=badeba3b8450; t=1580990305;
+ bh=9XpfaBBPgrfZTT7J0pH7RitqavvDUG/fe8lsu1Vybrc=;
  h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=OEFB3/Q6EmPGCUketM5RkJMnKl3qBTCU+8E0Rwwztnk9ZG5HslMbDAJ5kz/4SFVBH
- h8ugs4EXDRvi7Kwzp+Si49QhMlE63TquZej4WJl5YrIOjWcvdY/D/NMFvbpchLKAoY
- D5fx0eJ/ZdQjxY9KEiM5MgF3Biq9/vG+7hS4V5Bc=
+ b=EW93lZzNRpXJ5SxkllWu4StEo/llLldEKVBsA3rbnSuUPYUvbBiTQLI/wxuD2NcHY
+ ivJktnvRPJkQI2/av5rKMKWc/nErnjTMtQccKa2mbQhlZxDOM9ZCsPw6YoL4RR8ibn
+ nk/WL8ey9jwn1g4UZPi9dEt7qTKolg1YIE8wTevc=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from localhost.localdomain ([89.71.135.231]) by mail.gmx.com
  (mrgmx104 [212.227.17.174]) with ESMTPSA (Nemesis) id
- 1MryXN-1jMIpp0vO1-00nyBc; Thu, 06 Feb 2020 12:58:24 +0100
+ 1MAONX-1innpL41U3-00Brk6; Thu, 06 Feb 2020 12:58:25 +0100
 From: Kamil Rytarowski <n54@gmx.com>
 To: rth@twiddle.net, ehabkost@redhat.com, slp@redhat.com, pbonzini@redhat.com,
  peter.maydell@linaro.org, philmd@redhat.com, max@m00nbsd.net
-Subject: [PATCH v3 0/4] Implements the NetBSD Virtual Machine Monitor
- accelerator
-Date: Thu,  6 Feb 2020 12:57:27 +0100
-Message-Id: <20200206115731.13552-1-n54@gmx.com>
+Subject: [PATCH v3 1/4] Add the NVMM vcpu API
+Date: Thu,  6 Feb 2020 12:57:28 +0100
+Message-Id: <20200206115731.13552-2-n54@gmx.com>
 X-Mailer: git-send-email 2.25.0
-In-Reply-To: <20200128140945.929-1-n54@gmx.com>
+In-Reply-To: <20200206115731.13552-1-n54@gmx.com>
 References: <20200128140945.929-1-n54@gmx.com>
+ <20200206115731.13552-1-n54@gmx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:odWWlaWX1XBgzxzcosTaDsbJ6OaTeGfCqz9J2/00uLlxMokP/AN
- hih73hIr53sURqmp6SwJstACFX2EoBbDWxTlawJjRcwSIVNJWGJekngnMHWWa7ekpLZ9r8N
- b65czhZ/J/up6hCcHA9ypQW/KYQMskRjHoKvLhJKAIWQaAUJ36SY0BmwxZLiMXeSpqa8T4K
- /T5+Ieyv8bCALdMnapSiA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:o8k5FRsGizM=:RmIgF1JmyTDP8z4TUvRTcg
- 30w8qizZyYak+KnvO6iseQbcV2fJ5BjVvqcbXuW5oc2EQX+7wX3FPUMSYv4e1MRQghM2QQjOP
- 2OPkI0pK0QPb+f8hoRnIq69yQIZVVwDc2lMFgm5GNKrq8ii3zrOh6EbyawAAsV+I7vM980sXZ
- 32V+FYT6Fg2wxIqXhSBFkUre/y1pjT7VtQnhRW2+9UH/1GXAllY7vPHTiuJcDu+L/vJ93ZCKQ
- 61KKVK+qQftyh32NjZKObfdzXxy2azrlY2lLxTqi/uwwv1QyZoi/jV4ZW0AgXVkKoCPROdqX0
- Gf6//CgpYom52QzFIAE0x8zffHvORyLKW4mnBUUZPLZFlhEXWTvmrF18mh5EQGBROq+Eoh9LE
- Z3WNofnmMQ0/RufDIiS3LLEKuLHSaknUlva0O/IEi4VIqGazAMeS13xYp0J7FzBXbHUln+oaK
- WmvRnaQ4GOZopYVSMV3/SToLLAxMbNShcwaxURe0sg+Qp87ZF5ELIrAZdgE/2+X5xFbNlwcis
- ZUlMtxLgXv75unn5qJz3VvP95/gbXX0GRehR+klMsZBfywlZ9ythfPz++LDTRFE8YyuojbTkm
- 5POI+kRsonP2HUl64v5vhgin+hRESMyQ8k44PFb7ZG5F9tCdja1ALnGVkqz7+j+HcpvONuaw8
- h32f0BekHm0vlmN0owgXqiD/Jz1DeA5QomlcLf2trPWjEejf8m2Z/1GSaIJCuDek04qIFhvPU
- +LGUe4EqBXENr8A0/TKS1YRGOM3pPJe+7v/H81vOGhuQ6OSWNcDGf7QDaX4orJjEG34tS2WBn
- 2KaQmFlOFwPPdva34QTWY6jz6gQ7+Aa50/bGlsPWDjAGEOSCRLbqRue5UIJamQfaMQp9fDibT
- 3eqDpIZwM4eyhYw680cGW6krzLS1+JiPKQN1hT+mTWVobOh1uH+p3mq61EOqDabamqx22+10D
- Omr8riH5HjQJMI8oZ3KZpOL8lknLvvv02l5Ogw7krDlRFWFC4doJ3tXo5wBhL1IjeNi6LK0OJ
- 8X4/CrtiMFs99YtRGvu9TwLOiqu0dkzM67t3gzlWnVIs08zIh2blPPZ8njjrIy+Yqyqeg9aAM
- uNB/EZVVDRY/C7BYlqN0dnmYrSXYAMaruy5s2gjbAMcA/Iophbax4tLYEV7mqSSCQQ3L6s8pD
- 6sB4AYaNFMoDzbMqW0pXyKi0IXejlSVRU82cLY25FBsDA0ByHxFkESpjWEjfzawOmEyD8=
+X-Provags-ID: V03:K1:ofN6IsIMgWBPI45Q+q/RPVDIRr6bBY3cYL2JaQW6EACANhlMk3U
+ F47ho8wIg3hBpWPl02iSb9AqfFVYzxToO+h0OoLVx6BWKXHViZutAoOSTPzH/4cH15+AWaX
+ tCuC2N5/ExomNqzo9VpXCiAz0Ec/w9Ldb/yYte8RZ/NOr9czZ826X/ApZlZZ9rijnnRgW8z
+ 03NzuhKaZD0Eqypxk2ALw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:5lHER6zVqGE=:nTg9pbEiCNfjYJNuXSRN6Z
+ zrTQIkflW/i6jbAXOIzveQMzpGitMBQtyUQh6PlRZTlJNYi+nbJV1rcE9QIG0nMwg38r3SRw1
+ 73aCFLDaEdjKMWSPeMt6NbEGG6wgYdXcI8hpLplYomr0cmW0Ef7TwLt+ZBzXi+4OQoqFXVLzl
+ bpyIWsDIHg8XkpGvDhyh33m/pTnOt/Pt7ooVzIb480QrhH6g89sCRyq06cxYGGK+Tk92zcq7K
+ 8dhrEJJbQCjH1G/f94DH1rch1Oz2SCB1u3NtJNGj0V6mgoXfnLZX2OATcg4byV8e/v7Q5oC1T
+ jn0fQPApQ4D/80fl1Ka/yHcCKcMyNpxE9N5AoymIkOX8K+38+aeSzl3ZUURNa/Vn11uObR6Ts
+ XXw9aLwGNLHOnY5bkVYTK0etDssTPMF/e2YDBOyaNaHbgruJCP3wGHCpufHKZehekDbTuaLii
+ pvD5eV1ho79+zbqdWNuxeAdlrhspErjvfV76KLFhFKy9PpeNeVMbil/0dhXbKKpi2RuvXbu5v
+ Js9WuqqQzpUPOI0HvfkiijjGbdejuLlwbdIp4nSKXRVPVd0qWsKuiqljNGd2r+D6fHgkZ3250
+ h5s6x8+5bAtIUM8ruScx1kW5pSNShBYJLfJT6kcyAETUE1gSu0KHBnkxFPtTzMi4ikKyAp1QT
+ bt194SdTvb8rVfq7Da1/vhiD0PniDYnViP/hK29Wz4uBhofp8qAB5PW00bAMedm8wTXl/Nkpl
+ VgdGIZuWJRpNV6kUbDXyFxzHFYp5dJXiYysyZlWgt1kIVO2mCo2dydAlYCbr+XNL7wHEvUyGo
+ p7E8nHk9NSPxWIMLLc1KY28oiOEblDqkpXqUpACUfN83Gv0t4TEHB/SL07MFWJfnds/TUZDkO
+ Vxi1vk1waNsK9iwx9xDqtkwyAhcXyBMhWx4pUdIr2GAUL+QyQYHN4qaTVvCYko/Vn4bcSJSid
+ sS+yK+NINjQbgRLxMdZJCLYVq3KB1lDvyjUEVc3g5XVW7LWDteStfdsJzRWDmmsWwYTiMEU40
+ jD7CUbD7EicIXKFQB2YHjOJEsXNhoZNHr6ONRgvzIJcaYI4TGhJn5IGtI5Ir/cCZYWYYRIJFX
+ /G29y1+tJxzlfBScIQY7iiaDBimvhXiuzgrm7lDDlvmjc1d/oVRq9HVzHvYLqqdQwVlzkfzqm
+ T3j2VPV9If5XMJ9+xjlhoYE8jvnPxV0k9WNbmGmfi36YoJkjhCX4j3+A8YpzL0P+afbYU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.20
+X-Received-From: 212.227.17.22
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,107 +100,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello QEMU Community!
+From: Maxime Villard <max@m00nbsd.net>
 
-Over the past year the NetBSD team has been working hard on a new user-mod=
-e API
-for our hypervisor that will be released as part of the upcoming NetBSD 9.=
-0.
-This new API adds user-mode capabilities to create and manage virtual mach=
-ines,
-configure memory mappings for guest machines, and create and control execu=
-tion
-of virtual processors.
+Adds support for the NetBSD Virtual Machine Monitor (NVMM) stubs and
+introduces the nvmm.h sysemu API for managing the vcpu scheduling and
+management.
 
-With this new API we are now able to bring our hypervisor to the QEMU
-community! The following patches implement the NetBSD Virtual Machine Moni=
-tor
-accelerator (NVMM) for QEMU on NetBSD 9.0 and newer hosts.
-
-When compiling QEMU for x86_64 passing the --enable-nvmm flag will compile=
- the
-accelerator for use. At runtime using the '-accel nvmm' should see a
-significant performance improvement over emulation, much like when using '=
-hax'
-on NetBSD.
-
-The documentation for this new API is visible at https://man.netbsd.org un=
-der
-the libnvmm(3) and nvmm(4) pages.
-
-NVMM was designed and implemented by Maxime Villard.
-
-Thank you for your feedback.
-
-Refrences:
-https://m00nbsd.net/4e0798b7f2620c965d0dd9d6a7a2f296.html
-
-Test plan:
-
-1. Download a NetBSD 9.0 pre-release snapshot:
-http://nycdn.netbsd.org/pub/NetBSD-daily/netbsd-9/latest/images/NetBSD-9.0=
-_RC1-amd64.iso
-
-2. Install it natively on a not too old x86_64 hardware (Intel or AMD).
-
-There is no support for nested virtualization in NVMM.
-
-3. Setup the system.
-
- export PKG_PATH=3Dhttp://www.ki.nu/pkgsrc/packages/current/NetBSD-9.0_RC1=
-/All
- pkg_add git gmake python37 glib2 bison pkgconf pixman
-
-Install mozilla-rootcerts and follow post-install instructions.
-
- pkg_add mozilla-rootcerts
-
-More information: https://wiki.qemu.org/Hosts/BSD#NetBSD
-
-4. Build qemu
-
- mkdir build
- cd build
- ../configure --python=3Dpython3.7
- gmake
- gmake check
-
-5. Test
-
- qemu -accel nvmm ...
-
-
-History:
-v2 -> v3:
- - Register nvmm in targetos NetBSD check
- - Stop including hw/boards.h
- - Rephrase old code comments (remove XXX)
-v1 -> v2:
- - Included the testing plan as requested by Philippe Mathieu-Daude
- - Formatting nit fix in qemu-options.hx
- - Document NVMM in the accel section of qemu-options.hx
-
-Maxime Villard (4):
-  Add the NVMM vcpu API
-  Add the NetBSD Virtual Machine Monitor accelerator.
-  Introduce the NVMM impl
-  Add the NVMM acceleration enlightenments
-
- accel/stubs/Makefile.objs |    1 +
- accel/stubs/nvmm-stub.c   |   43 ++
- configure                 |   37 ++
- cpus.c                    |   58 ++
- include/sysemu/hw_accel.h |   14 +
- include/sysemu/nvmm.h     |   35 ++
- qemu-options.hx           |   16 +-
- target/i386/Makefile.objs |    1 +
- target/i386/helper.c      |    2 +-
- target/i386/nvmm-all.c    | 1221 +++++++++++++++++++++++++++++++++++++
- 10 files changed, 1419 insertions(+), 9 deletions(-)
+Signed-off-by: Maxime Villard <max@m00nbsd.net>
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+=2D--
+ accel/stubs/Makefile.objs |  1 +
+ accel/stubs/nvmm-stub.c   | 43 +++++++++++++++++++++++++++++++++++++++
+ include/sysemu/nvmm.h     | 35 +++++++++++++++++++++++++++++++
+ 3 files changed, 79 insertions(+)
  create mode 100644 accel/stubs/nvmm-stub.c
  create mode 100644 include/sysemu/nvmm.h
- create mode 100644 target/i386/nvmm-all.c
 
+diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
+index 3894caf95d..09f2d3e1dd 100644
+=2D-- a/accel/stubs/Makefile.objs
++++ b/accel/stubs/Makefile.objs
+@@ -1,5 +1,6 @@
+ obj-$(call lnot,$(CONFIG_HAX))  +=3D hax-stub.o
+ obj-$(call lnot,$(CONFIG_HVF))  +=3D hvf-stub.o
+ obj-$(call lnot,$(CONFIG_WHPX)) +=3D whpx-stub.o
++obj-$(call lnot,$(CONFIG_NVMM)) +=3D nvmm-stub.o
+ obj-$(call lnot,$(CONFIG_KVM))  +=3D kvm-stub.o
+ obj-$(call lnot,$(CONFIG_TCG))  +=3D tcg-stub.o
+diff --git a/accel/stubs/nvmm-stub.c b/accel/stubs/nvmm-stub.c
+new file mode 100644
+index 0000000000..c2208b84a3
+=2D-- /dev/null
++++ b/accel/stubs/nvmm-stub.c
+@@ -0,0 +1,43 @@
++/*
++ * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
++ *
++ * NetBSD Virtual Machine Monitor (NVMM) accelerator stub.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or lat=
+er.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "sysemu/nvmm.h"
++
++int nvmm_init_vcpu(CPUState *cpu)
++{
++    return -1;
++}
++
++int nvmm_vcpu_exec(CPUState *cpu)
++{
++    return -1;
++}
++
++void nvmm_destroy_vcpu(CPUState *cpu)
++{
++}
++
++void nvmm_cpu_synchronize_state(CPUState *cpu)
++{
++}
++
++void nvmm_cpu_synchronize_post_reset(CPUState *cpu)
++{
++}
++
++void nvmm_cpu_synchronize_post_init(CPUState *cpu)
++{
++}
++
++void nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu)
++{
++}
+diff --git a/include/sysemu/nvmm.h b/include/sysemu/nvmm.h
+new file mode 100644
+index 0000000000..10496f3980
+=2D-- /dev/null
++++ b/include/sysemu/nvmm.h
+@@ -0,0 +1,35 @@
++/*
++ * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
++ *
++ * NetBSD Virtual Machine Monitor (NVMM) accelerator support.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or lat=
+er.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_NVMM_H
++#define QEMU_NVMM_H
++
++#include "config-host.h"
++#include "qemu-common.h"
++
++int nvmm_init_vcpu(CPUState *);
++int nvmm_vcpu_exec(CPUState *);
++void nvmm_destroy_vcpu(CPUState *);
++
++void nvmm_cpu_synchronize_state(CPUState *);
++void nvmm_cpu_synchronize_post_reset(CPUState *);
++void nvmm_cpu_synchronize_post_init(CPUState *);
++void nvmm_cpu_synchronize_pre_loadvm(CPUState *);
++
++#ifdef CONFIG_NVMM
++
++int nvmm_enabled(void);
++
++#else /* CONFIG_NVMM */
++
++#define nvmm_enabled() (0)
++
++#endif /* CONFIG_NVMM */
++
++#endif /* CONFIG_NVMM */
 =2D-
 2.25.0
 
