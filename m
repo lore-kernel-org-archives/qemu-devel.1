@@ -2,71 +2,83 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26AF8C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1713C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:13:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE512214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:12:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE512214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 99620214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:13:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PhTihGvz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99620214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izgx9-00032F-2P
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:12:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38740)
+	id 1izgy8-0005Qm-Pc
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:13:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57765)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1izgvh-00009O-Su
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:10:51 -0500
+ (envelope-from <mreitz@redhat.com>) id 1izgdc-0003l9-K0
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:52:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1izgvg-0006hJ-M1
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:10:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48212)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1izgvg-0006dH-GG
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:10:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1izgve-0008VW-LL
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 13:10:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 998BC2E8042
- for <qemu-devel@nongnu.org>; Thu,  6 Feb 2020 13:10:46 +0000 (UTC)
+ (envelope-from <mreitz@redhat.com>) id 1izgdb-0001n6-Lv
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:52:08 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55985
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izgdb-0001lf-Ho
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:52:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580993527;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kPbx+krUXpbscyYUiKrhyMv0I7dRYUoEf7YQ4xzU4YI=;
+ b=PhTihGvza9LuGrqaFOMyVjfToxe+MqaEhH2USN8dTpv6YbxYmXebWMZxG8BqfkbIdWHy4c
+ +GbZrHz/H9UTXQPK5U01yUzZoCxiNYGAUJewCWryKylzMOrqLpL35wOOYcepa63qN7nWlp
+ V2KCjPmKc6ksAS18TnaPuHb3nEJtGy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-Fg_kAZaDMNSKLQbz_qA1aw-1; Thu, 06 Feb 2020 07:52:04 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F56018CA242;
+ Thu,  6 Feb 2020 12:52:03 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.15])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 04B5D5C1B0;
+ Thu,  6 Feb 2020 12:52:02 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 14/17] qcow2: Don't require aligned offsets in
+ qcow2_co_copy_range_from()
+Date: Thu,  6 Feb 2020 13:51:29 +0100
+Message-Id: <20200206125132.594625-15-mreitz@redhat.com>
+In-Reply-To: <20200206125132.594625-1-mreitz@redhat.com>
+References: <20200206125132.594625-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: Fg_kAZaDMNSKLQbz_qA1aw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Feb 2020 13:02:04 -0000
-From: Kentaro Kawakami <1862167@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: kawakami-k
-X-Launchpad-Bug-Reporter: Kentaro Kawakami (kawakami-k)
-X-Launchpad-Bug-Modifier: Kentaro Kawakami (kawakami-k)
-Message-Id: <158099412478.8645.15882160651412694280.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1862167] [NEW] Variation of SVE register size (qemu-user-aarch64)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1fca38d0ba4a92b987082129d3fd05f0bbff72bb
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,50 +87,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1862167 <1862167@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+From: Alberto Garcia <berto@igalia.com>
 
-Specification of ARMv8-A SVE extention allows various values =E2=80=8B=E2=
-=80=8Bfor the
-size of the SVE register. On the other hand, it seems that the current
-qemu-aarch64 supports only the maximum length of 2048 bits as the SVE
-register size. I am writing an assembler program for a CPU that is
-compliant with ARMv8-A + SVE and has a 512-bit SVE register, but when
-this is run with qemu-user-aarch64, a 2048-bit load / store instruction
-is executed This causes a segmentation fault. Shouldn't qeum-user-
-aarch64 have an option to specify the SVE register size?
+qemu-img's convert_co_copy_range() operates at the sector level and
+block_copy() operates at the cluster level so this condition is always
+true, but it is not necessary to restrict this here, so let's leave it
+to the driver implementation return an error if there is any.
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Message-id: a4264aaee656910c84161a2965f7a501437379ca.1579374329.git.berto@i=
+galia.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
--- =
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6cb5aee4a5..ff257d1a6c 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3828,10 +3828,6 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
+         case QCOW2_CLUSTER_NORMAL:
+             child =3D s->data_file;
+             copy_offset +=3D offset_into_cluster(s, src_offset);
+-            if ((copy_offset & 511) !=3D 0) {
+-                ret =3D -EIO;
+-                goto out;
+-            }
+             break;
+=20
+         default:
+--=20
+2.24.1
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1862167
-
-Title:
-  Variation of SVE register size (qemu-user-aarch64)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Specification of ARMv8-A SVE extention allows various values =E2=80=8B=E2=
-=80=8Bfor the
-  size of the SVE register. On the other hand, it seems that the current
-  qemu-aarch64 supports only the maximum length of 2048 bits as the SVE
-  register size. I am writing an assembler program for a CPU that is
-  compliant with ARMv8-A + SVE and has a 512-bit SVE register, but when
-  this is run with qemu-user-aarch64, a 2048-bit load / store
-  instruction is executed This causes a segmentation fault. Shouldn't
-  qeum-user-aarch64 have an option to specify the SVE register size?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1862167/+subscriptions
 
