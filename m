@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 722AAC352A2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF5FC33CAC
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 05:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B1E1214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 7A66F206CC
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 05:26:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1E1214AF
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A66F206CC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izZgM-0006Ub-FB
+	id 1izZgM-0006VO-LS
 	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 00:26:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58431)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58433)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1izZfa-0005fZ-FN
+ (envelope-from <bounces@canonical.com>) id 1izZfa-0005fa-Kv
  for qemu-devel@nongnu.org; Thu, 06 Feb 2020 00:25:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1izZfZ-0002OY-BF
+ (envelope-from <bounces@canonical.com>) id 1izZfZ-0002OS-94
  for qemu-devel@nongnu.org; Thu, 06 Feb 2020 00:25:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50296)
+Received: from indium.canonical.com ([91.189.90.7]:50278)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1izZfZ-0002O8-6J
+ id 1izZfZ-0002Nm-3w
  for qemu-devel@nongnu.org; Thu, 06 Feb 2020 00:25:41 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1izZfY-0006to-H5
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 05:25:40 +0000
+ id 1izZfX-0006sy-F4
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 05:25:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 75BC22E80C0
- for <qemu-devel@nongnu.org>; Thu,  6 Feb 2020 05:25:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6F7A12E8058
+ for <qemu-devel@nongnu.org>; Thu,  6 Feb 2020 05:25:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Feb 2020 05:20:21 -0000
+Date: Thu, 06 Feb 2020 05:17:49 -0000
 From: Chris Hoy <1862110@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,16 +54,15 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: chrs-hoy
 X-Launchpad-Bug-Reporter: Chris Hoy (chrs-hoy)
 X-Launchpad-Bug-Modifier: Chris Hoy (chrs-hoy)
-References: <158096626936.9041.17441916407484515612.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158096642203.26233.11748562075241655475.malone@soybean.canonical.com>
-Subject: [Bug 1862110] Re: qemu in script is not parsing properly
+Message-Id: <158096626936.9041.17441916407484515612.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1862110] [NEW] qemu in script is not parsing properly
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: baf7631c25ee78dbd81cefb1f1b4dfa1e733a018
+X-Launchpad-Hash: b1abcbdc0e370f2edef425d02acc8dfff9533b28
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,7 +80,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-EDIT: The backslash under the ovmf setting was commented
+Public bug reported:
+
+Bug Report: =
+
+>>qemu-system-x86_64 --version: QEMU emulator version 4.2.0
+>>Arch-linux version 2020.02.01
+I was following a tutorial on how to make a windows vm and i have encounter=
+ed and issue in the settings of my script I have listed below.
+
+The commented code directly above the uncommented qemu instance would
+boot the Windows screen but the issue arises when I try to reach the
+same code block under the commented setting lines which takes me to the
+default SeaBIOS loader.
+
+ =
+
+#!/bin/bash
+
+vmname=3D"windows10vm"
+
+if ps -ef | grep qemu-system-x86_64 | grep -q multifunction=3Don; then
+echo "A passthrough VM is already running." &
+exit 1
+
+else
+
+# use pulseaudio
+
+export QEMU_AUDIO_DRV=3Dpa
+export QEMU_PA_SAMPLES=3D8192
+export QEMU_AUDIO_TIMER_PERIOD=3D99
+export QEMU_PA_SERVER=3D/run/user/1000/pulse/native
+
+cp /usr/share/ovmf/x64/OVMF_VARS.fd /tmp/my_vars.fd
+
+#qemu-system-x86_64 \
+#-drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../IMGs/wi=
+n.img \
+#-drive file=3D.../ISOs/Win10_1909_English_x64.iso,index=3D1,media=3Dcdrom \
+
+qemu-system-x86_64 \
+
+#-name $vmname,process=3D$vmname \
+#-machine type=3Dq35,accel=3Dkvm \
+#-cpu host,kvm=3Doff \
+#-smp 4,sockets=3D1,cores=3D3,threads=3D1 \
+#-m 8G \
+#-balloon none \
+#-rtc clock=3Dhost,base=3Dlocaltime \
+#-vga none \
+#-nographic \
+#-serial none \
+#-parallel none \
+#-soundhw hda \
+#-usb \
+#-device usb-host,vendorid=3D...,productid=3D... \
+#-device usb-host,vendorid=3D...,productid=3D... \
+#-device vfio-pci,host=3D...,multifunction=3Don \
+#-device vfio-pci,host=3D... \
+#-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/ovmf/x64/OVMF_V=
+ARS.fd \
+#-drive if=3Dpflash,format=3Draw,file=3D/tmp/my_vars.fd \
+#-boot order=3D dc \
+
+-drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../IMGs/win=
+.img \
+-drive file=3D.../ISOs/Win10_1909_English_x64.iso,index=3D1,media=3Dcdrom \
+-drive file=3D.../ISOs/virtio-0.1.171.iso,index=3D2,media=3Dcdrom \
+
+#-netdev type=3Dtap,id=3Dnet0,ifname=3Dvmtap0,vhost=3Don \
+#-device virtio-net-pci,netdev=3Dnet0,mac=3D... \
+
+exit 0
+
+fi
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
