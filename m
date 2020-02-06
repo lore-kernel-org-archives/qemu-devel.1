@@ -2,86 +2,81 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 775A4C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF09C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:19:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F595206CC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:18:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10ABA206CC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:19:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HBhsYNB1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F595206CC
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LHegkkIw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10ABA206CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izfAt-00043n-Dp
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:18:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50304)
+	id 1izfCG-0006Db-V4
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:19:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51040)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1izeoj-0003VZ-Rf
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:31 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1izeps-0005tS-7v
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:56:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1izeoh-0000Hj-SV
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:29 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39501)
+ (envelope-from <peter.maydell@linaro.org>) id 1izepq-0008Gd-Vc
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:56:40 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34822)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1izeoe-00005K-7Y
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:26 -0500
-Received: by mail-wr1-x442.google.com with SMTP id y11so6578533wrt.6
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:55:24 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1izepq-0008CC-Pd
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:56:38 -0500
+Received: by mail-oi1-x243.google.com with SMTP id b18so4155445oie.2
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:56:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=oFO7A+GHodLVViilFHrVVzMQZ82rOVrK9HIlLR/jPA8=;
- b=HBhsYNB1AJII2Hz4xrt7POvRF4wtsX5M37/+F9kYd9lihZkmQEtMVYMN8LG53XHUfW
- Q4PpdpY0TBbv07UPrJGBvz5O4Eqg99hkD9u7GuIs4HOFEiKlFlZR2DGjV+B/T/ogUbhv
- d29KKEOeMTrBJZ7GUppQjg5L6oLokiozBhJiwoWLq77td7w7cT8rNwGt7zJ7r3epS2jx
- UOgAKLa6aucSSR+dotx+4Mx+S9NFmcJb9QkMXHUl0nsf4jmVL2kIRB0iKNr2bogdWUW0
- MXCVnWwuoFk02n9EKwztN0ourZSJc/yF4qNfBsOeZ9UQiSRemA30hztbiip7VPCwlS1V
- SY9g==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=hoVpaaxA/IqP5s1JvcpuvxK3sp4hYRopXLBeMPJaOl8=;
+ b=LHegkkIwtZCsmEJ8zzORbD7U6aCIUhhGIPofAHyFHEnUzDngNvvsdJ+jF1wCKyxdqR
+ a/Uw/syfOmKFTRstECMf7Pkd6taoUe8nzOwtlEK4hBQ+xjcZ899vF3ynRklF7K2+4SHZ
+ sFzY5r7nYDnS9nDTaczIbgNygo1vdBaYr6olCGR3wMenB6kAL7n4Z2rukmuHdR1kwiGJ
+ 1Cn2j0s9/mqlQ6kZXcrH5I6v+1PwMjGoyN3is4ptxJwzfKzm4q3ySGAh7TK+9dIvCxNs
+ P+AYK6hzWqVttRErZmW9D/BHPJFPKbkd7/DgJzRwAIHQAYRVRq48QwZibE6drbBlGTSJ
+ FXOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=oFO7A+GHodLVViilFHrVVzMQZ82rOVrK9HIlLR/jPA8=;
- b=ViQyXznUdH9GhgobnVVM+3zolUdL9shJRVj2bGiktsPrycT0dOl5/NPR7O7qoNrUlT
- 0eDYmTHcQ1XmqPXDbTjbzEbacqJM6nILszh8wlzvfebfwItIgvds6Q3Vts3UfezLlFYs
- QUF5X1QJ3fXv3q1Wto43ZJpvR0d3QyTX9dh7iTyRnQMHrTSp2i19faItBRkTKVkoAmzR
- ey4CgNdds4K5GknC8/VFm04i0qJMrmmhZJHCUhMMWi7/1a/2JPgEVe5Bcl12h5V/2xOw
- BFzAN/W8dWwkxv5lS6F9DpWrYUL3SvWBMnU0AGjaVN7LfZvEWdGrQ5c8XtglgpJXbg+4
- c3gw==
-X-Gm-Message-State: APjAAAXYW4wferOMJ+Fjr15aM+20RlIGN788yGD6bUYFx9SKcLGTKbox
- H77yRJOcKT+nXXpXHvk26m5fJXvpfGft7A==
-X-Google-Smtp-Source: APXvYqxjcrnpVueDXD72vrvudfWfUJq3/lZnhheCOF47uoWc6FG29jxPd31GaWAlCXHGSS07eWlhog==
-X-Received: by 2002:a5d:534d:: with SMTP id t13mr3354310wrv.77.1580986522929; 
- Thu, 06 Feb 2020 02:55:22 -0800 (PST)
-Received: from cloudburst.c.hoisthospitality.com ([135.196.99.211])
- by smtp.gmail.com with ESMTPSA id m21sm3364995wmi.27.2020.02.06.02.55.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 02:55:22 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 39/41] target/arm: Pass more cpu state to arm_excp_unmasked
-Date: Thu,  6 Feb 2020 10:54:46 +0000
-Message-Id: <20200206105448.4726-40-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200206105448.4726-1-richard.henderson@linaro.org>
-References: <20200206105448.4726-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=hoVpaaxA/IqP5s1JvcpuvxK3sp4hYRopXLBeMPJaOl8=;
+ b=VoXo41KunuDHb1lqW2YwBhkmUy0RLj0rCmmVTxjGZrQOR8/xcJ6/tgT3S6TstJUyiO
+ Ceo+5vbdXL01xqJ8JUvz7ajWkL/SHpqMwbYYzmaZR99SP2KW/mQeEQVZPPPRsvSPhPXP
+ g/sU9BJBBuH5ytxvYcDuXqChD2F4Gi0RG2CI73to/75m6Hnn+yzDMJFe/keYDW6MSlud
+ fYKYQIeipiJNDr+f1sTk8N7raqhWnk+NS6XIM2VM2uozcKH6f85tAQKkgTuCQKUXXa0K
+ kayO2YdfoOLbcwnZYMss0Y70XXY6YWaPzJKHOgvLCCXdnouTu+YhI4bdR6z1ppD0PwBM
+ q1Qg==
+X-Gm-Message-State: APjAAAW2PIvQ7fEgzfKR5l53uz+x1GIkSD1ujDzlNQdtDkHwOx99H1ho
+ 4UJkJvKZeOHPqVsK3HhhT4V81q/Fa9F1cpuLjMqfrQ==
+X-Google-Smtp-Source: APXvYqwkGVDe2WLXneuG+GzDJ7uHz9RYwiGtcFaYJtJiwOM1q0yhw9LMC6N5FhAGIeZdxlQcXqhwBLagB7qtvyGPELo=
+X-Received: by 2002:aca:b2c5:: with SMTP id b188mr6505351oif.163.1580986597881; 
+ Thu, 06 Feb 2020 02:56:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20200206104743.11740-1-alex.bennee@linaro.org>
+In-Reply-To: <20200206104743.11740-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 6 Feb 2020 10:56:27 +0000
+Message-ID: <CAFEAcA9e=6+Uhdn6rStPqQJQPipoVDf0dANJcV2pt1iSDVQ_kA@mail.gmail.com>
+Subject: Re: [PATCH] .readthedocs.yml: specify some minimum python requirements
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,103 +88,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Avoid redundant computation of cpu state by passing it in
-from the caller, which has already computed it for itself.
+On Thu, 6 Feb 2020 at 10:47, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+> QEMU is all about the Python 3 now so lets also hint that to
+> ReadTheDocs in its config file.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  .readthedocs.yml | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+>  create mode 100644 .readthedocs.yml
+>
+> diff --git a/.readthedocs.yml b/.readthedocs.yml
+> new file mode 100644
+> index 00000000000..99730364bbc
+> --- /dev/null
+> +++ b/.readthedocs.yml
+> @@ -0,0 +1,17 @@
+> +# .readthedocs.yml
+> +# Read the Docs configuration file
+> +# See https://docs.readthedocs.io/en/stable/config-file/v2.html for deta=
+ils
+> +
+> +# Required
+> +version: 2
+> +
+> +# Build documentation in the docs/ directory with Sphinx
+> +sphinx:
+> +  configuration: docs/conf.py
+> +
+> +# We want all the document formats
+> +formats: all
 
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+> +# We need at least 3.4 for enum, but we enforce 3.5+ for sphinx
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index b81ed44bd2..fcee0a2dd4 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -411,14 +411,13 @@ static void arm_cpu_reset(CPUState *s)
- }
- 
- static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
--                                     unsigned int target_el)
-+                                     unsigned int target_el,
-+                                     unsigned int cur_el, bool secure,
-+                                     uint64_t hcr_el2)
- {
-     CPUARMState *env = cs->env_ptr;
--    unsigned int cur_el = arm_current_el(env);
--    bool secure = arm_is_secure(env);
-     bool pstate_unmasked;
-     int8_t unmasked = 0;
--    uint64_t hcr_el2;
- 
-     /*
-      * Don't take exceptions if they target a lower EL.
-@@ -429,8 +428,6 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
-         return false;
-     }
- 
--    hcr_el2 = arm_hcr_el2_eff(env);
--
-     switch (excp_idx) {
-     case EXCP_FIQ:
-         pstate_unmasked = !(env->daif & PSTATE_F);
-@@ -535,6 +532,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     CPUARMState *env = cs->env_ptr;
-     uint32_t cur_el = arm_current_el(env);
-     bool secure = arm_is_secure(env);
-+    uint64_t hcr_el2 = arm_hcr_el2_eff(env);
-     uint32_t target_el;
-     uint32_t excp_idx;
-     bool ret = false;
-@@ -542,7 +540,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_FIQ) {
-         excp_idx = EXCP_FIQ;
-         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
--        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
-+        if (arm_excp_unmasked(cs, excp_idx, target_el,
-+                              cur_el, secure, hcr_el2)) {
-             cs->exception_index = excp_idx;
-             env->exception.target_el = target_el;
-             cc->do_interrupt(cs);
-@@ -552,7 +551,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_HARD) {
-         excp_idx = EXCP_IRQ;
-         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
--        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
-+        if (arm_excp_unmasked(cs, excp_idx, target_el,
-+                              cur_el, secure, hcr_el2)) {
-             cs->exception_index = excp_idx;
-             env->exception.target_el = target_el;
-             cc->do_interrupt(cs);
-@@ -562,7 +562,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_VIRQ) {
-         excp_idx = EXCP_VIRQ;
-         target_el = 1;
--        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
-+        if (arm_excp_unmasked(cs, excp_idx, target_el,
-+                              cur_el, secure, hcr_el2)) {
-             cs->exception_index = excp_idx;
-             env->exception.target_el = target_el;
-             cc->do_interrupt(cs);
-@@ -572,7 +573,8 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_VFIQ) {
-         excp_idx = EXCP_VFIQ;
-         target_el = 1;
--        if (arm_excp_unmasked(cs, excp_idx, target_el)) {
-+        if (arm_excp_unmasked(cs, excp_idx, target_el,
-+                              cur_el, secure, hcr_el2)) {
-             cs->exception_index = excp_idx;
-             env->exception.target_el = target_el;
-             cc->do_interrupt(cs);
--- 
-2.20.1
+A better comment IMHO:
 
+# For consistency, we require that QEMU's Sphinx extensions
+# run with at least the same minimum version of Python that
+# we require for other Python in our codebase (our conf.py
+# enforces this, and some code needs it.)
+
+Otherwise this will become inaccurate in a couple of weeks
+as soon as some other extension code lands that really does
+have a 3.5 requirement.
+
+> +python:
+> +  version: 3.5
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
