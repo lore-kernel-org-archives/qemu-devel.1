@@ -4,43 +4,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 984CEC3F68F
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E0C1C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:06:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71300217F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:05:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71300217F4
+	by mail.kernel.org (Postfix) with ESMTPS id 5344F21775
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:06:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5344F21775
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ize1v-0007B1-Ls
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:05:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32952)
+	id 1ize3A-0008SJ-HR
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:06:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ize0A-0006ce-Vq
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:03:16 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ize20-0007Qw-0C
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:05:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ize08-0007Ao-J2
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:03:14 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:43651)
+ (envelope-from <laurent@vivier.eu>) id 1ize1x-0005wN-Tf
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:05:07 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:51919)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1ize04-0006jL-Up; Thu, 06 Feb 2020 05:03:09 -0500
+ id 1ize1v-0005Vo-FH; Thu, 06 Feb 2020 05:05:03 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MOAmt-1jAKI20LGb-00OY9s; Thu, 06 Feb 2020 11:03:03 +0100
-Subject: Re: [PATCH] hw/i386/vmmouse: Fix crash when using the vmmouse on a
- machine without vmport
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-References: <20200129112954.4282-1-thuth@redhat.com>
+ 1MJn4B-1jEi4E15Pl-00KASf; Thu, 06 Feb 2020 11:04:47 +0100
+Subject: Re: [PATCH] MAINTAINERS: Cover hppa-softmmu.mak in the HP-PARISC
+ Machines section
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200129190316.16901-1-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,34 +83,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <6f5abb31-7b4b-7ffd-ce08-edbc8ba96845@vivier.eu>
-Date: Thu, 6 Feb 2020 11:03:02 +0100
+Message-ID: <3ee6077b-9c03-b762-8e8f-12b2c609562f@vivier.eu>
+Date: Thu, 6 Feb 2020 11:04:45 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200129112954.4282-1-thuth@redhat.com>
+In-Reply-To: <20200129190316.16901-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:b9TXFAkYUh1iWgIVrl48m4Dklwt6SOCkdLjSzsGuwO+MPhZY9BB
- FWkAZ/YpvGZtcGdcmrst4hvvz9/H3YvPjAdOpmsMTbx1HvDhm08dWspiE0NbWHPWeh3Zu6K
- qoO0PA2sbFJVK+yeBBuu7DDFKZ2VwP7uoiGFqgPVp5eH4/AUjdfTSXxmYwbz5RD8V+GrjnT
- NNhtI8fabGAerDT1z576w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DIVCMzgIVos=:XKCUWbujWNMj216c9EQdK3
- Mj7qFo6hKXv4apejbZcKwEz5Oe6we7YLrJx6rjiJM4zlgjGWP9tl6tHKkF6zAdbR1b0y/2dp4
- Cu+IVhjV38Mpy4gGYb8nCcIx1DGQv/hfXtN/FFJ5tPcJ6BUlH+M0CmS4+ndNuRUrcHDg98UgJ
- XXMDJbwz7hUOrd2nqeSaGE3DJX627sZIDgfD7OOCt8giKD1jxo3rdWnTE024b3xFGpF2P3RVJ
- Bypcshna5VQpr1qQ8CSs5p3SP8SZ9AB67mTqtRiPPuG64ip0qYOenJmuusvIIk3ZAdjFX3gtD
- KQ4Ixza+TzwJYZ/TwzAWljv5JhCAA4V2clMLqeTIdtfEYRK20W3aIOVoTwalK4cKdtoAJMBhR
- tC6RDd64IvNJYxNqYznrz5ETcKd/JF/hkERCREg8fsJ7H7NQPY0dsep/T1J5ale5ohHJvLYdW
- oOW0HJSvDVjVzHumzz6inG+JFVBn7DztUE8lxEy0SFMOExOo/vA7Z9nKMRAHEZtNm34ojvJXK
- z/4dE476uMs3NtgghDUHQPCRjVCrf848izP8UIA2YTcWh7CCSpqYgOArWOkFZuaQKJvseS+Ax
- tAaACQKVTWUxFuRzDlhFegpTeHEaxiCHqTqmuUkl6qd9/oyx+qpPJ696cQJ1SV+a4bFtR1ZZt
- 2XsB3j+lCWdSrjP4yfeQd5kJQL/do7dcWZdPDkUO1HBbC39QaNbeUyKNUMjX6zSyXTKHk7YVX
- AHn5yWugMfQX3TARKm84M1T9gTEDMweX/zY0r9vpLRoQ5fvMu+GBpr8TWR/MKMHbBnUYaIhW+
- rO/7qcjIbAhVmMHo4kuuTWIms25mTmeh1vRzBTJ6xOttf1/rI9/VETHUF9ezPYJmoQntFNB
+X-Provags-ID: V03:K1:eIGvU0TxDaUkfPlAubBKTxTR1Trr6ci0bj8wfrDupejBMLGS4Yp
+ kK83uMRFU7nUOOakkkwbOXl0h7FtI3OZ1iWV42++QCv2rMi5DC8NZdmxSSasye0pFgDha25
+ xe6dKk3fiO3rJFk2C6X4TepAI7nbOxUShuWpErPT/sHa0bd8b3NuqTqLiNX+Ots0InnNVK9
+ d54enKhY3z8GqwwEOayAw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:rUsfBGBmNgo=:Dzhwg0d6FY1CH0yHVzIRbI
+ Y9djiROPSox1WZbVzJrUmNgf+3W7xBBeT8LAH9hOgyR7deG3FTldPrUBkHTGVjmQouGjxuAbM
+ zZpZs72Ju6icdHlEemPt6JlgAErRN+UudT2iSHSMb7zvCbmytT7fvLAQBHyq9j3OXLmT0y0xT
+ wBCQXSK+ozkVfrnbcbRdB21Moa4+NZUxlvbZjGboxN1Hi8o/rfqbkV/RKoSK8WGW/5J70c5By
+ iNZT9d54GsLhF7ojh06Ou9rmwu0r/r3YV4BQKUjWNiC0dljankG+ynTFwj7/DRpXW/faMK5iT
+ Lvf1hCxkamwK+bi7YFSFYV2pZNOcBfycQu0PRcJ3LhPh3YRxiiPuHySUoXz8ab3CCrNLxpZfI
+ y2yvTuUOmzE1Ke/iMN+tbRgafJo6Tl2YkeSHPy3i8MDPq3btFDf0sBYny9xrRF0iAJK6OXULq
+ UUu3RQ3rSPPKczjxOrkszBwNfv/6CrrtO3IQbuXE/pbzp55NHiTBl3rEHSkwRFcO6pq/HmCz5
+ bcAY9/yX4fTGHj9LTzeyz/oRe5tL1I02jXupWI7aOSETsyiPVmHSQeph5R/owyh73c6DRSFuZ
+ opRbUkPGXBs6FL4wDPXoNALd/EdROsq0KtMdMX/wAnnyb2UndXn+gINPIxUEXP7S12LXb8QJU
+ jttFu4H7LWyb7pBJc8Nyr6evNy4VOave3SZVcJuRSQcawtqfk4Xhx+SHeZnhU3Lx7CQrfI8OB
+ rmgbaCd+h5HkbAUZIyjZLHiJBUYLPy5O0V47mFgi07Yua8pOSOBUiAJWu2zG5rFf6GStqFT2/
+ quc5qQUbTrnRQ14jCeqCwbYm00/wVU7cqEIO/Ih/+PmMl+WtNTvIetvDZrDc6NmyuIO5nod
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,55 +122,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-trivial@nongnu.org, Helge Deller <deller@gmx.de>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/01/2020 à 12:29, Thomas Huth a écrit :
-> QEMU currently crashes when the user tries to use the "vmmouse" on a
-> machine without vmport, e.g.:
+Le 29/01/2020 à 20:03, Philippe Mathieu-Daudé a écrit :
+> Modifications to default-configs/hppa-softmmu.mak should be
+> reviewed by the hppa-softmmu users (currently a single machine).
 > 
->  $ x86_64-softmmu/qemu-system-x86_64 -machine microvm -device vmmouse
->  Segmentation fault (core dumped)
-> 
-> or:
-> 
->  $ x86_64-softmmu/qemu-system-x86_64 -device vmmouse -M pc,vmport=off
->  Segmentation fault (core dumped)
-> 
-> Let's avoid the crash by checking for the vmport device first.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/i386/vmmouse.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
-> index 7c2a375527..e8e62bd96b 100644
-> --- a/hw/i386/vmmouse.c
-> +++ b/hw/i386/vmmouse.c
-> @@ -23,6 +23,7 @@
->   */
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index efd3f3875f..2c00a49c42 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -896,6 +896,7 @@ HP B160L
+>  M: Richard Henderson <rth@twiddle.net>
+>  R: Helge Deller <deller@gmx.de>
+>  S: Odd Fixes
+> +F: default-configs/hppa-softmmu.mak
+>  F: hw/hppa/
+>  F: pc-bios/hppa-firmware.img
 >  
->  #include "qemu/osdep.h"
-> +#include "qapi/error.h"
->  #include "ui/console.h"
->  #include "hw/i386/pc.h"
->  #include "hw/input/i8042.h"
-> @@ -269,6 +270,11 @@ static void vmmouse_realizefn(DeviceState *dev, Error **errp)
->  
->      DPRINTF("vmmouse_init\n");
->  
-> +    if (!object_resolve_path_type("", TYPE_VMPORT, NULL)) {
-> +        error_setg(errp, "vmmouse needs a machine with vmport");
-> +        return;
-> +    }
-> +
->      vmport_register(VMMOUSE_STATUS, vmmouse_ioport_read, s);
->      vmport_register(VMMOUSE_COMMAND, vmmouse_ioport_read, s);
->      vmport_register(VMMOUSE_DATA, vmmouse_ioport_read, s);
 > 
 
 Applied to my trivial-patches branch.
