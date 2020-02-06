@@ -2,89 +2,97 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B975C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C6C5C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:28:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14D4E21741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:26:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E873721741
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 14:28:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HHA5yVZW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D4E21741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGkPR/1H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E873721741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izi7H-0004tX-2D
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 09:26:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53536)
+	id 1izi8p-0007F9-2n
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 09:28:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1izi6b-0004Fw-Jn
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:26:10 -0500
+ (envelope-from <groeck7@gmail.com>) id 1izi6x-0004Zt-TR
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:26:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1izi6Z-0003IB-QX
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:26:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34012
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1izi6Z-0003CC-K3
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:26:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580999167;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=y7bGp6CfkI25EMAXXKBjxR4WkUwynk6Btbi4PodTI3A=;
- b=HHA5yVZW9e3kaBvt5OytDJr/O+SUmufo5BXWJqlJYsXWLYyx41zRXDJuI0PAIaGj0BWzG9
- STfVJg6Q7CbzraUWJnYEjBPk4Ez5h6kbj9hK5dXKAimrQo63MEjsD93HCiZTQR9ofCIhVY
- 3fLypaubONl8g9Vxm/Zs4Cp38GHHjuc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-G6HByh80N7GjVGYShf6Hnw-1; Thu, 06 Feb 2020 09:26:05 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4423B192B9C6;
- Thu,  6 Feb 2020 14:26:04 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-204.ams2.redhat.com [10.36.116.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 55B3448;
- Thu,  6 Feb 2020 14:26:00 +0000 (UTC)
-Date: Thu, 6 Feb 2020 15:25:58 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH 02/13] qcrypto-luks: implement encryption key management
-Message-ID: <20200206142558.GB4926@linux.fritz.box>
-References: <20200130125319.GD1891831@redhat.com>
- <87zhe5ovbv.fsf@dusky.pond.sub.org>
- <20200130150108.GM1891831@redhat.com>
- <877e18oq76.fsf@dusky.pond.sub.org>
- <87mu9xxwzv.fsf@dusky.pond.sub.org>
- <20200205093011.GA5768@dhcp-200-226.str.redhat.com>
- <20200205102303.GB2221087@redhat.com>
- <87a75xgl6w.fsf@dusky.pond.sub.org>
- <87h803ua2c.fsf@dusky.pond.sub.org>
- <20200206133658.GL2391707@redhat.com>
+ (envelope-from <groeck7@gmail.com>) id 1izi6w-0005cd-Sf
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 09:26:31 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38426)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1izi6u-0004yM-F6; Thu, 06 Feb 2020 09:26:28 -0500
+Received: by mail-pl1-x642.google.com with SMTP id t6so2418747plj.5;
+ Thu, 06 Feb 2020 06:26:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dgvelOjxXepWDkCo+aQxeDvybFNaShgsH498mYyRW24=;
+ b=YGkPR/1HaAW5MnJvS47pmUITdfddFk8EqCzyjCkUqLeES5Q5u4MWiIvXVsIKZe6cJO
+ gdKaznoFskLynbg/XCtE31NqDhqvHA5xnpWxmuqpn+/DZHuZ9KnVX5xPjrh7NSFgRy6R
+ dUD0TzutqBXEVfa8yfhHKGaLBMxPW5h5msiHp9+VJStZrDzwOqwnElosaqIaLsg4kh34
+ Zknab0wO6aLKRq0Fv7m0O6Z1ejI3aF3liEFx/p7z5UW+b0x5roT2ltvU+KojPE0Dg4TX
+ EtPomucQRzrf3C8OgXbS0oEe7tyJwrDNeOXkXwSgS0qpxPrllnNPph3tL2MSTNMaWsF2
+ q6LQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dgvelOjxXepWDkCo+aQxeDvybFNaShgsH498mYyRW24=;
+ b=rtdGw7HRcw55qIcVLAHlt5A96meN6frDw07mXUh9ijtDxEmuvinYbpQQq+ZUxIxesR
+ hd4d4ixKPT7clhQyi9rWyhfWfY9/k4QU0GtDWoY0M85ZVcML2Ikc8RNfNM1IxEmjdhl0
+ 5CTaZ4Ntp6t10UQJK206PTkIKeNP8jEuEvW27n9AZc24kLs0KVKRKNph3E/UjObJ4iwq
+ i67lkJvDL5rg0Lip+tenE8ue0nBp+3+KAdV1pPUOQiT1XYNNK+Dijtzg+3GmWp3kKtje
+ kRMx+IsLrastCHJtwCGGokFOpWqA4VevLyOzgwx9D2W4RLhs4ylUybSNJdDDUwMIlviU
+ Mr6Q==
+X-Gm-Message-State: APjAAAWa77tozXiRYn64JwxiuwJutPCvLs6af6wv/3c/DXz10ixgxkRJ
+ 6FUoXK53gqaPPHwzo+gx+sY=
+X-Google-Smtp-Source: APXvYqxbeNN2ZRneGxIUXb4P/bNjdmjUBBV3mVHfceTvpJs+g+RNgoAFRSJqWkH5uhyRXDEMkU7ByQ==
+X-Received: by 2002:a17:902:b690:: with SMTP id
+ c16mr4077065pls.320.1580999186314; 
+ Thu, 06 Feb 2020 06:26:26 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id
+ m12sm3722748pjf.25.2020.02.06.06.26.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 06 Feb 2020 06:26:25 -0800 (PST)
+Subject: Re: [PATCH 2/3] m25p80: Improve command handling for Jedec and
+ unsupported commands
+To: Joel Stanley <joel@jms.id.au>
+References: <20200203180904.2727-1-linux@roeck-us.net>
+ <20200203180904.2727-2-linux@roeck-us.net>
+ <accf297f-0c54-7475-8817-c1014999a57d@kaod.org>
+ <7fe70871-c0e3-4ff6-bfda-17b45aa50c5e@roeck-us.net>
+ <22a96987-9548-1335-8b04-00167ed9491d@kaod.org>
+ <20200205174345.GA7754@roeck-us.net>
+ <CACPK8XesxroZii2-r-HTigW4-7Ahw4TQNG1r-YO2K09S7Ap9=Q@mail.gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <7318860e-4d6c-b7f8-182f-d0efa332973f@roeck-us.net>
+Date: Thu, 6 Feb 2020 06:26:23 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200206133658.GL2391707@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: G6HByh80N7GjVGYShf6Hnw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <CACPK8XesxroZii2-r-HTigW4-7Ahw4TQNG1r-YO2K09S7Ap9=Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,36 +104,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
+ Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.02.2020 um 14:36 hat Daniel P. Berrang=E9 geschrieben:
-> On Thu, Feb 06, 2020 at 02:20:11PM +0100, Markus Armbruster wrote:
-> > One more question regarding the array in
-> >=20
-> >     { 'struct': 'QCryptoBlockAmendOptionsLUKS',
-> >       'data' : {
-> >                 'keys': ['LUKSKeyslotUpdate'],
-> >                  '*unlock-secret' : 'str' } }
-> >=20
-> > Why an array?  Do we really need multiple keyslot updates in one amend
-> > operation?
->=20
-> I think it it is unlikely we'd use this in libvirt. In the case of wantin=
-g
-> to *change* a key, it is safer to do a sequence of "add key" and then
-> "remove key". If you combine them into the same operation, and you get
-> an error back, it is hard to know /where/ it failed ? was the new key
-> added or not ?
+On 2/5/20 11:04 PM, Joel Stanley wrote:
+> On Wed, 5 Feb 2020 at 17:43, Guenter Roeck <linux@roeck-us.net> wrote:
+>>
+>> On Wed, Feb 05, 2020 at 11:08:07AM +0100, Cédric Le Goater wrote:
+>>>
+>>> ok. we will need to model SFDP one day.
+>>>
+>>> Are you using the OpenBMC images or do you have your own ?
+>>>
+>>
+>> I am running images built from upstream/stable kernel branches.
+> 
+> I think Cédric was wondering which flash images and therefore
+> filesystems you were using in your testing.
+> 
+Ah, ok. Sorry, misunderstood.
 
-I think the array came in because of the "describe the new state"
-approach. The state has eight keyslots, so in order to fully describe
-the new state, you would have to be able to pass multiple slots at once.
+> I had a poke around here but I couldn't work out where 'mtd32' came from:
+> 
+> https://github.com/groeck/linux-build-test/blob/master/rootfs/arm/run-qemu-arm.sh
+> 
 
-Kevin
+mtd32 tells the infrastructure that the boot device is mtd (flash) with
+32MB capacity. The infrastructure uses that to create the actual flash
+image and to generate the qemu command line. The root file system is
+is rootfs-armv5.ext2 (located in the same directory as the run script).
+It was generated using buildroot.
 
+Guenter
 
