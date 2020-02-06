@@ -2,114 +2,89 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A31C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A74A6C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:45:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3C5C206CC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:33:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7098020730
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:45:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kwf38x0f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C5C206CC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GZxSaUVy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7098020730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izeTS-0001mc-TI
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:33:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33388)
+	id 1izeet-00049j-Gf
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:45:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rth7680@gmail.com>) id 1izeOn-00005F-N0
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:28:42 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1izeeE-0003hz-QT
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:44:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rth7680@gmail.com>) id 1izeOm-0001JN-Jy
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:28:41 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55093)
+ (envelope-from <alex.bennee@linaro.org>) id 1izeeC-0008I0-DV
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:44:38 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39011)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1izeOm-000164-CZ
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:28:40 -0500
-Received: by mail-wm1-x344.google.com with SMTP id g1so5682533wmh.4
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:28:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=62+/egQfC/qaJqd1bACLWI/4S4BEOAdrScAqprINvvs=;
- b=kwf38x0f0reuBI9H59UGKY+aMWKfzwXycKeJMbcvPUPMf71bGD3yJCSQbcWGtpOPtN
- eJHfFdcEzO4cLrKq4CNCT4Uzreqlu/pc1Z+7QEiAJYmctCtL03vUtttvkcKZOqSF/Y8R
- dmM1E0TWF4nvOuQaW0LKzjDWe7MuJ6r7KTSXGV0n+Ssy8b3zyT+LqCNrv1L9nQy8ha5+
- zZ51m4JVu1/1pMwfXkod52Ahu1tKolo1PCtPm9xIxrAKEhgmed/k42Cz43ExpLkAgEwm
- VRfwTSvM2QJYQ22s8K/JXKXnc5BgTeXufMv0P/Q75dDb4kaImnvuU4HG5uverL1pcxr3
- z09w==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1izeeC-0007y8-3B
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:44:36 -0500
+Received: by mail-wm1-x342.google.com with SMTP id c84so6431883wme.4
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:44:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=gdR/nScs6F4cHmnBQODQO9NFt/jKw0D5TyrF6Qxqpwg=;
+ b=GZxSaUVyYHJ9p2OOPk4jouDbkBT1b24Uj9JhmbsUkE/1UUnV66PFQqvRX/SwkHX0zx
+ p3LkOELd5SDr6rlJjfg9vr2OlyrfFbh4dF/LuXUK21O4b+ygGctWJA/W3d3rscal/c5t
+ DaIzqnV4mTNEnxYNc/tbsb5El9XpuuHkvv54Re3AU3FLf1mgkqaXTzujJDXcbaT0EbIe
+ k5VsHZoe3tTORoLtWQx3DVpIjUsj9IgfehK2Et0O4MOHI/2IBfXQvjgi9V3pmpdAU97r
+ 9PidJnXotyljGrhJFtscwKCUPQ+3BAqq0qwIT1eCjwyq5VBINE7WhdgFFAcUeyVx9o7e
+ LQjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=62+/egQfC/qaJqd1bACLWI/4S4BEOAdrScAqprINvvs=;
- b=CNdhF3uHSLD3GYY0E41/cXWm6OXpRN0qYyMErXpcl1uAfiGolgQr2uRaEqK0jFbrPF
- ddX+vt3T6Ltng9PxTpgzw4PMTmd+cIJ+K+6+E0qV1yk0Fm9Yd9vJVAxZuCkn76bwL5cR
- r/TeUdR4aZnS8/kTV9t9nvbpHgjdU6f+o4JKvlo4cvaAH/2lVZ3dJuoIiNftNoTF+nxH
- Jt5cpN1iTt58wavTmwAbvPUG5lPO9rz9vyeRDvkcNY8SGE0TZE8lVHfbLX7pz1V4vIYs
- nghZTPf6YkTyoMT9kt3HBo9m//Ylj3qcji54xK1ih+o/arNjdIZgIzuu/J+bn0KGI+nU
- u/PQ==
-X-Gm-Message-State: APjAAAUV/BVIwKUPGicplasMDIXeotbMYm5slT0U52T5iJvJ5HxTD40H
- UJKPDHQX72GmPzMTYqjNsMQ=
-X-Google-Smtp-Source: APXvYqzOT6xgLk/FjGiMLexyyEjqijoDboxDROUnEl1CTrphLKFqDG2Hs0ohXSlkYdJa0FqqXQ3WhA==
-X-Received: by 2002:a1c:9849:: with SMTP id a70mr3682537wme.76.1580984918239; 
- Thu, 06 Feb 2020 02:28:38 -0800 (PST)
-Received: from [10.43.13.93] ([135.196.99.211])
- by smtp.googlemail.com with ESMTPSA id t10sm3086333wmi.40.2020.02.06.02.28.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 02:28:37 -0800 (PST)
-Subject: Re: [PATCH] Add support for a helper with 7 arguments
-From: Richard Henderson <rth@twiddle.net>
-To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
-References: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
- <09def3cf-6833-ccf5-457e-1755a7fd0e04@twiddle.net>
-Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
- mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
- n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
- rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
- Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
- n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
- AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFYBBMBAgBCAhsDBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAIZARYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweUY
- BQkP1h/pAAoJEK0ScMxN0CebqDsH/0YyfnXk+Dc++H37VCEKgRet2i1ATFzxRnifkvmdxha0
- V+PVptQ2fwSe+w3KxoFecD8W75nysmUjrU/FicW9yU5YRlGONPZjruG02/KzmhA5PzWJdYO3
- i/t0qRayvWIcX2qA/flsXEbmb/BbAFM05LQIdcOu74eiBFe5CBCOWBDJeneE1urIE0hSYxoh
- nCcG60ULrNj13ohZ4zAEluoY32qIo7/OPWmtR88cPrEbZT8k+RqgZbsotzaPT1/RlL74fL8k
- ofYfTgKAFH7eEy6fF2nzDp2GThVn+3sA62xtpSXUf/X1m75B40KOcq1EQbHypNTmBc1wt13e
- ibhPNEVX2am5AQ0EUa4sLwEIALITHfH3gciRNfQIe7awDTDvn6H3C6gDyCAnv5LiuLTLZiyK
- NZp3lNO3rPowyKrGT2RIDlumlqPgdeHzqEEX91YK0yk2vdFvwU04rJ4D+qRgdUPoeICLD1zo
- PwOv2FaY6Tf8dKYas1RHF5QU5yQNey8j7IYYoE2yGPn2PtBmvtmK4iLataUEvx0U385Zr+jf
- HscqwTiToryeDC8Io/9BsMvAssE5Yf5URS2nJ7LFOvc4njsQJPF1i9egBXaIloqv7p2hVCKJ
- Hl5UWIxitQ9QQIl6iU4LCpz8mVYTXwv48IAVpbUf7+ak9V9Kk3jCeQnlxCJBUHjUhoIzinbS
- JHPHtkkAEQEAAYkBPAQYAQIAJgIbDBYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweVIBQkP
- 1iAZAAoJEK0ScMxN0CebGHUH/RtouOlWl6To97tQsTJUq/2YwmRpFOsvV0/zCX4fKBGAbeZi
- VaELSt2+3UEErA+n8HwbQmjJ6IrdhA9GustOpOyCcbLVSMwql/OlAwBtDzCcC8dTU4zcuY2a
- rGG2A8i5krU85G9r1wowVcWZBsdmW7/dKiNoadLQiig4bHNiSaV4ograas5efyEjqTxiY+yG
- hzPw5DK2kbp2co8iDF1vW0LWPeLFBinCgItcI9LvgHWaB3rwjOfvNpMn5m64SoQYHB8wbnid
- erAjOzkBzmqnfS1tAUr8mtESStEwrEmNv0ZoA6S0Wt+c9pyTr+BpG4OFlhj7ZI+Eh7zOrr33
- q9OBIdA=
-Message-ID: <640ffa37-a70b-dfa9-55ef-cde5c7f0dfcb@twiddle.net>
-Date: Thu, 6 Feb 2020 10:28:35 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=gdR/nScs6F4cHmnBQODQO9NFt/jKw0D5TyrF6Qxqpwg=;
+ b=FPU5N8AnzbT4rXN4u899G5RmAWX3vqD3v8bhdZPesJxWn8+ZMjhLoL5jwCeKe+1GYJ
+ 6VENKcD1cHkuwcsq1K2NJLmyU5AI6x7n1dyjvVGFKetwwJMHqIlybYGPedRRlmGrlo2S
+ QZnC+w68RicRE6zQB5xKoNlYjiN+QinNliFe6bkfPzJWAu/g5fZYheA14uOxUhCOdGRr
+ T1tSKka5S5gV8GeT34afICfw4beOioL07SeW/PWh/zgbBIF0qtib+m6trLBdHXj3T7DQ
+ R91/kProAKetfMTH1dvX+78XXaOeF2kDMcWCPC1QigFewzxlfZm0XhaDtMGmCLoNT6QR
+ Et+Q==
+X-Gm-Message-State: APjAAAV+3PIYDNDEkrqouB0lDdG5oftIHiZh7PMK1bZzFwFJDD8ZovWx
+ UpExegoJVTZwQRl/mztmSOHS7g==
+X-Google-Smtp-Source: APXvYqxGYkiCQ79mBWuOouyIERLQB3OSOUGygBbwRzf0SkMOKgluFq8E0w6vdfENq5JRaWkaR3+C7Q==
+X-Received: by 2002:a1c:a947:: with SMTP id s68mr3899730wme.61.1580985874804; 
+ Thu, 06 Feb 2020 02:44:34 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 16sm3243172wmi.0.2020.02.06.02.44.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Feb 2020 02:44:33 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DF5F61FF87;
+ Thu,  6 Feb 2020 10:44:32 +0000 (GMT)
+References: <20200201192916.31796-1-richard.henderson@linaro.org>
+ <878slja79n.fsf@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v6 00/41] target/arm: Implement ARMv8.1-VHE
+In-reply-to: <878slja79n.fsf@linaro.org>
+Date: Thu, 06 Feb 2020 10:44:32 +0000
+Message-ID: <87ftfo806n.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <09def3cf-6833-ccf5-457e-1755a7fd0e04@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,40 +96,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/6/20 6:02 AM, Richard Henderson wrote:
-> On 2/5/20 10:41 PM, Taylor Simpson wrote:
->> Currently, helpers can only take up to 6 arguments.  This patch adds the
->> capability for up to 7 arguments.  I have tested it with the Hexagon port
->> that I am preparing for submission.
-> 
-> This is not safe, in general, without other changes.
-> 
->>From include/tcg/tcg.h:
-> 
->> /* While we limit helpers to 6 arguments, for 32-bit hosts, with padding,
->>    this imples a max of 6*2 (64-bit in) + 2 (64-bit out) = 14 operands.
->>    There are never more than 2 outputs, which means that we can store all
->>    dead + sync data within 16 bits.  */
->> #define DEAD_ARG  4
->> #define SYNC_ARG  1
->> typedef uint16_t TCGLifeData;
-> 
-> Thus 7 uint64_t inputs, on a 32-bit host, will overflow TCGLifeData.
 
-My bad, no it won't.  For some reason I had two outputs in my head, but they'll
-both be uint32_t not two uint64_t.  7 uint64_t inputs with 1 uint64_t output
-will *just* fit.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+
+> Richard Henderson <richard.henderson@linaro.org> writes:
+>
+>> Version 6 moves vhe_reginfo[] to file scope, and one tweak
+>> to the vhe register access masking that Peter asked for.
+>>
+>> All patches now have reviews.
+>
+> I was re-testing and I was able to boot my guest Image+buildroot.
+> However the busybox crashes after login so I'm unable to do stuff in the
+> guests userspace. I seem to recall we saw this last time but I can't
+> remember what the problem was.
+
+PEBKAC
+
+I've now deleted the errant Image and re-tested with both 32 bit and 64
+bit EL0 userspaces in the guest. So keep my:
+
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 
-> What are you doing that requires so many arguments?
-
-But I'd still like to know why you need so many.
 
 
-r~
+>
+>>
+>>
+>> r~
+>>
+>>
+>> Alex Benn=C3=A9e (1):
+>>   target/arm: check TGE and E2H flags for EL0 pauth traps
+>>
+>> Richard Henderson (40):
+>>   target/arm: Define isar_feature_aa64_vh
+>>   target/arm: Enable HCR_E2H for VHE
+>>   target/arm: Add CONTEXTIDR_EL2
+>>   target/arm: Add TTBR1_EL2
+>>   target/arm: Update CNTVCT_EL0 for VHE
+>>   target/arm: Split out vae1_tlbmask
+>>   target/arm: Split out alle1_tlbmask
+>>   target/arm: Simplify tlb_force_broadcast alternatives
+>>   target/arm: Rename ARMMMUIdx*_S12NSE* to ARMMMUIdx*_E10_*
+>>   target/arm: Rename ARMMMUIdx_S2NS to ARMMMUIdx_Stage2
+>>   target/arm: Rename ARMMMUIdx_S1NSE* to ARMMMUIdx_Stage1_E*
+>>   target/arm: Rename ARMMMUIdx_S1SE[01] to ARMMMUIdx_SE10_[01]
+>>   target/arm: Rename ARMMMUIdx*_S1E3 to ARMMMUIdx*_SE3
+>>   target/arm: Rename ARMMMUIdx_S1E2 to ARMMMUIdx_E2
+>>   target/arm: Recover 4 bits from TBFLAGs
+>>   target/arm: Expand TBFLAG_ANY.MMUIDX to 4 bits
+>>   target/arm: Rearrange ARMMMUIdxBit
+>>   target/arm: Tidy ARMMMUIdx m-profile definitions
+>>   target/arm: Reorganize ARMMMUIdx
+>>   target/arm: Add regime_has_2_ranges
+>>   target/arm: Update arm_mmu_idx for VHE
+>>   target/arm: Update arm_sctlr for VHE
+>>   target/arm: Update aa64_zva_access for EL2
+>>   target/arm: Update ctr_el0_access for EL2
+>>   target/arm: Add the hypervisor virtual counter
+>>   target/arm: Update timer access for VHE
+>>   target/arm: Update define_one_arm_cp_reg_with_opaque for VHE
+>>   target/arm: Add VHE system register redirection and aliasing
+>>   target/arm: Add VHE timer register redirection and aliasing
+>>   target/arm: Flush tlb for ASID changes in EL2&0 translation regime
+>>   target/arm: Flush tlbs for E2&0 translation regime
+>>   target/arm: Update arm_phys_excp_target_el for TGE
+>>   target/arm: Update {fp,sve}_exception_el for VHE
+>>   target/arm: Update get_a64_user_mem_index for VHE
+>>   target/arm: Update arm_cpu_do_interrupt_aarch64 for VHE
+>>   target/arm: Enable ARMv8.1-VHE in -cpu max
+>>   target/arm: Move arm_excp_unmasked to cpu.c
+>>   target/arm: Pass more cpu state to arm_excp_unmasked
+>>   target/arm: Use bool for unmasked in arm_excp_unmasked
+>>   target/arm: Raise only one interrupt in arm_cpu_exec_interrupt
+>>
+>>  target/arm/cpu-param.h     |    2 +-
+>>  target/arm/cpu-qom.h       |    1 +
+>>  target/arm/cpu.h           |  423 +++++--------
+>>  target/arm/internals.h     |   73 ++-
+>>  target/arm/translate.h     |    4 +-
+>>  target/arm/cpu.c           |  162 ++++-
+>>  target/arm/cpu64.c         |    1 +
+>>  target/arm/debug_helper.c  |   50 +-
+>>  target/arm/helper-a64.c    |    2 +-
+>>  target/arm/helper.c        | 1220 +++++++++++++++++++++++++++---------
+>>  target/arm/pauth_helper.c  |   14 +-
+>>  target/arm/translate-a64.c |   47 +-
+>>  target/arm/translate.c     |   74 ++-
+>>  13 files changed, 1392 insertions(+), 681 deletions(-)
+
+
+--=20
+Alex Benn=C3=A9e
 
