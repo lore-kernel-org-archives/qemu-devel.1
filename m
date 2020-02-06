@@ -2,87 +2,86 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F1C5C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFEBC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:15:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD31B206CC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCFDD206CC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:15:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m5n98L18"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD31B206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AXILPSpG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCFDD206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36275 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izf7g-0006xS-VJ
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:15:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50115)
+	id 1izf8P-0008Cm-VV
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:15:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1izeoX-0003OA-Gb
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:20 -0500
+ (envelope-from <thuth@redhat.com>) id 1izete-0006Cj-DH
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:00:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1izeoV-0007tC-5L
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:17 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:56295)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1izeoU-0007nG-RH
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:15 -0500
-Received: by mail-wm1-x344.google.com with SMTP id q9so5784140wmj.5
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:55:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=KOzTT0q0LhBt7o79LT+62J9yg5xdIQ6AR786QD6JuK8=;
- b=m5n98L18iOux8R3GHRXmwR0cnKct7QE7iwAt0IDTPq9BjZyR/BXDgvTPdo/ZyL273E
- 8+zZ+dww8JK/ny9xPE4m/e40nK41TO4HTUSPMz+kXqalBpf2m5UUW/XL26Fkq1hL2SrO
- C4h9kmpdAiDFfNeChZPaLHaBDcZUME7LhVRNQrafj+01nvfGwz2CgA41cb4pGOPPIfZc
- 84N/x1fDEPUEHYWYmexRN/ATwEvXZrATtFDqlvjI07eC/PtVWJGwExAU47lSzRXNpoX6
- BqKYEc+3xxPVEOEVGla1TFyWbksx88Mcu5wLN+alnQ2YA59hozHbT7ijymw4mTC5uDmT
- AxAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=KOzTT0q0LhBt7o79LT+62J9yg5xdIQ6AR786QD6JuK8=;
- b=jF8BWx0M6dwemYCcJJJjMpYLRTtunBypB8NmeK2+6a+irGLWPoDFAjM3zBamdtVmlP
- ae3o0YTmfuLzVpz46TirIVa9vCieXBY9EXsxfuzeZbge5tNo2XiB+vK1ScSauSbkeaxM
- f+pHOFLCdak9bzCJUFOQkdlq+IIm1139cblOHcaBOUxQRzSkYncRxfk5F0aassJINQhO
- gIft/zjVz0jqt2j0QDHuauKWpU43HtbMD3G4GnnQOPewLbMcbTJdMNThmOG6LwK5zPbQ
- zYPVSv81JWR5JWdIJmgc6/3aw/n+xj10HBsaKYVKiBfzgIKMYstGaRCiHg8G4uNsWXO1
- oSKw==
-X-Gm-Message-State: APjAAAXQST2wA/dI57pOKvkUwKuTylHvE00Rj2GwB9UB1EQpmX/F791E
- hlTDBjAXIXOkgL2ytLcHJUjUIlRwDSyfhg==
-X-Google-Smtp-Source: APXvYqxRjP5vTIUJnrjLWqATWWyhJK2z6Wk3f/oDmWkPJdOiDhFAVuPZBQgUFULO6vaO5OdMzKgaBw==
-X-Received: by 2002:a1c:2747:: with SMTP id n68mr3854343wmn.14.1580986513294; 
- Thu, 06 Feb 2020 02:55:13 -0800 (PST)
-Received: from cloudburst.c.hoisthospitality.com ([135.196.99.211])
- by smtp.gmail.com with ESMTPSA id m21sm3364995wmi.27.2020.02.06.02.55.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 02:55:12 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 28/41] target/arm: Add VHE system register redirection and
- aliasing
-Date: Thu,  6 Feb 2020 10:54:35 +0000
-Message-Id: <20200206105448.4726-29-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200206105448.4726-1-richard.henderson@linaro.org>
-References: <20200206105448.4726-1-richard.henderson@linaro.org>
+ (envelope-from <thuth@redhat.com>) id 1izetc-0004ZO-MX
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:00:34 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33858
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1izetc-0004VM-HL
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:00:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580986832;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=+rg27dlHYRZaxBCxoo0CQU8VDaQbMcMRvmbj0ClGVSo=;
+ b=AXILPSpGrXHKzOhoiic6xP5EtTNodR0UhcGEcqq23l8qYewywq70zVSr9LQm6fjI3SGsWj
+ Y194AWnE6Ma6MikmhmMMyK7NTfnmeFyEHgGtMoFrzNmugAroDz38l8inufLpGJnE/rsbtp
+ e9SoPPMQ7rvPN9l62zTS7eUZniiHk+w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-Sh-vYLN9MBG36ImOjnT4Gg-1; Thu, 06 Feb 2020 06:00:24 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5212B8010CB;
+ Thu,  6 Feb 2020 11:00:23 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-151.ams2.redhat.com [10.36.116.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C2B15DA7E;
+ Thu,  6 Feb 2020 11:00:21 +0000 (UTC)
+Subject: Re: [PATCH] pc-bios/s390x: Pack ResetInfo struct
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, cohuck@redhat.com
+References: <20200205182126.13010-1-jjherne@linux.ibm.com>
+ <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <896302f7-ec21-6108-6dde-f5a7439d87ab@redhat.com>
+Date: Thu, 6 Feb 2020 12:00:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: Sh-vYLN9MBG36ImOjnT4Gg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,241 +93,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Several of the EL1/0 registers are redirected to the EL2 version when in
-EL2 and HCR_EL2.E2H is set.  Many of these registers have side effects.
-Link together the two ARMCPRegInfo structures after they have been
-properly instantiated.  Install common dispatch routines to all of the
-relevant registers.
+On 06/02/2020 11.09, Christian Borntraeger wrote:
+>=20
+>=20
+> On 05.02.20 19:21, Jason J. Herne wrote:
+>> This fixes vfio-ccw when booting non-Linux operating systems. Without th=
+is
+>> struct being packed, a few extra bytes of low core memory get overwritte=
+n when
+>> we  assign a value to memory address 0 in jump_to_IPL_2. This is enough =
+to
+>> cause some non-Linux OSes of fail when booting.
+>>
+>> The problem was introduced by:
+>> 5c6f0d5f46a77d77 "pc-bios/s390x: Fix reset psw mask".
+>>
+>> The fix is to pack the struct thereby removing the 4 bytes of padding th=
+at get
+>> added at the end, likely to allow an array of these structs to naturally=
+ align
+>> on an 8-byte boundary.
+>>
+>> Fixes: 5c6f0d5f46a7 ("pc-bios/s390x: Fix reset psw mask")
+>> CC: Janosch Frank <frankja@linux.ibm.com>
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> ---
+>>  pc-bios/s390-ccw/jump2ipl.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+>> index da13c43cc0..1e9eaa037f 100644
+>> --- a/pc-bios/s390-ccw/jump2ipl.c
+>> +++ b/pc-bios/s390-ccw/jump2ipl.c
+>> @@ -18,7 +18,7 @@
+>>  typedef struct ResetInfo {
+>>      uint64_t ipl_psw;
+>>      uint32_t ipl_continue;
+>> -} ResetInfo;
+>> +} __attribute__((packed)) ResetInfo;
+>> =20
+>>  static ResetInfo save;
+>=20
+> Just looked into that.
+>=20
+> We do save the old content in "save" and restore the old memory content.
+>=20
+> static void jump_to_IPL_2(void)
+> {
+>     ResetInfo *current =3D 0;
+>=20
+>     void (*ipl)(void) =3D (void *) (uint64_t) current->ipl_continue;
+> --->*current =3D save;
+>     ipl(); /* should not return */
+> }
+>=20
+> void jump_to_IPL_code(uint64_t address)
+> {
+>     /* store the subsystem information _after_ the bootmap was loaded */
+>     write_subsystem_identification();
+>=20
+>     /* prevent unknown IPL types in the guest */
+>     if (iplb.pbt =3D=3D S390_IPL_TYPE_QEMU_SCSI) {
+>         iplb.pbt =3D S390_IPL_TYPE_CCW;
+>         set_iplb(&iplb);
+>     }
+>=20
+>     /*
+>      * The IPL PSW is at address 0. We also must not overwrite the
+>      * content of non-BIOS memory after we loaded the guest, so we
+>      * save the original content and restore it in jump_to_IPL_2.
+>      */
+>     ResetInfo *current =3D 0;
+>=20
+> --->save =3D *current;
 
-The same set of registers that are redirected also have additional
-EL12/EL02 aliases created to access the original register that was
-redirected.
+Right, and this should also work without your modification. I've stared
+at the code a couple of weeks ago, looking for a very similar issue:
 
-Omit the generic timer registers from redirection here, because we'll
-need multiple kinds of redirection from both EL0 and EL2.
+ https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03484.html
 
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v5: Drop unioning in ARMCPRegInfo with bank_fieldoffsets[].
-v6: Adjust spelling of new_reg access adjustment (pmm).
----
- target/arm/cpu.h    |  13 ++++
- target/arm/helper.c | 162 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 175 insertions(+)
+... but in the end, the problem was something else:
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ded1e8e0a8..d091a7e2e8 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -2576,6 +2576,19 @@ struct ARMCPRegInfo {
-      * fieldoffset is 0 then no reset will be done.
-      */
-     CPResetFn *resetfn;
-+
-+    /*
-+     * "Original" writefn and readfn.
-+     * For ARMv8.1-VHE register aliases, we overwrite the read/write
-+     * accessor functions of various EL1/EL0 to perform the runtime
-+     * check for which sysreg should actually be modified, and then
-+     * forwards the operation.  Before overwriting the accessors,
-+     * the original function is copied here, so that accesses that
-+     * really do go to the EL1/EL0 version proceed normally.
-+     * (The corresponding EL2 register is linked via opaque.)
-+     */
-+    CPReadFn *orig_readfn;
-+    CPWriteFn *orig_writefn;
- };
- 
- /* Macros which are lvalues for the field in CPUARMState for the
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2aa04d0613..8f7620f243 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5358,6 +5358,158 @@ static const ARMCPRegInfo el3_cp_reginfo[] = {
-     REGINFO_SENTINEL
- };
- 
-+#ifndef CONFIG_USER_ONLY
-+/* Test if system register redirection is to occur in the current state.  */
-+static bool redirect_for_e2h(CPUARMState *env)
-+{
-+    return arm_current_el(env) == 2 && (arm_hcr_el2_eff(env) & HCR_E2H);
-+}
-+
-+static uint64_t el2_e2h_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    CPReadFn *readfn;
-+
-+    if (redirect_for_e2h(env)) {
-+        /* Switch to the saved EL2 version of the register.  */
-+        ri = ri->opaque;
-+        readfn = ri->readfn;
-+    } else {
-+        readfn = ri->orig_readfn;
-+    }
-+    if (readfn == NULL) {
-+        readfn = raw_read;
-+    }
-+    return readfn(env, ri);
-+}
-+
-+static void el2_e2h_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                          uint64_t value)
-+{
-+    CPWriteFn *writefn;
-+
-+    if (redirect_for_e2h(env)) {
-+        /* Switch to the saved EL2 version of the register.  */
-+        ri = ri->opaque;
-+        writefn = ri->writefn;
-+    } else {
-+        writefn = ri->orig_writefn;
-+    }
-+    if (writefn == NULL) {
-+        writefn = raw_write;
-+    }
-+    writefn(env, ri, value);
-+}
-+
-+static void define_arm_vh_e2h_redirects_aliases(ARMCPU *cpu)
-+{
-+    struct E2HAlias {
-+        uint32_t src_key, dst_key, new_key;
-+        const char *src_name, *dst_name, *new_name;
-+        bool (*feature)(const ARMISARegisters *id);
-+    };
-+
-+#define K(op0, op1, crn, crm, op2) \
-+    ENCODE_AA64_CP_REG(CP_REG_ARM64_SYSREG_CP, crn, crm, op0, op1, op2)
-+
-+    static const struct E2HAlias aliases[] = {
-+        { K(3, 0,  1, 0, 0), K(3, 4,  1, 0, 0), K(3, 5, 1, 0, 0),
-+          "SCTLR", "SCTLR_EL2", "SCTLR_EL12" },
-+        { K(3, 0,  1, 0, 2), K(3, 4,  1, 1, 2), K(3, 5, 1, 0, 2),
-+          "CPACR", "CPTR_EL2", "CPACR_EL12" },
-+        { K(3, 0,  2, 0, 0), K(3, 4,  2, 0, 0), K(3, 5, 2, 0, 0),
-+          "TTBR0_EL1", "TTBR0_EL2", "TTBR0_EL12" },
-+        { K(3, 0,  2, 0, 1), K(3, 4,  2, 0, 1), K(3, 5, 2, 0, 1),
-+          "TTBR1_EL1", "TTBR1_EL2", "TTBR1_EL12" },
-+        { K(3, 0,  2, 0, 2), K(3, 4,  2, 0, 2), K(3, 5, 2, 0, 2),
-+          "TCR_EL1", "TCR_EL2", "TCR_EL12" },
-+        { K(3, 0,  4, 0, 0), K(3, 4,  4, 0, 0), K(3, 5, 4, 0, 0),
-+          "SPSR_EL1", "SPSR_EL2", "SPSR_EL12" },
-+        { K(3, 0,  4, 0, 1), K(3, 4,  4, 0, 1), K(3, 5, 4, 0, 1),
-+          "ELR_EL1", "ELR_EL2", "ELR_EL12" },
-+        { K(3, 0,  5, 1, 0), K(3, 4,  5, 1, 0), K(3, 5, 5, 1, 0),
-+          "AFSR0_EL1", "AFSR0_EL2", "AFSR0_EL12" },
-+        { K(3, 0,  5, 1, 1), K(3, 4,  5, 1, 1), K(3, 5, 5, 1, 1),
-+          "AFSR1_EL1", "AFSR1_EL2", "AFSR1_EL12" },
-+        { K(3, 0,  5, 2, 0), K(3, 4,  5, 2, 0), K(3, 5, 5, 2, 0),
-+          "ESR_EL1", "ESR_EL2", "ESR_EL12" },
-+        { K(3, 0,  6, 0, 0), K(3, 4,  6, 0, 0), K(3, 5, 6, 0, 0),
-+          "FAR_EL1", "FAR_EL2", "FAR_EL12" },
-+        { K(3, 0, 10, 2, 0), K(3, 4, 10, 2, 0), K(3, 5, 10, 2, 0),
-+          "MAIR_EL1", "MAIR_EL2", "MAIR_EL12" },
-+        { K(3, 0, 10, 3, 0), K(3, 4, 10, 3, 0), K(3, 5, 10, 3, 0),
-+          "AMAIR0", "AMAIR_EL2", "AMAIR_EL12" },
-+        { K(3, 0, 12, 0, 0), K(3, 4, 12, 0, 0), K(3, 5, 12, 0, 0),
-+          "VBAR", "VBAR_EL2", "VBAR_EL12" },
-+        { K(3, 0, 13, 0, 1), K(3, 4, 13, 0, 1), K(3, 5, 13, 0, 1),
-+          "CONTEXTIDR_EL1", "CONTEXTIDR_EL2", "CONTEXTIDR_EL12" },
-+        { K(3, 0, 14, 1, 0), K(3, 4, 14, 1, 0), K(3, 5, 14, 1, 0),
-+          "CNTKCTL", "CNTHCTL_EL2", "CNTKCTL_EL12" },
-+
-+        /*
-+         * Note that redirection of ZCR is mentioned in the description
-+         * of ZCR_EL2, and aliasing in the description of ZCR_EL1, but
-+         * not in the summary table.
-+         */
-+        { K(3, 0,  1, 2, 0), K(3, 4,  1, 2, 0), K(3, 5, 1, 2, 0),
-+          "ZCR_EL1", "ZCR_EL2", "ZCR_EL12", isar_feature_aa64_sve },
-+
-+        /* TODO: ARMv8.2-SPE -- PMSCR_EL2 */
-+        /* TODO: ARMv8.4-Trace -- TRFCR_EL2 */
-+    };
-+#undef K
-+
-+    size_t i;
-+
-+    for (i = 0; i < ARRAY_SIZE(aliases); i++) {
-+        const struct E2HAlias *a = &aliases[i];
-+        ARMCPRegInfo *src_reg, *dst_reg;
-+
-+        if (a->feature && !a->feature(&cpu->isar)) {
-+            continue;
-+        }
-+
-+        src_reg = g_hash_table_lookup(cpu->cp_regs, &a->src_key);
-+        dst_reg = g_hash_table_lookup(cpu->cp_regs, &a->dst_key);
-+        g_assert(src_reg != NULL);
-+        g_assert(dst_reg != NULL);
-+
-+        /* Cross-compare names to detect typos in the keys.  */
-+        g_assert(strcmp(src_reg->name, a->src_name) == 0);
-+        g_assert(strcmp(dst_reg->name, a->dst_name) == 0);
-+
-+        /* None of the core system registers use opaque; we will.  */
-+        g_assert(src_reg->opaque == NULL);
-+
-+        /* Create alias before redirection so we dup the right data. */
-+        if (a->new_key) {
-+            ARMCPRegInfo *new_reg = g_memdup(src_reg, sizeof(ARMCPRegInfo));
-+            uint32_t *new_key = g_memdup(&a->new_key, sizeof(uint32_t));
-+            bool ok;
-+
-+            new_reg->name = a->new_name;
-+            new_reg->type |= ARM_CP_ALIAS;
-+            /* Remove PL1/PL0 access, leaving PL2/PL3 R/W in place.  */
-+            new_reg->access &= PL2_RW | PL3_RW;
-+
-+            ok = g_hash_table_insert(cpu->cp_regs, new_key, new_reg);
-+            g_assert(ok);
-+        }
-+
-+        src_reg->opaque = dst_reg;
-+        src_reg->orig_readfn = src_reg->readfn ?: raw_read;
-+        src_reg->orig_writefn = src_reg->writefn ?: raw_write;
-+        if (!src_reg->raw_readfn) {
-+            src_reg->raw_readfn = raw_read;
-+        }
-+        if (!src_reg->raw_writefn) {
-+            src_reg->raw_writefn = raw_write;
-+        }
-+        src_reg->readfn = el2_e2h_read;
-+        src_reg->writefn = el2_e2h_write;
-+    }
-+}
-+#endif
-+
- static CPAccessResult ctr_el0_access(CPUARMState *env, const ARMCPRegInfo *ri,
-                                      bool isread)
- {
-@@ -7291,6 +7443,16 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         : cpu_isar_feature(aa32_predinv, cpu)) {
-         define_arm_cp_regs(cpu, predinv_reginfo);
-     }
-+
-+#ifndef CONFIG_USER_ONLY
-+    /*
-+     * Register redirections and aliases must be done last,
-+     * after the registers from the other extensions have been defined.
-+     */
-+    if (arm_feature(env, ARM_FEATURE_EL2) && cpu_isar_feature(aa64_vh, cpu)) {
-+        define_arm_vh_e2h_redirects_aliases(cpu);
-+    }
-+#endif
- }
- 
- void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
--- 
-2.20.1
+ https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03520.html
+
+and the fix had been done in the startup code of the test:
+
+ https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04225.html
+
+So I'd guess that you face the very same problem here. That means, you
+either have to convince the non-Linux OS to check their startup code
+whether they depend on zeroed registers somewhere, or we fix this issue
+for good in jump_to_IPL_2() by clearing the registers there before
+jumping into the OS code (which we likely should do anyway since the OS
+may expect a clean state).
+
+ Thomas
 
 
