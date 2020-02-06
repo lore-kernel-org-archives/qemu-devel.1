@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 074C7C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 627A1C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4F03217BA
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:04:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31B87217BA
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:04:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aRu+vacS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F03217BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iNAWbMt9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31B87217BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izgpb-0003uq-Tm
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:04:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57355)
+	id 1izgpg-00043H-Bk
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:04:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1izgdH-00030E-Nj
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:50 -0500
+ (envelope-from <mreitz@redhat.com>) id 1izgde-0003pN-2B
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:52:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1izgdG-0000Zr-H8
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45096
+ (envelope-from <mreitz@redhat.com>) id 1izgdd-0001qy-0G
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:52:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25707
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izgdG-0000Xp-DS
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:46 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izgdc-0001pR-SN
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:52:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580993505;
+ s=mimecast20190719; t=1580993528;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H8KZ/TW2HT1XQWa+bFUi9md34JHzWwCTHP8M8ZEnN3U=;
- b=aRu+vacSxXHsJNH37Y4XdLH96dLEHLASIDFnugRJst6WMUQaCyQcJb5lx+/zD8eZiB/sXG
- nh/KUVnI37ihV+CiFl46/0f8Q8fcIc2YIWfKmVwFhFFMQ5ZLdyqAMN9JRgWtfirARQXPzg
- WEy5Pv2nGBfrToRQ+V9ZgVFncp9uQXE=
+ bh=rHAUWzt6avoVW6phXiYyG8JK8L6KH9qBvSRszB9uNBQ=;
+ b=iNAWbMt9nAW5z3LFrxwvAKso9HdRtzsXkqGalAyGqU/zRRah+G3m4mg4SadoLvwVtYOVyB
+ /dr6R2wcbYbJJm7TZ+H7CA0++PgTN54aA3sxKlYoxC6osxS8hv5ZKw0gxaEhLXFpW7mqGp
+ XP8kLPHbBA4TVPjdvNX4WU0YOUBrXQQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-JvAIFooiPIm5Czd5SGv1Bg-1; Thu, 06 Feb 2020 07:51:43 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-62-HShPvbFqO5CaL9WDFue_ZA-1; Thu, 06 Feb 2020 07:52:06 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EA0118C43CD;
- Thu,  6 Feb 2020 12:51:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 776CA800D6C;
+ Thu,  6 Feb 2020 12:52:05 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.15])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3401489A83;
- Thu,  6 Feb 2020 12:51:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C11E60BF7;
+ Thu,  6 Feb 2020 12:52:04 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 04/17] qcow2: Use a GString in report_unsupported_feature()
-Date: Thu,  6 Feb 2020 13:51:19 +0100
-Message-Id: <20200206125132.594625-5-mreitz@redhat.com>
+Subject: [PULL 15/17] qcow2: Use BDRV_SECTOR_SIZE instead of the hardcoded
+ value
+Date: Thu,  6 Feb 2020 13:51:30 +0100
+Message-Id: <20200206125132.594625-16-mreitz@redhat.com>
 In-Reply-To: <20200206125132.594625-1-mreitz@redhat.com>
 References: <20200206125132.594625-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: JvAIFooiPIm5Czd5SGv1Bg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: HShPvbFqO5CaL9WDFue_ZA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,75 +94,45 @@ Sender: "Qemu-devel"
 
 From: Alberto Garcia <berto@igalia.com>
 
-This is a bit more efficient than having to allocate and free memory
-for each item.
+This replaces all remaining instances in the qcow2 code.
 
-The default size (60) is enough for all the existing incompatible
-features or the "Unknown incompatible feature" message.
-
-Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Message-id: 20200115135626.19442-1-berto@igalia.com
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-id: b5f74b606c2d9873b12d29acdb7fd498029c4025.1579374329.git.berto@i=
+galia.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+ block/qcow2.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index cef9d72b3a..e29fc07068 100644
+index ff257d1a6c..ef96606f8d 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -453,16 +453,15 @@ static void cleanup_unknown_header_ext(BlockDriverSta=
-te *bs)
- static void report_unsupported_feature(Error **errp, Qcow2Feature *table,
-                                        uint64_t mask)
- {
--    char *features =3D g_strdup("");
--    char *old;
-+    g_autoptr(GString) features =3D g_string_sized_new(60);
+@@ -3272,7 +3272,8 @@ qcow2_co_create(BlockdevCreateOptions *create_options=
+, Error **errp)
 =20
-     while (table && table->name[0] !=3D '\0') {
-         if (table->type =3D=3D QCOW2_FEAT_TYPE_INCOMPATIBLE) {
-             if (mask & (1ULL << table->bit)) {
--                old =3D features;
--                features =3D g_strdup_printf("%s%s%.46s", old, *old ? ", "=
- : "",
--                                           table->name);
--                g_free(old);
-+                if (features->len > 0) {
-+                    g_string_append(features, ", ");
-+                }
-+                g_string_append_printf(features, "%.46s", table->name);
-                 mask &=3D ~(1ULL << table->bit);
-             }
-         }
-@@ -470,14 +469,14 @@ static void report_unsupported_feature(Error **errp, =
-Qcow2Feature *table,
+     /* Validate options and set default values */
+     if (!QEMU_IS_ALIGNED(qcow2_opts->size, BDRV_SECTOR_SIZE)) {
+-        error_setg(errp, "Image size must be a multiple of 512 bytes");
++        error_setg(errp, "Image size must be a multiple of %u bytes",
++                   (unsigned) BDRV_SECTOR_SIZE);
+         ret =3D -EINVAL;
+         goto out;
+     }
+@@ -3946,8 +3947,9 @@ static int coroutine_fn qcow2_co_truncate(BlockDriver=
+State *bs, int64_t offset,
+         return -ENOTSUP;
      }
 =20
-     if (mask) {
--        old =3D features;
--        features =3D g_strdup_printf("%s%sUnknown incompatible feature: %"=
- PRIx64,
--                                   old, *old ? ", " : "", mask);
--        g_free(old);
-+        if (features->len > 0) {
-+            g_string_append(features, ", ");
-+        }
-+        g_string_append_printf(features,
-+                               "Unknown incompatible feature: %" PRIx64, m=
-ask);
+-    if (offset & 511) {
+-        error_setg(errp, "The new size must be a multiple of 512");
++    if (!QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE)) {
++        error_setg(errp, "The new size must be a multiple of %u",
++                   (unsigned) BDRV_SECTOR_SIZE);
+         return -EINVAL;
      }
 =20
--    error_setg(errp, "Unsupported qcow2 feature(s): %s", features);
--    g_free(features);
-+    error_setg(errp, "Unsupported qcow2 feature(s): %s", features->str);
- }
-=20
- /*
 --=20
 2.24.1
 
