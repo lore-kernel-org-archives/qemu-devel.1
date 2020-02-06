@@ -2,82 +2,79 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F12C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 09:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1D1C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 09:57:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 546D32192A
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 09:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F829218AC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 09:57:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KOkYbrw8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 546D32192A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ajsvi6VA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F829218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izdrT-0001Bu-Em
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 04:54:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44701)
+	id 1izduB-0002DO-Cq
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 04:57:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1izdqV-0000c3-9I
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:53:16 -0500
+ (envelope-from <cohuck@redhat.com>) id 1izdst-0001kz-Uc
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1izdqT-0000Hl-SS
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:53:14 -0500
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:42802)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1izdqT-0008Uq-Is
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:53:13 -0500
-Received: by mail-ot1-x32b.google.com with SMTP id 66so4891409otd.9
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 01:53:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=vvG/3UNvQndCiBHy7fbvZVLT633wNDfGYgFo52BQbqY=;
- b=KOkYbrw8cec9Nvi3+0LP4MVcAZL9l3lo/59re+I6yTDMVKN7lTGHnA/l7E1y3aP/Ht
- Fu2Jl6nmbfjaETKYbsdvLSDVpJrM0u4q33cr2ztf6WGIV7/fF1VL3X4KjgVB2Sjb0cwC
- 2tRXB1+vEDH20frW2DHw+ThvvSMHOI59V3nGe5/W5euCdYZalEAoOAxzo9cKwIL0Erev
- kkY5jCbPs00yjqy99bwNNvXJM2KVX8OQY5DOnQ8o3WMCciaiHkAEuCcMVIZLNWv01fag
- cKGTrp01z5ou8vu/H5sU+uJ9AlIqTXbMnUski2i748eqDsvPxGyy0UWJqgg0uNgMqm7j
- hG3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=vvG/3UNvQndCiBHy7fbvZVLT633wNDfGYgFo52BQbqY=;
- b=sIzusJd61dPoboNzRdL7DrIitgwlSKmrf9RIZB+RTkcY/KxykJpsy/I1tQuoERWPe/
- +z1CxLfytyHXIis30u5xrJvrIkvEbB9sg8UjQOE8Wa74KUOR5QKoyjuLfUnPBeLWUS+O
- BHHyPrYZwbT2EmsVjCwlT5E0/jsz3Z8DEqT8lC+2/hN0A5KKxptDoTSjrK2tgLHXbOEo
- bQToYX2VJeTLUo2djERWTAHzCMbJtb+LqD8E9UVjOfTwwmA+Fig76ea0C/AJ1J/8XdCm
- /lLUTAuQfsOo1lfePLAeDf4UwG+fQlKmPoCP9joXaca08DepO+hY2585vZgup695lIyY
- Hxyg==
-X-Gm-Message-State: APjAAAXN77605SuLIFUa+Lh7raBxtvS2fxd5wjLCR2aNZ3/2BoZnoCo2
- rLp+SDEkfrlWcLMqkH88MLyTFthqlRVlr3MhDmEzEA==
-X-Google-Smtp-Source: APXvYqwwPUm3M0GaWHECWJ/nYVTwp5+ctik9qX26RQhh/oIQedwYMOIpRPczhT379asuMo3a9IRVlvEV9gASGveVm0w=
-X-Received: by 2002:a05:6830:13d3:: with SMTP id
- e19mr29922698otq.135.1580982792332; 
- Thu, 06 Feb 2020 01:53:12 -0800 (PST)
+ (envelope-from <cohuck@redhat.com>) id 1izdsq-0005SE-O7
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:55:42 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57402
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1izdsq-0005KJ-1O
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:55:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1580982934;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SscazImKevBMxCnSo6uK6I2+cu1YBTNkt3lVSNQjl5I=;
+ b=ajsvi6VAbsjEVC1PoGogXACRVOsrtlJkmn60A0z4GjrQzs2UmMX01u1Uk1lzfBgzRa/jkF
+ 3BjP+Tu9FPhe1cLZZrmMJnycgmUmv0iAW7viSipRuKG9l7hnyfJo1jgDqn+erWIlZWSSA3
+ PG0xWvo5g1HPhbDF1qmtlGDiiquIVNQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-rtz04DhtNDe1vu7zR_F85w-1; Thu, 06 Feb 2020 04:55:32 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 078361083EA6;
+ Thu,  6 Feb 2020 09:55:31 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 182F760BF7;
+ Thu,  6 Feb 2020 09:55:29 +0000 (UTC)
+Date: Thu, 6 Feb 2020 10:55:27 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: "Jason J. Herne" <jjherne@linux.ibm.com>
+Subject: Re: [PATCH] pc-bios/s390x: Pack ResetInfo struct
+Message-ID: <20200206105527.00fb21e7.cohuck@redhat.com>
+In-Reply-To: <20200205182126.13010-1-jjherne@linux.ibm.com>
+References: <20200205182126.13010-1-jjherne@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20200204184028.13708-1-alex.bennee@linaro.org>
-In-Reply-To: <20200204184028.13708-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Feb 2020 09:53:01 +0000
-Message-ID: <CAFEAcA8C2ruo+Swp3LvMxJp9DoQXGGYAKoA8bM2Y0XaHR2vk+w@mail.gmail.com>
-Subject: Re: [PULL 00/16] testing updates
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: rtz04DhtNDe1vu7zR_F85w-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,45 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 4 Feb 2020 at 18:40, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
->
-> The following changes since commit 7bd9d0a9e26c7a3c67c0f174f0009ba19969b1=
-58:
->
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-202=
-0-02-04' into staging (2020-02-04 16:12:31 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-testing-040220-1
->
-> for you to fetch changes up to 68e5b85e41fe7684e58cd077772b7d1e8bc092c7:
->
->   .travis.yml: ensure python3-sphinx installed for docs (2020-02-04 17:13=
-:29 +0000)
->
-> ----------------------------------------------------------------
-> Testing updates and build fixes:
->
->   - move more cross compilers to buster
->   - fix build breakage (hppa Kconfig)
->   - disable docs on shippable
->   - build docs under bionic with python3
->   - travis.yml re-factoring
->   - check capabilities of non-docker compilers
->   - smarter make -j parallelism
+On Wed,  5 Feb 2020 13:21:26 -0500
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
+> This fixes vfio-ccw when booting non-Linux operating systems. Without this
+> struct being packed, a few extra bytes of low core memory get overwritten when
+> we  assign a value to memory address 0 in jump_to_IPL_2. This is enough to
+> cause some non-Linux OSes of fail when booting.
 
-Applied, thanks.
+s/of/to/
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+> 
+> The problem was introduced by:
+> 5c6f0d5f46a77d77 "pc-bios/s390x: Fix reset psw mask".
 
--- PMM
+So, what introduced the problem was turning two 32 bit values into a 64
+bit value?
+
+> 
+> The fix is to pack the struct thereby removing the 4 bytes of padding that get
+> added at the end, likely to allow an array of these structs to naturally align
+> on an 8-byte boundary.
+> 
+> Fixes: 5c6f0d5f46a7 ("pc-bios/s390x: Fix reset psw mask")
+> CC: Janosch Frank <frankja@linux.ibm.com>
+> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/jump2ipl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+> index da13c43cc0..1e9eaa037f 100644
+> --- a/pc-bios/s390-ccw/jump2ipl.c
+> +++ b/pc-bios/s390-ccw/jump2ipl.c
+> @@ -18,7 +18,7 @@
+>  typedef struct ResetInfo {
+>      uint64_t ipl_psw;
+>      uint32_t ipl_continue;
+> -} ResetInfo;
+> +} __attribute__((packed)) ResetInfo;
+>  
+>  static ResetInfo save;
+>  
+
+I'm wondering if we have more stuff like that lurking in the bios.
+
 
