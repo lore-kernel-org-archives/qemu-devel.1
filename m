@@ -2,68 +2,70 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 529BAC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C096C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:52:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27CAF21741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:52:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27CAF21741
+	by mail.kernel.org (Postfix) with ESMTPS id 409D321741
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:52:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409D321741
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izgde-0003Cu-5P
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 07:52:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56092)
+	id 1izge1-0004Mh-C4
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 07:52:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1izgcO-0000jp-5F
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:50:53 -0500
+ (envelope-from <laurent@vivier.eu>) id 1izgcW-00013b-Tk
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1izgcN-0005OS-06
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:50:52 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:48687)
+ (envelope-from <laurent@vivier.eu>) id 1izgcV-00060N-OK
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:00 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:53311)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1izgcK-0005CF-BG; Thu, 06 Feb 2020 07:50:48 -0500
+ id 1izgcQ-0005b0-PN; Thu, 06 Feb 2020 07:50:55 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MLAAs-1jHtzG1Rek-00IDyH; Thu, 06 Feb 2020 13:50:32 +0100
+ id 1M9nlN-1iuTwk3gEX-005n7S; Thu, 06 Feb 2020 13:50:36 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/12] Trivial branch patches
-Date: Thu,  6 Feb 2020 13:50:15 +0100
-Message-Id: <20200206125027.1926263-1-laurent@vivier.eu>
+Subject: [PULL 02/12] monitor: fix memory leak in
+ monitor_fdset_dup_fd_find_remove
+Date: Thu,  6 Feb 2020 13:50:17 +0100
+Message-Id: <20200206125027.1926263-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200206125027.1926263-1-laurent@vivier.eu>
+References: <20200206125027.1926263-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:QzrtNTtr1K/Hl64rveH+CH3JhhqW2lAEJSTsE1MD4Gf/mDf2eDG
- hcp6UwtyYGq2ZDKfQLywQR/Cbj4isrd1eOE0vfg2DmT9RgwJ+Mf/fzwBHYOZsk3WOXe7CoG
- XVD9F+1JVH68RHSSP1QFWUKI3lggejSWLdxNVWGhfC3VovWD883sn7qhA0yhnGck+JWmQVF
- fK4hc9oJiKuwv9ddsA8EQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uGANA53uBh8=:mJANNCyFK9Ag03MxmagNJE
- j44usZCp4LHSJeTclAX7LZg4UuEKy5aJBMJhQKwNDlvJDWyGW6BRUc7M9z6mrTHZy6FJVYeTp
- 024lseQ2xq6hhO4kjUxY92mAHsDrsICKb+YPpiR3tSQe7EBujZmotQLZwtpCXmD4kmGbWJ8q9
- iEk8yGU9hzlOB8iZzIMipyHqBbg/s3/QZ+egOUQPJk9tQxag1rtUo0YGU/VEm6UqmpSzIEzv+
- SuqyH5r1zIcWjTSln6NwJOvhwFc5TABCKThzIuHHS+9ShSGXk6gFYPtSy3D1H93pKu3AWZ3sv
- j4LeEu24Hf9Kn4xs2lDOuycr3d/sP5gF3Y5VmY053wH8JR2zVDH5vk4Qt7wE8LGY1KI7k1VU9
- aOLJRbF0iQ7Q+WCH+TmYq6vQmX9rjjpjxcXHht7eEhFMkNqL5DOwXvr+5cgE3OuB5aF6/uZWU
- SeF6Of9ebNYR5HrU3GJbGb+tMYI80laJIqNf8Jc46w7BoCZ8KaCdrNGmU7Z3GHK/yYHIHdcau
- Ktw3FUbxfLhu2sOuSBHrWQ0nUFWJCQ8YOa5ADEIfaI+FDEOUtQRMgRzNM10gY/6UjFOWfSWG/
- TitqJo8xo8hzoTmghFptOGuFD+qygIfjaFXSigzynQ/0D+mKBsxw5xhHw0zmRKHCdhm/l81L5
- tTm+basNwLzPQAMwD9MDESZ/u00mbP3u9PUzJCEtYe59NBHjNO60mSg3NTHfAdhTTE32CY4qb
- usX+c1+jHcFaXuOPTVL+qY8yVQ/wAkRJqo+bNxT/rOhvCAUDRyXmwfzTc/nj8iviSNIrO9U77
- GYNL/onpkqa+DCYPFN6Ce3h8YHnsKLEvSVxNubbY9yN3ea+USLErU2nKXs56NGXLFOofpiH
+X-Provags-ID: V03:K1:PkLbluZi6767fKHrm29TXI9V8f4/V582cxLm+KeDjydbCtXz7Bv
+ Tn7ZXQuNi/17LtWUKlKFKQ4SXE9KVkFyDrTp5q/j8sJg2cvmifTj8/cHjHe07iJ2a4BHTxA
+ GhwP3qNK4ScCXfEuN4ZqeXgB7g7xgA//KjXuh+IkAEdftV/uLQ0BMGbNLlMRKo3VShKUPfF
+ lETwqwIygfPTzZOCoPlug==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:MyMkWIfuP24=:8fOiACXUsPJBRFpxPx71hE
+ 5P9iq32APsm62UHeKUGw9GnzBlx4CElui7p5rO4aPQxPr3YsZT4PXTbpfoR8p9YP9Xk5rWz3s
+ erRqHPX1jR+cVRtRHxXhRzusn+EDMCYljbIqkkEdKunpvcfCUr+QBdy4C8E8ApOr1pVay4YQ/
+ WCPnWWbr9GW6ZgYebmKU80PXSvRjV4/WTckPm0xel+36DPvD+HJn5WEDh2jDL/4Znpi0B2L9O
+ rX07gehOAo3Pqv9mz+/FMpXVQUilMXNlldA1MVMWzolLoBuGcc9MHhMhSja2BsBpmEHmbtkup
+ Q13eruMCYuJHO9Gmbuj30mcfDlkPkXaSjPX7+KCqJuNPiqWkxO26AR/muHyUWZeJ9VP994kFk
+ xkQ5dm+ZEQChK9NrzsArGzD1lStIUodPGd5NNMjXutZggAXPm/iwJW/dVWsGYHgx61uzzoyKq
+ 9pMXCMMWwem0KrciygVqBudQPhdKB8GGIb0MJFEjpPz1cXlF7YBFB2fkI0n6hcEsA8A2oeoPg
+ bqmnWr5LZtniSikc6/pwxbj51DqCHFX1bfzBsa2i30yd8bPpz2MbWRxHpgf/ImYhCQvl5GBjF
+ jyKqO45o//hwKcKF+gbeDPwGgG59lOm9DGwWF2XIIuUndMvxGm14VxOwnKR+aQj0cGsYTJSLQ
+ B9XRl1IIbhRM6g3a5lqdcMojVudEn/1Kymat2R0aTWXolEOj9zYmYs+ZkhiVESbs907c5QjHo
+ BZto7rjLD7zhTpQsihgDIpdEcCJ0+9ifXt1ZGLiLgNHcYDTk6b0S7Mt7RGutKXaMHWUJON5X2
+ 0P0AXkBUIvHhQGpvi6mzvNJM09fTpC1+hnFxPjCIEFngIIhfdioooDJgkAp5y/TaE3inc8n
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,81 +77,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-trivial@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Igor Mammedov <imammedo@redhat.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Laurent Vivier <laurent@vivier.eu>,
+ Max Reitz <mreitz@redhat.com>, Euler Robot <euler.robot@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 7bd9d0a9e26c7a3c67c0f174f0009ba19969b158:
+From: Chen Qun <kuhn.chenqun@huawei.com>
 
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-02-04' into staging (2020-02-04 16:12:31 +0000)
+When remove dup_fd in monitor_fdset_dup_fd_find_remove function,
+we need to free mon_fdset_fd_dup. ASAN shows memory leak stack:
 
-are available in the Git repository at:
+Direct leak of 96 byte(s) in 3 object(s) allocated from:
+    #0 0xfffd37b033b3 in __interceptor_calloc (/lib64/libasan.so.4+0xd33b3)
+    #1 0xfffd375c71cb in g_malloc0 (/lib64/libglib-2.0.so.0+0x571cb)
+    #2 0xaaae25bf1c17 in monitor_fdset_dup_fd_add /qemu/monitor/misc.c:1724
+    #3 0xaaae265cfd8f in qemu_open /qemu/util/osdep.c:315
+    #4 0xaaae264e2b2b in qmp_chardev_open_file_source /qemu/chardev/char-fd.c:122
+    #5 0xaaae264e47cf in qmp_chardev_open_file /qemu/chardev/char-file.c:81
+    #6 0xaaae264e118b in qemu_char_open /qemu/chardev/char.c:237
+    #7 0xaaae264e118b in qemu_chardev_new /qemu/chardev/char.c:964
+    #8 0xaaae264e1543 in qemu_chr_new_from_opts /qemu/chardev/char.c:680
+    #9 0xaaae25e12e0f in chardev_init_func /qemu/vl.c:2083
+    #10 0xaaae26603823 in qemu_opts_foreach /qemu/util/qemu-option.c:1170
+    #11 0xaaae258c9787 in main /qemu/vl.c:4089
+    #12 0xfffd35b80b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+    #13 0xaaae258d7b63  (/qemu/build/aarch64-softmmu/qemu-system-aarch64+0x8b7b63)
 
-  git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200115072016.167252-1-kuhn.chenqun@huawei.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ monitor/misc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-for you to fetch changes up to 8ef350b32fe08d254f92a3a7efe89809397fff77:
-
-  MAINTAINERS: Cc the qemu-arm@nongnu.org for the ARM machines (2020-02-06 12:32:03 +0100)
-
-----------------------------------------------------------------
-trivial patches 20200206
-
-----------------------------------------------------------------
-
-Chen Qun (1):
-  monitor: fix memory leak in monitor_fdset_dup_fd_find_remove
-
-John Snow (1):
-  qemu-options: replace constant 1 with HAS_ARG
-
-Julia Suvorova (2):
-  qemu-img: Place the '-i aio' option in alphabetical order
-  hw/pci/pci_bridge: Fix typo in comment
-
-Leif Lindholm (1):
-  MAINTAINERS: update Leif Lindholm's address
-
-Miroslav Rezanina (1):
-  aspeed/i2c: Prevent uninitialized warning
-
-Philippe Mathieu-Daudé (4):
-  hw/smbios/smbios: Remove unused include
-  hw/timer/m48t59: Convert debug printf()s to trace events
-  MAINTAINERS: Cover hppa-softmmu.mak in the HP-PARISC Machines section
-  MAINTAINERS: Cc the qemu-arm@nongnu.org for the ARM machines
-
-Thomas Huth (2):
-  hw/bt: Remove empty Kconfig file
-  hw/i386/vmmouse: Fix crash when using the vmmouse on a machine without
-    vmport
-
- .mailmap                    |  1 +
- MAINTAINERS                 | 10 +++++++++-
- docs/interop/qemu-img.rst   |  8 ++++----
- hw/bt/Kconfig               |  0
- hw/i2c/aspeed_i2c.c         |  2 +-
- hw/i386/vmmouse.c           |  6 ++++++
- hw/rtc/m48t59-internal.h    |  5 -----
- hw/rtc/m48t59.c             | 11 +++++------
- hw/rtc/trace-events         |  6 ++++++
- hw/smbios/smbios.c          |  1 -
- include/hw/pci/pci_bridge.h |  2 +-
- monitor/misc.c              |  1 +
- qemu-img-cmds.hx            |  4 ++--
- qemu-options.hx             |  2 +-
- 14 files changed, 37 insertions(+), 22 deletions(-)
- delete mode 100644 hw/bt/Kconfig
-
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 4752150a6780..9c3484d0a774 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -1749,6 +1749,7 @@ static int64_t monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+             if (mon_fdset_fd_dup->fd == dup_fd) {
+                 if (remove) {
+                     QLIST_REMOVE(mon_fdset_fd_dup, next);
++                    g_free(mon_fdset_fd_dup);
+                     if (QLIST_EMPTY(&mon_fdset->dup_fds)) {
+                         monitor_fdset_cleanup(mon_fdset);
+                     }
 -- 
 2.24.1
 
