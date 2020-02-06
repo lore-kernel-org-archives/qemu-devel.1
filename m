@@ -2,86 +2,87 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFEBC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:15:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1A4C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:16:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCFDD206CC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:15:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9731206CC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:16:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AXILPSpG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCFDD206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hGji574y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9731206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36275 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izf8P-0008Cm-VV
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:15:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52094)
+	id 1izf8j-0000KQ-PS
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:16:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50335)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1izete-0006Cj-DH
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:00:36 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1izeol-0003WQ-Gd
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1izetc-0004ZO-MX
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:00:34 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33858
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1izetc-0004VM-HL
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:00:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580986832;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=+rg27dlHYRZaxBCxoo0CQU8VDaQbMcMRvmbj0ClGVSo=;
- b=AXILPSpGrXHKzOhoiic6xP5EtTNodR0UhcGEcqq23l8qYewywq70zVSr9LQm6fjI3SGsWj
- Y194AWnE6Ma6MikmhmMMyK7NTfnmeFyEHgGtMoFrzNmugAroDz38l8inufLpGJnE/rsbtp
- e9SoPPMQ7rvPN9l62zTS7eUZniiHk+w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-Sh-vYLN9MBG36ImOjnT4Gg-1; Thu, 06 Feb 2020 06:00:24 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5212B8010CB;
- Thu,  6 Feb 2020 11:00:23 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-151.ams2.redhat.com [10.36.116.151])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C2B15DA7E;
- Thu,  6 Feb 2020 11:00:21 +0000 (UTC)
-Subject: Re: [PATCH] pc-bios/s390x: Pack ResetInfo struct
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, cohuck@redhat.com
-References: <20200205182126.13010-1-jjherne@linux.ibm.com>
- <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <896302f7-ec21-6108-6dde-f5a7439d87ab@redhat.com>
-Date: Thu, 6 Feb 2020 12:00:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <richard.henderson@linaro.org>) id 1izeoj-0000PM-QW
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:31 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40932)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1izeoh-0000Bi-SN
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:29 -0500
+Received: by mail-wm1-x344.google.com with SMTP id t14so6454408wmi.5
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:55:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=PlQncbgF47pMapzIaA4NjY5mlZwQMC8/lcrQ+9CvfyQ=;
+ b=hGji574yXf8GOf4EfAOH6s9AKD5+GCjDDHv9PqSg6cnskHJk5DqrafpDbcM80IWYxj
+ ygV11VQaWxtJD865ol1V/fw2jCXvg2y9cZOnA8g2/diONIguvkHi64GHqQx+zw8psp1U
+ ZhDWE/wO3ZT0TXUgHZGVcrH21dp62vFsMJ6jM6qrEV9XjKFOi9OXCRS31E0gmksYt/3W
+ Fy61+FP6cAX9ZAxdj3vXmXqoOfNIoEiEy+tQw6Klgdd3JbJPGa+HmAMTwaoa4V7Lt/CT
+ 1thNzWTrdyPwT6HYKWla6EhxaNNSOsLXtQ35MlnBYjMFEMy87P6gPYVRRLQrx7L9Acjf
+ 3XYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=PlQncbgF47pMapzIaA4NjY5mlZwQMC8/lcrQ+9CvfyQ=;
+ b=dSS5d+Rs1Tpx53sotLTiF2wybILvcMkAM7ATDgJAZ9yTUJ60gQSpbSO5/Pd3Ddb7s8
+ jpJEAn29wgf6pfuWMa8ic+dup6vCfSzCL2GnZbJPWlgyAE7RDU/M1gRjGZTI+qQfBYLC
+ FXCwvIhWxzQLmqkK5fgNGJ0JS1woNJG6UGs/5LnR/ZBUMviEFALU6Qvd40WOUVbBr7Ny
+ ZgHlDHaYr6guFk7G6jK1COihi5ztfia9twd82uaGRdd8MqCALq405tNP8j9HhpBnRvwY
+ qJIbH+iqcIzXqawkSE9vKihASw7mrsoUR9eMk8h+hwAmGlJfGszJX0ccf76e1MWuewiq
+ d76A==
+X-Gm-Message-State: APjAAAWuz1kG47qYQqbtR/2FnJ+vWXQEA/E8ci2L0wpyb/Efml7rll+/
+ C2txwVApjEXqamOkh/Ek7lUCDVGRb/k8gQ==
+X-Google-Smtp-Source: APXvYqwKfq8x0UtKi4HQBHPj3BMeBme1StTJ9beZZo+5c3yBAORiVhkg4NVaI2N0LkVBv8xxUo63dg==
+X-Received: by 2002:a1c:5419:: with SMTP id i25mr3960830wmb.150.1580986524725; 
+ Thu, 06 Feb 2020 02:55:24 -0800 (PST)
+Received: from cloudburst.c.hoisthospitality.com ([135.196.99.211])
+ by smtp.gmail.com with ESMTPSA id m21sm3364995wmi.27.2020.02.06.02.55.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Feb 2020 02:55:24 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 41/41] target/arm: Raise only one interrupt in
+ arm_cpu_exec_interrupt
+Date: Thu,  6 Feb 2020 10:54:48 +0000
+Message-Id: <20200206105448.4726-42-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200206105448.4726-1-richard.henderson@linaro.org>
+References: <20200206105448.4726-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: Sh-vYLN9MBG36ImOjnT4Gg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,104 +94,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/02/2020 11.09, Christian Borntraeger wrote:
->=20
->=20
-> On 05.02.20 19:21, Jason J. Herne wrote:
->> This fixes vfio-ccw when booting non-Linux operating systems. Without th=
-is
->> struct being packed, a few extra bytes of low core memory get overwritte=
-n when
->> we  assign a value to memory address 0 in jump_to_IPL_2. This is enough =
-to
->> cause some non-Linux OSes of fail when booting.
->>
->> The problem was introduced by:
->> 5c6f0d5f46a77d77 "pc-bios/s390x: Fix reset psw mask".
->>
->> The fix is to pack the struct thereby removing the 4 bytes of padding th=
-at get
->> added at the end, likely to allow an array of these structs to naturally=
- align
->> on an 8-byte boundary.
->>
->> Fixes: 5c6f0d5f46a7 ("pc-bios/s390x: Fix reset psw mask")
->> CC: Janosch Frank <frankja@linux.ibm.com>
->> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
->> ---
->>  pc-bios/s390-ccw/jump2ipl.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
->> index da13c43cc0..1e9eaa037f 100644
->> --- a/pc-bios/s390-ccw/jump2ipl.c
->> +++ b/pc-bios/s390-ccw/jump2ipl.c
->> @@ -18,7 +18,7 @@
->>  typedef struct ResetInfo {
->>      uint64_t ipl_psw;
->>      uint32_t ipl_continue;
->> -} ResetInfo;
->> +} __attribute__((packed)) ResetInfo;
->> =20
->>  static ResetInfo save;
->=20
-> Just looked into that.
->=20
-> We do save the old content in "save" and restore the old memory content.
->=20
-> static void jump_to_IPL_2(void)
-> {
->     ResetInfo *current =3D 0;
->=20
->     void (*ipl)(void) =3D (void *) (uint64_t) current->ipl_continue;
-> --->*current =3D save;
->     ipl(); /* should not return */
-> }
->=20
-> void jump_to_IPL_code(uint64_t address)
-> {
->     /* store the subsystem information _after_ the bootmap was loaded */
->     write_subsystem_identification();
->=20
->     /* prevent unknown IPL types in the guest */
->     if (iplb.pbt =3D=3D S390_IPL_TYPE_QEMU_SCSI) {
->         iplb.pbt =3D S390_IPL_TYPE_CCW;
->         set_iplb(&iplb);
->     }
->=20
->     /*
->      * The IPL PSW is at address 0. We also must not overwrite the
->      * content of non-BIOS memory after we loaded the guest, so we
->      * save the original content and restore it in jump_to_IPL_2.
->      */
->     ResetInfo *current =3D 0;
->=20
-> --->save =3D *current;
+The fall through organization of this function meant that we
+would raise an interrupt, then might overwrite that with another.
+Since interrupt prioritization is IMPLEMENTATION DEFINED, we
+can recognize these in any order we choose.
 
-Right, and this should also work without your modification. I've stared
-at the code a couple of weeks ago, looking for a very similar issue:
+Unify the code to raise the interrupt in a block at the end.
 
- https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03484.html
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.c | 30 ++++++++++++------------------
+ 1 file changed, 12 insertions(+), 18 deletions(-)
 
-... but in the end, the problem was something else:
-
- https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03520.html
-
-and the fix had been done in the startup code of the test:
-
- https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04225.html
-
-So I'd guess that you face the very same problem here. That means, you
-either have to convince the non-Linux OS to check their startup code
-whether they depend on zeroed registers somewhere, or we fix this issue
-for good in jump_to_IPL_2() by clearing the registers there before
-jumping into the OS code (which we likely should do anyway since the OS
-may expect a clean state).
-
- Thomas
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 4ffc09909d..b0762a76c4 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -535,17 +535,15 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     uint64_t hcr_el2 = arm_hcr_el2_eff(env);
+     uint32_t target_el;
+     uint32_t excp_idx;
+-    bool ret = false;
++
++    /* The prioritization of interrupts is IMPLEMENTATION DEFINED. */
+ 
+     if (interrupt_request & CPU_INTERRUPT_FIQ) {
+         excp_idx = EXCP_FIQ;
+         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
+         if (arm_excp_unmasked(cs, excp_idx, target_el,
+                               cur_el, secure, hcr_el2)) {
+-            cs->exception_index = excp_idx;
+-            env->exception.target_el = target_el;
+-            cc->do_interrupt(cs);
+-            ret = true;
++            goto found;
+         }
+     }
+     if (interrupt_request & CPU_INTERRUPT_HARD) {
+@@ -553,10 +551,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+         target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
+         if (arm_excp_unmasked(cs, excp_idx, target_el,
+                               cur_el, secure, hcr_el2)) {
+-            cs->exception_index = excp_idx;
+-            env->exception.target_el = target_el;
+-            cc->do_interrupt(cs);
+-            ret = true;
++            goto found;
+         }
+     }
+     if (interrupt_request & CPU_INTERRUPT_VIRQ) {
+@@ -564,10 +559,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+         target_el = 1;
+         if (arm_excp_unmasked(cs, excp_idx, target_el,
+                               cur_el, secure, hcr_el2)) {
+-            cs->exception_index = excp_idx;
+-            env->exception.target_el = target_el;
+-            cc->do_interrupt(cs);
+-            ret = true;
++            goto found;
+         }
+     }
+     if (interrupt_request & CPU_INTERRUPT_VFIQ) {
+@@ -575,14 +567,16 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+         target_el = 1;
+         if (arm_excp_unmasked(cs, excp_idx, target_el,
+                               cur_el, secure, hcr_el2)) {
+-            cs->exception_index = excp_idx;
+-            env->exception.target_el = target_el;
+-            cc->do_interrupt(cs);
+-            ret = true;
++            goto found;
+         }
+     }
++    return false;
+ 
+-    return ret;
++ found:
++    cs->exception_index = excp_idx;
++    env->exception.target_el = target_el;
++    cc->do_interrupt(cs);
++    return true;
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY) || !defined(TARGET_AARCH64)
+-- 
+2.20.1
 
 
