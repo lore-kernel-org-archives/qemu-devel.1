@@ -2,118 +2,64 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E4EC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 15:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA59C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 15:13:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2285B21741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 15:07:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oCYmrT1K";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nG26Ycy5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2285B21741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 89F9720838
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 15:13:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89F9720838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izikL-0003kC-9C
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 10:07:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50196)
+	id 1iziqp-0005WV-PZ
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 10:13:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52462)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.merwick@oracle.com>) id 1izija-00035V-8Q
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 10:06:27 -0500
+ (envelope-from <yuzenghui@huawei.com>) id 1iziph-0004yg-2J
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 10:12:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1izijU-0004Gg-LU
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 10:06:25 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:40040)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1izijU-0003y3-BZ
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 10:06:20 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 016F3xJn158073;
- Thu, 6 Feb 2020 15:06:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=54HpMFxsTKG6rGaZkF7uzsspAOLzIEvzXPP+H54tHFY=;
- b=oCYmrT1KhNTvWimOJU/u2eZUmSjyqxWuaINle6xn38TXupn+5IqWtXWNJbhujuJnlmEh
- vANZAYxdp8Zsibo5VoNgHjGA64g/rK76/BkQDgC5nAO7js+0QtteqsBRYc1wTqCAfyUj
- DR3MtJl/rvLa6DdAX+I5gazhYM9y7wtNXsGLKuWzDZQTM3T82D782UGIr7a9oaW4vbxv
- ce2FmoVXKfWgAuOadDL++QusryhEDdFB5XlO8NBZp54dok3IFrlGLMbhGOU9NEuR6Xzh
- Khnkg/0f4ZY/Ap/VkMcZ27ucsoDbSwKBwlKQL+kZRwBDKG9jHqLcjL7hiqgPjBg4WL3r 7g== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=54HpMFxsTKG6rGaZkF7uzsspAOLzIEvzXPP+H54tHFY=;
- b=nG26Ycy5jhU/jTtmrP4jxQb1RJ3mbf6LsXASfQz33eMjwqDMIsrGV9GM3zXnavQ/lwi+
- I3JZpGwwZAuMHPHXhVidoVunnxfa6wbiXuD7+nTofagMkMEQe882ggWTtzi3OzcaneEM
- 75jzCGAQW+MdNEBbhoMu6KcB6kuk7QJ3US31PHTFRiVsgPX2OjempKTJGowi9WkyaAX9
- 7wFtXkVOJqYcFkVzSrzGa+w9LdmRpvCTAL3QM2Rgq98Gze8NmkfS2XEl/SkqDCmKd+9/
- fC6uwr1rsnTmNYEmCoGbGxTHutFxX77i56sbpuBF4Eianj810nnkZ4MTbnJQQ+mn0XZk Tw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2130.oracle.com with ESMTP id 2xykbpa8mk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 06 Feb 2020 15:06:03 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 016F3udL182457;
- Thu, 6 Feb 2020 15:06:02 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2y080dbtgt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 06 Feb 2020 15:06:02 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 016F60uj012740;
- Thu, 6 Feb 2020 15:06:00 GMT
-Received: from [10.175.182.212] (/10.175.182.212)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 06 Feb 2020 07:06:00 -0800
-Subject: Re: [PATCH v2 1/6] tests/boot_linux_console: add microvm acceptance
- test
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- alex.bennee@linaro.org, fam@euphon.net
-References: <1580914565-19675-1-git-send-email-liam.merwick@oracle.com>
- <1580914565-19675-2-git-send-email-liam.merwick@oracle.com>
- <6ceb7e42-125a-ac91-fad6-e67c332c48b4@redhat.com>
- <03a996af-49eb-8c91-eabd-4b9a29270f63@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <09b5f7df-fe96-27c5-8559-1c760522f526@oracle.com>
-Date: Thu, 6 Feb 2020 15:05:57 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <yuzenghui@huawei.com>) id 1izipf-0004ck-1F
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 10:12:45 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:42534 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yuzenghui@huawei.com>)
+ id 1izipa-0004Pb-0M; Thu, 06 Feb 2020 10:12:38 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 30C342B1006464400976;
+ Thu,  6 Feb 2020 23:12:27 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Thu, 6 Feb 2020
+ 23:12:18 +0800
+Subject: Re: [kvm-unit-tests PATCH v3 05/14] arm/arm64: ITS: Introspection
+ tests
+To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+ <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+References: <20200128103459.19413-1-eric.auger@redhat.com>
+ <20200128103459.19413-6-eric.auger@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <a5f8d1dc-fa1c-c5e2-e449-afac92840563@huawei.com>
+Date: Thu, 6 Feb 2020 23:12:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <03a996af-49eb-8c91-eabd-4b9a29270f63@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20200128103459.19413-6-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9522
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002060115
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9522
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002060115
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
- 016F3xJn158073
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,106 +71,469 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, wainersm@redhat.com,
- slp@redhat.com, sgarzare@redhat.com
+Cc: andre.przywara@arm.com, drjones@redhat.com, alexandru.elisei@arm.com,
+ thuth@redhat.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/02/2020 14:09, Philippe Mathieu-Daud=E9 wrote:
-> Hi Liam,
->=20
-> On 2/6/20 2:57 PM, Philippe Mathieu-Daud=E9 wrote:
->> On 2/5/20 3:56 PM, Liam Merwick wrote:
->>> Refactor test_x86_64_pc() to test_x86_64_machine() so that separate
->>> functions which specify the Avocado tag of ':avocado: tags=3Dmachine:=
-'
->>> as being either 'pc' or 'microvm' can be used to test booting a
->>> compressed kernel using either machine class.
->>>
->>> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
->>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->>> ---
->>> =A0 tests/acceptance/boot_linux_console.py | 20 +++++++++++++++++---
->>> =A0 1 file changed, 17 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/tests/acceptance/boot_linux_console.py=20
->>> b/tests/acceptance/boot_linux_console.py
->>> index e40b84651b0b..233601b429bd 100644
->>> --- a/tests/acceptance/boot_linux_console.py
->>> +++ b/tests/acceptance/boot_linux_console.py
->>> @@ -51,10 +51,10 @@ class BootLinuxConsole(Test):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 os.chdir(cwd)
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 return self.workdir + path
->>> -=A0=A0=A0 def test_x86_64_pc(self):
->>> +=A0=A0=A0 def do_test_x86_64_machine(self):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->>> -=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:x86_64
->>> -=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:pc
->>> +=A0=A0=A0=A0=A0=A0=A0 Common routine to boot an x86_64 guest.
->>> +=A0=A0=A0=A0=A0=A0=A0 Caller must specify tags=3Darch and tags=3Dmac=
-hine
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 kernel_url =3D=20
->>> ('https://archives.fedoraproject.org/pub/archive/fedora'
->>> '/linux/releases/29/Everything/x86_64/os/images/pxeboot'
->>> @@ -70,6 +70,20 @@ class BootLinuxConsole(Test):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 console_pattern =3D 'Kernel command line:=
- %s' %=20
->>> kernel_command_line
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 self.wait_for_console_pattern(console_pat=
-tern)
->>> +=A0=A0=A0 def test_x86_64_pc(self):
->>> +=A0=A0=A0=A0=A0=A0=A0 """
->>> +=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:x86_64
->>> +=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:pc
->>> +=A0=A0=A0=A0=A0=A0=A0 """
->>> +=A0=A0=A0=A0=A0=A0=A0 self.do_test_x86_64_machine()
->>> +
->>> +=A0=A0=A0 def test_x86_64_microvm(self):
->>> +=A0=A0=A0=A0=A0=A0=A0 """
->>> +=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:x86_64
->>> +=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Dmachine:microvm
->>> +=A0=A0=A0=A0=A0=A0=A0 """
->>> +=A0=A0=A0=A0=A0=A0=A0 self.do_test_x86_64_machine()
->>> +
->>> =A0=A0=A0=A0=A0 def test_mips_malta(self):
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 """
->>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 :avocado: tags=3Darch:mips
->>>
->>
->> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->> Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->=20
-> Actually this breaks testing the distrib QEMU:
+Hi Eric,
+
+On 2020/1/28 18:34, Eric Auger wrote:
+> Detect the presence of an ITS as part of the GICv3 init
+> routine, initialize its base address and read few registers
+> the IIDR, the TYPER to store its dimensioning parameters.
+> Also parse the BASER registers.
+> 
+> This is our first ITS test, belonging to a new "its" group.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v2 -> v3:
+> - updated dates and changed author
+> - squash "arm/arm64: ITS: Test BASER" into this patch but
+>    removes setup_baser which will be introduced later.
+> - only compile on aarch64
+> - restrict the new test to aarch64
+> 
+> v1 -> v2:
+> - clean GITS_TYPER macros and unused fields in typer struct
+> - remove memory attribute related macros
+> - remove everything related to memory attributes
+> - s/dev_baser/coll_baser/ in report_info
+> - add extra line
+> - removed index filed in its_baser
+> ---
+>   arm/Makefile.arm64         |   1 +
+>   arm/gic.c                  |  49 ++++++++++++++++++
+>   arm/unittests.cfg          |   7 +++
+>   lib/arm/asm/gic-v3-its.h   | 103 +++++++++++++++++++++++++++++++++++++
+>   lib/arm/gic-v3-its.c       |  88 +++++++++++++++++++++++++++++++
+>   lib/arm/gic.c              |  30 +++++++++--
+>   lib/arm64/asm/gic-v3-its.h |   1 +
+>   7 files changed, 274 insertions(+), 5 deletions(-)
+>   create mode 100644 lib/arm/asm/gic-v3-its.h
+>   create mode 100644 lib/arm/gic-v3-its.c
+>   create mode 100644 lib/arm64/asm/gic-v3-its.h
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 6d3dc2c..2571ffb 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -19,6 +19,7 @@ endef
+>   cstart.o = $(TEST_DIR)/cstart64.o
+>   cflatobjs += lib/arm64/processor.o
+>   cflatobjs += lib/arm64/spinlock.o
+> +cflatobjs += lib/arm/gic-v3-its.o
+>   
+>   OBJDIRS += lib/arm64
+>   
+> diff --git a/arm/gic.c b/arm/gic.c
+> index abf08c7..4d7dd03 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -16,6 +16,7 @@
+>   #include <asm/processor.h>
+>   #include <asm/delay.h>
+>   #include <asm/gic.h>
+> +#include <asm/gic-v3-its.h>
+>   #include <asm/smp.h>
+>   #include <asm/barrier.h>
+>   #include <asm/io.h>
+> @@ -518,6 +519,50 @@ static void gic_test_mmio(void)
+>   		test_targets(nr_irqs);
+>   }
+>   
+> +#if defined(__arm__)
+> +
+> +static void test_its_introspection(void) {}
+> +
+> +#else /* __arch64__ */
+> +
+> +static void test_its_introspection(void)
+> +{
+> +	struct its_baser *dev_baser, *coll_baser;
+> +	struct its_typer *typer = &its_data.typer;
+> +
+> +	if (!gicv3_its_base()) {
+> +		report_skip("No ITS, skip ...");
+> +		return;
+> +	}
+> +
+> +	/* IIDR */
+> +	report(test_readonly_32(gicv3_its_base() + GITS_IIDR, false),
+> +	       "GITS_IIDR is read-only"),
+> +
+> +	/* TYPER */
+> +	report(test_readonly_32(gicv3_its_base() + GITS_TYPER, false),
+> +	       "GITS_TYPER is read-only");
+> +
+> +	report(typer->phys_lpi, "ITS supports physical LPIs");
+> +	report_info("vLPI support: %s", typer->virt_lpi ? "yes" : "no");
+> +	report_info("ITT entry size = 0x%x", typer->ite_size);
+> +	report_info("Bit Count: EventID=%d DeviceId=%d CollId=%d",
+> +		    typer->eventid_bits, typer->deviceid_bits,
+> +		    typer->collid_bits);
+> +	report(typer->eventid_bits && typer->deviceid_bits &&
+> +	       typer->collid_bits, "ID spaces");
+> +	report_info("Target address format %s",
+> +			typer->pta ? "Redist basse address" : "PE #");
+
+typo: s/basse/base/
+
+> +
+> +	dev_baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
+> +	coll_baser = its_lookup_baser(GITS_BASER_TYPE_COLLECTION);
+> +	report(dev_baser && coll_baser, "detect device and collection BASER");
+> +	report_info("device baser entry_size = 0x%x", dev_baser->esz);
+> +	report_info("collection baser entry_size = 0x%x", coll_baser->esz);
+
+How about "device table entry_size = ..." and "collection table
+entry_size = ..."?
+
+> +}
+> +
+> +#endif
+> +
+>   int main(int argc, char **argv)
+>   {
+>   	if (!gic_init()) {
+> @@ -549,6 +594,10 @@ int main(int argc, char **argv)
+>   		report_prefix_push(argv[1]);
+>   		gic_test_mmio();
+>   		report_prefix_pop();
+> +	} else if (strcmp(argv[1], "its-introspection") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_its_introspection();
+> +		report_prefix_pop();
+>   	} else {
+>   		report_abort("Unknown subtest '%s'", argv[1]);
+>   	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index daeb5a0..ba2b31b 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -122,6 +122,13 @@ smp = $MAX_SMP
+>   extra_params = -machine gic-version=3 -append 'active'
+>   groups = gic
+>   
+> +[its-introspection]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'its-introspection'
+> +groups = its
+> +arch = arm64
+> +
+>   # Test PSCI emulation
+>   [psci]
+>   file = psci.flat
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..815c515
+> --- /dev/null
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -0,0 +1,103 @@
+> +/*
+> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
+> + *
+> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#ifndef _ASMARM_GIC_V3_ITS_H_
+> +#define _ASMARM_GIC_V3_ITS_H_
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +struct its_typer {
+> +	unsigned int ite_size;
+> +	unsigned int eventid_bits;
+> +	unsigned int deviceid_bits;
+> +	unsigned int collid_bits;
+> +	bool pta;
+> +	bool phys_lpi;
+> +	bool virt_lpi;
+> +};
+> +
+> +struct its_baser {
+> +	int type;
+> +	size_t psz;
+> +	int nr_pages;
+> +	bool indirect;
+> +	phys_addr_t table_addr;
+> +	bool valid;
+> +	int esz;
+> +};
+> +
+> +#define GITS_BASER_NR_REGS              8
+> +
+> +struct its_data {
+> +	void *base;
+> +	struct its_typer typer;
+> +	struct its_baser baser[GITS_BASER_NR_REGS];
+> +};
+> +
+> +extern struct its_data its_data;
+> +
+> +#define gicv3_its_base()		(its_data.base)
+> +
+> +#if defined(__aarch64__)
+> +
+> +#define GITS_CTLR			0x0000
+> +#define GITS_IIDR			0x0004
+> +#define GITS_TYPER			0x0008
+> +#define GITS_CBASER			0x0080
+> +#define GITS_CWRITER			0x0088
+> +#define GITS_CREADR			0x0090
+> +#define GITS_BASER			0x0100
+> +
+> +#define GITS_TYPER_PLPIS                BIT(0)
+> +#define GITS_TYPER_VLPIS		BIT(1)
+> +#define GITS_TYPER_ITT_ENTRY_SIZE	GENMASK_ULL(7, 4)
+> +#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
+> +#define GITS_TYPER_IDBITS		GENMASK_ULL(8, 12)
+> +#define GITS_TYPER_IDBITS_SHIFT         8
+> +#define GITS_TYPER_DEVBITS		GENMASK_ULL(13, 17)
+> +#define GITS_TYPER_DEVBITS_SHIFT        13
+> +#define GITS_TYPER_PTA                  BIT(19)
+> +#define GITS_TYPER_CIDBITS		GENMASK_ULL(32, 35)
+> +#define GITS_TYPER_CIDBITS_SHIFT	32
+> +#define GITS_TYPER_CIL			BIT(36)
+> +
+> +#define GITS_CTLR_ENABLE		(1U << 0)
+> +
+> +#define GITS_CBASER_VALID		(1UL << 63)
+> +
+> +#define GITS_BASER_VALID		BIT(63)
+> +#define GITS_BASER_INDIRECT		BIT(62)
+> +#define GITS_BASER_TYPE_SHIFT		(56)
+> +#define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
+> +#define GITS_BASER_ENTRY_SIZE_SHIFT	(48)
+> +#define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
+> +#define GITS_BASER_PAGE_SIZE_SHIFT	(8)
+> +#define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGES_MAX		256
+> +#define GITS_BASER_PAGES_SHIFT		(0)
+> +#define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
+> +#define GITS_BASER_PHYS_ADDR_MASK	0xFFFFFFFFF000
+> +#define GITS_BASER_TYPE_NONE		0
+> +#define GITS_BASER_TYPE_DEVICE		1
+> +#define GITS_BASER_TYPE_COLLECTION	4
+> +
+> +extern void its_parse_typer(void);
+> +extern void its_init(void);
+> +extern int its_parse_baser(int i, struct its_baser *baser);
+> +extern struct its_baser *its_lookup_baser(int type);
+> +
+> +#else /* __arm__ */
+> +
+> +static inline void its_init(void) {}
+> +
+> +#endif
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> new file mode 100644
+> index 0000000..2c0ce13
+> --- /dev/null
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -0,0 +1,88 @@
+> +/*
+> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/gic.h>
+> +#include <alloc_page.h>
+> +#include <asm/gic-v3-its.h>
+> +
+> +void its_parse_typer(void)
+> +{
+> +	u64 typer = readq(gicv3_its_base() + GITS_TYPER);
+> +
+> +	its_data.typer.ite_size = ((typer & GITS_TYPER_ITT_ENTRY_SIZE) >>
+> +					GITS_TYPER_ITT_ENTRY_SIZE_SHIFT) + 1;
+> +	its_data.typer.pta = typer & GITS_TYPER_PTA;
+> +	its_data.typer.eventid_bits = ((typer & GITS_TYPER_IDBITS) >>
+> +						GITS_TYPER_IDBITS_SHIFT) + 1;
+> +	its_data.typer.deviceid_bits = ((typer & GITS_TYPER_DEVBITS) >>
+> +						GITS_TYPER_DEVBITS_SHIFT) + 1;
+> +
+> +	if (typer & GITS_TYPER_CIL)
+> +		its_data.typer.collid_bits = ((typer & GITS_TYPER_CIDBITS) >>
+> +						GITS_TYPER_CIDBITS_SHIFT) + 1;
+> +	else
+> +		its_data.typer.collid_bits = 16;
+> +
+> +	its_data.typer.virt_lpi = typer & GITS_TYPER_VLPIS;
+> +	its_data.typer.phys_lpi = typer & GITS_TYPER_PLPIS;
+> +}
+> +
+> +int its_parse_baser(int i, struct its_baser *baser)
+> +{
+> +	void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
+> +	u64 val = readq(reg_addr);
+> +
+> +	if (!val) {
+> +		memset(baser, 0, sizeof(*baser));
+> +		return -1;
+> +	}
+
+Unimplemented BASERs? How about using something like:
+
+	if (GITS_BASER_TYPE(val) == GITS_BASER_TYPE_NONE) {
+		[...]
+	}
+
+to make it a bit more explicit?
+
+But feel free to just ignore it because you're right that
+the unimplemented BASERs are RES0.
 
 
-I happen to have a QEMU RPM installed - how do I override 'make=20
-check-acceptance' to pick up /usr/bin/qemu-system-x86_64 (and=20
-/usr/share/qemu/bios-microvm.bin - not sure that is a universal location=20
-for distros)?   Overriding QTEST_QEMU_BINARY didn't seem to work for me=20
-- doesn't appear to apply to the check-acceptance rule.
+Thanks,
+Zenghui
 
->=20
->  =A0(1/2)=20
-> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:=
-=20
-> PASS (2.58 s)
->  =A0(2/2)=20
-> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_mic=
-rovm:=20
->=20
-> Output: 'qemu-system-x86_64: -machine microvm: unsupported machine=20
-> type\nUse -machine help to list supported machines\n'
-> ERROR: timed out (15.10 s)
->=20
-> Do you mind testing the series testing a machine is available?
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675086.html
-
-
-Sure. I'll test/review those.
-
-Regards,
-Liam
+> +
+> +	baser->valid = val & GITS_BASER_VALID;
+> +	baser->indirect = val & GITS_BASER_INDIRECT;
+> +	baser->type = GITS_BASER_TYPE(val);
+> +	baser->esz = GITS_BASER_ENTRY_SIZE(val);
+> +	baser->nr_pages = GITS_BASER_NR_PAGES(val);
+> +	baser->table_addr = val & GITS_BASER_PHYS_ADDR_MASK;
+> +	switch (val & GITS_BASER_PAGE_SIZE_MASK) {
+> +	case GITS_BASER_PAGE_SIZE_4K:
+> +		baser->psz = SZ_4K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_16K:
+> +		baser->psz = SZ_16K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_64K:
+> +		baser->psz = SZ_64K;
+> +		break;
+> +	default:
+> +		baser->psz = SZ_64K;
+> +	}
+> +	return 0;
+> +}
+> +
+> +struct its_baser *its_lookup_baser(int type)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> +		struct its_baser *baser = &its_data.baser[i];
+> +
+> +		if (baser->type == type)
+> +			return baser;
+> +	}
+> +	return NULL;
+> +}
+> +
+> +void its_init(void)
+> +{
+> +	int i;
+> +
+> +	if (!its_data.base)
+> +		return;
+> +
+> +	its_parse_typer();
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++)
+> +		its_parse_baser(i, &its_data.baser[i]);
+> +}
+> +
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index aa9cb86..6b70b05 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -6,9 +6,11 @@
+>   #include <devicetree.h>
+>   #include <asm/gic.h>
+>   #include <asm/io.h>
+> +#include <asm/gic-v3-its.h>
+>   
+>   struct gicv2_data gicv2_data;
+>   struct gicv3_data gicv3_data;
+> +struct its_data its_data;
+>   
+>   struct gic_common_ops {
+>   	void (*enable_defaults)(void);
+> @@ -44,12 +46,13 @@ static const struct gic_common_ops gicv3_common_ops = {
+>    * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
+>    */
+>   static bool
+> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+> +gic_get_dt_bases(const char *compatible, void **base1, void **base2, void **base3)
+>   {
+>   	struct dt_pbus_reg reg;
+> -	struct dt_device gic;
+> +	struct dt_device gic, its;
+>   	struct dt_bus bus;
+> -	int node, ret, i;
+> +	int node, subnode, ret, i, len;
+> +	const void *fdt = dt_fdt();
+>   
+>   	dt_bus_init_defaults(&bus);
+>   	dt_device_init(&gic, &bus, NULL);
+> @@ -74,19 +77,35 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+>   		base2[i] = ioremap(reg.addr, reg.size);
+>   	}
+>   
+> +	if (base3 && !strcmp(compatible, "arm,gic-v3")) {
+> +		dt_for_each_subnode(node, subnode) {
+> +			const struct fdt_property *prop;
+> +
+> +			prop = fdt_get_property(fdt, subnode, "compatible", &len);
+> +			if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
+> +				dt_device_bind_node(&its, subnode);
+> +				ret = dt_pbus_translate(&its, 0, &reg);
+> +				assert(ret == 0);
+> +				*base3 = ioremap(reg.addr, reg.size);
+> +				break;
+> +			}
+> +		}
+> +
+> +	}
+> +
+>   	return true;
+>   }
+>   
+>   int gicv2_init(void)
+>   {
+>   	return gic_get_dt_bases("arm,cortex-a15-gic",
+> -			&gicv2_data.dist_base, &gicv2_data.cpu_base);
+> +			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
+>   }
+>   
+>   int gicv3_init(void)
+>   {
+>   	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
+> -			&gicv3_data.redist_bases[0]);
+> +			&gicv3_data.redist_bases[0], &its_data.base);
+>   }
+>   
+>   int gic_version(void)
+> @@ -104,6 +123,7 @@ int gic_init(void)
+>   		gic_common_ops = &gicv2_common_ops;
+>   	else if (gicv3_init())
+>   		gic_common_ops = &gicv3_common_ops;
+> +	its_init();
+>   	return gic_version();
+>   }
+>   
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..083cba4
+> --- /dev/null
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -0,0 +1 @@
+> +#include "../../arm/asm/gic-v3-its.h"
+> 
 
 
