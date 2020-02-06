@@ -2,101 +2,86 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A045C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE989C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:11:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 447EC206CC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:11:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A5D5206CC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 11:11:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzZPY3/G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 447EC206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qnlqFw+p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A5D5206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izf3z-0000Gp-DQ
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:11:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55689)
+	id 1izf4P-0000xK-Px
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 06:11:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50054)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izf1D-000351-Cq
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:08:24 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1izeoV-0003Ix-Ew
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izf1C-0005sE-4i
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:08:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34312
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izf1C-0005pu-0L
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 06:08:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580987301;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AS0nEzYBOWUX42VgZ6/aCvxTM0F6DjJNAL92beNsEFk=;
- b=ZzZPY3/GDGMfNv+hLelJLybaT8kvJbWTZzgsXfVN14qF3CwKKIJmNJdLTfvpPlubhx/sm8
- XPCNLgrS2W0okQpzHKuxTCgAylOaIVD6X+TBZCXTfrJptH1I4Co0Lw3jzBizsbRb8ARgIU
- jwhr4dF8jK06YRX7F93ASQaLQKM3jvA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-G272hgZ2P4WU7ROomynWsQ-1; Thu, 06 Feb 2020 06:08:16 -0500
-Received: by mail-wm1-f69.google.com with SMTP id t17so2615127wmi.7
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 03:08:16 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1izeoT-0007io-I4
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:15 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50248)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1izeoT-0007cK-8K
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:55:13 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a5so5802243wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 02:55:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=upHYF1UMXzuY7YGdgMwFvDjEH+GvpeNijlwWGAtlcaE=;
+ b=qnlqFw+p76jInhDSPdcAgJuAvEbBOOE6v+YY7TCYWjY7g6MaWzHDos/xvGRRxax9JI
+ TDMHor4GKMkvyEjcwIxhYSLhTaXdd4sFzCSEl+lU1wYUql0nWrpddipMddOCKBrhjz24
+ DsRTe0+sAbAoVudKR/M+fNaPGbOhjm9bHv0q8Rj689MA8K22zjss9Ax3Lz6xmu5Q0jM8
+ HBxc7wmGywucKIJ9rYxn8tIzXw0lIjYIE3GgS+2aiY9VMAhW4cH2Cnb4vKgbQCzVb1g7
+ 5RPm0Cv3I2Oly2BFvzf4YmcTiT9D10zacFp6m+kOhrYFXzICisM4+arrR4Lc8bmaI6Fm
+ zy8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Nu5Dy5d0X7tVEgM4PbaK9Aq4Ut1lH3ZTznIj6j1nAIk=;
- b=Qo4O5AONC+GzbufFt7jgnpYKrxuXx26T2rfXS60Os+ypfuAW7MMnsndKtyWwzfY4Gr
- y03GLihOsii66e5ti4fgKrCxDhmGGug+zFRlcGvU0om3Q1i0FtSJYkVNpEPIvjmhjheP
- 6q75TImW0LhFA+H3py8nZYqm1odDF3EboD3SZfBAGgS4yWvJDaMjIJIgtr1+YuNRHOne
- OTKE3YE4llDRC2ufdwUlNRiA7MF35xc82/Mk0K378ruwtvfpd+KUIUFrjOuOSIoZvjxw
- JXCWctOxozTEd2Qvxu0djWs4y+wGy6yuYilB3RAnUIcpJIkqB2qXzOqdDdUv1SJHU8BP
- RScQ==
-X-Gm-Message-State: APjAAAUI66S3vgQ4kITs3A3GlYReVwi+l89fKCllKyXQMiomOs2sEmnl
- 1Cr5osiow/On64tQQXMLtjWQsmRSuzoaSbogmJYslJROpAu/etNxCAHhF8+nQ2TaJPpumMeImfE
- VTZVKgb2vqnX1W4A=
-X-Received: by 2002:a1c:4d18:: with SMTP id o24mr3925373wmh.35.1580987295761; 
- Thu, 06 Feb 2020 03:08:15 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwdotbsdzuJ0QK8GPsLXU10ZT+nTsw0curItafwRoNkY3rDGlXkoT5URdmwyVNG4LK4gAwVjQ==
-X-Received: by 2002:a1c:4d18:: with SMTP id o24mr3925338wmh.35.1580987295463; 
- Thu, 06 Feb 2020 03:08:15 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id b10sm3872007wrt.90.2020.02.06.03.08.14
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 03:08:14 -0800 (PST)
-Subject: Re: [PATCH] mailmap: Add entry about me
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Yu-Chen Lin <npes87184@gmail.com>, qemu-devel@nongnu.org,
- QEMU Trivial <qemu-trivial@nongnu.org>
-References: <20191206140931.14133-1-npes87184@gmail.com>
- <bd91caac-86c5-54a6-080d-37909b91a656@redhat.com>
-Message-ID: <548b2024-f34e-f4cd-f3b9-c4575c918cbe@redhat.com>
-Date: Thu, 6 Feb 2020 12:08:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=upHYF1UMXzuY7YGdgMwFvDjEH+GvpeNijlwWGAtlcaE=;
+ b=PmgG2xLaCWYH1ByC3qIowcPkHPnKKL40GECA0ApTMqHUZN5+kIRluCW2iBf1r/kasq
+ mLl6ENgobfd1XHnze8mUKT8//4pfYAgHPvJBvQhh6LZppBlLm5ludT2eG4dkJki7L5Mk
+ hP5vFLcbbt2jqBdCFr6/erZCTt1g55NV/2G2IXMSHvatzv2uaMZyVWYXjH06u/LfbNxB
+ hKX95iBCDB4cVnc7Q78ymztPkDQrrnab9WgvDsQyrp8CI8s3oad1GdOosWxpCVLXPgF4
+ Bz3hb9fMDVPeMDuvD1RCWI+9eiliXFTt+YPR08xLPKVix8jH6EhBnVmPl5G6nvzxNlzA
+ gyvg==
+X-Gm-Message-State: APjAAAUqKn5Eozg7N8Fe29BaiRQexauFXxWwYb4ibYlI4PUKb9rkm22Q
+ CuJ5uJoDjsrkifRFmdoyiuhAW+cM3IKWhA==
+X-Google-Smtp-Source: APXvYqxQDPtVtcSO1VWSDsTuPlxkzG6TqhAYVT2HHOHScUvsb3QcVign/FCMwL4Y6VObq5Qh+QR2lw==
+X-Received: by 2002:a7b:cc97:: with SMTP id p23mr3890632wma.89.1580986511787; 
+ Thu, 06 Feb 2020 02:55:11 -0800 (PST)
+Received: from cloudburst.c.hoisthospitality.com ([135.196.99.211])
+ by smtp.gmail.com with ESMTPSA id m21sm3364995wmi.27.2020.02.06.02.55.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Feb 2020 02:55:11 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 26/41] target/arm: Update timer access for VHE
+Date: Thu,  6 Feb 2020 10:54:33 +0000
+Message-Id: <20200206105448.4726-27-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200206105448.4726-1-richard.henderson@linaro.org>
+References: <20200206105448.4726-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <bd91caac-86c5-54a6-080d-37909b91a656@redhat.com>
-Content-Language: en-US
-X-MC-Unique: G272hgZ2P4WU7ROomynWsQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,50 +93,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper.c | 102 +++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 81 insertions(+), 21 deletions(-)
 
-I suggest changing the subject to:
-"mailmap: Add entry for Yu-Chen Lin"
-
-On 12/6/19 3:15 PM, Philippe Mathieu-Daud=E9 wrote:
-> Cc'ing qemu-trivial@
->=20
-> On 12/6/19 3:09 PM, Yu-Chen Lin wrote:
->> I have two mail address, add entries for
->> showing author and email correctly.
->>
->> Signed-off-by: Yu-Chen Lin <npes87184@gmail.com>
->> ---
->> =A0 .mailmap | 3 ++-
->> =A0 1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/.mailmap b/.mailmap
->> index 3816e4effe..3fbf3902a3 100644
->> --- a/.mailmap
->> +++ b/.mailmap
->> @@ -151,7 +151,8 @@ Xiaoqiang Zhao <zxq_yx_007@163.com>
->> =A0 Xinhua Cao <caoxinhua@huawei.com>
->> =A0 Xiong Zhang <xiong.y.zhang@intel.com>
->> =A0 Yin Yin <yin.yin@cs2c.com.cn>
->> -yuchenlin <npes87184@gmail.com>
->> +Yu-Chen Lin <npes87184@gmail.com>
->> +Yu-Chen Lin <npes87184@gmail.com> <yuchenlin@synology.com>
-
-Apparently the mailmap process is getting stricter,
-can you Ack-by this patch from your Synology account?
-
->=20
-> Thanks for updating your entry in .mailmap!
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->=20
->> =A0 YunQiang Su <syq@debian.org>
->> =A0 YunQiang Su <ysu@wavecomp.com>
->> =A0 Yuri Pudgorodskiy <yur@virtuozzo.com>
->>
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 996865a3a2..992ab2a15f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -2324,10 +2324,18 @@ static CPAccessResult gt_cntfrq_access(CPUARMState *env, const ARMCPRegInfo *ri,
+      * Writable only at the highest implemented exception level.
+      */
+     int el = arm_current_el(env);
++    uint64_t hcr;
++    uint32_t cntkctl;
+ 
+     switch (el) {
+     case 0:
+-        if (!extract32(env->cp15.c14_cntkctl, 0, 2)) {
++        hcr = arm_hcr_el2_eff(env);
++        if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
++            cntkctl = env->cp15.cnthctl_el2;
++        } else {
++            cntkctl = env->cp15.c14_cntkctl;
++        }
++        if (!extract32(cntkctl, 0, 2)) {
+             return CP_ACCESS_TRAP;
+         }
+         break;
+@@ -2355,17 +2363,47 @@ static CPAccessResult gt_counter_access(CPUARMState *env, int timeridx,
+ {
+     unsigned int cur_el = arm_current_el(env);
+     bool secure = arm_is_secure(env);
++    uint64_t hcr = arm_hcr_el2_eff(env);
+ 
+-    /* CNT[PV]CT: not visible from PL0 if ELO[PV]CTEN is zero */
+-    if (cur_el == 0 &&
+-        !extract32(env->cp15.c14_cntkctl, timeridx, 1)) {
+-        return CP_ACCESS_TRAP;
+-    }
++    switch (cur_el) {
++    case 0:
++        /* If HCR_EL2.<E2H,TGE> == '11': check CNTHCTL_EL2.EL0[PV]CTEN. */
++        if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
++            return (extract32(env->cp15.cnthctl_el2, timeridx, 1)
++                    ? CP_ACCESS_OK : CP_ACCESS_TRAP_EL2);
++        }
+ 
+-    if (arm_feature(env, ARM_FEATURE_EL2) &&
+-        timeridx == GTIMER_PHYS && !secure && cur_el < 2 &&
+-        !extract32(env->cp15.cnthctl_el2, 0, 1)) {
+-        return CP_ACCESS_TRAP_EL2;
++        /* CNT[PV]CT: not visible from PL0 if EL0[PV]CTEN is zero */
++        if (!extract32(env->cp15.c14_cntkctl, timeridx, 1)) {
++            return CP_ACCESS_TRAP;
++        }
++
++        /* If HCR_EL2.<E2H,TGE> == '10': check CNTHCTL_EL2.EL1PCTEN. */
++        if (hcr & HCR_E2H) {
++            if (timeridx == GTIMER_PHYS &&
++                !extract32(env->cp15.cnthctl_el2, 10, 1)) {
++                return CP_ACCESS_TRAP_EL2;
++            }
++        } else {
++            /* If HCR_EL2.<E2H> == 0: check CNTHCTL_EL2.EL1PCEN. */
++            if (arm_feature(env, ARM_FEATURE_EL2) &&
++                timeridx == GTIMER_PHYS && !secure &&
++                !extract32(env->cp15.cnthctl_el2, 1, 1)) {
++                return CP_ACCESS_TRAP_EL2;
++            }
++        }
++        break;
++
++    case 1:
++        /* Check CNTHCTL_EL2.EL1PCTEN, which changes location based on E2H. */
++        if (arm_feature(env, ARM_FEATURE_EL2) &&
++            timeridx == GTIMER_PHYS && !secure &&
++            (hcr & HCR_E2H
++             ? !extract32(env->cp15.cnthctl_el2, 10, 1)
++             : !extract32(env->cp15.cnthctl_el2, 0, 1))) {
++            return CP_ACCESS_TRAP_EL2;
++        }
++        break;
+     }
+     return CP_ACCESS_OK;
+ }
+@@ -2375,19 +2413,41 @@ static CPAccessResult gt_timer_access(CPUARMState *env, int timeridx,
+ {
+     unsigned int cur_el = arm_current_el(env);
+     bool secure = arm_is_secure(env);
++    uint64_t hcr = arm_hcr_el2_eff(env);
+ 
+-    /* CNT[PV]_CVAL, CNT[PV]_CTL, CNT[PV]_TVAL: not visible from PL0 if
+-     * EL0[PV]TEN is zero.
+-     */
+-    if (cur_el == 0 &&
+-        !extract32(env->cp15.c14_cntkctl, 9 - timeridx, 1)) {
+-        return CP_ACCESS_TRAP;
+-    }
++    switch (cur_el) {
++    case 0:
++        if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
++            /* If HCR_EL2.<E2H,TGE> == '11': check CNTHCTL_EL2.EL0[PV]TEN. */
++            return (extract32(env->cp15.cnthctl_el2, 9 - timeridx, 1)
++                    ? CP_ACCESS_OK : CP_ACCESS_TRAP_EL2);
++        }
+ 
+-    if (arm_feature(env, ARM_FEATURE_EL2) &&
+-        timeridx == GTIMER_PHYS && !secure && cur_el < 2 &&
+-        !extract32(env->cp15.cnthctl_el2, 1, 1)) {
+-        return CP_ACCESS_TRAP_EL2;
++        /*
++         * CNT[PV]_CVAL, CNT[PV]_CTL, CNT[PV]_TVAL: not visible from
++         * EL0 if EL0[PV]TEN is zero.
++         */
++        if (!extract32(env->cp15.c14_cntkctl, 9 - timeridx, 1)) {
++            return CP_ACCESS_TRAP;
++        }
++        /* fall through */
++
++    case 1:
++        if (arm_feature(env, ARM_FEATURE_EL2) &&
++            timeridx == GTIMER_PHYS && !secure) {
++            if (hcr & HCR_E2H) {
++                /* If HCR_EL2.<E2H,TGE> == '10': check CNTHCTL_EL2.EL1PTEN. */
++                if (!extract32(env->cp15.cnthctl_el2, 11, 1)) {
++                    return CP_ACCESS_TRAP_EL2;
++                }
++            } else {
++                /* If HCR_EL2.<E2H> == 0: check CNTHCTL_EL2.EL1PCEN. */
++                if (!extract32(env->cp15.cnthctl_el2, 1, 1)) {
++                    return CP_ACCESS_TRAP_EL2;
++                }
++            }
++        }
++        break;
+     }
+     return CP_ACCESS_OK;
+ }
+-- 
+2.20.1
 
 
