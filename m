@@ -2,78 +2,95 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F6AC35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A7AC35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:47:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22644218AC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:46:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eZG86Tj8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22644218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C36121775
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:47:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C36121775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izoyv-00047s-5d
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 16:46:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35112)
+	id 1izozE-0004YI-AM
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 16:47:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41278)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izobt-0003ZX-30
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:53 -0500
+ (envelope-from <farman@linux.ibm.com>) id 1izoxa-0002tz-5G
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:45:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izobs-00022j-3x
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26701
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izobs-00021T-0n
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581024171;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YV9xwEMsyXIfsLTnG09j6HmaxroNO4TDw93kpzlEeeo=;
- b=eZG86Tj8IYvBp802PB2+QUBeZbDxcS1648NscxtrvZLJv2DRLSBsz/UBy3gK7QysRzX3pd
- uOJchSb6nUKjqdIGEAJs+JXqV69cNepskdfOPTI+6pfX8EBbEBSTQnW30Aoii4B9LgR0B7
- rOfDn+8EW1JLEdZvI7k6Wei9PtPRiZU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-tLZr66OjOTmSPLkau8_R9w-1; Thu, 06 Feb 2020 16:22:47 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 571CF8018A2;
- Thu,  6 Feb 2020 21:22:46 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-120.brq.redhat.com [10.40.204.120])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 04F7460BEC;
- Thu,  6 Feb 2020 21:22:43 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 42/46] tests/qemu-iotests/check: Only check for Python 3
- interpreter
-Date: Thu,  6 Feb 2020 22:19:32 +0100
-Message-Id: <20200206211936.17098-43-philmd@redhat.com>
-In-Reply-To: <20200206211936.17098-1-philmd@redhat.com>
-References: <20200206211936.17098-1-philmd@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: tLZr66OjOTmSPLkau8_R9w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ (envelope-from <farman@linux.ibm.com>) id 1izoxY-0007CX-Kk
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:45:18 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:65260)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <farman@linux.ibm.com>)
+ id 1izoxY-00079U-Ad
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:45:16 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 016LeQrD016621
+ for <qemu-devel@nongnu.org>; Thu, 6 Feb 2020 16:45:15 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y0p3k1paq-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 16:45:15 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
+ Thu, 6 Feb 2020 21:45:13 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 6 Feb 2020 21:45:11 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 016Lj9BX590292
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 6 Feb 2020 21:45:09 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 625794C050;
+ Thu,  6 Feb 2020 21:45:09 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 50CB34C044;
+ Thu,  6 Feb 2020 21:45:09 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Thu,  6 Feb 2020 21:45:09 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+ id 0E7CFE0278; Thu,  6 Feb 2020 22:45:09 +0100 (CET)
+From: Eric Farman <farman@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: [RFC PATCH v2 2/7] linux-headers: update
+Date: Thu,  6 Feb 2020 22:45:04 +0100
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200206214509.16434-1-farman@linux.ibm.com>
+References: <20200206214509.16434-1-farman@linux.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 20020621-4275-0000-0000-0000039EA9CA
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20020621-4276-0000-0000-000038B2D855
+Message-Id: <20200206214509.16434-3-farman@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-06_04:2020-02-06,
+ 2020-02-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ priorityscore=1501 suspectscore=0 clxscore=1015 impostorscore=0
+ phishscore=0 spamscore=0 malwarescore=0 adultscore=0 bulkscore=0
+ mlxscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002060158
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,42 +102,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Jason Herne <jjherne@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x@nongnu.org, Jared Rossi <jrossi@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All the iotests Python scripts have been converted to search for
-the Python 3 interpreter. Update the ./check script accordingly.
+From: Farhan Ali <alifm@linux.ibm.com>
 
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200130163232.10446-13-philmd@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
 ---
- tests/qemu-iotests/check | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index f5afb12016..da77917cb6 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -838,8 +838,7 @@ do
-=20
-         start=3D$(_wallclock)
-=20
--        if [ "$(head -n 1 "$source_iotests/$seq" | sed 's/3$//')" \
--            =3D=3D "#!/usr/bin/env python" ]; then
-+        if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/env =
-python3" ]; then
-             if $python_usable; then
-                 run_command=3D"$PYTHON $seq"
-             else
---=20
-2.21.1
+Notes:
+    v1->v2: [EF]
+     - Re-ran 3 February 2020 (based on kernel tag v5.5)
+    v0->v1: [EF]
+     - Run scripts/update-linux-headers.sh properly, but do not
+       add resulting changes to linux-headers/asm-mips/
+
+ include/standard-headers/linux/input.h |  1 +
+ linux-headers/asm-arm64/unistd.h       |  1 +
+ linux-headers/linux/vfio.h             |  3 +++
+ linux-headers/linux/vfio_ccw.h         | 19 +++++++++++++++++++
+ 4 files changed, 24 insertions(+)
+
+diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
+index d8914f25a5..f89c986190 100644
+--- a/include/standard-headers/linux/input.h
++++ b/include/standard-headers/linux/input.h
+@@ -31,6 +31,7 @@ struct input_event {
+ 	unsigned long __sec;
+ #if defined(__sparc__) && defined(__arch64__)
+ 	unsigned int __usec;
++	unsigned int __pad;
+ #else
+ 	unsigned long __usec;
+ #endif
+diff --git a/linux-headers/asm-arm64/unistd.h b/linux-headers/asm-arm64/unistd.h
+index 4703d21866..f83a70e07d 100644
+--- a/linux-headers/asm-arm64/unistd.h
++++ b/linux-headers/asm-arm64/unistd.h
+@@ -19,5 +19,6 @@
+ #define __ARCH_WANT_NEW_STAT
+ #define __ARCH_WANT_SET_GET_RLIMIT
+ #define __ARCH_WANT_TIME32_SYSCALLS
++#define __ARCH_WANT_SYS_CLONE3
+ 
+ #include <asm-generic/unistd.h>
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index fb10370d29..9e227348b3 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -378,6 +378,8 @@ struct vfio_region_gfx_edid {
+ 
+ /* sub-types for VFIO_REGION_TYPE_CCW */
+ #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
++#define VFIO_REGION_SUBTYPE_CCW_SCHIB		(2)
++#define VFIO_REGION_SUBTYPE_CCW_CRW		(3)
+ 
+ /*
+  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+@@ -577,6 +579,7 @@ enum {
+ 
+ enum {
+ 	VFIO_CCW_IO_IRQ_INDEX,
++	VFIO_CCW_CRW_IRQ_INDEX,
+ 	VFIO_CCW_NUM_IRQS
+ };
+ 
+diff --git a/linux-headers/linux/vfio_ccw.h b/linux-headers/linux/vfio_ccw.h
+index fcc3e69ef5..c56c1a621c 100644
+--- a/linux-headers/linux/vfio_ccw.h
++++ b/linux-headers/linux/vfio_ccw.h
+@@ -34,4 +34,23 @@ struct ccw_cmd_region {
+ 	__u32 ret_code;
+ } __attribute__((packed));
+ 
++/*
++ * Used for processing commands that read the subchannel-information block
++ * Reading this region triggers a stsch() to hardware
++ * Note: this is controlled by a capability
++ */
++struct ccw_schib_region {
++#define SCHIB_AREA_SIZE 52
++	__u8 schib_area[SCHIB_AREA_SIZE];
++} __attribute__((packed));
++
++/*
++ * Used for returning Channel Report Word(s) to userspace.
++ * Note: this is controlled by a capability
++ */
++struct ccw_crw_region {
++	__u32 crw0;
++	__u32 crw1;
++} __attribute__((packed));
++
+ #endif
+-- 
+2.17.1
 
 
