@@ -2,99 +2,63 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A590BC35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 01:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 782A4C35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 01:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A27420658
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 01:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A27420658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A03620658
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 01:46:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A03620658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izWDo-0002Vl-OF
-	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 20:44:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55752)
+	id 1izWFZ-0003xl-EG
+	for qemu-devel@archiver.kernel.org; Wed, 05 Feb 2020 20:46:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55852)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <muriloo@linux.ibm.com>) id 1izVqK-0003Hr-BQ
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:20:34 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1izVqO-0003Ss-Ht
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:20:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <muriloo@linux.ibm.com>) id 1izVqI-0001mO-HN
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:20:32 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37560
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
- id 1izVqI-0001cE-Ah
- for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:20:30 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0161J7N6043815; Wed, 5 Feb 2020 20:20:28 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhn3ecn6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Feb 2020 20:20:27 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0161KRsp046628;
- Wed, 5 Feb 2020 20:20:27 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xyhn3ecmv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Feb 2020 20:20:27 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0161DgF2007732;
- Thu, 6 Feb 2020 01:20:26 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
- [9.57.198.28]) by ppma02dal.us.ibm.com with ESMTP id 2xykc9kjkq-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 06 Feb 2020 01:20:26 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0161KPg845023666
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 6 Feb 2020 01:20:26 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E2C01AE06A;
- Thu,  6 Feb 2020 01:20:25 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 243DFAE05F;
- Thu,  6 Feb 2020 01:20:25 +0000 (GMT)
-Received: from localhost (unknown [9.85.199.146])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
- Thu,  6 Feb 2020 01:20:24 +0000 (GMT)
-From: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1 08/13] util/mmap-alloc: Prepare for resizable mmaps
-Date: Wed, 05 Feb 2020 20:00:08 -0300
-Message-ID: <2036195.sfUKtyktLc@kermit.br.ibm.com>
-Organization: IBM
-In-Reply-To: <20200203183125.164879-9-david@redhat.com>
-References: <20200203183125.164879-1-david@redhat.com>
- <20200203183125.164879-9-david@redhat.com>
+ (envelope-from <guoheyi@huawei.com>) id 1izVqN-0002Jq-FR
+ for qemu-devel@nongnu.org; Wed, 05 Feb 2020 20:20:36 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2697 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1izVqL-0001Xg-1P; Wed, 05 Feb 2020 20:20:33 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 371BABC200ABA29A102D;
+ Thu,  6 Feb 2020 09:20:28 +0800 (CST)
+Received: from [127.0.0.1] (10.173.221.228) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0;
+ Thu, 6 Feb 2020 09:20:20 +0800
+Subject: Re: [RFC v2 00/14] Add SDEI support for arm64
+To: Marc Zyngier <maz@kernel.org>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <CAFEAcA-+tAbb9h2wZOm56TqUvjQJT0OYFLwTVS-UxKrF5PO3mQ@mail.gmail.com>
+ <5aece614-4341-35e5-53a6-2f3d788e6e8d@huawei.com>
+ <e8b93460-48e6-43cd-4608-370c07cb45ec@huawei.com>
+ <350aa4ca1b57a466ed882236caf23051@kernel.org>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <c67c1563-045f-a5f8-8b8b-97d792aa1912@huawei.com>
+Date: Thu, 6 Feb 2020 09:20:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-05_06:2020-02-04,
- 2020-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- impostorscore=0 malwarescore=0 suspectscore=1 phishscore=0 clxscore=1015
- adultscore=0 mlxlogscore=999 bulkscore=0 spamscore=0 lowpriorityscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002060006
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <350aa4ca1b57a466ed882236caf23051@kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+X-Originating-IP: [10.173.221.228]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,154 +70,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Gavin Shan <gshan@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, James
+ Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello, David.
+Hi Marc,
 
-On Monday, February 3, 2020 3:31:20 PM -03 David Hildenbrand wrote:
-> When shrinking a mmap we want to re-reserve the already populated area.
-> When growing a memory region, we want to populate starting with a given
-> fd_offset. Prepare by allowing to pass these parameters.
-> 
-> Also, let's make sure we always process full pages, to avoid
-> unmapping/remapping pages that are already in use when
-> growing/shrinking. (existing callers seem to guarantee this, but that's
-> not obvious)
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Greg Kurz <groug@kaod.org>
-> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  util/mmap-alloc.c | 32 +++++++++++++++++++++-----------
->  1 file changed, 21 insertions(+), 11 deletions(-)
-> 
-> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> index f043ccb0ab..63ad6893b7 100644
-> --- a/util/mmap-alloc.c
-> +++ b/util/mmap-alloc.c
-> @@ -83,12 +83,12 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
->  }
-> 
->  /*
-> - * Reserve a new memory region of the requested size to be used for mapping
-> - * from the given fd (if any).
-> + * Reserve a new memory region of the requested size or re-reserve parts
-> + * of an existing region to be used for mapping from the given fd (if any).
-> */
-> -static void *mmap_reserve(size_t size, int fd)
-> +static void *mmap_reserve(void *ptr, size_t size, int fd)
->  {
-> -    int flags = MAP_PRIVATE;
-> +    int flags = MAP_PRIVATE | (ptr ? MAP_FIXED : 0);
-> 
->  #if defined(__powerpc64__) && defined(__linux__)
->      /*
-> @@ -111,19 +111,23 @@ static void *mmap_reserve(size_t size, int fd)
->      flags |= MAP_ANONYMOUS;
->  #endif
-> 
-> -    return mmap(0, size, PROT_NONE, flags, fd, 0);
-> +    return mmap(ptr, size, PROT_NONE, flags, fd, 0);
->  }
-> 
->  /*
->   * Populate memory in a reserved region from the given fd (if any).
->   */
-> -static void *mmap_populate(void *ptr, size_t size, int fd, bool shared,
-> -                           bool is_pmem)
-> +static void *mmap_populate(void *ptr, size_t size, int fd, size_t
-> fd_offset, +                           bool shared, bool is_pmem)
->  {
->      int map_sync_flags = 0;
->      int flags = MAP_FIXED;
->      void *new_ptr;
-> 
-> +    if (fd == -1) {
-> +        fd_offset = 0;
-> +    }
-> +
->      flags |= fd == -1 ? MAP_ANONYMOUS : 0;
->      flags |= shared ? MAP_SHARED : MAP_PRIVATE;
->      if (shared && is_pmem) {
-> @@ -131,7 +135,7 @@ static void *mmap_populate(void *ptr, size_t size, int
-> fd, bool shared, }
-> 
->      new_ptr = mmap(ptr, size, PROT_READ | PROT_WRITE, flags |
-> map_sync_flags, -                   fd, 0);
-> +                   fd, fd_offset);
->      if (new_ptr == MAP_FAILED && map_sync_flags) {
->          if (errno == ENOTSUP) {
->              char *proc_link = g_strdup_printf("/proc/self/fd/%d", fd);
-> @@ -153,7 +157,7 @@ static void *mmap_populate(void *ptr, size_t size, int
-> fd, bool shared, * If mmap failed with MAP_SHARED_VALIDATE | MAP_SYNC, we
-> will try * again without these flags to handle backwards compatibility. */
-> -        new_ptr = mmap(ptr, size, PROT_READ | PROT_WRITE, flags, fd, 0);
-> +        new_ptr = mmap(ptr, size, PROT_READ | PROT_WRITE, flags, fd,
-> fd_offset); }
->      return new_ptr;
->  }
-> @@ -178,13 +182,16 @@ void *qemu_ram_mmap(int fd,
->      size_t offset, total;
->      void *ptr, *guardptr;
-> 
-> +    /* we can only map whole pages */
-> +    size = QEMU_ALIGN_UP(size, pagesize);
-> +
+On 2020/2/5 21:15, Marc Zyngier wrote:
+> Hi Heyi,
+>
+> On 2020-02-04 08:26, Heyi Guo wrote:
+>> Update Marc's email address.
+>>
+>> +cc Gavin as he is posting a RFC for ARM NMI.
+>>
+>> Hi Marc,
+>>
+>> Really sorry for missing to update your email address, for the initial
+>> topic was raised long time ago and I forgot to update the Cc list in
+>> the commit message of the patches.
+>>
+>> Thanks Gavin for forwarding current discussion on ARM NMI to me.
+>>
+>> For you said SDEI is "horrible", does it mean we'd better never
+>> implement SDEI in virtual world? Or do you have any advice on how to
+>> implement it?
+>
+> My concern is that SDEI implies having EL3. EL3 not being virtualizable
+> with KVM, you end-up baking SDEI in *hardware*. Of course, this hardwar=
+e
+> is actually software (it is QEMU), but this isn't the way it was=20
+> intended.
 
-Caller already rounds up size to block->page_size.
+>
+> It's not the first time we've done that (PSCI is another example), but=20
+> the
+> logic behind SDEI looks much more invasive.
 
-Why this QEMU_ALIGN_UP is necessary?
+Thanks for your comments.
 
->      /*
->       * Note: this always allocates at least one extra page of virtual
-> address * space, even if size is already aligned.
->       */
->      total = size + align;
+Thinking about them for quite a while, below is my understanding, please=20
+correct me if I'm wrong:
 
-If size was aligned above with pagesize boundary, why would this align be 
-necessary?
+So should the KVM based virtual machine be treated as one with CPUs only=20
+having NS-EL1 and NS-EL0, ideally? And SDEI messes up this model, isn't i=
+t?
 
-Can the pagesize differ from memory region align?
+PSCI only contains some one-shot operations, so it is much less invasive=20
+than SDEI.
 
-> 
-> -    guardptr = mmap_reserve(total, fd);
-> +    guardptr = mmap_reserve(0, total, fd);
->      if (guardptr == MAP_FAILED) {
->          return MAP_FAILED;
->      }
-> @@ -195,7 +202,7 @@ void *qemu_ram_mmap(int fd,
-> 
->      offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) -
-> (uintptr_t)guardptr;
-> 
-> -    ptr = mmap_populate(guardptr + offset, size, fd, shared, is_pmem);
-> +    ptr = mmap_populate(guardptr + offset, size, fd, 0, shared, is_pmem);
->      if (ptr == MAP_FAILED) {
->          munmap(guardptr, total);
->          return MAP_FAILED;
-> @@ -221,6 +228,9 @@ void qemu_ram_munmap(int fd, void *ptr, size_t size)
->  {
->      const size_t pagesize = mmap_pagesize(fd);
-> 
-> +    /* we can only map whole pages */
-> +    size = QEMU_ALIGN_UP(size, pagesize);
-> +
 
-I'm trying to understand why this align is necessary, too.
+I've another question. The origin of "virtual" SDEI requirement comes=20
+from the lack of hard lockup detector in VM. We can have some kind of=20
+watchdog, but how can the watchdog trigger the VM OS to panic and run=20
+kdump, even in irq-off state?
 
->      if (ptr) {
->          /* Unmap both the RAM block and the guard page */
->          munmap(ptr, size + pagesize);
+Thanks,
 
--- 
-Murilo
+Heyi
+
+>
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 M.
+
 
