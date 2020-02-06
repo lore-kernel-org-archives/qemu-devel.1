@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1FC9C3F68F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E2BAC33CAC
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:38:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87A1B218AC
+	by mail.kernel.org (Postfix) with ESMTPS id 70D4420838
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:38:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qOnzYlFP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87A1B218AC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y6xUIs5h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D4420838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izl6P-00084i-MO
+	id 1izl6P-00082e-Cy
 	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 12:38:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43326)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43458)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1izkzQ-0006AF-3J
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:30:56 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1izkzq-0006hH-Rz
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1izkzP-0004Ds-59
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:30:56 -0500
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:35043)
+ (envelope-from <peter.maydell@linaro.org>) id 1izkzp-0005ug-KB
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:22 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:37839)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1izkzO-0004Ah-Uk
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:30:55 -0500
-Received: by mail-wm1-x330.google.com with SMTP id b17so1011295wmb.0
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 09:30:54 -0800 (PST)
+ id 1izkzp-0005mn-Cd
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:21 -0500
+Received: by mail-wr1-x429.google.com with SMTP id w15so8200394wru.4
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 09:31:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=DdTyceGkkwj9dEzcBkZjrrEjb4XQeMiC6gg82f8sScs=;
- b=qOnzYlFP2huECs+jOx6ZRFEEzjmdM7EPXg8vfEK7BrZvsEpWdOj7n+vMVqu063ucbB
- IZA6ML1S8L5PJWd2YhW9enEH5XPIJOeW8BkpQSVE992NQ9HIBbV2k6B8nsMdmB8lpRdJ
- RIPuJJ5MIlydCHfLC0EpCv5AGOI9pHh1xP1dIkr+hTitAdJDJR2Njm+nEBL9K+y4Md4z
- uJOPLUYmiEaa3CSBYjqtudwo4R1EJL/hlhNOMkjbaS3mlGZxMcXdbQ/5KCvUOTE+tpmu
- wg/3s9oYvN24E5f+XG4Pm62BaZBohmVkjxzlZ9a5PR2miPCQO7HpTc2NBKgAkQ3qOiHh
- q2sw==
+ bh=ny3WK8pMdlgBlAoYUdqL7k5E1SZb/jHOFqlIQGucr5M=;
+ b=Y6xUIs5hWVoM0LMDBumGmw7SFmqozh4Bbo6rVPQmqjYeJWOpG75nQww3he5bpG3yyn
+ IDRsEz7dn6SVqidsaUU2x2yhlc3tleCepXRiGf4BpUp6/QJwTD5q/U3/4GTFWI4mv+N1
+ x6a7Qe6//NcHM/r2CxO0xD8MfUuV4UOOUUjNWQVUHl49F3ilWjD6JdAtZkNbjT0L5fpL
+ dfDUCgBcUFaAJZQdaMdPMd3ZMoGKMGuIFeUdG7ULHDtf1xCi4BB4jaQwLpdkQVU8Ocze
+ iqxEDrVD97QNelejlK/WeBgFs8VLDIJeDfsrVwIxWp3PXOq1RcrVbXDWooMSsInXit8L
+ 77kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=DdTyceGkkwj9dEzcBkZjrrEjb4XQeMiC6gg82f8sScs=;
- b=V0ZJseGG9ACcMxoUOM7Aup+YD4Dp6LnRouZspMugvyUN4qy8PO1VhHeNAIwxNWsdzT
- calZqAah8b4F9EjySTLtLCijtfu0yLpV1swdX9ln4tfivxnsjwu75GgKWak/U8QRPI/g
- bKtoF6Dhgz3ksUc+Er39k+k9TEY6LMjamB0Klgyuwar1JJpd+Mr/sSda4Ir9gB5e9/BA
- Drsjd2YHfVs2I/bxEODmBJv2plSI2hUNMeSUR3OL5q+LF0C7yRaA2Y+B7CfAFk/JBKLx
- yx5oTDKuR0u9xr1Nng8QlvMuNwdknPWXvTG54Djf0UFF4dGiTQSb73Eud3106Ctasjlc
- 3EOw==
-X-Gm-Message-State: APjAAAWgfkdzHKKgEXsMtG0N+gSPwsL1VuX5R7+MD7O2mEqlVTv7Mv+t
- m6+tNVZrU8ZaAsrS65/5rX9Tkdpp7QA=
-X-Google-Smtp-Source: APXvYqw1DaTTKqGhgyqctUTvCMzPMCoLPYfBxmRcvs3MWeMRqrqDPsyyGPohO7+fEIa9yEC6FYjWxQ==
-X-Received: by 2002:a1c:113:: with SMTP id 19mr5927295wmb.95.1581010253331;
- Thu, 06 Feb 2020 09:30:53 -0800 (PST)
+ bh=ny3WK8pMdlgBlAoYUdqL7k5E1SZb/jHOFqlIQGucr5M=;
+ b=oU/mAFZCF77Od/kx5cObIrLQh1qfSoPBxSQsiEoXLZn5N2mqj9ih71liLK1MyrJvs/
+ Ssnedngk8HdiuHNvhvsheyME/ocnlvySlTCGoqYTPgv4zgdDNoYrw1oOFvk8dj4mrK/z
+ 5wt3w7WmZBAO5bZKu41aS4hMVp7ZG/UYd7brSBoLaN2Nji9NDQVNnRkL0dPFSm7kWOAz
+ Dd2XiPGkiUFwVpKJScHONtNSGowML0U5GmDrtlAAM6vbgQ5F6HJKtwJiWhlsYGxVEN+S
+ 9zghjO5fvQfZ4NIEXoTcyQ5BNpiHMBYPHa04+AMNzERzVQepKKRy7RMBQxM1pr/xS7h/
+ W09w==
+X-Gm-Message-State: APjAAAWegsZOH3uEu2+u4ibTxxGWbOpflhKLuRKp4+WZg18swPjUfWrF
+ 9/oumVa1u6Y2QZQOs+z6gaSeYpsApaM=
+X-Google-Smtp-Source: APXvYqyWTvZ/C1bk3vc5Jaie/wSB0lyj1IgMSIJYJUo9RF1SD6KKWuQx2BzdVZehIZxWDqCbtRQ02Q==
+X-Received: by 2002:adf:f0ca:: with SMTP id x10mr5036186wro.423.1581010277659; 
+ Thu, 06 Feb 2020 09:31:17 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w15sm5204214wrs.80.2020.02.06.09.30.50
+ by smtp.gmail.com with ESMTPSA id w15sm5204214wrs.80.2020.02.06.09.31.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 09:30:51 -0800 (PST)
+ Thu, 06 Feb 2020 09:31:16 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/29] qga/qapi-schema.json: Fix missing '-' in
- GuestDiskBusType doc comment
-Date: Thu,  6 Feb 2020 17:30:15 +0000
-Message-Id: <20200206173040.17337-5-peter.maydell@linaro.org>
+Subject: [PATCH 12/29] qapi: Explicitly put "foo: dropped in n.n" notes into
+ Notes section
+Date: Thu,  6 Feb 2020 17:30:23 +0000
+Message-Id: <20200206173040.17337-13-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200206173040.17337-1-peter.maydell@linaro.org>
 References: <20200206173040.17337-1-peter.maydell@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::330
+X-Received-From: 2a00:1450:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,36 +101,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The doc comment for GuestDiskBusType doesn't match up with the
-enumeration because of a missing hyphen in 'file-backed-virtual'.
-This means the docs are rendered wrongly:
-       "virtual"
-           Win virtual bus type "file-backed" virtual: Win file-backed bus type
+A handful of QAPI doc comments include lines like
+"ppcemb: dropped in 3.1". The doc comment parser will just
+put these into whatever the preceding section was; sometimes
+that's "Notes", and sometimes it's some random other section,
+as with "NetClientDriver" where the "'dump': dropped in 2.12"
+line ends up in the "Since:" section.
 
-       "file-backed-virtual"
-           Not documented
+Put all of these explicitly into Notes: sections (either
+preexisting or new), with the right indentation, and
+standardising on quoting of the symbol with ''.
 
-Add the missing hyphen.
+In the case of QKeyCode, the generated docs were actively
+misformatted:
+   ac_bookmarks
+        since 2.10 altgr, altgr_r: dropped in 2.10
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qga/qapi-schema.json | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qapi/machine.json | 2 +-
+ qapi/net.json     | 6 +++---
+ qapi/ui.json      | 3 ++-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index fb4605cc19c..23ce6af597d 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -809,7 +809,7 @@
- # @sas: Win serial-attaches SCSI bus type
- # @mmc: Win multimedia card (MMC) bus type
- # @virtual: Win virtual bus type
--# @file-backed virtual: Win file-backed bus type
-+# @file-backed-virtual: Win file-backed bus type
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 704b2b0fe31..51ffa96be98 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -20,7 +20,7 @@
+ #        prefix to produce the corresponding QEMU executable name. This
+ #        is true even for "qemu-system-x86_64".
  #
- # Since: 2.2; 'Unknown' and all entries below since 2.4
+-# ppcemb: dropped in 3.1
++#        'ppcemb': dropped in 3.1
+ #
+ # Since: 3.0
  ##
+diff --git a/qapi/net.json b/qapi/net.json
+index 109eff71cd4..8fbcbc611b9 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -447,7 +447,7 @@
+ #
+ # Since: 2.7
+ #
+-# 'dump': dropped in 2.12
++# Notes: 'dump': dropped in 2.12
+ ##
+ { 'enum': 'NetClientDriver',
+   'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+@@ -464,7 +464,7 @@
+ #
+ # Since: 1.2
+ #
+-# 'l2tpv3' - since 2.1
++# Notes: 'l2tpv3' - since 2.1
+ ##
+ { 'union': 'Netdev',
+   'base': { 'id': 'str', 'type': 'NetClientDriver' },
+@@ -494,7 +494,7 @@
+ #
+ # Since: 1.2
+ #
+-# 'vlan': dropped in 3.0
++# Notes: 'vlan': dropped in 3.0
+ ##
+ { 'struct': 'NetLegacy',
+   'data': {
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 94a07318f55..6da52b81143 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -776,7 +776,6 @@
+ # @ac_forward: since 2.10
+ # @ac_refresh: since 2.10
+ # @ac_bookmarks: since 2.10
+-# altgr, altgr_r: dropped in 2.10
+ #
+ # @muhenkan: since 2.12
+ # @katakanahiragana: since 2.12
+@@ -790,6 +789,8 @@
+ #
+ # Since: 1.3.0
+ #
++# Notes: - 'altgr': dropped in 2.10
++#        - 'altgr_r': dropped in 2.10
+ ##
+ { 'enum': 'QKeyCode',
+   'data': [ 'unmapped',
 -- 
 2.20.1
 
