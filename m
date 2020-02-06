@@ -6,40 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35DBCC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4AFBC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:19:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0927020658
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:15:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0927020658
+	by mail.kernel.org (Postfix) with ESMTPS id 8913220658
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:19:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8913220658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izeCN-0006qe-8a
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:15:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44238)
+	id 1izeFT-0000Am-PH
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:19:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44937)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ize71-0002Lh-Gr
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:10:23 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ize7s-0003IY-OZ
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:11:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ize6y-0008QK-NH
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:10:19 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:57641)
+ (envelope-from <laurent@vivier.eu>) id 1ize7j-0002VD-L2
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:11:12 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:58973)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1ize6y-0008HB-EH; Thu, 06 Feb 2020 05:10:16 -0500
+ id 1ize7j-0002Tr-Bi; Thu, 06 Feb 2020 05:11:03 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MGhds-1ilsTi3iVO-00DrSU; Thu, 06 Feb 2020 11:10:09 +0100
-Subject: Re: [PATCH] qemu-img: Place the '-i aio' option in alphabetical order
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org
-References: <20200205163008.204493-1-jusual@redhat.com>
- <d97e763f-b987-06b7-a7e3-d243b6790f31@redhat.com>
+ 1Mt7x1-1jnlwA3I6b-00tRPf; Thu, 06 Feb 2020 11:10:59 +0100
+Subject: Re: [PATCH] hw/pci/pci_bridge: Fix typo in comment
+To: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20200205185123.210209-1-jusual@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,34 +82,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <3928f965-13a5-801d-826d-fa286991868e@vivier.eu>
-Date: Thu, 6 Feb 2020 11:10:07 +0100
+Message-ID: <6edde287-4d49-d76c-3bed-23455539e3e5@vivier.eu>
+Date: Thu, 6 Feb 2020 11:10:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <d97e763f-b987-06b7-a7e3-d243b6790f31@redhat.com>
+In-Reply-To: <20200205185123.210209-1-jusual@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:gGwJdq3vIQnfv+yEL2j8zwgoDZ2CWDCjxQulhWsXg98vp1tWorY
- nkZVjHUUrtsEVMMmfd+0SFWUAQN1+vhrbZ8BQbHMDArM0TxSxCMW14+ro3Ke9IP6u152xJU
- oQuQ4ZPMZHNk72WUymlMgO1Ut4e3vjyc7pS8uagPiTBUuvCQWgCDHKr60dbhSFXIfUYxCs/
- sRQ17dhNzBeD1G/9T3qhw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:G8F09bRYvC4=:pPBye3pLm8oM4+R5vj/pKK
- snXB67R0jrNb9Th+ncj1EzXbm36R7A7prIGVVDNuwkpsw80Y8hHtaIfDoWIKfh/rIwU34TxFz
- 49SIX/zHHPEPWoHGWEa6KIcoalVT2v9D4wENTvWKc13w30m+dbEj1FRSLR6+sk3nGlNI+QRit
- 0NVjL/Srs3v4+HKYlSb6WkMpzrDqC6af1qMmBB9+niWX4TP686dJ/4tC3k80JsJrRyB5es/v7
- f7pY5Qvj7VNL6ltoNlVsIfvfzvSAYJYqb69syfK0W5CpDtvMxQjXEI8pNa+W3LPWi5b5G+JOY
- X4MuCcdO4O+/tMq6TGn8IWglqjgEwhotHw5e9cMlONgejp5pW7J318OyvRRafY9t931jBUQBu
- W5HCowK+K+GfaGlYyQrvDvZQ0NkIPPHfzDNJvrASpaPwv31ho9mLUDAZkHR+WcLiyWURJbPCq
- PmPl4eUQ6HZzYFKkOVWcd5p+5U/thhIzyxpMUJzv7qBYI8A7jkFQH+WmN+H4VWYwpxHL/fI/d
- TI5ClsrHp96rXvKKb5ZykCrDatVd1uEhN8tZ0N7+Hd1ZHwNWxir998EahcaQrxUSRpxCCXNf0
- p9i9/Ndn0lH7d1yenWL9cX3j3cp1MMYuo7g59VKShJP8mY4A+3zBR6+wneU9i2TW7I3om2bgD
- txu6u1tomcecn7njDVI/XlN3xrYxzuj1hWY2MX9bBRbO/xNA/Nup1svdWQozijzFEdkVwkkTp
- 5mQJRkog+HvmCzRiBGaS6DLDzwV3kaiL4nfYPVhhpjSNQlGC99Ca6oBDF2OtJN9bjjt4QXMBi
- OA95kWu0kplzd/coW7zNMA052X3RzCm0Dmfek6+qUKTKpeZz7Ak9m8Gm5RPCdayy5m40rZ5
+X-Provags-ID: V03:K1:0sj0sQEIPAGqv4VCerkPYW8poMbuHREJIqQ5VfflqOUZ6de0MRR
+ Imy7HVbSxlPq75lQW6vNJPnMvtBYRNa/jKGoVRsMN02GF8uxgxxMD2R7erwIWHlrgR2PYsL
+ ZP1xLLVJWolas4jiwCVwZBxyy70Ny8MkT6THvZNR6FQGNY6v7NitrhzJxnKOL1p+yBeoVcI
+ 4jC+m0oK0AoeHNRRHYmAQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:etIieyaNvcg=:fuKkLhKkcdIt68iM4dDqCb
+ GpSeUyk07scRVF2a/84o//e9Qvy0hvCsOlWbnpm29jKSBW2X4bEH7ORbgwCHnAO8DMZnXyzFB
+ 5nx3s9u7R12W61s5+CQyP0YD0YRkikTWH6oV28S3dRnpcKub0dunNdMYHtljqkto5wJ8e7G3M
+ klMidxb2FeoAjptJgKqTdcJBTAHzSxRqHBn61TnxK6emAuPhayKlzBEQ7YIDoxV73TxEfdzkI
+ iCU/qwK0IldtrwOFNWq0F3XBKZEoVmyhsHIFRA7bCpKS+chKMuWxzYFLzeS8Cy+sIrJLuf9EG
+ e13lHRaIaRHTWJVwJHEfBcxvpjc79isA36vkB93RYCQxRayXRc8ZCO+SFHZkc/YngcvgpKbX5
+ ovPGQr6avvh4lwJ8Io8mLRtcO9h0etPAiZHtvhue9YjYYfUT9u27DkqMbeLbdHkKncte7SWw/
+ U5OInjWRRKe5BmJHQtT5M9A61K/PsZe8TONMCv3i5kv7R3L9RlJOMh8JrqK7409Wy6JckQwzk
+ 9bXINB2C9HVA93I58ehZ7Ssi/8YCxNqcyDgNqgsNqb55zNN4IeQ1G9mk/YieGfTgZLtNuQtd8
+ 2qdxk5n548hvXjk43O3uERDabn++JT1IjcgGTSPgMbrZ+m+15ZBNQbi/6QPFs0cirz/mn96PO
+ JUniOXm6iT0KZa0XtuqF1ErXVAiy0u6R3ZL7qLbjJDUwIXLoLihsrr06mCXDNqB9MSvxLQuC6
+ AP5pP/j/Cqmij9vf0WUztnHWF/Na999baBO47EUyP+SqdBeRcMxRhe3SpFJa5jMx4yNAjPExz
+ BpIblHYtPQzgtTr6BzQahjf4GqETYWZwIYe8SC+b9rWwc6R1mJxAsA46ZGubJV9IRVf2y2L
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,96 +121,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 05/02/2020 à 18:17, Philippe Mathieu-Daudé a écrit :
-> Cc'ing qemu-trivial@
+Le 05/02/2020 à 19:51, Julia Suvorova a écrit :
+> Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> ---
+>  include/hw/pci/pci_bridge.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> On 2/5/20 5:30 PM, Julia Suvorova wrote:
->> The '-i AIO' option was accidentally placed after '-n' and '-t'. Move it
->> after '--flush-interval'.
->>
->> Signed-off-by: Julia Suvorova <jusual@redhat.com>
->> ---
->>   docs/interop/qemu-img.rst | 8 ++++----
->>   qemu-img-cmds.hx          | 4 ++--
->>   2 files changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/docs/interop/qemu-img.rst b/docs/interop/qemu-img.rst
->> index fa27e5c7b4..42e4451db4 100644
->> --- a/docs/interop/qemu-img.rst
->> +++ b/docs/interop/qemu-img.rst
->> @@ -247,7 +247,7 @@ Command description:
->>     Amends the image format specific *OPTIONS* for the image file
->>     *FILENAME*. Not all file formats support this operation.
->>   -.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT]
->> [--flush-interval=FLUSH_INTERVAL] [-n] [-i AIO] [--no-drain] [-o
->> OFFSET] [--pattern=PATTERN] [-q] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t
->> CACHE] [-w] [-U] FILENAME
->> +.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT]
->> [--flush-interval=FLUSH_INTERVAL] [-i AIO] [-n] [--no-drain] [-o
->> OFFSET] [--pattern=PATTERN] [-q] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t
->> CACHE] [-w] [-U] FILENAME
->>       Run a simple sequential I/O benchmark on the specified image. If
->> ``-w`` is
->>     specified, a write test is performed, otherwise a read test is
->> performed.
->> @@ -264,13 +264,13 @@ Command description:
->>     ``--no-drain`` is specified, a flush is issued without draining
->> the request
->>     queue first.
->>   +  if ``-i`` is specified, *AIO* option can be used to specify
->> different
->> +  AIO backends: ``threads``, ``native`` or ``io_uring``.
->> +
->>     If ``-n`` is specified, the native AIO backend is used if
->> possible. On
->>     Linux, this option only works if ``-t none`` or ``-t directsync`` is
->>     specified as well.
->>   -  if ``-i`` is specified, *AIO* option can be used to specify
->> different
->> -  AIO backends: ``threads``, ``native`` or ``io_uring``.
->> -
->>     For write tests, by default a buffer filled with zeros is written.
->> This can be
->>     overridden with a pattern byte specified by *PATTERN*.
->>   diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
->> index 3fd836ca90..d7fbc6b1f4 100644
->> --- a/qemu-img-cmds.hx
->> +++ b/qemu-img-cmds.hx
->> @@ -16,9 +16,9 @@ SRST
->>   ERST
->>     DEF("bench", img_bench,
->> -    "bench [-c count] [-d depth] [-f fmt]
->> [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset]
->> [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache]
->> [-i aio] [-w] [-U] filename")
->> +    "bench [-c count] [-d depth] [-f fmt]
->> [--flush-interval=flush_interval] [-i aio] [-n] [--no-drain] [-o
->> offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t
->> cache] [-w] [-U] filename")
->>   SRST
->> -.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT]
->> [--flush-interval=FLUSH_INTERVAL] [-n] [--no-drain] [-o OFFSET]
->> [--pattern=PATTERN] [-q] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t CACHE]
->> [-i AIO] [-w] [-U] FILENAME
->> +.. option:: bench [-c COUNT] [-d DEPTH] [-f FMT]
->> [--flush-interval=FLUSH_INTERVAL] [-i AIO] [-n] [--no-drain] [-o
->> OFFSET] [--pattern=PATTERN] [-q] [-s BUFFER_SIZE] [-S STEP_SIZE] [-t
->> CACHE] [-w] [-U] FILENAME
->>   ERST
->>   DEF("check", img_check,
->>       "check [--object objectdef] [--image-opts] [-q] [-f fmt]
->> [--output=ofmt] [-r [leaks | all]] [-T src_cache] [-U] filename")
->>
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
+> diff --git a/include/hw/pci/pci_bridge.h b/include/hw/pci/pci_bridge.h
+> index ba488818d2..99c674e949 100644
+> --- a/include/hw/pci/pci_bridge.h
+> +++ b/include/hw/pci/pci_bridge.h
+> @@ -108,7 +108,7 @@ void pci_bridge_dev_unplug_request_cb(HotplugHandler *hotplug_dev,
+>  
+>  /*
+>   * before qdev initialization(qdev_init()), this function sets bus_name and
+> - * map_irq callback which are necessry for pci_bridge_initfn() to
+> + * map_irq callback which are necessary for pci_bridge_initfn() to
+>   * initialize bus.
+>   */
+>  void pci_bridge_map_irq(PCIBridge *br, const char* bus_name,
 > 
 
 Applied to my trivial-patches branch.
