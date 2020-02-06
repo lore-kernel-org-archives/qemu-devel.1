@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A178AC33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF933C33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:35:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71DC321775
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEDE321775
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:35:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X03e9Yrq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71DC321775
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AG4Qohl8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEDE321775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izl3q-0003zy-I6
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 12:35:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43314)
+	id 1izl42-0004GI-Qv
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 12:35:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43304)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1izkzN-00066M-En
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:30:55 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1izkzM-00042x-Dz
+ (envelope-from <peter.maydell@linaro.org>) id 1izkzM-00065H-GX
  for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:30:53 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33713)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <peter.maydell@linaro.org>) id 1izkzL-0003xh-BL
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:30:52 -0500
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:44167)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1izkzM-0003zG-6x
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:30:52 -0500
-Received: by mail-wr1-x441.google.com with SMTP id u6so8237862wrt.0
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 09:30:52 -0800 (PST)
+ id 1izkzK-0003pP-59
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:30:51 -0500
+Received: by mail-wr1-x431.google.com with SMTP id m16so8168129wrx.11
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 09:30:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=E1tpXHsNOMFCBxdlvbzgg+MYBNzwjBDboyeQBHHvZGM=;
- b=X03e9YrqTAPYxUiKW42wPsUzBqsGmw3nZnKORBmgEzr/aY6kNuxIb5KNdx81teMjvf
- BPfUbK07JtvPbqwJgM9J/k1DSu4/o7LhZYVIRmNYechWV/o46CqqtxwcrR+t6YBBqfv1
- NYILT2TPjDTg0xGToL1mpnuuomQoIHqHXTDSy9en35iLRgEDaLwj2TcDJ/95JrhZjEwQ
- EnGYcebb4DwF6HzVJ0SupnjUcd0ItNub7pzRJlKEI2ONv8yVADlpjw0wyUuwz36RBS0K
- cTXo7ajIUHXxmMd5+Bx7qV2AJtfp8y/zdedfQOAiFjUcovrW1uMi6iuwlJLf6q2+FcWr
- Kq9Q==
+ bh=wr8RlgOBQK+lZKQOUvmEh0ytBymCGpyT+5O+C4ZgoYs=;
+ b=AG4Qohl8KXnqXx7w1lxhvhIjoRFVP/mtyDy7TzyzuWUDFyG2HCwN6JaSrmqnz+Hg9s
+ RJMYJAVXA6gsl09QeiusAZg61TmewYZch16aHJ5d+OeiAG4/RN2YWYP2c0FGHr0IwKGL
+ olObe3TeoBPytc53Phc7RcuVY6XpFDguTNHPdYQYg+pFimpLvKsbQfZVfQbYybbZRqaL
+ ADpXQmy+AITpQz4sir9M5oI6iiAdABTl6g7qZWxmCVidBeNjc5KOeD80Iw7lnAQOo85k
+ +6b+S0qjcQCGtEVsb4sZmwzOmvh6twdwcaU5k8Df2pHPqGo06nnKJhoBfZwk8kLOIDaa
+ Hyig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=E1tpXHsNOMFCBxdlvbzgg+MYBNzwjBDboyeQBHHvZGM=;
- b=XNEz2TxAYMXlPZ5jHi/hqJ8zM5IuDU0G8SAXfzZJBLKKyM471caXvhK7yF5JKbi+Pj
- 6aww5yDF/ugPIZLxDFRczvw9FZV7R6ZCPWLJUBnTPis6tLlB8nVb42NpTwzLHDQbU70W
- dIhuYEZWQnJZtbAzbryeE1T0Zx4ByAIBt6WINoJN4lEMmf8DoxUj6cwimbjtKWGgd3X4
- ebI91IIWrBffWniKxBZj66pNHmNbY0xASWh4vK7Vj8Hg/50YYDXoAk9R0WW3pP5M7WHC
- gmkC/wKi0XkJ4CZ2aIpTNSSCsl5i1aOvpqaj5s6FdZJIjpzc0rGxJweWbswOe77JDl6h
- v2ww==
-X-Gm-Message-State: APjAAAUFnCpI0ZxNa1OqyuKS2ivrFy4qTBWmhkp9uSpIPWqjrxiZdUBC
- 3i6O5sxxLmjS/BUtdmxPw1HYKhCB8Y0=
-X-Google-Smtp-Source: APXvYqzG7nVuwzy1hpVPdEECk5+wQ6ZZ0wMa6QCswQQIDuuFeqxD+2g0wc7UMarnyBberhuG/lX3GQ==
-X-Received: by 2002:a5d:53c1:: with SMTP id a1mr4731013wrw.373.1581010250763; 
- Thu, 06 Feb 2020 09:30:50 -0800 (PST)
+ bh=wr8RlgOBQK+lZKQOUvmEh0ytBymCGpyT+5O+C4ZgoYs=;
+ b=UHk2/hMKmlwkiYRaZ5xgXuU3BdXhQTouU1qx6HIyDB4abEbCoHGu5987ovGlLnvOsA
+ a6AWfFubN23Io9XON+R3jTIcJfOLnfI6Ttf0tfR3kprvQRaywLabWE6EapzxmuqdvpN+
+ +RcLKbGkzEhjAqGIvI9dawVphMFm99A/N4Hk/G/EqWwqA1Gw8FPalXuegi2UHW35VUHD
+ XsbfUUcWP51TohGkAtT7h7cWUQzGGaPUoELdbP2u4R1YAXJHS3VVIaiFEAzAuOD2Wh8M
+ 9q7FXcLpygFgEosWjOrXhWASSOcEp8O8fFmESF0E7ZtzT4Pr3/3QVVEsnPsT1zt4cnAK
+ Uuiw==
+X-Gm-Message-State: APjAAAXyidt/UGY9p6OpqgZ25/Yi6qjbNfBZ0U8CnodhNotwSM7HVa8O
+ nABaxA95Jesj6cKgqgwKVtckueiISao=
+X-Google-Smtp-Source: APXvYqz8r4VUhsw1YcxX7c2AdM3TgYbYLVhPDJkYfnAav7IIjvDqSsU4y96BZ9S5K0VHfR4oehUGig==
+X-Received: by 2002:a05:6000:1201:: with SMTP id
+ e1mr4969750wrx.386.1581010248573; 
+ Thu, 06 Feb 2020 09:30:48 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w15sm5204214wrs.80.2020.02.06.09.30.48
+ by smtp.gmail.com with ESMTPSA id w15sm5204214wrs.80.2020.02.06.09.30.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 09:30:49 -0800 (PST)
+ Thu, 06 Feb 2020 09:30:47 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/29] Makefile: Fix typo in dependency list for interop
- manpages
-Date: Thu,  6 Feb 2020 17:30:14 +0000
-Message-Id: <20200206173040.17337-4-peter.maydell@linaro.org>
+Subject: [PATCH 02/29] configure: Check that sphinx-build is using Python 3
+Date: Thu,  6 Feb 2020 17:30:13 +0000
+Message-Id: <20200206173040.17337-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200206173040.17337-1-peter.maydell@linaro.org>
 References: <20200206173040.17337-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,30 +102,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix a typo in the dependency list for the manpages built from the
-'interop' manual, which meant we were accidentally not including
-the .hx file in the dependency list.
+Currently configure's has_sphinx_build() check simply runs a dummy
+sphinx-build and either passes or fails.  This means that "no
+sphinx-build at all" and "sphinx-build exists but is too old" are
+both reported the same way.
 
-Fixes: e13c59fa4414215500e6
+Further, we want to assume that all the Python we write is running
+with at least Python 3.5; configure checks that for our scripts, but
+Sphinx extensions run with whatever Python version sphinx-build
+itself is using.
+
+Add a check to our conf.py which makes sphinx-build fail if it would
+be running our extensions with an old Python, and handle this
+in configure so we can report failure helpfully to the user.
+This will mean that configure --enable-docs will fail like this
+if the sphinx-build provided is not suitable:
+
+Warning: sphinx-build exists but it is either too old or uses too old a Python version
+
+ERROR: User requested feature docs
+       configure was not able to find it.
+       Install texinfo, Perl/perl-podlators and a Python 3 version of python-sphinx
+
+(As usual, the default is to simply not build the docs, as we would
+if sphinx-build wasn't present at all.)
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 ---
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ configure    | 12 ++++++++++--
+ docs/conf.py | 10 ++++++++++
+ 2 files changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 20bf0cc771a..274a24f7aa4 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1052,7 +1052,7 @@ $(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system)
+diff --git a/configure b/configure
+index 0aceb8e50db..2c5cad13edd 100755
+--- a/configure
++++ b/configure
+@@ -4808,11 +4808,19 @@ has_sphinx_build() {
  
- $(call define-manpage-rule,interop,\
-        qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1 virtfs-proxy-helper.1,\
--       $(SRC_PATH/qemu-img-cmds.hx))
-+       $(SRC_PATH)/qemu-img-cmds.hx)
+ # Check if tools are available to build documentation.
+ if test "$docs" != "no" ; then
+-  if has makeinfo && has pod2man && has_sphinx_build; then
++  if has_sphinx_build; then
++    sphinx_ok=yes
++  else
++    sphinx_ok=no
++  fi
++  if has makeinfo && has pod2man && test "$sphinx_ok" = "yes"; then
+     docs=yes
+   else
+     if test "$docs" = "yes" ; then
+-      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and python-sphinx"
++      if has $sphinx_build && test "$sphinx_ok" != "yes"; then
++        echo "Warning: $sphinx_build exists but it is either too old or uses too old a Python version" >&2
++      fi
++      feature_not_found "docs" "Install texinfo, Perl/perl-podlators and a Python 3 version of python-sphinx"
+     fi
+     docs=no
+   fi
+diff --git a/docs/conf.py b/docs/conf.py
+index ee7faa6b4e7..7588bf192ee 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -28,6 +28,16 @@
  
- $(call define-manpage-rule,system,qemu-block-drivers.7)
+ import os
+ import sys
++import sphinx
++from sphinx.errors import VersionRequirementError
++
++# Make Sphinx fail cleanly if using an old Python, rather than obscurely
++# failing because some code in one of our extensions doesn't work there.
++# Unfortunately this doesn't display very neatly (there's an unavoidable
++# Python backtrace) but at least the information gets printed...
++if sys.version_info < (3,5):
++    raise VersionRequirementError(
++        "QEMU requires a Sphinx that uses Python 3.5 or better\n")
  
+ # The per-manual conf.py will set qemu_docdir for a single-manual build;
+ # otherwise set it here if this is an entire-manual-set build.
 -- 
 2.20.1
 
