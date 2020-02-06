@@ -2,88 +2,116 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A87C33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19268C33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:18:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12F6421741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCAA1214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:18:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HWtOiIxM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12F6421741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xy6a/kzI";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rNn1a8lW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCAA1214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izlVS-0001Z8-8c
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:04:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53458)
+	id 1izljk-0006hX-0n
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:18:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1izlUq-0001Ac-4q
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:03:25 -0500
+ (envelope-from <liam.merwick@oracle.com>) id 1izliw-00066E-1z
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:17:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1izlUl-00061f-34
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:03:20 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50697
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1izlUk-0005tC-MU
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:03:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581012197;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ehpupSTSlY2Bz1X1+tXxl5gti4mSOdHrmwd9pkSNB70=;
- b=HWtOiIxMj9hbMsSFDdvqK3mNMTTZSjA/nmts90AbcDmocrx8/UijQsXhRxejekrDIW8c+i
- 0DN95+HV4Ke25zi9erjtbQESLrOHONyWpROq5FzCw18AFbizenZWMXLsUDMOaKcWpKeLIM
- kNjTMkaKVEYDYMHpFcgEJ31RyOCmy5Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-l8xH47JrO9WJKtbhwW7DVA-1; Thu, 06 Feb 2020 13:03:01 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1BE25A09B;
- Thu,  6 Feb 2020 18:02:59 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.75])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AFC6C19C69;
- Thu,  6 Feb 2020 18:02:49 +0000 (UTC)
-Date: Thu, 6 Feb 2020 18:02:47 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: qmp-shell for GSoC/Outreachy?
-Message-ID: <20200206180247.GJ3655@work-vm>
-References: <20200127143505.GD5669@linux.fritz.box>
- <20200127202925.GE3419@work-vm>
- <20200128105932.GC6431@linux.fritz.box>
- <20200205130946.GC5768@dhcp-200-226.str.redhat.com>
- <a45df5ab-3cad-0fbe-901f-4bc1ba28d38e@redhat.com>
- <20200205194944.GP3210@work-vm> <877e10xdd6.fsf@dusky.pond.sub.org>
- <20200206100920.GD2391707@redhat.com>
- <8736bnx6cx.fsf@dusky.pond.sub.org>
- <20200206121528.GG2391707@redhat.com>
+ (envelope-from <liam.merwick@oracle.com>) id 1izliu-0006cq-9y
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:17:57 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:55402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+ id 1izliu-0006b5-1R
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:17:56 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 016IFEu9118530;
+ Thu, 6 Feb 2020 18:17:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=lnYvUmZuRtethVMs/y5ortAcbc8orYP9U/RAQEAaRhE=;
+ b=xy6a/kzIzC4lqGIwL5tqu2Hkukd1z5dYtaww51rZZekb3jPVcO0cNi6F97qdXUGGvJuy
+ a9CBGb3biITNyM+vwIK4kHIeIP7aJkjBtXSBsptO7wRlJDhQ6yM+xW81RvzPC04Jpk4F
+ 8CTqws5pA2UQGRgfAf+zpshM5+GCL/P/Wgxpk2oV36rofES0eV+8VmPIN675X2wkr5qz
+ 5LY4mHo+TYUSQNXk2RkMc8EfuMh+74dN2KuNtKMLTgFTLNJ6QwvD6I5iHM4V3D461SRi
+ PQKe6Jp6DBzXU0Ty4w2odwcoTN0hFQZTwALhLLduWB3tp3tdDtsGpDzNx0wyVvKTaCDy Lw== 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=lnYvUmZuRtethVMs/y5ortAcbc8orYP9U/RAQEAaRhE=;
+ b=rNn1a8lWyH0RxUOTkloqy83TPgNuxpWK3ZlpKJFQ6ySKJ6aOVo3M6+Qx5rDtQJRmv9yw
+ 2SLe7ps2u4DoqlipuL34Ae9ZrXEsVg1EdWxCAcouXKGjwnunA1TyFjy+hSHHxeUG2Q4p
+ XTYx0bpPuJ5vRluKnBr3vIWTUHGdkHpHsHyUP+LeXsnN856V+T6JQlC+t0yJSal/Nuky
+ 6VfloJX7N8Z36FBG9Lq58UZ/M7pQGh1B8WSnT7LnJLVoIgO9aO2R5sVruHmE+O+rYaxY
+ 4KOqx9ApDSvLIyF1uDFoXeWNs/e+9lRBxbYJxWPjEItvGWrywkkp3N0zm80JBkAF+l1x Xw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2xykbpbg3v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 06 Feb 2020 18:17:48 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 016IE7w0144359;
+ Thu, 6 Feb 2020 18:17:48 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 2y0mjuvtx4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 06 Feb 2020 18:17:48 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 016IHl0i020867;
+ Thu, 6 Feb 2020 18:17:47 GMT
+Received: from [10.175.182.212] (/10.175.182.212)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 06 Feb 2020 10:17:46 -0800
+Subject: Re: [PATCH v2 09/29] tests/acceptance: Use 'machine' tag to check if
+ available in QEMU binary
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200129212345.20547-1-philmd@redhat.com>
+ <20200129212345.20547-10-philmd@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <e1100e02-33aa-02a4-c59b-ad04f214972a@oracle.com>
+Date: Thu, 6 Feb 2020 18:17:43 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200206121528.GG2391707@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: l8xH47JrO9WJKtbhwW7DVA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20200129212345.20547-10-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9523
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002060134
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9523
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002060134
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
+ 016IFEu9118530
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,140 +123,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Thu, Feb 06, 2020 at 01:11:58PM +0100, Markus Armbruster wrote:
-> > Daniel P. Berrang=E9 <berrange@redhat.com> writes:
-> >=20
-> > > On Thu, Feb 06, 2020 at 10:40:37AM +0100, Markus Armbruster wrote:
-> > >> > If the user screwsup, it should give an error that prompts the use=
-r
-> > >> > to the parameter they got wrong.
-> > >> >
-> > >> > Output from commands should normally be pretty formatted (with an =
-option
-> > >> > to display raw json for those needing it).
-> > >> >   e.g. that 'query-version' should give either just the package
-> > >> >   version (as info version currently does) or:
-> > >> >       4.2.50  Package: v4.2.0-1188-gd95a3885a9
-> > >> >
-> > >> > We shouldn't lose any HMP commands that some people find useful
-> > >> >   Ditching HMP isn't an option until we've got almost all of it
-> > >> >   covered.
-> > >>=20
-> > >> In particular, we currently use HMP for debugging and monitoring
-> > >> purposes, where we don't need or want QMP's rigor, neither its rigor=
-ous
-> > >> interface stability, nor its structured I/O.  We want the "whipuptit=
-ude"
-> > >> we get from monitor_printf().  This is actually a point David has ma=
-de
-> > >> several times.
-> > >
-> > > I'd like to argue that this decision to keep these debugging/monitori=
-ng
-> > > things in HMP only was a mistake, because it ensures that QEMU intern=
-als
-> > > need to keep HMP related code forever.
-> > >
-> > > What we actually need is a part of QMP that does not have the long te=
-rm
-> > > stability requirement, nor need for fully structured data. In fact th=
-is
-> > > pretty much already exists - we have declared the 'x-' prefix as a wa=
-y
-> > > to model QMP commands which are experimental / suboptimal / subject
-> > > to change.
-> > >
-> > > I suggest that every HMP command which does not have a QMP equivalent
-> > > should be turned into a QMP command with an "x-" prefix, with no
-> > > extra modelling applied
-> >=20
-> > Makes sense (see my point about "allowing some [whipuptitude] in QMP"),
-> > except I disagree with your example:
-> >=20
-> > > Take "info block"
-> > >
-> > > (hmp) info block
-> > > ide1-cd0: [not inserted]
-> > >     Attached to:      /machine/unattached/device[23]
-> > >     Removable device: not locked, tray closed
-> > >
-> > > floppy0: [not inserted]
-> > >     Attached to:      /machine/unattached/device[16]
-> > >     Removable device: not locked, tray closed
-> > >
-> > > sd0: [not inserted]
-> > >     Removable device: not locked, tray closed
-> > >
-> > >
-> > > I suggest we support it as "x-query-block"
-> > >
-> > > (qmp) x-query-block
-> > > {
-> > >     "return": {
-> > >         "info": "ide1-cd0: [not inserted]
-> > >     Attached to:      /machine/unattached/device[23]
-> > >     Removable device: not locked, tray closed
-> > >
-> > > floppy0: [not inserted]
-> > >     Attached to:      /machine/unattached/device[16]
-> > >     Removable device: not locked, tray closed
-> > >
-> > > sd0: [not inserted]
-> > >     Removable device: not locked, tray closed"
-> > >     }
-> > > }
-> >=20
-> > This commmand does have a QMP equivalent: query-block.
+On 29/01/2020 21:23, Philippe Mathieu-Daud=C3=A9 wrote:
+> We already use the 'machine' tag in Avocado tests.
+> If the requested machine is not available in the QEMU binary,
+> the tests will be cancelled (skipped):
 >=20
-> Doh, I should have actually checked before picking a random
-> example :-)
+>    $ python -m avocado --show=3Dapp run tests/acceptance/x86_cpu_model_=
+versions.py
+>     ...
+>     (04/11) CascadelakeArchCapabilities.test_4_1: CANCEL: Test expects =
+machine 'pc-i440fx-4.1' which is missing from QEMU binary (0.10 s)
+>     (05/11) CascadelakeArchCapabilities.test_4_0: CANCEL: Test expects =
+machine 'pc-i440fx-4.0' which is missing from QEMU binary (0.11 s)
+>     ...
 >=20
-> >=20
-> > Hmm, no more.  It actually wraps around both query-block and
-> > query-named-block-nodes now.  I think that makes it an example of "go
-> > beyond 1:1".
-> >=20
-> > A better example for "allowing whipuptitude" would be "info registers".
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>   tests/acceptance/avocado_qemu/__init__.py | 13 ++++++++++---
+>   1 file changed, 10 insertions(+), 3 deletions(-)
 >=20
-> Yep, that's a classic that would be horribly painful to try to represent
-> as a fully structured set of arrays & dicts for all architectures.
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptan=
+ce/avocado_qemu/__init__.py
+> index e7d5affe24..53ec8512d1 100644
+> --- a/tests/acceptance/avocado_qemu/__init__.py
+> +++ b/tests/acceptance/avocado_qemu/__init__.py
+> @@ -20,6 +20,7 @@ SRC_ROOT_DIR =3D os.path.join(os.path.dirname(__file_=
+_), '..', '..', '..')
+>   sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+>  =20
+>   from qemu.binutils import binary_get_arch
+> +from qemu.binutils import binary_get_machines
+>   from qemu.binutils import binary_get_version
+>   from qemu.machine import QEMUMachine
+>  =20
+> @@ -118,9 +119,6 @@ class Test(avocado.Test):
+>           self.arch =3D self.params.get('arch',
+>                                       default=3Dself._get_unique_tag_va=
+l('arch'))
+>  =20
+> -        self.machine =3D self.params.get('machine',
+> -                                       default=3Dself._get_unique_tag_=
+val('machine'))
+> -
+>           # Verify qemu_bin
+>           default_qemu_bin =3D pick_default_qemu_bin(arch=3Dself.arch)
+>           self.qemu_bin =3D self.params.get('qemu_bin',
+> @@ -151,6 +149,15 @@ class Test(avocado.Test):
+>               if bin_arch !=3D self.arch:
+>                   self.cancel(fmt.format(self.arch, bin_arch))
+>  =20
+> +        # Verify machine
+> +        self.machine =3D self.params.get('machine',
+> +                                       default=3Dself._get_unique_tag_=
+val('machine'))
+> +        logger.debug('machine: {}'.format(self.machine))
+> +        if self.machine:
+> +            fmt =3D "Test expects machine '{}' which is missing from Q=
+EMU binary"
+> +            if self.machine not in binary_get_machines(self.qemu_bin):
+> +                self.cancel(fmt.format(self.machine))
+> +
 
-'info registers' is a challenge for JSON since it's all 64bit unsigned
-int's;  you really want the result to be in hex, and definitely not to
-have been randomly sign extended or truncated, or converted to float or
-whatever other evils a json processor might do.  So the user wants
-a nice consistent format.
+Starting with this patch:
 
-'info qtree' and 'info mtree' are other interesting cases that I use
-very frequently.
+$ avocado run --filter-by-tags arch:x86_64 tests/acceptance
+...
+/boot_linux_console.py:BootLinuxConsole.test_x86_64_pc: CANCEL: Test=20
+expects machine 'pc' which is missing from QEMU binary (0.05 s)
+...
 
-Dave
+$ x86_64-softmmu/qemu-system-x86_64 -machine help
+Supported machines are:
+microvm              microvm (i386)
+pc                   Standard PC (i440FX + PIIX, 1996) (alias of=20
+pc-i440fx-5.0)
+...
 
+but checking via QMP, 'pc' (and 'q35') is listed as 'alias'
+...
+         {
+             "hotpluggable-cpus": true,
+             "name": "pc-i440fx-5.0",
+             "numa-mem-supported": true,
+             "default-cpu-type": "qemu64-x86_64-cpu",
+             "is-default": true,
+             "cpu-max": 255,
+             "deprecated": false,
+             "alias": "pc"
+         },
+...
 
+Does 'alias' need to be checked by binary_get_machines() in Patch8 as=20
+well as 'name'?
 
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Liam
+
 
 
