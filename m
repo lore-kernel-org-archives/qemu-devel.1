@@ -2,95 +2,82 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D5EBC35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 22:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83240C35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 22:02:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1F03214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 22:02:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1F03214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A981214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 22:02:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vjE/8XjL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A981214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46975 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izpE7-0002yK-0H
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 17:02:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41416)
+	id 1izpEc-0003qM-Ea
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 17:02:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39946)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <farman@linux.ibm.com>) id 1izoxd-0002xR-JZ
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:45:23 -0500
+ (envelope-from <beata.michalska@linaro.org>) id 1izotn-0006SE-SV
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:41:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farman@linux.ibm.com>) id 1izoxb-0007MI-3P
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:45:21 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24664)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farman@linux.ibm.com>)
- id 1izoxa-0007IO-ME
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:45:18 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 016LienJ129141
- for <qemu-devel@nongnu.org>; Thu, 6 Feb 2020 16:45:17 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y0mpnnspj-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 16:45:17 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
- Thu, 6 Feb 2020 21:45:15 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 6 Feb 2020 21:45:12 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 016LjALS38666242
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 6 Feb 2020 21:45:10 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B32B5A404D;
- Thu,  6 Feb 2020 21:45:09 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9CBF4A405B;
- Thu,  6 Feb 2020 21:45:09 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Thu,  6 Feb 2020 21:45:09 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
- id 1C3F9E0289; Thu,  6 Feb 2020 22:45:09 +0100 (CET)
-From: Eric Farman <farman@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: [RFC PATCH v2 7/7] vfio-ccw: Add support for the CRW irq
-Date: Thu,  6 Feb 2020 22:45:09 +0100
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200206214509.16434-1-farman@linux.ibm.com>
-References: <20200206214509.16434-1-farman@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20020621-0028-0000-0000-000003D81F4C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020621-0029-0000-0000-0000249C82A4
-Message-Id: <20200206214509.16434-8-farman@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-06_04:2020-02-06,
- 2020-02-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- mlxlogscore=999 clxscore=1015 suspectscore=0 lowpriorityscore=0
- adultscore=0 malwarescore=0 impostorscore=0 phishscore=0 mlxscore=0
- bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002060158
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+ (envelope-from <beata.michalska@linaro.org>) id 1izotm-0002SP-BZ
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:41:23 -0500
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:46702)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
+ id 1izotm-0002Ot-5y
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:41:22 -0500
+Received: by mail-io1-xd43.google.com with SMTP id t26so7907921ioi.13
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 13:41:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=kvVxq0r49Mqq4asBVI4NCDYI19hcfdO7wI2SNt5QJ9A=;
+ b=vjE/8XjLWPicwX3CFGOsQ5nQfZDB9lS8l3stAVjyHSX8MRXbbJI/amrcU3tHU4Ncps
+ cl45EDIGEtj2/UFLWMZCUhFXtjepvTsqql0gZ5VjYzm1iclCwBeb6UxtlkD5taX4JsAQ
+ BmVIZOvjZs8kY+WubZYYJJ3c9DPHocNPaHwlV7o4J3uoBPDC+nHPgzdIC7f+0y0Db74l
+ HnNWsNIIJjBB92rBK3mZtnlVYxpFAQ9b5SCkFEhfq9vXcclk1MIsqKKZPnvyRUHaEK1v
+ GFuk4WluePJbRl4cqniAephhkFK5Cgn3woOhCxnZoSZbQV6Jebx6jVaRVFGH1U0TYGP4
+ wZMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=kvVxq0r49Mqq4asBVI4NCDYI19hcfdO7wI2SNt5QJ9A=;
+ b=Kc1QAIMLraYlJBnpSqSqkzWfCaAJodkglTbtD6GEV9FmQOZWC/saIzNTqh5Q8WOsoU
+ k1TNQ8KCAIiJXSspJ0zHtsSw15WeM26wkdWCH7NnjAc8VWPrTas+xSmzcYTTlBKKifoQ
+ Rk8LEZ6CM5/LC43bTn8HYE6CWe+BMT+8Xl6Cgjj0PO6xArN+QUMQYOsDeynfb1WfwIEJ
+ 5Wrmi1TwH/YYzUPke+jStUd7LFPMZ0ScyjwwggLCc2noxj26GhNmdodl+wkPfdIjERoG
+ kPTve2mwe5+rjxaE6eQp9OBHmlnPKwVMj4icayOjO3+kfs430CSvL6T6aBXBOlx/paFx
+ lTrw==
+X-Gm-Message-State: APjAAAVTcyd2jPkfLpKTbgjJbUwkRu2Py7id9Ft/IoN/21v7YqRrAq0h
+ kkMiUyiE5IEtHyX3oiMWkLjfBOl2dWj5b3fmDY1QGg==
+X-Google-Smtp-Source: APXvYqyQCDWRRpkhqSVdBthGBigb1aUxsXt/uKE8cjGefkWSNZ4y57QZWPFq81DWzm7nnWwQEmDdLQcVncVKiCGHbaI=
+X-Received: by 2002:a5d:9255:: with SMTP id e21mr280183iol.260.1581025280987; 
+ Thu, 06 Feb 2020 13:41:20 -0800 (PST)
+MIME-Version: 1.0
+References: <20200129202441.12745-1-beata.michalska@linaro.org>
+ <20200129202441.12745-2-beata.michalska@linaro.org>
+ <20200204103447.naw26xl2y2zbyrqb@kamzik.brq.redhat.com>
+In-Reply-To: <20200204103447.naw26xl2y2zbyrqb@kamzik.brq.redhat.com>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Thu, 6 Feb 2020 21:41:10 +0000
+Message-ID: <CADSWDzuQvZThaoFbeYM2QrDbwRPrZuiyDrVJV=jxiSMTW9O-rg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] target/arm: kvm: Inject events at the last stage
+ of sync
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,138 +89,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Herne <jjherne@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x@nongnu.org, Jared Rossi <jrossi@linux.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Christoffer Dall <Christoffer.Dall@arm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Farhan Ali <alifm@linux.ibm.com>
+On Tue, 4 Feb 2020 at 10:34, Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Wed, Jan 29, 2020 at 08:24:40PM +0000, Beata Michalska wrote:
+> > KVM_SET_VCPU_EVENTS might actually lead to vcpu registers being modified.
+> > As such this should be the last step of sync to avoid potential overwriting
+> > of whatever changes KVM might have done.
+> >
+> > Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> > ---
+> >  target/arm/kvm32.c | 20 ++++++++++----------
+> >  target/arm/kvm64.c | 20 ++++++++++----------
+> >  2 files changed, 20 insertions(+), 20 deletions(-)
+> >
+> > diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> > index 32bf8d6..cf2b47f 100644
+> > --- a/target/arm/kvm32.c
+> > +++ b/target/arm/kvm32.c
+> > @@ -386,17 +386,17 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+> >          return ret;
+> >      }
+> >
+> > -    ret = kvm_put_vcpu_events(cpu);
+> > -    if (ret) {
+> > -        return ret;
+> > -    }
+> > -
+> >      write_cpustate_to_list(cpu, true);
+> >
+> >      if (!write_list_to_kvmstate(cpu, level)) {
+> >          return EINVAL;
+> >      }
+> >
+> > +    ret = kvm_put_vcpu_events(cpu);
+> > +    if (ret) {
+> > +        return ret;
+> > +    }
+> > +
+>
+> I think we should put a comment above this that says basically the same
+> thing as the commit message in order to explain why kvm_put_vcpu_events()
+> *must* be after write_list_to_kvmstate().
+>
+Will do that.
 
-The CRW irq will be used by vfio-ccw to notify the userspace
-about any CRWs the userspace needs to handle. Let's add support
-for it.
+> >      kvm_arm_sync_mpstate_to_kvm(cpu);
+> >
+> >      return ret;
+> > @@ -462,11 +462,6 @@ int kvm_arch_get_registers(CPUState *cs)
+> >      }
+> >      vfp_set_fpscr(env, fpscr);
+> >
+> > -    ret = kvm_get_vcpu_events(cpu);
+> > -    if (ret) {
+> > -        return ret;
+> > -    }
+> > -
+> >      if (!write_kvmstate_to_list(cpu)) {
+> >          return EINVAL;
+> >      }
+> > @@ -475,6 +470,11 @@ int kvm_arch_get_registers(CPUState *cs)
+> >       */
+> >      write_list_to_cpustate(cpu);
+> >
+> > +    ret = kvm_get_vcpu_events(cpu);
+> > +    if (ret) {
+> > +        return ret;
+> > +    }
+> > +
+>
+> Why are we moving kvm_get_vcpu_events()?
 
-Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
+This is only to make things consistent with put_registeres.
+There is no functional change per se.
 
-Notes:
-    v1->v2:
-     - Add a loop to continually read region while data is
-       present, queueing CRWs as found [CH]
-    v0->v1: [EF]
-     - Check vcdev->crw_region before registering the irq,
-       in case host kernel does not have matching support
-     - Split the refactoring changes to an earlier (new) patch
-       (and don't remove the "num_irqs" check in the register
-       routine, but adjust it to the check the input variable)
-     - Don't revert the cool vfio_set_irq_signaling() stuff
-     - Unregister CRW IRQ before IO IRQ in unrealize
-     - s/crw1/crw0/
+BR
 
- hw/vfio/ccw.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+Beata
 
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index 044441a277..5e3d446213 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -48,6 +48,7 @@ struct VFIOCCWDevice {
-     uint64_t crw_region_offset;
-     struct ccw_crw_region *crw_region;
-     EventNotifier io_notifier;
-+    EventNotifier crw_notifier;
-     bool force_orb_pfch;
-     bool warned_orb_pfch;
- };
-@@ -265,6 +266,40 @@ static void vfio_ccw_reset(DeviceState *dev)
-     ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
- }
- 
-+static void vfio_ccw_crw_notifier_handler(void *opaque)
-+{
-+    VFIOCCWDevice *vcdev = opaque;
-+    struct ccw_crw_region *region = vcdev->crw_region;
-+    CRW crw;
-+    int size;
-+    uint8_t rsc, erc;
-+
-+    if (!event_notifier_test_and_clear(&vcdev->crw_notifier)) {
-+        return;
-+    }
-+
-+    do {
-+        memset(region, 0, sizeof(*region));
-+        size = pread(vcdev->vdev.fd, region, vcdev->crw_region_size,
-+                     vcdev->crw_region_offset);
-+
-+        if (size == -1) {
-+            error_report("vfio-ccw: Read crw region failed with errno=%d", errno);
-+            break;
-+        }
-+
-+        if (size == 0 || region->crw0 == 0) {
-+            /* No more CRWs to queue */
-+            break;
-+        }
-+
-+        memcpy(&crw, &region->crw0, sizeof(CRW));
-+        rsc = (crw.flags & 0x0f00) >> 8;
-+        erc = crw.flags & 0x003f;
-+        css_queue_crw(rsc, erc, 0, 0, crw.rsid);
-+    } while (1);
-+}
-+
- static void vfio_ccw_io_notifier_handler(void *opaque)
- {
-     VFIOCCWDevice *vcdev = opaque;
-@@ -351,6 +386,10 @@ static void vfio_ccw_register_irq_notifier(VFIOCCWDevice *vcdev,
-         notifier = &vcdev->io_notifier;
-         fd_read = vfio_ccw_io_notifier_handler;
-         break;
-+    case VFIO_CCW_CRW_IRQ_INDEX:
-+        notifier = &vcdev->crw_notifier;
-+        fd_read = vfio_ccw_crw_notifier_handler;
-+        break;
-     default:
-         error_setg(errp, "vfio: Unsupported device irq(%d)", irq);
-         return;
-@@ -401,6 +440,9 @@ static void vfio_ccw_unregister_irq_notifier(VFIOCCWDevice *vcdev,
-     case VFIO_CCW_IO_IRQ_INDEX:
-         notifier = &vcdev->io_notifier;
-         break;
-+    case VFIO_CCW_CRW_IRQ_INDEX:
-+        notifier = &vcdev->crw_notifier;
-+        break;
-     default:
-         error_report("vfio: Unsupported device irq(%d)", irq);
-         return;
-@@ -621,6 +663,14 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
-         goto out_notifier_err;
-     }
- 
-+    if (vcdev->crw_region) {
-+        vfio_ccw_register_irq_notifier(vcdev, VFIO_CCW_CRW_IRQ_INDEX, &err);
-+        if (err) {
-+            vfio_ccw_unregister_irq_notifier(vcdev, VFIO_CCW_IO_IRQ_INDEX);
-+            goto out_notifier_err;
-+        }
-+    }
-+
-     return;
- 
- out_notifier_err:
-@@ -645,6 +695,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
-     S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
-     VFIOGroup *group = vcdev->vdev.group;
- 
-+    vfio_ccw_unregister_irq_notifier(vcdev, VFIO_CCW_CRW_IRQ_INDEX);
-     vfio_ccw_unregister_irq_notifier(vcdev, VFIO_CCW_IO_IRQ_INDEX);
-     vfio_ccw_put_region(vcdev);
-     vfio_ccw_put_device(vcdev);
--- 
-2.17.1
-
+> >      kvm_arm_sync_mpstate_to_qemu(cpu);
+> >
+> >      return 0;
+> > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> > index 6344113..d06fd32 100644
+> > --- a/target/arm/kvm64.c
+> > +++ b/target/arm/kvm64.c
+> > @@ -1043,17 +1043,17 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+> >          return ret;
+> >      }
+> >
+> > -    ret = kvm_put_vcpu_events(cpu);
+> > -    if (ret) {
+> > -        return ret;
+> > -    }
+> > -
+> >      write_cpustate_to_list(cpu, true);
+> >
+> >      if (!write_list_to_kvmstate(cpu, level)) {
+> >          return -EINVAL;
+> >      }
+> >
+> > +    ret = kvm_put_vcpu_events(cpu);
+> > +    if (ret) {
+> > +        return ret;
+> > +    }
+> > +
+> >      kvm_arm_sync_mpstate_to_kvm(cpu);
+> >
+> >      return ret;
+> > @@ -1251,11 +1251,6 @@ int kvm_arch_get_registers(CPUState *cs)
+> >      }
+> >      vfp_set_fpcr(env, fpr);
+> >
+> > -    ret = kvm_get_vcpu_events(cpu);
+> > -    if (ret) {
+> > -        return ret;
+> > -    }
+> > -
+> >      if (!write_kvmstate_to_list(cpu)) {
+> >          return -EINVAL;
+> >      }
+> > @@ -1264,6 +1259,11 @@ int kvm_arch_get_registers(CPUState *cs)
+> >       */
+> >      write_list_to_cpustate(cpu);
+> >
+> > +    ret = kvm_get_vcpu_events(cpu);
+> > +    if (ret) {
+> > +        return ret;
+> > +    }
+> > +
+> >      kvm_arm_sync_mpstate_to_qemu(cpu);
+> >
+> >      /* TODO: other registers */
+> > --
+> > 2.7.4
+> >
+> >
+>
+> Same comments for kvm64.c as for kvm32.c
+>
+> Thanks,
+> drew
+>
 
