@@ -2,100 +2,87 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D6CC33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 16:49:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1228EC33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 16:50:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50DAA20838
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 16:49:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCE3A20838
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 16:50:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YD0maEE7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50DAA20838
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i21k2Zse"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCE3A20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izkLd-0000cC-Eo
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 11:49:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56348)
+	id 1izkM1-0001Q0-Sn
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 11:50:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56558)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izkKb-0007BD-Fw
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:48:46 -0500
+ (envelope-from <eblake@redhat.com>) id 1izkL1-00083K-V8
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:49:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izkKZ-0005kb-WF
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:48:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44527
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1izkL0-0007Tg-20
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:49:11 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35011
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izkKZ-0005hw-Nx
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:48:43 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1izkKz-0007R9-Uh
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 11:49:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581007723;
+ s=mimecast20190719; t=1581007749;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VRKZxQWihF2X175wvO0Nl0XhJDux6OoYVe3DIPIrFGE=;
- b=YD0maEE7VauD1WakIfP6FtlrDgZU2YgvOIfE/9+89n7kXVsY6DZhtRfE9vb3KzJbKcF5I6
- wbWtBsYdAXPkIkT3RzJBJ7tQrfrYDcZglM2UC3NRxleSljdCuLtqNw1HKWFG8IhbqrGFh7
- k73+67wYpKpUSIZMDJQctC6F4h90e0A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-s11usECSN9-VmFaDjU42dQ-1; Thu, 06 Feb 2020 11:48:40 -0500
-Received: by mail-wr1-f72.google.com with SMTP id s13so3747128wrb.21
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 08:48:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=h71KXt8ncdVnXZtJi10mW6py/Vn7daUYhvP48+54hXc=;
- b=ZPMUinVX1j9mpx86Ev1Ez50hOuwYaIy8BCFX07YA+u1Q3ESPTXqok/Et4sI9SjXwBF
- 7mW4jTQDJ6CY2aRYKptfdtGmg1tu/aXBJ2Nv67Xc+M++5WkFWgHw6uBhqii+oQhAcEgJ
- EGOn3TI67WniRbP/EzPKWqqtoBtZzTa2miW8FrslZFff1oAZoVR6j3nhfMKPjliDEbS5
- u1drGwwpFpPT/nYZSEg/enHcTY2YUTKcqc17rOyYGkWSS3CAuIaVXwkAUjFRlJFjoWaQ
- k3rAgnT55BB0FjS0SNjhjXB02E2KcQwa/vEizh3GGa/veq5DdwL1RxZIsFEciAk2fEKU
- E+EA==
-X-Gm-Message-State: APjAAAX/vUtuqVpVgD5wZre01J0rhoQDWyKzIyAv15k+go/Bq1NrClZO
- sbvdlxMqAgjCsUvdBihYPGsgTYslBBGycfnkg5+sOGqEeUO7kQp4Iv7pmtNDZYmAzk3DU4IMY7l
- sIkqOE6DzXeHy46s=
-X-Received: by 2002:adf:8b54:: with SMTP id v20mr4926936wra.390.1581007719830; 
- Thu, 06 Feb 2020 08:48:39 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxyFQJcG1ky94iCAfcQTsaEJQjX9IlhgXGV8w6vLzy/sHf8PnM8+wszl7yLTgoOvyqa159JVg==
-X-Received: by 2002:adf:8b54:: with SMTP id v20mr4926903wra.390.1581007719498; 
- Thu, 06 Feb 2020 08:48:39 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id s8sm64879wmf.45.2020.02.06.08.48.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 08:48:39 -0800 (PST)
-Subject: Re: [PATCH v2 00/29] tests/acceptance/virtio_seg_max_adjust: Restrict
- it to Linux/X86
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200129212345.20547-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4bbe9ff8-e1a8-917d-5a57-ce5185da19fa@redhat.com>
-Date: Thu, 6 Feb 2020 17:48:38 +0100
+ bh=nA0Z9XQdZkLoyMP7+S643kyEMtY3XTB4WmhULCLjqkM=;
+ b=i21k2Zserw/bEkk9R/zevCmSK79oxDIkPvd76XBjEvwPABcBxMEVV1kOSa/X96VveEb0Ey
+ ZE/mEYwsAqBODDMH+GSjrnXtoX/8lQvH/VojgJ+FrGZ1nHOPliAkc0Kn7XvUD0euw62sMw
+ WFE47oYjXiuDLxuL1YvvZNlvdYLV+Lk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-Y47xCJDPNQa2ffI0oCmwNw-1; Thu, 06 Feb 2020 11:48:31 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D4B7802B9E;
+ Thu,  6 Feb 2020 16:48:30 +0000 (UTC)
+Received: from [10.3.117.249] (ovpn-117-249.phx2.redhat.com [10.3.117.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2029B60BEC;
+ Thu,  6 Feb 2020 16:48:27 +0000 (UTC)
+Subject: Re: [PATCH] tests/qemu_iotests: Minimize usage of used ports
+To: Max Reitz <mreitz@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?=
+ <ldoktor@redhat.com>, qemu-block@nongnu.org
+References: <20200203075955.28861-1-ldoktor@redhat.com>
+ <fe6a7eb5-352a-3cb5-4e75-bd99baf6d54e@redhat.com>
+ <595ffedf-4213-f000-96e1-3216e272b1c1@redhat.com>
+ <726ca911-be83-c2d5-ff3f-efa32bc2233e@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <797578d5-bfab-5eb7-8921-0fcf1f3ee40e@redhat.com>
+Date: Thu, 6 Feb 2020 10:48:26 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200129212345.20547-1-philmd@redhat.com>
+In-Reply-To: <726ca911-be83-c2d5-ff3f-efa32bc2233e@redhat.com>
 Content-Language: en-US
-X-MC-Unique: s11usECSN9-VmFaDjU42dQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: Y47xCJDPNQa2ffI0oCmwNw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,87 +94,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/29/20 10:23 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Currently our CI is mostly restricted to Linux/X86.
-> We want to have more, but until there we have to run these tests
-> manually, which is why we didn't noticed earlier this test was
-> failing on OSX.
->=20
-> This series contains the patches I used to debug why the
-> virtio_seg_max_adjust had broken the OSX CI, but then I
-> kept testing on other archs, thus added more patches...
->=20
-> Currently our CI is mostly restricted to Linux/X86.
-> We want to have more, but until there we have to run these tests
-> manually, which is why we didn't noticed earlier some tests are
-> failing (on OSX, using --without-default-devices, ...).
->=20
-> Tested on Linux/FreeBSD/OSX, X86/Aarch64.
->=20
-> Regards,
->=20
-> Phil.
->=20
-> Supersedes: <20200122223247.30419-1-philmd@redhat.com>
-> "tests/acceptance/virtio_seg_max_adjust: Restrict it to Linux/X86"
->=20
-> Denis Plotnikov (1):
->    tests: rename virtio_seg_max_adjust to virtio_check_params
->=20
-> Philippe Mathieu-Daud=C3=A9 (28):
->    hw/core: Allow setting 'virtio-blk-device.scsi' property on OSX host
->    accel/accel: Make TYPE_ACCEL abstract
->    python/qemu: Add binutils::binary_get_version()
->    tests/acceptance: Use 'version-min' tag to verify QEMU binary version
->    tests/acceptance: Restrict X86CPUModelAliases test to QEMU >=3D 4.1
->    python/qemu: Add binutils::binary_get_arch()
->    tests/acceptance: Use the 'arch' tag to verify QEMU binary target
->    python/qemu: Add binutils::binary_get_machines()
->    tests/acceptance: Use 'machine' tag to check if available in QEMU
->      binary
->    python/qemu: Add binutils::binary_get_qom_implementations()
->    python/qemu: Add binutils::binary_get_accels()
->    python/qemu/accel: Use binutils::binary_get_accels()
->    python/qemu: Add binutils::binary_get_devices()
->    tests/acceptance: Use 'device' tags to check availability in QEMU
->      binary
->    tests/acceptance/virtio_check_params: Only remove listed machines
->    tests/acceptance/virtio_check_params: Improve exception logging
->    tests/acceptance/virtio_check_params: List machine being tested
->    tests/acceptance/virtio_check_params: Only test Xen as superuser
->    tests/acceptance/virtio_check_params: Skip test if arch is not
->      supported
->    tests/acceptance/virtio_check_params: Kludge to skip tests on MIPS
->    tests/acceptance/virtio_check_params: Support the s390x architecture
->    tests/acceptance/virtio_check_params: Support the ppc architecture
->    tests/acceptance/virtio_check_params: Default to -nodefaults
->    tests/acceptance/virtio_check_params: Require a virtio-scsi-pci device
->    tests/acceptance/boot_linux_console: Do not use VGA on Clipper machine
->    tests/acceptance/migration: Default to -nodefaults
->    tests/acceptance/version: Default to -nodefaults
->    MAINTAINERS: Add Acceptance tests reviewers
+On 2/6/20 10:37 AM, Max Reitz wrote:
 
-I have applied the following patches on my python-next tree [*]:
-15/29 tests: rename virtio_seg_max_adjust to virtio_check_params
-17/29 tests/acceptance/virtio_check_params: Improve exception logging
-18/29 tests/acceptance/virtio_check_params: List machine being tested
-24/29 tests/acceptance/virtio_check_params: Default to -nodefaults
-26/29 tests/acceptance/boot_linux_console: Do not use VGA on Clipper machin=
-e
-27/29 tests/acceptance/migration: Default to -nodefaults
-28/29 tests/acceptance/version: Default to -nodefaults
+>>
+>> thank you and I am sorry for not digging deep enough. This week my CI fa=
+iled with:
+>>
+>> 01:24:06 DEBUG| [stdout] +ERROR: test_inet (__main__.QemuNBD)
+>> 01:24:06 DEBUG| [stdout] +----------------------------------------------=
+------------------------
+>> 01:24:06 DEBUG| [stdout] +Traceback (most recent call last):
+>> 01:24:06 DEBUG| [stdout] +  File "147", line 85, in setUp
+>> 01:24:06 DEBUG| [stdout] +    self.vm.launch()
+>> 01:24:06 DEBUG| [stdout] +  File "/home/jenkins/ppc64le/qemu-master/test=
+s/qemu-iotests/../../python/qemu/machine.py", line 302, in launch
+>> 01:24:06 DEBUG| [stdout] +    self._launch()
+>> 01:24:06 DEBUG| [stdout] +  File "/home/jenkins/ppc64le/qemu-master/test=
+s/qemu-iotests/../../python/qemu/machine.py", line 319, in _launch
+>> 01:24:06 DEBUG| [stdout] +    self._pre_launch()
+>> 01:24:06 DEBUG| [stdout] +  File "/home/jenkins/ppc64le/qemu-master/test=
+s/qemu-iotests/../../python/qemu/qtest.py", line 106, in _pre_launch
+>> 01:24:06 DEBUG| [stdout] +    super(QEMUQtestMachine, self)._pre_launch(=
+)
+>> 01:24:06 DEBUG| [stdout] +  File "/home/jenkins/ppc64le/qemu-master/test=
+s/qemu-iotests/../../python/qemu/machine.py", line 270, in _pre_launch
+>> 01:24:06 DEBUG| [stdout] +    self._qmp =3D qmp.QEMUMonitorProtocol(self=
+._vm_monitor, server=3DTrue)
+>> 01:24:06 DEBUG| [stdout] +  File "/home/jenkins/ppc64le/qemu-master/test=
+s/qemu-iotests/../../python/qemu/qmp.py", line 60, in __init__
+>> 01:24:06 DEBUG| [stdout] +    self.__sock.bind(self.__address)
+>> 01:24:06 DEBUG| [stdout] +OSError: [Errno 98] Address already in use
 
-I plan to disable the virtio_check_params.py test for now, because it=20
-broke the CI and the Virtuozzo folks didn't reply to this series=20
-intending to fix it. We will restore it once it later.
+Was this test 147?  If so, see:
+https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg01469.html
 
-[*] https://gitlab.com/philmd/qemu/commits/python-next
+because that failure matches what I was seeing.
+
+>>
+>> I made the mistake of reproducing this on my home system using the qemu =
+revision that I had and assuming it's caused by a used port. So I limited t=
+he port range and used nc to occupy the port. It sort-of reproduced but ins=
+tead of Address already in use it hanged until I kill the nc process. Then =
+it failed with:
+>>
+>> +Traceback (most recent call last):
+>> +  File "147", line 124, in test_inet
+>> +    flatten_sock_addr(address))
+>> +  File "147", line 59, in client_test
+>> +    self.assert_qmp(result, 'return', {})
+>> +  File "/home/medic/Work/Projekty/qemu/tests/qemu-iotests/iotests.py", =
+line 821, in assert_qmp
+>> +    result =3D self.dictpath(d, path)
+>> +  File "/home/medic/Work/Projekty/qemu/tests/qemu-iotests/iotests.py", =
+line 797, in dictpath
+>> +    self.fail('failed path traversal for "%s" in "%s"' % (path, str(d))=
+)
+>> +AssertionError: failed path traversal for "return" in "{'error': {'clas=
+s': 'GenericError', 'desc': 'Failed to read initial magic: Unexpected end-o=
+f-file before all bytes were read'}}"
+>>
+
+That's a secondary failure, I assume if the initial bug is fixed we are=20
+less likely to hit the secondary one; but the secondary one may still be=20
+worth fixing.
+
+>> After a brief study I thought qemu is not doing the job well enough and =
+wanted to add a protection. Anyway after a more thorough overview I came to=
+ a different conclusion and that is that we are facing the same issue as wi=
+th incoming migration about a year ago. What happened is that I started "nc=
+ -l localhost 32789" which results in:
+>>
+>> COMMAND   PID  USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+>> nc      26758 medic    3u  IPv6 9579487      0t0  TCP localhost:32789 (L=
+ISTEN)
+>>
+>> Then we start the server by "_try_server_up" where qemu-nbd detects the =
+port is occupied on IPv6 but available on IPv4, so it claims it:
+>> COMMAND   PID  USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+>> nc        26758 medic    3u  IPv6 9579487      0t0  TCP localhost:32789 =
+(LISTEN)
+>> qemu-nbd  26927 medic    4u  IPv4 9591857      0t0  TCP localhost:32789 =
+(LISTEN)
+>>
+>> and reports success. Then we try to connect but the hotplugged VM first =
+attempts to connect on the IPv6 address and hangs for infinity.
+>>
+>> Now is this an expected behavior? If so then we need the find_free_addre=
+ss (but preferably directly in _try_server_up just before starting the qemu=
+-nbd) to leave as little time-frame for collision as possible. Otherwise th=
+e test is alright and qemu-nbd needs a fix to bail out in case some address=
+ is already used (IIRC this is what incoming migration does).
+>=20
+> Ah, OK.
+>=20
+> Well, expected behavior...  It=E2=80=99s a shame, that=E2=80=99s what it =
+is.
+
+In libnbd, we recently improved the testsuite by switching over to=20
+systemd-style fd passing: instead of asking qemu-nbd to open a random=20
+port (and hoping it is available), we instead pre-open the port (where=20
+failure is under our control) and then pass in that fd with environment=20
+variables to qemu-nbd, which in turn guarantees that qemu-nbd won't hit=20
+failures in trying to use the port.  Maybe we should utilize that more=20
+in qemu's own testsuite.
+
+Also, I need to revisit my proposed patches for letting qemu-nbd support=20
+TLS over Unix sockets, as that's another way to avoid TCP contention=20
+(right now, qemu has an anachronistic prohibition against the=20
+combination of TLS and Unix sockets).
+
+>=20
+>> My second mistake was testing this on the old code-base and rebasing it =
+only before sending the patch (without testing after the rebase). If I were=
+ to test it first, I would have found out that the real reproducer is simpl=
+y running the test as the commit 8dff69b9415b4287e900358744b732195e1ab2e2 b=
+roke it.
+>>
+>>
+>> So basically there are 2 actions:
+>>
+>> 1. fix the test as on my system it fails in 100% of cases, bisect says t=
+he first bad commit is 8dff69b9415b4287e900358744b732195e1ab2e2. Would anyo=
+ne have time in digging into this? I already spent way too much time on thi=
+s and don't really know what that commit is trying to do.
+>=20
+> Yep, I=E2=80=99ve sent a patch:
+>=20
+> https://lists.nongnu.org/archive/html/qemu-block/2020-02/msg00294.html
+
+Ah, so we did notice the same problem.
+
+>=20
+>> 2. decide on the behavior when IPv4/6 is already in use (bail-out or sta=
+rt).
+>> 2a. In case it should bail-out than the test is correct and there is no =
+need for my patch. On the other hand qemu-nbd has to be fixed
+>=20
+> I don=E2=80=99t think it makes much sense to let qemu=E2=80=99s NBD serve=
+r ensure that
+> it claims both IPv4 and IPv6 in case the user specifies a
+> non-descriptive hostname.
+>=20
+>> 2b. Otherwise I can send a v2 that will check the port in the _try_serve=
+r_up just before starting qemu-nbd to minimize the risk of using a utilized=
+ port (or should you decide it's not worth checking, I can simply forget ab=
+out this)
+>=20
+> Hm.  It wouldn=E2=80=99t be fully reliable, but, well...  The risk would =
+be minimal.
+>=20
+> OTOH, would it work if we just did a %s/localhost/127.0.0.1/ in the
+> test?  We have specific cases for IPv6, so I think it makes sense to
+> force IPv4 in all other cases.
+
+Except then it will fail on machines configured for IPv6-only.
+
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
