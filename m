@@ -2,95 +2,101 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7673C35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 20:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD96C35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 20:37:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60C16214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 20:32:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CD4A21775
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 20:37:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fdt3px8y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60C16214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cE5l5mIX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CD4A21775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iznok-00027V-Bx
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 15:32:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46922)
+	id 1iznu3-0003xN-E0
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 15:37:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48670)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iznnv-0001hQ-3h
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:31:16 -0500
+ (envelope-from <philmd@redhat.com>) id 1izntU-0003Lh-K1
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:37:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iznnt-0004Ym-Aq
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:31:14 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28089
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1izntT-0005zH-M9
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:37:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43704
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iznnt-0004XW-6s
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:31:13 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izntT-0005yh-J3
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:36:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581021072;
+ s=mimecast20190719; t=1581021418;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RZBrWifjx9YPfRsBr6Cqdf1kQBNYA/xZ2nQySJ0XPSQ=;
- b=fdt3px8yqgh/nDoJBqGM8bNGK3CK1HpB40qCLlZC9/dMaTDzqD0uRk+/cBuSQTiyyKV+me
- DgVhvPfnYfaJlY8RCNOBkpqmnMWBqZK0uPjRQhw0pJI5QdeaV+sM4OyxOM7ZXQ1VKYwEid
- xYsDNEjwNc3JL8utsHyu6wx+9hrz3Zw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-3wB4UjryNEmYs8onB9Ll6Q-1; Thu, 06 Feb 2020 15:31:09 -0500
-Received: by mail-wr1-f69.google.com with SMTP id l1so4087012wrt.4
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 12:31:09 -0800 (PST)
+ bh=i3/QIxY9a4hGMUCO6ojEHPC6gW4y7NH0vxDHvs1NOo8=;
+ b=cE5l5mIX9jKnG3fbRkJjskb1ChBruhzDQIyG7tCqtRriwOQ+oguqQGFMgDh0XsS3dgLYlP
+ dv1eqFMfCMKFZgU7uY/BAnaMDBWDjh70bpftLYlg5ijunreb1YfhsCRRHMCn1W1WnVED+U
+ BZoRtuYvSsdqAf2M2xLJ/O56TKLgFQQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-c0GQufzIPuiz35SirUMNpw-1; Thu, 06 Feb 2020 15:36:55 -0500
+Received: by mail-wm1-f71.google.com with SMTP id z7so609797wmi.0
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 12:36:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:content-transfer-encoding:from:mime-version
- :subject:date:message-id:references:cc:in-reply-to:to;
- bh=yK9eCK6yjt0cADdDSOw+fYRQRzGXDJUG89irwumnsfY=;
- b=UYt/PGzG0080cHlt1dlsl1nx3dypTpO5Rl6grGMiEIRdlOeE6Ni6qVYkdnOD+7dhol
- U46l7HHh1+9rRF+AQRH4duNBOWIpQM55fEjV22rwvH850ULxGgX6m2pRNTpogTyJAD2y
- ySiXdejsW6Ybnx0jp46fyyyL2vahPVSMtY/zdwb1OBxYfu0gL6IjiOEWUvId3VAWvAzs
- LzLMcRNg4AoKDPHMoajvIpf2b6/IMw/9UKOyQyLguw3q3MmxlwW64baYMy2Pj3NWDR7d
- VxWq/q5mMuOs35/p0sQltKSx7R2NKsmXlJ0jmjYLrYNKU5piDgGxXaP/Hdwj2JSiJg1i
- tcMQ==
-X-Gm-Message-State: APjAAAWfFYTEn4YyzTv90LcVOlz0/HxsvlKckctNQ7Bwqim3+wtQlSMz
- rn7/AvKBI91yrnBS5oNXZy9lCdmsP40XO78dYtCdt6ZewJcvhyg9M4MyI8VV8RuhLc9AKbQe7X/
- 2AGFIhxBCdKRQX+Q=
-X-Received: by 2002:a1c:7c05:: with SMTP id x5mr6407932wmc.15.1581021068627;
- Thu, 06 Feb 2020 12:31:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyyWpoAywWZgh5p2thwUbUbmz4V9O/PzV50aZSbJfwqTtvPB+DyfBjngSipL37FqCxfRP+aHA==
-X-Received: by 2002:a1c:7c05:: with SMTP id x5mr6407907wmc.15.1581021068335;
- Thu, 06 Feb 2020 12:31:08 -0800 (PST)
-Received: from [192.168.3.122] (p5B0C655E.dip0.t-ipconnect.de. [91.12.101.94])
- by smtp.gmail.com with ESMTPSA id
- z25sm736172wmf.14.2020.02.06.12.31.07
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tDKxNiUakhkYL3yyLRKv4nW3ZKHDpH2FL/0Cbl5X/2c=;
+ b=cOv013foeojCvD/F1ibRGRGDOMfy79QwrppcBS4rCe8TPKHIni3YFV8pCbHczrlGbq
+ m7ea2H5xtoRhZOGIfoM1R5m9aUHG41xWah1CcsdJJfv35igETrXHNTJrsVpZdxPpnLa4
+ 3iJ2qpbnGyReDcJen11i066FaukRFiTWGgsc3E9MoQuvHKqHgnBugKNUdj/DmmCLkqgm
+ lSF69YY+/5mmafAQHfoT9TssQlEkq4pvu/a7rAwtkLAOzSBWiHOBBvYO2Xal6yDX5Fb+
+ DSR/c47k5SBTz7lGP5zblySDhtTUxYkVoXVml1SAyQJh9nxegWTwde2oNbpzrffp7a8f
+ mLOg==
+X-Gm-Message-State: APjAAAVvu4yxQjkZZ1P5DOohPVHBp6MTssljl3wFca4QghMXwDpvJ3cy
+ EVqlor5uTP9/mHdW3SFPQ2KsQK0wCV1D5nVd73TAiskh9fOz3auSoY3tsvlHCJH41MwlF/OIBtF
+ b1TjKcq8Dazo3D2Q=
+X-Received: by 2002:a1c:bdc5:: with SMTP id n188mr6484216wmf.124.1581021413753; 
+ Thu, 06 Feb 2020 12:36:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwvrptNMOj6WMv/c38sGWTKZgvIPl7fEb3YY+AOdnvgjKdXYpD7bNLFnmusYP9Le6ec3FN7Wg==
+X-Received: by 2002:a1c:bdc5:: with SMTP id n188mr6484188wmf.124.1581021413419; 
+ Thu, 06 Feb 2020 12:36:53 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id s16sm514636wrn.78.2020.02.06.12.36.52
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 12:31:07 -0800 (PST)
-From: David Hildenbrand <david@redhat.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v1 00/13] Ram blocks with resizable anonymous allocations
- under POSIX
-Date: Thu, 6 Feb 2020 21:31:06 +0100
-Message-Id: <13585E49-B84C-41D8-8825-F96841F475D0@redhat.com>
-References: <20200206201121.GM3655@work-vm>
-In-Reply-To: <20200206201121.GM3655@work-vm>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-X-Mailer: iPhone Mail (17C54)
-X-MC-Unique: 3wB4UjryNEmYs8onB9Ll6Q-1
+ Thu, 06 Feb 2020 12:36:52 -0800 (PST)
+Subject: Re: [PATCH v2 17/29] tests/acceptance/virtio_check_params: Improve
+ exception logging
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20200129212345.20547-1-philmd@redhat.com>
+ <20200129212345.20547-18-philmd@redhat.com>
+ <20200206195441.GA412524@habkost.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <41dbf2d1-0c38-f483-fdc6-815015f1649d@redhat.com>
+Date: Thu, 6 Feb 2020 21:36:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200206195441.GA412524@habkost.net>
+Content-Language: en-US
+X-MC-Unique: c0GQufzIPuiz35SirUMNpw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,100 +108,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Alex Williamson <alex.williamson@redhat.com>,
- Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Richard Henderson <rth@twiddle.net>
+Cc: Cleber Rosa <crosa@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-> Am 06.02.2020 um 21:11 schrieb Dr. David Alan Gilbert <dgilbert@redhat.co=
-m>:
+On 2/6/20 8:54 PM, Eduardo Habkost wrote:
+> On Wed, Jan 29, 2020 at 10:23:33PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>   tests/acceptance/virtio_check_params.py | 8 ++++++--
+>>   1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/acceptance/virtio_check_params.py b/tests/acceptance/=
+virtio_check_params.py
+>> index 4a417b8ef5..51a2dd76e8 100755
+>> --- a/tests/acceptance/virtio_check_params.py
+>> +++ b/tests/acceptance/virtio_check_params.py
+>> @@ -77,8 +77,12 @@ class VirtioMaxSegSettingsCheck(Test):
+>>               vm.set_machine(mt["name"])
+>>               for s in VM_DEV_PARAMS[dev_type_name]:
+>>                   vm.add_args(s)
+>> -            vm.launch()
+>> -            query_ok, props, error =3D self.query_virtqueue(vm, dev_typ=
+e_name)
+>> +            try:
+>> +                vm.launch()
+>> +                query_ok, props, error =3D self.query_virtqueue(vm, dev=
+_type_name)
+>> +            except:
+>> +                query_ok =3D False
+>> +                error =3D sys.exc_info()[0]
 >=20
-> =EF=BB=BF* David Hildenbrand (david@redhat.com) wrote:
->> We already allow resizable ram blocks for anonymous memory, however, the=
-y
->> are not actually resized. All memory is mmaped() R/W, including the memo=
-ry
->> exceeding the used_length, up to the max_length.
->>=20
->> When resizing, effectively only the boundary is moved. Implement actuall=
-y
->> resizable anonymous allocations and make use of them in resizable ram
->> blocks when possible. Memory exceeding the used_length will be
->> inaccessible. Especially ram block notifiers require care.
->>=20
->> Having actually resizable anonymous allocations (via mmap-hackery) allow=
-s
->> to reserve a big region in virtual address space and grow the
->> accessible/usable part on demand. Even if "/proc/sys/vm/overcommit_memor=
-y"
->> is set to "never" under Linux, huge reservations will succeed. If there =
-is
->> not enough memory when resizing (to populate parts of the reserved regio=
-n),
->> trying to resize will fail. Only the actually used size is reserved in t=
-he
->> OS.
->>=20
->> E.g., virtio-mem [1] wants to reserve big resizable memory regions and
->> grow the usable part on demand. I think this change is worth sending out
->> individually. Accompanied by a bunch of minor fixes and cleanups.
->>=20
->> [1] https://lore.kernel.org/kvm/20191212171137.13872-1-david@redhat.com/
->=20
-> There's a few bits I've not understood from skimming the patches:
->=20
+> I would prefer to do this inside query_virtqueue(), but:
 
-Thanks for having a look!
+The problem is in vm.launch():
 
->  a) Am I correct in thinking you PROT_NONE the extra space so you can
-> gkrow/shrink it?
-
-Yes!
-
->  b) What does kvm see - does it have a slot for the whole space or for
-> only the used space?
-
-Only the used space. Resizing triggers a resize of the memory region. That =
-triggers memory notifiers, which remove the old kvm memslot and re-add the =
-new kvm memslot. (That=E2=80=98s existing handling, so nothing new).
-
-So KVM will not see PROT_NONE when creating a slot.
-
->     I ask because we found with virtiofs/DAX experiments that on Power,
-> kvm gets upset if you give it a mapping with PROT_NONE.
->     (That maybe less of an issue if you change the mapping after the
-> slot is created).
-
-That should work as expected. Resizing *while* kvm is running is tricky, bu=
-t that=E2=80=98s not part of this series and a different story :) right now=
-, resizing is only valid on reboot/incoming migration.
+DEBUG| Output: "xencall: error: Could not obtain handle on privileged=20
+command interface: No such file or directory\nxen be core: xen be core:=20
+can't open xen interface\ncan't open xen interface\nqemu-system-x86_64:=20
+failed to initialize xen: Operation not permitted\n"
 
 >=20
->  c) It's interesting this is keyed off the RAMBlock notifiers - do
->     memory_listener's on the address space the block is mapped into get
->    triggered?  I'm wondering how vhost (and vhost-user) in particular
->    see this.
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>=20
 
-Yes, memory listeners get triggered. Old region is removed, new one is adde=
-d. Nothing changed on that front.
+Thanks, I'll keep this patch queued.
 
-The issue with ram block notifiers is that they did not do a =E2=80=9Eremov=
-e old, add new=E2=80=9C on resizes. They only added the full ram block. Bad=
-. E.g., vfio wants to pin all memory - which would fail on PROT_NONE.
-
-E.g., for HAX, there is no kernel ioctl to remove a ram block ... for SEV t=
-here is, but I am not sure about the implications when converting back and =
-forth between encrypted/unencrypted. So SEV and HAX require legacy handling=
-.
-
-Cheers!
+Phil.
 
 
