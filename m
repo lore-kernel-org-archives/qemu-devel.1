@@ -2,136 +2,113 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A50A9C33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B4CC33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:55:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7704F214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:53:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SKtcaAYw";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="CIkZba9I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7704F214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	by mail.kernel.org (Postfix) with ESMTPS id D9D16214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:55:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9D16214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izlLh-0003iQ-Nr
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 12:53:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50076)
+	id 1izlN4-0005ga-3g
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 12:55:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@quicinc.com>) id 1izlKt-00024g-IG
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:53:08 -0500
+ (envelope-from <laurent@vivier.eu>) id 1izlMQ-0004rq-7d
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:54:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@quicinc.com>) id 1izlKs-0000xQ-Co
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:53:07 -0500
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:41697)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
- id 1izlKr-0000qv-Qs
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:53:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1581011585; x=1612547585;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=/0xcHvg3IYQPrr0LPMFU0Cu8lEoXDqik7KqSyhEJazw=;
- b=SKtcaAYwSUE3LM5KH8/vPHzAzHWqhDHNL6/n9WEXPyEFdblurcs1Sya9
- prFzN7EQm30ZBDop8w2W5NpUJjJ/RoULh0vrkRPRm1WBGNTSTxgfYArd/
- SAFEvEdAewttjqP7gBoEbSWgNTai2g/mFVyIbHlaJ75s3scj0swzTBbzO w=;
-Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 06 Feb 2020 09:53:04 -0800
-Received: from nasanexm03c.na.qualcomm.com ([10.85.0.106])
- by ironmsg01-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 06 Feb 2020 09:53:04 -0800
-Received: from APSANEXR01A.ap.qualcomm.com (10.85.0.36) by
- nasanexm03c.na.qualcomm.com (10.85.0.106) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Thu, 6 Feb 2020 09:53:03 -0800
-Received: from NASANEXM01E.na.qualcomm.com (10.85.0.31) by
- APSANEXR01A.ap.qualcomm.com (10.85.0.36) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Thu, 6 Feb 2020 09:53:00 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (199.106.107.6)
- by NASANEXM01E.na.qualcomm.com (10.85.0.31) with Microsoft SMTP Server (TLS)
- id 15.0.1473.3 via Frontend Transport; Thu, 6 Feb 2020 09:53:00 -0800
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
- BYAPR02MB4199.namprd02.prod.outlook.com (20.176.249.23) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Thu, 6 Feb 2020 17:52:57 +0000
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62]) by BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62%6]) with mapi id 15.20.2707.023; Thu, 6 Feb 2020
- 17:52:57 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: Richard Henderson <rth@twiddle.net>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH] Add support for a helper with 7 arguments
-Thread-Topic: [PATCH] Add support for a helper with 7 arguments
-Thread-Index: AQHV3HWNrLXzUmuR802n/46fb+QBo6gNrT4AgABKNoCAABLgEIAAQsYAgAAS9GA=
-Date: Thu, 6 Feb 2020 17:52:57 +0000
-Message-ID: <BYAPR02MB48864A309572E1347920CAF0DE1D0@BYAPR02MB4886.namprd02.prod.outlook.com>
-References: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
- <09def3cf-6833-ccf5-457e-1755a7fd0e04@twiddle.net>
- <640ffa37-a70b-dfa9-55ef-cde5c7f0dfcb@twiddle.net>
- <BYAPR02MB48863BDFCB4CB26717467579DE1D0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <3614849d-12a5-fa43-fb10-801e9648b40e@twiddle.net>
-In-Reply-To: <3614849d-12a5-fa43-fb10-801e9648b40e@twiddle.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=tsimpson@quicinc.com; 
-x-originating-ip: [199.106.103.55]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6925a390-66b5-4746-6ebc-08d7ab2d661c
-x-ms-traffictypediagnostic: BYAPR02MB4199:
-x-microsoft-antispam-prvs: <BYAPR02MB419947BACFFD36C621312036DE1D0@BYAPR02MB4199.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4502;
-x-forefront-prvs: 0305463112
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(136003)(396003)(39860400002)(376002)(366004)(199004)(189003)(2906002)(71200400001)(8936002)(81166006)(66556008)(478600001)(33656002)(64756008)(66446008)(8676002)(81156014)(5660300002)(66476007)(55016002)(9686003)(86362001)(186003)(6506007)(66946007)(53546011)(26005)(76116006)(4326008)(7696005)(110136005)(52536014)(316002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4199;
- H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: isXimmEA/SRc9HcSSQJRSpjKVmqrF5wLfGJxa1XcGWDlAOMlkHT+FU3QfLQrxqPaHB75TFPmtrdt3OPovvqtJBhngFRPACbfRknNosBuEZJm1y1ESW+CHVIHinVvek3r2c1lPetluE0K98OVkbQHAVAbOInpvJjfS0qoJHjxBhKazqoVs3JOZZIGf2jimXg+tuyzkbmP2TuotAGxy9hIwou4IetzbOdart82ngSVeMhZk9pW9vtsG4GOY5h1kygFX7bsP0zDRzuEvWd6fG0e+IEkX26qZ0jOmOTYGlJFw4kvLqmUC11RUQgvCdq3vH75z57duCwikgITL8IwUYZBXNpYunkkueMXv1isHlQAaBT2inH4DafItoVJt4Lf2IrJ92P7gSNfneDRUxQE0ohKL/jE+AqhMPjE3k4YILhkeb+i2jH/yL4R3ib4Z7Tmx7BI
-x-ms-exchange-antispam-messagedata: 9T6tfEDvUtOLVZyHYeIOgSbumv3fi/NfDg2IOy8qKfyrIaem8/Xh2zA2lj4G0rBGGVTzctNhlVtx9UNB7uZHZpmIClZxigHhquB/iutHh97PRO9iwDZGHJonYVJrWSGdXuJrQCDmOrT+h/s3NCjnkA==
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h/6AmhiWzXBhgqgIpk+mWXPfi7uZ8rKAnfv1OIX23vgdWtPGY6qQgZa+RZJUSwy7kC1iyvPqTKtjGvNAjBN/AgVFTt1hqbQFHC/tKG4FfL7V2ywqIyvsCBoqgeBZqJ11+mga8AgAogEjVRJ9p69RQuH8qZ26/b59xQKcPmBbhowW2wqAyNhwI/moVoMKen1dSZFxrzmZzeBA7hpcOES24Wq1sj3DI1PHtxNOdBqZdajhNdeGMVvWdpFuBFIIC/E9SC7M2lh80Gdce1SfjC5FJujOQY7IgPSFBUsLbR9rEYprXIybGrj+yjUs4NSRwC/XWagak5f1WcYgbwachSwLOA==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D5qgSU8KI/l7dvCBLlVZ5lVneLx+Q7qMGagHKV8QZ1o=;
- b=PKp3/3UsKqAVa1LIJoCKiHgzezVfJayhHRYF2b5ibdNxWuRjFKhlHmfLdfrOArvbPFI02W2tY3gvoNv1s73mp955pwTyM/+VfIj9V0xz6yyjVkKCGLpd0GGeG2HkyqN7ktI5l20zochldrrsXCa8PB5wIcY/k7tc6ro1ZTnOl6e/WnUahnj0xIxNlRo+FtUDlgucWMv8Ey1nlJwC5631Jw/pmSr8H6ig+IrJNtmEsTwWNpDdy3zW63ZVeyu6CAcNiE0VA3+BKRVD0AgkctJlqWnbNbofRd54vdNLHIq+S5al/cKyoKr91sUQQt2JqpkFtsu3qVvEszJ4cDIZ7Tytow==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D5qgSU8KI/l7dvCBLlVZ5lVneLx+Q7qMGagHKV8QZ1o=;
- b=CIkZba9IKS8uTHRqpta0UARqsDDyurSFhVwojI52RoL1jKtG9aaNk33jk+NNDZ+py/vlsw1rrY7JinehaaPdP2mHAww6Haj8r7tS4VPiS8AvmRFPN8xMBvTfCFPyrffmFkC0DVGRPRuA3pO8hclQmUP6SAlCxlEhvfWT/7LJPNk=
-x-ms-exchange-crosstenant-network-message-id: 6925a390-66b5-4746-6ebc-08d7ab2d661c
-x-ms-exchange-crosstenant-originalarrivaltime: 06 Feb 2020 17:52:57.0322 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: h6QYjfO3n02OXoYVKkC/6/FX+/hFFZLl3XubaVeb6SI6dkR/kIdA8jJFMOmVYTpWoP2GIXYctkV3Jj0HaPTQLw==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4199
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <laurent@vivier.eu>) id 1izlMP-0004g1-2C
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:54:42 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:41057)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1izlMO-0004bk-Ow; Thu, 06 Feb 2020 12:54:41 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N49Ul-1ji8eA2kc5-0104Mk; Thu, 06 Feb 2020 18:54:19 +0100
+Subject: Re: [PATCH] nbd: Fix regression with multiple meta contexts
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200206173832.130004-1-eblake@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c28915e5-0387-16af-3154-451029cc8a3a@vivier.eu>
+Date: Thu, 6 Feb 2020 18:54:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-OriginatorOrg: quicinc.com
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.39
+In-Reply-To: <20200206173832.130004-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:FlCei6F072w0cDtdW7z8w/U7PGgpwgQugYUy4Tc9yL4XRCkJV2M
+ fmvgqJNVOf00Ghz61Gj1GkXfW4NFecbXwcHcrkGyRKuc9l+tUsEyR36zHtfLVsB1at2K5Cb
+ pjrv4imdFY7mREuIT1cNtYwAEiSUHktN69UpFyUT6vbOuChMo/id5Q77/qzKhXnFPFEoG2w
+ Giydx4ftegN9YLg16xEcA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zqTTsw+8uM8=:7qhgn4nEJiej3ZQLFhitNN
+ c/TedTvFewdA7UK5EBsd+a4Z8tj1eD9VzLOruozt1F2jkGM/xh8ofqaiJ6+VdReJRaVH1OWIF
+ HuRTpQMBriIR7GSqPtsVDK6cIxxJmT2W/Jki3SzWoAjI7JHLMMg4l3CH7Vbqr/37VKH4Z0+QK
+ oDU08JhIKA8LJJ369VlkL6v01GDgajveg7gvGEIqVhIllA5tifQmk/b5H4Fh6xdxftyhT9/NQ
+ OZiRNMgtnLBk41ZV+SvvYCpiPN5Na7dSYrNIGb9Lw4/YdO3Fd1jhQ97V5FSqH99yrU1t6Tyfv
+ h95GCSsNGApG1SsVxloUwpbqBINTvE/GRZofkEgg8/v/hz0JgnLLnhv9tnDiTk2WWxhlKUDUh
+ jpcTzY5XWGQsU+bkq1jTZwOJkyaH2QoU53BmGDZ/nzh253FpjlkEKQ4WFicAphTqX2dzAiFF/
+ gR0XNBBQsCQP5VpBwfxurAI7HhBHHdjh4FSEVOL//LkVctwAolGW5eSIo2c1d0haoAXkKN6/K
+ g6SYgubqk/6LZgM+PW7kHoivfGYW6HgaWIX8rI+qVZHycuHePRk75wCItNlu1JWZwvhoB+Wi6
+ wJt7eP+8QYRbgfQDaLk+msCBh4WgqLXf1/YMwfUBMulstPAzRwKFcmwhhTfP+VLQVUKr1SznD
+ B3OtPaxYdn0OOwooD0TwKmsX5d4Z9VOPXKsB97nqU5UgWgDAjOjz8XI8G93+PSMuRgIhIjKgo
+ E/wqbo6LtsuufLdmOw13CVslhLZS4z5PmdBz4C6IU7VIXACXayIXuamvsr+goF/9xnTjDUrZa
+ 9+msIKTHJdAMaj641pvY+FnZfukFy80HC+jbvu4ZN2x6XhrieI5ums7UBpkJHpBxYel0ied
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -143,54 +120,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, pannengyuan@huawei.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUmljaGFyZCBIZW5kZXJz
-b24gPHJ0aDc2ODBAZ21haWwuY29tPiBPbiBCZWhhbGYgT2YgUmljaGFyZA0KPiBIZW5kZXJzb24N
-Cj4gU2VudDogVGh1cnNkYXksIEZlYnJ1YXJ5IDYsIDIwMjAgOTozNSBBTQ0KPiBUbzogVGF5bG9y
-IFNpbXBzb24gPHRzaW1wc29uQHF1aWNpbmMuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+
-IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBTdWJqZWN0OiBSZTog
-W1BBVENIXSBBZGQgc3VwcG9ydCBmb3IgYSBoZWxwZXIgd2l0aCA3IGFyZ3VtZW50cw0KPg0KPg0K
-PiBJIHRoaW5rIHRoaXMgaXMgcXVpdGUgdWdseS4gIEkga25vdyB5b3UndmUgYmVlbiB0YWxraW5n
-IGFib3V0IGF1dG8tZ2VuZXJhdGluZw0KPiBldmVyeXRoaW5nIGJ1dCB3ZSBvdWdodCB0byBkbyBi
-ZXR0ZXIgdGhhbiB0aGlzLg0KPg0KPiBZb3Ugc2hvdWxkIGJlIHBhc3NpbmcgdmFsdWVzIG5vdCBy
-ZWdub3MgaWYgeW91IGNhbiBwb3NzaWJseSBkbyBzby4gIFlvdQ0KPiBzaG91bGQNCj4gYmUgcGFz
-c2luZyBmdWxsIHZpcnR1YWwgYWRkcmVzc2VzIG5vdCBOIHNlcGFyYXRlIGNvbXBvbmVudHMgb2Yg
-YW4gYWRkcmVzcy4NCj4gUHJlZGljYXRlcyBzaG91bGQgYmUgZXZhbHVhdGVkIGVhcmxpZXIgc28g
-dGhhdCB0aGUgaGVscGVyIGlzbid0IGV2ZW4gY2FsbGVkIGlmDQo+IGl0J3MgZmFsc2UuDQoNCldl
-IGFyZSBwYXNzaW5nIHZhbHVlcywgbm90IHJlZyBudW1iZXJzLiAgVGhlIGdlbmVyYXRvciBkb2Vz
-bid0IGtub3cgYW55dGhpbmcgYWJvdXQgdGhlIHNlbWFudGljcyBvZiB0aGUgaW5zdHJ1Y3Rpb24u
-ICBJdCBvbmx5IGtub3dzIHdoaWNoIG9wZXJhbmRzIGFyZSByZWFkLCB3cml0dGVuLCBvciBib3Ro
-LiAgU28sIHRoZXJlJ3Mgbm8gd2F5IHRvIGNvbWJpbmUgdGhlIDMgb3BlcmFuZHMgaW50byBhIHNp
-bmdsZSBlZmZlY3RpdmUgYWRkcmVzcyB1bnRpbCB3ZSBhcmUgaW5zaWRlIHRoZSBoZWxwZXIuICBB
-bHNvLCB0aGVyZSdzIG5vIHdheSB0byBrbm93IGlmIHRoZSBpbnN0cnVjdGlvbiBpcyBwcmVkaWNh
-dGVkIG9yIGlmIGl0IGp1c3QgaGFzIGEgcHJlZGljYXRlIGFzIGFuIG9wZXJhbmQuICBBbHNvLCB0
-aGVyZSBhcmUgaW5zdHJ1Y3Rpb25zIHdoZXJlIHRoZSBwcmVkaWNhdGUgaXMgdXNlZCBpbiB0aGUg
-ZmFsc2Ugc2Vuc2UuDQoNCj4NCj4gQ29tYmluZSB0aGF0IHdpdGggMy4zLjEgUGFja2V0IGV4ZWN1
-dGlvbiBzZW1hbnRpY3MsICJkdWFsIHN0b3JlcywgbmV3LXZhbHVlDQo+IHN0b3JlcywgYW5kIHNs
-b3QxIHN0b3JlIHdpdGggc2xvdDAgbG9hZHMgaGF2ZSBub24tcGFyYWxsZWwgZXhlY3V0aW9uDQo+
-IHNlbWFudGljcyIsIGFuZCB5b3UgbmVlZCBubyBzcGVjaWFsIGhlbHBlciBhdCBhbGw6DQo+DQo+
-IGFuZHQwLCBwdiwgMQ0KPiBicmNvbmRpdDAsIDAsIG92ZXINCj4NCj4gc2hsaXQwLCBydSwgdTIN
-Cj4gYWRkdDAsIHQwLCBycw0KPiBxZW11X3N0cnQsIHQwLCBtbXVfaWR4LCBNT19VQg0KPiAgb3Zl
-cjoNCj4NCg0KV2UgY2FuJ3QgYWN0dWFsbHkgZG8gdGhlIHN0b3JlIGhlcmUuICBXZSBoYXZlIHRv
-IHJlY29yZCBpdCBpbiBhIHNpZGUgZGF0YSBzdHJ1Y3R1cmUgaW4gdGhlIGVudiBhbmQgcGVyZm9y
-bSB0aGUgc3RvcmUgd2hlbiB0aGUgcGFja2V0IGNvbW1pdHMuDQoNClRoZXJlIGlzIGEgbWVjaGFu
-aXNtIHRvIG92ZXJyaWRlIHRoZSBjYWxsIHRvIHRoZSBoZWxwZXIgKGZXUkFQXzx0YWc+KS4gIElm
-IHdlIGRpZCBvdmVycmlkZSB0aGlzIGluc3RydWN0aW9uLCB0aGUgVENHIHdvdWxkIGJlIHNpbWls
-YXIgdG8gd2hhdCB5b3UgaGF2ZS4gIEhvd2V2ZXIsIGFsbCBpbnN0cnVjdGlvbnMgc3RpbGwgZ2V0
-IGEgaGVscGVyIGJlY2F1c2UgdGhlIGdlbmVyYXRvciBkb2Vzbid0IGtub3cgd2hpY2ggaW5zdHJ1
-Y3Rpb25zIGFyZSBvdmVycmlkZGVuLg0KDQpDdXJyZW50bHksIHRoZXJlIGFyZSBhIHRvdGFsIG9m
-IDM1IGluc3RydWN0aW9ucyB0aGF0IG5lZWQgYSBoZWxwZXIgd2l0aCA3IGFyZ3VtZW50cy4gIDMy
-IG9mIHRoZW0gYXJlIHByZWRpY2F0ZWQgc3RvcmVzLCBidXQgdGhlcmUgYXJlIGFsc28gMyB2c2Nh
-dHRlciBpbnN0cnVjdGlvbnMuICBGb3IgZXhhbXBsZSwNCiAgICBpZiAoUXM0KSB2c2NhdHRlcihS
-dDMyLCBNdTIsIFZ2MzIudykudyA9IFZ3MzINCkluIHRoaXMgY2FzZSwgdGhlIHByZWRpY2F0ZSBp
-cyBhIHZlY3RvciB1c2VkIGFzIGEgbWFzayBmb3IgZWFjaCBlbGVtZW50IG9mIHRoZSBzdG9yZS4g
-IEV2ZW4gaWYgd2Ugd2VyZW4ndCB1c2luZyBhIGdlbmVyYXRvciwgSSB3b3VsZCBkbyBhIGhlbHBl
-ciBmb3IgdGhlc2UgYmVjYXVzZSBvZiB0aGVpciBjb21wbGV4aXR5Lg0KDQo+IEJ1dCBzdXBwb3Nl
-IHRoaXMgd2VyZSBzb21ldGhpbmcgbW9yZSBjb21wbGljYXRlZCB0aGFuIGEgYmFyZSBzdG9yZSwg
-YW5kDQo+IHRoZQ0KPiBwb2ludCBzdGlsbCBzdGFuZHMgYWJvdXQgcHJlLWNvbXB1dGluZyBmdWxs
-IGFkZHJlc3Nlcy4NCj4NCj4NCj4gcn4NCg==
+Le 06/02/2020 à 18:38, Eric Blake a écrit :
+> Detected by a hang in the libnbd testsuite.  If a client requests
+> multiple meta contexts (both base:allocation and qemu:dirty-bitmap:x)
+> at the same time, our attempt to silence a false-positive warning
+> about a potential uninitialized variable introduced botched logic: we
+> were short-circuiting the second context, and never sending the
+> NBD_REPLY_FLAG_DONE.  Combining two 'if' into one 'if/else' in
+> bdf200a55 was wrong (I'm a bit embarrassed that such a change was my
+> initial suggestion after the v1 patch, then I did not review the v2
+> patch that actually got committed). Revert that, and instead silence
+> the false positive warning by replacing 'return ret' with 'return 0'
+> (the value it always has at that point in the code, even though it
+> eluded the deduction abilities of the robot that reported the false
+> positive).
+> 
+> Fixes: bdf200a5535
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> 
+> It's never fun when a regression is caused by a patch taken through
+> qemu-trivial, proving that the patch was not trivial after all.
+
+trivial doesn't mean not reviewed...
+The patch v1 was trivial, the v2 wasn't.
+
+> 
+>  nbd/server.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/nbd/server.c b/nbd/server.c
+> index 87fcd2e7bfac..11a31094ff83 100644
+> --- a/nbd/server.c
+> +++ b/nbd/server.c
+> @@ -2384,15 +2384,23 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+>                                                 !client->export_meta.bitmap,
+>                                                 NBD_META_ID_BASE_ALLOCATION,
+>                                                 errp);
+> -            } else {              /* client->export_meta.bitmap */
+> +                if (ret < 0) {
+> +                    return ret;
+> +                }
+> +            }
+> +
+> +            if (client->export_meta.bitmap) {
+>                  ret = nbd_co_send_bitmap(client, request->handle,
+>                                           client->exp->export_bitmap,
+>                                           request->from, request->len,
+>                                           dont_fragment,
+>                                           true, NBD_META_ID_DIRTY_BITMAP, errp);
+> +                if (ret < 0) {
+> +                    return ret;
+> +                }
+>              }
+> 
+> -            return ret;
+> +            return 0;
+>          } else {
+>              return nbd_send_generic_reply(client, request->handle, -EINVAL,
+>                                            "CMD_BLOCK_STATUS not negotiated",
+> 
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
