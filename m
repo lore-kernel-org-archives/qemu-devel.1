@@ -2,98 +2,88 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD6AC33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB168C33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:20:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D30EB214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:19:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B0E1214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:20:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmlWijkq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30EB214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TOqXk+AU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B0E1214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izlkA-0007KL-0I
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:19:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58206)
+	id 1izlkw-00007t-M4
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:20:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58387)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izljO-0006VX-Lf
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:18:27 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1izljz-0007Os-FH
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izljM-0008Ng-Jq
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:18:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48019
+ (envelope-from <dgilbert@redhat.com>) id 1izljx-0001Pc-ST
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:19:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41340
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izljM-00085M-Cc
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:18:24 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1izljx-0001N0-O8
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:19:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581013101;
+ s=mimecast20190719; t=1581013141;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=djLhxZadw2RbaFF924unvfVyj7m+RdR/UMqJH+VPMDE=;
- b=ZmlWijkqHiTReLYr7TomsaTgovMDMEw12//f1w9ciXGQJVk5lTP/7THiGnNZzZ4cRoWt1C
- DgASqtfKqw/Kr0zu45Lmz94YgiTWB7xibai736yKsf7P2gCiXHRH0wK324dNfrLkvooG8a
- zmiipgd35ysDG0Vt3kzcfvQtQX+Wr5w=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-KJfzTEbyN16ERmLlPsHmyw-1; Thu, 06 Feb 2020 13:18:19 -0500
-Received: by mail-wr1-f71.google.com with SMTP id x15so3892851wrl.15
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 10:18:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bA55/hCXTgrpMCN2OUA8J8vblTWKHvoba7+0LQs+YTM=;
- b=ZBU6tl4ObZyDt8QEb1Koz9aU02wnw9sT9kCYmPFybFkw0+V5uV/a2q9bfhV7uJQ84p
- DkQ54/ZwJYh+4D/RiOKWIZ/XXxbYGEIvPuOT9SGcWyEii/d96PSfEKRgsX7kqOeKOu82
- E+C/tQCh99jNCcJkPJhPwbB5p2q4lGdCz4KrQkINah0SgAw4sAdTYn2ydxR2wfdLMLPu
- NxR4EFQCdrTdo7dxQedA4pbMK5yss0YSydxvod/WSNmfiLj6gWrdRP+CB+8H4jimzkrA
- QKxjfvbFt0faTfA6/iI10teJ3zChGZDpFmwB0zcTLKlfVA2ksZVIY8tvnRZHBFsXNNsb
- va+Q==
-X-Gm-Message-State: APjAAAVRzYu9QTiAgSsvF3WEhH9LAaJvNlhRx38kUtXa6amRkW4FoeoJ
- ep5H8qGmDM59lkl5H8174MK0LDIjtu60bPZx1zZzu+gj/EBj88M6HpNZ0xQ0WSU2cS8AUV3mOyI
- IyafEC8yI9YR+h8U=
-X-Received: by 2002:a1c:638a:: with SMTP id x132mr5777299wmb.43.1581013098115; 
- Thu, 06 Feb 2020 10:18:18 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzXkBKz1jHKDTxrQL87ZX2P+PW/GMn/ESpu2WsMvhBbUt3AHlCueYztzzmE84hmvq9hv7r+ag==
-X-Received: by 2002:a1c:638a:: with SMTP id x132mr5777281wmb.43.1581013097890; 
- Thu, 06 Feb 2020 10:18:17 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id v12sm115030wru.23.2020.02.06.10.18.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 10:18:17 -0800 (PST)
-Subject: Re: [PATCH 1/2] tests/vhost-user-bridge: move to contrib/
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20200206173631.752092-1-lvivier@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7b4a568c-06fe-579a-8f44-649987af904c@redhat.com>
-Date: Thu, 6 Feb 2020 19:18:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=ASPjptcycQvfYD9VSyp5SVH2V6vSXO+5fG95WXM7lBI=;
+ b=TOqXk+AUKzfKQfUp6NaQ0N0uvakRQ/EuXHgklpV4yEvw2QJes5r/T1uTZUqUQjnn84Lp8w
+ mYUdacVeju0zwuhTuNossnRw/5r4pa8I28rJE8rpn/wgHZD6eJweS1QMuucLAs+ZQmJtnl
+ 0t2/XcnX+FIEYvfj9lBbCI7BTbAYIrc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-9Gt6LXvlNUeAhdjTknvcPw-1; Thu, 06 Feb 2020 13:18:52 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD4BA189F768;
+ Thu,  6 Feb 2020 18:18:48 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.75])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AD5785DA7C;
+ Thu,  6 Feb 2020 18:18:38 +0000 (UTC)
+Date: Thu, 6 Feb 2020 18:18:36 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: qmp-shell for GSoC/Outreachy?
+Message-ID: <20200206181836.GK3655@work-vm>
+References: <20200123190145.GI657556@redhat.com>
+ <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
+ <20200124095027.GA824327@redhat.com>
+ <20200127143505.GD5669@linux.fritz.box>
+ <20200127202925.GE3419@work-vm>
+ <20200128105932.GC6431@linux.fritz.box>
+ <20200205130946.GC5768@dhcp-200-226.str.redhat.com>
+ <a45df5ab-3cad-0fbe-901f-4bc1ba28d38e@redhat.com>
+ <20200205194944.GP3210@work-vm> <877e10xdd6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20200206173631.752092-1-lvivier@redhat.com>
-Content-Language: en-US
-X-MC-Unique: KJfzTEbyN16ERmLlPsHmyw-1
+In-Reply-To: <877e10xdd6.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 9Gt6LXvlNUeAhdjTknvcPw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,118 +95,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/6/20 6:36 PM, Laurent Vivier wrote:
-> vhost-user-bridge is not a test. Move it to contrib/ and
-> add it to the tools list.
+* Markus Armbruster (armbru@redhat.com) wrote:
+  That I wrote:
+> >
+> > I believe it should be a python shell with added commands.
+> >
+> > Simple things should be simple.
+> >   e.g. adding a disk from a local file should be trivial.
+> >
+> > Complex things can be complex - but it would be better if they were
+> > simple.
+> >
+> >   It's OK if the worst case of a blockdev is a bit hairy, but
+> >   watch out for cases where the hairyness creeps in unnecessarily.
 >=20
-> It will be built only if tools (--enable-tools) and
-> vhost-user (--enable-vhost-user) are enabled (both are set
-> by default).
+> Designing interfaces to complex machinery is hard.  Experience tells
+> that we do okay when we focus on the building blocks first.  That's
+> -blockdev.  When we start with trying to make simple things simple, we
+> end in swamps.  That's -drive.
 >=20
-> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->   Makefile                                                      | 3 +++
->   Makefile.objs                                                 | 1 +
->   configure                                                     | 3 +++
->   contrib/vhost-user-bridge/Makefile.objs                       | 1 +
->   tests/vhost-user-bridge.c =3D> contrib/vhost-user-bridge/main.c | 0
->   tests/Makefile.include                                        | 1 -
->   6 files changed, 8 insertions(+), 1 deletion(-)
->   create mode 100644 contrib/vhost-user-bridge/Makefile.objs
->   rename tests/vhost-user-bridge.c =3D> contrib/vhost-user-bridge/main.c =
-(100%)
-
-Please update the comment in docs/devel/migration.rst too:
-
-   ... and the `vhost-user-bridge` (in `tests/`) and ...
-
-by "(in `contrib/`)".
-
-With docs/devel/migration.rst updated:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
+> Focus on building blocks is of course no excuse for unnecessary
+> hairiness.
 >=20
-> diff --git a/Makefile b/Makefile
-> index 461d40bea6c2..23342a433e11 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -442,6 +442,7 @@ dummy :=3D $(call unnest-vars,, \
->                   libvhost-user-obj-y \
->                   vhost-user-scsi-obj-y \
->                   vhost-user-blk-obj-y \
-> +                vhost-user-bridge-obj-y \
->                   vhost-user-input-obj-y \
->                   vhost-user-gpu-obj-y \
->                   qga-vss-dll-obj-y \
-> @@ -672,6 +673,8 @@ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) li=
-bvhost-user.a
->   =09$(call LINK, $^)
->   vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
->   =09$(call LINK, $^)
-> +vhost-user-bridge$(EXESUF): $(vhost-user-bridge-obj-y) libvhost-user.a
-> +=09$(call LINK, $^)
->  =20
->   rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
->   rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 26b9cff95436..0240100b9a17 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -109,6 +109,7 @@ vhost-user-scsi.o-cflags :=3D $(LIBISCSI_CFLAGS)
->   vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
->   vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
->   vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
-> +vhost-user-bridge-obj-y =3D contrib/vhost-user-bridge/
->   rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
->   vhost-user-input-obj-y =3D contrib/vhost-user-input/
->   vhost-user-gpu-obj-y =3D contrib/vhost-user-gpu/
-> diff --git a/configure b/configure
-> index 115dc38085f3..0415eb5c99d3 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6223,6 +6223,9 @@ if test "$want_tools" =3D "yes" ; then
->     if [ "$curl" =3D "yes" ]; then
->         tools=3D"elf2dmp\$(EXESUF) $tools"
->     fi
-> +  if [ "$vhost_user" =3D "yes" ]; then
-> +      tools=3D"vhost-user-bridge\$(EXESUF) $tools"
-> +  fi
->   fi
->   if test "$softmmu" =3D yes ; then
->     if test "$linux" =3D yes; then
-> diff --git a/contrib/vhost-user-bridge/Makefile.objs b/contrib/vhost-user=
--bridge/Makefile.objs
-> new file mode 100644
-> index 000000000000..36a8d9b49a05
-> --- /dev/null
-> +++ b/contrib/vhost-user-bridge/Makefile.objs
-> @@ -0,0 +1 @@
-> +vhost-user-bridge-obj-y =3D main.o
-> diff --git a/tests/vhost-user-bridge.c b/contrib/vhost-user-bridge/main.c
-> similarity index 100%
-> rename from tests/vhost-user-bridge.c
-> rename to contrib/vhost-user-bridge/main.c
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 2f1cafed720d..78cdbe91aed5 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -586,7 +586,6 @@ include $(SRC_PATH)/tests/qtest/Makefile.include
->  =20
->   tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
->   tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
-> -tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-=
-obj-y) libvhost-user.a
->  =20
->   SPEED =3D quick
->  =20
+> It's also no reason not to build more convenient things on top of the
+> building blocks.  I doubt they should go into QMP, though.
+
+I see where you're coming from, but I like -drive - it's simple for
+simple things; maybe it's a nightmare for some others, but if I just
+want a VM with a disk on virtio, it's easy.
+
+But I agree if you have good building blocks and they're easy to
+understand and easy to represent, it's not a bad start.
+
+> > If the user screwsup, it should give an error that prompts the user
+> > to the parameter they got wrong.
+> >
+> > Output from commands should normally be pretty formatted (with an optio=
+n
+> > to display raw json for those needing it).
+> >   e.g. that 'query-version' should give either just the package
+> >   version (as info version currently does) or:
+> >       4.2.50  Package: v4.2.0-1188-gd95a3885a9
+> >
+> > We shouldn't lose any HMP commands that some people find useful
+> >   Ditching HMP isn't an option until we've got almost all of it
+> >   covered.
 >=20
+> In particular, we currently use HMP for debugging and monitoring
+> purposes, where we don't need or want QMP's rigor, neither its rigorous
+> interface stability, nor its structured I/O.  We want the "whipuptitude"
+> we get from monitor_printf().  This is actually a point David has made
+> several times.
+>=20
+> To have a qmp-shell replace HMP, I think it needs to be able to
+>=20
+> * Go beyond 1:1
+>=20
+>   We tried a 1:1 mapping between HMP and QMP commands, and it didn't
+>   work out.  HMP's replacement should let us build convenient commands
+>   from QMP building blocks.
+>=20
+>   We tried a 1:1 mapping between HMP and QMP command arguments, guided
+>   by @args_type.  Worked out for simple cases, but was too constricting.
+
+Yes, it works for some things.
+
+> * Preserve "whipuptitude" [David]
+>=20
+>   I figure that means allowing some in QMP.  Without compromising its
+>   core mission, of course.
+>=20
+> * As discoverable as HMP is now [Kevin]
+>=20
+> * Help, completion and such at least on par with what HMP provides now
+>=20
+> Highly desirable:
+>=20
+> * Support transitioning to the machine interface [John]
+>=20
+>   Let humans start playing with the human interface, and when they feel
+>   the need to automate, help them transition to QMP.
+>=20
+> Back to John's question on qmp-shell syntax, which hasn't been answered
+> so far.
+>=20
+> JSON is a data-interchange format.  It doesn't try to be a configuration
+> format or programming language syntax for human use.  It gets pressed
+> into these roles with entirely predictable poor results.
+>=20
+> Pain points of JSON include having to count parenthesises and having to
+> quote so bloody much.  Additional QMP pain points include long names and
+> excessive nesting.
+
+Some other pet hates:
+  a) Number formats are awful for our uses
+  b) Lack of room for comments
+
+> For the configuration format role, more usable alternatives exist.  YAML
+> is a popular one.
+>=20
+> qmp-shell is a REPL.  It needs a REPL-friendly syntax.  I doubt YAML is
+> or even tries to be REPL-friendly.  I'd love to be wrong; the first rule
+> of language design is "don't".
+>=20
+> Other language suggestions?
+
+While I hate XML, there's a certain niceness in using the same thing as
+libvirt for places that mean the same thing; but that would have the bad
+requirement that things meant *exactly* the same thing.
+
+But, for machine representations, I'm not sure moving away from JSON is
+a requirement.
+
+Dave
+
+> On making JSON suck less in this role:
+>=20
+> LISP REPLs demonstrate that computers can assist effectively with
+> counting parenthesises, and with completing long names.
+>=20
+> We could make quoting optional for sufficiently nice object member
+> names.  QAPI naming rules ensure niceness, actually.
+>=20
+> We could make quoting optional for certain string literals.  Simple
+> enough for literals that can only be a string, like abc.  For literals
+> that could be something else like 123 or true, omitting quotes creates
+> ambiguity.  When the schema accepts only one of the possible types, the
+> ambiguity goes away.  Complexity stays, however.
+>=20
+> Excessive nesting should ideally be attacked in QMP itself, but backward
+> compatibility makes that hard.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
