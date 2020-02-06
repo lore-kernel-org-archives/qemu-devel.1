@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4D2C33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FDFFC33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:42:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BD9F20838
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:40:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 713E620659
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 17:42:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hc/R2JNs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BD9F20838
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wQT2Bzz9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 713E620659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izl8q-0003zz-4s
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 12:40:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43572)
+	id 1izlAC-0006cZ-Jp
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 12:42:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1izl05-0006o9-C4
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:39 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1izl07-0006on-7k
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1izl01-0006cV-L5
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:37 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:33091)
+ (envelope-from <peter.maydell@linaro.org>) id 1izl05-0006oH-AT
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:39 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:35044)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1izkzy-0006GT-Qa
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:31 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id u6so8240253wrt.0
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 09:31:27 -0800 (PST)
+ id 1izl03-0006Yw-Cp
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 12:31:35 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id b17so1013331wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 09:31:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8Q3qcfVtQBbM2YwOrLV7NuxogQrx/IXYuo0cjcWYW7M=;
- b=Hc/R2JNsdYlv7+ZPYvbd3MSd4KU3dDiu0mQTAw/VnmRWvO88hwjmWMUj+dagJ5TCRi
- vXpc3rmg7+h/MRr0cPcZiHcnMwUrp7K7QEtkDYTo4OjiHgsz43jgo/ZKQanSxNxG0Byn
- V2Sjn7iUKAkoZOP8CDGBWkWVc4thOO0dz780/d79IU2W+b8L95XtDLxQ5BtedGbs3TyP
- 4MxeEzFQE1o61HQN9vpBfcHuZ8uup4X7MWwL3i0G7ha9cb86ZBCf33ipftIoy3MKvj8W
- KTyVXqYNQgF0DWMT+0Ukq97t9iwDMwon+sMaG0vir5LYMcXQMckyaaE7Yz8hnZHMnrEc
- pWNQ==
+ bh=m1bLOghX51x85KpGQ8LubXbMWazawtflU6lC5+ETOt0=;
+ b=wQT2Bzz9jNy8iLOdroBgTf7SntlkB0ipMeBC6LwtXQO+3zjL7QRL971LsiynI8r6/l
+ SBgcAXuTGmeCFDEXufv6A3rO/eIQ4Lj/eFrts8IVCYa6qiEwj1rP2H4uha8Dk16nx9x+
+ uMJk1xaOpd0D5JcHLorTYHtPRE5q+OZ6OSvyKGYrPXngpbEipNk97ZvMZKwfb3iW7ybQ
+ dAEIUpr9/Yt9PaJwnWjLrVAcSCIsmdnr/QOmDoOAB9YSXS2+JTAZ7m8SxnsrvTxM00EQ
+ AVtUK35x83yjxfmx9c6oo5nVnJ+YOShXsSc4uRR4mu+6bhpWO6lgKexV0YK358f/Vr9E
+ pzxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8Q3qcfVtQBbM2YwOrLV7NuxogQrx/IXYuo0cjcWYW7M=;
- b=RiB3blWlZz54t4Tb0ohqV1VbjeeS+BgeXU1tHqOWd5bE3pFXO9U9TOlmm+UJQQJt89
- IiRZPmjKk40LuSyzaXItc71swheXdC/ZdUN3bXcfd2Kis1oUv40rbF1FP31fh0Q7P4/a
- tkQ4hX3AGKEOOrp/m6LPu5a4FOh+0FFmMbqfj2d0/TTITZjoHRycNoAcf2o+BGNqJR6n
- cldrXqapICr2uxqPDPK3AfBoqfvdIH16a3e+7hC4k6Cmxa4x6lrrwox98RzQosHZVuCe
- /TJ8TsL3Q0MIv+BzCNur0WtKgyCzUR0Edbo3ax0fCSElyd8/9czQwW5F9TIZdqPiW+kz
- xZAA==
-X-Gm-Message-State: APjAAAWRmIkEqVOB5mVZsc9DqIzdkwDYDHM9pWvyOf6NSA0f/zJOEB+P
- vUn9Y5So2Oq2WH1h1Zf+asLWv38HWGY=
-X-Google-Smtp-Source: APXvYqze11AuYP+PUlei0byGw6RgFymLeJolzZKWWrXE+ObcbO0LcXH9DwiAgaQh2gv8lklyfY4yfg==
-X-Received: by 2002:a5d:5752:: with SMTP id q18mr5049287wrw.277.1581010285881; 
- Thu, 06 Feb 2020 09:31:25 -0800 (PST)
+ bh=m1bLOghX51x85KpGQ8LubXbMWazawtflU6lC5+ETOt0=;
+ b=SKzXFsawdu1SzVvTZ4t69ySxiPvUE/eJCvxGH9f3pc8iCGpCqDtndphu0VRe+mbsek
+ 2M2Q66dTQXFMl682/ZGndcI11QrMkOcYiPQPn8yLn/J1GMgc8Is516v7KndnvYorJCWU
+ TPQx+kw9HnHXIsCPQ1HPbv3bnnzqajnvzKAH46UOn7R0vTnu3S9WGqha222y6b5F99Iy
+ o/pgbGfZjex/LT0UWeTQ6yn999YJD3J/9zE4wE0O/AGPvwC02aCxb4lV3r+jb3CRvIgd
+ b+vnl6jkFTH3TybIl1OtzxwKr7+7Im1FsUfkOHWexEbquYz45kzTQh8KlIDtgrjdqqul
+ hs9w==
+X-Gm-Message-State: APjAAAWK4lRgJCqCSBER4KK/uA+A+swLIiNUmay1W709SkHE/KyeqLIg
+ 6J2T/f1sB3nRF/LTjgOlM1KwzN1kM3E=
+X-Google-Smtp-Source: APXvYqxbPYqAkExvaGSYMeSzXxhZIVtHvHwyhXGY4sxGd/4VGQ5IyK0qpxMAs+HgDf+sGeJFo9xZkg==
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr5576802wmk.131.1581010291851; 
+ Thu, 06 Feb 2020 09:31:31 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w15sm5204214wrs.80.2020.02.06.09.31.24
+ by smtp.gmail.com with ESMTPSA id w15sm5204214wrs.80.2020.02.06.09.31.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 09:31:25 -0800 (PST)
+ Thu, 06 Feb 2020 09:31:31 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 17/29] qapi: Add blank lines before bulleted lists
-Date: Thu,  6 Feb 2020 17:30:28 +0000
-Message-Id: <20200206173040.17337-18-peter.maydell@linaro.org>
+Subject: [PATCH 21/29] scripts/qapi: Move doc-comment whitespace stripping to
+ doc.py
+Date: Thu,  6 Feb 2020 17:30:32 +0000
+Message-Id: <20200206173040.17337-22-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200206173040.17337-1-peter.maydell@linaro.org>
 References: <20200206173040.17337-1-peter.maydell@linaro.org>
@@ -80,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42f
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,74 +101,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-rST insists on a blank line before and after a bulleted list,
-but our texinfo doc generator did not. Add some extra blank
-lines in the doc comments so they're acceptable rST input.
+As we accumulate lines from doc comments when parsing the JSON, the
+QAPIDoc class generally strips leading and trailing whitespace using
+line.strip() when it calls _append_freeform().  This is fine for
+texinfo, but for rST leading whitespace is significant.  We'd like to
+move to having the text in doc comments be rST format rather than a
+custom syntax, so move the removal of leading whitespace from the
+QAPIDoc class to the texinfo-specific processing code in
+texi_format() in qapi/doc.py.
+
+(Trailing whitespace will always be stripped by the rstrip() in
+Section::append regardless.)
+
+In a followup commit we will make the whitespace in the lines of doc
+comment sections more consistently follow the input source.
+
+There is no change to the generated .texi files before and after this
+commit.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- qapi/block-core.json | 1 +
- qapi/char.json       | 2 ++
- qapi/trace.json      | 1 +
- qapi/ui.json         | 1 +
- 4 files changed, 5 insertions(+)
+ scripts/qapi/doc.py    |  1 +
+ scripts/qapi/parser.py | 12 ++++--------
+ 2 files changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 9e878e39336..092cd8f13d9 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4757,6 +4757,7 @@
- #
- # Once the tray opens, a DEVICE_TRAY_MOVED event is emitted. There are cases in
- # which no such event will be generated, these include:
-+#
- # - if the guest has locked the tray, @force is false and the guest does not
- #   respond to the eject request
- # - if the BlockBackend denoted by @device does not have a guest device attached
-diff --git a/qapi/char.json b/qapi/char.json
-index 8a9f1e75097..6907b2bfdba 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -133,6 +133,7 @@
- # @data: data to write
- #
- # @format: data encoding (default 'utf8').
-+#
- #          - base64: data must be base64 encoded text.  Its binary
- #            decoding gets written.
- #          - utf8: data's UTF-8 encoding is written
-@@ -167,6 +168,7 @@
- # @size: how many bytes to read at most
- #
- # @format: data encoding (default 'utf8').
-+#
- #          - base64: the data read is returned in base64 encoding.
- #          - utf8: the data read is interpreted as UTF-8.
- #            Bug: can screw up when the buffer contains invalid UTF-8
-diff --git a/qapi/trace.json b/qapi/trace.json
-index 4955e5a7503..47c68f04da7 100644
---- a/qapi/trace.json
-+++ b/qapi/trace.json
-@@ -53,6 +53,7 @@
- # Returns: a list of @TraceEventInfo for the matching events
- #
- #          An event is returned if:
-+#
- #          - its name matches the @name pattern, and
- #          - if @vcpu is given, the event has the "vcpu" property.
- #
-diff --git a/qapi/ui.json b/qapi/ui.json
-index f527bbdc26e..b368401fd1d 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -935,6 +935,7 @@
- # Input event union.
- #
- # @type: the input type, one of:
-+#
- #        - 'key': Input event of Keyboard
- #        - 'btn': Input event of pointer buttons
- #        - 'rel': Input event of relative pointer motion
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index 6f1c17f71f7..96346c9b14f 100644
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -80,6 +80,7 @@ def texi_format(doc):
+     inlist = ''
+     lastempty = False
+     for line in doc.split('\n'):
++        line = line.strip()
+         empty = line == ''
+ 
+         # FIXME: Doing this in a single if / elif chain is
+diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+index 342792e4103..2196ec5de1e 100644
+--- a/scripts/qapi/parser.py
++++ b/scripts/qapi/parser.py
+@@ -422,10 +422,10 @@ class QAPIDoc(object):
+                 self._append_line = self._append_various_line
+                 self._append_various_line(line)
+             else:
+-                self._append_freeform(line.strip())
++                self._append_freeform(line)
+         else:
+             # This is a free-form documentation block
+-            self._append_freeform(line.strip())
++            self._append_freeform(line)
+ 
+     def _append_args_line(self, line):
+         """
+@@ -458,7 +458,7 @@ class QAPIDoc(object):
+                 self._append_various_line(line)
+             return
+ 
+-        self._append_freeform(line.strip())
++        self._append_freeform(line)
+ 
+     def _append_features_line(self, line):
+         name = line.split(' ', 1)[0]
+@@ -477,7 +477,7 @@ class QAPIDoc(object):
+             self._append_various_line(line)
+             return
+ 
+-        self._append_freeform(line.strip())
++        self._append_freeform(line)
+ 
+     def _append_various_line(self, line):
+         """
+@@ -500,10 +500,6 @@ class QAPIDoc(object):
+             line = line[len(name)+1:]
+             self._start_section(name[:-1])
+ 
+-        if (not self._section.name or
+-                not self._section.name.startswith('Example')):
+-            line = line.strip()
+-
+         self._append_freeform(line)
+ 
+     def _start_symbol_section(self, symbols_dict, name):
 -- 
 2.20.1
 
