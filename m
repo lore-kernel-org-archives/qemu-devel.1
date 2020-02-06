@@ -4,40 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 944D5C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 984CEC3F68F
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:05:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DC8B218AC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:00:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DC8B218AC
+	by mail.kernel.org (Postfix) with ESMTPS id 71300217F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 10:05:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71300217F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izdxX-0005FE-Ko
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:00:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54713)
+	id 1ize1v-0007B1-Ls
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 05:05:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1izdwP-00044P-ID
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:59:22 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ize0A-0006ce-Vq
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:03:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1izdwK-0005WU-HU
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 04:59:21 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:36797)
+ (envelope-from <laurent@vivier.eu>) id 1ize08-0007Ao-J2
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 05:03:14 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:43651)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1izdwK-0005Gr-8Z; Thu, 06 Feb 2020 04:59:16 -0500
+ id 1ize04-0006jL-Up; Thu, 06 Feb 2020 05:03:09 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MCsLu-1iqoEZ1UJM-008oJT; Thu, 06 Feb 2020 10:59:11 +0100
-Subject: Re: [PATCH] hw/bt: Remove empty Kconfig file
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20200123064525.6935-1-thuth@redhat.com>
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MOAmt-1jAKI20LGb-00OY9s; Thu, 06 Feb 2020 11:03:03 +0100
+Subject: Re: [PATCH] hw/i386/vmmouse: Fix crash when using the vmmouse on a
+ machine without vmport
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+References: <20200129112954.4282-1-thuth@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,34 +84,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <37d524a2-a67e-6eca-f75e-f9014c4d36b9@vivier.eu>
-Date: Thu, 6 Feb 2020 10:59:10 +0100
+Message-ID: <6f5abb31-7b4b-7ffd-ce08-edbc8ba96845@vivier.eu>
+Date: Thu, 6 Feb 2020 11:03:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200123064525.6935-1-thuth@redhat.com>
+In-Reply-To: <20200129112954.4282-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:nDPPkRfjEjaBvHzc2/brdD4FNmE81aq6kWYQk9UQcMsMHedMXUW
- 4uns5E3088Wj9zfNy89R2cMCBTDGYO2LRUBl3hRKax1d66FgfC70hQFd1f54+7XkA1QerNs
- p+ssFR8NEf01iNe4JB4V1Eyn8bWkxg01ymjNqB6uP7R+JenWVPihhljMNK2CvBY/w4r16rY
- rQUBcNE1asN45MGIqwt2A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ne37KLy3NBk=:sk+tu1jgfJSWCHPktWMU/n
- 0IClP6R500ux970pZlvf5iqotLhbiGxuPA8mh+q2hje30eqF0IMKYVjBGa5vH0jM44f2uIoM6
- Bg0LiNfjStaeOTvsnB4MH7lh4tZg+YC6yWAj8Ecr+AekcvCMSyA/Ilj7fEsVZV2FgJcHrDp0L
- wjyDQZ1ovOaHbUcRFDXIz+30lSzDSDt8IzHBlfZu49Fu9gLueS0BSX6AXEuz+hOYuOzLLfntr
- jLgb3rDxozW/w0sjUK0DpPMrxOiQMUVhFjryOWRJ9FHFowqvFF/wGggMrqqzkNEhcaHNUfSc4
- URZHOdd08/Guq4wmbDHgs9QoUllSKy1ijjyWgIO/cFxFKMaIuHhTD8jGCKt54hGtq+4D7J0qE
- cT1afcUTMYh9RmjNaCulXLioN9HxVQ9miicHWagC/aZRrHz2vk0Op+ev61PVrbSvkBA/aOw/5
- 8Hwk6QCnw9FVS4zDXlxeOcoGL21nLPuAOp9c31kkVfcffopqRj49vfDlbExT62aC3IwbTTE9J
- gU5QE1xNkIQ+Dt8zO0OaFUDVY1QnDZVGMXpRUz+qUzSUuTHNS+ZaguI+as6vWk4Sw5o/hQQtf
- eBWuxcz0DA+t+i6V0b5bNKT+peGTJpvOoEbAJ9oA0/iZ+vRaIH2H9vJk0fb83hQ3BX/ZOIZWQ
- YrTRuoxW1m8Fp10+1YqmfzgtWnrl0l2/BVitUyKwZRWUJk+tQdD3rLeMgJLUmWqfcwKQJj6HO
- QHTvhsOqe23VYAMHd7SLoZAGZKCNvsluA3pZy8knhtFOWtZlJit4iko+wzwx5oTtqxPA7GiW7
- XbjBARcrgKpsvXrsozp9AJlPTI7ho6RKC9sBx+Z0lYtjHGwkCPgJJJR6/yhcn8mEoc2mSqu
+X-Provags-ID: V03:K1:b9TXFAkYUh1iWgIVrl48m4Dklwt6SOCkdLjSzsGuwO+MPhZY9BB
+ FWkAZ/YpvGZtcGdcmrst4hvvz9/H3YvPjAdOpmsMTbx1HvDhm08dWspiE0NbWHPWeh3Zu6K
+ qoO0PA2sbFJVK+yeBBuu7DDFKZ2VwP7uoiGFqgPVp5eH4/AUjdfTSXxmYwbz5RD8V+GrjnT
+ NNhtI8fabGAerDT1z576w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:DIVCMzgIVos=:XKCUWbujWNMj216c9EQdK3
+ Mj7qFo6hKXv4apejbZcKwEz5Oe6we7YLrJx6rjiJM4zlgjGWP9tl6tHKkF6zAdbR1b0y/2dp4
+ Cu+IVhjV38Mpy4gGYb8nCcIx1DGQv/hfXtN/FFJ5tPcJ6BUlH+M0CmS4+ndNuRUrcHDg98UgJ
+ XXMDJbwz7hUOrd2nqeSaGE3DJX627sZIDgfD7OOCt8giKD1jxo3rdWnTE024b3xFGpF2P3RVJ
+ Bypcshna5VQpr1qQ8CSs5p3SP8SZ9AB67mTqtRiPPuG64ip0qYOenJmuusvIIk3ZAdjFX3gtD
+ KQ4Ixza+TzwJYZ/TwzAWljv5JhCAA4V2clMLqeTIdtfEYRK20W3aIOVoTwalK4cKdtoAJMBhR
+ tC6RDd64IvNJYxNqYznrz5ETcKd/JF/hkERCREg8fsJ7H7NQPY0dsep/T1J5ale5ohHJvLYdW
+ oOW0HJSvDVjVzHumzz6inG+JFVBn7DztUE8lxEy0SFMOExOo/vA7Z9nKMRAHEZtNm34ojvJXK
+ z/4dE476uMs3NtgghDUHQPCRjVCrf848izP8UIA2YTcWh7CCSpqYgOArWOkFZuaQKJvseS+Ax
+ tAaACQKVTWUxFuRzDlhFegpTeHEaxiCHqTqmuUkl6qd9/oyx+qpPJ696cQJ1SV+a4bFtR1ZZt
+ 2XsB3j+lCWdSrjP4yfeQd5kJQL/do7dcWZdPDkUO1HBbC39QaNbeUyKNUMjX6zSyXTKHk7YVX
+ AHn5yWugMfQX3TARKm84M1T9gTEDMweX/zY0r9vpLRoQ5fvMu+GBpr8TWR/MKMHbBnUYaIhW+
+ rO/7qcjIbAhVmMHo4kuuTWIms25mTmeh1vRzBTJ6xOttf1/rI9/VETHUF9ezPYJmoQntFNB
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
+X-Received-From: 212.227.17.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,30 +123,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 23/01/2020 à 07:45, Thomas Huth a écrit :
-> While removing the bluetooth code some weeks ago, I had to leave the
-> hw/bt/Kconfig file around. Otherwise some of the builds would have been
-> broken since the generated dependency files tried to include it before
-> they were rebuilt. Meanwhile, all those dependency files should have
-> been updated, so we can remove the empty Kconfig file now, too.
+Le 29/01/2020 à 12:29, Thomas Huth a écrit :
+> QEMU currently crashes when the user tries to use the "vmmouse" on a
+> machine without vmport, e.g.:
+> 
+>  $ x86_64-softmmu/qemu-system-x86_64 -machine microvm -device vmmouse
+>  Segmentation fault (core dumped)
+> 
+> or:
+> 
+>  $ x86_64-softmmu/qemu-system-x86_64 -device vmmouse -M pc,vmport=off
+>  Segmentation fault (core dumped)
+> 
+> Let's avoid the crash by checking for the vmport device first.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/bt/Kconfig | 0
->  1 file changed, 0 insertions(+), 0 deletions(-)
->  delete mode 100644 hw/bt/Kconfig
+>  hw/i386/vmmouse.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> diff --git a/hw/bt/Kconfig b/hw/bt/Kconfig
-> deleted file mode 100644
-> index e69de29bb2..0000000000
+> diff --git a/hw/i386/vmmouse.c b/hw/i386/vmmouse.c
+> index 7c2a375527..e8e62bd96b 100644
+> --- a/hw/i386/vmmouse.c
+> +++ b/hw/i386/vmmouse.c
+> @@ -23,6 +23,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qapi/error.h"
+>  #include "ui/console.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/input/i8042.h"
+> @@ -269,6 +270,11 @@ static void vmmouse_realizefn(DeviceState *dev, Error **errp)
+>  
+>      DPRINTF("vmmouse_init\n");
+>  
+> +    if (!object_resolve_path_type("", TYPE_VMPORT, NULL)) {
+> +        error_setg(errp, "vmmouse needs a machine with vmport");
+> +        return;
+> +    }
+> +
+>      vmport_register(VMMOUSE_STATUS, vmmouse_ioport_read, s);
+>      vmport_register(VMMOUSE_COMMAND, vmmouse_ioport_read, s);
+>      vmport_register(VMMOUSE_DATA, vmmouse_ioport_read, s);
 > 
-
-Reviewed-by: Laurent Vivier <laurent@vivier.Eu>
 
 Applied to my trivial-patches branch.
 
