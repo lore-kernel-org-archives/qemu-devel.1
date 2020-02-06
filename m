@@ -7,73 +7,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F7AC35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F5EBC35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:42:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E42D021775
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:42:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0926121775
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 21:42:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7JM02X5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E42D021775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RTIvHjlk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0926121775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izoua-0007Bp-2e
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 16:42:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34985)
+	id 1izovH-0007yC-7y
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 16:42:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35064)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1izobU-0002WI-Dk
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:32 -0500
+ (envelope-from <philmd@redhat.com>) id 1izobm-0003Ie-Vc
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1izobR-0000VT-Jo
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:28 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49872
+ (envelope-from <philmd@redhat.com>) id 1izobk-0001ch-KS
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:46 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29715
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izobR-0000Td-Eh
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:25 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izobk-0001bN-Ea
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 16:22:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581024145;
+ s=mimecast20190719; t=1581024164;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CoJGHbJBpGeoyffsS7kiX3tIUk0FFd5akK57xqprB0U=;
- b=A7JM02X5Ap1V7YvUxd0LAzbqmf5LHNC6yhfaSCko9yB8UXh3qeOSZjf+0FB6MczGjUJEzo
- b2z/sIXgzVtQPRRGchv/bzkyz/7hMYchStZCSh5WFyxz61DPIvR+v6PWtenxbxFz1+/oBG
- VWQjYHE2kvsyRvSz/jZRAe+Ww+RFSZk=
+ bh=dUSXKrtwOekH1mW+ygscHj3ERS1jNGvAJjomSRRjHH8=;
+ b=RTIvHjlkpRW61wzYxTohYlPwxI4V5ddddE7IPRrU5F9qrpkkauLW88lDrwouoM9w/w0RkY
+ 6ze/nk1FPRwk9HHPkV3lnFmSddKDVZUacxNIWYEWrGD57JJrBVI1JFAMlYY0f5iw4cKq33
+ 9rVQpMBR8kk3v6VI5oB3rRY8CPn1i34=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-WhKg-5tjNIqJq0UvKfIdCA-1; Thu, 06 Feb 2020 16:22:23 -0500
+ us-mta-229-fASoa701O9Kwsva8W5SAjQ-1; Thu, 06 Feb 2020 16:22:42 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5ADC11835A14;
- Thu,  6 Feb 2020 21:22:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9DE48018A2;
+ Thu,  6 Feb 2020 21:22:40 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-120.brq.redhat.com [10.40.204.120])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9BB9460BEC;
- Thu,  6 Feb 2020 21:22:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5636060BEC;
+ Thu,  6 Feb 2020 21:22:35 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 37/46] scripts/tracetool: Remove shebang header
-Date: Thu,  6 Feb 2020 22:19:27 +0100
-Message-Id: <20200206211936.17098-38-philmd@redhat.com>
+Subject: [PULL 40/46] tests/qemu-iotests: Explicit usage of Python3 (scripts
+ without __main__)
+Date: Thu,  6 Feb 2020 22:19:30 +0100
+Message-Id: <20200206211936.17098-41-philmd@redhat.com>
 In-Reply-To: <20200206211936.17098-1-philmd@redhat.com>
 References: <20200206211936.17098-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: WhKg-5tjNIqJq0UvKfIdCA-1
+X-MC-Unique: fASoa701O9Kwsva8W5SAjQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,279 +87,422 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
  Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Use the program search path to find the Python 3 interpreter.
+
 Patch created mechanically by running:
 
-  $ chmod 644 $(git grep -lF '#!/usr/bin/env python' \
-      | xargs grep -L 'if __name__.*__main__')
-  $ sed -i "/^#\!\/usr\/bin\/\(env\ \)\?python.\?$/d" \
+  $ sed -i "s,^#\!/usr/bin/\(env\ \)\?python$,#\!/usr/bin/env python3," \
       $(git grep -lF '#!/usr/bin/env python' \
       | xargs grep -L 'if __name__.*__main__')
 
 Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200130163232.10446-9-philmd@redhat.com>
+Message-Id: <20200130163232.10446-11-philmd@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- scripts/tracetool/__init__.py                    | 1 -
- scripts/tracetool/backend/__init__.py            | 1 -
- scripts/tracetool/backend/dtrace.py              | 1 -
- scripts/tracetool/backend/ftrace.py              | 1 -
- scripts/tracetool/backend/log.py                 | 1 -
- scripts/tracetool/backend/simple.py              | 1 -
- scripts/tracetool/backend/syslog.py              | 1 -
- scripts/tracetool/backend/ust.py                 | 1 -
- scripts/tracetool/format/__init__.py             | 1 -
- scripts/tracetool/format/c.py                    | 1 -
- scripts/tracetool/format/d.py                    | 1 -
- scripts/tracetool/format/h.py                    | 1 -
- scripts/tracetool/format/log_stap.py             | 1 -
- scripts/tracetool/format/simpletrace_stap.py     | 1 -
- scripts/tracetool/format/stap.py                 | 1 -
- scripts/tracetool/format/tcg_h.py                | 1 -
- scripts/tracetool/format/tcg_helper_c.py         | 1 -
- scripts/tracetool/format/tcg_helper_h.py         | 1 -
- scripts/tracetool/format/tcg_helper_wrapper_h.py | 1 -
- scripts/tracetool/format/ust_events_c.py         | 1 -
- scripts/tracetool/format/ust_events_h.py         | 1 -
- scripts/tracetool/transform.py                   | 1 -
- scripts/tracetool/vcpu.py                        | 1 -
- 23 files changed, 23 deletions(-)
+ tests/qemu-iotests/149 | 2 +-
+ tests/qemu-iotests/194 | 2 +-
+ tests/qemu-iotests/202 | 2 +-
+ tests/qemu-iotests/203 | 2 +-
+ tests/qemu-iotests/206 | 2 +-
+ tests/qemu-iotests/207 | 2 +-
+ tests/qemu-iotests/208 | 2 +-
+ tests/qemu-iotests/209 | 2 +-
+ tests/qemu-iotests/210 | 2 +-
+ tests/qemu-iotests/211 | 2 +-
+ tests/qemu-iotests/212 | 2 +-
+ tests/qemu-iotests/213 | 2 +-
+ tests/qemu-iotests/216 | 2 +-
+ tests/qemu-iotests/218 | 2 +-
+ tests/qemu-iotests/219 | 2 +-
+ tests/qemu-iotests/222 | 2 +-
+ tests/qemu-iotests/224 | 2 +-
+ tests/qemu-iotests/228 | 2 +-
+ tests/qemu-iotests/234 | 2 +-
+ tests/qemu-iotests/235 | 2 +-
+ tests/qemu-iotests/236 | 2 +-
+ tests/qemu-iotests/237 | 2 +-
+ tests/qemu-iotests/238 | 2 +-
+ tests/qemu-iotests/242 | 2 +-
+ tests/qemu-iotests/246 | 2 +-
+ tests/qemu-iotests/248 | 2 +-
+ tests/qemu-iotests/254 | 2 +-
+ tests/qemu-iotests/255 | 2 +-
+ tests/qemu-iotests/256 | 2 +-
+ tests/qemu-iotests/260 | 2 +-
+ tests/qemu-iotests/262 | 2 +-
+ tests/qemu-iotests/264 | 2 +-
+ tests/qemu-iotests/266 | 2 +-
+ tests/qemu-iotests/277 | 2 +-
+ tests/qemu-iotests/280 | 2 +-
+ 35 files changed, 35 insertions(+), 35 deletions(-)
 
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-index 44c118bc2a..13d29f1e42 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -1,4 +1,3 @@
+diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
+index 8ab42e94c6..0a7b765d07 100755
+--- a/tests/qemu-iotests/149
++++ b/tests/qemu-iotests/149
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/backend/__init__.py b/scripts/tracetool/back=
-end/__init__.py
-index 259c6a6531..54cab2c4de 100644
---- a/scripts/tracetool/backend/__init__.py
-+++ b/scripts/tracetool/backend/__init__.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2016 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+index 72e47e8833..9dc1bd3510 100755
+--- a/tests/qemu-iotests/194
++++ b/tests/qemu-iotests/194
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/backend/dtrace.py b/scripts/tracetool/backen=
-d/dtrace.py
-index c2f3a4e5a8..638990db79 100644
---- a/scripts/tracetool/backend/dtrace.py
-+++ b/scripts/tracetool/backend/dtrace.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2017 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/202 b/tests/qemu-iotests/202
+index 581ca34d79..920a8683ef 100755
+--- a/tests/qemu-iotests/202
++++ b/tests/qemu-iotests/202
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/backend/ftrace.py b/scripts/tracetool/backen=
-d/ftrace.py
-index 92f71b28f9..e9844dd335 100644
---- a/scripts/tracetool/backend/ftrace.py
-+++ b/scripts/tracetool/backend/ftrace.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2017 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/203 b/tests/qemu-iotests/203
+index 4874a1a0d8..49eff5d405 100755
+--- a/tests/qemu-iotests/203
++++ b/tests/qemu-iotests/203
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/backend/log.py b/scripts/tracetool/backend/l=
-og.py
-index 33c95af8e9..23b274c0fd 100644
---- a/scripts/tracetool/backend/log.py
-+++ b/scripts/tracetool/backend/log.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2017 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+index 9f16a7df8d..e2b50ae24d 100755
+--- a/tests/qemu-iotests/206
++++ b/tests/qemu-iotests/206
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/backend/simple.py b/scripts/tracetool/backen=
-d/simple.py
-index c2fd1c24c4..b650c262b5 100644
---- a/scripts/tracetool/backend/simple.py
-+++ b/scripts/tracetool/backend/simple.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test qcow2 and file image creation
+ #
+diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
+index 812ab34e47..3d9c1208ca 100755
+--- a/tests/qemu-iotests/207
++++ b/tests/qemu-iotests/207
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/backend/syslog.py b/scripts/tracetool/backen=
-d/syslog.py
-index 668fb73fee..1373a90192 100644
---- a/scripts/tracetool/backend/syslog.py
-+++ b/scripts/tracetool/backend/syslog.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test ssh image creation
+ #
+diff --git a/tests/qemu-iotests/208 b/tests/qemu-iotests/208
+index 546eb1de3e..1c3fc8c7fd 100755
+--- a/tests/qemu-iotests/208
++++ b/tests/qemu-iotests/208
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/backend/ust.py b/scripts/tracetool/backend/u=
-st.py
-index 280cb7c106..a772a3b53b 100644
---- a/scripts/tracetool/backend/ust.py
-+++ b/scripts/tracetool/backend/ust.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2018 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/209 b/tests/qemu-iotests/209
+index e0f464bcbe..65c1a1e70a 100755
+--- a/tests/qemu-iotests/209
++++ b/tests/qemu-iotests/209
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/__init__.py b/scripts/tracetool/forma=
-t/__init__.py
-index cf6e0e2da5..aba2f7a441 100644
---- a/scripts/tracetool/format/__init__.py
-+++ b/scripts/tracetool/format/__init__.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Tests for NBD BLOCK_STATUS extension
+ #
+diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
+index 4ca0fe26ef..e49896e23d 100755
+--- a/tests/qemu-iotests/210
++++ b/tests/qemu-iotests/210
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/c.py b/scripts/tracetool/format/c.py
-index 31207961b0..78af8aff72 100644
---- a/scripts/tracetool/format/c.py
-+++ b/scripts/tracetool/format/c.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test luks and file image creation
+ #
+diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
+index 8834ebfe85..163994d559 100755
+--- a/tests/qemu-iotests/211
++++ b/tests/qemu-iotests/211
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/d.py b/scripts/tracetool/format/d.py
-index c7cb2a93a6..d3980b914b 100644
---- a/scripts/tracetool/format/d.py
-+++ b/scripts/tracetool/format/d.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test VDI and file image creation
+ #
+diff --git a/tests/qemu-iotests/212 b/tests/qemu-iotests/212
+index 8f3ccc7b15..800f92dd84 100755
+--- a/tests/qemu-iotests/212
++++ b/tests/qemu-iotests/212
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.py
-index 5596b304e6..83e1a2f355 100644
---- a/scripts/tracetool/format/h.py
-+++ b/scripts/tracetool/format/h.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test parallels and file image creation
+ #
+diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
+index 3fc8dc6eaa..1eee45276a 100755
+--- a/tests/qemu-iotests/213
++++ b/tests/qemu-iotests/213
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/log_stap.py b/scripts/tracetool/forma=
-t/log_stap.py
-index 9ab0cf2cce..b486beb672 100644
---- a/scripts/tracetool/format/log_stap.py
-+++ b/scripts/tracetool/format/log_stap.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test vhdx and file image creation
+ #
+diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
+index 3c0ae54b44..372f042d3e 100755
+--- a/tests/qemu-iotests/216
++++ b/tests/qemu-iotests/216
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/simpletrace_stap.py b/scripts/traceto=
-ol/format/simpletrace_stap.py
-index 57b04061cf..4f4633b4e6 100644
---- a/scripts/tracetool/format/simpletrace_stap.py
-+++ b/scripts/tracetool/format/simpletrace_stap.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Copy-on-read tests using a COR filter node
+ #
+diff --git a/tests/qemu-iotests/218 b/tests/qemu-iotests/218
+index 2554d84581..1325ba9eaa 100755
+--- a/tests/qemu-iotests/218
++++ b/tests/qemu-iotests/218
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/stap.py b/scripts/tracetool/format/st=
-ap.py
-index e8ef3e762d..8fc808f2ef 100644
---- a/scripts/tracetool/format/stap.py
-+++ b/scripts/tracetool/format/stap.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # This test covers what happens when a mirror block job is cancelled
+ # in various phases of its existence.
+diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
+index 655f54d881..b8774770c4 100755
+--- a/tests/qemu-iotests/219
++++ b/tests/qemu-iotests/219
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/tcg_h.py b/scripts/tracetool/format/t=
-cg_h.py
-index 1651cc3f71..0180e3d76c 100644
---- a/scripts/tracetool/format/tcg_h.py
-+++ b/scripts/tracetool/format/tcg_h.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2018 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
+index 3f9f934ad8..bf1718e179 100644
+--- a/tests/qemu-iotests/222
++++ b/tests/qemu-iotests/222
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool/f=
-ormat/tcg_helper_c.py
-index 1b3522a716..6527b69afd 100644
---- a/scripts/tracetool/format/tcg_helper_c.py
-+++ b/scripts/tracetool/format/tcg_helper_c.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # This test covers the basic fleecing workflow, which provides a
+ # point-in-time snapshot of a node that can be queried over NBD.
+diff --git a/tests/qemu-iotests/224 b/tests/qemu-iotests/224
+index b4dfaa639f..e91fb26fd8 100755
+--- a/tests/qemu-iotests/224
++++ b/tests/qemu-iotests/224
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/tcg_helper_h.py b/scripts/tracetool/f=
-ormat/tcg_helper_h.py
-index 6b184b641b..98ebe52f18 100644
---- a/scripts/tracetool/format/tcg_helper_h.py
-+++ b/scripts/tracetool/format/tcg_helper_h.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test json:{} filenames with qemu-internal BDSs
+ # (the one of commit, to be precise)
+diff --git a/tests/qemu-iotests/228 b/tests/qemu-iotests/228
+index 9a50afd205..64bc82ee23 100755
+--- a/tests/qemu-iotests/228
++++ b/tests/qemu-iotests/228
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/tcg_helper_wrapper_h.py b/scripts/tra=
-cetool/format/tcg_helper_wrapper_h.py
-index ff53447512..6adeab74df 100644
---- a/scripts/tracetool/format/tcg_helper_wrapper_h.py
-+++ b/scripts/tracetool/format/tcg_helper_wrapper_h.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test for when a backing file is considered overridden (thus, a
+ # json:{} filename is generated for the overlay) and when it is not
+diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
+index 59a7f949ec..324c1549fd 100755
+--- a/tests/qemu-iotests/234
++++ b/tests/qemu-iotests/234
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/ust_events_c.py b/scripts/tracetool/f=
-ormat/ust_events_c.py
-index 264784cdf2..deced9533d 100644
---- a/scripts/tracetool/format/ust_events_c.py
-+++ b/scripts/tracetool/format/ust_events_c.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2018 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+index 3d7533980d..760826128e 100755
+--- a/tests/qemu-iotests/235
++++ b/tests/qemu-iotests/235
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/format/ust_events_h.py b/scripts/tracetool/f=
-ormat/ust_events_h.py
-index b14054ac01..6ce559f6cc 100644
---- a/scripts/tracetool/format/ust_events_h.py
-+++ b/scripts/tracetool/format/ust_events_h.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Simple mirror test
+ #
+diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
+index 79a6381f8e..8ce927a16c 100755
+--- a/tests/qemu-iotests/236
++++ b/tests/qemu-iotests/236
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/transform.py b/scripts/tracetool/transform.p=
-y
-index 2ca9286046..8fd4dcf20d 100644
---- a/scripts/tracetool/transform.py
-+++ b/scripts/tracetool/transform.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test bitmap merges.
+ #
+diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
+index a2242a4736..50ba364a3e 100755
+--- a/tests/qemu-iotests/237
++++ b/tests/qemu-iotests/237
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
-diff --git a/scripts/tracetool/vcpu.py b/scripts/tracetool/vcpu.py
-index 452c7f589d..0b104e4f15 100644
---- a/scripts/tracetool/vcpu.py
-+++ b/scripts/tracetool/vcpu.py
-@@ -1,4 +1,3 @@
++#!/usr/bin/env python3
+ #
+ # Test vmdk and file image creation
+ #
+diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
+index e5ac2b2ff8..d4e060228c 100755
+--- a/tests/qemu-iotests/238
++++ b/tests/qemu-iotests/238
+@@ -1,4 +1,4 @@
 -#!/usr/bin/env python
- # -*- coding: utf-8 -*-
-=20
- """
++#!/usr/bin/env python3
+ #
+ # Regression test for throttle group member unregister segfault with iothr=
+ead
+ #
+diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+index c176e92da6..97617876bc 100755
+--- a/tests/qemu-iotests/242
++++ b/tests/qemu-iotests/242
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test for qcow2 bitmap printed information
+ #
+diff --git a/tests/qemu-iotests/246 b/tests/qemu-iotests/246
+index b0997a392f..59a216a839 100755
+--- a/tests/qemu-iotests/246
++++ b/tests/qemu-iotests/246
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test persistent bitmap resizing.
+ #
+diff --git a/tests/qemu-iotests/248 b/tests/qemu-iotests/248
+index f26b4bb2aa..68c374692e 100755
+--- a/tests/qemu-iotests/248
++++ b/tests/qemu-iotests/248
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test resume mirror after auto pause on ENOSPC
+ #
+diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
+index 09584f3f7d..ee66c986db 100755
+--- a/tests/qemu-iotests/254
++++ b/tests/qemu-iotests/254
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test external snapshot with bitmap copying and moving.
+ #
+diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
+index 0ba03d9e61..4a4818bafb 100755
+--- a/tests/qemu-iotests/255
++++ b/tests/qemu-iotests/255
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test commit job graph modifications while requests are active
+ #
+diff --git a/tests/qemu-iotests/256 b/tests/qemu-iotests/256
+index c594a43205..e34074c83e 100755
+--- a/tests/qemu-iotests/256
++++ b/tests/qemu-iotests/256
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test incremental/backup across iothread contexts
+ #
+diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
+index 4f6082c9d2..30c0de380d 100755
+--- a/tests/qemu-iotests/260
++++ b/tests/qemu-iotests/260
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Tests for temporary external snapshot when we have bitmaps.
+ #
+diff --git a/tests/qemu-iotests/262 b/tests/qemu-iotests/262
+index bbcb5260a6..8835dce7be 100755
+--- a/tests/qemu-iotests/262
++++ b/tests/qemu-iotests/262
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2019 Red Hat, Inc.
+ #
+diff --git a/tests/qemu-iotests/264 b/tests/qemu-iotests/264
+index 131366422b..879123a343 100755
+--- a/tests/qemu-iotests/264
++++ b/tests/qemu-iotests/264
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test nbd reconnect
+ #
+diff --git a/tests/qemu-iotests/266 b/tests/qemu-iotests/266
+index c353cf88ee..91bdf8729e 100755
+--- a/tests/qemu-iotests/266
++++ b/tests/qemu-iotests/266
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test VPC and file image creation
+ #
+diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
+index 1f72dca2d4..04aa15a3d5 100755
+--- a/tests/qemu-iotests/277
++++ b/tests/qemu-iotests/277
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Test NBD client reconnection
+ #
+diff --git a/tests/qemu-iotests/280 b/tests/qemu-iotests/280
+index 85e9114c5e..69288fdd0e 100755
+--- a/tests/qemu-iotests/280
++++ b/tests/qemu-iotests/280
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # Copyright (C) 2019 Red Hat, Inc.
+ #
 --=20
 2.21.1
 
