@@ -2,90 +2,83 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DABC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9C4C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:39:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA0CC21741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:37:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4881C21741
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:39:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FxwJlHiR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA0CC21741
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ew6wkgkq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4881C21741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izhLz-0001mf-3j
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:37:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56334)
+	id 1izhN2-0003Fo-Ef
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:39:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56831)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1izhLJ-0000zR-Pd
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:37:18 -0500
+ (envelope-from <kraxel@redhat.com>) id 1izhLw-0001td-D0
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:37:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1izhLI-0002Oo-LN
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:37:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38689
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kraxel@redhat.com>) id 1izhLv-0006VS-CX
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:37:56 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51250
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1izhLI-0002JL-Gf
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:37:16 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1izhLv-0006TV-8S
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:37:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580996235;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1580996274;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aMaPERG/mfCmSNsZmV4ZNCSbujSA6BEqyPghhq7ASy8=;
- b=FxwJlHiRcMJVUP0fB98snwDslqJlkKJUgD6uyFvHcKsL+p1qIqmifSZbIIXVRMTtTwXLMu
- 9h9CFB1/jMyB5Fh00T2SdjQwNgqToKpEAY300uPZy7A4n04JJFQS/8ypIEgfJpmdlNOg15
- 8+UBBuyTDD113KZSpGPCRRQA+lkLqSg=
+ bh=Hae5PYKk+AjoFBIxQ3ZfcWV6vduRxZUs5/edxsxEqUI=;
+ b=Ew6wkgkqRhYX6UGASLB5FHNT/bYwuWVmWVLLR2XlWTtAB6ywz7fr4BysUrlgGiETj6Zira
+ oeTC1fwyleCHuR5Su6P/r4BfiJyz7WU20jtJN3ArqOtjd2WMw1jqLL5VlFVznETGcYIgwX
+ fFfjC+XLLRjKsTmQBw9uvt1OL7Tin94=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357--Sn7L46DOyq605E2EslnlQ-1; Thu, 06 Feb 2020 08:37:08 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-384-HbbyZbNCOZmzgAzNZ_DD2w-1; Thu, 06 Feb 2020 08:37:51 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D040DB90;
- Thu,  6 Feb 2020 13:37:07 +0000 (UTC)
-Received: from redhat.com (ovpn-112-65.ams2.redhat.com [10.36.112.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3EBC726E4B;
- Thu,  6 Feb 2020 13:37:02 +0000 (UTC)
-Date: Thu, 6 Feb 2020 13:36:58 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 02/13] qcrypto-luks: implement encryption key management
-Message-ID: <20200206133658.GL2391707@redhat.com>
-References: <20200130123847.GE6438@linux.fritz.box>
- <20200130125319.GD1891831@redhat.com>
- <87zhe5ovbv.fsf@dusky.pond.sub.org>
- <20200130150108.GM1891831@redhat.com>
- <877e18oq76.fsf@dusky.pond.sub.org>
- <87mu9xxwzv.fsf@dusky.pond.sub.org>
- <20200205093011.GA5768@dhcp-200-226.str.redhat.com>
- <20200205102303.GB2221087@redhat.com>
- <87a75xgl6w.fsf@dusky.pond.sub.org>
- <87h803ua2c.fsf@dusky.pond.sub.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EFE792211;
+ Thu,  6 Feb 2020 13:37:50 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-112.ams2.redhat.com
+ [10.36.116.112])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D2FAB100032E;
+ Thu,  6 Feb 2020 13:37:49 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 75B779D7F; Thu,  6 Feb 2020 14:37:48 +0100 (CET)
+Date: Thu, 6 Feb 2020 14:37:48 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
+Subject: Re: [RFC PATCH] audio: proper support for float samples in mixeng
+Message-ID: <20200206133748.rs3ocu4jf3lorvdj@sirius.home.kraxel.org>
+References: <8a8b0b5698401b78d3c4c8ec90aef83b95babb06.1580672076.git.DirtY.iCE.hu@gmail.com>
+ <CAFEAcA_8-0wqQX8KEK_zFRufoaEQkaeaXu4DLx08KazxTZ5fxQ@mail.gmail.com>
+ <1686aa04-0dc8-c08b-bdee-565979f19023@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87h803ua2c.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: -Sn7L46DOyq605E2EslnlQ-1
+In-Reply-To: <1686aa04-0dc8-c08b-bdee-565979f19023@gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: HbbyZbNCOZmzgAzNZ_DD2w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,39 +90,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 06, 2020 at 02:20:11PM +0100, Markus Armbruster wrote:
-> One more question regarding the array in
+On Mon, Feb 03, 2020 at 09:38:39PM +0100, Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3=
+ wrote:
+> On 2020-02-03 11:00, Peter Maydell wrote:
+> > On Sun, 2 Feb 2020 at 19:39, K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.=
+ice.hu@gmail.com> wrote:
+> > >=20
+> > > This adds proper support for float samples in mixeng by adding a new
+> > > audio format for it.
+> > >=20
+> > > Limitations: only native endianness is supported.
+> >=20
+> > Could you explain a bit more what this limitation means, please?
+> > In general QEMU behaviour shouldn't depend on the endianness
+> > of the host, ie we should byteswap where necessary.
 >=20
->     { 'struct': 'QCryptoBlockAmendOptionsLUKS',
->       'data' : {
->                 'keys': ['LUKSKeyslotUpdate'],
->                  '*unlock-secret' : 'str' } }
->=20
-> Why an array?  Do we really need multiple keyslot updates in one amend
-> operation?
+> None of the virtual sound cards support float samples (it looks like most=
+ of
+> them only support 8 and 16 bit, only hda supports 32 bit), it is only use=
+d
+> for the audio backends (i.e. host side).
 
-I think it it is unlikely we'd use this in libvirt. In the case of wanting
-to *change* a key, it is safer to do a sequence of "add key" and then
-"remove key". If you combine them into the same operation, and you get
-an error back, it is hard to know /where/ it failed ? was the new key
-added or not ?
+Queued patch & added this to the commit message.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+thanks,
+  Gerd
 
 
