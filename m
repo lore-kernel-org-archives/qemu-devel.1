@@ -2,79 +2,68 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FD68C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72510C33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:56:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF63621741
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:56:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fiM+5Z4p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF63621741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4BAE821741
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 12:56:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BAE821741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izghM-0003TC-0i
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 07:56:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57218)
+	id 1izghO-0003YD-Er
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 07:56:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56637)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1izgdC-0002hA-78
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:43 -0500
+ (envelope-from <laurent@vivier.eu>) id 1izgch-0001Mf-8z
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1izgd9-00006e-Q4
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44385
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <laurent@vivier.eu>) id 1izgce-0006Mq-96
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:11 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:57897)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1izgd9-0008UK-MC
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 07:51:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580993499;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GfhWKSPujBhyPDKoAjyuD6mRn/QZgvQar/qO4t/5+O4=;
- b=fiM+5Z4pKm/ZK9NqSYk+uDymjemGGh+yP6bQc+yXwZMcF1e3DLkCFWe4zz+CTwtpiJo1Ma
- aREmAqwK3GsBatQZfQgZSyakv68VfEijSFyqbwNd3fbJw49o1NKbd73C4NvZgHeBdsHHJa
- WvwdVwwMI2EPtuZNoh0uzqz7kuHmC0o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-ajy2vLtDNJ6WlNLcnvC8uw-1; Thu, 06 Feb 2020 07:51:37 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333AB7A136;
- Thu,  6 Feb 2020 12:51:36 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.15])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C831D26FB0;
- Thu,  6 Feb 2020 12:51:35 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 01/17] qcow2: Assert that host cluster offsets fit in L2 table
- entries
-Date: Thu,  6 Feb 2020 13:51:16 +0100
-Message-Id: <20200206125132.594625-2-mreitz@redhat.com>
-In-Reply-To: <20200206125132.594625-1-mreitz@redhat.com>
-References: <20200206125132.594625-1-mreitz@redhat.com>
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1izgcW-00060H-G7; Thu, 06 Feb 2020 07:51:00 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MWitM-1j1zws2frE-00X8C7; Thu, 06 Feb 2020 13:50:46 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 08/12] qemu-options: replace constant 1 with HAS_ARG
+Date: Thu,  6 Feb 2020 13:50:23 +0100
+Message-Id: <20200206125027.1926263-9-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200206125027.1926263-1-laurent@vivier.eu>
+References: <20200206125027.1926263-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: ajy2vLtDNJ6WlNLcnvC8uw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:oUS9/CdvOMTgMQUxXzkvMUnhIKE+wbz8rdCq2y0WIs9E41NNsNp
+ z7d1JpcONN9ivWLRIapo/5quaJv6DrNIaKZhhJwRV7vP/k5OX3aKs9+Lt4LyCf9YrNOIOd2
+ pD0rgm5Oa9kTJdxp7craCW7YYT2zYcPnrvQo+5IP8dtR9Ffw62AKYCvlGHRBAWpjgtb9R/X
+ BoIZL4WhNC2YlTkt6BXiw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:oCwD7SN5neA=:iogWmR6DI49knC4Kql8lrV
+ qb2ZwyQK8f1kCwAYiNIK85dPEBIsxLFMxigtpoWedagIzXgebvoEIUfkcnDWO9vTwQIKWQvIK
+ Yp42cUwMezy8fX+9kei9Kv4R2OQQphB86nC3HJO1EiSp7rnujPeH2tm6PLETYfLEk+OBpIp1Z
+ WfnKCtZI0G2dtUPVsQnm+/kDWPuVg8KUKsYxAEXLnQQY5Mc/pm4stguTiUguAl2XCkThAXcDh
+ C1FVnc77/EJB0M+DSIj/wLXOiLd/mvOWglURLYdElhHHTpNotHzwkdvfhYIWX/N2ILpWJJuwC
+ Iwy26Rcb4SfWxvcWcLyGwTf9Rd6G6YKYrnlMj8Eym/TR2yCU7Jmfm5u4Sq+dJ5Qfmp9DJ72fq
+ uNzYihVBSIJxEfAYKC71rr6T8a25wkQAQ5AS+rQ8QbdrkOwxYDwQK/yp8fuWV5YF3AvAY01Fe
+ /9H1JGnswftqUTibxzSHzYxRUPVl6dHIyM7rZOMpOIlr8VfyqV/b+pAP4mTiL3oIKx4dt41W4
+ bbjr1mKcQzCvQ+Mkaga7LrLWUvt09bkYCkT0p3rn8dvYWCraNAHKC/af9KwlyGUMxx2mANIRq
+ ZcrKW2FpZf7+1R5FN5IGgTWGVbWx1Yti683zkzzakMF4euK3k8dJL8oRzMSkW9nGm93/Vn2le
+ 95h2H4CssrkJpZM1Sy1JPILQIQOYYnN0cehD6rVuK3tS5uDY1kSyrsu8Ei2y8ATvsdWlbN9Po
+ BIb1JUy54dBxydLhm4GLhjxKfus++aSqO2No5UoE6B7z6koGCBjgzLzMuSG+iDZAS0brGL/6G
+ Rz0YQir4oJeGrPuhSzCFo6V4JigyLakHqIdBmmtd5ujgjWp9uLZTAxqH4x8VnwBDMmTv3LP
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,97 +75,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-trivial@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alberto Garcia <berto@igalia.com>
+From: John Snow <jsnow@redhat.com>
 
-The standard cluster descriptor in L2 table entries has a field to
-store the host cluster offset. When we need to get that offset from an
-entry we use L2E_OFFSET_MASK to ensure that we only use the bits that
-belong to that field.
-
-But while that mask is used every time we read from an L2 entry, it
-is never used when we write to it. Due to the QCOW_MAX_CLUSTER_OFFSET
-limit set in the cluster allocation code QEMU can never produce
-offsets that don't fit in that field so any such offset would indicate
-a bug in QEMU.
-
-Compressed cluster descriptors contain two fields (host cluster offset
-and size of the compressed data) and the situation with them is
-similar. In this case the masks are not constant but are stored in the
-csize_mask and cluster_offset_mask fields of BDRVQcow2State.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
+This is the only instance of a non-zero constant not using a symbolic
+constant.
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20200113161146.20099-1-berto@igalia.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-Id: <20200204165638.25051-1-jsnow@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- block/qcow2-cluster.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ qemu-options.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 8982b7b762..e9431f6785 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -777,6 +777,10 @@ int qcow2_alloc_compressed_cluster_offset(BlockDriverS=
-tate *bs,
-         (cluster_offset + compressed_size - 1) / QCOW2_COMPRESSED_SECTOR_S=
-IZE -
-         (cluster_offset / QCOW2_COMPRESSED_SECTOR_SIZE);
-=20
-+    /* The offset and size must fit in their fields of the L2 table entry =
-*/
-+    assert((cluster_offset & s->cluster_offset_mask) =3D=3D cluster_offset=
-);
-+    assert((nb_csectors & s->csize_mask) =3D=3D nb_csectors);
-+
-     cluster_offset |=3D QCOW_OFLAG_COMPRESSED |
-                       ((uint64_t)nb_csectors << s->csize_shift);
-=20
-@@ -972,6 +976,7 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, Q=
-CowL2Meta *m)
-=20
-     assert(l2_index + m->nb_clusters <=3D s->l2_slice_size);
-     for (i =3D 0; i < m->nb_clusters; i++) {
-+        uint64_t offset =3D cluster_offset + (i << s->cluster_bits);
-         /* if two concurrent writes happen to the same unallocated cluster
-          * each write allocates separate cluster and writes data concurren=
-tly.
-          * The first one to complete updates l2 table with pointer to its
-@@ -982,8 +987,10 @@ int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, =
-QCowL2Meta *m)
-             old_cluster[j++] =3D l2_slice[l2_index + i];
-         }
-=20
--        l2_slice[l2_index + i] =3D cpu_to_be64((cluster_offset +
--                    (i << s->cluster_bits)) | QCOW_OFLAG_COPIED);
-+        /* The offset must fit in the offset field of the L2 table entry *=
-/
-+        assert((offset & L2E_OFFSET_MASK) =3D=3D offset);
-+
-+        l2_slice[l2_index + i] =3D cpu_to_be64(offset | QCOW_OFLAG_COPIED)=
-;
-      }
-=20
-=20
-@@ -1913,6 +1920,9 @@ static int expand_zero_clusters_in_l1(BlockDriverStat=
-e *bs, uint64_t *l1_table,
-                         goto fail;
-                     }
-=20
-+                    /* The offset must fit in the offset field */
-+                    assert((offset & L2E_OFFSET_MASK) =3D=3D offset);
-+
-                     if (l2_refcount > 1) {
-                         /* For shared L2 tables, set the refcount accordin=
-gly
-                          * (it is already 1 and needs to be l2_refcount) *=
-/
---=20
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 224a8e8712a4..ff3e806977a8 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1955,7 +1955,7 @@ STEXI
+ Start in full screen.
+ ETEXI
+ 
+-DEF("g", 1, QEMU_OPTION_g ,
++DEF("g", HAS_ARG, QEMU_OPTION_g ,
+     "-g WxH[xDEPTH]  Set the initial graphical resolution and depth\n",
+     QEMU_ARCH_PPC | QEMU_ARCH_SPARC | QEMU_ARCH_M68K)
+ STEXI
+-- 
 2.24.1
 
 
