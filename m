@@ -2,85 +2,129 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A67BCC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E038BC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:24:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7033420661
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:22:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9E8220661
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 13:24:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQ5qrm/7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7033420661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MKALg3ES"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9E8220661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izh7E-0007JI-KU
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:22:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38101)
+	id 1izh8U-0008To-T6
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 08:24:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42028)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1izgto-0004P8-Os
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:08:54 -0500
+ (envelope-from <david@redhat.com>) id 1izh1G-0000sg-CL
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:16:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1izgtm-0002YR-Qo
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:08:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46068
+ (envelope-from <david@redhat.com>) id 1izh1F-0006iN-72
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:16:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47117
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1izgtm-0002Y4-MN
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:08:50 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1izh1D-0006g1-5x
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 08:16:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1580994530;
+ s=mimecast20190719; t=1580994989;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hwtKBXobbHOJUY+qczJQH4BHdUqYlzLqXY6tKN4pN5k=;
- b=bQ5qrm/7DKlZAXM52BheAIDzTyfwhYNBfDRRRrG5lLXhN+6xLMv71pGcAWoeu4dQqaOZjE
- OiW5yWE1zbV+wlWSHHXQU6lHS0zVrhc01NtVqAYA8nkUQ64qH0UZnDa+RVh9ZdRkKwFR7f
- FrmheJv2X/Bbn+7QmuWW73imJtc3g5M=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=qSBwvzeii81q8sUE2/Dxr8F4be/sF3amUaeaPu+4msM=;
+ b=MKALg3ESphGG20yYms3Dukvhioh7tOtiGYCpUoxmAUIA2gUFM4tNLp5isog9M76buAo/j5
+ JAY0zS1Em7I+w5ADgUGFD1rX3IVZa+fPPXhCqZ/6K/J66RayBtt6rCxDuZbjLR8jcCApxN
+ 4O2UdqgVKb8gvgbNjLFQ7M6ZP8UqdmM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-2QG99HKvN0KVdW-BmpnrYg-1; Thu, 06 Feb 2020 08:08:47 -0500
+ us-mta-63-OcOUbssfOrquj2egEP9rIQ-1; Thu, 06 Feb 2020 08:16:25 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3ABA5800EB2;
- Thu,  6 Feb 2020 13:08:46 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF6EF60BEC;
- Thu,  6 Feb 2020 13:08:41 +0000 (UTC)
-Date: Thu, 6 Feb 2020 14:08:39 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v3 00/18] APIC ID fixes for AMD EPYC CPU models
-Message-ID: <20200206140839.378ea544@redhat.com>
-In-Reply-To: <8b97f174-dd7e-cec0-daf7-29104d663aa6@amd.com>
-References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
- <20200203155921.658d7765@redhat.com>
- <b493a4f4-48de-79a7-00d5-119fbe789879@amd.com>
- <20200204090230.28f31a87@redhat.com>
- <fec6193d-09f1-5609-28fb-d10122053610@amd.com>
- <20200205103838.424b40a9@redhat.com>
- <3b7e02cb-4da0-d5f0-6cd0-c9b8045bbe17@amd.com>
- <20200205175619.51be0cc8@redhat.com>
- <8b97f174-dd7e-cec0-daf7-29104d663aa6@amd.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 204BB101FC60;
+ Thu,  6 Feb 2020 13:16:24 +0000 (UTC)
+Received: from [10.36.118.128] (unknown [10.36.118.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C563F60BEC;
+ Thu,  6 Feb 2020 13:16:19 +0000 (UTC)
+Subject: Re: [PATCH v1 06/13] util/mmap-alloc: Factor out reserving of a
+ memory region to mmap_reserve()
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200203183125.164879-1-david@redhat.com>
+ <20200203183125.164879-7-david@redhat.com>
+ <ac536bfa-ca47-f0bd-e054-ce981758d5f3@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <b8dbcfec-1e7b-0e79-b7fa-c8ac75a68fb3@redhat.com>
+Date: Thu, 6 Feb 2020 14:16:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
+In-Reply-To: <ac536bfa-ca47-f0bd-e054-ce981758d5f3@linaro.org>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 2QG99HKvN0KVdW-BmpnrYg-1
+X-MC-Unique: OcOUbssfOrquj2egEP9rIQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,202 +136,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, armbru@redhat.com,
- qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Feb 2020 13:07:31 -0600
-Babu Moger <babu.moger@amd.com> wrote:
+On 06.02.20 12:55, Richard Henderson wrote:
+> On 2/3/20 6:31 PM, David Hildenbrand wrote:
+>> We want to reserve a memory region without actually populating memory.
+>> Let's factor that out.
+>>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Greg Kurz <groug@kaod.org>
+>> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  util/mmap-alloc.c | 58 +++++++++++++++++++++++++++--------------------
+>>  1 file changed, 33 insertions(+), 25 deletions(-)
+>>
+>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+>> index 82f02a2cec..43a26f38a8 100644
+>> --- a/util/mmap-alloc.c
+>> +++ b/util/mmap-alloc.c
+>> @@ -82,6 +82,38 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+>>      return qemu_real_host_page_size;
+>>  }
+>>  
+>> +/*
+>> + * Reserve a new memory region of the requested size to be used for mapping
+>> + * from the given fd (if any).
+>> + */
+>> +static void *mmap_reserve(size_t size, int fd)
+>> +{
+>> +    int flags = MAP_PRIVATE;
+>> +
+>> +#if defined(__powerpc64__) && defined(__linux__)
+>> +    /*
+>> +     * On ppc64 mappings in the same segment (aka slice) must share the same
+>> +     * page size. Since we will be re-allocating part of this segment
+>> +     * from the supplied fd, we should make sure to use the same page size, to
+>> +     * this end we mmap the supplied fd.  In this case, set MAP_NORESERVE to
+>> +     * avoid allocating backing store memory.
+>> +     * We do this unless we are using the system page size, in which case
+>> +     * anonymous memory is OK.
+>> +     */
+>> +    if (fd == -1 || qemu_fd_getpagesize(fd) == qemu_real_host_page_size) {
+>> +        fd = -1;
+>> +        flags |= MAP_ANONYMOUS;
+>> +    } else {
+>> +        flags |= MAP_NORESERVE;
+>> +    }
+>> +#else
+>> +    fd = -1;
+>> +    flags |= MAP_ANONYMOUS;
+>> +#endif
+> 
+> Because this is just code movement,
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> But is there a reason not to add MAP_NORESERVE all of the time?
+> It seems to match intent, in that we're reserving vma but not planning to use
+> the memory, anonymous or not.
 
-> On 2/5/20 10:56 AM, Igor Mammedov wrote:
-> > On Wed, 5 Feb 2020 10:10:06 -0600
-> > Babu Moger <babu.moger@amd.com> wrote:
-> >  =20
-> >> On 2/5/20 3:38 AM, Igor Mammedov wrote: =20
-> >>> On Tue, 4 Feb 2020 13:08:58 -0600
-> >>> Babu Moger <babu.moger@amd.com> wrote:
-> >>>    =20
-> >>>> On 2/4/20 2:02 AM, Igor Mammedov wrote:   =20
-> >>>>> On Mon, 3 Feb 2020 13:31:29 -0600
-> >>>>> Babu Moger <babu.moger@amd.com> wrote:
-> >>>>>      =20
-> >>>>>> On 2/3/20 8:59 AM, Igor Mammedov wrote:     =20
-> >>>>>>> On Tue, 03 Dec 2019 18:36:54 -0600
-> >>>>>>> Babu Moger <babu.moger@amd.com> wrote:
-> >>>>>>>        =20
-> >>>>>>>> This series fixes APIC ID encoding problems on AMD EPYC CPUs.
-> >>>>>>>> https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2=
-F%2Fbugzilla.redhat.com%2Fshow_bug.cgi%3Fid%3D1728166&amp;data=3D02%7C01%7C=
-babu.moger%40amd.com%7C6b6d6af79fee45cc904808d7aa5c5f37%7C3dd8961fe4884e608=
-e11a82d994e183d%7C0%7C0%7C637165186049856500&amp;sdata=3DvDAkIxR3U6LX%2FmnY=
-jZPRC55smMqLend%2FHQjbfYWydBk%3D&amp;reserved=3D0
-> >>>>>>>>
-> >>>>>>>> Currently, the APIC ID is decoded based on the sequence
-> >>>>>>>> sockets->dies->cores->threads. This works for most standard AMD =
-and other
-> >>>>>>>> vendors' configurations, but this decoding sequence does not fol=
-low that of
-> >>>>>>>> AMD's APIC ID enumeration strictly. In some cases this can cause=
- CPU topology
-> >>>>>>>> inconsistency.  When booting a guest VM, the kernel tries to val=
-idate the
-> >>>>>>>> topology, and finds it inconsistent with the enumeration of EPYC=
- cpu models.
-> >>>>>>>>
-> >>>>>>>> To fix the problem we need to build the topology as per the Proc=
-essor
-> >>>>>>>> Programming Reference (PPR) for AMD Family 17h Model 01h, Revisi=
-on B1
-> >>>>>>>> Processors. It is available at https://nam11.safelinks.protectio=
-n.outlook.com/?url=3Dhttps%3A%2F%2Fwww.amd.com%2Fsystem%2Ffiles%2FTechDocs%=
-2F55570-B1_PUB.zip&amp;data=3D02%7C01%7Cbabu.moger%40amd.com%7C6b6d6af79fee=
-45cc904808d7aa5c5f37%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637165186=
-049856500&amp;sdata=3DrVMRN%2BbUeGWEksKO5uQ3Wxc71eeHCXMrkLVRbo4JHHI%3D&amp;=
-reserved=3D0
-> >>>>>>>>
-> >>>>>>>> Here is the text from the PPR.
-> >>>>>>>> Operating systems are expected to use Core::X86::Cpuid::SizeId[A=
-picIdSize], the
-> >>>>>>>> number of least significant bits in the Initial APIC ID that ind=
-icate core ID
-> >>>>>>>> within a processor, in constructing per-core CPUID masks.
-> >>>>>>>> Core::X86::Cpuid::SizeId[ApicIdSize] determines the maximum numb=
-er of cores
-> >>>>>>>> (MNC) that the processor could theoretically support, not the ac=
-tual number of
-> >>>>>>>> cores that are actually implemented or enabled on the processor,=
- as indicated
-> >>>>>>>> by Core::X86::Cpuid::SizeId[NC].
-> >>>>>>>> Each Core::X86::Apic::ApicId[ApicId] register is preset as follo=
-ws:
-> >>>>>>>> =E2=80=A2 ApicId[6] =3D Socket ID.
-> >>>>>>>> =E2=80=A2 ApicId[5:4] =3D Node ID.
-> >>>>>>>> =E2=80=A2 ApicId[3] =3D Logical CCX L3 complex ID
-> >>>>>>>> =E2=80=A2 ApicId[2:0]=3D (SMT) ? {LogicalCoreID[1:0],ThreadId} :=
- {1'b0,LogicalCoreID[1:0]}       =20
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> After checking out all patches and some pondering, used here appr=
-oach
-> >>>>>>> looks to me too intrusive for the task at hand especially where i=
-t
-> >>>>>>> comes to generic code.
-> >>>>>>>
-> >>>>>>> (Ignore till =3D=3D=3D=3D to see suggestion how to simplify witho=
-ut reading
-> >>>>>>> reasoning behind it first)
-> >>>>>>>
-> >>>>>>> Lets look for a way to simplify it a little bit.
-> >>>>>>>
-> >>>>>>> So problem we are trying to solve,
-> >>>>>>>  1: calculate APIC IDs based on cpu type (to e more specific: for=
- EPYC based CPUs)
-> >>>>>>>  2: it depends on knowing total number of numa nodes.
-> >>>>>>>
-> >>>>>>> Externally workflow looks like following:
-> >>>>>>>   1. user provides -smp x,sockets,cores,...,maxcpus
-> >>>>>>>       that's used by possible_cpu_arch_ids() singleton to build l=
-ist of
-> >>>>>>>       possible CPUs (which is available to user via command 'hotp=
-luggable-cpus')
-> >>>>>>>
-> >>>>>>>       Hook could be called very early and possible_cpus data migh=
-t be
-> >>>>>>>       not complete. It builds a list of possible CPUs which user =
-could
-> >>>>>>>       modify later.
-> >>>>>>>
-> >>>>>>>   2.1 user uses "-numa cpu,node-id=3Dx,..." or legacy "-numa node=
-,node_id=3Dx,cpus=3D"
-> >>>>>>>       options to assign cpus to nodes, which is one way or anothe=
-r calling
-> >>>>>>>       machine_set_cpu_numa_node(). The later updates 'possible_cp=
-us' list
-> >>>>>>>       with node information. It happens early when total number o=
-f nodes
-> >>>>>>>       is not available.
-> >>>>>>>
-> >>>>>>>   2.2 user does not provide explicit node mappings for CPUs.
-> >>>>>>>       QEMU steps in and assigns possible cpus to nodes in machine=
-_numa_finish_cpu_init()
-> >>>>>>>       (using the same machine_set_cpu_numa_node()) right before c=
-alling boards
-> >>>>>>>       specific machine init(). At that time total number of nodes=
- is known.
-> >>>>>>>
-> >>>>>>> In 1 -- 2.1 cases, 'arch_id' in 'possible_cpus' list doesn't have=
- to be defined before
-> >>>>>>> boards init() is run.     =20
-> >>>>
-> >>>> In case of 2.1, we need to have the arch_id already generated. This =
-is
-> >>>> done inside possible_cpu_arch_ids. The arch_id is used by
-> >>>> machine_set_cpu_numa_node to assign the cpus to correct numa node.  =
- =20
-> >>>
-> >>> I might have missed something but I don't see arch_id itself being us=
-ed in
-> >>> machine_set_cpu_numa_node(). It only uses props part of possible_cpus=
-   =20
-> >>
-> >> Before calling machine_set_cpu_numa_node, we call
-> >> cpu_index_to_instance_props -> x86_cpu_index_to_props->
-> >> possible_cpu_arch_ids->x86_possible_cpu_arch_ids.
-> >>
-> >> This sequence sets up the arch_id(in x86_cpu_apic_id_from_index) for a=
-ll
-> >> the available cpus. Based on the arch_id, it also sets up the props. =
-=20
-> >=20
-> >=20
-> > x86_possible_cpu_arch_ids()
-> >    arch_id =3D x86_cpu_apic_id_from_index(x86ms, i)
-> >    x86_topo_ids_from_apicid(arch_id, x86ms->smp_dies, ms->smp.cores,  m=
-s->smp.threads, &topo);
-> >    // assign socket/die/core/thread from topo
-> >=20
-> > so currently it uses indirect way to convert index in possible_cpus->cp=
-us[]
-> > to socket/die/core/thread ids.
-> > But essentially it take '-smp' options and [0..max_cpus) number as orig=
-inal data
-> > converts it into intermediate apic_id and then reverse engineer it back=
- to
-> > topo info.
-> >=20
-> > Why not use x86_topo_ids_from_idx() directly to get rid of 'props' depe=
-ndency on apic_id? =20
->=20
-> It might work. But this feels like a work-around and delaying the problem
-> for later. Just re-arranging the numa code little bit we can address this=
-.
+AFAIK, if you mmap something PROT_NONE, it's an implicit MAP_NORESERVE.
+I keep setting in conditionally, because I am not sure if any POSIX
+system (or older kernel) might choke on MAP_NORESERVE. e.g.,
 
-The idea behind possible_cpus is to allow users query topo information
-board generates (based on -smp) at configuration time (or late) so users
-could know what -numa cpu,topo_options [and -device foo-cpu,topo_options]
-to use, initializing apic_id on the first access is secondary and I did
-it only because I could do it without additional data.
+"In kernels before 2.6, this flag had effect only for private writable
+mappings." sounds like it would get ignored. But also sounds like it's
+somewhat Linux specific.
 
-But main purpose of possible_cpus is to keep topology information.
-That includes numa node mapping, which should be stored in possible_cpus
-along with the rest of cpu topology.
+-- 
+Thanks,
 
-Looking [12/18] numa patch, it makes -numa node,cpus legacy option
-to reintroduce data duplication, by storing mapping elsewhere and
-then putting that mapping into possible_cpus at numa complete time
-(that's what I dislike and don't see a valid reason to do so).
-
-That also won't work if user queries hotpluggable-cpus before that time
-and it also doesn't work if user uses preferable -numa cpu,topo_options
-as both would initialize possible_cpus on the first access.
-
-So if you need do some board specific post-processing done on topo
-information when it's complete and recalculate apic_id do it at board
-init time like was suggested before (x86_cpu_new() looks like a good
-place to do it).
-
-[...]
+David / dhildenb
 
 
