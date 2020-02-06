@@ -2,116 +2,98 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19268C33CAC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:18:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD6AC33CAC
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:19:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCAA1214AF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:18:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D30EB214AF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 18:19:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xy6a/kzI";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rNn1a8lW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCAA1214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmlWijkq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D30EB214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izljk-0006hX-0n
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:18:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58022)
+	id 1izlkA-0007KL-0I
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 13:19:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.merwick@oracle.com>) id 1izliw-00066E-1z
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:17:59 -0500
+ (envelope-from <philmd@redhat.com>) id 1izljO-0006VX-Lf
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:18:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1izliu-0006cq-9y
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:17:57 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:55402)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1izliu-0006b5-1R
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:17:56 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 016IFEu9118530;
- Thu, 6 Feb 2020 18:17:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=lnYvUmZuRtethVMs/y5ortAcbc8orYP9U/RAQEAaRhE=;
- b=xy6a/kzIzC4lqGIwL5tqu2Hkukd1z5dYtaww51rZZekb3jPVcO0cNi6F97qdXUGGvJuy
- a9CBGb3biITNyM+vwIK4kHIeIP7aJkjBtXSBsptO7wRlJDhQ6yM+xW81RvzPC04Jpk4F
- 8CTqws5pA2UQGRgfAf+zpshM5+GCL/P/Wgxpk2oV36rofES0eV+8VmPIN675X2wkr5qz
- 5LY4mHo+TYUSQNXk2RkMc8EfuMh+74dN2KuNtKMLTgFTLNJ6QwvD6I5iHM4V3D461SRi
- PQKe6Jp6DBzXU0Ty4w2odwcoTN0hFQZTwALhLLduWB3tp3tdDtsGpDzNx0wyVvKTaCDy Lw== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=lnYvUmZuRtethVMs/y5ortAcbc8orYP9U/RAQEAaRhE=;
- b=rNn1a8lWyH0RxUOTkloqy83TPgNuxpWK3ZlpKJFQ6ySKJ6aOVo3M6+Qx5rDtQJRmv9yw
- 2SLe7ps2u4DoqlipuL34Ae9ZrXEsVg1EdWxCAcouXKGjwnunA1TyFjy+hSHHxeUG2Q4p
- XTYx0bpPuJ5vRluKnBr3vIWTUHGdkHpHsHyUP+LeXsnN856V+T6JQlC+t0yJSal/Nuky
- 6VfloJX7N8Z36FBG9Lq58UZ/M7pQGh1B8WSnT7LnJLVoIgO9aO2R5sVruHmE+O+rYaxY
- 4KOqx9ApDSvLIyF1uDFoXeWNs/e+9lRBxbYJxWPjEItvGWrywkkp3N0zm80JBkAF+l1x Xw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 2xykbpbg3v-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 06 Feb 2020 18:17:48 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 016IE7w0144359;
- Thu, 6 Feb 2020 18:17:48 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 2y0mjuvtx4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 06 Feb 2020 18:17:48 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 016IHl0i020867;
- Thu, 6 Feb 2020 18:17:47 GMT
-Received: from [10.175.182.212] (/10.175.182.212)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 06 Feb 2020 10:17:46 -0800
-Subject: Re: [PATCH v2 09/29] tests/acceptance: Use 'machine' tag to check if
- available in QEMU binary
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200129212345.20547-1-philmd@redhat.com>
- <20200129212345.20547-10-philmd@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <e1100e02-33aa-02a4-c59b-ad04f214972a@oracle.com>
-Date: Thu, 6 Feb 2020 18:17:43 +0000
+ (envelope-from <philmd@redhat.com>) id 1izljM-0008Ng-Jq
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:18:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48019
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1izljM-00085M-Cc
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 13:18:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581013101;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=djLhxZadw2RbaFF924unvfVyj7m+RdR/UMqJH+VPMDE=;
+ b=ZmlWijkqHiTReLYr7TomsaTgovMDMEw12//f1w9ciXGQJVk5lTP/7THiGnNZzZ4cRoWt1C
+ DgASqtfKqw/Kr0zu45Lmz94YgiTWB7xibai736yKsf7P2gCiXHRH0wK324dNfrLkvooG8a
+ zmiipgd35ysDG0Vt3kzcfvQtQX+Wr5w=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-KJfzTEbyN16ERmLlPsHmyw-1; Thu, 06 Feb 2020 13:18:19 -0500
+Received: by mail-wr1-f71.google.com with SMTP id x15so3892851wrl.15
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 10:18:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bA55/hCXTgrpMCN2OUA8J8vblTWKHvoba7+0LQs+YTM=;
+ b=ZBU6tl4ObZyDt8QEb1Koz9aU02wnw9sT9kCYmPFybFkw0+V5uV/a2q9bfhV7uJQ84p
+ DkQ54/ZwJYh+4D/RiOKWIZ/XXxbYGEIvPuOT9SGcWyEii/d96PSfEKRgsX7kqOeKOu82
+ E+C/tQCh99jNCcJkPJhPwbB5p2q4lGdCz4KrQkINah0SgAw4sAdTYn2ydxR2wfdLMLPu
+ NxR4EFQCdrTdo7dxQedA4pbMK5yss0YSydxvod/WSNmfiLj6gWrdRP+CB+8H4jimzkrA
+ QKxjfvbFt0faTfA6/iI10teJ3zChGZDpFmwB0zcTLKlfVA2ksZVIY8tvnRZHBFsXNNsb
+ va+Q==
+X-Gm-Message-State: APjAAAVRzYu9QTiAgSsvF3WEhH9LAaJvNlhRx38kUtXa6amRkW4FoeoJ
+ ep5H8qGmDM59lkl5H8174MK0LDIjtu60bPZx1zZzu+gj/EBj88M6HpNZ0xQ0WSU2cS8AUV3mOyI
+ IyafEC8yI9YR+h8U=
+X-Received: by 2002:a1c:638a:: with SMTP id x132mr5777299wmb.43.1581013098115; 
+ Thu, 06 Feb 2020 10:18:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzXkBKz1jHKDTxrQL87ZX2P+PW/GMn/ESpu2WsMvhBbUt3AHlCueYztzzmE84hmvq9hv7r+ag==
+X-Received: by 2002:a1c:638a:: with SMTP id x132mr5777281wmb.43.1581013097890; 
+ Thu, 06 Feb 2020 10:18:17 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id v12sm115030wru.23.2020.02.06.10.18.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 06 Feb 2020 10:18:17 -0800 (PST)
+Subject: Re: [PATCH 1/2] tests/vhost-user-bridge: move to contrib/
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200206173631.752092-1-lvivier@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7b4a568c-06fe-579a-8f44-649987af904c@redhat.com>
+Date: Thu, 6 Feb 2020 19:18:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200129212345.20547-10-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20200206173631.752092-1-lvivier@redhat.com>
 Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9523
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002060134
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9523
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002060134
+X-MC-Unique: KJfzTEbyN16ERmLlPsHmyw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- 016IFEu9118530
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,108 +105,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/01/2020 21:23, Philippe Mathieu-Daud=C3=A9 wrote:
-> We already use the 'machine' tag in Avocado tests.
-> If the requested machine is not available in the QEMU binary,
-> the tests will be cancelled (skipped):
+On 2/6/20 6:36 PM, Laurent Vivier wrote:
+> vhost-user-bridge is not a test. Move it to contrib/ and
+> add it to the tools list.
 >=20
->    $ python -m avocado --show=3Dapp run tests/acceptance/x86_cpu_model_=
-versions.py
->     ...
->     (04/11) CascadelakeArchCapabilities.test_4_1: CANCEL: Test expects =
-machine 'pc-i440fx-4.1' which is missing from QEMU binary (0.10 s)
->     (05/11) CascadelakeArchCapabilities.test_4_0: CANCEL: Test expects =
-machine 'pc-i440fx-4.0' which is missing from QEMU binary (0.11 s)
->     ...
+> It will be built only if tools (--enable-tools) and
+> vhost-user (--enable-vhost-user) are enabled (both are set
+> by default).
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > ---
->   tests/acceptance/avocado_qemu/__init__.py | 13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
+>   Makefile                                                      | 3 +++
+>   Makefile.objs                                                 | 1 +
+>   configure                                                     | 3 +++
+>   contrib/vhost-user-bridge/Makefile.objs                       | 1 +
+>   tests/vhost-user-bridge.c =3D> contrib/vhost-user-bridge/main.c | 0
+>   tests/Makefile.include                                        | 1 -
+>   6 files changed, 8 insertions(+), 1 deletion(-)
+>   create mode 100644 contrib/vhost-user-bridge/Makefile.objs
+>   rename tests/vhost-user-bridge.c =3D> contrib/vhost-user-bridge/main.c =
+(100%)
+
+Please update the comment in docs/devel/migration.rst too:
+
+   ... and the `vhost-user-bridge` (in `tests/`) and ...
+
+by "(in `contrib/`)".
+
+With docs/devel/migration.rst updated:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
 >=20
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptan=
-ce/avocado_qemu/__init__.py
-> index e7d5affe24..53ec8512d1 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -20,6 +20,7 @@ SRC_ROOT_DIR =3D os.path.join(os.path.dirname(__file_=
-_), '..', '..', '..')
->   sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+> diff --git a/Makefile b/Makefile
+> index 461d40bea6c2..23342a433e11 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -442,6 +442,7 @@ dummy :=3D $(call unnest-vars,, \
+>                   libvhost-user-obj-y \
+>                   vhost-user-scsi-obj-y \
+>                   vhost-user-blk-obj-y \
+> +                vhost-user-bridge-obj-y \
+>                   vhost-user-input-obj-y \
+>                   vhost-user-gpu-obj-y \
+>                   qga-vss-dll-obj-y \
+> @@ -672,6 +673,8 @@ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) li=
+bvhost-user.a
+>   =09$(call LINK, $^)
+>   vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
+>   =09$(call LINK, $^)
+> +vhost-user-bridge$(EXESUF): $(vhost-user-bridge-obj-y) libvhost-user.a
+> +=09$(call LINK, $^)
 >  =20
->   from qemu.binutils import binary_get_arch
-> +from qemu.binutils import binary_get_machines
->   from qemu.binutils import binary_get_version
->   from qemu.machine import QEMUMachine
+>   rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
+>   rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 26b9cff95436..0240100b9a17 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -109,6 +109,7 @@ vhost-user-scsi.o-cflags :=3D $(LIBISCSI_CFLAGS)
+>   vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
+>   vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
+>   vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
+> +vhost-user-bridge-obj-y =3D contrib/vhost-user-bridge/
+>   rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
+>   vhost-user-input-obj-y =3D contrib/vhost-user-input/
+>   vhost-user-gpu-obj-y =3D contrib/vhost-user-gpu/
+> diff --git a/configure b/configure
+> index 115dc38085f3..0415eb5c99d3 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6223,6 +6223,9 @@ if test "$want_tools" =3D "yes" ; then
+>     if [ "$curl" =3D "yes" ]; then
+>         tools=3D"elf2dmp\$(EXESUF) $tools"
+>     fi
+> +  if [ "$vhost_user" =3D "yes" ]; then
+> +      tools=3D"vhost-user-bridge\$(EXESUF) $tools"
+> +  fi
+>   fi
+>   if test "$softmmu" =3D yes ; then
+>     if test "$linux" =3D yes; then
+> diff --git a/contrib/vhost-user-bridge/Makefile.objs b/contrib/vhost-user=
+-bridge/Makefile.objs
+> new file mode 100644
+> index 000000000000..36a8d9b49a05
+> --- /dev/null
+> +++ b/contrib/vhost-user-bridge/Makefile.objs
+> @@ -0,0 +1 @@
+> +vhost-user-bridge-obj-y =3D main.o
+> diff --git a/tests/vhost-user-bridge.c b/contrib/vhost-user-bridge/main.c
+> similarity index 100%
+> rename from tests/vhost-user-bridge.c
+> rename to contrib/vhost-user-bridge/main.c
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 2f1cafed720d..78cdbe91aed5 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -586,7 +586,6 @@ include $(SRC_PATH)/tests/qtest/Makefile.include
 >  =20
-> @@ -118,9 +119,6 @@ class Test(avocado.Test):
->           self.arch =3D self.params.get('arch',
->                                       default=3Dself._get_unique_tag_va=
-l('arch'))
+>   tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
+>   tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+> -tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-=
+obj-y) libvhost-user.a
 >  =20
-> -        self.machine =3D self.params.get('machine',
-> -                                       default=3Dself._get_unique_tag_=
-val('machine'))
-> -
->           # Verify qemu_bin
->           default_qemu_bin =3D pick_default_qemu_bin(arch=3Dself.arch)
->           self.qemu_bin =3D self.params.get('qemu_bin',
-> @@ -151,6 +149,15 @@ class Test(avocado.Test):
->               if bin_arch !=3D self.arch:
->                   self.cancel(fmt.format(self.arch, bin_arch))
+>   SPEED =3D quick
 >  =20
-> +        # Verify machine
-> +        self.machine =3D self.params.get('machine',
-> +                                       default=3Dself._get_unique_tag_=
-val('machine'))
-> +        logger.debug('machine: {}'.format(self.machine))
-> +        if self.machine:
-> +            fmt =3D "Test expects machine '{}' which is missing from Q=
-EMU binary"
-> +            if self.machine not in binary_get_machines(self.qemu_bin):
-> +                self.cancel(fmt.format(self.machine))
-> +
-
-Starting with this patch:
-
-$ avocado run --filter-by-tags arch:x86_64 tests/acceptance
-...
-/boot_linux_console.py:BootLinuxConsole.test_x86_64_pc: CANCEL: Test=20
-expects machine 'pc' which is missing from QEMU binary (0.05 s)
-...
-
-$ x86_64-softmmu/qemu-system-x86_64 -machine help
-Supported machines are:
-microvm              microvm (i386)
-pc                   Standard PC (i440FX + PIIX, 1996) (alias of=20
-pc-i440fx-5.0)
-...
-
-but checking via QMP, 'pc' (and 'q35') is listed as 'alias'
-...
-         {
-             "hotpluggable-cpus": true,
-             "name": "pc-i440fx-5.0",
-             "numa-mem-supported": true,
-             "default-cpu-type": "qemu64-x86_64-cpu",
-             "is-default": true,
-             "cpu-max": 255,
-             "deprecated": false,
-             "alias": "pc"
-         },
-...
-
-Does 'alias' need to be checked by binary_get_machines() in Patch8 as=20
-well as 'name'?
-
-Regards,
-Liam
-
+>=20
 
 
