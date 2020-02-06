@@ -2,57 +2,80 @@ Return-Path: <SRS0=rlpO=32=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7596AC35247
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 19:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3FAC35247
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 20:12:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B0AD218AC
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 19:58:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B0AD218AC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 67CDB2192A
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Feb 2020 20:12:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZbBiureW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67CDB2192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iznHs-0004xI-E1
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 14:58:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35256)
+	id 1iznVi-0008OT-I7
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 15:12:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iznHJ-0004NZ-Ts
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:57:35 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iznV5-0007wq-Uo
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:11:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iznHH-0003qH-Cc
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:57:33 -0500
-Resent-Date: Thu, 06 Feb 2020 14:57:33 -0500
-Resent-Message-Id: <E1iznHH-0003qH-Cc@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21128)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iznHH-0003kk-39
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 14:57:31 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1581018969935501.9666108356928;
- Thu, 6 Feb 2020 11:56:09 -0800 (PST)
-In-Reply-To: <20200206173040.17337-1-peter.maydell@linaro.org>
-Subject: Re: [PATCH 00/29] Convert QAPI doc comments to generate rST instead
- of texinfo
-Message-ID: <158101896929.19404.639362435298132958@a1bbccc8075a>
+ (envelope-from <dgilbert@redhat.com>) id 1iznV4-0003Jy-4h
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:11:47 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21275
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iznV3-0003Gn-W6
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 15:11:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581019905;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=u9aoD5UNMxOvZIruDj5OKzAJd+8pjB96nm/Rf9NL/hQ=;
+ b=ZbBiureWUfQqoUuVw5YJZgljUx4EQdPCzz7pF1GBBIp83qrt0xL0WkNTR4ENfxqgr739e9
+ gTglmxaRn2t7Lx8gvGTbtab5ID9JgZa66ttuuTIC/sh0CJnL3+fFY/uHsDc9aBzbowg061
+ DT1goZwyZgd6x/n9qUZUOfFD/hmQ8JM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-338-5W-tQpTZONqsMFWrD6evbQ-1; Thu, 06 Feb 2020 15:11:37 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1577DB60;
+ Thu,  6 Feb 2020 20:11:35 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.75])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 37741859A5;
+ Thu,  6 Feb 2020 20:11:24 +0000 (UTC)
+Date: Thu, 6 Feb 2020 20:11:21 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1 00/13] Ram blocks with resizable anonymous allocations
+ under POSIX
+Message-ID: <20200206201121.GM3655@work-vm>
+References: <20200203183125.164879-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: peter.maydell@linaro.org
-Date: Thu, 6 Feb 2020 11:56:09 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20200203183125.164879-1-david@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: 5W-tQpTZONqsMFWrD6evbQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,48 +87,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com,
- qemu-devel@nongnu.org, stefanha@redhat.com, jsnow@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIwNjE3MzA0MC4xNzMz
-Ny0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
-aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
-bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcg
-Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VO
-Vj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgdGVz
-dHMvdGVzdC1xYXBpLWNvbW1hbmRzLm8KICBDQyAgICAgIHRlc3RzL3Rlc3Qtc3RyaW5nLWlucHV0
-LXZpc2l0b3IubwogIENDICAgICAgdGVzdHMvdGVzdC1zdHJpbmctb3V0cHV0LXZpc2l0b3Iubwpk
-b2MtZ29vZCBGQUlMCi0tLSAvdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvcWFwaS1zY2hlbWEvZG9j
-LWdvb2Qub3V0CisrKyAKQEAgLTEsMTk5ICswLDAgQEAKLS0tCisrKyAKQEAgLTAsMCArMSBAQAor
-ZG9jLWdvb2QuanNvbjoxMDQ6MTogdW5leHBlY3RlZCBkZS1pbmRlbnQKbWFrZTogKioqIFtjaGVj
-ay10ZXN0cy9xYXBpLXNjaGVtYS9mcm9udGVuZF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBm
-b3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIENDICAgICAgdGVzdHMvdGVzdC1xbXAtZXZlbnQubwpU
-cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
-Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
-bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
-bXUuaW5zdGFuY2UudXVpZD1hYzhlOGRiZjU5M2M0MmUzODU3MjE1NTQ3NTljYjI1MicsICctdScs
-ICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
-Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
-LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScs
-ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
-Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92
-YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC15OWhfa3c0ci9zcmMvZG9ja2VyLXNyYy4yMDIwLTAy
-LTA2LTE0LjUzLjUxLjExNTM3Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAn
-L3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0
-IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1h
-YzhlOGRiZjU5M2M0MmUzODU3MjE1NTQ3NTljYjI1MgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5d
-IEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVz
-dGVyLXRtcC15OWhfa3c0ci9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNl
-bnRvczddIEVycm9yIDIKCnJlYWwgICAgMm0xNy42NTFzCnVzZXIgICAgMG03LjY1M3MKCgpUaGUg
-ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMjA2
-MTczMDQwLjE3MzM3LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnL3Rlc3RpbmcuZG9ja2VyLXF1
-aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+* David Hildenbrand (david@redhat.com) wrote:
+> We already allow resizable ram blocks for anonymous memory, however, they
+> are not actually resized. All memory is mmaped() R/W, including the memor=
+y
+> exceeding the used_length, up to the max_length.
+>=20
+> When resizing, effectively only the boundary is moved. Implement actually
+> resizable anonymous allocations and make use of them in resizable ram
+> blocks when possible. Memory exceeding the used_length will be
+> inaccessible. Especially ram block notifiers require care.
+>=20
+> Having actually resizable anonymous allocations (via mmap-hackery) allows
+> to reserve a big region in virtual address space and grow the
+> accessible/usable part on demand. Even if "/proc/sys/vm/overcommit_memory=
+"
+> is set to "never" under Linux, huge reservations will succeed. If there i=
+s
+> not enough memory when resizing (to populate parts of the reserved region=
+),
+> trying to resize will fail. Only the actually used size is reserved in th=
+e
+> OS.
+>=20
+> E.g., virtio-mem [1] wants to reserve big resizable memory regions and
+> grow the usable part on demand. I think this change is worth sending out
+> individually. Accompanied by a bunch of minor fixes and cleanups.
+>=20
+> [1] https://lore.kernel.org/kvm/20191212171137.13872-1-david@redhat.com/
+
+There's a few bits I've not understood from skimming the patches:
+
+  a) Am I correct in thinking you PROT_NONE the extra space so you can
+gkrow/shrink it?
+  b) What does kvm see - does it have a slot for the whole space or for
+only the used space?
+     I ask because we found with virtiofs/DAX experiments that on Power,
+kvm gets upset if you give it a mapping with PROT_NONE.
+     (That maybe less of an issue if you change the mapping after the
+slot is created).
+
+  c) It's interesting this is keyed off the RAMBlock notifiers - do
+     memory_listener's on the address space the block is mapped into get
+    triggered?  I'm wondering how vhost (and vhost-user) in particular
+    see this.
+
+Dave
+
+>=20
+> David Hildenbrand (13):
+>   util: vfio-helpers: Factor out and fix processing of existings ram
+>     blocks
+>   exec: Factor out setting ram settings (madvise ...) into
+>     qemu_ram_apply_settings()
+>   exec: Reuse qemu_ram_apply_settings() in qemu_ram_remap()
+>   exec: Drop "shared" parameter from ram_block_add()
+>   util/mmap-alloc: Factor out calculation of pagesize to mmap_pagesize()
+>   util/mmap-alloc: Factor out reserving of a memory region to
+>     mmap_reserve()
+>   util/mmap-alloc: Factor out populating of memory to mmap_populate()
+>   util/mmap-alloc: Prepare for resizable mmaps
+>   util/mmap-alloc: Implement resizable mmaps
+>   numa: Introduce ram_block_notify_resized() and
+>     ram_block_notifiers_support_resize()
+>   util: vfio-helpers: Implement ram_block_resized()
+>   util: oslib: Resizable anonymous allocations under POSIX
+>   exec: Ram blocks with resizable anonymous allocations under POSIX
+>=20
+>  exec.c                    |  99 ++++++++++++++++++----
+>  hw/core/numa.c            |  39 +++++++++
+>  include/exec/cpu-common.h |   3 +
+>  include/exec/memory.h     |   8 ++
+>  include/exec/ramlist.h    |   4 +
+>  include/qemu/mmap-alloc.h |  21 +++--
+>  include/qemu/osdep.h      |   6 +-
+>  stubs/ram-block.c         |  20 -----
+>  util/mmap-alloc.c         | 168 ++++++++++++++++++++++++--------------
+>  util/oslib-posix.c        |  37 ++++++++-
+>  util/oslib-win32.c        |  14 ++++
+>  util/trace-events         |   5 +-
+>  util/vfio-helpers.c       |  33 ++++----
+>  13 files changed, 331 insertions(+), 126 deletions(-)
+>=20
+> --=20
+> 2.24.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
