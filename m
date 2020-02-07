@@ -2,94 +2,80 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1803BC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1377C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:55:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8177222C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:54:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C51F22314
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:55:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G3ZorjER"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8177222C2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cOeXA570"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C51F22314
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0Ba5-0003wH-SO
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 16:54:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45012)
+	id 1j0BbM-0004uV-JF
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 16:55:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45232)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j0BZW-0002pb-Fa
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:53:59 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1j0Baj-0004Se-U7
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:55:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j0BZU-0002mm-0A
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:53:57 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50726
+ (envelope-from <ehabkost@redhat.com>) id 1j0Bai-00041s-Iq
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:55:13 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58653
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j0BZT-0002kQ-N2
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:53:55 -0500
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1j0Bai-000409-Ez
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:55:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581112433;
+ s=mimecast20190719; t=1581112512;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cPFzs69CLcsKWh6Zeggqq06x3bj43vrIyQRLMw4e3UM=;
- b=G3ZorjERa/fhh2mDsdsGT1IsFLnEF22u/EKADzNIx4FLCzKLdvZnKhkodiJUpnsBEptosN
- mChPCYq2tI2nFHhpsXbB0PZGf/W79+V5ryrfj1nHGtPI9CD533zyez9BnRdR/fLZOeZL4v
- XuL+t235SkMC5qa8TeZku02MRkcpirs=
+ bh=Xh+z907CDf7g01QdNBywOHsWlT/svOmeToaR79Ka+mI=;
+ b=cOeXA570hEprmxWjbW/1y/I4aT66UHfJLohuqbgyNFmuT8Fwf9JyHcqO9gQWuKfZxLCa9F
+ +PVkW+091kKU+u9xn92wpbL7L82q/1w6DW56RLrVIlhc9VPgh3aCVZNWIu7Bb29yrFptkD
+ cOr/9hQ5ODETjSfFKQmFcf97By16YFM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-BzdheTX4MTGScyM0WzRvgw-1; Fri, 07 Feb 2020 16:53:50 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-421-x7P7ymZlN9eiRTampcoy2w-1; Fri, 07 Feb 2020 16:55:06 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2A878014D1;
- Fri,  7 Feb 2020 21:53:48 +0000 (UTC)
-Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 253231001B30;
- Fri,  7 Feb 2020 21:53:42 +0000 (UTC)
-Subject: Re: Getting whole-tree patches reviewed and merged
-To: Markus Armbruster <armbru@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <87d0bmchq0.fsf@dusky.pond.sub.org>
- <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200120100849.GB345995@stefanha-x1.localdomain>
- <871rrtmkko.fsf@dusky.pond.sub.org>
- <20200121113224.GD630615@stefanha-x1.localdomain>
- <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
- <87wo9lc4oe.fsf_-_@dusky.pond.sub.org> <20200121143658.GB597037@redhat.com>
- <871rrs97ld.fsf@dusky.pond.sub.org>
- <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
- <CAFEAcA-C5Kvp-tUZfXSeAiFAHW-YXb+ddwFqyo5Y=0ziPhFbDA@mail.gmail.com>
- <871rrs136l.fsf_-_@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <f450e310-3614-5e03-b932-ecba95970c95@redhat.com>
-Date: Fri, 7 Feb 2020 15:53:42 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3BDD800E21;
+ Fri,  7 Feb 2020 21:55:04 +0000 (UTC)
+Received: from localhost (unused-10-15-17-6.yyz.redhat.com [10.15.17.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8FBEB790D7;
+ Fri,  7 Feb 2020 21:54:59 +0000 (UTC)
+Date: Fri, 7 Feb 2020 16:54:59 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] qapi: Fix code generation with Python 3.5
+Message-ID: <20200207215459.GJ412524@habkost.net>
+References: <20200116202558.31473-1-armbru@redhat.com>
+ <3fb3e411-c5de-fbc1-684b-c7fb1ce2ea7d@redhat.com>
+ <875zhapnlt.fsf@dusky.pond.sub.org>
+ <a6ea59a5-0877-fdeb-5b37-9ec3f31074a4@redhat.com>
+ <87lfq5s19h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <871rrs136l.fsf_-_@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: BzdheTX4MTGScyM0WzRvgw-1
+In-Reply-To: <87lfq5s19h.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: x7P7ymZlN9eiRTampcoy2w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -104,55 +90,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, thuth@redhat.com,
+ Cleber Rosa <cleber@redhat.com>, mdroth@linux.vnet.ibm.com,
+ qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/21/20 11:16 PM, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
+On Sat, Jan 18, 2020 at 07:54:18AM +0100, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> > On 1/17/20 2:07 AM, Markus Armbruster wrote:
+> >> John Snow <jsnow@redhat.com> writes:
+[...]
+> >>> This problem has bitten me *many* times. I'm wondering if there's a
+> >>> prescription that isn't just "Wait until we can stipulate 3.6+".
+> >>=20
+> >> No clue.
+> >>=20
+> >> 3.5 EOL is scheduled for 2020-09-13.
+> >> https://devguide.python.org/#status-of-python-branches
+> >>=20
+> >> We support 3.5 because we support Debian 9.
+> >>=20
+> >> We'd normally drop support for Debian 9 two years after Debian 10,
+> >> i.e. July 2021.  Assuming Debian supports it that far.  Whether they c=
+an
+> >> truly support Python 3.5 after uptstream EOL seems doubtful.
+> >>=20
+> >
+> > We should decide whether we consider Debian LTS to be adequately
+> > supported, yes-or-no.
+> >
+> > We should use a rule of "two years after successor, or End-of-Support,
+> > whichever comes first."
 >=20
->> On Tue, 21 Jan 2020 at 15:11, Marc-Andr=C3=A9 Lureau
->> <marcandre.lureau@gmail.com> wrote:
->>> There are plenty of refactoring to do. The problem when touching the
->>> whole code-base, imho, is review time. It may take a couple of
->>> hours/days to come up with a cocci/spatch, and make various patches
->>> here and there. But it takes often weeks and a lot of constant push to
->>> various folks to get all the reviews (as seens by the qdev prop-ptr
->>> series earlier for example). How can we better address whole code-base
->>> changes?
->>
->> It depends. If it's literally just a cocci/spatch mechanical
->> transformation, I think we should be OK with reviewing that
->> transform and then applying it; we don't need to get acks
->> from every submaintainer for that kind of thing.
+> Yes.
 >=20
-> I go one step further: I prefer mechanical changes committed together,
-> not torn apart and routed through N+1 trees, where N is the number of
-> active maintainers picking patches from the series, and 1 is the
-> maintainer taking pity of the inevitable leftovers.
+> > For Debian, is end of support three years after it comes out, or is it
+> > when the LTS is EOL?
 >=20
-> Tearing a patch series apart may be in order when it's invasive enough
-> to risk many conflicts.  The subsystem maintainer may need tighter
-> control over merging order then, and routing picked patches through his
-> own tree may be the practical way to get it.
+> We need to define end-of-support for Debian: is it Debian proper or is
+> it Debian LTS?
+>=20
+> <https://wiki.debian.org/DebianOldStable>:
+>=20
+>     Q) How long will security updates be provided?
+>=20
+>     The security team tries to support a stable distribution for about
+>     one year after the next stable distribution has been released,
+>     except when another stable distribution is released within this
+>     year.  It is not possible to support three distributions; supporting
+>     two simultaneously is already difficult enough.
+>=20
+> <https://wiki.debian.org/LTS>:
+>=20
+>     Debian Long Term Support (LTS) is a project to extend the lifetime
+>     of all Debian stable releases to (at least) 5 years.  Debian LTS is
+>     not handled by the Debian security team, but by a separate group of
+>     volunteers and companies interested in making it a success.
+>=20
+>     Thus the Debian LTS team takes over security maintenance of the
+>     various releases once the Debian Security team stops its work.
 
-And the pending work on ERRP_AUTO_PROPAGATE is an example of that -=20
-Vladimir has been trying to get the improvements in for some time, but=20
-it touches so many files, and is awkward to review whether it is split=20
-into over 100 patches per maintainer area or when it is consolidates=20
-into few but large patches.
+As Debian LTS is maintained by a separate group, I interpret
+"Debian EOL" as not including LTS.
+
+Supporting Debian 9 in 2020 is already being a burden.
+Supporting it until mid-2021 seems pointless.
+
+
+>=20
+> Debian 10 "Buster" was released in July 2019.  Debian 9 "Stretch" will
+> receive security updates from Debian until mid 2020, i.e. just about
+> when Python 3.5 reaches EOL.  LTS will attempt to support it until June
+> 2022.
+>=20
+> I think we should give ourselves a bit more flexibility than the
+> categorical "Support for the previous major version will be dropped 2
+> years after the new major version is released."  At some point, the cost
+> of supporting old hosts exceeds the utility.  We should face this
+> tradeoff.
+
+Agreed.
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Eduardo
 
 
