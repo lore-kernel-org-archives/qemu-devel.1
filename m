@@ -2,79 +2,81 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C6F3C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95529C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:27:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8F2520720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:23:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60F5020720
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:27:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DjMLYs2H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F2520720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qAAwM3UH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F5020720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j06PP-0004m2-5n
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:23:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54255)
+	id 1j06Tq-0007Wo-Gy
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:27:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55987)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j06NC-0001Br-JD
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:20:55 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j06TD-0006tc-DE
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j06NB-0003TU-BZ
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:20:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59712
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j06NB-0003RX-7N
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:20:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581092452;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DeJwD+5oSTfpziNL0l7YGkVnz0HH2iOXbi7RNEBKA7w=;
- b=DjMLYs2HToPZSRMIcAc1FQpdKfsPUXUxnB1EydiXY4d5zdAAY4RNAP6E8nmxuTIZd6uS5B
- CtU/7//QQZbl6coWDw5v7t9wu5PmhnK0ijIw9hmybu58uJkZ0SSOVOXVtuwDhlQWZgSPEn
- /3KT3EjuVshpRDcv4CjQPWTwybNqjlg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-EutTKxFLNuK3g1U6U3jTIA-1; Fri, 07 Feb 2020 11:20:48 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2183B10CE784;
- Fri,  7 Feb 2020 16:20:44 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-88.brq.redhat.com [10.40.204.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CCBB7790EB;
- Fri,  7 Feb 2020 16:20:25 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/3] hw: Do not initialize MachineClass::is_default to 0
-Date: Fri,  7 Feb 2020 17:19:46 +0100
-Message-Id: <20200207161948.15972-2-philmd@redhat.com>
-In-Reply-To: <20200207161948.15972-1-philmd@redhat.com>
-References: <20200207161948.15972-1-philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j06TB-0002Km-Th
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:07 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44477)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j06TB-0002It-Ne
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:05 -0500
+Received: by mail-ot1-x343.google.com with SMTP id h9so2651632otj.11
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 08:27:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=upod4aUb/SI3ylNWoOZvHfrbH9kC8Aab+nACy1Fo47k=;
+ b=qAAwM3UHRkdXUMpX+E0r83d2KZR6sTFLnqnCiYGd6b2t6q4/LQ8iVYp+t5Lq69xXQ5
+ str3S2c23Yxceb+lJ21pft3/a2aRwj4QVvHHFJn3l7mRlDFvnt1dYksPWH5hOoOzs4+W
+ IdgNb9OM2jrWW3/9ZqWXGqt4KIdKZRPnwc8HAwtvkVSr2IB/mw/1lXY0tXsF/b4efOo9
+ 1FMgSqLxmkocQJzRn4ZlWrOyFrz3Re9yb0JmAj8GxwsMyfn+EGFKGYaptm6+ZWW3TOCQ
+ hVCrDnBcMnzS9zXX2JXT2i6Al75g3wio4r69kzGOiXBi332dWf7g0tOobQLNXkPRmk/a
+ NUnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=upod4aUb/SI3ylNWoOZvHfrbH9kC8Aab+nACy1Fo47k=;
+ b=CsIAGLlFveM+wDGk1NOA/VdZk5k9mPK/1g0UedtltV9RuRr8RjPaqMwqiQbbMEssaN
+ XaOU5P340IXuBrbiHu4pODJWB08qY2HiJfL34H3tkqUkpcPwlInmCCiSpRhOwFaCsBbi
+ xW79YyDuHpOnF+dhc/fn0RoVqNPJbVTEOuzfi8hYgS4AHTqwR9B4we5Twbz+Q1X6Wx8W
+ TgSsJ47I91Bn11ci58q7hlzD2UIcgOj8UVxABPDR2xQ0XxuaSzeEb4zgZ7OTFXfnwN1Y
+ OX6/rtO5crFbCMCgg6EWwmUVz+4xsjgH7ye7zkJSRKVCiM/x1eGrnoYe1K9vmhjCLFh0
+ v6Zw==
+X-Gm-Message-State: APjAAAWvch+1S/KDZIWKoz5Mwuz0EDKE6EeToIh6RsYgekUsB0xQuSdk
+ 2XT5i5Zv+67mARQLdIxKcCfjGQGsEfDZ43yTAcVyqQ==
+X-Google-Smtp-Source: APXvYqwXiJmgD4Yww/9ez3szrehg/4a+lWp33J4dAHau6Zx78lcpAmDdZeX6ZG33iiXsQzZuOhpaFGKt7VjPufXUDWg=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id l4mr129113otd.91.1581092824684; 
+ Fri, 07 Feb 2020 08:27:04 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: EutTKxFLNuK3g1U6U3jTIA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200203032328.12051-1-crosa@redhat.com>
+ <20200203032328.12051-2-crosa@redhat.com>
+ <5d0def0e-0943-3345-784d-80f8ccc318b9@redhat.com>
+In-Reply-To: <5d0def0e-0943-3345-784d-80f8ccc318b9@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Feb 2020 16:26:53 +0000
+Message-ID: <CAFEAcA8HPvzaxA1pguscX5FsuWvpJhkDAuFSApofabEWVzzjQQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] GitLab CI: crude mapping of PMM's scripts to jobs
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,120 +88,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chris Wulff <crwulff@gmail.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Anthony Green <green@moxielogic.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
- Jia Liu <proljc@gmail.com>, qemu-trivial@nongnu.org,
- Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>,
- Magnus Damm <magnus.damm@gmail.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
- Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>,
- qemu-riscv@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The MachineClass is already zeroed on creation.
+On Fri, 7 Feb 2020 at 08:37, Thomas Huth <thuth@redhat.com> wrote:
+> Question to Peter/Alex/Stefan/Howevermergespullreqsinthefuture:
+>
+> Should the above jobs really be skipped for pull requests, or would it
+> be ok to include them there, too? (in the latter case, the above changes
+> could just be dropped)
 
-Note: The code setting is_default=3D0 in hw/i386/pc_piix.c is
-      different (related to compat options). When adding a
-      new versioned machine, we want it to be the new default,
-      so we have to mark the previous one as not default.
+I don't mind, as long as the CI run doesn't take more than (say)
+1h to 1h30 elapsed time to complete from kicking it off to getting
+all the results back. The specific set of x86 configs tested don't
+really worry me (as long as we do have a reasonable spread):
+the thing I really care about is that we get the multiple
+host architectures and the BSDs into the test setup. (We already
+have about five different ways of doing CI testing of x86 Linux
+hosts, which is the least likely setup to break. It's the
+other host configs that I'm really keen to see progress on
+automation of, because that's what's really blocking us from
+being able to move off my hand-coded scripting.)
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v3: new patch
----
- hw/lm32/lm32_boards.c               | 1 -
- hw/lm32/milkymist.c                 | 1 -
- hw/m68k/q800.c                      | 1 -
- hw/microblaze/petalogix_ml605_mmu.c | 1 -
- hw/tricore/tricore_testboard.c      | 1 -
- 5 files changed, 5 deletions(-)
+In the long run we should probably aim for being consistent about
+what we test between the pull-request tests and whatever the
+'public-facing CI' part is.
 
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index d1894adab8..156b050abc 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -302,7 +302,6 @@ static void lm32_uclinux_class_init(ObjectClass *oc, vo=
-id *data)
-=20
-     mc->desc =3D "lm32 platform for uClinux and u-boot by Theobroma System=
-s";
-     mc->init =3D lm32_uclinux_init;
--    mc->is_default =3D 0;
-     mc->default_cpu_type =3D LM32_CPU_TYPE_NAME("lm32-full");
- }
-=20
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index 6d46134232..9fa5fd7050 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -214,7 +214,6 @@ static void milkymist_machine_init(MachineClass *mc)
- {
-     mc->desc =3D "Milkymist One";
-     mc->init =3D milkymist_init;
--    mc->is_default =3D 0;
-     mc->default_cpu_type =3D LM32_CPU_TYPE_NAME("lm32-full");
- }
-=20
-diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-index 1e32363688..788b5d663f 100644
---- a/hw/m68k/q800.c
-+++ b/hw/m68k/q800.c
-@@ -441,7 +441,6 @@ static void q800_machine_class_init(ObjectClass *oc, vo=
-id *data)
-     mc->init =3D q800_init;
-     mc->default_cpu_type =3D M68K_CPU_TYPE_NAME("m68040");
-     mc->max_cpus =3D 1;
--    mc->is_default =3D 0;
-     mc->block_default_type =3D IF_SCSI;
- }
-=20
-diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_=
-ml605_mmu.c
-index 09486bc8bf..0a2640c40b 100644
---- a/hw/microblaze/petalogix_ml605_mmu.c
-+++ b/hw/microblaze/petalogix_ml605_mmu.c
-@@ -216,7 +216,6 @@ static void petalogix_ml605_machine_init(MachineClass *=
-mc)
- {
-     mc->desc =3D "PetaLogix linux refdesign for xilinx ml605 little endian=
-";
-     mc->init =3D petalogix_ml605_init;
--    mc->is_default =3D 0;
- }
-=20
- DEFINE_MACHINE("petalogix-ml605", petalogix_ml605_machine_init)
-diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboard.=
-c
-index 20c9ccb3ce..8ec2b5bddd 100644
---- a/hw/tricore/tricore_testboard.c
-+++ b/hw/tricore/tricore_testboard.c
-@@ -105,7 +105,6 @@ static void ttb_machine_init(MachineClass *mc)
- {
-     mc->desc =3D "a minimal TriCore board";
-     mc->init =3D tricoreboard_init;
--    mc->is_default =3D 0;
-     mc->default_cpu_type =3D TRICORE_CPU_TYPE_NAME("tc1796");
- }
-=20
---=20
-2.21.1
+> > +ubuntu-18.04.3-x86_64-notcg:
+> > + tags:
+> > + - ubuntu_18.04.3
+> > + - x86_64
+> > + rules:
+> > + - if: '$CI_COMMIT_REF_NAME == "staging"'
+> > + script:
+> > + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/remake-merge-builds#n35
+> > + - ./configure --disable-libssh --enable-debug --disable-tcg
+> > + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pull-buildtest#n35
+> > + - make
+> > + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pull-buildtest#n39
+> > + # Question: check is disabled on the original script, because the machine
+> > + # is said to be running VirtualBox.  Should this be dropped or should the
+> > + # machine be tweaked or substituted?
+> > + - make check V=1
+>
+> Without TCG, you definitely need a host that can do KVM for running make
+> check.
+> Question for Peter: Would it be ok to drop this job and simply always
+> use the "build-tcg-disabled" job that is already available in
+> .gitlab-ci.yml ?
 
+If we have a CI setup where KVM reliably works then we should
+ideally test a --disable-tcg setup somehow. Right now my pullreq
+tests don't test that because I run them on my work desktop box
+and (as the config says) sometimes I'm running VirtualBox which
+causes KVM to fail -- but that should be irrelevant to our CI
+runners...
+
+thanks
+-- PMM
 
