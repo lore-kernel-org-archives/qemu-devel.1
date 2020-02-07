@@ -4,94 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B9E4C352A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14DFEC352A4
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:24:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCBA521741
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:24:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C96A9214AF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:24:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUKZ3h8b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCBA521741
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K1so45hm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C96A9214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j00oU-0002A6-44
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 05:24:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48711)
+	id 1j00oY-0002GW-09
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 05:24:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j00nj-0001B1-0D
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:23:56 -0500
+ (envelope-from <drjones@redhat.com>) id 1j00jv-0003RX-Op
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:20:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j00nh-0003D1-Tx
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:23:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58358
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <drjones@redhat.com>) id 1j00jt-0005GN-HS
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:19:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51956
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j00nh-0003Bl-QU
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:23:53 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j00jt-0005C4-9y
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:19:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581071033;
+ s=mimecast20190719; t=1581070796;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9s1Qx6A91TLMd+q11aMBXC3QFrx0W4N2W57XoqufQh8=;
- b=dUKZ3h8bk15xyECsEJK9uAyDRrr3gFqZ24lKFPqWnsvS21uB4eAO9kkx9TtfAZhDvB0xkT
- nuXfn9x5GMVgep11W69wflfbfC8/UZLF2ZDsYu5YNB31qrYVOqr+ZFACiF5qL6SOA3C2P0
- etL8/jhN1KN2GaBNuXXxMaFbeTb7vF0=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-6KCVjVR7MBa4PnsbAQjZ6g-1; Fri, 07 Feb 2020 05:23:51 -0500
-Received: by mail-qt1-f197.google.com with SMTP id c22so1321349qtn.23
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 02:23:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ZnxDCvmuPZ5pZ0PeIwsxPJFJk2jcdWwkHN/1vNPLLDk=;
- b=Mju7AAvozIWUhjSQ8Lnk3vESxisHrEO6NPzCFlyoMi9nu0gFz9gCthtn+toSR+Sdze
- xLlXQ1bhfDS9kYiHlPeKqjHggEUDCX7NtddHWLbnD7hx85kyX2z5WM5J6RCNkt0yTd/g
- RW5hmOn/aq330mjXJWZFIQwBohZq8UnNMVDyvgLczXdWQByeb4MUFed790SkM8q2UvBA
- rSbs5GhTwvlDI2pdyAxljr/8jwwpGAEzIAT+g7VdU/XredFeeWOB+b236oOlt0XucLAz
- A2aoadH1HEKa43bMP3BX1EsSWxEPbQVeVyGNRJ/oQbSVUegFVtYqGZy+Jtsbd34l6G2A
- pYMw==
-X-Gm-Message-State: APjAAAUm3drdBApoaMVf8kuHOFzgMEnd4trlg83yCoTKP1e/YsjNsMP+
- 2uifv2JUVh1IX5hG8dqQaaiivRUc5aBiwljULvjqUzJDQ2Gh7VRsIFhju5mL8j9goyt3TfQpL4Q
- nTdQ148fZWV59F58=
-X-Received: by 2002:ac8:607:: with SMTP id d7mr6659136qth.271.1581071031048;
- Fri, 07 Feb 2020 02:23:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxc+TXuranA8oMxcdx2IB50Rvt9e3fKtfun2BvKDyudrz+Y6Z6oRM+pTkgMGX8qk+o1/HZEFg==
-X-Received: by 2002:ac8:607:: with SMTP id d7mr6659116qth.271.1581071030771;
- Fri, 07 Feb 2020 02:23:50 -0800 (PST)
-Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id e130sm1056520qkb.72.2020.02.07.02.23.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 02:23:49 -0800 (PST)
-Date: Fri, 7 Feb 2020 05:23:45 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
+ bh=QklhyZ3eOvqYI3xX8Ml/lPO2oC5taM5lDrzZXHLl4Uo=;
+ b=K1so45hmpWF3WstNpRRfY5GenU5ZTxg9HfHafw4QMFxBQjz1259g+VHE7Vt2jjWHD5gpxc
+ zQv3OQ2l7EY8jdRkA3INX/ujxxfjxy1+IzordvqvY4OREE3i//iV7aShnB2bHTWq4ESWjK
+ sFVaMtJb28tJsTQbFbS3HVPg9Vun8r4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-gQwGD1EoOeK60f-Hj3qNbA-1; Fri, 07 Feb 2020 05:19:53 -0500
+X-MC-Unique: gQwGD1EoOeK60f-Hj3qNbA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60DFB1800D42;
+ Fri,  7 Feb 2020 10:19:51 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A724A19C7F;
+ Fri,  7 Feb 2020 10:19:46 +0000 (UTC)
+Date: Fri, 7 Feb 2020 11:19:43 +0100
+From: Andrew Jones <drjones@redhat.com>
 To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v14 08/11] virtio-iommu-pci: Introduce the x-dt-binding
- option
-Message-ID: <20200207052214-mutt-send-email-mst@kernel.org>
-References: <20200207093203.3788-1-eric.auger@redhat.com>
- <20200207093203.3788-9-eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 05/14] arm/arm64: ITS: Introspection
+ tests
+Message-ID: <20200207101943.fuakoieafbroe7rw@kamzik.brq.redhat.com>
+References: <20200128103459.19413-1-eric.auger@redhat.com>
+ <20200128103459.19413-6-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200207093203.3788-9-eric.auger@redhat.com>
-X-MC-Unique: 6KCVjVR7MBa4PnsbAQjZ6g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
+In-Reply-To: <20200128103459.19413-6-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,96 +83,504 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- jean-philippe@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org,
- peterx@redhat.com, dgilbert@redhat.com, bharatb.linux@gmail.com,
- qemu-arm@nongnu.org, eric.auger.pro@gmail.com
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 07, 2020 at 10:32:00AM +0100, Eric Auger wrote:
-> At the moment, the kernel only supports device tree
-> integration of the virtio-iommu. DT bindings between the
-> PCI root complex and the IOMMU must be created by the machine
-> in conformance to:
->=20
-> Documentation/devicetree/bindings/virtio/iommu.txt.
->=20
-> To make sure the end-user is aware of this, force him to use the
-> temporary device option "x-dt-binding" and also double check the
-> machine has a hotplug handler for the virtio-iommu-pci device.
-> This hotplug handler is in charge of creating those DT bindings.
->=20
+On Tue, Jan 28, 2020 at 11:34:50AM +0100, Eric Auger wrote:
+> Detect the presence of an ITS as part of the GICv3 init
+> routine, initialize its base address and read few registers
+> the IIDR, the TYPER to store its dimensioning parameters.
+> Also parse the BASER registers.
+> 
+> This is our first ITS test, belonging to a new "its" group.
+> 
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-
-how about setting it by default from machine class?
-See
-[PATCH 1/2] spapr: Disable legacy virtio devices for pseries-5.0 and later
-[PATCH 2/2] spapr: Enable virtio iommu_platform=3Don by default
-which does it for spapr.
-
+> 
 > ---
->=20
-> May be squashed with previous patch
+> 
+> v2 -> v3:
+> - updated dates and changed author
+> - squash "arm/arm64: ITS: Test BASER" into this patch but
+>   removes setup_baser which will be introduced later.
+> - only compile on aarch64
+> - restrict the new test to aarch64
+> 
+> v1 -> v2:
+> - clean GITS_TYPER macros and unused fields in typer struct
+> - remove memory attribute related macros
+> - remove everything related to memory attributes
+> - s/dev_baser/coll_baser/ in report_info
+> - add extra line
+> - removed index filed in its_baser
 > ---
->  hw/virtio/virtio-iommu-pci.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
->=20
-> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
-> index d539fcce75..3d06e14000 100644
-> --- a/hw/virtio/virtio-iommu-pci.c
-> +++ b/hw/virtio/virtio-iommu-pci.c
-> @@ -14,6 +14,7 @@
->  #include "virtio-pci.h"
->  #include "hw/virtio/virtio-iommu.h"
->  #include "hw/qdev-properties.h"
-> +#include "qapi/error.h"
-> =20
->  typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
-> =20
-> @@ -27,10 +28,12 @@ typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
->  struct VirtIOIOMMUPCI {
->      VirtIOPCIProxy parent_obj;
->      VirtIOIOMMU vdev;
-> +    bool dt_binding;
->  };
-> =20
->  static Property virtio_iommu_pci_properties[] =3D {
->      DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
-> +    DEFINE_PROP_BOOL("x-dt-binding", VirtIOIOMMUPCI, dt_binding, false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> =20
-> @@ -39,6 +42,21 @@ static void virtio_iommu_pci_realize(VirtIOPCIProxy *v=
-pci_dev, Error **errp)
->      VirtIOIOMMUPCI *dev =3D VIRTIO_IOMMU_PCI(vpci_dev);
->      DeviceState *vdev =3D DEVICE(&dev->vdev);
-> =20
-> +    if (!dev->dt_binding) {
-> +        error_setg(errp,
-> +                   "Instantiation currently only is possible if the mach=
-ine "
-> +                   "creates device tree iommu-map bindings, ie. ACPI is =
-not "
-> +                   "yet supported");
-> +        error_append_hint(errp, "use -virtio-iommu-pci,x-dt-binding\n");
-> +        return;
-> +    }
+>  arm/Makefile.arm64         |   1 +
+>  arm/gic.c                  |  49 ++++++++++++++++++
+>  arm/unittests.cfg          |   7 +++
+>  lib/arm/asm/gic-v3-its.h   | 103 +++++++++++++++++++++++++++++++++++++
+>  lib/arm/gic-v3-its.c       |  88 +++++++++++++++++++++++++++++++
+>  lib/arm/gic.c              |  30 +++++++++--
+>  lib/arm64/asm/gic-v3-its.h |   1 +
+>  7 files changed, 274 insertions(+), 5 deletions(-)
+>  create mode 100644 lib/arm/asm/gic-v3-its.h
+>  create mode 100644 lib/arm/gic-v3-its.c
+>  create mode 100644 lib/arm64/asm/gic-v3-its.h
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 6d3dc2c..2571ffb 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -19,6 +19,7 @@ endef
+>  cstart.o = $(TEST_DIR)/cstart64.o
+>  cflatobjs += lib/arm64/processor.o
+>  cflatobjs += lib/arm64/spinlock.o
+> +cflatobjs += lib/arm/gic-v3-its.o
+
+If gic-v3-its.c will never be compiled for arm, then it should
+probably go lib/arm64, not lib/arm. Same comment for all other
+new source and header files. The only problem with that is...
+
+>  
+>  OBJDIRS += lib/arm64
+>  
+> diff --git a/arm/gic.c b/arm/gic.c
+> index abf08c7..4d7dd03 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -16,6 +16,7 @@
+>  #include <asm/processor.h>
+>  #include <asm/delay.h>
+>  #include <asm/gic.h>
+> +#include <asm/gic-v3-its.h>
+
+...here where we'd have to do
+
+ #if defined(__aarch64__)
+ #include <asm/gic-v3-its.h>
+ #endif
+
+which is ugly. However that can be avoided by adding an
+empty lib/arm/asm/gic-v3-its.h file.
+
+
+>  #include <asm/smp.h>
+>  #include <asm/barrier.h>
+>  #include <asm/io.h>
+> @@ -518,6 +519,50 @@ static void gic_test_mmio(void)
+>  		test_targets(nr_irqs);
+>  }
+>  
+> +#if defined(__arm__)
 > +
-> +    if (!qdev_get_machine_hotplug_handler(DEVICE(vpci_dev))) {
-> +        error_setg(errp,
-> +                   "The machine does not implement a virtio-iommu-pci ho=
-tplug "
-> +                   " handler that creates the device tree iommu-map bind=
-ings");
-> +       return;
-> +    }
->      qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
->      object_property_set_link(OBJECT(dev),
->                               OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
-> --=20
+> +static void test_its_introspection(void) {}
+
+ static void test_its_introspection(void)
+ {
+     report_abort(...);
+ }
+
+> +
+> +#else /* __arch64__ */
+> +
+> +static void test_its_introspection(void)
+> +{
+> +	struct its_baser *dev_baser, *coll_baser;
+> +	struct its_typer *typer = &its_data.typer;
+> +
+> +	if (!gicv3_its_base()) {
+> +		report_skip("No ITS, skip ...");
+> +		return;
+> +	}
+> +
+> +	/* IIDR */
+> +	report(test_readonly_32(gicv3_its_base() + GITS_IIDR, false),
+> +	       "GITS_IIDR is read-only"),
+> +
+> +	/* TYPER */
+> +	report(test_readonly_32(gicv3_its_base() + GITS_TYPER, false),
+> +	       "GITS_TYPER is read-only");
+> +
+> +	report(typer->phys_lpi, "ITS supports physical LPIs");
+> +	report_info("vLPI support: %s", typer->virt_lpi ? "yes" : "no");
+> +	report_info("ITT entry size = 0x%x", typer->ite_size);
+> +	report_info("Bit Count: EventID=%d DeviceId=%d CollId=%d",
+> +		    typer->eventid_bits, typer->deviceid_bits,
+> +		    typer->collid_bits);
+> +	report(typer->eventid_bits && typer->deviceid_bits &&
+> +	       typer->collid_bits, "ID spaces");
+> +	report_info("Target address format %s",
+> +			typer->pta ? "Redist basse address" : "PE #");
+> +
+> +	dev_baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
+> +	coll_baser = its_lookup_baser(GITS_BASER_TYPE_COLLECTION);
+> +	report(dev_baser && coll_baser, "detect device and collection BASER");
+> +	report_info("device baser entry_size = 0x%x", dev_baser->esz);
+> +	report_info("collection baser entry_size = 0x%x", coll_baser->esz);
+> +}
+> +
+> +#endif
+> +
+>  int main(int argc, char **argv)
+>  {
+>  	if (!gic_init()) {
+> @@ -549,6 +594,10 @@ int main(int argc, char **argv)
+>  		report_prefix_push(argv[1]);
+>  		gic_test_mmio();
+>  		report_prefix_pop();
+> +	} else if (strcmp(argv[1], "its-introspection") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_its_introspection();
+> +		report_prefix_pop();
+>  	} else {
+>  		report_abort("Unknown subtest '%s'", argv[1]);
+>  	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index daeb5a0..ba2b31b 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -122,6 +122,13 @@ smp = $MAX_SMP
+>  extra_params = -machine gic-version=3 -append 'active'
+>  groups = gic
+>  
+> +[its-introspection]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'its-introspection'
+> +groups = its
+> +arch = arm64
+> +
+>  # Test PSCI emulation
+>  [psci]
+>  file = psci.flat
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..815c515
+> --- /dev/null
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -0,0 +1,103 @@
+> +/*
+> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
+> + *
+> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#ifndef _ASMARM_GIC_V3_ITS_H_
+> +#define _ASMARM_GIC_V3_ITS_H_
+> +
+> +#ifndef __ASSEMBLY__
+
+Doesn't look like you use the #else /* __ASSEMBLY__ */ side of this.
+I'd leave out the #ifndef until we add defines we need to access
+from assembler.
+
+> +
+> +struct its_typer {
+> +	unsigned int ite_size;
+> +	unsigned int eventid_bits;
+> +	unsigned int deviceid_bits;
+> +	unsigned int collid_bits;
+> +	bool pta;
+> +	bool phys_lpi;
+> +	bool virt_lpi;
+> +};
+> +
+> +struct its_baser {
+> +	int type;
+> +	size_t psz;
+> +	int nr_pages;
+> +	bool indirect;
+> +	phys_addr_t table_addr;
+> +	bool valid;
+> +	int esz;
+> +};
+> +
+> +#define GITS_BASER_NR_REGS              8
+> +
+> +struct its_data {
+> +	void *base;
+> +	struct its_typer typer;
+> +	struct its_baser baser[GITS_BASER_NR_REGS];
+> +};
+> +
+> +extern struct its_data its_data;
+> +
+> +#define gicv3_its_base()		(its_data.base)
+> +
+> +#if defined(__aarch64__)
+> +
+> +#define GITS_CTLR			0x0000
+> +#define GITS_IIDR			0x0004
+> +#define GITS_TYPER			0x0008
+> +#define GITS_CBASER			0x0080
+> +#define GITS_CWRITER			0x0088
+> +#define GITS_CREADR			0x0090
+> +#define GITS_BASER			0x0100
+> +
+> +#define GITS_TYPER_PLPIS                BIT(0)
+> +#define GITS_TYPER_VLPIS		BIT(1)
+> +#define GITS_TYPER_ITT_ENTRY_SIZE	GENMASK_ULL(7, 4)
+> +#define GITS_TYPER_ITT_ENTRY_SIZE_SHIFT	4
+> +#define GITS_TYPER_IDBITS		GENMASK_ULL(8, 12)
+> +#define GITS_TYPER_IDBITS_SHIFT         8
+> +#define GITS_TYPER_DEVBITS		GENMASK_ULL(13, 17)
+> +#define GITS_TYPER_DEVBITS_SHIFT        13
+> +#define GITS_TYPER_PTA                  BIT(19)
+> +#define GITS_TYPER_CIDBITS		GENMASK_ULL(32, 35)
+> +#define GITS_TYPER_CIDBITS_SHIFT	32
+> +#define GITS_TYPER_CIL			BIT(36)
+> +
+> +#define GITS_CTLR_ENABLE		(1U << 0)
+> +
+> +#define GITS_CBASER_VALID		(1UL << 63)
+> +
+> +#define GITS_BASER_VALID		BIT(63)
+> +#define GITS_BASER_INDIRECT		BIT(62)
+> +#define GITS_BASER_TYPE_SHIFT		(56)
+> +#define GITS_BASER_TYPE(r)		(((r) >> GITS_BASER_TYPE_SHIFT) & 7)
+> +#define GITS_BASER_ENTRY_SIZE_SHIFT	(48)
+> +#define GITS_BASER_ENTRY_SIZE(r)	((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
+> +#define GITS_BASER_PAGE_SIZE_SHIFT	(8)
+> +#define GITS_BASER_PAGE_SIZE_4K		(0UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_16K	(1UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_64K	(2UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGE_SIZE_MASK	(3UL << GITS_BASER_PAGE_SIZE_SHIFT)
+> +#define GITS_BASER_PAGES_MAX		256
+> +#define GITS_BASER_PAGES_SHIFT		(0)
+> +#define GITS_BASER_NR_PAGES(r)		(((r) & 0xff) + 1)
+> +#define GITS_BASER_PHYS_ADDR_MASK	0xFFFFFFFFF000
+> +#define GITS_BASER_TYPE_NONE		0
+> +#define GITS_BASER_TYPE_DEVICE		1
+> +#define GITS_BASER_TYPE_COLLECTION	4
+> +
+> +extern void its_parse_typer(void);
+> +extern void its_init(void);
+> +extern int its_parse_baser(int i, struct its_baser *baser);
+> +extern struct its_baser *its_lookup_baser(int type);
+> +
+> +#else /* __arm__ */
+> +
+> +static inline void its_init(void) {}
+
+Looks like the empty gic-v3-its.h I suggested creating above will actually
+be useful. We can add stubs like this in it.
+
+> +
+> +#endif
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> new file mode 100644
+> index 0000000..2c0ce13
+> --- /dev/null
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -0,0 +1,88 @@
+> +/*
+> + * Copyright (C) 2020, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/gic.h>
+> +#include <alloc_page.h>
+> +#include <asm/gic-v3-its.h>
+> +
+> +void its_parse_typer(void)
+> +{
+> +	u64 typer = readq(gicv3_its_base() + GITS_TYPER);
+> +
+> +	its_data.typer.ite_size = ((typer & GITS_TYPER_ITT_ENTRY_SIZE) >>
+> +					GITS_TYPER_ITT_ENTRY_SIZE_SHIFT) + 1;
+> +	its_data.typer.pta = typer & GITS_TYPER_PTA;
+> +	its_data.typer.eventid_bits = ((typer & GITS_TYPER_IDBITS) >>
+> +						GITS_TYPER_IDBITS_SHIFT) + 1;
+> +	its_data.typer.deviceid_bits = ((typer & GITS_TYPER_DEVBITS) >>
+> +						GITS_TYPER_DEVBITS_SHIFT) + 1;
+> +
+> +	if (typer & GITS_TYPER_CIL)
+> +		its_data.typer.collid_bits = ((typer & GITS_TYPER_CIDBITS) >>
+> +						GITS_TYPER_CIDBITS_SHIFT) + 1;
+
+nit: please consider aligning like this
+
+ ((typer & MASK) >>
+  SHIFT) + 1;
+
+Or, maybe better to macro it
+
+ #define TYPER_FIELD(typer, mask, shift) (((type) & (mask) >> (shift)) + 1)
+
+And, rather than have a bunch of 'its_data.typer's we could use an alias,
+helping us stay within 120 chars.
+
+ struct its_typer *t = &its_data.typer;
+
+ t->ite_size = TYPER_FIELD(typer, GITS_TYPER_ITT_ENTRY_SIZE,
+                           GITS_TYPER_ITT_ENTRY_SIZE_SHIFT);
+
+
+> +	else
+> +		its_data.typer.collid_bits = 16;
+> +
+> +	its_data.typer.virt_lpi = typer & GITS_TYPER_VLPIS;
+> +	its_data.typer.phys_lpi = typer & GITS_TYPER_PLPIS;
+> +}
+> +
+> +int its_parse_baser(int i, struct its_baser *baser)
+> +{
+> +	void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
+> +	u64 val = readq(reg_addr);
+> +
+> +	if (!val) {
+> +		memset(baser, 0, sizeof(*baser));
+> +		return -1;
+> +	}
+> +
+> +	baser->valid = val & GITS_BASER_VALID;
+> +	baser->indirect = val & GITS_BASER_INDIRECT;
+> +	baser->type = GITS_BASER_TYPE(val);
+> +	baser->esz = GITS_BASER_ENTRY_SIZE(val);
+> +	baser->nr_pages = GITS_BASER_NR_PAGES(val);
+> +	baser->table_addr = val & GITS_BASER_PHYS_ADDR_MASK;
+> +	switch (val & GITS_BASER_PAGE_SIZE_MASK) {
+> +	case GITS_BASER_PAGE_SIZE_4K:
+> +		baser->psz = SZ_4K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_16K:
+> +		baser->psz = SZ_16K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_64K:
+> +		baser->psz = SZ_64K;
+> +		break;
+> +	default:
+> +		baser->psz = SZ_64K;
+> +	}
+> +	return 0;
+> +}
+> +
+> +struct its_baser *its_lookup_baser(int type)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> +		struct its_baser *baser = &its_data.baser[i];
+> +
+> +		if (baser->type == type)
+> +			return baser;
+> +	}
+> +	return NULL;
+> +}
+> +
+> +void its_init(void)
+> +{
+> +	int i;
+> +
+> +	if (!its_data.base)
+> +		return;
+> +
+> +	its_parse_typer();
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++)
+> +		its_parse_baser(i, &its_data.baser[i]);
+> +}
+> +
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index aa9cb86..6b70b05 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -6,9 +6,11 @@
+>  #include <devicetree.h>
+>  #include <asm/gic.h>
+>  #include <asm/io.h>
+> +#include <asm/gic-v3-its.h>
+>  
+>  struct gicv2_data gicv2_data;
+>  struct gicv3_data gicv3_data;
+> +struct its_data its_data;
+>  
+>  struct gic_common_ops {
+>  	void (*enable_defaults)(void);
+> @@ -44,12 +46,13 @@ static const struct gic_common_ops gicv3_common_ops = {
+>   * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
+>   */
+>  static bool
+> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+> +gic_get_dt_bases(const char *compatible, void **base1, void **base2, void **base3)
+>  {
+>  	struct dt_pbus_reg reg;
+> -	struct dt_device gic;
+> +	struct dt_device gic, its;
+>  	struct dt_bus bus;
+> -	int node, ret, i;
+> +	int node, subnode, ret, i, len;
+> +	const void *fdt = dt_fdt();
+>  
+>  	dt_bus_init_defaults(&bus);
+>  	dt_device_init(&gic, &bus, NULL);
+> @@ -74,19 +77,35 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+>  		base2[i] = ioremap(reg.addr, reg.size);
+>  	}
+>  
+> +	if (base3 && !strcmp(compatible, "arm,gic-v3")) {
+
+If base != NULL, then we could assert(strcmp(compatible, "arm,cortex-a15-gic") != 0)
+
+> +		dt_for_each_subnode(node, subnode) {
+> +			const struct fdt_property *prop;
+> +
+> +			prop = fdt_get_property(fdt, subnode, "compatible", &len);
+> +			if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
+> +				dt_device_bind_node(&its, subnode);
+> +				ret = dt_pbus_translate(&its, 0, &reg);
+> +				assert(ret == 0);
+> +				*base3 = ioremap(reg.addr, reg.size);
+> +				break;
+> +			}
+> +		}
+> +
+> +	}
+> +
+>  	return true;
+>  }
+>  
+>  int gicv2_init(void)
+>  {
+>  	return gic_get_dt_bases("arm,cortex-a15-gic",
+> -			&gicv2_data.dist_base, &gicv2_data.cpu_base);
+> +			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
+>  }
+>  
+>  int gicv3_init(void)
+>  {
+>  	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
+> -			&gicv3_data.redist_bases[0]);
+> +			&gicv3_data.redist_bases[0], &its_data.base);
+>  }
+>  
+>  int gic_version(void)
+> @@ -104,6 +123,7 @@ int gic_init(void)
+>  		gic_common_ops = &gicv2_common_ops;
+>  	else if (gicv3_init())
+>  		gic_common_ops = &gicv3_common_ops;
+> +	its_init();
+>  	return gic_version();
+>  }
+>  
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..083cba4
+> --- /dev/null
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -0,0 +1 @@
+> +#include "../../arm/asm/gic-v3-its.h"
+> -- 
 > 2.20.1
+>
+
+Thanks,
+drew 
 
 
