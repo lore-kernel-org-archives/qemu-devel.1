@@ -2,87 +2,89 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F4AC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BDCC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:52:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13DBA21741
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:50:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAF3520838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:52:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cMJU7U/r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DBA21741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DEu35tWL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAF3520838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j06pr-0004AY-8x
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:50:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60653)
+	id 1j06rH-0005bW-W2
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:52:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1j06pD-0003eY-RL
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:49:52 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j06pf-0004AH-35
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:50:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1j06pC-0004pw-SC
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:49:51 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41796)
+ (envelope-from <alex.bennee@linaro.org>) id 1j06pd-0005Jg-Kn
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:50:18 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53522)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1j06pC-0004np-Ln
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:49:50 -0500
-Received: by mail-wr1-x443.google.com with SMTP id c9so3470204wrw.8
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 08:49:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=92uU3xpuUKXAnWusoGwd6BJzOpB2e8piLTQYa8P/0IM=;
- b=cMJU7U/rWOF8ZDdTaTj6thyE++n/qAY9UQ1hqdGb00eCjXRpp2/jR2Hl55xbjD3cLB
- tdWYPx35CrL6PHsb/g/vl+k+pxv5vNoJprc0e/yhjyYyQDMAQWHxOuEUU9AnjFjLKhX5
- G889g9n59V3iaeIXPGOP1MusCptFjbaOU2umbRW/u01u+/vxT+c/w+qlSCZjeoX1WJ+j
- 35fjN7oq/xoOuaf8w6d/gf6vM/IkZ9SrwqEP51fwTlo0hfUBKHFxNRigQZKPVYAHvDbj
- ju/z8ADTJF8bIhYodO7owlCnyZO81ZgVtJYaY24mf36gKCdk3InyCJ0i2X4JKaoa1Z7J
- kfxw==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j06pd-0005JB-D6
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:50:17 -0500
+Received: by mail-wm1-x341.google.com with SMTP id s10so3245574wmh.3
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 08:50:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=YIppaXtV7VBSeH2WhK7RaQjEGHXi5D11I34HwoRYAg8=;
+ b=DEu35tWLoiZfUxrTXaayVg/K5HwsHHn1XmOcEdPi7VXv2yvshUJWT5oxR49pF8uNQE
+ 6SyhWUufeuCr7J+X8zkyV3DOq652K3UtRYkotbX+pJrAJxgTb9sWQ4Q/q6DLV23wms3d
+ KQ+mV2K0qaK/4VMCcVIr5fgkpWoMcDjAXsfidHG3GXnrKrDpFJiwMiMMDBjrnwgW90Nj
+ J3zO0D9JsEC5c7q/OtkrQ7WW0uCesx/g5TYN2bg++jBWUrDgClzvClvVyYO61OwrldxS
+ EYfzDOgybeiGz+RlC3Tr+ianPnVnTKiEmwwj6Y7ZDYQufJvFZz9VzA2ZM0qWrnqmpX8M
+ 8Alw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=92uU3xpuUKXAnWusoGwd6BJzOpB2e8piLTQYa8P/0IM=;
- b=ladkzyNq1SC84EseBovTL2qzZRHNJHaEBGKxcEBVgf2wQf6vnSju4znoKG6pFmfDBB
- SAidIjKBVc04hwHdRqZdHoIPuIlssMu6FWYPzyf+Q4Z6qxZq2gUkY4QBz78dtJAmZBPJ
- XAddLzs7/dzaCoUplNeO6AEpH6fZz1nXJ8uTJtX8VjbSW4kw6x10QMdEIAj1UzSmCH/p
- mlF0M/SdAKETlIN/rDINEfa/BvIJCTC/f3TBj6txt0JKAHxjilVeBqOU0bQPqVpar9rL
- ajus85o8QijUCuybnVaOsQ1PjC1x3LKWBe5gyznmkrAIBaqi+jbXszgT95W2fEEX8/M6
- MUoQ==
-X-Gm-Message-State: APjAAAWZcE9qTNz8ZYuDrf2Pai5VL8uqcy0MkJn8Xtk4ZX0LlFl7BUuH
- hEdokXXxuTdPGBeeQeMdZ9Q=
-X-Google-Smtp-Source: APXvYqx/jcU2vtHr7vTIyZNXKu4QK8yyhN7UYnuF4sJBFJAkad++ft5EgFbQqOt0SfG2wvx+omtAAw==
-X-Received: by 2002:adf:97d6:: with SMTP id t22mr5547260wrb.407.1581094189529; 
- Fri, 07 Feb 2020 08:49:49 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id w19sm3832825wmc.22.2020.02.07.08.49.48
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=YIppaXtV7VBSeH2WhK7RaQjEGHXi5D11I34HwoRYAg8=;
+ b=eEkXYx/zRJ4mcv0F5RzTfespHi1cAAxroAR6FU/PoMOMZ6PR2y6QCtnrjVrNSdDrTE
+ vQdyjvBgp19AeR6KmvOPbAVA+pevyq05VTHdBKCcE5tkauiPywcdnG0TVYNAfJgolGVJ
+ BLzm/0KCDuLB30c/zbo4juzc/16aSm/lP/JMWP18W1/3qeuWEOdgYewV7GknDoguG8lQ
+ aBgVmByZqss4iEU3RQXx1OicGRCw3NmA30H/+Q1UA8dsXsbyIuTQT4xJ9HrxJReYy2Mc
+ 3F7N1fgXMpNS6xdxuhtwFP83e7LlD0KZc38VGcOZL8sO/Ua2DC0dE5oMH/yGoO/mO2yR
+ nl4w==
+X-Gm-Message-State: APjAAAWSqFYp1XZJQIoPOmtgFXjGi6wwAFo32nWPTcEqAHev5/kbhqzb
+ FkhqPKqWE2JGmQuuGJfKHlzp6w==
+X-Google-Smtp-Source: APXvYqw3rJl8tsq96jRthoVlyCaWSMtRfJzKNTlzwxV1MVfwhyYTz/2CV0GsoTP40meaiig8CPhaQg==
+X-Received: by 2002:a05:600c:20f:: with SMTP id
+ 15mr5186892wmi.128.1581094216165; 
+ Fri, 07 Feb 2020 08:50:16 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f8sm4032809wru.12.2020.02.07.08.50.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 08:49:48 -0800 (PST)
-Date: Fri, 7 Feb 2020 16:49:47 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2] hw/core: Allow setting 'virtio-blk-device.scsi'
- property on OSX host
-Message-ID: <20200207164947.GK168381@stefanha-x1.localdomain>
-References: <20200207001404.1739-1-philmd@redhat.com>
+ Fri, 07 Feb 2020 08:50:14 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3EA1C1FF87;
+ Fri,  7 Feb 2020 16:50:14 +0000 (GMT)
+References: <20200205212920.467-1-robert.foley@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v1 00/14] tests/vm: Add support for aarch64 VMs
+In-reply-to: <20200205212920.467-1-robert.foley@linaro.org>
+Date: Fri, 07 Feb 2020 16:50:14 +0000
+Message-ID: <877e0y735l.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Rex5+51txc1ort/q"
-Content-Disposition: inline
-In-Reply-To: <20200207001404.1739-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,64 +96,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: fam@euphon.net, peter.puhov@linaro.org, philmd@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Rex5+51txc1ort/q
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Robert Foley <robert.foley@linaro.org> writes:
 
-On Fri, Feb 07, 2020 at 01:14:04AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Commit ed65fd1a2750 ("virtio-blk: switch off scsi-passthrough by
-> default") changed the default value of the 'scsi' property of
-> virtio-blk, which is only available on Linux hosts. It also added
-> an unconditional compat entry for 2.4 or earlier machines.
->=20
-> Trying to set this property on a pre-2.5 machine on OSX, we get:
->=20
->    Unexpected error in object_property_find() at qom/object.c:1201:
->    qemu-system-x86_64: -device virtio-blk-pci,id=3Dscsi0,drive=3Ddrive0: =
-can't apply global virtio-blk-device.scsi=3Dtrue: Property '.scsi' not found
->=20
-> Fix this error by marking the property optional.
->=20
-> Fixes: ed65fd1a27 ("virtio-blk: switch off scsi-passthrough by default")
-> Suggested-by: Cornelia Huck <cohuck@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
-> v2: Reworded description (Cornelia)
->=20
-> Extracted from testing series:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675074.html
-> ---
->  hw/core/machine.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> This is version 1 of the patch series to=20
+> add support for 2 aarch64 VMs.=20=20
+>  - Ubuntu 18.04 aarch64 VM
+>  - CentOS 8 aarch64 VM
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Testing under TCG with:
 
-Stefan
+  make vm-build-ubuntu.aarch64 V=3D1 QEMU=3Daarch64-softmmu/qemu-system-aar=
+ch64
 
---Rex5+51txc1ort/q
-Content-Type: application/pgp-signature; name="signature.asc"
+I'm seeing it hang:
 
------BEGIN PGP SIGNATURE-----
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 sed -ie 's/"1"/"0"/g' /etc/apt/apt.conf.d/20auto-upgrades
+  Warning: Permanently added '[127.0.0.1]:37431' (ECDSA) to the list of kno=
+wn hosts.
+  bash: warning: setlocale: LC_ALL: cannot change locale (en_GB.UTF-8)
+  Connection to 127.0.0.1 closed.
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 sync && reboot
+  Warning: Permanently added '[127.0.0.1]:37431' (ECDSA) to the list of kno=
+wn hosts.
+  bash: warning: setlocale: LC_ALL: cannot change locale (en_GB.UTF-8)
+  Connection to 127.0.0.1 closed by remote host.
+  Connection to 127.0.0.1 closed.
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 exit 0
+  Warning: Permanently added '[127.0.0.1]:37431' (ECDSA) to the list of kno=
+wn hosts.
+  bash: warning: setlocale: LC_ALL: cannot change locale (en_GB.UTF-8)
+  Connection to 127.0.0.1 closed.
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 locale
+  ssh_exchange_identification: Connection closed by remote host
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sources.list
+  ssh_exchange_identification: Connection closed by remote host
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 apt-get update
+  ssh_exchange_identification: Connection closed by remote host
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 apt-get build-dep -y qemu
+  ssh_exchange_identification: Connection closed by remote host
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 apt-get install -y libfdt-dev flex bison
+  ssh_exchange_identification: Connection closed by remote host
+  DEBUG:root:ssh_cmd: ssh -t -o StrictHostKeyChecking=3Dno -o UserKnownHost=
+sFile=3D/dev/null -o ConnectTimeout=3D60 -p 37431 -i /home/alex.bennee/lsrc=
+/qemu.git/builds/all/vm-test-xxrw1r36.tmp/id_rsa -o SendEnv=3Dhttps_proxy -=
+o SendEnv=3Dhttp_proxy -o SendEnv=3Dftp_proxy -o SendEnv=3Dno_proxy root@12=
+7.0.0.1 poweroff
+  ssh_exchange_identification: Connection closed by remote host
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl49lSsACgkQnKSrs4Gr
-c8gl4wf+KAcn8Vs6f0jAh8kw1o9ktF+PHmxUesiACA+jKiYDmBK4hb8HRxU6SzSG
-6dd0Z/tliODb+GGAIfI94PYd/zApyU1pR+3BPnDI/Inq4PjoVdpw4OVt8Iu/Lu7W
-gjQZntD867XDF9qen81OswvHH8F6bAT8sX6oy1dTcuia/zLAu90h30F186YIlGWN
-irLrDlRRAMk4KxoRvJ431Ra/2aPA4v7oiF0pe5sY0WZCaaM/+yqthHdFB7HQeDRH
-CFQhZ7zUHDFiRNq2xI/Xa6yQNTl/qyuQaaM/vhNeqxlhM2Z2g+0J6aTMYUOhg2Ud
-BwxtQ5Acg4NZBoDXWPbneZzVCb0a7g==
-=e/cJ
------END PGP SIGNATURE-----
-
---Rex5+51txc1ort/q--
+--=20
+Alex Benn=C3=A9e
 
