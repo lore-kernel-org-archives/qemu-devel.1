@@ -2,76 +2,79 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F92CC04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 159A5C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:14:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAE422465D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:14:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9215B2465D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:14:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hlGqn8JX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE422465D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UmCAy2b4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9215B2465D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05Ko-0006bC-4Z
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:14:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35685)
+	id 1j05Kr-0006kz-P8
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:14:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j05II-0002Ws-TS
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:49 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j058E-0000iA-Bn
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j05IG-00040Z-99
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30076
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j05IG-0003xz-3C
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581088303;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=kkHRc1PwiQeLeAXUZKF+RwJeJeiO6ejjpGNQQLx3tY4=;
- b=hlGqn8JXXMR34wHlYkt+L04kuyD62nlAdeDb9sq0tzvKuVH6afBhmyt5+OOlpHpB2I15W6
- uDyroFeF7Jf77Zq1i5SaroJ+cVvbL/JOV9COd286yN+h9WfJdyuI+E/G1tVyfNSy/dMTZZ
- JAVLHTbKAAZWMJsvtvlQ0HQwkaShJpU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-f5Z24Ky8PRemxIzqtAqJgw-1; Fri, 07 Feb 2020 10:11:32 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5754801E6C;
- Fri,  7 Feb 2020 15:11:30 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-120.brq.redhat.com [10.40.204.120])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 56DAD790D7;
- Fri,  7 Feb 2020 15:11:26 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/46] Python queue 2020-02-07
-Date: Fri,  7 Feb 2020 16:11:12 +0100
-Message-Id: <20200207151113.29349-1-philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j0588-0003JN-7R
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:22 -0500
+Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:37896)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j0587-0003Ed-SD
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:16 -0500
+Received: by mail-oi1-x22a.google.com with SMTP id l9so2237682oii.5
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 07:01:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lmKHRLOMLiulq5XOV3jUR+8JbZpGp8iUux1+j2rpVlA=;
+ b=UmCAy2b4L0d/MiGR9dcs2dEcFsArDRGOHEudwuElQ99ShjbFHd2nwC45Af7E2B4y4n
+ jSBPhDj6r/zT0zNr4Fu6GN+AUUK7jYBPCjVGatFmbeYhx8bVeE88OBRemREyXzdNTPLZ
+ vUE03NECGeGbTgh5LKXiM+VS5U6QTOCKdic9ClqBrpsLADRQLhCoHG9ty7LBL9o+2VHN
+ +oL/sJxwH03+u9Pj9+CYmGzM8YM3iBsjOj+lV0lQmy/6mNQoqClbnwffT1w6xmu1K+1y
+ OHK/gkUg/HiEVUje1JmLYb8ekbS8J8WTLEHbjv0RAWcsdtO89VICS1OX5wVw1qsgTktf
+ 3HeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lmKHRLOMLiulq5XOV3jUR+8JbZpGp8iUux1+j2rpVlA=;
+ b=qsENsT/RJujY5SquFLKHH6O7z7bIvSr6e53ubcOQJ0q8Shx1JqUemlfU3CRJ/GvNx4
+ qyUb+OUR+f9WydCxA5eUthz4C6Kx5WLKnYcJKWGoJSe04SPJv5YwmkS9sfXMnZi7z4D6
+ VLZslVfKRksgR1SFakHMx/+L0uxtb6fyhmMKjqcDyl0W+bQl3o3oxckS0mdiCyU5x8NO
+ 3amZtG0vugQ5eNzA+qnWYwi0juO31SVQfkY3NlYKTcwxBFfcfm4MkoSxjfwhmGHSKIKa
+ F2T+D8YxlD+29MpWT+zKEhPMnATjWPiCbDawFymFSRfcMqDFiPauM5b04o8EXfie8MTo
+ dHJQ==
+X-Gm-Message-State: APjAAAXRs7H1oNyIvmjjrZINecorJVOhhFiraZMdyYor7FXF7fZYQNgQ
+ f7iHf6bACHTXZAkrRDPXXxHhMKUpe7mroPyA2Cc8qw==
+X-Google-Smtp-Source: APXvYqz2c2DPD0d/PGHRD2tWrbFL78xTkKTV4/sftf/L0w+6cThlO+3fKYk968XBNSrm2SAGAbrhKMKL3spDD60Wuqs=
+X-Received: by 2002:a54:4f16:: with SMTP id e22mr2417588oiy.170.1581087674999; 
+ Fri, 07 Feb 2020 07:01:14 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: f5Z24Ky8PRemxIzqtAqJgw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200207074557.26073-1-kraxel@redhat.com>
+In-Reply-To: <20200207074557.26073-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Feb 2020 15:01:04 +0000
+Message-ID: <CAFEAcA8ni9V3=qzXTFu3djXGGLkXS+BJmVqfTbK4E9HZq6CeVg@mail.gmail.com>
+Subject: Re: [PULL 00/12] Audio 20200207 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,286 +86,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On Fri, 7 Feb 2020 at 07:47, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 928173659d6e5dc368284f73f90ea1d129e1f57d:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200130' into staging (2020-01-30 16:19:04 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/audio-20200207-pull-request
+>
+> for you to fetch changes up to ed2a4a794184df3dbd5ee4cc06e86fe220663faf:
+>
+>   audio: proper support for float samples in mixeng (2020-02-06 14:35:57 +0100)
+>
+> ----------------------------------------------------------------
+> audio: bugfixes, mostly audio backend rewrite fallout
+>
+> ---------------------------------------------------------------
 
-I prepared this series on behalf of Eduardo and
-Cleber.
 
-Eduardo already ack'ed yesterday version (2020-02-06) cover:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg677636.html
+Applied, thanks.
 
-Since 2020-02-06 (v1):
-- rebased to cover new iotests #283 (merged yesterday).
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-Regards,
-
-Phil.
-
-The following changes since commit 863d2ed5823f90c42dcd481687cc99cbc9c4a17c=
-:
-
-  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-02-06=
-' into staging (2020-02-06 16:22:05 +0000)
-
-are available in the Git repository at:
-
-  https://gitlab.com/philmd/qemu.git tags/python-next-20200207
-
-for you to fetch changes up to 66e7dde18cc4085ca47124be4ca08fa8e6bcdd3a:
-
-  .readthedocs.yml: specify some minimum python requirements (2020-02-07 15=
-:15:16 +0100)
-
-----------------------------------------------------------------
-- Python 3 cleanups:
-  . Remove text about Python 2 in qemu-deprecated (Thomas)
-  . Remove shebang header (Paolo, Philippe)
-  . scripts/checkpatch.pl now allows Python 3 interpreter (Philippe)
-  . Explicit usage of Python 3 interpreter in scripts (Philippe)
-  . Fix Python scripts permissions (Paolo, Philippe)
-  . Drop 'from __future__ import print_function' (Paolo)
-  . Specify minimum python requirements in ReadTheDocs configuration (Alex)
-- Test UNIX/EXEC transports with migration (Oksana)
-- Added extract_from_rpm helper, improved extract_from_deb (Liam)
-- Allow to use other serial consoles than default one (Philippe)
-- Various improvements in QEMUMonitorProtocol (Wainer)
-- Fix kvm_available() on ppc64le (Wainer)
-
-----------------------------------------------------------------
-
-Alex Benn=C3=A9e (1):
-  .readthedocs.yml: specify some minimum python requirements
-
-Denis Plotnikov (1):
-  tests: rename virtio_seg_max_adjust to virtio_check_params
-
-Liam Merwick (4):
-  travis.yml: install rpm2cpio for acceptance tests
-  tests/boot_linux_console: add extract_from_rpm method
-  tests/boot_linux_console: use os.path for filesystem paths
-  tests/boot_linux_console: fix extract_from_deb() comment
-
-Luk=C3=A1=C5=A1 Doktor (1):
-  python: Treat None-return of greeting cmd
-
-Oksana Vohchana (4):
-  tests/acceptance/migration: Factor out assert_migration()
-  tests/acceptance/migration: Factor out do_migrate()
-  tests/acceptance/migration: Test UNIX transport when migrating
-  tests/acceptance/migration: Test EXEC transport when migrating
-
-Paolo Bonzini (3):
-  scripts/signrom: remove Python 2 support, add shebang
-  make all Python scripts executable
-  drop "from __future__ import print_function"
-
-Philippe Mathieu-Daud=C3=A9 (24):
-  python/qemu/machine: Allow to use other serial consoles than default
-  Acceptance tests: Extract _console_interaction()
-  Acceptance tests: Add interrupt_interactive_console_until_pattern()
-  tests/boot_linux_console: Tag Emcraft Smartfusion2 as running 'u-boot'
-  tests/acceptance/virtio_check_params: Improve exception logging
-  tests/acceptance/virtio_check_params: List machine being tested
-  tests/acceptance/virtio_check_params: Default to -nodefaults
-  tests/acceptance/virtio_check_params: Disable the test
-  tests/acceptance/boot_linux_console: Do not use VGA on Clipper machine
-  tests/acceptance/version: Default to -nodefaults
-  tests/acceptance/migration: Add the 'migration' tag
-  tests/acceptance/migration: Default to -nodefaults
-  scripts/checkpatch.pl: Only allow Python 3 interpreter
-  tests/qemu-iotests/check: Allow use of python3 interpreter
-  tests/qemu-iotests: Explicit usage of Python 3 (scripts with __main__)
-  tests: Explicit usage of Python 3
-  scripts: Explicit usage of Python 3 (scripts with __main__)
-  scripts/minikconf: Explicit usage of Python 3
-  scripts/tracetool: Remove shebang header
-  tests/acceptance: Remove shebang header
-  tests/vm: Remove shebang header
-  tests/qemu-iotests: Explicit usage of Python3 (scripts without
-    __main__)
-  scripts: Explicit usage of Python 3 (scripts without __main__)
-  tests/qemu-iotests/check: Only check for Python 3 interpreter
-
-Thomas Huth (2):
-  qemu-deprecated: Remove text about Python 2
-  tests/acceptance: Add boot tests for some of the QEMU advent calendar
-    images
-
-Wainer dos Santos Moschetta (6):
-  python/qemu: qmp: Replace socket.error with OSError
-  python/qemu: Delint the qmp module
-  python/qemu: qmp: Make accept()'s timeout configurable
-  python/qemu: qmp: Make QEMUMonitorProtocol a context manager
-  python/qemu: qmp: Remove unnused attributes
-  python/qemu: accel: Fix kvm_available() on ppc64le
-
- qemu-deprecated.texi                          |   8 --
- .readthedocs.yml                              |  20 +++
- .travis.yml                                   |   3 +-
- python/qemu/accel.py                          |   3 +-
- python/qemu/machine.py                        |  10 +-
- python/qemu/qmp.py                            |  99 ++++++++++----
- scripts/analyse-9p-simpletrace.py             |   3 +-
- scripts/analyse-locks-simpletrace.py          |   3 +-
- scripts/checkpatch.pl                         |   6 +
- scripts/decodetree.py                         |   2 +-
- scripts/device-crash-test                     |   3 +-
- scripts/dump-guest-memory.py                  |   1 -
- scripts/kvm/kvm_flightrecorder                |   3 +-
- scripts/kvm/vmxcap                            |   1 -
- scripts/minikconf.py                          |   2 +-
- scripts/modules/module_block.py               |   1 -
- scripts/qapi-gen.py                           |   3 +-
- scripts/qapi/doc.py                           |   1 -
- scripts/qmp/qemu-ga-client                    |   3 +-
- scripts/qmp/qmp                               |   3 +-
- scripts/qmp/qmp-shell                         |   3 +-
- scripts/qmp/qom-fuse                          |   2 +-
- scripts/qmp/qom-get                           |   1 -
- scripts/qmp/qom-list                          |   1 -
- scripts/qmp/qom-set                           |   1 -
- scripts/qmp/qom-tree                          |   1 -
- scripts/render_block_graph.py                 |   2 +-
- scripts/replay-dump.py                        |   3 +-
- scripts/signrom.py                            |  11 +-
- scripts/simpletrace.py                        |   3 +-
- scripts/tracetool.py                          |   2 +-
- scripts/tracetool/__init__.py                 |   1 -
- scripts/tracetool/backend/__init__.py         |   1 -
- scripts/tracetool/backend/dtrace.py           |   1 -
- scripts/tracetool/backend/ftrace.py           |   1 -
- scripts/tracetool/backend/log.py              |   1 -
- scripts/tracetool/backend/simple.py           |   1 -
- scripts/tracetool/backend/syslog.py           |   1 -
- scripts/tracetool/backend/ust.py              |   1 -
- scripts/tracetool/format/__init__.py          |   1 -
- scripts/tracetool/format/c.py                 |   1 -
- scripts/tracetool/format/d.py                 |   1 -
- scripts/tracetool/format/h.py                 |   1 -
- scripts/tracetool/format/log_stap.py          |   1 -
- scripts/tracetool/format/simpletrace_stap.py  |   1 -
- scripts/tracetool/format/stap.py              |   1 -
- scripts/tracetool/format/tcg_h.py             |   1 -
- scripts/tracetool/format/tcg_helper_c.py      |   1 -
- scripts/tracetool/format/tcg_helper_h.py      |   1 -
- .../tracetool/format/tcg_helper_wrapper_h.py  |   1 -
- scripts/tracetool/format/ust_events_c.py      |   1 -
- scripts/tracetool/format/ust_events_h.py      |   1 -
- scripts/tracetool/transform.py                |   1 -
- scripts/tracetool/vcpu.py                     |   1 -
- scripts/vmstate-static-checker.py             |   3 +-
- tests/acceptance/avocado_qemu/__init__.py     |  59 +++++++--
- tests/acceptance/boot_linux_console.py        | 124 +++++++++++++++++-
- tests/acceptance/migration.py                 |  57 +++++---
- tests/acceptance/version.py                   |   1 +
- ...g_max_adjust.py =3D> virtio_check_params.py} |  16 ++-
- tests/acceptance/x86_cpu_model_versions.py    |   1 -
- tests/docker/travis.py                        |   3 +-
- tests/guest-debug/test-gdbstub.py             |   1 -
- tests/migration/guestperf/engine.py           |   1 -
- tests/migration/guestperf/plot.py             |   1 -
- tests/migration/guestperf/shell.py            |   1 -
- tests/qapi-schema/test-qapi.py                |   3 +-
- tests/qemu-iotests/030                        |   2 +-
- tests/qemu-iotests/040                        |   2 +-
- tests/qemu-iotests/041                        |   2 +-
- tests/qemu-iotests/044                        |   2 +-
- tests/qemu-iotests/045                        |   2 +-
- tests/qemu-iotests/055                        |   2 +-
- tests/qemu-iotests/056                        |   2 +-
- tests/qemu-iotests/057                        |   2 +-
- tests/qemu-iotests/065                        |   2 +-
- tests/qemu-iotests/093                        |   2 +-
- tests/qemu-iotests/096                        |   2 +-
- tests/qemu-iotests/118                        |   2 +-
- tests/qemu-iotests/124                        |   2 +-
- tests/qemu-iotests/129                        |   2 +-
- tests/qemu-iotests/132                        |   2 +-
- tests/qemu-iotests/136                        |   2 +-
- tests/qemu-iotests/139                        |   2 +-
- tests/qemu-iotests/147                        |   2 +-
- tests/qemu-iotests/148                        |   2 +-
- tests/qemu-iotests/149                        |   3 +-
- tests/qemu-iotests/151                        |   2 +-
- tests/qemu-iotests/152                        |   2 +-
- tests/qemu-iotests/155                        |   2 +-
- tests/qemu-iotests/163                        |   2 +-
- tests/qemu-iotests/165                        |   3 +-
- tests/qemu-iotests/169                        |   2 +-
- tests/qemu-iotests/194                        |   2 +-
- tests/qemu-iotests/196                        |   2 +-
- tests/qemu-iotests/199                        |   2 +-
- tests/qemu-iotests/202                        |   2 +-
- tests/qemu-iotests/203                        |   2 +-
- tests/qemu-iotests/205                        |   2 +-
- tests/qemu-iotests/206                        |   2 +-
- tests/qemu-iotests/207                        |   2 +-
- tests/qemu-iotests/208                        |   2 +-
- tests/qemu-iotests/209                        |   2 +-
- tests/qemu-iotests/210                        |   2 +-
- tests/qemu-iotests/211                        |   2 +-
- tests/qemu-iotests/212                        |   2 +-
- tests/qemu-iotests/213                        |   2 +-
- tests/qemu-iotests/216                        |   2 +-
- tests/qemu-iotests/218                        |   2 +-
- tests/qemu-iotests/219                        |   2 +-
- tests/qemu-iotests/222                        |   2 +-
- tests/qemu-iotests/224                        |   2 +-
- tests/qemu-iotests/228                        |   2 +-
- tests/qemu-iotests/234                        |   2 +-
- tests/qemu-iotests/235                        |   2 +-
- tests/qemu-iotests/236                        |   2 +-
- tests/qemu-iotests/237                        |   2 +-
- tests/qemu-iotests/238                        |   2 +-
- tests/qemu-iotests/242                        |   2 +-
- tests/qemu-iotests/245                        |   2 +-
- tests/qemu-iotests/246                        |   2 +-
- tests/qemu-iotests/248                        |   2 +-
- tests/qemu-iotests/254                        |   2 +-
- tests/qemu-iotests/255                        |   2 +-
- tests/qemu-iotests/256                        |   2 +-
- tests/qemu-iotests/257                        |   2 +-
- tests/qemu-iotests/258                        |   2 +-
- tests/qemu-iotests/260                        |   2 +-
- tests/qemu-iotests/262                        |   2 +-
- tests/qemu-iotests/264                        |   2 +-
- tests/qemu-iotests/266                        |   2 +-
- tests/qemu-iotests/277                        |   2 +-
- tests/qemu-iotests/280                        |   2 +-
- tests/qemu-iotests/281                        |   2 +-
- tests/qemu-iotests/283                        |   2 +-
- tests/qemu-iotests/check                      |   2 +-
- tests/qemu-iotests/iotests.py                 |   1 -
- tests/qemu-iotests/nbd-fault-injector.py      |   3 +-
- tests/qemu-iotests/qcow2.py                   |   3 +-
- tests/qemu-iotests/qed.py                     |   3 +-
- tests/vm/basevm.py                            |   2 -
- tests/vm/centos                               |   2 +-
- tests/vm/fedora                               |   2 +-
- tests/vm/freebsd                              |   2 +-
- tests/vm/netbsd                               |   2 +-
- tests/vm/openbsd                              |   2 +-
- tests/vm/ubuntu.i386                          |   2 +-
- 147 files changed, 432 insertions(+), 234 deletions(-)
- create mode 100644 .readthedocs.yml
- mode change 100644 =3D> 100755 scripts/minikconf.py
- mode change 100644 =3D> 100755 scripts/signrom.py
- rename tests/acceptance/{virtio_seg_max_adjust.py =3D> virtio_check_params=
-.py} (90%)
- mode change 100755 =3D> 100644
- mode change 100644 =3D> 100755 tests/qemu-iotests/222
- mode change 100644 =3D> 100755 tests/qemu-iotests/245
- mode change 100755 =3D> 100644 tests/vm/basevm.py
-
---=20
-2.21.1
-
+-- PMM
 
