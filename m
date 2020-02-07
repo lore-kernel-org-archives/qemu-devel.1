@@ -2,85 +2,83 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B674C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 08:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1A0C352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 08:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8FFD20726
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 08:33:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59831214AF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 08:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LbSI5Cmr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8FFD20726
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T7yZO2wx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59831214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izz53-0006C9-29
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 03:33:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50169)
+	id 1izz9T-0000RS-HD
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 03:38:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51040)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1izz4S-0005cW-Hr
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:33:06 -0500
+ (envelope-from <thuth@redhat.com>) id 1izz8q-0008Ch-5h
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:37:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1izz4Q-0001aZ-Iu
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:33:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35182
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1izz8o-0006YV-99
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:37:35 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29227
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1izz4Q-0001Zk-Ez
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:33:02 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1izz8o-0006Y5-5E
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:37:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581064380;
+ s=mimecast20190719; t=1581064653;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NhouSIuywyp1T6A41l00TmfPraaQ278VS05yKU/Nubo=;
- b=LbSI5CmrWB7llnIDN3WhYEGSXIYQuos1Q2uoa2Gsc684+waneAKUTsTTJ3qn+UzbU0wplY
- uwrfWfcZtXnBp8FAreCJLML3AM8XUz9pO6sq/Nn6NSkpAZyI5jlRftt4OxPMsWSIiIK+XR
- kFinGFxnslXr471l0iMvvyKVhvBno5w=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=n9ZZpCiIpfFBxUlp3D2UDr3SaIpNH+T9eBjcAIfdGGI=;
+ b=T7yZO2wxohn38/Jh0ow57XBtq4XNfd2rOuA2ts7Hez/PwiyoZVih9hY/Sq8T1AVubxB5Ki
+ pujuTwp5OqObJoCYPW9x2+3susxowUf1PSu1UoaWwBv4ZtiBfTEJPmXyAG7DOvQpYCEIBX
+ qNITJGhPNbMNIDKR9eeSFNB4k0NJVgg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-UwlYKJnwN1yGU1kxmCj0Xw-1; Fri, 07 Feb 2020 03:32:58 -0500
+ us-mta-156-I0IlzcufN2GUIvU6K1khuw-1; Fri, 07 Feb 2020 03:37:22 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BCD4107B76B;
- Fri,  7 Feb 2020 08:32:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
- [10.36.116.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FADD1BC6D;
- Fri,  7 Feb 2020 08:32:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 310E511386A7; Fri,  7 Feb 2020 09:32:50 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 06/29] qga/qapi-schema.json: minor format fixups for rST
-References: <20200206173040.17337-1-peter.maydell@linaro.org>
- <20200206173040.17337-7-peter.maydell@linaro.org>
-Date: Fri, 07 Feb 2020 09:32:50 +0100
-In-Reply-To: <20200206173040.17337-7-peter.maydell@linaro.org> (Peter
- Maydell's message of "Thu, 6 Feb 2020 17:30:17 +0000")
-Message-ID: <871rr6vlu5.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6E1818A8C83;
+ Fri,  7 Feb 2020 08:37:21 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-143.ams2.redhat.com [10.36.116.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 21844790F8;
+ Fri,  7 Feb 2020 08:37:17 +0000 (UTC)
+Subject: Re: [RFC PATCH 2/2] GitLab CI: crude mapping of PMM's scripts to jobs
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20200203032328.12051-1-crosa@redhat.com>
+ <20200203032328.12051-2-crosa@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5d0def0e-0943-3345-784d-80f8ccc318b9@redhat.com>
+Date: Fri, 7 Feb 2020 09:37:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200203032328.12051-2-crosa@redhat.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: UwlYKJnwN1yGU1kxmCj0Xw-1
+X-MC-Unique: I0IlzcufN2GUIvU6K1khuw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,218 +90,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> rST format requires a blank line before the start of a bulleted
-> or enumerated list. Two places in qapi-schema.json were missing
-> this blank line.
->
-> Some places were using an indented line as a sort of single-item
-> bulleted list, which in the texinfo output comes out all run
-> onto a single line; use a real bulleted list instead.
->
-> Some places unnecessarily indented lists, which confuses rST.
->
-> guest-fstrim:minimum's documentation was indented the
-> right amount to share a line with @minimum, but wasn't
-> actually doing so.
->
-> The indent on the bulleted list in the guest-set-vcpus
-> Returns section meant rST misindented it.
->
-> Changes to the generated texinfo are very minor (the new
-> bulletted lists, and a few extra blank lines).
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 03/02/2020 04.23, Cleber Rosa wrote:
+> This is a crude and straightforward mapping of Peter's
+> "remake-merge-builds" and "pull-buildtest" scripts.
+>=20
+> Some characteristics were removed for simplicity sake (but eventually
+> will), including:
+>  * number of simultaneous make jobs
+>  * make's synchronous output, not needed because of previous point
+>  * out-of-tree builds
+>=20
+> This covers the "x86-64 Linux with a variety of different build
+> configs"[1].  I've personally tested all of them, and only had
+> issues with the "notcg" job[2], but it seems to be a test specific
+> issue with the nested KVM I was using.
+>=20
+> [1] - https://wiki.qemu.org/Requirements/GatingCI#Current_Tests
+> [2] - https://paste.centos.org/view/1dd43a1c
+>=20
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  qga/qapi-schema.json | 86 +++++++++++++++++++++++---------------------
->  1 file changed, 45 insertions(+), 41 deletions(-)
->
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index 7661b2b3b45..0e3a00ee052 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -510,8 +510,7 @@
->  #
->  # Discard (or "trim") blocks which are not in use by the filesystem.
->  #
-> -# @minimum:
-> -#           Minimum contiguous free range to discard, in bytes. Free ran=
-ges
-> +# @minimum: Minimum contiguous free range to discard, in bytes. Free ran=
-ges
->  #           smaller than this may be ignored (this is a hint and the gue=
-st
->  #           may not respect it).  By increasing this value, the fstrim
->  #           operation will complete more quickly for filesystems with ba=
-dly
-> @@ -546,7 +545,8 @@
->  # (or set its status to "shutdown") due to other reasons.
->  #
->  # The following errors may be returned:
-> -#          If suspend to disk is not supported, Unsupported
-> +#
-> +# - If suspend to disk is not supported, Unsupported
->  #
->  # Notes: It's strongly recommended to issue the guest-sync command befor=
-e
->  #        sending commands when the guest resumes
-> @@ -575,12 +575,14 @@
->  #
->  # This command does NOT return a response on success. There are two opti=
-ons
->  # to check for success:
-> -#   1. Wait for the SUSPEND QMP event from QEMU
-> -#   2. Issue the query-status QMP command to confirm the VM status is
-> -#      "suspended"
-> +#
-> +# 1. Wait for the SUSPEND QMP event from QEMU
-> +# 2. Issue the query-status QMP command to confirm the VM status is
-> +#    "suspended"
->  #
->  # The following errors may be returned:
-> -#          If suspend to ram is not supported, Unsupported
-> +#
-> +# - If suspend to ram is not supported, Unsupported
->  #
->  # Notes: It's strongly recommended to issue the guest-sync command befor=
-e
->  #        sending commands when the guest resumes
-> @@ -607,12 +609,14 @@
->  #
->  # This command does NOT return a response on success. There are two opti=
-ons
->  # to check for success:
-> -#   1. Wait for the SUSPEND QMP event from QEMU
-> -#   2. Issue the query-status QMP command to confirm the VM status is
-> -#      "suspended"
-> +#
-> +# 1. Wait for the SUSPEND QMP event from QEMU
-> +# 2. Issue the query-status QMP command to confirm the VM status is
-> +#    "suspended"
->  #
->  # The following errors may be returned:
-> -#          If hybrid suspend is not supported, Unsupported
-> +#
-> +# - If hybrid suspend is not supported, Unsupported
->  #
->  # Notes: It's strongly recommended to issue the guest-sync command befor=
-e
->  #        sending commands when the guest resumes
-> @@ -767,17 +771,17 @@
->  # Returns: The length of the initial sublist that has been successfully
->  #          processed. The guest agent maximizes this value. Possible cas=
-es:
->  #
-> -#          - 0:              if the @vcpus list was empty on input. Gues=
-t state
-> -#                            has not been changed. Otherwise,
-> -#          - Error:          processing the first node of @vcpus failed =
-for the
-> -#                            reason returned. Guest state has not been c=
-hanged.
-> -#                            Otherwise,
-> +#          - 0: if the @vcpus list was empty on input. Guest state
-> +#            has not been changed. Otherwise,
-> +#          - Error: processing the first node of @vcpus failed for the
-> +#            reason returned. Guest state has not been changed.
-> +#            Otherwise,
->  #          - < length(@vcpus): more than zero initial nodes have been pr=
-ocessed,
-> -#                            but not the entire @vcpus list. Guest state=
- has
-> -#                            changed accordingly. To retrieve the error
-> -#                            (assuming it persists), repeat the call wit=
-h the
-> -#                            successfully processed initial sublist remo=
-ved.
-> -#                            Otherwise,
-> +#            but not the entire @vcpus list. Guest state has
-> +#            changed accordingly. To retrieve the error
-> +#            (assuming it persists), repeat the call with the
-> +#            successfully processed initial sublist removed.
-> +#            Otherwise,
->  #          - length(@vcpus): call successful.
+>  .gitlab-ci.yml | 116 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 116 insertions(+)
 
-Source readability suffers a bit here.
+Thanks for doing this! The patch looks basically fine to me, but some
+comments below...
 
-Can we break the line after the colon?
+> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> index d2c7d2198e..eb4077e2ab 100644
+> --- a/.gitlab-ci.yml
+> +++ b/.gitlab-ci.yml
+> @@ -2,6 +2,8 @@ include:
+>    - local: '/.gitlab-ci-edk2.yml'
+> =20
+>  build-system1:
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME !=3D "staging"'
+>   before_script: &before_scr_apt
+>   - apt-get update -qq
+>   - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev geni=
+soimage
+> @@ -17,6 +19,8 @@ build-system1:
+>   - make -j2 check
+> =20
+>  build-system2:
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME !=3D "staging"'
+>   before_script:
+>    *before_scr_apt
+>   script:
+> @@ -31,6 +35,8 @@ build-system2:
+>   - make -j2 check
+> =20
+>  build-disabled:
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME !=3D "staging"'
+>   before_script:
+>    *before_scr_apt
+>   script:
+> @@ -47,6 +53,8 @@ build-disabled:
+>   - make -j2 check-qtest SPEED=3Dslow
+> =20
+>  build-tcg-disabled:
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME !=3D "staging"'
+>   before_script:
+>    *before_scr_apt
+>   script:
+> @@ -67,6 +75,8 @@ build-tcg-disabled:
+>              248 250 254 255 256
+> =20
+>  build-user:
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME !=3D "staging"'
+>   before_script:
+>    *before_scr_apt
+>   script:
+> @@ -78,6 +88,8 @@ build-user:
+>   - make run-tcg-tests-i386-linux-user run-tcg-tests-x86_64-linux-user
+> =20
+>  build-clang:
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME !=3D "staging"'
+>   before_script:
+>    *before_scr_apt
+>   script:
+> @@ -92,6 +104,8 @@ build-clang:
+>   - make -j2 check
+> =20
+>  build-tci:
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME !=3D "staging"'
+>   before_script:
+>    *before_scr_apt
+>   script:
 
-   #          - 0:
-   #            if the @vcpus list was empty on input. Guest state has
-   #            not been changed. Otherwise,
+Question to Peter/Alex/Stefan/Howevermergespullreqsinthefuture:
 
-Or would a definition list be a better fit?
+Should the above jobs really be skipped for pull requests, or would it
+be ok to include them there, too? (in the latter case, the above changes
+could just be dropped)
 
->  #
->  # Since: 1.5
-> @@ -1182,35 +1186,35 @@
->  # @GuestOSInfo:
->  #
->  # @kernel-release:
-> -#     * POSIX: release field returned by uname(2)
-> -#     * Windows: build number of the OS
-> +# * POSIX: release field returned by uname(2)
-> +# * Windows: build number of the OS
->  # @kernel-version:
-> -#     * POSIX: version field returned by uname(2)
-> -#     * Windows: version number of the OS
-> +# * POSIX: version field returned by uname(2)
-> +# * Windows: version number of the OS
->  # @machine:
-> -#     * POSIX: machine field returned by uname(2)
-> -#     * Windows: one of x86, x86_64, arm, ia64
-> +# * POSIX: machine field returned by uname(2)
-> +# * Windows: one of x86, x86_64, arm, ia64
->  # @id:
-> -#     * POSIX: as defined by os-release(5)
-> -#     * Windows: contains string "mswindows"
-> +# * POSIX: as defined by os-release(5)
-> +# * Windows: contains string "mswindows"
->  # @name:
-> -#     * POSIX: as defined by os-release(5)
-> -#     * Windows: contains string "Microsoft Windows"
-> +# * POSIX: as defined by os-release(5)
-> +# * Windows: contains string "Microsoft Windows"
->  # @pretty-name:
-> -#     * POSIX: as defined by os-release(5)
-> -#     * Windows: product name, e.g. "Microsoft Windows 10 Enterprise"
-> +# * POSIX: as defined by os-release(5)
-> +# * Windows: product name, e.g. "Microsoft Windows 10 Enterprise"
->  # @version:
-> -#     * POSIX: as defined by os-release(5)
-> -#     * Windows: long version string, e.g. "Microsoft Windows Server 200=
-8"
-> +# * POSIX: as defined by os-release(5)
-> +# * Windows: long version string, e.g. "Microsoft Windows Server 2008"
->  # @version-id:
-> -#     * POSIX: as defined by os-release(5)
-> -#     * Windows: short version identifier, e.g. "7" or "20012r2"
-> +# * POSIX: as defined by os-release(5)
-> +# * Windows: short version identifier, e.g. "7" or "20012r2"
->  # @variant:
-> -#     * POSIX: as defined by os-release(5)
-> -#     * Windows: contains string "server" or "client"
-> +# * POSIX: as defined by os-release(5)
-> +# * Windows: contains string "server" or "client"
->  # @variant-id:
-> -#     * POSIX: as defined by os-release(5)
-> -#     * Windows: contains string "server" or "client"
-> +# * POSIX: as defined by os-release(5)
-> +# * Windows: contains string "server" or "client"
->  #
->  # Notes:
->  #
+> @@ -111,3 +125,105 @@ build-tci:
+>   - QTEST_QEMU_BINARY=3D"x86_64-softmmu/qemu-system-x86_64" ./tests/qtest=
+/pxe-test
+>   - QTEST_QEMU_BINARY=3D"s390x-softmmu/qemu-system-s390x"
+>     ./tests/qtest/pxe-test -m slow
+> +
+> +ubuntu-18.04.3-x86_64-notools:
+> + tags:
+> + - ubuntu_18.04.3
+> + - x86_64
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME =3D=3D "staging"'
+> + script:
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/rem=
+ake-merge-builds#n22
 
-The use of bullets vs. dashes for lists seems a bit random, but that's
-not this patch's fault.
+Line 22 currently seems to be disabled, so I think you could drop this job?
+
+> + - ./configure --target-list=3Darm-softmmu --disable-tools --disable-lib=
+ssh
+> + # There is no make / make check in the "pull-buildtest" script for this=
+.
+> + # Question: should it at least be built? Or dropped?
+> + - make
+> +
+> +ubuntu-18.04.3-x86_64-all-linux-static:
+> + tags:
+> + - ubuntu_18.04.3
+> + - x86_64
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME =3D=3D "staging"'
+> + script:
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/rem=
+ake-merge-builds#n25
+> + - ./configure --enable-debug --static --disable-system --disable-gluste=
+rfs --disable-libssh
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n36
+> + - make
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n45
+> + - make check V=3D1
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n48
+> + - make check-tcg V=3D1
+> +
+> +ubuntu-18.04.3-x86_64-all:
+> + tags:
+> + - ubuntu_18.04.3
+> + - x86_64
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME =3D=3D "staging"'
+> + script:
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/rem=
+ake-merge-builds#n26
+> + - ./configure --disable-libssh
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n28
+> + - make
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n37
+> + - make check V=3D1
+> +
+> +ubuntu-18.04.3-x86_64-alldbg:
+> + tags:
+> + - ubuntu_18.04.3
+> + - x86_64
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME =3D=3D "staging"'
+> + script:
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/rem=
+ake-merge-builds#n27
+> + - ./configure --disable-libssh
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n27
+> + - make clean
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n29
+> + - make
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n37
+> + - make check V=3D1
+> +
+> +ubuntu-18.04.3-x86_64-clang:
+> + tags:
+> + - ubuntu_18.04.3
+> + - x86_64
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME =3D=3D "staging"'
+> + script:
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/rem=
+ake-merge-builds#n31
+> + - ./configure --disable-libssh --cc=3Dclang --cxx=3Dclang++ --enable-gt=
+k --extra-cflags=3D'-fsanitize=3Dundefined -fno-sanitize=3Dshift-base -Werr=
+or'
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n33
+> + - make
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n39
+> + - make check V=3D1
+> +
+> +ubuntu-18.04.3-x86_64-tci:
+> + tags:
+> + - ubuntu_18.04.3
+> + - x86_64
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME =3D=3D "staging"'
+> + script:
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/rem=
+ake-merge-builds#n33
+> + - ./configure --disable-libssh --enable-debug --enable-tcg-interpreter
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n34
+> + - make
+
+I think "make check" should now work with TCI, too, there was a fix for
+it some months ago (commit 2f160e0f9797c7522bfd0d09218d0c9340a5137c).
+At least it's worth a try to enable it...
+
+Alternatively, I think we don't urgently need to introduce this job -
+there is already "build-tci" in gitlab-ci.yml which should cover
+--enable-tcg-interpreter already and does some testing, too.
+
+> +
+> +ubuntu-18.04.3-x86_64-notcg:
+> + tags:
+> + - ubuntu_18.04.3
+> + - x86_64
+> + rules:
+> + - if: '$CI_COMMIT_REF_NAME =3D=3D "staging"'
+> + script:
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/rem=
+ake-merge-builds#n35
+> + - ./configure --disable-libssh --enable-debug --disable-tcg
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n35
+> + - make
+> + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pul=
+l-buildtest#n39
+> + # Question: check is disabled on the original script, because the machi=
+ne
+> + # is said to be running VirtualBox.  Should this be dropped or should t=
+he
+> + # machine be tweaked or substituted?
+> + - make check V=3D1
+
+Without TCG, you definitely need a host that can do KVM for running make
+check.
+Question for Peter: Would it be ok to drop this job and simply always
+use the "build-tcg-disabled" job that is already available in
+.gitlab-ci.yml ?
+
+ Thomas
 
 
