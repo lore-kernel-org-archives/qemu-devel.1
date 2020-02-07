@@ -4,87 +4,88 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C46BC352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E324CC352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:04:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D922820715
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:03:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9CE020838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:04:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vh1hggbQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D922820715
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DT8XUlFe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9CE020838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j02Lp-0006kX-Lq
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 07:03:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40894)
+	id 1j02My-0008Qq-Uf
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 07:04:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40737)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j02KR-0005VR-Su
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:01:49 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j02Jm-000425-HA
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j02KQ-0004qs-2g
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:01:47 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42986)
+ (envelope-from <alex.bennee@linaro.org>) id 1j02Jk-00039B-Ii
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:01:06 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35932)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j02KO-0004pY-MM
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:01:46 -0500
-Received: by mail-wr1-x444.google.com with SMTP id k11so2345925wrd.9
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 04:01:44 -0800 (PST)
+ id 1j02Jk-00036n-CC
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:01:04 -0500
+Received: by mail-wr1-x443.google.com with SMTP id z3so2388670wru.3
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 04:01:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=IkXdX3jqdzZqpQ5BvV+KV+8d39GBQpKyYclb//73NFU=;
- b=Vh1hggbQMf8o4JDmsv/89oxq709arjDZwo64IMg2FnWg1r9TnWbaB74tP0lwcBquj0
- rdCmvfQ8PN01EhoPl5fasNik7hsZS7IWGgWxOBO96e3tTduyDEa25HB/rVhrhXvPyfGg
- z/3tKVbj064nlJDCLG+HTpIzw8OfXjnSIMQeLUPTzClfNl4FLQQ2Xx7ERTSyxT6nwly1
- LeBu2h/1EGMRxpQVf02iOv471ENJmzW+pVVEH4P/SAcwO43qpbXI+SBNYfs2Xj7D7ZoE
- YEMYzpNwUeh5yNJGc78tHU+GzIHLJYQS1dH46UVPJWuniRVnEA6W7WgGBIRkO2AeycwD
- K/og==
+ bh=WLYOzD/3xJ/LWmKemowiSmHZ2JOR1HpYvsZ6ca2WSxA=;
+ b=DT8XUlFeIfmtoGLBke+RP2ieB+KS0p00Ckbbe5CWwXA/NVV8EDIKTJax7euZd6nqCy
+ BZxgbzDf9fmgdFeFWxXI1YeNo90J0lVAHEL6eSlLygd2Ur1MP1wOOUZtErDR/3zi3wOt
+ CkanI1ue3nIO+iVUrhGOUZEzRuQGX1rQCZtLdP2uENDnc7NUCt070AeHP7YNpMGnHWxf
+ xi5FVMCpc6q6wXbzcZW+p0Tg2MqC9BaJpAOUXcswiFDEqBPRpVPRAgR6Vs/TI+UVrt+a
+ E93GaLn37LSkMXSXrhRiBvbiecFzArnGL/OHGfs7anzsPsPbQVxhbF38hms5ybYVKTL9
+ w1Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=IkXdX3jqdzZqpQ5BvV+KV+8d39GBQpKyYclb//73NFU=;
- b=gHYMN1jWtY1ivozKppJhu6sFsLF5+weinjQcQ4EtIsfmqIq182Nsry2mBc1QsIW4Fz
- oK2lMNLnv1vmAJpeU5iLoDU2U2HvuIapPDMO+i0Ty1RzSWKEZMP9EWWWCqkXkuY5BZa5
- E0T2Gu21S082AoV8cnIV62eC6866KiUZqs8Hpb7rkUrgUcnnCShet6xKdrvxvIPYrWaB
- B7QepoAs+UfLKG79r1AeMKftDYcegi6kxf6u7vNaeh6NRGmcE/tDqfJ/Tc9Fuwdxn6om
- cXuoouXC5b+v43WDRtTXPUmTguoS7ro/OeiHMvKOSH1HwornPO+aRaRdd84ppG4VckXf
- TV6Q==
-X-Gm-Message-State: APjAAAUnqylOyOxMaSvShRSGpvagCkhszePsVR1oEcirOIK+WhkIlh/e
- SPZhPBGuRxT0Nbth4LDz4THn6w==
-X-Google-Smtp-Source: APXvYqyGDTtn3Go75gAnI1MweyIvg6Q1Z8WseWzwfPKCPGLFqw+g+j/fZLDRtwylYk1rvPtlNpN+Ng==
-X-Received: by 2002:adf:9c8c:: with SMTP id d12mr4328120wre.404.1581076903615; 
- Fri, 07 Feb 2020 04:01:43 -0800 (PST)
+ bh=WLYOzD/3xJ/LWmKemowiSmHZ2JOR1HpYvsZ6ca2WSxA=;
+ b=GsMJ+ijh7Yfrs88QQJv428QGNRyMOkCpBoF/ECJka4e78YIfKyxMSnpysboObfW6px
+ Cfr4v7Ajb7qEASWZJKLhvZmWocfIe5N3Pkvz/MkPZQ6hyYGwzk5ublD5xYoY0e2e345q
+ BgZYYdGG2dPDx4uOpALNVbGA81RKALtqFZ8UkuiOdnagtRoiidvf4nNwpZTt5D+Qq64X
+ DmpKxm1tkP9FT2WrrOQvjtI7aTVGmNzFTHkaOMfG5avksLVTtkVRr6sTultIDOinaPXJ
+ OweeGjnyro0KoJ4f2L1gMV5BQulGEbTm3xzOpJdtnkZMD3vj3zwGesIY9euivADclynV
+ UgyA==
+X-Gm-Message-State: APjAAAUFKGkNRaosR7hud2YoelVmK+fLDXPfVSPXgcxZHGFh3TWfkZ9H
+ CDSkStvk+PhGVbwf5PkFfMVdHA==
+X-Google-Smtp-Source: APXvYqxkcF6XCtY07dn6pHVDZcMDJyu69Fee3DSidb86Zi9sQnhpUSBOFdNyqqGxwC3bphkzEmgfuQ==
+X-Received: by 2002:a5d:4b03:: with SMTP id v3mr4594868wrq.178.1581076862998; 
+ Fri, 07 Feb 2020 04:01:02 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t131sm3218448wmb.13.2020.02.07.04.01.42
+ by smtp.gmail.com with ESMTPSA id l6sm3068620wmg.42.2020.02.07.04.01.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 04:01:42 -0800 (PST)
+ Fri, 07 Feb 2020 04:01:01 -0800 (PST)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A82B01FF87;
- Fri,  7 Feb 2020 12:01:41 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 252801FF87;
+ Fri,  7 Feb 2020 12:01:01 +0000 (GMT)
 References: <20200205212920.467-1-robert.foley@linaro.org>
- <20200205212920.467-5-robert.foley@linaro.org>
+ <20200205212920.467-4-robert.foley@linaro.org>
 User-agent: mu4e 1.3.7; emacs 27.0.60
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v1 04/14] tests/vm: give wait_ssh() option to wait for root
-In-reply-to: <20200205212920.467-5-robert.foley@linaro.org>
-Date: Fri, 07 Feb 2020 12:01:41 +0000
-Message-ID: <87k14y7gii.fsf@linaro.org>
+Subject: Re: [PATCH v1 03/14] tests/vm: increased max timeout for vm boot.
+In-reply-to: <20200205212920.467-4-robert.foley@linaro.org>
+Date: Fri, 07 Feb 2020 12:01:01 +0000
+Message-ID: <87mu9u7gjm.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,51 +106,45 @@ Sender: "Qemu-devel"
 
 Robert Foley <robert.foley@linaro.org> writes:
 
-> Allow wait_ssh to wait for root user to be ready.
-> This solves the issue where we perform a wait_ssh()
-> successfully, but the root user is not yet ready
-> to be logged in.
+> Add change to increase timeout waiting for VM to boot.
+> Needed for some emulation cases where it can take longer
+> than 5 minutes to boot.
 >
 > Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> ---
->  tests/vm/basevm.py | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 4de358ae22..a29099f6f1 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -314,7 +314,7 @@ class BaseVM(object):
->      def print_step(self, text):
->          sys.stderr.write("### %s ...\n" % text)
->=20=20
-> -    def wait_ssh(self, seconds=3D300):
-> +    def wait_ssh(self, wait_root=3DFalse, seconds=3D300):
->          # Allow more time for VM to boot under TCG.
->          if not kvm_available(self.arch):
->              seconds *=3D self.tcg_ssh_timeout_multiplier
-> @@ -322,7 +322,10 @@ class BaseVM(object):
->          endtime =3D starttime + datetime.timedelta(seconds=3Dseconds)
->          guest_up =3D False
->          while datetime.datetime.now() < endtime:
-> -            if self.ssh("exit 0") =3D=3D 0:
-> +            if wait_root and self.ssh_root("exit 0") =3D=3D 0:
-> +                guest_up =3D True
-> +                break
-> +            elif self.ssh("exit 0") =3D=3D 0:
->                  guest_up =3D True
->                  break
->              seconds =3D (endtime - datetime.datetime.now()).total_second=
-s()
-> @@ -333,7 +336,6 @@ class BaseVM(object):
->=20=20
->      def shutdown(self):
->          self._guest.shutdown()
-> -
-
-Stray line deletion. Otherwise:
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  tests/vm/basevm.py | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 991115e44b..4de358ae22 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -59,6 +59,10 @@ class BaseVM(object):
+>      poweroff =3D "poweroff"
+>      # enable IPv6 networking
+>      ipv6 =3D True
+> +    # Scale up some timeouts under TCG.
+> +    # 4 is arbitrary, but greater than 2,
+> +    # since we found we need to wait more than twice as long.
+> +    tcg_ssh_timeout_multiplier =3D 4
+>      def __init__(self, debug=3DFalse, vcpus=3DNone):
+>          self._guest =3D None
+>          self._tmpdir =3D os.path.realpath(tempfile.mkdtemp(prefix=3D"vm-=
+test-",
+> @@ -311,6 +315,9 @@ class BaseVM(object):
+>          sys.stderr.write("### %s ...\n" % text)
+>=20=20
+>      def wait_ssh(self, seconds=3D300):
+> +        # Allow more time for VM to boot under TCG.
+> +        if not kvm_available(self.arch):
+> +            seconds *=3D self.tcg_ssh_timeout_multiplier
+>          starttime =3D datetime.datetime.now()
+>          endtime =3D starttime + datetime.timedelta(seconds=3Dseconds)
+>          guest_up =3D False
+
 
 --=20
 Alex Benn=C3=A9e
