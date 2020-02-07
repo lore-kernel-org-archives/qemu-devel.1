@@ -2,86 +2,96 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDBDAC352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 08:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4192CC352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 08:54:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8DE221741
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 08:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E34372082E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 08:54:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E3LmUNOV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8DE221741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uChwXcnu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E34372082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izzMN-0007ZJ-W6
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 03:51:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55236)
+	id 1izzP0-0000Lc-0a
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 03:54:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1izzLi-00078L-MA
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:50:55 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1izzO8-0008Lf-7h
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:53:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1izzLg-0003SW-Ox
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:50:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60759
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1izzLg-0003RK-KQ
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:50:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581065451;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cXBZMEFBSosf4xLzlVuuDj7a8A8RrfJMAhVBws1w5tA=;
- b=E3LmUNOVxkfRgnMXdxGaxrCjc6+yITCr3LQ0ju4cMZA7UfmOYTEgM3Gyz7iFkNDCkf2JuC
- yGU32LpSArNFx30RvL+HWlYskSQAN/inlziiyzDRbpxzMmi1uTVCB/mx9HTz+RSaOOX2Yq
- r9yL/9JcUuS+tIUCQ34EPhcDCdx8fcU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-ATn5YG0NMCyJNOEBakkqpw-1; Fri, 07 Feb 2020 03:50:48 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF154801E76;
- Fri,  7 Feb 2020 08:50:46 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
- [10.36.116.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 987CD87B00;
- Fri,  7 Feb 2020 08:50:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 29C5711386A7; Fri,  7 Feb 2020 09:50:40 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 07/29] qapi/block-core.json: Use literal block for ascii
- art
-References: <20200206173040.17337-1-peter.maydell@linaro.org>
- <20200206173040.17337-8-peter.maydell@linaro.org>
-Date: Fri, 07 Feb 2020 09:50:40 +0100
-In-Reply-To: <20200206173040.17337-8-peter.maydell@linaro.org> (Peter
- Maydell's message of "Thu, 6 Feb 2020 17:30:18 +0000")
-Message-ID: <87tv42u6fz.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <richard.henderson@linaro.org>) id 1izzO6-0006uw-Ut
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:53:23 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36765)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1izzO6-0006os-NO
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 03:53:22 -0500
+Received: by mail-wr1-x444.google.com with SMTP id z3so1683260wru.3
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 00:53:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ocQRA8osZ1UsQk2pAdCSaPXB0TYn8WJCOp8jtmwAdZY=;
+ b=uChwXcnu8jnJUkHS3Fvh3IUtkISQ1nKRo8u23A56GXo0y4mnE9fcrZtnv3lLb0Revf
+ jQfglLsGSw/AI4e7Owk19cAEg7FAVIx39uFGqCpDdwYBCqX/i/Em3BMCoZgozcZhBI1+
+ XC8MCzG+9RvvgYpNQdA6AearwmvlDC1m2X0y8jrzsu2NFV6FO6QIwmSNuCqnrAcUO9rX
+ yiuMQ9vAUG8pdoFxZL1HN3hnYmqlaX/tGtdSLKgh0Vg5Y3ZFDSTvN4h/MHaGcwoZaRNz
+ J6qZ2JPWFJqbPPleDZNLSRoyTmIG0t5pnm3VnfcywTFqGVrJ5o+O1m/OlyHbxWSk5JjY
+ XE2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ocQRA8osZ1UsQk2pAdCSaPXB0TYn8WJCOp8jtmwAdZY=;
+ b=gkIX6UmssB+cPSlK+hko5h91B5cMzYL47H6T3q7utVPfjhCQ4fimc/w1QKWAEm9ajB
+ z6V3sKPW6Kf9pvi4apwr/K8D+30SNYB26XRFD6rB6beqi/rSMxFv5rT8VDy86JDUKyH4
+ 2fZukRx9jkOpAde27On+taQNg3y19T4FrDgg/egswO5FtxfKVf/q8vXyKC/sFt3czbBE
+ WP2/npQR35OWktD9hBnLM95epoIuGBiqG3eiHUQyKwOIjr9WlEqufnVOLP0J8VPm37nJ
+ YD0fZDRVxVyJjsME7B/qIKWL4dVN3wI3rwGyTanIDt7C1FPukJg/cDJpgy50T92UrigK
+ UkLQ==
+X-Gm-Message-State: APjAAAW6Y0NwvnqAV1GUv6xRf1M9dJd+g7TWQNISFzqRQ+dLbPgpR7Eo
+ y3aDTPM1kBgu0z09yVBcPZnZ2Q==
+X-Google-Smtp-Source: APXvYqy/Yf62yGF5XsaoPFuhZblcsXhtUYwKiLY53CnCRvPA5gOrP8A2CS29mu/mtADk/2bDVgjjCg==
+X-Received: by 2002:a5d:4a91:: with SMTP id o17mr3318473wrq.232.1581065601476; 
+ Fri, 07 Feb 2020 00:53:21 -0800 (PST)
+Received: from [10.43.13.93] ([135.196.99.211])
+ by smtp.gmail.com with ESMTPSA id o187sm2841106wme.36.2020.02.07.00.53.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 07 Feb 2020 00:53:21 -0800 (PST)
+Subject: Re: [PATCH] Add support for a helper with 7 arguments
+To: Taylor Simpson <tsimpson@quicinc.com>, Richard Henderson
+ <rth@twiddle.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
+ <09def3cf-6833-ccf5-457e-1755a7fd0e04@twiddle.net>
+ <640ffa37-a70b-dfa9-55ef-cde5c7f0dfcb@twiddle.net>
+ <BYAPR02MB48863BDFCB4CB26717467579DE1D0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <3614849d-12a5-fa43-fb10-801e9648b40e@twiddle.net>
+ <BYAPR02MB48864A309572E1347920CAF0DE1D0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <34caf794-85b7-c177-7951-d821ace5caa9@linaro.org>
+ <BYAPR02MB488682AB2538F8EBE631EA80DE1C0@BYAPR02MB4886.namprd02.prod.outlook.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <858bff3f-6e24-20a7-a7f3-49bee2cb8e12@linaro.org>
+Date: Fri, 7 Feb 2020 08:53:19 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: ATn5YG0NMCyJNOEBakkqpw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <BYAPR02MB488682AB2538F8EBE631EA80DE1C0@BYAPR02MB4886.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,80 +103,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 2/7/20 4:46 AM, Taylor Simpson wrote:
+>> I think that we can do the store immediately -- I give specifics above.  Do you
+>> have a counter-example?  Admittedly I'm new to browsing the architecture,
+>> but I
+>> don't see a legal packet for which you can't just Store Now.
+> 
+> You can have two stores in a packet, and the second one could fault.  If anything in the packet faults, none of the instructions commit.
 
-> The ascii-art graph in the BlockLatencyHistogramInfo
-> documentation doesn't render correctly in either the HTML
-> or the manpage output, because in both cases the whitespace
-> is collapsed.
+Then what does the manual mean when it says "dual stores have non-parallel
+semantics"?  Is that solely about the semantics of the bytes in memory?
 
-Plain text and PDF output is just as bad.  Suggest "doesn't render
-correctly, because the whitespace is collapsed".
 
-> Use the '|' format that emits a literal 'example' block
-> so the graph is displayed correctly.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  qapi/block-core.json | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index ef94a296868..372f35ee5f0 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -550,13 +550,13 @@
->  #        For the example above, @bins may be something like [3, 1, 5, 2]=
-,
->  #        and corresponding histogram looks like:
->  #
-> -#        5|           *
-> -#        4|           *
-> -#        3| *         *
-> -#        2| *         *    *
-> -#        1| *    *    *    *
-> -#         +------------------
-> -#             10   50   100
-> +# |       5|           *
-> +# |       4|           *
-> +# |       3| *         *
-> +# |       2| *         *    *
-> +# |       1| *    *    *    *
-> +# |        +------------------
-> +# |            10   50   100
-
-Wow, we're acquiring a second use of the '|' feature.
-
-It's actually broken, because the doc generator puts each | line in its
-own @example environment.
-
-Doesn't really matter, because PATCH 26 replaces it by rST markup that
-actually works.  A note in the commit message could make sense, though.
-
-But instead of making it differently broken until PATCH 26 fixes it for
-good, I'd simply leave it broken until then :)
-
-If you decide to keep the patch: can we keep the table aligned with the
-preceding paragraph?  Like this:
-
-   # |      5|           *
-   # |      4|           *
-   # |      3| *         *
-   # |      2| *         *    *
-   # |      1| *    *    *    *
-   # |       +------------------
-   # |           10   50   100
-
->  #
->  # Since: 4.0
->  ##
-
+r~
 
