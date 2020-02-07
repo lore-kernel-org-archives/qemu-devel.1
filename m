@@ -2,100 +2,106 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 896EAC04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 376F3C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:03:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5694520720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:03:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fsHkjef8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5694520720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0BDDC20720
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:03:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BDDC20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j04E2-0004Um-GN
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:03:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44945)
+	id 1j04EK-00052i-65
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:03:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j04Cm-0002cm-02
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:02:08 -0500
+ (envelope-from <jjherne@linux.ibm.com>) id 1j04DL-0003ak-HU
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:02:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j04Ck-0000K5-Kc
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:01:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38446
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j04Ck-0000Ju-HD
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:01:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581084118;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OzYA7j6sMSvM1+wsQDNqi9C1gEidxZ3+YnF4SDYAQFQ=;
- b=fsHkjef8+d6DUw9r7cJA/OmOr2mnqJ3VgX3Qe2c1P5SQ55rWeX9DhnDsvRiSQzIobxaPnQ
- Q3Rm25UUns7vUmKJnXkvYymHKrBcYp289KBxfJPPHbhbXJbO98u6zsmcmnl4+n7ZC3DQ0P
- pzook0LGW2H9jjKSn6wHQ/4h8H9mNfs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-usmN2D4sPSeKpBO19aPebQ-1; Fri, 07 Feb 2020 09:01:56 -0500
-Received: by mail-wm1-f71.google.com with SMTP id a10so768756wme.9
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:01:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=cV0y7LUvB+UraMl1o3hn8Zz2xU3X8YlPtRsgStWRpwA=;
- b=i9DN9LhVsB1gFD7KNQ62plYV3NTc7UFLm22RNFm2N7q4d9qyEF2yy2UGxvTHBmdB22
- 5Rw/UyusJPrX23RxMb+j7uTzzTgtoU9/QKbcsXOAfTkZzuYfSVODvkKlQeQDmPw5EQMz
- a+4GPYfYFtwxRhgbnzoEWxUTc34jNX0eXYilGNbW1LOlqXgEbD2bbVz2OmHKxd+3Kii4
- G1aLWo/znwRXDDO0cGFqZ3NHYkyqnvuhLKR1JnOaGRi3SdajyotXY8kuRyKaR4Oznmj6
- kFwSwAWAQy/iIk9trJgyFGgowGmnaIBxIMASVN+LAyWfaAoFbEXhOmaDK0vIm+Pkm9Km
- nYtQ==
-X-Gm-Message-State: APjAAAWutdoDwjJr0rhD/9XULDBxQyL6ZcvZKxrGM5uzx3einax0AyHl
- OK3r8cwrnbcy3VUd7oqhubUbox0Ko0BY3nL0b4QhVSdXcsOvgVQiDR2bDFQRGC1m/Si3WpeptMK
- Gm0Qc+4pD+ZPbIjM=
-X-Received: by 2002:a5d:6545:: with SMTP id z5mr4821952wrv.3.1581084115014;
- Fri, 07 Feb 2020 06:01:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz8GvwTvUAzPPkBlJmAuQN6CS0cea2WYsbLxxJV5Hy+GW4DX3D1FGWHsY2+LziXUGhWVvDoZg==
-X-Received: by 2002:a5d:6545:: with SMTP id z5mr4821826wrv.3.1581084113411;
- Fri, 07 Feb 2020 06:01:53 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id y8sm3433731wma.10.2020.02.07.06.01.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Feb 2020 06:01:52 -0800 (PST)
-Subject: Re: [PULL 00/46] Python queue 2020-02-06
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200206211936.17098-1-philmd@redhat.com>
- <CAFEAcA_bHE1s5q4bUrna0ph4Zw4m0VynjTcRo9GPjZDThqHZZQ@mail.gmail.com>
- <c43d995e-aaba-80ca-1945-e0ba02d67162@redhat.com>
-Message-ID: <0d1891e4-b161-e695-cfc9-ce29dfdd3a34@redhat.com>
-Date: Fri, 7 Feb 2020 15:01:52 +0100
+ (envelope-from <jjherne@linux.ibm.com>) id 1j04DJ-0001Nc-VB
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:02:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35834
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
+ id 1j04DJ-0001Je-OW; Fri, 07 Feb 2020 09:02:33 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 017E0PSO057891; Fri, 7 Feb 2020 09:02:32 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y0p79t87b-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 07 Feb 2020 09:02:32 -0500
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 017E0jiR059970;
+ Fri, 7 Feb 2020 09:02:32 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y0p79t86p-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 07 Feb 2020 09:02:32 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 017E19eH029297;
+ Fri, 7 Feb 2020 14:02:31 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma03dal.us.ibm.com with ESMTP id 2xykca33u3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 07 Feb 2020 14:02:31 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 017E2Uof43647410
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 7 Feb 2020 14:02:30 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 062B86A04F;
+ Fri,  7 Feb 2020 14:02:30 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 632246A05A;
+ Fri,  7 Feb 2020 14:02:29 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.177.182])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri,  7 Feb 2020 14:02:29 +0000 (GMT)
+Subject: Re: [PATCH] pc-bios/s390x: Pack ResetInfo struct
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, cohuck@redhat.com
+References: <20200205182126.13010-1-jjherne@linux.ibm.com>
+ <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
+ <896302f7-ec21-6108-6dde-f5a7439d87ab@redhat.com>
+ <caefcdbf-e68c-ba05-2ec4-17f127109434@de.ibm.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+Message-ID: <d9891265-2254-ee64-c009-0105f7a8b02b@linux.ibm.com>
+Date: Fri, 7 Feb 2020 09:02:28 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <c43d995e-aaba-80ca-1945-e0ba02d67162@redhat.com>
-Content-Language: en-US
-X-MC-Unique: usmN2D4sPSeKpBO19aPebQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <caefcdbf-e68c-ba05-2ec4-17f127109434@de.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-07_01:2020-02-07,
+ 2020-02-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 phishscore=0
+ impostorscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
+ priorityscore=1501 adultscore=0 lowpriorityscore=0 spamscore=0
+ clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002070107
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,151 +113,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: jjherne@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/7/20 1:39 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 2/7/20 12:51 PM, Peter Maydell wrote:
->> On Thu, 6 Feb 2020 at 21:21, Philippe Mathieu-Daud=C3=A9=20
->> <philmd@redhat.com> wrote:
->>>
->>> Hi Peter,
->>>
->>> I prepared this series on behalf of Eduardo and
->>> Cleber (one of them will ack this cover).
->>>
->>> Regards,
->>>
->>> Phil.
->>>
->>> The following changes since commit=20
->>> 418fa86dd465b4fd8394373cf83db8fa65d7611c:
->>>
->>> =C2=A0=C2=A0 Merge remote-tracking branch=20
->>> 'remotes/stsquad/tags/pull-testing-040220-1' into staging (2020-02-04=
-=20
->>> 18:55:06 +0000)
->>>
->>> are available in the Git repository at:
->>>
->>> =C2=A0=C2=A0 https://gitlab.com/philmd/qemu.git tags/python-next-202002=
-06
->>>
->>> for you to fetch changes up to 3e3481a5df933a26b47f08e5913821672d28d308=
-:
->>>
->>> =C2=A0=C2=A0 .readthedocs.yml: specify some minimum python requirements=
-=20
->>> (2020-02-06 21:48:24 +0100)
->>
->> Hi; this fails 'make check' (all hosts):
->>
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 iotest-qcow2: 252
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 iotest-qcow2: 256
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 iotest-qcow2: 265
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 iotest-qcow2: 267
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 iotest-qcow2: 268
->> =C2=A0=C2=A0 TEST=C2=A0=C2=A0=C2=A0 iotest-qcow2: 283 [fail]
->> QEMU=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --
->> "/home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/../.=
-./x86_64-softmmu/qemu-system-x86_64"=20
->>
->> -nodefaults -display none -accel qtest
->> QEMU_IMG=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --
->> "/home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/../.=
-./qemu-img"=20
->>
->> QEMU_IO=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --
->> "/home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/../.=
-./qemu-io"=20
->>
->> =C2=A0 --cache writeback --aio threads -f qcow2
->> QEMU_NBD=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --
->> "/home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/../.=
-./qemu-nbd"=20
->>
->> IMGFMT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -- qcow2 (compat=3D1.1)
->> IMGPROTO=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -- file
->> PLATFORM=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -- Linux/x86_64 e104462 4.15.0-74=
--generic
->> TEST_DIR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --
->> /home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/scrat=
-ch=20
->>
->> SOCK_DIR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -- /tmp/tmp.oppAzNNHIY
->> SOCKET_SCM_HELPER --
->> /home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/socke=
-t_scm_helper=20
->>
->>
->> --- /home/petmay01/linaro/qemu-for-merges/tests/qemu-iotests/283.out
->> =C2=A0 2020-02-06 18:59:06.291529139 +0000
->> +++=20
->> /home/petmay01/linaro/qemu-for-merges/build/all/tests/qemu-iotests/283.o=
-ut.bad=20
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2020-02-07 11:25:38.477373907 +0000
->> @@ -1,8 +1 @@
->> -{"execute": "blockdev-add", "arguments": {"driver": "null-co",
->> "node-name": "target"}}
->> -{"return": {}}
->> -{"execute": "blockdev-add", "arguments": {"driver": "blkdebug",
->> "image": {"driver": "null-co", "node-name": "base", "size": 1048576},
->> "node-name": "source"}}
->> -{"return": {}}
->> -{"execute": "blockdev-add", "arguments": {"driver": "blkdebug",
->> "image": "base", "node-name": "other", "take-child-perms": ["write"]}}
->> -{"return": {}}
->> -{"execute": "blockdev-backup", "arguments": {"device": "source",
->> "sync": "full", "target": "target"}}
->> -{"error": {"class": "GenericError", "desc": "Cannot set permissions
->> for backup-top filter: Conflicts with use by other as 'image', which
->> uses 'write' on base"}}
->> +./check: line 866: ./283: Permission denied
->> Not run: 220
->> Failures: 283
->=20
-> Interesting.
-> I apologize this test is not in my suite.
+On 2/7/20 6:28 AM, Christian Borntraeger wrote:
+> Jason,
+> 
+> can you run objdump -Sdr on jump2ipl.o on a broken variant?
+> 
+> 
+To keep the volume lower, I've only pasted the output that I think you're interested in. 
+If you want to see the entire thing just let me know.
 
-Actually test 283 was merged yesterday few hours before I send this pull=20
-request (which is why it passed the new checkpatch test), and it doesn't=20
-use the Python 3 interpreter after shebang.
+static void jump_to_IPL_2(void)
+{
+  1d0:	eb bf f0 58 00 24 	stmg	%r11,%r15,88(%r15)
+  1d6:	a7 fb ff 50       	aghi	%r15,-176
+  1da:	b9 04 00 bf       	lgr	%r11,%r15
+     ResetInfo *current = 0;
+  1de:	a7 19 00 00       	lghi	%r1,0
+  1e2:	e3 10 b0 a8 00 24 	stg	%r1,168(%r11)
 
-Once updated to Python 3, with this hunk, the test pass:
+     void (*ipl)(void) = (void *) (uint64_t) current->ipl_continue;
+  1e8:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
+  1ee:	58 10 10 08       	l	%r1,8(%r1)
+  1f2:	b9 16 00 11       	llgfr	%r1,%r1
+  1f6:	e3 10 b0 a0 00 24 	stg	%r1,160(%r11)
+     *current = save;
+  1fc:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
+  202:	c0 20 00 00 00 00 	larl	%r2,202 <jump_to_IPL_2+0x32>
+			204: R_390_PC32DBL	.bss+0x2
+  208:	eb 23 20 00 00 04 	lmg	%r2,%r3,0(%r2)
+  20e:	eb 23 10 00 00 24 	stmg	%r2,%r3,0(%r1)
+     ipl(); /* should not return */
+  214:	e3 10 b0 a0 00 04 	lg	%r1,160(%r11)
+  21a:	0d e1             	basr	%r14,%r1
+}
+  21c:	18 00             	lr	%r0,%r0
+  21e:	eb bf b1 08 00 04 	lmg	%r11,%r15,264(%r11)
+  224:	07 fe             	br	%r14
+  226:	07 07             	nopr	%r7
 
--- >8 --
---- a/tests/qemu-iotests/283
-+++ b/tests/qemu-iotests/283
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
-  #
-  # Test for backup-top filter permission activation failure
-  #
----
+0000000000000228 <jump_to_IPL_code>:
 
-   ...
-   TEST    iotest-qcow2: 244
-   TEST    iotest-qcow2: 249
-   TEST    iotest-qcow2: 251
-   TEST    iotest-qcow2: 252
-   TEST    iotest-qcow2: 256
-   TEST    iotest-qcow2: 265
-   TEST    iotest-qcow2: 267
-   TEST    iotest-qcow2: 268
-   TEST    iotest-qcow2: 283
-Not run: 220
-Passed all 115 iotests
+void jump_to_IPL_code(uint64_t address)
+{
+  228:	eb bf f0 58 00 24 	stmg	%r11,%r15,88(%r15)
+  22e:	c0 d0 00 00 00 00 	larl	%r13,22e <jump_to_IPL_code+0x6>
+			230: R_390_PC32DBL	.rodata+0x2a
+  234:	a7 fb ff 50       	aghi	%r15,-176
+  238:	b9 04 00 bf       	lgr	%r11,%r15
+  23c:	e3 20 b0 a0 00 24 	stg	%r2,160(%r11)
+     /* store the subsystem information _after_ the bootmap was loaded */
+     write_subsystem_identification();
+  242:	c0 e5 00 00 00 00 	brasl	%r14,242 <jump_to_IPL_code+0x1a>
+			244: R_390_PLT32DBL	write_subsystem_identification+0x2
 
-I'll rebase and respin.
+     /* prevent unknown IPL types in the guest */
+     if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
+  248:	c0 10 00 00 00 00 	larl	%r1,248 <jump_to_IPL_code+0x20>
+			24a: R_390_GOTENT	iplb+0x2
+  24e:	e3 10 10 00 00 04 	lg	%r1,0(%r1)
+  254:	43 10 10 0c       	ic	%r1,12(%r1)
+  258:	a7 28 00 ff       	lhi	%r2,255
+  25c:	14 12             	nr	%r1,%r2
+  25e:	a7 1e 00 ff       	chi	%r1,255
+  262:	a7 74 00 15       	jne	28c <jump_to_IPL_code+0x64>
+         iplb.pbt = S390_IPL_TYPE_CCW;
+  266:	c0 10 00 00 00 00 	larl	%r1,266 <jump_to_IPL_code+0x3e>
+			268: R_390_GOTENT	iplb+0x2
+  26c:	e3 10 10 00 00 04 	lg	%r1,0(%r1)
+  272:	92 02 10 0c       	mvi	12(%r1),2
+         set_iplb(&iplb);
+  276:	c0 10 00 00 00 00 	larl	%r1,276 <jump_to_IPL_code+0x4e>
+			278: R_390_GOTENT	iplb+0x2
+  27c:	e3 10 10 00 00 04 	lg	%r1,0(%r1)
+  282:	b9 04 00 21       	lgr	%r2,%r1
+  286:	c0 e5 ff ff ff 75 	brasl	%r14,170 <set_iplb>
+     /*
+      * The IPL PSW is at address 0. We also must not overwrite the
+      * content of non-BIOS memory after we loaded the guest, so we
+      * save the original content and restore it in jump_to_IPL_2.
+      */
+     ResetInfo *current = 0;
+  28c:	a7 19 00 00       	lghi	%r1,0
+  290:	e3 10 b0 a8 00 24 	stg	%r1,168(%r11)
 
->=20
->> Failed 1 of 115 iotests
->> /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:842:
->> recipe for target 'check-tests/check-block.sh' failed
+     save = *current;
+  296:	c0 10 00 00 00 00 	larl	%r1,296 <jump_to_IPL_code+0x6e>
+			298: R_390_PC32DBL	.bss+0x2
+  29c:	e3 20 b0 a8 00 04 	lg	%r2,168(%r11)
+  2a2:	eb 23 20 00 00 04 	lmg	%r2,%r3,0(%r2)
+  2a8:	eb 23 10 00 00 24 	stmg	%r2,%r3,0(%r1)
 
+     current->ipl_psw = (uint64_t) &jump_to_IPL_2;
+  2ae:	c0 20 ff ff ff 91 	larl	%r2,1d0 <jump_to_IPL_2>
+  2b4:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
+  2ba:	e3 20 10 00 00 24 	stg	%r2,0(%r1)
+     current->ipl_psw |= RESET_PSW_MASK;
+  2c0:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
+  2c6:	e3 10 10 00 00 04 	lg	%r1,0(%r1)
+  2cc:	e3 20 d0 00 00 04 	lg	%r2,0(%r13)
+  2d2:	b9 81 00 21       	ogr	%r2,%r1
+  2d6:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
+  2dc:	e3 20 10 00 00 24 	stg	%r2,0(%r1)
+     current->ipl_continue = address & 0x7fffffff;
+  2e2:	e3 10 b0 a0 00 04 	lg	%r1,160(%r11)
+  2e8:	b9 17 00 21       	llgtr	%r2,%r1
+  2ec:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
+  2f2:	50 20 10 08       	st	%r2,8(%r1)
+
+     debug_print_int("set IPL addr to", current->ipl_continue);
+  2f6:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
+  2fc:	58 10 10 08       	l	%r1,8(%r1)
+  300:	b9 16 00 11       	llgfr	%r1,%r1
+  304:	b9 04 00 31       	lgr	%r3,%r1
+  308:	c0 20 00 00 00 00 	larl	%r2,308 <jump_to_IPL_code+0xe0>
+			30a: R_390_PC32DBL	.rodata+0x2
+  30e:	c0 e5 ff ff ff 4d 	brasl	%r14,1a8 <debug_print_int>
+
+     /* Ensure the guest output starts fresh */
+     sclp_print("\n");
+  314:	c0 20 00 00 00 00 	larl	%r2,314 <jump_to_IPL_code+0xec>
+			316: R_390_PC32DBL	.rodata+0x12
+  31a:	c0 e5 00 00 00 00 	brasl	%r14,31a <jump_to_IPL_code+0xf2>
+			31c: R_390_PLT32DBL	sclp_print+0x2
+     /*
+      * HACK ALERT.
+      * We use the load normal reset to keep r15 unchanged. jump_to_IPL_2
+      * can then use r15 as its stack pointer.
+      */
+     asm volatile("lghi 1,1\n\t"
+  320:	a7 19 00 01       	lghi	%r1,1
+  324:	83 11 03 08       	diag	%r1,%r1,776
+                  "diag 1,1,0x308\n\t"
+                  : : : "1", "memory");
+     panic("\n! IPL returns !\n");
+  328:	c0 20 00 00 00 00 	larl	%r2,328 <jump_to_IPL_code+0x100>
+			32a: R_390_PC32DBL	.rodata+0x14
+  32e:	c0 e5 00 00 00 00 	brasl	%r14,32e <jump_to_IPL_code+0x106>
+			330: R_390_PLT32DBL	panic+0x2
+}
+  334:	18 00             	lr	%r0,%r0
+  336:	eb bf b1 08 00 04 	lmg	%r11,%r15,264(%r11)
+  33c:	07 fe             	br	%r14
+  33e:	07 07             	nopr	%r7
+
+
+
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
 
