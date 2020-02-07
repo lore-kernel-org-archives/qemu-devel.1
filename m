@@ -2,79 +2,115 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B97C04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3D7C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:31:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B84922464
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:29:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4448520838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:31:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bq8TZUg1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B84922464
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqwMZiBz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4448520838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05Zh-0005ay-R3
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:29:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41365)
+	id 1j05bW-0006uf-Fq
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:31:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41228)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j05Z5-00053a-NV
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:29:09 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j05Yc-0004tL-7J
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:28:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j05Z4-0000HY-19
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:29:07 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28431
+ (envelope-from <mreitz@redhat.com>) id 1j05Ya-0006js-OB
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:28:38 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46281
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j05Z3-0000Fe-KK
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:29:05 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j05Ya-0006hb-G2
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:28:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581089345;
+ s=mimecast20190719; t=1581089316;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pi1okzEXVffEvyXwBNHQH32Xg7nmD6MJp7QmhmTnms8=;
- b=bq8TZUg1FnY6quPbIhz972zEKYFgTaP+aHbVYVR7Gl+ho4Itlbyd+Yu+jb920alB+bG/59
- h92TdPLp8BDTX5MQwuSh4Xl2l9nC/KHMYm5mJlJ1FQJxWrQwyOL+OGMYHjJ00bVohjMH1l
- 8GQ594zDQd/U6UvdJ4J1G62zdB5/7vA=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=fRaLgTYpKD34fmsy8H86X5XeMcGDGYPY31BAfBDjepE=;
+ b=TqwMZiBzLLBCRv8zIvOX4JVwkYQ3Qp50P/ldJDTX9A4z3tSXxoBSBRCLvZ7ojTv23NKo0O
+ xlu0uOhf3gfHxP5yei9rSuSy7IAKzNY0LojdwAhyXzShREo5cK285MWiNyx9MUHNQbYRa3
+ GGFUo3aH2dwrqvJNFaPj2aS9lCBgOSg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-C8r5FaMpOHys1cqnMdSZzQ-1; Fri, 07 Feb 2020 10:29:01 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-160-1w7bGCL6P-KwqZNs2lWXFQ-1; Fri, 07 Feb 2020 10:28:29 -0500
+X-MC-Unique: 1w7bGCL6P-KwqZNs2lWXFQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B72E21083E80;
- Fri,  7 Feb 2020 15:28:59 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 17AF35DA81;
- Fri,  7 Feb 2020 15:28:49 +0000 (UTC)
-Date: Fri, 7 Feb 2020 15:28:47 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1 00/13] Ram blocks with resizable anonymous allocations
- under POSIX
-Message-ID: <20200207152847.GG3302@work-vm>
-References: <20200206201121.GM3655@work-vm>
- <13585E49-B84C-41D8-8825-F96841F475D0@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DE79189F763;
+ Fri,  7 Feb 2020 15:28:28 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-14.ams2.redhat.com
+ [10.36.117.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 25FF460BF7;
+ Fri,  7 Feb 2020 15:28:26 +0000 (UTC)
+Subject: Re: [PATCH v3 1/1] qemu-img: Add --target-is-zero to convert
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eric Blake <eblake@redhat.com>, David Edmondson
+ <david.edmondson@oracle.com>, qemu-devel@nongnu.org
+References: <20200204095246.1974117-1-david.edmondson@oracle.com>
+ <20200204095246.1974117-2-david.edmondson@oracle.com>
+ <90f3f74b-6154-d7ce-4e0e-ba4422f7da11@redhat.com>
+ <91c3d45b-4c27-d366-6dd9-5c27164cce35@virtuozzo.com>
+ <92ca6082-a3a6-c116-d1cc-e9810280c0c6@redhat.com>
+ <38ac63ec-af49-d9d5-c1d4-e45614b71d4c@redhat.com>
+ <f110458f-b3e7-6301-64bf-2b4957f3601e@virtuozzo.com>
+ <570489b5-8d1b-27c4-01d3-0e63130d2c57@redhat.com>
+ <99dc03a7-f93a-bdee-f38d-ac5aae8a3ca9@virtuozzo.com>
+ <33849f7f-1ae9-126c-28b8-f9a5602aa2d0@redhat.com>
+ <96aab671-23db-1917-983e-182312a41220@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <cd26d37d-5684-479b-a9ee-ae337e16a558@redhat.com>
+Date: Fri, 7 Feb 2020 16:28:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <13585E49-B84C-41D8-8825-F96841F475D0@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: C8r5FaMpOHys1cqnMdSZzQ-1
+In-Reply-To: <96aab671-23db-1917-983e-182312a41220@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="M8Z60bh6sZYGAIN3yuXxVk0qW7R07TxSz"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,118 +124,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* David Hildenbrand (david@redhat.com) wrote:
->=20
->=20
-> > Am 06.02.2020 um 21:11 schrieb Dr. David Alan Gilbert <dgilbert@redhat.=
-com>:
-> >=20
-> > =EF=BB=BF* David Hildenbrand (david@redhat.com) wrote:
-> >> We already allow resizable ram blocks for anonymous memory, however, t=
-hey
-> >> are not actually resized. All memory is mmaped() R/W, including the me=
-mory
-> >> exceeding the used_length, up to the max_length.
-> >>=20
-> >> When resizing, effectively only the boundary is moved. Implement actua=
-lly
-> >> resizable anonymous allocations and make use of them in resizable ram
-> >> blocks when possible. Memory exceeding the used_length will be
-> >> inaccessible. Especially ram block notifiers require care.
-> >>=20
-> >> Having actually resizable anonymous allocations (via mmap-hackery) all=
-ows
-> >> to reserve a big region in virtual address space and grow the
-> >> accessible/usable part on demand. Even if "/proc/sys/vm/overcommit_mem=
-ory"
-> >> is set to "never" under Linux, huge reservations will succeed. If ther=
-e is
-> >> not enough memory when resizing (to populate parts of the reserved reg=
-ion),
-> >> trying to resize will fail. Only the actually used size is reserved in=
- the
-> >> OS.
-> >>=20
-> >> E.g., virtio-mem [1] wants to reserve big resizable memory regions and
-> >> grow the usable part on demand. I think this change is worth sending o=
-ut
-> >> individually. Accompanied by a bunch of minor fixes and cleanups.
-> >>=20
-> >> [1] https://lore.kernel.org/kvm/20191212171137.13872-1-david@redhat.co=
-m/
-> >=20
-> > There's a few bits I've not understood from skimming the patches:
-> >=20
->=20
-> Thanks for having a look!
->=20
-> >  a) Am I correct in thinking you PROT_NONE the extra space so you can
-> > gkrow/shrink it?
->=20
-> Yes!
->=20
-> >  b) What does kvm see - does it have a slot for the whole space or for
-> > only the used space?
->=20
-> Only the used space. Resizing triggers a resize of the memory region. Tha=
-t triggers memory notifiers, which remove the old kvm memslot and re-add th=
-e new kvm memslot. (That=E2=80=98s existing handling, so nothing new).
->=20
-> So KVM will not see PROT_NONE when creating a slot.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--M8Z60bh6sZYGAIN3yuXxVk0qW7R07TxSz
+Content-Type: multipart/mixed; boundary="FO6nnQaZcymSDgyN6j4c84w5UtqnFIwYr"
 
-OK, that's easy then.
+--FO6nnQaZcymSDgyN6j4c84w5UtqnFIwYr
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> >     I ask because we found with virtiofs/DAX experiments that on Power,
-> > kvm gets upset if you give it a mapping with PROT_NONE.
-> >     (That maybe less of an issue if you change the mapping after the
-> > slot is created).
+On 07.02.20 16:16, Vladimir Sementsov-Ogievskiy wrote:
+> 07.02.2020 18:03, Max Reitz wrote:
+>> On 07.02.20 15:53, Vladimir Sementsov-Ogievskiy wrote:
+>>> 07.02.2020 17:41, Max Reitz wrote:
+>>>> On 07.02.20 13:07, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 07.02.2020 13:33, Max Reitz wrote:
+>>>>>> On 04.02.20 15:23, Eric Blake wrote:
+>>>>>>> On 2/4/20 7:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>
+>>>>>>>>> I understand that it is safer to have restrictions now and lift
+>>>>>>>>> them
+>>>>>>>>> later, than to allow use of the option at any time and leave room
+>>>>>>>>> for
+>>>>>>>>> the user to shoot themselves in the foot with no way to add safet=
+y
+>>>>>>>>> later.=C2=A0 The argument against no backing file is somewhat
+>>>>>>>>> understandable (technically, as long as the backing file also
+>>>>>>>>> reads
+>>>>>>>>> as all zeroes, then the overall image reads as all zeroes - but
+>>>>>>>>> why
+>>>>>>>>> have a backing file that has no content?); the argument
+>>>>>>>>> requiring -n
+>>>>>>>>> is a bit weaker (if I'm creating an image, I _know_ it reads as
+>>>>>>>>> all
+>>>>>>>>> zeroes, so the --target-is-zero argument is redundant, but it
+>>>>>>>>> shouldn't hurt to allow it).
+>>>>>>>>
+>>>>>>>> I know that it reads as all zeroes, only if this format provides
+>>>>>>>> zero
+>>>>>>>> initialization..
+>>>>>>>>
+>>>>>>>>>
+>>>>>>>>>> +++ b/qemu-img.c
+>>>>>>>>>
+>>>>>>>>>> @@ -2247,6 +2256,11 @@ static int img_convert(int argc, char
+>>>>>>>>>> **argv)
+>>>>>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 warn_report("This will become an error in future
+>>>>>>>>>> QEMU
+>>>>>>>>>> versions.");
+>>>>>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 if (s.has_zero_init && !skip_create) {
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("--targ=
+et-is-zero requires use of -n
+>>>>>>>>>> flag");
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail_getopt;
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>>
+>>>>>>>>> So I think we could drop this hunk with no change in behavior.
+>>>>>>>>
+>>>>>>>> I think, no we can't. If we allow target-is-zero, with -n, we'd
+>>>>>>>> better
+>>>>>>>> to check that what we are creating is zero-initialized (format has
+>>>>>>>> zero-init), and if not we should report error.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Good call.=C2=A0 Yes, if we allow --target-is-zero without -n, we M=
+UST
+>>>>>>> insist
+>>>>>>> that bdrv_has_zero_init() returns 1 (or, after my followup series,
+>>>>>>> bdrv_known_zeroes() includes BDRV_ZERO_CREATE).
+>>>>>>
+>>>>>> Why?
+>>>>>>
+>>>>>> I could imagine a user creating a qcow2 image on some block device
+>>>>>> with
+>>>>>> preallocation where we cannot verify that the result will be
+>>>>>> zero.=C2=A0 But
+>>>>>> they want qemu not to zero the device, so they would specify
+>>>>>> --target-is-zero.
+>>>>>
+>>>>> If user create image, setting --target-is-zero is always valid. But i=
+f
+>>>>> we in
+>>>>> same operation create the image automatically, having
+>>>>> --target-is-zero,
+>>>>> when
+>>>>> we know that what we are creating is not zero is misleading and shoul=
+d
+>>>>> fail..
+>>>>
+>>>> bdrv_has_zero_init() doesn=E2=80=99t return false only for images that=
+ we know
+>>>> are not zero.=C2=A0 It returns true for images where we know they are.=
+=C2=A0 But
+>>>> if we don=E2=80=99t know, then it returns false also.
+>>>
+>>> yes, but we don't have better check.
+>>
+>> Correct, but maybe the user knows more, hence why it may make sense for
+>> them to provide us with some information we don=E2=80=99t have.
+>>
+>>>>> If we want to add a behavior to skip zeros unconditionally, we should
+>>>>> call new
+>>>>> option --skip-zeroes, to clearly specify what we want.
+>>>>
+>>>> It was my impression that this was exactly what --target-is-zero means
+>>>> and implies.
+>>>>
+>>>
+>>> For me it sounds strange that user has better knowledge about what Qemu
+>>> creates than Qemu itself. And if it so - it should be fixed in Qemu,
+>>> rather than creating user interface to hint Qemu what it does.
+>>
+>> I brought an example where qemu cannot know whether the image is zero
+>> (preallocation on a block device), but the user / management layer might
+>> know.
+>>
 >=20
-> That should work as expected. Resizing *while* kvm is running is tricky, =
-but that=E2=80=98s not part of this series and a different story :) right n=
-ow, resizing is only valid on reboot/incoming migration.
+> It sounds unsafe for me. User can't know how exactly Qemu do preallocatio=
+n,
+> which syscalls it calls, etc. How can user be sure, that Qemu produces
+> all-zero image, if even Qemu doesn't sure in it?
 
-Hmm 'when' during an incoming migration; I ask because of userfaultfd
-setup for postcopy.  Also note those things can combine - i.e. a reboot
-that happens during a migration (we've already got a pile of related
-bugs).
+For example, qcow2 images are always zero if the underlying storage is zero=
+.
 
-> >=20
-> >  c) It's interesting this is keyed off the RAMBlock notifiers - do
-> >     memory_listener's on the address space the block is mapped into get
-> >    triggered?  I'm wondering how vhost (and vhost-user) in particular
-> >    see this.
->=20
-> Yes, memory listeners get triggered. Old region is removed, new one is ad=
-ded. Nothing changed on that front.
->=20
-> The issue with ram block notifiers is that they did not do a =E2=80=9Erem=
-ove old, add new=E2=80=9C on resizes. They only added the full ram block. B=
-ad. E.g., vfio wants to pin all memory - which would fail on PROT_NONE.
->=20
-> E.g., for HAX, there is no kernel ioctl to remove a ram block ... for SEV=
- there is, but I am not sure about the implications when converting back an=
-d forth between encrypted/unencrypted. So SEV and HAX require legacy handli=
-ng.
+Then again, it isn=E2=80=99t like we need --target-is-zero without -n anywa=
+y.
+If users want that, they can always use qemu-img create +
+qemu-img convert -n --target-is-zero.  So seeing that you=E2=80=99re
+uncomfortable with the idea of --target-is-zero with -n, I can=E2=80=99t sa=
+y
+there is any actual reason why we=E2=80=99d have to allow it.
 
-I guess for a memory listener it just sees a new layout after the commit
-and then can figure out what changed.
+Max
 
-Dave
+> Otherwise, we should document, how exactly (up to syscalls, their
+> parameters, flags, the whole logic and algorithm) preallocation is done,
+> so user can analyze it and be sure that produced image would be all-zero
+> (when Qemu can't determine it because some specific block device, for whi=
+ch
+> Qemu doesn't know that its preallocation algorithm produces all-zero, but
+> user is sure in it)..
 
-> Cheers!
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--FO6nnQaZcymSDgyN6j4c84w5UtqnFIwYr--
+
+--M8Z60bh6sZYGAIN3yuXxVk0qW7R07TxSz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl49ghkACgkQ9AfbAGHV
+z0B1ywf/cBMI/ZRf6f3KLANuv1q5wjVqpeoNlYoAhBVeZ9cQy3ODNsS2HLRbHawY
+uL7PAtBeUrp+fLLE7UbpEC15heuL+DshgPxtI+3jaZ1W6eI29VbRr5KCkBHiaSG6
+o7QmX6ovzQH+yP6nU8YLqMWEEoA1a/LMUJFcd3mN7/Z9rwOP/MCbGFyZhV5mtxHo
+grgz90cD1vIwRrejGa/N1xn8sRUyryzYp5uTEqLz5BHlb7au38YI4uTxb1GDkfOo
+sqId2/HRogOTGhECnkHl8Rdw8cOxIVwBKf+xCTG17dWE4oQ96VWUa12nU/YY4spB
+dhA4JgmPdZOwUSCqJf6NNnumqowdEg==
+=5xrY
+-----END PGP SIGNATURE-----
+
+--M8Z60bh6sZYGAIN3yuXxVk0qW7R07TxSz--
 
 
