@@ -2,102 +2,76 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3950DC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F2AC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:31:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02A7420720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:28:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0184220720
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:31:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xs1uY8ZI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02A7420720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g4o8h1Ko"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0184220720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j06Us-0000A6-7e
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:28:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55995)
+	id 1j06X9-0003Bp-2k
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:31:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56425)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j06TD-0006te-Sg
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:09 -0500
+ (envelope-from <stefanha@redhat.com>) id 1j06W2-0001Ei-2v
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j06TC-0002NJ-LD
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:07 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53131
+ (envelope-from <stefanha@redhat.com>) id 1j06W0-0007k2-FN
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:30:02 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20952
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j06TC-0002M0-HQ
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:06 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j06W0-0007jp-Br
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:30:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581092826;
+ s=mimecast20190719; t=1581093000;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NRew0WM9/hguVVDiQByA4rcgt0exsoGjc2th1JNhHPk=;
- b=Xs1uY8ZIrt/au9kAItB6hw4D15wp2//DR/YMkpU7o5vFCJGpFJkkF/DKiDrrA6sDdPlnT9
- X8bhwZfSYqdV6CGeor0lHclJndBCKaEw+8YqjctYWTzYvSyZWeUJ0zYsrrexJcp2R/xFv9
- J5t2ZEKodcnXcn8PttKm/TKDy3JR7sY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-Eib08X-yP7eCdcCmnJE0Cw-1; Fri, 07 Feb 2020 11:27:03 -0500
-Received: by mail-wm1-f69.google.com with SMTP id g26so931164wmk.6
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 08:27:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2k/2EJp51nHK080TIi/E0WhhVolewYmzVbUQJs/efd4=;
- b=J9V6ZTsxxEHZO125j1J6VejcWQgBTgwf7fxEAEQI0pRRwF2Miz80RHF5c1unH/3SbQ
- keRvp7BmxsCDvmF2wQ1L9TyljT3r17a4S0Ww0McbgDkzthMYbCtJLvNpTQ375TMfkG7N
- vhUN1AkxSm3YUvcuCkItzn1cE6ob2b/qfdL33XZ3d4vlxfJxMHoCX16xdPTozL/yoSm1
- CwhIWKqwJsIg7MOXfa1c4/m7jruhpq++bfLsFCZogaCy/4plZlCJSXLpUG1DFL1FY8nA
- /pNeWZTnwXyoDqTAVGYJv0jy6ICeJ1UrI6QPBh/xIVGov929OhW8vCn1HWDAR2uynL1c
- EicQ==
-X-Gm-Message-State: APjAAAWDYXkFU2W4Xn+HsOrsIjtlWBmgmlU3oqZEdMt6lxTCBLZ/YwuD
- iAPHHpzjA+v3SkM7bmmSk/yITJtyAHOtoC1Ci0iyKcptlGKBKaKmAXU3DkCp4ZTcwYcF9YA57P7
- g65yu/DlVpu9YY1Q=
-X-Received: by 2002:a1c:4d18:: with SMTP id o24mr5090933wmh.35.1581092822801; 
- Fri, 07 Feb 2020 08:27:02 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxok2Nx4s3cjmNK/Gj6cuVv1QGJ68HxLfccaqMLYtgRHntobkykNKitwaJM5TUN/vQdEQAlpw==
-X-Received: by 2002:a1c:4d18:: with SMTP id o24mr5090905wmh.35.1581092822570; 
- Fri, 07 Feb 2020 08:27:02 -0800 (PST)
-Received: from [192.168.254.233] (66.red-217-126-125.staticip.rima-tde.net.
- [217.126.125.66])
- by smtp.gmail.com with ESMTPSA id r1sm3919271wrx.11.2020.02.07.08.27.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Feb 2020 08:27:02 -0800 (PST)
-Subject: Re: [PATCH 2/3] MAINTAINERS: Cover qapi/block{-core}.json in 'Block
- layer core' section
-To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20200207103012.27049-1-philmd@redhat.com>
- <20200207103012.27049-3-philmd@redhat.com>
- <87blqaqyxi.fsf@dusky.pond.sub.org> <20200207142146.GF6031@linux.fritz.box>
- <87blqapej2.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6f20c34f-f96e-ad7d-e91c-0863471406d8@redhat.com>
-Date: Fri, 7 Feb 2020 17:27:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ content-transfer-encoding:content-transfer-encoding;
+ bh=poyby5WDTLiQ1z4ZTXrEo99HBsanLjvO+0nCtTeitdM=;
+ b=g4o8h1KocczWlyxHTDTEGWFeANEXNb2Yg6vDrXFhuugYp45ZE7EliI6R7Cu7v5G3EgdjvO
+ 7imD+WAtvHymLYmDJcyNqp+78cnBS5f8VAH7G+DN+guHMUfWMr9Ba3X6xU5vbxq38xF7Nx
+ lBLaTvwtwvVGfuWLWm4/CbKTGuPnjtw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409--o73x8EIMKmeg2e4R-iirA-1; Fri, 07 Feb 2020 11:29:56 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E5F4101FC60;
+ Fri,  7 Feb 2020 16:29:55 +0000 (UTC)
+Received: from localhost (ovpn-116-141.ams2.redhat.com [10.36.116.141])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 581755DA7D;
+ Fri,  7 Feb 2020 16:29:52 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] docs: add virtiofsd(1) man page
+Date: Fri,  7 Feb 2020 16:29:51 +0000
+Message-Id: <20200207162951.178437-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87blqapej2.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-MC-Unique: Eib08X-yP7eCdcCmnJE0Cw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: -o73x8EIMKmeg2e4R-iirA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,71 +83,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/7/20 5:07 PM, Markus Armbruster wrote:
-> Kevin Wolf <kwolf@redhat.com> writes:
->=20
->> Am 07.02.2020 um 15:01 hat Markus Armbruster geschrieben:
->>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>>
->>>> List this file in the proper section, so maintainers get
->>>> notified when it is modified.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>> ---
->>>> Cc: Kevin Wolf <kwolf@redhat.com>
->>>> Cc: Max Reitz <mreitz@redhat.com>
->>>> Cc: qemu-block@nongnu.org
->>>> ---
->>>>   MAINTAINERS | 2 ++
->>>>   1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>> index 903831e0a4..e269e9092c 100644
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -1842,6 +1842,8 @@ S: Supported
->>>     Block layer core
->>>     M: Kevin Wolf <kwolf@redhat.com>
->>>     M: Max Reitz <mreitz@redhat.com>
->>>     L: qemu-block@nongnu.org
->>>     S: Supported
->>>>   F: block*
->>>>   F: block/
->>>>   F: hw/block/
->>>> +F: qapi/block.json
->>>> +F: qapi/block-core.json
->>>>   F: include/block/
->>>>   F: qemu-img*
->>>>   F: docs/interop/qemu-img.rst
->>>
->>> This is in addition to
->>>
->>>      Block QAPI, monitor, command line
->>>      M: Markus Armbruster <armbru@redhat.com>
->>>      S: Supported
->>>      F: blockdev.c
->>>      F: block/qapi.c
->>>      F: qapi/block*.json
->>>      F: qapi/transaction.json
->>>      T: git https://repo.or.cz/qemu/armbru.git block-next
->>>
->>> I'm not sure this section makes much sense anymore.
->>
->> This is probably for you to decide.
->>
->> Though the block-next branch from the T: line doesn't even exist any
->> more...
->=20
-> I have the questionable habit to delete my -next branches when they're
-> empty.
+Document the virtiofsd(1) program and its command-line options.  This
+man page is a rST conversion of the original texi documentation that I
+wrote.
 
-Having dangling -next branches pointing to something very previous is=20
-also questionable...
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v3:
+ * Dropped old -o vhost_user_socket=3DPATH option [dgilbert]
+v2:
+ * Fix mount -t virtio_fs -> virtiofs outdated doc [Liam]
+ * Use memory-backend-memfd instead of memory-backend-file
+---
+ MAINTAINERS                |   1 +
+ Makefile                   |   9 ++-
+ docs/interop/conf.py       |   5 +-
+ docs/interop/index.rst     |   1 +
+ docs/interop/virtiofsd.rst | 120 +++++++++++++++++++++++++++++++++++++
+ 5 files changed, 134 insertions(+), 2 deletions(-)
+ create mode 100644 docs/interop/virtiofsd.rst
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e72b5e5f69..4a118fe504 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1612,6 +1612,7 @@ S: Supported
+ F: tools/virtiofsd/*
+ F: hw/virtio/vhost-user-fs*
+ F: include/hw/virtio/vhost-user-fs.h
++F: docs/interop/virtiofsd.rst
+=20
+ virtio-input
+ M: Gerd Hoffmann <kraxel@redhat.com>
+diff --git a/Makefile b/Makefile
+index 461d40bea6..f0e1a2fc1d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -348,6 +348,9 @@ DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1
+ DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-img.1
+ DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-nbd.8
+ DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-ga.8
++ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
++DOCS+=3D$(MANUAL_BUILDDIR)/interop/virtiofsd.1
++endif
+ DOCS+=3D$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
+ DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/=
+interop/qemu-qmp-ref.7
+ DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/in=
+terop/qemu-ga-ref.7
+@@ -861,6 +864,9 @@ ifdef CONFIG_VIRTFS
+ =09$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
+ =09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/virtfs-proxy-helper.1 "$(DES=
+TDIR)$(mandir)/man1"
+ endif
++ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
++=09$(INSTALL_DATA) docs/interop/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
++endif
+=20
+ install-datadir:
+ =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
+@@ -1051,7 +1057,8 @@ $(MANUAL_BUILDDIR)/system/index.html: $(call manual-d=
+eps,system)
+ =09$(call build-manual,system,html)
+=20
+ $(call define-manpage-rule,interop,\
+-       qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1 virtfs-proxy-help=
+er.1,\
++       qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
++       virtiofsd.1 virtfs-proxy-helper.1,\
+        $(SRC_PATH/qemu-img-cmds.hx))
+=20
+ $(call define-manpage-rule,system,qemu-block-drivers.7)
+diff --git a/docs/interop/conf.py b/docs/interop/conf.py
+index b0f322207c..b3cda17042 100644
+--- a/docs/interop/conf.py
++++ b/docs/interop/conf.py
+@@ -27,5 +27,8 @@ man_pages =3D [
+      [], 1),
+     ('virtfs-proxy-helper', 'virtfs-proxy-helper',
+      u'QEMU 9p virtfs proxy filesystem helper',
+-     ['M. Mohan Kumar'], 1)
++     ['M. Mohan Kumar'], 1),
++    ('virtiofsd', 'virtiofsd', u'QEMU virtio-fs shared file system daemon'=
+,
++     ['Stefan Hajnoczi <stefanha@redhat.com>',
++      'Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>'], 1),
+ ]
+diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+index 3b763b1eeb..e8455b4270 100644
+--- a/docs/interop/index.rst
++++ b/docs/interop/index.rst
+@@ -24,3 +24,4 @@ Contents:
+    vhost-user
+    vhost-user-gpu
+    virtfs-proxy-helper
++   virtiofsd
+diff --git a/docs/interop/virtiofsd.rst b/docs/interop/virtiofsd.rst
+new file mode 100644
+index 0000000000..378594c422
+--- /dev/null
++++ b/docs/interop/virtiofsd.rst
+@@ -0,0 +1,120 @@
++QEMU virtio-fs shared file system daemon
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Synopsis
++--------
++
++**virtiofsd** [*OPTIONS*]
++
++Description
++-----------
++
++Share a host directory tree with a guest through a virtio-fs device.  This
++program is a vhost-user backend that implements the virtio-fs device.  Eac=
+h
++virtio-fs device instance requires its own virtiofsd process.
++
++This program is designed to work with QEMU's ``--device vhost-user-fs-pci`=
+`
++but should work with any virtual machine monitor (VMM) that supports
++vhost-user.  See the Examples section below.
++
++This program must be run as the root user.  Upon startup the program will
++switch into a new file system namespace with the shared directory tree as =
+its
++root.  This prevents "file system escapes" due to symlinks and other file
++system objects that might lead to files outside the shared directory.  The
++program also sandboxes itself using seccomp(2) to prevent ptrace(2) and ot=
+her
++vectors that could allow an attacker to compromise the system after gainin=
+g
++control of the virtiofsd process.
++
++Options
++-------
++
++.. program:: virtiofsd
++
++.. option:: -h, --help
++
++  Print help.
++
++.. option:: -V, --version
++
++  Print version.
++
++.. option:: -d
++
++  Enable debug output.
++
++.. option:: --syslog
++
++  Print log messages to syslog instead of stderr.
++
++.. option:: -o OPTION
++
++  * debug -
++    Enable debug output.
++
++  * flock|no_flock -
++    Enable/disable flock.  The default is ``no_flock``.
++
++  * log_level=3DLEVEL -
++    Print only log messages matching LEVEL or more severe.  LEVEL is one o=
+f
++    ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
++
++  * norace -
++    Disable racy fallback.  The default is false.
++
++  * posix_lock|no_posix_lock -
++    Enable/disable remote POSIX locks.  The default is ``posix_lock``.
++
++  * readdirplus|no_readdirplus -
++    Enable/disable readdirplus.  The default is ``readdirplus``.
++
++  * source=3DPATH -
++    Share host directory tree located at PATH.  This option is required.
++
++  * timeout=3DTIMEOUT -
++    I/O timeout in seconds.  The default depends on cache=3D option.
++
++  * writeback|no_writeback -
++    Enable/disable writeback cache. The cache alows the FUSE client to buf=
+fer
++    and merge write requests.  The default is ``no_writeback``.
++
++  * xattr|no_xattr -
++    Enable/disable extended attributes (xattr) on files and directories.  =
+The
++    default is ``no_xattr``.
++
++.. option:: --socket-path=3DPATH
++
++  Listen on vhost-user UNIX domain socket at PATH.
++
++.. option:: --fd=3DFDNUM
++
++  Accept connections from vhost-user UNIX domain socket file descriptor FD=
+NUM.
++  The file descriptor must already be listening for connections.
++
++.. option:: --thread-pool-size=3DNUM
++
++  Restrict the number of worker threads per request queue to NUM.  The def=
+ault
++  is 64.
++
++.. option:: --cache=3Dnone|auto|always
++
++  Select the desired trade-off between coherency and performance.  ``none`=
+`
++  forbids the FUSE client from caching to achieve best coherency at the co=
+st of
++  performance.  ``auto`` acts similar to NFS with a 1 second metadata cach=
+e
++  timeout.  ``always`` sets a long cache lifetime at the expense of cohere=
+ncy.
++
++Examples
++--------
++
++Export ``/var/lib/fs/vm001/`` on vhost-user UNIX domain socket
++``/var/run/vm001-vhost-fs.sock``:
++
++::
++
++  host# virtiofsd --socket-path=3D/var/run/vm001-vhost-fs.sock -o source=
+=3D/var/lib/fs/vm001
++  host# qemu-system-x86_64 \
++      -chardev socket,id=3Dchar0,path=3D/var/run/vm001-vhost-fs.sock \
++      -device vhost-user-fs-pci,chardev=3Dchar0,tag=3Dmyfs \
++      -object memory-backend-memfd,id=3Dmem,size=3D4G,share=3Don \
++      -numa node,memdev=3Dmem \
++      ...
++  guest# mount -t virtiofs myfs /mnt
+--=20
+2.24.1
 
 
