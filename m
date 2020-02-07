@@ -2,83 +2,82 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF14FC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DECC35250
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:35:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B808E22314
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:34:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1908217BA
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:35:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ajvN/jFp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B808E22314
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ikBu6CjM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1908217BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j06Zu-0007eU-Lv
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:34:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57052)
+	id 1j06bF-0001TS-OH
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:35:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1j06YA-0005Km-Si
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:32:15 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1j06aA-0008Fq-5Q
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:34:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1j06Y8-0002Ui-Vg
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:32:14 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40731)
+ (envelope-from <robert.foley@linaro.org>) id 1j06a4-00061X-MT
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:34:18 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:45961)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1j06Y8-0002T3-OT; Fri, 07 Feb 2020 11:32:12 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t3so3405026wru.7;
- Fri, 07 Feb 2020 08:32:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1j06a4-0005zh-Cx
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:34:12 -0500
+Received: by mail-lf1-x142.google.com with SMTP id 203so1904517lfa.12
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 08:34:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=s8WHZwwsqqzS7ulVZKw3O52kQ41FpfMk1ogLky/AC6c=;
- b=ajvN/jFpi1dyRMBmxDaZ8MHZBF8OQr9lSq0wznyhRLTZdbySclPB9vAUgfiB/T+UU/
- mLD7e0s+dO5bqWj0EIcvIRRlEjwkQuhFq6fjjQyooArBlf9ot3MejY+EfurCURR8FRFN
- x6I/ehM1u9ycdgAGIT8pCygNtFh4OXVCaHeNTTLkGhqD5c5Gp87hMOqtCTKC2Q415ZGc
- OcKtbOe/Sa7+Ruw+vNsxLCA7YzIY+5CFw/0OlVcJ8/nf1DwgLqknUeRkY67kC3u7lS0r
- WGIwzmLLPnijo4s/EeJpeu97ktfKDQOwAgsYvBMNGC2UBtlB6TqCNWeWYP+7ivwfGVsO
- 7X7w==
+ bh=UTMAv6rzdbL/Zo/Vu84sRuIP+QwRS1wmkIfbvmMS5mk=;
+ b=ikBu6CjMl6UHMgytb/IwD31sOfq6VGwJow2chcXTKb/110Y5Hf3R3LBcPISGn6vmpV
+ +hN1d3zxiK+U9ZzRv3FnRTq57tuxOtsRv/KvoQFc5nMgjyWBo1NX8OUzuhHiZCqSBOZm
+ jwPHsZ1VMEiufB4JFMCVLpUjR31O4kClgI3HXvN9IeFBNdbmwKScwS+ISWyRQXuvGvyE
+ uvzEM4JwDaSQZuVmd+rTRy7pSFRbLwsXf2/VCrc9x86QNI5wnuxwFoTzwpI0H3d/Dv9T
+ 4LDg5da8L5AnBjEcz3S1dOSEFNOOgVfBJa6AFIarWNRJo7emcDaqkvb2U+dIVYFnQ6j/
+ EEag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=s8WHZwwsqqzS7ulVZKw3O52kQ41FpfMk1ogLky/AC6c=;
- b=PkThbBsWZEz+Cb6z8YXXeF5duU3KrTE1eWi1zVLEKPDwknkTFaEihale+6ya71tT3a
- 7ZkbXUkhBdWAGPqwOcGzahbUT86gnu2/6Pi5gz+dmBk+aqDbEG+g7PfwgG+TMU6IKyQv
- H1yOuwU2qOWZxe3GVzdICpWPdck6XsDhzQxWDjXgW/ccYqTH+tL+dVdx5ocVRAKUnADh
- uSOG3pNoeWDojfLTyGbgNOMcahMgVAs16wti/UfwYjaGXuQQkujzGjRCH2WJgaBrBZ/U
- U/OI/Of9/9FV9XSKno+4In8Mwa//QLBpCpdoI+0lrrLufn58Gh22djDEUz5kW8WIilNx
- L/aw==
-X-Gm-Message-State: APjAAAUHReUxQrCPf6avaNuZIiZq2SaUInIEWkOumrNmVXM/Mv9sQipa
- FjzuABFjf5gAZ/NlD86k4hZ+Qg1istRxF47I4Tk=
-X-Google-Smtp-Source: APXvYqzv046zaGv11f9JP7gkZBskeRRcVF52SNVFTwX6H5KywAmipUHjtHDeeZxucHLm7f0hFKjUIHgpvFB/F31Eibs=
-X-Received: by 2002:a05:6000:1289:: with SMTP id
- f9mr5269404wrx.381.1581093131486; 
- Fri, 07 Feb 2020 08:32:11 -0800 (PST)
+ bh=UTMAv6rzdbL/Zo/Vu84sRuIP+QwRS1wmkIfbvmMS5mk=;
+ b=YdFdEhmNEoG3Ic4mUKVNCSSzH9njtnpFMJazScQT8SvXykaquapCWUV8SOgRZorlve
+ ZzLTKbi9FJ3X3/GmKtPQaaNbCPQsca96/FBCWvE8MZcm8maJ/Pk/PKlN+csCAMrF+vSm
+ LFN7qGTYt/CogFqmDJtT2t3/dxicSNjvJqhw4FzCBW55HCGIeeqqcFXorJsqz6VqIB9g
+ Dy5goS3sA8uzT0luIdk+UrlglQCOQhBAxXTUtXxXOd1SGMD7yeWVcIFjVLoN1MTbMmwB
+ SBHo0K1zPjjJXaMHyQ5Qb/z3XolCHOOEtMHWFwiiacRWBQ6xJW4dt3I8vTwV5Sf5Hg7Z
+ QGgA==
+X-Gm-Message-State: APjAAAXI3cNUYBQIu4UsX79OzcffEFQO39siYJ0VL8esMic6XIqfJvfx
+ i6a5Z3Ru8/9hy07280vPPb6ybozgEkiyZLd24NRPwA==
+X-Google-Smtp-Source: APXvYqwLqn35kITPXh8/Ln+qXZaWC5KJKa+p7VWWFCUl1JhowP5FJFKwJWzksmgdoxXlemw9ODDAWfdJTICII5gHWLc=
+X-Received: by 2002:a19:6445:: with SMTP id b5mr4848227lfj.187.1581093250498; 
+ Fri, 07 Feb 2020 08:34:10 -0800 (PST)
 MIME-Version: 1.0
-References: <20200207161948.15972-1-philmd@redhat.com>
- <20200207161948.15972-4-philmd@redhat.com>
-In-Reply-To: <20200207161948.15972-4-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 7 Feb 2020 17:31:59 +0100
-Message-ID: <CAJ+F1CJmFrH7H503cExpR3SVAJ99uGDM_AdkieSwNSh4D859yg@mail.gmail.com>
-Subject: Re: [PATCH v4 3/3] vl: Abort if multiple machines are registered as
- default
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+References: <20200207150118.23007-1-alex.bennee@linaro.org>
+ <20200207150118.23007-5-alex.bennee@linaro.org>
+In-Reply-To: <20200207150118.23007-5-alex.bennee@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Fri, 7 Feb 2020 11:33:34 -0500
+Message-ID: <CAEyhzFuaDk6CCO72UD0vE9j+Eo=StnoEpWEg5iqOubGhdzXxag@mail.gmail.com>
+Subject: Re: [PATCH v1 4/5] target/riscv: progressively load the instruction
+ during decode
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,89 +89,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chris Wulff <crwulff@gmail.com>,
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+ "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Anthony Green <green@moxielogic.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
- Jia Liu <proljc@gmail.com>, qemu trival <qemu-trivial@nongnu.org>,
- Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>,
- Magnus Damm <magnus.damm@gmail.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Qemu-s390x list <qemu-s390x@nongnu.org>, Stafford Horne <shorne@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-riscv@nongnu.org,
- Thomas Huth <huth@tuxfamily.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Michael Walle <michael@walle.cc>,
- "open list:sPAPR pseries" <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
+ robhenry@microsoft.com, aaron@os.amperecomputing.com, cota@braap.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kuhn.chenqun@huawei.com,
+ Peter Puhov <peter.puhov@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 7, 2020 at 5:21 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->
-> It would be confusing to have multiple default machines.
-> Abort if this ever occurs.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> v2: Use assert() instead of human friendly message (Marc-Andr=C3=A9)
-> v3: Move the check to find_machine() (Michael)
->
-> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-> ---
->  vl.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/vl.c b/vl.c
-> index 7dcb0879c4..ebc203af0d 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1184,16 +1184,18 @@ static MachineClass *find_machine(const char *nam=
-e, GSList *machines)
->  static MachineClass *find_default_machine(GSList *machines)
+Hi,
+On Fri, 7 Feb 2020 at 10:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+> -static void decode_RV32_64C0(DisasContext *ctx)
+> +static void decode_RV32_64C0(DisasContext *ctx, uint16_t opcode)
 >  {
->      GSList *el;
-> +    MachineClass *default_machineclass =3D NULL;
+> -    uint8_t funct3 =3D extract32(ctx->opcode, 13, 3);
+> -    uint8_t rd_rs2 =3D GET_C_RS2S(ctx->opcode);
+> -    uint8_t rs1s =3D GET_C_RS1S(ctx->opcode);
+> +    uint8_t funct3 =3D extract32(opcode, 13, 3);
+
+We noticed that a uint16_t opcode is passed into this function and
+then passed on to extract32().
+This is a minor point, but the extract32() will validate the start and
+length values passed in according to 32 bits, not 16 bits.
+static inline uint32_t extract32(uint32_t value, int start, int length)
+{
+    assert(start >=3D 0 && length > 0 && length <=3D 32 - start);
+Since we have an extract32() and extract64(), maybe we could add an
+extract16() and use it here?
+
+Thanks & Regards,
+-Rob
+> +    uint8_t rd_rs2 =3D GET_C_RS2S(opcode);
+> +    uint8_t rs1s =3D GET_C_RS1S(opcode);
 >
->      for (el =3D machines; el; el =3D el->next) {
->          MachineClass *mc =3D el->data;
->
->          if (mc->is_default) {
-> -            return mc;
-> +            assert(default_machineclass =3D=3D NULL && "Multiple default=
- machines");
-> +            default_machineclass =3D mc;
->          }
+>      switch (funct3) {
+>      case 3:
+>  #if defined(TARGET_RISCV64)
+>          /* C.LD(RV64/128) -> ld rd', offset[7:3](rs1')*/
+>          gen_load_c(ctx, OPC_RISC_LD, rd_rs2, rs1s,
+> -                 GET_C_LD_IMM(ctx->opcode));
+> +                 GET_C_LD_IMM(opcode));
+>  #else
+>          /* C.FLW (RV32) -> flw rd', offset[6:2](rs1')*/
+>          gen_fp_load(ctx, OPC_RISC_FLW, rd_rs2, rs1s,
+> -                    GET_C_LW_IMM(ctx->opcode));
+> +                    GET_C_LW_IMM(opcode));
+>  #endif
+>          break;
+>      case 7:
+>  #if defined(TARGET_RISCV64)
+>          /* C.SD (RV64/128) -> sd rs2', offset[7:3](rs1')*/
+>          gen_store_c(ctx, OPC_RISC_SD, rs1s, rd_rs2,
+> -                  GET_C_LD_IMM(ctx->opcode));
+> +                  GET_C_LD_IMM(opcode));
+>  #else
+>          /* C.FSW (RV32) -> fsw rs2', offset[6:2](rs1')*/
+>          gen_fp_store(ctx, OPC_RISC_FSW, rs1s, rd_rs2,
+> -                     GET_C_LW_IMM(ctx->opcode));
+> +                     GET_C_LW_IMM(opcode));
+>  #endif
+>          break;
 >      }
->
-> -    return NULL;
-> +    return default_machineclass;
 >  }
 >
->  static int machine_help_func(QemuOpts *opts, MachineState *machine)
-> --
-> 2.21.1
+> -static void decode_RV32_64C(DisasContext *ctx)
+> +static void decode_RV32_64C(DisasContext *ctx, uint16_t opcode)
+>  {
+> -    uint8_t op =3D extract32(ctx->opcode, 0, 2);
+> +    uint8_t op =3D extract32(opcode, 0, 2);
 >
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+>      switch (op) {
+>      case 0:
+> -        decode_RV32_64C0(ctx);
+> +        decode_RV32_64C0(ctx, opcode);
+>          break;
+>      }
+>  }
+> @@ -709,22 +708,24 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+>  /* Include the auto-generated decoder for 16 bit insn */
+>  #include "decode_insn16.inc.c"
+>
+> -static void decode_opc(DisasContext *ctx)
+> +static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t o=
+pcode)
+>  {
+>      /* check for compressed insn */
+> -    if (extract32(ctx->opcode, 0, 2) !=3D 3) {
+> +    if (extract32(opcode, 0, 2) !=3D 3) {
+>          if (!has_ext(ctx, RVC)) {
+>              gen_exception_illegal(ctx);
+>          } else {
+>              ctx->pc_succ_insn =3D ctx->base.pc_next + 2;
+> -            if (!decode_insn16(ctx, ctx->opcode)) {
+> +            if (!decode_insn16(ctx, opcode)) {
+>                  /* fall back to old decoder */
+> -                decode_RV32_64C(ctx);
+> +                decode_RV32_64C(ctx, opcode);
+>              }
+>          }
+>      } else {
+> +        uint32_t opcode32 =3D opcode;
+> +        opcode32 =3D deposit32(opcode32, 16, 16, translator_lduw(env, ct=
+x->base.pc_next + 2));
+>          ctx->pc_succ_insn =3D ctx->base.pc_next + 4;
+> -        if (!decode_insn32(ctx, ctx->opcode)) {
+> +        if (!decode_insn32(ctx, opcode32)) {
+>              gen_exception_illegal(ctx);
+>          }
+>      }
+> @@ -776,9 +777,9 @@ static void riscv_tr_translate_insn(DisasContextBase =
+*dcbase, CPUState *cpu)
+>  {
+>      DisasContext *ctx =3D container_of(dcbase, DisasContext, base);
+>      CPURISCVState *env =3D cpu->env_ptr;
+> +    uint16_t opcode16 =3D translator_lduw(env, ctx->base.pc_next);
+>
+> -    ctx->opcode =3D translator_ldl(env, ctx->base.pc_next);
+> -    decode_opc(ctx);
+> +    decode_opc(env, ctx, opcode16);
+>      ctx->base.pc_next =3D ctx->pc_succ_insn;
+>
+>      if (ctx->base.is_jmp =3D=3D DISAS_NEXT) {
+> --
+> 2.20.1
+>
 
