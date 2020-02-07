@@ -2,61 +2,81 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1557C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 11:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C7CC352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 11:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A86ED20720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 11:13:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A86ED20720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0004120720
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 11:14:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PGHJkI57"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0004120720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j01ZR-0000mn-RO
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 06:13:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58728)
+	id 1j01aV-0002sr-5x
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 06:14:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j01Yc-000831-7X
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:12:23 -0500
+ (envelope-from <quintela@redhat.com>) id 1j01ZH-0000xw-0f
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:13:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j01Yb-00063w-03
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:12:21 -0500
-Received: from 12.mo4.mail-out.ovh.net ([178.33.104.253]:44808)
+ (envelope-from <quintela@redhat.com>) id 1j01ZE-0007NE-LT
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:13:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29048
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j01Ya-00061x-PW
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:12:20 -0500
-Received: from player789.ha.ovh.net (unknown [10.108.54.74])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 2781D223DCF
- for <qemu-devel@nongnu.org>; Fri,  7 Feb 2020 12:12:17 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player789.ha.ovh.net (Postfix) with ESMTPSA id 09002F25AABD;
- Fri,  7 Feb 2020 11:12:12 +0000 (UTC)
-Date: Fri, 7 Feb 2020 12:12:09 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH] ppc: function to setup latest class options
-Message-ID: <20200207121209.06a1be98@bahia.lan>
-In-Reply-To: <e77a2a7b-ed74-7584-4751-711b115e98c7@redhat.com>
-References: <20200207064628.1196095-1-mst@redhat.com>
- <e77a2a7b-ed74-7584-4751-711b115e98c7@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j01ZD-0007HO-OR
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:13:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581073978;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=f6SFr5pduWQxlu0WksYSi6nycfYulm0IDscl4fl7hW4=;
+ b=PGHJkI57HmnxfUr9+EBhfWAaIzARS34e/kQZTgKzrWIXqO5HQs9sP/1KbynPdKmAGKZPtc
+ 3V7iOjpqN1tFqOgXJRdD8Zzwz8dMEiG0px9+AdSIaZv/eAmPrqRxJ0TvH8ysFaglorgLHd
+ 7sGWYdbEfFl3WamMVuJuwFAK5rvKXJo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-xFaRKRn0O3-9FQyuBkHsRg-1; Fri, 07 Feb 2020 06:12:56 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A14B2DB25
+ for <qemu-devel@nongnu.org>; Fri,  7 Feb 2020 11:12:55 +0000 (UTC)
+Received: from redhat.com (ovpn-116-157.ams2.redhat.com [10.36.116.157])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 24AEF19756;
+ Fri,  7 Feb 2020 11:12:38 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [PATCH v2 1/2] tests/vhost-user-bridge: move to contrib/
+In-Reply-To: <20200207095412.794912-1-lvivier@redhat.com> (Laurent Vivier's
+ message of "Fri, 7 Feb 2020 10:54:11 +0100")
+References: <20200207095412.794912-1-lvivier@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Fri, 07 Feb 2020 12:12:36 +0100
+Message-ID: <87lfpe8xcr.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: xFaRKRn0O3-9FQyuBkHsRg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 5048816661030607139
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrheehgddvhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeekledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.104.253
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,69 +88,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Feb 2020 11:35:47 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+Laurent Vivier <lvivier@redhat.com> wrote:
+> vhost-user-bridge is not a test. Move it to contrib/ and
+> add it to the tools list.
+>
+> It will be built only if tools (--enable-tools) and
+> vhost-user (--enable-vhost-user) are enabled (both are set
+> by default).
+>
+> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-> On 2/7/20 7:48 AM, Michael S. Tsirkin wrote:
-> > We are going to add more init for the latest machine, so move the setup
-> > to a function so we don't have to change the DEFINE_SPAPR_MACHINE macro
-> > each time.
-> >=20
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >   hw/ppc/spapr.c | 9 +++++++--
-> >   1 file changed, 7 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 02cf53fc5b..4cf2a992a5 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -4428,6 +4428,12 @@ static const TypeInfo spapr_machine_info =3D {
-> >       },
-> >   };
-> >  =20
-> > +static void spapr_machine_latest_class_options(MachineClass *mc)
-> > +{
-> > +    mc->alias =3D "pseries";
-> > +    mc->is_default =3D 1;
->=20
-> But we can have only 1 default per QEMU binary... How PPC manage having=20
-> multiple defaults? The first or last listed is choosen as default?
->=20
-
-IIUC it isn't about putting multiple defaults here. It is about putting
-any additional init for the default machine type that we cannot put in
-spapr_machine_class_init(), instead of putting it in the versioned
-init function, eg. spapr_machine_5_0_class_options(). Otherwise this
-would force us to carry the change when we add a new machine version.
-
-> > +}
-> > +
-> >   #define DEFINE_SPAPR_MACHINE(suffix, verstr, latest)                 \
-> >       static void spapr_machine_##suffix##_class_init(ObjectClass *oc, \
-> >                                                       void *data)      \
-> > @@ -4435,8 +4441,7 @@ static const TypeInfo spapr_machine_info =3D {
-> >           MachineClass *mc =3D MACHINE_CLASS(oc);                      =
-  \
-> >           spapr_machine_##suffix##_class_options(mc);                  \
-> >           if (latest) {                                                \
-> > -            mc->alias =3D "pseries";                                  =
- \
-> > -            mc->is_default =3D 1;                                     =
- \
-> > +            spapr_machine_latest_class_options(mc);                  \
-> >           }                                                            \
-> >       }                                                                \
-> >       static const TypeInfo spapr_machine_##suffix##_info =3D {        =
-  \
-> >=20
->=20
->=20
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
 
