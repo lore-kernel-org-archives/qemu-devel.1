@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB51AC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B64B6C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:49:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 951352082E
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:48:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 802DE2082E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:49:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUid7UpZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951352082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W+oqDe0M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 802DE2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izxQp-0003HW-Of
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 01:48:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47685)
+	id 1izxSU-0004wt-L5
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 01:49:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47884)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1izxPd-0002kb-LQ
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:46:51 -0500
+ (envelope-from <mst@redhat.com>) id 1izxQv-0003YH-OJ
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:48:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1izxPb-0005rC-6x
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:46:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50056
+ (envelope-from <mst@redhat.com>) id 1izxQu-0006LV-QN
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:48:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52062
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1izxPb-0005q6-2l
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:46:47 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1izxQu-0006LL-Mb
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:48:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581058006;
+ s=mimecast20190719; t=1581058088;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
  bh=LfiMKctqhjdwd1D2LZap/x6StrUEy5cXEeAQ/7gAuLk=;
- b=bUid7UpZMcMFKfMQd2vHHh6VwhsvI7mNFKVSoDMyP7cPAhPgSg9YzTrlDSWaEUbtOE4WwZ
- 09lqpo/ivtNfnjcnIPliSGtgXdC/N7FkEw0r6OPaGNbFiRYek5I+4cuACAHUHjU4hvLwPi
- ENop4AtFxpAxiXSNPZNdLnFf1DxJcqw=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-MfSDPUOIMrSjL_nLKpUAvw-1; Fri, 07 Feb 2020 01:46:41 -0500
-Received: by mail-qk1-f199.google.com with SMTP id q135so748078qke.22
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 22:46:41 -0800 (PST)
+ b=W+oqDe0M+xZ6o+zb124aCnWH9x7fpgAQ8ZvkSHJSG7xbE8s3PIlRQSigbDNrUUC+2MZ48f
+ MTLa+jO71B35iq3K/8r+3RtkKds8fRjgqFSPlTYIMuzFiZ6iYOHyeEAUkZ4Jhp2yvbg9ii
+ 2AEkNJJjp75dgA81jyFG/rjMvVuvHGE=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-iInmVhJPM9yy4wmpNY60Iw-1; Fri, 07 Feb 2020 01:48:06 -0500
+Received: by mail-qt1-f199.google.com with SMTP id l1so1012656qtp.21
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 22:48:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
  :content-disposition;
  bh=caOSvPGo6ztdT+lrJkWh9sG+yrPfmF1JMzVqHIi/AXc=;
- b=C6gf72D52M1BKEYbSJ9F1tlm1N66cepnoI4zXLtwRW0BLo+XflllF7N45tfhigkcn0
- rjIlrHzxTh1aYszVUR5o4xCORgCy73kZbNc9G7Ib+4HVvd1DKcoN3yzIC7s6j58eGiPI
- 9FOMAhTnza8q/M8y9yqFGrFLBhBCh+uCjiQT4ZudBdYGBVDPaorBgV9dTDEK/7LEVjfo
- JhEiS6u6W6kADWJiXyUfaM7/DyTU8PRGqdFUeREkatSYDIThKRVCgO9W9rL8kynsGbtW
- xmVMdsprSbINBFsJfTnozEy+e/asfX60cgt5sy+3WItsQI2axes1Sx1h3o5FZYHwJ74l
- a6Eg==
-X-Gm-Message-State: APjAAAXJb8wxj4mwa6+kivrIzDy7MbRoQXDezxUkgwoq+VV+eoHaNNe5
- s0nVBH3qHXV052I8cV1J10pZg7oAATasybxLsBUs9Aq//LLYGPLPP7Wr+OQHqo8jRRwNeMdYHmq
- q7SFO3YRqMi44u+k=
-X-Received: by 2002:ac8:6f63:: with SMTP id u3mr6135100qtv.39.1581058001152;
- Thu, 06 Feb 2020 22:46:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx5GQp02c0EQZ672MSvayDiXkiKGJ9QGzP2kZES3QB2wUr3+ijjr68efb1Egvg32R/OTe/R6g==
-X-Received: by 2002:ac8:6f63:: with SMTP id u3mr6135086qtv.39.1581058000851;
- Thu, 06 Feb 2020 22:46:40 -0800 (PST)
+ b=eOxOSnmz9bc0lJh90yZ1VfmGauU9mcJ6bPlAZpsknaSqhKS5Rrber4F7oL/TvLScJr
+ F4WwtDVQWlMD78to318GYVJj6reZqEJVUAvYgefcGiZ8dYujUyl1j8xhfsSADWNdD82i
+ 7/fXTOlmD9tqUxdZy3M1PK+aPTpLT9pkZ5InBiLT3hxa/EHGFhNkQGeZf9OHB0oPQpx0
+ +33+KxRhoT6t1p8Es8RrurQnIMhr6iR+sc+Kjo/EKOV2/K48QjZ4LfLk/VIua0DUplc4
+ SBqgq5mK04uMzrBZSNc8YW36kULDBJ5Ia29qkMUxa7vL+FRnopdB/IB1NKh1JoEJTAvj
+ zJRA==
+X-Gm-Message-State: APjAAAWRVuX7HaqMbJnt818MAOs80iB80ieUy3hohFBgkWFp/z/+k1Sz
+ eN86BnMopk8l6pNODNf+yJ/D3PjUjlITpyWghSTkgGSt0HmyMdN9Zas2O66KzP7uBWpHvY6RwI3
+ b6bnzJpJ3D1AmrLQ=
+X-Received: by 2002:a37:b82:: with SMTP id 124mr6057703qkl.18.1581058086050;
+ Thu, 06 Feb 2020 22:48:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqweAndxhdMgtuJ1+AjIJexDxkV1bkUg5OQmi6SAMF3nCAjTRTVQiK84jKz97baFWICPZyzKmQ==
+X-Received: by 2002:a37:b82:: with SMTP id 124mr6057698qkl.18.1581058085798;
+ Thu, 06 Feb 2020 22:48:05 -0800 (PST)
 Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id s42sm906581qtk.87.2020.02.06.22.46.38
+ by smtp.gmail.com with ESMTPSA id g53sm942586qtk.76.2020.02.06.22.48.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 22:46:40 -0800 (PST)
-Date: Fri, 7 Feb 2020 01:46:37 -0500
+ Thu, 06 Feb 2020 22:48:05 -0800 (PST)
+Date: Fri, 7 Feb 2020 01:48:02 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
 Subject: [PATCH] ppc: function to setup latest class options
@@ -81,7 +81,7 @@ Message-ID: <20200207064628.1196095-1-mst@redhat.com>
 MIME-Version: 1.0
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: MfSDPUOIMrSjL_nLKpUAvw-1
+X-MC-Unique: iInmVhJPM9yy4wmpNY60Iw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -104,6 +104,7 @@ Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200207064802.SjbdZ4giQia9rA5LvLDsH122_6LzB5hSoNVEUdmkVY8@z>
 
 We are going to add more init for the latest machine, so move the setup
 to a function so we don't have to change the DEFINE_SPAPR_MACHINE macro
