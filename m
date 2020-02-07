@@ -2,95 +2,97 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 611AEC04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4797BC04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:12:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CEA320838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:12:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AB7F20838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:12:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YyRol/tn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CEA320838
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UtFpuNR9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB7F20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j04Mo-0004GX-AW
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:12:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46366)
+	id 1j04Mv-0004bq-6d
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:12:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j04Lx-0003FY-1w
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:11:31 -0500
+ (envelope-from <philmd@redhat.com>) id 1j04M4-0003QR-Op
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:11:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j04Lv-0003Ll-Vf
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:11:28 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26235
+ (envelope-from <philmd@redhat.com>) id 1j04M3-0003U4-8J
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:11:36 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50699
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j04Lv-0003KG-RK
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:11:27 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j04M3-0003Tl-3n
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:11:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581084687;
+ s=mimecast20190719; t=1581084694;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=o81+JWmLU/tFz7R4cIBaX3fO8pUbp9JTZdiL9GKDwS8=;
- b=YyRol/tngp4sph/BUE0LTmtt5PjcOPzWccZgigURuc6O7a4ksKapiChUuAuxabDLtNfhUn
- x3VqkQSJtKiTrM07jW4IjIsaC0nQm5zrtsT7obHiUjYsVxzaV2H0ZYBZr11xzkkDawwsZu
- eGF+b1sWLEmq6Vk2nA0sPvoRWZi0c+Y=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-04Fe0YQrMj6WZMiWjRBE8A-1; Fri, 07 Feb 2020 09:11:25 -0500
-Received: by mail-qk1-f200.google.com with SMTP id b23so1467200qkg.17
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:11:25 -0800 (PST)
+ bh=CMJwCnQMMtDZ2xN1Oam2D6ILQ3ApDnbLf7j2mIL9jBc=;
+ b=UtFpuNR9bxf9nvIj70R98miQK5E2vJaR0cktN1xUvtxgTzpIx8TGTKXSgMG2b/1MN5AeTL
+ gE+pohkO0pv0nzOTTBQo/pOUPJucoJme54taehMsW/zfm1gdxuSlslZudcEE41N38T1epp
+ b9iS38R8PmTnMI5GnMG4bU/tXFOuO5U=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-212-g30m7cdzPgq4u6j96Kp3Eg-1; Fri, 07 Feb 2020 09:11:27 -0500
+Received: by mail-wr1-f71.google.com with SMTP id t3so1268873wrm.23
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:11:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=r7HLC+pRyHdtI1HUnYeCh7nUdsYVlBwhAa0vgrpGZwE=;
- b=Ovn+RFuDZeSFCd3uLOnVva7uoLmY6d3rd/0yQC5JUPKBrN/jGBtW4hjp4NcI5zHGMS
- Kb0gWrkA2JijWdLjoYEXc6oCokek0TS4OBn1iqW8fAr7EgiEaXfyO3GFMwppRhnDSki7
- dz/+btzAKHFsASwOLkMJmvw37QR13iD8OY3Cc4Edubjxcn0oSeN+/5tQa96cDmn4Axi/
- r8rD+V4qhMmo1BG7qW77zntL+844KgH3u7yeJbXCssVhoaFriZm2/y7AdK43agQKCT1O
- AWnh6nzBILF109Q4JNu7EOrNaZ1YEFTF+aZF+gK9mG3itwwxAtimmJDoSj8I2cHBD28a
- hyqA==
-X-Gm-Message-State: APjAAAWhGwukBqE9loq6MBoruMTjrKlkwZZ85kqF6SeNNfYqhhu9JCst
- rDYJv07l9CU9BUHfwIIq/xn5l8c7m9uesCXCeEnO9kmWSCYcnnDQrvReMD+lE0ET3T8d+t23QzU
- yOZpNIx1yB6cl+tg=
-X-Received: by 2002:ae9:f50c:: with SMTP id o12mr7535352qkg.42.1581084685173; 
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=g7nVf2s1/3pbmvfdJ9NFjPcNGW4R6taN5BpO4j8u95s=;
+ b=kehDoWog2D8nZX+1ZoAGLXMEVsrg3zxxf5jQVXw/IW+P0/YpQTMNlvk9Sn2WjxFynt
+ 1ZoMwobC9mcLqidFthtEUPZFThDRDdEvgUqjupyX2UHrEsE2DpQAbWUbrJrUDMR8uOLZ
+ zttwQ7qoFYwqrHrLC/i1GzN5Dpzrz+W/1T4XfOWVLWgYSd+jJmSudW+2m6OYym3p2qn0
+ 1pp+OpaZOqN2i+ftcgZmTJgKjBz5+tLbIubdmbFkM2UEMmAWnIsWrnwcLj/vIy7Gr2xJ
+ QB99/MUrzt/7QMkusJtZnPHvWUAfkfXuCE6sk0KQoUmAn2A38JDiTZIK/jykXHNnIHuC
+ 6JUg==
+X-Gm-Message-State: APjAAAUzuo2L+3Egz3L85NuzpUb43zq0Yvr0rVlEVcPS2IsKAf8rRrPH
+ 2eccA/LGSPZqXaESc29TwVeGl4GaCQriYdWCnLCzBEQYUevqoDRFlGtoQS3X7LU+6iH2eqEMfjo
+ jwnOaKxxaESXLRbg=
+X-Received: by 2002:a1c:791a:: with SMTP id l26mr4674378wme.58.1581084686046; 
+ Fri, 07 Feb 2020 06:11:26 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx6Yf/8wBKQyw2Hd94yD1shfnGMoIfuQSZN7ImOLkQ2sNJ3r5yA4gcan9wocWFN+Hb36qyGmQ==
+X-Received: by 2002:a1c:791a:: with SMTP id l26mr4674356wme.58.1581084685722; 
  Fri, 07 Feb 2020 06:11:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqybFpSe7hEw7HPlsSHWTeTred/Bqbnh34A8vvhVkNG91NbRJEbUtCucDkm6pF0Z6PlJOt/FQw==
-X-Received: by 2002:ae9:f50c:: with SMTP id o12mr7535300qkg.42.1581084684907; 
- Fri, 07 Feb 2020 06:11:24 -0800 (PST)
-Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id d17sm1358069qkc.9.2020.02.07.06.11.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 06:11:24 -0800 (PST)
-Date: Fri, 7 Feb 2020 09:11:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v3 3/3] vl: Abort if multiple machines are registered as
- default
-Message-ID: <20200207090427-mutt-send-email-mst@kernel.org>
-References: <20200207130453.16666-1-philmd@redhat.com>
- <20200207130453.16666-4-philmd@redhat.com>
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id s16sm3658470wrn.78.2020.02.07.06.11.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 07 Feb 2020 06:11:25 -0800 (PST)
+Subject: Re: [PATCH] tests/acceptance/virtio_check_params: Disable test
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+References: <20200206171715.25041-1-philmd@redhat.com>
+ <e940c4ec-2cd8-17d0-5885-bed9823182f4@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2bdad61c-2a1e-e665-6018-76a34b6b7884@redhat.com>
+Date: Fri, 7 Feb 2020 15:11:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200207130453.16666-4-philmd@redhat.com>
-X-MC-Unique: 04Fe0YQrMj6WZMiWjRBE8A-1
+In-Reply-To: <e940c4ec-2cd8-17d0-5885-bed9823182f4@redhat.com>
+Content-Language: en-US
+X-MC-Unique: g30m7cdzPgq4u6j96Kp3Eg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,79 +106,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chris Wulff <crwulff@gmail.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>, Anthony Green <green@moxielogic.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
- Jia Liu <proljc@gmail.com>, qemu-trivial@nongnu.org,
- Helge Deller <deller@gmx.de>, Magnus Damm <magnus.damm@gmail.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
- Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>,
- qemu-riscv@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Cornelia Huck <cohuck@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 07, 2020 at 02:04:53PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> It would be confusing to have multiple default machines.
-> Abort if this ever occurs.
+On 2/7/20 1:53 PM, Wainer dos Santos Moschetta wrote:
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
-> v2: Use assert() instead of human friendly message (Marc-Andr=E9)
+> On 2/6/20 3:17 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> This test fails on various CI:
 >=20
-> Cc: Marc-Andr=E9 Lureau <marcandre.lureau@gmail.com>
-> Cc: Laurent Vivier <laurent@vivier.eu>
+>=20
+> What CI(s) you mean?
+>=20
+> Afaik the acceptance tests are executed only on Travis
 
-Is it really worth adding counting logic just so we can assert?
-There are a bunch of other places that deal with
-default, like qmp query machines and find_default_machine.
+AFAIK maintainers doesn't have to have all their tests public, but are=20
+encouraged to share them.
 
-> ---
->  vl.c | 4 ++++
->  1 file changed, 4 insertions(+)
+Due to patches missing review by other maintainers, and getting merged=20
+via other trees, I'm still waiting to post some of them (in particular=20
+Cirrus-CI).
+
+I run my tests on Linux (X86/Aarch64 always, PPC/S390X/MIPS often),=20
+FreeBSD/OSX (X86).
+
+Before disabling this test, I tried to fix it:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg675074.html
+But got no review from the developers during 1 full week.
+I am not removing the test, I am simply disabling it, until the=20
+interested developers step in to fix it. I think I am being fair.
+
 >=20
-> diff --git a/vl.c b/vl.c
-> index 7dcb0879c4..b3e0f7af25 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2354,6 +2354,8 @@ static MachineClass *machine_parse(const char *name=
-, GSList *machines)
->      GSList *el;
-> =20
->      if (is_help_option(name)) {
-> +        int default_count =3D 0;
-> +
->          printf("Supported machines are:\n");
->          machines =3D g_slist_sort(machines, machine_class_cmp);
->          for (el =3D machines; el; el =3D el->next) {
-> @@ -2364,7 +2366,9 @@ static MachineClass *machine_parse(const char *name=
-, GSList *machines)
->              printf("%-20s %s%s%s\n", mc->name, mc->desc,
->                     mc->is_default ? " (default)" : "",
->                     mc->deprecation_reason ? " (deprecated)" : "");
-> +            default_count +=3D !!mc->is_default;
->          }
-> +        assert(default_count <=3D 1);
->          exit(0);
->      }
-> =20
-> --=20
-> 2.21.1
+>>
+>> - Using QEMU 4.0:
+>>
+>>   =20
+>> tests/acceptance/x86_cpu_model_versions.py:X86CPUModelAliases.test_none_=
+alias: =20
+>> ERROR: 'alias-of' (0.45 s)
+>>
+>> - On OSX
+>>
+>> =C2=A0=C2=A0=C2=A0 Unexpected error in object_property_find() at qom/obj=
+ect.c:1201:
+>> =C2=A0=C2=A0=C2=A0 qemu-system-x86_64: -device virtio-blk-pci,id=3Dscsi0=
+,drive=3Ddrive0:=20
+>> can't apply global virtio-blk-device.scsi=3Dtrue: Property '.scsi' not=
+=20
+>> found
+>>
+>> - When removing unavailable machine:
+>>
+>> =C2=A0=C2=A0 VirtioMaxSegSettingsCheck.test_machine_types: ERROR:=20
+>> list.remove(x): x not in list (0.12 s)
+>>
+>> - Using Xen:
+>>
+>> =C2=A0=C2=A0 xencall: error: Could not obtain handle on privileged comma=
+nd=20
+>> interface: No such file or directory
+>> =C2=A0=C2=A0 xen be core: xen be core: can't open xen interface
+>>
+>> - On PPC:
+>>
+>> =C2=A0=C2=A0 TestFail: machine type pseries-2.8: No Transactional Memory=
+ support=20
+>> in TCG, try appending -machine cap-htm=3Doff
+>>
+>> - On S390X:
+>>
+>> =C2=A0=C2=A0 ERROR: qemu-system-s390x: -device virtio-scsi-pci,id=3Dscsi=
+0:=20
+>> 'virtio-scsi-pci' is not a valid device model name
+>>
+>> Disable it for now.
+>>
+>> Cc: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>> Series fixing the errors:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675074.html
+>> ---
+>> =C2=A0 tests/acceptance/virtio_check_params.py | 2 ++
+>=20
+> Sorry, I'm a little lost here. I can't see=20
+> tests/acceptance/virtio_check_params.py on master. Are you patching upon=
+=20
+> another series?
+
+Based on the patches I extracted here:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg677487.html
+
+>=20
+> thanks,
+>=20
+> - Wainer
+>=20
+>> =C2=A0 1 file changed, 2 insertions(+)
+>>
+>> diff --git a/tests/acceptance/virtio_check_params.py=20
+>> b/tests/acceptance/virtio_check_params.py
+>> index d5f345f75e..87e6c839d1 100644
+>> --- a/tests/acceptance/virtio_check_params.py
+>> +++ b/tests/acceptance/virtio_check_params.py
+>> @@ -25,6 +25,7 @@ import logging
+>> =C2=A0 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..=
+',=20
+>> 'python'))
+>> =C2=A0 from qemu.machine import QEMUMachine
+>> =C2=A0 from avocado_qemu import Test
+>> +from avocado import skip
+>> =C2=A0 #list of machine types and virtqueue properties to test
+>> =C2=A0 VIRTIO_SCSI_PROPS =3D {'seg_max_adjust': 'seg_max_adjust'}
+>> @@ -116,6 +117,7 @@ class VirtioMaxSegSettingsCheck(Test):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 return True
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return False
+>> +=C2=A0=C2=A0=C2=A0 @skip("break multi-arch CI")
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def test_machine_types(self):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # collect all mac=
+hine types except 'none', 'isapc', 'microvm'
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 with QEMUMachine(=
+self.qemu_bin) as vm:
+>=20
 
 
