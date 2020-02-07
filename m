@@ -2,107 +2,84 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1BCEC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C338C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:33:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A55B20720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:32:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17CF920720
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:33:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STu03fjv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A55B20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kvI0keKP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17CF920720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j06YN-0005Ak-QL
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:32:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56732)
+	id 1j06Yu-0006GK-8n
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:33:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j06X9-0003eF-3N
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:31:12 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j06X3-0003Qd-H5
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:31:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j06X7-0001G6-No
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:31:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51113
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j06X7-0001Ei-IU
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:31:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581093069;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=tqVwmYut82zXsjcPSIx12JL50oPUULvJ7KkL5opX+vE=;
- b=STu03fjvq83tk7jFzTOqQLBK/w0/t43Irib4WyriJKl40paOBSh2oy3JwkHKeuxKnBePSa
- 3Oe8ELqffSx7WE/Xyg+VRjc/fmYyCwQzWco3TAMlebwk6LVQe1qD9w/qaKOQLDwBDmOuN+
- EBTgvhF75oB9MZnRn06ZlGvPbqkbU/A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-Wjb7pmW4Mgic2Y6zBf5J9w-1; Fri, 07 Feb 2020 11:30:47 -0500
-X-MC-Unique: Wjb7pmW4Mgic2Y6zBf5J9w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA37B8010F0;
- Fri,  7 Feb 2020 16:30:46 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-14.ams2.redhat.com
- [10.36.117.14])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 06950790FA;
- Fri,  7 Feb 2020 16:30:44 +0000 (UTC)
-Subject: Re: [PATCH v3] block/backup-top: fix flags handling
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200207161231.32707-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7b775d8f-a4b9-3376-1744-7cac2a792dba@redhat.com>
-Date: Fri, 7 Feb 2020 17:30:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <peter.maydell@linaro.org>) id 1j06X2-0000vc-7w
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:31:05 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39433)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j06X2-0000t0-1M
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:31:04 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 77so2698001oty.6
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 08:31:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=A0FH83oh7ENKUjuXubeD3BNm6HJpW6vKnujDArV3+eg=;
+ b=kvI0keKP0K2ncWB/Dy+Grj3GdMCgyjYkQdeAtHHSr2giE4vGQTFcUhnF1qfSxoDQ8J
+ 7kM/oX3QmQo8/E1JIp/1iJadaFLu81OHZji5X+TTX7SoMb7soO/9ZeHKXxpZSz/JujWv
+ 7jwKHdtMYaV5mzoWiNVG0OB5Tu7YAy6JUjcaYejUOaoylC66DfF93fHRVWzuS/HcUHB8
+ 8cgVAmbXB2oRZrfH63p8kkt46QZm0OBNBTmyYwyp/0LfWyIWeI3MZf9wWjukJjDFHSu1
+ rPpyLozsu9I8KJG3fBT/t/2lZVajTAIoIdzeKiVhmlsixprXgZFQXL+h9WABpMdlmzbX
+ Ndpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=A0FH83oh7ENKUjuXubeD3BNm6HJpW6vKnujDArV3+eg=;
+ b=ufD1n6+5PIFybMPX2/RbiaDvhyrX7aprzZrCub+9j4JeFhyWiVtLLzWGcJMm5o3eMb
+ sXeXgzMtRCfB10haY3UKYcKbk2E51swtnnkOcWl4DVWPAnP6zuedS72CrHvRSX394ZeF
+ r+SH9DE9249klUV3ZyLXqajiqKprTnQJ5CkRJfqiDbhP23uu4zuABca1m6tUpviqHA4N
+ DOirWgwda6noIFcjTezDiWGVT1CcE3N5NNQmYnd9d0ZcG/47am3BOv68m7a3KBVbFqgH
+ zKwD8lEglC3W+x/8cl3iLXdSRMoua3IrMFNAZ/hOnJrLgn4g+i6G78oar2/s8gdy03n9
+ m5SQ==
+X-Gm-Message-State: APjAAAU4mAuSpv280LICfdr6IT2EDUk3ZuF3B8nHklmTiRf+/ylsPfZ7
+ zOh01BXAfAYF8nJMsOO6KZzFqw0DwQbHISEtUm4d7Hm6
+X-Google-Smtp-Source: APXvYqxpzNBBfDGuUkAnpRpU8S+j0eDhzniGT6ODi5fD3ipsIwia6OAHXBFxyIZRvH6z9TK49lRKX2d+vS5VbiriofU=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr161339ota.232.1581093063008; 
+ Fri, 07 Feb 2020 08:31:03 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200207161231.32707-1-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="7JD8oKQnYovVxOl3LvcexPxNGnEFscKcu"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200206173040.17337-1-peter.maydell@linaro.org>
+ <20200206173040.17337-3-peter.maydell@linaro.org>
+ <875zgipe1n.fsf@dusky.pond.sub.org>
+In-Reply-To: <875zgipe1n.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Feb 2020 16:30:52 +0000
+Message-ID: <CAFEAcA90qHdHvozNhjX0d5xzoOiFb6oTVdXWf9u9aRvV=YHw4w@mail.gmail.com>
+Subject: Re: [PATCH 02/29] configure: Check that sphinx-build is using Python 3
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,84 +91,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: John Snow <jsnow@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7JD8oKQnYovVxOl3LvcexPxNGnEFscKcu
-Content-Type: multipart/mixed; boundary="qQsoSTtDnqDFpOxrs4RKGg5r78FtAviQU"
+On Fri, 7 Feb 2020 at 16:18, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+> > Currently configure's has_sphinx_build() check simply runs a dummy
+> > sphinx-build and either passes or fails.  This means that "no
+> > sphinx-build at all" and "sphinx-build exists but is too old" are
+> > both reported the same way.
+> >
+> > Further, we want to assume that all the Python we write is running
+> > with at least Python 3.5; configure checks that for our scripts, but
+> > Sphinx extensions run with whatever Python version sphinx-build
+> > itself is using.
+> >
+> > Add a check to our conf.py which makes sphinx-build fail if it would
+> > be running our extensions with an old Python, and handle this
+> > in configure so we can report failure helpfully to the user.
+> > This will mean that configure --enable-docs will fail like this
+> > if the sphinx-build provided is not suitable:
+> >
+> > Warning: sphinx-build exists but it is either too old or uses too old a=
+ Python version
+> >
+> > ERROR: User requested feature docs
+> >        configure was not able to find it.
+> >        Install texinfo, Perl/perl-podlators and a Python 3 version of p=
+ython-sphinx
+> >
+> > (As usual, the default is to simply not build the docs, as we would
+> > if sphinx-build wasn't present at all.)
+> >
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> > Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> > ---
+> >  configure    | 12 ++++++++++--
+> >  docs/conf.py | 10 ++++++++++
+> >  2 files changed, 20 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/configure b/configure
+> > index 0aceb8e50db..2c5cad13edd 100755
+> > --- a/configure
+> > +++ b/configure
+>
+> Any particular reason for having $sphinx_build default to the
+> indeterminate version sphinx-build rather than sphinx-build-3?
 
---qQsoSTtDnqDFpOxrs4RKGg5r78FtAviQU
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Because that's the binary we were using before this patch.
+"Allow the user to specify" shouldn't be tangled up with
+"and also change the default".
 
-On 07.02.20 17:12, Vladimir Sementsov-Ogievskiy wrote:
-> backup-top "supports" write-unchanged, by skipping CBW operation in
-> backup_top_co_pwritev. But it forgets to do the same in
-> backup_top_co_pwrite_zeroes, as well as declare support for
-> BDRV_REQ_WRITE_UNCHANGED.
->=20
-> Fix this, and, while being here, declare also support for flags
-> supported by source child.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->=20
-> v3: rebase on master, keep state initialization after check top !=3D NULL=
-.
->=20
-> v2: restrict flags propagation like it is done in other filters [Eric]
->     move state variable initialization to the top
->  block/backup-top.c | 31 ++++++++++++++++++++-----------
->  1 file changed, 20 insertions(+), 11 deletions(-)
->=20
-> diff --git a/block/backup-top.c b/block/backup-top.c
-> index fa78f3256d..1bfb360bd3 100644
-> --- a/block/backup-top.c
-> +++ b/block/backup-top.c
+It might be sphinx-build-3 on RH, but on Debian/Ubuntu it's
+just 'sphinx-build' assuming you installed the python3-sphinx
+and not the python2-sphinx, or you can run it directly out of
+/usr/share/sphinx/scripts/python3/sphinx-build, or (like
+me) you might have a locally installed 'sphinx-build' which
+is using Python 3. My assumption is that once the python2->3
+transition has faded into the rear view mirror most distros
+will just have a /usr/bin/sphinx-build that's a Python 3 one.
 
-[...]
-
-> @@ -196,8 +200,13 @@ BlockDriverState *bdrv_backup_top_append(BlockDriver=
-State *source,
->          return NULL;
->      }
-> =20
-> -    top->total_sectors =3D source->total_sectors;
->      state =3D top->opaque;
-> +    top->total_sectors =3D source->total_sectors;
-
-This looks a bit accidental, but, well, whatever.
-
-Thanks, applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-
---qQsoSTtDnqDFpOxrs4RKGg5r78FtAviQU--
-
---7JD8oKQnYovVxOl3LvcexPxNGnEFscKcu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl49kLMACgkQ9AfbAGHV
-z0CGiAf8DSXgCg+xlcEcDGr3h3/mhzf3ZERJpwgQoL1y37CzF1kCRFGRvcPOm2IH
-HP51Vorz7ME9wOzmRehoyrDkkrrkksmG/srQzXruJQTqmlmsELnV7nTgys64EEoe
-uq5A3vGLIMqWzXw7CjqTd29lfx1qIbU8oy4VIDujQSVPn4r9vaGHMpZFs7wvnuS7
-TWwydNB8Yk+QTEX5YIhdjUVv1iprrQKGtEPBsQbK5nRVyjN9rK1y680WGy/6mpEA
-+l6lO6isq0amupJhS9k1HzlumOKnkfFsY9dAoutu/OvjO/8b4TUoBnQ4716LUM4p
-TzLHaZu45N/8o6sgMr41UDeIYj9lBQ==
-=fYFz
------END PGP SIGNATURE-----
-
---7JD8oKQnYovVxOl3LvcexPxNGnEFscKcu--
-
+thanks
+-- PMM
 
