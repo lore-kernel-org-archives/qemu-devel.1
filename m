@@ -2,78 +2,47 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6720C352A4
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44199C352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:56:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A56FD20726
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:55:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLVjxXiP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A56FD20726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1A7F320726
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:56:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A7F320726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sysgo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j00Mb-000596-TG
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 04:55:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40121)
+	id 1j00Nd-0006uq-6f
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 04:56:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40350)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1j00Ln-00046T-OH
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:55:04 -0500
+ (envelope-from <rka@sysgo.com>) id 1j00MK-0004w5-7J
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:55:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1j00Lm-0007GG-Q3
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:55:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35936
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j00Lm-0007Fv-MU
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:55:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581069302;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NCm0Mvx1br1jVA8CNGlevixp3HoXFeo0l1mtXsESuqo=;
- b=SLVjxXiPed2LwvfkZ/3QwJUjVH68pTQVhUzdlHNYcVPIOnfZ8PC94eW8o4e+SYreL0Fct2
- QAHyVoYEs2StQEFA/klpthYKcYr0mHPhh05l6gfdxZOjwUXmHfERZLQdbpiCLY5b73ntwk
- F8ZK9rOC89yQ5tWE8ne9yTv9GGNwAxc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-8cR7c58GND-mrLWaRg0CoA-1; Fri, 07 Feb 2020 04:55:00 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA661802B86
- for <qemu-devel@nongnu.org>; Fri,  7 Feb 2020 09:54:59 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-116-229.ams2.redhat.com
- [10.36.116.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B7ABA90062;
- Fri,  7 Feb 2020 09:54:53 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] virtiofsd: add it to the tools list
-Date: Fri,  7 Feb 2020 10:54:12 +0100
-Message-Id: <20200207095412.794912-2-lvivier@redhat.com>
-In-Reply-To: <20200207095412.794912-1-lvivier@redhat.com>
-References: <20200207095412.794912-1-lvivier@redhat.com>
+ (envelope-from <rka@sysgo.com>) id 1j00MJ-0000CU-Ay
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:55:36 -0500
+Received: from mail.sysgo.com ([176.9.12.79]:52482)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <rka@sysgo.com>)
+ id 1j00MG-00008K-GF; Fri, 07 Feb 2020 04:55:32 -0500
+From: Roman Kapl <rka@sysgo.com>
+To: qemu-arm@nongnu.org
+Subject: [PATCH] i.MX: Fix inverted register bits in wdt code.
+Date: Fri,  7 Feb 2020 10:54:09 +0100
+Message-Id: <20200207095409.11227-1-rka@sysgo.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 8cR7c58GND-mrLWaRg0CoA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 176.9.12.79
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,49 +54,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Roman Kapl <rka@sysgo.com>,
+ qemu-devel@nongnu.org, Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-it will be built only when tools are enabled (always enabled by default)
+Documentation says for WDA '0: Assert WDOG output.' and for SRS
+'0: Assert system reset signal.'.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Roman Kapl <rka@sysgo.com>
 ---
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/misc/imx2_wdt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 23342a433e11..484fbb737858 100644
---- a/Makefile
-+++ b/Makefile
-@@ -327,7 +327,7 @@ HELPERS-y +=3D vhost-user-gpu$(EXESUF)
- vhost-user-json-y +=3D contrib/vhost-user-gpu/50-qemu-gpu.json
- endif
-=20
--ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG)$(CONFIG_TOOLS),y=
-yyy)
- HELPERS-y +=3D virtiofsd$(EXESUF)
- vhost-user-json-y +=3D tools/virtiofsd/50-qemu-virtiofsd.json
- endif
-@@ -681,7 +681,7 @@ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADD=
-S)
- =09$(call LINK, $^)
-=20
- # relies on Linux-specific syscalls
--ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG)$(CONFIG_TOOLS),y=
-yyy)
- virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS)
- =09$(call LINK, $^)
- endif
+diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
+index e47e442592..c8944729c4 100644
+--- a/hw/misc/imx2_wdt.c
++++ b/hw/misc/imx2_wdt.c
+@@ -28,7 +28,7 @@ static void imx2_wdt_write(void *opaque, hwaddr addr,
+                            uint64_t value, unsigned int size)
+ {
+     if (addr =3D=3D IMX2_WDT_WCR &&
+-        (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))) {
++        (~value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))) {
+         watchdog_perform_action();
+     }
+ }
 --=20
-2.24.1
+2.22.0
 
 
