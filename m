@@ -2,81 +2,90 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2084C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 17:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E48C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 17:13:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1862214AF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 17:11:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45105214AF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 17:13:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XobVNXde"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1862214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a1tVXaro"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45105214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j07AC-00086p-Tx
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 12:11:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37393)
+	id 1j07C2-000118-F4
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 12:13:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37678)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j079I-0007KN-Pc
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:10:38 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j07BN-0000IL-H2
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:12:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j079H-0006Ah-87
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:10:36 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36746)
+ (envelope-from <alex.bennee@linaro.org>) id 1j07BL-0001N5-Sp
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:12:45 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34115)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j079H-0006AO-1g
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:10:35 -0500
-Received: by mail-ot1-x341.google.com with SMTP id j20so2848458otq.3
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 09:10:34 -0800 (PST)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j07BL-0001Lr-L0
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:12:43 -0500
+Received: by mail-wm1-x341.google.com with SMTP id s144so3590804wme.1
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 09:12:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aQexNwjtTPORkoeMe0qjZ/4WcoZeRMZqyihVIjfZTXo=;
- b=XobVNXdewi4uRC9P0en8AwjaeCxGwtHuRETt2IC2qt2u/l11yKf/BpfswOeu7TpIAW
- ADpO1xBdrB9+CXfBE+VYSBdc7DOa7JIefcczXSHjd5oBWThZykLyl1umUDAtzA86c/t8
- KpZMTPTa31dcj/87ZXq6WSQfbKZESECCdnFZQVnEPDl8esuenKlESBBmqkPsY/zZ12ih
- 33ypfiTV5ddRuBsGbRmmAFfTiGwjxMsaMFTKzlE0Nz/qGn7BFCUkfg+b1EFG5sHp+4CD
- qV+p9c5m9P0WvMNg1CxoUqsc4YGUhosRcfujw8yVBpSaiGrYwUFChukNPSCTeM2qSaF1
- kB8Q==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=JG8ScU+qIaNs6EifqhSzYi39o+XePyR5mVHqWQCwc+w=;
+ b=a1tVXaroRlaJsxy6GCdif3xkHIIz/Nrtxn/MsoRFv9/WCnS/4y5L1HWv71b80mj/Ad
+ i2KZ8Ig7WR5eZh6QpC0308gdFd/MfsjjvY6wolVl0yW27vJWGQzeGsDmkPeNOUm7dQoV
+ UMrDKcizSw78gHDLOpp0E6bJ7D6L3a/eYEcxowYRpxjQHMUnENDD+MskWBGeGMyIm1Yn
+ LiOz1mE+7smKMEQYHHxaJiLXsWEXTElH5qOyip2IhZC0Hd9/660+rhz7/Q544Mw+xOaf
+ W+xW3SROdBu8KyxXVPt0/T/8YHxn4/tSyUNLhOaUy8Tz4n7XqtAKw4r0D0dtHr0ai8iL
+ rvbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aQexNwjtTPORkoeMe0qjZ/4WcoZeRMZqyihVIjfZTXo=;
- b=C52eR6eEfhxn6zPu/Q0pHPUkeooMb1fSTU9eBfSPjkDuxs6ICig8VOMAbHf6UmtGoN
- vQd3JNO67SsgZPNAEdR9fK6xiIYoeA85HqFxn1BqFSx+cWGnQs95bYCsAAtc46RsRYvW
- Pmxd10HYZog6HgdxUU7n6UUyVZxjI5M3bLJzm9U1J2k7INuFlfkWWrM9fsdgH7mqS6Nq
- RsvVll6BphG3/tGlV7HdliHQ/MNrjDoVibJ5QPCWrd7050LQqzy0SPbWIVrBo27aZhxK
- Qhmhfu7Xri3IktMlNQwADA0u3ItTNFwxzMBjbalL29oCzxDCwEu7EXuvymNMrWZVNDC6
- v35A==
-X-Gm-Message-State: APjAAAWfgKmXwpMJFQylyEnLTCwoiaIo1FMHlN4A2s26EohhR+beUyBd
- w8xeCeV1jf9r45VOdoSHlJs8DpQTBAhga/5RKR7uvg==
-X-Google-Smtp-Source: APXvYqxUC3BQ0rHp6uJcwETkQwJA0BU+d83EPa9HHHzF5irVf7wEEF7IiccbEy82sMXv/FkIURiNvGSkvr+qP6EKTPM=
-X-Received: by 2002:a05:6830:184:: with SMTP id
- q4mr298739ota.232.1581095434030; 
- Fri, 07 Feb 2020 09:10:34 -0800 (PST)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=JG8ScU+qIaNs6EifqhSzYi39o+XePyR5mVHqWQCwc+w=;
+ b=ZxNrR8Xdi9yzg6kxJW8/G04Z4Mw80maEuMA7uqTiqzc+vUuiaXOkadMW71PRvZHXwU
+ VOA3BBUNmsr0WJAjfJpudboUrlulKWsJvugeq2KEUdmtZkFpudFylt/hnP/6VustOBf1
+ yYReRugAUgVFlbqbPMErRQYBba0sxu79x3R3niUNbjrA8ohRLZcpi2uMChfUuwxcEYu6
+ gJQiR8o2FP47NTnnUHUOMBNwE9X6FSFwXMdBFYdEbWIIVE/OO4vzvzcREMFtzb8byDFy
+ isQCdLH0iynUBI+exgwAP/VcGkgl0wPI7hRPyek27X/iaHOvXAvA0ukpaSFiJ6m+V6Em
+ lNHA==
+X-Gm-Message-State: APjAAAUrVR4XfVxqw77wG8CH20QFtX1GyqAJlC5zzd54ybMNoRjdl6kI
+ brWOgG/8PM2phSesjpZTqX3CwA==
+X-Google-Smtp-Source: APXvYqz+FXMrg8fk2HJoEH79dQ9xBLFLoNVknoz9rRR+iiQiZP2DPOKplmNGrWpYqT1j/iIX4EIvSA==
+X-Received: by 2002:a1c:7718:: with SMTP id t24mr5281709wmi.119.1581095562284; 
+ Fri, 07 Feb 2020 09:12:42 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u4sm4072323wrt.37.2020.02.07.09.12.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 07 Feb 2020 09:12:40 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DC5A91FF87;
+ Fri,  7 Feb 2020 17:12:39 +0000 (GMT)
+References: <20200205212920.467-1-robert.foley@linaro.org>
+ <20200205212920.467-7-robert.foley@linaro.org>
+User-agent: mu4e 1.3.7; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v1 06/14] tests/vm: Add logging of console to file.
+In-reply-to: <20200205212920.467-7-robert.foley@linaro.org>
+Date: Fri, 07 Feb 2020 17:12:39 +0000
+Message-ID: <874kw27248.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200206173040.17337-1-peter.maydell@linaro.org>
- <877e0ynxhx.fsf@dusky.pond.sub.org>
-In-Reply-To: <877e0ynxhx.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Feb 2020 17:10:23 +0000
-Message-ID: <CAFEAcA-owBQMnvY5Asa4m4DUF-hBqRTmu8C7fktfvMRE2HZfgg@mail.gmail.com>
-Subject: Re: [PATCH 00/29] Convert QAPI doc comments to generate rST instead
- of texinfo
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,88 +97,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: fam@euphon.net, peter.puhov@linaro.org, philmd@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Feb 2020 at 17:00, Markus Armbruster <armbru@redhat.com> wrote:
+
+Robert Foley <robert.foley@linaro.org> writes:
+
+> This adds logging of the char device used by the console
+> to a file.  The basevm.py then uses this file to read
+> chars from the console.
+> One reason to add this is to aid with debugging.
+
+I can certainly see an argument for saving the install log.
+
+> But another is because there is an issue where the QEMU
+> might hang if the characters from the character device
+> are not consumed by the script.
+
+I'm a little confused by this. Outputting to a file and then parsing the
+file seems a bit more janky than injesting the output in the script and
+then logging it.
+
+Is this to work around the hang because the socket buffers fill up and
+aren't drained?
+
 >
-> Peter Maydell <peter.maydell@linaro.org> writes:
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> ---
+>  tests/vm/basevm.py        | 48 ++++++++++++++++++++++---
+>  tests/vm/socket_thread.py | 73 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 116 insertions(+), 5 deletions(-)
+>  create mode 100644 tests/vm/socket_thread.py
 >
-> > This series switches all our QAPI doc comments over from
-> > texinfo format to rST.
-> >
-> > The basic approach is somewhat similar to how we deal with kerneldoc
-> > and hxtool: we have a custom Sphinx extension which is passed a
-> > filename which is the json file it should run the QAPI parser over and
-> > generate documentation for. Unlike 'kerneldoc' but somewhat like
-> > hxtool, I have chosed to generate documentation by generating a tree
-> > of docutils nodes, rather than by generating rST source that is then
-> > fed to the rST parser to generate docutils nodes.  Individual lumps of
-> > doc comment go to the rST parser, but the structured parts we render
-> > directly. This makes it easier to get the structure and heading level
-> > nesting correct.
-> >
-> > Rather than trying to exactly handle all the existing comments I have
-> > opted (as Markus suggested) to tweak them where this seemed more
-> > sensible than contorting the rST generator to deal with
-> > weirdnesses. The principal changes are:
-> >  * whitespace is now significant, and multiline definitions must have
-> >    their second and subsequent lines indented to match the first line
-> >  * general rST format markup is permitted, not just the small set of
-> >    markup the old texinfo generator handled. For most things (notably
-> >    bulleted and itemized lists) the old format is the same as rST was.
-> >  * Specific things that might trip people up:
-> >    - instead of *bold* and _italic_ rST has **bold** and *italic*
->
-> Actually, qapi-code-gen.txt documents and doc.py implements *strong* and
-> _emphasis_.  Texinfo commonly renders them as bold and italic when the
-> output format supports that.  rST has **strong** and *emphasis*.
->
-> Your series adjusts emphasis markup for rST [PATCH 18].  Since it
-> doesn't touch strong markup, strong silently becomes emphasis.  I guess
-> that's okay, perhaps even an improvement, but double-checking the actual
-> uses of this markup wouldn't hurt.
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index a926211da8..87a484c55c 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -31,12 +31,17 @@ import tempfile
+>  import shutil
+>  import multiprocessing
+>  import traceback
+> +from socket_thread import SocketThread
+>=20=20
+>  SSH_KEY =3D open(os.path.join(os.path.dirname(__file__),
+>                 "..", "keys", "id_rsa")).read()
+>  SSH_PUB_KEY =3D open(os.path.join(os.path.dirname(__file__),
+>                     "..", "keys", "id_rsa.pub")).read()
+>=20=20
+> +class ConsoleTimeoutException(Exception):
+> +    """Raise this exception when read from console times out."""
+> +    pass
+> +
+>  class BaseVM(object):
+>      GUEST_USER =3D "qemu"
+>      GUEST_PASS =3D "qemupass"
+> @@ -59,12 +64,18 @@ class BaseVM(object):
+>      poweroff =3D "poweroff"
+>      # enable IPv6 networking
+>      ipv6 =3D True
+> +    # This is the timeout on the wait for console bytes.
+> +    socket_timeout =3D 120
+>      # Scale up some timeouts under TCG.
+>      # 4 is arbitrary, but greater than 2,
+>      # since we found we need to wait more than twice as long.
+>      tcg_ssh_timeout_multiplier =3D 4
+> +    console_logfile =3D "console.log"
 
-Yeah, that would be a good plan.
- git grep '\*[^*]*\*' qapi/*.json
-(and eyeball-filtering out the false hits) shows just one use:
+We should probably dump the log somewhere other than cwd. Given we cache
+stuff in ~/.cache/qemu-vm maybe something of the form:
 
-qapi/introspect.json:# Note: the QAPI schema is also used to help
-define *internal*
+  ~/.cache/qemu-vm/ubuntu.aarch64.install.log
 
-I can put a patch on the end which converts that to **internal**
-once the rST generator is in use.
+?
 
-> >    - lists need a preceding and following blank line
-> >    - a lone literal '*' will need to be backslash-escaped to
-> >      avoid a rST syntax error
-> >  * the old leading '|' for example (literal text) blocks is replaced
-> >    by the standard rST '::' literal block.
-> >  * headings and subheadings must now be in a freeform documentation
-> >    comment of their own
->
-> Can we simply use rST instead?  See my review of PATCH 18.
+>      def __init__(self, debug=3DFalse, vcpus=3DNone):
+>          self._guest =3D None
+> +        self._console_fd =3D None
+> +        self._socket_thread =3D None
+> +        self._console_timeout_sec =3D self.socket_timeout
+>          self._tmpdir =3D os.path.realpath(tempfile.mkdtemp(prefix=3D"vm-=
+test-",
+>                                                           suffix=3D".tmp",
+>                                                           dir=3D"."))
+> @@ -179,6 +190,15 @@ class BaseVM(object):
+>                              "-device",
+>                              "virtio-blk,drive=3D%s,serial=3D%s,bootindex=
+=3D1" % (name, name)]
+>=20=20
+> +    def init_console(self, socket):
+> +        """Init the thread to dump console to a file.
+> +           Also open the file descriptor we will use to
+> +           read from the console."""
+> +        self._socket_thread =3D SocketThread(socket, self.console_logfil=
+e)
+> +        self._console_fd =3D open(self.console_logfile, "r")
+> +        self._socket_thread.start()
+> +        print("console logfile is: {}".format(self.console_logfile))
+> +
+>      def boot(self, img, extra_args=3D[]):
+>          args =3D self._args + [
+>              "-device", "VGA",
+> @@ -201,6 +221,7 @@ class BaseVM(object):
+>              raise
+>          atexit.register(self.shutdown)
+>          self._guest =3D guest
+> +        self.init_console(guest.console_socket)
+>          usernet_info =3D guest.qmp("human-monitor-command",
+>                                   command_line=3D"info usernet")
+>          self.ssh_port =3D None
+> @@ -212,9 +233,10 @@ class BaseVM(object):
+>              raise Exception("Cannot find ssh port from 'info usernet':\n=
+%s" % \
+>                              usernet_info)
+>=20=20
+> -    def console_init(self, timeout =3D 120):
+> -        vm =3D self._guest
+> -        vm.console_socket.settimeout(timeout)
+> +    def console_init(self, timeout =3D None):
+> +        if timeout =3D=3D None:
+> +            timeout =3D self.socket_timeout
+> +        self._console_timeout_sec =3D timeout
+>=20=20
+>      def console_log(self, text):
+>          for line in re.split("[\r\n]", text):
+> @@ -230,13 +252,27 @@ class BaseVM(object):
+>              # log console line
+>              sys.stderr.write("con recv: %s\n" % line)
+>=20=20
+> +    def console_recv(self, n):
+> +        """Read n chars from the console_logfile being dumped to
+> +           by the socket thread we created earlier."""
+> +        start_time =3D time.time()
+> +        while True:
+> +            data =3D self._console_fd.read(1)
+> +            if data !=3D "":
+> +                break
+> +            time.sleep(0.1)
+> +            elapsed_sec =3D time.time() - start_time
+> +            if elapsed_sec > self._console_timeout_sec:
+> +                raise ConsoleTimeoutException
+> +        return data.encode('latin1')
+> +
 
-No, we can't (see my reply to that review). In theory you could have
-the heading syntax be a rST heading, but that is not feasible to
-recognise in the Python script[*] and it gives the impression that
-it is just an inline rST heading, not something that's more complicated
-and structured.
+Is latin1 really the best choice here? I would expect things to be utf-8 cl=
+ean.
 
-[*] You'd need to manually re-implement the weird thing rST does
-where practically any kind of underlining is valid and it figures
-out which one means which depth by looking at the usage through
-the whole document. You'd have to do bizarre stuff like running
-through the entire set of doc comments once doing no output but
-just looking at heading underline characters to guess which one
-is which depth, and then once you'd figured that out you could
-do it all over again actually generating the doc.
+>      def console_wait(self, expect, expectalt =3D None):
+>          vm =3D self._guest
+>          output =3D ""
+>          while True:
+>              try:
+> -                chars =3D vm.console_socket.recv(1)
+> -            except socket.timeout:
+> +                chars =3D self.console_recv(1)
+> +            except ConsoleTimeoutException:
+>                  sys.stderr.write("console: *** read timeout ***\n")
+>                  sys.stderr.write("console: waiting for: '%s'\n" % expect)
+>                  if not expectalt is None:
+> @@ -335,6 +371,8 @@ class BaseVM(object):
+>              raise Exception("Timeout while waiting for guest ssh")
+>=20=20
+>      def shutdown(self):
+> +        self._socket_thread.join()
+> +        self._console_fd.close()
+>          self._guest.shutdown()
+>      def wait(self):
+>          self._guest.wait()
+> diff --git a/tests/vm/socket_thread.py b/tests/vm/socket_thread.py
+> new file mode 100644
+> index 0000000000..6160e9163d
+> --- /dev/null
+> +++ b/tests/vm/socket_thread.py
+> @@ -0,0 +1,73 @@
+> +#!/usr/bin/env python
+> +#
+> +# This python module defines a thread object which
+> +# reads from a socket and dumps it to a file.
+> +#
+> +# The main use case is for reading QEMU console char dev and
+> +# dumping them to a file either for debugging or for
+> +# parsing by QEMU itself.
+> +#
+> +# Copyright 2020 Linaro
+> +#
+> +# Authors:
+> +#  Robert Foley <robert.foley@linaro.org>
+> +#
+> +# This code is licensed under the GPL version 2 or later.  See
+> +# the COPYING file in the top-level directory.
+> +#
+> +import sys
+> +import re
+> +import threading
+> +import time
+> +import traceback
+> +import gettext
+> +
+> +class SocketThread(threading.Thread):
+> +    """ Implements the standard threading.Thread API.(start, join, etc.).
+> +        dumps all characters received on socket into a file.
+> +    """
+> +    def __init__(self, socket, filename):
+> +        super(SocketThread, self).__init__()
+> +        self.alive =3D threading.Event()
+> +        self.alive.set()
+> +        self.socket =3D socket
+> +        self.log_file =3D open(filename, "w")
+> +        self.debug =3D True
+> +
+> +    def receive(self):
+> +        """Until the user calls join, we will read chars from
+> +           the socket and dump them as is to the file."""
+> +        self.socket.setblocking(0)
+> +        self.socket.settimeout(1.0)
+> +        while self.alive.isSet():
+> +            try:
+> +                chars =3D self.socket.recv(1)
+> +            except:
+> +                continue
+> +            output =3D chars.decode("latin1")
+> +            self.log_file.write("{}".format(output))
+> +            # Flush the file since we need the characters to be
+> +            # always up to date in case someone is reading the file
+> +            # waiting for some characters to show up.
+> +            self.log_file.flush()
+> +        self.socket.setblocking(1)
+> +
+> +    def run(self):
+> +        """This is the main loop of the socket thread.
+> +           Simply receive from the file until the user
+> +           calls join."""
+> +        while self.alive.isSet():
+> +            try:
+> +                self.receive()
+> +            except Exception as e:
+> +                sys.stderr.write("Exception encountered\n")
+> +                traceback.print_exc()
+> +                continue
+> +
+> +    def join(self, timeout=3DNone):
+> +        """Time to destroy the thread.
+> +           Clear the event to stop the thread, and wait for
+> +           it to complete."""
+> +        self.alive.clear()
+> +        threading.Thread.join(self, timeout)
+> +        self.log_file.close()
 
-thanks
--- PMM
+I'm note sure about this - introducing threading into Python seems very
+un-pythonic. I wonder if the python experts have any view on a better
+way to achieve what we want which I think is:
+
+  - a buffer that properly drains output from QEMU
+  - which can optionally be serialised onto disk for logging
+
+What else are we trying to achieve here?
+
+--=20
+Alex Benn=C3=A9e
 
