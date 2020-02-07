@@ -2,95 +2,99 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C155C35247
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 00:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57572C35247
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 00:30:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08D2F2064C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 00:28:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PtHiJbVu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D2F2064C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2DF5D2064C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 00:30:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DF5D2064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izrVO-00065D-6c
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 19:28:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59297)
+	id 1izrWy-0007vi-DX
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 19:30:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1izrUg-0005QP-Rn
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 19:27:40 -0500
+ (envelope-from <muriloo@linux.ibm.com>) id 1izrWQ-0007X8-0E
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 19:29:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1izrUf-00043y-EH
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 19:27:38 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50706)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1izrUf-00043W-5C
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 19:27:37 -0500
-Received: by mail-wm1-x343.google.com with SMTP id a5so826699wmb.0
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 16:27:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Wtvtrt+SLCtvqf+PjMj5EU6d8kN8+5NHA0pM2+MU93o=;
- b=PtHiJbVuITKCuVLcisCUgBfkSJiuAryRPHg+sGjbaZG5xN8QqJXfWo1QEjbi8B2Skl
- Oy/89Y2RHCE0ilcFw6H/nHQpQ3vWCp6n20ApIxqqaa3Fz/vcCP9omI5UxQ7D2U4VHL8S
- mrZBB15PsNlXRTXZu49QBaO7P7cbThZggqSyPwuFBWjEabWQ1o6ILWM54gam8Nf1XydK
- dXcjrpFESwrORzal9ztoVybZWdxkIC79zTWo4VOh+SvjfZIcVbzJYfL52si1EbyqEhg+
- ZtnIrzAy/sHZhpj4jLVW3+sd13KTHZAQEVuKqxeXQuX7UrFOy2MfkDDMvRBI/eo4X4N/
- WoPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Wtvtrt+SLCtvqf+PjMj5EU6d8kN8+5NHA0pM2+MU93o=;
- b=JLqL3JKf15YmMeuseWfKStxhUUGLJ5dxojlxKeewYOKqIHpXiFTvZG7UTIQHEn74S6
- AYTPuqiSI6JTeqoG4N+M5KcyzgLDfJKtY4qoCfP7+A4xrUdKXcSFs/7Fq0FjoiukJY/d
- Pm2/qEXcY8eeJ6b0LGV+fNKUPt7FY9sRztgrMHY8MQJAera8Y/mKAHjAx/yrgYM9BV0j
- 367V/Ldvn0Pe45TF2iXWBAIraaR89yc4+PEcyKXkBdYOBviqpCiz2EOxkCXxNzRLmF7v
- OWw75/XvfbfL/vctVbrqJIRTriclzn5clKFcyM3LWX8U0Tdcnl59rLZxtVT2feTT9LKc
- /tJg==
-X-Gm-Message-State: APjAAAUI/+ptO/zjkOA3ZYfT5yo1afsjQpBRBaAu9EKUBiyWvA0M13oW
- CeintfHEWxsiNtKuvvbJGYAONw==
-X-Google-Smtp-Source: APXvYqyu/FauFpZF/HqZwxq8Td7eyVo3m0sc8P45bnCzaLDoGOxYRRfaQz/v1v/Ay5hJqnuCUp8GSw==
-X-Received: by 2002:a1c:5f8a:: with SMTP id t132mr492159wmb.162.1581035255842; 
- Thu, 06 Feb 2020 16:27:35 -0800 (PST)
-Received: from [10.43.13.93] ([135.196.99.211])
- by smtp.gmail.com with ESMTPSA id e17sm1271063wma.12.2020.02.06.16.27.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Feb 2020 16:27:34 -0800 (PST)
-Subject: Re: [PATCH] Add support for a helper with 7 arguments
-To: Taylor Simpson <tsimpson@quicinc.com>, Richard Henderson
- <rth@twiddle.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
- <09def3cf-6833-ccf5-457e-1755a7fd0e04@twiddle.net>
- <640ffa37-a70b-dfa9-55ef-cde5c7f0dfcb@twiddle.net>
- <BYAPR02MB48863BDFCB4CB26717467579DE1D0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <3614849d-12a5-fa43-fb10-801e9648b40e@twiddle.net>
- <BYAPR02MB48864A309572E1347920CAF0DE1D0@BYAPR02MB4886.namprd02.prod.outlook.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <34caf794-85b7-c177-7951-d821ace5caa9@linaro.org>
-Date: Fri, 7 Feb 2020 00:27:33 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <muriloo@linux.ibm.com>) id 1izrWO-0004z1-Fb
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 19:29:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32958)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+ id 1izrWO-0004yx-7I
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 19:29:24 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01706fNb064939; Thu, 6 Feb 2020 19:29:14 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y0n7gqy9t-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 06 Feb 2020 19:29:14 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0170TDUk133794;
+ Thu, 6 Feb 2020 19:29:13 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y0n7gqy9m-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 06 Feb 2020 19:29:13 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0170RKJf018092;
+ Fri, 7 Feb 2020 00:29:12 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma04dal.us.ibm.com with ESMTP id 2xykc9wh3s-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 07 Feb 2020 00:29:12 +0000
+Received: from b03ledav004.gho.boulder.ibm.com
+ (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0170TBSX59834826
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 7 Feb 2020 00:29:11 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7C5577805F;
+ Fri,  7 Feb 2020 00:29:11 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 44C5A78069;
+ Fri,  7 Feb 2020 00:29:10 +0000 (GMT)
+Received: from localhost (unknown [9.85.203.48])
+ by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Fri,  7 Feb 2020 00:29:09 +0000 (GMT)
+From: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1 09/13] util/mmap-alloc: Implement resizable mmaps
+Date: Thu, 06 Feb 2020 21:29:07 -0300
+Message-ID: <5327048.DvuYhMxLoT@kermit.br.ibm.com>
+Organization: IBM
+In-Reply-To: <20200203183125.164879-10-david@redhat.com>
+References: <20200203183125.164879-1-david@redhat.com>
+ <20200203183125.164879-10-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB48864A309572E1347920CAF0DE1D0@BYAPR02MB4886.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-06_04:2020-02-06,
+ 2020-02-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 impostorscore=0
+ adultscore=0 suspectscore=1 priorityscore=1501 malwarescore=0 phishscore=0
+ mlxscore=0 clxscore=1015 spamscore=0 mlxlogscore=999 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002060173
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,89 +106,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/6/20 5:52 PM, Taylor Simpson wrote:
-> 
-> 
->> -----Original Message-----
->> From: Richard Henderson <rth7680@gmail.com> On Behalf Of Richard
->> Henderson
->> Sent: Thursday, February 6, 2020 9:35 AM
->> To: Taylor Simpson <tsimpson@quicinc.com>; qemu-devel@nongnu.org
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Subject: Re: [PATCH] Add support for a helper with 7 arguments
->>
->>
->> I think this is quite ugly.  I know you've been talking about auto-generating
->> everything but we ought to do better than this.
->>
->> You should be passing values not regnos if you can possibly do so.  You
->> should
->> be passing full virtual addresses not N separate components of an address.
->> Predicates should be evaluated earlier so that the helper isn't even called if
->> it's false.
-> 
-> We are passing values, not reg numbers.  The generator doesn't know anything about the semantics of the instruction...
+Hello, David.
 
-And this, I claim, is wrong.
+On Monday, February 3, 2020 3:31:21 PM -03 David Hildenbrand wrote:
+> Implement resizable mmaps. For now, the actual resizing is not wired up.
+> Introduce qemu_ram_mmap_resizable() and qemu_ram_mmap_resize(). Make
+> qemu_ram_mmap() a wrapper of qemu_ram_mmap_resizable().
+>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Greg Kurz <groug@kaod.org>
+> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  include/qemu/mmap-alloc.h | 21 ++++++++++++-------
+>  util/mmap-alloc.c         | 44 ++++++++++++++++++++++++++++-----------
+>  2 files changed, 45 insertions(+), 20 deletions(-)
+>
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index e786266b92..70bc8e9637 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -7,11 +7,13 @@ size_t qemu_fd_getpagesize(int fd);
+>  size_t qemu_mempath_getpagesize(const char *mem_path);
+>
+>  /**
+> - * qemu_ram_mmap: mmap the specified file or device.
+> + * qemu_ram_mmap_resizable: reserve a memory region of @max_size to mmap
+> the + *                          specified file or device and mmap @size of
+> it. *
+>   * Parameters:
+>   *  @fd: the file or the device to mmap
+>   *  @size: the number of bytes to be mmaped
+> + *  @max_size: the number of bytes to be reserved
+>   *  @align: if not zero, specify the alignment of the starting mapping
+> address; *          otherwise, the alignment in use will be determined by
+> QEMU. *  @shared: map has RAM_SHARED flag.
+> @@ -21,12 +23,15 @@ size_t qemu_mempath_getpagesize(const char *mem_path);
+>   *  On success, return a pointer to the mapped area.
+>   *  On failure, return MAP_FAILED.
+>   */
+> -void *qemu_ram_mmap(int fd,
+> -                    size_t size,
+> -                    size_t align,
+> -                    bool shared,
+> -                    bool is_pmem);
+> -
+> -void qemu_ram_munmap(int fd, void *ptr, size_t size);
+> +void *qemu_ram_mmap_resizable(int fd, size_t size, size_t max_size,
+> +                              size_t align, bool shared, bool is_pmem);
+> +void *qemu_ram_mmap_resize(void *ptr, int fd, size_t old_size, size_t
+> new_size, +                           bool shared, bool is_pmem);
+> +static inline void *qemu_ram_mmap(int fd, size_t size, size_t align,
+> +                                  bool shared, bool is_pmem)
+> +{
+> +    return qemu_ram_mmap_resizable(fd, size, size, align, shared, is_pmem);
+> +}
+> +void qemu_ram_munmap(int fd, void *ptr, size_t max_size);
+>
+>  #endif
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index 63ad6893b7..2d562145e9 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -172,11 +172,8 @@ static inline size_t mmap_pagesize(int fd)
+>  #endif
+>  }
+>
+> -void *qemu_ram_mmap(int fd,
+> -                    size_t size,
+> -                    size_t align,
+> -                    bool shared,
+> -                    bool is_pmem)
+> +void *qemu_ram_mmap_resizable(int fd, size_t size, size_t max_size,
+> +                              size_t align, bool shared, bool is_pmem)
+>  {
+>      const size_t pagesize = mmap_pagesize(fd);
+>      size_t offset, total;
+> @@ -184,12 +181,14 @@ void *qemu_ram_mmap(int fd,
+>
+>      /* we can only map whole pages */
+>      size = QEMU_ALIGN_UP(size, pagesize);
+> +    max_size = QEMU_ALIGN_UP(max_size, pagesize);
+>
+>      /*
+>       * Note: this always allocates at least one extra page of virtual
+> address -     * space, even if size is already aligned.
+> +     * space, even if the size is already aligned. We will reserve an area
+> of +     * at least max_size, but only populate the requested part of it.
+> */
+> -    total = size + align;
+> +    total = max_size + align;
+>
+>      guardptr = mmap_reserve(0, total, fd);
+>      if (guardptr == MAP_FAILED) {
+> @@ -217,22 +216,43 @@ void *qemu_ram_mmap(int fd,
+>       * a guard page guarding against potential buffer overflows.
+>       */
+>      total -= offset;
+> -    if (total > size + pagesize) {
+> -        munmap(ptr + size + pagesize, total - size - pagesize);
+> +    if (total > max_size + pagesize) {
+> +        munmap(ptr + max_size + pagesize, total - max_size - pagesize);
+>      }
+>
+>      return ptr;
+>  }
+>
+> -void qemu_ram_munmap(int fd, void *ptr, size_t size)
+> +void *qemu_ram_mmap_resize(void *ptr, int fd, size_t old_size, size_t
+> new_size, +                           bool shared, bool is_pmem)
+>  {
+>      const size_t pagesize = mmap_pagesize(fd);
+>
+>      /* we can only map whole pages */
+> -    size = QEMU_ALIGN_UP(size, pagesize);
+> +    old_size = QEMU_ALIGN_UP(old_size, pagesize);
+> +    new_size = QEMU_ALIGN_UP(new_size, pagesize);
 
-If you can generate C for the operation out of line, then you can interpret it
-inline as well.  Or, make a reasonable decision about what bit to be out of
-line and what bit to be a helper.
+Shouldn't we just assert old_size and new_size are aligned with
+pagesize?
 
-> It only knows which operands are read, written, or both.  So, there's no way
-> to combine the 3 operands into a single effective address until we are
-> inside the helper.  Also, there's no way to know if the instruction is
-> predicated or if it just has a predicate as an operand.  Also, there are
-> instructions where the predicate is used in the false sense.
-There certainly is a way to know what the effective address is.  From the
-pseudo-code that I browsed today, "EA = foo" is a big clue.
+> +
+> +    /* we support actually resizable memory regions only on Linux */
+> +    if (old_size < new_size) {
+> +        /* populate the missing piece into the reserved area */
+> +        ptr = mmap_populate(ptr + old_size, new_size - old_size, fd,
+> old_size, +                            shared, is_pmem);
+> +    } else if (old_size > new_size) {
+> +        /* discard this piece, keeping the area reserved (should never
+> fail) */ +        ptr = mmap_reserve(ptr + new_size, old_size - new_size,
+> fd); +    }
 
-There certainly is a way to know if the instruction is predicated.  From the
-pseudo-code that I browsed today,
+I find the behaviour of this function somewhat confusing.  Perhaps I'm
+missing something and need your help to clarify.  Please bear with me.
 
-  if (pred) {
-    operation;
-  } else {
-    NOP;
-  }
+For the case where we want to grow in size, it returns a populated area
+(PROT_READ | PROT_WRITE flags).
 
-is the clue, vs
+And for the case where we want to shrink in size, it returns a reserved
+area (PROT_NONE flag), requiring the caller to call mmap_populate()
+again to be able to use that memory.
 
-  Rd = mux(Pu, Rs, Rt).
+I believe the behaviour should be consistent regardless if we want to
+grow or shrink in size.  Either return a reserved or an already
+populated area.  Not both.
 
-Of course there are insns where !Pd is used; that doesn't change anything.
+Would "old_size == new_size" situation be possible?  In this case, ptr
+would be returned without changing protection flags of the mapping.
 
->> Combine that with 3.3.1 Packet execution semantics, "dual stores, new-value
->> stores, and slot1 store with slot0 loads have non-parallel execution
->> semantics", and you need no special helper at all:
->>
->> andt0, pv, 1
->> brcondit0, 0, over
->>
->> shlit0, ru, u2
->> addt0, t0, rs
->> qemu_strt, t0, mmu_idx, MO_UB
->>  over:
->>
-> 
-> We can't actually do the store here.  We have to record it in a side data structure in the env and perform the store when the packet commits.
+Shouldn't we also assert that new_size <= max_size?
 
-I think that we can do the store immediately -- I give specifics above.  Do you
-have a counter-example?  Admittedly I'm new to browsing the architecture, but I
-don't see a legal packet for which you can't just Store Now.
+> +    return ptr;
+> +}
+> +
+> +void qemu_ram_munmap(int fd, void *ptr, size_t max_size)
+> +{
+> +    const size_t pagesize = mmap_pagesize(fd);
+> +
+> +    /* we can only map whole pages */
+> +    max_size = QEMU_ALIGN_UP(max_size, pagesize);
 
-> Currently, there are a total of 35 instructions that need a helper with 7 arguments.  32 of them are predicated stores, but there are also 3 vscatter instructions.  For example,
->     if (Qs4) vscatter(Rt32, Mu2, Vv32.w).w = Vw32
+Shouldn't we just assert this and leave the alignment to the caller?
 
-Ok, vscatter is indeed complex.  But I still count 6 operands.  Is it the
-"slot" one that you're concerned is the 7th?  I don't see that as strictly
-necessary, since this can only be in slot 0.
+>
+>      if (ptr) {
+>          /* Unmap both the RAM block and the guard page */
+> -        munmap(ptr, size + pagesize);
+> +        munmap(ptr, max_size + pagesize);
+>      }
+>  }
 
-
-r~
+--
+Murilo
 
