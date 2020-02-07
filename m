@@ -2,56 +2,90 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F66EC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF2C8C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:32:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48D6F222D9
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:28:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D6F222D9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 84014214AF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:32:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="axi0PGlW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84014214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0BBB-0003yK-FS
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 16:28:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41260)
+	id 1j0BF1-00088o-Ml
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 16:32:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42020)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j0BAc-0003M9-P3
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:28:16 -0500
+ (envelope-from <eblake@redhat.com>) id 1j0BDx-0006ik-Ar
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:31:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j0BAb-00028J-Ce
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:28:14 -0500
-Resent-Date: Fri, 07 Feb 2020 16:28:14 -0500
-Resent-Message-Id: <E1j0BAb-00028J-Ce@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21165)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j0BAb-00020m-3L
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:28:13 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1581110874077843.9282855373436;
- Fri, 7 Feb 2020 13:27:54 -0800 (PST)
-In-Reply-To: <20200207150118.23007-1-alex.bennee@linaro.org>
-Subject: Re: [PATCH  v1 0/5] plugins/next
-Message-ID: <158111087297.591.17758979896075088344@a1bbccc8075a>
+ (envelope-from <eblake@redhat.com>) id 1j0BDv-00031j-JP
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:31:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60134
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j0BDv-00030F-FK
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:31:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581111098;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LV5yZOsCNcOVNwOZ+xxdoqGuGudtGoUWyic/Jn4ffo8=;
+ b=axi0PGlW5K/PXw+sdYvXIdxxnGDFVmUTJzHtR9/abnOdpylzRQwBVhTK2ut+wTpLSDCIF+
+ NnIrRGb9s5I3fes1lkYtbtu/Gdyvqj65hTrCUlNL0quF25XYP/MgQcfF1B0y+IFJukYVLB
+ odCJRlU7pZvGlhvJzjvdZiN72mlx4j8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-233-wxfmn8UbNu6nhM1v3F3dDQ-1; Fri, 07 Feb 2020 16:31:34 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1941BDB61;
+ Fri,  7 Feb 2020 21:31:32 +0000 (UTC)
+Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B6C6E5DA7D;
+ Fri,  7 Feb 2020 21:31:23 +0000 (UTC)
+Subject: Re: qmp-shell for GSoC/Outreachy?
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200123190145.GI657556@redhat.com>
+ <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
+ <20200124095027.GA824327@redhat.com> <20200127143505.GD5669@linux.fritz.box>
+ <20200127202925.GE3419@work-vm> <20200128105932.GC6431@linux.fritz.box>
+ <20200205130946.GC5768@dhcp-200-226.str.redhat.com>
+ <a45df5ab-3cad-0fbe-901f-4bc1ba28d38e@redhat.com>
+ <20200205194944.GP3210@work-vm> <877e10xdd6.fsf@dusky.pond.sub.org>
+ <20200206181836.GK3655@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <3035d327-51e2-bc2b-ff62-4eabd617334b@redhat.com>
+Date: Fri, 7 Feb 2020 15:31:23 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Fri, 7 Feb 2020 13:27:54 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20200206181836.GK3655@work-vm>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: wxfmn8UbNu6nhM1v3F3dDQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,56 +97,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: robert.foley@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, cota@braap.org, peter.puhov@linaro.org,
- kuhn.chenqun@huawei.com, alex.bennee@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIwNzE1MDExOC4yMzAw
-Ny0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
-ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
-dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9
-MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9
-MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKLS4uLi4uLi4uLi4uLi4u
-Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
-Li4uLi4uLi4uLi4uLi4uLi4uLi4KKy4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4u
-Li4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLkUuLi4uLi4uLi4uLi4uLi4uLi4K
-Kz09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT0KK0VSUk9SOiB0ZXN0X3BhdXNlIChfX21haW5fXy5UZXN0U2luZ2xlRHJp
-dmVVbmFsaWduZWRMZW5ndGgpCistLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCitUcmFjZWJhY2sgKG1vc3QgcmVjZW50
-IGNhbGwgbGFzdCk6CisgIEZpbGUgIjA0MSIsIGxpbmUgMTA2LCBpbiB0ZXN0X3BhdXNlCi0tLQog
-UmFuIDkxIHRlc3RzCiAKLU9LCitGQUlMRUQgKGVycm9ycz0xKQogIFRFU1QgICAgaW90ZXN0LXFj
-b3cyOiAwNDIKICBURVNUICAgIGlvdGVzdC1xY293MjogMDQzCiAgVEVTVCAgICBpb3Rlc3QtcWNv
-dzI6IDA0NgotLS0KICBURVNUICAgIGlvdGVzdC1xY293MjogMjgzCkZhaWx1cmVzOiAwNDEKRmFp
-bGVkIDEgb2YgMTE2IGlvdGVzdHMKbWFrZTogKioqIFtjaGVjay10ZXN0cy9jaGVjay1ibG9jay5z
-aF0gRXJyb3IgMQpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90
-ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhp
-dChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkK
-c3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdk
-b2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD00NGQwMjdi
-NmQxMTQ0MTMzOGI3YWZmNWQ4NTE1ZDZmMicsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0
-JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICct
-ZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICct
-ZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIv
-dG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2Fj
-aGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
-LTgyZ2Q0OTRkL3NyYy9kb2NrZXItc3JjLjIwMjAtMDItMDctMTYuMTYuMjIuMjcxMTc6L3Zhci90
-bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0
-LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRl
-cj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTQ0ZDAyN2I2ZDExNDQxMzM4YjdhZmY1ZDg1
-MTVkNmYyCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5n
-IGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTgyZ2Q0OTRkL3NyYycKbWFr
-ZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAx
-MW0zMS4zODZzCnVzZXIgICAgMG04LjY5NnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMjA3MTUwMTE4LjIzMDA3LTEtYWxleC5iZW5u
-ZWVAbGluYXJvLm9yZy90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2Uu
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+On 2/6/20 12:18 PM, Dr. David Alan Gilbert wrote:
+
+>>
+>> Pain points of JSON include having to count parenthesises and having to
+>> quote so bloody much.  Additional QMP pain points include long names and
+>> excessive nesting.
+> 
+> Some other pet hates:
+>    a) Number formats are awful for our uses
+>    b) Lack of room for comments
+
+Both permitted in JSON5.  Converting valid JSON5 into the stricter JSON 
+is lossy when it comes to comments, but as comments don't affect machine 
+meaning, maybe all the more it requires is an argument to 
+qmp_capabilities stating whether the rest of the session will stick to 
+strict JSON or prefer JSON5.
+
+>> We could make quoting optional for certain string literals.
+
+Hmm - JSON5 makes quoting optional for keys in { key:value }, but not 
+values.
+
+And one of the reasons why my QAPIfication of netdev was NOT committed 
+was that the original code allowed both "item":1 and "item":"1" in the 
+QemuOpts world, and we were torn on whether letting QMP accept both 
+integer and string-that-parses-as-integer was acceptable.
+
+>>  Simple
+>> enough for literals that can only be a string, like abc.  For literals
+>> that could be something else like 123 or true, omitting quotes creates
+>> ambiguity.  When the schema accepts only one of the possible types, the
+>> ambiguity goes away.  Complexity stays, however.
+
+Do we even allow an alternate that permits both a string and a number at 
+once? I thought you tightened qapi to reject that because of the 
+potential for ambiguity.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
