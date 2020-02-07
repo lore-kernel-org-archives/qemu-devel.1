@@ -4,77 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CBFC04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 764E6C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:41:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 320AF21741
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:41:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4328E21741
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rjG7KeRo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 320AF21741
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ndNBi4YF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4328E21741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j04oV-0005aO-DC
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:40:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51734)
+	id 1j04oa-0005nI-C0
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:41:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51594)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j04i5-0000vt-LR
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:34:22 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j04hv-0000VL-Fc
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:34:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j04i4-0003Je-G5
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:34:21 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56103)
+ (envelope-from <peter.maydell@linaro.org>) id 1j04hu-0002yw-4g
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:34:11 -0500
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:36795)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j04i4-0003HZ-8p
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:34:20 -0500
-Received: by mail-wm1-x341.google.com with SMTP id q9so2777853wmj.5
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:34:20 -0800 (PST)
+ id 1j04ht-0002wL-PU
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:34:09 -0500
+Received: by mail-wm1-x333.google.com with SMTP id p17so3045896wma.1
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:34:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=JMPFk0I8G2lk98QhY9xW2fm5UIcVqoFjQ1BM8KPf/ic=;
- b=rjG7KeRoWjtvIsqJO1AHpjQBk2qcL+oiwqjEIS6S/lxr5oJm1Dvl2P1eTw00B2G4vK
- I1OYDU4BtofCUYGxO1N5nzrS7sSjOSSQnbfNkOsqGy0w0N4T25hNLagdRzhJAErbKYlJ
- zEtnhERRDk2c/SNjKKAM+LK4Qlob8IzXruO/Dpa5JSAoogVbmVVaRcbAvTzQ0q7LRmeX
- IoY0T+VhCcVC581C3bFzX62MJJGvEOWFDzjAM+WLvjIcGIs2guTEiQABX6OTj4oNZDST
- eY85Sw2own4qjPpUu1tpEFp+z5hWR3iJ0btJS05I3eJgSaY+DEMhAR2KnoZFNmG8/8pd
- u+LQ==
+ bh=D621dwQXOCtDrRVeetHrEB9BflVBfYRoR+UKvBUiqEI=;
+ b=ndNBi4YFlCWtcesszPV2vvsrHSu6AW2uDMSjwB3wb7nXK+PAA6eug9C0YE4dSC2thP
+ 7esJmbUliEutlorF4JX9NR2PTOGRPOX6Spv5v27Oux/cx22YV1BMaQkW/uOaZsk9PeAC
+ El1dKtGH9Q71iJEeVq4f+Xm8lD61tmY6+iO+4xfzd0pjd4eUNcUGOt4UZ31+UXEtGVTr
+ JkCBgHFmMHexAct26h5+7WbCk2ATot1gcaiGiAFx2aUXB+1UCGXN4R+xmFYtyrIPEEWX
+ tSmFVl4u/d09ti12jDN205ePosjdImhhp1zzcLE3T6z7BTr9XMVNienMWoe5nb544Ino
+ 7TGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=JMPFk0I8G2lk98QhY9xW2fm5UIcVqoFjQ1BM8KPf/ic=;
- b=k09tUufNCIFNETn4TaQyHZUDyL05QiFPR1ADBItBtTjoJA4xERL6jKTwggFFeojPFt
- IwP/5oEyuUexDdCGzOqDTnPf/qtsIKGxru70npSWSSl0DjIJCRHf06LRf6WXiXmzz+iL
- +VRQ/SUVIzlT/9ZkgWFbS9lnmd0ewGrNPpwES9eHg+D58ISbagAiuSU3Ni51udBQA3Vv
- NOSGQdN4wpJocNzcNf84FA41oSlHB0JiSUH3JTGpwKRmF9K7Bpas4XYiWW9thXEEAVN1
- kp9Vg/jSBRzQynUA/ivKZF0g6TC+U58jI871SjJ1zOm0rnrzKmmsB8sOboVRiqpZiwER
- 2/2Q==
-X-Gm-Message-State: APjAAAWhTxFcMtUGApWSb2J+lU4ctR7SW8IWRq2hHrr82uktw7DO6ue4
- SnQi43lYn3eNlKafYJN8qJpW5xOpnZA=
-X-Google-Smtp-Source: APXvYqxFo5AkpVuIpqsqAb0MAOzvZfHisZqDe3zPbQVZLE9OmUWs14ZkVdVAU6LUfW2eF92lLLSkrw==
-X-Received: by 2002:a7b:c0da:: with SMTP id s26mr4651088wmh.52.1581086059078; 
- Fri, 07 Feb 2020 06:34:19 -0800 (PST)
+ bh=D621dwQXOCtDrRVeetHrEB9BflVBfYRoR+UKvBUiqEI=;
+ b=cP664dllTelmcH2o+2hk7LLr2my5CbuHOD7C/hFT75mVdoCfZwlSZeOlZDiAtUCIjK
+ mXi5RPZD243+IL8ZwaGdv5efekXohn8+y9y+mf/t/qjLBz6PBNvJSvIoR1wFBzzkaCUk
+ tuz+mTcVTpIDGOKt9kJce4sDH0sKbTTBsPy7wiwPIhG1XNp0Bcs6uUGDvjmGFw1Q1l3K
+ LD1xnJ/qa0CD/bpr0b6Faf4bxhjMJ7y9t8mkhwca7MbDO5Mc7TRe0T5ul0+PRFLJqGFa
+ 39o01SCF2UG8gyuC9cYOj4Bt7/pA7pZkvVMYV7sykW+/8X8CqqWhKMcIMTEwMj2BpKXm
+ UCdw==
+X-Gm-Message-State: APjAAAVeRWnwYfilOluIC4rL5l66UhWAEfN0nqKgqEvbItL65878j+cW
+ ju21tnjtR3G5Kd5ET/QZErn3SnPlKhA=
+X-Google-Smtp-Source: APXvYqzaogO1wyErH4uxgmnyJsJm1lteUNvPEbzfRSaNgCYCdIDH3W92TEyi32D44+uho+CyLW9XTw==
+X-Received: by 2002:a1c:7dd4:: with SMTP id y203mr4789590wmc.67.1581086048298; 
+ Fri, 07 Feb 2020 06:34:08 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id w1sm3796430wro.72.2020.02.07.06.34.17
+ by smtp.gmail.com with ESMTPSA id w1sm3796430wro.72.2020.02.07.06.34.07
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 06:34:18 -0800 (PST)
+ Fri, 07 Feb 2020 06:34:07 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 31/48] target/arm: Flush tlb for ASID changes in EL2&0
- translation regime
-Date: Fri,  7 Feb 2020 14:33:26 +0000
-Message-Id: <20200207143343.30322-32-peter.maydell@linaro.org>
+Subject: [PULL 21/48] target/arm: Add regime_has_2_ranges
+Date: Fri,  7 Feb 2020 14:33:16 +0000
+Message-Id: <20200207143343.30322-22-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200207143343.30322-1-peter.maydell@linaro.org>
 References: <20200207143343.30322-1-peter.maydell@linaro.org>
@@ -83,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,74 +100,125 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Since we only support a single ASID, flush the tlb when it changes.
-
-Note that TCR_EL2, like TCR_EL1, has the A1 bit that chooses between
-the two TTBR* registers for the location of the ASID.
+Create a predicate to indicate whether the regime has
+both positive and negative addresses.
 
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200206105448.4726-31-richard.henderson@linaro.org
+Message-id: 20200206105448.4726-21-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ target/arm/internals.h     | 18 ++++++++++++++++++
+ target/arm/helper.c        | 23 ++++++-----------------
+ target/arm/translate-a64.c |  3 +--
+ 3 files changed, 25 insertions(+), 19 deletions(-)
 
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 0c4119a3a2e..6d4a942bde4 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -837,6 +837,24 @@ static inline void arm_call_el_change_hook(ARMCPU *cpu)
+     }
+ }
+ 
++/* Return true if this address translation regime has two ranges.  */
++static inline bool regime_has_2_ranges(ARMMMUIdx mmu_idx)
++{
++    switch (mmu_idx) {
++    case ARMMMUIdx_Stage1_E0:
++    case ARMMMUIdx_Stage1_E1:
++    case ARMMMUIdx_E10_0:
++    case ARMMMUIdx_E10_1:
++    case ARMMMUIdx_E20_0:
++    case ARMMMUIdx_E20_2:
++    case ARMMMUIdx_SE10_0:
++    case ARMMMUIdx_SE10_1:
++        return true;
++    default:
++        return false;
++    }
++}
++
+ /* Return true if this address translation regime is secure */
+ static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
+ {
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index cfa6ce59dc8..f9be6b052f0 100644
+index 3ce37c2c163..f7bc7f1a8de 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -3763,7 +3763,7 @@ static void vmsa_ttbcr_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-     tcr->base_mask = 0xffffc000u;
- }
+@@ -9031,15 +9031,8 @@ static int get_S1prot(CPUARMState *env, ARMMMUIdx mmu_idx, bool is_aa64,
+     }
  
--static void vmsa_tcr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+static void vmsa_tcr_el12_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                uint64_t value)
+     if (is_aa64) {
+-        switch (regime_el(env, mmu_idx)) {
+-        case 1:
+-            if (!is_user) {
+-                xn = pxn || (user_rw & PAGE_WRITE);
+-            }
+-            break;
+-        case 2:
+-        case 3:
+-            break;
++        if (regime_has_2_ranges(mmu_idx) && !is_user) {
++            xn = pxn || (user_rw & PAGE_WRITE);
+         }
+     } else if (arm_feature(env, ARM_FEATURE_V7)) {
+         switch (regime_el(env, mmu_idx)) {
+@@ -9573,7 +9566,6 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+                                         ARMMMUIdx mmu_idx)
  {
-     ARMCPU *cpu = env_archcpu(env);
-@@ -3789,7 +3789,17 @@ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    /* TODO: There are ASID fields in here with HCR_EL2.E2H */
-+    /*
-+     * If we are running with E2&0 regime, then an ASID is active.
-+     * Flush if that might be changing.  Note we're not checking
-+     * TCR_EL2.A1 to know if this is really the TTBRx_EL2 that
-+     * holds the active ASID, only checking the field that might.
-+     */
-+    if (extract64(raw_read(env, ri) ^ value, 48, 16) &&
-+        (arm_hcr_el2_eff(env) & HCR_E2H)) {
-+        tlb_flush_by_mmuidx(env_cpu(env),
-+                            ARMMMUIdxBit_E20_2 | ARMMMUIdxBit_E20_0);
-+    }
-     raw_write(env, ri, value);
- }
+     uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
+-    uint32_t el = regime_el(env, mmu_idx);
+     bool tbi, tbid, epd, hpd, using16k, using64k;
+     int select, tsz;
  
-@@ -3849,7 +3859,7 @@ static const ARMCPRegInfo vmsa_cp_reginfo[] = {
-                              offsetof(CPUARMState, cp15.ttbr1_ns) } },
-     { .name = "TCR_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 2,
--      .access = PL1_RW, .writefn = vmsa_tcr_el1_write,
-+      .access = PL1_RW, .writefn = vmsa_tcr_el12_write,
-       .resetfn = vmsa_ttbcr_reset, .raw_writefn = raw_write,
-       .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[1]) },
-     { .name = "TTBCR", .cp = 15, .crn = 2, .crm = 0, .opc1 = 0, .opc2 = 2,
-@@ -5175,10 +5185,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
-       .resetvalue = 0 },
-     { .name = "TCR_EL2", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 2,
--      .access = PL2_RW,
--      /* no .writefn needed as this can't cause an ASID change;
--       * no .raw_writefn or .resetfn needed as we never use mask/base_mask
--       */
-+      .access = PL2_RW, .writefn = vmsa_tcr_el12_write,
-+      /* no .raw_writefn or .resetfn needed as we never use mask/base_mask */
-       .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[2]) },
-     { .name = "VTCR", .state = ARM_CP_STATE_AA32,
-       .cp = 15, .opc1 = 4, .crn = 2, .crm = 1, .opc2 = 2,
+@@ -9583,7 +9575,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+      */
+     select = extract64(va, 55, 1);
+ 
+-    if (el > 1) {
++    if (!regime_has_2_ranges(mmu_idx)) {
+         tsz = extract32(tcr, 0, 6);
+         using64k = extract32(tcr, 14, 1);
+         using16k = extract32(tcr, 15, 1);
+@@ -9739,10 +9731,7 @@ static bool get_phys_addr_lpae(CPUARMState *env, target_ulong address,
+         param = aa64_va_parameters(env, address, mmu_idx,
+                                    access_type != MMU_INST_FETCH);
+         level = 0;
+-        /* If we are in 64-bit EL2 or EL3 then there is no TTBR1, so mark it
+-         * invalid.
+-         */
+-        ttbr1_valid = (el < 2);
++        ttbr1_valid = regime_has_2_ranges(mmu_idx);
+         addrsize = 64 - 8 * param.tbi;
+         inputsize = 64 - param.tsz;
+     } else {
+@@ -11458,8 +11447,8 @@ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
+ 
+     flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
+ 
+-    /* FIXME: ARMv8.1-VHE S2 translation regime.  */
+-    if (regime_el(env, stage1) < 2) {
++    /* Get control bits for tagged addresses.  */
++    if (regime_has_2_ranges(mmu_idx)) {
+         ARMVAParameters p1 = aa64_va_parameters_both(env, -1, stage1);
+         tbid = (p1.tbi << 1) | p0.tbi;
+         tbii = tbid & ~((p1.tbid << 1) | p0.tbid);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index fcfb96ce1fb..3982e1988dc 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -175,8 +175,7 @@ static void gen_top_byte_ignore(DisasContext *s, TCGv_i64 dst,
+     if (tbi == 0) {
+         /* Load unmodified address */
+         tcg_gen_mov_i64(dst, src);
+-    } else if (s->current_el >= 2) {
+-        /* FIXME: ARMv8.1-VHE S2 translation regime.  */
++    } else if (!regime_has_2_ranges(s->mmu_idx)) {
+         /* Force tag byte to all zero */
+         tcg_gen_extract_i64(dst, src, 0, 56);
+     } else {
 -- 
 2.20.1
 
