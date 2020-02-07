@@ -2,60 +2,60 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20143C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 20:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3856DC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 20:20:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D207920715
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 20:19:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4D1F20715
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 20:20:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ESZpDxNI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D207920715
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="CaUgEQjp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D1F20715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0A6U-0002cE-2O
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 15:19:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54273)
+	id 1j0A6b-0002xP-4C
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 15:20:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1j0A3B-0005fW-T9
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:31 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1j0A3X-0006E5-50
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1j0A3A-0006lU-1c
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:29 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:16217)
+ (envelope-from <kwankhede@nvidia.com>) id 1j0A3V-0007A3-1g
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:51 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:18003)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1j0A39-0006kG-Ro
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:28 -0500
+ id 1j0A3U-00078A-P1
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:49 -0500
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5e3dc55c0001>; Fri, 07 Feb 2020 12:15:25 -0800
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e3dc5940000>; Fri, 07 Feb 2020 12:16:20 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Fri, 07 Feb 2020 12:16:24 -0800
+ Fri, 07 Feb 2020 12:16:45 -0800
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Fri, 07 Feb 2020 12:16:24 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 7 Feb
- 2020 20:16:24 +0000
+ by hqpgpgate101.nvidia.com on Fri, 07 Feb 2020 12:16:45 -0800
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 7 Feb
+ 2020 20:16:46 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL101.nvidia.com
  (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Fri, 7 Feb 2020 20:16:17 +0000
+ Transport; Fri, 7 Feb 2020 20:16:38 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v12 Kernel 1/7] vfio: KABI for migration interface for device
- state
-Date: Sat, 8 Feb 2020 01:12:28 +0530
-Message-ID: <1581104554-10704-2-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to for
+ dirty pages tracking.
+Date: Sat, 8 Feb 2020 01:12:31 +0530
+Message-ID: <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
 References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
@@ -63,18 +63,18 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1581106525; bh=Wk/4vlleosW0ARxawGyH3dUipo434bU6vZVMB6qpW1Y=;
+ t=1581106580; bh=V92M9kZNrAz8narYr9KEP/P3a3G4aMPmzWkSASFijgI=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=ESZpDxNI6FyuI9/di6HP09hWINSc4fqZKC/ppLb0GYCnjl9gNKyzOZAayjZ4DWPLM
- hdT2ZQo+ezYwU3VOI5vESbYJFZJURs60dq/lzSb5pFhB7p6DvUIMeiffOSh60gvfA/
- qGZPZYLXfCI0DZ5qkqcomEDndYUz0eZwelHoZBVu56DPbUGGeuUp14skB2NCtf7X5W
- oF74rgH1kkMTU10PAZdT4rGMVbEjNkegAaxzYK+w3Ur40ACP0rlQf8+DAzzOql2lCg
- t7mN6HZYK8dCpe3FvYtU6lSIYM2ASOvd/wIZrDmQYH4CnriQFDU/txEpjpxaoLtsaI
- MjGIj9UtsY5zg==
+ b=CaUgEQjpksf09gzJFfKatqVQYWPI3uEwke9kSjntfjMQEnRNsGgXK2tCiDH8uA8go
+ 65sLvoCvPrBkhiatzTjD4xap+d62aK4riu1RxIXF5AT+hx8ycAiB4I4AepGGo5AhuJ
+ CfKa0GE5MCcmnQVpqFjRGs/X1g5UEbmWLvWPD/AHGjkAUjSfr9P6b2O4tPQRwFigQ2
+ 9umKZVhF+0xICo9reJApnAwxVWlFkMgqeuoH2uoJ9jme0tS20iBA7r7cWAvhu4/OCN
+ anl78js1SfjDLK9k+C2u8wSefPrwXNlXfyA5J2yBzBZ+Xby+YsIv5EndWI0l40ZwPw
+ QgwMuID7hIKVg==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.143
+X-Received-From: 216.228.121.64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,248 +97,457 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-- Defined MIGRATION region type and sub-type.
+VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+- Start pinned and unpinned pages tracking while migration is active
+- Stop pinned and unpinned dirty pages tracking. This is also used to
+  stop dirty pages tracking if migration failed or cancelled.
+- Get dirty pages bitmap. This ioctl returns bitmap of dirty pages, its
+  user space application responsibility to copy content of dirty pages
+  from source to destination during migration.
 
-- Defined vfio_device_migration_info structure which will be placed at 0th
-  offset of migration region to get/set VFIO device related information.
-  Defined members of structure and usage on read/write access.
+To prevent DoS attack, memory for bitmap is allocated per vfio_dma
+structure. Bitmap size is calculated considering smallest supported page
+size. Bitmap is allocated when dirty logging is enabled for those
+vfio_dmas whose vpfn list is not empty or whole range is mapped, in
+case of pass-through device.
 
-- Defined device states and state transition details.
+There could be multiple option as to when bitmap should be populated:
+* Polulate bitmap for already pinned pages when bitmap is allocated for
+  a vfio_dma with the smallest supported page size. Updates bitmap from
+  page pinning and unpinning functions. When user application queries
+  bitmap, check if requested page size is same as page size used to
+  populated bitmap. If it is equal, copy bitmap. But if not equal,
+  re-populated bitmap according to requested page size and then copy to
+  user.
+  Pros: Bitmap gets populated on the fly after dirty tracking has
+        started.
+  Cons: If requested page size is different than smallest supported
+        page size, then bitmap has to be re-populated again, with
+        additional overhead of allocating bitmap memory again for
+        re-population of bitmap.
 
-- Defined sequence to be followed while saving and resuming VFIO device.
+* Populate bitmap when bitmap is queried by user application.
+  Pros: Bitmap is populated with requested page size. This eliminates
+        the need to re-populate bitmap if requested page size is
+        different than smallest supported pages size.
+  Cons: There is one time processing time, when bitmap is queried.
+
+I prefer later option with simple logic and to eliminate over-head of
+bitmap repopulation in case of differnt page sizes. Later option is
+implemented in this patch.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- include/uapi/linux/vfio.h | 208 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 208 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 299 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 287 insertions(+), 12 deletions(-)
 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 9e843a147ead..572242620ce9 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
- #define VFIO_REGION_TYPE_GFX                    (1)
- #define VFIO_REGION_TYPE_CCW			(2)
-+#define VFIO_REGION_TYPE_MIGRATION              (3)
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index d386461e5d11..df358dc1c85b 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -70,6 +70,7 @@ struct vfio_iommu {
+ 	unsigned int		dma_avail;
+ 	bool			v2;
+ 	bool			nesting;
++	bool			dirty_page_tracking;
+ };
  
- /* sub-types for VFIO_REGION_TYPE_PCI_* */
+ struct vfio_domain {
+@@ -90,6 +91,7 @@ struct vfio_dma {
+ 	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+ 	struct task_struct	*task;
+ 	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
++	unsigned long		*bitmap;
+ };
  
-@@ -379,6 +380,213 @@ struct vfio_region_gfx_edid {
- /* sub-types for VFIO_REGION_TYPE_CCW */
- #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+ struct vfio_group {
+@@ -125,6 +127,7 @@ struct vfio_regions {
+ 					(!list_empty(&iommu->domain_list))
  
-+/* sub-types for VFIO_REGION_TYPE_MIGRATION */
-+#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
+ static int put_pfn(unsigned long pfn, int prot);
++static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu);
+ 
+ /*
+  * This code handles mapping and unmapping of user data buffers
+@@ -174,6 +177,57 @@ static void vfio_unlink_dma(struct vfio_iommu *iommu, struct vfio_dma *old)
+ 	rb_erase(&old->node, &iommu->dma_list);
+ }
+ 
++static inline unsigned long dirty_bitmap_bytes(unsigned int npages)
++{
++	if (!npages)
++		return 0;
 +
-+/*
-+ * Structure vfio_device_migration_info is placed at 0th offset of
-+ * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
-+ * information. Field accesses from this structure are only supported at their
-+ * native width and alignment, otherwise the result is undefined and vendor
-+ * drivers should return an error.
-+ *
-+ * device_state: (read/write)
-+ *      - User application writes this field to inform vendor driver about the
-+ *        device state to be transitioned to.
-+ *      - Vendor driver should take necessary actions to change device state.
-+ *        On successful transition to given state, vendor driver should return
-+ *        success on write(device_state, state) system call. If device state
-+ *        transition fails, vendor driver should return error, -EFAULT.
-+ *      - On user application side, if device state transition fails, i.e. if
-+ *        write(device_state, state) returns error, read device_state again to
-+ *        determine the current state of the device from vendor driver.
-+ *      - Vendor driver should return previous state of the device unless vendor
-+ *        driver has encountered an internal error, in which case vendor driver
-+ *        may report the device_state VFIO_DEVICE_STATE_ERROR.
-+ *	- User application must use the device reset ioctl in order to recover
-+ *	  the device from VFIO_DEVICE_STATE_ERROR state. If the device is
-+ *	  indicated in a valid device state via reading device_state, the user
-+ *	  application may decide attempt to transition the device to any valid
-+ *	  state reachable from the current state or terminate itself.
-+ *
-+ *      device_state consists of 3 bits:
-+ *      - If bit 0 set, indicates _RUNNING state. When it's clear, that
-+ *	  indicates _STOP state. When device is changed to _STOP, driver should
-+ *	  stop device before write() returns.
-+ *      - If bit 1 set, indicates _SAVING state. When set, that indicates driver
-+ *        should start gathering device state information which will be provided
-+ *        to VFIO user application to save device's state.
-+ *      - If bit 2 set, indicates _RESUMING state. When set, that indicates
-+ *        prepare to resume device, data provided through migration region
-+ *        should be used to resume device.
-+ *      Bits 3 - 31 are reserved for future use. In order to preserve them,
-+ *	user application should perform read-modify-write operation on this
-+ *	field when modifying the specified bits.
-+ *
-+ *  +------- _RESUMING
-+ *  |+------ _SAVING
-+ *  ||+----- _RUNNING
-+ *  |||
-+ *  000b => Device Stopped, not saving or resuming
-+ *  001b => Device running state, default state
-+ *  010b => Stop Device & save device state, stop-and-copy state
-+ *  011b => Device running and save device state, pre-copy state
-+ *  100b => Device stopped and device state is resuming
-+ *  101b => Invalid state
-+ *  110b => Error state
-+ *  111b => Invalid state
-+ *
-+ * State transitions:
-+ *
-+ *              _RESUMING  _RUNNING    Pre-copy    Stop-and-copy   _STOP
-+ *                (100b)     (001b)     (011b)        (010b)       (000b)
-+ * 0. Running or Default state
-+ *                             |
-+ *
-+ * 1. Normal Shutdown (optional)
-+ *                             |------------------------------------->|
-+ *
-+ * 2. Save state or Suspend
-+ *                             |------------------------->|---------->|
-+ *
-+ * 3. Save state during live migration
-+ *                             |----------->|------------>|---------->|
-+ *
-+ * 4. Resuming
-+ *                  |<---------|
-+ *
-+ * 5. Resumed
-+ *                  |--------->|
-+ *
-+ * 0. Default state of VFIO device is _RUNNNG when user application starts.
-+ * 1. During normal user application shutdown, vfio device state changes
-+ *    from _RUNNING to _STOP. This is optional, user application may or may not
-+ *    perform this state transition and vendor driver may not need.
-+ * 2. When user application save state or suspend application, device state
-+ *    transitions from _RUNNING to stop-and-copy state and then to _STOP.
-+ *    On state transition from _RUNNING to stop-and-copy, driver must
-+ *    stop device, save device state and send it to application through
-+ *    migration region. Sequence to be followed for such transition is given
-+ *    below.
-+ * 3. In user application live migration, state transitions from _RUNNING
-+ *    to pre-copy to stop-and-copy to _STOP.
-+ *    On state transition from _RUNNING to pre-copy, driver should start
-+ *    gathering device state while application is still running and send device
-+ *    state data to application through migration region.
-+ *    On state transition from pre-copy to stop-and-copy, driver must stop
-+ *    device, save device state and send it to user application through
-+ *    migration region.
-+ *    Sequence to be followed for above two transitions is given below.
-+ * 4. To start resuming phase, device state should be transitioned from
-+ *    _RUNNING to _RESUMING state.
-+ *    In _RESUMING state, driver should use received device state data through
-+ *    migration region to resume device.
-+ * 5. On providing saved device data to driver, application should change state
-+ *    from _RESUMING to _RUNNING.
-+ *
-+ * pending bytes: (read only)
-+ *      Number of pending bytes yet to be migrated from vendor driver
-+ *
-+ * data_offset: (read only)
-+ *      User application should read data_offset in migration region from where
-+ *      user application should read device data during _SAVING state or write
-+ *      device data during _RESUMING state. See below for detail of sequence to
-+ *      be followed.
-+ *
-+ * data_size: (read/write)
-+ *      User application should read data_size to get size of data copied in
-+ *      bytes in migration region during _SAVING state and write size of data
-+ *      copied in bytes in migration region during _RESUMING state.
-+ *
-+ * Migration region looks like:
-+ *  ------------------------------------------------------------------
-+ * |vfio_device_migration_info|    data section                      |
-+ * |                          |     ///////////////////////////////  |
-+ * ------------------------------------------------------------------
-+ *   ^                              ^
-+ *  offset 0-trapped part        data_offset
-+ *
-+ * Structure vfio_device_migration_info is always followed by data section in
-+ * the region, so data_offset will always be non-0. Offset from where data is
-+ * copied is decided by kernel driver, data section can be trapped or mapped
-+ * or partitioned, depending on how kernel driver defines data section.
-+ * Data section partition can be defined as mapped by sparse mmap capability.
-+ * If mmapped, then data_offset should be page aligned, where as initial section
-+ * which contain vfio_device_migration_info structure might not end at offset
-+ * which is page aligned. The user is not required to access via mmap regardless
-+ * of the region mmap capabilities.
-+ * Vendor driver should decide whether to partition data section and how to
-+ * partition the data section. Vendor driver should return data_offset
-+ * accordingly.
-+ *
-+ * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
-+ * and for _SAVING device state or stop-and-copy phase:
-+ * a. read pending_bytes, indicates start of new iteration to get device data.
-+ *    Repeatative read on pending_bytes at this stage should have no side
-+ *    effect.
-+ *    If pending_bytes == 0, user application should not iterate to get data
-+ *    for that device.
-+ *    If pending_bytes > 0, go through below steps.
-+ * b. read data_offset, indicates vendor driver to make data available through
-+ *    data section. Vendor driver should return this read operation only after
-+ *    data is available from (region + data_offset) to (region + data_offset +
-+ *    data_size).
-+ * c. read data_size, amount of data in bytes available through migration
-+ *    region.
-+ *    Read on data_offset and data_size should return offset and size of current
-+ *    buffer if user application reads those more than once here.
-+ * d. read data of data_size bytes from (region + data_offset) from migration
-+ *    region.
-+ * e. process data.
-+ * f. read pending_bytes, this read operation indicates data from previous
-+ *    iteration had read. If pending_bytes > 0, goto step b.
-+ *
-+ * If there is any error during the above sequence, vendor driver can return
-+ * error code for next read()/write() operation, that will terminate the loop
-+ * and user should take next necessary action, for example, fail migration or
-+ * terminate user application.
-+ *
-+ * User application can transition from _SAVING|_RUNNING (pre-copy state) to
-+ * _SAVING (stop-and-copy) state regardless of pending bytes.
-+ * User application should iterate in _SAVING (stop-and-copy) until
-+ * pending_bytes is 0.
-+ *
-+ * Sequence to be followed while _RESUMING device state:
-+ * While data for this device is available, repeat below steps:
-+ * a. read data_offset from where user application should write data.
-+ * b. write data of data_size to migration region from data_offset. Data size
-+ *    should be data packet size at source during _SAVING.
-+ * c. write data_size which indicates vendor driver that data is written in
-+ *    migration region. Vendor driver should read this data from migration
-+ *    region and resume device's state.
-+ *
-+ * For user application, data is opaque. User application should write data in
-+ * the same order as received and should of same transaction size at source.
-+ */
++	return ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
++}
 +
-+struct vfio_device_migration_info {
-+	__u32 device_state;         /* VFIO device state */
-+#define VFIO_DEVICE_STATE_STOP      (0)
-+#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
-+#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
-+#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
-+#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
-+				     VFIO_DEVICE_STATE_SAVING |  \
-+				     VFIO_DEVICE_STATE_RESUMING)
++static int vfio_dma_bitmap_alloc(struct vfio_iommu *iommu,
++				 struct vfio_dma *dma, unsigned long pgsizes)
++{
++	unsigned long pgshift = __ffs(pgsizes);
 +
-+#define VFIO_DEVICE_STATE_VALID(state) \
-+	(state & VFIO_DEVICE_STATE_RESUMING ? \
-+	(state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
++	if (!RB_EMPTY_ROOT(&dma->pfn_list) || dma->iommu_mapped) {
++		unsigned long npages = dma->size >> pgshift;
++		unsigned long bsize = dirty_bitmap_bytes(npages);
 +
-+#define VFIO_DEVICE_STATE_ERROR			\
-+		(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING)
++		dma->bitmap = kvzalloc(bsize, GFP_KERNEL);
++		if (!dma->bitmap)
++			return -ENOMEM;
++	}
++	return 0;
++}
 +
-+	__u32 reserved;
-+	__u64 pending_bytes;
-+	__u64 data_offset;
-+	__u64 data_size;
-+} __attribute__((packed));
++static int vfio_dma_all_bitmap_alloc(struct vfio_iommu *iommu,
++				     unsigned long pgsizes)
++{
++	struct rb_node *n = rb_first(&iommu->dma_list);
++	int ret;
++
++	for (; n; n = rb_next(n)) {
++		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
++
++		ret = vfio_dma_bitmap_alloc(iommu, dma, pgsizes);
++		if (ret)
++			return ret;
++	}
++	return 0;
++}
++
++static void vfio_dma_all_bitmap_free(struct vfio_iommu *iommu)
++{
++	struct rb_node *n = rb_first(&iommu->dma_list);
++
++	for (; n; n = rb_next(n)) {
++		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
++
++		kfree(dma->bitmap);
++	}
++}
 +
  /*
-  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
-  * which allows direct access to non-MSIX registers which happened to be within
+  * Helper Functions for host iova-pfn list
+  */
+@@ -244,6 +298,29 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
+ 	kfree(vpfn);
+ }
+ 
++static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma)
++{
++	struct rb_node *n = rb_first(&dma->pfn_list);
++
++	for (; n; n = rb_next(n)) {
++		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
++
++		if (!vpfn->ref_count)
++			vfio_remove_from_pfn_list(dma, vpfn);
++	}
++}
++
++static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
++{
++	struct rb_node *n = rb_first(&iommu->dma_list);
++
++	for (; n; n = rb_next(n)) {
++		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
++
++		vfio_remove_unpinned_from_pfn_list(dma);
++	}
++}
++
+ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+ 					       unsigned long iova)
+ {
+@@ -261,7 +338,8 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+ 	vpfn->ref_count--;
+ 	if (!vpfn->ref_count) {
+ 		ret = put_pfn(vpfn->pfn, dma->prot);
+-		vfio_remove_from_pfn_list(dma, vpfn);
++		if (!dma->bitmap)
++			vfio_remove_from_pfn_list(dma, vpfn);
+ 	}
+ 	return ret;
+ }
+@@ -483,13 +561,14 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+ 	return ret;
+ }
+ 
+-static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
++static int vfio_unpin_page_external(struct vfio_iommu *iommu,
++				    struct vfio_dma *dma, dma_addr_t iova,
+ 				    bool do_accounting)
+ {
+ 	int unlocked;
+ 	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
+ 
+-	if (!vpfn)
++	if (!vpfn || !vpfn->ref_count)
+ 		return 0;
+ 
+ 	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
+@@ -510,6 +589,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 	unsigned long remote_vaddr;
+ 	struct vfio_dma *dma;
+ 	bool do_accounting;
++	unsigned long iommu_pgsizes = vfio_pgsize_bitmap(iommu);
+ 
+ 	if (!iommu || !user_pfn || !phys_pfn)
+ 		return -EINVAL;
+@@ -551,8 +631,10 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 
+ 		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+ 		if (vpfn) {
+-			phys_pfn[i] = vpfn->pfn;
+-			continue;
++			if (vpfn->ref_count > 1) {
++				phys_pfn[i] = vpfn->pfn;
++				continue;
++			}
+ 		}
+ 
+ 		remote_vaddr = dma->vaddr + iova - dma->iova;
+@@ -560,11 +642,23 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 					     do_accounting);
+ 		if (ret)
+ 			goto pin_unwind;
+-
+-		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+-		if (ret) {
+-			vfio_unpin_page_external(dma, iova, do_accounting);
+-			goto pin_unwind;
++		if (!vpfn) {
++			ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
++			if (ret) {
++				vfio_unpin_page_external(iommu, dma, iova,
++							 do_accounting);
++				goto pin_unwind;
++			}
++		} else
++			vpfn->pfn = phys_pfn[i];
++
++		if (iommu->dirty_page_tracking && !dma->bitmap) {
++			ret = vfio_dma_bitmap_alloc(iommu, dma, iommu_pgsizes);
++			if (ret) {
++				vfio_unpin_page_external(iommu, dma, iova,
++							 do_accounting);
++				goto pin_unwind;
++			}
+ 		}
+ 	}
+ 
+@@ -578,7 +672,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 
+ 		iova = user_pfn[j] << PAGE_SHIFT;
+ 		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+-		vfio_unpin_page_external(dma, iova, do_accounting);
++		vfio_unpin_page_external(iommu, dma, iova, do_accounting);
+ 		phys_pfn[j] = 0;
+ 	}
+ pin_done:
+@@ -612,7 +706,7 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
+ 		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+ 		if (!dma)
+ 			goto unpin_exit;
+-		vfio_unpin_page_external(dma, iova, do_accounting);
++		vfio_unpin_page_external(iommu, dma, iova, do_accounting);
+ 	}
+ 
+ unpin_exit:
+@@ -830,6 +924,113 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+ 	return bitmap;
+ }
+ 
++static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
++				  size_t size, uint64_t pgsize,
++				  unsigned char __user *bitmap)
++{
++	struct vfio_dma *dma;
++	dma_addr_t i = iova, iova_limit;
++	unsigned int bsize, nbits = 0, l = 0;
++	unsigned long pgshift = __ffs(pgsize);
++
++	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
++		int ret, j;
++		unsigned int npages = 0, shift = 0;
++		unsigned char temp = 0;
++
++		/* mark all pages dirty if all pages are pinned and mapped. */
++		if (dma->iommu_mapped) {
++			iova_limit = min(dma->iova + dma->size, iova + size);
++			npages = iova_limit/pgsize;
++			bitmap_set(dma->bitmap, 0, npages);
++		} else if (dma->bitmap) {
++			struct rb_node *n = rb_first(&dma->pfn_list);
++			bool found = false;
++
++			for (; n; n = rb_next(n)) {
++				struct vfio_pfn *vpfn = rb_entry(n,
++						struct vfio_pfn, node);
++				if (vpfn->iova >= i) {
++					found = true;
++					break;
++				}
++			}
++
++			if (!found) {
++				i += dma->size;
++				continue;
++			}
++
++			for (; n; n = rb_next(n)) {
++				unsigned int s;
++				struct vfio_pfn *vpfn = rb_entry(n,
++						struct vfio_pfn, node);
++
++				if (vpfn->iova >= iova + size)
++					break;
++
++				s = (vpfn->iova - dma->iova) >> pgshift;
++				bitmap_set(dma->bitmap, s, 1);
++
++				iova_limit = vpfn->iova + pgsize;
++			}
++			npages = iova_limit/pgsize;
++		}
++
++		bsize = dirty_bitmap_bytes(npages);
++		shift = nbits % BITS_PER_BYTE;
++
++		if (npages && shift) {
++			l--;
++			if (!access_ok((void __user *)bitmap + l,
++					sizeof(unsigned char)))
++				return -EINVAL;
++
++			ret = __get_user(temp, bitmap + l);
++			if (ret)
++				return ret;
++		}
++
++		for (j = 0; j < bsize; j++, l++) {
++			temp = temp |
++			       (*((unsigned char *)dma->bitmap + j) << shift);
++			if (!access_ok((void __user *)bitmap + l,
++					sizeof(unsigned char)))
++				return -EINVAL;
++
++			ret = __put_user(temp, bitmap + l);
++			if (ret)
++				return ret;
++			if (shift) {
++				temp = *((unsigned char *)dma->bitmap + j) >>
++					(BITS_PER_BYTE - shift);
++			}
++		}
++
++		nbits += npages;
++
++		i = min(dma->iova + dma->size, iova + size);
++		if (i >= iova + size)
++			break;
++	}
++	return 0;
++}
++
++static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
++{
++	long bsize;
++
++	if (!bitmap_size || bitmap_size > SIZE_MAX)
++		return -EINVAL;
++
++	bsize = dirty_bitmap_bytes(npages);
++
++	if (bitmap_size < bsize)
++		return -EINVAL;
++
++	return bsize;
++}
++
+ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 			     struct vfio_iommu_type1_dma_unmap *unmap)
+ {
+@@ -2277,6 +2478,80 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 
+ 		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+ 			-EFAULT : 0;
++	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
++		struct vfio_iommu_type1_dirty_bitmap range;
++		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
++				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
++				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
++		int ret;
++
++		if (!iommu->v2)
++			return -EACCES;
++
++		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
++				    bitmap);
++
++		if (copy_from_user(&range, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (range.argsz < minsz || range.flags & ~mask)
++			return -EINVAL;
++
++		/* only one flag should be set at a time */
++		if (__ffs(range.flags) != __fls(range.flags))
++			return -EINVAL;
++
++		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
++			unsigned long iommu_pgsizes = vfio_pgsize_bitmap(iommu);
++
++			mutex_lock(&iommu->lock);
++			iommu->dirty_page_tracking = true;
++			ret = vfio_dma_all_bitmap_alloc(iommu, iommu_pgsizes);
++			mutex_unlock(&iommu->lock);
++			return ret;
++		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
++			mutex_lock(&iommu->lock);
++			iommu->dirty_page_tracking = false;
++			vfio_dma_all_bitmap_free(iommu);
++			vfio_remove_unpinned_from_dma_list(iommu);
++			mutex_unlock(&iommu->lock);
++			return 0;
++		} else if (range.flags &
++				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
++			long bsize;
++			unsigned long pgshift = __ffs(range.pgsize);
++			uint64_t iommu_pgsizes = vfio_pgsize_bitmap(iommu);
++			uint64_t iommu_pgmask =
++				 ((uint64_t)1 << __ffs(iommu_pgsizes)) - 1;
++
++			if ((range.pgsize & iommu_pgsizes) != range.pgsize)
++				return -EINVAL;
++			if (range.iova & iommu_pgmask)
++				return -EINVAL;
++			if (!range.size || range.size & iommu_pgmask)
++				return -EINVAL;
++			if (range.iova + range.size < range.iova)
++				return -EINVAL;
++			if (!access_ok((void __user *)range.bitmap,
++				       range.bitmap_size))
++				return -EINVAL;
++
++			bsize = verify_bitmap_size(range.size >> pgshift,
++						   range.bitmap_size);
++			if (bsize < 0)
++				return bsize;
++
++			mutex_lock(&iommu->lock);
++			if (iommu->dirty_page_tracking)
++				ret = vfio_iova_dirty_bitmap(iommu, range.iova,
++					 range.size, range.pgsize,
++					 (unsigned char __user *)range.bitmap);
++			else
++				ret = -EINVAL;
++			mutex_unlock(&iommu->lock);
++
++			return ret;
++		}
+ 	}
+ 
+ 	return -ENOTTY;
 -- 
 2.7.0
 
