@@ -2,78 +2,81 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF6E2C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B808C352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:01:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA3ED20715
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:00:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3875220715
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:01:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wUpaWc7x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA3ED20715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C61Qux9u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3875220715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j02JW-00036z-Rb
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 07:00:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40298)
+	id 1j02KF-0004ap-DX
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 07:01:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40534)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j02IH-0001w2-Jv
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:59:34 -0500
+ (envelope-from <berrange@redhat.com>) id 1j02Iz-0002kT-Ok
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:00:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j02IG-0000f0-IO
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:59:33 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33013)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j02IG-0000c9-CX
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:59:32 -0500
-Received: by mail-oi1-x243.google.com with SMTP id q81so1745675oig.0
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 03:59:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=E19fk3bg12ZgnPQArsaMN6KJslPcvXLVjVWlcuBwsJM=;
- b=wUpaWc7xs6bHtj2/nm/IJU1mRPx2fvx5LD1rxypRlIn+MdQI4esNOmWN9c+kENGsMn
- nGKLuyO7BTrBpW/93rqS+R8zKToeXI4G27ZeF38obqluLCvYDOKC3envP0nviQtHhISc
- 9OGnsUdQBXbIBkI7eMvZFXG7uJwrm/EWrZcKwgr+qlfQzAQk3laBPhPdT6XXA84uDDkR
- eXoq0CFnhSX33FnZ0CXDteP13ZMY1sfFaDrbWnTPuT1dMLoCFz9JEsFJgFaHy9dxq4mb
- gPiPenNpM0FmSdvwG291P0tt3FX/HF71JGImxDZkGKETr88OKVANTvAlmistspr4pz1X
- 0LOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=E19fk3bg12ZgnPQArsaMN6KJslPcvXLVjVWlcuBwsJM=;
- b=pKXaXVRUspNNkRmVUz9HQtJrXyxv1I8yz3XF3TfM8QRYHbOeF2I3hEf4e4ZoxgRKdI
- 2qzBq0HRKxlo90x2cMRC4bRGAjHZxf23oH6Lbw4ptvFIIa7UnXXEjRooTS/H3W9V5kqY
- LREakNIeE/keusK+P3C3/QSoRa21+5NxmG7d670anXNxPCgjewfj0yMlfvMMReLrexAb
- zdsrv0ohOkm2XQC6ocWoGxlqxg0UVZXM6S/Z5+rPTOqvafhyQMi6Zc2OCqJK5SKq/jVw
- GOcY7zvLQmPTqu9oAiSUnB6kXKmVs0scTZySXI5ekSP+BfvrUOZy6ow7jSS1zlhuI5OL
- roTA==
-X-Gm-Message-State: APjAAAXvo9oPhwxhP+uD0BCelmDJQySvKQbjIMrEb1/WRHopXhWcrQ6w
- 0qzz2WdmJocxQMhezB9D4b94FZ2Enn+nKZuf01eZsw==
-X-Google-Smtp-Source: APXvYqz93zNP00scrm7dM1Uq6SmLyWHXzvnGBPUx6Fzecuid/88xernf64/bq4Dx5WgwC+rsJ1cfFXy/+x3uTfVO+k0=
-X-Received: by 2002:a54:4f16:: with SMTP id e22mr1871929oiy.170.1581076771478; 
- Fri, 07 Feb 2020 03:59:31 -0800 (PST)
+ (envelope-from <berrange@redhat.com>) id 1j02Iy-0002KH-D9
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:00:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37168
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j02Iy-0002I3-8M
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:00:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581076815;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OAzyWK4uOKPR/9c0mh90tocsTwZN6z5D/JwckST0c9Y=;
+ b=C61Qux9uzf2OOOsWg01ZwvycUiWwkCIzeoZxa/NTs5p8oGPEQdO5mAmHm2nPKWTvtMFar4
+ GZe9h9B/rygpnTOaDPL+UoSyThg+3jBCYVp43tNxKCybXtTMy5+FGxaBdOTkekdACAB5+i
+ uDB6h2f23sxIxt/SBRvxnbHy+J5wQ14=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-inWcCHkSO5aXlByMalgwow-1; Fri, 07 Feb 2020 06:59:59 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47A881800D42;
+ Fri,  7 Feb 2020 11:59:58 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 733D619756;
+ Fri,  7 Feb 2020 11:59:54 +0000 (UTC)
+Date: Fri, 7 Feb 2020 11:59:52 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: should we have a new 'tools' manual?
+Message-ID: <20200207115952.GB2511885@redhat.com>
+References: <CAFEAcA--P9FLM4qBxf23sLuv5Tz4HRgj7ONC7ODxnfZiLph9TA@mail.gmail.com>
 MIME-Version: 1.0
-References: <2357909.uYzqtL8Sc2@desktop2>
-In-Reply-To: <2357909.uYzqtL8Sc2@desktop2>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Feb 2020 11:59:20 +0000
-Message-ID: <CAFEAcA-4LDRH3A-PVphzQn3F82hODV8f0YsZuVqygn-jFi_p+w@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] bcm2835_dma: Fix TD mode
-To: Rene Stange <rsta2@o2online.de>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+In-Reply-To: <CAFEAcA--P9FLM4qBxf23sLuv5Tz4HRgj7ONC7ODxnfZiLph9TA@mail.gmail.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: inWcCHkSO5aXlByMalgwow-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,34 +88,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- Andrew Baumann <andrew.baumann@microsoft.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 3 Feb 2020 at 15:41, Rene Stange <rsta2@o2online.de> wrote:
->
-> Hi Philippe,
->
-> this v2 patch splits the initial fix into two commits as suggested.
->
-> Regards,
->
-> Rene
->
->
-> Rene Stange (2):
->   bcm2835_dma: Fix the ylen loop in TD mode
->   bcm2835_dma: Re-initialize xlen in TD mode
->
->  hw/dma/bcm2835_dma.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+On Fri, Feb 07, 2020 at 11:50:37AM +0000, Peter Maydell wrote:
+> So far we've been converting docs to Sphinx and assigning them
+> to manuals according to the division originally set out by
+> Paolo on the wiki: https://wiki.qemu.org/Features/Documentation
+>=20
+>  * QEMU User-mode Emulation User's Guide (docs/user)
+>  * QEMU System Emulation User's Guide (docs/system)
+>  * QEMU System Emulation Management and Interoperability Guide (docs/inte=
+rop)
+>  * QEMU System Emulation Guest Hardware Specifications (docs/specs)
+>  * QEMU Developer's Guide (docs/devel, not shipped to end-users)
+>=20
+> but some of our documentation has always been a bit of an awkward
+> fit into this classification:
+>  * qemu-img
+>  * qemu-nbd
+>  * virtfs-proxy-helper
+> etc. I've tended to put these things into interop/.
+>=20
+> The proposal from Dan and David was that we should add a sixth
+> top-level manual
+>  * QEMU Tools Guide (docs/tools)
+>=20
+> which would be a more coherent place for these to live.
+>=20
+> This seems like a good idea to me -- do people agree? What's
+> our definition of a "tool", or do we just know one when we see it?
+> What in particular should go in tools/ ?
 
-Applied to target-arm.next, thanks (with the commit message
-tweak suggested by Philippe).
+There are essentially two consumers of our docs
 
--- PMM
+  - Sysadmins running / interacting with QEMU
+  - Application developers building QEMU mgmt tools
+
+In the sysadmin use case, they'll primarily care about docs describing
+the system emulator configuration & usage, and the various tools usage.
+
+The app devs will care about nearly all of our documentation, except for
+stuff that is purely QEMU internals.
+
+The downside of mixing tools into the general "interop" doc is that it
+makes it harder to find IMHO. Thus having a dedicated "tools" doc will
+be a useful grouping for sysadmins to quickly find docs relevant to
+daily admin tasks.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
