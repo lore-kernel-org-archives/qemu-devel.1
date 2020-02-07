@@ -2,99 +2,62 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F8EC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE52C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:42:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0F3D20838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:32:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQUGGQ+w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F3D20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3205D2082E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:42:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3205D2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izxC4-0003z0-VV
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 01:32:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42919)
+	id 1izxL6-0008Dv-AP
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 01:42:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45808)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1izxBF-0003Xl-Lj
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:31:59 -0500
+ (envelope-from <jan.kiszka@siemens.com>) id 1izxKB-0007YG-Hu
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1izxBE-0005df-92
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:31:57 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29356
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jan.kiszka@siemens.com>) id 1izxK9-00055T-Pf
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:41:10 -0500
+Received: from gecko.sbs.de ([194.138.37.40]:60389)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1izxBD-0005Z7-Ud
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:31:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581057115;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yHXKTHRbvU/hlnHBEG8DGvXYaMI9x8xVzvJo+Od69yo=;
- b=eQUGGQ+w1tzF334zWqNIsdHwRHTFaCK0I1pEcRguaXAStH9KxkeuEi5F5q9V0hLCxZkSp0
- EEMBTnb1VK082aGoBqE1Rt/tmq6Vqo3xYxDszBCdRb0/v40ErsFwXRkNR4ejzFTFNsEKXs
- RwTv8ZgXN5tVy6ssDB+RNdknuP0I104=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-5wfRVQEdMpquwWRaTbtquw-1; Fri, 07 Feb 2020 01:31:48 -0500
-Received: by mail-qk1-f197.google.com with SMTP id i11so736106qki.12
- for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 22:31:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=oS7Qa3s3lP9mfsFjCIvdVqUNKWJ3iUBI/IivcbVebqY=;
- b=J4TlAS9jRiW5cbEqwt3E9zDZOcLGx9kTi02Vc9nGTDzmJZnrjoAl7ImNKQ2b9B51eu
- J5AwD4TmN44Yd9LheAu3S0splLa5FHcsWawFWPl2HW4H6i6gbTCqsMLnzSAR1CuCs785
- CemDeECqezy67zYsRaMtGMJmkK/Xdy3R3AWtCYo99z8rb/+pm9rGQagpuWVhnhMI0Wqh
- uZ8km5dljAC6xPXzJmwFhEOMMTIfYmSRN7Cb6xj1X9gxKcf4ABfMvp9Fv/QGyn6BV9b+
- IX8OLD3Cgre7ZDqAXeCkRUfUnGZVCiZBPhG9BNjr9iXo0eBJD30XKjv6T6edKZTcK/lj
- LSJA==
-X-Gm-Message-State: APjAAAU0IG+FDfx2rWot6ogUU0eX/zLcTFnNx5LcUTAJ5Swi6O7Jwwsb
- zYH94ojP1os8yA6Y3vphIVhiVoZKDpDacrJdg+sLMRQ5As/VLyfEgjEe3bIqzR27WJQAHGPsLuP
- /RXy3exNeE6T+12c=
-X-Received: by 2002:a05:620a:14a6:: with SMTP id
- x6mr6206173qkj.206.1581057107994; 
- Thu, 06 Feb 2020 22:31:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxTJY+AuhxAif36QdUP1VpEy8aRsoPd9bVIeR3jUMQGQR9/+dM5sqbKHdodkWapbsUDaadwfA==
-X-Received: by 2002:a05:620a:14a6:: with SMTP id
- x6mr6206149qkj.206.1581057107728; 
- Thu, 06 Feb 2020 22:31:47 -0800 (PST)
-Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id h4sm924493qtp.24.2020.02.06.22.31.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Feb 2020 22:31:46 -0800 (PST)
-Date: Fri, 7 Feb 2020 01:31:42 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2] hw/core: Allow setting 'virtio-blk-device.scsi'
- property on OSX host
-Message-ID: <20200207013044-mutt-send-email-mst@kernel.org>
-References: <20200207001404.1739-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+ id 1izxK9-0004uJ-Da
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:41:09 -0500
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+ by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id 0176f5aW027202
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 7 Feb 2020 07:41:05 +0100
+Received: from [167.87.42.193] ([167.87.42.193])
+ by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 0176f4SE026935;
+ Fri, 7 Feb 2020 07:41:04 +0100
+Subject: Re: [PATCH] apic: Report current_count via 'info lapic'
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
+References: <f6c36298-5e63-f4c6-654c-3b16010ae6da@siemens.com>
+ <3d05c5a8-34fb-3309-ebba-14d187813756@redhat.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <7684f66e-8dad-3b28-1078-a7a5cb578bd8@siemens.com>
+Date: Fri, 7 Feb 2020 07:41:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200207001404.1739-1-philmd@redhat.com>
-X-MC-Unique: 5wfRVQEdMpquwWRaTbtquw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <3d05c5a8-34fb-3309-ebba-14d187813756@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: base64
+X-MIME-Autoconverted: from 8bit to base64 by gecko.sbs.de id 0176f5aW027202
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 194.138.37.40
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,61 +69,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, stefanha@redhat.com,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 07, 2020 at 01:14:04AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Commit ed65fd1a2750 ("virtio-blk: switch off scsi-passthrough by
-> default") changed the default value of the 'scsi' property of
-> virtio-blk, which is only available on Linux hosts. It also added
-> an unconditional compat entry for 2.4 or earlier machines.
->=20
-> Trying to set this property on a pre-2.5 machine on OSX, we get:
->=20
->    Unexpected error in object_property_find() at qom/object.c:1201:
->    qemu-system-x86_64: -device virtio-blk-pci,id=3Dscsi0,drive=3Ddrive0: =
-can't apply global virtio-blk-device.scsi=3Dtrue: Property '.scsi' not foun=
-d
->=20
-> Fix this error by marking the property optional.
->=20
-> Fixes: ed65fd1a27 ("virtio-blk: switch off scsi-passthrough by default")
-> Suggested-by: Cornelia Huck <cohuck@redhat.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-Stefan I think this makes sense in your tree same as
-the original patch it's fixing. Right?
-
-> ---
-> v2: Reworded description (Cornelia)
->=20
-> Extracted from testing series:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675074.html
-> ---
->  hw/core/machine.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 3e288bfceb..d8e30e4895 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -148,7 +148,8 @@ GlobalProperty hw_compat_2_5[] =3D {
->  const size_t hw_compat_2_5_len =3D G_N_ELEMENTS(hw_compat_2_5);
-> =20
->  GlobalProperty hw_compat_2_4[] =3D {
-> -    { "virtio-blk-device", "scsi", "true" },
-> +    /* Optional because the 'scsi' property is Linux-only */
-> +    { "virtio-blk-device", "scsi", "true", .optional =3D true },
->      { "e1000", "extra_mac_registers", "off" },
->      { "virtio-pci", "x-disable-pcie", "on" },
->      { "virtio-pci", "migrate-extra", "off" },
-> --=20
-> 2.21.1
-
+T24gMDYuMDIuMjAgMjM6MzYsIFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIHdyb3RlOg0KPiBP
+biAyLzYvMjAgODo1MCBQTSwgSmFuIEtpc3prYSB3cm90ZToNCj4+IEZyb206IEphbiBLaXN6
+a2EgPGphbi5raXN6a2FAc2llbWVucy5jb20+DQo+Pg0KPj4gVGhpcyBpcyBoZWxwZnVsIHdo
+ZW4gZGVidWdnaW5nIHN0dWNrIGd1ZXN0IHRpbWVycy4NCj4+DQo+PiBBcyB3ZSBuZWVkIGFw
+aWNfZ2V0X2N1cnJlbnRfY291bnQgZm9yIHRoYXQsIGFuZCBpdCBpcyByZWFsbHkgbm90DQo+
+PiBlbXVsYXRpb24gc3BlY2lmaWMsIG1vdmUgaXQgdG8gYXBpY19jb21tb24uYyBhbmQgZXhw
+b3J0IGl0Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IEphbiBLaXN6a2EgPGphbi5raXN6a2FA
+c2llbWVucy5jb20+DQo+PiAtLS0NCj4+IMKgIGh3L2ludGMvYXBpYy5jwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDE4IC0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4gwqAg
+aHcvaW50Yy9hcGljX2NvbW1vbi5jwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxOCArKysrKysr
+KysrKysrKysrKysNCj4+IMKgIGluY2x1ZGUvaHcvaTM4Ni9hcGljX2ludGVybmFsLmggfMKg
+IDEgKw0KPj4gwqAgdGFyZ2V0L2kzODYvaGVscGVyLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHzCoCA1ICsrKy0tDQo+PiDCoCA0IGZpbGVzIGNoYW5nZWQsIDIyIGluc2VydGlvbnMoKyks
+IDIwIGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9ody9pbnRjL2FwaWMuYyBi
+L2h3L2ludGMvYXBpYy5jDQo+PiBpbmRleCBiZDQwNDY3OTY1Li5mMjIwN2QwYWNlIDEwMDY0
+NA0KPj4gLS0tIGEvaHcvaW50Yy9hcGljLmMNCj4+ICsrKyBiL2h3L2ludGMvYXBpYy5jDQo+
+PiBAQCAtNjE1LDI0ICs2MTUsNiBAQCBpbnQgYXBpY19hY2NlcHRfcGljX2ludHIoRGV2aWNl
+U3RhdGUgKmRldikNCj4+IMKgwqDCoMKgwqAgcmV0dXJuIDA7DQo+PiDCoCB9DQo+PiDCoCAt
+c3RhdGljIHVpbnQzMl90IGFwaWNfZ2V0X2N1cnJlbnRfY291bnQoQVBJQ0NvbW1vblN0YXRl
+ICpzKQ0KPj4gLXsNCj4+IC3CoMKgwqAgaW50NjRfdCBkOw0KPj4gLcKgwqDCoCB1aW50MzJf
+dCB2YWw7DQo+PiAtwqDCoMKgIGQgPSAocWVtdV9jbG9ja19nZXRfbnMoUUVNVV9DTE9DS19W
+SVJUVUFMKSAtDQo+PiBzLT5pbml0aWFsX2NvdW50X2xvYWRfdGltZSkgPj4NCj4+IC3CoMKg
+wqDCoMKgwqDCoCBzLT5jb3VudF9zaGlmdDsNCj4+IC3CoMKgwqAgaWYgKHMtPmx2dFtBUElD
+X0xWVF9USU1FUl0gJiBBUElDX0xWVF9USU1FUl9QRVJJT0RJQykgew0KPj4gLcKgwqDCoMKg
+wqDCoMKgIC8qIHBlcmlvZGljICovDQo+PiAtwqDCoMKgwqDCoMKgwqAgdmFsID0gcy0+aW5p
+dGlhbF9jb3VudCAtIChkICUgKCh1aW50NjRfdClzLT5pbml0aWFsX2NvdW50ICsgMSkpOw0K
+Pj4gLcKgwqDCoCB9IGVsc2Ugew0KPj4gLcKgwqDCoMKgwqDCoMKgIGlmIChkID49IHMtPmlu
+aXRpYWxfY291bnQpDQo+PiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2YWwgPSAwOw0KPj4g
+LcKgwqDCoMKgwqDCoMKgIGVsc2UNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZhbCA9
+IHMtPmluaXRpYWxfY291bnQgLSBkOw0KPj4gLcKgwqDCoCB9DQo+PiAtwqDCoMKgIHJldHVy
+biB2YWw7DQo+PiAtfQ0KPj4gLQ0KPj4gwqAgc3RhdGljIHZvaWQgYXBpY190aW1lcl91cGRh
+dGUoQVBJQ0NvbW1vblN0YXRlICpzLCBpbnQ2NF90IGN1cnJlbnRfdGltZSkNCj4+IMKgIHsN
+Cj4+IMKgwqDCoMKgwqAgaWYgKGFwaWNfbmV4dF90aW1lcihzLCBjdXJyZW50X3RpbWUpKSB7
+DQo+PiBkaWZmIC0tZ2l0IGEvaHcvaW50Yy9hcGljX2NvbW1vbi5jIGIvaHcvaW50Yy9hcGlj
+X2NvbW1vbi5jDQo+PiBpbmRleCA5ZWMwZjJkZWIyLi42ZjRlODc3ODc4IDEwMDY0NA0KPj4g
+LS0tIGEvaHcvaW50Yy9hcGljX2NvbW1vbi5jDQo+PiArKysgYi9ody9pbnRjL2FwaWNfY29t
+bW9uLmMNCj4+IEBAIC0xODksNiArMTg5LDI0IEBAIGJvb2wgYXBpY19uZXh0X3RpbWVyKEFQ
+SUNDb21tb25TdGF0ZSAqcywgaW50NjRfdA0KPj4gY3VycmVudF90aW1lKQ0KPj4gwqDCoMKg
+wqDCoCByZXR1cm4gdHJ1ZTsNCj4+IMKgIH0NCj4+IMKgICt1aW50MzJfdCBhcGljX2dldF9j
+dXJyZW50X2NvdW50KEFQSUNDb21tb25TdGF0ZSAqcykNCj4+ICt7DQo+PiArwqDCoMKgIGlu
+dDY0X3QgZDsNCj4+ICvCoMKgwqAgdWludDMyX3QgdmFsOw0KPj4gK8KgwqDCoCBkID0gKHFl
+bXVfY2xvY2tfZ2V0X25zKFFFTVVfQ0xPQ0tfVklSVFVBTCkgLQ0KPj4gcy0+aW5pdGlhbF9j
+b3VudF9sb2FkX3RpbWUpID4+DQo+PiArwqDCoMKgwqDCoMKgwqAgcy0+Y291bnRfc2hpZnQ7
+DQo+PiArwqDCoMKgIGlmIChzLT5sdnRbQVBJQ19MVlRfVElNRVJdICYgQVBJQ19MVlRfVElN
+RVJfUEVSSU9ESUMpIHsNCj4+ICvCoMKgwqDCoMKgwqDCoCAvKiBwZXJpb2RpYyAqLw0KPj4g
+K8KgwqDCoMKgwqDCoMKgIHZhbCA9IHMtPmluaXRpYWxfY291bnQgLSAoZCAlICgodWludDY0
+X3Qpcy0+aW5pdGlhbF9jb3VudCArIDEpKTsNCj4+ICvCoMKgwqAgfSBlbHNlIHsNCj4+ICvC
+oMKgwqDCoMKgwqDCoCBpZiAoZCA+PSBzLT5pbml0aWFsX2NvdW50KQ0KPj4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgdmFsID0gMDsNCj4+ICvCoMKgwqDCoMKgwqDCoCBlbHNlDQo+PiAr
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2YWwgPSBzLT5pbml0aWFsX2NvdW50IC0gZDsNCj4g
+DQo+IFVzaW5nIFFFTVUgc3R5bGUgaWYgKCkge30gZWxzZSB7fToNCg0KWWVhaCwgdGhhdCBo
+YXBwZW5zIHdoZW4geW91IG1vdmUgb2xkIGNvZGUgLSB3aWxsIGFkZHJlc3MuDQoNCj4gUmV2
+aWV3ZWQtYnk6IFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxwaGlsbWRAcmVkaGF0LmNvbT4N
+Cg0KVGhhbmtzLA0KSmFuDQoNCi0tIA0KU2llbWVucyBBRywgQ29ycG9yYXRlIFRlY2hub2xv
+Z3ksIENUIFJEQSBJT1QgU0VTLURFDQpDb3Jwb3JhdGUgQ29tcGV0ZW5jZSBDZW50ZXIgRW1i
+ZWRkZWQgTGludXgNCg==
 
