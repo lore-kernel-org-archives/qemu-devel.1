@@ -2,79 +2,125 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC48C04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 698A3C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:18:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC1812465D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:17:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35CB4246D8
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:18:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEE2FgNG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC1812465D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="mkUox7Nv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35CB4246D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05Nd-0002sF-5c
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:17:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35668)
+	id 1j05PF-0004Mh-CT
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:18:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37502)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j05IH-0002Sm-ED
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:47 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j05Mj-0001qB-2m
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:16:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j05IE-0003xV-UK
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49132
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j05IE-0003wk-Pc
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581088302;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VDsi+VqkaqSUruHHrGUuNAjG5/4dE2L6Y8PNJF3SLus=;
- b=AEE2FgNGsYYBonCTG3wRMeOifZXwldFsWqlxvPptpkLrLfnc3zUQS7vF+viw5HVaHWoUdt
- UckOIyoT+cr/4wlxPSi7ky/iKFjditbxh06zSsaFGLwFzeGhJyE8t3/icbJXb5112bGcXD
- j0f3slrQAfKUgOfImaEKY2MBuCJD/i4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-VIw6QDa9OumJ-OUPxRJhpQ-1; Fri, 07 Feb 2020 10:11:37 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 692E4800D5C;
- Fri,  7 Feb 2020 15:11:36 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-120.brq.redhat.com [10.40.204.120])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F7CE790D7;
- Fri,  7 Feb 2020 15:11:31 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 40/46] tests/qemu-iotests: Explicit usage of Python3
- (scripts without __main__)
-Date: Fri,  7 Feb 2020 16:11:13 +0100
-Message-Id: <20200207151113.29349-2-philmd@redhat.com>
-In-Reply-To: <20200207151113.29349-1-philmd@redhat.com>
-References: <20200207151113.29349-1-philmd@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: VIw6QDa9OumJ-OUPxRJhpQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j05Mh-00081B-Kj
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:16:20 -0500
+Received: from mail-eopbgr60122.outbound.protection.outlook.com
+ ([40.107.6.122]:17294 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j05Mc-0007df-2F; Fri, 07 Feb 2020 10:16:14 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F80G26xsuMUdIPLRlnDgPRzliFXB6wX8e/AFbRFL5q+2CKFjKR2dKIdVe/HkEEsS46TwQ+f8eQ6Xk2bKdqHrd0elQkHAks/Or9Jil6gnlJy6RbxiN0MOG/Cye+fwUpVPa19XpVrJtROWCvYD+iUUUDHDTYkOOgMDd3FVHy032pNMFlBycnnRguVDAZcTm+r8pit5h/h1W4fbnPS99ljRCaVFB5mOwpFm7Bh4cNBKDg2q2NOYkkm+HEgNiY1zOBgMZTCnR0wSYN0PIAA3ido0ZSbTLuxPkioNUvqWQL3Qi4yPSo/MWxxhv7EThIuOQdqVaSgexliK2LMSoWZnFJwFqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ny2Kb8Ln/pkcHG3qOvGVt5VIRRcLetWKRE2V88l7Ms0=;
+ b=b7Bm4fXZYOSQFgRFj+3uouSp8NsGYK+ER9AJfaRbSRJa116ZdexIdTGa8dO28u5NzN+szZ20BZ6HYQ0NgOQylLd4/ekzlleGZiKm6jtMyjjpOFKDtly8ADXQupc7y5f39FhYEjKbRaEXgqkvgq+wQLrdN4Pie17uMVLCqt6RzSMabpByquH1pg/jEhRZOC8GQZrkipV/bXC3R/Mhl/pJjaTLKkAdSuLB2u/FbHQkLAFrFdzc7by0S+mk+PtNqV+Yc8X1l6Zu/6ILVN3zP2NJUdJrVg7PQ9HShREQOE4E1BiIuLmsTFirP46VfGXOt8TDRQELarDRjpjnXVCKJBYejw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ny2Kb8Ln/pkcHG3qOvGVt5VIRRcLetWKRE2V88l7Ms0=;
+ b=mkUox7NvKNQSNAbnCoTS/rAOZ0SViA+vNs1HH7GiP/u7PjCIKfZoO9bD3932aTMfmnMWTBeHXhqZerkLkzSrdjIl6MkxsYdI770WJMCrxvx/FT8u2cXZnTFrAkXxxXfXG0pAB/TWTVoBx0MQGiGrKcrHaz0EXDjb6OECETVL7Rg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3176.eurprd08.prod.outlook.com (52.135.164.25) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.25; Fri, 7 Feb 2020 15:16:11 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2707.023; Fri, 7 Feb 2020
+ 15:16:11 +0000
+Subject: Re: [PATCH v3 1/1] qemu-img: Add --target-is-zero to convert
+To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>,
+ David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org
+References: <20200204095246.1974117-1-david.edmondson@oracle.com>
+ <20200204095246.1974117-2-david.edmondson@oracle.com>
+ <90f3f74b-6154-d7ce-4e0e-ba4422f7da11@redhat.com>
+ <91c3d45b-4c27-d366-6dd9-5c27164cce35@virtuozzo.com>
+ <92ca6082-a3a6-c116-d1cc-e9810280c0c6@redhat.com>
+ <38ac63ec-af49-d9d5-c1d4-e45614b71d4c@redhat.com>
+ <f110458f-b3e7-6301-64bf-2b4957f3601e@virtuozzo.com>
+ <570489b5-8d1b-27c4-01d3-0e63130d2c57@redhat.com>
+ <99dc03a7-f93a-bdee-f38d-ac5aae8a3ca9@virtuozzo.com>
+ <33849f7f-1ae9-126c-28b8-f9a5602aa2d0@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200207181610209
+Message-ID: <96aab671-23db-1917-983e-182312a41220@virtuozzo.com>
+Date: Fri, 7 Feb 2020 18:16:10 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <33849f7f-1ae9-126c-28b8-f9a5602aa2d0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-ClientProxiedBy: HE1PR02CA0088.eurprd02.prod.outlook.com
+ (2603:10a6:7:29::17) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+MIME-Version: 1.0
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR02CA0088.eurprd02.prod.outlook.com (2603:10a6:7:29::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.23 via Frontend Transport; Fri, 7 Feb 2020 15:16:11 +0000
+X-Tagtoolbar-Keys: D20200207181610209
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d810c301-0278-460a-7036-08d7abe0aa83
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3176:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB31766B0DFDFFCD11594CE931C11C0@AM6PR08MB3176.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0306EE2ED4
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(376002)(346002)(366004)(396003)(39850400004)(136003)(199004)(189003)(66476007)(66556008)(66946007)(86362001)(5660300002)(31696002)(2906002)(36756003)(81156014)(81166006)(478600001)(8676002)(8936002)(31686004)(4326008)(186003)(52116002)(26005)(53546011)(2616005)(956004)(316002)(16526019)(16576012)(6486002)(110136005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3176;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wRS06HqZ2MqZy7hVvNeLxbdERfaq71JAEEnUXGKheMxJJ2d2z6VmXlE6bWV46AzYhcmlNQKTjTvvyWVPVkfY8gsegjQNtZTIGmWXnEmc9mj7g5/CKhEosQ/IsslOtUIXFRsLaxIzxpZTkusN80ZFL91RMPMqEZ/OnT4miLMvkqfRjBs197a0lW+7wnf60SXz4v3SWeiyXOUK2sIhqf0KEZsOa4JuhL6h2yIYpdYgCSxxo22+j8G6A8rg5Fl8hwBQAMhKYRxj/WlFoTCt3vMYnHmYGrxZKGN6fcDCfs5dG5MQIwx/PIeyMr/MKGugZHXlA4WUT5O6LFZzf6FMVaF/T0uOYroQNGOsGYzpq7JYgrSHGe//36NqLe0p+GCxccT/vYSATY9uPm4NiyV1A7novBG96So1dbg2vmMqGmUtJgm0Y3ZqNLDg51j4+qpThyP5
+X-MS-Exchange-AntiSpam-MessageData: WQ7bi+MFPsX5n3HPMd1UFTzME0DTf3mx65xrdvb24XkK0eGeXkImWaaDoK34yZ5LiH8r7S5vMyXNzN9YuTx4MQjMTl61UCZXL148yWAeHHOrWH4I/6bPyONKBbqdrKAXkqbAmd4ylecWhqKag7K6+A==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d810c301-0278-460a-7036-08d7abe0aa83
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2020 15:16:11.8848 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: An4pXidsCYDW33/7iExhMWWgInG7+qzxlPu8AEAkSPNUAI3R39oUtyqPcU7DPu8XLZeshp86BNGDrtVrMnarZKuATEcUxGkb5NGX7zzHJHQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3176
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.122
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,434 +132,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use the program search path to find the Python 3 interpreter.
+07.02.2020 18:03, Max Reitz wrote:
+> On 07.02.20 15:53, Vladimir Sementsov-Ogievskiy wrote:
+>> 07.02.2020 17:41, Max Reitz wrote:
+>>> On 07.02.20 13:07, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 07.02.2020 13:33, Max Reitz wrote:
+>>>>> On 04.02.20 15:23, Eric Blake wrote:
+>>>>>> On 2/4/20 7:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>
+>>>>>>>> I understand that it is safer to have restrictions now and lift th=
+em
+>>>>>>>> later, than to allow use of the option at any time and leave room
+>>>>>>>> for
+>>>>>>>> the user to shoot themselves in the foot with no way to add safety
+>>>>>>>> later.=C2=A0 The argument against no backing file is somewhat
+>>>>>>>> understandable (technically, as long as the backing file also read=
+s
+>>>>>>>> as all zeroes, then the overall image reads as all zeroes - but wh=
+y
+>>>>>>>> have a backing file that has no content?); the argument requiring =
+-n
+>>>>>>>> is a bit weaker (if I'm creating an image, I _know_ it reads as al=
+l
+>>>>>>>> zeroes, so the --target-is-zero argument is redundant, but it
+>>>>>>>> shouldn't hurt to allow it).
+>>>>>>>
+>>>>>>> I know that it reads as all zeroes, only if this format provides ze=
+ro
+>>>>>>> initialization..
+>>>>>>>
+>>>>>>>>
+>>>>>>>>> +++ b/qemu-img.c
+>>>>>>>>
+>>>>>>>>> @@ -2247,6 +2256,11 @@ static int img_convert(int argc, char
+>>>>>>>>> **argv)
+>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 warn_report("This will become an error in future QEMU
+>>>>>>>>> versions.");
+>>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>> +=C2=A0=C2=A0=C2=A0 if (s.has_zero_init && !skip_create) {
+>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("--targe=
+t-is-zero requires use of -n flag");
+>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail_getopt;
+>>>>>>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>
+>>>>>>>> So I think we could drop this hunk with no change in behavior.
+>>>>>>>
+>>>>>>> I think, no we can't. If we allow target-is-zero, with -n, we'd
+>>>>>>> better
+>>>>>>> to check that what we are creating is zero-initialized (format has
+>>>>>>> zero-init), and if not we should report error.
+>>>>>>>
+>>>>>>
+>>>>>> Good call.=C2=A0 Yes, if we allow --target-is-zero without -n, we MU=
+ST
+>>>>>> insist
+>>>>>> that bdrv_has_zero_init() returns 1 (or, after my followup series,
+>>>>>> bdrv_known_zeroes() includes BDRV_ZERO_CREATE).
+>>>>>
+>>>>> Why?
+>>>>>
+>>>>> I could imagine a user creating a qcow2 image on some block device wi=
+th
+>>>>> preallocation where we cannot verify that the result will be zero.=C2=
+=A0 But
+>>>>> they want qemu not to zero the device, so they would specify
+>>>>> --target-is-zero.
+>>>>
+>>>> If user create image, setting --target-is-zero is always valid. But if
+>>>> we in
+>>>> same operation create the image automatically, having --target-is-zero=
+,
+>>>> when
+>>>> we know that what we are creating is not zero is misleading and should
+>>>> fail..
+>>>
+>>> bdrv_has_zero_init() doesn=E2=80=99t return false only for images that =
+we know
+>>> are not zero.=C2=A0 It returns true for images where we know they are.=
+=C2=A0 But
+>>> if we don=E2=80=99t know, then it returns false also.
+>>
+>> yes, but we don't have better check.
+>=20
+> Correct, but maybe the user knows more, hence why it may make sense for
+> them to provide us with some information we don=E2=80=99t have.
+>=20
+>>>> If we want to add a behavior to skip zeros unconditionally, we should
+>>>> call new
+>>>> option --skip-zeroes, to clearly specify what we want.
+>>>
+>>> It was my impression that this was exactly what --target-is-zero means
+>>> and implies.
+>>>
+>>
+>> For me it sounds strange that user has better knowledge about what Qemu
+>> creates than Qemu itself. And if it so - it should be fixed in Qemu,
+>> rather than creating user interface to hint Qemu what it does.
+>=20
+> I brought an example where qemu cannot know whether the image is zero
+> (preallocation on a block device), but the user / management layer might
+> know.
+>=20
 
-Patch created mechanically by running:
+It sounds unsafe for me. User can't know how exactly Qemu do preallocation,
+which syscalls it calls, etc. How can user be sure, that Qemu produces
+all-zero image, if even Qemu doesn't sure in it?
 
-  $ sed -i "s,^#\!/usr/bin/\(env\ \)\?python$,#\!/usr/bin/env python3," \
-      $(git grep -lF '#!/usr/bin/env python' \
-      | xargs grep -L 'if __name__.*__main__')
+Otherwise, we should document, how exactly (up to syscalls, their
+parameters, flags, the whole logic and algorithm) preallocation is done,
+so user can analyze it and be sure that produced image would be all-zero
+(when Qemu can't determine it because some specific block device, for which
+Qemu doesn't know that its preallocation algorithm produces all-zero, but
+user is sure in it)...
 
-Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Suggested-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200130163232.10446-11-philmd@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v2: Rebased to include tests/qemu-iotests/283
 
- tests/qemu-iotests/149 | 2 +-
- tests/qemu-iotests/194 | 2 +-
- tests/qemu-iotests/202 | 2 +-
- tests/qemu-iotests/203 | 2 +-
- tests/qemu-iotests/206 | 2 +-
- tests/qemu-iotests/207 | 2 +-
- tests/qemu-iotests/208 | 2 +-
- tests/qemu-iotests/209 | 2 +-
- tests/qemu-iotests/210 | 2 +-
- tests/qemu-iotests/211 | 2 +-
- tests/qemu-iotests/212 | 2 +-
- tests/qemu-iotests/213 | 2 +-
- tests/qemu-iotests/216 | 2 +-
- tests/qemu-iotests/218 | 2 +-
- tests/qemu-iotests/219 | 2 +-
- tests/qemu-iotests/222 | 2 +-
- tests/qemu-iotests/224 | 2 +-
- tests/qemu-iotests/228 | 2 +-
- tests/qemu-iotests/234 | 2 +-
- tests/qemu-iotests/235 | 2 +-
- tests/qemu-iotests/236 | 2 +-
- tests/qemu-iotests/237 | 2 +-
- tests/qemu-iotests/238 | 2 +-
- tests/qemu-iotests/242 | 2 +-
- tests/qemu-iotests/246 | 2 +-
- tests/qemu-iotests/248 | 2 +-
- tests/qemu-iotests/254 | 2 +-
- tests/qemu-iotests/255 | 2 +-
- tests/qemu-iotests/256 | 2 +-
- tests/qemu-iotests/260 | 2 +-
- tests/qemu-iotests/262 | 2 +-
- tests/qemu-iotests/264 | 2 +-
- tests/qemu-iotests/266 | 2 +-
- tests/qemu-iotests/277 | 2 +-
- tests/qemu-iotests/280 | 2 +-
- tests/qemu-iotests/283 | 2 +-
- 36 files changed, 36 insertions(+), 36 deletions(-)
 
-diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
-index 8ab42e94c6..0a7b765d07 100755
---- a/tests/qemu-iotests/149
-+++ b/tests/qemu-iotests/149
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2016 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index 72e47e8833..9dc1bd3510 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2017 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/202 b/tests/qemu-iotests/202
-index 581ca34d79..920a8683ef 100755
---- a/tests/qemu-iotests/202
-+++ b/tests/qemu-iotests/202
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2017 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/203 b/tests/qemu-iotests/203
-index 4874a1a0d8..49eff5d405 100755
---- a/tests/qemu-iotests/203
-+++ b/tests/qemu-iotests/203
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2017 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
-index 9f16a7df8d..e2b50ae24d 100755
---- a/tests/qemu-iotests/206
-+++ b/tests/qemu-iotests/206
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test qcow2 and file image creation
- #
-diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
-index 812ab34e47..3d9c1208ca 100755
---- a/tests/qemu-iotests/207
-+++ b/tests/qemu-iotests/207
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test ssh image creation
- #
-diff --git a/tests/qemu-iotests/208 b/tests/qemu-iotests/208
-index 546eb1de3e..1c3fc8c7fd 100755
---- a/tests/qemu-iotests/208
-+++ b/tests/qemu-iotests/208
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2018 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/209 b/tests/qemu-iotests/209
-index e0f464bcbe..65c1a1e70a 100755
---- a/tests/qemu-iotests/209
-+++ b/tests/qemu-iotests/209
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Tests for NBD BLOCK_STATUS extension
- #
-diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
-index 4ca0fe26ef..e49896e23d 100755
---- a/tests/qemu-iotests/210
-+++ b/tests/qemu-iotests/210
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test luks and file image creation
- #
-diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
-index 8834ebfe85..163994d559 100755
---- a/tests/qemu-iotests/211
-+++ b/tests/qemu-iotests/211
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test VDI and file image creation
- #
-diff --git a/tests/qemu-iotests/212 b/tests/qemu-iotests/212
-index 8f3ccc7b15..800f92dd84 100755
---- a/tests/qemu-iotests/212
-+++ b/tests/qemu-iotests/212
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test parallels and file image creation
- #
-diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
-index 3fc8dc6eaa..1eee45276a 100755
---- a/tests/qemu-iotests/213
-+++ b/tests/qemu-iotests/213
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test vhdx and file image creation
- #
-diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
-index 3c0ae54b44..372f042d3e 100755
---- a/tests/qemu-iotests/216
-+++ b/tests/qemu-iotests/216
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copy-on-read tests using a COR filter node
- #
-diff --git a/tests/qemu-iotests/218 b/tests/qemu-iotests/218
-index 2554d84581..1325ba9eaa 100755
---- a/tests/qemu-iotests/218
-+++ b/tests/qemu-iotests/218
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # This test covers what happens when a mirror block job is cancelled
- # in various phases of its existence.
-diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
-index 655f54d881..b8774770c4 100755
---- a/tests/qemu-iotests/219
-+++ b/tests/qemu-iotests/219
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2018 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
-index 3f9f934ad8..bf1718e179 100644
---- a/tests/qemu-iotests/222
-+++ b/tests/qemu-iotests/222
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # This test covers the basic fleecing workflow, which provides a
- # point-in-time snapshot of a node that can be queried over NBD.
-diff --git a/tests/qemu-iotests/224 b/tests/qemu-iotests/224
-index b4dfaa639f..e91fb26fd8 100755
---- a/tests/qemu-iotests/224
-+++ b/tests/qemu-iotests/224
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test json:{} filenames with qemu-internal BDSs
- # (the one of commit, to be precise)
-diff --git a/tests/qemu-iotests/228 b/tests/qemu-iotests/228
-index 9a50afd205..64bc82ee23 100755
---- a/tests/qemu-iotests/228
-+++ b/tests/qemu-iotests/228
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test for when a backing file is considered overridden (thus, a
- # json:{} filename is generated for the overlay) and when it is not
-diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
-index 59a7f949ec..324c1549fd 100755
---- a/tests/qemu-iotests/234
-+++ b/tests/qemu-iotests/234
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2018 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
-index 3d7533980d..760826128e 100755
---- a/tests/qemu-iotests/235
-+++ b/tests/qemu-iotests/235
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Simple mirror test
- #
-diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
-index 79a6381f8e..8ce927a16c 100755
---- a/tests/qemu-iotests/236
-+++ b/tests/qemu-iotests/236
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test bitmap merges.
- #
-diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
-index a2242a4736..50ba364a3e 100755
---- a/tests/qemu-iotests/237
-+++ b/tests/qemu-iotests/237
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test vmdk and file image creation
- #
-diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
-index e5ac2b2ff8..d4e060228c 100755
---- a/tests/qemu-iotests/238
-+++ b/tests/qemu-iotests/238
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Regression test for throttle group member unregister segfault with iothr=
-ead
- #
-diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
-index c176e92da6..97617876bc 100755
---- a/tests/qemu-iotests/242
-+++ b/tests/qemu-iotests/242
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test for qcow2 bitmap printed information
- #
-diff --git a/tests/qemu-iotests/246 b/tests/qemu-iotests/246
-index b0997a392f..59a216a839 100755
---- a/tests/qemu-iotests/246
-+++ b/tests/qemu-iotests/246
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test persistent bitmap resizing.
- #
-diff --git a/tests/qemu-iotests/248 b/tests/qemu-iotests/248
-index f26b4bb2aa..68c374692e 100755
---- a/tests/qemu-iotests/248
-+++ b/tests/qemu-iotests/248
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test resume mirror after auto pause on ENOSPC
- #
-diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
-index 09584f3f7d..ee66c986db 100755
---- a/tests/qemu-iotests/254
-+++ b/tests/qemu-iotests/254
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test external snapshot with bitmap copying and moving.
- #
-diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
-index 0ba03d9e61..4a4818bafb 100755
---- a/tests/qemu-iotests/255
-+++ b/tests/qemu-iotests/255
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test commit job graph modifications while requests are active
- #
-diff --git a/tests/qemu-iotests/256 b/tests/qemu-iotests/256
-index c594a43205..e34074c83e 100755
---- a/tests/qemu-iotests/256
-+++ b/tests/qemu-iotests/256
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test incremental/backup across iothread contexts
- #
-diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
-index 4f6082c9d2..30c0de380d 100755
---- a/tests/qemu-iotests/260
-+++ b/tests/qemu-iotests/260
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Tests for temporary external snapshot when we have bitmaps.
- #
-diff --git a/tests/qemu-iotests/262 b/tests/qemu-iotests/262
-index bbcb5260a6..8835dce7be 100755
---- a/tests/qemu-iotests/262
-+++ b/tests/qemu-iotests/262
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2019 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/264 b/tests/qemu-iotests/264
-index 131366422b..879123a343 100755
---- a/tests/qemu-iotests/264
-+++ b/tests/qemu-iotests/264
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test nbd reconnect
- #
-diff --git a/tests/qemu-iotests/266 b/tests/qemu-iotests/266
-index c353cf88ee..91bdf8729e 100755
---- a/tests/qemu-iotests/266
-+++ b/tests/qemu-iotests/266
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test VPC and file image creation
- #
-diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
-index 1f72dca2d4..04aa15a3d5 100755
---- a/tests/qemu-iotests/277
-+++ b/tests/qemu-iotests/277
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test NBD client reconnection
- #
-diff --git a/tests/qemu-iotests/280 b/tests/qemu-iotests/280
-index 85e9114c5e..69288fdd0e 100755
---- a/tests/qemu-iotests/280
-+++ b/tests/qemu-iotests/280
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Copyright (C) 2019 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
-index 293e557bd9..55b7cff953 100644
---- a/tests/qemu-iotests/283
-+++ b/tests/qemu-iotests/283
-@@ -1,4 +1,4 @@
--#!/usr/bin/env python
-+#!/usr/bin/env python3
- #
- # Test for backup-top filter permission activation failure
- #
 --=20
-2.21.1
-
+Best regards,
+Vladimir
 
