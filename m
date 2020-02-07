@@ -2,65 +2,83 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F8AC2D0B1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 07:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6E52C2D0B1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 07:38:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F980214AF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 07:25:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F980214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5DD2C20726
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 07:38:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKeu/18R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DD2C20726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izy0f-0002xM-Qk
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 02:25:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58752)
+	id 1izyE1-0007jV-ID
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 02:38:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1izxyS-0000SV-Gn
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 02:22:49 -0500
+ (envelope-from <drjones@redhat.com>) id 1izyDA-0007CC-PJ
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 02:38:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1izxyQ-0005dW-C5
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 02:22:48 -0500
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:42523)
+ (envelope-from <drjones@redhat.com>) id 1izyD8-0006T1-MI
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 02:37:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32341
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1izxyQ-0005a3-6d
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 02:22:46 -0500
-Received: from player714.ha.ovh.net (unknown [10.108.35.240])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id B65121C8F8F
- for <qemu-devel@nongnu.org>; Fri,  7 Feb 2020 08:22:43 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player714.ha.ovh.net (Postfix) with ESMTPSA id 779F5F082EC8;
- Fri,  7 Feb 2020 07:22:31 +0000 (UTC)
-Subject: Re: [PATCH v2 3/4] m25p80: Improve command handling for unsupported
- commands
-To: Guenter Roeck <linux@roeck-us.net>,
- Alistair Francis <alistair@alistair23.me>, Kevin Wolf <kwolf@redhat.com>
-References: <20200206183219.3756-1-linux@roeck-us.net>
- <20200206183219.3756-3-linux@roeck-us.net>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f1f8af75-c1a6-482c-395d-9dab67ef2cc0@kaod.org>
-Date: Fri, 7 Feb 2020 08:22:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1izyD8-0006RW-EL
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 02:37:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581061077;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3Pum9DLoPcluppoVUR9e3hm+aPXS0TbibkrITFC+2VM=;
+ b=ZKeu/18Ri28c58yRFT1m79cCDXoWcQTkPA0FoTZTeDJLD9Jr2AoFnCm7r3v5qQb3hc53IW
+ qkdpRAqhURaWCn0u6GcyKFAWa1al1w4FRcpYKGzQhQNCUb1tfLpbhBS/EFNZL549CHpQwW
+ +NaZ4yBLGAHc1k55v+biBI0btpWpk08=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-SXhL_bQ-MbqcyIHfJuLpjQ-1; Fri, 07 Feb 2020 02:37:56 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A190DB60;
+ Fri,  7 Feb 2020 07:37:54 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F1705790EA;
+ Fri,  7 Feb 2020 07:37:49 +0000 (UTC)
+Date: Fri, 7 Feb 2020 08:37:47 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [RFC PATCH v2 5/5] target/arm/cpu: Add the kvm-no-adjvtime CPU
+ property
+Message-ID: <20200207073747.x3rsqxtfbmtlfqws@kamzik.brq.redhat.com>
+References: <20191212173320.11610-1-drjones@redhat.com>
+ <20191212173320.11610-6-drjones@redhat.com>
+ <CAP+75-Vt3apV8i64oFTC6pAATXkrE1g+tVskr_3ohBHtZ1LNdQ@mail.gmail.com>
+ <20200206124047.o4sy52jgbkqeravd@kamzik.brq.redhat.com>
+ <2522956e-5dae-3ebc-76d2-010a918e0d19@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200206183219.3756-3-linux@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 1171780329806531504
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrheeggddutdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+In-Reply-To: <2522956e-5dae-3ebc-76d2-010a918e0d19@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: SXhL_bQ-MbqcyIHfJuLpjQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.52.147
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,57 +90,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, bijan.mottahedeh@oracle.com,
+ Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ guoheyi@huawei.com, msys.mizuma@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/6/20 7:32 PM, Guenter Roeck wrote:
-> Whenever an unsupported command is encountered, the current code
-> interprets each transferred byte as new command. Most of the time, thos=
-e
-> 'commands' are interpreted as new unknown commands. However, in rare
-> cases, it may be that for example address or length information
-> passed with the original command is by itself a valid command.
-> If that happens, the state machine may get completely confused and,
-> worst case, start writing data into the flash or even erase it.
+On Thu, Feb 06, 2020 at 11:46:49PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 2/6/20 1:40 PM, Andrew Jones wrote:
+> > On Thu, Feb 06, 2020 at 01:08:53PM +0100, Philippe Mathieu-Daud=E9 wrot=
+e:
+> > ...
+> > > > +/* KVM VCPU properties should be prefixed with "kvm-". */
+> > > > +void kvm_arm_add_vcpu_properties(Object *obj)
+> > > > +{
+> > > > +    if (!kvm_enabled()) {
+> > >=20
+> > > This can't happen, right? Can we turn that into an assertion, or
+> > > remove the check?
+> >=20
+> > You're right. An assert would be more appropriate. Will you send a patc=
+h?
 >=20
-> To avoid the problem, transition into STATE_READING_DATA and keep
-> sending a value of 0 until the chip is deselected after encountering
-> an unsupported command.
+> Apparently this can be called with KVM_CONFIG && !kvm_enabled():
 >=20
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> See kvm_arm_set_cpu_features_from_host()
+> {
+>     if (!arm_host_cpu_features.dtb_compatible) {
+>         if (!kvm_enabled() ||
+>             !kvm_arm_get_host_cpu_features(&arm_host_cpu_features)) {
+>             /* We can't report this error yet, so flag that we need to
+>              * in arm_cpu_realizefn().
+>              */
+>=20
+> I won't modify your patch (until I have a better understanding of
+> TYPE_ARM_HOST_CPU).
+>
 
+Just grepped around and talked to Igor. Indeed we need to be able
+to do the host cpu init without erroring out (even if we know we
+will in realize) and, as cpu instance_init should add the properties,
+then I don't really see a cleaner way to do it than what we already
+have.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-> ---
-> v2: Split patch into two parts; improved description.
->=20
->  hw/block/m25p80.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> index 53bf63856f..8227088441 100644
-> --- a/hw/block/m25p80.c
-> +++ b/hw/block/m25p80.c
-> @@ -1161,6 +1161,11 @@ static void decode_new_cmd(Flash *s, uint32_t va=
-lue)
->          s->quad_enable =3D false;
->          break;
->      default:
-> +        s->pos =3D 0;
-> +        s->len =3D 1;
-> +        s->state =3D STATE_READING_DATA;
-> +        s->data_read_loop =3D true;
-> +        s->data[0] =3D 0;
->          qemu_log_mask(LOG_GUEST_ERROR, "M25P80: Unknown cmd %x\n", val=
-ue);
->          break;
->      }
->=20
+Thanks,
+drew
 
 
