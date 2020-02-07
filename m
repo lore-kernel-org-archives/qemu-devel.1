@@ -2,90 +2,76 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D8D6C04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:12:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F92CC04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:14:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A36C2465D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:12:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAE422465D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:14:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w2WmCj33"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A36C2465D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hlGqn8JX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE422465D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05JQ-0004G5-6U
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:12:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60316)
+	id 1j05Ko-0006bC-4Z
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:14:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35685)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j058J-0000uF-Rj
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:29 -0500
+ (envelope-from <philmd@redhat.com>) id 1j05II-0002Ws-TS
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j058I-000470-DI
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:27 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54570)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j058I-00040s-50
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:26 -0500
-Received: by mail-wm1-x344.google.com with SMTP id g1so2881177wmh.4
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 07:01:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=U6Am3X6OQTZ1x+tf20LucVI7jeDaV7FG5H5GI7lV8EE=;
- b=w2WmCj33W1pPjplq1vkGvP4r1LLm/qIZk/PhWqJ2Ao2pD2xj1LPBVu1ZAdDEC0C5DY
- YSKINVK4XvBick/c6PVD+n0aS729CVzuF+EaMguiB3oV3SVr2cUsNBHsfKg4X3am0xWu
- 0SNDwohlhnz72jbGkdz8/1TGMuO7NynmCQFEvjm/I/n9cMSybW/+ptVslwkXo86GEZJe
- mBv9yqp29GLdn4Da4ty9P3Ugw4R+2tFsADBU59s4WKiORfC1aaLw8jD/CHMOqR1VV+HL
- vZS3q1Dh5BtWtgB9SRwUs8SPiF/z2MhezuehcCB/sV3USuaqRSLTIMckwR86PqYuiouP
- Nd+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=U6Am3X6OQTZ1x+tf20LucVI7jeDaV7FG5H5GI7lV8EE=;
- b=VihXl8fffGRU1hx6+iybggOt6H8T81gVTt0FL4kNpXbhBcA1FKyd2+ZDqGzmQe81Mr
- m8+I4gHjnPS0mGCcSkm9xwknDhMui3dbknzpi3V0w9rpu8l4Bz5HWPcjxMm4Wx7IjUM1
- TqzlfQXqLJLkeFUYZMlL4MVUIqCPilzeiaxUL6MdCfXuTDQKFdSWY63cC4RPFjt3EDmI
- KKVMrknEwohqahHWBwuwWhUtQ6Viao3uCH2leqhg+S5VgGViiI6Qg+kpBefDs7FKSwWc
- Ot8IULb7NAOpKLJuwgzdGeA6jcYoFEKzvbebUTmxm1R5sDDOa29rKoeFFypKF7+HwygC
- eMpw==
-X-Gm-Message-State: APjAAAWMINohVM4GMYO0zndUn3v+CQu5WAv+zA0mpgTVR88HzBUgrFS1
- 8V21kiqbnCdbjUeJ2rKi7LE3yw==
-X-Google-Smtp-Source: APXvYqxOMp8kveOFWUrZwYWQwbPSBkD6s7EKiNuV1LixsgOVeUhIHRE1vmd+9Be0JLtXQNSSaTScZw==
-X-Received: by 2002:a1c:7907:: with SMTP id l7mr4652088wme.37.1581087685087;
- Fri, 07 Feb 2020 07:01:25 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d23sm3790469wra.30.2020.02.07.07.01.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 07:01:22 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4621E1FF91;
- Fri,  7 Feb 2020 15:01:19 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <philmd@redhat.com>) id 1j05IG-00040Z-99
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30076
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j05IG-0003xz-3C
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:11:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581088303;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=kkHRc1PwiQeLeAXUZKF+RwJeJeiO6ejjpGNQQLx3tY4=;
+ b=hlGqn8JXXMR34wHlYkt+L04kuyD62nlAdeDb9sq0tzvKuVH6afBhmyt5+OOlpHpB2I15W6
+ uDyroFeF7Jf77Zq1i5SaroJ+cVvbL/JOV9COd286yN+h9WfJdyuI+E/G1tVyfNSy/dMTZZ
+ JAVLHTbKAAZWMJsvtvlQ0HQwkaShJpU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-f5Z24Ky8PRemxIzqtAqJgw-1; Fri, 07 Feb 2020 10:11:32 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5754801E6C;
+ Fri,  7 Feb 2020 15:11:30 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-120.brq.redhat.com [10.40.204.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 56DAD790D7;
+ Fri,  7 Feb 2020 15:11:26 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 4/5] target/riscv: progressively load the instruction
- during decode
-Date: Fri,  7 Feb 2020 15:01:17 +0000
-Message-Id: <20200207150118.23007-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200207150118.23007-1-alex.bennee@linaro.org>
-References: <20200207150118.23007-1-alex.bennee@linaro.org>
+Subject: [PULL v2 00/46] Python queue 2020-02-07
+Date: Fri,  7 Feb 2020 16:11:12 +0100
+Message-Id: <20200207151113.29349-1-philmd@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: f5Z24Ky8PRemxIzqtAqJgw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,143 +83,286 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>, robert.foley@linaro.org,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, cota@braap.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The plugin system would throw up a harmless warning when it detected
-that a disassembly of an instruction didn't use all it's bytes. Fix
-the riscv decoder to only load the instruction bytes it needs as it
-needs them.
+Hi Peter,
 
-This drops opcode from the ctx in favour if passing the appropriately
-sized opcode down a few levels of the decode.
+I prepared this series on behalf of Eduardo and
+Cleber.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/riscv/translate.c | 39 ++++++++++++++++++++-------------------
- 1 file changed, 20 insertions(+), 19 deletions(-)
+Eduardo already ack'ed yesterday version (2020-02-06) cover:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg677636.html
 
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 14dc71156be..99f2bcf177c 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -44,7 +44,6 @@ typedef struct DisasContext {
-     /* pc_succ_insn points to the instruction following base.pc_next */
-     target_ulong pc_succ_insn;
-     target_ulong priv_ver;
--    uint32_t opcode;
-     uint32_t mstatus_fs;
-     uint32_t misa;
-     uint32_t mem_idx;
-@@ -492,45 +491,45 @@ static void gen_set_rm(DisasContext *ctx, int rm)
-     tcg_temp_free_i32(t0);
- }
- 
--static void decode_RV32_64C0(DisasContext *ctx)
-+static void decode_RV32_64C0(DisasContext *ctx, uint16_t opcode)
- {
--    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
--    uint8_t rd_rs2 = GET_C_RS2S(ctx->opcode);
--    uint8_t rs1s = GET_C_RS1S(ctx->opcode);
-+    uint8_t funct3 = extract32(opcode, 13, 3);
-+    uint8_t rd_rs2 = GET_C_RS2S(opcode);
-+    uint8_t rs1s = GET_C_RS1S(opcode);
- 
-     switch (funct3) {
-     case 3:
- #if defined(TARGET_RISCV64)
-         /* C.LD(RV64/128) -> ld rd', offset[7:3](rs1')*/
-         gen_load_c(ctx, OPC_RISC_LD, rd_rs2, rs1s,
--                 GET_C_LD_IMM(ctx->opcode));
-+                 GET_C_LD_IMM(opcode));
- #else
-         /* C.FLW (RV32) -> flw rd', offset[6:2](rs1')*/
-         gen_fp_load(ctx, OPC_RISC_FLW, rd_rs2, rs1s,
--                    GET_C_LW_IMM(ctx->opcode));
-+                    GET_C_LW_IMM(opcode));
- #endif
-         break;
-     case 7:
- #if defined(TARGET_RISCV64)
-         /* C.SD (RV64/128) -> sd rs2', offset[7:3](rs1')*/
-         gen_store_c(ctx, OPC_RISC_SD, rs1s, rd_rs2,
--                  GET_C_LD_IMM(ctx->opcode));
-+                  GET_C_LD_IMM(opcode));
- #else
-         /* C.FSW (RV32) -> fsw rs2', offset[6:2](rs1')*/
-         gen_fp_store(ctx, OPC_RISC_FSW, rs1s, rd_rs2,
--                     GET_C_LW_IMM(ctx->opcode));
-+                     GET_C_LW_IMM(opcode));
- #endif
-         break;
-     }
- }
- 
--static void decode_RV32_64C(DisasContext *ctx)
-+static void decode_RV32_64C(DisasContext *ctx, uint16_t opcode)
- {
--    uint8_t op = extract32(ctx->opcode, 0, 2);
-+    uint8_t op = extract32(opcode, 0, 2);
- 
-     switch (op) {
-     case 0:
--        decode_RV32_64C0(ctx);
-+        decode_RV32_64C0(ctx, opcode);
-         break;
-     }
- }
-@@ -709,22 +708,24 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
- /* Include the auto-generated decoder for 16 bit insn */
- #include "decode_insn16.inc.c"
- 
--static void decode_opc(DisasContext *ctx)
-+static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
- {
-     /* check for compressed insn */
--    if (extract32(ctx->opcode, 0, 2) != 3) {
-+    if (extract32(opcode, 0, 2) != 3) {
-         if (!has_ext(ctx, RVC)) {
-             gen_exception_illegal(ctx);
-         } else {
-             ctx->pc_succ_insn = ctx->base.pc_next + 2;
--            if (!decode_insn16(ctx, ctx->opcode)) {
-+            if (!decode_insn16(ctx, opcode)) {
-                 /* fall back to old decoder */
--                decode_RV32_64C(ctx);
-+                decode_RV32_64C(ctx, opcode);
-             }
-         }
-     } else {
-+        uint32_t opcode32 = opcode;
-+        opcode32 = deposit32(opcode32, 16, 16, translator_lduw(env, ctx->base.pc_next + 2));
-         ctx->pc_succ_insn = ctx->base.pc_next + 4;
--        if (!decode_insn32(ctx, ctx->opcode)) {
-+        if (!decode_insn32(ctx, opcode32)) {
-             gen_exception_illegal(ctx);
-         }
-     }
-@@ -776,9 +777,9 @@ static void riscv_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     CPURISCVState *env = cpu->env_ptr;
-+    uint16_t opcode16 = translator_lduw(env, ctx->base.pc_next);
- 
--    ctx->opcode = translator_ldl(env, ctx->base.pc_next);
--    decode_opc(ctx);
-+    decode_opc(env, ctx, opcode16);
-     ctx->base.pc_next = ctx->pc_succ_insn;
- 
-     if (ctx->base.is_jmp == DISAS_NEXT) {
--- 
-2.20.1
+Since 2020-02-06 (v1):
+- rebased to cover new iotests #283 (merged yesterday).
+
+Regards,
+
+Phil.
+
+The following changes since commit 863d2ed5823f90c42dcd481687cc99cbc9c4a17c=
+:
+
+  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-02-06=
+' into staging (2020-02-06 16:22:05 +0000)
+
+are available in the Git repository at:
+
+  https://gitlab.com/philmd/qemu.git tags/python-next-20200207
+
+for you to fetch changes up to 66e7dde18cc4085ca47124be4ca08fa8e6bcdd3a:
+
+  .readthedocs.yml: specify some minimum python requirements (2020-02-07 15=
+:15:16 +0100)
+
+----------------------------------------------------------------
+- Python 3 cleanups:
+  . Remove text about Python 2 in qemu-deprecated (Thomas)
+  . Remove shebang header (Paolo, Philippe)
+  . scripts/checkpatch.pl now allows Python 3 interpreter (Philippe)
+  . Explicit usage of Python 3 interpreter in scripts (Philippe)
+  . Fix Python scripts permissions (Paolo, Philippe)
+  . Drop 'from __future__ import print_function' (Paolo)
+  . Specify minimum python requirements in ReadTheDocs configuration (Alex)
+- Test UNIX/EXEC transports with migration (Oksana)
+- Added extract_from_rpm helper, improved extract_from_deb (Liam)
+- Allow to use other serial consoles than default one (Philippe)
+- Various improvements in QEMUMonitorProtocol (Wainer)
+- Fix kvm_available() on ppc64le (Wainer)
+
+----------------------------------------------------------------
+
+Alex Benn=C3=A9e (1):
+  .readthedocs.yml: specify some minimum python requirements
+
+Denis Plotnikov (1):
+  tests: rename virtio_seg_max_adjust to virtio_check_params
+
+Liam Merwick (4):
+  travis.yml: install rpm2cpio for acceptance tests
+  tests/boot_linux_console: add extract_from_rpm method
+  tests/boot_linux_console: use os.path for filesystem paths
+  tests/boot_linux_console: fix extract_from_deb() comment
+
+Luk=C3=A1=C5=A1 Doktor (1):
+  python: Treat None-return of greeting cmd
+
+Oksana Vohchana (4):
+  tests/acceptance/migration: Factor out assert_migration()
+  tests/acceptance/migration: Factor out do_migrate()
+  tests/acceptance/migration: Test UNIX transport when migrating
+  tests/acceptance/migration: Test EXEC transport when migrating
+
+Paolo Bonzini (3):
+  scripts/signrom: remove Python 2 support, add shebang
+  make all Python scripts executable
+  drop "from __future__ import print_function"
+
+Philippe Mathieu-Daud=C3=A9 (24):
+  python/qemu/machine: Allow to use other serial consoles than default
+  Acceptance tests: Extract _console_interaction()
+  Acceptance tests: Add interrupt_interactive_console_until_pattern()
+  tests/boot_linux_console: Tag Emcraft Smartfusion2 as running 'u-boot'
+  tests/acceptance/virtio_check_params: Improve exception logging
+  tests/acceptance/virtio_check_params: List machine being tested
+  tests/acceptance/virtio_check_params: Default to -nodefaults
+  tests/acceptance/virtio_check_params: Disable the test
+  tests/acceptance/boot_linux_console: Do not use VGA on Clipper machine
+  tests/acceptance/version: Default to -nodefaults
+  tests/acceptance/migration: Add the 'migration' tag
+  tests/acceptance/migration: Default to -nodefaults
+  scripts/checkpatch.pl: Only allow Python 3 interpreter
+  tests/qemu-iotests/check: Allow use of python3 interpreter
+  tests/qemu-iotests: Explicit usage of Python 3 (scripts with __main__)
+  tests: Explicit usage of Python 3
+  scripts: Explicit usage of Python 3 (scripts with __main__)
+  scripts/minikconf: Explicit usage of Python 3
+  scripts/tracetool: Remove shebang header
+  tests/acceptance: Remove shebang header
+  tests/vm: Remove shebang header
+  tests/qemu-iotests: Explicit usage of Python3 (scripts without
+    __main__)
+  scripts: Explicit usage of Python 3 (scripts without __main__)
+  tests/qemu-iotests/check: Only check for Python 3 interpreter
+
+Thomas Huth (2):
+  qemu-deprecated: Remove text about Python 2
+  tests/acceptance: Add boot tests for some of the QEMU advent calendar
+    images
+
+Wainer dos Santos Moschetta (6):
+  python/qemu: qmp: Replace socket.error with OSError
+  python/qemu: Delint the qmp module
+  python/qemu: qmp: Make accept()'s timeout configurable
+  python/qemu: qmp: Make QEMUMonitorProtocol a context manager
+  python/qemu: qmp: Remove unnused attributes
+  python/qemu: accel: Fix kvm_available() on ppc64le
+
+ qemu-deprecated.texi                          |   8 --
+ .readthedocs.yml                              |  20 +++
+ .travis.yml                                   |   3 +-
+ python/qemu/accel.py                          |   3 +-
+ python/qemu/machine.py                        |  10 +-
+ python/qemu/qmp.py                            |  99 ++++++++++----
+ scripts/analyse-9p-simpletrace.py             |   3 +-
+ scripts/analyse-locks-simpletrace.py          |   3 +-
+ scripts/checkpatch.pl                         |   6 +
+ scripts/decodetree.py                         |   2 +-
+ scripts/device-crash-test                     |   3 +-
+ scripts/dump-guest-memory.py                  |   1 -
+ scripts/kvm/kvm_flightrecorder                |   3 +-
+ scripts/kvm/vmxcap                            |   1 -
+ scripts/minikconf.py                          |   2 +-
+ scripts/modules/module_block.py               |   1 -
+ scripts/qapi-gen.py                           |   3 +-
+ scripts/qapi/doc.py                           |   1 -
+ scripts/qmp/qemu-ga-client                    |   3 +-
+ scripts/qmp/qmp                               |   3 +-
+ scripts/qmp/qmp-shell                         |   3 +-
+ scripts/qmp/qom-fuse                          |   2 +-
+ scripts/qmp/qom-get                           |   1 -
+ scripts/qmp/qom-list                          |   1 -
+ scripts/qmp/qom-set                           |   1 -
+ scripts/qmp/qom-tree                          |   1 -
+ scripts/render_block_graph.py                 |   2 +-
+ scripts/replay-dump.py                        |   3 +-
+ scripts/signrom.py                            |  11 +-
+ scripts/simpletrace.py                        |   3 +-
+ scripts/tracetool.py                          |   2 +-
+ scripts/tracetool/__init__.py                 |   1 -
+ scripts/tracetool/backend/__init__.py         |   1 -
+ scripts/tracetool/backend/dtrace.py           |   1 -
+ scripts/tracetool/backend/ftrace.py           |   1 -
+ scripts/tracetool/backend/log.py              |   1 -
+ scripts/tracetool/backend/simple.py           |   1 -
+ scripts/tracetool/backend/syslog.py           |   1 -
+ scripts/tracetool/backend/ust.py              |   1 -
+ scripts/tracetool/format/__init__.py          |   1 -
+ scripts/tracetool/format/c.py                 |   1 -
+ scripts/tracetool/format/d.py                 |   1 -
+ scripts/tracetool/format/h.py                 |   1 -
+ scripts/tracetool/format/log_stap.py          |   1 -
+ scripts/tracetool/format/simpletrace_stap.py  |   1 -
+ scripts/tracetool/format/stap.py              |   1 -
+ scripts/tracetool/format/tcg_h.py             |   1 -
+ scripts/tracetool/format/tcg_helper_c.py      |   1 -
+ scripts/tracetool/format/tcg_helper_h.py      |   1 -
+ .../tracetool/format/tcg_helper_wrapper_h.py  |   1 -
+ scripts/tracetool/format/ust_events_c.py      |   1 -
+ scripts/tracetool/format/ust_events_h.py      |   1 -
+ scripts/tracetool/transform.py                |   1 -
+ scripts/tracetool/vcpu.py                     |   1 -
+ scripts/vmstate-static-checker.py             |   3 +-
+ tests/acceptance/avocado_qemu/__init__.py     |  59 +++++++--
+ tests/acceptance/boot_linux_console.py        | 124 +++++++++++++++++-
+ tests/acceptance/migration.py                 |  57 +++++---
+ tests/acceptance/version.py                   |   1 +
+ ...g_max_adjust.py =3D> virtio_check_params.py} |  16 ++-
+ tests/acceptance/x86_cpu_model_versions.py    |   1 -
+ tests/docker/travis.py                        |   3 +-
+ tests/guest-debug/test-gdbstub.py             |   1 -
+ tests/migration/guestperf/engine.py           |   1 -
+ tests/migration/guestperf/plot.py             |   1 -
+ tests/migration/guestperf/shell.py            |   1 -
+ tests/qapi-schema/test-qapi.py                |   3 +-
+ tests/qemu-iotests/030                        |   2 +-
+ tests/qemu-iotests/040                        |   2 +-
+ tests/qemu-iotests/041                        |   2 +-
+ tests/qemu-iotests/044                        |   2 +-
+ tests/qemu-iotests/045                        |   2 +-
+ tests/qemu-iotests/055                        |   2 +-
+ tests/qemu-iotests/056                        |   2 +-
+ tests/qemu-iotests/057                        |   2 +-
+ tests/qemu-iotests/065                        |   2 +-
+ tests/qemu-iotests/093                        |   2 +-
+ tests/qemu-iotests/096                        |   2 +-
+ tests/qemu-iotests/118                        |   2 +-
+ tests/qemu-iotests/124                        |   2 +-
+ tests/qemu-iotests/129                        |   2 +-
+ tests/qemu-iotests/132                        |   2 +-
+ tests/qemu-iotests/136                        |   2 +-
+ tests/qemu-iotests/139                        |   2 +-
+ tests/qemu-iotests/147                        |   2 +-
+ tests/qemu-iotests/148                        |   2 +-
+ tests/qemu-iotests/149                        |   3 +-
+ tests/qemu-iotests/151                        |   2 +-
+ tests/qemu-iotests/152                        |   2 +-
+ tests/qemu-iotests/155                        |   2 +-
+ tests/qemu-iotests/163                        |   2 +-
+ tests/qemu-iotests/165                        |   3 +-
+ tests/qemu-iotests/169                        |   2 +-
+ tests/qemu-iotests/194                        |   2 +-
+ tests/qemu-iotests/196                        |   2 +-
+ tests/qemu-iotests/199                        |   2 +-
+ tests/qemu-iotests/202                        |   2 +-
+ tests/qemu-iotests/203                        |   2 +-
+ tests/qemu-iotests/205                        |   2 +-
+ tests/qemu-iotests/206                        |   2 +-
+ tests/qemu-iotests/207                        |   2 +-
+ tests/qemu-iotests/208                        |   2 +-
+ tests/qemu-iotests/209                        |   2 +-
+ tests/qemu-iotests/210                        |   2 +-
+ tests/qemu-iotests/211                        |   2 +-
+ tests/qemu-iotests/212                        |   2 +-
+ tests/qemu-iotests/213                        |   2 +-
+ tests/qemu-iotests/216                        |   2 +-
+ tests/qemu-iotests/218                        |   2 +-
+ tests/qemu-iotests/219                        |   2 +-
+ tests/qemu-iotests/222                        |   2 +-
+ tests/qemu-iotests/224                        |   2 +-
+ tests/qemu-iotests/228                        |   2 +-
+ tests/qemu-iotests/234                        |   2 +-
+ tests/qemu-iotests/235                        |   2 +-
+ tests/qemu-iotests/236                        |   2 +-
+ tests/qemu-iotests/237                        |   2 +-
+ tests/qemu-iotests/238                        |   2 +-
+ tests/qemu-iotests/242                        |   2 +-
+ tests/qemu-iotests/245                        |   2 +-
+ tests/qemu-iotests/246                        |   2 +-
+ tests/qemu-iotests/248                        |   2 +-
+ tests/qemu-iotests/254                        |   2 +-
+ tests/qemu-iotests/255                        |   2 +-
+ tests/qemu-iotests/256                        |   2 +-
+ tests/qemu-iotests/257                        |   2 +-
+ tests/qemu-iotests/258                        |   2 +-
+ tests/qemu-iotests/260                        |   2 +-
+ tests/qemu-iotests/262                        |   2 +-
+ tests/qemu-iotests/264                        |   2 +-
+ tests/qemu-iotests/266                        |   2 +-
+ tests/qemu-iotests/277                        |   2 +-
+ tests/qemu-iotests/280                        |   2 +-
+ tests/qemu-iotests/281                        |   2 +-
+ tests/qemu-iotests/283                        |   2 +-
+ tests/qemu-iotests/check                      |   2 +-
+ tests/qemu-iotests/iotests.py                 |   1 -
+ tests/qemu-iotests/nbd-fault-injector.py      |   3 +-
+ tests/qemu-iotests/qcow2.py                   |   3 +-
+ tests/qemu-iotests/qed.py                     |   3 +-
+ tests/vm/basevm.py                            |   2 -
+ tests/vm/centos                               |   2 +-
+ tests/vm/fedora                               |   2 +-
+ tests/vm/freebsd                              |   2 +-
+ tests/vm/netbsd                               |   2 +-
+ tests/vm/openbsd                              |   2 +-
+ tests/vm/ubuntu.i386                          |   2 +-
+ 147 files changed, 432 insertions(+), 234 deletions(-)
+ create mode 100644 .readthedocs.yml
+ mode change 100644 =3D> 100755 scripts/minikconf.py
+ mode change 100644 =3D> 100755 scripts/signrom.py
+ rename tests/acceptance/{virtio_seg_max_adjust.py =3D> virtio_check_params=
+.py} (90%)
+ mode change 100755 =3D> 100644
+ mode change 100644 =3D> 100755 tests/qemu-iotests/222
+ mode change 100644 =3D> 100755 tests/qemu-iotests/245
+ mode change 100755 =3D> 100644 tests/vm/basevm.py
+
+--=20
+2.21.1
 
 
