@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA385C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF0AC35247
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:05:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5402214AF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:05:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5402214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 979BC20715
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:05:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 979BC20715
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izt1O-0006u7-Ps
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 21:05:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59595)
+	id 1izt1Q-00070u-PB
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 21:05:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvY-0005q5-7r
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:30 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsva-0005qO-17
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvW-00018F-Jk
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:28 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:53079 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvY-00019W-3P
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:29 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:53091 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1izsvW-00017k-7Q
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:26 -0500
+ id 1izsvX-00018d-OD
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:28 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 8F6101A20FD;
- Fri,  7 Feb 2020 02:58:22 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 4A5C91A2124;
+ Fri,  7 Feb 2020 02:58:23 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 4993F1A2055;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id EC8D11A2107;
  Fri,  7 Feb 2020 02:58:22 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc5 06/32] target/avr: CPU class: Add GDB support
-Date: Fri,  7 Feb 2020 02:57:34 +0100
-Message-Id: <1581040680-308-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc5 16/32] target/avr: Add instruction translation - CPU main
+ translation function
+Date: Fri,  7 Feb 2020 02:57:44 +0100
+Message-Id: <1581040680-308-17-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1581040680-308-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1581040680-308-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -66,7 +67,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+ Michael Rolnik <mrolnik@gmail.com>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -74,221 +75,253 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-This includes GDB hooks for reading from wnd wrtiting to AVR
-registers, and xml register definition file as well.
+Add the core of translation mechanism.
 
-[AM: Split a larger AVR introduction patch into logical units]
-Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Co-developed-by: Richard Henderson <richard.henderson@linaro.org>
 Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
-Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- target/avr/cpu.h     |  2 ++
- target/avr/cpu.c     |  4 +++
- target/avr/gdbstub.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++=
+ target/avr/translate.c | 214 +++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- MAINTAINERS          |  2 ++
- gdb-xml/avr-cpu.xml  | 49 ++++++++++++++++++++++++++++++
- 5 files changed, 141 insertions(+)
- create mode 100644 target/avr/gdbstub.c
- create mode 100644 gdb-xml/avr-cpu.xml
+ 1 file changed, 214 insertions(+)
 
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-index d3003f8..a5213bd 100644
---- a/target/avr/cpu.h
-+++ b/target/avr/cpu.h
-@@ -123,6 +123,8 @@ extern const struct VMStateDescription vms_avr_cpu;
- void avr_cpu_do_interrupt(CPUState *cpu);
- bool avr_cpu_exec_interrupt(CPUState *cpu, int int_req);
- hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-+int avr_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
-+int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 806a0f4..a6e6748 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -2815,3 +2815,217 @@ static bool trans_WDR(DisasContext *ctx, arg_WDR =
+*a)
 =20
- #define cpu_list avr_cpu_list
- #define cpu_signal_handler cpu_avr_signal_handler
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-index 19e729a..f2632a3 100644
---- a/target/avr/cpu.c
-+++ b/target/avr/cpu.c
-@@ -210,4 +210,8 @@ static void avr_cpu_class_init(ObjectClass *oc, void =
-*data)
-     cc->disas_set_info =3D avr_cpu_disas_set_info;
-     cc->tcg_initialize =3D avr_cpu_tcg_init;
-     cc->synchronize_from_tb =3D avr_cpu_synchronize_from_tb;
-+    cc->gdb_read_register =3D avr_cpu_gdb_read_register;
-+    cc->gdb_write_register =3D avr_cpu_gdb_write_register;
-+    cc->gdb_num_core_regs =3D 35;
-+    cc->gdb_core_xml_file =3D "avr-cpu.xml";
+     return true;
  }
-diff --git a/target/avr/gdbstub.c b/target/avr/gdbstub.c
-new file mode 100644
-index 0000000..733184c
---- /dev/null
-+++ b/target/avr/gdbstub.c
-@@ -0,0 +1,84 @@
++
++
 +/*
-+ * QEMU AVR CPU
++ *  Core translation mechanism functions:
 + *
-+ * Copyright (c) 2019 Michael Rolnik
++ *    - translate()
++ *    - canonicalize_skip()
++ *    - gen_intermediate_code()
++ *    - restore_state_to_opc()
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
 + */
-+
-+#include "qemu/osdep.h"
-+#include "exec/gdbstub.h"
-+
-+int avr_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
++static void translate(DisasContext *ctx)
 +{
-+    AVRCPU *cpu =3D AVR_CPU(cs);
-+    CPUAVRState *env =3D &cpu->env;
++    uint32_t opcode =3D next_word(ctx);
 +
-+    /*  R */
-+    if (n < 32) {
-+        return gdb_get_reg8(mem_buf, env->r[n]);
++    if (!decode_insn(ctx, opcode)) {
++        gen_helper_unsupported(cpu_env);
++        ctx->bstate =3D DISAS_NORETURN;
 +    }
-+
-+    /*  SREG */
-+    if (n =3D=3D 32) {
-+        uint8_t sreg =3D cpu_get_sreg(env);
-+
-+        return gdb_get_reg8(mem_buf, sreg);
-+    }
-+
-+    /*  SP */
-+    if (n =3D=3D 33) {
-+        return gdb_get_reg16(mem_buf, env->sp & 0x0000ffff);
-+    }
-+
-+    /*  PC */
-+    if (n =3D=3D 34) {
-+        return gdb_get_reg32(mem_buf, env->pc_w * 2);
-+    }
-+
-+    return 0;
 +}
 +
-+int avr_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++/* Standardize the cpu_skip condition to NE.  */
++static bool canonicalize_skip(DisasContext *ctx)
 +{
-+    AVRCPU *cpu =3D AVR_CPU(cs);
-+    CPUAVRState *env =3D &cpu->env;
++    switch (ctx->skip_cond) {
++    case TCG_COND_NEVER:
++        /* Normal case: cpu_skip is known to be false.  */
++        return false;
 +
-+    /*  R */
-+    if (n < 32) {
-+        env->r[n] =3D *mem_buf;
-+        return 1;
++    case TCG_COND_ALWAYS:
++        /*
++         * Breakpoint case: cpu_skip is known to be true, via TB_FLAGS_S=
+KIP.
++         * The breakpoint is on the instruction being skipped, at the st=
+art
++         * of the TranslationBlock.  No need to update.
++         */
++        return false;
++
++    case TCG_COND_NE:
++        if (ctx->skip_var1 =3D=3D NULL) {
++            tcg_gen_mov_tl(cpu_skip, ctx->skip_var0);
++        } else {
++            tcg_gen_xor_tl(cpu_skip, ctx->skip_var0, ctx->skip_var1);
++            ctx->skip_var1 =3D NULL;
++        }
++        break;
++
++    default:
++        /* Convert to a NE condition vs 0. */
++        if (ctx->skip_var1 =3D=3D NULL) {
++            tcg_gen_setcondi_tl(ctx->skip_cond, cpu_skip, ctx->skip_var0=
+, 0);
++        } else {
++            tcg_gen_setcond_tl(ctx->skip_cond, cpu_skip,
++                               ctx->skip_var0, ctx->skip_var1);
++            ctx->skip_var1 =3D NULL;
++        }
++        ctx->skip_cond =3D TCG_COND_NE;
++        break;
 +    }
-+
-+    /*  SREG */
-+    if (n =3D=3D 32) {
-+        cpu_set_sreg(env, *mem_buf);
-+        return 1;
++    if (ctx->free_skip_var0) {
++        tcg_temp_free(ctx->skip_var0);
++        ctx->free_skip_var0 =3D false;
 +    }
-+
-+    /*  SP */
-+    if (n =3D=3D 33) {
-+        env->sp =3D lduw_p(mem_buf);
-+        return 2;
-+    }
-+
-+    /*  PC */
-+    if (n =3D=3D 34) {
-+        env->pc_w =3D ldl_p(mem_buf) / 2;
-+        return 4;
-+    }
-+
-+    return 0;
++    ctx->skip_var0 =3D cpu_skip;
++    return true;
 +}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e94c4c5..ef7b51f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -167,11 +167,13 @@ AVR TCG CPUs
- M: Michael Rolnik <mrolnik@gmail.com>
- R: Sarah Harris <S.E.Harris@kent.ac.uk>
- S: Maintained
-+F: gdb-xml/avr-cpu.xml
- F: target/avr/cpu-param.h
- F: target/avr/cpu-qom.h
- F: target/avr/cpu.h
- F: target/avr/cpu.c
- F: target/avr/helper.c
-+F: target/avr/gdbstub.c
- F: target/avr/machine.c
-=20
- CRIS TCG CPUs
-diff --git a/gdb-xml/avr-cpu.xml b/gdb-xml/avr-cpu.xml
-new file mode 100644
-index 0000000..c4747f5
---- /dev/null
-+++ b/gdb-xml/avr-cpu.xml
-@@ -0,0 +1,49 @@
-+<?xml version=3D"1.0"?>
-+<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
 +
-+     Copying and distribution of this file, with or without modification=
-,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_i=
+nsns)
++{
++    CPUAVRState *env =3D cs->env_ptr;
++    DisasContext ctx =3D {
++        .tb =3D tb,
++        .cs =3D cs,
++        .env =3D env,
++        .memidx =3D 0,
++        .bstate =3D DISAS_NEXT,
++        .skip_cond =3D TCG_COND_NEVER,
++        .singlestep =3D cs->singlestep_enabled,
++    };
++    target_ulong pc_start =3D tb->pc / 2;
++    int num_insns =3D 0;
 +
-+<!-- Register numbers are hard-coded in order to maintain backward
-+     compatibility with older versions of tools that didn't use xml
-+     register descriptions.  -->
++    if (tb->flags & TB_FLAGS_FULL_ACCESS) {
++        /*
++         * This flag is set by ST/LD instruction we will regenerate it O=
+NLY
++         * with mem/cpu memory access instead of mem access
++         */
++        max_insns =3D 1;
++    }
++    if (ctx.singlestep) {
++        max_insns =3D 1;
++    }
 +
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name=3D"org.gnu.gdb.riscv.cpu">
-+  <reg name=3D"r0" bitsize=3D"8" type=3D"int" regnum=3D"0"/>
-+  <reg name=3D"r1" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r2" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r3" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r4" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r5" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r6" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r7" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r8" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r9" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r10" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r11" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r12" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r13" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r14" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r15" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r16" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r17" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r18" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r19" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r20" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r21" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r22" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r23" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r24" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r25" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r26" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r27" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r28" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r29" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r30" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"r31" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"sreg" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"sp" bitsize=3D"8" type=3D"int"/>
-+  <reg name=3D"pc" bitsize=3D"8" type=3D"int"/>
-+</feature>
++    gen_tb_start(tb);
++
++    ctx.npc =3D pc_start;
++    if (tb->flags & TB_FLAGS_SKIP) {
++        ctx.skip_cond =3D TCG_COND_ALWAYS;
++        ctx.skip_var0 =3D cpu_skip;
++    }
++
++    do {
++        TCGLabel *skip_label =3D NULL;
++
++        /* translate current instruction */
++        tcg_gen_insn_start(ctx.npc);
++        num_insns++;
++
++        /*
++         * this is due to some strange GDB behavior
++         * let's assume main has address 0x100
++         * b main   - sets breakpoint at address 0x00000100 (code)
++         * b *0x100 - sets breakpoint at address 0x00800100 (data)
++         */
++        if (unlikely(!ctx.singlestep &&
++                (cpu_breakpoint_test(cs, OFFSET_CODE + ctx.npc * 2, BP_A=
+NY) ||
++                 cpu_breakpoint_test(cs, OFFSET_DATA + ctx.npc * 2, BP_A=
+NY)))) {
++            canonicalize_skip(&ctx);
++            tcg_gen_movi_tl(cpu_pc, ctx.npc);
++            gen_helper_debug(cpu_env);
++            goto done_generating;
++        }
++
++        /* Conditionally skip the next instruction, if indicated.  */
++        if (ctx.skip_cond !=3D TCG_COND_NEVER) {
++            skip_label =3D gen_new_label();
++            if (ctx.skip_var0 =3D=3D cpu_skip) {
++                /*
++                 * Copy cpu_skip so that we may zero it before the branc=
+h.
++                 * This ensures that cpu_skip is non-zero after the labe=
+l
++                 * if and only if the skipped insn itself sets a skip.
++                 */
++                ctx.free_skip_var0 =3D true;
++                ctx.skip_var0 =3D tcg_temp_new();
++                tcg_gen_mov_tl(ctx.skip_var0, cpu_skip);
++                tcg_gen_movi_tl(cpu_skip, 0);
++            }
++            if (ctx.skip_var1 =3D=3D NULL) {
++                tcg_gen_brcondi_tl(ctx.skip_cond, ctx.skip_var0, 0, skip=
+_label);
++            } else {
++                tcg_gen_brcond_tl(ctx.skip_cond, ctx.skip_var0,
++                                  ctx.skip_var1, skip_label);
++                ctx.skip_var1 =3D NULL;
++            }
++            if (ctx.free_skip_var0) {
++                tcg_temp_free(ctx.skip_var0);
++                ctx.free_skip_var0 =3D false;
++            }
++            ctx.skip_cond =3D TCG_COND_NEVER;
++            ctx.skip_var0 =3D NULL;
++        }
++
++        translate(&ctx);
++
++        if (skip_label) {
++            canonicalize_skip(&ctx);
++            gen_set_label(skip_label);
++            if (ctx.bstate =3D=3D DISAS_NORETURN) {
++                ctx.bstate =3D DISAS_CHAIN;
++            }
++        }
++    } while (ctx.bstate =3D=3D DISAS_NEXT
++             && num_insns < max_insns
++             && (ctx.npc - pc_start) * 2 < TARGET_PAGE_SIZE - 4
++             && !tcg_op_buf_full());
++
++    if (tb->cflags & CF_LAST_IO) {
++        gen_io_end();
++    }
++
++    bool nonconst_skip =3D canonicalize_skip(&ctx);
++
++    switch (ctx.bstate) {
++    case DISAS_NORETURN:
++        assert(!nonconst_skip);
++        break;
++    case DISAS_NEXT:
++    case DISAS_TOO_MANY:
++    case DISAS_CHAIN:
++        if (!nonconst_skip) {
++            /* Note gen_goto_tb checks singlestep.  */
++            gen_goto_tb(&ctx, 1, ctx.npc);
++            break;
++        }
++        tcg_gen_movi_tl(cpu_pc, ctx.npc);
++        /* fall through */
++    case DISAS_LOOKUP:
++        if (!ctx.singlestep) {
++            tcg_gen_lookup_and_goto_ptr();
++            break;
++        }
++        /* fall through */
++    case DISAS_EXIT:
++        if (ctx.singlestep) {
++            gen_helper_debug(cpu_env);
++        } else {
++            tcg_gen_exit_tb(NULL, 0);
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++done_generating:
++    gen_tb_end(tb, num_insns);
++
++    tb->size =3D (ctx.npc - pc_start) * 2;
++    tb->icount =3D num_insns;
++}
++
++void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
++                            target_ulong *data)
++{
++    env->pc_w =3D data[0];
++}
 --=20
 2.7.4
 
