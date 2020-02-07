@@ -2,163 +2,82 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 293C4C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D33ACC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:10:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D58B120720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:04:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9034221741
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 21:10:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VfAWgOEv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58B120720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cWzeITb3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9034221741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0Anw-00074s-2z
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 16:04:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34318)
+	id 1j0At8-0002sg-NV
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 16:10:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j0AnD-0006aZ-2o
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:04:04 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j0AsW-0002L1-6s
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:09:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j0AnB-0008KU-Pg
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:04:03 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20954
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j0AnB-0008IT-L4
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:04:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581109441;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=T8hBMIIs7fR85ag68L8JSHa3OD8BsZZn4HyESSNWsxY=;
- b=VfAWgOEvYK37JdyWX/8xWOkD5dTOmLz6G+ZX6CD8pHhTkH0FVvTzB3FttqPgswZAtAHPbN
- zG+ygjYcJhnQbXDLLpN06zKYb87kbmofxu1585xlvkFxq8yNZqOBGCNJe1sLjVM4sIZy69
- Pujek4NFRaYEP+xKXLax0/pFyMyv5v0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-5jA2b5IBNCi64MOU6s7oRQ-1; Fri, 07 Feb 2020 16:03:56 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C0BB800D55;
- Fri,  7 Feb 2020 21:03:55 +0000 (UTC)
-Received: from [10.10.124.0] (ovpn-124-0.rdu2.redhat.com [10.10.124.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE2D560BF7;
- Fri,  7 Feb 2020 21:03:48 +0000 (UTC)
-Subject: Re: qmp-shell for GSoC/Outreachy?
-To: Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200123190145.GI657556@redhat.com>
- <2561a069-ce5f-3c30-b04e-db7cd2fcdc85@redhat.com>
- <20200124095027.GA824327@redhat.com> <20200127143505.GD5669@linux.fritz.box>
- <20200127202925.GE3419@work-vm> <20200128105932.GC6431@linux.fritz.box>
- <20200205130946.GC5768@dhcp-200-226.str.redhat.com>
- <a45df5ab-3cad-0fbe-901f-4bc1ba28d38e@redhat.com>
- <20200205194944.GP3210@work-vm> <877e10xdd6.fsf@dusky.pond.sub.org>
- <20200206100920.GD2391707@redhat.com> <8736bnx6cx.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <28064ba5-d76a-e59e-e836-52b8a62b0271@redhat.com>
-Date: Fri, 7 Feb 2020 16:03:48 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j0AsT-0007R8-W7
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 16:09:31 -0500
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:43538)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1j0AsT-0007QK-Q2; Fri, 07 Feb 2020 16:09:29 -0500
+Received: by mail-io1-xd42.google.com with SMTP id n21so1014311ioo.10;
+ Fri, 07 Feb 2020 13:09:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DGQE7Ulr1dPFbkBbpWWN+b7EnRREQqShmFupImjIXsg=;
+ b=cWzeITb3HO4lxvYtI0eJ7pFf0w0idzM14lR/y46EbodfpnQNqAU8dn6CXNsPqqlMma
+ 9R8KCsgA6N/mt+6B1TQJtE/HSQQPWt2Npc4FAOU+kPZQenOjEMlA8UfEO4sGFKUucvl0
+ NZmEWJTZtcBg96GGMvtUff26561LO4RlFc25pl72skmfpDukgJzmWS88+BCZHn35AHsL
+ C1Ba1olNl86clYWpx+rpNUXDGi7Xo0RZImCTXmYUU9CAb/TSm4b219Q7LnivQXuNXJVO
+ lp8WhWhT7S1/mMs2JFl5HddhKYZt4Ep9bRLyPIZLJ+13FrKydzM4FgxRWlqnToosloUc
+ L+sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DGQE7Ulr1dPFbkBbpWWN+b7EnRREQqShmFupImjIXsg=;
+ b=Q+3ahdq8R4+j2jyCbR2twe5LhfTIK0DAz8ym1+31ulezqhLU/v29T9T/FJDONYyEdx
+ sCbQtBdniPb27vzTa4a3YvUtKZe9i8h750+VBZsXkQmUpKCnfMk9i3Sr5BtzxtkcANJl
+ nIuayK5MrUQwbqbK+8EhwBYBngNYCQ6SQeI5+guttv4BKeWvErth5p3/bNMj/38HyPP8
+ /FGmIz75p8Z9Kh0FhUT5k74nN7dYcrJxKLuRJW8WbbzU5rWWwCxn4XF1AIUIABLaJ0tp
+ EFTesNG8fv9UxNHLfE8bMSgJZ30qzXXj6/fA23Ets8IB01BTv40rXWzqk1kcTGWlmc1G
+ VpQw==
+X-Gm-Message-State: APjAAAUAeJuRahUyAkOBHXnQmAmeeKZho3rVq9c5WjMdWPEk5bk6UTz6
+ ObAZKM69wlubToFgYTJnTN/WDF9uvgZooiqTci8=
+X-Google-Smtp-Source: APXvYqzUQ5qQtdeFH1SsdoH5SxLwh9AD74MZ8PQ1GW9qLdyFHfeAQ3g67lLWm8NNzxl6QqG2fNBnV6ESjUMVbs08Xvo=
+X-Received: by 2002:a6b:6f01:: with SMTP id k1mr437677ioc.28.1581109769076;
+ Fri, 07 Feb 2020 13:09:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <8736bnx6cx.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 5jA2b5IBNCi64MOU6s7oRQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
+ <20200119005102.3847-9-nieklinnenbank@gmail.com>
+ <e9c31386-d471-159a-6cb0-7e621cb3bc83@redhat.com>
+ <CAPan3WpJnd4YPa1DT_5Z6+i5yVahAE7sFHZ6JXqC69KstFG+Mg@mail.gmail.com>
+In-Reply-To: <CAPan3WpJnd4YPa1DT_5Z6+i5yVahAE7sFHZ6JXqC69KstFG+Mg@mail.gmail.com>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Fri, 7 Feb 2020 22:09:16 +0100
+Message-ID: <CAPan3WpjkBc9WKPt7SDud5TQsnRphnBJwgqUep+3fFzfzLC0hg@mail.gmail.com>
+Subject: Re: [PATCH v4 08/20] hw/arm/allwinner: add SD/MMC host controller
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000230470059e02ce7b"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -170,155 +89,320 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, jasowang@redhat.com,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--000000000000230470059e02ce7b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Philippe,
+
+FYI, and in case someone also wants to do a similar configuration test on
+some other machine.
+I managed to re-produce the same error by temporarily modifying
+default-configs/arm-softmmu.mak, such that it only enables the orangepi
+machine.
+That way, if any configuration item is missing from the machine, the error
+will be visible.
+
+Regards,
+Niek
 
 
-On 2/6/20 7:11 AM, Markus Armbruster wrote:
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->=20
->> On Thu, Feb 06, 2020 at 10:40:37AM +0100, Markus Armbruster wrote:
->>>> If the user screwsup, it should give an error that prompts the user
->>>> to the parameter they got wrong.
->>>>
->>>> Output from commands should normally be pretty formatted (with an opti=
-on
->>>> to display raw json for those needing it).
->>>>   e.g. that 'query-version' should give either just the package
->>>>   version (as info version currently does) or:
->>>>       4.2.50  Package: v4.2.0-1188-gd95a3885a9
->>>>
->>>> We shouldn't lose any HMP commands that some people find useful
->>>>   Ditching HMP isn't an option until we've got almost all of it
->>>>   covered.
->>>
->>> In particular, we currently use HMP for debugging and monitoring
->>> purposes, where we don't need or want QMP's rigor, neither its rigorous
->>> interface stability, nor its structured I/O.  We want the "whipuptitude=
-"
->>> we get from monitor_printf().  This is actually a point David has made
->>> several times.
+On Sun, Feb 2, 2020 at 10:43 PM Niek Linnenbank <nieklinnenbank@gmail.com>
+wrote:
+
+> Hi Philippe,
+>
+> On Sun, Jan 19, 2020 at 8:02 PM Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com>
+> wrote:
+>
+>> On 1/19/20 1:50 AM, Niek Linnenbank wrote:
+>> > The Allwinner System on Chip families sun4i and above contain
+>> > an integrated storage controller for Secure Digital (SD) and
+>> > Multi Media Card (MMC) interfaces. This commit adds support
+>> > for the Allwinner SD/MMC storage controller with the following
+>> > emulated features:
+>> >
+>> >   * DMA transfers
+>> >   * Direct FIFO I/O
+>> >   * Short/Long format command responses
+>> >   * Auto-Stop command (CMD12)
+>> >   * Insert & remove card detection
+>> >
+>> > The following boards are extended with the SD host controller:
+>> >
+>> >   * Cubieboard (hw/arm/cubieboard.c)
+>> >   * Orange Pi PC (hw/arm/orangepi.c)
+>> >
+>> > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+>> > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> > ---
+>> >   include/hw/arm/allwinner-a10.h   |   2 +
+>> >   include/hw/arm/allwinner-h3.h    |   3 +
+>> >   include/hw/sd/allwinner-sdhost.h | 135 +++++
+>> >   hw/arm/allwinner-a10.c           |  11 +
+>> >   hw/arm/allwinner-h3.c            |  15 +-
+>> >   hw/arm/cubieboard.c              |  15 +
+>> >   hw/arm/orangepi.c                |  16 +
+>> >   hw/sd/allwinner-sdhost.c         | 848 +++++++++++++++++++++++++++++=
+++
+>> >   hw/sd/Makefile.objs              |   1 +
+>> >   hw/sd/trace-events               |   7 +
+>> >   10 files changed, 1052 insertions(+), 1 deletion(-)
+>> >   create mode 100644 include/hw/sd/allwinner-sdhost.h
+>> >   create mode 100644 hw/sd/allwinner-sdhost.c
 >>
->> I'd like to argue that this decision to keep these debugging/monitoring
->> things in HMP only was a mistake, because it ensures that QEMU internals
->> need to keep HMP related code forever.
+>> Failure at build if configured with --without-default-devices:
 >>
->> What we actually need is a part of QMP that does not have the long term
->> stability requirement, nor need for fully structured data. In fact this
->> pretty much already exists - we have declared the 'x-' prefix as a way
->> to model QMP commands which are experimental / suboptimal / subject
->> to change.
+>>    CC      arm-softmmu/hw/sd/allwinner-sdhost.o
+>>    CC      arm-softmmu/hw/arm/orangepi.o
+>>    CC      arm-softmmu/hw/arm/allwinner-h3.o
+>>    LINK    arm-softmmu/qemu-system-arm
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.o: in function
+>> `allwinner_sdhost_send_command':
+>> hw/sd/allwinner-sdhost.c:239: undefined reference to `sdbus_do_command'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.o: in function
+>> `allwinner_sdhost_read':
+>> hw/sd/allwinner-sdhost.c:517: undefined reference to `sdbus_data_ready'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.c:518: undefined reference to
+>> `sdbus_read_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.c:519: undefined reference to
+>> `sdbus_read_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.c:520: undefined reference to
+>> `sdbus_read_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.c:521: undefined reference to
+>> `sdbus_read_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.o: in function
+>> `allwinner_sdhost_process_desc':
+>> hw/sd/allwinner-sdhost.c:340: undefined reference to `sdbus_read_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.c:334: undefined reference to
+>> `sdbus_write_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.o: in function
+>> `allwinner_sdhost_write':
+>> hw/sd/allwinner-sdhost.c:651: undefined reference to `sdbus_write_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.c:652: undefined reference to
+>> `sdbus_write_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.c:653: undefined reference to
+>> `sdbus_write_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.c:654: undefined reference to
+>> `sdbus_write_data'
+>> /usr/bin/ld: hw/sd/allwinner-sdhost.o: in function `allwinner_sdhost_dma=
+':
+>> hw/sd/allwinner-sdhost.c:372: undefined reference to `sdbus_data_ready'
+>> collect2: error: ld returned 1 exit status
+>> make[1]: *** [Makefile:206: qemu-system-arm] Error 1
 >>
->> I suggest that every HMP command which does not have a QMP equivalent
->> should be turned into a QMP command with an "x-" prefix, with no
->> extra modelling applied
->=20
-> Makes sense (see my point about "allowing some [whipuptitude] in QMP"),
-> except I disagree with your example:
->=20
->> Take "info block"
 >>
->> (hmp) info block
->> ide1-cd0: [not inserted]
->>     Attached to:      /machine/unattached/device[23]
->>     Removable device: not locked, tray closed
+> Thanks for reporting this Philippe. As you pointed out, I also made the
+> same mistake in patch #4 for USB support [1].
+> Here I also tried to re-produce the error here with:
+>
+> $ ./configure --target-list=3Darm-softmmu --without-default-devices; make=
+ -j5
+>
+> But again no error. I also see that CONFIG_SD=3Dy is set in
+> arm-softmmu/config-devices.mak.
+> Maybe on my laptop  --without-default-devices has no effect or is
+> overriden somehow, I'll try to debug it further.
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00125.html
+>
+>
+>> Fixed by:
 >>
->> floppy0: [not inserted]
->>     Attached to:      /machine/unattached/device[16]
->>     Removable device: not locked, tray closed
+>> -- >8 --
+>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+>> index bb75c1de17..086241354c 100644
+>> --- a/hw/arm/Kconfig
+>> +++ b/hw/arm/Kconfig
+>> @@ -302,6 +302,9 @@ config ALLWINNER_H3
+>>       select ARM_TIMER
+>>       select ARM_GIC
+>>       select UNIMP
+>>       select USB_OHCI
+>>       select USB_EHCI_SYSBUS
+>> +    select SD
 >>
->> sd0: [not inserted]
->>     Removable device: not locked, tray closed
+>> Thanks, I'll add this fix.
+>
+> Regards,
+> Niek
+>
+>
+>>   config RASPI
+>>       bool
+>> ---
 >>
 >>
->> I suggest we support it as "x-query-block"
->>
->> (qmp) x-query-block
->> {
->>     "return": {
->>         "info": "ide1-cd0: [not inserted]
->>     Attached to:      /machine/unattached/device[23]
->>     Removable device: not locked, tray closed
->>
->> floppy0: [not inserted]
->>     Attached to:      /machine/unattached/device[16]
->>     Removable device: not locked, tray closed
->>
->> sd0: [not inserted]
->>     Removable device: not locked, tray closed"
->>     }
->> }
->=20
-> This commmand does have a QMP equivalent: query-block.
->=20
-> Hmm, no more.  It actually wraps around both query-block and
-> query-named-block-nodes now.  I think that makes it an example of "go
-> beyond 1:1".
->=20
-> A better example for "allowing whipuptitude" would be "info registers".
->=20
->> Functionally we in fact already support pretty much exactly
->> that via the "human-monitor-command"  QMP command.
->>
->> The difference is that with the latter, we will still have to
->> keep around the internal dispatching machinery for HMP inside
->> QEMU forever. If we transplant all remaining HMP commands with
->> an "x-" prefix, we open up the possibility of completely
->> separating HMP out and having QEMU work exclusively with QMP
->> internally.
->>
->> This is complementary to an improved qmp-shell client.
->=20
-> Yes.
->=20
+>
+> --
+> Niek Linnenbank
+>
+>
 
-A note:
+--=20
+Niek Linnenbank
 
-qmp-shell could offer some sugared versions of things like "query-block"
-that do some work understanding the reply from QEMU and printing it in a
-nice human format.
+--000000000000230470059e02ce7b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is generally what I have in mind for things when it's possible: use
-"real" QMP interfaces to do the query, and then use qmp-shell code to
-display "pretty" results.
+<div dir=3D"ltr"><div>Hi Philippe,</div><div><br></div><div>FYI, and in cas=
+e someone also wants to do a similar configuration test on some other machi=
+ne.</div><div>I managed to re-produce the same error by temporarily modifyi=
+ng default-configs/arm-softmmu.mak, such that it only enables the orangepi =
+machine.</div><div>That way, if any configuration item is missing from the =
+machine, the error will be visible.</div><div><br></div><div>Regards,</div>=
+<div>Niek<br></div><div><br></div></div><br><div class=3D"gmail_quote"><div=
+ dir=3D"ltr" class=3D"gmail_attr">On Sun, Feb 2, 2020 at 10:43 PM Niek Linn=
+enbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">nieklinnenbank@gmail=
+.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"mar=
+gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
+ex"><div dir=3D"ltr"><div>Hi Philippe,<br></div><br><div class=3D"gmail_quo=
+te"><div dir=3D"ltr" class=3D"gmail_attr">On Sun, Jan 19, 2020 at 8:02 PM P=
+hilippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com" target=
+=3D"_blank">philmd@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"=
+gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
+4,204,204);padding-left:1ex">On 1/19/20 1:50 AM, Niek Linnenbank wrote:<br>
+&gt; The Allwinner System on Chip families sun4i and above contain<br>
+&gt; an integrated storage controller for Secure Digital (SD) and<br>
+&gt; Multi Media Card (MMC) interfaces. This commit adds support<br>
+&gt; for the Allwinner SD/MMC storage controller with the following<br>
+&gt; emulated features:<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0* DMA transfers<br>
+&gt;=C2=A0 =C2=A0* Direct FIFO I/O<br>
+&gt;=C2=A0 =C2=A0* Short/Long format command responses<br>
+&gt;=C2=A0 =C2=A0* Auto-Stop command (CMD12)<br>
+&gt;=C2=A0 =C2=A0* Insert &amp; remove card detection<br>
+&gt; <br>
+&gt; The following boards are extended with the SD host controller:<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0* Cubieboard (hw/arm/cubieboard.c)<br>
+&gt;=C2=A0 =C2=A0* Orange Pi PC (hw/arm/orangepi.c)<br>
+&gt; <br>
+&gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gm=
+ail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
+&gt; Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@re=
+dhat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 =C2=A0include/hw/arm/allwinner-a10.h=C2=A0 =C2=A0|=C2=A0 =C2=A02=
+ +<br>
+&gt;=C2=A0 =C2=A0include/hw/arm/allwinner-h3.h=C2=A0 =C2=A0 |=C2=A0 =C2=A03=
+ +<br>
+&gt;=C2=A0 =C2=A0include/hw/sd/allwinner-sdhost.h | 135 +++++<br>
+&gt;=C2=A0 =C2=A0hw/arm/allwinner-a10.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0|=C2=A0 11 +<br>
+&gt;=C2=A0 =C2=A0hw/arm/allwinner-h3.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 |=C2=A0 15 +-<br>
+&gt;=C2=A0 =C2=A0hw/arm/cubieboard.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 15 +<br>
+&gt;=C2=A0 =C2=A0hw/arm/orangepi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 |=C2=A0 16 +<br>
+&gt;=C2=A0 =C2=A0hw/sd/allwinner-sdhost.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+| 848 +++++++++++++++++++++++++++++++<br>
+&gt;=C2=A0 =C2=A0hw/sd/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
+&gt;=C2=A0 =C2=A0hw/sd/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A07 +<br>
+&gt;=C2=A0 =C2=A010 files changed, 1052 insertions(+), 1 deletion(-)<br>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/sd/allwinner-sdhost.h<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/sd/allwinner-sdhost.c<br>
+<br>
+Failure at build if configured with --without-default-devices:<br>
+<br>
+=C2=A0 =C2=A0CC=C2=A0 =C2=A0 =C2=A0 arm-softmmu/hw/sd/allwinner-sdhost.o<br=
+>
+=C2=A0 =C2=A0CC=C2=A0 =C2=A0 =C2=A0 arm-softmmu/hw/arm/orangepi.o<br>
+=C2=A0 =C2=A0CC=C2=A0 =C2=A0 =C2=A0 arm-softmmu/hw/arm/allwinner-h3.o<br>
+=C2=A0 =C2=A0LINK=C2=A0 =C2=A0 arm-softmmu/qemu-system-arm<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.o: in function <br>
+`allwinner_sdhost_send_command&#39;:<br>
+hw/sd/allwinner-sdhost.c:239: undefined reference to `sdbus_do_command&#39;=
+<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.o: in function `allwinner_sdhost_read&#=
+39;:<br>
+hw/sd/allwinner-sdhost.c:517: undefined reference to `sdbus_data_ready&#39;=
+<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.c:518: undefined reference to <br>
+`sdbus_read_data&#39;<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.c:519: undefined reference to <br>
+`sdbus_read_data&#39;<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.c:520: undefined reference to <br>
+`sdbus_read_data&#39;<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.c:521: undefined reference to <br>
+`sdbus_read_data&#39;<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.o: in function <br>
+`allwinner_sdhost_process_desc&#39;:<br>
+hw/sd/allwinner-sdhost.c:340: undefined reference to `sdbus_read_data&#39;<=
+br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.c:334: undefined reference to <br>
+`sdbus_write_data&#39;<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.o: in function `allwinner_sdhost_write&=
+#39;:<br>
+hw/sd/allwinner-sdhost.c:651: undefined reference to `sdbus_write_data&#39;=
+<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.c:652: undefined reference to <br>
+`sdbus_write_data&#39;<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.c:653: undefined reference to <br>
+`sdbus_write_data&#39;<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.c:654: undefined reference to <br>
+`sdbus_write_data&#39;<br>
+/usr/bin/ld: hw/sd/allwinner-sdhost.o: in function `allwinner_sdhost_dma&#3=
+9;:<br>
+hw/sd/allwinner-sdhost.c:372: undefined reference to `sdbus_data_ready&#39;=
+<br>
+collect2: error: ld returned 1 exit status<br>
+make[1]: *** [Makefile:206: qemu-system-arm] Error 1<br>
+<br></blockquote><div><br></div><div>Thanks for reporting this Philippe. As=
+ you pointed out, I also made the same mistake in patch #4 for USB support =
+[1].</div><div>Here I also tried to re-produce the error here with:</div><d=
+iv><br></div><div>$ ./configure --target-list=3Darm-softmmu --without-defau=
+lt-devices; make -j5</div><div><br></div><div>But again no error. I also se=
+e that CONFIG_SD=3Dy is set in arm-softmmu/config-devices.mak.</div><div>Ma=
+ybe on my laptop=C2=A0 --without-default-devices has no effect or is overri=
+den somehow, I&#39;ll try to debug it further.</div><div><br></div><div>[1]=
+ <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00125.=
+html" target=3D"_blank">https://lists.gnu.org/archive/html/qemu-devel/2020-=
+02/msg00125.html</a></div><div>=C2=A0</div><blockquote class=3D"gmail_quote=
+" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
+padding-left:1ex">
+Fixed by:<br>
+<br>
+-- &gt;8 --<br>
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig<br>
+index bb75c1de17..086241354c 100644<br>
+--- a/hw/arm/Kconfig<br>
++++ b/hw/arm/Kconfig<br>
+@@ -302,6 +302,9 @@ config ALLWINNER_H3<br>
+=C2=A0 =C2=A0 =C2=A0 select ARM_TIMER<br>
+=C2=A0 =C2=A0 =C2=A0 select ARM_GIC<br>
+=C2=A0 =C2=A0 =C2=A0 select UNIMP<br>
+=C2=A0 =C2=A0 =C2=A0 select USB_OHCI<br>
+=C2=A0 =C2=A0 =C2=A0 select USB_EHCI_SYSBUS<br>
++=C2=A0 =C2=A0 select SD<br>
+<br></blockquote><div>Thanks, I&#39;ll add this fix.</div><div><br></div><d=
+iv>Regards,</div><div>Niek<br></div><div>=C2=A0</div><blockquote class=3D"g=
+mail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204=
+,204,204);padding-left:1ex">
+=C2=A0 config RASPI<br>
+=C2=A0 =C2=A0 =C2=A0 bool<br>
+---<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr"><div dir=
+=3D"ltr"><div>Niek Linnenbank<br><br></div></div></div></div>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div>
 
-e.g.
-
->> query-block
-
-might execute the raw QMP command and give you back the giant textwall
-of gibberish, but perhaps:
-
->> ?info block
-
-would execute query-block behind the scenes, digest the results, and
-pretty-print some results.
-
-These shell-local commands, denoted by the "?" prefix, could be
-user-extensible python extensions that simply react to incoming data,
-optionally perform extra work, and display results.
-
-Otherwise, for commands where this is too laborious, too intensive, or
-just not worth it -- but we cannot be rid of them -- I like Dan's idea
-of just offering e.g.
-
-'x-debug-foo' and returning big text blobs, so we don't have to waste
-any brain-calories on devising a properly structured response.
-
-Actually, we can even use the featureflags to tag such commands as e.g.
-"human-ui-only" and could conditionally compile them out for enterprise
-deployments where poor behavior WRT synchronicity is a security liability.
-
---js
-
+--000000000000230470059e02ce7b--
 
