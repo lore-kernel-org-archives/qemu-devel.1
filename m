@@ -2,63 +2,83 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78943C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 22:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7431C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 22:22:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F19220720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 22:21:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F19220720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 8B41B20720
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 22:22:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qb0iIGNW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B41B20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0C0E-0001L5-G6
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 17:21:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50378)
+	id 1j0C0w-00023G-PJ
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 17:22:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j0Byl-0000de-4e
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:20:04 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1j0BzM-00019M-Sn
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:20:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j0Byj-0007Bq-Jo
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:20:03 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:63742)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j0Byd-0005q8-Al; Fri, 07 Feb 2020 17:19:56 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 8B7327461AE;
- Fri,  7 Feb 2020 23:19:45 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id F21FE745953; Fri,  7 Feb 2020 23:19:44 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id F094374569F;
- Fri,  7 Feb 2020 23:19:44 +0100 (CET)
-Date: Fri, 7 Feb 2020 23:19:44 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 01/30] hw/arm/raspi: Use BCM2708 machine type with
- pre Device Tree kernels
-In-Reply-To: <27d1f0e2-941c-11ca-d736-f25af055d9da@redhat.com>
-Message-ID: <alpine.BSF.2.22.395.2002072308310.88696@zero.eik.bme.hu>
-References: <20200206011756.2413-1-f4bug@amsat.org>
- <20200206011756.2413-2-f4bug@amsat.org>
- <alpine.BSF.2.22.395.2002061320310.71431@zero.eik.bme.hu>
- <27d1f0e2-941c-11ca-d736-f25af055d9da@redhat.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <robert.foley@linaro.org>) id 1j0BzL-0000Gt-Ah
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:20:40 -0500
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:45613)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1j0BzL-0000B8-1H
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:20:39 -0500
+Received: by mail-lj1-x244.google.com with SMTP id f25so904791ljg.12
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 14:20:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=eI8qM9AM5BA2CQDWBWStTW/GjA81uhrYL6kf/5O2hWY=;
+ b=qb0iIGNWNoSXaGOyDm0ErXYuOnHxG9ZFZMduRRn/2Eb+K6GnkHWovW3waeeSVAsMQc
+ G/gGsKjUKYnMqsdwlAAFWZOXy4mgv8f20x7cj9iZsK8EeHUoRJGFxGIPQW0qCS7aemDJ
+ 4IPMMhlpq7FZko9yZw0Hy8Dz9wkwXvt4rv9vNyzUFytJJX+BTBWfMhDTgyYqIOMrJgA5
+ EYuqFhvWwayy4lM93I5fHyn8bxRdvp/54/PxsGgqEGXgqZvUyogF/hF6Mt7ediQpDdy3
+ SWVnFdDt2DoZ218QONsMgNliNE41aXED5lemhKvvBrkCFzmlR84R6vXFcF8ZBL5leSAT
+ WoXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=eI8qM9AM5BA2CQDWBWStTW/GjA81uhrYL6kf/5O2hWY=;
+ b=DVDN61i2x0hJ0IJ6onyiur6DhTTPoB6KViv3rzQphYLV2Y8o6mgItIdM4WNLWjoxy+
+ W0LlQj8HPekE9+ttPJ5kCY/CVVYWhsMxBA+crPGkiLONQrCtxQJF+rLpsNxcunKaIbBM
+ k463u/+rECJa4E2GSHFf7QoflvXXOix62GOy3FHVgXkdR+g8yge2sCU8YKVwDM3i7Ga6
+ R7UtS0d07JGJVPcb9Lh+20xy+CZOT0NRx/4UsB02FMhsYnLUHxkaZFjCFmYL7Vk2rasB
+ JqW4e+iQ6Fm6zCBSWBBtPGnrOrjuMzTuZrleWcyx9THqTkXooNu/+GPpK9c3ho9IRrRU
+ iiCA==
+X-Gm-Message-State: APjAAAULM/VadEaKgSLzqf7w1m5W5vWw06qTnJLDJ6xuYaN5/2bj3kKn
+ OmYVnLlWgCAXD1k3UR/jAmwKiqWbmW6PaSqiF/ahXw==
+X-Google-Smtp-Source: APXvYqwj1psIQYeOkTqRcfR7y4ZdKYCIDU2rGpLctCk/YLGb1J7QVySzLdHHmlYUIyGpY6nw301VLdB1LqvbPmbMa1M=
+X-Received: by 2002:a05:651c:120d:: with SMTP id
+ i13mr785984lja.173.1581114036899; 
+ Fri, 07 Feb 2020 14:20:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- BOUNDARY="3866299591-1581770763-1581113487=:88696"
-Content-ID: <alpine.BSF.2.22.395.2002072311370.88696@zero.eik.bme.hu>
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+References: <20200205212920.467-1-robert.foley@linaro.org>
+ <20200205212920.467-7-robert.foley@linaro.org>
+ <874kw27248.fsf@linaro.org>
+In-Reply-To: <874kw27248.fsf@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Fri, 7 Feb 2020 17:20:00 -0500
+Message-ID: <CAEyhzFs6+Lssj8a5QckmDaqi41E8_WemueSYuZrqtr=tVbYOjA@mail.gmail.com>
+Subject: Re: [PATCH v1 06/14] tests/vm: Add logging of console to file.
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,156 +90,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
+Cc: fam@euphon.net, Peter Puhov <peter.puhov@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---3866299591-1581770763-1581113487=:88696
-Content-Type: text/plain; CHARSET=ISO-8859-15; format=flowed
-Content-ID: <alpine.BSF.2.22.395.2002072311371.88696@zero.eik.bme.hu>
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 7 Feb 2020, Philippe Mathieu-Daud=E9 wrote:
-> On 2/6/20 1:21 PM, BALATON Zoltan wrote:
->> On Thu, 6 Feb 2020, Philippe Mathieu-Daud=E9 wrote:
->>> When booting without device tree, the Linux kernels uses the $R1
->>> register to determine the machine type. The list of values is
->>> registered at [1].
->>>=20
->>> There are two entries for the Raspberry Pi:
->>>=20
->>> - https://www.arm.linux.org.uk/developer/machines/list.php?mid=3D3138
->>> =A0name: MACH_TYPE_BCM2708
->>> =A0value: 0xc42 (3138)
->>> =A0status: Active, not mainlined
->>> =A0date: 15 Oct 2010
->>>=20
->>> - https://www.arm.linux.org.uk/developer/machines/list.php?mid=3D4828
->>> =A0name: MACH_TYPE_BCM2835
->>> =A0value: 4828
->>> =A0status: Active, mainlined
->>> =A0date: 6 Dec 2013
->>>=20
->>> QEMU always used the non-mainlined type MACH_TYPE_BCM2708.
->>> The value 0xc43 is registered to 'MX51_GGC' (processor i.MX51), and
->>> 0xc44 to 'Western Digital Sharespace NAS' (processor Marvell 88F5182)=
-.
->>>=20
->>> The Raspberry Pi foundation bootloader only sets the BCM2708 machine
->>> type, see [2] or [3]:
->>>=20
->>> 133 9:
->>> 134=A0=A0=A0=A0 mov r0, #0
->>> 135=A0=A0=A0=A0 ldr r1, =3D3138=A0=A0=A0=A0=A0=A0 @ BCM2708 machine i=
-d
->>> 136=A0=A0=A0=A0 ldr r2, atags=A0=A0=A0=A0=A0=A0 @ ATAGS
->>> 137=A0=A0=A0=A0 bx=A0 r4
->>>=20
->>> U-Boot only uses MACH_TYPE_BCM2708 (see [4]):
->>>=20
->>> 25 /*
->>> 26=A0 * 2835 is a SKU in a series for which the 2708 is the first or =
-primary=20
->>> SoC,
->>> 27=A0 * so 2708 has historically been used rather than a dedicated 28=
-35 ID.
->>> 28=A0 *
->>> 29=A0 * We don't define a machine type for bcm2709/bcm2836 since the =
-RPi=20
->>> Foundation
->>> 30=A0 * chose to use someone else's previously registered machine ID =
-(3139,=20
->>> MX51_GGC)
->>> 31=A0 * rather than obtaining a valid ID:-/
->>> 32=A0 *
->>> 33=A0 * For the bcm2837, hopefully a machine type is not needed, sinc=
-e=20
->>> everything
->>> 34=A0 * is DT.
->>> 35=A0 */
->>>=20
->>> While the definition MACH_BCM2709 with value 0xc43 was introduced in
->>> a commit described "Add 2709 platform for Raspberry Pi 2" out of the
->>> mainline Linux kernel, it does not seem used, and the platform is
->>> introduced with Device Tree support anyway (see [5] and [6]).
->>>=20
->>> Remove the unused values (0xc43 introduced in commit 1df7d1f9303aef
->>> "raspi: add raspberry pi 2 machine" and 0xc44 in commit bade58166f4
->>> "raspi: Raspberry Pi 3 support"), keeping only MACH_TYPE_BCM2708.
->>>=20
->>> [1] https://www.arm.linux.org.uk/developer/machines/
->>> [2]=20
->>> https://github.com/raspberrypi/tools/blob/920c7ed2e/armstubs/armstub7=
-.S#L135=20
->>> [3]=20
->>> https://github.com/raspberrypi/tools/blob/49719d554/armstubs/armstub7=
-.S#L64=20
->>> [4]=20
->>> https://gitlab.denx.de/u-boot/u-boot/blob/v2015.04/include/configs/rp=
-i-common.h#L18=20
->>> [5]=20
->>> https://github.com/raspberrypi/linux/commit/d9fac63adac#diff-6722037d=
-79570df5b392a49e0e006573R526=20
->>> [6]=20
->>> http://lists.infradead.org/pipermail/linux-rpi-kernel/2015-February/0=
-01268.html=20
->>>=20
->>> Cc: Zolt=E1n Baldaszti <bztemail@gmail.com>
->>> Cc: Pekka Enberg <penberg@iki.fi>
->>> Cc: Stephen Warren <swarren@nvidia.com>
->>> Cc: Kshitij Soni <kshitij.soni@broadcom.com>
->>> Cc: Michael Chan <michael.chan@broadcom.com>
->>> Cc: Andrew Baumann <Andrew.Baumann@microsoft.com>
->>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->>> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->>> ---
->>> hw/arm/raspi.c | 5 ++---
->>> 1 file changed, 2 insertions(+), 3 deletions(-)
->>>=20
->>> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
->>> index 3996f6c63a..ef76a27f33 100644
->>> --- a/hw/arm/raspi.c
->>> +++ b/hw/arm/raspi.c
->>> @@ -29,8 +29,7 @@
->>> #define FIRMWARE_ADDR_3 0x80000 /* Pi 3 loads kernel.img here by defa=
-ult=20
->>> */
->>> #define SPINTABLE_ADDR=A0 0xd8 /* Pi 3 bootloader spintable */
->>>=20
->>> -/* Table of Linux board IDs for different Pi versions */
->>> -static const int raspi_boardid[] =3D {[1] =3D 0xc42, [2] =3D 0xc43, =
-[3] =3D=20
->>> 0xc44};
->>=20
->> Maybe worth a comment about why using this number (short, one line ver=
-sion=20
->> of commit message).
+On Fri, 7 Feb 2020 at 12:12, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+> Robert Foley <robert.foley@linaro.org> writes:
 >
-> You mean something like:
+> > This adds logging of the char device used by the console
+> > to a file.  The basevm.py then uses this file to read
+> > chars from the console.
+> > One reason to add this is to aid with debugging.
 >
-> /* Registered machine type:
-> * https://www.arm.linux.org.uk/developer/machines/list.php?mid=3D3138
-> */
+> I can certainly see an argument for saving the install log.
+>
+> > But another is because there is an issue where the QEMU
+> > might hang if the characters from the character device
+> > are not consumed by the script.
+>
+> I'm a little confused by this. Outputting to a file and then parsing the
+> file seems a bit more janky than injesting the output in the script and
+> then logging it.
+>
+> Is this to work around the hang because the socket buffers fill up and
+> aren't drained?
 
-I think a link in a comment is not very convenient (and may break if the=20
-website is ever moved) so maybe just a line to say why this particular=20
-number was chosen would be better, such as
+Yes, exactly.  This is to work around the hang we are seeing when we
+try to use these new VMs.
 
-/* This matches RPi Foundation bootloader and U-Boot */
+> > +    console_logfile =3D "console.log"
+>
+> We should probably dump the log somewhere other than cwd. Given we cache
+> stuff in ~/.cache/qemu-vm maybe something of the form:
+>
+>   ~/.cache/qemu-vm/ubuntu.aarch64.install.log
+>
+> ?
 
->> +#define MACH_TYPE_BCM2708=A0=A0 3138 /* Linux board IDs */
+Good point, we will locate the log file there.
 
-The rest of the detailed explanation could be looked up in the commit=20
-message. Just suggested the comment to warn readers that this is not a=20
-mistake but a pecularity of the platform.
+> > +            elapsed_sec =3D time.time() - start_time
+> > +            if elapsed_sec > self._console_timeout_sec:
+> > +                raise ConsoleTimeoutException
+> > +        return data.encode('latin1')
+> > +
+>
+> Is latin1 really the best choice here? I would expect things to be utf-8 =
+clean.
 
-Regards,
-BALATON Zoltan
---3866299591-1581770763-1581113487=:88696--
+We were trying to follow the existing code, which is using latin1.
+For example, console_wait() or console_consume() are using latin1.
+However on further inspection we see that console_send() is using utf-8.
+We will look at changing these latin1 cases to be utf-8.
+I also found a case in get_qemu_version() we will change to utf-8 also.
+
+> > +
+> > +    def join(self, timeout=3DNone):
+> > +        """Time to destroy the thread.
+> > +           Clear the event to stop the thread, and wait for
+> > +           it to complete."""
+> > +        self.alive.clear()
+> > +        threading.Thread.join(self, timeout)
+> > +        self.log_file.close()
+>
+> I'm note sure about this - introducing threading into Python seems very
+> un-pythonic. I wonder if the python experts have any view on a better
+> way to achieve what we want which I think is:
+>
+>   - a buffer that properly drains output from QEMU
+>   - which can optionally be serialised onto disk for logging
+>
+> What else are we trying to achieve here?
+
+I think that covers what we are trying to achieve here.
+The logging to file is a nice to have, but
+the draining of the output from QEMU is the main objective here.
+We will do a bit more research here to seek out a cleaner way to achieve th=
+is,
+but certainly we would also be interested if any python experts have a
+view on a cleaner approach.
+
+Thanks & Regards,
+-Rob
+>
+> --
+> Alex Benn=C3=A9e
 
