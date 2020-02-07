@@ -2,81 +2,83 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF72C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 17:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D0AC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 17:05:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B57120838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 17:03:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4668920838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 17:05:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xe8Jaqc+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B57120838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMrBRlPh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4668920838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j072j-0002sT-Az
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 12:03:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34784)
+	id 1j074A-0004gF-FV
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 12:05:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j06zN-0004cP-Qx
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:00:22 -0500
+ (envelope-from <armbru@redhat.com>) id 1j06zf-0005J7-Af
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:00:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j06zM-0003IZ-Fb
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:00:21 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44870)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j06zM-0003FZ-7y
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:00:20 -0500
-Received: by mail-ot1-x343.google.com with SMTP id h9so2760753otj.11
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 09:00:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=F5+d8AqKgWKJUkNZjeJml+KURblA5gJfBPv4qC+u0Mk=;
- b=xe8Jaqc+7nRii9xTrbGGMfZ5+pgsC6Wp0COB7RuEP3pLbnUjvYuVI/oEK1zfcfX82A
- 0y+hH5+/lodU5q3w/BcozaWzVs5KqCLey4xHM6ueVkXzChq4uQTJ6N8T2FuTUbWgX8SF
- WHsM/qBE1J1uC8YVhv1CarU7lb9tp6xP3mnAhkCpWxHmSNZoHkaFEuEcSUHmt9uCuhXK
- 0myWp9gdTx1AjQBdYLueX9jpGiV2XH3r+S6xFOeYqseyfcla8hy6taaKxsHZXLb+mtO/
- A7B42eTN3++6MYwUGVSBQ69FankoBB6ZLNCS9sduiDmvnKOAkBQbtpkQ7D2bFSkcoOMO
- 7QYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=F5+d8AqKgWKJUkNZjeJml+KURblA5gJfBPv4qC+u0Mk=;
- b=VHkIkFPp2nxkyPNV28GMhyc1W3AwJ9CJ3EWANfEpp6tXRF23vaRgbH0y3+AYPE1JKH
- lR5Q1bsOpCXHP9wPqKwozEzOXfeU8Dw7neK4QkNZX+ToxeRogIWW+KOewTVlx3ai3gkB
- NKRLHSwotXRcMjG0UU/VHhuSfrf4ymEyLLT07FGcJ0MAeNdFRn5CWrx24Pyizj7eQTkv
- 9Mw4UFUwVBnU3DQlD6LIKHYD+8x34uj601QDwSpUPnoF2PzKbJUrIMLiJIIUySbx5RgY
- khbBcaMme6sb2+500lHg6gVnVnvE+HzLZtAwaFrafm1A5D/ar0xs2K9Aybzx3FVTRp/k
- dHxg==
-X-Gm-Message-State: APjAAAVAcszcqybnMR4vfn7wslkmyi2p/7IHj9HrREgFbAKCpQmahYvW
- G588ZuMjgM+RIifQsnMK4hS6OmRcHrP/tMSQeD4Sjg==
-X-Google-Smtp-Source: APXvYqxl6Wbyk+TigT7Zwm8VLi/H5gcIIvwW9HZUDY3XLcxvToiNEBWi+hw1bMTtMuAZIDbYK5PklceAGjY6qw0WBug=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr214504otq.221.1581094818843; 
- Fri, 07 Feb 2020 09:00:18 -0800 (PST)
-MIME-Version: 1.0
+ (envelope-from <armbru@redhat.com>) id 1j06zd-0003mg-I1
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:00:38 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58097
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j06zd-0003lI-DO
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 12:00:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581094836;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=t72mgmiL/Qj1q/rEiZeORO8Fy8Obi+8E0bh7zz3LHag=;
+ b=fMrBRlPhwmzkjB1moDpC/Nktt7FUDTDD29dhmrWa8jljqYMKcD5IDusHFMvUbkw+TnXuTZ
+ Py4zVimtN38BST0QxG2BFtNifg279pO2Lv3Oibhmznhdq+ue5N3E2TFZSuY2Yezx92gYT0
+ 5/En00y8Bw7F+vLXlGRS+yWa1XulW5k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-P-5mC0wPMvizeFsgKcPnuQ-1; Fri, 07 Feb 2020 12:00:34 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DAB88010F1;
+ Fri,  7 Feb 2020 17:00:33 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
+ [10.36.116.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CF40560BEC;
+ Fri,  7 Feb 2020 17:00:27 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 5CBC711386A7; Fri,  7 Feb 2020 18:00:26 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 00/29] Convert QAPI doc comments to generate rST instead
+ of texinfo
 References: <20200206173040.17337-1-peter.maydell@linaro.org>
- <20200206173040.17337-19-peter.maydell@linaro.org>
- <87a75unxrm.fsf@dusky.pond.sub.org>
-In-Reply-To: <87a75unxrm.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Feb 2020 17:00:07 +0000
-Message-ID: <CAFEAcA_ncWPsFyywKCM9sWt+ZP+hYqYbMOL07EinQbkVHgBfbA@mail.gmail.com>
-Subject: Re: [PATCH 18/29] qapi/migration.json: Replace _this_ with *this*
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+Date: Fri, 07 Feb 2020 18:00:26 +0100
+In-Reply-To: <20200206173040.17337-1-peter.maydell@linaro.org> (Peter
+ Maydell's message of "Thu, 6 Feb 2020 17:30:11 +0000")
+Message-ID: <877e0ynxhx.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: P-5mC0wPMvizeFsgKcPnuQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,36 +91,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
  Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Feb 2020 at 16:54, Markus Armbruster <armbru@redhat.com> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
-> > The MigrationInfo::setup-time documentation is the only place where
-> > we use _this_ inline markup to mean italics.
->
-> Nitpick: _this_ does not mean italics, it means emphasis.  See
-> qapi-code-gen.txt section "Documentation markup".  doc.py maps it to
-> @emph{this}, which Texinfo commonly renders in italics when the output
-> format supports that.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Yeah, I know. But to my mind nobody actually cares about "is this
-'emphasis' or 'strong'", because those are pretty meaningless
-and are not very easy to distinguish semantically. What people
-actually care about is "how does this render", because bold and
-italics look noticeably different and if you're writing you
-might care about which you get. At that point 'strong' is just
-a confusing synonym for 'bold' and 'emphasis' is a confusing
-synonym for 'italics'. But maybe I'm out on a limb here.
+> This series switches all our QAPI doc comments over from
+> texinfo format to rST.
+>
+> The basic approach is somewhat similar to how we deal with kerneldoc
+> and hxtool: we have a custom Sphinx extension which is passed a
+> filename which is the json file it should run the QAPI parser over and
+> generate documentation for. Unlike 'kerneldoc' but somewhat like
+> hxtool, I have chosed to generate documentation by generating a tree
+> of docutils nodes, rather than by generating rST source that is then
+> fed to the rST parser to generate docutils nodes.  Individual lumps of
+> doc comment go to the rST parser, but the structured parts we render
+> directly. This makes it easier to get the structure and heading level
+> nesting correct.
+>
+> Rather than trying to exactly handle all the existing comments I have
+> opted (as Markus suggested) to tweak them where this seemed more
+> sensible than contorting the rST generator to deal with
+> weirdnesses. The principal changes are:
+>  * whitespace is now significant, and multiline definitions must have
+>    their second and subsequent lines indented to match the first line
+>  * general rST format markup is permitted, not just the small set of
+>    markup the old texinfo generator handled. For most things (notably
+>    bulleted and itemized lists) the old format is the same as rST was.
+>  * Specific things that might trip people up:
+>    - instead of *bold* and _italic_ rST has **bold** and *italic*
 
-Anyway, I'm happy to tweak the commit message.
+Actually, qapi-code-gen.txt documents and doc.py implements *strong* and
+_emphasis_.  Texinfo commonly renders them as bold and italic when the
+output format supports that.  rST has **strong** and *emphasis*.
 
-thanks
--- PMM
+Your series adjusts emphasis markup for rST [PATCH 18].  Since it
+doesn't touch strong markup, strong silently becomes emphasis.  I guess
+that's okay, perhaps even an improvement, but double-checking the actual
+uses of this markup wouldn't hurt.
+
+>    - lists need a preceding and following blank line
+>    - a lone literal '*' will need to be backslash-escaped to
+>      avoid a rST syntax error
+>  * the old leading '|' for example (literal text) blocks is replaced
+>    by the standard rST '::' literal block.
+>  * headings and subheadings must now be in a freeform documentation
+>    comment of their own
+
+Can we simply use rST instead?  See my review of PATCH 18.
+
+>  * we support arbitrary levels of sub- and sub-sub-heading, not just a
+>    main and sub-heading like the old texinfo generator
+>  * as a special case, @foo is retained and is equivalent to ``foo``
+
+Apart from these remarks, your changes look sensible to me right now.  I
+hope they'll still look that way when I'm done reviewing :)
+
+[...]
+
 
