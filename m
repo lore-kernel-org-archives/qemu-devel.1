@@ -2,86 +2,89 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CAD4C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 11:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3EFC352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 11:41:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4927920720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 11:41:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF1CB20720
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 11:41:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WoFpzwVH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4927920720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xxaxL3XO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF1CB20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j020W-0004BW-DK
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 06:41:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36088)
+	id 1j020a-0004bO-UW
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 06:41:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j01z5-0002q9-Rf
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:39:44 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j01z9-0002sx-52
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:39:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j01z4-0005cr-IW
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:39:43 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39542)
+ (envelope-from <alex.bennee@linaro.org>) id 1j01z8-0005iy-2g
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:39:47 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50504)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j01z4-0005ay-B9
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:39:42 -0500
-Received: by mail-wr1-x444.google.com with SMTP id y11so2286540wrt.6
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 03:39:42 -0800 (PST)
+ id 1j01z7-0005hS-SC
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 06:39:46 -0500
+Received: by mail-wm1-x341.google.com with SMTP id a5so2265090wmb.0
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 03:39:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jyG9KD8JNUOpj/k4ZmkY8ByVZXkTc/qLI0RZdDbWsBY=;
- b=WoFpzwVH+gAAWElYog37Bo5Q23Q6rTfjzZuOrIpLpqW9WP1WodR0mn8Qwh47Aucube
- uH+TMXsZffr3MgNQs8Xa/9/SUbw0I3axKVqNsYb1VyOJO5XnmLJFEZ3nrQB36pIQfMGr
- zmqqQH3VIkw+PV+3SwPAYy8+6zCq1eqDoJq/+qFwArHXc41HeuZp+zAnuP+N3LVQxUj6
- hrYYwpotk2iNyPY+kPuqdnMnmEkfTDwyLA6alYCskHkyGo4rbDmEC7BKCgAPxTqLzWwo
- moZgxKeBcEyjeYxwkT0EtzQaaxGnYD4D6n8irNMJgH4lJpmotmRWx38ouXcwEhXq8QxR
- ZDaQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=y4d6Sguo40PEMFEa1p9tKAqrtcGlKPa27ISKFx3kAqI=;
+ b=xxaxL3XOk3IDVbga8LKTZmCLe/MHkX23MmNEtqohD2umfyItiXSveJjh5a4SjHwFFe
+ 8I93g7ZLOJhRZ62nIMc5t50jAGhJOrwCpSQeinSI41ALjlOJPcjDSP3csld8r/Yixyt8
+ QvlKFABopqjjHkK2O8d7aYAzufhN16g1Otc60AtZ4PAhurwk09t53VqZbYDG89ZYKJkz
+ eGdj8Klcj9fWhJlZ5pI7He86f0OClxvng2C5FbeSc8nAmSPM0rKQ3LyUdwL3Y9A/VglJ
+ e3LLfJXhxBPCgphF8YGesQqCWSq/8mqcQqqAveUkxYh6Btqp7AAE1coc6TjB07HU6BjJ
+ YaMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=jyG9KD8JNUOpj/k4ZmkY8ByVZXkTc/qLI0RZdDbWsBY=;
- b=Wulw0uBsDliDI7QSm3+nvLt8M666/dUQYYp+GUJLuan8rcvMqvvEbbaSARrsk2IT8c
- 8q+GecJENYtq1RhoLPSF0luKAM5PhU5cnk18/eK0SbyvpUS3aXFrSR2mLw+lu0SpqZ6x
- S5TAS43Ezfmb/cLyb/MD7XjosWuIiWwmeBrivUN79Vq7hQ3+1tfs9k2iMWR+iV1FtOUj
- fMUuJFlwlJU2LSBTsU0e3tG43rxlYk2hga7Z9Lirth0Q996/NYaMFAdedEzX0QxO3hRy
- Axtd9LPgsbaS2gMhTJEHQJxdTYNF5KKGS1L6C8fnx4ueZx/pTmgN3lOgQ6A7QBUDgFjY
- zePg==
-X-Gm-Message-State: APjAAAV1RDAETJU0aVBfneP/XfBsK1VdnOzw23z3nc9F8V0ZPBeXUAwL
- hGSzZilbG+DTl6HF5B5MVZrOjQ==
-X-Google-Smtp-Source: APXvYqyRtR/lg5DrMOcnPHycRXJ+qGrxfMS8usMunzx5so6M8lUrXbJvNPbfpnBQpYne5Hu78rx/WA==
-X-Received: by 2002:a5d:6987:: with SMTP id g7mr4148216wru.422.1581075581220; 
- Fri, 07 Feb 2020 03:39:41 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=y4d6Sguo40PEMFEa1p9tKAqrtcGlKPa27ISKFx3kAqI=;
+ b=AdcIZiq1ZNcFv2U88BhOU8yQaJ1PzgVYRpYFjBczmbd+oGGyt9FuVTHIRjq/sb67sP
+ pZvhtTHBrRrqr9XrjIL/EfIjQB4dU1eXeMBplbcfhzh+wdL4ADLponJq7ueJ1Q83hJS7
+ 2Xi0vjhI6YWtCZIxpNw3qm0MKHw3u/caOtP1EgrdDbkWu7IL7AQ3Uw5X9NQcui/ztfv4
+ Xpt8xVfxegl9ESEABd5/pHg2xgbzVVGYvWw9Arq4MrhDnYiWVOj2VGM7v7/qOCbeagVb
+ TP6YyYN5MnvRGq37vRMArq6b1rpuDyhsQGd/lgNuvnAgFf42BIG/nzXXFaM+Ola/nlBH
+ Aazw==
+X-Gm-Message-State: APjAAAXNyQPsvgmyDkDPz5srbpVYUjxcR3QnvUQ1dX9i9clSe9CfZv0O
+ yoHW7SfaXzZtJNZ6Z2vQBoVDcQ==
+X-Google-Smtp-Source: APXvYqwQsuBWOql+9b9V/MTI2aE8Bq8cOBX55jN/KLkZR0+KNn4wL0NwpjNiRyA1gQq/pOT9P45Q4Q==
+X-Received: by 2002:a05:600c:242:: with SMTP id 2mr3908121wmj.2.1581075584796; 
+ Fri, 07 Feb 2020 03:39:44 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z11sm2971617wrv.96.2020.02.07.03.39.39
+ by smtp.gmail.com with ESMTPSA id x14sm2954784wmj.42.2020.02.07.03.39.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 03:39:40 -0800 (PST)
+ Fri, 07 Feb 2020 03:39:42 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6B5141FF87;
+ by zen.linaroharston (Postfix) with ESMTP id B27191FF90;
  Fri,  7 Feb 2020 11:39:39 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 0/5] testing/next (rcutorture and misc tweaks)
-Date: Fri,  7 Feb 2020 11:39:34 +0000
-Message-Id: <20200207113939.9247-1-alex.bennee@linaro.org>
+Subject: [PATCH  v1 3/5] tests/rcutorture: better document locking of stats
+Date: Fri,  7 Feb 2020 11:39:37 +0000
+Message-Id: <20200207113939.9247-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200207113939.9247-1-alex.bennee@linaro.org>
+References: <20200207113939.9247-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,29 +105,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+This is pure code motion with no functional effect.
 
-The current state of testing/next is mostly a rubber duck exercise as
-I tried to figure out what might cause the rcutorture test to fail.
-The only real practical change is asserting we are never about to
-reset and existing active RCU structure. So far I haven't seen the
-rcutorture crash occur since (although git stability seems to be a
-current problem for Travis).
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/rcutorture.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-Alex Bennée (4):
-  tests/tcg: include a skip runner for pauth3 with plugins
-  tests/rcutorture: update usage hint
-  tests/rcutorture: better document locking of stats
-  tests/rcutorture: mild documenting refactor of update thread
-
-Thomas Huth (1):
-  travis.yml: Test the s390-ccw build, too
-
- tests/rcutorture.c                        | 55 +++++++++++++++++------
- .travis.yml                               | 10 +++++
- tests/tcg/aarch64/Makefile.softmmu-target |  2 +
- 3 files changed, 53 insertions(+), 14 deletions(-)
-
+diff --git a/tests/rcutorture.c b/tests/rcutorture.c
+index e8b2169e7dd..256d24ed5ba 100644
+--- a/tests/rcutorture.c
++++ b/tests/rcutorture.c
+@@ -65,8 +65,6 @@
+ #include "qemu/rcu.h"
+ #include "qemu/thread.h"
+ 
+-long long n_reads = 0LL;
+-long n_updates = 0L;
+ int nthreadsrunning;
+ 
+ #define GOFLAG_INIT 0
+@@ -78,11 +76,20 @@ static volatile int goflag = GOFLAG_INIT;
+ #define RCU_READ_RUN 1000
+ 
+ #define NR_THREADS 100
+-static QemuMutex counts_mutex;
+ static QemuThread threads[NR_THREADS];
+ static struct rcu_reader_data *data[NR_THREADS];
+ static int n_threads;
+ 
++/*
++ * Statistical counts
++ *
++ * These are the sum of local counters at the end of a run.
++ * Updates are protected by a mutex.
++ */
++static QemuMutex counts_mutex;
++long long n_reads = 0LL;
++long n_updates = 0L;
++
+ static void create_thread(void *(*func)(void *))
+ {
+     if (n_threads >= NR_THREADS) {
+@@ -230,8 +237,9 @@ struct rcu_stress {
+ struct rcu_stress rcu_stress_array[RCU_STRESS_PIPE_LEN] = { { 0 } };
+ struct rcu_stress *rcu_stress_current;
+ int rcu_stress_idx;
+-
+ int n_mberror;
++
++/* Updates protected by counts_mutex */
+ long long rcu_stress_count[RCU_STRESS_PIPE_LEN + 1];
+ 
+ 
 -- 
 2.20.1
 
