@@ -2,82 +2,108 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED514C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 18:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE33C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 18:02:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B76CA214AF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 18:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EC2A214AF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 18:02:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lFJt4/1H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B76CA214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hk+pdu9V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EC2A214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j07wx-0004Hf-PJ
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 13:01:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48209)
+	id 1j07xr-0005Ft-Jh
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 13:02:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48520)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j07wJ-0003VZ-Rp
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 13:01:16 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j07xC-0004c6-4d
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 13:02:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j07wI-00073h-0G
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 13:01:15 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36770)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j07wH-0006z4-Q3
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 13:01:13 -0500
-Received: by mail-oi1-x242.google.com with SMTP id c16so2849337oic.3
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 10:01:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Bu8jAfUNNx0M7UrXp1dt6MXcfvGiBPlyXSYK/slfxKQ=;
- b=lFJt4/1Hv2d7FKkANEmakNqJH4mFpPXW3ja4ghSMwZL7t4ArCaThtHDxyq4qLft9fI
- Se2lgB0eJB/MHbWukr07hWvqfu50t2c8wSjCTod18XLjzIOJq+65YmdwRyWIDb8IIYMp
- +3NJLA7edQ9iCcW9WPMd1qTR59vdcBcT64WJTxd8N4vAnnqJZ/6WGv70BrUThags3Vqw
- nFY5meAq2Msgvzz/jvg1rA1ycQOHwTA/c5Q/Ph2xu+xLi4/PSCKZCvq7ab3sOtjzteJ/
- n9NtLtx9SloL7soIB/8o+/VTlj0ltMGfUQc5p2yU0yUMjVp4Sl9k3uJxue8e+lP138+a
- OA4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Bu8jAfUNNx0M7UrXp1dt6MXcfvGiBPlyXSYK/slfxKQ=;
- b=bneDjhNwFNj6096UCfJEaTjuLt7P7GccDwvLWnYzExCYznhzeEGfR9NifEGXh+PRUd
- jrFxcwnn0FxQRO6JsHNJ4VsVlxpGgInxne7uEEQSvN8VtMhRjuRggB4V/sGYAtD9RPx0
- 4FQC81Xq9/MIGwueh3EuFh5F5rJ+kQAFTz9mL6Sh8NqHnBohQbOLGc4Kt7lKAv6F4gC/
- fZQ/ZbMxzNtguMEKrM6VgGPhvUqHY1VNhd+5AzhyLYEKopvJT+9gL4VpNMeaO+ZzZ+H8
- 5w74bVkTKNYlv8m+ViJUmIVlaAq3C7nKnESODdS4jDOFfqxICfEzvGC0wPDfdWgSz5Af
- +fyw==
-X-Gm-Message-State: APjAAAWCsaxQruYQlKUjwvSgDKkLhYlby8N7y3zXf4Hc5+BOOwHq11R2
- pDPR84YWfoQ0vKi8aDbv4yCNp01LpH8PnHfoYuoQVw==
-X-Google-Smtp-Source: APXvYqzljVmpm7uU3U6CSxTpchIL+whonxh747V5lk0d/Fduh/PJAkKzcf7nXZ7UeU0rtgpr4rFlDACHeyuNnTrNZj0=
-X-Received: by 2002:a05:6808:3b2:: with SMTP id
- n18mr2780502oie.146.1581098472578; 
- Fri, 07 Feb 2020 10:01:12 -0800 (PST)
+ (envelope-from <mreitz@redhat.com>) id 1j07xA-0001wT-K3
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 13:02:09 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21710
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j07xA-0001uO-GD
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 13:02:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581098527;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=L7oJicjRjGXqoaIATWD7pzJpaX+XLptdeOXLyR/bxNk=;
+ b=Hk+pdu9VND69HAqGThRba3oq31SKnCGMlylWRIZc7nFoKHhX5HYSjNq225Iyy1MSYm0OV0
+ aVQF9TL9gXa0w+n/9mVAJSsw5CspMd8+l6RhDXCUfmhFzEazb70n1kZorVQbT8JqyeQMHo
+ Q7/2RBPVMZgjiOwnNv9Ac4VCwq8460w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-HSDytHQrOgO_mOFVflUbQQ-1; Fri, 07 Feb 2020 13:02:03 -0500
+X-MC-Unique: HSDytHQrOgO_mOFVflUbQQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10A3B802565;
+ Fri,  7 Feb 2020 18:02:02 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-14.ams2.redhat.com
+ [10.36.117.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D33E287B11;
+ Fri,  7 Feb 2020 18:01:57 +0000 (UTC)
+Subject: Re: [PATCH v2 4/7] block/block-copy: refactor interfaces to use bytes
+ instead of end
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191127180840.11937-1-vsementsov@virtuozzo.com>
+ <20191127180840.11937-5-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <b41bd0ca-07f6-27e5-b6c7-eefa2a4826ba@redhat.com>
+Date: Fri, 7 Feb 2020 19:01:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200203144716.32204-1-richard.henderson@linaro.org>
- <20200203144716.32204-15-richard.henderson@linaro.org>
-In-Reply-To: <20200203144716.32204-15-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Feb 2020 18:01:01 +0000
-Message-ID: <CAFEAcA9mkjeis8mavOSQsxvnH3pLv=WpwcKsNKzOONzMB6=+Ww@mail.gmail.com>
-Subject: Re: [PATCH v3 14/20] target/arm: Set PAN bit as required on exception
- entry
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <20191127180840.11937-5-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="9JGGW5b3LekC2KZRDaHFIFeLeBGgLArx6"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,73 +115,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 3 Feb 2020 at 14:47, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The PAN bit is preserved, or set as per SCTLR_ELx.SPAN,
-> plus several other conditions listed in the ARM ARM.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9JGGW5b3LekC2KZRDaHFIFeLeBGgLArx6
+Content-Type: multipart/mixed; boundary="ZCtYxxQRpcx9p6JtMgjj8H42rHYv91sAm"
+
+--ZCtYxxQRpcx9p6JtMgjj8H42rHYv91sAm
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 27.11.19 19:08, Vladimir Sementsov-Ogievskiy wrote:
+> We have a lot of "chunk_end - start" invocations, let's switch to
+> bytes/cur_bytes scheme instead.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-> v2: Tidy preservation of CPSR_PAN in take_aarch32_exception (pmm).
-> ---
->  target/arm/helper.c | 40 +++++++++++++++++++++++++++++++++++++---
->  1 file changed, 37 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 18e4cbb63c..4c0eb7e7d9 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -8772,8 +8772,12 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
->                                     uint32_t mask, uint32_t offset,
->                                     uint32_t newpc)
+>  include/block/block-copy.h |  4 +--
+>  block/block-copy.c         | 68 ++++++++++++++++++++------------------
+>  2 files changed, 37 insertions(+), 35 deletions(-)
+
+[...]
+
+> diff --git a/block/block-copy.c b/block/block-copy.c
+> index 94e7e855ef..cc273b6cb8 100644
+> --- a/block/block-copy.c
+> +++ b/block/block-copy.c
+
+[...]
+
+> @@ -150,24 +150,26 @@ void block_copy_set_callbacks(
+
+[...]
+
+>  static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
+> -                                           int64_t start, int64_t end,
+> +                                           int64_t start, int64_t bytes,
+
+I wonder whether it would make more sense to make some of these @bytes
+parameters plain ints, because...
+
+>                                             bool zeroes, bool *error_is_r=
+ead)
 >  {
-> +    int new_el;
-> +
->      /* Change the CPU state so as to actually take the exception. */
->      switch_mode(env, new_mode);
-> +    new_el = arm_current_el(env);
-> +
->      /*
->       * For exceptions taken to AArch32 we must clear the SS bit in both
->       * PSTATE and in the old-state value we save to SPSR_<mode>, so zero it now.
-> @@ -8786,7 +8790,7 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
->      env->uncached_cpsr = (env->uncached_cpsr & ~CPSR_M) | new_mode;
->      /* Set new mode endianness */
->      env->uncached_cpsr &= ~CPSR_E;
-> -    if (env->cp15.sctlr_el[arm_current_el(env)] & SCTLR_EE) {
-> +    if (env->cp15.sctlr_el[new_el] & SCTLR_EE) {
->          env->uncached_cpsr |= CPSR_E;
->      }
->      /* J and IL must always be cleared for exception entry */
-> @@ -8797,6 +8801,12 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
->          env->thumb = (env->cp15.sctlr_el[2] & SCTLR_TE) != 0;
->          env->elr_el[2] = env->regs[15];
->      } else {
-> +        /* CPSR.PAN is preserved unless target is EL1 and SCTLR.SPAN == 0. */
-> +        if (cpu_isar_feature(aa64_pan, env_archcpu(env))
-> +            && new_el == 1
-> +            && !(env->cp15.sctlr_el[1] & SCTLR_SPAN)) {
-> +            env->uncached_cpsr |= CPSR_PAN;
-> +        }
+>      int ret;
+> -    int nbytes =3D MIN(end, s->len) - start;
+> +    int nbytes =3D MIN(start + bytes, s->len) - start;
 
-This doesn't catch the "taking exception to EL3 and AArch32 is EL3"
-case, which is also supposed to honour SCTLR.SPAN.
+...things like this look a bit dangerous now.  So if the interface
+already clearly shows that we=92re always expecting something less than
+INT_MAX, it might all be a bit clearer.
 
-Given where this code is, we know we're taking an exception to
-AArch32 and that we're not going to Hyp mode, so in fact every
-case where we get here is one where we should honour SCTLR.SPAN
-and I think we can just drop the "new_el == 1" part of the condition.
+I=92ll leave it up to you:
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-thanks
--- PMM
+
+--ZCtYxxQRpcx9p6JtMgjj8H42rHYv91sAm--
+
+--9JGGW5b3LekC2KZRDaHFIFeLeBGgLArx6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl49phQACgkQ9AfbAGHV
+z0Bsygf/Y4pGhERL/iYygYpm7SyF5beGWjLhLoT6jNKOuWr3p2DfrwojGbS8LCoq
+bEezn3AJqYDocpAsoBPExAFmG6jhaCewmtGzn5IWxo/+Go9EsRjxUojttTs92dh7
+xeo8njrK09VPmRV7pAgUE9lwdUjU805FDsOzmydXeuDkRbougIZB30m+WwDw+8IW
+Al34IG+JN/Q3k14Y/Bop6jN1wE1r7a79oUqK1Rh5kDAtPMWeIWji8nbJTbPX4js6
+Adny5eyjVI9e/xYNjaU3zjNxm529TFeNSuLI6icjEtBvoCC0jmL78dACKg/RHkeQ
+efmhWk/tmg+FF8n2qw77KlkDcNV0yg==
+=rlbB
+-----END PGP SIGNATURE-----
+
+--9JGGW5b3LekC2KZRDaHFIFeLeBGgLArx6--
+
 
