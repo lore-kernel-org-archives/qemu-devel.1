@@ -2,73 +2,77 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C62A8C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 20:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C93C35250
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 20:17:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A100820715
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 20:16:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A100820715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DA6F620715
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 20:17:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="DRKxYNW2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA6F620715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0A3G-0005aE-S5
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 15:16:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54172)
+	id 1j0A4L-0007Xu-0f
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 15:17:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54255)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j0A2L-00054V-QC
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:15:39 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1j0A36-0005br-4F
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j0A2K-0005z5-0O
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:15:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48314)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j0A2J-0005xT-R0
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:15:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j0A2I-0002j1-FL
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 20:15:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6EE862E80C7
- for <qemu-devel@nongnu.org>; Fri,  7 Feb 2020 20:15:34 +0000 (UTC)
+ (envelope-from <kwankhede@nvidia.com>) id 1j0A33-0006af-Ja
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:23 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:17951)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1j0A33-0006U6-96
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 15:16:21 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e3dc5780001>; Fri, 07 Feb 2020 12:15:52 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Fri, 07 Feb 2020 12:16:17 -0800
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Fri, 07 Feb 2020 12:16:17 -0800
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 7 Feb
+ 2020 20:16:17 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Fri, 7 Feb 2020 20:16:10 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v12 Kernel 0/7] KABIs to support migration for VFIO devices
+Date: Sat, 8 Feb 2020 01:12:27 +0530
+Message-ID: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+X-NVConfidentiality: public
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Feb 2020 20:06:33 -0000
-From: yw662 <1862415@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: yw662
-X-Launchpad-Bug-Reporter: yw662 (yw662)
-X-Launchpad-Bug-Modifier: yw662 (yw662)
-References: <158110549948.8965.4395096108369482087.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158110599324.18631.7546781486066208876.malone@gac.canonical.com>
-Subject: [Bug 1862415] Re: -nic user cannot receive TFTP response from outside
- on windows 10 host
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: fdd15d6e007a7015a11555d0b3f45d079f4bf1ba
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1581106552; bh=ozjH+tKAAJmnPnuzUL56QveBzh7MYBg6k3KzjCa9NPA=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ X-NVConfidentiality:MIME-Version:Content-Type;
+ b=DRKxYNW2DQ/3gQRCVMhlxLxUiluFQJeD/E8zG+E5HHaWAhlSsLnVdITYPCepR0Wiq
+ XF8USsCP/dLFMPsuSnFgXzsLT43BwdROqJhteoPHW27s0ttuBcx4y/Iy1LVK8COZA3
+ OotK2nA1LN12DeIxMwoP35UnRRMzqDMAJS1lNCQIDyMp/DSTMYCO0hikZnMgUTPrln
+ Hw0Mvnbtp2N1wkNr/B1IL2pOsS5Om+f2/dqi1ozKlDMb89fHx5QEjjlb1N1bpEzARh
+ asMbTt+yj+kcSzhb4qIZDjVcoc4P4mpmw5q6mLGYrvzeMcjn/dM8Kei8CiciDFrte3
+ 0J7cVLlhunIWQ==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,170 +81,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1862415 <1862415@bugs.launchpad.net>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "host.pcap"
-   https://bugs.launchpad.net/qemu/+bug/1862415/+attachment/5326376/+files/=
-host.pcap
+Hi,
 
--- =
+This patch set adds:
+* New IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
+  respect to IOMMU container rather than per device. All pages pinned by
+  vendor driver through vfio_pin_pages external API has to be marked as
+  dirty during  migration. When IOMMU capable device is present in the
+  container and all pages are pinned and mapped, then all pages are marked
+  dirty.
+  When there are CPU writes, CPU dirty page tracking can identify dirtied
+  pages, but any page pinned by vendor driver can also be written by
+  device. As of now there is no device which has hardware support for
+  dirty page tracking. So all pages which are pinned should be considered
+  as dirty.
+  This ioctl is also used to start/stop dirty pages tracking for pinned and
+  unpinned pages while migration is active.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1862415
+* Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
+  unmapping IO virtual address range.
+  With vIOMMU, during pre-copy phase of migration, while CPUs are still
+  running, IO virtual address unmap can happen while device still keeping
+  reference of guest pfns. Those pages should be reported as dirty before
+  unmap, so that VFIO user space application can copy content of those
+  pages from source to destination.
 
-Title:
-  -nic user cannot receive TFTP response from outside on windows 10 host
+* Patch 7 is proposed change to detect if IOMMU capable device driver is
+  smart to report pages to be marked dirty by pinning pages using
+  vfio_pin_pages() API.
 
-Status in QEMU:
-  New
 
-Bug description:
-  Configuration:
-  qemu is on a windows 10 host, address 192.168.1.24
-  A tftp server, which is atftpd, is at address 192.168.1.31
-  a guest is started by: =
+Yet TODO:
+Since there is no device which has hardware support for system memmory
+dirty bitmap tracking, right now there is no other API from vendor driver
+to VFIO IOMMU module to report dirty pages. In future, when such hardware
+support will be implemented, an API will be required such that vendor
+driver could report dirty pages to VFIO module during migration phases.
 
-  ```
-  .\qemu-system-x86_64.exe -accel hax \
-  -nic user,id=3Dn1,tftp-server-name=3D192.168.1.31,bootfile=3Dtftp://192.1=
-68.1.31/grub/i386-pc/core.0 \
-  -object filter-dump,id=3Df1,netdev=3Dn1,file=3Ddump.dat
-  ```
+Adding revision history from previous QEMU patch set to understand KABI
+changes done till now
 
-  qemu v4.2.0-11797-g2890edc853-dirty, from https://qemu.weilnetz.de/w64/
-  windows 10 1909 18363.628
+v11 -> v12
+- Changed bitmap allocation in vfio_iommu_type1.
+- Remove atomicity of ref_count.
+- Updated comments for migration device state structure about error
+  reporting.
+- Nit picks from v11 reviews
 
-  Here is the captured traffic from dump.dat, no filter applied:
-  No.	Time	Source	Destination	Protocol	Length	Info
-  1	0.000000	0.0.0.0	255.255.255.255	DHCP	439	DHCP Discover - Transaction I=
-D 0xdb38340e
-  2	0.000081	10.0.2.2	255.255.255.255	DHCP	590	DHCP Offer    - Transaction =
-ID 0xdb38340e
-  3	1.035670	0.0.0.0	255.255.255.255	DHCP	439	DHCP Discover - Transaction I=
-D 0xdb38340e
-  4	1.035693	10.0.2.2	255.255.255.255	DHCP	590	DHCP Offer    - Transaction =
-ID 0xdb38340e
-  5	3.068055	0.0.0.0	255.255.255.255	DHCP	451	DHCP Request  - Transaction I=
-D 0xdb38340e
-  6	3.068099	10.0.2.2	255.255.255.255	DHCP	590	DHCP ACK      - Transaction =
-ID 0xdb38340e
-  7	3.068209	RealtekU_12:34:56	Broadcast	ARP	42	ARP Announcement for 10.0.2=
-.15
-  8	3.148419	RealtekU_12:34:56	Broadcast	ARP	42	Who has 10.0.2.2? Tell 10.0=
-.2.15
-  9	3.148449	52:55:0a:00:02:02	RealtekU_12:34:56	ARP	64	10.0.2.2 is at 52:5=
-5:0a:00:02:02
-  10	3.148511	10.0.2.15	192.168.1.31	TFTP	91	Read Request, File: grub/i386-=
-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  11	3.398093	10.0.2.15	192.168.1.31	TFTP	91	Read Request, File: grub/i386-=
-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  12	3.946041	10.0.2.15	192.168.1.31	TFTP	91	Read Request, File: grub/i386-=
-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  13	4.990262	10.0.2.15	192.168.1.31	TFTP	91	Read Request, File: grub/i386-=
-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  14	7.022839	10.0.2.15	192.168.1.31	TFTP	91	Read Request, File: grub/i386-=
-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  15	11.087041	10.0.2.15	192.168.1.31	TFTP	91	Read Request, File: grub/i386=
--pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
+v10 -> v11
+- Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
+- Added proposal to detect if IOMMU capable device calls external pin pages
+  API to mark pages dirty.
+- Nit picks from v10 reviews
 
-  =
+v9 -> v10:
+- Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
+  during unmap while migration is active
+- Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
+  tracking.
+- If iommu_mapped, mark all pages dirty.
+- Added unpinned pages tracking while migration is active.
+- Updated comments for migration device state structure with bit
+  combination table and state transition details.
 
-  Here is the captured traffic at host NIC, filered by from or to 192.168.1=
-.31
-  No.	Time	Source	Destination	Protocol	Length	Info
-  14140	57.729066	192.168.1.24	192.168.1.31	TFTP	91	Read Request, File: gru=
-b/i386-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  14141	57.732988	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14255	57.977995	192.168.1.24	192.168.1.31	TFTP	91	Read Request, File: gru=
-b/i386-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  14256	57.979876	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14275	58.525939	192.168.1.24	192.168.1.31	TFTP	91	Read Request, File: gru=
-b/i386-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  14276	58.527819	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14328	59.570178	192.168.1.24	192.168.1.31	TFTP	91	Read Request, File: gru=
-b/i386-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  14329	59.581024	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14383	61.602742	192.168.1.24	192.168.1.31	TFTP	91	Read Request, File: gru=
-b/i386-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  14384	61.605554	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14730	62.736572	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14741	62.987924	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14756	63.533477	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14815	64.577653	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  14916	65.666959	192.168.1.24	192.168.1.31	TFTP	91	Read Request, File: gru=
-b/i386-pc/core.0, Transfer type: octet, blksize=3D1432, tsize=3D0
-  14917	65.668778	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  15235	66.615186	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  15481	67.745250	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  15509	67.991523	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  15566	68.539050	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  16691	69.583531	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  17457	70.675366	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  17599	71.615337	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  17904	72.747338	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  18012	72.995681	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  18192	73.544257	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  18360	74.588002	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  18981	75.679037	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  19270	76.620528	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  19839	77.752338	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  19852	78.001267	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  19917	78.548965	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20066	79.593232	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20140	80.684604	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20220	81.625996	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20537	82.824574	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20551	83.033318	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20607	83.555510	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20734	84.598612	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20816	85.691535	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  20898	86.631036	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
-  22311	90.695296	192.168.1.31	192.168.1.24	TFTP	69	Option Acknowledgement,=
- tsize=3D45542, blksize=3D1432
+v8 -> v9:
+- Split patch set in 2 sets, Kernel and QEMU.
+- Dirty pages bitmap is queried from IOMMU container rather than from
+  vendor driver for per device. Added 2 ioctls to achieve this.
 
-  From the traffic, the guest sent the request properly, and it is
-  rerouted outside properly, and the server respond to it properly.
-  However, the guest never received the response.
+v7 -> v8:
+- Updated comments for KABI
+- Added BAR address validation check during PCI device's config space load
+  as suggested by Dr. David Alan Gilbert.
+- Changed vfio_migration_set_state() to set or clear device state flags.
+- Some nit fixes.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1862415/+subscriptions
+v6 -> v7:
+- Fix build failures.
+
+v5 -> v6:
+- Fix build failure.
+
+v4 -> v5:
+- Added decriptive comment about the sequence of access of members of
+  structure vfio_device_migration_info to be followed based on Alex's
+  suggestion
+- Updated get dirty pages sequence.
+- As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
+  get_object, save_config and load_config.
+- Fixed multiple nit picks.
+- Tested live migration with multiple vfio device assigned to a VM.
+
+v3 -> v4:
+- Added one more bit for _RESUMING flag to be set explicitly.
+- data_offset field is read-only for user space application.
+- data_size is read for every iteration before reading data from migration,
+  that is removed assumption that data will be till end of migration
+  region.
+- If vendor driver supports mappable sparsed region, map those region
+  during setup state of save/load, similarly unmap those from cleanup
+  routines.
+- Handles race condition that causes data corruption in migration region
+  during save device state by adding mutex and serialiaing save_buffer and
+  get_dirty_pages routines.
+- Skip called get_dirty_pages routine for mapped MMIO region of device.
+- Added trace events.
+- Split into multiple functional patches.
+
+v2 -> v3:
+- Removed enum of VFIO device states. Defined VFIO device state with 2
+  bits.
+- Re-structured vfio_device_migration_info to keep it minimal and defined
+  action on read and write access on its members.
+
+v1 -> v2:
+- Defined MIGRATION region type and sub-type which should be used with
+  region type capability.
+- Re-structured vfio_device_migration_info. This structure will be placed
+  at 0th offset of migration region.
+- Replaced ioctl with read/write for trapped part of migration region.
+- Added both type of access support, trapped or mmapped, for data section
+  of the region.
+- Moved PCI device functions to pci file.
+- Added iteration to get dirty page bitmap until bitmap for all requested
+  pages are copied.
+
+Thanks,
+Kirti
+
+
+Kirti Wankhede (7):
+  vfio: KABI for migration interface for device state
+  vfio iommu: Remove atomicity of ref_count of pinned pages
+  vfio iommu: Add ioctl definition for dirty pages tracking.
+  vfio iommu: Implementation of ioctl to for dirty pages tracking.
+  vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
+  vfio iommu: Adds flag to indicate dirty pages tracking capability
+    support
+  vfio: Selective dirty page tracking if IOMMU backed device pins pages
+
+ drivers/vfio/vfio.c             |  13 +-
+ drivers/vfio/vfio_iommu_type1.c | 435 +++++++++++++++++++++++++++++++++++++---
+ include/linux/vfio.h            |   4 +-
+ include/uapi/linux/vfio.h       | 267 +++++++++++++++++++++++-
+ 4 files changed, 692 insertions(+), 27 deletions(-)
+
+-- 
+2.7.0
+
 
