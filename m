@@ -2,111 +2,99 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F736C2D0B1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F8EC2D0B1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:32:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E281120726
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:07:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E281120726
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id D0F3D20838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 06:32:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQUGGQ+w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F3D20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izwnA-0004Zc-W3
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 01:07:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35181)
+	id 1izxC4-0003z0-VV
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 01:32:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42919)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sw@weilnetz.de>) id 1izwmd-0004Ar-Jd
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:06:32 -0500
+ (envelope-from <mst@redhat.com>) id 1izxBF-0003Xl-Lj
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sw@weilnetz.de>) id 1izwmc-0000xY-1J
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:06:31 -0500
-Received: from mail.weilnetz.de ([37.120.169.71]:35778
- helo=v2201612906741603.powersrv.de)
+ (envelope-from <mst@redhat.com>) id 1izxBE-0005df-92
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:31:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29356
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1izwmb-0000oC-Rf
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:06:29 -0500
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 14228DBAF42;
- Fri,  7 Feb 2020 07:06:27 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id uk8Hdr3KyPVJ; Fri,  7 Feb 2020 07:06:25 +0100 (CET)
-Received: from macbook02.fritz.box (pD9EC3998.dip0.t-ipconnect.de
- [217.236.57.152])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 4769DDBAEB7;
- Fri,  7 Feb 2020 07:06:25 +0100 (CET)
-Subject: Re: Qemu 4.2.0 on Windows host
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Jerry Geis <jerry.geis@gmail.com>, qemu-devel@nongnu.org
-References: <CABr8-B7+S=WavWA7Ad_7sSB5B-QFJ6uBFuVXPw1hNRQwdZw_7A@mail.gmail.com>
- <e5723022-32d6-56f0-8499-9be7890fc4d6@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <d760ec87-e5df-8d03-93c9-f0460dc38ea4@weilnetz.de>
-Date: Fri, 7 Feb 2020 07:06:24 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1izxBD-0005Z7-Ud
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 01:31:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581057115;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yHXKTHRbvU/hlnHBEG8DGvXYaMI9x8xVzvJo+Od69yo=;
+ b=eQUGGQ+w1tzF334zWqNIsdHwRHTFaCK0I1pEcRguaXAStH9KxkeuEi5F5q9V0hLCxZkSp0
+ EEMBTnb1VK082aGoBqE1Rt/tmq6Vqo3xYxDszBCdRb0/v40ErsFwXRkNR4ejzFTFNsEKXs
+ RwTv8ZgXN5tVy6ssDB+RNdknuP0I104=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-5wfRVQEdMpquwWRaTbtquw-1; Fri, 07 Feb 2020 01:31:48 -0500
+Received: by mail-qk1-f197.google.com with SMTP id i11so736106qki.12
+ for <qemu-devel@nongnu.org>; Thu, 06 Feb 2020 22:31:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=oS7Qa3s3lP9mfsFjCIvdVqUNKWJ3iUBI/IivcbVebqY=;
+ b=J4TlAS9jRiW5cbEqwt3E9zDZOcLGx9kTi02Vc9nGTDzmJZnrjoAl7ImNKQ2b9B51eu
+ J5AwD4TmN44Yd9LheAu3S0splLa5FHcsWawFWPl2HW4H6i6gbTCqsMLnzSAR1CuCs785
+ CemDeECqezy67zYsRaMtGMJmkK/Xdy3R3AWtCYo99z8rb/+pm9rGQagpuWVhnhMI0Wqh
+ uZ8km5dljAC6xPXzJmwFhEOMMTIfYmSRN7Cb6xj1X9gxKcf4ABfMvp9Fv/QGyn6BV9b+
+ IX8OLD3Cgre7ZDqAXeCkRUfUnGZVCiZBPhG9BNjr9iXo0eBJD30XKjv6T6edKZTcK/lj
+ LSJA==
+X-Gm-Message-State: APjAAAU0IG+FDfx2rWot6ogUU0eX/zLcTFnNx5LcUTAJ5Swi6O7Jwwsb
+ zYH94ojP1os8yA6Y3vphIVhiVoZKDpDacrJdg+sLMRQ5As/VLyfEgjEe3bIqzR27WJQAHGPsLuP
+ /RXy3exNeE6T+12c=
+X-Received: by 2002:a05:620a:14a6:: with SMTP id
+ x6mr6206173qkj.206.1581057107994; 
+ Thu, 06 Feb 2020 22:31:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxTJY+AuhxAif36QdUP1VpEy8aRsoPd9bVIeR3jUMQGQR9/+dM5sqbKHdodkWapbsUDaadwfA==
+X-Received: by 2002:a05:620a:14a6:: with SMTP id
+ x6mr6206149qkj.206.1581057107728; 
+ Thu, 06 Feb 2020 22:31:47 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+ by smtp.gmail.com with ESMTPSA id h4sm924493qtp.24.2020.02.06.22.31.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Feb 2020 22:31:46 -0800 (PST)
+Date: Fri, 7 Feb 2020 01:31:42 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2] hw/core: Allow setting 'virtio-blk-device.scsi'
+ property on OSX host
+Message-ID: <20200207013044-mutt-send-email-mst@kernel.org>
+References: <20200207001404.1739-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e5723022-32d6-56f0-8499-9be7890fc4d6@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200207001404.1739-1-philmd@redhat.com>
+X-MC-Unique: 5wfRVQEdMpquwWRaTbtquw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 37.120.169.71
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,32 +106,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Cornelia Huck <cohuck@redhat.com>, stefanha@redhat.com,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.02.20 um 23:17 schrieb Philippe Mathieu-Daud=C3=A9:
+On Fri, Feb 07, 2020 at 01:14:04AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Commit ed65fd1a2750 ("virtio-blk: switch off scsi-passthrough by
+> default") changed the default value of the 'scsi' property of
+> virtio-blk, which is only available on Linux hosts. It also added
+> an unconditional compat entry for 2.4 or earlier machines.
+>=20
+> Trying to set this property on a pre-2.5 machine on OSX, we get:
+>=20
+>    Unexpected error in object_property_find() at qom/object.c:1201:
+>    qemu-system-x86_64: -device virtio-blk-pci,id=3Dscsi0,drive=3Ddrive0: =
+can't apply global virtio-blk-device.scsi=3Dtrue: Property '.scsi' not foun=
+d
+>=20
+> Fix this error by marking the property optional.
+>=20
+> Fixes: ed65fd1a27 ("virtio-blk: switch off scsi-passthrough by default")
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-> Cc'ing Stefan who might know...
->
-> On 2/8/20 1:42 PM, Jerry Geis wrote:
->> I am trying to figure out how to boot a linux external USB disk from
->> windows host ?
->>
->> I do this all the time on linux - simply -hda /dev/sdb
->>
->> But how do I reference the USB on Windows ?
->> Thanks,
->>
->> Jerry
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
+Stefan I think this makes sense in your tree same as
+the original patch it's fixing. Right?
 
-Try -hda \\.\PhysicalDrive1 or -hda //./PhysicalDrive1.
-
-See https://qemu.weilnetz.de/doc/qemu-doc.html chapter "2.8.7.2 Windows".
-
-Kind regards,
-
-Stefan
+> ---
+> v2: Reworded description (Cornelia)
+>=20
+> Extracted from testing series:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675074.html
+> ---
+>  hw/core/machine.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 3e288bfceb..d8e30e4895 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -148,7 +148,8 @@ GlobalProperty hw_compat_2_5[] =3D {
+>  const size_t hw_compat_2_5_len =3D G_N_ELEMENTS(hw_compat_2_5);
+> =20
+>  GlobalProperty hw_compat_2_4[] =3D {
+> -    { "virtio-blk-device", "scsi", "true" },
+> +    /* Optional because the 'scsi' property is Linux-only */
+> +    { "virtio-blk-device", "scsi", "true", .optional =3D true },
+>      { "e1000", "extra_mac_registers", "off" },
+>      { "virtio-pci", "x-disable-pcie", "on" },
+>      { "virtio-pci", "migrate-extra", "off" },
+> --=20
+> 2.21.1
 
 
