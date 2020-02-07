@@ -2,96 +2,105 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2EAFC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FFAC04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:29:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDD20214AF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61D05214AF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:29:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gKweddJh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD20214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CWU9JOUz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D05214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j04ce-000172-TV
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:28:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49944)
+	id 1j04dE-00024V-IP
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:29:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50044)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j04bd-0000Ew-T3
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:27:46 -0500
+ (envelope-from <liam.merwick@oracle.com>) id 1j04c9-0000gK-T5
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:28:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j04bc-0002b4-Pa
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:27:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24635
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j04bc-0002Zt-Ly
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:27:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581085660;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rAaFfbbWuueE+CH3D2w4/AhbcXvm0SdG98aPBQGIqxo=;
- b=gKweddJhD8Cj/0SJOJCYvPB9edC7wCH4qXwqJ7GiNhs+9Rr6Nv+0azJQtpZRb+moZ/FAwO
- ns97rMRw7+5zfiLIXrhkiaLtQHcvRxSMrnIy/lRzYnvxsL+cK94Fzb6BufqUaxH2QfwRJJ
- IiHddQ4BKK++5GczvHKFYncFUEf00lc=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-eV1iR0zAO-qRvjb037H5qw-1; Fri, 07 Feb 2020 09:27:37 -0500
-Received: by mail-qt1-f200.google.com with SMTP id d9so1685214qtq.13
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:27:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=/+mcTgyM4TM1KAKKxzzXGQSR6tVRzBp69dTvTGgPD44=;
- b=WK9BU49G1xRlMKrH+tcMLuMPAwEtSm7jim7b8amSqBdMcGrP+hZ36VCykI72mdcmjR
- VitQwD279p9EBOIpE7bHVWD1ljeyVC7R6vhLd6wM2d3cfjBmxyiBM1Io2yXvxXPjkKrj
- zcAiNBpEwoG7SHaJLJVvxX0gAZJN2kRFdo7kXlc0dmp2ffQ+FD6jVMyGmq3VFYHDVr0I
- fqOWVJMrvQ8SVdypUMdVXbrAAzwuQrM8ZNzShuQGXnL3w2Gq21nS4Xsty3ZlZpHU+yl8
- ltJZyoUcqqdJw5q9RctDjYMvP0yyodJPccGmTBFoCxlWTlsoaLTgWw+4UA0HIjL3nb5a
- 31Lw==
-X-Gm-Message-State: APjAAAVnDGHNHdRDGH8aD7QSsfDG37TqPajtrzcculujIoYjhTwqWaS1
- yeSfT6Jmb5u3Cw03gSTcc3kUjBVbV3OmSQTl5dHdHbcVSXvhbgAYTTw8s0FHS8ZHoWqBzQYNKZ0
- PK3Uhoi7FJ6trK98=
-X-Received: by 2002:a37:4743:: with SMTP id u64mr6197508qka.289.1581085657019; 
- Fri, 07 Feb 2020 06:27:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzOAOQ0h44AfXyncve+EbK3kF0y3Em8xW8NUgYoxGGWwG6j1kj//dCEYeJnZkM5S91Tmjpcig==
-X-Received: by 2002:a37:4743:: with SMTP id u64mr6197493qka.289.1581085656782; 
- Fri, 07 Feb 2020 06:27:36 -0800 (PST)
-Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id h13sm1434089qtu.23.2020.02.07.06.27.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 06:27:36 -0800 (PST)
-Date: Fri, 7 Feb 2020 09:27:32 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] ppc: function to setup latest class options
-Message-ID: <20200207092612-mutt-send-email-mst@kernel.org>
-References: <20200207064628.1196095-1-mst@redhat.com>
- <e77a2a7b-ed74-7584-4751-711b115e98c7@redhat.com>
- <20200207121209.06a1be98@bahia.lan>
+ (envelope-from <liam.merwick@oracle.com>) id 1j04c8-0003RH-Ax
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:28:13 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:35368)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+ id 1j04c8-0003Lk-3F
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:28:12 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 017ES957052290;
+ Fri, 7 Feb 2020 14:28:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=cKNgBV1r7Z2Mkv2xnevHRkYunGF5cmVkVaSRz7LzOkE=;
+ b=CWU9JOUzkifxUy43KJykf3IFgE6yIFc36SJpE4Lm04Av8PGFAWMrcpTHYAn+5csPUg59
+ KM7rOOTf17BCExvNAcBuasOy8bEcGjsKZnmZra5ZLPeRLHSGK86qmiblw9YBmev74S0D
+ dgfJbmOctRj3Y9GKSbSP9WuD/b5Gw6oijVyQsRA8WIWvbdGkdqjFLDp3Onplw6wbkrmm
+ ++1qFHtpoaj3V4T1WqztUJaQwScXj4tPdHrqh5WN+xUvSQLEjrFOhGtj/ewv42FMKMyB
+ Z0hsvtKeTx152DlD4u2L5y2W6bCPE8TMrKTGmgzX1OP0LfXjjFhMIAnJWm3u+W0boBBA fQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2xykbpga9e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 07 Feb 2020 14:28:09 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 017EJfMX001125;
+ Fri, 7 Feb 2020 14:28:09 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3020.oracle.com with ESMTP id 2y0mk1x6wv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 07 Feb 2020 14:28:09 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 017ES8T2031417;
+ Fri, 7 Feb 2020 14:28:08 GMT
+Received: from [10.175.208.183] (/10.175.208.183)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 07 Feb 2020 06:28:07 -0800
+Subject: Re: [PATCH v2 10/29] python/qemu: Add
+ binutils::binary_get_qom_implementations()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200129212345.20547-1-philmd@redhat.com>
+ <20200129212345.20547-11-philmd@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <4d8b1927-8b2e-efa9-c116-4aa61462d6c2@oracle.com>
+Date: Fri, 7 Feb 2020 14:28:02 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200207121209.06a1be98@bahia.lan>
-X-MC-Unique: eV1iR0zAO-qRvjb037H5qw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20200129212345.20547-11-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9523
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=4
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2002070110
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9523
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=4 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2002070111
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
+ 017ES957052290
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,88 +112,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 07, 2020 at 12:12:09PM +0100, Greg Kurz wrote:
-> On Fri, 7 Feb 2020 11:35:47 +0100
-> Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
+On 29/01/2020 21:23, Philippe Mathieu-Daud=C3=A9 wrote:
+> Since QEMU binaries can be built with various configurations,
+> the list of QOM objects linked can vary.
+> Add a helper to query the list of all QOM types implementing a
+> particular interface.
 >=20
-> > On 2/7/20 7:48 AM, Michael S. Tsirkin wrote:
-> > > We are going to add more init for the latest machine, so move the set=
-up
-> > > to a function so we don't have to change the DEFINE_SPAPR_MACHINE mac=
-ro
-> > > each time.
-> > >=20
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >   hw/ppc/spapr.c | 9 +++++++--
-> > >   1 file changed, 7 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 02cf53fc5b..4cf2a992a5 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -4428,6 +4428,12 @@ static const TypeInfo spapr_machine_info =3D {
-> > >       },
-> > >   };
-> > >  =20
-> > > +static void spapr_machine_latest_class_options(MachineClass *mc)
-> > > +{
-> > > +    mc->alias =3D "pseries";
-> > > +    mc->is_default =3D 1;
-> >=20
-> > But we can have only 1 default per QEMU binary... How PPC manage having=
-=20
-> > multiple defaults? The first or last listed is choosen as default?
-> >=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>   python/qemu/binutils.py          | 20 ++++++++++++++++++++
+>   tests/acceptance/core_scripts.py | 10 ++++++++++
+>   2 files changed, 30 insertions(+)
 >=20
-> IIUC it isn't about putting multiple defaults here. It is about putting
-> any additional init for the default machine type that we cannot put in
-> spapr_machine_class_init(), instead of putting it in the versioned
-> init function, eg. spapr_machine_5_0_class_options(). Otherwise this
-> would force us to carry the change when we add a new machine version.
+> diff --git a/python/qemu/binutils.py b/python/qemu/binutils.py
+> index 7bb57c521b..76f256f5d2 100644
+> --- a/python/qemu/binutils.py
+> +++ b/python/qemu/binutils.py
+> @@ -66,3 +66,23 @@ def binary_get_machines(qemu_bin):
+>           LOG.info(res)
+>           vm.shutdown()
+>           return [m['name'] for m in res]
+> +
+> +def binary_get_qom_implementations(qemu_bin, type_name, include_abstra=
+ct=3DFalse):
+> +    '''
+> +    Get list of QOM types implementing a particular interface
+> +
+> +    @param qemu_bin (str): path to the QEMU binary
+> +    @param type_name (str): QOM interface name
+> +    @param include_abstract (bool): if True, abstract interfaces are a=
+lso
+> +                                    returned in the list
+> +    @return list of QOM types implementing the interface @type_name
+> +    '''
+> +    with QEMUMachine(qemu_bin) as vm:
+> +        vm.set_machine('none')
+> +        vm.launch()
+> +        res =3D vm.command('qom-list-types',
+> +                         implements=3Dtype_name,
+> +                         abstract=3Dinclude_abstract)
+> +        LOG.info(res)
+> +        vm.shutdown()
 
-Maybe it's cleaner to pass the latest flag to
-spapr_machine_latest_class_options? Rename it spapr_machine_default_class_o=
-ptions?
-This way we don't need to bother clearing is_default in other
-machine types, we'll only set it for the latest one.
 
-> > > +}
-> > > +
-> > >   #define DEFINE_SPAPR_MACHINE(suffix, verstr, latest)               =
-  \
-> > >       static void spapr_machine_##suffix##_class_init(ObjectClass *oc=
-, \
-> > >                                                       void *data)    =
-  \
-> > > @@ -4435,8 +4441,7 @@ static const TypeInfo spapr_machine_info =3D {
-> > >           MachineClass *mc =3D MACHINE_CLASS(oc);                    =
-    \
-> > >           spapr_machine_##suffix##_class_options(mc);                =
-  \
-> > >           if (latest) {                                              =
-  \
-> > > -            mc->alias =3D "pseries";                                =
-   \
-> > > -            mc->is_default =3D 1;                                   =
-   \
-> > > +            spapr_machine_latest_class_options(mc);                 =
- \
-> > >           }                                                          =
-  \
-> > >       }                                                              =
-  \
-> > >       static const TypeInfo spapr_machine_##suffix##_info =3D {      =
-    \
-> > >=20
-> >=20
-> >=20
+Based on Wainer's comment on patch3 - is this vm.shutdown() needed?
+
+otherwise
+
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+
+
+> +        return [m['name'] for m in res]
+> diff --git a/tests/acceptance/core_scripts.py b/tests/acceptance/core_s=
+cripts.py
+> index a5b112f928..c2fe4acf1d 100644
+> --- a/tests/acceptance/core_scripts.py
+> +++ b/tests/acceptance/core_scripts.py
+> @@ -18,6 +18,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__=
+), '..', '..', 'python'))
+>   from avocado_qemu import Test
+>   from qemu.binutils import binary_get_arch
+>   from qemu.binutils import binary_get_machines
+> +from qemu.binutils import binary_get_qom_implementations
+>   from qemu.binutils import binary_get_version
+>  =20
+>  =20
+> @@ -49,3 +50,12 @@ class PythonQemuCoreScripts(Test):
+>               logger.debug('machine: {}'.format(m))
+>           # The 'none' machine is always available
+>           self.assertIn('none', machines)
+> +
+> +    def test_get_qom_implementation(self):
+> +        logger =3D logging.getLogger('core')
+> +        type_name =3D "accel"
+> +        type_impl =3D binary_get_qom_implementations(self.qemu_bin,
+> +                                                   type_name, True)
+> +        for t in type_impl:
+> +            logger.debug('type: {}'.format(t))
+> +        self.assertIn(type_name, type_impl)
+>=20
 
 
