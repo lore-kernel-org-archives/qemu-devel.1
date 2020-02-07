@@ -2,81 +2,133 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54566C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D853C352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:44:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F94F20715
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:43:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37B2620715
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:44:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kjmYjdRb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F94F20715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="n97QKspT";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="ACZhx7H3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37B2620715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j02zC-0004MD-6h
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 07:43:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48691)
+	id 1j0301-0005K0-EE
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 07:44:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j02yb-0003nX-Mk
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:43:19 -0500
+ (envelope-from <tsimpson@quicinc.com>) id 1j02zF-0004XY-Fm
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:43:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j02yZ-0004SS-QG
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:43:17 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42001)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j02yZ-0004Pn-IA
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:43:15 -0500
-Received: by mail-ot1-x342.google.com with SMTP id 66so1989836otd.9
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 04:43:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dT+1//t+1n3J4i4429sXYbdd+bGjv+rVyCphBDzuQrs=;
- b=kjmYjdRbK9jNDBRh440cc+AW/RMwqfHNW4JFQvPIbGIhstuKa6/voYsgw4BYaGpKyG
- rvhISuxLYpQ07Mo+/vCVbTtPFkP3k+rJj32c2JMofo56ASlbdRCOMLjsCZmzJe5sk01M
- KjIWCjXEfEk6sWPE6bZOM5KqiLzFasYK/6uBuQ9HZZeYz/uQKIWqt6t97pmqykMKrDX0
- JZoNewaD1xSrkrRb/Gz2DAjBq//BfXalPMgrC9j0ft5FWjqeM8HNYf2xizy/qUtjxkRP
- CnwQbmfoW5IKrthVorQwB2evXRYCUENHqyI4Szb/v0uZfKktTiPOrgDWUtOZN4Z3kTbi
- 5HSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=dT+1//t+1n3J4i4429sXYbdd+bGjv+rVyCphBDzuQrs=;
- b=uQFFVYHhBj67kTTlsSDvM1jhP1J31RP8uHREVvBgEgg93JJ7AiO9IbYwsGp78pSJOt
- jsv6tg2pHPTpvOv0uX+kIH2qE+LQrO+ogds7WAdKirmgUYJBNR9IjQYjX1FbavQwsvPJ
- jPgYaJ1mjju7ws6PrHTlVibBuXVinXZa+EwGFcpmbEeDChuP+RVVt/XFAk50xkk1mmBU
- XRRjmHB3F/Luk75hrIo8nRpawWbm7I6WY/iFs952sj2hL8J649IqgC2Pku7QIP8dIvg8
- MyLevRfG8KMKliVVnrLLnXedSD6TUEopFBVnveHgWyLdTKDhx/SDq679LsGbBYTgIW2H
- 1l6w==
-X-Gm-Message-State: APjAAAWTsha8xg/Z/t/CadOqZuLgmBqzMtUupORzumERlFMQUDKgrzlL
- rZMmGSawoWY9NiRb/uj3I//vBRDQTQ1Slr/oL3WNsA==
-X-Google-Smtp-Source: APXvYqy/EOvdNqNGUibG1La5Pt46RD46pTdRltUnj0NZsPxDimTiUb+lNTrkNMlgVU2W1AM/irOU6lk9ngxmMiQE4X0=
-X-Received: by 2002:a05:6830:184:: with SMTP id
- q4mr2613753ota.232.1581079394464; 
- Fri, 07 Feb 2020 04:43:14 -0800 (PST)
+ (envelope-from <tsimpson@quicinc.com>) id 1j02zE-0005uz-Fv
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:43:57 -0500
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:17508)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
+ id 1j02zE-0005pZ-1c
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:43:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1581079436; x=1612615436;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=GgmupYRlbe3YCsT0jISnC4ouv8rAkp6F2rf8QyRlEGM=;
+ b=n97QKspTf5ozY5tNChEv62GvDYRAMjaL2iqTjkqNwTJ0cdv0PZBPVN5U
+ Yjwxrm5gYgfoWk/Ityfu6Gw+QeEnK+lBAIS59PsGPEcg8e74mFYxlgqdG
+ SbDHzZ7PiAmZr6TiDfvgJbDWwBVtnjNs3pyvntpeNzRS1xr04zwj9sksm 4=;
+Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 07 Feb 2020 04:43:53 -0800
+Received: from nasanexm03a.na.qualcomm.com ([10.85.0.103])
+ by ironmsg05-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 07 Feb 2020 04:43:53 -0800
+Received: from APSANEXR01B.ap.qualcomm.com (10.85.0.37) by
+ nasanexm03a.na.qualcomm.com (10.85.0.103) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Fri, 7 Feb 2020 04:43:53 -0800
+Received: from nasanexm01a.na.qualcomm.com (10.85.0.81) by
+ APSANEXR01B.ap.qualcomm.com (10.85.0.37) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Fri, 7 Feb 2020 04:43:50 -0800
+Received: from NAM02-BL2-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm01a.na.qualcomm.com (10.85.0.81) with Microsoft SMTP Server (TLS)
+ id 15.0.1473.3 via Frontend Transport; Fri, 7 Feb 2020 04:43:49 -0800
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
+ BYAPR02MB4326.namprd02.prod.outlook.com (52.135.237.27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2686.32; Fri, 7 Feb 2020 12:43:49 +0000
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::bde4:83e4:96ad:fe62]) by BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::bde4:83e4:96ad:fe62%6]) with mapi id 15.20.2707.023; Fri, 7 Feb 2020
+ 12:43:48 +0000
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [PATCH] Add support for a helper with 7 arguments
+Thread-Topic: [PATCH] Add support for a helper with 7 arguments
+Thread-Index: AQHV3HWNrLXzUmuR802n/46fb+QBo6gPp2wAgAACx8A=
+Date: Fri, 7 Feb 2020 12:43:48 +0000
+Message-ID: <BYAPR02MB4886E14CC87B1169B2F6BE2BDE1C0@BYAPR02MB4886.namprd02.prod.outlook.com>
+References: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
+ <b308434a-1ee8-4fb5-0e60-4dfdd047c959@linaro.org>
+In-Reply-To: <b308434a-1ee8-4fb5-0e60-4dfdd047c959@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=tsimpson@quicinc.com; 
+x-originating-ip: [199.106.103.57]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 85be8268-edff-4651-a90c-08d7abcb60f3
+x-ms-traffictypediagnostic: BYAPR02MB4326:
+x-microsoft-antispam-prvs: <BYAPR02MB4326A5F9D958D92CA04782F5DE1C0@BYAPR02MB4326.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0306EE2ED4
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(136003)(39860400002)(376002)(396003)(366004)(189003)(199004)(186003)(4326008)(8676002)(81166006)(81156014)(86362001)(33656002)(71200400001)(26005)(478600001)(6506007)(55016002)(2906002)(76116006)(64756008)(9686003)(66446008)(66946007)(66556008)(66476007)(54906003)(7696005)(5660300002)(110136005)(8936002)(316002)(52536014);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4326;
+ H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yExg7KEJpj7Bb2XM4cNKADdlGMofm4x4tXgPUFa8TQQh7x0lJehHkDrksAjxly6n9CrIb2l8uc9sbNUb/7o2TC2npxlPT05zeFiEjD2myQ8R3Jy3R1RgsLO0Azf1XKRCLQMgdbwwZrnKXsBeQhAhxULZWTGzvPXs+egPriTQAHJbR4jSNos4t/qEeMQcShVS2m1hV/ZKml6GsM0vxqQKtB/YKvcslTJvQbdKHMWYHY2966GzFA195jnKTuA7+pdUK7MwzSJUhj7Rf1NhvKvDrwZMLl+y//sYkykerAtdU7fD6I+cVfJdcouO1TSJP2bwWSWEiBQ6VDEpo9KahIqx0y7URv/EyqP18lslS0oE5ubxJGhxqSS40yyRwthPzq2Lo86fxE073z7I6qKrN3B8tJvw6RWACgnOB6EVahg5G3RSjrjYMLuNXEQgVXiRZXw/
+x-ms-exchange-antispam-messagedata: E2sjsSYoXLYygJ3npPBz23VaNHn3vM0QKSfgHbhbsu6xX/LXPZJ2n80vq8FHwcoJBSJ66v/c0jvHOiwwL8JVwXooM49cm4Qo3Ml/BLFdyTYt3GzedZlEw68T0Q93K0QKA2/Zb7tWA3fQkETw9GIZag==
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DgXNx0qAjjIAo4E8wHhVp/5knqlFV2uKm3DFgE8vZml18ShccG0N6SKHVcyKTf2FVO7PG8nERGkMYqYrkZAmBNYA6eMUrD1OKGbGmmRP2wutG4j0/lZUwkjNvdp5rKPJK7vR9Bo9HzLuUf4sjEckFMM29sfBtO29zhIWjrR/meVZB4IOXfItbajENrLvIhThl4KcV1Igaw4k7Csfx2XLPgwazCmto4eHFteuPWP1Wj9K1ut1rQh4B8eVI9r2yJcOIucj9hNPNAEqkn4DTQhzTYAJXUfe93A6nvYIEh1hdwpC8LblBaK/pwG5gehy7QVw2iDtIMdqz0RMvZ6T/dHsEQ==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d4F+WPDLaYjD49d0OXP6KelEuyjFLFOacIOsIZx8eKY=;
+ b=eNOz5TWdWucF8JXv4Hm5rOWLfAK7JGHiRc20ARQaYnljKetHMFkLvmJgrlF5bwNWi9Ae2StYnqz+rpRq1O9KPz5TeQ3DO2vdqZ3O5ZRor2YLK8/xRERqfe0ET82420h5pFbExnkfAczgUyMCAQE4dK44uuxMjLI09FhVQaDsjKhLw1mb6ZNRoMirroGV6iBJKRxvkapO3DcAraBYCyq3rPVQyMSGxtLE91oW6K6ckHRUcQ54Grh3Z4pKS3nS7rDB+D7GTtwyqG2rSTdpizKyErXwmOi+fqTYQLEed1rBPbfMUZvcakZ6zkkO/dcVRMSb4EFDLJsQvTjP++fIBjXqjw==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d4F+WPDLaYjD49d0OXP6KelEuyjFLFOacIOsIZx8eKY=;
+ b=ACZhx7H3qBmbuPZAWZ5Ugy7EWVriIfDmFzFz4RU4jwaxEYRCY6We20T50NENDoI3rpGTNCKLvfM8uRYlUgcYxLvye3ZQzzKNodB0itAQb1EOq6ZfUcHvkd0S0BOuqIZQGmHZIHsRCOYoe1GnwsjB4llzqK0zuif581QShBfrNq0=
+x-ms-exchange-crosstenant-network-message-id: 85be8268-edff-4651-a90c-08d7abcb60f3
+x-ms-exchange-crosstenant-originalarrivaltime: 07 Feb 2020 12:43:48.7947 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: TQw07Beya16igVA3zQKmmnKiTBG3olkI8+bDGeOmsBpnjeLUQMGqr1vWlN4QgoG2lpBl9O6yHLq/+unLu2d/YQ==
+x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4326
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200128180142.15132-1-cohuck@redhat.com>
- <20200128180142.15132-3-cohuck@redhat.com>
-In-Reply-To: <20200128180142.15132-3-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Feb 2020 12:43:03 +0000
-Message-ID: <CAFEAcA9wM4r=OfLnREQOQAcqOEdSr3=bHsjoO9mvn4VogMhQLw@mail.gmail.com>
-Subject: Re: [PATCH RFC 2/2] docs: rstfy vfio-ap documentation
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-OriginatorOrg: quicinc.com
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 199.106.114.39
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,236 +140,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>,
- "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Pierre Morel <pmorel@linux.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jan 2020 at 19:39, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> Move to system/, as this is mostly about configuring vfio-ap.
->
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-
-> diff --git a/docs/vfio-ap.txt b/docs/system/vfio-ap.rst
-> similarity index 56%
-> rename from docs/vfio-ap.txt
-> rename to docs/system/vfio-ap.rst
-> index b1eb2deeaf2f..c8c5728e0aaa 100644
-> --- a/docs/vfio-ap.txt
-> +++ b/docs/system/vfio-ap.rst
-> @@ -1,17 +1,17 @@
->  Adjunct Processor (AP) Device
->  =============================
->
-> -Contents:
-> -=========
-> -* Introduction
-> -* AP Architectural Overview
-> -* Start Interpretive Execution (SIE) Instruction
-> -* AP Matrix Configuration on Linux Host
-> -* Starting a Linux Guest Configured with an AP Matrix
-> -* Example: Configure AP Matrices for Three Linux Guests
-> -> -Introduction:
-> -============
-> +Contents
-> +--------
-> +* `Introduction`_
-> +* `AP Architectural Overview`_
-> +* `Start Interpretive Execution (SIE) Instruction`_
-> +* `AP Matrix Configuration on Linux Host`_
-> +* `Starting a Linux Guest Configured with an AP Matrix`_
-> +* `Example: Configure AP Matrices for Three Linux Guests`_
-> +
-
-You don't need to manually write out a table of contents. You
-can just have one line
-
-.. contents::
-
-and Sphinx will produce an autogenerated table of contents
-(including a 'Contents' title) for you.
-
-https://docutils.sourceforge.io/docs/ref/rst/directives.html#table-of-contents
-
-An example where we already use this is
-docs/interop/live-block-operations.rst:
-https://www.qemu.org/docs/master/interop/live-block-operations.html
-
-
-> +Introduction
-> +------------
-
-rST doesn't require it, but I'd recommend a blank line below
-the ---- line; I think it makes the source more readable.
-
->  The IBM Adjunct Processor (AP) Cryptographic Facility is comprised
->  of three AP instructions and from 1 to 256 PCIe cryptographic adapter cards.
->  These AP devices provide cryptographic functions to all CPUs assigned to a
-> @@ -21,8 +21,8 @@ On s390x, AP adapter cards are exposed via the AP bus. This document
->  describes how those cards may be made available to KVM guests using the
->  VFIO mediated device framework.
->
-> -AP Architectural Overview:
-> -=========================
-> +AP Architectural Overview
-> +-------------------------
->  In order understand the terminology used in the rest of this document, let's
->  start with some definitions:
->
-> @@ -75,7 +75,7 @@ start with some definitions:
->    must be one of the control domains.
->
->  Start Interpretive Execution (SIE) Instruction
-> -==============================================
-> +----------------------------------------------
->  A KVM guest is started by executing the Start Interpretive Execution (SIE)
->  instruction. The SIE state description is a control block that contains the
->  state information for a KVM guest and is supplied as input to the SIE
-> @@ -114,246 +114,254 @@ The APQNs can provide secure key functionality - i.e., a private key is stored
->  on the adapter card for each of its domains - so each APQN must be assigned to
->  at most one guest or the linux host.
->
-> -   Example 1: Valid configuration:
-> -   ------------------------------
-> -   Guest1: adapters 1,2  domains 5,6
-> -   Guest2: adapter  1,2  domain 7
-> +Example 1: Valid configuration
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +Guest1: adapters 1,2  domains 5,6
-> +Guest2: adapter  1,2  domain 7
-
-These don't render correctly -- rST thinks the "Example 1..." line
-is a subsection heading because of the underlining, and then renders
-the next two lines as runon-text:
-"Guest1: adapters 1,2 domains 5,6 Guest2: adapter 1,2 domain 7"
-
-Depending on what you want, you could try one of:
- * use a literal block (which gets you fixed-width font, preserved
-   whitespace and linebreaks)
- * use a bulleted list
- * use one of rST's table formats
-
-(is it deliberate that line 1 is "adapters" and line 2 is "adapter" ?)
-
-> -   This is valid because both guests have a unique set of APQNs: Guest1 has
-> -   APQNs (1,5), (1,6), (2,5) and (2,6); Guest2 has APQNs (1,7) and (2,7).
-> +This is valid because both guests have a unique set of APQNs: Guest1 has
-> +APQNs (1,5), (1,6), (2,5) and (2,6); Guest2 has APQNs (1,7) and (2,7).
->
-> -   Example 2: Valid configuration:
-> -   ------------------------------
-> -   Guest1: adapters 1,2 domains 5,6
-> -   Guest2: adapters 3,4 domains 5,6
-> +Example 2: Valid configuration
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +Guest1: adapters 1,2 domains 5,6
-> +Guest2: adapters 3,4 domains 5,6
->
-> -   This is also valid because both guests have a unique set of APQNs:
-> -      Guest1 has APQNs (1,5), (1,6), (2,5), (2,6);
-> -      Guest2 has APQNs (3,5), (3,6), (4,5), (4,6)
-> +This is also valid because both guests have a unique set of APQNs:
-> +   Guest1 has APQNs (1,5), (1,6), (2,5), (2,6);
-> +   Guest2 has APQNs (3,5), (3,6), (4,5), (4,6)
-
-This is differently rendered from the equivalent text in example 1,
-because of the indent -- rST treats the 2 indented lines as a block
-quote, and indents them in the output, but flows the text into
-one long line.
-
-I think personally I'd opt to render like this:
-
-This is also valid because both guests have a unique set of APQNs:
-
-* Guest1 has APQNs (1,5), (1,6), (2,5), (2,6)
-* Guest2 has APQNs (3,5), (3,6), (4,5), (4,6)
-
-(ie a bulleted list); but anyway consistency between the examples
-would be good.
-
->
-> -   Example 3: Invalid configuration:
-> -   --------------------------------
-> -   Guest1: adapters 1,2  domains 5,6
-> -   Guest2: adapter  1    domains 6,7
-> +Example 3: Invalid configuration
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +Guest1: adapters 1,2  domains 5,6
-> +Guest2: adapter  1    domains 6,7
->
-> -   This is an invalid configuration because both guests have access to
-> -   APQN (1,6).
-> +This is an invalid configuration because both guests have access to
-> +APQN (1,6).
-
-> -      * Individual bits in the mask can be switched on and off by specifying
-> -        each bit number to be switched in a comma separated list. Each bit
-> -        number string must be prepended with a ('+') or minus ('-') to indicate
-> -        the corresponding bit is to be switched on ('+') or off ('-'). Some
-> -        valid values are:
-> +    * Individual bits in the mask can be switched on and off by specifying
-> +      each bit number to be switched in a comma separated list. Each bit
-> +      number string must be prepended with a ('+') or minus ('-') to indicate
-> +      the corresponding bit is to be switched on ('+') or off ('-'). Some
-> +      valid values are::
->
->             "+0"    switches bit 0 on
->             "-13"   switches bit 13 off
->             "+0x41" switches bit 65 on
->             "-0xff" switches bit 255 off
-
-Maybe use a definition list here rather than a literal block?
-
-      valid values are:
-
-      ``+0``
-          switches bit 0 on
-      ``-13``
-          switches bit 13 off
-
-etc. The literal block is fine if you think it looks better though.
-
-
->
->  assign_adapter
-
-Since these are filenames, you can enclose them in ``  `` and they'll
-render as fixed-width text, which I think makes them stand out a
-bit better in the HTML. I'm pretty sure this works even in the
-term part of a definition list.
-
-Not in this diff, but should the 'No APQN...' para in the assign_domain
-docs really be a 2nd para of the preceding bullet point rather than either
-its own bullet point or a paragraph outside the bulleted list ?
-
-(ditto for assign_domain)
-
-
-> @@ -486,20 +494,22 @@ facilities:
->     The AP facilities feature indicates that AP facilities are installed on the
->     guest. This feature will be exposed for use only if the AP facilities
->     are installed on the host system. The feature is s390-specific and is
-> -   represented as a parameter of the -cpu option on the QEMU command line:
-> +   represented as a parameter of the -cpu option on the QEMU command line::
->
->        qemu-system-s390x -cpu $model,ap=on|off
->
-> -      Where:
-> +   Where:
->
-> -         $model is the CPU model defined for the guest (defaults to the model of
-> -                the host system if not specified).
-> +      $model
-
-Formatting $model and ap=on|off with `` `` would look nicer I think
-(ditto below)
-
-thanks
--- PMM
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFJpY2hhcmQgSGVuZGVyc29u
+IDxyaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnPg0KPg0KPiBCdXQgSSBlbmNvdXJhZ2UgeW91
+IHRvIHJlLXRoaW5rIHlvdXIgcHVyZWx5IG1lY2hhbmljYWwgYXBwcm9hY2ggdG8gdGhlDQo+IGhl
+eGFnb24NCj4gcG9ydC4gIEl0IHNlZW1zIHRvIG1lIHRoYXQgeW91IHNob3VsZCBiZSBkb2luZyBt
+dWNoIG1vcmUgZHVyaW5nIHRoZQ0KPiB0cmFuc2xhdGlvbg0KPiBwaGFzZSBzbyB0aGF0IHlvdSBj
+YW4gbWluaW1pemUgdGhlIG51bWJlciBvZiBoZWxwZXJzIHRoYXQgeW91IHJlcXVpcmUuDQo+DQoN
+ClRoZXJlIGFyZSBhIGNvdXBsZSBvZiB0aGluZ3Mgd2UgY291bGQgZG8NCi0gU2hvcnQgdGVybTog
+QWRkICNpZmRlZidzIHRvIHRoZSBnZW5lcmF0ZWQgY29kZSBzbyB0aGF0IHRoZSBoZWxwZXIgaXNu
+J3QgY29tcGlsZWQgd2hlbiB0aGVyZSBpcyBhIGZXUkFQXzx0YWc+IGRlZmluZWQuICBUaGVyZSBh
+cmUgY3VycmVudGx5IH41MDAgaW5zdHJ1Y3Rpb25zIHdoZXJlIHRoaXMgaXMgdGhlIGNhc2UuDQot
+IExvbmcgdGVybTogSW50ZWdyYXRlIHJldi5uZydzIGFwcHJvYWNoIHRoYXQgdXNlcyBmbGV4L2Jp
+c29uIHRvIHBhcnNlIHRoZSBzZW1hbnRpY3MgYW5kIGdlbmVyYXRlIFRDRyBjb2RlLg0KLSBMb25n
+IGxvbmcgdGVybTogQSBtdWNoIG1vcmUgZ2VuZXJhbCBhcHByb2FjaCB3aWxsIGJlIHRvIHR1cm4g
+dGhlIEMgc2VtYW50aWNzIGNvZGUgaW50byBMTFZNIElSIGFuZCBnZW5lcmF0ZSBUQ0cgZnJvbSB0
+aGUgSVIuDQoNCkFsc28sIG5vdGUgdGhhdCBiZWluZyBhYmxlIHRvIHVzZSBlaXRoZXIgYSBoZWxw
+ZXIgb3IgVENHIGNvZGUgaXMgZXh0cmVtZWx5IHVzZWZ1bCBmb3IgZGVidWdnaW5nIHFlbXUtaGV4
+YWdvbi4gIFdoZW4gYSB0ZXN0IGlzIGZhaWxpbmcgYW5kIHlvdSBzdXNwZWN0IGEgYnVnIGluIFRD
+RyBnZW5lcmF0aW9uLCB5b3UgY2FuIHN3aXRjaCB0byB0aGUgaGVscGVyIHZlcnNpb24gYW5kIHNl
+ZSBpZiB0aGUgdGVzdCBwYXNzZXMuICBUaGVyZSBoYXZlIGJlZW4gY2FzZXMgd2hlcmUgSSB1c2Vk
+IGJpbmFyeSBzZWFyY2ggb3ZlciB0aGUgZldSQVAgZGVmaW5pdGlvbnMgdG8gZmlndXJlIG91dCB3
+aGljaCBvbmUgb2YgdGhlbSBoYXMgdGhlIGJ1Zy4gIEFsc28sIGl0IGNhbiBiZSB2ZXJ5IGhhbmR5
+IHRvIGJlIGFibGUgdG8gc2V0IGEgYnJlYWtwb2ludCBpbnNpZGUgdGhlIGhlbHBlciBhbmQgZXhh
+bWluZSB0aGUgQ1BVIHN0YXRlIGluIHRoZSBtaWRkbGUgb2YgVENHIGV4ZWN1dGlvbi4NCg0KVGF5
+bG9yDQoNCg==
 
