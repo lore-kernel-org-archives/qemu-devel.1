@@ -4,84 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D2CC352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05060C352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:48:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 676C222314
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:47:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4D8422314
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:48:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SBhHPwJo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 676C222314
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8cB6pg9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D8422314
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j00EE-0000Tw-Kr
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 04:47:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38379)
+	id 1j00Fr-0001RG-0h
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 04:48:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38619)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j00D2-0008SR-VN
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:46:02 -0500
+ (envelope-from <cohuck@redhat.com>) id 1j00F3-0000yS-1V
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:48:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j00D1-0008HX-Dx
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:46:00 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50104
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1j00F1-0000nA-W3
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:48:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31694
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j00D1-0008GR-Ag
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:45:59 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j00F1-0000md-T7
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:48:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581068758;
+ s=mimecast20190719; t=1581068883;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cJcTR2CM7hoEl5Nw8xSpTwnRMhiwZxPeoZExpng3GOk=;
- b=SBhHPwJoaYHZd44En4d7/oB9ErIRS4ttcrdihdwldAhBFtf0Ozxk0GC/DSsWYDi2aUAcra
- Vx+bekj498eKwryQIk1AJ5RSQ/Dh0ITdHKpoWZUFmwStt0PuN4TtrzkoyNKEf4fItxmBnD
- iMa7hxWCxEwr011y1dOmC7oK59lqOkA=
+ bh=lSjoUif4OOgn5tnMUAUMJM5Phj+0k1qUdgJDsIstd6Q=;
+ b=N8cB6pg9mObbgRVj+Yw1TLFejhvkMZ88nnN8s+We+bp3cbqTPeaLTSpej6F4CBH3OOdjj5
+ esvh4wO1ZXkGwG5BWJ1iQe9JioSB01vZyKzW95YbxUohcybcgn1QkPOVaIOktZR2gZEWX+
+ V1+2pYO5r0xP+keeC0QdLulEU/AeZ6A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-YYQyez7hPQy1et5fRbzkFQ-1; Fri, 07 Feb 2020 04:45:54 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-253-zfs3-OtiMuqxBGIN4i0rNA-1; Fri, 07 Feb 2020 04:48:01 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8F3B100511E;
- Fri,  7 Feb 2020 09:45:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
- [10.36.116.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5907D19C7F;
- Fri,  7 Feb 2020 09:45:47 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D68CF11386A7; Fri,  7 Feb 2020 10:45:45 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 11/29] qapi/ui.json: Put input-send-event body text in the
- right place
-References: <20200206173040.17337-1-peter.maydell@linaro.org>
- <20200206173040.17337-12-peter.maydell@linaro.org>
-Date: Fri, 07 Feb 2020 10:45:45 +0100
-In-Reply-To: <20200206173040.17337-12-peter.maydell@linaro.org> (Peter
- Maydell's message of "Thu, 6 Feb 2020 17:30:22 +0000")
-Message-ID: <87r1z6spbq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E276800D54;
+ Fri,  7 Feb 2020 09:48:00 +0000 (UTC)
+Received: from gondolin (ovpn-117-112.ams2.redhat.com [10.36.117.112])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D832E8E611;
+ Fri,  7 Feb 2020 09:47:53 +0000 (UTC)
+Date: Fri, 7 Feb 2020 10:47:51 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] travis.yml: Test the s390-ccw build, too
+Message-ID: <20200207104751.36609b11.cohuck@redhat.com>
+In-Reply-To: <20200206202543.7085-1-thuth@redhat.com>
+References: <20200206202543.7085-1-thuth@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: YYQyez7hPQy1et5fRbzkFQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: zfs3-OtiMuqxBGIN4i0rNA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,64 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>,
+ Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Thu,  6 Feb 2020 21:25:43 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-> In the doc comment for input-send-event, there is a multi-line
-> chunk of text ("The @device...take precedence") which is intended
-> to be the main body text describing the event. However it has
-> been placed after the arguments and Returns: section, which
-> means that the parser actually thinks that this text is
-> part of the "Returns" section text.
->
-> Move the body text up to the top so that the parser correctly
-> classifies it as body.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Since we can now use a s390x host on Travis, we can also build and
+> test the s390-ccw bios images there. For this we have to make sure
+> that roms/SLOF is checked out, too, and then move the generated *.img
+> files to the right location before running the tests.
+
+Oh, nice.
+
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  qapi/ui.json | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/qapi/ui.json b/qapi/ui.json
-> index aced267a1e4..94a07318f55 100644
-> --- a/qapi/ui.json
-> +++ b/qapi/ui.json
-> @@ -949,13 +949,6 @@
->  #
->  # Send input event(s) to guest.
->  #
-> -# @device: display device to send event(s) to.
-> -# @head: head to send event(s) to, in case the
-> -#        display device supports multiple scanouts.
-> -# @events: List of InputEvent union.
-> -#
-> -# Returns: Nothing on success.
-> -#
->  # The @device and @head parameters can be used to send the input event
->  # to specific input devices in case (a) multiple input devices of the
->  # same kind are added to the virtual machine and (b) you have
-> @@ -967,6 +960,13 @@
->  # are admissible, but devices with input routing config take
->  # precedence.
->  #
-> +# @device: display device to send event(s) to.
-> +# @head: head to send event(s) to, in case the
-> +#        display device supports multiple scanouts.
-> +# @events: List of InputEvent union.
-> +#
-> +# Returns: Nothing on success.
-> +#
->  # Since: 2.6
->  #
->  # Note: The consoles are visible in the qom tree, under
+>  .travis.yml | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index 6c0ec6cf69..c0eeff9caa 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -508,6 +508,16 @@ matrix:
+>        env:
+>          - TEST_CMD="make check check-tcg V=1"
+>          - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
+> +      script:
+> +        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
+> +        - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
+> +        - |
+> +          if [ "$BUILD_RC" -eq 0 ] ; then
+> +              mv pc-bios/s390-ccw/*.img pc-bios/ ;
+> +              ${TEST_CMD} ;
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Out of curiousity: Which kind of tests are run for the net image?
+
+> +          else
+> +              $(exit $BUILD_RC);
+> +          fi
+>  
+>      # Release builds
+>      # The make-release script expect a QEMU version, so our tag must start with a 'v'.
+
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
 
