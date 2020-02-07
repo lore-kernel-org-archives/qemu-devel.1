@@ -2,98 +2,55 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0563C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 23:04:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E94BC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 23:24:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5B0521741
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 23:04:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cyW4qco6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5B0521741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 34DAD21775
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 23:24:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34DAD21775
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0CgA-0005fj-T7
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 18:04:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57954)
+	id 1j0Cyx-0007sq-B8
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 18:24:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1j0CfY-0004hs-2M
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 18:04:17 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j0CyQ-0007Iq-Se
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 18:23:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1j0CfV-0006ne-UO
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 18:04:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59583
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j0CfV-0006lB-J1
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 18:04:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581116652;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QbIFO7Oxc9JmMQe9oFXeh2qJJYelsG+d0X1l7OckJLI=;
- b=cyW4qco6j1BgYAMjAOC6H29MMMH1tGktCeephT+Nxv2XCOlaKSZffGIUKtUihABCQ5B9Dv
- LFB5PZ0Aa5gMq4fveHHavsyu1DVqXM3/UsPmNVWOonzpvH5GWRKIo1MoNjUFoX4tdtvOMK
- Y7UUVDyQH5Q3xza4RuG5cRWBQ0thnxw=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-KU0Es1abMii62AwmKbqOdw-1; Fri, 07 Feb 2020 18:04:08 -0500
-Received: by mail-qk1-f199.google.com with SMTP id a23so529304qkl.7
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 15:04:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=aXUqDz/U9ZcLQH+8OSUrnfufM7Gxds5/ddEtUUb4k3w=;
- b=fnOGO1XYXaoiHwUy7IhdrpIWWUkeIaSAX/FMHD8wSt4GF9gscJ9JT0c1uYP+8kUsUx
- rAe4OltIG5Ja1epQu2C7LZl+4YUwCXcH2SgfSBfrQqGL9ajvcDkS5DSpSjrAVz4TIORL
- 6Vf7uGcYGzUpcfK4EgTeqrm0S8smI1Ccm+mW8nPUQxhjFQ4RLjUZ94gGUX+XhxMMqqNh
- lu6R7w+MahpUxFno99P6bhDWDfELyETD4aljFDDloxQ+arJRIo4k3QGbD9jZSx/7wOe/
- pHmofpRwcaLiD+0WwskrRZsYabuQdFfp+asaE6SAnWy+P0LDxPEWOsr/kQ6d4S2pJ8tu
- ctfQ==
-X-Gm-Message-State: APjAAAXdl+OSmxFQVFgugtI/GdnlfaWiBYuk9j8eHIDBWLvnWSVBbrZo
- LEoL8VRaz6jWT7Bm+9jFTDvvFZV/B4uHekjSQdzRoTsLbtRgLtplFzIADJG6i2jIAJYNW3s6LYa
- 9zQfZOwbiwbuvInw=
-X-Received: by 2002:a37:47c4:: with SMTP id u187mr1248011qka.165.1581116647919; 
- Fri, 07 Feb 2020 15:04:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwEcxy9tJ+LIBzeRRHCghalmREfh/Uul9tIJP1AJEr7MqA/baZTV6bsgIbSXV+ZhJVvuujKzQ==
-X-Received: by 2002:a37:47c4:: with SMTP id u187mr1247994qka.165.1581116647667; 
- Fri, 07 Feb 2020 15:04:07 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
- by smtp.gmail.com with ESMTPSA id k29sm2093779qtu.54.2020.02.07.15.04.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 15:04:06 -0800 (PST)
-Date: Fri, 7 Feb 2020 18:04:05 -0500
-From: Peter Xu <peterx@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v14 08/11] virtio-iommu-pci: Introduce the x-dt-binding
- option
-Message-ID: <20200207230405.GJ720553@xz-x1>
-References: <20200207093203.3788-1-eric.auger@redhat.com>
- <20200207093203.3788-9-eric.auger@redhat.com>
- <20200207100540.GA1999431@myrica>
- <20200207052405-mutt-send-email-mst@kernel.org>
+ (envelope-from <no-reply@patchew.org>) id 1j0CyO-0006gr-Pn
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 18:23:46 -0500
+Resent-Date: Fri, 07 Feb 2020 18:23:46 -0500
+Resent-Message-Id: <E1j0CyO-0006gr-Pn@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21188)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j0CyO-0006eY-Hk; Fri, 07 Feb 2020 18:23:44 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 158111778134334.42922240466805;
+ Fri, 7 Feb 2020 15:23:01 -0800 (PST)
+In-Reply-To: <20200207174548.9087-1-linux@roeck-us.net>
+Subject: Re: [PATCH v2] hw/arm: ast2600: Wire up EHCI controllers
+Message-ID: <158111778008.591.16723178729708022519@a1bbccc8075a>
 MIME-Version: 1.0
-In-Reply-To: <20200207052405-mutt-send-email-mst@kernel.org>
-X-MC-Unique: KU0Es1abMii62AwmKbqOdw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: linux@roeck-us.net
+Date: Fri, 7 Feb 2020 15:23:01 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,69 +62,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, quintela@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, Eric Auger <eric.auger@redhat.com>,
- bharatb.linux@gmail.com, qemu-arm@nongnu.org, eric.auger.pro@gmail.com
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, andrew@aj.id.au, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, joel@jms.id.au, linux@roeck-us.net, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 07, 2020 at 05:24:54AM -0500, Michael S. Tsirkin wrote:
-> On Fri, Feb 07, 2020 at 11:05:40AM +0100, Jean-Philippe Brucker wrote:
-> > Hi Eric,
-> >=20
-> > On Fri, Feb 07, 2020 at 10:32:00AM +0100, Eric Auger wrote:
-> > > At the moment, the kernel only supports device tree
-> > > integration of the virtio-iommu. DT bindings between the
-> > > PCI root complex and the IOMMU must be created by the machine
-> > > in conformance to:
-> > >=20
-> > > Documentation/devicetree/bindings/virtio/iommu.txt.
-> > >=20
-> > > To make sure the end-user is aware of this, force him to use the
-> > > temporary device option "x-dt-binding" and also double check the
-> > > machine has a hotplug handler for the virtio-iommu-pci device.
-> > > This hotplug handler is in charge of creating those DT bindings.
-> > >=20
-> > > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> > [...]
-> > > @@ -39,6 +42,21 @@ static void virtio_iommu_pci_realize(VirtIOPCIProx=
-y *vpci_dev, Error **errp)
-> > >      VirtIOIOMMUPCI *dev =3D VIRTIO_IOMMU_PCI(vpci_dev);
-> > >      DeviceState *vdev =3D DEVICE(&dev->vdev);
-> > > =20
-> > > +    if (!dev->dt_binding) {
-> > > +        error_setg(errp,
-> > > +                   "Instantiation currently only is possible if the =
-machine "
-> > > +                   "creates device tree iommu-map bindings, ie. ACPI=
- is not "
-> > > +                   "yet supported");
-> > > +        error_append_hint(errp, "use -virtio-iommu-pci,x-dt-binding\=
-n");
-> >=20
-> > "use -device virtio-iommu-pci,x-dt-binding"?
-> >=20
-> > Can the option be safely removed as soon as we implement a topology
-> > description for the remaining platforms?  Or will we need to carry it
-> > forever for backward-compatibility (ie. ensure that an old command-line
-> > invocation that contains this option still works)?
-> >=20
-> > Thanks,
-> > Jean
->=20
-> I'd worry that if we actually document it then users will come to
-> depend on it for sure, even though it starts with x-.
-
-I thought x- parameters can be dropped directly with totally no
-grarantee...  Otherwise how do we differenciate x- with the common
-parameters, and how do we introduce remove-prone parameters?
-
-Thanks,
-
---=20
-Peter Xu
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIwNzE3NDU0OC45MDg3
+LTEtbGludXhAcm9lY2stdXMubmV0LwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2VyLWlt
+YWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0BmZWRv
+cmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvdGFyZ2V0L2FybS90cmFuc2xhdGUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L3RyYWNlL2dlbmVyYXRlZC1oZWxwZXJzLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90
+YXJnZXQvYXJtL3RyYW5zbGF0ZS1zdmUubwovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVl
+ZF9hc3QyNjAwLmM6MzQ6NjogZXJyb3I6ICdBU1BFRURfRUhDSTEnIHVuZGVjbGFyZWQgaGVyZSAo
+bm90IGluIGEgZnVuY3Rpb24pOyBkaWQgeW91IG1lYW4gJ0FTUEVFRF9NSUkxJz8KICAgICBbQVNQ
+RUVEX0VIQ0kxXSAgICAgPSAweDFFNkExMDAwLAogICAgICBefn5+fn5+fn5+fn4KICAgICAgQVNQ
+RUVEX01JSTEKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOjM0OjY6
+IGVycm9yOiBhcnJheSBpbmRleCBpbiBpbml0aWFsaXplciBub3Qgb2YgaW50ZWdlciB0eXBlCi90
+bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzozNDo2OiBub3RlOiAobmVh
+ciBpbml0aWFsaXphdGlvbiBmb3IgJ2FzcGVlZF9zb2NfYXN0MjYwMF9tZW1tYXAnKQovdG1wL3Fl
+bXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6MzU6NjogZXJyb3I6ICdBU1BFRURf
+RUhDSTInIHVuZGVjbGFyZWQgaGVyZSAobm90IGluIGEgZnVuY3Rpb24pOyBkaWQgeW91IG1lYW4g
+J0FTUEVFRF9NSUkyJz8KICAgICBbQVNQRUVEX0VIQ0kyXSAgICAgPSAweDFFNkEzMDAwLAogICAg
+ICBefn5+fn5+fn5+fn4KICAgICAgQVNQRUVEX01JSTIKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Fy
+bS9hc3BlZWRfYXN0MjYwMC5jOjM1OjY6IGVycm9yOiBhcnJheSBpbmRleCBpbiBpbml0aWFsaXpl
+ciBub3Qgb2YgaW50ZWdlciB0eXBlCi90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2Fz
+dDI2MDAuYzozNTo2OiBub3RlOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJ2FzcGVlZF9zb2Nf
+YXN0MjYwMF9tZW1tYXAnKQovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAw
+LmM6ODQ6NjogZXJyb3I6IGFycmF5IGluZGV4IGluIGluaXRpYWxpemVyIG5vdCBvZiBpbnRlZ2Vy
+IHR5cGUKICAgICBbQVNQRUVEX0VIQ0kxXSAgICAgPSA1LAogICAgICBefn5+fn5+fn5+fn4KL3Rt
+cC9xZW11LXRlc3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOjg0OjY6IG5vdGU6IChuZWFy
+IGluaXRpYWxpemF0aW9uIGZvciAnYXNwZWVkX3NvY19hc3QyNjAwX2lycW1hcCcpCi90bXAvcWVt
+dS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzo4NTo2OiBlcnJvcjogYXJyYXkgaW5k
+ZXggaW4gaW5pdGlhbGl6ZXIgbm90IG9mIGludGVnZXIgdHlwZQogICAgIFtBU1BFRURfRUhDSTJd
+ICAgICA9IDksCiAgICAgIF5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2Fz
+cGVlZF9hc3QyNjAwLmM6ODU6Njogbm90ZTogKG5lYXIgaW5pdGlhbGl6YXRpb24gZm9yICdhc3Bl
+ZWRfc29jX2FzdDI2MDBfaXJxbWFwJykKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FybS9hc3BlZWRf
+YXN0MjYwMC5jOiBJbiBmdW5jdGlvbiAnYXNwZWVkX3NvY19hc3QyNjAwX2luaXQnOgovdG1wL3Fl
+bXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6MTczOjI1OiBlcnJvcjogJ0FzcGVl
+ZFNvQ0NsYXNzJyB7YWthICdzdHJ1Y3QgQXNwZWVkU29DQ2xhc3MnfSBoYXMgbm8gbWVtYmVyIG5h
+bWVkICdlaGNpc19udW0nOyBkaWQgeW91IG1lYW4gJ3NwaXNfbnVtJz8KICAgICBmb3IgKGkgPSAw
+OyBpIDwgc2MtPmVoY2lzX251bTsgaSsrKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICBefn5+
+fn5+fn4KICAgICAgICAgICAgICAgICAgICAgICAgIHNwaXNfbnVtCi0tLQogICAgICAgICAgICAg
+ICAgIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vY3B1LXFvbS5oOjIzLAogICAg
+ICAgICAgICAgICAgIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vY3B1Lmg6MjUs
+CiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9h
+c3QyNjAwLmM6MTI6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzox
+NzQ6NTg6IGVycm9yOiAnQXNwZWVkU29DU3RhdGUnIHtha2EgJ3N0cnVjdCBBc3BlZWRTb0NTdGF0
+ZSd9IGhhcyBubyBtZW1iZXIgbmFtZWQgJ2VoY2knOyBkaWQgeW91IG1lYW4gJ3NkaGNpJz8KICAg
+ICAgICAgc3lzYnVzX2luaXRfY2hpbGRfb2JqKG9iaiwgImVoY2lbKl0iLCBPQkpFQ1QoJnMtPmVo
+Y2lbaV0pLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xb20vb2JqZWN0Lmg6NTEx
+OjE3OiBub3RlOiBpbiBkZWZpbml0aW9uIG9mIG1hY3JvICdPQkpFQ1QnCiAgICAgKChPYmplY3Qg
+Kikob2JqKSkKICAgICAgICAgICAgICAgICBefn4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FybS9h
+c3BlZWRfYXN0MjYwMC5jOjE3NTo0MTogZXJyb3I6ICdBc3BlZWRTb0NTdGF0ZScge2FrYSAnc3Ry
+dWN0IEFzcGVlZFNvQ1N0YXRlJ30gaGFzIG5vIG1lbWJlciBuYW1lZCAnZWhjaSc7IGRpZCB5b3Ug
+bWVhbiAnc2RoY2knPwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2l6ZW9mKHMtPmVo
+Y2lbaV0pLCBUWVBFX1BMQVRGT1JNX0VIQ0kpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIF5+fn4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBzZGhjaQovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6MTc1OjUx
+OiBlcnJvcjogJ1RZUEVfUExBVEZPUk1fRUhDSScgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRo
+aXMgZnVuY3Rpb24pOyBkaWQgeW91IG1lYW4gJ1BPV0VSX1BMQVRGT1JNX1JPTEUnPwogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgc2l6ZW9mKHMtPmVoY2lbaV0pLCBUWVBFX1BMQVRGT1JN
+X0VIQ0kpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBefn5+fn5+fn5+fn5+fn5+fn4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgUE9XRVJfUExBVEZPUk1fUk9MRQovdG1wL3FlbXUtdGVzdC9zcmMvaHcv
+YXJtL2FzcGVlZF9hc3QyNjAwLmM6MTc1OjUxOiBub3RlOiBlYWNoIHVuZGVjbGFyZWQgaWRlbnRp
+ZmllciBpcyByZXBvcnRlZCBvbmx5IG9uY2UgZm9yIGVhY2ggZnVuY3Rpb24gaXQgYXBwZWFycyBp
+bgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6IEluIGZ1bmN0aW9u
+ICdhc3BlZWRfc29jX2FzdDI2MDBfcmVhbGl6ZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0v
+YXNwZWVkX2FzdDI2MDAuYzo0Mjk6MjU6IGVycm9yOiAnQXNwZWVkU29DQ2xhc3MnIHtha2EgJ3N0
+cnVjdCBBc3BlZWRTb0NDbGFzcyd9IGhhcyBubyBtZW1iZXIgbmFtZWQgJ2VoY2lzX251bSc7IGRp
+ZCB5b3UgbWVhbiAnc3Bpc19udW0nPwogICAgIGZvciAoaSA9IDA7IGkgPCBzYy0+ZWhjaXNfbnVt
+OyBpKyspIHsKICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fgogICAgICAgICAgICAg
+ICAgICAgICAgICAgc3Bpc19udW0KLS0tCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUt
+dGVzdC9zcmMvdGFyZ2V0L2FybS9jcHUtcW9tLmg6MjMsCiAgICAgICAgICAgICAgICAgZnJvbSAv
+dG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2FybS9jcHUuaDoyNSwKICAgICAgICAgICAgICAgICBm
+cm9tIC90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzoxMjoKL3RtcC9x
+ZW11LXRlc3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOjQzMDo0NTogZXJyb3I6ICdBc3Bl
+ZWRTb0NTdGF0ZScge2FrYSAnc3RydWN0IEFzcGVlZFNvQ1N0YXRlJ30gaGFzIG5vIG1lbWJlciBu
+YW1lZCAnZWhjaSc7IGRpZCB5b3UgbWVhbiAnc2RoY2knPwogICAgICAgICBvYmplY3RfcHJvcGVy
+dHlfc2V0X2Jvb2woT0JKRUNUKCZzLT5laGNpW2ldKSwgdHJ1ZSwgInJlYWxpemVkIiwgJmVycik7
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn4KL3RtcC9x
+ZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9tL29iamVjdC5oOjUxMToxNzogbm90ZTogaW4gZGVmaW5p
+dGlvbiBvZiBtYWNybyAnT0JKRUNUJwogICAgICgoT2JqZWN0ICopKG9iaikpCiAgICAgICAgICAg
+ICAgICAgXn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzo0MzU6
+NDQ6IGVycm9yOiAnQXNwZWVkU29DU3RhdGUnIHtha2EgJ3N0cnVjdCBBc3BlZWRTb0NTdGF0ZSd9
+IGhhcyBubyBtZW1iZXIgbmFtZWQgJ2VoY2knOyBkaWQgeW91IG1lYW4gJ3NkaGNpJz8KICAgICAg
+ICAgc3lzYnVzX21taW9fbWFwKFNZU19CVVNfREVWSUNFKCZzLT5laGNpW2ldKSwgMCwKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+Ci90bXAvcWVtdS10ZXN0
+L3NyYy9pbmNsdWRlL3FvbS9vYmplY3QuaDo1MTE6MTc6IG5vdGU6IGluIGRlZmluaXRpb24gb2Yg
+bWFjcm8gJ09CSkVDVCcKLS0tCi90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2
+MDAuYzo0MzU6MjU6IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyAnU1lTX0JVU19ERVZJQ0Un
+CiAgICAgICAgIHN5c2J1c19tbWlvX21hcChTWVNfQlVTX0RFVklDRSgmcy0+ZWhjaVtpXSksIDAs
+CiAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9z
+cmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6NDM3OjQ3OiBlcnJvcjogJ0FzcGVlZFNvQ1N0YXRl
+JyB7YWthICdzdHJ1Y3QgQXNwZWVkU29DU3RhdGUnfSBoYXMgbm8gbWVtYmVyIG5hbWVkICdlaGNp
+JzsgZGlkIHlvdSBtZWFuICdzZGhjaSc/CiAgICAgICAgIHN5c2J1c19jb25uZWN0X2lycShTWVNf
+QlVTX0RFVklDRSgmcy0+ZWhjaVtpXSksIDAsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xb20vb2Jq
+ZWN0Lmg6NTExOjE3OiBub3RlOiBpbiBkZWZpbml0aW9uIG9mIG1hY3JvICdPQkpFQ1QnCi0tLQog
+ICAgICAgICBzeXNidXNfY29ubmVjdF9pcnEoU1lTX0JVU19ERVZJQ0UoJnMtPmVoY2lbaV0pLCAw
+LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn4KL3RtcC9xZW11LXRl
+c3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOiBJbiBmdW5jdGlvbiAnYXNwZWVkX3NvY19h
+c3QyNjAwX2NsYXNzX2luaXQnOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3Qy
+NjAwLmM6NTU5Ojk6IGVycm9yOiAnQXNwZWVkU29DQ2xhc3MnIHtha2EgJ3N0cnVjdCBBc3BlZWRT
+b0NDbGFzcyd9IGhhcyBubyBtZW1iZXIgbmFtZWQgJ2VoY2lzX251bSc7IGRpZCB5b3UgbWVhbiAn
+c3Bpc19udW0nPwogICAgIHNjLT5laGNpc19udW0gICAgPSAyOwogICAgICAgICBefn5+fn5+fn4K
+ICAgICAgICAgc3Bpc19udW0KbWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMu
+bWFrOjY5OiBody9hcm0vYXNwZWVkX2FzdDI2MDAub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2Vm
+aWxlOjQ5NDogYWFyY2g2NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvcWVtdS1zeXN0
+ZW0teDg2XzY0LmV4ZQpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6Ci0tLQogICAg
+cmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQ
+cm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0t
+bGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD00YzdjNzY4YWE5Y2Y0YmUyYjdjNGRhZjNk
+NmNkYTQzZCcsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25m
+aW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdV
+UkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUn
+LCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12Jywg
+Jy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6
+eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtejFwNnp6MjUvc3JjL2RvY2tl
+ci1zcmMuMjAyMC0wMi0wNy0xOC4yMC4wOC40MDg1Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11
+OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5v
+bi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0
+YW5jZS51dWlkPTRjN2M3NjhhYTljZjRiZTJiN2M0ZGFmM2Q2Y2RhNDNkCm1ha2VbMV06ICoqKiBb
+ZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLXoxcDZ6ejI1L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRl
+c3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDJtNTIuNTEycwp1c2VyICAgIDBtOC40
+ODNzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy8yMDIwMDIwNzE3NDU0OC45MDg3LTEtbGludXhAcm9lY2stdXMubmV0L3Rlc3RpbmcuZG9ja2Vy
+LW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
