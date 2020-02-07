@@ -2,123 +2,81 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D3CC04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:04:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E6A7C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:04:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F1F621741
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39C9C21741
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:04:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QHKMpNKO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F1F621741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDPF/JZL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39C9C21741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05Aw-0004bF-8D
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:04:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57291)
+	id 1j05BL-0005Wu-Dx
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:04:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60182)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j050d-00022Y-Le
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:53:34 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1j058B-0000d9-6D
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j050c-0003xN-FH
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:53:31 -0500
-Received: from mail-eopbgr80110.outbound.protection.outlook.com
- ([40.107.8.110]:3320 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j050Y-0003eO-7O; Fri, 07 Feb 2020 09:53:26 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P6e6GYD4BB/O5O6xQc9eaoZUwFzVSxd3ShSrBQwNkntN4sQAzxzvYEGlwBuMN2PMvuqiS9WoqBToZzDuna5SksPfGwn38xF56/NIWUjCfFSpkv2QGf6gUxEs/2byeq5eCG7pfsGxd0HZHSHpprhUrcg8cmnN9KCqP9BCv/zye7V4M7uUq2I/7VTs8BUHkTeaTxcJp0WeQ475SwWnoXMxTWHx839wu1+87HiwKBgJu5ikBI2a4ijOo8LKsB2mDOz8yuc8w7b06xzCd9qv0YayP9Ik+taaOLE2v1Cj6R1DKvdOcILkyKI2d8pwnEH0qGMAprsS6qCC8ismwX79I/+2rQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=06oVgLbcn/mpLeFfk6cdXd72HZOfMAqAqN3Xms4wfMA=;
- b=S2Q5jvZH/Cew6PgSnw3ufIp0Yvza/ChTAqKAjOiZqSiU92qgw72u0zcuEjzIlp0RymBQDJ+GB/VuYZ5LkowqrGWzyI+6pooX4ckTHP8gtlJWbLyziqXfjeNM4+PFgA1+1yD1Sf1p8cYVFB+8xeegz+hvFv+VPMB7ZH6+5CEDtGJTXLEXTo3VipdL+/KLNVlqQJREH4wPREl95bsfuhq4TBlYruqV8PVdk/Owy1gKU2t/s0T90IgnZiNBVGMQ3Ee8pGTBZPmkWb+nEIEnciBYn0dRI2vcEvJJ9H1utpbOIeog0IVYlxC3vYmhrEDhauPX+slavBH3UxysQ1zQQTjl+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=06oVgLbcn/mpLeFfk6cdXd72HZOfMAqAqN3Xms4wfMA=;
- b=QHKMpNKOJofhyocEJr2xb8c5xTFTDg+nIQMV8x3rAjaYZCjnNghaOlk4DUUJfh4nAjszPvVQmN68tH1gDDHNLDk5s/rh2neSq2WucrmR3nJA4cwOI3ekBtqwxx6A/g+Egh73ehjK6rfdSgFxX/RLe/0bZAbBvFrL1diyTFVmdfc=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4280.eurprd08.prod.outlook.com (20.179.5.83) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Fri, 7 Feb 2020 14:53:23 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2707.023; Fri, 7 Feb 2020
- 14:53:23 +0000
-Subject: Re: [PATCH v3 1/1] qemu-img: Add --target-is-zero to convert
-To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>,
- David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org
-References: <20200204095246.1974117-1-david.edmondson@oracle.com>
- <20200204095246.1974117-2-david.edmondson@oracle.com>
- <90f3f74b-6154-d7ce-4e0e-ba4422f7da11@redhat.com>
- <91c3d45b-4c27-d366-6dd9-5c27164cce35@virtuozzo.com>
- <92ca6082-a3a6-c116-d1cc-e9810280c0c6@redhat.com>
- <38ac63ec-af49-d9d5-c1d4-e45614b71d4c@redhat.com>
- <f110458f-b3e7-6301-64bf-2b4957f3601e@virtuozzo.com>
- <570489b5-8d1b-27c4-01d3-0e63130d2c57@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200207175321466
-Message-ID: <99dc03a7-f93a-bdee-f38d-ac5aae8a3ca9@virtuozzo.com>
-Date: Fri, 7 Feb 2020 17:53:21 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <570489b5-8d1b-27c4-01d3-0e63130d2c57@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1PR05CA0215.eurprd05.prod.outlook.com
- (2603:10a6:3:fa::15) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <mrolnik@gmail.com>) id 1j0588-0003Kt-Dh
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:18 -0500
+Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:44313)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1j0588-0003Ft-66
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:16 -0500
+Received: by mail-qv1-xf43.google.com with SMTP id n8so1114952qvg.11
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 07:01:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=54G+CYCHGRXMdevsxzhbkIds9bO1PhV2qcIwfkJFrAg=;
+ b=iDPF/JZL8aRLAwpjXpbwBu4r246IRXlLUmvv/n5+ubR6X4CkQ25EcEr8Sk+SzDpzD0
+ o53USTnoSwijRAKaXuGFjrZf0AEQ9hlOJXAzNVHjhu/SIo37YESturCK9fJJwpooI/bn
+ xKUU1huUWi46gT227UuOwyK3vZMz3YWjPSLzTe4s/vkpAq2vSCXrqwUDDboL0B0XLBvW
+ rBIiSEj68BT9zAjpWKBaWkCe45XRLyoKyZSNkug3TgzeVo0e/BWPzj2YM7DT/H79VTGa
+ 2+gOENxJL152cjf/RD0VvD5Ql91dsYi1g9mvhqwpUhxlkEl4eadprNseoMH/yOEWnWhd
+ sLcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=54G+CYCHGRXMdevsxzhbkIds9bO1PhV2qcIwfkJFrAg=;
+ b=hqzttHGnwJE3dUV5sff4z/alDCIJvF8jqMf8Lrr1dAdyJ3a62hgugpX40KQQi+uIe4
+ O9eovnStf5+3/QWGZ+0vBDz2FJp/iZ/nUVDNh246tWdtX57OJsrkOiHtjbaqLJVFTqtD
+ 2zep6bhBO6EQkd8pjNaWmjm81v8wyau/C/5N2ku9KhHJM/TBa2iY0f9F2IyX+9E//7M5
+ XA+fXNuiKKr3mdzCEjFTVCGiULtjiW2qREVMd+ml8XXGPe6sOLILqellkkik5kf6buRp
+ 2ggliCBzDYsQRJbmL9H3TBgFYop5ETUctDdPp8DNEcujeePLRpD25FuNkn2lg2PiNNnM
+ XVeA==
+X-Gm-Message-State: APjAAAUMSJqY1wDjgPJ7MT2+HUt37OS4kpriJF6sd/m4pNEwaKJQ7YLl
+ qpSqpsV+JOwyzUugBJ88S+BjHUSk02ZK2sUsf7U=
+X-Google-Smtp-Source: APXvYqzq1XnKhgm45b99aTE82Xlf5f+dGVAsF8+lodDOlAqkQj3rYDENc2saAhvghw3fFAAo0M4J0MkjS/lgtLCZvNM=
+X-Received: by 2002:a0c:8d0a:: with SMTP id r10mr6681724qvb.7.1581087675158;
+ Fri, 07 Feb 2020 07:01:15 -0800 (PST)
 MIME-Version: 1.0
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR05CA0215.eurprd05.prod.outlook.com (2603:10a6:3:fa::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21 via Frontend Transport; Fri, 7 Feb 2020 14:53:23 +0000
-X-Tagtoolbar-Keys: D20200207175321466
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2724e587-032d-492c-a3a1-08d7abdd7ae2
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4280:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4280042DFB3E8E83725BA179C11C0@AM6PR08MB4280.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 0306EE2ED4
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(136003)(376002)(346002)(366004)(396003)(39850400004)(189003)(199004)(4326008)(52116002)(8676002)(81156014)(26005)(81166006)(186003)(2616005)(86362001)(66946007)(66556008)(66476007)(16526019)(2906002)(8936002)(31696002)(53546011)(956004)(6486002)(478600001)(31686004)(110136005)(16576012)(36756003)(5660300002)(316002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4280;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Wgb+ZiKeoWkNx25qkdcL/3X8M8gkBBlBX1SER7FsQqr45xf5kW5QIjh2doylcmDQCWIQjzM1rqLP5BkXYr7TbKoPzWQaeSdASOpDoHl6lSmggcjUR3duzD+U1yC3ZNXWu9ffCta6sMPnnMrZzZuF5WEGQbgpnLTAMrAcWH2YyhP8Y3E7RWoNozlTKAoN+jb/ll6pH+I7XuICQVk1ZoOcrBOhiNCUSGYjfwScxq1qzPZ1vjfZpoXeJ1UT7Y3jpS6nm/4X7SHPlDTiKw9K0cy2I9rBynnFLORa+4w/64yzVgq5yB+h76/lEh4GZDM8fwQxMCMhchBHGqXcYEgmI+QpkFoklqRXm8yG9qIGM+ZgihRm+a7GPbg67laMX+DZP5+PI4jHd9gY7Ro4ShZ+1C0Unj7ep30QTulzYWEzl0XsWC+4uU1wzoApGvXI7CyLHtch
-X-MS-Exchange-AntiSpam-MessageData: V5qHplhPt4cny7njPaKq+WN7oLacuaRKAKqlzyBEVRFqpjLHqonHu+p1gSnJuSTgU3ZLNS9mJAAhNvrDxBDkfKZJngGI3wNZy9VqqFJ9NrHaFVhKf1H19TqAcrmWmjjnOW2ODZYMFIkmq86hCOu5bg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2724e587-032d-492c-a3a1-08d7abdd7ae2
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2020 14:53:23.5129 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L12EbgxkvuVZJ9U7+oe/kjE+i4Xka2WdOL5OILMvVdfeBPfH13kp63Kw3yhIRimCm1OUdQeTiJcY6N8boY+zd21Q5VvAPigWJPOVElPWSmA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4280
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.110
+References: <1581040680-308-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1581040680-308-2-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1581040680-308-2-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Fri, 7 Feb 2020 17:00:36 +0200
+Message-ID: <CAK4993jtzCCqJEySYN8eXKKwZ51HS1LBxdpSs5-oow39jq4T8w@mail.gmail.com>
+Subject: Re: [PATCH rc5 01/32] target/avr: Add basic parameters of the new
+ platform
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Content-Type: multipart/alternative; boundary="0000000000003c93de059dfda944"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,98 +88,386 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-07.02.2020 17:41, Max Reitz wrote:
-> On 07.02.20 13:07, Vladimir Sementsov-Ogievskiy wrote:
->> 07.02.2020 13:33, Max Reitz wrote:
->>> On 04.02.20 15:23, Eric Blake wrote:
->>>> On 2/4/20 7:59 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>>
->>>>>> I understand that it is safer to have restrictions now and lift them
->>>>>> later, than to allow use of the option at any time and leave room fo=
-r
->>>>>> the user to shoot themselves in the foot with no way to add safety
->>>>>> later.=C2=A0 The argument against no backing file is somewhat
->>>>>> understandable (technically, as long as the backing file also reads
->>>>>> as all zeroes, then the overall image reads as all zeroes - but why
->>>>>> have a backing file that has no content?); the argument requiring -n
->>>>>> is a bit weaker (if I'm creating an image, I _know_ it reads as all
->>>>>> zeroes, so the --target-is-zero argument is redundant, but it
->>>>>> shouldn't hurt to allow it).
->>>>>
->>>>> I know that it reads as all zeroes, only if this format provides zero
->>>>> initialization..
->>>>>
->>>>>>
->>>>>>> +++ b/qemu-img.c
->>>>>>
->>>>>>> @@ -2247,6 +2256,11 @@ static int img_convert(int argc, char **argv=
-)
->>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 warn_=
-report("This will become an error in future QEMU
->>>>>>> versions.");
->>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>>> +=C2=A0=C2=A0=C2=A0 if (s.has_zero_init && !skip_create) {
->>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("--target-=
-is-zero requires use of -n flag");
->>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail_getopt;
->>>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>>
->>>>>> So I think we could drop this hunk with no change in behavior.
->>>>>
->>>>> I think, no we can't. If we allow target-is-zero, with -n, we'd bette=
-r
->>>>> to check that what we are creating is zero-initialized (format has
->>>>> zero-init), and if not we should report error.
->>>>>
->>>>
->>>> Good call.=C2=A0 Yes, if we allow --target-is-zero without -n, we MUST=
- insist
->>>> that bdrv_has_zero_init() returns 1 (or, after my followup series,
->>>> bdrv_known_zeroes() includes BDRV_ZERO_CREATE).
->>>
->>> Why?
->>>
->>> I could imagine a user creating a qcow2 image on some block device with
->>> preallocation where we cannot verify that the result will be zero.=C2=
-=A0 But
->>> they want qemu not to zero the device, so they would specify
->>> --target-is-zero.
->>
->> If user create image, setting --target-is-zero is always valid. But if
->> we in
->> same operation create the image automatically, having --target-is-zero,
->> when
->> we know that what we are creating is not zero is misleading and should
->> fail..
->=20
-> bdrv_has_zero_init() doesn=E2=80=99t return false only for images that we=
- know
-> are not zero.  It returns true for images where we know they are.  But
-> if we don=E2=80=99t know, then it returns false also.
+--0000000000003c93de059dfda944
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-yes, but we don't have better check.
+Tested-by: Michael Rolnik <mrolnik@gmail.com>
 
->=20
->> If we want to add a behavior to skip zeros unconditionally, we should
->> call new
->> option --skip-zeroes, to clearly specify what we want.
->=20
-> It was my impression that this was exactly what --target-is-zero means
-> and implies.
->=20
+On Fri, Feb 7, 2020 at 3:58 AM Aleksandar Markovic <
+aleksandar.markovic@rt-rk.com> wrote:
 
-For me it sounds strange that user has better knowledge about what Qemu
-creates than Qemu itself. And if it so - it should be fixed in Qemu,
-rather than creating user interface to hint Qemu what it does.
-
-
+> From: Michael Rolnik <mrolnik@gmail.com>
+>
+> This includes definitions of various basic parameters needed
+> for integration of a new platform into QEMU.
+>
+> [AM: Split a larger AVR introduction patch into logical units]
+> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
+> Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+> Acked-by: Igor Mammedov <imammedo@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  target/avr/cpu-param.h | 37 ++++++++++++++++++++++++++++
+>  target/avr/cpu.h       | 66
+> ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  MAINTAINERS            |  7 ++++++
+>  3 files changed, 110 insertions(+)
+>  create mode 100644 target/avr/cpu-param.h
+>  create mode 100644 target/avr/cpu.h
+>
+> diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
+> new file mode 100644
+> index 0000000..0c29ce4
+> --- /dev/null
+> +++ b/target/avr/cpu-param.h
+> @@ -0,0 +1,37 @@
+> +/*
+> + * QEMU AVR CPU
+> + *
+> + * Copyright (c) 2019 Michael Rolnik
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see
+> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> + */
+> +
+> +#ifndef AVR_CPU_PARAM_H
+> +#define AVR_CPU_PARAM_H
+> +
+> +#define TARGET_LONG_BITS 32
+> +/*
+> + * TARGET_PAGE_BITS cannot be more than 8 bits because
+> + * 1.  all IO registers occupy [0x0000 .. 0x00ff] address range, and the=
+y
+> + *     should be implemented as a device and not memory
+> + * 2.  SRAM starts at the address 0x0100
+> + */
+> +#define TARGET_PAGE_BITS 8
+> +#define TARGET_PHYS_ADDR_SPACE_BITS 24
+> +#define TARGET_VIRT_ADDR_SPACE_BITS 24
+> +#define NB_MMU_MODES 2
+> +
+> +
+> +#endif
+> diff --git a/target/avr/cpu.h b/target/avr/cpu.h
+> new file mode 100644
+> index 0000000..ecdeafb
+> --- /dev/null
+> +++ b/target/avr/cpu.h
+> @@ -0,0 +1,66 @@
+> +/*
+> + * QEMU AVR CPU
+> + *
+> + * Copyright (c) 2019 Michael Rolnik
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see
+> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> + */
+> +
+> +#ifndef QEMU_AVR_CPU_H
+> +#define QEMU_AVR_CPU_H
+> +
+> +#include "exec/cpu-defs.h"
+> +
+> +#define TCG_GUEST_DEFAULT_MO 0
+> +
+> +/*
+> + * AVR has two memory spaces, data & code.
+> + * e.g. both have 0 address
+> + * ST/LD instructions access data space
+> + * LPM/SPM and instruction fetching access code memory space
+> + */
+> +#define MMU_CODE_IDX 0
+> +#define MMU_DATA_IDX 1
+> +
+> +#define EXCP_RESET 1
+> +#define EXCP_INT(n) (EXCP_RESET + (n) + 1)
+> +
+> +/* Number of CPU registers */
+> +#define NUMBER_OF_CPU_REGISTERS 32
+> +/* Number of IO registers accessible by ld/st/in/out */
+> +#define NUMBER_OF_IO_REGISTERS 64
+> +
+> +/*
+> + * Offsets of AVR memory regions in host memory space.
+> + *
+> + * This is needed because the AVR has separate code and data address
+> + * spaces that both have start from zero but have to go somewhere in
+> + * host memory.
+> + *
+> + * It's also useful to know where some things are, like the IO registers=
+.
+> + */
+> +/* Flash program memory */
+> +#define OFFSET_CODE 0x00000000
+> +/* CPU registers, IO registers, and SRAM */
+> +#define OFFSET_DATA 0x00800000
+> +/* CPU registers specifically, these are mapped at the start of data */
+> +#define OFFSET_CPU_REGISTERS OFFSET_DATA
+> +/*
+> + * IO registers, including status register, stack pointer, and memory
+> + * mapped peripherals, mapped just after CPU registers
+> + */
+> +#define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)
+> +
+> +#endif /* !defined (QEMU_AVR_CPU_H) */
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e72b5e5..4e47309 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -163,6 +163,13 @@ S: Maintained
+>  F: hw/arm/smmu*
+>  F: include/hw/arm/smmu*
+>
+> +AVR TCG CPUs
+> +M: Michael Rolnik <mrolnik@gmail.com>
+> +R: Sarah Harris <S.E.Harris@kent.ac.uk>
+> +S: Maintained
+> +F: target/avr/cpu-param.h
+> +F: target/avr/cpu.h
+> +
+>  CRIS TCG CPUs
+>  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+>  S: Maintained
+> --
+> 2.7.4
+>
+>
 
 --=20
-Best regards,
-Vladimir
+Best Regards,
+Michael Rolnik
+
+--0000000000003c93de059dfda944
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Tested-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gm=
+ail.com">mrolnik@gmail.com</a>&gt;<br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Feb 7, 2020 at 3:58 AM Aleksa=
+ndar Markovic &lt;<a href=3D"mailto:aleksandar.markovic@rt-rk.com">aleksand=
+ar.markovic@rt-rk.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_qu=
+ote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,20=
+4);padding-left:1ex">From: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gma=
+il.com" target=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
+<br>
+This includes definitions of various basic parameters needed<br>
+for integration of a new platform into QEMU.<br>
+<br>
+[AM: Split a larger AVR introduction patch into logical units]<br>
+Suggested-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@g=
+mail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt;<br>
+Co-developed-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" ta=
+rget=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
+Co-developed-by: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" =
+target=3D"_blank">S.E.Harris@kent.ac.uk</a>&gt;<br>
+Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
+et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
+Signed-off-by: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" ta=
+rget=3D"_blank">S.E.Harris@kent.ac.uk</a>&gt;<br>
+Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
+naro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
+Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@=
+gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt;<br>
+Acked-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" target=
+=3D"_blank">imammedo@redhat.com</a>&gt;<br>
+Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
+com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0target/avr/cpu-param.h | 37 ++++++++++++++++++++++++++++<br>
+=C2=A0target/avr/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0| 66 +++++++++++++++++++++=
++++++++++++++++++++++++++++++<br>
+=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 7 ++++++=
+<br>
+=C2=A03 files changed, 110 insertions(+)<br>
+=C2=A0create mode 100644 target/avr/cpu-param.h<br>
+=C2=A0create mode 100644 target/avr/cpu.h<br>
+<br>
+diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h<br>
+new file mode 100644<br>
+index 0000000..0c29ce4<br>
+--- /dev/null<br>
++++ b/target/avr/cpu-param.h<br>
+@@ -0,0 +1,37 @@<br>
++/*<br>
++ * QEMU AVR CPU<br>
++ *<br>
++ * Copyright (c) 2019 Michael Rolnik<br>
++ *<br>
++ * This library is free software; you can redistribute it and/or<br>
++ * modify it under the terms of the GNU Lesser General Public<br>
++ * License as published by the Free Software Foundation; either<br>
++ * version 2.1 of the License, or (at your option) any later version.<br>
++ *<br>
++ * This library is distributed in the hope that it will be useful,<br>
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<=
+br>
++ * Lesser General Public License for more details.<br>
++ *<br>
++ * You should have received a copy of the GNU Lesser General Public<br>
++ * License along with this library; if not, see<br>
++ * &lt;<a href=3D"http://www.gnu.org/licenses/lgpl-2.1.html" rel=3D"norefe=
+rrer" target=3D"_blank">http://www.gnu.org/licenses/lgpl-2.1.html</a>&gt;<b=
+r>
++ */<br>
++<br>
++#ifndef AVR_CPU_PARAM_H<br>
++#define AVR_CPU_PARAM_H<br>
++<br>
++#define TARGET_LONG_BITS 32<br>
++/*<br>
++ * TARGET_PAGE_BITS cannot be more than 8 bits because<br>
++ * 1.=C2=A0 all IO registers occupy [0x0000 .. 0x00ff] address range, and =
+they<br>
++ *=C2=A0 =C2=A0 =C2=A0should be implemented as a device and not memory<br>
++ * 2.=C2=A0 SRAM starts at the address 0x0100<br>
++ */<br>
++#define TARGET_PAGE_BITS 8<br>
++#define TARGET_PHYS_ADDR_SPACE_BITS 24<br>
++#define TARGET_VIRT_ADDR_SPACE_BITS 24<br>
++#define NB_MMU_MODES 2<br>
++<br>
++<br>
++#endif<br>
+diff --git a/target/avr/cpu.h b/target/avr/cpu.h<br>
+new file mode 100644<br>
+index 0000000..ecdeafb<br>
+--- /dev/null<br>
++++ b/target/avr/cpu.h<br>
+@@ -0,0 +1,66 @@<br>
++/*<br>
++ * QEMU AVR CPU<br>
++ *<br>
++ * Copyright (c) 2019 Michael Rolnik<br>
++ *<br>
++ * This library is free software; you can redistribute it and/or<br>
++ * modify it under the terms of the GNU Lesser General Public<br>
++ * License as published by the Free Software Foundation; either<br>
++ * version 2.1 of the License, or (at your option) any later version.<br>
++ *<br>
++ * This library is distributed in the hope that it will be useful,<br>
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<=
+br>
++ * Lesser General Public License for more details.<br>
++ *<br>
++ * You should have received a copy of the GNU Lesser General Public<br>
++ * License along with this library; if not, see<br>
++ * &lt;<a href=3D"http://www.gnu.org/licenses/lgpl-2.1.html" rel=3D"norefe=
+rrer" target=3D"_blank">http://www.gnu.org/licenses/lgpl-2.1.html</a>&gt;<b=
+r>
++ */<br>
++<br>
++#ifndef QEMU_AVR_CPU_H<br>
++#define QEMU_AVR_CPU_H<br>
++<br>
++#include &quot;exec/cpu-defs.h&quot;<br>
++<br>
++#define TCG_GUEST_DEFAULT_MO 0<br>
++<br>
++/*<br>
++ * AVR has two memory spaces, data &amp; code.<br>
++ * e.g. both have 0 address<br>
++ * ST/LD instructions access data space<br>
++ * LPM/SPM and instruction fetching access code memory space<br>
++ */<br>
++#define MMU_CODE_IDX 0<br>
++#define MMU_DATA_IDX 1<br>
++<br>
++#define EXCP_RESET 1<br>
++#define EXCP_INT(n) (EXCP_RESET + (n) + 1)<br>
++<br>
++/* Number of CPU registers */<br>
++#define NUMBER_OF_CPU_REGISTERS 32<br>
++/* Number of IO registers accessible by ld/st/in/out */<br>
++#define NUMBER_OF_IO_REGISTERS 64<br>
++<br>
++/*<br>
++ * Offsets of AVR memory regions in host memory space.<br>
++ *<br>
++ * This is needed because the AVR has separate code and data address<br>
++ * spaces that both have start from zero but have to go somewhere in<br>
++ * host memory.<br>
++ *<br>
++ * It&#39;s also useful to know where some things are, like the IO registe=
+rs.<br>
++ */<br>
++/* Flash program memory */<br>
++#define OFFSET_CODE 0x00000000<br>
++/* CPU registers, IO registers, and SRAM */<br>
++#define OFFSET_DATA 0x00800000<br>
++/* CPU registers specifically, these are mapped at the start of data */<br=
+>
++#define OFFSET_CPU_REGISTERS OFFSET_DATA<br>
++/*<br>
++ * IO registers, including status register, stack pointer, and memory<br>
++ * mapped peripherals, mapped just after CPU registers<br>
++ */<br>
++#define OFFSET_IO_REGISTERS (OFFSET_DATA + NUMBER_OF_CPU_REGISTERS)<br>
++<br>
++#endif /* !defined (QEMU_AVR_CPU_H) */<br>
+diff --git a/MAINTAINERS b/MAINTAINERS<br>
+index e72b5e5..4e47309 100644<br>
+--- a/MAINTAINERS<br>
++++ b/MAINTAINERS<br>
+@@ -163,6 +163,13 @@ S: Maintained<br>
+=C2=A0F: hw/arm/smmu*<br>
+=C2=A0F: include/hw/arm/smmu*<br>
+<br>
++AVR TCG CPUs<br>
++M: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" target=3D"_blan=
+k">mrolnik@gmail.com</a>&gt;<br>
++R: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" target=3D"_bl=
+ank">S.E.Harris@kent.ac.uk</a>&gt;<br>
++S: Maintained<br>
++F: target/avr/cpu-param.h<br>
++F: target/avr/cpu.h<br>
++<br>
+=C2=A0CRIS TCG CPUs<br>
+=C2=A0M: Edgar E. Iglesias &lt;<a href=3D"mailto:edgar.iglesias@gmail.com" =
+target=3D"_blank">edgar.iglesias@gmail.com</a>&gt;<br>
+=C2=A0S: Maintained<br>
+-- <br>
+2.7.4<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">Best Regards,<br>Michael Rolnik</div>
+
+--0000000000003c93de059dfda944--
 
