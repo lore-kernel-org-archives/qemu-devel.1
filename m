@@ -2,60 +2,78 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34360C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B320DC352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:19:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DEC920838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:16:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DEC920838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7E33420838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:19:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XWLo5Ocf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E33420838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j00gD-0006rL-7t
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 05:16:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46168)
+	id 1j00iz-0000fL-OG
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 05:19:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46982)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j00ey-0005mq-L5
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:14:53 -0500
+ (envelope-from <kraxel@redhat.com>) id 1j00i5-0007oK-RX
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:18:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j00ex-0002Q3-Hu
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:14:52 -0500
-Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:56524)
+ (envelope-from <kraxel@redhat.com>) id 1j00i4-0008Ia-3J
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:18:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57678
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j00ex-0001vz-CE
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:14:51 -0500
-Received: from player716.ha.ovh.net (unknown [10.108.57.16])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id D022583202
- for <qemu-devel@nongnu.org>; Fri,  7 Feb 2020 11:14:41 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player716.ha.ovh.net (Postfix) with ESMTPSA id 6AAB1F0A4DE3;
- Fri,  7 Feb 2020 10:14:37 +0000 (UTC)
-Date: Fri, 7 Feb 2020 11:14:34 +0100
-From: Greg Kurz <groug@kaod.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] ppc: function to setup latest class options
-Message-ID: <20200207111434.75c97bbe@bahia.lan>
-In-Reply-To: <20200207064628.1196095-1-mst@redhat.com>
-References: <20200207064628.1196095-1-mst@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1j00i3-0008Hl-Vw
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:18:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581070683;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=wZVfmWa3Tk0OtZcF8zGnMZ9rxTFCvx+JI8m9OiB5Jxc=;
+ b=XWLo5OcfZQgGW02/miiGCe103fDo1Gk9aJWKekSUFVT7I0QE/boQtOVzBzJlH+6tEXJRYi
+ 0EQ1Pjg1PucLG5TC4mSPzMDFAQjYdShP2KcvedTE3V50e62JIYx/dpG6o1/s0R1ObGPmY1
+ +fIPwJMJ2Fe8OLYytvr7hlQlOhy3v+c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-82YxjycMOmqx5MFkUeGzJQ-1; Fri, 07 Feb 2020 05:18:00 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A420189F760;
+ Fri,  7 Feb 2020 10:17:59 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-112.ams2.redhat.com
+ [10.36.116.112])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2948B87B1C;
+ Fri,  7 Feb 2020 10:17:54 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 6AA711747D; Fri,  7 Feb 2020 11:17:53 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/7] ui: rework -show-cursor option
+Date: Fri,  7 Feb 2020 11:17:46 +0100
+Message-Id: <20200207101753.25812-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 4076039140646951385
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrheehgddufecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduiedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 82YxjycMOmqx5MFkUeGzJQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.50.107
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,58 +85,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, jtomko@redhat.com,
+ libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>,
+ jpewhacker@gmail.com, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Feb 2020 01:48:02 -0500
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Add -display {sdl,gtk,cocoa},show-cursor=3Don as replacement for
+-show-cursor.  sdl + cocoa are switched over (no change in behavior),
+gtk support is added.
 
-> We are going to add more init for the latest machine, so move the setup
-> to a function so we don't have to change the DEFINE_SPAPR_MACHINE macro
-> each time.
-> 
+Gerd Hoffmann (7):
+  ui: add show-cursor option
+  ui: wire up legacy -show-cursor option
+  ui/sdl: switch to new show-cursor option
+  ui/cocoa: switch to new show-cursor option
+  ui/gtk: implement show-cursor option
+  ui: drop curor_hide global variable.
+  ui: deprecate legacy -show-cursor option
 
-Not sure about the meaning of "change the DEFINE_SPAPR_MACHINE macro" but
-yes, if we don't put the additional init there, we would be forced to
-move it around each time to the new default machine init.
+ include/sysemu/sysemu.h |  1 -
+ ui/gtk.c                |  8 ++++++--
+ ui/sdl2.c               | 16 ++++++++--------
+ vl.c                    | 16 ++++++++++++++--
+ qapi/ui.json            |  3 +++
+ qemu-deprecated.texi    |  5 +++++
+ ui/cocoa.m              |  4 ++++
+ 7 files changed, 40 insertions(+), 13 deletions(-)
 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 02cf53fc5b..4cf2a992a5 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4428,6 +4428,12 @@ static const TypeInfo spapr_machine_info = {
->      },
->  };
->  
-> +static void spapr_machine_latest_class_options(MachineClass *mc)
-> +{
-> +    mc->alias = "pseries";
-> +    mc->is_default = 1;
-> +}
-> +
->  #define DEFINE_SPAPR_MACHINE(suffix, verstr, latest)                 \
->      static void spapr_machine_##suffix##_class_init(ObjectClass *oc, \
->                                                      void *data)      \
-> @@ -4435,8 +4441,7 @@ static const TypeInfo spapr_machine_info = {
->          MachineClass *mc = MACHINE_CLASS(oc);                        \
->          spapr_machine_##suffix##_class_options(mc);                  \
->          if (latest) {                                                \
-> -            mc->alias = "pseries";                                   \
-> -            mc->is_default = 1;                                      \
-> +            spapr_machine_latest_class_options(mc);                  \
->          }                                                            \
->      }                                                                \
->      static const TypeInfo spapr_machine_##suffix##_info = {          \
+--=20
+2.18.1
 
 
