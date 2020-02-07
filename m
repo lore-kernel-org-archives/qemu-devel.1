@@ -2,82 +2,88 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 893A1C04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D50C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:08:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E62520838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:06:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E62520838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6CD6720838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:08:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YQnNshFb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CD6720838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j069O-0001o9-Gr
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:06:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48651)
+	id 1j06B8-0004os-Ky
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:08:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j068U-0000Io-HN
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:05:44 -0500
+ (envelope-from <armbru@redhat.com>) id 1j06AO-0003Tg-2M
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:07:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j068T-0004XT-2j
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:05:42 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2074 helo=huawei.com)
+ (envelope-from <armbru@redhat.com>) id 1j06AM-000646-QQ
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:07:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56764
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j068P-0004Qp-P7; Fri, 07 Feb 2020 11:05:37 -0500
-Received: from lhreml705-cah.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id 758D95F97B0B9C3636AF;
- Fri,  7 Feb 2020 16:05:30 +0000 (GMT)
-Received: from lhreml702-chm.china.huawei.com (10.201.108.51) by
- lhreml705-cah.china.huawei.com (10.201.108.46) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Fri, 7 Feb 2020 16:05:29 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml702-chm.china.huawei.com (10.201.108.51) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Fri, 7 Feb 2020 16:05:29 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Fri, 7 Feb 2020 16:05:29 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Topic: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Index: AQHVzV43w2nN4JnxQEOUTwT8NpSKx6gLQ1MAgAAWtoCAACc+AIABYS3wgAAIyYCAAR1e4IAAFJiAgAAHflCAADtYAIABo1pQ
-Date: Fri, 7 Feb 2020 16:05:29 +0000
-Message-ID: <6bf255ecb88446f1b08ee4ab21a85f02@huawei.com>
-References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
- <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
- <20200204162320.67e5d353@redhat.com>
- <74eaaa45-0d20-9a21-fbf8-6d29deb248eb@redhat.com>
- <4ce41554-8b8e-dbb5-5fe9-43af09950f23@redhat.com>
- <8e0b2c762e914c64bebfab5fc7441661@huawei.com>
- <133f274e-e942-7008-93d2-8edb1bc4d7ae@redhat.com>
- <52fff289cca14874ad493fc25806fe3d@huawei.com>
- <f041380c-afcb-f8d8-89db-8f48c7b46767@redhat.com>
- <e97fa28c653044b8bab66aeca2374682@huawei.com>
- <0ff4d2c1-ebd3-1d2f-07e8-a4f13be07ceb@redhat.com>
-In-Reply-To: <0ff4d2c1-ebd3-1d2f-07e8-a4f13be07ceb@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j06AM-00063a-NI
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:07:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581091658;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3oD1NuLLoLNSEhus9xc2ZfXtMyC4FjTGa+wT7BCvANM=;
+ b=YQnNshFby5rOC5JBrioo3MUzrRuJ1bdZSpbVbaZjTkPcXgMyNgb5FtBi8EgkkUuA2pi6Mt
+ 7WsWrgMYeLP8h81PoKMFurLfbsUmmdNx8TQILmDySSDKx0RGmj2AB8Xphzum99MH5qL+nT
+ FtXw9p5VgAQQsnyJ6n+F+VMvclqecJ8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-wXzcXzB9MMCYzszM0I3Fmg-1; Fri, 07 Feb 2020 11:07:21 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44303800D6C;
+ Fri,  7 Feb 2020 16:07:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-136.ams2.redhat.com
+ [10.36.116.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E2D1F60BEC;
+ Fri,  7 Feb 2020 16:07:14 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7847711386A7; Fri,  7 Feb 2020 17:07:13 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 2/3] MAINTAINERS: Cover qapi/block{-core}.json in 'Block
+ layer core' section
+References: <20200207103012.27049-1-philmd@redhat.com>
+ <20200207103012.27049-3-philmd@redhat.com>
+ <87blqaqyxi.fsf@dusky.pond.sub.org>
+ <20200207142146.GF6031@linux.fritz.box>
+Date: Fri, 07 Feb 2020 17:07:13 +0100
+In-Reply-To: <20200207142146.GF6031@linux.fritz.box> (Kevin Wolf's message of
+ "Fri, 7 Feb 2020 15:21:46 +0100")
+Message-ID: <87blqapej2.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: wXzcXzB9MMCYzszM0I3Fmg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,84 +95,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ Philippe =?utf-8?Q?M?= =?utf-8?Q?athieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGF2aWQgSGlsZGVuYnJh
-bmQgW21haWx0bzpkYXZpZEByZWRoYXQuY29tXQ0KPiBTZW50OiAwNiBGZWJydWFyeSAyMDIwIDE0
-OjU1DQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVt
-LnRob2RpQGh1YXdlaS5jb20+Ow0KPiBJZ29yIE1hbW1lZG92IDxpbWFtbWVkb0ByZWRoYXQuY29t
-Pg0KPiBDYzogcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyB4aWFvZ3Vhbmdyb25nLmVyaWNAZ21h
-aWwuY29tOw0KPiBtc3RAcmVkaGF0LmNvbTsgc2hhbm5vbi56aGFvc2xAZ21haWwuY29tOyBxZW11
-LWRldmVsQG5vbmdudS5vcmc7DQo+IHh1d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMaW51
-eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47DQo+IGVyaWMuYXVnZXJAcmVkaGF0LmNvbTsgcWVt
-dS1hcm1Abm9uZ251Lm9yZzsgbGVyc2VrQHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRD
-SCB2MiAxLzddIGV4ZWM6IEZpeCBmb3IgcWVtdV9yYW1fcmVzaXplKCkgY2FsbGJhY2sNCj4gDQo+
-IE9uIDA2LjAyLjIwIDEyOjI4LCBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIHdyb3RlOg0KPiA+
-DQo+ID4NCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogRGF2aWQg
-SGlsZGVuYnJhbmQgW21haWx0bzpkYXZpZEByZWRoYXQuY29tXQ0KPiA+PiBTZW50OiAwNiBGZWJy
-dWFyeSAyMDIwIDEwOjU2DQo+ID4+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFt
-ZWVyYWxpLmtvbG90aHVtLnRob2RpQGh1YXdlaS5jb20+Ow0KPiA+PiBJZ29yIE1hbW1lZG92IDxp
-bWFtbWVkb0ByZWRoYXQuY29tPg0KPiA+PiBDYzogcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyB4
-aWFvZ3Vhbmdyb25nLmVyaWNAZ21haWwuY29tOw0KPiA+PiBtc3RAcmVkaGF0LmNvbTsgc2hhbm5v
-bi56aGFvc2xAZ21haWwuY29tOyBxZW11LWRldmVsQG5vbmdudS5vcmc7DQo+ID4+IHh1d2VpIChP
-KSA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47DQo+
-ID4+IGVyaWMuYXVnZXJAcmVkaGF0LmNvbTsgcWVtdS1hcm1Abm9uZ251Lm9yZzsgbGVyc2VrQHJl
-ZGhhdC5jb20NCj4gPj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAxLzddIGV4ZWM6IEZpeCBmb3Ig
-cWVtdV9yYW1fcmVzaXplKCkgY2FsbGJhY2sNCj4gPg0KPiA+IFsuLi5dDQo+ID4NCj4gPj4+IHJv
-b3RAdWJ1bnR1Oi8jIGNhdCAvZGV2L3BtZW0NCj4gPj4+IHBtZW0wICBwbWVtMQ0KPiA+Pj4NCj4g
-Pj4+IEZyb20gdGhlIGxvZ3MsIGl0IGxvb2tzIGxpa2UgdGhlIHJhbV9sb2FkX3ByZWNvcHkoKSAt
-LT4gcWVtdV9yYW1fcmVzaXplKCkNCj4gaXMNCj4gPj4gbm90DQo+ID4+PiBjYWxsZWQgYXMgbGVu
-Z3RoID09IHVzZWRfbGVuZ3RoIGFuZCBib3RoIHNlZW1zIHRvIGJlIHBhZ2UgYWxpZ25lZCB2YWx1
-ZXMuDQo+ID4+PiBBbmQgZnJvbQ0KPiA+PiBodHRwczovL2dpdGh1Yi5jb20vcWVtdS9xZW11L2Js
-b2IvbWFzdGVyL21pZ3JhdGlvbi9yYW0uYyNMMzQyMQ0KPiA+Pj4gcWVtdV9yYW1fcmVzaXplKCkg
-aXMgY2FsbGVkIHdpdGggbGVuZ3RoIGlmIGxlbmd0aCAhPSB1c2VkX2xlbmd0aC4NCj4gPj4NCj4g
-Pj4gQXNzdW1lIG9uIHlvdXIgc291cmNlLCB0aGUgb2xkIHNpemUgaXMgMTIzNDUgYnl0ZXMuIFNv
-IDE2Mzg0IGFsaWduZWQgdXANCj4gPj4gKDQgcGFnZXMpLg0KPiA+Pg0KPiA+PiBBc3N1bWUgb24g
-eW91ciB0YXJnZXQsIHRoZSBuZXcgc2l6ZSBpcyAxMjM0NTYgYnl0ZXMsIHNvIDEyNjk3NiBhbGln
-bmVkDQo+ID4+IHVwICgzMSBwYWdlcykuDQo+ID4+DQo+ID4+IElmIHlvdSBtaWdyYXRlIGZyb20g
-c291cmNlIHRvIGRlc3RpbmF0aW9uLCB0aGUgbWlncmF0aW9uIGNvZGUgd291bGQNCj4gPj4gcmVz
-aXplIHRvIDE2Mzg0LCBhbHRob3VnaCB0aGUgImFjdHVhbCBzaXplIiBpcyAxMjM0NS4gVGhlIGNh
-bGxiYWNrIHdpbGwNCj4gPj4gYmUgY2FsbGVkIHdpdGggdGhlIGFsaWduZWQgc2l6ZSwgbm90IHRo
-ZSBhY3R1YWwgc2l6ZS4gU2FtZSB0aGUgb3RoZXIgd2F5DQo+ID4+IGFyb3VuZC4gVGhhdCdzIHdo
-YXQncyBpbmNvbnNpc3RlbnQgSU1ITy4NCj4gPg0KPiA+IFRoYW5rcy4gWW91IGFyZSByaWdodC4g
-SSBkaWRu4oCZdCBjb25zaWRlciB0aGUgY2FzZSB3aGVyZSB0aGUgdGFyZ2V0IGNhbiBiZQ0KPiA+
-IGNvbmZpZ3VyZWQgd2l0aCBhIGxhcmdlciBudW1iZXIgb2YgZGV2aWNlcyB0aGFuIHRoZSBzb3Vy
-Y2UuIEkgY2FuIHJlcGxpY2F0ZQ0KPiA+IHRoZSBzY2VuYXJpbyBub3csDQo+ID4NCj4gPiBTb3Vy
-Y2U6DQo+ID4NCj4gPiBmd19jZmdfYWRkX2ZpbGVfY2FsbGJhY2s6IGZpbGVuYW1lIGV0Yy9ib290
-LWZhaWwtd2FpdCBzaXplIDB4NA0KPiA+IGZ3X2NmZ19hZGRfZmlsZV9jYWxsYmFjazogZmlsZW5h
-bWUgZXRjL2FjcGkvbnZkaW1tLW1lbSBzaXplIDB4MTAwMA0KPiA+IGZ3X2NmZ19hZGRfZmlsZV9j
-YWxsYmFjazogZmlsZW5hbWUgZXRjL2FjcGkvdGFibGVzIHNpemUgMHg2MjEwDQo+ID4NCj4gPiBU
-YXJnZXQ6DQo+ID4gcmFtX2xvYWRfcHJlY29weTogUmFtIGJsayBtZW0xIGxlbmd0aCAweDQwMDAw
-MDAwIHVzZWRfbGVuZ3RoDQo+IDB4NDAwMDAwMDANCj4gPiByYW1fbG9hZF9wcmVjb3B5OiBSYW0g
-YmxrIHZpcnQuZmxhc2gwIGxlbmd0aCAweDQwMDAwMDAgdXNlZF9sZW5ndGgNCj4gMHg0MDAwMDAw
-DQo+ID4gcmFtX2xvYWRfcHJlY29weTogUmFtIGJsayB2aXJ0LmZsYXNoMSBsZW5ndGggMHg0MDAw
-MDAwIHVzZWRfbGVuZ3RoDQo+IDB4NDAwMDAwMA0KPiA+IHJhbV9sb2FkX3ByZWNvcHk6IFJhbSBi
-bGsgL3JvbUBldGMvYWNwaS90YWJsZXMgbGVuZ3RoIDB4NzAwMA0KPiB1c2VkX2xlbmd0aCAweDgw
-MDANCj4gPiBmd19jZmdfbW9kaWZ5X2ZpbGU6IGZpbGVuYW1lIGV0Yy9hY3BpL3RhYmxlcyBsZW4g
-MHg3MDAwDQo+ID4NCj4gPiBUYXJnZXQgdXBkYXRlcyBGV0NmZ0VudHJ5IHdpdGggYSBwYWdlIGFs
-aWduZWQgc2l6ZSA6KC4gSSB3aWxsIGxvb2sgaW50byB0aGlzIGFuZA0KPiBzZWUgaG93DQo+ID4g
-d2UgY2FuIHNvbHZlIHRoaXMuIEFueSBwb2ludGVycyB3ZWxjb21lLg0KPiANCj4gQ2FuIHlvdSBs
-b29rIHRoZSBvcmlnaW5hbCB2YWx1ZSB1cCBzb21laG93IGFuZCB1cyB0aGUgcmVzaXplIGNhbGxi
-YWNrDQo+IG9ubHkgYXMgYSBub3RpZmljYXRpb24gdGhhdCBzb21ldGhpbmcgY2hhbmdlZD8gKHRo
-YXQgdmFsdWUgd291bGQgaGF2ZSB0bw0KPiBiZSBzdG9yZWQgc29tZXdoZXJlIGFuZCBtaWdyYXRl
-ZCBJIGFzc3VtZSAtIG1heWJlIHRoYXQncyBhbHJlYWR5IGJlaW5nDQo+IGRvbmUpDQoNCk9rLiBJ
-IHdpbGwgdGFrZSBhIGxvb2sgYXQgdGhhdC4gQnV0IGNhbiB3ZSBpbnN0ZWFkIHBhc3MgdGhlIGJs
-b2NrLT51c2VkX2xlbmd0aCB0bw0KZndfY2ZnX2FkZF9maWxlX2NhbGxiYWNrKCkuIFRoYXQgd2F5
-IHdlIGRvbuKAmXQgaGF2ZSB0byBjaGFuZ2UgdGhlIHFlbXVfcmFtX3Jlc2l6ZSgpDQphcyB3ZWxs
-LiBJIHRoaW5rIElnb3IgaGFzIHN1Z2dlc3RlZCB0aGlzIGJlZm9yZVsxXSBhbmQgSSBoYWQgYSBn
-byBhdCBpdCBiZWZvcmUgY29taW5nIHVwDQp3aXRoIHRoZSAicmVxX2xlbmd0aCIgcHJvcG9zYWwg
-aGVyZS4NCg0KVGhhbmtzLA0KU2hhbWVlcg0KDQpbMV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcv
-cWVtdS1kZXZlbC8zMjNhYTc0YTkyOTM0YjZhOTg5ZTZlNGRiZTBkZmUyMUBodWF3ZWkuY29tLw0K
-DQoNCg==
+Kevin Wolf <kwolf@redhat.com> writes:
+
+> Am 07.02.2020 um 15:01 hat Markus Armbruster geschrieben:
+>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>=20
+>> > List this file in the proper section, so maintainers get
+>> > notified when it is modified.
+>> >
+>> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> > ---
+>> > Cc: Kevin Wolf <kwolf@redhat.com>
+>> > Cc: Max Reitz <mreitz@redhat.com>
+>> > Cc: qemu-block@nongnu.org
+>> > ---
+>> >  MAINTAINERS | 2 ++
+>> >  1 file changed, 2 insertions(+)
+>> >
+>> > diff --git a/MAINTAINERS b/MAINTAINERS
+>> > index 903831e0a4..e269e9092c 100644
+>> > --- a/MAINTAINERS
+>> > +++ b/MAINTAINERS
+>> > @@ -1842,6 +1842,8 @@ S: Supported
+>>    Block layer core
+>>    M: Kevin Wolf <kwolf@redhat.com>
+>>    M: Max Reitz <mreitz@redhat.com>
+>>    L: qemu-block@nongnu.org
+>>    S: Supported
+>> >  F: block*
+>> >  F: block/
+>> >  F: hw/block/
+>> > +F: qapi/block.json
+>> > +F: qapi/block-core.json
+>> >  F: include/block/
+>> >  F: qemu-img*
+>> >  F: docs/interop/qemu-img.rst
+>>=20
+>> This is in addition to
+>>=20
+>>     Block QAPI, monitor, command line
+>>     M: Markus Armbruster <armbru@redhat.com>
+>>     S: Supported
+>>     F: blockdev.c
+>>     F: block/qapi.c
+>>     F: qapi/block*.json
+>>     F: qapi/transaction.json
+>>     T: git https://repo.or.cz/qemu/armbru.git block-next
+>>=20
+>> I'm not sure this section makes much sense anymore.
+>
+> This is probably for you to decide.
+>
+> Though the block-next branch from the T: line doesn't even exist any
+> more...
+
+I have the questionable habit to delete my -next branches when they're
+empty.
+
+>> Should qapi/transaction.json also be added to "Block layer core"?  Or
+>> should it go into John's section "Block Jobs"?
+>
+> I think at the moment it only supports actions that are more related to
+> block jobs, so moving it there would make sense to me.
+
+Alright, what about this:
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e72b5e5f69..43e821c901 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1842,6 +1842,8 @@ F: block*
+ F: block/
+ F: hw/block/
+ F: include/block/
++F: qapi/block.json
++F: qapi/block-core.json
+ F: qemu-img*
+ F: docs/interop/qemu-img.rst
+ F: qemu-io*
+@@ -1887,16 +1889,8 @@ F: block/commit.c
+ F: block/stream.c
+ F: block/mirror.c
+ F: qapi/job.json
+-T: git https://github.com/jnsnow/qemu.git jobs
+-
+-Block QAPI, monitor, command line
+-M: Markus Armbruster <armbru@redhat.com>
+-S: Supported
+-F: blockdev.c
+-F: block/qapi.c
+-F: qapi/block*.json
+ F: qapi/transaction.json
+-T: git https://repo.or.cz/qemu/armbru.git block-next
++T: git https://github.com/jnsnow/qemu.git jobs
+=20
+ Dirty Bitmaps
+ M: John Snow <jsnow@redhat.com>
+
 
