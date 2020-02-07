@@ -2,81 +2,102 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95529C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3950DC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:28:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60F5020720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:27:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02A7420720
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:28:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qAAwM3UH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F5020720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xs1uY8ZI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02A7420720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j06Tq-0007Wo-Gy
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:27:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55987)
+	id 1j06Us-0000A6-7e
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:28:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j06TD-0006tc-DE
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:08 -0500
+ (envelope-from <philmd@redhat.com>) id 1j06TD-0006te-Sg
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j06TB-0002Km-Th
+ (envelope-from <philmd@redhat.com>) id 1j06TC-0002NJ-LD
  for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:07 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44477)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j06TB-0002It-Ne
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:05 -0500
-Received: by mail-ot1-x343.google.com with SMTP id h9so2651632otj.11
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 08:27:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=upod4aUb/SI3ylNWoOZvHfrbH9kC8Aab+nACy1Fo47k=;
- b=qAAwM3UHRkdXUMpX+E0r83d2KZR6sTFLnqnCiYGd6b2t6q4/LQ8iVYp+t5Lq69xXQ5
- str3S2c23Yxceb+lJ21pft3/a2aRwj4QVvHHFJn3l7mRlDFvnt1dYksPWH5hOoOzs4+W
- IdgNb9OM2jrWW3/9ZqWXGqt4KIdKZRPnwc8HAwtvkVSr2IB/mw/1lXY0tXsF/b4efOo9
- 1FMgSqLxmkocQJzRn4ZlWrOyFrz3Re9yb0JmAj8GxwsMyfn+EGFKGYaptm6+ZWW3TOCQ
- hVCrDnBcMnzS9zXX2JXT2i6Al75g3wio4r69kzGOiXBi332dWf7g0tOobQLNXkPRmk/a
- NUnA==
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53131
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j06TC-0002M0-HQ
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:27:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581092826;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NRew0WM9/hguVVDiQByA4rcgt0exsoGjc2th1JNhHPk=;
+ b=Xs1uY8ZIrt/au9kAItB6hw4D15wp2//DR/YMkpU7o5vFCJGpFJkkF/DKiDrrA6sDdPlnT9
+ X8bhwZfSYqdV6CGeor0lHclJndBCKaEw+8YqjctYWTzYvSyZWeUJ0zYsrrexJcp2R/xFv9
+ J5t2ZEKodcnXcn8PttKm/TKDy3JR7sY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-Eib08X-yP7eCdcCmnJE0Cw-1; Fri, 07 Feb 2020 11:27:03 -0500
+Received: by mail-wm1-f69.google.com with SMTP id g26so931164wmk.6
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 08:27:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=upod4aUb/SI3ylNWoOZvHfrbH9kC8Aab+nACy1Fo47k=;
- b=CsIAGLlFveM+wDGk1NOA/VdZk5k9mPK/1g0UedtltV9RuRr8RjPaqMwqiQbbMEssaN
- XaOU5P340IXuBrbiHu4pODJWB08qY2HiJfL34H3tkqUkpcPwlInmCCiSpRhOwFaCsBbi
- xW79YyDuHpOnF+dhc/fn0RoVqNPJbVTEOuzfi8hYgS4AHTqwR9B4we5Twbz+Q1X6Wx8W
- TgSsJ47I91Bn11ci58q7hlzD2UIcgOj8UVxABPDR2xQ0XxuaSzeEb4zgZ7OTFXfnwN1Y
- OX6/rtO5crFbCMCgg6EWwmUVz+4xsjgH7ye7zkJSRKVCiM/x1eGrnoYe1K9vmhjCLFh0
- v6Zw==
-X-Gm-Message-State: APjAAAWvch+1S/KDZIWKoz5Mwuz0EDKE6EeToIh6RsYgekUsB0xQuSdk
- 2XT5i5Zv+67mARQLdIxKcCfjGQGsEfDZ43yTAcVyqQ==
-X-Google-Smtp-Source: APXvYqwXiJmgD4Yww/9ez3szrehg/4a+lWp33J4dAHau6Zx78lcpAmDdZeX6ZG33iiXsQzZuOhpaFGKt7VjPufXUDWg=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id l4mr129113otd.91.1581092824684; 
- Fri, 07 Feb 2020 08:27:04 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2k/2EJp51nHK080TIi/E0WhhVolewYmzVbUQJs/efd4=;
+ b=J9V6ZTsxxEHZO125j1J6VejcWQgBTgwf7fxEAEQI0pRRwF2Miz80RHF5c1unH/3SbQ
+ keRvp7BmxsCDvmF2wQ1L9TyljT3r17a4S0Ww0McbgDkzthMYbCtJLvNpTQ375TMfkG7N
+ vhUN1AkxSm3YUvcuCkItzn1cE6ob2b/qfdL33XZ3d4vlxfJxMHoCX16xdPTozL/yoSm1
+ CwhIWKqwJsIg7MOXfa1c4/m7jruhpq++bfLsFCZogaCy/4plZlCJSXLpUG1DFL1FY8nA
+ /pNeWZTnwXyoDqTAVGYJv0jy6ICeJ1UrI6QPBh/xIVGov929OhW8vCn1HWDAR2uynL1c
+ EicQ==
+X-Gm-Message-State: APjAAAWDYXkFU2W4Xn+HsOrsIjtlWBmgmlU3oqZEdMt6lxTCBLZ/YwuD
+ iAPHHpzjA+v3SkM7bmmSk/yITJtyAHOtoC1Ci0iyKcptlGKBKaKmAXU3DkCp4ZTcwYcF9YA57P7
+ g65yu/DlVpu9YY1Q=
+X-Received: by 2002:a1c:4d18:: with SMTP id o24mr5090933wmh.35.1581092822801; 
+ Fri, 07 Feb 2020 08:27:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxok2Nx4s3cjmNK/Gj6cuVv1QGJ68HxLfccaqMLYtgRHntobkykNKitwaJM5TUN/vQdEQAlpw==
+X-Received: by 2002:a1c:4d18:: with SMTP id o24mr5090905wmh.35.1581092822570; 
+ Fri, 07 Feb 2020 08:27:02 -0800 (PST)
+Received: from [192.168.254.233] (66.red-217-126-125.staticip.rima-tde.net.
+ [217.126.125.66])
+ by smtp.gmail.com with ESMTPSA id r1sm3919271wrx.11.2020.02.07.08.27.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 07 Feb 2020 08:27:02 -0800 (PST)
+Subject: Re: [PATCH 2/3] MAINTAINERS: Cover qapi/block{-core}.json in 'Block
+ layer core' section
+To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20200207103012.27049-1-philmd@redhat.com>
+ <20200207103012.27049-3-philmd@redhat.com>
+ <87blqaqyxi.fsf@dusky.pond.sub.org> <20200207142146.GF6031@linux.fritz.box>
+ <87blqapej2.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6f20c34f-f96e-ad7d-e91c-0863471406d8@redhat.com>
+Date: Fri, 7 Feb 2020 17:27:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200203032328.12051-1-crosa@redhat.com>
- <20200203032328.12051-2-crosa@redhat.com>
- <5d0def0e-0943-3345-784d-80f8ccc318b9@redhat.com>
-In-Reply-To: <5d0def0e-0943-3345-784d-80f8ccc318b9@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Feb 2020 16:26:53 +0000
-Message-ID: <CAFEAcA8HPvzaxA1pguscX5FsuWvpJhkDAuFSApofabEWVzzjQQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/2] GitLab CI: crude mapping of PMM's scripts to jobs
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <87blqapej2.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-MC-Unique: Eib08X-yP7eCdcCmnJE0Cw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,66 +109,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: qemu-trivial@nongnu.org, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Feb 2020 at 08:37, Thomas Huth <thuth@redhat.com> wrote:
-> Question to Peter/Alex/Stefan/Howevermergespullreqsinthefuture:
->
-> Should the above jobs really be skipped for pull requests, or would it
-> be ok to include them there, too? (in the latter case, the above changes
-> could just be dropped)
+On 2/7/20 5:07 PM, Markus Armbruster wrote:
+> Kevin Wolf <kwolf@redhat.com> writes:
+>=20
+>> Am 07.02.2020 um 15:01 hat Markus Armbruster geschrieben:
+>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>>>
+>>>> List this file in the proper section, so maintainers get
+>>>> notified when it is modified.
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>> ---
+>>>> Cc: Kevin Wolf <kwolf@redhat.com>
+>>>> Cc: Max Reitz <mreitz@redhat.com>
+>>>> Cc: qemu-block@nongnu.org
+>>>> ---
+>>>>   MAINTAINERS | 2 ++
+>>>>   1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>>> index 903831e0a4..e269e9092c 100644
+>>>> --- a/MAINTAINERS
+>>>> +++ b/MAINTAINERS
+>>>> @@ -1842,6 +1842,8 @@ S: Supported
+>>>     Block layer core
+>>>     M: Kevin Wolf <kwolf@redhat.com>
+>>>     M: Max Reitz <mreitz@redhat.com>
+>>>     L: qemu-block@nongnu.org
+>>>     S: Supported
+>>>>   F: block*
+>>>>   F: block/
+>>>>   F: hw/block/
+>>>> +F: qapi/block.json
+>>>> +F: qapi/block-core.json
+>>>>   F: include/block/
+>>>>   F: qemu-img*
+>>>>   F: docs/interop/qemu-img.rst
+>>>
+>>> This is in addition to
+>>>
+>>>      Block QAPI, monitor, command line
+>>>      M: Markus Armbruster <armbru@redhat.com>
+>>>      S: Supported
+>>>      F: blockdev.c
+>>>      F: block/qapi.c
+>>>      F: qapi/block*.json
+>>>      F: qapi/transaction.json
+>>>      T: git https://repo.or.cz/qemu/armbru.git block-next
+>>>
+>>> I'm not sure this section makes much sense anymore.
+>>
+>> This is probably for you to decide.
+>>
+>> Though the block-next branch from the T: line doesn't even exist any
+>> more...
+>=20
+> I have the questionable habit to delete my -next branches when they're
+> empty.
 
-I don't mind, as long as the CI run doesn't take more than (say)
-1h to 1h30 elapsed time to complete from kicking it off to getting
-all the results back. The specific set of x86 configs tested don't
-really worry me (as long as we do have a reasonable spread):
-the thing I really care about is that we get the multiple
-host architectures and the BSDs into the test setup. (We already
-have about five different ways of doing CI testing of x86 Linux
-hosts, which is the least likely setup to break. It's the
-other host configs that I'm really keen to see progress on
-automation of, because that's what's really blocking us from
-being able to move off my hand-coded scripting.)
+Having dangling -next branches pointing to something very previous is=20
+also questionable...
 
-In the long run we should probably aim for being consistent about
-what we test between the pull-request tests and whatever the
-'public-facing CI' part is.
-
-> > +ubuntu-18.04.3-x86_64-notcg:
-> > + tags:
-> > + - ubuntu_18.04.3
-> > + - x86_64
-> > + rules:
-> > + - if: '$CI_COMMIT_REF_NAME == "staging"'
-> > + script:
-> > + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/remake-merge-builds#n35
-> > + - ./configure --disable-libssh --enable-debug --disable-tcg
-> > + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pull-buildtest#n35
-> > + - make
-> > + # https://git.linaro.org/people/peter.maydell/misc-scripts.git/tree/pull-buildtest#n39
-> > + # Question: check is disabled on the original script, because the machine
-> > + # is said to be running VirtualBox.  Should this be dropped or should the
-> > + # machine be tweaked or substituted?
-> > + - make check V=1
->
-> Without TCG, you definitely need a host that can do KVM for running make
-> check.
-> Question for Peter: Would it be ok to drop this job and simply always
-> use the "build-tcg-disabled" job that is already available in
-> .gitlab-ci.yml ?
-
-If we have a CI setup where KVM reliably works then we should
-ideally test a --disable-tcg setup somehow. Right now my pullreq
-tests don't test that because I run them on my work desktop box
-and (as the config says) sometimes I'm running VirtualBox which
-causes KVM to fail -- but that should be irrelevant to our CI
-runners...
-
-thanks
--- PMM
 
