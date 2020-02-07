@@ -2,51 +2,51 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE21DC35247
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83156C35247
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:12:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9156E21927
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:12:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9156E21927
+	by mail.kernel.org (Postfix) with ESMTPS id 5763B21927
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:12:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5763B21927
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izt8N-0004dz-ND
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 21:12:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59819)
+	id 1izt8X-0004pa-Hu
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 21:12:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59813)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvm-0006Jj-Cl
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:45 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvm-0006JG-7t
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvj-0001My-Ob
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvj-0001Ld-ED
  for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:53213 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:53195 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1izsvj-0001AO-B4
+ id 1izsvj-0001AE-5s
  for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:39 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id EC1711A20FC;
+ by mail.rt-rk.com (Postfix) with ESMTP id D0DA31A213B;
  Fri,  7 Feb 2020 02:58:23 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id B4DB51A20F5;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id AA97A1A1FEE;
  Fri,  7 Feb 2020 02:58:23 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc5 29/32] tests/acceptance: Test the Arduino MEGA2560 board
-Date: Fri,  7 Feb 2020 02:57:57 +0100
-Message-Id: <1581040680-308-30-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc5 28/32] tests/boot-serial: Test some Arduino boards (AVR
+ based)
+Date: Fri,  7 Feb 2020 02:57:56 +0100
+Message-Id: <1581040680-308-29-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1581040680-308-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1581040680-308-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -76,108 +76,71 @@ Sender: "Qemu-devel"
 
 From: Michael Rolnik <mrolnik@gmail.com>
 
-The test is based on
-https://github.com/seharris/qemu-avr-tests/tree/master/free-rtos/Demo
-demo which. If working correctly, prints 'ABCDEFGHIJKLMNOPQRSTUVWX' out.
-it also demostrates that timer and IRQ are working
+Print out 'T' through serial port.
 
-As the path name demonstrates, the FreeRTOS tests target a
-board based on a ATMega2560 MCU. We have one, the Arduino
-MEGA2560.
-
-Complementary documentation:
-
-https://feilipu.me/2012/01/15/ethermega-arduino-mega-2560-and-freertos/
-https://feilipu.me/2015/11/24/arduino_freertos/ (see 'Compatibility')
+The Arduino Duemilanove is based on a AVR5 CPU, while the
+Arduino MEGA2560 on a AVR6 CPU.
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-[rth: Squash multiple avocado fixups from f4bug]
+[rth: Squash Arduino adjustments from f4bug]
+Tested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Tested-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Acked-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- MAINTAINERS                      |  1 +
- tests/acceptance/machine_avr6.py | 50 ++++++++++++++++++++++++++++++++++=
-++++++
- 2 files changed, 51 insertions(+)
- create mode 100644 tests/acceptance/machine_avr6.py
+ tests/qtest/boot-serial-test.c | 11 +++++++++++
+ tests/qtest/Makefile.include   |  2 ++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a68ec75..33ddbcc 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -180,6 +180,7 @@ F: target/avr/gdbstub.c
- F: target/avr/machine.c
- F: target/avr/translate.c
- F: target/avr/insn.decode
-+F: tests/acceptance/machine_avr6.py
+diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-tes=
+t.c
+index 85a3614..bfe7624 100644
+--- a/tests/qtest/boot-serial-test.c
++++ b/tests/qtest/boot-serial-test.c
+@@ -17,6 +17,15 @@
+ #include "libqtest.h"
+ #include "libqos/libqos-spapr.h"
 =20
- CRIS TCG CPUs
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_=
-avr6.py
-new file mode 100644
-index 0000000..b644d2a
---- /dev/null
-+++ b/tests/acceptance/machine_avr6.py
-@@ -0,0 +1,50 @@
-+#
-+# QEMU AVR
-+#
-+# Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
-+#
-+# This program is free software: you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation, either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
++static const uint8_t bios_avr[] =3D {
++    0x88, 0xe0,             /* ldi r24, 0x08   */
++    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
++    0x86, 0xe0,             /* ldi r24, 0x06   */
++    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 =
+*/
++    0x84, 0xe5,             /* ldi r24, 0x54   */
++    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
++};
 +
-+import time
+ static const uint8_t kernel_mcf5208[] =3D {
+     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
+     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
+@@ -104,6 +113,8 @@ typedef struct testdef {
+=20
+ static testdef_t tests[] =3D {
+     { "alpha", "clipper", "", "PCI:" },
++    { "avr", "arduino-duemilanove", "", "T", sizeof(bios_avr), NULL, bio=
+s_avr },
++    { "avr", "arduino-mega-2560-v3", "", "T", sizeof(bios_avr), NULL, bi=
+os_avr},
+     { "ppc", "ppce500", "", "U-Boot" },
+     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+     { "ppc", "g3beige", "", "PowerPC,750" },
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index eb0f23b..00b3219 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -65,6 +65,8 @@ check-qtest-i386-y +=3D numa-test
+=20
+ check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
+=20
++check-qtest-avr-y +=3D boot-serial-test
 +
-+from avocado_qemu import Test
-+
-+class AVR6Machine(Test):
-+    timeout =3D 5
-+
-+    def test_freertos(self):
-+        """
-+        :avocado: tags=3Darch:avr
-+        :avocado: tags=3Dmachine:arduino-mega-2560-v3
-+        """
-+        """
-+        https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/=
-Demo/AVR_ATMega2560_GCC/demo.elf
-+        constantly prints out 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQ=
-RSTUVWX'
-+        """
-+        rom_url =3D ('https://github.com/seharris/qemu-avr-tests'
-+                   '/raw/36c3e67b8755dcf/free-rtos/Demo'
-+                   '/AVR_ATMega2560_GCC/demo.elf')
-+        rom_hash =3D '7eb521f511ca8f2622e0a3c5e8dd686efbb911d4'
-+        rom_path =3D self.fetch_asset(rom_url, asset_hash=3Drom_hash)
-+
-+        self.vm.add_args('-bios', rom_path)
-+        self.vm.add_args('-nographic')
-+        self.vm.launch()
-+
-+        time.sleep(2)
-+        self.vm.shutdown()
-+
-+        self.assertIn('ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'=
-,
-+                self.vm.get_log())
+ check-qtest-alpha-y +=3D boot-serial-test
+ check-qtest-alpha-$(CONFIG_VGA) +=3D display-vga-test
+=20
 --=20
 2.7.4
 
