@@ -2,105 +2,88 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD7B1C04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDB9C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:08:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9FC421741
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB92720838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:08:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Mr5zGgK4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9FC421741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DH02ILyn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB92720838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05Dl-0002Qq-T4
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:07:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52649)
+	id 1j05F5-0004d7-4q
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:08:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60234)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.merwick@oracle.com>) id 1j04lC-0007cs-L6
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:37:35 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j058G-0000nN-Jd
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1j04lB-0000ZB-Iz
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:37:34 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:43332)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1j04lB-0000YE-9M
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:37:33 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 017EYO3v068731;
- Fri, 7 Feb 2020 14:37:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=Mei5PN0W74WXwRPU1LsX9CCpKWFCJXX4kihdRaR0ybc=;
- b=Mr5zGgK456EqpufRaHHJz3x32TFWkeDaD3rgeDhBskovz1Vd2TRcb0j8/jjG2IvR9CbG
- womzYyFiC1MnBxoa0z2XVoLFwjKKR5ed8fuKlKv+NIdcr+cqzCEwjPI7a+ujSYBBbiFy
- YEd5E+YYLOb48G0VLFhGx4iJuQXc0ywgP3Lh3YowZ/8c63aqDtPu1C87IspGxCsQgSLi
- giG1Fn33ebJm4gSWsRQ2OMGe5mxFG8IaGrlXW7be/C/6RJP5S6F2LYpvY64QuB+8F3Js
- O2RXvzNf+3A35lSK7u7k9ciVbTFqw5qoFOnyRnBJPFR0tssAcHEqgvl3D+e5EDsCWBjE +Q== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2xykbprd4e-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 07 Feb 2020 14:37:32 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 017EYGnJ106779;
- Fri, 7 Feb 2020 14:37:31 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 2y16pqtyqb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 07 Feb 2020 14:37:31 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 017EbTNX028039;
- Fri, 7 Feb 2020 14:37:29 GMT
-Received: from [10.175.208.183] (/10.175.208.183)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 07 Feb 2020 06:37:29 -0800
-Subject: Re: [PATCH v2 12/29] python/qemu/accel: Use
- binutils::binary_get_accels()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200129212345.20547-1-philmd@redhat.com>
- <20200129212345.20547-13-philmd@redhat.com>
-From: Liam Merwick <liam.merwick@oracle.com>
-Message-ID: <44b8b644-f37d-7363-8871-4d89ff61ff75@oracle.com>
-Date: Fri, 7 Feb 2020 14:37:24 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <alex.bennee@linaro.org>) id 1j058E-0003ni-A4
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:24 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35171)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j058E-0003gZ-3j
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:22 -0500
+Received: by mail-wr1-x442.google.com with SMTP id w12so3087807wrt.2
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 07:01:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=geflNNg5itN8dXnNJ+nN1Foj8Td7+gJztf5WRFw/CZI=;
+ b=DH02ILyn31hWZDIn7PbXVwUTONERvvLND5bXRV94M7JO4SmRqYA0gjtHKA7eCS/xvc
+ 52titBIzfHffSdrESWMFb6DrjvxZZzvzHf+0a/68KKicLArTWpDh+b31eDJSqBij72VW
+ XiJZYh7qq3CuYVXxqbfOayOgPIF7IkhvoB1zyguZ4mgfyzYWOT743Vb9WKmS4EgI2bUB
+ Pl3HR8GOr7rf1UGfk8wWj8F5OExi5Ylp6gWBLTisimWZEL1xxpky9OMeUljgOSfo2M1L
+ n6ivpcAzndODuuBpkkf72+PPp5/8YvREoLb5qzgpOQYDkgKAHaZvMEjCnnMoOvc0u5aM
+ xdlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=geflNNg5itN8dXnNJ+nN1Foj8Td7+gJztf5WRFw/CZI=;
+ b=HmL8C8kA+AsUN1TJTeZDcjj9pHOdd0bVkc8OBUSavw/sBFzgorkmacLMcQ3m5zUHs8
+ FSgGL3JxJhEP+V1LyRLwY95fXUWfEhrGlOGcxHlwoBgGJaZd3oNAFF/6G+03EOpGK53E
+ Zq+jEU+75nCz8R0p8ox96JiRsdtfxxK6sWsbVwU7t5+Xe8MBUuxXOUZsWEVWb/Oa58UX
+ hBOZP1kjhikSGCgOzfLvSSqEaxI2wTaF7T8KCuL6HVng1pKXdHj2/r8x2prsHI26HJB5
+ z5kVTcVyPwnrlhqqlhwdrMpANQ6t4AzuZuvZtIO9P+IQuqIr0NXxSsDa/J1HozRNzXpI
+ YjHQ==
+X-Gm-Message-State: APjAAAX7hy8ZcgjyqEUZ6BObMXxRvObcsGrMaLi3ykArwXTTE3kJbWm3
+ suT/UgHDJW5cOyRyGhXxR3OA6A==
+X-Google-Smtp-Source: APXvYqwwsz0TekjGr2ewp2Wg/EFFUEAULdrWGs0PrslPC7+pXQHsjyqXyGPIkSyUwMVKe6H2m9CPKw==
+X-Received: by 2002:adf:f6c8:: with SMTP id y8mr5043627wrp.167.1581087680720; 
+ Fri, 07 Feb 2020 07:01:20 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a26sm3688453wmm.18.2020.02.07.07.01.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 07 Feb 2020 07:01:19 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 1A7F21FF8F;
+ Fri,  7 Feb 2020 15:01:19 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 2/5] plugins/core: add missing break in cb_to_tcg_flags
+Date: Fri,  7 Feb 2020 15:01:15 +0000
+Message-Id: <20200207150118.23007-3-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200207150118.23007-1-alex.bennee@linaro.org>
+References: <20200207150118.23007-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200129212345.20547-13-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9523
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2002070112
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9523
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2002070112
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
- 017EYO3v068731
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,85 +95,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: robert.foley@linaro.org, robhenry@microsoft.com,
+ aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
+ peter.puhov@linaro.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/01/2020 21:23, Philippe Mathieu-Daud=C3=A9 wrote:
-> Instead of parsing the process help output, use the
-> binary_get_accels() helper which queries the list of
-> accelerators over a QMP socket.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: "Emilio G. Cota" <cota@braap.org>
 
+Reported-by: Robert Henry <robhenry@microsoft.com>
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <20200105072940.32204-1-cota@braap.org>
+---
+ plugins/core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-
-
-> ---
->   python/qemu/accel.py | 26 ++++----------------------
->   1 file changed, 4 insertions(+), 22 deletions(-)
->=20
-> diff --git a/python/qemu/accel.py b/python/qemu/accel.py
-> index 0b38ddf0ab..cde51ae159 100644
-> --- a/python/qemu/accel.py
-> +++ b/python/qemu/accel.py
-> @@ -16,7 +16,8 @@ accelerators.
->  =20
->   import logging
->   import os
-> -import subprocess
-> +
-> +from .binutils import binary_get_accels
->  =20
->   LOG =3D logging.getLogger(__name__)
->  =20
-> @@ -27,25 +28,6 @@ ADDITIONAL_ARCHES =3D {
->       "aarch64" : "armhf"
->   }
->  =20
-> -def list_accel(qemu_bin):
-> -    """
-> -    List accelerators enabled in the QEMU binary.
-> -
-> -    @param qemu_bin (str): path to the QEMU binary.
-> -    @raise Exception: if failed to run `qemu -accel help`
-> -    @return a list of accelerator names.
-> -    """
-> -    if not qemu_bin:
-> -        return []
-> -    try:
-> -        out =3D subprocess.check_output([qemu_bin, '-accel', 'help'],
-> -                                      universal_newlines=3DTrue)
-> -    except:
-> -        LOG.debug("Failed to get the list of accelerators in %s", qemu=
-_bin)
-> -        raise
-> -    # Skip the first line which is the header.
-> -    return [acc.strip() for acc in out.splitlines()[1:]]
-> -
->   def kvm_available(target_arch=3DNone, qemu_bin=3DNone):
->       """
->       Check if KVM is available using the following heuristic:
-> @@ -64,7 +46,7 @@ def kvm_available(target_arch=3DNone, qemu_bin=3DNone=
-):
->           if target_arch !=3D host_arch:
->               if target_arch !=3D ADDITIONAL_ARCHES.get(host_arch):
->                   return False
-> -    if qemu_bin and "kvm" not in list_accel(qemu_bin):
-> +    if qemu_bin and "kvm" not in binary_get_accels(qemu_bin):
->           return False
->       return True
->  =20
-> @@ -74,4 +56,4 @@ def tcg_available(qemu_bin):
->  =20
->       @param qemu_bin (str): path to the QEMU binary
->       """
-> -    return 'tcg' in list_accel(qemu_bin)
-> +    return 'tcg' in binary_get_accels(qemu_bin)
->=20
+diff --git a/plugins/core.c b/plugins/core.c
+index 9e1b9e7a915..ed863011baf 100644
+--- a/plugins/core.c
++++ b/plugins/core.c
+@@ -286,6 +286,7 @@ static inline uint32_t cb_to_tcg_flags(enum qemu_plugin_cb_flags flags)
+     switch (flags) {
+     case QEMU_PLUGIN_CB_RW_REGS:
+         ret = 0;
++        break;
+     case QEMU_PLUGIN_CB_R_REGS:
+         ret = TCG_CALL_NO_WG;
+         break;
+-- 
+2.20.1
 
 
