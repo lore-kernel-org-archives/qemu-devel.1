@@ -2,80 +2,85 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3700AC352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20BDBC352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:07:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 027A020715
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:06:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE20B2082E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 12:07:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lT2o1hi/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 027A020715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1rNFZp2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE20B2082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j02On-00017Y-5v
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 07:06:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41781)
+	id 1j02Pr-0002Rt-5E
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 07:07:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j02Nu-0000aV-M3
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:05:23 -0500
+ (envelope-from <wainersm@redhat.com>) id 1j02O8-0000oH-G4
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:05:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j02Nt-0000mP-Hx
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:05:22 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45365)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j02Nt-0000it-Cm
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:05:21 -0500
-Received: by mail-oi1-x244.google.com with SMTP id v19so1691570oic.12
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 04:05:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tHUoR3padVMe0/lveG4FmzH69RJlGW608W3ZOi4ZZY4=;
- b=lT2o1hi/a45hFPFVyCmIX4CroFlyqq9ZblvXOTR6cXS85J+kzgNThqo4ecHnmlktQN
- HCORYXZNUDwB6Am/JUUjiELHXP8HNwcV8wBo4+aTDkmLwK2LoxrWn+iu7Sv161duQ6Ev
- oYVEB4lKldUU+1lu+K8tblC7MGRW8EXaLAG7hAyx7Iosrl4pcuvMpfmG8McFezp4LSr+
- PAIsik6fg0Prgbi9DZ4Wux4+/VIJGFj8tXt55xYj0rvwjhrDOm19n/60mxKLf2fbfJNv
- m3YEmu2FIxlddlgD/Ksq9Z6sJL2WOfGUcF43w1DImXv24Ryj4X8orbDzf4J4CEEiZl/b
- +wGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tHUoR3padVMe0/lveG4FmzH69RJlGW608W3ZOi4ZZY4=;
- b=oyWTrDm+qFfYgkZ7BOyVPpo+VY8FQesJB3NH3F5m9cPs5k8lSkOxJNtzeZbQfeJeF7
- 4ExiBrSIZgMnhkwueHiNrEk2PGMkdtwiu6ByT2HLF979G3xT8Zg1pFQc6bCK9TtFIu2/
- XuXQTmK/3x416EOGxMFFiR7qI/lw/bC9zRljfbkLwyyRhHAHfl8OOIlbyEEomUAS4vqK
- o2WTTRa/tf9JZ1EbvUWOpPIIxTSZQJl5vnLRMNWCkD5Xw3OPaEOayqQRXNfc+OV3ODFy
- bRrHPCpeznIye/A28bxFK/1PoWpmuIF/9qf1qMqkUI/4dxDxq2JgCGTfvNRDXaGKzaVr
- iQuQ==
-X-Gm-Message-State: APjAAAWYieLxJwP18nWaiky9lBf/kkce0355wJbHiQs8lqp9e8sy+5vb
- zmtPDaKKsD9ZFDMkuhN6aketg0852v5A+ZFL4k/dww==
-X-Google-Smtp-Source: APXvYqwznGnaqo0Sje/cceRXxVZnVxzQ/rNSXFH9RsGYa9+bwFz0n4JPCrIW8YdPISKHuOuCdMVROsSMvMY45La6AWI=
-X-Received: by 2002:aca:b2c5:: with SMTP id b188mr1843459oif.163.1581077120423; 
- Fri, 07 Feb 2020 04:05:20 -0800 (PST)
+ (envelope-from <wainersm@redhat.com>) id 1j02O6-0001dm-5q
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:05:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52309
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1j02O5-0001ZT-7H
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 07:05:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581077132;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j9Qkui0iShpfn/9QisNA8GjsUjl3Q6LtqcvlkFgcIv4=;
+ b=Y1rNFZp2S8timeuJdydozDOrVM5nyiz3bOBkhTF0N39MdvHOOCYTI3Smpdvmob1NxBTs2C
+ bYYlLNnJqsW+HjwCEgwVfz55V0AGtf6EU3XZTJTASWGKl/Uvzywg4+LQ35KH7Dl2OWcpCx
+ I2pzdQdEN2dIU+kZj2+o/Knev07ldCs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-uIeB8Ks2MT-HCPyqgeVb9A-1; Fri, 07 Feb 2020 07:05:18 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9731802700;
+ Fri,  7 Feb 2020 12:05:17 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-96.gru2.redhat.com
+ [10.97.116.96])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5CB4D60BEC;
+ Fri,  7 Feb 2020 12:05:10 +0000 (UTC)
+Subject: Re: [PATCH v2 28/29] tests/acceptance/version: Default to -nodefaults
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200129212345.20547-1-philmd@redhat.com>
+ <20200129212345.20547-29-philmd@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <318d039a-af30-be53-460d-a7d49c8aaf17@redhat.com>
+Date: Fri, 7 Feb 2020 10:05:08 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20200128180142.15132-1-cohuck@redhat.com>
- <20200128180142.15132-2-cohuck@redhat.com>
-In-Reply-To: <20200128180142.15132-2-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Feb 2020 12:05:09 +0000
-Message-ID: <CAFEAcA9kkxNZg7ij5vXQU-pA+sxed13L0GB6RfiWsvyT2rPPYg@mail.gmail.com>
-Subject: Re: [PATCH RFC 1/2] docs: rstfy s390 dasd ipl documentation
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <20200129212345.20547-29-philmd@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: uIeB8Ks2MT-HCPyqgeVb9A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,63 +92,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>,
- "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Pierre Morel <pmorel@linux.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>
+Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jan 2020 at 19:36, Cornelia Huck <cohuck@redhat.com> wrote:
+
+On 1/29/20 7:23 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> We don't need the default options to run this test.
 >
-> While at it, also fix the numbering in 'What QEMU does'.
+> This fixes errors when running a binary built with
+> --without-default-devices such:
 >
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>    ERROR: qemu-system-arm: Unsupported NIC model: virtio-net-pci
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
+>   tests/acceptance/version.py | 1 +
+>   1 file changed, 1 insertion(+)
 
-> diff --git a/docs/devel/s390-dasd-ipl.txt b/docs/devel/s390-dasd-ipl.rst
-> similarity index 77%
-> rename from docs/devel/s390-dasd-ipl.txt
-> rename to docs/devel/s390-dasd-ipl.rst
-> index 9107e048e4e6..1f6a7ea01ce6 100644
-> --- a/docs/devel/s390-dasd-ipl.txt
-> +++ b/docs/devel/s390-dasd-ipl.rst
-> @@ -1,25 +1,28 @@
-> -*****************************
-> -***** s390 hardware IPL *****
-> -*****************************
-> +Booting from real channel-attached devices on s390x
-> +===================================================
-> +
-> +s390 hardware IPL
-> +-----------------
+My comments in [1] also applies for this change. So:
+
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg675104.html
+
+
 >
->  The s390 hardware IPL process consists of the following steps.
->
-> -1. A READ IPL ccw is constructed in memory location 0x0.
-> +1. A READ IPL ccw is constructed in memory location ``0x0``.
->      This ccw, by definition, reads the IPL1 record which is located on the disk
->      at cylinder 0 track 0 record 1. Note that the chain flag is on in this ccw
->      so when it is complete another ccw will be fetched and executed from memory
-> -    location 0x08.
-> +    location ``0x08``.
+> diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
+> index 67c2192c93..79b923d4fc 100644
+> --- a/tests/acceptance/version.py
+> +++ b/tests/acceptance/version.py
+> @@ -17,6 +17,7 @@ class Version(Test):
+>       :avocado: tags=3Dquick
+>       """
+>       def test_qmp_human_info_version(self):
+> +        self.vm.add_args('-nodefaults')
+>           self.vm.launch()
+>           res =3D self.vm.command('human-monitor-command',
+>                                 command_line=3D'info version')
 
-I think the indentation here is off -- rST likes to see every line
-in a multiline bullet point start in the same column, like this:
-
-1. A READ IPL ccw is constructed in memory location ``0x0``.
-   This ccw, by ...
-   at cylinder...
-
-Otherwise I think you end up with a blockquote by accident.
-
-Formatting-wise the rest looks OK to me (and the other enumerated
-lists in this document don't have this odd indentation, just this
-first set of 1..4).
-
-thanks
--- PMM
 
