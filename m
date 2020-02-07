@@ -2,108 +2,64 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B468C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FB2C352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:57:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EF1B206CC
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:57:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fIQI4uVG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EF1B206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C91D1206CC
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:57:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C91D1206CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j01KF-0002Q1-AR
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 05:57:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55582)
+	id 1j01KX-0001qX-OT
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 05:57:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54617)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j01JQ-0001dp-Kr
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:56:41 -0500
+ (envelope-from <james.morse@arm.com>) id 1j01Fx-0007VE-1R
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:53:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j01JP-0003e5-Kj
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:56:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34080
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j01JP-0003cf-Gq
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:56:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581072999;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=g5Tls0xjHoGv5iEkNn6aslQ9JyTFGqA1j2jvrDCK3iI=;
- b=fIQI4uVGKrYqRR+o81PRIjCQ1A0W1kEx8BbRGOxq+NtospQowDdjekpZ4b6gRlct570Uvn
- XvZKKNa8im2D9cAIlwpV6JxyzQV/bmvkGsRavzKfxemnS61W6MxfQJzPnZjsov2j/k7XyJ
- MYuwdU0eICLKF74xSU7jLwgx4ESQG1M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-0lhYKBK2MzqdyhGuz2McQw-1; Fri, 07 Feb 2020 05:56:34 -0500
-X-MC-Unique: 0lhYKBK2MzqdyhGuz2McQw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76507100551A;
- Fri,  7 Feb 2020 10:56:33 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-88.ams2.redhat.com
- [10.36.116.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 794B219756;
- Fri,  7 Feb 2020 10:56:29 +0000 (UTC)
-Subject: Re: [PATCH 2/3] MAINTAINERS: Cover qapi/block{-core}.json in 'Block
- layer core' section
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200207103012.27049-1-philmd@redhat.com>
- <20200207103012.27049-3-philmd@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9697fd9e-34e2-75ec-da84-1d7979b1ad18@redhat.com>
-Date: Fri, 7 Feb 2020 11:56:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <james.morse@arm.com>) id 1j01Fu-0005dy-R6
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:53:03 -0500
+Received: from foss.arm.com ([217.140.110.172]:46824)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <james.morse@arm.com>)
+ id 1j01Fr-0005Tk-Bp; Fri, 07 Feb 2020 05:52:59 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 92F2630E;
+ Fri,  7 Feb 2020 02:52:57 -0800 (PST)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E4CFC3F52E;
+ Fri,  7 Feb 2020 02:52:55 -0800 (PST)
+Subject: Re: [RFC v2 00/14] Add SDEI support for arm64
+To: Marc Zyngier <maz@kernel.org>, Heyi Guo <guoheyi@huawei.com>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <CAFEAcA-+tAbb9h2wZOm56TqUvjQJT0OYFLwTVS-UxKrF5PO3mQ@mail.gmail.com>
+ <5aece614-4341-35e5-53a6-2f3d788e6e8d@huawei.com>
+ <e8b93460-48e6-43cd-4608-370c07cb45ec@huawei.com>
+ <350aa4ca1b57a466ed882236caf23051@kernel.org>
+ <c67c1563-045f-a5f8-8b8b-97d792aa1912@huawei.com>
+ <f8394aafb2adb513186cd2784a1cb077@kernel.org>
+From: James Morse <james.morse@arm.com>
+Message-ID: <58519c6b-5c0e-b557-ac91-2024c594b28c@arm.com>
+Date: Fri, 7 Feb 2020 10:52:54 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200207103012.27049-3-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="T1hiSBJTwRaKQGaNnrEwYwNXE1K9j3vH2"
+In-Reply-To: <f8394aafb2adb513186cd2784a1cb077@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 217.140.110.172
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,56 +71,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Gavin Shan <gshan@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---T1hiSBJTwRaKQGaNnrEwYwNXE1K9j3vH2
-Content-Type: multipart/mixed; boundary="iLKsXrrOeVdlJwpevKtXH3EW7OEmgzXdh"
+Hi guys,
 
---iLKsXrrOeVdlJwpevKtXH3EW7OEmgzXdh
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 06/02/2020 17:30, Marc Zyngier wrote:
+> On 2020-02-06 01:20, Heyi Guo wrote:
+>> On 2020/2/5 21:15, Marc Zyngier wrote:
+>>> My concern is that SDEI implies having EL3. EL3 not being virtualizable
+>>> with KVM, you end-up baking SDEI in *hardware*. Of course, this hardware
+>>> is actually software (it is QEMU), but this isn't the way it was intended.
+>>
+>>>
+>>> It's not the first time we've done that (PSCI is another example), but the
+>>> logic behind SDEI looks much more invasive.
+>>
+>> Thanks for your comments.
+>>
+>> Thinking about them for quite a while, below is my understanding,
+>> please correct me if I'm wrong:
+>>
+>> So should the KVM based virtual machine be treated as one with CPUs
+>> only having NS-EL1 and NS-EL0, ideally? And SDEI messes up this model,
+>> isn't it?
+> 
+> Well, that's exactly what it is (until we have nested virt, in which case
+> you will be able to add NS-EL2 to the mix).
+> 
+>> PSCI only contains some one-shot operations, so it is much less
+>> invasive than SDEI.
 
-On 07.02.20 11:30, Philippe Mathieu-Daud=C3=A9 wrote:
-> List this file in the proper section, so maintainers get
-> notified when it is modified.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: qemu-block@nongnu.org
-> ---
->  MAINTAINERS | 2 ++
->  1 file changed, 2 insertions(+)
+Is there an established pattern for how Qemu 'gets' things that are done in secure-world?
+For PSCI the kernel does it, but this obviously doesn't scale to something like OP-TEE.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Ideally we'd get the reference implementation (from ATF) in some form that is easy to use...
 
 
---iLKsXrrOeVdlJwpevKtXH3EW7OEmgzXdh--
+>> I've another question. The origin of "virtual" SDEI requirement comes
+>> from the lack of hard lockup detector in VM.
 
---T1hiSBJTwRaKQGaNnrEwYwNXE1K9j3vH2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+(this is your use case. Its origin was just symmetry with EL3<->EL2)
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl49QlsACgkQ9AfbAGHV
-z0D+jggAm1Du+vEwUJQxAFKTUi9j0N198irEYDmSKN/pfzxfRu3fTdHYT9sqaS6c
-8NyHjo6w+OrtB3T/n+0TN4zE0ePAqa90jSAgn+zWcLW/RClOMNSJzUIa0MDyBMSI
-mHoxhJEHTlK8qfwIyWtyNUPGjq3dv+rmawRfwbsYco+rR6gXT9aw8ptzYt9whnZJ
-sUed0B7qLO1mHHGuN5BkH0NgZMtjmLmcPEDOciIl+fe/9ja4wW6MPwTEu243sEQp
-UvzFLsy/bpSENYETT6GByOz5eSypxSdsft+CfwhXYncdi1qDWhRlGpWpUddLkYIG
-taNVMnXG2CTEJ4+IP6tU1XNG5ZXAGQ==
-=znAr
------END PGP SIGNATURE-----
+> Sure. But nothing guarantees that the guest is going to register a SDEI
+> entry point anyway.
 
---T1hiSBJTwRaKQGaNnrEwYwNXE1K9j3vH2--
+>> We can have some kind of
+>> watchdog, but how can the watchdog trigger the VM OS to panic and run
+>> kdump, even in irq-off state?
+> 
+> Nothing. All the events, including SDEI, are maskable, one way or another.
+> 
+> Gavin's approach to inject a SError is probably OK for Linux, given that
+> it tends to run with PSTATE.A==0. But that's not a guarantee either (if
+> you take a recursive exception, SError won't be delivered).
 
+Or get stuck in debug-state (for which we mask SError), power-management, the vectors or
+somewhere weird, like KVM's world-switch.
+
+
+If you just want to kill the OS if its sort-of-alive, there is another trick:
+
+Synchronous exceptions can't be masked because they are caused by the instruction pointed
+to by the ELR. You can't inject an emulated data-abort unless the ELR points to an
+instruction that accesses memory, but...
+
+synchronous external abort for instruction fetch is something that  could happen at any
+time. If you have v8.2 you can make the severity uncontainable for extra points.
+
+On real hardware, this would be as if this instruction missed in the i-cache, then got an
+abort from the PoU-cache. The PoU-cache must have suffered some metadata corruption to
+report an uncontained error. On real hardware its very likely the next instruction would
+suffer the same fate, but linux should put up a good show of trying to panic().
+
+
+> The long and the short of it is that there is no way to do what you want
+> with absolute guarantees on the ARM architecture. It just doesn't exist.
+
+Yes. By sort-of-alive it needs to be making some kind of progress. If the CPU is spinning
+through the vectors (because some joker unmapped them), all bets are off.
+
+
+Thanks,
+
+James
 
