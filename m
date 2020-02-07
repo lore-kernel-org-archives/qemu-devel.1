@@ -2,90 +2,115 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE6AC04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C610C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:16:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 470572465D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:15:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 170F82465D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:16:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OLxckoe3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470572465D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfCFnCU6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 170F82465D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05M6-0000bY-G2
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:15:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60333)
+	id 1j05MY-0001Fu-8g
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:16:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36191)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j058K-0000wL-JE
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:29 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j05JL-0004br-LH
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:12:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j058J-0004D6-BW
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:28 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55457)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j058J-00047j-3I
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:27 -0500
-Received: by mail-wm1-x343.google.com with SMTP id q9so2869375wmj.5
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 07:01:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=20w7i9jiAm5hvyfwFIkzlqbRcfX9RLZbq6NcYeukZyY=;
- b=OLxckoe3p/ZV52/++8NBWwJliB6tjTDM7yc0RH2OX4Wutq0kcWEFI1ohBipqxVjeRj
- DLZ14vPK1pUv9xrG3Ni1fGdTJgbDoSl5Ic09YpiYJFvyp/wfpwZWGsP2uhDjHjghj6Az
- k+p3PTKVBPDlMj6k5qbhVGZ1hjpf5JN6ABTtzz6S1O4vnQ5eguAczP4wTt57N7AgocUf
- zn62knDIgt5wFA7SXOfZfLSOaaUnRVgz6IN0H0wWUTJ29RUN6ybt5zmyb15qt+yYmxPb
- fS+sTqjgjlQqrxFJeVbMpF12Kx/m1jlbiqgmrGAvy0Bdae4CnE5GpHMWH201757AEEpt
- Hhpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=20w7i9jiAm5hvyfwFIkzlqbRcfX9RLZbq6NcYeukZyY=;
- b=UJjlxpNEXXR82YibifaBWhawMTzHWxjMm1XiC5Z8wLMkGf/O9Zpc7QGMbTrBM5EWYS
- tohjlVewGddZahIyCGx65Jv8SkEGSSxI5m073i2P5Rje0i62S39CMBkoaocuLcZNv/b0
- +5xoaHqypZfIVrbSHzWCqU6gkAuaiMM0faNffdiYdPxI6/3r90tQZRHVQeFsUImxmLto
- sGiJ66OqK5o8CaRnA37b8MpUErXsFB64swNwzGfHfB/UFbic2Nsi5rjRgvtcsDgec/O9
- jdZQ+urpp9vcr4SvrDQLmB/f2mEl4m6pAdYVxxLYjxdUWvxiQapRxeHw9RM0h//Wmrw2
- Q7Mg==
-X-Gm-Message-State: APjAAAVJ5p/HRnr84WVnXT0m0kZgycd5NnNkBwsuI7w04Uzb8gJNFc+L
- iHEZI8RxdRdjV/axBAof0kJdaA==
-X-Google-Smtp-Source: APXvYqwXNo0U8bhZTQ5u7VKINr4aWxa83nVQ2jiIacW88D7c3jN+q99h2VKAB0Pc3dYZ6whUEtkq0Q==
-X-Received: by 2002:a05:600c:d5:: with SMTP id
- u21mr4819763wmm.98.1581087686129; 
- Fri, 07 Feb 2020 07:01:26 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s22sm3535449wmh.4.2020.02.07.07.01.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 07:01:23 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5CAAE1FF92;
- Fri,  7 Feb 2020 15:01:19 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 5/5] tests/plugins: make howvec clean-up after itself.
-Date: Fri,  7 Feb 2020 15:01:18 +0000
-Message-Id: <20200207150118.23007-6-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200207150118.23007-1-alex.bennee@linaro.org>
-References: <20200207150118.23007-1-alex.bennee@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1j05JK-0006e9-6N
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:12:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20743
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j05JJ-0006dA-Vu
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:12:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581088369;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=aBCHWQ9+Hn0YFcnlnh+ot786GMekHR4eCe/0zxugR1c=;
+ b=bfCFnCU6Ou4+k/2mP6Q/a/900Yk3CgVb9AfT3fbIxjHxLrnTEIFNdfKTJsv499Y3S58tsD
+ HDsf2SKq/C/IbLyhmMC+sUK2FBVR8vchSudrjxVMfNapJmR16oBG36tV0HfMo6jzZrATz/
+ Zb92ohYxV+JJKbarDg/RJuNHX0M6Iwg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-ux1CoHqmNNmsPuhV_LSONg-1; Fri, 07 Feb 2020 10:12:45 -0500
+X-MC-Unique: ux1CoHqmNNmsPuhV_LSONg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E28D8800E21;
+ Fri,  7 Feb 2020 15:12:43 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-14.ams2.redhat.com
+ [10.36.117.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AC3BB10016DA;
+ Fri,  7 Feb 2020 15:12:42 +0000 (UTC)
+Subject: Re: [PATCH v3 1/1] qemu-img: Add --target-is-zero to convert
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org
+References: <20200204095246.1974117-1-david.edmondson@oracle.com>
+ <20200204095246.1974117-2-david.edmondson@oracle.com>
+ <90f3f74b-6154-d7ce-4e0e-ba4422f7da11@redhat.com>
+ <91c3d45b-4c27-d366-6dd9-5c27164cce35@virtuozzo.com>
+ <92ca6082-a3a6-c116-d1cc-e9810280c0c6@redhat.com>
+ <38ac63ec-af49-d9d5-c1d4-e45614b71d4c@redhat.com>
+ <f110458f-b3e7-6301-64bf-2b4957f3601e@virtuozzo.com>
+ <570489b5-8d1b-27c4-01d3-0e63130d2c57@redhat.com>
+ <bc572c68-4a4a-9734-39bb-07d78322de1b@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <56483c0b-7ebc-193b-72d7-d0331eb84b09@redhat.com>
+Date: Fri, 7 Feb 2020 16:12:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <bc572c68-4a4a-9734-39bb-07d78322de1b@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="AX87pzFrG0JhDf89WiWLn1tGKHlsMoaVL"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,60 +122,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TCG plugins are responsible for their own memory usage and although
-the plugin_exit is tied to the end of execution in this case it is
-still poor practice. Ensure we delete the hash table and related data
-when we are done to be a good plugin citizen.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AX87pzFrG0JhDf89WiWLn1tGKHlsMoaVL
+Content-Type: multipart/mixed; boundary="fE5oabCvqIgq0BXL6kVvIpGqOdpBF3xPO"
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/plugin/howvec.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+--fE5oabCvqIgq0BXL6kVvIpGqOdpBF3xPO
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/plugin/howvec.c b/tests/plugin/howvec.c
-index 4ca555e1239..7b77403559d 100644
---- a/tests/plugin/howvec.c
-+++ b/tests/plugin/howvec.c
-@@ -163,6 +163,13 @@ static gint cmp_exec_count(gconstpointer a, gconstpointer b)
-     return ea->count > eb->count ? -1 : 1;
- }
- 
-+static void free_record(gpointer data)
-+{
-+    InsnExecCount *rec = (InsnExecCount *) data;
-+    g_free(rec->insn);
-+    g_free(rec);
-+}
-+
- static void plugin_exit(qemu_plugin_id_t id, void *p)
- {
-     g_autoptr(GString) report = g_string_new("Instruction Classes:\n");
-@@ -213,12 +220,15 @@ static void plugin_exit(qemu_plugin_id_t id, void *p)
-         g_list_free(it);
-     }
- 
-+    g_list_free(counts);
-+    g_hash_table_destroy(insns);
-+
-     qemu_plugin_outs(report->str);
- }
- 
- static void plugin_init(void)
- {
--    insns = g_hash_table_new(NULL, g_direct_equal);
-+    insns = g_hash_table_new_full(NULL, g_direct_equal, NULL, &free_record);
- }
- 
- static void vcpu_insn_exec_before(unsigned int cpu_index, void *udata)
--- 
-2.20.1
+On 07.02.20 15:57, Eric Blake wrote:
+> On 2/7/20 8:41 AM, Max Reitz wrote:
+>=20
+>>>> I could imagine a user creating a qcow2 image on some block device wit=
+h
+>>>> preallocation where we cannot verify that the result will be zero.=C2=
+=A0 But
+>>>> they want qemu not to zero the device, so they would specify
+>>>> --target-is-zero.
+>>>
+>>> If user create image, setting --target-is-zero is always valid. But if
+>>> we in
+>>> same operation create the image automatically, having --target-is-zero,
+>>> when
+>>> we know that what we are creating is not zero is misleading and should
+>>> fail..
+>>
+>> bdrv_has_zero_init() doesn=E2=80=99t return false only for images that w=
+e know
+>> are not zero.=C2=A0 It returns true for images where we know they are.=
+=C2=A0 But
+>> if we don=E2=80=99t know, then it returns false also.
+>=20
+> Huh?
+>=20
+> bdrv_has_zero_init() currently returns 1 if a driver knows that creating
+> an image results in that image reading as 0.=C2=A0 That means it can retu=
+rn 1
+> even for non-zero images that were not just created.=C2=A0 Thus, that
+> interface has both false positives (returning 1 for a non-zero image if
+> the driver hard-codes it to 1) and false negatives (returning 0 for an
+> image that happens to read as zero).=C2=A0 The false negatives are less
+> important (if we don't know if the image is already zero, then zeroing
+> it again is a waste of time but not semantically wrong) than the false
+> positives (but as long as you don't rely on bdrv_has_zero_init() unless
+> you also know the image was just created, you are safely avoiding the
+> false positives).
+>=20
+> And that's the whole point of my series to add a qcow2 persistent bit to
+> track whether an image has known-zero contents: qemu-img should not be
+> calling bdrv_has_zero_init(), since it is so finicky on what it means.
+
+Sorry, I was unclear.  I meant =E2=80=9Cthat we know are not zero immediate=
+ly
+after creation=E2=80=9D.
+
+My point that it may return false even for (newly created) images that
+are zero stands.  One could also say it returns only =E2=80=9Cyes=E2=80=9D =
+(is zero) or
+=E2=80=9Cmaybe=E2=80=9D, and not =E2=80=9Cyes=E2=80=9D or =E2=80=9Cno=E2=80=
+=9D.
+
+>>> If we want to add a behavior to skip zeros unconditionally, we should
+>>> call new
+>>> option --skip-zeroes, to clearly specify what we want.
+>>
+>> It was my impression that this was exactly what --target-is-zero means
+>> and implies.
+>=20
+> --target-is-zero turns into the behavior of 'skip a pre-zeroing pass'.
+> If the destination is already zero, then copying zeroes from the source
+> is a waste of time. If the destination is not already zero, then zeroes
+> from the source are not copied, and the destination will not be
+> identical to the source.=C2=A0 We then have a choice of whether
+> --target-is-zero is merely a way to tell qemu something that it couldn't
+> learn otherwise but still be as safe as possible (if we can quickly
+> prove the target has non-zero data, the user lied about it being already
+> zero, so fail the command, so add yet another option to bypass the
+> safety check), or whether it really is synonymous with 'only copy the
+> non-zero portions of the source, and if the destination was not all zero
+> the copy is not faithful but I meant for it to be that way'.
+
+If you claim that it isn=E2=80=99t supposed to be an unsafe override, and i=
+f we
+plan to take your series in some form or another, it follows that we
+will have to drop this patch here.
+
+Because after your series, qemu can have some insight into existing
+images (either in the driver=E2=80=99s implementation of make_zero, or in
+qemu-img itself by virtue of some is_zero function).  Therefore, we
+could do the same =E2=80=9Csafety check=E2=80=9D and see whether our insigh=
+t agrees on
+what the user told us.
+
+This would make the flag completely superfluous, though, because when
+qemu knows the image to be zero, it does the right thing anyway.
+
+Therefore, I see this flag to be for cases where qemu doesn=E2=80=99t know.=
+  And
+that makes it an unsafe override.
+
+Max
+
+
+--fE5oabCvqIgq0BXL6kVvIpGqOdpBF3xPO--
+
+--AX87pzFrG0JhDf89WiWLn1tGKHlsMoaVL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl49fmkACgkQ9AfbAGHV
+z0AYfgf/Rhh1MXF2bFHYnCt/2+4XSRy24KOym+AWez9RFrud0qPQ2n9SSw0ZnIsO
+HcwYNHw0AhtDgeRWAkNFD0AblNalq1HwZVKwtbLvZPAFuOkMYWgqxSox8LyHk+d3
+OrUh+Td6t/e6OAAwLSPCwYM9wO8l469QVYolyfz9OP3Z/4MVi0NBfKCR7rlyiXrQ
+natWy09O1omHR89D/9SZbhpGh5ejJgZu7geIqGLondx6cC0AAm32FBjhf762t3+1
+GcRwynMzToO85LifQizgO2TPA5hGXYD77dEI9xy/Q4sV8zVDhv7U/6urmi87VwIP
+oFWMiH+qtfUO3rf2rpKh/fvScIEyZw==
+=RzKx
+-----END PGP SIGNATURE-----
+
+--AX87pzFrG0JhDf89WiWLn1tGKHlsMoaVL--
 
 
