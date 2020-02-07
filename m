@@ -2,117 +2,83 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3D7C04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:31:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39018C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:33:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4448520838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:31:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 022C920838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:33:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TqwMZiBz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4448520838
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpJHyuAr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 022C920838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05bW-0006uf-Fq
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:31:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41228)
+	id 1j05d3-00087q-7j
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:33:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j05Yc-0004tL-7J
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:28:39 -0500
+ (envelope-from <cohuck@redhat.com>) id 1j05cS-0007hF-9j
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:32:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j05Ya-0006js-OB
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:28:38 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46281
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1j05cQ-0007ZP-4g
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:32:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29448
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j05Ya-0006hb-G2
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:28:36 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j05cQ-0007Yj-1C
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:32:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581089316;
+ s=mimecast20190719; t=1581089553;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=fRaLgTYpKD34fmsy8H86X5XeMcGDGYPY31BAfBDjepE=;
- b=TqwMZiBzLLBCRv8zIvOX4JVwkYQ3Qp50P/ldJDTX9A4z3tSXxoBSBRCLvZ7ojTv23NKo0O
- xlu0uOhf3gfHxP5yei9rSuSy7IAKzNY0LojdwAhyXzShREo5cK285MWiNyx9MUHNQbYRa3
- GGFUo3aH2dwrqvJNFaPj2aS9lCBgOSg=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gbKmirCKxBQdYoc2AXVNIl2ztg0w7yP3GX4N6InYoWs=;
+ b=OpJHyuArSZxYsqsiQn3BkbSsx5xtZnQb4rzOV4AVRcvMJ80K3DG9W/MaZ/hZQ3Wr9HRVze
+ XQ30agAVhcXPBeXBrocu+8rbWMG1c6RfgxfLdvwIsIwkfR4wnuaLpNU7lrA+edAO+Lt8rN
+ NOw3QU6db1QjQRp2/mxStNzxs5k5ntU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-1w7bGCL6P-KwqZNs2lWXFQ-1; Fri, 07 Feb 2020 10:28:29 -0500
-X-MC-Unique: 1w7bGCL6P-KwqZNs2lWXFQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-309-SMPaxjtQO1CQoM0Fj5PI0w-1; Fri, 07 Feb 2020 10:32:24 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DE79189F763;
- Fri,  7 Feb 2020 15:28:28 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-14.ams2.redhat.com
- [10.36.117.14])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 25FF460BF7;
- Fri,  7 Feb 2020 15:28:26 +0000 (UTC)
-Subject: Re: [PATCH v3 1/1] qemu-img: Add --target-is-zero to convert
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eric Blake <eblake@redhat.com>, David Edmondson
- <david.edmondson@oracle.com>, qemu-devel@nongnu.org
-References: <20200204095246.1974117-1-david.edmondson@oracle.com>
- <20200204095246.1974117-2-david.edmondson@oracle.com>
- <90f3f74b-6154-d7ce-4e0e-ba4422f7da11@redhat.com>
- <91c3d45b-4c27-d366-6dd9-5c27164cce35@virtuozzo.com>
- <92ca6082-a3a6-c116-d1cc-e9810280c0c6@redhat.com>
- <38ac63ec-af49-d9d5-c1d4-e45614b71d4c@redhat.com>
- <f110458f-b3e7-6301-64bf-2b4957f3601e@virtuozzo.com>
- <570489b5-8d1b-27c4-01d3-0e63130d2c57@redhat.com>
- <99dc03a7-f93a-bdee-f38d-ac5aae8a3ca9@virtuozzo.com>
- <33849f7f-1ae9-126c-28b8-f9a5602aa2d0@redhat.com>
- <96aab671-23db-1917-983e-182312a41220@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <cd26d37d-5684-479b-a9ee-ae337e16a558@redhat.com>
-Date: Fri, 7 Feb 2020 16:28:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 624CF8048F8;
+ Fri,  7 Feb 2020 15:32:23 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0721185785;
+ Fri,  7 Feb 2020 15:32:20 +0000 (UTC)
+Date: Fri, 7 Feb 2020 16:32:18 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Tony Krowiak
+ <akrowiak@linux.ibm.com>
+Subject: Re: [PATCH RFC 2/2] docs: rstfy vfio-ap documentation
+Message-ID: <20200207163218.207a931f.cohuck@redhat.com>
+In-Reply-To: <CAFEAcA9wM4r=OfLnREQOQAcqOEdSr3=bHsjoO9mvn4VogMhQLw@mail.gmail.com>
+References: <20200128180142.15132-1-cohuck@redhat.com>
+ <20200128180142.15132-3-cohuck@redhat.com>
+ <CAFEAcA9wM4r=OfLnREQOQAcqOEdSr3=bHsjoO9mvn4VogMhQLw@mail.gmail.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <96aab671-23db-1917-983e-182312a41220@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: SMPaxjtQO1CQoM0Fj5PI0w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="M8Z60bh6sZYGAIN3yuXxVk0qW7R07TxSz"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,175 +90,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---M8Z60bh6sZYGAIN3yuXxVk0qW7R07TxSz
-Content-Type: multipart/mixed; boundary="FO6nnQaZcymSDgyN6j4c84w5UtqnFIwYr"
+On Fri, 7 Feb 2020 12:43:03 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
---FO6nnQaZcymSDgyN6j4c84w5UtqnFIwYr
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> On Tue, 28 Jan 2020 at 19:39, Cornelia Huck <cohuck@redhat.com> wrote:
+> >
+> > Move to system/, as this is mostly about configuring vfio-ap.
+> >
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>  
+> 
+> > diff --git a/docs/vfio-ap.txt b/docs/system/vfio-ap.rst
+> > similarity index 56%
+> > rename from docs/vfio-ap.txt
+> > rename to docs/system/vfio-ap.rst
+> > index b1eb2deeaf2f..c8c5728e0aaa 100644
+> > --- a/docs/vfio-ap.txt
+> > +++ b/docs/system/vfio-ap.rst
+> > @@ -1,17 +1,17 @@
+> >  Adjunct Processor (AP) Device
+> >  =============================
+> >
+> > -Contents:
+> > -=========
+> > -* Introduction
+> > -* AP Architectural Overview
+> > -* Start Interpretive Execution (SIE) Instruction
+> > -* AP Matrix Configuration on Linux Host
+> > -* Starting a Linux Guest Configured with an AP Matrix
+> > -* Example: Configure AP Matrices for Three Linux Guests  
+> > -> -Introduction:  
+> > -============
+> > +Contents
+> > +--------
+> > +* `Introduction`_
+> > +* `AP Architectural Overview`_
+> > +* `Start Interpretive Execution (SIE) Instruction`_
+> > +* `AP Matrix Configuration on Linux Host`_
+> > +* `Starting a Linux Guest Configured with an AP Matrix`_
+> > +* `Example: Configure AP Matrices for Three Linux Guests`_
+> > +  
+> 
+> You don't need to manually write out a table of contents. You
+> can just have one line
+> 
+> .. contents::
+> 
+> and Sphinx will produce an autogenerated table of contents
+> (including a 'Contents' title) for you.
+> 
+> https://docutils.sourceforge.io/docs/ref/rst/directives.html#table-of-contents
+> 
+> An example where we already use this is
+> docs/interop/live-block-operations.rst:
+> https://www.qemu.org/docs/master/interop/live-block-operations.html
 
-On 07.02.20 16:16, Vladimir Sementsov-Ogievskiy wrote:
-> 07.02.2020 18:03, Max Reitz wrote:
->> On 07.02.20 15:53, Vladimir Sementsov-Ogievskiy wrote:
->>> 07.02.2020 17:41, Max Reitz wrote:
->>>> On 07.02.20 13:07, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 07.02.2020 13:33, Max Reitz wrote:
->>>>>> On 04.02.20 15:23, Eric Blake wrote:
->>>>>>> On 2/4/20 7:59 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>>
->>>>>>>>> I understand that it is safer to have restrictions now and lift
->>>>>>>>> them
->>>>>>>>> later, than to allow use of the option at any time and leave room
->>>>>>>>> for
->>>>>>>>> the user to shoot themselves in the foot with no way to add safet=
-y
->>>>>>>>> later.=C2=A0 The argument against no backing file is somewhat
->>>>>>>>> understandable (technically, as long as the backing file also
->>>>>>>>> reads
->>>>>>>>> as all zeroes, then the overall image reads as all zeroes - but
->>>>>>>>> why
->>>>>>>>> have a backing file that has no content?); the argument
->>>>>>>>> requiring -n
->>>>>>>>> is a bit weaker (if I'm creating an image, I _know_ it reads as
->>>>>>>>> all
->>>>>>>>> zeroes, so the --target-is-zero argument is redundant, but it
->>>>>>>>> shouldn't hurt to allow it).
->>>>>>>>
->>>>>>>> I know that it reads as all zeroes, only if this format provides
->>>>>>>> zero
->>>>>>>> initialization..
->>>>>>>>
->>>>>>>>>
->>>>>>>>>> +++ b/qemu-img.c
->>>>>>>>>
->>>>>>>>>> @@ -2247,6 +2256,11 @@ static int img_convert(int argc, char
->>>>>>>>>> **argv)
->>>>>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 warn_report("This will become an error in future
->>>>>>>>>> QEMU
->>>>>>>>>> versions.");
->>>>>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>>>>>> +=C2=A0=C2=A0=C2=A0 if (s.has_zero_init && !skip_create) {
->>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("--targ=
-et-is-zero requires use of -n
->>>>>>>>>> flag");
->>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail_getopt;
->>>>>>>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>>>>>>
->>>>>>>>> So I think we could drop this hunk with no change in behavior.
->>>>>>>>
->>>>>>>> I think, no we can't. If we allow target-is-zero, with -n, we'd
->>>>>>>> better
->>>>>>>> to check that what we are creating is zero-initialized (format has
->>>>>>>> zero-init), and if not we should report error.
->>>>>>>>
->>>>>>>
->>>>>>> Good call.=C2=A0 Yes, if we allow --target-is-zero without -n, we M=
-UST
->>>>>>> insist
->>>>>>> that bdrv_has_zero_init() returns 1 (or, after my followup series,
->>>>>>> bdrv_known_zeroes() includes BDRV_ZERO_CREATE).
->>>>>>
->>>>>> Why?
->>>>>>
->>>>>> I could imagine a user creating a qcow2 image on some block device
->>>>>> with
->>>>>> preallocation where we cannot verify that the result will be
->>>>>> zero.=C2=A0 But
->>>>>> they want qemu not to zero the device, so they would specify
->>>>>> --target-is-zero.
->>>>>
->>>>> If user create image, setting --target-is-zero is always valid. But i=
-f
->>>>> we in
->>>>> same operation create the image automatically, having
->>>>> --target-is-zero,
->>>>> when
->>>>> we know that what we are creating is not zero is misleading and shoul=
-d
->>>>> fail..
->>>>
->>>> bdrv_has_zero_init() doesn=E2=80=99t return false only for images that=
- we know
->>>> are not zero.=C2=A0 It returns true for images where we know they are.=
-=C2=A0 But
->>>> if we don=E2=80=99t know, then it returns false also.
->>>
->>> yes, but we don't have better check.
->>
->> Correct, but maybe the user knows more, hence why it may make sense for
->> them to provide us with some information we don=E2=80=99t have.
->>
->>>>> If we want to add a behavior to skip zeros unconditionally, we should
->>>>> call new
->>>>> option --skip-zeroes, to clearly specify what we want.
->>>>
->>>> It was my impression that this was exactly what --target-is-zero means
->>>> and implies.
->>>>
->>>
->>> For me it sounds strange that user has better knowledge about what Qemu
->>> creates than Qemu itself. And if it so - it should be fixed in Qemu,
->>> rather than creating user interface to hint Qemu what it does.
->>
->> I brought an example where qemu cannot know whether the image is zero
->> (preallocation on a block device), but the user / management layer might
->> know.
->>
->=20
-> It sounds unsafe for me. User can't know how exactly Qemu do preallocatio=
-n,
-> which syscalls it calls, etc. How can user be sure, that Qemu produces
-> all-zero image, if even Qemu doesn't sure in it?
+Oh, nice, will do. (Not sure how useful this was in the text document,
+anyway.)
 
-For example, qcow2 images are always zero if the underlying storage is zero=
-.
+> 
+> 
+> > +Introduction
+> > +------------  
+> 
+> rST doesn't require it, but I'd recommend a blank line below
+> the ---- line; I think it makes the source more readable.
+> 
+> >  The IBM Adjunct Processor (AP) Cryptographic Facility is comprised
+> >  of three AP instructions and from 1 to 256 PCIe cryptographic adapter cards.
+> >  These AP devices provide cryptographic functions to all CPUs assigned to a
+> > @@ -21,8 +21,8 @@ On s390x, AP adapter cards are exposed via the AP bus. This document
+> >  describes how those cards may be made available to KVM guests using the
+> >  VFIO mediated device framework.
+> >
+> > -AP Architectural Overview:
+> > -=========================
+> > +AP Architectural Overview
+> > +-------------------------
+> >  In order understand the terminology used in the rest of this document, let's
+> >  start with some definitions:
+> >
+> > @@ -75,7 +75,7 @@ start with some definitions:
+> >    must be one of the control domains.
+> >
+> >  Start Interpretive Execution (SIE) Instruction
+> > -==============================================
+> > +----------------------------------------------
+> >  A KVM guest is started by executing the Start Interpretive Execution (SIE)
+> >  instruction. The SIE state description is a control block that contains the
+> >  state information for a KVM guest and is supplied as input to the SIE
+> > @@ -114,246 +114,254 @@ The APQNs can provide secure key functionality - i.e., a private key is stored
+> >  on the adapter card for each of its domains - so each APQN must be assigned to
+> >  at most one guest or the linux host.
+> >
+> > -   Example 1: Valid configuration:
+> > -   ------------------------------
+> > -   Guest1: adapters 1,2  domains 5,6
+> > -   Guest2: adapter  1,2  domain 7
+> > +Example 1: Valid configuration
+> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > +Guest1: adapters 1,2  domains 5,6
+> > +Guest2: adapter  1,2  domain 7  
+> 
+> These don't render correctly -- rST thinks the "Example 1..." line
+> is a subsection heading because of the underlining, and then renders
+> the next two lines as runon-text:
+> "Guest1: adapters 1,2 domains 5,6 Guest2: adapter 1,2 domain 7"
+> 
+> Depending on what you want, you could try one of:
+>  * use a literal block (which gets you fixed-width font, preserved
+>    whitespace and linebreaks)
+>  * use a bulleted list
+>  * use one of rST's table formats
 
-Then again, it isn=E2=80=99t like we need --target-is-zero without -n anywa=
-y.
-If users want that, they can always use qemu-img create +
-qemu-img convert -n --target-is-zero.  So seeing that you=E2=80=99re
-uncomfortable with the idea of --target-is-zero with -n, I can=E2=80=99t sa=
-y
-there is any actual reason why we=E2=80=99d have to allow it.
+Hm... I think this is supposed to be:
+- header ("Example 1: ...")
+- config
+- explanation why this is a valid config
 
-Max
+Maybe a table? Tony, any preferences?
 
-> Otherwise, we should document, how exactly (up to syscalls, their
-> parameters, flags, the whole logic and algorithm) preallocation is done,
-> so user can analyze it and be sure that produced image would be all-zero
-> (when Qemu can't determine it because some specific block device, for whi=
-ch
-> Qemu doesn't know that its preallocation algorithm produces all-zero, but
-> user is sure in it)..
+> 
+> (is it deliberate that line 1 is "adapters" and line 2 is "adapter" ?)
 
+I don't think so.
 
---FO6nnQaZcymSDgyN6j4c84w5UtqnFIwYr--
+> 
+> > -   This is valid because both guests have a unique set of APQNs: Guest1 has
+> > -   APQNs (1,5), (1,6), (2,5) and (2,6); Guest2 has APQNs (1,7) and (2,7).
+> > +This is valid because both guests have a unique set of APQNs: Guest1 has
+> > +APQNs (1,5), (1,6), (2,5) and (2,6); Guest2 has APQNs (1,7) and (2,7).
+> >
+> > -   Example 2: Valid configuration:
+> > -   ------------------------------
+> > -   Guest1: adapters 1,2 domains 5,6
+> > -   Guest2: adapters 3,4 domains 5,6
+> > +Example 2: Valid configuration
+> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > +Guest1: adapters 1,2 domains 5,6
+> > +Guest2: adapters 3,4 domains 5,6
+> >
+> > -   This is also valid because both guests have a unique set of APQNs:
+> > -      Guest1 has APQNs (1,5), (1,6), (2,5), (2,6);
+> > -      Guest2 has APQNs (3,5), (3,6), (4,5), (4,6)
+> > +This is also valid because both guests have a unique set of APQNs:
+> > +   Guest1 has APQNs (1,5), (1,6), (2,5), (2,6);
+> > +   Guest2 has APQNs (3,5), (3,6), (4,5), (4,6)  
+> 
+> This is differently rendered from the equivalent text in example 1,
+> because of the indent -- rST treats the 2 indented lines as a block
+> quote, and indents them in the output, but flows the text into
+> one long line.
+> 
+> I think personally I'd opt to render like this:
+> 
+> This is also valid because both guests have a unique set of APQNs:
+> 
+> * Guest1 has APQNs (1,5), (1,6), (2,5), (2,6)
+> * Guest2 has APQNs (3,5), (3,6), (4,5), (4,6)
+> 
+> (ie a bulleted list); but anyway consistency between the examples
+> would be good.
 
---M8Z60bh6sZYGAIN3yuXxVk0qW7R07TxSz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Nod. The indentation in the document was a bit inconsistent, it just
+did not matter before.
 
------BEGIN PGP SIGNATURE-----
+> 
+> >
+> > -   Example 3: Invalid configuration:
+> > -   --------------------------------
+> > -   Guest1: adapters 1,2  domains 5,6
+> > -   Guest2: adapter  1    domains 6,7
+> > +Example 3: Invalid configuration
+> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > +Guest1: adapters 1,2  domains 5,6
+> > +Guest2: adapter  1    domains 6,7
+> >
+> > -   This is an invalid configuration because both guests have access to
+> > -   APQN (1,6).
+> > +This is an invalid configuration because both guests have access to
+> > +APQN (1,6).  
+> 
+> > -      * Individual bits in the mask can be switched on and off by specifying
+> > -        each bit number to be switched in a comma separated list. Each bit
+> > -        number string must be prepended with a ('+') or minus ('-') to indicate
+> > -        the corresponding bit is to be switched on ('+') or off ('-'). Some
+> > -        valid values are:
+> > +    * Individual bits in the mask can be switched on and off by specifying
+> > +      each bit number to be switched in a comma separated list. Each bit
+> > +      number string must be prepended with a ('+') or minus ('-') to indicate
+> > +      the corresponding bit is to be switched on ('+') or off ('-'). Some
+> > +      valid values are::
+> >
+> >             "+0"    switches bit 0 on
+> >             "-13"   switches bit 13 off
+> >             "+0x41" switches bit 65 on
+> >             "-0xff" switches bit 255 off  
+> 
+> Maybe use a definition list here rather than a literal block?
+> 
+>       valid values are:
+> 
+>       ``+0``
+>           switches bit 0 on
+>       ``-13``
+>           switches bit 13 off
+> 
+> etc. The literal block is fine if you think it looks better though.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl49ghkACgkQ9AfbAGHV
-z0B1ywf/cBMI/ZRf6f3KLANuv1q5wjVqpeoNlYoAhBVeZ9cQy3ODNsS2HLRbHawY
-uL7PAtBeUrp+fLLE7UbpEC15heuL+DshgPxtI+3jaZ1W6eI29VbRr5KCkBHiaSG6
-o7QmX6ovzQH+yP6nU8YLqMWEEoA1a/LMUJFcd3mN7/Z9rwOP/MCbGFyZhV5mtxHo
-grgz90cD1vIwRrejGa/N1xn8sRUyryzYp5uTEqLz5BHlb7au38YI4uTxb1GDkfOo
-sqId2/HRogOTGhECnkHl8Rdw8cOxIVwBKf+xCTG17dWE4oQ96VWUa12nU/YY4spB
-dhA4JgmPdZOwUSCqJf6NNnumqowdEg==
-=5xrY
------END PGP SIGNATURE-----
+Not sure if a definition list for something that is basically a list of
+examples makes sense. Will check how it renders.
 
---M8Z60bh6sZYGAIN3yuXxVk0qW7R07TxSz--
+> 
+> 
+> >
+> >  assign_adapter  
+> 
+> Since these are filenames, you can enclose them in ``  `` and they'll
+> render as fixed-width text, which I think makes them stand out a
+> bit better in the HTML. I'm pretty sure this works even in the
+> term part of a definition list.
+
+That's probably a good idea, will check.
+
+> 
+> Not in this diff, but should the 'No APQN...' para in the assign_domain
+> docs really be a 2nd para of the preceding bullet point rather than either
+> its own bullet point or a paragraph outside the bulleted list ?
+
+Will also check, I mostly converted this document via a whack-a-mole
+approach.
+
+> 
+> (ditto for assign_domain)
+> 
+> 
+> > @@ -486,20 +494,22 @@ facilities:
+> >     The AP facilities feature indicates that AP facilities are installed on the
+> >     guest. This feature will be exposed for use only if the AP facilities
+> >     are installed on the host system. The feature is s390-specific and is
+> > -   represented as a parameter of the -cpu option on the QEMU command line:
+> > +   represented as a parameter of the -cpu option on the QEMU command line::
+> >
+> >        qemu-system-s390x -cpu $model,ap=on|off
+> >
+> > -      Where:
+> > +   Where:
+> >
+> > -         $model is the CPU model defined for the guest (defaults to the model of
+> > -                the host system if not specified).
+> > +      $model  
+> 
+> Formatting $model and ap=on|off with `` `` would look nicer I think
+> (ditto below)
+
+Yep, I'll check if there is anything else that should be fixed-width.
+
+> 
+> thanks
+> -- PMM
+> 
+
+Thanks for looking!
 
 
