@@ -2,80 +2,116 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5D0C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24758C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:48:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 686A521741
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:44:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E57D821741
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 16:48:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZCOWOonv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 686A521741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="v8HXZVal"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E57D821741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j06kD-0007OA-Gh
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:44:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59402)
+	id 1j06o7-0001m7-5N
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 11:48:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60136)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j06jU-0006wu-5M
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:43:58 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j06mk-0008Kt-Kt
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:47:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j06jR-0000ib-7B
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:43:54 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60131
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j06jQ-0000h6-FA
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:43:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581093831;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FJZzFc4tYwsnobOMqdFK+ts48v8zhN4d0wSXe1xvCy4=;
- b=ZCOWOonvGgup/fUXfgSxJdscIZeebpXwB9qTvQCZX0I4aFYGShWmoYqyjFVVj/Qou0aqmd
- K2AkNufzDfspQ+pcFJKLlCOFSbh72LvygR2iVakzPJTK6KT+eVJFHtKmejneeQVUyODawU
- QFgjoG6N043bJz64e1FheZg1AjScTvI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-uM66_Gs1OWyV5AUWIgEFgQ-1; Fri, 07 Feb 2020 11:43:47 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D465385EE6C;
- Fri,  7 Feb 2020 16:43:46 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.64])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB1FB790D8;
- Fri,  7 Feb 2020 16:43:43 +0000 (UTC)
-Date: Fri, 7 Feb 2020 16:43:40 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v3] docs: add virtiofsd(1) man page
-Message-ID: <20200207164340.GL3302@work-vm>
-References: <20200207162951.178437-1-stefanha@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j06mi-00020x-Sy
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 11:47:17 -0500
+Received: from mail-db8eur05on2135.outbound.protection.outlook.com
+ ([40.107.20.135]:3809 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j06mi-0001rd-3n; Fri, 07 Feb 2020 11:47:16 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IkuHUT4EdM7HA6ww4QdY6PzwWv46BlhHeKnozf0I3ye9NOo1z0OtiNfa5htsfhFTddfa/niG/CHlv2+TkTn/pskne4yqEpAy4uu0DSyC9xFKb+GsstqrVSo134wPCS0vFx510ewgdrotSkvwAJ2bOt7jfAJtGoYEFjoFjrup78DBGkmBfKsPBqbj6ND7AamTjF7+jOMkdZqJj1k8qDVTOp/V0TWBR6pHmxY9yDpS+3LIuyhp68AeGapvXNdA83SsXnTNsxBlWcN7CNbu3Iu/HJPX46kV1g9Ml9YDgpUxaWCVFZA6bVW7fxVXKyks2/SwS3Z8Uj20syWHIKfJYASL7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3rT9/1UHBVMzobEUB5KL90BQ8lpK5mVz/3sQWwNFnow=;
+ b=Sq7uoQStWcAzps2s7zY+EaKckaKydiSK0wjYjrcZaR3aYD8yx3f9Lx73bpcHZ4TI1HRU9rmtAsAhN0HWwSJOHmdJTfhDcyQtLuibgMoywfHVicKRztzL5k29mAaXygl1YwxMrrTKQ/WE+6qaMH7nyCq5j787OElFPmG1apKQPSqM9IIK780bluEzJLWO/0d4KMHmMZx45VIgeBwiJgbLxCRmWeWemSUyDLzOlgAt2SEdsLD8mtbODUZKjdUoP1TpCCg5+en5J/KSiVeh+Phf1Wpfq6QW1wfOBdFAyow37kaIMoGe0FD2gSo4uUBBebOOI8+eh0cyZAUPtfF4NnKhsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3rT9/1UHBVMzobEUB5KL90BQ8lpK5mVz/3sQWwNFnow=;
+ b=v8HXZVala5dMPaYsC8weFVjCks3QdCOTG3oFV6meJp0HJHbWP+CDohkWRltvVaqEZx3UGnpourdFSQYypBm+NwapYVlYJCGhZ8Ua558rbcQ+IkDiY/M1e7h7gEVCEGpS+CEX3FCk7WXkZVQWH9WJdEQOb7xA9+InxVpDEU+TzCU=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB5013.eurprd08.prod.outlook.com (10.255.123.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.24; Fri, 7 Feb 2020 16:47:13 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2707.023; Fri, 7 Feb 2020
+ 16:47:13 +0000
+Subject: Re: [PATCH v3] block/backup-top: fix flags handling
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200207161231.32707-1-vsementsov@virtuozzo.com>
+ <7b775d8f-a4b9-3376-1744-7cac2a792dba@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200207194711218
+Message-ID: <6ed4743e-e309-2f87-37f5-c313e677bd04@virtuozzo.com>
+Date: Fri, 7 Feb 2020 19:47:11 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <7b775d8f-a4b9-3376-1744-7cac2a792dba@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1PR0501CA0036.eurprd05.prod.outlook.com
+ (2603:10a6:3:1a::46) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
-In-Reply-To: <20200207162951.178437-1-stefanha@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: uM66_Gs1OWyV5AUWIgEFgQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR0501CA0036.eurprd05.prod.outlook.com (2603:10a6:3:1a::46) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21 via Frontend Transport; Fri, 7 Feb 2020 16:47:12 +0000
+X-Tagtoolbar-Keys: D20200207194711218
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4a4ca0d8-6dfd-4f25-76ce-08d7abed61ad
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5013:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB50130B525A2FE69D9717600CC11C0@AM6PR08MB5013.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 0306EE2ED4
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(396003)(376002)(39850400004)(366004)(346002)(136003)(189003)(199004)(2616005)(4326008)(52116002)(66476007)(66556008)(31686004)(16576012)(956004)(5660300002)(66946007)(2906002)(16526019)(53546011)(6486002)(186003)(316002)(31696002)(26005)(478600001)(86362001)(8676002)(966005)(81156014)(81166006)(8936002)(36756003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5013;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2yBO74gUckuvkqYlZ+oQ+bEskuNBLMaLCWEfyJN1/e1tMcv9S0ikg3j4OI7+GaiWJYAcEKLrcNSZtY/qd0apegsjsHlpbAQ88kPsqM7wmn97eTISwVz8I7+sEHgTtg7UnPdpL5I+Tjew742PLvOzI7kw8RKi3tzMXxTGLqXd6HEgnjtjiF9zr61jNUPJWiPwLS2fL5HpRva+nQIIn/VBSWXcGzLoI9e0hTEQyrz5Nr3WU3gia+WvdwMkQtm9Vddi2OBIO3MmQ/aRAldWm4fB+zL0tLsLScyj3NhF4KD1haeFNlysngZjuVPdA8Z9qWup/Wm+JIR0x3BEgwrpaDHll++OAXKQloZmYmOlBwIpLUSabpHXv7paiy4d6AuGqvVs8qeEuRGUv5493mMzEgYJdAGSWDESdymap2lbSQoPZYy5z2hdKAsUQrMrDC+yBacK8lLm4pUG89vt1VXJpkPJOQb5p9dRxE/Z8RB2QDMnop6GHJE0ZL1iMCI1UlafwbsFXW7nWynn9DuQg3O71ndurg==
+X-MS-Exchange-AntiSpam-MessageData: VxOVGCEFcX/Ncyyakq1FHXIZ77cIc0COf1nchAacQLKT31wLNpC8mLjVt1D2XVIRJVhM2ecDfSskfR0DUIRGvNRu4EaiXZdpysm9GOnvokLaBc0R87s6gQTYD8gG0RFJtGY3S4U8EI3c8cu/b7t0pw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a4ca0d8-6dfd-4f25-76ce-08d7abed61ad
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2020 16:47:13.1710 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zuH3k6giFC5BPZISb02scaNIuXE8hKfX2VxuER9JHaLb+96gpomsgwQnCddoOhYrZw2le8rB7yxvS/WHeF7tRSfSjCdAHneEvYrclPbGc2k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5013
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.20.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,266 +123,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> Document the virtiofsd(1) program and its command-line options.  This
-> man page is a rST conversion of the original texi documentation that I
-> wrote.
->=20
-> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+07.02.2020 19:30, Max Reitz wrote:
+> On 07.02.20 17:12, Vladimir Sementsov-Ogievskiy wrote:
+>> backup-top "supports" write-unchanged, by skipping CBW operation in
+>> backup_top_co_pwritev. But it forgets to do the same in
+>> backup_top_co_pwrite_zeroes, as well as declare support for
+>> BDRV_REQ_WRITE_UNCHANGED.
+>>
+>> Fix this, and, while being here, declare also support for flags
+>> supported by source child.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>
+>> v3: rebase on master, keep state initialization after check top != NULL.
+>>
+>> v2: restrict flags propagation like it is done in other filters [Eric]
+>>      move state variable initialization to the top
+>>   block/backup-top.c | 31 ++++++++++++++++++++-----------
+>>   1 file changed, 20 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/block/backup-top.c b/block/backup-top.c
+>> index fa78f3256d..1bfb360bd3 100644
+>> --- a/block/backup-top.c
+>> +++ b/block/backup-top.c
+> 
+> [...]
+> 
+>> @@ -196,8 +200,13 @@ BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
+>>           return NULL;
+>>       }
+>>   
+>> -    top->total_sectors = source->total_sectors;
+>>       state = top->opaque;
+>> +    top->total_sectors = source->total_sectors;
+> 
+> This looks a bit accidental, but, well, whatever.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+I failed to restrict myself in a wish to keep all "top->.. =" initializers went together :)
+Hmm, I could "state =" intializer to go after them. But it's good to keep it at top too.
 
-I'll add this to my stack for a virtiofs pull.
+> 
+> Thanks, applied to my block branch:
+> 
+> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+> 
 
-Dave
+
+Thanks!
 
 
-> ---
-> v3:
->  * Dropped old -o vhost_user_socket=3DPATH option [dgilbert]
-> v2:
->  * Fix mount -t virtio_fs -> virtiofs outdated doc [Liam]
->  * Use memory-backend-memfd instead of memory-backend-file
-> ---
->  MAINTAINERS                |   1 +
->  Makefile                   |   9 ++-
->  docs/interop/conf.py       |   5 +-
->  docs/interop/index.rst     |   1 +
->  docs/interop/virtiofsd.rst | 120 +++++++++++++++++++++++++++++++++++++
->  5 files changed, 134 insertions(+), 2 deletions(-)
->  create mode 100644 docs/interop/virtiofsd.rst
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index e72b5e5f69..4a118fe504 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1612,6 +1612,7 @@ S: Supported
->  F: tools/virtiofsd/*
->  F: hw/virtio/vhost-user-fs*
->  F: include/hw/virtio/vhost-user-fs.h
-> +F: docs/interop/virtiofsd.rst
-> =20
->  virtio-input
->  M: Gerd Hoffmann <kraxel@redhat.com>
-> diff --git a/Makefile b/Makefile
-> index 461d40bea6..f0e1a2fc1d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -348,6 +348,9 @@ DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1
->  DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-img.1
->  DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-nbd.8
->  DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-ga.8
-> +ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-> +DOCS+=3D$(MANUAL_BUILDDIR)/interop/virtiofsd.1
-> +endif
->  DOCS+=3D$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
->  DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt doc=
-s/interop/qemu-qmp-ref.7
->  DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/=
-interop/qemu-ga-ref.7
-> @@ -861,6 +864,9 @@ ifdef CONFIG_VIRTFS
->  =09$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
->  =09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/virtfs-proxy-helper.1 "$(D=
-ESTDIR)$(mandir)/man1"
->  endif
-> +ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-> +=09$(INSTALL_DATA) docs/interop/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
-> +endif
-> =20
->  install-datadir:
->  =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
-> @@ -1051,7 +1057,8 @@ $(MANUAL_BUILDDIR)/system/index.html: $(call manual=
--deps,system)
->  =09$(call build-manual,system,html)
-> =20
->  $(call define-manpage-rule,interop,\
-> -       qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1 virtfs-proxy-he=
-lper.1,\
-> +       qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
-> +       virtiofsd.1 virtfs-proxy-helper.1,\
->         $(SRC_PATH/qemu-img-cmds.hx))
-> =20
->  $(call define-manpage-rule,system,qemu-block-drivers.7)
-> diff --git a/docs/interop/conf.py b/docs/interop/conf.py
-> index b0f322207c..b3cda17042 100644
-> --- a/docs/interop/conf.py
-> +++ b/docs/interop/conf.py
-> @@ -27,5 +27,8 @@ man_pages =3D [
->       [], 1),
->      ('virtfs-proxy-helper', 'virtfs-proxy-helper',
->       u'QEMU 9p virtfs proxy filesystem helper',
-> -     ['M. Mohan Kumar'], 1)
-> +     ['M. Mohan Kumar'], 1),
-> +    ('virtiofsd', 'virtiofsd', u'QEMU virtio-fs shared file system daemo=
-n',
-> +     ['Stefan Hajnoczi <stefanha@redhat.com>',
-> +      'Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>'], 1),
->  ]
-> diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-> index 3b763b1eeb..e8455b4270 100644
-> --- a/docs/interop/index.rst
-> +++ b/docs/interop/index.rst
-> @@ -24,3 +24,4 @@ Contents:
->     vhost-user
->     vhost-user-gpu
->     virtfs-proxy-helper
-> +   virtiofsd
-> diff --git a/docs/interop/virtiofsd.rst b/docs/interop/virtiofsd.rst
-> new file mode 100644
-> index 0000000000..378594c422
-> --- /dev/null
-> +++ b/docs/interop/virtiofsd.rst
-> @@ -0,0 +1,120 @@
-> +QEMU virtio-fs shared file system daemon
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Synopsis
-> +--------
-> +
-> +**virtiofsd** [*OPTIONS*]
-> +
-> +Description
-> +-----------
-> +
-> +Share a host directory tree with a guest through a virtio-fs device.  Th=
-is
-> +program is a vhost-user backend that implements the virtio-fs device.  E=
-ach
-> +virtio-fs device instance requires its own virtiofsd process.
-> +
-> +This program is designed to work with QEMU's ``--device vhost-user-fs-pc=
-i``
-> +but should work with any virtual machine monitor (VMM) that supports
-> +vhost-user.  See the Examples section below.
-> +
-> +This program must be run as the root user.  Upon startup the program wil=
-l
-> +switch into a new file system namespace with the shared directory tree a=
-s its
-> +root.  This prevents "file system escapes" due to symlinks and other fil=
-e
-> +system objects that might lead to files outside the shared directory.  T=
-he
-> +program also sandboxes itself using seccomp(2) to prevent ptrace(2) and =
-other
-> +vectors that could allow an attacker to compromise the system after gain=
-ing
-> +control of the virtiofsd process.
-> +
-> +Options
-> +-------
-> +
-> +.. program:: virtiofsd
-> +
-> +.. option:: -h, --help
-> +
-> +  Print help.
-> +
-> +.. option:: -V, --version
-> +
-> +  Print version.
-> +
-> +.. option:: -d
-> +
-> +  Enable debug output.
-> +
-> +.. option:: --syslog
-> +
-> +  Print log messages to syslog instead of stderr.
-> +
-> +.. option:: -o OPTION
-> +
-> +  * debug -
-> +    Enable debug output.
-> +
-> +  * flock|no_flock -
-> +    Enable/disable flock.  The default is ``no_flock``.
-> +
-> +  * log_level=3DLEVEL -
-> +    Print only log messages matching LEVEL or more severe.  LEVEL is one=
- of
-> +    ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
-> +
-> +  * norace -
-> +    Disable racy fallback.  The default is false.
-> +
-> +  * posix_lock|no_posix_lock -
-> +    Enable/disable remote POSIX locks.  The default is ``posix_lock``.
-> +
-> +  * readdirplus|no_readdirplus -
-> +    Enable/disable readdirplus.  The default is ``readdirplus``.
-> +
-> +  * source=3DPATH -
-> +    Share host directory tree located at PATH.  This option is required.
-> +
-> +  * timeout=3DTIMEOUT -
-> +    I/O timeout in seconds.  The default depends on cache=3D option.
-> +
-> +  * writeback|no_writeback -
-> +    Enable/disable writeback cache. The cache alows the FUSE client to b=
-uffer
-> +    and merge write requests.  The default is ``no_writeback``.
-> +
-> +  * xattr|no_xattr -
-> +    Enable/disable extended attributes (xattr) on files and directories.=
-  The
-> +    default is ``no_xattr``.
-> +
-> +.. option:: --socket-path=3DPATH
-> +
-> +  Listen on vhost-user UNIX domain socket at PATH.
-> +
-> +.. option:: --fd=3DFDNUM
-> +
-> +  Accept connections from vhost-user UNIX domain socket file descriptor =
-FDNUM.
-> +  The file descriptor must already be listening for connections.
-> +
-> +.. option:: --thread-pool-size=3DNUM
-> +
-> +  Restrict the number of worker threads per request queue to NUM.  The d=
-efault
-> +  is 64.
-> +
-> +.. option:: --cache=3Dnone|auto|always
-> +
-> +  Select the desired trade-off between coherency and performance.  ``non=
-e``
-> +  forbids the FUSE client from caching to achieve best coherency at the =
-cost of
-> +  performance.  ``auto`` acts similar to NFS with a 1 second metadata ca=
-che
-> +  timeout.  ``always`` sets a long cache lifetime at the expense of cohe=
-rency.
-> +
-> +Examples
-> +--------
-> +
-> +Export ``/var/lib/fs/vm001/`` on vhost-user UNIX domain socket
-> +``/var/run/vm001-vhost-fs.sock``:
-> +
-> +::
-> +
-> +  host# virtiofsd --socket-path=3D/var/run/vm001-vhost-fs.sock -o source=
-=3D/var/lib/fs/vm001
-> +  host# qemu-system-x86_64 \
-> +      -chardev socket,id=3Dchar0,path=3D/var/run/vm001-vhost-fs.sock \
-> +      -device vhost-user-fs-pci,chardev=3Dchar0,tag=3Dmyfs \
-> +      -object memory-backend-memfd,id=3Dmem,size=3D4G,share=3Don \
-> +      -numa node,memdev=3Dmem \
-> +      ...
-> +  guest# mount -t virtiofs myfs /mnt
-> --=20
-> 2.24.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+-- 
+Best regards,
+Vladimir
 
