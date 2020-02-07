@@ -2,92 +2,116 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDCABC04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B086BC04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98702214AF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:05:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C1A6214AF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:06:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5cddgPM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98702214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UB6g6YUS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C1A6214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05CJ-0007Qp-OB
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:05:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52536)
+	id 1j05D8-0000fP-Kq
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:06:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jpewhacker@gmail.com>) id 1j04kx-0006vg-35
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:37:19 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j05AZ-0004XR-RC
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:03:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jpewhacker@gmail.com>) id 1j04kw-0000B2-7O
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:37:19 -0500
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:39584)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jpewhacker@gmail.com>)
- id 1j04kv-000097-WE
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:37:18 -0500
-Received: by mail-il1-x142.google.com with SMTP id f70so1874223ill.6
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:37:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=dk5ODb3Gj2TYjyKARkYyg25EdfWD4skwXJSnw3qyrb0=;
- b=M5cddgPMHTja5Vgn3UCsynQWsaSw1+QoLZozU3H4Z0U0FpmTkI8Ct9Q8DDQjrdjyqK
- OAuaKhun6z7d6bSQ+8P0GPeILSh84QVCG2x+w8jyw04DPrCw6VWsmNr/TFWGnBkGqRuO
- 2vRsU8CKSRpgUXH0sFBGI+wxid+68IT/A3wgm8kz4JTITPFEGmPrjS0gbcQQnEGpYTpa
- TNBtv6Z7Ujbr3uwZa9wTSpvoBajW72Q5kkTfeqMHEvQp989ZVOA0bdoy5TA2od9tdMah
- IwDkGrliN0rU+SHHHBu/vUwoGVrTIIvhhKz4ZXCK+pGXW+/mn2bWS/tdtp6Fh3gGTa2+
- ogLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=dk5ODb3Gj2TYjyKARkYyg25EdfWD4skwXJSnw3qyrb0=;
- b=EQlMWSlDlzGqk2St7ZW+pyn1+Mo1oT+/sqbCMK42LzLnoUW6vlkopP0B6RqKm+XP2c
- sQxxd8RSiAkOqaS4DODf2DH9TB0Nk9JIu5wYUAxtpRBr6Ppevz/Mil7D0STmRsxnrtGY
- qPvahe1CWiFUNzQx2rt77x7zFq7sOz20Td0SWH252/8vwdtrtalxGKoA1TokRx/7EfEU
- 84gSzcPRCyRwbm1pXQwo4gQw2a3zjHPfA8MvEo4pE0Y/lrWKjqTZWXohFLJiEVdICPyQ
- wbot8Qxddz70somPVKZiv7nK7VWFWaOd4n+R57QJ4Ut9P9BDeEqwFXQZp6ZjDqprnXTO
- Q5Zw==
-X-Gm-Message-State: APjAAAUDiVSPtuMHe7aD8lFsHlhLDMlqoBEEx0tOzw3alNKBWRtGDLf0
- ztmudHIEYknbrKMAKrjp6UI=
-X-Google-Smtp-Source: APXvYqzAKso3V9XBOJNuQpXFb4L6TEVFLOyKaG/GW/q/r2V0J4PA5TGFnAnRUKAhVGUqwpy+2dxQng==
-X-Received: by 2002:a92:c50f:: with SMTP id r15mr9770993ilg.258.1581086235730; 
- Fri, 07 Feb 2020 06:37:15 -0800 (PST)
-Received: from [10.30.196.58] ([204.77.163.55])
- by smtp.gmail.com with ESMTPSA id y11sm1322793ilm.22.2020.02.07.06.37.14
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Feb 2020 06:37:15 -0800 (PST)
-From: Joshua Watt <jpewhacker@gmail.com>
-X-Google-Original-From: Joshua Watt <JPEWhacker@gmail.com>
-Subject: Re: [PATCH v3 5/7] ui/gtk: implement show-cursor option
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200207101753.25812-1-kraxel@redhat.com>
- <20200207101753.25812-6-kraxel@redhat.com>
-Message-ID: <b0dca00d-5d35-a139-b5d0-1777c92b23a0@gmail.com>
-Date: Fri, 7 Feb 2020 08:37:13 -0600
+ (envelope-from <mreitz@redhat.com>) id 1j05AY-0000iu-AX
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:03:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53254
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j05AY-0000gO-4U
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:03:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581087825;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=xQR15/3try4pw2bjapwOtPcO2QuHAmUU7LxpVN9mHxw=;
+ b=UB6g6YUS2DW50s1CzuebndAlGjNxB161X1ENsAvA7fVu8kGttVNH8PKu3n+QFoNA8OivwU
+ LNsfrxNmlmyjXPpxwJ0Au9J7g7efjxC+8UN5vYIgVG+JaE7sss4DwaWTuQ9krzVUMSYGXp
+ QCsUY3TsITFBUomT5+Vw1zcgdIgzxlk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-93-BgyegY_ENlyDTzWyZ4NlYg-1; Fri, 07 Feb 2020 10:03:37 -0500
+X-MC-Unique: BgyegY_ENlyDTzWyZ4NlYg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC291101FC64;
+ Fri,  7 Feb 2020 15:03:35 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-14.ams2.redhat.com
+ [10.36.117.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A87D85785;
+ Fri,  7 Feb 2020 15:03:32 +0000 (UTC)
+Subject: Re: [PATCH v3 1/1] qemu-img: Add --target-is-zero to convert
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eric Blake <eblake@redhat.com>, David Edmondson
+ <david.edmondson@oracle.com>, qemu-devel@nongnu.org
+References: <20200204095246.1974117-1-david.edmondson@oracle.com>
+ <20200204095246.1974117-2-david.edmondson@oracle.com>
+ <90f3f74b-6154-d7ce-4e0e-ba4422f7da11@redhat.com>
+ <91c3d45b-4c27-d366-6dd9-5c27164cce35@virtuozzo.com>
+ <92ca6082-a3a6-c116-d1cc-e9810280c0c6@redhat.com>
+ <38ac63ec-af49-d9d5-c1d4-e45614b71d4c@redhat.com>
+ <f110458f-b3e7-6301-64bf-2b4957f3601e@virtuozzo.com>
+ <570489b5-8d1b-27c4-01d3-0e63130d2c57@redhat.com>
+ <99dc03a7-f93a-bdee-f38d-ac5aae8a3ca9@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <33849f7f-1ae9-126c-28b8-f9a5602aa2d0@redhat.com>
+Date: Fri, 7 Feb 2020 16:03:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200207101753.25812-6-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::142
+In-Reply-To: <99dc03a7-f93a-bdee-f38d-ac5aae8a3ca9@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="CMIWMNJFZkvkGw94eoIqbDttsvHMe9w0O"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,46 +123,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, jtomko@redhat.com,
- libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CMIWMNJFZkvkGw94eoIqbDttsvHMe9w0O
+Content-Type: multipart/mixed; boundary="TvV061wtlUWtzgYldk3Uc03PF8vjuLBWk"
 
-On 2/7/20 4:17 AM, Gerd Hoffmann wrote:
-> When specified just set null_cursor to NULL so we get the default
-> pointer instead of a blank pointer.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->   ui/gtk.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/ui/gtk.c b/ui/gtk.c
-> index d18892d1de61..a685d1ae0848 100644
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -2243,8 +2243,12 @@ static void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
->       textdomain("qemu");
->   
->       window_display = gtk_widget_get_display(s->window);
-> -    s->null_cursor = gdk_cursor_new_for_display(window_display,
-> -                                                GDK_BLANK_CURSOR);
-> +    if (s->opts->has_show_cursor && s->opts->show_cursor) {
-> +        s->null_cursor = NULL; /* default pointer */
-> +    } else {
-> +        s->null_cursor = gdk_cursor_new_for_display(window_display,
-> +                                                    GDK_BLANK_CURSOR);
-> +    }
+--TvV061wtlUWtzgYldk3Uc03PF8vjuLBWk
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I think it would make more sense to have all the logic related to what 
-cursor is used in the same location, instead of split up between here 
-and gd_update_cursor(). This would also match the behavior of the SDL 
-and cocoa backends a little better.
+On 07.02.20 15:53, Vladimir Sementsov-Ogievskiy wrote:
+> 07.02.2020 17:41, Max Reitz wrote:
+>> On 07.02.20 13:07, Vladimir Sementsov-Ogievskiy wrote:
+>>> 07.02.2020 13:33, Max Reitz wrote:
+>>>> On 04.02.20 15:23, Eric Blake wrote:
+>>>>> On 2/4/20 7:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>
+>>>>>>> I understand that it is safer to have restrictions now and lift the=
+m
+>>>>>>> later, than to allow use of the option at any time and leave room
+>>>>>>> for
+>>>>>>> the user to shoot themselves in the foot with no way to add safety
+>>>>>>> later.=C2=A0 The argument against no backing file is somewhat
+>>>>>>> understandable (technically, as long as the backing file also reads
+>>>>>>> as all zeroes, then the overall image reads as all zeroes - but why
+>>>>>>> have a backing file that has no content?); the argument requiring -=
+n
+>>>>>>> is a bit weaker (if I'm creating an image, I _know_ it reads as all
+>>>>>>> zeroes, so the --target-is-zero argument is redundant, but it
+>>>>>>> shouldn't hurt to allow it).
+>>>>>>
+>>>>>> I know that it reads as all zeroes, only if this format provides zer=
+o
+>>>>>> initialization..
+>>>>>>
+>>>>>>>
+>>>>>>>> +++ b/qemu-img.c
+>>>>>>>
+>>>>>>>> @@ -2247,6 +2256,11 @@ static int img_convert(int argc, char
+>>>>>>>> **argv)
+>>>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ warn_report("This will become an error in future QEMU
+>>>>>>>> versions.");
+>>>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 if (s.has_zero_init && !skip_create) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("--target=
+-is-zero requires use of -n flag");
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail_getopt;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>>>>>
+>>>>>>> So I think we could drop this hunk with no change in behavior.
+>>>>>>
+>>>>>> I think, no we can't. If we allow target-is-zero, with -n, we'd
+>>>>>> better
+>>>>>> to check that what we are creating is zero-initialized (format has
+>>>>>> zero-init), and if not we should report error.
+>>>>>>
+>>>>>
+>>>>> Good call.=C2=A0 Yes, if we allow --target-is-zero without -n, we MUS=
+T
+>>>>> insist
+>>>>> that bdrv_has_zero_init() returns 1 (or, after my followup series,
+>>>>> bdrv_known_zeroes() includes BDRV_ZERO_CREATE).
+>>>>
+>>>> Why?
+>>>>
+>>>> I could imagine a user creating a qcow2 image on some block device wit=
+h
+>>>> preallocation where we cannot verify that the result will be zero.=C2=
+=A0 But
+>>>> they want qemu not to zero the device, so they would specify
+>>>> --target-is-zero.
+>>>
+>>> If user create image, setting --target-is-zero is always valid. But if
+>>> we in
+>>> same operation create the image automatically, having --target-is-zero,
+>>> when
+>>> we know that what we are creating is not zero is misleading and should
+>>> fail..
+>>
+>> bdrv_has_zero_init() doesn=E2=80=99t return false only for images that w=
+e know
+>> are not zero.=C2=A0 It returns true for images where we know they are.=
+=C2=A0 But
+>> if we don=E2=80=99t know, then it returns false also.
+>=20
+> yes, but we don't have better check.
 
->   
->       s->mouse_mode_notifier.notify = gd_mouse_mode_change;
->       qemu_add_mouse_mode_change_notifier(&s->mouse_mode_notifier);
+Correct, but maybe the user knows more, hence why it may make sense for
+them to provide us with some information we don=E2=80=99t have.
+
+>>> If we want to add a behavior to skip zeros unconditionally, we should
+>>> call new
+>>> option --skip-zeroes, to clearly specify what we want.
+>>
+>> It was my impression that this was exactly what --target-is-zero means
+>> and implies.
+>>
+>=20
+> For me it sounds strange that user has better knowledge about what Qemu
+> creates than Qemu itself. And if it so - it should be fixed in Qemu,
+> rather than creating user interface to hint Qemu what it does.
+
+I brought an example where qemu cannot know whether the image is zero
+(preallocation on a block device), but the user / management layer might
+know.
+
+Max
+
+
+--TvV061wtlUWtzgYldk3Uc03PF8vjuLBWk--
+
+--CMIWMNJFZkvkGw94eoIqbDttsvHMe9w0O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl49fEMACgkQ9AfbAGHV
+z0D3EAf/XYsDKkM0RtFpjkjxD4bkhoBL7bP0cZhLsUtkqgsrGQgGta+rjly23Q3O
+tL9gBpjocyGgeEAMahoqtWt0G7zGRofbmenHB0WoaWuKQ8NEMF7vTAnN43GaJOMK
+SA8GTnsp5OJaIxXznwH6bK79PizqYYQ2em2CnqInRyAq2qALRPPn++zdMBQNPm9s
+TZPmSzbSL7awWc+GrN5MnSfgu5/boXJvJiSCJQyjASF3XnjikT6H3VOMwFJun8PK
+S08YKd/s3xJmPiY4EAiEtvdCsmlXj+N97dTz1yc4v718+9sTgsgExgut4ZOJYaeN
+EXoFaqCIvdIGjAQwFrrIk/oDOYBD4w==
+=V3gR
+-----END PGP SIGNATURE-----
+
+--CMIWMNJFZkvkGw94eoIqbDttsvHMe9w0O--
+
 
