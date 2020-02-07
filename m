@@ -2,91 +2,84 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FCBFC04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD51C04EB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:22:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C18E20838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:22:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D83A20838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:22:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kkFd2gkK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C18E20838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzimdG6e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D83A20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j04Wg-0001zN-Ia
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:22:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48699)
+	id 1j04X2-00035A-Mt
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:22:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48764)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1j04Vo-0000S9-NH
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:21:41 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j04WB-00017z-Pn
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:22:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1j04Vn-0005YD-Bc
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:21:40 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:35328)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1j04Vn-0005Ws-63; Fri, 07 Feb 2020 09:21:39 -0500
-Received: by mail-pf1-x442.google.com with SMTP id y73so1373599pfg.2;
- Fri, 07 Feb 2020 06:21:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=MXTE7+VG/fuavlzhWWW8cwSsMcmiVYN8chLv/BbuYRQ=;
- b=kkFd2gkKjMscBWiifoMvICLDUUe0b+TXzqK+vYbSmMVeVdAd7WQ3ZOfVDQ+aRJUN/v
- NA80XNatBQay2t+1im7LqUcoVG+di1lnczx2reer3aNmTDzEvQ7GJQHwHa3hj3GF0Zrg
- OyYRvWtgFmRiMIKOc4pnzYa+vSXF6Q17ZCzuX+6RPkMqWP/69WmkRPMbycNKiC06baau
- NvvFLr5GBP3p7Tz1Q6ttKO6MXCZDunTnKi/OH152+Vv3hnyBiieioanNaQdqPr5Xk5+x
- iWBxhAeAzxQhBc2sVeLC+X0LAl0rEO67DCY2zHZxUAOUuiQuRBvykAUhzH434NNckwgx
- MDIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MXTE7+VG/fuavlzhWWW8cwSsMcmiVYN8chLv/BbuYRQ=;
- b=bLBotZrVNG6/XpcdFDIkeK/v92glaQI210lDuVMhoH2uScDlZUtCecc8L4kuzihCMA
- ZxMb8Mya6US9F/vroa1/QeQ+hfF0hRxCXL9KTCYxASPiwAFyn2jwzmypLdck00GK56en
- cgToOBY3R0QU/xUNSYrLROu+sQBofs2PkDH9vw8rDt9VPTgBAJDIBKLYnvNcfWQ+kqMx
- nw5zaYdvi/yhDlKlQ8J4LJg/TIV90iszrWV4LR+cYRIthT3cgy1rfhXvJpvPPvlxwDmf
- Xh8O0/hO0rHu2cbg3r3FMq/2C5kN6dfqJGyTAOoO/866GDudMyAbqsREVdehnGKyuk1H
- jnZw==
-X-Gm-Message-State: APjAAAXUy1/RVEJmb0NEHzoDz+1FWhH5ABfpHQhzM5KnwVXjdTxEwtfy
- beKcWhP0GGYT7Qolr1lh0M8SBEWd
-X-Google-Smtp-Source: APXvYqz4If7rG4zHDO6LToOOKrOIwikXyNY8VeRMOjA3rT618aIjtTh3tuw37+JKBX/WnGBOwXogVw==
-X-Received: by 2002:a63:a541:: with SMTP id r1mr9753236pgu.118.1581085294415; 
- Fri, 07 Feb 2020 06:21:34 -0800 (PST)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id
- e19sm3174475pgn.86.2020.02.07.06.21.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Feb 2020 06:21:33 -0800 (PST)
-Subject: Re: [PATCH] hw/arm: ast2400/ast2500: Wire up EHCI controllers
-To: Joel Stanley <joel@jms.id.au>
-References: <20200206183437.3979-1-linux@roeck-us.net>
- <e9f490fe-34d3-6830-832c-155f6fa63482@kaod.org>
- <1605922b-2aa0-dd8e-720a-031e74bc9872@roeck-us.net>
- <CACPK8XdADQwGnsX=YR0n_zm_WMv532bAmR3O-CfyJ23ytT9bpA@mail.gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <ebcfceea-2f70-7e88-0996-b072ec81f59e@roeck-us.net>
-Date: Fri, 7 Feb 2020 06:21:31 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <kwolf@redhat.com>) id 1j04WA-0005fo-HF
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:22:03 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20883
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j04WA-0005fZ-Dj
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:22:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581085322;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eQfAzTwlVM2OYnutHJNomAK7rGHwnqHEPD+pu1p48mI=;
+ b=ZzimdG6eiumghKgE0RznfkjVWOQJU54ovwGi90jOFqzi9cYUIF8VTgzfY7wTMjaCez7vc+
+ r4rHjnyZ0srHVA8F8mu21fiDr4QFaau4hyIbefykZZpyEQiju/5mus5zAThs5/8n8MsRxO
+ WeaQbcDgRdCMypiTVMOaPcsOA90AGFc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-233-3LUA86Q-MheKNEpMSscnHw-1; Fri, 07 Feb 2020 09:21:58 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18D2D8C02BE;
+ Fri,  7 Feb 2020 14:21:57 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-156.ams2.redhat.com [10.36.116.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E35E360BEC;
+ Fri,  7 Feb 2020 14:21:47 +0000 (UTC)
+Date: Fri, 7 Feb 2020 15:21:46 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 2/3] MAINTAINERS: Cover qapi/block{-core}.json in 'Block
+ layer core' section
+Message-ID: <20200207142146.GF6031@linux.fritz.box>
+References: <20200207103012.27049-1-philmd@redhat.com>
+ <20200207103012.27049-3-philmd@redhat.com>
+ <87blqaqyxi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CACPK8XdADQwGnsX=YR0n_zm_WMv532bAmR3O-CfyJ23ytT9bpA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+In-Reply-To: <87blqaqyxi.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 3LUA86Q-MheKNEpMSscnHw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,71 +91,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/7/20 5:09 AM, Joel Stanley wrote:
-> On Fri, 7 Feb 2020 at 12:58, Guenter Roeck <linux@roeck-us.net> wrote:
->>
->> On 2/7/20 12:16 AM, Cédric Le Goater wrote:
->>> On 2/6/20 7:34 PM, Guenter Roeck wrote:
->>>> Initialize EHCI controllers on AST2400 and AST2500 using the existing
->>>> TYPE_PLATFORM_EHCI. After this change, booting ast2500-evb into Linux
->>>> successfully instantiates a USB interface.
->>>>
->>>> ehci-platform 1e6a3000.usb: EHCI Host Controller
->>>> ehci-platform 1e6a3000.usb: new USB bus registered, assigned bus number 1
->>>> ehci-platform 1e6a3000.usb: irq 21, io mem 0x1e6a3000
->>>> ehci-platform 1e6a3000.usb: USB 2.0 started, EHCI 1.00
->>>> usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 5.05
->>>> usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
->>>> usb usb1: Product: EHCI Host Controller
->>>
->>> Cool. Have you tried to plug any devices ?
->>>
->>
->> Yes, booting from USB drive works just fine. I already added it to my
->> test suite at kerneltests.org.
-> 
-> Nice!
-> 
-> Reviewed-by: Joel Stanley <joel@jms.id.au>
-> 
->>> This looks good. Could you add the AST2600 also ?
->>>
->>
->> I thought about that, but how would I test it ? None of the ast2600
->> systems in the Linux kernel enables it. The devicetree include file for
->> ast2600 doesn't even have an entry for it. I could cook something up,
->> but that would not reflect real hardware.
-> 
-> FYI, there are patches on the linux-aspeed list to enable USB:
-> 
->   https://patchwork.ozlabs.org/project/linux-aspeed/list/?series=156260
-> 
-> They have not yet been merged into the kernel, but I will merge the
-> device tree changes once -rc1 is out.
-> 
+Am 07.02.2020 um 15:01 hat Markus Armbruster geschrieben:
+> Philippe Mathieu-Daud=E9 <philmd@redhat.com> writes:
+>=20
+> > List this file in the proper section, so maintainers get
+> > notified when it is modified.
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> > ---
+> > Cc: Kevin Wolf <kwolf@redhat.com>
+> > Cc: Max Reitz <mreitz@redhat.com>
+> > Cc: qemu-block@nongnu.org
+> > ---
+> >  MAINTAINERS | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 903831e0a4..e269e9092c 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -1842,6 +1842,8 @@ S: Supported
+>    Block layer core
+>    M: Kevin Wolf <kwolf@redhat.com>
+>    M: Max Reitz <mreitz@redhat.com>
+>    L: qemu-block@nongnu.org
+>    S: Supported
+> >  F: block*
+> >  F: block/
+> >  F: hw/block/
+> > +F: qapi/block.json
+> > +F: qapi/block-core.json
+> >  F: include/block/
+> >  F: qemu-img*
+> >  F: docs/interop/qemu-img.rst
+>=20
+> This is in addition to
+>=20
+>     Block QAPI, monitor, command line
+>     M: Markus Armbruster <armbru@redhat.com>
+>     S: Supported
+>     F: blockdev.c
+>     F: block/qapi.c
+>     F: qapi/block*.json
+>     F: qapi/transaction.json
+>     T: git https://repo.or.cz/qemu/armbru.git block-next
+>=20
+> I'm not sure this section makes much sense anymore.
 
-Excellent. With the above series, and after enabling ehci1 for ast2600-evb
-and adding the necessary code to qemu, I get
+This is probably for you to decide.
 
-ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
-ehci-platform: EHCI generic platform driver
-ehci-platform 1e6a3000.usb: EHCI Host Controller
-ehci-platform 1e6a3000.usb: new USB bus registered, assigned bus number 1
-ehci-platform 1e6a3000.usb: irq 25, io mem 0x1e6a3000
-ehci-platform 1e6a3000.usb: USB 2.0 started, EHCI 1.00
-usb usb1: Manufacturer: Linux 5.5.0-09825-ga0802f2d0ef5-dirty ehci_hcd
+Though the block-next branch from the T: line doesn't even exist any
+more...
 
-and I can mount a USB drive. Is that good enough for a follow-up patch,
-or should I wait until the code finds its way into the Linux kernel ?
+> Should qapi/transaction.json also be added to "Block layer core"?  Or
+> should it go into John's section "Block Jobs"?
 
-Thanks,
-Guenter
+I think at the moment it only supports actions that are more related to
+block jobs, so moving it there would make sense to me.
+
+Kevin
+
 
