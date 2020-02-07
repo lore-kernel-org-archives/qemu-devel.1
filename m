@@ -4,97 +4,94 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70497C04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2EAFC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F526214AF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDD20214AF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 14:28:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QsYbeyWR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F526214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gKweddJh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD20214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j04aK-000859-Fm
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:26:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49594)
+	id 1j04ce-000172-TV
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 09:28:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49944)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j04ZX-0006yd-3Q
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:25:32 -0500
+ (envelope-from <mst@redhat.com>) id 1j04bd-0000Ew-T3
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:27:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j04ZV-0004qW-N6
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:25:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25151
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1j04bc-0002b4-Pa
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:27:41 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24635
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j04ZV-0004pR-Iz
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:25:29 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j04bc-0002Zt-Ly
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:27:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581085529;
+ s=mimecast20190719; t=1581085660;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5giItzpYoo3JEelMMhtzAC6x4a3E/6AQgX4HqCHDuJE=;
- b=QsYbeyWRVzcxFF7z2Vg/GpAtwzhxRJI748j1qxV2XxFhtx9nPwu7POMnc3NGIp8XZUEI5N
- rpSZmrfgeTd0HEITIe6qz/5/uwfu6EpksXKR4FUNCS6SJ+Icop/v6KY87jgA1XRH+5LDSZ
- yl5GM69ECOiJ2zRbR1IzpJExAVsZlJM=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-uf37IS3iPmiQODtFL0uyng-1; Fri, 07 Feb 2020 09:25:26 -0500
-Received: by mail-qk1-f197.google.com with SMTP id a132so1519148qkg.5
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:25:26 -0800 (PST)
+ bh=rAaFfbbWuueE+CH3D2w4/AhbcXvm0SdG98aPBQGIqxo=;
+ b=gKweddJhD8Cj/0SJOJCYvPB9edC7wCH4qXwqJ7GiNhs+9Rr6Nv+0azJQtpZRb+moZ/FAwO
+ ns97rMRw7+5zfiLIXrhkiaLtQHcvRxSMrnIy/lRzYnvxsL+cK94Fzb6BufqUaxH2QfwRJJ
+ IiHddQ4BKK++5GczvHKFYncFUEf00lc=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-eV1iR0zAO-qRvjb037H5qw-1; Fri, 07 Feb 2020 09:27:37 -0500
+Received: by mail-qt1-f200.google.com with SMTP id d9so1685214qtq.13
+ for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 06:27:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=zs6K5DgkRqHV/ngJLTDOx4/uc8Jnp+hvbLz9w49py/Q=;
- b=oXiExi0p0PLPICcI8+J5XirCe7KwcskXlqm4xd7yMDzgakTSgbI22gnn9sT75sSnzJ
- xfoK17tjZWWXBjuoDJdUUtRCe9Tp7ToK3YaRicenvc+8cDAdx6qTtWaKZW3r4SSibc53
- 1ZfYEP5TYSi1TqAO0jcGuYEKLQX++6hY8GC7rwQ7+XDz/I99auZR7k/MQDnrhRQhXc0P
- KbOoNj1XT5thUt+Ro0FAYnZg+YPeFyWviuNl8RUXUsJWexZQazperRlcnQ5vSzklDd9v
- koTbQ2aQUVLVjWuCkJUM/mF2LIiaD1GdZxJJwnwDET0zx2BafSVZbjfjdNvBNBwPSqVH
- Fm6A==
-X-Gm-Message-State: APjAAAV4nQ1TK5V2U19ytLsk1gL3tKDt9UmuHzc4SZXQfeFeJUne4rVO
- h5ArHNoQolSKxzHnM1uRXJX1Svw+SRnKD+18cLfqdUriW/lk1PaTlt6US6Wure3gtFJGuwgbwc8
- N9OmrkQ/qGXOJCJE=
-X-Received: by 2002:ac8:607:: with SMTP id d7mr7573949qth.271.1581085525601;
- Fri, 07 Feb 2020 06:25:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzmFBmC/C8aFTepE2yfJ9wB6lNLabovEOWo1q8396V/RXiRthP2BnpsoYobvSJMZLQVX0nzfQ==
-X-Received: by 2002:ac8:607:: with SMTP id d7mr7573905qth.271.1581085525317;
- Fri, 07 Feb 2020 06:25:25 -0800 (PST)
+ bh=/+mcTgyM4TM1KAKKxzzXGQSR6tVRzBp69dTvTGgPD44=;
+ b=WK9BU49G1xRlMKrH+tcMLuMPAwEtSm7jim7b8amSqBdMcGrP+hZ36VCykI72mdcmjR
+ VitQwD279p9EBOIpE7bHVWD1ljeyVC7R6vhLd6wM2d3cfjBmxyiBM1Io2yXvxXPjkKrj
+ zcAiNBpEwoG7SHaJLJVvxX0gAZJN2kRFdo7kXlc0dmp2ffQ+FD6jVMyGmq3VFYHDVr0I
+ fqOWVJMrvQ8SVdypUMdVXbrAAzwuQrM8ZNzShuQGXnL3w2Gq21nS4Xsty3ZlZpHU+yl8
+ ltJZyoUcqqdJw5q9RctDjYMvP0yyodJPccGmTBFoCxlWTlsoaLTgWw+4UA0HIjL3nb5a
+ 31Lw==
+X-Gm-Message-State: APjAAAVnDGHNHdRDGH8aD7QSsfDG37TqPajtrzcculujIoYjhTwqWaS1
+ yeSfT6Jmb5u3Cw03gSTcc3kUjBVbV3OmSQTl5dHdHbcVSXvhbgAYTTw8s0FHS8ZHoWqBzQYNKZ0
+ PK3Uhoi7FJ6trK98=
+X-Received: by 2002:a37:4743:: with SMTP id u64mr6197508qka.289.1581085657019; 
+ Fri, 07 Feb 2020 06:27:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzOAOQ0h44AfXyncve+EbK3kF0y3Em8xW8NUgYoxGGWwG6j1kj//dCEYeJnZkM5S91Tmjpcig==
+X-Received: by 2002:a37:4743:: with SMTP id u64mr6197493qka.289.1581085656782; 
+ Fri, 07 Feb 2020 06:27:36 -0800 (PST)
 Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id m204sm1407189qke.35.2020.02.07.06.25.18
+ by smtp.gmail.com with ESMTPSA id h13sm1434089qtu.23.2020.02.07.06.27.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 06:25:24 -0800 (PST)
-Date: Fri, 7 Feb 2020 09:25:16 -0500
+ Fri, 07 Feb 2020 06:27:36 -0800 (PST)
+Date: Fri, 7 Feb 2020 09:27:32 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Subject: Re: [PATCH v3 2/3] hw: Make MachineClass::is_default a boolean type
-Message-ID: <20200207092450-mutt-send-email-mst@kernel.org>
-References: <20200207130453.16666-1-philmd@redhat.com>
- <20200207130453.16666-3-philmd@redhat.com>
- <20200207091138-mutt-send-email-mst@kernel.org>
- <16ec9b38-94e4-bd2d-a47f-83a27289ab47@vivier.eu>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] ppc: function to setup latest class options
+Message-ID: <20200207092612-mutt-send-email-mst@kernel.org>
+References: <20200207064628.1196095-1-mst@redhat.com>
+ <e77a2a7b-ed74-7584-4751-711b115e98c7@redhat.com>
+ <20200207121209.06a1be98@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <16ec9b38-94e4-bd2d-a47f-83a27289ab47@vivier.eu>
-X-MC-Unique: uf37IS3iPmiQODtFL0uyng-1
+In-Reply-To: <20200207121209.06a1be98@bahia.lan>
+X-MC-Unique: eV1iR0zAO-qRvjb037H5qw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,118 +103,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chris Wulff <crwulff@gmail.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>, Anthony Green <green@moxielogic.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
- Jia Liu <proljc@gmail.com>, qemu-trivial@nongnu.org,
- Helge Deller <deller@gmx.de>, Magnus Damm <magnus.damm@gmail.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>,
+Cc: qemu-ppc@nongnu.org,
  Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
- Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>,
- qemu-riscv@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Michael Walle <michael@walle.cc>,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 07, 2020 at 03:22:19PM +0100, Laurent Vivier wrote:
-> Le 07/02/2020 =E0 15:11, Michael S. Tsirkin a =E9crit=A0:
-> > On Fri, Feb 07, 2020 at 02:04:52PM +0100, Philippe Mathieu-Daud=E9 wrot=
-e:
-> >> There's no good reason for it to be type int, change it to bool.
-> >>
-> >> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> >> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+On Fri, Feb 07, 2020 at 12:12:09PM +0100, Greg Kurz wrote:
+> On Fri, 7 Feb 2020 11:35:47 +0100
+> Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
+>=20
+> > On 2/7/20 7:48 AM, Michael S. Tsirkin wrote:
+> > > We are going to add more init for the latest machine, so move the set=
+up
+> > > to a function so we don't have to change the DEFINE_SPAPR_MACHINE mac=
+ro
+> > > each time.
+> > >=20
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> > >   hw/ppc/spapr.c | 9 +++++++--
+> > >   1 file changed, 7 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index 02cf53fc5b..4cf2a992a5 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -4428,6 +4428,12 @@ static const TypeInfo spapr_machine_info =3D {
+> > >       },
+> > >   };
+> > >  =20
+> > > +static void spapr_machine_latest_class_options(MachineClass *mc)
+> > > +{
+> > > +    mc->alias =3D "pseries";
+> > > +    mc->is_default =3D 1;
 > >=20
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > But we can have only 1 default per QEMU binary... How PPC manage having=
+=20
+> > multiple defaults? The first or last listed is choosen as default?
 > >=20
-> >> ---
-> >> v3: new patch
-> >> ---
-> >>  include/hw/boards.h                      |  2 +-
-> >>  hw/alpha/dp264.c                         |  2 +-
-> >>  hw/cris/axis_dev88.c                     |  2 +-
-> >>  hw/hppa/machine.c                        |  2 +-
-> >>  hw/i386/pc_piix.c                        | 10 +++++-----
-> >>  hw/lm32/lm32_boards.c                    |  2 +-
-> >>  hw/m68k/mcf5208.c                        |  2 +-
-> >>  hw/microblaze/petalogix_s3adsp1800_mmu.c |  2 +-
-> >>  hw/mips/mips_malta.c                     |  2 +-
-> >>  hw/moxie/moxiesim.c                      |  2 +-
-> >>  hw/nios2/10m50_devboard.c                |  2 +-
-> >>  hw/openrisc/openrisc_sim.c               |  2 +-
-> >>  hw/ppc/mac_oldworld.c                    |  2 +-
-> >>  hw/ppc/spapr.c                           |  2 +-
-> >>  hw/riscv/spike.c                         |  2 +-
-> >>  hw/s390x/s390-virtio-ccw.c               |  2 +-
-> >>  hw/sh4/shix.c                            |  2 +-
-> >>  hw/sparc/sun4m.c                         |  2 +-
-> >>  hw/sparc64/niagara.c                     |  2 +-
-> >>  hw/sparc64/sun4u.c                       |  4 ++--
-> >>  hw/unicore32/puv3.c                      |  2 +-
-> >>  21 files changed, 26 insertions(+), 26 deletions(-)
-> >>
-> ...
-> >> diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-> >> index 5eb2d097b9..81a1748fad 100644
-> >> --- a/hw/sparc64/niagara.c
-> >> +++ b/hw/sparc64/niagara.c
-> >> @@ -170,7 +170,7 @@ static void niagara_class_init(ObjectClass *oc, vo=
-id *data)
-> >> =20
-> >>      mc->desc =3D "Sun4v platform, Niagara";
-> >>      mc->init =3D niagara_init;
-> >> -    mc->max_cpus =3D 1; /* XXX for now */
-> >> +    mc->max_cpus =3D true; /* XXX for now */
 >=20
-> what happened here ^^^
->=20
-> >>      mc->default_boot_order =3D "c";
-> >>      mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Sun-UltraSparc-T1")=
-;
-> >>  }
-> >> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> >> index b7ac42f7a5..3c2c9d2eb0 100644
-> >> --- a/hw/sparc64/sun4u.c
-> >> +++ b/hw/sparc64/sun4u.c
-> >> @@ -816,7 +816,7 @@ static void sun4u_class_init(ObjectClass *oc, void=
- *data)
-> >>      mc->init =3D sun4u_init;
-> >>      mc->block_default_type =3D IF_IDE;
-> >>      mc->max_cpus =3D 1; /* XXX for now */
-> >> -    mc->is_default =3D 1;
-> >> +    mc->is_default =3D true;
-> >>      mc->default_boot_order =3D "c";
-> >>      mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-UltraSparc-IIi")=
-;
-> >>      mc->ignore_boot_device_suffixes =3D true;
-> >> @@ -841,7 +841,7 @@ static void sun4v_class_init(ObjectClass *oc, void=
- *data)
-> >>      mc->desc =3D "Sun4v platform";
-> >>      mc->init =3D sun4v_init;
-> >>      mc->block_default_type =3D IF_IDE;
-> >> -    mc->max_cpus =3D 1; /* XXX for now */
-> >> +    mc->max_cpus =3D true; /* XXX for now */
->=20
-> and here ^^
->=20
-> Thanks,
-> Laurent
+> IIUC it isn't about putting multiple defaults here. It is about putting
+> any additional init for the default machine type that we cannot put in
+> spapr_machine_class_init(), instead of putting it in the versioned
+> init function, eg. spapr_machine_5_0_class_options(). Otherwise this
+> would force us to carry the change when we add a new machine version.
 
-Ooh good catch. Which probably means we don't have a unit test for these
-...
+Maybe it's cleaner to pass the latest flag to
+spapr_machine_latest_class_options? Rename it spapr_machine_default_class_o=
+ptions?
+This way we don't need to bother clearing is_default in other
+machine types, we'll only set it for the latest one.
+
+> > > +}
+> > > +
+> > >   #define DEFINE_SPAPR_MACHINE(suffix, verstr, latest)               =
+  \
+> > >       static void spapr_machine_##suffix##_class_init(ObjectClass *oc=
+, \
+> > >                                                       void *data)    =
+  \
+> > > @@ -4435,8 +4441,7 @@ static const TypeInfo spapr_machine_info =3D {
+> > >           MachineClass *mc =3D MACHINE_CLASS(oc);                    =
+    \
+> > >           spapr_machine_##suffix##_class_options(mc);                =
+  \
+> > >           if (latest) {                                              =
+  \
+> > > -            mc->alias =3D "pseries";                                =
+   \
+> > > -            mc->is_default =3D 1;                                   =
+   \
+> > > +            spapr_machine_latest_class_options(mc);                 =
+ \
+> > >           }                                                          =
+  \
+> > >       }                                                              =
+  \
+> > >       static const TypeInfo spapr_machine_##suffix##_info =3D {      =
+    \
+> > >=20
+> >=20
+> >=20
 
 
