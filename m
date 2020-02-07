@@ -2,86 +2,79 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8CE6C04EB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF5CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:10:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8535320838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:09:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E6AD20838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 15:10:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JYzdP/i/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8535320838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPJc74pq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6AD20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j05GK-0007IS-Jr
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:09:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60257)
+	id 1j05H2-00008X-Ge
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 10:10:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56028)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j058H-0000oz-9i
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:26 -0500
+ (envelope-from <groeck7@gmail.com>) id 1j04xK-000119-Un
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:50:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j058F-0003rx-0K
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:25 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40391)
+ (envelope-from <groeck7@gmail.com>) id 1j04xG-00058h-Kx
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 09:50:05 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:36000)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j058E-0003m8-PQ
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 10:01:22 -0500
-Received: by mail-wm1-x342.google.com with SMTP id t14so3087846wmi.5
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 07:01:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=IJCI3ecePskizRDxYgL1MN+1IoehJPZSqp7DKKTNS8A=;
- b=JYzdP/i/D8FO0LkEpN0NgzLiA0P0LsfNY9+uJRk7aokme7rbTV+Q9aCT14jhDdzz22
- YdcN5f7qCR1B4UrgOKpuQ8qjDNUt3cC0Rzyi2QBdcPbsVQl502W7pdaKifQnsT7Dj2ys
- BJeOhWbWfO+ZU4euU9FREi91EkEKlsxEDtp44ry6N8EML9BOGc8bVoTLpfDxcQKMBBsb
- wgFr+g0ywJ7LB+bnbGXxup3/OZgfEjsSRR+b9HaITbSjMonX0j1zgTK34DQCz4OQZVuZ
- D5+Z0DONZASvT6IrJUzf8IjQSMR9mwEjxXc7PtUDsRc9lom1fAOik5kWJ01tYqTnwnem
- Kq7g==
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1j04xD-0004wM-OG; Fri, 07 Feb 2020 09:49:59 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id gv17so1026002pjb.1;
+ Fri, 07 Feb 2020 06:49:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id;
+ bh=oCAEZ4YZo0aISc3BRa7rvbjrbum3bZV93gOfR1uaB/M=;
+ b=lPJc74pqxRHioEWnnulDBlxdpgIW+B0OPBGEms7a4ZLF0CE3UaNN4EYOa8bstVZifn
+ CHoZFSW/uitmY5WsUHsigEtjiBoPlmT0uM4C/av/peWb8USR+nOdg0XXaGneKY7nibA9
+ eEBJzyCAVdsAcByTYroFmCGnv30xXgRZV/I7GwoBjW1pNvExfpzkRRL7olJqa7x/ccvP
+ bkWQBGW2d0qj58RmExkhSMoQHjUpdaWUl/Y7a7nzTIpiTcWhrlMS3kDq3UyfBv72em9b
+ qZoLhrdmKGlgczYqA0ZH112B3VIVDE8up4epYPEzovJEPsjV/U26bVGluX5q4iQC36c7
+ 4q+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=IJCI3ecePskizRDxYgL1MN+1IoehJPZSqp7DKKTNS8A=;
- b=T45Zm08XTBDIeSaiUMKg5mdT3miZ9lw17/GuJLoggKVAVI5dtQu+YQnu3wgdFVf7QN
- 3B7kREBxYrexVkeK4TTJ5E6wlxvQkeEw9R9z2yz5hQGebXvkp1zhLipuz6tH4qA/oZ9z
- B75PeL6tjFoDTK6P1SqhjORhw/SuCHAz7p70fYYqr/qxQFEuQon2ZlUJcylbWjooKj6N
- X8rPEmHCdH56WESpF75Yx0joc1exl4rcBFkdI00jur0CqlQq6Z9pqTTY+5q9Fn+dtYk3
- 4W9rSipPW3lNDR7YhmXu/UNQ9kUqlPbM8XyB5ed1thCDYttKun7AutFnG8c6zPb+XPLL
- VhDA==
-X-Gm-Message-State: APjAAAUmmYqEMbjOUQMN5CuvQY6yseTRypxFobJgCJK8XCcfiNTQNEOj
- tMlTl0dqlHqupbKXUwEl7BMEqw==
-X-Google-Smtp-Source: APXvYqzVWjDDMeaCLxNRhG5AojHFyJiPDRpm3KQage2ykWOJj8HuBYDCTY6w/vlwE29uaFxx6HZCbg==
-X-Received: by 2002:a1c:7203:: with SMTP id n3mr4784113wmc.119.1581087681633; 
- Fri, 07 Feb 2020 07:01:21 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i11sm3647867wrs.10.2020.02.07.07.01.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Feb 2020 07:01:19 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E38EE1FF87;
- Fri,  7 Feb 2020 15:01:18 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 0/5] plugins/next
-Date: Fri,  7 Feb 2020 15:01:13 +0000
-Message-Id: <20200207150118.23007-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+ bh=oCAEZ4YZo0aISc3BRa7rvbjrbum3bZV93gOfR1uaB/M=;
+ b=L7beLgp4BncTaT5vqI4N75OUpjE43M/SuGIeHaWfyKaq9LeolALa1Zte7JZPpuZULM
+ ufvewTqBau7ER9rFQq1QzTQG+t8rH+M2GMeDPS+0QAz24jsV2GUHNzKeRWeAShhMlZN7
+ 9wqsBjOabdkSPIlmaJNwkPBL3imJ6es1yuwzi45tTzbx7KLSMkGZ+sIcR0KQ6/sCBIQ/
+ wki8emQhtHup9U4seRbMa45n3Vvrsd3HYD1D4ZgEXEwbtfR4W4zphCrGxtnGMuvO7gjd
+ jRqs3lidG1AGF+kYWfQFHsuAQket0f2LxdJFytXqgH4uEqnnBdj1KfJrNUoRACu5Z187
+ dEuA==
+X-Gm-Message-State: APjAAAXRN+hWrqpShdykPjYcRzOjoYrvpZPXeNNeS207LIt/ROYwq9x5
+ M3IiU/z/mXi36TsBtqtMy+7aQqaO
+X-Google-Smtp-Source: APXvYqz2tZc18ve/VWMx11toeLu7iXwfRWKRtv5xLCWxNhIeazH6HDh9TBLvxpcP+KzrI7nRqrCnng==
+X-Received: by 2002:a17:90a:8806:: with SMTP id
+ s6mr4027592pjn.141.1581086998301; 
+ Fri, 07 Feb 2020 06:49:58 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id 144sm3660623pfc.45.2020.02.07.06.49.56
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 07 Feb 2020 06:49:57 -0800 (PST)
+From: Guenter Roeck <linux@roeck-us.net>
+To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Subject: [PATCH] hw/arm: ast2600: Wire up EHCI controllers
+Date: Fri,  7 Feb 2020 06:49:54 -0800
+Message-Id: <20200207144954.13634-1-linux@roeck-us.net>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,40 +86,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Initialize EHCI controllers on AST2600 using the existing
+TYPE_PLATFORM_EHCI. After this change, booting ast2600-evb
+into Linux successfully instantiates a USB interface after
+the necessary changes are made to its devicetree files.
 
-A few bits and pieces for plugin cleanup. The most major thing in this
-series is tweaking the riscv decoder to only load the instruction
-bytes it needs.
+ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+ehci-platform: EHCI generic platform driver
+ehci-platform 1e6a3000.usb: EHCI Host Controller
+ehci-platform 1e6a3000.usb: new USB bus registered, assigned bus number 1
+ehci-platform 1e6a3000.usb: irq 25, io mem 0x1e6a3000
+ehci-platform 1e6a3000.usb: USB 2.0 started, EHCI 1.00
+usb usb1: Manufacturer: Linux 5.5.0-09825-ga0802f2d0ef5-dirty ehci_hcd
+usb 1-1: new high-speed USB device number 2 using ehci-platform
 
-Alex Bennée (3):
-  docs/devel: document query handle lifetimes
-  target/riscv: progressively load the instruction during decode
-  tests/plugins: make howvec clean-up after itself.
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ hw/arm/aspeed_ast2600.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-Chen Qun (1):
-  tests/plugin: prevent uninitialized warning
-
-Emilio G. Cota (1):
-  plugins/core: add missing break in cb_to_tcg_flags
-
- docs/devel/tcg-plugins.rst | 13 +++++++++++--
- plugins/core.c             |  1 +
- target/riscv/translate.c   | 39 +++++++++++++++++++-------------------
- tests/plugin/bb.c          |  6 +++---
- tests/plugin/howvec.c      | 12 +++++++++++-
- tests/plugin/insn.c        |  3 +--
- 6 files changed, 47 insertions(+), 27 deletions(-)
-
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index 931887ac68..a528251c8d 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -31,6 +31,8 @@ static const hwaddr aspeed_soc_ast2600_memmap[] = {
+     [ASPEED_FMC]       = 0x1E620000,
+     [ASPEED_SPI1]      = 0x1E630000,
+     [ASPEED_SPI2]      = 0x1E641000,
++    [ASPEED_EHCI1]     = 0x1E6A1000,
++    [ASPEED_EHCI2]     = 0x1E6A3000,
+     [ASPEED_MII1]      = 0x1E650000,
+     [ASPEED_MII2]      = 0x1E650008,
+     [ASPEED_MII3]      = 0x1E650010,
+@@ -77,6 +79,8 @@ static const int aspeed_soc_ast2600_irqmap[] = {
+     [ASPEED_ADC]       = 78,
+     [ASPEED_XDMA]      = 6,
+     [ASPEED_SDHCI]     = 43,
++    [ASPEED_EHCI1]     = 5,
++    [ASPEED_EHCI2]     = 9,
+     [ASPEED_GPIO]      = 40,
+     [ASPEED_GPIO_1_8V] = 11,
+     [ASPEED_RTC]       = 13,
+@@ -167,6 +171,11 @@ static void aspeed_soc_ast2600_init(Object *obj)
+                               sizeof(s->spi[i]), typename);
+     }
+ 
++    for (i = 0; i < sc->ehcis_num; i++) {
++        sysbus_init_child_obj(obj, "ehci[*]", OBJECT(&s->ehci[i]),
++                              sizeof(s->ehci[i]), TYPE_PLATFORM_EHCI);
++    }
++
+     snprintf(typename, sizeof(typename), "aspeed.sdmc-%s", socname);
+     sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc),
+                           typename);
+@@ -395,6 +404,19 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+                         s->spi[i].ctrl->flash_window_base);
+     }
+ 
++    /* EHCI */
++    for (i = 0; i < sc->ehcis_num; i++) {
++        object_property_set_bool(OBJECT(&s->ehci[i]), true, "realized", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->ehci[i]), 0,
++                        sc->memmap[ASPEED_EHCI1 + i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->ehci[i]), 0,
++                           aspeed_soc_get_irq(s, ASPEED_EHCI1 + i));
++    }
++
+     /* SDMC - SDRAM Memory Controller */
+     object_property_set_bool(OBJECT(&s->sdmc), true, "realized", &err);
+     if (err) {
+@@ -499,6 +521,7 @@ static void aspeed_soc_ast2600_class_init(ObjectClass *oc, void *data)
+     sc->silicon_rev  = AST2600_A0_SILICON_REV;
+     sc->sram_size    = 0x10000;
+     sc->spis_num     = 2;
++    sc->ehcis_num    = 2;
+     sc->wdts_num     = 4;
+     sc->macs_num     = 4;
+     sc->irqmap       = aspeed_soc_ast2600_irqmap;
 -- 
-2.20.1
+2.17.1
 
 
