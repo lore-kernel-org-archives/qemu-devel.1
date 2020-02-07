@@ -2,83 +2,85 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7431C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 22:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 384E3C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 22:49:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B41B20720
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 22:22:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F261921775
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 22:49:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qb0iIGNW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B41B20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oxDr7guD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F261921775
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0C0w-00023G-PJ
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 17:22:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50495)
+	id 1j0CRJ-0006PJ-6s
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 17:49:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56212)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1j0BzM-00019M-Sn
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:20:42 -0500
+ (envelope-from <groeck7@gmail.com>) id 1j0CQh-0005LZ-5n
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:48:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1j0BzL-0000Gt-Ah
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:20:40 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:45613)
+ (envelope-from <groeck7@gmail.com>) id 1j0CQf-0006jm-Tu
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:48:55 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:40358)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1j0BzL-0000B8-1H
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 17:20:39 -0500
-Received: by mail-lj1-x244.google.com with SMTP id f25so904791ljg.12
- for <qemu-devel@nongnu.org>; Fri, 07 Feb 2020 14:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=eI8qM9AM5BA2CQDWBWStTW/GjA81uhrYL6kf/5O2hWY=;
- b=qb0iIGNWNoSXaGOyDm0ErXYuOnHxG9ZFZMduRRn/2Eb+K6GnkHWovW3waeeSVAsMQc
- G/gGsKjUKYnMqsdwlAAFWZOXy4mgv8f20x7cj9iZsK8EeHUoRJGFxGIPQW0qCS7aemDJ
- 4IPMMhlpq7FZko9yZw0Hy8Dz9wkwXvt4rv9vNyzUFytJJX+BTBWfMhDTgyYqIOMrJgA5
- EYuqFhvWwayy4lM93I5fHyn8bxRdvp/54/PxsGgqEGXgqZvUyogF/hF6Mt7ediQpDdy3
- SWVnFdDt2DoZ218QONsMgNliNE41aXED5lemhKvvBrkCFzmlR84R6vXFcF8ZBL5leSAT
- WoXQ==
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1j0CQf-0006jX-OO; Fri, 07 Feb 2020 17:48:53 -0500
+Received: by mail-pg1-x542.google.com with SMTP id z7so515428pgk.7;
+ Fri, 07 Feb 2020 14:48:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=c0YrgqcAFKn9jO4Ubw0Jyq4UDMhCZkruc5f4J/Wv9R4=;
+ b=oxDr7guDw62QGBtTfhwD1c1uLrlekKSf4UgwfRRtx0ajBWsCTD7Vhf3UJRIadCIIOh
+ nL1eJaAmDWPHapVZjJCTH44n+mXmcHKsRxvA90/zIW1bDsDxQD3Mc1uYnzUdRzCudDOZ
+ EVuo3r+NSi/n6lSLdM9ef2N4KxsUqrlO9EBNj9jzpblwCgovdQ51ly5Kg4h+xUZ87cNu
+ pQDrin7LLrpwSmAvVVk89a0YBBt0D7II/JdkhdmGuY+D6cMnP66z+oRff8QKi4lzzpFR
+ 5nTJU7D+WnMY07FxLMRUfpGiVvhKjaqFdi2YzZJxRqKS6M51m2eJHA2Rn2cz3zhxORt4
+ 7o9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=eI8qM9AM5BA2CQDWBWStTW/GjA81uhrYL6kf/5O2hWY=;
- b=DVDN61i2x0hJ0IJ6onyiur6DhTTPoB6KViv3rzQphYLV2Y8o6mgItIdM4WNLWjoxy+
- W0LlQj8HPekE9+ttPJ5kCY/CVVYWhsMxBA+crPGkiLONQrCtxQJF+rLpsNxcunKaIbBM
- k463u/+rECJa4E2GSHFf7QoflvXXOix62GOy3FHVgXkdR+g8yge2sCU8YKVwDM3i7Ga6
- R7UtS0d07JGJVPcb9Lh+20xy+CZOT0NRx/4UsB02FMhsYnLUHxkaZFjCFmYL7Vk2rasB
- JqW4e+iQ6Fm6zCBSWBBtPGnrOrjuMzTuZrleWcyx9THqTkXooNu/+GPpK9c3ho9IRrRU
- iiCA==
-X-Gm-Message-State: APjAAAULM/VadEaKgSLzqf7w1m5W5vWw06qTnJLDJ6xuYaN5/2bj3kKn
- OmYVnLlWgCAXD1k3UR/jAmwKiqWbmW6PaSqiF/ahXw==
-X-Google-Smtp-Source: APXvYqwj1psIQYeOkTqRcfR7y4ZdKYCIDU2rGpLctCk/YLGb1J7QVySzLdHHmlYUIyGpY6nw301VLdB1LqvbPmbMa1M=
-X-Received: by 2002:a05:651c:120d:: with SMTP id
- i13mr785984lja.173.1581114036899; 
- Fri, 07 Feb 2020 14:20:36 -0800 (PST)
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=c0YrgqcAFKn9jO4Ubw0Jyq4UDMhCZkruc5f4J/Wv9R4=;
+ b=sgDjAG7DH9xAwtfKJAaDmTg/P6B5Tib/dnSswyueTy/2nkV0irjR5GxZcCqxvNMc6h
+ z/B6zZ8FsAU6q+IlK2r/vRXnSgqRp0D+78PygexOV/mlxbrniKSO3c1mWdadanYzQ64P
+ BEcCyoVbRlry+bErXiemq6Z3trcqn3boMU3dobnI99C4ggjYE+UlTdWI3rUBppgYjfTW
+ khP6zsIa0PR6Q4CT65sUBkrwhdgm96/AE3bugkrq3C0sS15ZJLEtBnngo8b9G6tDqIZl
+ Sq5fYSgKb+59nAkpBoBvwi+xi7PNpXQXvKVH1vYMQWFFC86BuZ1xtOeeb599C+KJUb7P
+ TMzg==
+X-Gm-Message-State: APjAAAXloh+ZLQGnuUFQvShxI+ccIZia6B9MOw/vlSqINDwH0B8BYqm1
+ hAyWu6cGR+X23+YrB1d58HSWMDcc
+X-Google-Smtp-Source: APXvYqy6vcmHi4mi1vp58nuU9ZFyG6SpM2exRkFs2S/icMkgQ01C51MRnnpFtZO9K0GVXPLOmBKpHg==
+X-Received: by 2002:aa7:9d87:: with SMTP id f7mr1135579pfq.138.1581115732421; 
+ Fri, 07 Feb 2020 14:48:52 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id h10sm3987029pfo.181.2020.02.07.14.48.51
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 07 Feb 2020 14:48:51 -0800 (PST)
+Date: Fri, 7 Feb 2020 14:48:50 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v2] hw/arm: ast2600: Wire up EHCI controllers
+Message-ID: <20200207224850.GA10890@roeck-us.net>
+References: <20200207174548.9087-1-linux@roeck-us.net>
+ <158111304888.591.9861885311267533100@a1bbccc8075a>
 MIME-Version: 1.0
-References: <20200205212920.467-1-robert.foley@linaro.org>
- <20200205212920.467-7-robert.foley@linaro.org>
- <874kw27248.fsf@linaro.org>
-In-Reply-To: <874kw27248.fsf@linaro.org>
-From: Robert Foley <robert.foley@linaro.org>
-Date: Fri, 7 Feb 2020 17:20:00 -0500
-Message-ID: <CAEyhzFs6+Lssj8a5QckmDaqi41E8_WemueSYuZrqtr=tVbYOjA@mail.gmail.com>
-Subject: Re: [PATCH v1 06/14] tests/vm: Add logging of console to file.
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <158111304888.591.9861885311267533100@a1bbccc8075a>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,93 +92,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Peter Puhov <peter.puhov@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: andrew@aj.id.au, peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ clg@kaod.org, joel@jms.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Feb 2020 at 12:12, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> Robert Foley <robert.foley@linaro.org> writes:
->
-> > This adds logging of the char device used by the console
-> > to a file.  The basevm.py then uses this file to read
-> > chars from the console.
-> > One reason to add this is to aid with debugging.
->
-> I can certainly see an argument for saving the install log.
->
-> > But another is because there is an issue where the QEMU
-> > might hang if the characters from the character device
-> > are not consumed by the script.
->
-> I'm a little confused by this. Outputting to a file and then parsing the
-> file seems a bit more janky than injesting the output in the script and
-> then logging it.
->
-> Is this to work around the hang because the socket buffers fill up and
-> aren't drained?
+On Fri, Feb 07, 2020 at 02:04:09PM -0800, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200207174548.9087-1-linux@roeck-us.net/
+> 
+> 
+> 
+> Hi,
+> 
+> This series failed the docker-mingw@fedora build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+I forgot to mention that the patch depends on the similar
+patch for ast2400/ast2500. Sorry for that. Not sure though how
+to tell that to the test build system.
 
-Yes, exactly.  This is to work around the hang we are seeing when we
-try to use these new VMs.
-
-> > +    console_logfile =3D "console.log"
->
-> We should probably dump the log somewhere other than cwd. Given we cache
-> stuff in ~/.cache/qemu-vm maybe something of the form:
->
->   ~/.cache/qemu-vm/ubuntu.aarch64.install.log
->
-> ?
-
-Good point, we will locate the log file there.
-
-> > +            elapsed_sec =3D time.time() - start_time
-> > +            if elapsed_sec > self._console_timeout_sec:
-> > +                raise ConsoleTimeoutException
-> > +        return data.encode('latin1')
-> > +
->
-> Is latin1 really the best choice here? I would expect things to be utf-8 =
-clean.
-
-We were trying to follow the existing code, which is using latin1.
-For example, console_wait() or console_consume() are using latin1.
-However on further inspection we see that console_send() is using utf-8.
-We will look at changing these latin1 cases to be utf-8.
-I also found a case in get_qemu_version() we will change to utf-8 also.
-
-> > +
-> > +    def join(self, timeout=3DNone):
-> > +        """Time to destroy the thread.
-> > +           Clear the event to stop the thread, and wait for
-> > +           it to complete."""
-> > +        self.alive.clear()
-> > +        threading.Thread.join(self, timeout)
-> > +        self.log_file.close()
->
-> I'm note sure about this - introducing threading into Python seems very
-> un-pythonic. I wonder if the python experts have any view on a better
-> way to achieve what we want which I think is:
->
->   - a buffer that properly drains output from QEMU
->   - which can optionally be serialised onto disk for logging
->
-> What else are we trying to achieve here?
-
-I think that covers what we are trying to achieve here.
-The logging to file is a nice to have, but
-the draining of the output from QEMU is the main objective here.
-We will do a bit more research here to seek out a cleaner way to achieve th=
-is,
-but certainly we would also be interested if any python experts have a
-view on a cleaner approach.
-
-Thanks & Regards,
--Rob
->
-> --
-> Alex Benn=C3=A9e
+Guenter
 
