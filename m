@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD938C35247
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA0EC352A3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:11:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 858FF21D7D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:11:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 858FF21D7D
+	by mail.kernel.org (Postfix) with ESMTPS id 24AC121D7D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 02:11:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24AC121D7D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1izt6o-0001L0-J4
-	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 21:11:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59768)
+	id 1izt6q-0001QI-8L
+	for qemu-devel@archiver.kernel.org; Thu, 06 Feb 2020 21:11:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvk-0006Fc-IH
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvl-0006HC-9H
  for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvi-0001Ig-4p
- for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:40 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:53086 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1izsvi-0001Kj-Tn
+ for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:41 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:53114 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1izsvh-00018S-OY
+ id 1izsvi-00019A-Gx
  for qemu-devel@nongnu.org; Thu, 06 Feb 2020 20:59:38 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D36181A2102;
- Fri,  7 Feb 2020 02:58:22 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 9014D1A212E;
+ Fri,  7 Feb 2020 02:58:23 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 7580C1A20C9;
- Fri,  7 Feb 2020 02:58:22 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 5399F1A20ED;
+ Fri,  7 Feb 2020 02:58:23 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH rc5 09/32] target/avr: Add instruction helpers
-Date: Fri,  7 Feb 2020 02:57:37 +0100
-Message-Id: <1581040680-308-10-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH rc5 23/32] hw/avr: Add support for loading ELF/raw binaries
+Date: Fri,  7 Feb 2020 02:57:51 +0100
+Message-Id: <1581040680-308-24-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1581040680-308-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1581040680-308-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -65,304 +65,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Michael Rolnik <mrolnik@gmail.com>,
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Rolnik <mrolnik@gmail.com>
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Add helpers for instructions that need to interact with QEMU. Also,
-add stubs for unimplemented instructions. Instructions SPM and WDR
-are left unimplemented because they require emulation of complex
-peripherals. The implementation of instruction SLEEP is very limited
-due to the lack of peripherals to generate wake interrupts. Memory
-access instructions are implemented here because some address ranges
-actually refer to CPU registers.
+Add avr_load_firmware() function to load firmware in ELF or
+raw binary format.
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+[AM: Corrected the type of the variable containing e_flags]
+[AM: Moved definition of e_flags conversion function to boot.c]
+Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 ---
- target/avr/helper.h |  29 ++++++++
- target/avr/helper.c | 203 ++++++++++++++++++++++++++++++++++++++++++++++=
+ hw/avr/boot.h        |  33 +++++++++++++++
+ include/elf.h        |   4 ++
+ hw/avr/boot.c        | 116 +++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- MAINTAINERS         |   1 +
- 3 files changed, 233 insertions(+)
- create mode 100644 target/avr/helper.h
+ MAINTAINERS          |   3 ++
+ hw/avr/Makefile.objs |   1 +
+ 5 files changed, 157 insertions(+)
+ create mode 100644 hw/avr/boot.h
+ create mode 100644 hw/avr/boot.c
+ create mode 100644 hw/avr/Makefile.objs
 
-diff --git a/target/avr/helper.h b/target/avr/helper.h
+diff --git a/hw/avr/boot.h b/hw/avr/boot.h
 new file mode 100644
-index 0000000..bf08750
+index 0000000..62bc10c
 --- /dev/null
-+++ b/target/avr/helper.h
-@@ -0,0 +1,29 @@
++++ b/hw/avr/boot.h
+@@ -0,0 +1,33 @@
 +/*
-+ * QEMU AVR CPU
++ * AVR loader helpers
 + *
-+ * Copyright (c) 2019 Michael Rolnik
++ * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
 + *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ * This work is licensed under the terms of the GNU GPLv2 or later.
++ * See the COPYING file in the top-level directory.
++ * SPDX-License-Identifier: GPL-2.0-or-later
 + */
 +
-+DEF_HELPER_1(wdr, void, env)
-+DEF_HELPER_1(debug, void, env)
-+DEF_HELPER_1(break, void, env)
-+DEF_HELPER_1(sleep, void, env)
-+DEF_HELPER_1(unsupported, void, env)
-+DEF_HELPER_3(outb, void, env, i32, i32)
-+DEF_HELPER_2(inb, tl, env, i32)
-+DEF_HELPER_3(fullwr, void, env, i32, i32)
-+DEF_HELPER_2(fullrd, tl, env, i32)
-diff --git a/target/avr/helper.c b/target/avr/helper.c
-index 354def2..c582312 100644
---- a/target/avr/helper.c
-+++ b/target/avr/helper.c
-@@ -137,3 +137,206 @@ bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, =
-int size,
++#ifndef HW_AVR_BOOT_H
++#define HW_AVR_BOOT_H
++
++#include "hw/boards.h"
++#include "cpu.h"
++
++/**
++ * avr_load_firmware:   load an image into a memory region
++ *
++ * @cpu:        Handle a AVR CPU object
++ * @ms:         A MachineState
++ * @mr:         Memory Region to load into
++ * @firmware:   Path to the firmware file (raw binary or ELF format)
++ *
++ * Load a firmware supplied by the machine or by the user  with the
++ * '-bios' command line option, and put it in target memory.
++ *
++ * Returns: true on success, false on error.
++ */
++bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
++                       MemoryRegion *mr, const char *firmware);
++
++#endif
+diff --git a/include/elf.h b/include/elf.h
+index 8fbfe60..5b06b55 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -160,6 +160,8 @@ typedef struct mips_elf_abiflags_v0 {
 =20
-     return true;
- }
+ #define EM_CRIS         76      /* Axis Communications 32-bit embedded p=
+rocessor */
+=20
++#define EM_AVR          83      /* AVR 8-bit microcontroller */
 +
+ #define EM_V850		87	/* NEC v850 */
+=20
+ #define EM_H8_300H      47      /* Hitachi H8/300H */
+@@ -202,6 +204,8 @@ typedef struct mips_elf_abiflags_v0 {
+ #define EM_MOXIE           223     /* Moxie processor family */
+ #define EM_MOXIE_OLD       0xFEED
+=20
++#define EF_AVR_MACH     0x7F       /* Mask for AVR e_flags to get core t=
+ype */
++
+ /* This is the info that is needed to parse the dynamic section of the f=
+ile */
+ #define DT_NULL		0
+ #define DT_NEEDED	1
+diff --git a/hw/avr/boot.c b/hw/avr/boot.c
+new file mode 100644
+index 0000000..a82508a
+--- /dev/null
++++ b/hw/avr/boot.c
+@@ -0,0 +1,116 @@
 +/*
-+ *  helpers
++ * AVR loader helpers
++ *
++ * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
++ *
++ * This work is licensed under the terms of the GNU GPLv2 or later.
++ * See the COPYING file in the top-level directory.
++ * SPDX-License-Identifier: GPL-2.0-or-later
 + */
 +
-+void helper_sleep(CPUAVRState *env)
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "hw/loader.h"
++#include "elf.h"
++#include "boot.h"
++#include "qemu/error-report.h"
++
++static const char *avr_elf_e_flags_to_cpu_type(uint32_t flags)
 +{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_HLT;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_unsupported(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    /*
-+     *  I count not find what happens on the real platform, so
-+     *  it's EXCP_DEBUG for meanwhile
-+     */
-+    cs->exception_index =3D EXCP_DEBUG;
-+    if (qemu_loglevel_mask(LOG_UNIMP)) {
-+        qemu_log("UNSUPPORTED\n");
-+        cpu_dump_state(cs, stderr, 0);
-+    }
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_debug(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_break(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void helper_wdr(CPUAVRState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    /* WD is not implemented yet, placeholder */
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+/*
-+ * This function implements IN instruction
-+ *
-+ * It does the following
-+ * a.  if an IO register belongs to CPU, its value is read and returned
-+ * b.  otherwise io address is translated to mem address and physical me=
-mory
-+ *     is read.
-+ * c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementat=
-ion
-+ *
-+ */
-+target_ulong helper_inb(CPUAVRState *env, uint32_t port)
-+{
-+    target_ulong data =3D 0;
-+
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        data =3D 0xff & (env->rampD >> 16);
-+        break;
-+    case 0x39: /* RAMPX */
-+        data =3D 0xff & (env->rampX >> 16);
-+        break;
-+    case 0x3a: /* RAMPY */
-+        data =3D 0xff & (env->rampY >> 16);
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        data =3D 0xff & (env->rampZ >> 16);
-+        break;
-+    case 0x3c: /* EIND */
-+        data =3D 0xff & (env->eind >> 16);
-+        break;
-+    case 0x3d: /* SPL */
-+        data =3D env->sp & 0x00ff;
-+        break;
-+    case 0x3e: /* SPH */
-+        data =3D env->sp >> 8;
-+        break;
-+    case 0x3f: /* SREG */
-+        data =3D cpu_get_sreg(env);
-+        break;
++    switch (flags & EF_AVR_MACH) {
++    case bfd_mach_avr1:
++        return AVR_CPU_TYPE_NAME("avr1");
++    case bfd_mach_avr2:
++        return AVR_CPU_TYPE_NAME("avr2");
++    case bfd_mach_avr25:
++        return AVR_CPU_TYPE_NAME("avr25");
++    case bfd_mach_avr3:
++        return AVR_CPU_TYPE_NAME("avr3");
++    case bfd_mach_avr31:
++        return AVR_CPU_TYPE_NAME("avr31");
++    case bfd_mach_avr35:
++        return AVR_CPU_TYPE_NAME("avr35");
++    case bfd_mach_avr4:
++        return AVR_CPU_TYPE_NAME("avr4");
++    case bfd_mach_avr5:
++        return AVR_CPU_TYPE_NAME("avr5");
++    case bfd_mach_avr51:
++        return AVR_CPU_TYPE_NAME("avr51");
++    case bfd_mach_avr6:
++        return AVR_CPU_TYPE_NAME("avr6");
++    case bfd_mach_avrtiny:
++        return AVR_CPU_TYPE_NAME("avrtiny");
++    case bfd_mach_avrxmega2:
++        return AVR_CPU_TYPE_NAME("xmega2");
++    case bfd_mach_avrxmega3:
++        return AVR_CPU_TYPE_NAME("xmega3");
++    case bfd_mach_avrxmega4:
++        return AVR_CPU_TYPE_NAME("xmega4");
++    case bfd_mach_avrxmega5:
++        return AVR_CPU_TYPE_NAME("xmega5");
++    case bfd_mach_avrxmega6:
++        return AVR_CPU_TYPE_NAME("xmega6");
++    case bfd_mach_avrxmega7:
++        return AVR_CPU_TYPE_NAME("xmega7");
 +    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_read(OFFSET_IO_REGISTERS + port, &data, 1);
-+    }
-+
-+    return data;
-+}
-+
-+/*
-+ *  This function implements OUT instruction
-+ *
-+ *  It does the following
-+ *  a.  if an IO register belongs to CPU, its value is written into the =
-register
-+ *  b.  otherwise io address is translated to mem address and physical m=
-emory
-+ *      is written.
-+ *  c.  it caches the value for sake of SBI, SBIC, SBIS & CBI implementa=
-tion
-+ *
-+ */
-+void helper_outb(CPUAVRState *env, uint32_t port, uint32_t data)
-+{
-+    data &=3D 0x000000ff;
-+
-+    switch (port) {
-+    case 0x38: /* RAMPD */
-+        if (avr_feature(env, AVR_FEATURE_RAMPD)) {
-+            env->rampD =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x39: /* RAMPX */
-+        if (avr_feature(env, AVR_FEATURE_RAMPX)) {
-+            env->rampX =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3a: /* RAMPY */
-+        if (avr_feature(env, AVR_FEATURE_RAMPY)) {
-+            env->rampY =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3b: /* RAMPZ */
-+        if (avr_feature(env, AVR_FEATURE_RAMPZ)) {
-+            env->rampZ =3D (data & 0xff) << 16;
-+        }
-+        break;
-+    case 0x3c: /* EIDN */
-+        env->eind =3D (data & 0xff) << 16;
-+        break;
-+    case 0x3d: /* SPL */
-+        env->sp =3D (env->sp & 0xff00) | (data);
-+        break;
-+    case 0x3e: /* SPH */
-+        if (avr_feature(env, AVR_FEATURE_2_BYTE_SP)) {
-+            env->sp =3D (env->sp & 0x00ff) | (data << 8);
-+        }
-+        break;
-+    case 0x3f: /* SREG */
-+        cpu_set_sreg(env, data);
-+        break;
-+    default:
-+        /* not a special register, pass to normal memory access */
-+        cpu_physical_memory_write(OFFSET_IO_REGISTERS + port, &data, 1);
++        return NULL;
 +    }
 +}
 +
-+/*
-+ *  this function implements LD instruction when there is a posibility t=
-o read
-+ *  from a CPU register
-+ */
-+target_ulong helper_fullrd(CPUAVRState *env, uint32_t addr)
++bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
++                       MemoryRegion *mr, const char *firmware)
 +{
-+    uint8_t data;
++    const char *filename;
++    int bytes_loaded;
++    uint64_t entry;
++    uint32_t e_flags;
 +
-+    env->fullacc =3D false;
++    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
++    if (filename =3D=3D NULL) {
++        error_report("Unable to find %s", firmware);
++        return false;
++    }
 +
-+    if (addr < NUMBER_OF_CPU_REGISTERS) {
-+        /* CPU registers */
-+        data =3D env->r[addr];
-+    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) =
-{
-+        /* IO registers */
-+        data =3D helper_inb(env, addr - NUMBER_OF_CPU_REGISTERS);
++    bytes_loaded =3D load_elf_ram_sym(filename,
++                                    NULL, NULL, NULL,
++                                    &entry, NULL, NULL,
++                                    &e_flags, 0, EM_AVR, 0, 0,
++                                    NULL, true, NULL);
++    if (bytes_loaded >=3D 0) {
++        /* If ELF file is provided, determine CPU type reading ELF e_fla=
+gs. */
++        const char *elf_cpu =3D avr_elf_e_flags_to_cpu_type(e_flags);
++        const char *mcu_cpu_type =3D object_get_typename(OBJECT(cpu));
++        int cpu_len =3D strlen(mcu_cpu_type) - strlen(AVR_CPU_TYPE_SUFFI=
+X);
++
++        if (entry) {
++            error_report("BIOS entry_point must be 0x0000 "
++                         "(ELF image '%s' has entry_point 0x%04" PRIx64 =
+")",
++                         firmware, entry);
++            return false;
++        }
++        if (!elf_cpu) {
++            warn_report("Could not determine CPU type for ELF image '%s'=
+, "
++                        "assuming '%.*s' CPU",
++                         firmware, cpu_len, mcu_cpu_type);
++            return true;
++        }
++        if (strcmp(elf_cpu, mcu_cpu_type)) {
++            error_report("Current machine: %s with '%.*s' CPU",
++                         MACHINE_GET_CLASS(ms)->desc, cpu_len, mcu_cpu_t=
+ype);
++            error_report("ELF image '%s' is for '%.*s' CPU",
++                         firmware,
++                         (int)(strlen(elf_cpu) - strlen(AVR_CPU_TYPE_SUF=
+FIX)),
++                         elf_cpu);
++            return false;
++        }
 +    } else {
-+        /* memory */
-+        cpu_physical_memory_read(OFFSET_DATA + addr, &data, 1);
++        bytes_loaded =3D load_image_targphys(filename, OFFSET_CODE,
++                                           memory_region_size(mr));
 +    }
-+    return data;
-+}
-+
-+/*
-+ *  this function implements ST instruction when there is a posibility t=
-o write
-+ *  into a CPU register
-+ */
-+void helper_fullwr(CPUAVRState *env, uint32_t data, uint32_t addr)
-+{
-+    env->fullacc =3D false;
-+
-+    /* Following logic assumes this: */
-+    assert(OFFSET_CPU_REGISTERS =3D=3D OFFSET_DATA);
-+    assert(OFFSET_IO_REGISTERS =3D=3D OFFSET_CPU_REGISTERS +
-+            NUMBER_OF_CPU_REGISTERS);
-+
-+    if (addr < NUMBER_OF_CPU_REGISTERS) {
-+        /* CPU registers */
-+        env->r[addr] =3D data;
-+    } else if (addr < NUMBER_OF_CPU_REGISTERS + NUMBER_OF_IO_REGISTERS) =
-{
-+        /* IO registers */
-+        helper_outb(env, addr - NUMBER_OF_CPU_REGISTERS, data);
-+    } else {
-+        /* memory */
-+        cpu_physical_memory_write(OFFSET_DATA + addr, &data, 1);
++    if (bytes_loaded < 0) {
++        error_report("Unable to load firmware image %s as ELF or raw bin=
+ary",
++                     firmware);
++        return false;
 +    }
++    return true;
 +}
 diff --git a/MAINTAINERS b/MAINTAINERS
-index ef7b51f..3d83ed0 100644
+index 9ba3b49..336c968 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -172,6 +172,7 @@ F: target/avr/cpu-param.h
- F: target/avr/cpu-qom.h
- F: target/avr/cpu.h
- F: target/avr/cpu.c
-+F: target/avr/helper.h
- F: target/avr/helper.c
- F: target/avr/gdbstub.c
- F: target/avr/machine.c
+@@ -912,6 +912,9 @@ AVR MCUs
+ M: Michael Rolnik <mrolnik@gmail.com>
+ R: Sarah Harris <S.E.Harris@kent.ac.uk>
+ S: Maintained
++F: hw/avr/Makefile.objs
++F: hw/avr/boot.h
++F: hw/avr/boot.c
+ F: include/hw/char/avr_usart.h
+ F: hw/char/avr_usart.c
+ F: include/hw/timer/avr_timer16.h
+diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+new file mode 100644
+index 0000000..123f174
+--- /dev/null
++++ b/hw/avr/Makefile.objs
+@@ -0,0 +1 @@
++obj-y +=3D boot.o
 --=20
 2.7.4
 
