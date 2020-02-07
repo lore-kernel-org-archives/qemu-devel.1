@@ -2,77 +2,82 @@ Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B369C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1F9C352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4860D20838
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:20:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BAEA20838
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 10:20:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3KombWj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4860D20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iVECPz3X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BAEA20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j00kR-00044M-Fx
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 05:20:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47019)
+	id 1j00kn-0004oL-BQ
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 05:20:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1j00i6-0007oY-TS
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:18:08 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j00jh-0002nm-Id
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:19:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1j00i5-0008L7-P4
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:18:06 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41543
+ (envelope-from <eric.auger@redhat.com>) id 1j00jf-0003zm-F9
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:19:44 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52791
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1j00i5-0008K6-LT
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:18:05 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1j00jf-0003xh-Bo
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 05:19:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581070685;
+ s=mimecast20190719; t=1581070783;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DuM2nl8dOdAd8yN5ihNsFvt4btiTK4V3fnxUcpfgEO0=;
- b=b3KombWjmjYcdE4LGRzALBmwykq6aEkqIce9smuNJpo5kXSPwKFr9DLD8LYSFu99F84G5t
- k+Uv7wPcnEUTi1pxjvoaASc5J/9grS//xal/XOSCpYjMTFSr1p4GPdtdOl5gyK7Rmkl8Dj
- EXM9Y6BhBXSAr0YMmIcytT1suL0t72U=
+ bh=ZBrn9SGNO71zqqFpslql7PX6hoM1RQldG9GD7Gqg1jk=;
+ b=iVECPz3XPwlsnelUsaAnq9rP0C/h9Tw916Doa6tmYpdhky4/Qo23d66TLkXfjsGCVQKzK/
+ hL9f/au51fHfliKAIa3NYfKh2C99Kmxm9N8883TN3Utz7l28ep5eD+DfbVAx3PVPwaQQm/
+ Ab/h5ykpW0ChJeowcOp2b36Cu3khgE8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-5ppGau-wN7acGp4Eu3ZeTA-1; Fri, 07 Feb 2020 05:18:00 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-333-qKpaNl-HNJCNNo9nQwKAeA-1; Fri, 07 Feb 2020 05:19:41 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8D8D108838B;
- Fri,  7 Feb 2020 10:17:59 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-112.ams2.redhat.com
- [10.36.116.112])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 322C95DA7D;
- Fri,  7 Feb 2020 10:17:54 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 848E531EAC; Fri,  7 Feb 2020 11:17:53 +0100 (CET)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/7] ui/sdl: switch to new show-cursor option
-Date: Fri,  7 Feb 2020 11:17:49 +0100
-Message-Id: <20200207101753.25812-4-kraxel@redhat.com>
-In-Reply-To: <20200207101753.25812-1-kraxel@redhat.com>
-References: <20200207101753.25812-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 5ppGau-wN7acGp4Eu3ZeTA-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A09CDB60;
+ Fri,  7 Feb 2020 10:19:38 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E23B863AB;
+ Fri,  7 Feb 2020 10:19:28 +0000 (UTC)
+Subject: Re: [PATCH v14 08/11] virtio-iommu-pci: Introduce the x-dt-binding
+ option
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20200207093203.3788-1-eric.auger@redhat.com>
+ <20200207093203.3788-9-eric.auger@redhat.com>
+ <20200207100540.GA1999431@myrica>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <cec24814-2192-1e8f-495b-e57f5548df9e@redhat.com>
+Date: Fri, 7 Feb 2020 11:19:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <20200207100540.GA1999431@myrica>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: qKpaNl-HNJCNNo9nQwKAeA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -87,110 +92,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, jtomko@redhat.com,
- libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>,
- jpewhacker@gmail.com, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
+ mst@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use DisplayOpts settings instead of cursor_hide global variable.
-Also make "-display sdl,show-cursor=3Don" work.
+Hi Jean,
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/sdl2.c | 16 ++++++++--------
- vl.c      | 10 ++++++++++
- 2 files changed, 18 insertions(+), 8 deletions(-)
+On 2/7/20 11:05 AM, Jean-Philippe Brucker wrote:
+> Hi Eric,
+> 
+> On Fri, Feb 07, 2020 at 10:32:00AM +0100, Eric Auger wrote:
+>> At the moment, the kernel only supports device tree
+>> integration of the virtio-iommu. DT bindings between the
+>> PCI root complex and the IOMMU must be created by the machine
+>> in conformance to:
+>>
+>> Documentation/devicetree/bindings/virtio/iommu.txt.
+>>
+>> To make sure the end-user is aware of this, force him to use the
+>> temporary device option "x-dt-binding" and also double check the
+>> machine has a hotplug handler for the virtio-iommu-pci device.
+>> This hotplug handler is in charge of creating those DT bindings.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> [...]
+>> @@ -39,6 +42,21 @@ static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>>      VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(vpci_dev);
+>>      DeviceState *vdev = DEVICE(&dev->vdev);
+>>  
+>> +    if (!dev->dt_binding) {
+>> +        error_setg(errp,
+>> +                   "Instantiation currently only is possible if the machine "
+>> +                   "creates device tree iommu-map bindings, ie. ACPI is not "
+>> +                   "yet supported");
+>> +        error_append_hint(errp, "use -virtio-iommu-pci,x-dt-binding\n");
+> 
+> "use -device virtio-iommu-pci,x-dt-binding"?
+> 
+> Can the option be safely removed as soon as we implement a topology
+> description for the remaining platforms?  Or will we need to carry it
+> forever for backward-compatibility (ie. ensure that an old command-line
+> invocation that contains this option still works)?
 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 9030f1c42efb..3c9424eb42c3 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -161,9 +161,9 @@ static void sdl_update_caption(struct sdl2_console *sco=
-n)
-     }
- }
-=20
--static void sdl_hide_cursor(void)
-+static void sdl_hide_cursor(struct sdl2_console *scon)
- {
--    if (!cursor_hide) {
-+    if (scon->opts->has_show_cursor && scon->opts->show_cursor) {
-         return;
-     }
-=20
-@@ -175,9 +175,9 @@ static void sdl_hide_cursor(void)
-     }
- }
-=20
--static void sdl_show_cursor(void)
-+static void sdl_show_cursor(struct sdl2_console *scon)
- {
--    if (!cursor_hide) {
-+    if (scon->opts->has_show_cursor && scon->opts->show_cursor) {
-         return;
-     }
-=20
-@@ -216,7 +216,7 @@ static void sdl_grab_start(struct sdl2_console *scon)
-             SDL_WarpMouseInWindow(scon->real_window, guest_x, guest_y);
-         }
-     } else {
--        sdl_hide_cursor();
-+        sdl_hide_cursor(scon);
-     }
-     SDL_SetWindowGrab(scon->real_window, SDL_TRUE);
-     gui_grab =3D 1;
-@@ -227,7 +227,7 @@ static void sdl_grab_end(struct sdl2_console *scon)
- {
-     SDL_SetWindowGrab(scon->real_window, SDL_FALSE);
-     gui_grab =3D 0;
--    sdl_show_cursor();
-+    sdl_show_cursor(scon);
-     sdl_update_caption(scon);
- }
-=20
-@@ -658,7 +658,7 @@ static void sdl_mouse_warp(DisplayChangeListener *dcl,
-=20
-     if (on) {
-         if (!guest_cursor) {
--            sdl_show_cursor();
-+            sdl_show_cursor(scon);
-         }
-         if (gui_grab || qemu_input_is_absolute() || absolute_enabled) {
-             SDL_SetCursor(guest_sprite);
-@@ -667,7 +667,7 @@ static void sdl_mouse_warp(DisplayChangeListener *dcl,
-             }
-         }
-     } else if (gui_grab) {
--        sdl_hide_cursor();
-+        sdl_hide_cursor(scon);
-     }
-     guest_cursor =3D on;
-     guest_x =3D x, guest_y =3D y;
-diff --git a/vl.c b/vl.c
-index 5419b3d68200..0a13cf2b1724 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1931,6 +1931,16 @@ static void parse_display(const char *p)
-                 } else {
-                     goto invalid_sdl_args;
-                 }
-+            } else if (strstart(opts, ",show-cursor=3D", &nextopt)) {
-+                opts =3D nextopt;
-+                dpy.has_show_cursor =3D true;
-+                if (strstart(opts, "on", &nextopt)) {
-+                    dpy.show_cursor =3D true;
-+                } else if (strstart(opts, "off", &nextopt)) {
-+                    dpy.show_cursor =3D false;
-+                } else {
-+                    goto invalid_sdl_args;
-+                }
-             } else if (strstart(opts, ",gl=3D", &nextopt)) {
-                 opts =3D nextopt;
-                 dpy.has_gl =3D true;
---=20
-2.18.1
+"x-" properties are experimental so yes it is bound to be removed as
+soon as we get the topology description feature.
+
+I now have to figure out how to fix the make-check issue it introduces :-(
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> Jean
+> 
 
 
