@@ -6,72 +6,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05060C352A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74178C352A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:55:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4D8422314
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:48:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F5FD20726
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 09:55:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8cB6pg9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D8422314
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QFRouoSM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F5FD20726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j00Fr-0001RG-0h
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 04:48:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38619)
+	id 1j00Ma-00053y-EG
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 04:55:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j00F3-0000yS-1V
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:48:05 -0500
+ (envelope-from <lvivier@redhat.com>) id 1j00Li-00045y-Aj
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:54:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j00F1-0000nA-W3
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:48:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31694
+ (envelope-from <lvivier@redhat.com>) id 1j00Lg-00070H-Lu
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:54:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46025
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j00F1-0000md-T7
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:48:03 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j00Lg-0006yu-ID
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 04:54:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581068883;
+ s=mimecast20190719; t=1581069296;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lSjoUif4OOgn5tnMUAUMJM5Phj+0k1qUdgJDsIstd6Q=;
- b=N8cB6pg9mObbgRVj+Yw1TLFejhvkMZ88nnN8s+We+bp3cbqTPeaLTSpej6F4CBH3OOdjj5
- esvh4wO1ZXkGwG5BWJ1iQe9JioSB01vZyKzW95YbxUohcybcgn1QkPOVaIOktZR2gZEWX+
- V1+2pYO5r0xP+keeC0QdLulEU/AeZ6A=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=AN5OEky6D4oYKbeemXq5L4usGQTYVf9ZivJAlrymxKg=;
+ b=QFRouoSM8tkD1KsI1VEUMutdHfcWBCCZ8EenBeVuns4uhR0aKXysVDlKfV3DlYGpLEQWX8
+ tcgLf75U4AKZrMHCisnJKgTBrK0xg4dqBIbZrj3q9LE1Q+Me+YeOHVPg2p28egD7zSIM+Y
+ 7FfEM2uZzo3Q3YzPNwcihuiMMcDzGuQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-zfs3-OtiMuqxBGIN4i0rNA-1; Fri, 07 Feb 2020 04:48:01 -0500
+ us-mta-217-N8qJ8B96NG6KOU_FL9T9fA-1; Fri, 07 Feb 2020 04:54:54 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E276800D54;
- Fri,  7 Feb 2020 09:48:00 +0000 (UTC)
-Received: from gondolin (ovpn-117-112.ams2.redhat.com [10.36.117.112])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D832E8E611;
- Fri,  7 Feb 2020 09:47:53 +0000 (UTC)
-Date: Fri, 7 Feb 2020 10:47:51 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] travis.yml: Test the s390-ccw build, too
-Message-ID: <20200207104751.36609b11.cohuck@redhat.com>
-In-Reply-To: <20200206202543.7085-1-thuth@redhat.com>
-References: <20200206202543.7085-1-thuth@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62133801FB4
+ for <qemu-devel@nongnu.org>; Fri,  7 Feb 2020 09:54:53 +0000 (UTC)
+Received: from thinkpad.redhat.com (ovpn-116-229.ams2.redhat.com
+ [10.36.116.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 09CD78EA10;
+ Fri,  7 Feb 2020 09:54:12 +0000 (UTC)
+From: Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/2] tests/vhost-user-bridge: move to contrib/
+Date: Fri,  7 Feb 2020 10:54:11 +0100
+Message-Id: <20200207095412.794912-1-lvivier@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: zfs3-OtiMuqxBGIN4i0rNA-1
+X-MC-Unique: N8qJ8B96NG6KOU_FL9T9fA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -86,55 +83,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>,
- Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  6 Feb 2020 21:25:43 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+vhost-user-bridge is not a test. Move it to contrib/ and
+add it to the tools list.
 
-> Since we can now use a s390x host on Travis, we can also build and
-> test the s390-ccw bios images there. For this we have to make sure
-> that roms/SLOF is checked out, too, and then move the generated *.img
-> files to the right location before running the tests.
+It will be built only if tools (--enable-tools) and
+vhost-user (--enable-vhost-user) are enabled (both are set
+by default).
 
-Oh, nice.
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  .travis.yml | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 6c0ec6cf69..c0eeff9caa 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -508,6 +508,16 @@ matrix:
->        env:
->          - TEST_CMD="make check check-tcg V=1"
->          - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
-> +      script:
-> +        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-> +        - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
-> +        - |
-> +          if [ "$BUILD_RC" -eq 0 ] ; then
-> +              mv pc-bios/s390-ccw/*.img pc-bios/ ;
-> +              ${TEST_CMD} ;
+Notes:
+    v2: update docs
 
-Out of curiousity: Which kind of tests are run for the net image?
+ Makefile                                                      | 3 +++
+ Makefile.objs                                                 | 1 +
+ configure                                                     | 3 +++
+ contrib/vhost-user-bridge/Makefile.objs                       | 1 +
+ tests/vhost-user-bridge.c =3D> contrib/vhost-user-bridge/main.c | 0
+ docs/devel/migration.rst                                      | 2 +-
+ tests/Makefile.include                                        | 1 -
+ 7 files changed, 9 insertions(+), 2 deletions(-)
+ create mode 100644 contrib/vhost-user-bridge/Makefile.objs
+ rename tests/vhost-user-bridge.c =3D> contrib/vhost-user-bridge/main.c (10=
+0%)
 
-> +          else
-> +              $(exit $BUILD_RC);
-> +          fi
->  
->      # Release builds
->      # The make-release script expect a QEMU version, so our tag must start with a 'v'.
-
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+diff --git a/Makefile b/Makefile
+index 461d40bea6c2..23342a433e11 100644
+--- a/Makefile
++++ b/Makefile
+@@ -442,6 +442,7 @@ dummy :=3D $(call unnest-vars,, \
+                 libvhost-user-obj-y \
+                 vhost-user-scsi-obj-y \
+                 vhost-user-blk-obj-y \
++                vhost-user-bridge-obj-y \
+                 vhost-user-input-obj-y \
+                 vhost-user-gpu-obj-y \
+                 qga-vss-dll-obj-y \
+@@ -672,6 +673,8 @@ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libv=
+host-user.a
+ =09$(call LINK, $^)
+ vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
+ =09$(call LINK, $^)
++vhost-user-bridge$(EXESUF): $(vhost-user-bridge-obj-y) libvhost-user.a
++=09$(call LINK, $^)
+=20
+ rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
+ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+diff --git a/Makefile.objs b/Makefile.objs
+index 26b9cff95436..0240100b9a17 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -109,6 +109,7 @@ vhost-user-scsi.o-cflags :=3D $(LIBISCSI_CFLAGS)
+ vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
+ vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
+ vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
++vhost-user-bridge-obj-y =3D contrib/vhost-user-bridge/
+ rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
+ vhost-user-input-obj-y =3D contrib/vhost-user-input/
+ vhost-user-gpu-obj-y =3D contrib/vhost-user-gpu/
+diff --git a/configure b/configure
+index 115dc38085f3..0415eb5c99d3 100755
+--- a/configure
++++ b/configure
+@@ -6223,6 +6223,9 @@ if test "$want_tools" =3D "yes" ; then
+   if [ "$curl" =3D "yes" ]; then
+       tools=3D"elf2dmp\$(EXESUF) $tools"
+   fi
++  if [ "$vhost_user" =3D "yes" ]; then
++      tools=3D"vhost-user-bridge\$(EXESUF) $tools"
++  fi
+ fi
+ if test "$softmmu" =3D yes ; then
+   if test "$linux" =3D yes; then
+diff --git a/contrib/vhost-user-bridge/Makefile.objs b/contrib/vhost-user-b=
+ridge/Makefile.objs
+new file mode 100644
+index 000000000000..36a8d9b49a05
+--- /dev/null
++++ b/contrib/vhost-user-bridge/Makefile.objs
+@@ -0,0 +1 @@
++vhost-user-bridge-obj-y =3D main.o
+diff --git a/tests/vhost-user-bridge.c b/contrib/vhost-user-bridge/main.c
+similarity index 100%
+rename from tests/vhost-user-bridge.c
+rename to contrib/vhost-user-bridge/main.c
+diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
+index e88918f7639e..d00424460e23 100644
+--- a/docs/devel/migration.rst
++++ b/docs/devel/migration.rst
+@@ -807,7 +807,7 @@ The Linux kernel userfault support works on `/dev/shm` =
+memory and on `hugetlbfs`
+ for hugetlbfs which may be a problem in some configurations).
+=20
+ The vhost-user code in QEMU supports clients that have Postcopy support,
+-and the `vhost-user-bridge` (in `tests/`) and the DPDK package have change=
+s
++and the `vhost-user-bridge` (in `contrib/`) and the DPDK package have chan=
+ges
+ to support postcopy.
+=20
+ The client needs to open a userfaultfd and register the areas
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 2f1cafed720d..78cdbe91aed5 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -586,7 +586,6 @@ include $(SRC_PATH)/tests/qtest/Makefile.include
+=20
+ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
+ tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+-tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-ob=
+j-y) libvhost-user.a
+=20
+ SPEED =3D quick
+=20
+--=20
+2.24.1
 
 
