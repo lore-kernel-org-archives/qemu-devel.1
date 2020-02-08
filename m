@@ -2,93 +2,62 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCBEFC35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7661CC35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 11:19:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6C4721741
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:57:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A10020726
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 11:19:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="Ox722N3H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C4721741
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IjDWFLo8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A10020726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0Nnq-0003aa-Nd
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 05:57:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45954)
+	id 1j0O8r-000305-Ma
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 06:19:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.kiszka@web.de>) id 1j0Nky-00028x-SR
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:54:38 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j0O8C-0002Up-Uq
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 06:18:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@web.de>) id 1j0Nkx-0007R5-Iv
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:54:36 -0500
-Received: from mout.web.de ([217.72.192.78]:39503)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1j0Nkx-0007Qw-6q
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:54:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1581159268;
- bh=sYfdE61c9jgFzKD+slSRh/oTjHvfI2uPfM8W0Q9MQs0=;
- h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=Ox722N3HRxasP0+q9L4uyRAOi8FNleCCPu3n5uxcJ8kkDyU9l0GHl4JY/LURM9uUT
- mEaGBq/srKLS5HLnX5fr9a3EY+pJoSnQkEcqX1yELN56JgV/A2YWXLWYzIoBfhqXNu
- YDlEa51LLjSkLt/FyfdxzSILsBvLg2fp4kelvG88=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MEEeC-1il0c00GOe-00FWFj; Sat, 08
- Feb 2020 11:54:28 +0100
-Subject: Re: [PATCH] ui/gtk: Get display refresh rate with GDK version 3.22 or
- later
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?=
- <berrange@redhat.com>
-References: <20200116011217.2144-1-philmd@redhat.com>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <00874860-5ec7-505f-db6a-57f9cc6cae0f@web.de>
-Date: Sat, 8 Feb 2020 11:54:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <dgibson@ozlabs.org>) id 1j0O8B-0005cK-LC
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 06:18:36 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56911 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1j0O8A-0005Zw-Op; Sat, 08 Feb 2020 06:18:35 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48F8mg5hTQz9sRQ; Sat,  8 Feb 2020 22:18:27 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1581160707;
+ bh=ikgABbN60Lf71yU3MmFf1av+jCxW3xyqN0929N16B24=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=IjDWFLo8YtrFeluANx4lJKeZbEkE8q+HybVc2x0JHvMhdf38OC1G2DSdKNeJ0Rk68
+ 08I7YTUeMyokxbnrrpZSJtLjMBcf2GNT82i5Nowlsm8y+JyvTLLydZyHRXDiAtDY0K
+ fnWNhNtU+Z2LQIxnKJ56u/1qNYc/BQvvOHk/CjYs=
+Date: Sat, 8 Feb 2020 22:12:41 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] ppc: function to setup latest class options
+Message-ID: <20200208111241.GE219689@umbus.fritz.box>
+References: <20200207064628.1196095-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200116011217.2144-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:cDbkb4yiIOFxeLmiM6MaChTGaqZYSKvDGwAB5JaNa0lY4vvt3ES
- NT1bYiMBpoVyspfh90cvtcYl30hhNVC/5P+aZYOtK6UBIiooy5x4cSqdvu1EH7AWwAr1cGw
- K58YyUCbXVYsLBvTPQ14TGFCMzV2DwR1uJEuSshlhCtX8DdDa9ekRznuSrKPFDAoOrzGfOO
- kwcVwer8COWEKEot2DCgg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5HNe4TCZx4I=:XEKoUMHv5VkXK/9grrgUoA
- b0INJluYfK34s1XQkoNeWl1pOrQBSBqk2ebzDHl8GqWOoaRj0nEbKR5Enl0Odk+QI7jf6V5TM
- R3IqPD5khviKBxZ8cdTKoiaMUDgPCFeFUXscKefTzvYBK0e2sbZl3iXkSccKK4DAuY3twEAJf
- lbwzjNpE7STa9MhE+TeHT61AVatMROiakPYSSc55TD/UMCU3sU22prMZ8rz6GwWP6wGcoqviV
- g3IoabIQqgRL+J2x1ijdlVR3axUogCJNdxL3t69lYArwa6gMzprZr68Nj9cTHfGUw/2DXXvL+
- u3QdcuGwwqK+1gwWxEozHV7YZvYZQT0dNAv3amC9kjF7HACanHOV20H6d8BtXkiD7ZXju7xdp
- 20mWuPVbrAPF8v0cApl/EEJECEWqzlsLoRSYiIxwgo8nakvmvQfej/o3dkAJcBEpI8U780Gmu
- iuSt3gcMq1PALec7TfXc7X32pY5P0WzIFLYW35+/3GGRRSOTkuhtzMeGk7H5F7P/ecTU3zu82
- uRkuoKSNZ/XTaKdvEdbU6nznS6vm6rnWRrvZuegpdukd6hGUImdPwyhKTrewF8soaUTZu2y1u
- kw1+86tmlRj1JogyKO5ZSUT0+dWm8UFNF86uv17ezL7oLtdnREbCsVbcA9cKMEnaa7tbBvlad
- u06xMLDxx9PkH3M5mgsC7hYDDjM98LoF3uSgPPgvBJYdgphb6WTL9SJmQgp/uXMR23dBllvt2
- 8XJH6f8KLnc/0r2ApHpsQZNjJdzfIYelBjuBfjHpkLpryWfs4PMpyz3xUwvw2Wpw/x12yL6cc
- aH+d04xttqhZS79f0fOJP1LrlmEFCjcLL8P/OBsc+S+FfbnGUFlA7Av67KTxTNQcDPEFvho7V
- v7/84Z06zUy6mwdM1ofe2si/ixGpOqi2p3GRxWS3oVKqn4P5vOiw8UQ6g1jg3kTNeVV/R/LQX
- hbKZI0Jbmlf5xCKVIYCGCa79gkSmdJsBHhHDgzI0FXz+q8DbpmvWvPUVlCI9ZskDd8FbCXBhj
- l5A4sZ8pbWa+ChDW37f13dK5zqHhe889pSfowDjszppK1QZz11DEft+TyN944uUfdTIq82Jlc
- zyxDwqucvsy8LDiT6chyjS+viQz2EMznYIBJ+eH+qjQDsC925Rgnyz5DkPabPykqYKg8LUYJ8
- 1uEUvbuAiMEN4AT+qgAH7CXPNsty0Yn233dJ3LcHEE6sbcgPUDkemxjrG7+3e3p/dk5fZn+K2
- 1oQBbPv3ZwNGO1AJF
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.78
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lteA1dqeVaWQ9QQl"
+Content-Disposition: inline
+In-Reply-To: <20200207064628.1196095-1-mst@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,142 +69,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Nikola Pavlica <pavlica.nikola@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16.01.20 02:12, Philippe Mathieu-Daud=C3=A9 wrote:
-> The GdkMonitor was introduced in GTK+ 3.22:
-> https://developer.gnome.org/gdk3/stable/api-index-3-22.html#api-index-3.=
-22
->
-> If we build with older GTK+, the build fails:
->
->      CC      ui/gtk.o
->    qemu/ui/gtk.c: In function =E2=80=98gd_vc_gfx_init=E2=80=99:
->    qemu/ui/gtk.c:1973:5: error: unknown type name =E2=80=98GdkMonitor=E2=
-=80=99
->         GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, w=
-in);
->         ^
->    qemu/ui/gtk.c:1973:27: error: implicit declaration of function =E2=80=
-=98gdk_display_get_monitor_at_window=E2=80=99 [-Werror=3Dimplicit-function=
--declaration]
->         GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, w=
-in);
->                               ^
->    qemu/ui/gtk.c:1973:5: error: nested extern declaration of =E2=80=98gd=
-k_display_get_monitor_at_window=E2=80=99 [-Werror=3Dnested-externs]
->         GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, w=
-in);
->         ^
->    qemu/ui/gtk.c:1973:27: error: initialization makes pointer from integ=
-er without a cast [-Werror=3Dint-conversion]
->         GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, w=
-in);
->                               ^
->    qemu/ui/gtk.c:2035:28: error: implicit declaration of function =E2=80=
-=98gdk_monitor_get_refresh_rate=E2=80=99 [-Werror=3Dimplicit-function-decl=
-aration]
->         refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
->                                ^
->    qemu/ui/gtk.c:2035:5: error: nested extern declaration of =E2=80=98gd=
-k_monitor_get_refresh_rate=E2=80=99 [-Werror=3Dnested-externs]
->         refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
->         ^
->    cc1: all warnings being treated as errors
->    qemu/rules.mak:69: recipe for target 'ui/gtk.o' failed
->    make: *** [ui/gtk.o] Error 1
->
-> We only use the GdkMonitor API to get the monitor refresh rate.
->
-> GTK+ provides convenient definition in <gdk/gdkversionmacros.h>
-> (already include by <gdk/gdk.h>) to check which API are available.
->
-> Extract this code as a new gd_refresh_rate_millihz() function,
-> and check GDK_VERSION_3_22 is defined before calling its API.
-> If it is not defined, return 0. This is safe and fixes our build
-> failure.
->
-> Fixes: c4c00922cc (display/gtk: get proper refreshrate)
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+--lteA1dqeVaWQ9QQl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Feb 07, 2020 at 01:46:37AM -0500, Michael S. Tsirkin wrote:
+> We are going to add more init for the latest machine, so move the setup
+> to a function so we don't have to change the DEFINE_SPAPR_MACHINE macro
+> each time.
+>=20
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+Applied to ppc-for-5.0.
+
 > ---
-> Sorry I missed that, I only tested Nikola's patch on my workstation
-> which runs Fedora 30:
->
->    $ pkg-config --modversion gtk+-3.0
->    3.24.11
->
-> If Gerd acks this patch, we might consider having it directly
-> applied as a build fix.
-> ---
->   ui/gtk.c | 23 ++++++++++++++++++-----
->   1 file changed, 18 insertions(+), 5 deletions(-)
->
-> diff --git a/ui/gtk.c b/ui/gtk.c
-> index 7355d34fcf..d18892d1de 100644
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -1961,6 +1961,23 @@ static GtkWidget *gd_create_menu_machine(GtkDispl=
-ayState *s)
->       return machine_menu;
->   }
->
-> +/*
-> + * If available, return the refresh rate of the display in milli-Hertz,
-> + * else return 0.
-> + */
-> +static int gd_refresh_rate_millihz(GtkDisplayState *s)
+>  hw/ppc/spapr.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 02cf53fc5b..4cf2a992a5 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4428,6 +4428,12 @@ static const TypeInfo spapr_machine_info =3D {
+>      },
+>  };
+> =20
+> +static void spapr_machine_latest_class_options(MachineClass *mc)
 > +{
-> +#ifdef GDK_VERSION_3_22
-> +    GdkDisplay *dpy =3D gtk_widget_get_display(s->window);
-> +    GdkWindow *win =3D gtk_widget_get_window(s->window);
-> +    GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win)=
-;
-> +
-> +    return gdk_monitor_get_refresh_rate(monitor);
-> +#else
-> +    return 0;
-> +#endif
+> +    mc->alias =3D "pseries";
+> +    mc->is_default =3D 1;
 > +}
 > +
->   static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
->                                 QemuConsole *con, int idx,
->                                 GSList *group, GtkWidget *view_menu)
-> @@ -1968,10 +1985,6 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s,=
- VirtualConsole *vc,
->       bool zoom_to_fit =3D false;
->       int refresh_rate_millihz;
->
-> -    GdkDisplay *dpy =3D gtk_widget_get_display(s->window);
-> -    GdkWindow *win =3D gtk_widget_get_window(s->window);
-> -    GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win)=
-;
-> -
->       vc->label =3D qemu_console_get_label(con);
->       vc->s =3D s;
->       vc->gfx.scale_x =3D 1.0;
-> @@ -2032,7 +2045,7 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, =
-VirtualConsole *vc,
->       vc->gfx.kbd =3D qkbd_state_init(con);
->       vc->gfx.dcl.con =3D con;
->
-> -    refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
-> +    refresh_rate_millihz =3D gd_refresh_rate_millihz(s);
->       if (refresh_rate_millihz) {
->           vc->gfx.dcl.update_interval =3D MILLISEC_PER_SEC / refresh_rat=
-e_millihz;
->       }
->
+>  #define DEFINE_SPAPR_MACHINE(suffix, verstr, latest)                 \
+>      static void spapr_machine_##suffix##_class_init(ObjectClass *oc, \
+>                                                      void *data)      \
+> @@ -4435,8 +4441,7 @@ static const TypeInfo spapr_machine_info =3D {
+>          MachineClass *mc =3D MACHINE_CLASS(oc);                        \
+>          spapr_machine_##suffix##_class_options(mc);                  \
+>          if (latest) {                                                \
+> -            mc->alias =3D "pseries";                                   \
+> -            mc->is_default =3D 1;                                      \
+> +            spapr_machine_latest_class_options(mc);                  \
+>          }                                                            \
+>      }                                                                \
+>      static const TypeInfo spapr_machine_##suffix##_info =3D {          \
 
-This (as well as c4c00922cc) gives
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-qemu-system-x86_64: Gdk: gdk_window_get_origin: assertion 'GDK_IS_WINDOW (=
-window)' failed
+--lteA1dqeVaWQ9QQl
+Content-Type: application/pgp-signature; name="signature.asc"
 
-on startup under gtk 3.22.30 (mate 1.20.1).
+-----BEGIN PGP SIGNATURE-----
 
-Jan
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4+l6MACgkQbDjKyiDZ
+s5JVqRAAiCXcQgG4stsIrhYIF1UDwYJoCszo12MX/6S6QiPHD3yVim6ElKpJOoBt
+HGd8+UnmGD9/Qf0lcOZxdVJZRYFo4nDm0nwgRcSfbHphobdEWov/eZvcuifikvnp
+24BcO+4yp497iwvvDeeWuHDTHHNcq1EoCDWLSTBmHJW4sjLPLEniJA3e3LbqBVmG
+1LlHKYlIXaMOBtkvJM/W1w3uqEiGIgL1tCYkfYLPIV6hWPpuUDKWl1EZtWdtTPWx
+MnJWiv+rXwC0kLdbK9smqcyIHS93gHhHGVVUNKdZw32tIE1AmxX2ybeTO07Ihn6l
+cwfjCqxPZEMZQ5WZy6Gyzjt8Vuiz961ee0rzZVAN8rRormipXN9nBoDTwG0HvNAD
+doYps6ptSe1RaxOOgb5CfdK3cPhlypGjPpUm+21J3+zlJRDhgt0kToRyXtQVdquf
+qcFBA0hy1dIghHX346NKeSPfDAFhqb/LGqSj1P0N4/1wzNav/rbSpPdj1UKmYsBE
+yLFuuInjYPcJe/A1JLSaLyggwEKROXsN3MTEB0twBUUXlkcSYln+ZCU8sTzzhI48
+7fgqoY9me8Zeq1f5VsAM4XHpfFYmKSPau5V/VWkmUTUE6v7OHcCyWxYc7Hddh7Xh
+8loNPZcaGODKb4ppnjczPNo/Oq34vkTz/cSZxxHF6Ws5PeejTpA=
+=/Fj/
+-----END PGP SIGNATURE-----
+
+--lteA1dqeVaWQ9QQl--
 
