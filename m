@@ -2,83 +2,77 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=FORGED_HOTMAIL_RCVD2,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F27AC35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99721C35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:16:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EA7320726
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:08:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZg0tDem"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EA7320726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72ABB20726
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:16:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72ABB20726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0Ou8-0007l9-8n
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 07:08:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54956)
+	id 1j0P2c-0003xn-Lb
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 07:16:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j0OoP-0007H4-5T
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:02:14 -0500
+ (envelope-from <bounces@canonical.com>) id 1j0P1Z-0003Rx-Jf
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j0OoN-0000st-Q5
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:02:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42323
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j0OoN-0000sb-Ls
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:02:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581163331;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=t0vIBmBZQfWVx8KvIpuNXlRyx7P/Awf9qvG9cgC6aE0=;
- b=BZg0tDemX56TtAD6kRi8CpnrhZzVZOpB+VuXcevLS/I669aWv9wLXFbyAZSrVh6+B03OAy
- r2nM8CSsHUqonR8JiRjQ+BIvcunL/iIDfecScyviOYaLjpSoNclgnjn1SvHexXZhZeRWM6
- bhLZsRRfsWKHBxMgmzsV8vH8oaEAZs8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-Y80JT8kgPB2uM1rZKs7FxA-1; Sat, 08 Feb 2020 07:02:07 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A11F218A550B;
- Sat,  8 Feb 2020 12:01:58 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CD25E5C545;
- Sat,  8 Feb 2020 12:01:45 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org, jean-philippe@linaro.org,
- dgilbert@redhat.com, quintela@redhat.com, mst@redhat.com, peterx@redhat.com
-Subject: [PATCH v15 9/9] virtio-iommu: Support migration
-Date: Sat,  8 Feb 2020 13:00:22 +0100
-Message-Id: <20200208120022.1920-10-eric.auger@redhat.com>
-In-Reply-To: <20200208120022.1920-1-eric.auger@redhat.com>
-References: <20200208120022.1920-1-eric.auger@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1j0P1Y-0003eU-H5
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:15:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38010)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j0P1Y-0003dK-Bm
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:15:48 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j0P1W-00056h-Uw
+ for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 12:15:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E6C8D2E806D
+ for <qemu-devel@nongnu.org>; Sat,  8 Feb 2020 12:15:46 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: Y80JT8kgPB2uM1rZKs7FxA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Sat, 08 Feb 2020 12:03:59 -0000
+From: zebul666 <zebul666@hotmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=Laurent@vivier.eu; 
+X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fritz-the-cat laurent-vivier m-luescher pmaydell
+ tobijk zebul666
+X-Launchpad-Bug-Reporter: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
+X-Launchpad-Bug-Modifier: zebul666 (zebul666)
+References: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158116343932.19980.840186330917610547.malone@wampee.canonical.com>
+Subject: [Bug 1823790] Re: QEMU mishandling of SO_PEERSEC forces systemd into
+ tight loop
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: dbf6a04bb223c3a622de798838278855700fc332
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,160 +81,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, bharatb.linux@gmail.com, tnowicki@marvell.com
+Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add Migration support. We rely on recently added gtree and qlist
-migration. We only migrate the domain gtree. The endpoint gtree
-is re-constructed in a post-load operation.
+Well, it's kind of irrelevant but I am trying that on archlinux and this
+does not work for me.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Peter Xu <peterx@redhat.com>
+Using systemd-244.2-1 and qemu-user-static-4.2 that I built with
+Laurent's patch. May be I have done something wrong ?
 
----
+I still get that error that leads me here:
 
-v11 -> v12:
-- do not migrate the endpoint gtree but reconstruct it from the
-  domain gtree (Peter's suggestion)
-- add MIG_PRI_IOMMU
----
- hw/virtio/virtio-iommu.c | 109 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 99 insertions(+), 10 deletions(-)
+Failed to enqueue loopback interface start request: Operation not supported
+Caught <SEGV>, dumped core as pid 3.
+Exiting PID 1...
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 8509f64004..4cee8083bc 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -643,16 +643,6 @@ static uint64_t virtio_iommu_get_features(VirtIODevice=
- *vdev, uint64_t f,
-     return f;
- }
-=20
--/*
-- * Migration is not yet supported: most of the state consists
-- * of balanced binary trees which are not yet ready for getting
-- * migrated
-- */
--static const VMStateDescription vmstate_virtio_iommu_device =3D {
--    .name =3D "virtio-iommu-device",
--    .unmigratable =3D 1,
--};
--
- static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
- {
-     guint ua =3D GPOINTER_TO_UINT(a);
-@@ -736,9 +726,108 @@ static void virtio_iommu_instance_init(Object *obj)
- {
- }
-=20
-+#define VMSTATE_INTERVAL                               \
-+{                                                      \
-+    .name =3D "interval",                                \
-+    .version_id =3D 1,                                   \
-+    .minimum_version_id =3D 1,                           \
-+    .fields =3D (VMStateField[]) {                       \
-+        VMSTATE_UINT64(low, VirtIOIOMMUInterval),      \
-+        VMSTATE_UINT64(high, VirtIOIOMMUInterval),     \
-+        VMSTATE_END_OF_LIST()                          \
-+    }                                                  \
-+}
-+
-+#define VMSTATE_MAPPING                               \
-+{                                                     \
-+    .name =3D "mapping",                                \
-+    .version_id =3D 1,                                  \
-+    .minimum_version_id =3D 1,                          \
-+    .fields =3D (VMStateField[]) {                      \
-+        VMSTATE_UINT64(phys_addr, VirtIOIOMMUMapping),\
-+        VMSTATE_UINT32(flags, VirtIOIOMMUMapping),    \
-+        VMSTATE_END_OF_LIST()                         \
-+    },                                                \
-+}
-+
-+static const VMStateDescription vmstate_interval_mapping[2] =3D {
-+    VMSTATE_MAPPING,   /* value */
-+    VMSTATE_INTERVAL   /* key   */
-+};
-+
-+static int domain_preload(void *opaque)
-+{
-+    VirtIOIOMMUDomain *domain =3D opaque;
-+
-+    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,
-+                                       NULL, g_free, g_free);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_endpoint =3D {
-+    .name =3D "endpoint",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, VirtIOIOMMUEndpoint),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_domain =3D {
-+    .name =3D "domain",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .pre_load =3D domain_preload,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, VirtIOIOMMUDomain),
-+        VMSTATE_GTREE_V(mappings, VirtIOIOMMUDomain, 1,
-+                        vmstate_interval_mapping,
-+                        VirtIOIOMMUInterval, VirtIOIOMMUMapping),
-+        VMSTATE_QLIST_V(endpoint_list, VirtIOIOMMUDomain, 1,
-+                        vmstate_endpoint, VirtIOIOMMUEndpoint, next),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static gboolean reconstruct_endpoints(gpointer key, gpointer value,
-+                                      gpointer data)
-+{
-+    VirtIOIOMMU *s =3D (VirtIOIOMMU *)data;
-+    VirtIOIOMMUDomain *d =3D (VirtIOIOMMUDomain *)value;
-+    VirtIOIOMMUEndpoint *iter;
-+
-+    QLIST_FOREACH(iter, &d->endpoint_list, next) {
-+        iter->domain =3D d;
-+        g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
-+    }
-+    return false; /* continue the domain traversal */
-+}
-+
-+static int iommu_post_load(void *opaque, int version_id)
-+{
-+    VirtIOIOMMU *s =3D opaque;
-+
-+    g_tree_foreach(s->domains, reconstruct_endpoints, s);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_virtio_iommu_device =3D {
-+    .name =3D "virtio-iommu-device",
-+    .minimum_version_id =3D 1,
-+    .version_id =3D 1,
-+    .post_load =3D iommu_post_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_GTREE_DIRECT_KEY_V(domains, VirtIOIOMMU, 1,
-+                                   &vmstate_domain, VirtIOIOMMUDomain),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_virtio_iommu =3D {
-     .name =3D "virtio-iommu",
-     .minimum_version_id =3D 1,
-+    .priority =3D MIG_PRI_IOMMU,
-     .version_id =3D 1,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_VIRTIO_DEVICE,
---=20
-2.20.1
+I am trying to boot with systemd-nspawn an archlinux-arm built for a
+rpi0. That's fine if I don't boot it.
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1823790
+
+Title:
+  QEMU mishandling of SO_PEERSEC forces systemd into tight loop
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  While building Debian images for embedded ARM target systems I
+  detected that QEMU seems to force newer systemd daemons into a tight
+  loop.
+
+  My setup is the following:
+
+  Host machine: Ubuntu 18.04, amd64
+  LXD container: Debian Buster, arm64, systemd 241
+  QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3=
+.1+dfsg-7)
+
+  To easily reproduce the issue I have created the following repository:
+  https://github.com/lueschem/edi-qemu
+
+  The call where systemd gets looping is the following:
+  2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 err=
+no=3D34 (Numerical result out of range)
+
+  Furthermore I also verified that the issue is not related to LXD.
+  The same behavior can be reproduced using systemd-nspawn.
+
+  This issue reported against systemd seems to be related:
+  https://github.com/systemd/systemd/issues/11557
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1823790/+subscriptions
 
