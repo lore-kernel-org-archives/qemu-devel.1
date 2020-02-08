@@ -2,90 +2,78 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76481C35242
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 17:31:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D2EC35242
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 22:53:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4001A20658
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 17:31:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B578022522
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 22:53:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="li12p+Xi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4001A20658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WSdPwEu/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B578022522
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0Tx4-0005tH-5r
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 12:31:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32826)
+	id 1j0Yyy-0002jA-VI
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 17:53:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.kiszka@web.de>) id 1j0TtY-0003fP-Hv
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 12:27:53 -0500
+ (envelope-from <jtomko@redhat.com>) id 1j0YyN-0001KI-L3
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 17:53:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@web.de>) id 1j0TtX-0007X3-EQ
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 12:27:52 -0500
-Received: from mout.web.de ([212.227.17.12]:47977)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1j0TtW-0007WO-5t
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 12:27:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1581182863;
- bh=JumUw+gArUHorGvI4sUVP/YGhPCioeC4AxkJDT+0lco=;
- h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=li12p+XiGuBxO3GQqffAdAm0wLh/oTepr9QvxE30J9aUquwuh8HduyPG+20rnzSeB
- Q2cp5tqU8ZHksVzhgTN3pSg20rK4egFQF+fJ3Wa0/N5kGwAUDSa0JpzhYFL79NESIo
- YvgjX7bez0Z5HauV2X9QEwash6J9ltFBSnaJ9e8M=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MVLWc-1j0vkv33hW-00Yhkt; Sat, 08
- Feb 2020 18:27:43 +0100
-Subject: Re: [PATCH v2 0/2] ui/gtk: Fix gd_refresh_rate_millihz() when widget
- window is not realized
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200208161048.11311-1-f4bug@amsat.org>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <9a755d19-5eef-3acf-011e-4b985d0cf20a@web.de>
-Date: Sat, 8 Feb 2020 18:27:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <jtomko@redhat.com>) id 1j0YyL-0006St-8j
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 17:53:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29348
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1j0YyK-0006Pu-Tk
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 17:53:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581202387;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=gxFLU7f/at2iaVKBvXa0GQUb6YmWzKSUTCbS7pcCNos=;
+ b=WSdPwEu/rGTDmlsnG14o1Ki1ymwByiiunTzJ6U/b5OYl6vFhmO12TsfQ3zqBqNP19foS/C
+ p9Y8Io7LsF06+QdqPnhaYhzCqH0yVjpu79ptCdYtHjBUkdBLmTwcvcoU1GHaOt7U+HitH6
+ 7qlo8ai46rRd9McrtMqBKX7sHnyZTJ4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-1c3Ka8LON_CkynwMm9faCQ-1; Sat, 08 Feb 2020 17:53:01 -0500
+X-MC-Unique: 1c3Ka8LON_CkynwMm9faCQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6D208014C1;
+ Sat,  8 Feb 2020 22:53:00 +0000 (UTC)
+Received: from lpt (ovpn-200-20.brq.redhat.com [10.40.200.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B28D10013A7;
+ Sat,  8 Feb 2020 22:52:52 +0000 (UTC)
+Date: Sat, 8 Feb 2020 23:52:49 +0100
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v3 0/7] ui: rework -show-cursor option
+Message-ID: <20200208225249.GA1329@lpt>
+References: <20200207101753.25812-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200208161048.11311-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:xdRkQM2gllCatPx8FEAYeLyp2+4T7i7ZCBWdmG7OMWuZ+OI3puB
- RWfS2ISsIh3LaMZ7tHt+zPmQzPdq9+QYf1L1GEJMaJJ7zswVkB40dSx8o6zj61PYs5lHT1O
- KirVxifSujdqweXUonx8OGPYKcoaBuvWn7UJOL/yXfikHPsQfgRdow1JMVErZ9tZnFhsmWH
- vR7yjXWAExbk2qYmGml/A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:H+PceyxPKr0=:v29k3fo7XpHpNjk4r9eR5x
- LNy29nbv+gi6bfAyvxIOvdfcTIn1Dqd32z/fSG+D6hgaISfHAfY2eGBOm3xZRDxn6/1WIExGv
- 7x3aHz1JbKgtQYzITlEDQSEbcQ7DVGqR4RFJUmcdiQvq3t4rtBkzMj57plzDhUnLTic9B2lID
- 84fr1G2dyyFOSO3leIOc9aNvmEwssAwWtZyhydqeINQNJ0Uem8+W3ONw1f62mo/Melz7IKrNx
- M7i5Zpo7ls3iVkX8/mqmRrudd0pG/y7Xkv4K2tNKS/YAVIfJ8TvXwk80U4iegidKA6wAMz+cA
- 9YJcGcNc+giCh/K5PmLyB2Azv/ng1Oyi2CZMrwh+r5IsESIusErl1l4ex61sPIVj1dVga+JfM
- cSB6Zm3ryVyx/JUK/KwIixQwtnnw5UPPDs2GSr/mW0j+wnK1pP7WlgstXP5ECeeLtPFXGd2Er
- 4edZ+EvZGMH2RcPcXsFc0APve5EXRXR+Y/FTnILxivf6kJi0xCHhZZ5oQKrzkD1Tidz7Rq2C1
- 2ih5jU0PDi1aw8MTkH7miXmnZ4C0oKNQXuM/BTuk2O4XMz0FXKjUnTfTGgFhJrHqGULJe11Pn
- ja9EC1konP92Ek0Tmzesd8I4fm5/W/qBQroHhf3fuQ/PWgilfEL/1WZNYn7VICdnYg3esI0VD
- dGSuQg+Wc2m3zM2/cX+knvJGMt5+EjL/s2TxkSnfwvzKBSlvhBK9WqCvPnVzMwn9UwP+wT1rp
- oPb63vrzyBzwXg0r8oRGt7qpYkmsppd85dGGWRlBjS3XEyO4xK05uHGWL/v/f+gT4bV3bUIf/
- EJ+hYV3oJkn85U96No+wDHTA5gkRZKqBRuAfVT2j7YYJovRMeQqUYSM5qgCkZ7LzVd5nTZVNs
- O18oQB0+3WDq52UTRBVXH9s9rz/Ts3kLVRTQQ8hbeJ/zEvy54SKv7O/nUTaXL7lZnbNlv3q6b
- HEZkZzpTdzx7qkqEVYKB4XN6p+siJuFv/NMEzaQcRdewTa+AEGdRXHv1Ghf7zL3C75WOGYM6k
- 08jMm29PY2S+6yK7G6WmHJvDVangLom66UMU4fSfgZ3O7FOgWAl9zoI3yv+T0Fxkn0YSUAZ2/
- BuMDBjzR+6JiaX7cd9V2PHZzQm/DMmaQXfPbWwQsOcFWKd+azLkSqrV3FtLYVHqB6qNY38zNi
- r4buJ5aXDlB4GqfDdxTp4dKp4CmocP8PhVTocrNYjzE78+zbbUXPURU/4YjE09WfVHsMiawtl
- jtbkgXGR1K/p9QBCU
+In-Reply-To: <20200207101753.25812-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="fUYQa+Pmc3FrFX/N"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.12
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,29 +85,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>,
- Nikola Pavlica <pavlica.nikola@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, libvir-list@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ jpewhacker@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08.02.20 17:10, Philippe Mathieu-Daud=C3=A9 wrote:
-> Fix bug report from Jan Kiszka:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg678130.html
-> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg02260.html
+--fUYQa+Pmc3FrFX/N
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Feb 07, 2020 at 11:17:46AM +0100, Gerd Hoffmann wrote:
+>Add -display {sdl,gtk,cocoa},show-cursor=3Don as replacement for
+>-show-cursor.  sdl + cocoa are switched over (no change in behavior),
+>gtk support is added.
 >
-> Supersedes: <20200208143008.6157-1-f4bug@amsat.org>
+>Gerd Hoffmann (7):
+>  ui: add show-cursor option
+>  ui: wire up legacy -show-cursor option
+>  ui/sdl: switch to new show-cursor option
+>  ui/cocoa: switch to new show-cursor option
+>  ui/gtk: implement show-cursor option
+>  ui: drop curor_hide global variable.
+>  ui: deprecate legacy -show-cursor option
 >
-> Philippe Mathieu-Daud=C3=A9 (2):
->    ui/gtk: Update gd_refresh_rate_millihz() to handle VirtualConsole
->    ui/gtk: Fix gd_refresh_rate_millihz() when widget window is not
->      realized
->
->   ui/gtk.c | 19 +++++++++++--------
->   1 file changed, 11 insertions(+), 8 deletions(-)
+> include/sysemu/sysemu.h |  1 -
+> ui/gtk.c                |  8 ++++++--
+> ui/sdl2.c               | 16 ++++++++--------
+> vl.c                    | 16 ++++++++++++++--
+> qapi/ui.json            |  3 +++
+> qemu-deprecated.texi    |  5 +++++
+> ui/cocoa.m              |  4 ++++
+> 7 files changed, 40 insertions(+), 13 deletions(-)
 >
 
-Yep.
+Series:
+Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
 
-Tested-by: Jan Kiszka <jan.kiszka@web.de>
+Jano
+
+--fUYQa+Pmc3FrFX/N
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl4/O70ACgkQ+YPwO/Ma
+t53t5QgAp+vkpNDiOo111iByQyOwb7u3lKn/4xiMHVZoYYiUY8xa6HfYMBPISfSe
+jIGQPm0fJ6+jjHgFq6axULqjSyQCGf1Li5dfBqK+a2RcF0Taqh09z50TuuduRWBg
+bRXNlAuSk1DTEA3p+2s0A6Rs+rjE1aSouJm8IeKY4sGGG3GUbxW9A6kAh6BDwGi8
+7GkP6D1UvT9DZMdC3/I6u9fyfnp8ugGUEQ4LLn7fkjwwBvTygRttPHOanUAdZA82
+FSkdoxhO4nr/LqRyFexMm8oFRO7UOuhLE+x8XMnsGyEp3lFR7CGUbdVsYlBWs2uC
+hThEnI6eM2f4591T+ffTwodFSZzEEw==
+=lVoJ
+-----END PGP SIGNATURE-----
+
+--fUYQa+Pmc3FrFX/N--
+
 
