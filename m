@@ -2,80 +2,80 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF316C35242
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 16:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80493C35242
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 16:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A002C2082E
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 16:58:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FFE52082E
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 16:58:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bVleue/e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A002C2082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RrCdzZKg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FFE52082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0TRD-0007ox-OJ
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 11:58:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53791)
+	id 1j0TRV-00006a-DZ
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 11:58:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53899)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j0TPq-0005e1-0F
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 11:57:11 -0500
+ id 1j0TPz-0005zQ-Ud
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 11:57:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j0TPo-0001hD-Sy
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 11:57:09 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37036)
+ id 1j0TPy-0001oN-NE
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 11:57:19 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45764)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j0TPo-0001gL-Mq; Sat, 08 Feb 2020 11:57:08 -0500
-Received: by mail-wm1-x342.google.com with SMTP id f129so6031299wmf.2;
- Sat, 08 Feb 2020 08:57:08 -0800 (PST)
+ id 1j0TPy-0001nh-HK; Sat, 08 Feb 2020 11:57:18 -0500
+Received: by mail-wr1-x441.google.com with SMTP id g3so1410838wrs.12;
+ Sat, 08 Feb 2020 08:57:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=QqQIuN2OLiJlB7XbZ3pYMKM/Y6DyvpJ28zihmZMMx2E=;
- b=bVleue/eaJXkPO9gkwrE1uIMz0Tyvixkd0/jHPht3vKgSODnZEURqdeTVKhC8CtOOu
- QVnRBuT7hjEFNnui4StPFvzmpyOAgv6u89XEMJUeQKdo8oWrG6x5QrvcUvhIsUFAuOYd
- vMrAQ8ShgNLR672DPa9HzPEzT7+48J8DkeQqPjTrzwqODPQXw+jCfiOokGybg7N7CR26
- ljtZpCZ39qAVzWl9/e2ITFcwApKHYqxAzqIkVZ8Qh/5DgfJg6DDWaUiGudGwXTEIeyg+
- tQIp9K3EG8WEqJbYdSSixGFA5yLsEGVA91jTDI5fSfzW6apHLM629b2g3kC+C/2ryWDz
- lV4A==
+ bh=PQ9RCvZi2otUw1qqPfGvj8l91J+geLVqZwXKPaCPo0s=;
+ b=RrCdzZKgivqN4loroP0+cRbq4EF4GhRSz9wlioUwMOOSwq6XSv5UiRkIajIUvmmVNL
+ KO3nuaNJguzSguZBboF5p3EJezjoNoTbeFcQmfWZLfs0klS1iCxbalp4W4tYNg+X5Lk5
+ WOqN9zvi27SjAoo/Gq0hjtxJVmvvh6CVEBvxY73wCT4TV2Be1jExfwafhmdpkcQMq7li
+ OOtR/cSSD0QupAMyQUBeF0R2LPn/sMzd+yEcm8cGF9O9ckQ+qKQAMhDl6fiorrpHg6tj
+ zskUu9QXFnTnyavp+MWLFuRRdEOtaeWIxkfl1bHFbAp8PHXYPoK5gUWA1OySI60WM8PW
+ cQ3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=QqQIuN2OLiJlB7XbZ3pYMKM/Y6DyvpJ28zihmZMMx2E=;
- b=p7QtTMWVflfeL6e8JfVBIzRkUocxcJV+tCI4doJ2/75guiWYIkrLIxvyYo8Uwjhn1Q
- VWng5FiA+dSiQE+dP1YDjJTFMj0axB0VBwPbBlrLOvRtyJFKs4AkRCuYM9mqQ1jpXs1F
- Yh+gXiJRJnmm0k7U2leAbZcwaUm26uLxH9zOwG+zU5SHVw135wSNy3i5ZWoGZeEpPyQV
- ZRyRp6OrU3cgod/uouEF6fX3OEwBZ5J56C13zoe2BaKh70EIVCx9XI+8z6TM8BIyyW/f
- Qemiu7FcdsIIb9YCYRUqtCB8V86hXwEAfvhm0KzQj2W+KF+aiTTvamjqKk2KQ1ocDtW3
- conw==
-X-Gm-Message-State: APjAAAWtyNRLhNcDk089YjFLZCFsSVy82qjqFRnay6iB6ZqXwNzvSVNb
- 7KlozduZGmL/NSeOtS4G9SKamdbA
-X-Google-Smtp-Source: APXvYqyTgJaL/wdGXRAeG+D4A7nUE0LmTRxaYqmyoufj1aoLpSa/d4FehiDMHtIjztI2VObx5TNWkA==
-X-Received: by 2002:a7b:cb97:: with SMTP id m23mr4848283wmi.37.1581181027534; 
- Sat, 08 Feb 2020 08:57:07 -0800 (PST)
+ bh=PQ9RCvZi2otUw1qqPfGvj8l91J+geLVqZwXKPaCPo0s=;
+ b=TY37oLExDmXw6w5KtV1XzeUFww1x/f+1c0NRgh3cz7NmAO7p5gtYei0u2UCLOTULc/
+ 9AULgLzukli/bvVCWG4t9ATBAqkQZmJRUt5ZvIaxBAE5e2gJbf0aD5G7YP52PgdoB9XS
+ d5uLCxG0kgoiqcAuyZo4pp1UCSApBQf814MGA7WORl6HDGEuXEZ81HYxGDqtx5fvjrRw
+ ybhbgu8dHl8yzYZFWKUE/iTPTI6Mw2dOJ+LZEcMYZ5E+LahOS9KDkaZDwd9l98GnsEfc
+ Ha8ZuTJ4MvbKV73GUWvu+fp8W6I1ATPJx8kxdQJ+bNHAUt7nIjnksvPMbdpN7YieMr6Y
+ 9+pw==
+X-Gm-Message-State: APjAAAWmI6uJ6P1manhZ7LFjyN221bFpAc4YDX5vvr91eXoZ9DOcW8QN
+ cfu//Zlnx1yHqLtpqEVVOCb2iWcY
+X-Google-Smtp-Source: APXvYqyKlXtuXAwDGb6exyGIf/dF/fcd8I7KUjuzu+55+nSUxtnnA1rNOZjb8roUdwJLQ+SW6NDVhA==
+X-Received: by 2002:adf:b352:: with SMTP id k18mr6003393wrd.242.1581181037383; 
+ Sat, 08 Feb 2020 08:57:17 -0800 (PST)
 Received: from localhost.localdomain (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id a5sm7872763wmb.37.2020.02.08.08.57.05
+ by smtp.gmail.com with ESMTPSA id a5sm7872763wmb.37.2020.02.08.08.57.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 08 Feb 2020 08:57:07 -0800 (PST)
+ Sat, 08 Feb 2020 08:57:16 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/13] hw/arm/raspi: Extract the RAM size from the board
- revision
-Date: Sat,  8 Feb 2020 17:56:36 +0100
-Message-Id: <20200208165645.15657-5-f4bug@amsat.org>
+Subject: [PATCH v3 09/13] hw/arm/raspi: Let class_init() directly call
+ raspi_machine_init()
+Date: Sat,  8 Feb 2020 17:56:41 +0100
+Message-Id: <20200208165645.15657-10-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200208165645.15657-1-f4bug@amsat.org>
 References: <20200208165645.15657-1-f4bug@amsat.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,68 +110,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The board revision encode the amount of RAM. Add a helper
-to extract the RAM size, and use it.
-Since the amount of RAM is fixed (it is impossible to physically
-modify to have more or less RAM), do not allow sizes different
-than the one anounced by the manufacturer.
+raspi_machine_init() access to board_rev via RaspiMachineClass.
+raspi2_init() and raspi3_init() do nothing. Call raspi_machine_init
+directly.
 
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v3: Try to make error message clearer (Zoltan)
-I used the same string as "ppc/ppc405_boards: add RAM size checks"
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg675801.html
+Squash with previous?
 ---
- hw/arm/raspi.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ hw/arm/raspi.c | 16 +++-------------
+ 1 file changed, 3 insertions(+), 13 deletions(-)
 
 diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index f285e2988f..dcd8d2d6d3 100644
+index fbfcd29732..1628b0dda7 100644
 --- a/hw/arm/raspi.c
 +++ b/hw/arm/raspi.c
-@@ -13,6 +13,7 @@
+@@ -228,7 +228,7 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
+     arm_load_kernel(ARM_CPU(first_cpu), machine, &binfo);
+ }
  
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "cpu.h"
- #include "hw/arm/bcm2836.h"
-@@ -49,6 +50,12 @@ FIELD(REV_CODE, MANUFACTURER,      16, 4);
- FIELD(REV_CODE, MEMORY_SIZE,       20, 3);
- FIELD(REV_CODE, STYLE,             23, 1);
- 
-+static uint64_t board_ram_size(uint32_t board_rev)
-+{
-+    assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
-+    return 256 * MiB << FIELD_EX32(board_rev, REV_CODE, MEMORY_SIZE);
-+}
-+
- static int board_processor_id(uint32_t board_rev)
+-static void raspi_init(MachineState *machine)
++static void raspi_machine_init(MachineState *machine)
  {
-     assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
-@@ -191,15 +198,17 @@ static void raspi_init(MachineState *machine, uint32_t board_rev)
+     RaspiMachineClass *mc = RASPI_MACHINE_GET_CLASS(machine);
+     RaspiMachineState *s = RASPI_MACHINE(machine);
+@@ -280,11 +280,6 @@ static void raspi_init(MachineState *machine)
+     setup_boot(machine, version, machine->ram_size - vcram_size);
+ }
+ 
+-static void raspi2_init(MachineState *machine)
+-{
+-    raspi_init(machine);
+-}
+-
+ static void raspi2_machine_class_init(ObjectClass *oc, void *data)
  {
-     RasPiState *s = g_new0(RasPiState, 1);
-     int version = board_version(board_rev);
-+    uint64_t ram_size = board_ram_size(board_rev);
-     uint32_t vcram_size;
-     DriveInfo *di;
-     BlockBackend *blk;
-     BusState *bus;
-     DeviceState *carddev;
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -293,7 +288,7 @@ static void raspi2_machine_class_init(ObjectClass *oc, void *data)
  
--    if (machine->ram_size > 1 * GiB) {
--        error_report("Requested ram size is too large for this machine: "
--                     "maximum is 1GB");
-+    if (machine->ram_size != ram_size) {
-+        char *size_str = size_to_str(ram_size);
-+        error_report("Invalid RAM size, should be %s", size_str);
-+        g_free(size_str);
-         exit(1);
-     }
+     rmc->board_rev = board_rev;
+     mc->desc = "Raspberry Pi 2B";
+-    mc->init = raspi2_init;
++    mc->init = raspi_machine_init;
+     mc->block_default_type = IF_SD;
+     mc->no_parallel = 1;
+     mc->no_floppy = 1;
+@@ -306,11 +301,6 @@ static void raspi2_machine_class_init(ObjectClass *oc, void *data)
+ };
  
+ #ifdef TARGET_AARCH64
+-static void raspi3_init(MachineState *machine)
+-{
+-    raspi_init(machine);
+-}
+-
+ static void raspi3_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -319,7 +309,7 @@ static void raspi3_machine_class_init(ObjectClass *oc, void *data)
+ 
+     rmc->board_rev = board_rev;
+     mc->desc = "Raspberry Pi 3B";
+-    mc->init = raspi3_init;
++    mc->init = raspi_machine_init;
+     mc->block_default_type = IF_SD;
+     mc->no_parallel = 1;
+     mc->no_floppy = 1;
 -- 
 2.21.1
 
