@@ -2,85 +2,86 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2454C35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF033C35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:59:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BCFF20726
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F9D520726
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:59:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AS2dhyHb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BCFF20726
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XP/JEWx4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F9D520726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0Phk-0001y8-LG
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 07:59:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41302)
+	id 1j0Pho-00025N-PV
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 07:59:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41333)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j0Pgj-0000OB-Nh
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:22 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j0Pgl-0000OO-4p
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j0Pgi-0004Wy-G4
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:21 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:40244)
+ (envelope-from <richard.henderson@linaro.org>) id 1j0Pgk-0004b7-38
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:23 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45985)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j0Pgi-0004RM-9C
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:20 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id t14so5596256wmi.5
- for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 04:58:19 -0800 (PST)
+ id 1j0Pgj-0004ZQ-TX
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:22 -0500
+Received: by mail-wr1-x443.google.com with SMTP id g3so962279wrs.12
+ for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 04:58:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=kj0o4rjDF/bDBgTNcCHdm/WE+i3ZIlQjUcoYosDZcmA=;
- b=AS2dhyHbDEusIcv4da/9mZz+a5x0jEgpv1vj9bEj6uH9SLWYbrpcKEEdEZvAd36kGB
- smgA19wJMUv0lBgKdsq0RE3TeDXaBJ0ppmaSrInn+ohUfdiU77lw+hjbTKQidJm4MAp/
- m6gWl0m/DkqXlx35sqCdK9qPWRlqfa7m8cM78chIxm5WpYWSgCZL4Gk9wv9sGimLBO/0
- 3bexGyRECAmmkZjUi1n95c9S1psQM4E7BJd8KEqdqrUHeBZWVZh/96y+lRFNWIzJwOmE
- I/wDObULo+dj7er6sh5iVXcvXjcl/dHaPq5Yf7MpISEhCQzttNceioD+fiRGdlKWBTzb
- 64Uw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xtW+FSSefxatLNrrEmn+GvZA5uNXwjZFYEeWUyFoKGE=;
+ b=XP/JEWx4NU6g4VtDbSBwPdjxevhfE2JL2asufRvsplPOeEpbiGmuF6hojoO++2faRP
+ oCJtNxHVviTQ4hJA0l7a7Wz58hbQUrxQeH6TYFYJf7AiyGzys0DGA91zeD10+wtVf8po
+ L3x0zFmcVmTiJJXhhwk8XILyyK9cmqbHPg/fYdtQiGV8WQ8ABcfoHa+wyflJq51Cuowl
+ 9LiLVMJ0Gy8ap27qVy9pqFGydLaEuu3+/LhWtd98pZlHU1mtXr818qRikMNbp8EY/qAv
+ mJchN/TTp7Q6V2yJFmVjlbN6hY/S+QotYuAe17TMI071ksRj0qM74F/QoWUee4A5PzR2
+ Hvrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=kj0o4rjDF/bDBgTNcCHdm/WE+i3ZIlQjUcoYosDZcmA=;
- b=Ky6No6drD6H1eQQ37mROMlLwHlG08t/zPHIe9mfuz3nlu4M9iERYLpnO35tFsjrF58
- 9asFBd+TbndtDqxMp6dL0iU61a0o1jH2Jhn6sMUQ5LZqWtp1jO/hzx2Q5ZCMbZ7CrjQO
- ergKuTuKFuQUU78FxgHi6ElKB8quwNT1M8oXjxydrPnfTY1ftJTknAWZ335Jfaqp4OIs
- oAUig4LtPrI4XHFVen0TTe5uMwelo/0EGrGxDhFXtSX5XdtP0LcMPBn2eT4hlqhFMSLB
- pPGf4CK9WF+Zqbg0zmI6WLpssnsVs8pUCFNtDknnP4YeYbnI0+V15nINX497xJSEqphv
- 8YyQ==
-X-Gm-Message-State: APjAAAXo/kvwuhPUZoqkg9wqkDeUtqpyaSVB0jVisszDLA+sChTqZcp5
- ef/VAf2TJKPpSTJlk/VQ/SHpzX149Gp4BA==
-X-Google-Smtp-Source: APXvYqy609tz91p7gJ6pBd/vX005aVwRbgBjDMCv/YP4ENf+Dyds8n5/VVhb10u8eDeikIN8l8Kf8g==
-X-Received: by 2002:a05:600c:21c6:: with SMTP id
- x6mr4376757wmj.177.1581166698079; 
- Sat, 08 Feb 2020 04:58:18 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xtW+FSSefxatLNrrEmn+GvZA5uNXwjZFYEeWUyFoKGE=;
+ b=MI5Og65J8x+JOaAhEZFy707cRIBLBqzhXfSFOiEsje5pxvBwwzPchfhCT56OwOwSO1
+ sy/RBNyon1dG1tVqkYUfnKqLPAgY/ZmluOidYnlUWz3rTNutOqV5ym/dUzErBYn6KK5J
+ g5nXtCBaFrj/l5Dn8eFI2oPrb5O/vdDoSCiDYSZ9f9iObvmBBGDP1AKMNUyDonGXSdga
+ wGvMfSxjAbmSdOymI7DCbC9jdp549Ksi13Qj96qOJwqq12SJ6NPaFVrZDsVW5drbjh/Y
+ Bji7xw25oQvY4M5MqHMRnA0CcVlwyZ+dbITjiaB0xWmXlW/jv5ca77AcHFv7YRXethk6
+ by5Q==
+X-Gm-Message-State: APjAAAXTPzB2+LERNOaoD6EAJCNeqlbcyeZdEHWAuaAAu/DJrQ/6qaiJ
+ guYsYTT3sfwVAC+1rPn1yn++i7GKcCtyVw==
+X-Google-Smtp-Source: APXvYqx5ICfyIY4JLh+Lj/qOpE8U0o4ZO2dJGSwlUkZhpSqoMwWZVu6ZI/zw7zxljpyATYf/582aow==
+X-Received: by 2002:adf:d850:: with SMTP id k16mr5284870wrl.216.1581166700754; 
+ Sat, 08 Feb 2020 04:58:20 -0800 (PST)
 Received: from localhost.localdomain ([82.3.55.76])
- by smtp.gmail.com with ESMTPSA id p5sm7490534wrt.79.2020.02.08.04.58.17
+ by smtp.gmail.com with ESMTPSA id p5sm7490534wrt.79.2020.02.08.04.58.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 08 Feb 2020 04:58:17 -0800 (PST)
+ Sat, 08 Feb 2020 04:58:20 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 00/20] target/arm: Implement PAN, ATS1E1, UAO
-Date: Sat,  8 Feb 2020 12:57:56 +0000
-Message-Id: <20200208125816.14954-1-richard.henderson@linaro.org>
+Subject: [PATCH v4 03/20] target/arm: Add isar_feature tests for PAN + ATS1E1
+Date: Sat,  8 Feb 2020 12:57:59 +0000
+Message-Id: <20200208125816.14954-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200208125816.14954-1-richard.henderson@linaro.org>
+References: <20200208125816.14954-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32f
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,60 +98,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: https://git.linaro.org/people/peter.maydell/qemu-arm.git/log/?h=target-arm.next
+Include definitions for all of the bits in ID_MMFR3.
+We already have a definition for ID_AA64MMFR1.PAN.
 
-Version 4 incorporates the feedback on v3.  In particular:
-  * Split out CPSR_J masking to its own patch.
-  * Merge trivial braces formatting fixes into patch 5.
-  * Drop "Tidy msr_mask" patch, leaving CPSR_USER handling alone.
-  * Fixes for EL3 in "Set PAN bit as required on exception entry".
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-Patches without review:
-
-  0005-target-arm-Split-out-aarch32_cpsr_valid_mask.patch
-  0006-target-arm-Mask-CPSR_J-when-Jazelle-is-not-enable.patch
-  0009-target-arm-Remove-CPSR_RESERVED.patch
-  0014-target-arm-Set-PAN-bit-as-required-on-exception-e.patch
-
-
-r~
-
-
-Richard Henderson (20):
-  target/arm: Add arm_mmu_idx_is_stage1_of_2
-  target/arm: Add mmu_idx for EL1 and EL2 w/ PAN enabled
-  target/arm: Add isar_feature tests for PAN + ATS1E1
-  target/arm: Move LOR regdefs to file scope
-  target/arm: Split out aarch32_cpsr_valid_mask
-  target/arm: Mask CPSR_J when Jazelle is not enabled
-  target/arm: Replace CPSR_ERET_MASK with aarch32_cpsr_valid_mask
-  target/arm: Use aarch32_cpsr_valid_mask in helper_exception_return
-  target/arm: Remove CPSR_RESERVED
-  target/arm: Introduce aarch64_pstate_valid_mask
-  target/arm: Update MSR access for PAN
-  target/arm: Update arm_mmu_idx_el for PAN
-  target/arm: Enforce PAN semantics in get_S1prot
-  target/arm: Set PAN bit as required on exception entry
-  target/arm: Implement ATS1E1 system registers
-  target/arm: Enable ARMv8.2-ATS1E1 in -cpu max
-  target/arm: Add ID_AA64MMFR2_EL1
-  target/arm: Update MSR access to UAO
-  target/arm: Implement UAO semantics
-  target/arm: Enable ARMv8.2-UAO in -cpu max
-
- target/arm/cpu-param.h     |   2 +-
- target/arm/cpu.h           |  95 ++++++++---
- target/arm/internals.h     |  85 ++++++++++
- target/arm/cpu.c           |   4 +
- target/arm/cpu64.c         |   9 +
- target/arm/helper-a64.c    |   6 +-
- target/arm/helper.c        | 327 +++++++++++++++++++++++++++++--------
- target/arm/kvm64.c         |   2 +
- target/arm/op_helper.c     |  14 +-
- target/arm/translate-a64.c |  31 ++++
- target/arm/translate.c     |  42 +++--
- 11 files changed, 499 insertions(+), 118 deletions(-)
-
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index c63bceaaa5..08b2f5d73e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1727,6 +1727,15 @@ FIELD(ID_ISAR6, FHM, 8, 4)
+ FIELD(ID_ISAR6, SB, 12, 4)
+ FIELD(ID_ISAR6, SPECRES, 16, 4)
+ 
++FIELD(ID_MMFR3, CMAINTVA, 0, 4)
++FIELD(ID_MMFR3, CMAINTSW, 4, 4)
++FIELD(ID_MMFR3, BPMAINT, 8, 4)
++FIELD(ID_MMFR3, MAINTBCST, 12, 4)
++FIELD(ID_MMFR3, PAN, 16, 4)
++FIELD(ID_MMFR3, COHWALK, 20, 4)
++FIELD(ID_MMFR3, CMEMSZ, 24, 4)
++FIELD(ID_MMFR3, SUPERSEC, 28, 4)
++
+ FIELD(ID_MMFR4, SPECSEI, 0, 4)
+ FIELD(ID_MMFR4, AC2, 4, 4)
+ FIELD(ID_MMFR4, XNX, 8, 4)
+@@ -3443,6 +3452,16 @@ static inline bool isar_feature_aa32_vminmaxnm(const ARMISARegisters *id)
+     return FIELD_EX64(id->mvfr2, MVFR2, FPMISC) >= 4;
+ }
+ 
++static inline bool isar_feature_aa32_pan(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->mvfr0, ID_MMFR3, PAN) != 0;
++}
++
++static inline bool isar_feature_aa32_ats1e1(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->mvfr0, ID_MMFR3, PAN) >= 2;
++}
++
+ /*
+  * 64-bit feature tests via id registers.
+  */
+@@ -3602,6 +3621,16 @@ static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, LO) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_pan(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, PAN) != 0;
++}
++
++static inline bool isar_feature_aa64_ats1e1(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, PAN) >= 2;
++}
++
+ static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
+ {
+     return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, BT) != 0;
 -- 
 2.20.1
 
