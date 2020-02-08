@@ -6,79 +6,79 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E46EC35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 14:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 926E0C35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 15:00:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BEF9217BA
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 14:44:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53FF82082E
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 15:00:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F/z3Beas"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BEF9217BA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jLESKx9Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53FF82082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0RLE-0008J8-A1
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 09:44:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59584)
+	id 1j0Rao-0007Rr-Gp
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 10:00:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32956)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j0RKe-0007ua-5R
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:43:41 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j0RaA-0006kg-14
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:59:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j0RKc-0008GA-8O
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:43:39 -0500
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:37044)
+ (envelope-from <peter.maydell@linaro.org>) id 1j0Ra8-0004LM-Oq
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:59:41 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39680)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j0RKc-0008FZ-24
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:43:38 -0500
-Received: by mail-oi1-x236.google.com with SMTP id q84so5011190oic.4
- for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 06:43:37 -0800 (PST)
+ id 1j0Ra8-0004KP-JL
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:59:40 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 77so2135652oty.6
+ for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 06:59:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cwpb7fikghgZWonDpahs2ENNETMNNb4HyI9ZIm9+Z8Y=;
- b=F/z3BeasMbuwEsG03xwof3QHzWq9Oo0XIUqz1cRAiQi0DNX1aG4NDN2rkXoUKORIEd
- zChCNc3r6oCVc9sfXF9Qt4K917bWllt0WqJkui7EY656IXBUkH0g+St+DGTI8Ob+H3ZO
- btOtixyYuZpSOxLAzVr0Q0qZaNuyu2ypNAZD+DaUEWg2GuyTdnuNyBqlLztfdXF5mxwM
- e/DNIpQYHyWaEpPLqN3JSivKkAK9ZgL2HKUd3cAFlNTVBiNAuIAUB2Cl7EqYOn467zmM
- Sz1oOHRW6/j5Q0jNV2Q6HVSQIOF0PcmV4nCQP3ww9K/HRJZdGApJVZf/4zjm5OWL8AGu
- oBKA==
+ :cc; bh=jNvPf8krr/omFfKguqhpZTL6tItHI8anHXtXlxjM9VU=;
+ b=jLESKx9Z4EVKT8y37d4nJF+Hi+DATILUDhlQ+xmH6Hj6gAUxr10CGKjojkz2hhvqFn
+ SBWaLxT2Y2P40R+0pFV0toUvIcTWBd+tgvbGJsIQCKRWWx20O/GRJN1RN7ggcXuNpHMh
+ 1sPkmNR/Tdr5TNA0NC8oV0fZzSS0WqQdk0qYWVPuBeqztN5WN5a+qSIKglumyXA0fKSX
+ XTRQBTC4bqpcPkB+y9XMRN5KQjAJkOBlhjeloMJBuyQaxv4CZIe/vjFr2IsWqnZU2/Tp
+ E2vmvYPuKnLmQfKLKBX8hn3LzXNe9q+A/X2UUM7Tghr2X3PHioB655ocfi0etPU3+Hy8
+ BzYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=cwpb7fikghgZWonDpahs2ENNETMNNb4HyI9ZIm9+Z8Y=;
- b=LqH4rr6qKBS33clZFeM9gRw0EnV9j8cuOuNZzWY+jNy7eyX95BPT35iZChhs59q0/H
- 6pegHj9gRGhoShtvEBQzN96IaITMlY89zxhG5ziu0OeeRtwLHK4z9BCc8Ty5mD1+dkmi
- VQSmfIHYQMFNXc4019fkzPPpj1n1JrXLje4xZjZ6D27eNVN/80be93rZg+qyoQ3crvrY
- wjJaKc6zwbKayOhD9I+3WUUzMcgmXyUe7Xb02FdQN/fmC2/tt/3vZ3quYwiMahwrBKmx
- +cYEN7vTd1a3dLkT9kAC3bP0c19nbzH+SVFrXoinUEcvkon/iFb/lcE22xLii38REpVP
- KUlA==
-X-Gm-Message-State: APjAAAUMoyLEuw1R56HeNMkCjVlnCMns3/gXYujRMmvsbO/6Ddr1NBJu
- ar9BZb80o99KF3YJcgQATOd7arlaY0WV2+ZbQoDhluYy
-X-Google-Smtp-Source: APXvYqz+8dKy2S5c1I5BSfMN/IM/FJ+rfMeBOb8VpKb89joVZ0RVkPEeXkmNZy3Ky/4H3Fy/+m1nF1JZloQhaJy9GEU=
-X-Received: by 2002:a54:4f16:: with SMTP id e22mr5680033oiy.170.1581173016873; 
- Sat, 08 Feb 2020 06:43:36 -0800 (PST)
+ bh=jNvPf8krr/omFfKguqhpZTL6tItHI8anHXtXlxjM9VU=;
+ b=Uv6xmeUXZBaXXdBMB9eMwgcQucGihtuP9v/RBbPQVCmBX+LXJBgFlIbNqqdXOKzbq2
+ EvU0vJ1l1d/8rV59eeYv9mkRrgnhFgCV1bJfdVfOeTYiCy1vbTRmuvhJVNvlv50ZTUk+
+ 8nTtq0Mba8BrKAvSwhxTU9i4Jasvbqop842iXfKr+jVyisqlr90KTAkh3PC7Oc+6hcwC
+ 6uyVwkpdp89c8yfmDToKW5OWIg7zrcoqIWqtiXk/kmfBEIaTiONYjHKboBAo+cvJW8ci
+ MepUTmXB3tfn09+cxmIyOqSiLQEKYBq3i52GutxzivvQq6VtEYV7PF5littuelWnp2px
+ ZoQg==
+X-Gm-Message-State: APjAAAXYuU9Y92i0oH/QLE2fFevZSe6KnQ9SxzNWMWe7tdnrrIM0TLyY
+ y7ShF3mHwQrznRb2F4eZ3HImjMJ3+gZ8web+Iio2MA==
+X-Google-Smtp-Source: APXvYqxO5GHiaQlbp4LHZAEw0Hfvv/sspH02FcnwSm9POhTdp2y/EBmQhFqFMyjtUjl6EiGUSGVD7+lSoj+ZdhheTSY=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr3432197otq.97.1581173979715; 
+ Sat, 08 Feb 2020 06:59:39 -0800 (PST)
 MIME-Version: 1.0
 References: <20200206173040.17337-1-peter.maydell@linaro.org>
- <20200206173040.17337-20-peter.maydell@linaro.org>
- <87r1z6pg0x.fsf@dusky.pond.sub.org>
- <CAFEAcA_T-Muy0NOj1uufB=QCxsn0hMvDnD-KoCz1Dv-+v71i5w@mail.gmail.com>
- <87h801jhkj.fsf@dusky.pond.sub.org>
-In-Reply-To: <87h801jhkj.fsf@dusky.pond.sub.org>
+ <877e0ynxhx.fsf@dusky.pond.sub.org>
+ <CAFEAcA-owBQMnvY5Asa4m4DUF-hBqRTmu8C7fktfvMRE2HZfgg@mail.gmail.com>
+ <87blq9jhb5.fsf@dusky.pond.sub.org>
+In-Reply-To: <87blq9jhb5.fsf@dusky.pond.sub.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 8 Feb 2020 14:43:25 +0000
-Message-ID: <CAFEAcA8bPqNa=RRyNrt+9RL0ja56Qq8-xmNnp=vg6wz7-jmrhQ@mail.gmail.com>
-Subject: Re: [PATCH 19/29] qapi/qapi-schema.json: Put headers in their own
- doc-comment blocks
+Date: Sat, 8 Feb 2020 14:59:28 +0000
+Message-ID: <CAFEAcA_WX1e1AWA=uryJLLMGNH7LMkr+iq+cMVnv9yneGSsECg@mail.gmail.com>
+Subject: Re: [PATCH 00/29] Convert QAPI doc comments to generate rST instead
+ of texinfo
 To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::236
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,177 +98,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 8 Feb 2020 at 14:10, Markus Armbruster <armbru@redhat.com> wrote:
-> A couple of remarks.
->
-> Silently passing a "# == something" line to rST for literal
-> (mis-)interpretation is not nice.  It's the kind of indifference that
-> led to the messes you cleaned up in PATCH 04 and 08.  If the '=' markup
-> is only valid in certain places, it should be rejected where it isn't.
->
-> By refusing to translate "# == something" to rST (silently or loudly,
-> doesn't matter), the first tree structure becomes impossible.  Except
-> when I do the translating myself: I can put an *rST* section wherever I
-> want.
->
-> I'm still having difficulties understanding what exactly we gain by
-> translating '=' markup to rST.
+On Sat, 8 Feb 2020 at 14:16, Markus Armbruster <armbru@redhat.com> wrote:
+> I understand the difficulty of parsing rST (Paolo called it "the Perl of
+> markup languages" for a reason).  What I don't yet understand is (1) why
+> we need to recognize the document structure of doc comments, and (2) why
+> we can do that by recognizing '=' markup, but ignore the native rST
+> document structure markup.
 
-We don't translate '=' markup to rST. We use it as the way
-the input document tells us about the structure of the
-tree of docutils sections it wants us to create. No rST
-markup is ever involved in that process.
+I think we're completely at cross purposes here, so there's
+something I've not managed to communicate clearly.
 
-If we wanted to do something with '# == something' in actual
-chunks of doc comment, we would have to specifically scan
-the doc comment for that. Currently we simply pass doc
-comments to the rST parser to be parsed. Then you have
-to document the syntax of a doc comment as "rST, except
-that as a special case a line starting == doesn't do what
-it does in normal rST text but is a syntax error".
+We don't need to recognize the document structure of doc
+comments, indeed my implementation does not -- it just
+throws a doc comment at the rST parser to handle.
 
-What I would like is:
- * doc comments are simply rST, and we interpret them as
-   rST by passing them directly to the rST parser. (We do
-   special case the "@var means ``var``" markup, but I
-   would rather keep to a minimum the number of things we
-   special case in that way.)
- * headings and subheadings affect the entire document
-   structure; they are not rST source and are never
-   interpreted as rST source or sent to the rST parser.
-   They are a thing all of their own, not a bit of markup
-   within a larger doc comment.
- * not to gratuitously change the way we in practice
-   mark up headings in our document, because that makes
-   the texi->rST transition harder for no clear gain.
-   If we absolutely must mark them up in some other way
-   than we do today, I can implement that, but it feels
-   like unnecessary work.
+We *do* need to recognize the structure *of the document*
+(ie that it does have a thing with a heading "Block devices"
+that contains another thing with a heading "Background jobs"
+that in turn contains documentation for JobType, JobStatus....)
+so that when we're building up our tree of docutils node
+objects we know when we need to create a new 'section'
+node and give it a title 'Block devices' and which of
+the various section nodes in the tree should have all
+the nodes that make up the documentation of 'JobType'
+added to it.
 
-> By the way, your implementation rejects
->
->     ##
->     # = Introduction
->     # xxx
->     ##
->
-> but silently accepts
->
->     ##
->     # xxx
->     # = Introduction
->     ##
-
-Yes. I could treat all freeform comments that aren't
-the special one-line heading/subheading as being normal
-freeform comments, which would avoid this inconsistency.
-That's probably better.
-
-> doc-good.json has more instances of this issue.  Before your series, we
-> actually check we generate the Texinfo we expect for it.  I can't find
-> where you cover this now.  It has saved me from my screwups more than
-> once, so I don't want to lose that.
-
-Yes, we no longer have a test case for "do we generate what we
-expect to". That's harder to do with a Sphinx extension because
-we don't ever output rST source anywhere that we could compare
-to an expected version. (We still have the existing tests that
-the doc comments spit out by parser.py match expected output.)
-I'm dubious about running Sphinx and comparing the generated HTML
-because that seems like it would be vulnerable to test failures
-if Sphinx internals change the fine detail of how it outputs HTML.
-
-> Now let's put my doubts and your possible bugs / omissions aside and
-> assume we want '=' markup, and we want to keep the resulting sections
-> out of "sections created by the script for a QAPI command".
->
-> A schema's documentation is a sequence of comment blocks.
->
-> Each comment block is either a definition comment block or a free form
-> comment block.
->
-> Before your series, we recognize '=' markup everywhere, but that's
-> basically wrong (see "flaws in our parsing and representation of doc
-> comments" above).  It should be accepted only in free-form comment
-> blocks.
->
-> That way, the free-form comment blocks build a section structure, and
-> the definition comment blocks slot their stuff into this structure.
->
-> Form a language design perspective, I can't see the need for restricting
-> '=' further to occur only by themselves.
->
-> Is it an issue of implementation perhaps?
-
-Do you mean: could we make the implementation take a freeform
-comment block like:
+In order to achieve this separation (don't care about
+document structure inside lumps of rST, but do want to
+know what the overall section/subsection structure of
+the document is), this patchset pulls the identification
+of the document structure (heading/subheadings) completely
+out of being something you might find in the middle of
+a doc comment, and makes them their own
+special kind of markup:
 
 ##
-# = Foo
-#
-# Some text
-#
-# = Bar
-#
-# More text
+# = This is a heading
 ##
 
-and parse through that text to split it up into
+(In my head I find I'm thinking of this as "not actually
+a doc comment", which is probably where some of my
+lack of clarity is coming from, since syntactically
+speaking and from the point of view of qapi/parser.py
+that is a sort of doc comment.)
 
-- "start new level-1 section with heading 'Foo'"
-- "a freeform comment block '\nSome text\n\n'" (for current section)
-- "start new level-1 section with heading 'Bar'"
-- "a freeform comment block '\nMore text\n\n'" (for current section)
+I suppose that there's an argument that the identification
+of headings and subheadings should really be done in
+qapi/parser.py, so that instead of
 
-so that the input rST doesn't need to mark off the headings
-as being in their own freeform comment block ?
+        vis = QAPISchemaGenRSTVisitor(self)
+        vis.visit_begin(schema)
+        for doc in schema.docs:
+            if doc.symbol:
+                vis.symbol(doc, schema.lookup_entity(doc.symbol))
+            else:
+                vis.freeform(doc)
 
-Yes, we could do that, and it wouldn't be too hard.
-My issues with that are:
+you would have something more like
 
-(1) you now don't have a way to literally write '= Foo'
-to be interpreted the way that rST would interpret it
-in a comment block that's otherwise just "any
-rST markup is fine".
+        vis = QAPISchemaGenRSTVisitor(self)
+        vis.visit_begin(schema)
+        for doc in schema.docs:
+            if doc.symbol:
+                vis.symbol(doc, schema.lookup_entity(doc.symbol))
+            else if doc.is_section_header:
+                vis.start_new_section(doc)
+            else:
+                vis.freeform(doc)
 
-(2) it falsely suggests that headings are OK in
-doc comment blocks and are just another kind of
-markup within a doc comment, when they aren't, and
-we're really just providing syntactic sugar here
-
-(3) it obscures the actual structure of the
-document, which is
-
- [root node]
-  [section]
-     [title 'Foo']
-     [Text 'Some text']
-  [section]
-     [title 'Bar']
-     [Text 'More text']
-
-where "Some text" and "More text" are in entirely
-different sections, even though they're in the same
-doc comment block. (If 'Foo' is a subsection and
-'Bar' a section, the text can end up even further
-separated within the document tree.)
-
-(4) it breaks a general approach within the handling
-of doc comments, which is that we build the document
-based on the various bits of information about the
-symbol, etc, but a chunk of text from a document
-comment is handled simply by handing it off to
-the rST parser, not by doing some script-specific
-pre-parsing and mangling of it and then handing it
-to the rST parser. This in turn means that we need
-to document the syntax of comment blocks as not
-just "it's rST with the @var-means-``var`` extra"
-but "it's rST, with @var-means-``var``, and = Foo
-is invalid most places but within a freeform block
-means this other thing". I think that minimising
-the number of extras we add on top of "the syntax
-for a block of text in a doc comment is rST"
-makes things less confusing.
+(with the identification of headers and pulling out of
+what level of nesting this header is and what its text
+is done in parser.py)
 
 thanks
 -- PMM
