@@ -2,95 +2,93 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 167BDC35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCBEFC35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E41172051A
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:50:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E41172051A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A6C4721741
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:57:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="Ox722N3H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C4721741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0NhQ-0000HA-4w
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 05:50:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45165)
+	id 1j0Nnq-0003aa-Nd
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 05:57:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45954)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j0NcD-0002vN-Tv
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:45:35 -0500
+ (envelope-from <jan.kiszka@web.de>) id 1j0Nky-00028x-SR
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:54:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j0NcC-0005P8-HD
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:45:33 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18360)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j0NcC-0005OI-8Y
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:45:32 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 018AhmT0040793
- for <qemu-devel@nongnu.org>; Sat, 8 Feb 2020 05:45:31 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y1u540kxx-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 05:45:31 -0500
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Sat, 8 Feb 2020 10:45:29 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Sat, 8 Feb 2020 10:45:26 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 018AjPrb50135240
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sat, 8 Feb 2020 10:45:25 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4E7FC52051;
- Sat,  8 Feb 2020 10:45:25 +0000 (GMT)
-Received: from smtp.tlslab.ibm.com (unknown [9.101.4.1])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3A9E85204F;
- Sat,  8 Feb 2020 10:45:25 +0000 (GMT)
-Received: from bahia.ibmuc.com (sig-9-145-71-236.uk.ibm.com [9.145.71.236])
- by smtp.tlslab.ibm.com (Postfix) with ESMTP id B9CF5220137;
- Sat,  8 Feb 2020 11:45:24 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 5/6] tests/virtio-9p: added readdir test
-Date: Sat,  8 Feb 2020 11:45:05 +0100
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200208104506.2727882-1-groug@kaod.org>
-References: <20200208104506.2727882-1-groug@kaod.org>
+ (envelope-from <jan.kiszka@web.de>) id 1j0Nkx-0007R5-Iv
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:54:36 -0500
+Received: from mout.web.de ([217.72.192.78]:39503)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1j0Nkx-0007Qw-6q
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:54:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1581159268;
+ bh=sYfdE61c9jgFzKD+slSRh/oTjHvfI2uPfM8W0Q9MQs0=;
+ h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+ b=Ox722N3HRxasP0+q9L4uyRAOi8FNleCCPu3n5uxcJ8kkDyU9l0GHl4JY/LURM9uUT
+ mEaGBq/srKLS5HLnX5fr9a3EY+pJoSnQkEcqX1yELN56JgV/A2YWXLWYzIoBfhqXNu
+ YDlEa51LLjSkLt/FyfdxzSILsBvLg2fp4kelvG88=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MEEeC-1il0c00GOe-00FWFj; Sat, 08
+ Feb 2020 11:54:28 +0100
+Subject: Re: [PATCH] ui/gtk: Get display refresh rate with GDK version 3.22 or
+ later
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>
+References: <20200116011217.2144-1-philmd@redhat.com>
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <00874860-5ec7-505f-db6a-57f9cc6cae0f@web.de>
+Date: Sat, 8 Feb 2020 11:54:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20020810-0016-0000-0000-000002E4F33D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20020810-0017-0000-0000-00003347DFDC
-Message-Id: <20200208104506.2727882-6-groug@kaod.org>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-07_06:2020-02-07,
- 2020-02-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 phishscore=0
- mlxlogscore=980 impostorscore=0 bulkscore=0 priorityscore=1501
- adultscore=0 lowpriorityscore=0 spamscore=0 clxscore=1034 suspectscore=8
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002080089
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20200116011217.2144-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:cDbkb4yiIOFxeLmiM6MaChTGaqZYSKvDGwAB5JaNa0lY4vvt3ES
+ NT1bYiMBpoVyspfh90cvtcYl30hhNVC/5P+aZYOtK6UBIiooy5x4cSqdvu1EH7AWwAr1cGw
+ K58YyUCbXVYsLBvTPQ14TGFCMzV2DwR1uJEuSshlhCtX8DdDa9ekRznuSrKPFDAoOrzGfOO
+ kwcVwer8COWEKEot2DCgg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:5HNe4TCZx4I=:XEKoUMHv5VkXK/9grrgUoA
+ b0INJluYfK34s1XQkoNeWl1pOrQBSBqk2ebzDHl8GqWOoaRj0nEbKR5Enl0Odk+QI7jf6V5TM
+ R3IqPD5khviKBxZ8cdTKoiaMUDgPCFeFUXscKefTzvYBK0e2sbZl3iXkSccKK4DAuY3twEAJf
+ lbwzjNpE7STa9MhE+TeHT61AVatMROiakPYSSc55TD/UMCU3sU22prMZ8rz6GwWP6wGcoqviV
+ g3IoabIQqgRL+J2x1ijdlVR3axUogCJNdxL3t69lYArwa6gMzprZr68Nj9cTHfGUw/2DXXvL+
+ u3QdcuGwwqK+1gwWxEozHV7YZvYZQT0dNAv3amC9kjF7HACanHOV20H6d8BtXkiD7ZXju7xdp
+ 20mWuPVbrAPF8v0cApl/EEJECEWqzlsLoRSYiIxwgo8nakvmvQfej/o3dkAJcBEpI8U780Gmu
+ iuSt3gcMq1PALec7TfXc7X32pY5P0WzIFLYW35+/3GGRRSOTkuhtzMeGk7H5F7P/ecTU3zu82
+ uRkuoKSNZ/XTaKdvEdbU6nznS6vm6rnWRrvZuegpdukd6hGUImdPwyhKTrewF8soaUTZu2y1u
+ kw1+86tmlRj1JogyKO5ZSUT0+dWm8UFNF86uv17ezL7oLtdnREbCsVbcA9cKMEnaa7tbBvlad
+ u06xMLDxx9PkH3M5mgsC7hYDDjM98LoF3uSgPPgvBJYdgphb6WTL9SJmQgp/uXMR23dBllvt2
+ 8XJH6f8KLnc/0r2ApHpsQZNjJdzfIYelBjuBfjHpkLpryWfs4PMpyz3xUwvw2Wpw/x12yL6cc
+ aH+d04xttqhZS79f0fOJP1LrlmEFCjcLL8P/OBsc+S+FfbnGUFlA7Av67KTxTNQcDPEFvho7V
+ v7/84Z06zUy6mwdM1ofe2si/ixGpOqi2p3GRxWS3oVKqn4P5vOiw8UQ6g1jg3kTNeVV/R/LQX
+ hbKZI0Jbmlf5xCKVIYCGCa79gkSmdJsBHhHDgzI0FXz+q8DbpmvWvPUVlCI9ZskDd8FbCXBhj
+ l5A4sZ8pbWa+ChDW37f13dK5zqHhe889pSfowDjszppK1QZz11DEft+TyN944uUfdTIq82Jlc
+ zyxDwqucvsy8LDiT6chyjS+viQz2EMznYIBJ+eH+qjQDsC925Rgnyz5DkPabPykqYKg8LUYJ8
+ 1uEUvbuAiMEN4AT+qgAH7CXPNsty0Yn233dJ3LcHEE6sbcgPUDkemxjrG7+3e3p/dk5fZn+K2
+ 1oQBbPv3ZwNGO1AJF
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,227 +100,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Nikola Pavlica <pavlica.nikola@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+On 16.01.20 02:12, Philippe Mathieu-Daud=C3=A9 wrote:
+> The GdkMonitor was introduced in GTK+ 3.22:
+> https://developer.gnome.org/gdk3/stable/api-index-3-22.html#api-index-3.=
+22
+>
+> If we build with older GTK+, the build fails:
+>
+>      CC      ui/gtk.o
+>    qemu/ui/gtk.c: In function =E2=80=98gd_vc_gfx_init=E2=80=99:
+>    qemu/ui/gtk.c:1973:5: error: unknown type name =E2=80=98GdkMonitor=E2=
+=80=99
+>         GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, w=
+in);
+>         ^
+>    qemu/ui/gtk.c:1973:27: error: implicit declaration of function =E2=80=
+=98gdk_display_get_monitor_at_window=E2=80=99 [-Werror=3Dimplicit-function=
+-declaration]
+>         GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, w=
+in);
+>                               ^
+>    qemu/ui/gtk.c:1973:5: error: nested extern declaration of =E2=80=98gd=
+k_display_get_monitor_at_window=E2=80=99 [-Werror=3Dnested-externs]
+>         GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, w=
+in);
+>         ^
+>    qemu/ui/gtk.c:1973:27: error: initialization makes pointer from integ=
+er without a cast [-Werror=3Dint-conversion]
+>         GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, w=
+in);
+>                               ^
+>    qemu/ui/gtk.c:2035:28: error: implicit declaration of function =E2=80=
+=98gdk_monitor_get_refresh_rate=E2=80=99 [-Werror=3Dimplicit-function-decl=
+aration]
+>         refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
+>                                ^
+>    qemu/ui/gtk.c:2035:5: error: nested extern declaration of =E2=80=98gd=
+k_monitor_get_refresh_rate=E2=80=99 [-Werror=3Dnested-externs]
+>         refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
+>         ^
+>    cc1: all warnings being treated as errors
+>    qemu/rules.mak:69: recipe for target 'ui/gtk.o' failed
+>    make: *** [ui/gtk.o] Error 1
+>
+> We only use the GdkMonitor API to get the monitor refresh rate.
+>
+> GTK+ provides convenient definition in <gdk/gdkversionmacros.h>
+> (already include by <gdk/gdk.h>) to check which API are available.
+>
+> Extract this code as a new gd_refresh_rate_millihz() function,
+> and check GDK_VERSION_3_22 is defined before calling its API.
+> If it is not defined, return 0. This is safe and fixes our build
+> failure.
+>
+> Fixes: c4c00922cc (display/gtk: get proper refreshrate)
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> Sorry I missed that, I only tested Nikola's patch on my workstation
+> which runs Fedora 30:
+>
+>    $ pkg-config --modversion gtk+-3.0
+>    3.24.11
+>
+> If Gerd acks this patch, we might consider having it directly
+> applied as a build fix.
+> ---
+>   ui/gtk.c | 23 ++++++++++++++++++-----
+>   1 file changed, 18 insertions(+), 5 deletions(-)
+>
+> diff --git a/ui/gtk.c b/ui/gtk.c
+> index 7355d34fcf..d18892d1de 100644
+> --- a/ui/gtk.c
+> +++ b/ui/gtk.c
+> @@ -1961,6 +1961,23 @@ static GtkWidget *gd_create_menu_machine(GtkDispl=
+ayState *s)
+>       return machine_menu;
+>   }
+>
+> +/*
+> + * If available, return the refresh rate of the display in milli-Hertz,
+> + * else return 0.
+> + */
+> +static int gd_refresh_rate_millihz(GtkDisplayState *s)
+> +{
+> +#ifdef GDK_VERSION_3_22
+> +    GdkDisplay *dpy =3D gtk_widget_get_display(s->window);
+> +    GdkWindow *win =3D gtk_widget_get_window(s->window);
+> +    GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win)=
+;
+> +
+> +    return gdk_monitor_get_refresh_rate(monitor);
+> +#else
+> +    return 0;
+> +#endif
+> +}
+> +
+>   static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
+>                                 QemuConsole *con, int idx,
+>                                 GSList *group, GtkWidget *view_menu)
+> @@ -1968,10 +1985,6 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s,=
+ VirtualConsole *vc,
+>       bool zoom_to_fit =3D false;
+>       int refresh_rate_millihz;
+>
+> -    GdkDisplay *dpy =3D gtk_widget_get_display(s->window);
+> -    GdkWindow *win =3D gtk_widget_get_window(s->window);
+> -    GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win)=
+;
+> -
+>       vc->label =3D qemu_console_get_label(con);
+>       vc->s =3D s;
+>       vc->gfx.scale_x =3D 1.0;
+> @@ -2032,7 +2045,7 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, =
+VirtualConsole *vc,
+>       vc->gfx.kbd =3D qkbd_state_init(con);
+>       vc->gfx.dcl.con =3D con;
+>
+> -    refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
+> +    refresh_rate_millihz =3D gd_refresh_rate_millihz(s);
+>       if (refresh_rate_millihz) {
+>           vc->gfx.dcl.update_interval =3D MILLISEC_PER_SEC / refresh_rat=
+e_millihz;
+>       }
+>
 
-The first readdir test simply checks the amount of directory
-entries returned by 9pfs server, according to the created amount
-of virtual files on 9pfs synth driver side. Then the subsequent
-readdir test also checks whether all directory entries have the
-expected file names (as created on 9pfs synth driver side),
-ignoring their precise order in result list though.
+This (as well as c4c00922cc) gives
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-Id: <e0b4402722a877178f8fb6a8ad7b64bb20150613.1579567020.git.qemu_oss@crudebyte.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- tests/qtest/virtio-9p-test.c | 152 +++++++++++++++++++++++++++++++++++
- 1 file changed, 152 insertions(+)
+qemu-system-x86_64: Gdk: gdk_window_get_origin: assertion 'GDK_IS_WINDOW (=
+window)' failed
 
-diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index 06263edb53f9..2167322985ec 100644
---- a/tests/qtest/virtio-9p-test.c
-+++ b/tests/qtest/virtio-9p-test.c
-@@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t len)
-     req->r_off += len;
- }
- 
-+static void v9fs_uint8_read(P9Req *req, uint8_t *val)
-+{
-+    v9fs_memread(req, val, 1);
-+}
-+
- static void v9fs_uint16_write(P9Req *req, uint16_t val)
- {
-     uint16_t le_val = cpu_to_le16(val);
-@@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t *val)
-     le32_to_cpus(val);
- }
- 
-+static void v9fs_uint64_read(P9Req *req, uint64_t *val)
-+{
-+    v9fs_memread(req, val, 8);
-+    le64_to_cpus(val);
-+}
-+
- /* len[2] string[len] */
- static uint16_t v9fs_string_size(const char *string)
- {
-@@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
-         id == P9_RLOPEN ? "RLOPEN" :
-         id == P9_RWRITE ? "RWRITE" :
-         id == P9_RFLUSH ? "RFLUSH" :
-+        id == P9_RREADDIR ? "READDIR" :
-         "<unknown>";
- }
- 
-@@ -348,6 +360,82 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
-     v9fs_req_free(req);
- }
- 
-+/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
-+static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t offset,
-+                            uint32_t count, uint16_t tag)
-+{
-+    P9Req *req;
-+
-+    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
-+    v9fs_uint32_write(req, fid);
-+    v9fs_uint64_write(req, offset);
-+    v9fs_uint32_write(req, count);
-+    v9fs_req_send(req);
-+    return req;
-+}
-+
-+struct V9fsDirent {
-+    v9fs_qid qid;
-+    uint64_t offset;
-+    uint8_t type;
-+    char *name;
-+    struct V9fsDirent *next;
-+};
-+
-+/* size[4] Rreaddir tag[2] count[4] data[count] */
-+static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t *nentries,
-+                          struct V9fsDirent **entries)
-+{
-+    uint32_t local_count;
-+    struct V9fsDirent *e = NULL;
-+    uint16_t slen;
-+    uint32_t n = 0;
-+
-+    v9fs_req_recv(req, P9_RREADDIR);
-+    v9fs_uint32_read(req, &local_count);
-+
-+    if (count) {
-+        *count = local_count;
-+    }
-+
-+    for (int32_t togo = (int32_t)local_count;
-+         togo >= 13 + 8 + 1 + 2;
-+         togo -= 13 + 8 + 1 + 2 + slen, ++n)
-+    {
-+        if (!e) {
-+            e = g_malloc(sizeof(struct V9fsDirent));
-+            if (entries) {
-+                *entries = e;
-+            }
-+        } else {
-+            e = e->next = g_malloc(sizeof(struct V9fsDirent));
-+        }
-+        e->next = NULL;
-+        /* qid[13] offset[8] type[1] name[s] */
-+        v9fs_memread(req, &e->qid, 13);
-+        v9fs_uint64_read(req, &e->offset);
-+        v9fs_uint8_read(req, &e->type);
-+        v9fs_string_read(req, &slen, &e->name);
-+    }
-+
-+    if (nentries) {
-+        *nentries = n;
-+    }
-+
-+    v9fs_req_free(req);
-+}
-+
-+static void v9fs_free_dirents(struct V9fsDirent *e)
-+{
-+    struct V9fsDirent *next = NULL;
-+
-+    for (; e; e = next) {
-+        next = e->next;
-+        g_free(e->name);
-+        g_free(e);
-+    }
-+}
-+
- /* size[4] Tlopen tag[2] fid[4] flags[4] */
- static P9Req *v9fs_tlopen(QVirtio9P *v9p, uint32_t fid, uint32_t flags,
-                           uint16_t tag)
-@@ -480,6 +568,69 @@ static void fs_walk(void *obj, void *data, QGuestAllocator *t_alloc)
-     g_free(wqid);
- }
- 
-+static bool fs_dirents_contain_name(struct V9fsDirent *e, const char* name)
-+{
-+    for (; e; e = e->next) {
-+        if (!strcmp(e->name, name)) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-+{
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-+    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-+    uint16_t nqid;
-+    v9fs_qid qid;
-+    uint32_t count, nentries;
-+    struct V9fsDirent *entries = NULL;
-+    P9Req *req;
-+
-+    fs_attach(v9p, NULL, t_alloc);
-+    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rwalk(req, &nqid, NULL);
-+    g_assert_cmpint(nqid, ==, 1);
-+
-+    req = v9fs_tlopen(v9p, 1, O_DIRECTORY, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rlopen(req, &qid, NULL);
-+
-+    /*
-+     * submit count = msize - 11, because 11 is the header size of Rreaddir
-+     */
-+    req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - 11, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rreaddir(req, &count, &nentries, &entries);
-+
-+    /*
-+     * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
-+     * dir entries with only one readdir request.
-+     */
-+    g_assert_cmpint(
-+        nentries, ==,
-+        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
-+    );
-+
-+    /*
-+     * Check all file names exist in returned entries, ignore their order
-+     * though.
-+     */
-+    g_assert_cmpint(fs_dirents_contain_name(entries, "."), ==, true);
-+    g_assert_cmpint(fs_dirents_contain_name(entries, ".."), ==, true);
-+    for (int i = 0; i < QTEST_V9FS_SYNTH_READDIR_NFILES; ++i) {
-+        char *name = g_strdup_printf(QTEST_V9FS_SYNTH_READDIR_FILE, i);
-+        g_assert_cmpint(fs_dirents_contain_name(entries, name), ==, true);
-+        g_free(name);
-+    }
-+
-+    v9fs_free_dirents(entries);
-+    g_free(wnames[0]);
-+}
-+
- static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-     QVirtio9P *v9p = obj;
-@@ -658,6 +809,7 @@ static void register_virtio_9p_test(void)
-                  NULL);
-     qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
-                  NULL);
-+    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
- }
- 
- libqos_init(register_virtio_9p_test);
--- 
-2.21.1
+on startup under gtk 3.22.30 (mate 1.20.1).
 
+Jan
 
