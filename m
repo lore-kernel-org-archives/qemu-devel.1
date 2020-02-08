@@ -2,85 +2,82 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FCDC35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 13:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C28EC35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 13:08:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0121D21775
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 13:08:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B36421775
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 13:08:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y6gd0Ky3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0121D21775
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OrO15+Ll"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B36421775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0PqI-0002Ko-46
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 08:08:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41512)
+	id 1j0Pqr-0003fy-6D
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 08:08:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j0Pgx-0000ql-Dz
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:36 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j0Pl9-0000ep-9C
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 08:02:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j0Pgw-0005CL-81
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:35 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37469)
+ (envelope-from <peter.maydell@linaro.org>) id 1j0Pl8-0000nC-9b
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 08:02:55 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46433)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j0Pgw-0005Be-1o
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:34 -0500
-Received: by mail-wm1-x343.google.com with SMTP id f129so5631367wmf.2
- for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 04:58:33 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j0Pl8-0000mh-3g
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 08:02:54 -0500
+Received: by mail-oi1-x244.google.com with SMTP id a22so4793148oid.13
+ for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 05:02:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=m4T2G+2BVRE0tpK6F0FDHxQ98vwNbb8dIt/PD3r4gkg=;
- b=y6gd0Ky3n40UiSJHg7tyPyzONl/LEN7FFq+MWh9yQVBU47K3ruqXkTJ/DkW6ABSpnN
- L4QyLFDt7qyqhwAO3Ook/7jhUpFDybrOZ0dYKiCqhkYr/9GQvsBqmn9Sxo5giCGrMvPs
- 5C5yYbLfkN7QDHFxO+5ZZoRwT7e7SVqWdlx0/vNSqQ/8GeOUD19KKTJ0Rmv3kOr72X1l
- 5oS8XbbwMg4rgxwD6+1KgsHS4Q6epAfYjvUDCPYs18RYnTYtavhfwvq+Xa231DrjqlLm
- h27AWWHmDiasDZjOAO8TaQYNp++Ix0ONcwqxa2WmbZm1nvLIxjGVLdCm09Ial+qYogeY
- FI1g==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Ticawza4Abt+ODcV/2R06hYS6ay9d1PUPqXEuIBK5o0=;
+ b=OrO15+LlXwVHQBd46W40w55vOK+namnDj+H5YfBGErizLrgfKz2Rd/pPtCkiz9G1AV
+ hd/uoXiO/mYrobUnieVA15W9VtC2NRTtt/OWD9PIpkAJp7D0sTQ+5Wa7OnIfQL2STBvS
+ EqyI5Vwr3OLPicuBBJPHCg/pVGiSCxr8XlqpoohB0J7uXnAfqWIwAy/rua4zYHXZtzHI
+ j2JWlFVHzzbeMucMCDcaQR0UbznlzwtEYpnH/3DztJfdyTOQV7Qc56pnKxjy9xoI0vGD
+ zTvi00NyX79U/47GJeAkHtLXk0XJli2S1/q6oFFwfgdybEZJ3cKIDvjJ0GDv8fimKNE+
+ /krQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=m4T2G+2BVRE0tpK6F0FDHxQ98vwNbb8dIt/PD3r4gkg=;
- b=Iv7mLqzAYKxch+/COtvcqBx1f0MG5Lck08P8C1pHKNfAiAIiWPpfNtB++FnFJ1y9gw
- kGNLEskfOxfHgvXm5rpZOBz+V5sNj1SJzWuLbeieZgGESJeR3TYIWBq5IAUdyfte9Tvh
- vLmUX6A39CZU1iuvcrvxNhaLgAymaESy41tEZ6ZTbNVm4vDvoIa8vhyFmyVan7XytDF4
- piIxoCVnJ0RIwwaqPbpF9mFodv4gJlT9N3VelbY60Ny0cd18w+evq56WEWQFAcwzPDOT
- MMprBAQxj+XP/nIPwibsg84pMgghwDWSqKVznlAejDMIiuReFy3LZNLNH0y60tivUgLb
- HYEw==
-X-Gm-Message-State: APjAAAWfkO7uXbxy6Jb3KqOEYDWRe4eVlJECr7Y0/Y7f0K7fY6cR4vqe
- CeMSWFTyMhzewiihTkLy60apHGnEaNwAlA==
-X-Google-Smtp-Source: APXvYqxgFzV2Zj1dzrhpTGnr56uXRAUFbQgWP/99wc2Ud7fl5jUzEhLJvlGUpKSfSJ27Q0aSDbZ4bg==
-X-Received: by 2002:a1c:3d46:: with SMTP id k67mr4508928wma.171.1581166712854; 
- Sat, 08 Feb 2020 04:58:32 -0800 (PST)
-Received: from localhost.localdomain ([82.3.55.76])
- by smtp.gmail.com with ESMTPSA id p5sm7490534wrt.79.2020.02.08.04.58.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 08 Feb 2020 04:58:32 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 15/20] target/arm: Implement ATS1E1 system registers
-Date: Sat,  8 Feb 2020 12:58:11 +0000
-Message-Id: <20200208125816.14954-16-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200208125816.14954-1-richard.henderson@linaro.org>
-References: <20200208125816.14954-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Ticawza4Abt+ODcV/2R06hYS6ay9d1PUPqXEuIBK5o0=;
+ b=uVs18IJJKTwdXoQxGzmtpsFEReAI3JBExp9/RgktJeyfDkLhrEa5h1NhyfSga0AxEd
+ 54cGAKqSMa7JbZheZbGQ134AJgVMi8QtW7EUQAaOq+p7dixW2NwsQaUR/nIVGOnxi3pz
+ 6xLfCmm4h3AoOutuh1z8s8rzkIlUuyzr8mo8gV05G+8Bt379+zfzOr40yu5aopldWk6D
+ N7VU/cpVHTgZMjtMiXTVpQ23GoQdxRl/Pq5GPFuVjdrFwiXzi9INS64INkaiTwLefmpa
+ 7XRsNjRg3y7luaMXqM/cfyrdoRITOm0qNfBx41m3mMjsNJ0prCpaqzSRg6CG4nx6dpWw
+ gHRg==
+X-Gm-Message-State: APjAAAUZmzIJ0PO7fJgMT7PWHuuoZV6d/NEvihvAaUW/DpErq/VO6qg7
+ 6g8tw5+0dunG+2WY6WnSPy0DHEy3ZnQCDAKSSje5Jg==
+X-Google-Smtp-Source: APXvYqyTDWD1eFtPr2cen92aUb7Zsivfi53JKYbHwUaG4jgfBgDSNvubu3Goj29+1SrAjtAW44COycBnhOxyho8eq+8=
+X-Received: by 2002:a05:6808:289:: with SMTP id
+ z9mr5099803oic.48.1581166972862; 
+ Sat, 08 Feb 2020 05:02:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200203032328.12051-1-crosa@redhat.com>
+ <20200203032328.12051-2-crosa@redhat.com>
+ <a87e5634-903d-2ad5-4f33-b65f77703302@redhat.com>
+ <20200207193429.GB13258@localhost.localdomain>
+In-Reply-To: <20200207193429.GB13258@localhost.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 8 Feb 2020 13:02:41 +0000
+Message-ID: <CAFEAcA8dF+1a3zjw2MBVfD5k5U4EeU21iOik1mhKqg1ubicA6Q@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] GitLab CI: crude mapping of PMM's scripts to jobs
+To: Cleber Rosa <crosa@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,117 +89,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a minor enhancement over ARMv8.1-PAN.
-The *_PAN mmu_idx are used with the existing do_ats_write.
+On Fri, 7 Feb 2020 at 19:34, Cleber Rosa <crosa@redhat.com> wrote:
+> Also, the build and make steps worked fine without `--disable-gnutls`.
+> I was trying to not carry over any "exception" type of arguments,
+> unless they proved to be necessary.  Maybe Peter can give some more
+> info about this (should it be kept or not)?
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2: Move regdefs to file scope (pmm).
----
- target/arm/helper.c | 56 ++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 50 insertions(+), 6 deletions(-)
+A lot of those config options are random historical accident:
+I probably added in the configure option to work around something
+years back and then never bothered to undo it. I agree that if we
+don't need to pass that option to run on whatever OS the CI
+job is running on we shouldn't keep it.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index de16ce79ad..d99661d4ea 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -3409,16 +3409,21 @@ static void ats_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
- 
-     switch (ri->opc2 & 6) {
-     case 0:
--        /* stage 1 current state PL1: ATS1CPR, ATS1CPW */
-+        /* stage 1 current state PL1: ATS1CPR, ATS1CPW, ATS1CPRP, ATS1CPWP */
-         switch (el) {
-         case 3:
-             mmu_idx = ARMMMUIdx_SE3;
-             break;
-         case 2:
--            mmu_idx = ARMMMUIdx_Stage1_E1;
--            break;
-+            g_assert(!secure);  /* TODO: ARMv8.4-SecEL2 */
-+            /* fall through */
-         case 1:
--            mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
-+            if (ri->crm == 9 && (env->uncached_cpsr & CPSR_PAN)) {
-+                mmu_idx = (secure ? ARMMMUIdx_SE10_1_PAN
-+                           : ARMMMUIdx_Stage1_E1_PAN);
-+            } else {
-+                mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
-+            }
-             break;
-         default:
-             g_assert_not_reached();
-@@ -3487,8 +3492,13 @@ static void ats_write64(CPUARMState *env, const ARMCPRegInfo *ri,
-     switch (ri->opc2 & 6) {
-     case 0:
-         switch (ri->opc1) {
--        case 0: /* AT S1E1R, AT S1E1W */
--            mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
-+        case 0: /* AT S1E1R, AT S1E1W, AT S1E1RP, AT S1E1WP */
-+            if (ri->crm == 9 && (env->pstate & PSTATE_PAN)) {
-+                mmu_idx = (secure ? ARMMMUIdx_SE10_1_PAN
-+                           : ARMMMUIdx_Stage1_E1_PAN);
-+            } else {
-+                mmu_idx = secure ? ARMMMUIdx_SE10_1 : ARMMMUIdx_Stage1_E1;
-+            }
-             break;
-         case 4: /* AT S1E2R, AT S1E2W */
-             mmu_idx = ARMMMUIdx_E2;
-@@ -6683,6 +6693,32 @@ static const ARMCPRegInfo vhe_reginfo[] = {
-     REGINFO_SENTINEL
- };
- 
-+#ifndef CONFIG_USER_ONLY
-+static const ARMCPRegInfo ats1e1_reginfo[] = {
-+    { .name = "AT_S1E1R", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 0,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
-+      .writefn = ats_write64 },
-+    { .name = "AT_S1E1W", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 1,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
-+      .writefn = ats_write64 },
-+    REGINFO_SENTINEL
-+};
-+
-+static const ARMCPRegInfo ats1cp_reginfo[] = {
-+    { .name = "ATS1CPRP",
-+      .cp = 15, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 0,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
-+      .writefn = ats_write },
-+    { .name = "ATS1CPWP",
-+      .cp = 15, .opc1 = 0, .crn = 7, .crm = 9, .opc2 = 1,
-+      .access = PL1_W, .type = ARM_CP_NO_RAW | ARM_CP_RAISES_EXC,
-+      .writefn = ats_write },
-+    REGINFO_SENTINEL
-+};
-+#endif
-+
- void register_cp_regs_for_features(ARMCPU *cpu)
- {
-     /* Register all the coprocessor registers based on feature bits */
-@@ -7620,6 +7656,14 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-     if (cpu_isar_feature(aa64_pan, cpu)) {
-         define_one_arm_cp_reg(cpu, &pan_reginfo);
-     }
-+#ifndef CONFIG_USER_ONLY
-+    if (cpu_isar_feature(aa64_ats1e1, cpu)) {
-+        define_arm_cp_regs(cpu, ats1e1_reginfo);
-+    }
-+    if (cpu_isar_feature(aa32_ats1e1, cpu)) {
-+        define_arm_cp_regs(cpu, ats1cp_reginfo);
-+    }
-+#endif
- 
-     if (arm_feature(env, ARM_FEATURE_EL2) && cpu_isar_feature(aa64_vh, cpu)) {
-         define_arm_cp_regs(cpu, vhe_reginfo);
--- 
-2.20.1
+More generally, I don't think we should worry much about
+exactly replicating the fine detail of the various configurations I
+currently run on x86. If we basically cover:
+ * a debug build
+ * a non-debug build
+ * a linux-user --static build
+ * a clang build with the sanitizers enabled [+]
+ * windows crossbuilds
+ * a --disable-tcg build
+ * an --enable-tci-interpreter build
+ * and at least one of the above is done as an "incremental"
+   build and one as a "make clean and then build"
+then that's the same coverage we have today.
 
+[+] my scripts do this by hand by passing a lot of extra cflags,
+but IIRC configure now supports a simple 'enable sanitizers'
+option of some kind, which would be OK too
+
+thanks
+-- PMM
 
