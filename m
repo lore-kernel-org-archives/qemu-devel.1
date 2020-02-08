@@ -4,118 +4,115 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0A0C35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 843EAC35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:37:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AA5420726
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:29:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E63621775
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 10:37:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vpGX8vh/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AA5420726
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Yf5CMUZ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E63621775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0NN6-0004Xs-HJ
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 05:29:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42513)
+	id 1j0NUJ-0007ny-Cq
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 05:37:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44374)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j0NM9-0003RM-6V
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:28:58 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j0NTc-0006fJ-V7
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:36:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j0NM7-0005jQ-Gl
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:28:56 -0500
-Received: from mail-vi1eur05on2094.outbound.protection.outlook.com
- ([40.107.21.94]:57312 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j0NTb-0003NZ-Rj
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 05:36:40 -0500
+Received: from mail-eopbgr60124.outbound.protection.outlook.com
+ ([40.107.6.124]:40190 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j0NM5-0005c2-9o; Sat, 08 Feb 2020 05:28:55 -0500
+ id 1j0NTZ-00035H-2K; Sat, 08 Feb 2020 05:36:37 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MPve75VqPhYaCehf0iIefF34RvDnD/XPO3+It9ANdOxyibHTHJbFSWbqIdja3s85Jxv9PNARen3eaeVA8PL7mWgghXRBs+7atScKDTToiTmjkHtQdmUXgmsfSWRfyMUBYcNvmPEdD87311iPtFMz5vVEo1vf+jAG67Rr/8GNyk4OUC7dnGcrLHZZtl/7RjBFZR05zFzgbjI+XNP5q/8eZx6Rn64nhIvt8hFxslulIR3mNZ5SeyRqbC+N6dOm5IAVCKgbX9nQfE1HW7ant+GtPn10J/cF5HjcxmGjyg1WC4neWxWltrbia8nnRorBf1epq31EgA/n+5apsamOd/f+2g==
+ b=W27vmzcu1NKVYHyQz0s1TsjdGmzTU0iSo8KsOA166w4GukqZDvcEUb+wHF8ABtOVFvHgeEnQwaElLxzZe/QuVojDOHOTIyPwtu8mki6HlgvQgj5gZZbL1E3W4yxgoikDWKAPKvu5rhIly69RYRv63nKxvqbiYe1bKmc0pg2tUP47beET3xZVmwe6c5/kYl7gIepCFiIrdItaaAGj2kZC1y22gR/xiDtkVIv52K6cZGIoPg/e/DYkZS0EvfNjVUiAfItBB24UBSDrTzvuEZy7tRaf4gGwOOmadAZAymJjOnaazN1vsLLmACp26XmP/l1aUSOMXlM+wDvYjfgZuf0AAQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x1HmklBLI2+2YpHXw49VVl/8SovNAaGQQb/pUe9dA2w=;
- b=kEzXyTiirqWFNTR+k/F+8hRYiuecVW/ikF564WBCPK28C2S/Rd0IcXNPUFKvUTG3yoALInWLLdU4UTc7EV1MTB6Z5DLq6DmHTWC0uoolbbXDFagRXMjBoJmxVAiSCrSVyDJU5TReplRoS8dleJ8fDnTsIuVfDgfWjqCBps9/LqS8qZAvEjdhY3VxwGQ0nhUvh6dst1vc8/blgg6gasYkb6nv/4kmwS9ee9z2ao5s8AlKMqCzQJk+nNnIoMtQTq8DQUlKQX4RobQXJJdMB/dvxzQYV9vMb47cx0NlbXBzxmYMGLYNdhRDRxSco8+U4Tk87fZsd1aHprtatGCrJfrvqQ==
+ bh=HCa4omPyS7QR2nzBtxg7IvGeRGsMO0xKVrHwca7mOkc=;
+ b=Ixp7nqC8ilssWIzFTvbvxEQxVik0GxWU3kGeaCbQ6Kc+IiN9XZcT6h/n3m7a8p5/vOV1Q3ZtAPnO+VjiiaYgCA/RrxtO1LjtAsXQL+UtYLEXQxjH5gQM6uIdFhtmGrVM2W3XpGrOTwj5jJxLEwG+1ui36I7lVVYDGPZUNB3O+u/roCUrm83tyXnczHQW8i2p+177Et7FjK114poTFDpc1tQndZKXxWsnaesmdcZNp37MChVlYdZdB3cIDOHNWlpZmsUYld95JU4UXVfGaZamZN4nVaUZoT9MMzuxRlGzdadpQK/Ps/vc7TFy+YCW7935gECtIzGT8nZtoVa2MXHHvQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x1HmklBLI2+2YpHXw49VVl/8SovNAaGQQb/pUe9dA2w=;
- b=vpGX8vh/0Zb1jmbUwtdjzL1Hnj2lN7TsXNVxq/9tqvd3VXGGR9nhexIfwliEnOhdqKR349eg2ApEyH3TujtMquqFkbK/OBXlFEQa+hIHrBJpZDdXzED7oMjE7IU4GRgfLfZIteIdoLvZDOfQx4YLUDF1lvSzwVY8rIOirQMvlWw=
+ bh=HCa4omPyS7QR2nzBtxg7IvGeRGsMO0xKVrHwca7mOkc=;
+ b=Yf5CMUZ3c61n6RqNxJ0/qJ218KkaIPiPj9ULUKH6OzGiOvGkKV4mGXKogupaRFA9Pdcy638Y7K8kuHuh581yf/s2DMeHjVOBdLrQMYSDuyCWP/rt/Ly3BDQbBhvzwyV9FkdVLX/1hSiqJSv14azYKHxyfdA1zfL8woDJg3d5yoc=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=vsementsov@virtuozzo.com; 
 Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4884.eurprd08.prod.outlook.com (10.255.99.21) with Microsoft SMTP
+ AM6PR08MB4166.eurprd08.prod.outlook.com (20.179.1.80) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Sat, 8 Feb 2020 10:28:50 +0000
+ 15.20.2707.21; Sat, 8 Feb 2020 10:36:31 +0000
 Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
  ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
  ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2707.024; Sat, 8 Feb 2020
- 10:28:50 +0000
-Subject: Re: [PATCH v2 for-5.0 0/7] block-copy improvements: part I
-To: Max Reitz <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191127180840.11937-1-vsementsov@virtuozzo.com>
- <bbfcf774-e763-f7ed-2501-e5fba150cd5e@virtuozzo.com>
- <bee43863-28e9-09c8-8058-2d667f114338@virtuozzo.com>
- <a5d0bd06-1193-c646-dbb9-b2b701661c5b@redhat.com>
+ 10:36:31 +0000
+Subject: Re: ping Re: [PATCH for-5.0 v2 0/3] benchmark util
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200208132847575
-Message-ID: <45ea9de2-5e1d-6a33-c803-338bbed1824f@virtuozzo.com>
-Date: Sat, 8 Feb 2020 13:28:47 +0300
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20191126154848.193407-1-vsementsov@virtuozzo.com>
+ <e1efd3d2-b623-292b-67a9-e3cdd479f104@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200208133628629
+Message-ID: <fca8ced2-b3c6-74db-0d70-11ac3304b273@virtuozzo.com>
+Date: Sat, 8 Feb 2020 13:36:28 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
-In-Reply-To: <a5d0bd06-1193-c646-dbb9-b2b701661c5b@redhat.com>
+In-Reply-To: <e1efd3d2-b623-292b-67a9-e3cdd479f104@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1P195CA0016.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::26)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
+X-ClientProxiedBy: HE1PR09CA0081.eurprd09.prod.outlook.com
+ (2603:10a6:7:3d::25) To AM6PR08MB4423.eurprd08.prod.outlook.com
  (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
 Received: from [172.16.24.200] (185.231.240.5) by
- HE1P195CA0016.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::26) with Microsoft
+ HE1PR09CA0081.eurprd09.prod.outlook.com (2603:10a6:7:3d::25) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21 via Frontend Transport; Sat, 8 Feb 2020 10:28:49 +0000
-X-Tagtoolbar-Keys: D20200208132847575
+ 15.20.2707.23 via Frontend Transport; Sat, 8 Feb 2020 10:36:30 +0000
+X-Tagtoolbar-Keys: D20200208133628629
 X-Originating-IP: [185.231.240.5]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 40e95fbb-0100-413e-8661-08d7ac81afda
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4884:
+X-MS-Office365-Filtering-Correlation-Id: 3bfda370-0b7b-423e-2ea0-08d7ac82c2b3
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4166:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4884CEEDF039C1D6B3BF78DDC11F0@AM6PR08MB4884.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4166046B02F1BD76FB1F7BECC11F0@AM6PR08MB4166.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
 X-Forefront-PRVS: 03077579FF
 X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(396003)(39830400003)(376002)(346002)(199004)(189003)(31696002)(52116002)(16576012)(36756003)(26005)(110136005)(186003)(54906003)(2616005)(16526019)(956004)(53546011)(6486002)(316002)(8676002)(81166006)(66476007)(86362001)(81156014)(4326008)(66946007)(4744005)(66556008)(8936002)(2906002)(5660300002)(107886003)(478600001)(31686004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4884;
+ SFS:(10019020)(39850400004)(396003)(346002)(376002)(366004)(136003)(189003)(199004)(81156014)(2906002)(8676002)(8936002)(86362001)(31696002)(16526019)(81166006)(4326008)(52116002)(316002)(478600001)(16576012)(5660300002)(6486002)(66476007)(66556008)(36756003)(31686004)(26005)(66946007)(186003)(2616005)(956004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4166;
  H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
+ PTR:InfoNoRecords; MX:1; A:1; 
 Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PHtvlqulZbUAK6w5QDsTqcjtX4xGR8wHb4Del2+w0BmvE1/yv5d6T7hi7nqlbEPduTl9fHAbROXK0rKYAuSG0kcR9V5nfjGByu2XhBy7y4xKObYJ48iqKs1EBgmcopk5vpxuw3/DmbKkfn9aShVN55F/y+iG2ZeAtjERZsLpRd7aRkP+HuJteGsPXtaRmkJdiH1AyjBcZT60v+uxEpbjDfNH6ZsbYrucI1l8oilUc6tbeG0tTAViqc1nH0qTuEGn9okMKVjBgiuelGe9wBD/KUKxBVg2fZsQTouvtfKJvsHzhL1k5BfO5kUcA+qwd7r4nFldmTSsHwy4VuviDqc4TVMtfLmG7xwZeTRuslxT6Igi1oDiIFknZksnHG4E0I3yhJdxqeaRKVXsABOBhmUrD5qP2ewyHNZGfVUlNCN2tewUurXQTXYYucf+KNxuAIzg
-X-MS-Exchange-AntiSpam-MessageData: V0m0vunhaOnyKwpie6ZT6Lxzj4Hhm0wpYKDZycytaDbwOMcz/u68PM+wjQVdpDuv8yeSyCj9S3AeD2S6UUkFbfUrnEsoZRfNWia58PmoJSqmMFABFF5pUrOiFlN9miWXwJaiWeg6Cnp77O4PauPbvA==
+X-Microsoft-Antispam-Message-Info: fF2aUnscYoshatz01hctdEbtQDysd4K/XkR8LwLaOAIB74qEG4jmbPszfVKt+GvifUo4cDGwqPLZZJo8TfQueVQLe6CXm9luCcDmzVgUT69ToeYQhOXpuH0muDvbTFWFvL04eaoD80hyd/XwYSFI0wkuQbF6G+nZgRvail1e659C5Ne5uv0Q+8tDX0RgotYn50qrG2kbiwUwbll+XoF7cq0MlnEyD+9k92By4IYNFG5kIPDeC+3nA8V2deNWtJsWym4I/kYG3/sXDHlolhj2jX0GpsAHf5eq8Q3jkgR0diLxAjOtUyBrfw/6PrFjz4XVaWveTCT7IWtM0foOaXeLBpfhMyy+4SuKPg9GFLR0Km3mOBvj1oM2DHmM2n9r/5r2QOwP2xU0bfZdGaRc0PYiLYcDR47bgFxQfENQ7yeGbXAunMrHY5Jk2WJWVmxcbjl7
+X-MS-Exchange-AntiSpam-MessageData: znv77AMaCoPkmGs5/jIzoG9JipETtuzk4kFfYDTC3IeQsNivzkN1l5wWgCpXLEhBs6wDTqIkTXy/n9elV22n9vU1hTHSBN72Vb7eft63MraAhaJad+z3wKVHqWgo99GlpqiPNnPb3+yB1ogpI7MitQ==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40e95fbb-0100-413e-8661-08d7ac81afda
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2020 10:28:49.9396 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bfda370-0b7b-423e-2ea0-08d7ac82c2b3
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2020 10:36:31.0292 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tX8YhF7tLEZYAGsasU41lsTVLIaoAPIf/9ug1H36ZsYWulUJ9BkRZFfcYAeWl6/61gmW1qlopHm4aivS94z4FqjZRAmlfgPl6Jiqgt96eFs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4884
+X-MS-Exchange-CrossTenant-UserPrincipalName: NHFKdzrth9zFenQBPvUDYxCRXJxl2z4hvL8VX/TEhnsZLwoZEYulw5K2Ps8J4I54gs0TrrtPeScWwDUxLSVMHfD2ePkdcAaiMXLRhH1XSE4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4166
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.21.94
+X-Received-From: 40.107.6.124
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,27 +124,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: kwolf@redhat.com, ehabkost@redhat.com, stefanha@gmail.com,
+ mreitz@redhat.com, crosa@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-07.02.2020 21:05, Max Reitz wrote:
-> On 20.01.20 10:09, Vladimir Sementsov-Ogievskiy wrote:
->> ping
->=20
-> Sorry, I only got to patch 5 so far (without major complaints). I=E2=80=
-=99ll
-> have to pack things up for the weekend now and I=E2=80=99ll be on PTO nex=
-t week,
-> so I won=E2=80=99t get to review the final two patches before Feb 17, I=
-=E2=80=99m afraid...
->=20
+pingg..
 
-Thanks for the start and have a nice rest!
+Hi! Could it be merged at all?
+
+20.01.2020 12:10, Vladimir Sementsov-Ogievskiy wrote:
+> ping
+>=20
+> 26.11.2019 18:48, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
+>>
+>> Here is simple benchmarking utility, to generate performance
+>> comparison tables, like the following:
+>>
+>> ----------=C2=A0 -------------=C2=A0 -------------=C2=A0 -------------
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ backup-1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 backup-2=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 mirror
+>> ssd -> ssd=C2=A0 0.43 +- 0.00=C2=A0=C2=A0 4.48 +- 0.06=C2=A0=C2=A0 4.38 =
++- 0.02
+>> ssd -> hdd=C2=A0 10.60 +- 0.08=C2=A0 10.69 +- 0.18=C2=A0 10.57 +- 0.05
+>> ssd -> nbd=C2=A0 33.81 +- 0.37=C2=A0 10.67 +- 0.17=C2=A0 10.07 +- 0.07
+>> ----------=C2=A0 -------------=C2=A0 -------------=C2=A0 -------------
+>>
+>> This is a v2, as v1 was inside
+>> =C2=A0 "[RFC 00/24] backup performance: block_status + async"
+>>
+>> I'll use this benchmark in other series, hope someone
+>> will like it.
+>>
+>> Vladimir Sementsov-Ogievskiy (3):
+>> =C2=A0=C2=A0 python: add simplebench.py
+>> =C2=A0=C2=A0 python: add qemu/bench_block_job.py
+>> =C2=A0=C2=A0 python: add example usage of simplebench
+>>
+>> =C2=A0 python/bench-example.py=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ |=C2=A0 80 +++++++++++++++++++++
+>> =C2=A0 python/qemu/bench_block_job.py | 115 ++++++++++++++++++++++++++++=
++
+>> =C2=A0 python/simplebench.py=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | 128 +++++++++++++++++++++++++++++++++
+>> =C2=A0 3 files changed, 323 insertions(+)
+>> =C2=A0 create mode 100644 python/bench-example.py
+>> =C2=A0 create mode 100755 python/qemu/bench_block_job.py
+>> =C2=A0 create mode 100644 python/simplebench.py
+>>
+>=20
+>=20
 
 
 --=20
