@@ -2,119 +2,85 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F71CC35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2454C35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:59:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6475520726
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:56:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BCFF20726
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 12:59:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="jTysmf3A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6475520726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AS2dhyHb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BCFF20726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0PfL-00071t-L5
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 07:56:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40577)
+	id 1j0Phk-0001y8-LG
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 07:59:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41302)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j0Peb-0006Rw-2v
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:56:10 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j0Pgj-0000OB-Nh
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j0PeW-0006Wx-Rt
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:56:06 -0500
-Received: from mail-db8eur05on2114.outbound.protection.outlook.com
- ([40.107.20.114]:59616 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j0PeV-0006PP-KV; Sat, 08 Feb 2020 07:56:04 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BaanUKMhdJHrF3DFDX8NBVmssqEoZVbyPWyg3yh6vYsCOy4y7gX8QmfXKmdhx7PidGurflT5XcKwUh7Wl80kW0zm67WPnI68Gjlpif4rQmMCTMfA8QGw+tX3Dc2RIQEdbet4Awad4EcSrmm/pjWw0kjbsyF4d9HXB1U+MpT3SVsIo8uHHvE9o1hoBn5ocuf1MmWMoRrEuEnGvQAjPxF0rc3mb8PWuCyoOP2T73l5dpX8XzCdLjq92oKUq/NPv9wzSVl8EqSf443PVDJIZl/0preBpTRY+Q4nic9OPMmxcugzQLF3YCoyHH8UccKMv2QWyNQbkXyEIaKtIcrdaXa3UQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kfozLtDnbILPhvV7/1WZAnYlctOOyurNwKBLF2Au47I=;
- b=Lf414+/vikTTkzC1pPOdTuNsZJbIL+dWJYG+IrCM4ZO3bdRYBZ/TeJ2yk9f7pjEHxWG3VkDCdFnBzT08hGnABhdcQ3mNcAI9EcFsl7J6PvQ6VSTCPGhGDz4RQY2duoptQZF0kTcyY1dQl/qihKaaUCqECYOlebWvn35F2QZPQjgmcOGpPlgiqTANZOiVafGjQ/7hy1xnoCFIM8jateHag8Qvu6lKiF+w5i0aYrKLsbf98bBSWkS1091e02EFWBEKWgqf8RLtTLrglUMo6SFmf9eHljxwQ3ak3tmxmkbaeMpOcVofg/rD2p14bvZ6BTvsTKKIR9RHgQR/JPhHxK3m2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kfozLtDnbILPhvV7/1WZAnYlctOOyurNwKBLF2Au47I=;
- b=jTysmf3AkhvF3bK54411zLl3AtUSNZt2SERyKwOLd9nDm9tusVaqSgXgpf023Lj1JvbC/rZ5qVrv6igrUA/252CGJAzEgOsGzHOr4seDvE0MqElHH99VovzKqZ5pzz4XXPmG0udAjM/SHOJu63TEVwVqeOsF4/L3mXCM8PjvFmQ=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4772.eurprd08.prod.outlook.com (10.255.99.147) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.24; Sat, 8 Feb 2020 12:55:53 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2707.024; Sat, 8 Feb 2020
- 12:55:53 +0000
-Subject: Re: [PATCH v2 4/7] block/block-copy: refactor interfaces to use bytes
- instead of end
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20191127180840.11937-1-vsementsov@virtuozzo.com>
- <20191127180840.11937-5-vsementsov@virtuozzo.com>
- <b41bd0ca-07f6-27e5-b6c7-eefa2a4826ba@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200208155551141
-Message-ID: <8e787b7a-6997-fcd4-1eec-4cf3b52c5c2a@virtuozzo.com>
-Date: Sat, 8 Feb 2020 15:55:51 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <b41bd0ca-07f6-27e5-b6c7-eefa2a4826ba@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1PR0701CA0086.eurprd07.prod.outlook.com
- (2603:10a6:3:64::30) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <richard.henderson@linaro.org>) id 1j0Pgi-0004Wy-G4
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:21 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:40244)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j0Pgi-0004RM-9C
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:20 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id t14so5596256wmi.5
+ for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 04:58:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=kj0o4rjDF/bDBgTNcCHdm/WE+i3ZIlQjUcoYosDZcmA=;
+ b=AS2dhyHbDEusIcv4da/9mZz+a5x0jEgpv1vj9bEj6uH9SLWYbrpcKEEdEZvAd36kGB
+ smgA19wJMUv0lBgKdsq0RE3TeDXaBJ0ppmaSrInn+ohUfdiU77lw+hjbTKQidJm4MAp/
+ m6gWl0m/DkqXlx35sqCdK9qPWRlqfa7m8cM78chIxm5WpYWSgCZL4Gk9wv9sGimLBO/0
+ 3bexGyRECAmmkZjUi1n95c9S1psQM4E7BJd8KEqdqrUHeBZWVZh/96y+lRFNWIzJwOmE
+ I/wDObULo+dj7er6sh5iVXcvXjcl/dHaPq5Yf7MpISEhCQzttNceioD+fiRGdlKWBTzb
+ 64Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=kj0o4rjDF/bDBgTNcCHdm/WE+i3ZIlQjUcoYosDZcmA=;
+ b=Ky6No6drD6H1eQQ37mROMlLwHlG08t/zPHIe9mfuz3nlu4M9iERYLpnO35tFsjrF58
+ 9asFBd+TbndtDqxMp6dL0iU61a0o1jH2Jhn6sMUQ5LZqWtp1jO/hzx2Q5ZCMbZ7CrjQO
+ ergKuTuKFuQUU78FxgHi6ElKB8quwNT1M8oXjxydrPnfTY1ftJTknAWZ335Jfaqp4OIs
+ oAUig4LtPrI4XHFVen0TTe5uMwelo/0EGrGxDhFXtSX5XdtP0LcMPBn2eT4hlqhFMSLB
+ pPGf4CK9WF+Zqbg0zmI6WLpssnsVs8pUCFNtDknnP4YeYbnI0+V15nINX497xJSEqphv
+ 8YyQ==
+X-Gm-Message-State: APjAAAXo/kvwuhPUZoqkg9wqkDeUtqpyaSVB0jVisszDLA+sChTqZcp5
+ ef/VAf2TJKPpSTJlk/VQ/SHpzX149Gp4BA==
+X-Google-Smtp-Source: APXvYqy609tz91p7gJ6pBd/vX005aVwRbgBjDMCv/YP4ENf+Dyds8n5/VVhb10u8eDeikIN8l8Kf8g==
+X-Received: by 2002:a05:600c:21c6:: with SMTP id
+ x6mr4376757wmj.177.1581166698079; 
+ Sat, 08 Feb 2020 04:58:18 -0800 (PST)
+Received: from localhost.localdomain ([82.3.55.76])
+ by smtp.gmail.com with ESMTPSA id p5sm7490534wrt.79.2020.02.08.04.58.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 08 Feb 2020 04:58:17 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 00/20] target/arm: Implement PAN, ATS1E1, UAO
+Date: Sat,  8 Feb 2020 12:57:56 +0000
+Message-Id: <20200208125816.14954-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0701CA0086.eurprd07.prod.outlook.com (2603:10a6:3:64::30) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.9 via Frontend Transport; Sat, 8 Feb 2020 12:55:52 +0000
-X-Tagtoolbar-Keys: D20200208155551141
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 048909a4-a9e5-4bf5-30c3-08d7ac963afe
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4772:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB477297360A0C621338C9BC1DC11F0@AM6PR08MB4772.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:983;
-X-Forefront-PRVS: 03077579FF
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(396003)(346002)(39850400004)(376002)(189003)(199004)(6486002)(86362001)(186003)(478600001)(16526019)(26005)(53546011)(81156014)(81166006)(52116002)(31686004)(8676002)(8936002)(956004)(2616005)(31696002)(316002)(66476007)(66556008)(66946007)(16576012)(2906002)(5660300002)(4326008)(107886003)(36756003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4772;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ekfMowjgau4NhkYDH2dQR16WTsF14FwTd/fMFF8RQp7EXkmBIK0kRq8sB1lasDRNsJPdWPpEcguYa+StXukpP8mIY74Wjce30p4zrLn3lBBXM5HOwdLKMRWb6r3OXFNSgOEBXaWZC4vsX5zYqYs/QViJsnLYI8dFHpZqqknegyMO87SyTTN2qv9zKZ9GD+C3nHCxJdi2eq1ULq60AhR3ReFPtGK1/5EjytZuK47GcNVWVfzpwn53myRBglToxmPOdt2hTC/X1SLnUetDXMhTQhih4vUi2f0MVTZfQll8Lr+vXOWn5B/00cbl3/y5KZKj9+ZoT7FtbnEovmuj1iQHA5VDL9XWaa7d3GXUddgRh7Q+ZJiJnNSWM5SYM982FBD0+72Jt2bpmKb9hEuYnhdLYXtXxwNV6PBoAPq+ZLiDBfZcQeqyAeLbNVzI9IwQakEF
-X-MS-Exchange-AntiSpam-MessageData: GLBEjW60A6HZ6rgWgK4EBpEY3RBpIfRnDpgjeXoGr4exTR9UFJRT3DOFC/LU7cCrzfH4+EUSZxnpMvB96nGEG+Naeu4f1GfshCzClov4gu6Yn/UO5CDJw05zAoWRko38eB2D8zdgbhYuQHhgLo+uow==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 048909a4-a9e5-4bf5-30c3-08d7ac963afe
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2020 12:55:53.2112 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +pkQoVx9kOrn0dD7bLtXzK7oQB+RNUAD4WRtGgxq/z227EgZg+ABTrW7I+qM6GsCj3Z7CWWXtGwA7kdasDXDpoekhFxoZIG3+uyV9OOgjyo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4772
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.20.114
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,68 +92,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-07.02.2020 21:01, Max Reitz wrote:
-> On 27.11.19 19:08, Vladimir Sementsov-Ogievskiy wrote:
->> We have a lot of "chunk_end - start" invocations, let's switch to
->> bytes/cur_bytes scheme instead.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   include/block/block-copy.h |  4 +--
->>   block/block-copy.c         | 68 ++++++++++++++++++++------------------
->>   2 files changed, 37 insertions(+), 35 deletions(-)
->=20
-> [...]
->=20
->> diff --git a/block/block-copy.c b/block/block-copy.c
->> index 94e7e855ef..cc273b6cb8 100644
->> --- a/block/block-copy.c
->> +++ b/block/block-copy.c
->=20
-> [...]
->=20
->> @@ -150,24 +150,26 @@ void block_copy_set_callbacks(
->=20
-> [...]
->=20
->>   static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
->> -                                           int64_t start, int64_t end,
->> +                                           int64_t start, int64_t bytes=
-,
->=20
-> I wonder whether it would make more sense to make some of these @bytes
-> parameters plain ints, because...
->=20
->>                                              bool zeroes, bool *error_is=
-_read)
->>   {
->>       int ret;
->> -    int nbytes =3D MIN(end, s->len) - start;
->> +    int nbytes =3D MIN(start + bytes, s->len) - start;
->=20
-> ...things like this look a bit dangerous now.  So if the interface
-> already clearly shows that we=92re always expecting something less than
-> INT_MAX, it might all be a bit clearer.
+Based-on: https://git.linaro.org/people/peter.maydell/qemu-arm.git/log/?h=target-arm.next
 
-Hmm, yes. And it's preexisting, just becomes more obvious with new semantic=
-s.
-All block-copy tasks are limited to s->copy_size so it's actually safe.
-I'd better add an assertion, as I believe that 64bit write_zeroes will appe=
-ar in not far future.
+Version 4 incorporates the feedback on v3.  In particular:
+  * Split out CPSR_J masking to its own patch.
+  * Merge trivial braces formatting fixes into patch 5.
+  * Drop "Tidy msr_mask" patch, leaving CPSR_USER handling alone.
+  * Fixes for EL3 in "Set PAN bit as required on exception entry".
 
->=20
-> I=92ll leave it up to you:
->=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
->=20
+Patches without review:
+
+  0005-target-arm-Split-out-aarch32_cpsr_valid_mask.patch
+  0006-target-arm-Mask-CPSR_J-when-Jazelle-is-not-enable.patch
+  0009-target-arm-Remove-CPSR_RESERVED.patch
+  0014-target-arm-Set-PAN-bit-as-required-on-exception-e.patch
 
 
---=20
-Best regards,
-Vladimir
+r~
+
+
+Richard Henderson (20):
+  target/arm: Add arm_mmu_idx_is_stage1_of_2
+  target/arm: Add mmu_idx for EL1 and EL2 w/ PAN enabled
+  target/arm: Add isar_feature tests for PAN + ATS1E1
+  target/arm: Move LOR regdefs to file scope
+  target/arm: Split out aarch32_cpsr_valid_mask
+  target/arm: Mask CPSR_J when Jazelle is not enabled
+  target/arm: Replace CPSR_ERET_MASK with aarch32_cpsr_valid_mask
+  target/arm: Use aarch32_cpsr_valid_mask in helper_exception_return
+  target/arm: Remove CPSR_RESERVED
+  target/arm: Introduce aarch64_pstate_valid_mask
+  target/arm: Update MSR access for PAN
+  target/arm: Update arm_mmu_idx_el for PAN
+  target/arm: Enforce PAN semantics in get_S1prot
+  target/arm: Set PAN bit as required on exception entry
+  target/arm: Implement ATS1E1 system registers
+  target/arm: Enable ARMv8.2-ATS1E1 in -cpu max
+  target/arm: Add ID_AA64MMFR2_EL1
+  target/arm: Update MSR access to UAO
+  target/arm: Implement UAO semantics
+  target/arm: Enable ARMv8.2-UAO in -cpu max
+
+ target/arm/cpu-param.h     |   2 +-
+ target/arm/cpu.h           |  95 ++++++++---
+ target/arm/internals.h     |  85 ++++++++++
+ target/arm/cpu.c           |   4 +
+ target/arm/cpu64.c         |   9 +
+ target/arm/helper-a64.c    |   6 +-
+ target/arm/helper.c        | 327 +++++++++++++++++++++++++++++--------
+ target/arm/kvm64.c         |   2 +
+ target/arm/op_helper.c     |  14 +-
+ target/arm/translate-a64.c |  31 ++++
+ target/arm/translate.c     |  42 +++--
+ 11 files changed, 499 insertions(+), 118 deletions(-)
+
+-- 
+2.20.1
+
 
