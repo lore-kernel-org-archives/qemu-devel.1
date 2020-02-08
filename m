@@ -4,75 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2346C35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 13:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAE5C35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 13:05:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92B0E20726
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 13:04:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AA4F20726
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 13:05:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wNSpIODd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92B0E20726
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pDrjfa2N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AA4F20726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0Pn6-0004KU-PV
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 08:04:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41437)
+	id 1j0PnX-0005ZG-Cx
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 08:05:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j0Pgr-0000Xr-1y
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:30 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j0Pgr-0000as-W0
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j0Pgq-0004mw-0L
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:28 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43668)
+ (envelope-from <richard.henderson@linaro.org>) id 1j0Pgq-0004s1-To
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:29 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54370)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j0Pgp-0004kT-Qi
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:27 -0500
-Received: by mail-wr1-x443.google.com with SMTP id z9so2005214wrs.10
- for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 04:58:27 -0800 (PST)
+ id 1j0Pgq-0004ni-NT
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 07:58:28 -0500
+Received: by mail-wm1-x341.google.com with SMTP id g1so5183231wmh.4
+ for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 04:58:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Ovq6zgHOTulKMgq/xQFAYxCo50RIglYC4qMYC5kDj6w=;
- b=wNSpIODde3vl4gV01F+TyZqhfEtZmnarHKukxP47IeFAbl4vXActWeUuJBMk86i7rT
- 1sGvexGBYJORTMwCnlEmIPnIUkxFLdAfgDZ1g66WMX0kIQE0ktKFrpfUYlYNieAilHXn
- 4xNGGXnv5col+ns2c50YwReQ+A6YzhuiScKo9U4acenMV3VzXVz9qC251/r+FjLjwp4d
- tgcra/tDgKYAWAfinbKCJiKLrN9KueEBmYSbBD5WfyQdOFMPO1S9Y1YGqRcVgenf3hDa
- vlk2MMZeKvM/c1Mc1Hb9RfSYyEgtHnDY+rZ4un14BYDPXKxY5PoB/sjG1HJb8CGREwTp
- 9dPw==
+ bh=wslv7CYEufFwFJCvr0YawYhKrjC9XNcJ2ZwEcRCjRWY=;
+ b=pDrjfa2N7354imQpFehVJRZrkGS7Ke2bk8VJBnXpuBMGsWBXiJSu0l6SbGH9VZED/v
+ hHwMZAY8Oe9GqVEUOal6hvSgc7E/lHQ0wQkfC/eJhNU3mjsn+VU8CT49t7EiQvqXDOV4
+ pc7BfbpdZar3nwFiVn38fIfZLvNPZ8d/RFnoGLuu44+oDXN3u0eSGqrmP0KrkDDRt63W
+ QSiykQFzqpqxFsWR6sBt8OFyeQqxT6pyE+19JISgJS7l7jwFJKR0vvEk3QMi/vMNk+xK
+ Wefq3spBy10J+teZwFPNQvt5mJI02Mj6MX0qI96y4+rhfAMoXSSHd2f+esqRgxma+kRN
+ 4YIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Ovq6zgHOTulKMgq/xQFAYxCo50RIglYC4qMYC5kDj6w=;
- b=Zyj9LhUEFEzehpiPv0zva0DaQLZhNFGKH1gUs7FwWCYPfcZf6lH5kxN0wTKs6i4Qsy
- icOWFJuKRqog0KnUMqmZ8yfbaz3gsy1THMogGuJSDLI1cod5Bi/ppBko1Vt8c+g/xFdk
- NzVRxM6/lYvQLTviuRRUNpnUWybsg9m/gVUkK7ZqXfr1yObvWA4sbebJmzkB9oHBr6CJ
- 0kx3Xn8cTtSRTOG/UYyKXb6lOSMQemligWBnoJBQEhCB60npLBTi6N7YMMru9dtTZi1N
- A+va+BR9kAf9tHtPlcZ6OtvruBXBqorhb+OVLww+8lnX28Mk6aj9XN4ioFGtnwPgWBAK
- ONCQ==
-X-Gm-Message-State: APjAAAXCEZSa3Ha4oIV9hV8VmMM3o3+nxTuya0kXsMZFay5Kl/JA0pyX
- 1z228TgW6ctO1cV40dibdqdTQhya5EMvfA==
-X-Google-Smtp-Source: APXvYqy/5Eijl4VJVcExrbNT/l7sAiGGfvPTVQ2QKIRuwU0xtKRRhYcbEXDmlFd2WfYhuVHjeCRqLw==
-X-Received: by 2002:adf:ea4a:: with SMTP id j10mr5202640wrn.119.1581166706692; 
- Sat, 08 Feb 2020 04:58:26 -0800 (PST)
+ bh=wslv7CYEufFwFJCvr0YawYhKrjC9XNcJ2ZwEcRCjRWY=;
+ b=OPh1l6nXNHWNGfI4I9xHDvma6Yoq+GimHHJDC6/9jD5p1w8HUreJuLOMo4a3mO+lVB
+ 8/ZC4rf9NCXI0Gt01cB6I4ki23B+tQ5E+MjdHmQ7RKL7TRqehC2+VJSP2rplRbxuI7Cu
+ BaqbD43pGK7Bl2MYfR8OsxXuwBg8bzAAlkyuuiUaoOTgwWljVupI0iRt45cMF33H3zCC
+ nC+8RV1KjRloHEIcliUGxDUVV27bu/4fXqXhKCnKQahCJDLYSgBDMrNJSU9LEmyUdl+C
+ 9La14hDfgnO95BFG9+ZavIFfVafWhU6D4BaxC43Zzt+xkLD96iYniZzXsAB4cU8Sxnfr
+ cNtg==
+X-Gm-Message-State: APjAAAXYckTSPaiihjr4u1cKHV0X6dYyR3fO1Kd8+RwIn4rF8Oiaw9Qw
+ JnBjSfCAYev+XMPbRcGn1LsVN5/6jcd66A==
+X-Google-Smtp-Source: APXvYqwt/S3bCk7MAnqEAWcbVco77/ja8ShLnJUJ4gigeDUwsj8c6Sso+eX5dKoyGHyLlquj57pAOQ==
+X-Received: by 2002:a05:600c:2301:: with SMTP id
+ 1mr4433546wmo.147.1581166707530; 
+ Sat, 08 Feb 2020 04:58:27 -0800 (PST)
 Received: from localhost.localdomain ([82.3.55.76])
- by smtp.gmail.com with ESMTPSA id p5sm7490534wrt.79.2020.02.08.04.58.25
+ by smtp.gmail.com with ESMTPSA id p5sm7490534wrt.79.2020.02.08.04.58.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Sat, 08 Feb 2020 04:58:26 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 09/20] target/arm: Remove CPSR_RESERVED
-Date: Sat,  8 Feb 2020 12:58:05 +0000
-Message-Id: <20200208125816.14954-10-richard.henderson@linaro.org>
+Subject: [PATCH v4 10/20] target/arm: Introduce aarch64_pstate_valid_mask
+Date: Sat,  8 Feb 2020 12:58:06 +0000
+Message-Id: <20200208125816.14954-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200208125816.14954-1-richard.henderson@linaro.org>
 References: <20200208125816.14954-1-richard.henderson@linaro.org>
@@ -80,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,53 +98,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The only remaining use was in op_helper.c.  Use PSTATE_SS
-directly, and move the commentary so that it is more obvious
-what is going on.
+Use this along the exception return path, where we previously
+accepted any values.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h       | 6 ------
- target/arm/op_helper.c | 9 ++++++++-
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ target/arm/internals.h  | 12 ++++++++++++
+ target/arm/helper-a64.c |  1 +
+ 2 files changed, 13 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 694b074298..c6dff1d55b 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1186,12 +1186,6 @@ void pmu_init(ARMCPU *cpu);
- #define CPSR_IT_2_7 (0xfc00U)
- #define CPSR_GE (0xfU << 16)
- #define CPSR_IL (1U << 20)
--/* Note that the RESERVED bits include bit 21, which is PSTATE_SS in
-- * an AArch64 SPSR but RES0 in AArch32 SPSR and CPSR. In QEMU we use
-- * env->uncached_cpsr bit 21 to store PSTATE.SS when executing in AArch32,
-- * where it is live state but not accessible to the AArch32 code.
-- */
--#define CPSR_RESERVED (0x7U << 21)
- #define CPSR_J (1U << 24)
- #define CPSR_IT_0_1 (3U << 25)
- #define CPSR_Q (1U << 27)
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index acf1815ea3..af3020b78f 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -387,7 +387,14 @@ void HELPER(exception_bkpt_insn)(CPUARMState *env, uint32_t syndrome)
- 
- uint32_t HELPER(cpsr_read)(CPUARMState *env)
- {
--    return cpsr_read(env) & ~(CPSR_EXEC | CPSR_RESERVED);
-+    /*
-+     * We store the ARMv8 PSTATE.SS bit in env->uncached_cpsr.
-+     * This is convenient for populating SPSR_ELx, but must be
-+     * hidden from aarch32 mode, where it is not visible.
-+     *
-+     * TODO: ARMv8.4-DIT -- need to move SS somewhere else.
-+     */
-+    return cpsr_read(env) & ~(CPSR_EXEC | PSTATE_SS);
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 0569c96fd9..034d98ad53 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -1085,6 +1085,18 @@ static inline uint32_t aarch32_cpsr_valid_mask(uint64_t features,
+     return valid;
  }
  
- void HELPER(cpsr_write)(CPUARMState *env, uint32_t val, uint32_t mask)
++static inline uint32_t aarch64_pstate_valid_mask(const ARMISARegisters *id)
++{
++    uint32_t valid;
++
++    valid = PSTATE_M | PSTATE_DAIF | PSTATE_IL | PSTATE_SS | PSTATE_NZCV;
++    if (isar_feature_aa64_bti(id)) {
++        valid |= PSTATE_BTYPE;
++    }
++
++    return valid;
++}
++
+ /*
+  * Parameters of a given virtual address, as extracted from the
+  * translation control register (TCR) for a given regime.
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 0c9feba392..509ae93069 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -1032,6 +1032,7 @@ void HELPER(exception_return)(CPUARMState *env, uint64_t new_pc)
+                       cur_el, new_el, env->regs[15]);
+     } else {
+         env->aarch64 = 1;
++        spsr &= aarch64_pstate_valid_mask(&env_archcpu(env)->isar);
+         pstate_write(env, spsr);
+         if (!arm_singlestep_active(env)) {
+             env->pstate &= ~PSTATE_SS;
 -- 
 2.20.1
 
