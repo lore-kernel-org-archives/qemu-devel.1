@@ -1,56 +1,60 @@
-Return-Path: <SRS0=2niX=33=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBBBC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 23:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0629CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 00:03:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ECC821775
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Feb 2020 23:27:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ECC821775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id CA6D9206CC
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 00:03:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA6D9206CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0D1i-0001wv-Rr
-	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 18:27:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33046)
+	id 1j0DbH-0002kW-01
+	for qemu-devel@archiver.kernel.org; Fri, 07 Feb 2020 19:03:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j0D0z-0001WJ-Vv
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 18:26:27 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j0Dag-0002Ka-NU
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 19:03:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j0D0y-0006x2-E9
- for qemu-devel@nongnu.org; Fri, 07 Feb 2020 18:26:25 -0500
-Resent-Date: Fri, 07 Feb 2020 18:26:25 -0500
-Resent-Message-Id: <E1j0D0y-0006x2-E9@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21133)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j0D0y-0006oH-83; Fri, 07 Feb 2020 18:26:24 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1581117947112439.0638488255023;
- Fri, 7 Feb 2020 15:25:47 -0800 (PST)
-In-Reply-To: <20200207174548.9087-1-linux@roeck-us.net>
-Subject: Re: [PATCH v2] hw/arm: ast2600: Wire up EHCI controllers
-Message-ID: <158111794646.591.15728158804652336738@a1bbccc8075a>
+ (envelope-from <balaton@eik.bme.hu>) id 1j0Dae-0002lL-5e
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 19:03:17 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:33560)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1j0Dad-0002YS-4H
+ for qemu-devel@nongnu.org; Fri, 07 Feb 2020 19:03:15 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 6EC35747DF5;
+ Sat,  8 Feb 2020 01:03:11 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 3FEB3747871; Sat,  8 Feb 2020 01:03:11 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 3E3EB746383;
+ Sat,  8 Feb 2020 01:03:11 +0100 (CET)
+Date: Sat, 8 Feb 2020 01:03:11 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: jasper.lowell@bt.com
+Subject: RE: Emulating Solaris 10 on SPARC64 sun4u
+In-Reply-To: <LO2P123MB22710F9D590E023381119FAB831C0@LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM>
+Message-ID: <alpine.BSF.2.22.395.2002080030360.88696@zero.eik.bme.hu>
+References: <CWXP123MB2262B6F3159B7AA7AB010F4183020@CWXP123MB2262.GBRP123.PROD.OUTLOOK.COM>
+ <20200205173326.GA3256@work-vm>
+ <LO2P123MB22710F9D590E023381119FAB831C0@LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: linux@roeck-us.net
-Date: Fri, 7 Feb 2020 15:25:47 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,131 +66,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, andrew@aj.id.au, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, joel@jms.id.au, linux@roeck-us.net, clg@kaod.org
+Cc: John Snow <jsnow@redhat.com>, mark.cave-ayland@ilande.co.uk,
+ dgilbert@redhat.com, atar4qemu@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIwNzE3NDU0OC45MDg3
-LTEtbGludXhAcm9lY2stdXMubmV0LwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBhYXJjaDY0LXNv
-ZnRtbXUvZ2Ric3R1Yi14bWwubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0v
-dHJhbnNsYXRlLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90cmFjZS9nZW5lcmF0ZWQtaGVs
-cGVycy5vCi90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzozNDo2OiBl
-cnJvcjogJ0FTUEVFRF9FSENJMScgdW5kZWNsYXJlZCBoZXJlIChub3QgaW4gYSBmdW5jdGlvbikK
-ICAgICBbQVNQRUVEX0VIQ0kxXSAgICAgPSAweDFFNkExMDAwLAogICAgICBeCi90bXAvcWVtdS10
-ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzozNDo1OiBlcnJvcjogYXJyYXkgaW5kZXgg
-aW4gaW5pdGlhbGl6ZXIgbm90IG9mIGludGVnZXIgdHlwZQogICAgIFtBU1BFRURfRUhDSTFdICAg
-ICA9IDB4MUU2QTEwMDAsCiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9h
-c3QyNjAwLmM6MzQ6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnYXNwZWVkX3Nv
-Y19hc3QyNjAwX21lbW1hcCcpCi90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2
-MDAuYzozNTo2OiBlcnJvcjogJ0FTUEVFRF9FSENJMicgdW5kZWNsYXJlZCBoZXJlIChub3QgaW4g
-YSBmdW5jdGlvbikKICAgICBbQVNQRUVEX0VIQ0kyXSAgICAgPSAweDFFNkEzMDAwLAogICAgICBe
-Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzozNTo1OiBlcnJvcjog
-YXJyYXkgaW5kZXggaW4gaW5pdGlhbGl6ZXIgbm90IG9mIGludGVnZXIgdHlwZQogICAgIFtBU1BF
-RURfRUhDSTJdICAgICA9IDB4MUU2QTMwMDAsCiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaHcv
-YXJtL2FzcGVlZF9hc3QyNjAwLmM6MzU6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZv
-ciAnYXNwZWVkX3NvY19hc3QyNjAwX21lbW1hcCcpCi90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0v
-YXNwZWVkX2FzdDI2MDAuYzo4NDo1OiBlcnJvcjogYXJyYXkgaW5kZXggaW4gaW5pdGlhbGl6ZXIg
-bm90IG9mIGludGVnZXIgdHlwZQogICAgIFtBU1BFRURfRUhDSTFdICAgICA9IDUsCiAgICAgXgov
-dG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6ODQ6NTogZXJyb3I6IChu
-ZWFyIGluaXRpYWxpemF0aW9uIGZvciAnYXNwZWVkX3NvY19hc3QyNjAwX2lycW1hcCcpCi90bXAv
-cWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzo4NTo1OiBlcnJvcjogYXJyYXkg
-aW5kZXggaW4gaW5pdGlhbGl6ZXIgbm90IG9mIGludGVnZXIgdHlwZQogICAgIFtBU1BFRURfRUhD
-STJdICAgICA9IDksCiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3Qy
-NjAwLmM6ODU6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnYXNwZWVkX3NvY19h
-c3QyNjAwX2lycW1hcCcpCi90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAu
-YzogSW4gZnVuY3Rpb24gJ2FzcGVlZF9zb2NfYXN0MjYwMF9pbml0JzoKL3RtcC9xZW11LXRlc3Qv
-c3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOjE3MzoyMzogZXJyb3I6ICdBc3BlZWRTb0NDbGFz
-cycgaGFzIG5vIG1lbWJlciBuYW1lZCAnZWhjaXNfbnVtJwogICAgIGZvciAoaSA9IDA7IGkgPCBz
-Yy0+ZWhjaXNfbnVtOyBpKyspIHsKICAgICAgICAgICAgICAgICAgICAgICBeCkluIGZpbGUgaW5j
-bHVkZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9ody9xZGV2LWNvcmUuaDo2OjAs
-Ci0tLQogICAgICAgICAgICAgICAgIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0v
-Y3B1LXFvbS5oOjIzLAogICAgICAgICAgICAgICAgIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL3Rh
-cmdldC9hcm0vY3B1Lmg6MjUsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9z
-cmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6MTI6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0v
-YXNwZWVkX2FzdDI2MDAuYzoxNzQ6NTY6IGVycm9yOiAnQXNwZWVkU29DU3RhdGUnIGhhcyBubyBt
-ZW1iZXIgbmFtZWQgJ2VoY2knCiAgICAgICAgIHN5c2J1c19pbml0X2NoaWxkX29iaihvYmosICJl
-aGNpWypdIiwgT0JKRUNUKCZzLT5laGNpW2ldKSwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRl
-L3FvbS9vYmplY3QuaDo1MTE6MTc6IG5vdGU6IGluIGRlZmluaXRpb24gb2YgbWFjcm8gJ09CSkVD
-VCcKICAgICAoKE9iamVjdCAqKShvYmopKQogICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRl
-c3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOjE3NTozOTogZXJyb3I6ICdBc3BlZWRTb0NT
-dGF0ZScgaGFzIG5vIG1lbWJlciBuYW1lZCAnZWhjaScKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIHNpemVvZihzLT5laGNpW2ldKSwgVFlQRV9QTEFURk9STV9FSENJKTsKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYXJt
-L2FzcGVlZF9hc3QyNjAwLmM6MTc1OjUxOiBlcnJvcjogJ1RZUEVfUExBVEZPUk1fRUhDSScgdW5k
-ZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBzaXplb2Yocy0+ZWhjaVtpXSksIFRZUEVfUExBVEZPUk1fRUhDSSk7CiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11
-LXRlc3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOjE3NTo1MTogbm90ZTogZWFjaCB1bmRl
-Y2xhcmVkIGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQgb25seSBvbmNlIGZvciBlYWNoIGZ1bmN0aW9u
-IGl0IGFwcGVhcnMgaW4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5j
-OiBJbiBmdW5jdGlvbiAnYXNwZWVkX3NvY19hc3QyNjAwX3JlYWxpemUnOgovdG1wL3FlbXUtdGVz
-dC9zcmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6NDI5OjIzOiBlcnJvcjogJ0FzcGVlZFNvQ0Ns
-YXNzJyBoYXMgbm8gbWVtYmVyIG5hbWVkICdlaGNpc19udW0nCiAgICAgZm9yIChpID0gMDsgaSA8
-IHNjLT5laGNpc19udW07IGkrKykgewogICAgICAgICAgICAgICAgICAgICAgIF4KSW4gZmlsZSBp
-bmNsdWRlZCBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL2h3L3FkZXYtY29yZS5oOjY6
-MCwKLS0tCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2Fy
-bS9jcHUtcW9tLmg6MjMsCiAgICAgICAgICAgICAgICAgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMv
-dGFyZ2V0L2FybS9jcHUuaDoyNSwKICAgICAgICAgICAgICAgICBmcm9tIC90bXAvcWVtdS10ZXN0
-L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzoxMjoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2Fy
-bS9hc3BlZWRfYXN0MjYwMC5jOjQzMDo0MzogZXJyb3I6ICdBc3BlZWRTb0NTdGF0ZScgaGFzIG5v
-IG1lbWJlciBuYW1lZCAnZWhjaScKICAgICAgICAgb2JqZWN0X3Byb3BlcnR5X3NldF9ib29sKE9C
-SkVDVCgmcy0+ZWhjaVtpXSksIHRydWUsICJyZWFsaXplZCIsICZlcnIpOwogICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVk
-ZS9xb20vb2JqZWN0Lmg6NTExOjE3OiBub3RlOiBpbiBkZWZpbml0aW9uIG9mIG1hY3JvICdPQkpF
-Q1QnCiAgICAgKChPYmplY3QgKikob2JqKSkKICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10
-ZXN0L3NyYy9ody9hcm0vYXNwZWVkX2FzdDI2MDAuYzo0MzU6NDI6IGVycm9yOiAnQXNwZWVkU29D
-U3RhdGUnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2VoY2knCiAgICAgICAgIHN5c2J1c19tbWlvX21h
-cChTWVNfQlVTX0RFVklDRSgmcy0+ZWhjaVtpXSksIDAsCiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9tL29iamVj
-dC5oOjUxMToxNzogbm90ZTogaW4gZGVmaW5pdGlvbiBvZiBtYWNybyAnT0JKRUNUJwotLS0KL3Rt
-cC9xZW11LXRlc3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOjQzNToyNTogbm90ZTogaW4g
-ZXhwYW5zaW9uIG9mIG1hY3JvICdTWVNfQlVTX0RFVklDRScKICAgICAgICAgc3lzYnVzX21taW9f
-bWFwKFNZU19CVVNfREVWSUNFKCZzLT5laGNpW2ldKSwgMCwKICAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FybS9hc3BlZWRfYXN0MjYwMC5jOjQzNzo0NTog
-ZXJyb3I6ICdBc3BlZWRTb0NTdGF0ZScgaGFzIG5vIG1lbWJlciBuYW1lZCAnZWhjaScKICAgICAg
-ICAgc3lzYnVzX2Nvbm5lY3RfaXJxKFNZU19CVVNfREVWSUNFKCZzLT5laGNpW2ldKSwgMCwKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVz
-dC9zcmMvaW5jbHVkZS9xb20vb2JqZWN0Lmg6NTExOjE3OiBub3RlOiBpbiBkZWZpbml0aW9uIG9m
-IG1hY3JvICdPQkpFQ1QnCi0tLQogICAgICAgICBzeXNidXNfY29ubmVjdF9pcnEoU1lTX0JVU19E
-RVZJQ0UoJnMtPmVoY2lbaV0pLCAwLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgXgovdG1w
-L3FlbXUtdGVzdC9zcmMvaHcvYXJtL2FzcGVlZF9hc3QyNjAwLmM6IEluIGZ1bmN0aW9uICdhc3Bl
-ZWRfc29jX2FzdDI2MDBfY2xhc3NfaW5pdCc6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9hcm0vYXNw
-ZWVkX2FzdDI2MDAuYzo1NTk6NzogZXJyb3I6ICdBc3BlZWRTb0NDbGFzcycgaGFzIG5vIG1lbWJl
-ciBuYW1lZCAnZWhjaXNfbnVtJwogICAgIHNjLT5laGNpc19udW0gICAgPSAyOwogICAgICAgXgpt
-YWtlWzFdOiAqKiogW2h3L2FybS9hc3BlZWRfYXN0MjYwMC5vXSBFcnJvciAxCm1ha2VbMV06ICoq
-KiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbYWFyY2g2NC1zb2Z0
-bW11L2FsbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4u
-LgpybSB0ZXN0cy9xZW11LWlvdGVzdHMvc29ja2V0X3NjbV9oZWxwZXIubwpUcmFjZWJhY2sgKG1v
-c3QgcmVjZW50IGNhbGwgbGFzdCk6Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJl
-dGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3Vk
-bycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2Uu
-dXVpZD1iMTQwMjA4N2IwYjg0ZjZiYmU1MzE3ZTFlY2FiYmIxOCcsICctdScsICcxMDAxJywgJy0t
-c2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdF
-VF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUn
-LCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FD
-SEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11
-LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hl
-dy10ZXN0ZXItdG1wLXk5X20xczJxL3NyYy9kb2NrZXItc3JjLjIwMjAtMDItMDctMTguMjMuNDAu
-MTA3MzA6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11
-L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZp
-bHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWIxNDAyMDg3YjBiODRm
-NmJiZTUzMTdlMWVjYWJiYjE4Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtl
-WzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXk5X20x
-czJxL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3Ig
-MgoKcmVhbCAgICAybTcuNTg3cwp1c2VyICAgIDBtOC42NTBzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
-YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDIwNzE3NDU0OC45MDg3LTEt
-bGludXhAcm9lY2stdXMubmV0L3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVz
-c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBz
-Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
-dmVsQHJlZGhhdC5jb20=
+Hello,
+
+On Fri, 7 Feb 2020, jasper.lowell@bt.com wrote:
+> I haven't figured out where that is coming from.
+> The error doesn't look like it's in the OpenSolaris source code so I don't have any context behind it.
+> The error does show up here: https://docs.oracle.com/cd/E23824_01/html/821-1475/uata-7d.html so it might be related to the IDE controller.
+> The behaviour of Solaris 10 does make me think there is a problem with interrupts but OpenBSD works just fine on this architecture.
+
+Not sure if my problem I see on other machine emulation I'm working on is 
+related at all but there's a possibility it might be. I got this with 
+different arch (ppc but could also reproduce something similar with mips) 
+and ide controller emulation (via-ide) but the PCI bmdma code is shared by 
+CMD646, via-ide and sii3112 and also the ide-cdrom emulation is the same 
+so if there's a bug in these that could cause similar problems for 
+different components. Or it could be that we get similar symptoms due to 
+different reasons in which case sorry for the distracion but maybe we can 
+learn from the experience of each other even in that case.
+
+What I get is tracked here:
+
+https://osdn.net/projects/qmiga/ticket/38949
+
+(background on emulated machine: https://osdn.net/projects/qmiga/wiki/SubprojectPegasos2 )
+
+Originally I had both Linux and MorphOS fail after enabling BMDMA before I 
+had interrupt controller emulation (so that means it could be a problem 
+with that in your case as well so something to check). Now that I've 
+implemented interrupts Linux boots with DMA from CDROM but MorphOS is 
+still not happy. You saw OpenBSD work but Solaris not so that could be 
+similar in case the drivers do something differently or one relies on 
+something the other does not care about. It could also be that since Linux 
+is working, BMDMA and/or ide-cdrom may not emulate something other drivers 
+may need which could cause simlar problems on multiple archs/emulations 
+but I could be wrong about that.
+
+An advice I got before to debug this is to try enabling ide traces:
+
+https://lists.nongnu.org/archive/html/qemu-devel/2019-03/msg05656.html
+
+I've tried that but lacking detailed knowledge about ide controllers I 
+could not make much sense of the results so far.
+
+Not sure how much help this is but maybe if more people are looking at it 
+we might find something out. I've cc'd the IDE maintainer in case he has 
+something more useful to add.
+
+Regards,
+BALATON Zoltan
+
+> I've also tried using kmdb (Solaris kernel debugger) by running using `boot cdrom -kvd` at the OpenBIOS prompt.
+> I thought this might help diagnose the problem.
+> After the kernel debugger prompt occurs and I type `::cont` to continue, the system hangs completely.
+>
+> Thanks,
+> Lowell.
+>
+> -----Original Message-----
+> From: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Sent: Thursday, 6 February 2020 4:33 AM
+> To: Lowell,J,Jasper,VIM R <jasper.lowell@bt.com>
+> Cc: qemu-devel@nongnu.org; mark.cave-ayland@ilande.co.uk; atar4qemu@gmail.com
+> Subject: Re: Emulating Solaris 10 on SPARC64 sun4u
+>
+> * jasper.lowell@bt.com (jasper.lowell@bt.com) wrote:
+>> I'm currently working towards emulating Solaris 10 on sun4u.
+>>
+>> The Solaris 10 ISO image I am attempting to boot is the one from the
+>> Oracle download page at https://www.oracle.com/solaris/solaris10/downloads/solaris10-get-jsp-downloads.html.
+>> Image: sol-10-u11-ga-sparc-dvd.iso
+>> MD5:   53e8b066f7f250ce2fd2cef063f8072b
+>>
+>> I am using QEMU commit 7bd9d0a9e26c7a3c67c0f174f0009ba19969b158.
+>>
+>> The command I am using to run QEMU is:
+>> ./qemu/sparc64-softmmu/qemu-system-sparc64 -bios
+>> ./openbios/obj-sparc64/openbios-builtin.elf -cdrom
+>> ./iso/solaris/sol-10-u11-ga-sparc-dvd.iso -boot d -nographic -m 3G
+>>
+>> ```
+>> CPUs: 1 x SUNW,UltraSPARC-IIi
+>> UUID: 00000000-0000-0000-0000-000000000000
+>> Welcome to OpenBIOS v1.1 built on Feb 5 2020 19:15
+>>   Type 'help' for detailed information Trying cdrom:f...
+>> Not a bootable ELF image
+>> Not a bootable a.out image
+>>
+>> Loading FCode image...
+>> Loaded 7420 bytes
+>> entry point is 0x4000
+>> Evaluating FCode...
+>> Evaluating FCode...
+>> Ignoring failed claim for va 1000000 memsz af6d6!
+>> Ignoring failed claim for va 1402000 memsz 4dcc8!
+>> Ignoring failed claim for va 1800000 memsz 510c8!
+>> SunOS Release 5.10 Version Generic_147147-26 64-bit Copyright (c)
+>> 1983, 2013, Oracle and/or its affiliates. All rights reserved.
+>> could not find debugger-vocabulary-hook>threads:interpret: exception
+>> -13 caught interpret \ Copyright (c) 1995-1999 by Sun Microsystems, Inc.
+>> \ All rights reserved.
+>> \
+>> \ ident "@(#)data64.fth  1.3     00/07/17 SMI"
+>>
+>> hex
+>>
+>> only forth also definitions
+>> vocabulary kdbg-words
+>> also kdbg-words definitions
+>>
+>> defer p@
+>> defer p!
+>> ['] x@ is p@
+>> ['] x! is p!
+>>
+>> 8 constant ptrsize
+>>
+>> d# 32 constant nbitsminor
+>> h# ffffffff constant maxmin
+>> \
+>> \ Copyright 2008 Sun Microsystems, Inc.  All rights reserved.
+>> \ Use is subject to license terms.
+>> \
+>>
+>> \ #pragma ident  "@(#)kdbg.fth    1.20    08/06/06 SMI"
+>>
+>> h# 7ff constant v9bias
+>> h# unix-tte:interpret: exception -13 caught interpret ' unix-tte is
+>> va>tte-data failed with error ffffffffffffffed
+>> WARNING: consconfig: cannot find driver for screen device
+>> /pci@1fe,0/pci@1,1/QEMU,VGA@2 Configuring devices.
+>> WARNING: Interrupt not seen after set_features
+>
+> GIven that your problem below is looking like an interrupt related problem, have you figured out where that's coming from?
+>
+> Dave
+>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
 
