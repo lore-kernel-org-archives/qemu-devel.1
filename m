@@ -2,83 +2,91 @@ Return-Path: <SRS0=Z2zD=34=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 926E0C35250
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 15:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B921C35250
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 15:23:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53FF82082E
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 15:00:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10E7521741
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Feb 2020 15:23:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jLESKx9Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53FF82082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="IBOhoDUY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E7521741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0Rao-0007Rr-Gp
-	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 10:00:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32956)
+	id 1j0Rx9-0000zF-Tg
+	for qemu-devel@archiver.kernel.org; Sat, 08 Feb 2020 10:23:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36009)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j0RaA-0006kg-14
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:59:43 -0500
+ (envelope-from <jan.kiszka@web.de>) id 1j0Ru4-0006sc-44
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 10:20:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j0Ra8-0004LM-Oq
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:59:41 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39680)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j0Ra8-0004KP-JL
- for qemu-devel@nongnu.org; Sat, 08 Feb 2020 09:59:40 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 77so2135652oty.6
- for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 06:59:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jNvPf8krr/omFfKguqhpZTL6tItHI8anHXtXlxjM9VU=;
- b=jLESKx9Z4EVKT8y37d4nJF+Hi+DATILUDhlQ+xmH6Hj6gAUxr10CGKjojkz2hhvqFn
- SBWaLxT2Y2P40R+0pFV0toUvIcTWBd+tgvbGJsIQCKRWWx20O/GRJN1RN7ggcXuNpHMh
- 1sPkmNR/Tdr5TNA0NC8oV0fZzSS0WqQdk0qYWVPuBeqztN5WN5a+qSIKglumyXA0fKSX
- XTRQBTC4bqpcPkB+y9XMRN5KQjAJkOBlhjeloMJBuyQaxv4CZIe/vjFr2IsWqnZU2/Tp
- E2vmvYPuKnLmQfKLKBX8hn3LzXNe9q+A/X2UUM7Tghr2X3PHioB655ocfi0etPU3+Hy8
- BzYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jNvPf8krr/omFfKguqhpZTL6tItHI8anHXtXlxjM9VU=;
- b=Uv6xmeUXZBaXXdBMB9eMwgcQucGihtuP9v/RBbPQVCmBX+LXJBgFlIbNqqdXOKzbq2
- EvU0vJ1l1d/8rV59eeYv9mkRrgnhFgCV1bJfdVfOeTYiCy1vbTRmuvhJVNvlv50ZTUk+
- 8nTtq0Mba8BrKAvSwhxTU9i4Jasvbqop842iXfKr+jVyisqlr90KTAkh3PC7Oc+6hcwC
- 6uyVwkpdp89c8yfmDToKW5OWIg7zrcoqIWqtiXk/kmfBEIaTiONYjHKboBAo+cvJW8ci
- MepUTmXB3tfn09+cxmIyOqSiLQEKYBq3i52GutxzivvQq6VtEYV7PF5littuelWnp2px
- ZoQg==
-X-Gm-Message-State: APjAAAXYuU9Y92i0oH/QLE2fFevZSe6KnQ9SxzNWMWe7tdnrrIM0TLyY
- y7ShF3mHwQrznRb2F4eZ3HImjMJ3+gZ8web+Iio2MA==
-X-Google-Smtp-Source: APXvYqxO5GHiaQlbp4LHZAEw0Hfvv/sspH02FcnwSm9POhTdp2y/EBmQhFqFMyjtUjl6EiGUSGVD7+lSoj+ZdhheTSY=
-X-Received: by 2002:a05:6830:13da:: with SMTP id
- e26mr3432197otq.97.1581173979715; 
- Sat, 08 Feb 2020 06:59:39 -0800 (PST)
+ (envelope-from <jan.kiszka@web.de>) id 1j0Ru2-0008LL-Rs
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 10:20:16 -0500
+Received: from mout.web.de ([212.227.17.12]:45417)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1j0Ru2-0008HZ-FA
+ for qemu-devel@nongnu.org; Sat, 08 Feb 2020 10:20:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1581175207;
+ bh=K7cubIuVIWT/r4V9g3Ve6xIrAVEUAjGQe9YQgMAxbTg=;
+ h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+ b=IBOhoDUYJSr5DusjfAdPTcKuYnYk3bFgJwMEX4rzaGI+1swo6P7leQ1f9WS34mgTm
+ PuGbm49b4O7KQ09NPLbUfkOqDQAE+ZHxITGTfQJ96iogb/enUowyWTl9uHcUOYyaRB
+ gbfymafO7/48xykMf7AQfP3/3gp8Tr2aOfSy/0xQ=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MT8bi-1j7ZRp2iBS-00S61R; Sat, 08
+ Feb 2020 16:20:07 +0100
+Subject: Re: [PATCH] ui/gtk: Fix gd_refresh_rate_millihz() when using
+ VirtualConsole
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200208143008.6157-1-f4bug@amsat.org>
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <82618b0f-22ff-7282-c1bf-09d801166b7c@web.de>
+Date: Sat, 8 Feb 2020 16:20:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200206173040.17337-1-peter.maydell@linaro.org>
- <877e0ynxhx.fsf@dusky.pond.sub.org>
- <CAFEAcA-owBQMnvY5Asa4m4DUF-hBqRTmu8C7fktfvMRE2HZfgg@mail.gmail.com>
- <87blq9jhb5.fsf@dusky.pond.sub.org>
-In-Reply-To: <87blq9jhb5.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 8 Feb 2020 14:59:28 +0000
-Message-ID: <CAFEAcA_WX1e1AWA=uryJLLMGNH7LMkr+iq+cMVnv9yneGSsECg@mail.gmail.com>
-Subject: Re: [PATCH 00/29] Convert QAPI doc comments to generate rST instead
- of texinfo
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <20200208143008.6157-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:gweKZB+gowtUT2SB3RQ4CWlR5+7LwJasaeAorIXD9zzDV8nbiwz
+ zlczQiNyaxNvKHi22OWoPRSFW66ndZaxWtbwXpF8TNDDn87B/pNdNJNDb8ljlVS0+eRXrVa
+ 5VC5Xutfn94VfB02SVPwGwFEFrDJxjOGuKcTpXgiw+V3FEnPkCddkllvQfXb38wgcml44wD
+ EgmeNjUJCB8jXycRdUBcg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zxxpZUd1Mv0=:YsT3uCP1uEhVIZBz7wkcsA
+ mW66e5U7yiElTDpOjmMe7vS2zw98c30hzNjtr+WFZ3QluldDrF2hF8i8i+NvUCBOOkuhIdGo4
+ BZ+LYOrs/hEu9VwAUJ/fb1yiqLPDlc/aLCB4USGsM77QXmcYH38ZKVkeqwrbVfvF0Yl6Unvfm
+ qpbDEehqdus7Nb9sMqL5hbXgfTeYZL+B8mQ3U3f2QCI2JioKP3x6Rr3/6zSEY4dMqqRv9U9Ii
+ Xn5bzRgN9M2qqmqRBvAkHu6jVtjXq0k6zdt2Rhk2fiUdzy2rE9cp01WNNFG2MlVj1CssOtnhc
+ 6kLAmpMcY7uw7WTqYDx+sYoMOyJEcI0+hGwdwNCRLhCNFSZKH4xJ3ui6wXQBhmnJRhgmLc7xj
+ snLXOCAbsoXdO4+pqlBfy05rZ2uuLQokEEXFo/x+iVlRpVt9s9bXZLIpB3k67BslWzeBmkTFP
+ voVEleP2BD5MbQE+IGhas4Yv/U9k6eabkTh2CuPLxvmPF25V6hrUswsk/hGp7uQVxxIaLpqJc
+ 2PPmeC9yWbNxKlwW0fVVzZy0Eb+wvYFoPap+GegVxh2ppIIAijGjeSp1SaT07KVAOVmT18c0K
+ 8Kr2ZGnoeZKJn1XlU7rWFLx6INyVyBzd/ibhE8PPnf91HNX8YNAKoFo9/Jm88PfTcnUfkTRrE
+ oV2jZQUAHHb+uK3MutSqcooP+MGafkHQI7dMk/ne4I63kuIY0E4yN2WbpIMJEkbkXHqbDRolP
+ wgsUQcNQlXa3rA3xqm7PlCANlJ+CPpbU2GM16wGosLqBdvv+xfmgNVvJqp9HMEFEg51+axbeU
+ 9DinaNsrMhgNuwyCOC9uuEJXd4oxOcFGkX8yIUy0p0kaFTacKArfsT+klvrRsBMr4rtyZyhh5
+ 4Y2FUvNF7lOqCHDadi+6yBiEMOZUex9beYjIvOfHFo+syzmmvNHi8eVCet+GZx0EUVyEy4gHj
+ i38jTKL/FoGzGZL8CgBGNnrTZyBNw+ALCJztse2eiQqaepNmpkM554QHNMPuz6ih1nfUmxUik
+ hp2aUt6+SyLBkzt+WgkADYpNn9R9oJ7N+LbRhow/fNGMvXOzr9D5hr7OdOYP9wNZZAEzexDh+
+ kZRQVw8UX1n/xZgFbyale2Awbruwhv2Q9czSP5TfZg+hPa7U7vn5jdfyJ9z3SjBDuOuUlFpcR
+ 3mmFslB4dSL2aA7Sd3p2K5OfnkqOYR2uDd2hjAytdatWZ78ZDgzWXm7B6SzOCqZBk51Z1ETze
+ eMYTjHt1s8MFlUc0x
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,86 +98,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>,
+ Nikola Pavlica <pavlica.nikola@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 8 Feb 2020 at 14:16, Markus Armbruster <armbru@redhat.com> wrote:
-> I understand the difficulty of parsing rST (Paolo called it "the Perl of
-> markup languages" for a reason).  What I don't yet understand is (1) why
-> we need to recognize the document structure of doc comments, and (2) why
-> we can do that by recognizing '=' markup, but ignore the native rST
-> document structure markup.
+On 08.02.20 15:30, Philippe Mathieu-Daud=C3=A9 wrote:
+> Fix using virtual console under gtk 3.22.30 (mate 1.20.1):
+>
+>    qemu-system-x86_64: Gdk: gdk_window_get_origin: assertion 'GDK_IS_WIN=
+DOW (window)' failed
+>
+> Fixes: c4c00922cc and 28b58f19d2 (display/gtk: get proper refreshrate)
+> Reported-by: Jan Kiszka <jan.kiszka@web.de>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> Cc: Nikola Pavlica <pavlica.nikola@gmail.com>
+> Report:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg678130.html
+> ---
+>   ui/gtk.c | 9 +++++----
+>   1 file changed, 5 insertions(+), 4 deletions(-)
+>
+> diff --git a/ui/gtk.c b/ui/gtk.c
+> index d18892d1de..c59297ff4d 100644
+> --- a/ui/gtk.c
+> +++ b/ui/gtk.c
+> @@ -1965,11 +1965,11 @@ static GtkWidget *gd_create_menu_machine(GtkDisp=
+layState *s)
+>    * If available, return the refresh rate of the display in milli-Hertz=
+,
+>    * else return 0.
+>    */
+> -static int gd_refresh_rate_millihz(GtkDisplayState *s)
+> +static int gd_refresh_rate_millihz(GtkWidget *window)
+>   {
+>   #ifdef GDK_VERSION_3_22
+> -    GdkDisplay *dpy =3D gtk_widget_get_display(s->window);
+> -    GdkWindow *win =3D gtk_widget_get_window(s->window);
+> +    GdkDisplay *dpy =3D gtk_widget_get_display(window);
+> +    GdkWindow *win =3D gtk_widget_get_window(window);
+>       GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win=
+);
 
-I think we're completely at cross purposes here, so there's
-something I've not managed to communicate clearly.
+Nope, no change. It's triggered right from ui/gtk.c:1973, the line above.
 
-We don't need to recognize the document structure of doc
-comments, indeed my implementation does not -- it just
-throws a doc comment at the rST parser to handle.
+>
+>       return gdk_monitor_get_refresh_rate(monitor);
+> @@ -2045,7 +2045,8 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, =
+VirtualConsole *vc,
+>       vc->gfx.kbd =3D qkbd_state_init(con);
+>       vc->gfx.dcl.con =3D con;
+>
+> -    refresh_rate_millihz =3D gd_refresh_rate_millihz(s);
+> +    refresh_rate_millihz =3D gd_refresh_rate_millihz(vc->window ?
+> +                                                   vc->window : s->wind=
+ow);
+>       if (refresh_rate_millihz) {
+>           vc->gfx.dcl.update_interval =3D MILLISEC_PER_SEC / refresh_rat=
+e_millihz;
+>       }
+>
 
-We *do* need to recognize the structure *of the document*
-(ie that it does have a thing with a heading "Block devices"
-that contains another thing with a heading "Background jobs"
-that in turn contains documentation for JobType, JobStatus....)
-so that when we're building up our tree of docutils node
-objects we know when we need to create a new 'section'
-node and give it a title 'Block devices' and which of
-the various section nodes in the tree should have all
-the nodes that make up the documentation of 'JobType'
-added to it.
-
-In order to achieve this separation (don't care about
-document structure inside lumps of rST, but do want to
-know what the overall section/subsection structure of
-the document is), this patchset pulls the identification
-of the document structure (heading/subheadings) completely
-out of being something you might find in the middle of
-a doc comment, and makes them their own
-special kind of markup:
-
-##
-# = This is a heading
-##
-
-(In my head I find I'm thinking of this as "not actually
-a doc comment", which is probably where some of my
-lack of clarity is coming from, since syntactically
-speaking and from the point of view of qapi/parser.py
-that is a sort of doc comment.)
-
-I suppose that there's an argument that the identification
-of headings and subheadings should really be done in
-qapi/parser.py, so that instead of
-
-        vis = QAPISchemaGenRSTVisitor(self)
-        vis.visit_begin(schema)
-        for doc in schema.docs:
-            if doc.symbol:
-                vis.symbol(doc, schema.lookup_entity(doc.symbol))
-            else:
-                vis.freeform(doc)
-
-you would have something more like
-
-        vis = QAPISchemaGenRSTVisitor(self)
-        vis.visit_begin(schema)
-        for doc in schema.docs:
-            if doc.symbol:
-                vis.symbol(doc, schema.lookup_entity(doc.symbol))
-            else if doc.is_section_header:
-                vis.start_new_section(doc)
-            else:
-                vis.freeform(doc)
-
-(with the identification of headers and pulling out of
-what level of nesting this header is and what its text
-is done in parser.py)
-
-thanks
--- PMM
+Jan
 
