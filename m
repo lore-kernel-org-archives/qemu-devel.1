@@ -2,134 +2,100 @@ Return-Path: <SRS0=SBSl=35=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C56DFC2BA83
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 20:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6EF2C2BA83
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 20:59:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D3F820733
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 20:52:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB15020733
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 20:59:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="xG8TcUct";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="hSMKJM2Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3F820733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g8ZuSnCb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB15020733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0tZ6-0003ot-KW
-	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 15:52:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40531)
+	id 1j0tgE-00066o-Sm
+	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 15:59:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41558)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@quicinc.com>) id 1j0tXs-0003G6-Rg
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:51:14 -0500
+ (envelope-from <mst@redhat.com>) id 1j0tfZ-0005GT-5d
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:59:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@quicinc.com>) id 1j0tXr-0003dt-Oh
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:51:12 -0500
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:22103)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
- id 1j0tXr-0003c0-7N
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:51:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1581281471; x=1612817471;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=oQ2iXTmD14eNJbYp3Kr8AkjLGBFiGSt2yNAykF9jXQI=;
- b=xG8TcUct41QFOR5l9t0e37Ug7CnKKC82OXUl8Y0hDnPbGt3jRRkNhYr+
- 2DyqmJw2H47eVaeU2FZyDSmqJJRNU/WdmZj4QDsegKWtAHQH0fIgrA3nQ
- rhYP+p5o8S+C1u1X7+ONRrwhv31Q3qenVQJ8a6vp+0xo9Va8s8ByfathF k=;
-Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
- by alexa-out-sd-01.qualcomm.com with ESMTP; 09 Feb 2020 12:51:09 -0800
-Received: from nasanexm03g.na.qualcomm.com ([10.85.0.49])
- by ironmsg01-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 09 Feb 2020 12:51:09 -0800
-Received: from nasanexm03b.na.qualcomm.com (10.85.0.98) by
- nasanexm03g.na.qualcomm.com (10.85.0.49) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Sun, 9 Feb 2020 12:51:08 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
- by nasanexm03b.na.qualcomm.com (10.85.0.98) with Microsoft SMTP Server (TLS)
- id 15.0.1473.3 via Frontend Transport; Sun, 9 Feb 2020 12:51:08 -0800
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
- BYAPR02MB5621.namprd02.prod.outlook.com (20.178.0.160) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Sun, 9 Feb 2020 20:51:07 +0000
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62]) by BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62%6]) with mapi id 15.20.2707.028; Sun, 9 Feb 2020
- 20:51:07 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: Richard Henderson <richard.henderson@linaro.org>, Richard Henderson
- <rth@twiddle.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: RE: [PATCH] Add support for a helper with 7 arguments
-Thread-Topic: [PATCH] Add support for a helper with 7 arguments
-Thread-Index: AQHV3HWNrLXzUmuR802n/46fb+QBo6gPp2wAgAACx8CAADlQAIACaQnwgADlCQCAACYs8A==
-Date: Sun, 9 Feb 2020 20:51:07 +0000
-Message-ID: <BYAPR02MB488629639A76A15DAE7FBEC4DE1E0@BYAPR02MB4886.namprd02.prod.outlook.com>
-References: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
- <b308434a-1ee8-4fb5-0e60-4dfdd047c959@linaro.org>
- <BYAPR02MB4886E14CC87B1169B2F6BE2BDE1C0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <a01b3358-a598-9d01-f3c8-d9a84fb7dd28@twiddle.net>
- <SN6PR02MB4895FE0821C3927B41636AB0DE1E0@SN6PR02MB4895.namprd02.prod.outlook.com>
- <fc6876dc-1a15-152c-5585-4ab06deb60fc@linaro.org>
-In-Reply-To: <fc6876dc-1a15-152c-5585-4ab06deb60fc@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=tsimpson@quicinc.com; 
-x-originating-ip: [70.115.140.19]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 57ab35cf-7414-416f-97c0-08d7ada1c95d
-x-ms-traffictypediagnostic: BYAPR02MB5621:
-x-microsoft-antispam-prvs: <BYAPR02MB562123363BAD654C7859E779DE1E0@BYAPR02MB5621.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0308EE423E
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(396003)(366004)(136003)(346002)(39860400002)(199004)(189003)(7696005)(478600001)(110136005)(71200400001)(316002)(8936002)(8676002)(55016002)(52536014)(81156014)(5660300002)(9686003)(81166006)(4326008)(76116006)(66446008)(64756008)(66556008)(66476007)(66946007)(33656002)(186003)(53546011)(26005)(6506007)(86362001)(2906002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB5621;
- H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +q2q3nI5VmYqrj+zPKBfC6aWOcaNSTAc48FcGs1BkMozr3wbRDFTzsj4QIaAgzjcJA5PIDd4LbDJ3oh8/Ol7PaAaTm5TikFBaoZg/Ue+qGF2gZaIWckFhUOxRe96dUiMMhshUBLYQJ3nsR2Q2oDTBjnwyCLl4teaWmC5Y3NUmP7tQT33+QmxKbPWoSL3R44GluM/Otb4kDeCbyqBI/bW5i0NyVq4fWq5dUiZKOh3eENjx2offwSgC8ydhjQAqVKt4vJmJE3dxdS3L++Asu4pFFmZrUiJlAKfJNOZKVpMBCnWkdIlsbB0+tP9Q4Lw7REgrKPHbCzVrwSSgqiLLPLRXuMl5iZspZy0ZYrtqidTkKXXQBXkIiCNmmRfgyMEmg/Dw4wR1rCk2UGTEi421/CONyVb6iWXPtt3yU6diiOBZa/z77tVazHRtGtWRhL2s0LN
-x-ms-exchange-antispam-messagedata: VioPSya/vR+cVgd/xBc4Z8OH3me1ChjYL687EcWQMxsSH9htiOkXco3/3az2EuCKQ1e96n873Vn+ytebJwOE9CLnlpiXct+gFkj+t5c3rD39KtPQkjNNKaM0riuppqH23bQDPr2DdkLvjxQP4lacKQ==
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FANRdul/YgMMf6D61Ythqt9aEg+tgweK+xs4qx8cA6czZjZu0bgLyo85ZiLZkocafiF9rSFJbi3Q0+nMRZVHjcF9C7cgpabucHl0pUt0sXxoHPOYw7VNIxqu3AbYM43WGFCq+/SAelnlDJ4hIIExkvFjkOycIqH2XyBVOK/hZpEffjoLL+ANqNHEDcPgf5aOs8BvHuwQYHVRMEaIVcjWcthi8abs2NuZSWoHuAdjHqxcdNkwxsZb1J+NI8pa+FnyI14GsJA2YDvCVnFbAke+i7UB2abyMQ+QnyfX3Y61yfehx0QDoMz9roRjJzf66e2iTTNUPYDFwUJ/F2wA+dlUiA==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7bQFBgQ5oDM6fVX4GWZyb3aB5Hbxzs2cBfzsBsp3hUI=;
- b=frlgQoWmWLOewv1VxEGli67vVoMDVNFeDhXyGw326MNVcihICmumBrvElZh0OU2sREJB0AA76BZzknp+sU/iGClNhjQoxqPrC2WG0uFtFMSK/lRpeGuS92YwA2xdwOdfcZVrBwERAHq5mDa8kYGVa9KmMOGC4c/Ifx6PT01CNVdw8vfDSd0ABAtH/uZgjnuGIavXzqnHwxtC9CQSlbJ5YeCryTpXTSHQm+oeeQ2NPfrvf+NI9EhLEY1Nyhk3M73r+A1UPmt0ralaXYG51zWA5QfCzU9yvysKVi/4dgZOO9czgZN2ZK6jxmsThEZEmceIXdtZc7v3Dj4FSxBEuC9qxg==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7bQFBgQ5oDM6fVX4GWZyb3aB5Hbxzs2cBfzsBsp3hUI=;
- b=hSMKJM2YXuUO2PkUe5l15Q1NsSUDO1Lt6yTPh190CR3Fkn+VOIfjW64dNesw/JpUcT0abURqsWU6eOChsuaTa98IgOSQf0qy3zA5nr5/mfOgh1qnlW7v7wlL4zKbjMlLL9wiY/XZ4BV8BQsjja2vxCeppinrg90uY6N3FqZStck=
-x-ms-exchange-crosstenant-network-message-id: 57ab35cf-7414-416f-97c0-08d7ada1c95d
-x-ms-exchange-crosstenant-originalarrivaltime: 09 Feb 2020 20:51:07.3619 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: JyOY0o/87D9b+RxCaW779S2svbGZVkEtNdOG+InFeX43U4N5a9sC80C9C0CC0zDYzHGP/elYU5xrxJlf0GSTSg==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB5621
-x-originatororg: quicinc.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <mst@redhat.com>) id 1j0tfX-0001er-G0
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:59:08 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38289
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j0tfX-0001eW-Ci
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:59:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581281947;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4TgsTYlq2uWpX5l3dOcoMSrO707rEi65LVX3fRa5d4g=;
+ b=g8ZuSnCboqB1QRrMYtTCpLGRs60vlSKcve8LhptpxT6REkXUvwVOKnFNklNqzrGiGX7rZK
+ zjj373CuNpkIy0SLn6wPFuOv+dVBp7fretCVikLLxhwjfVmFsDTNabW8Q18PFS2RvfIarX
+ mqKGf+Cv8B0tqhm5avibxjsLdkqmOk4=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-H20WUhj8ON6ybmID9SKh7g-1; Sun, 09 Feb 2020 15:59:03 -0500
+Received: by mail-qk1-f197.google.com with SMTP id i11so3508325qki.12
+ for <qemu-devel@nongnu.org>; Sun, 09 Feb 2020 12:59:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=b8IZa3WqHO9P3WUfVwvQeYuuFSFdaUexg28Zj2YYOh4=;
+ b=tYODguxufG3noMfMm3xjrsU1MMey2To2dQQsO31+ReoHOr1dykoCTkg5gBIaTk/6x/
+ lBVZUB5e5+VRnJyiwFMpSvxoE/b2S6ixP1K+23FpzgNT6ADrIUohgAvuAvA9fiyBeUaE
+ NXQSHswKqsIhIiiFYOXxqtUhQKZHIxuwpmouD/cleksJjI3isdIF98rE4Tg8vN/V8mEr
+ 0LUtu1HAwkpmRai8J06mpBJ7bspaWDEKaqohXMznUFVDo2bxpddDUO5zcMcSsGQfe8DQ
+ 9i84dUz+uej6JdeelBidTQtlraiQ3A9pZAPHmhRuGb9qvicM+WgN6pWSjrVe3XRivzxD
+ /zLA==
+X-Gm-Message-State: APjAAAWw3KrND6Min8BmCHHoTG3Tl3TqeuTyph14ghZLIcrFfjXweGmc
+ NXEVO3vC8NxicW3N63VNfQi6NDlzFRhjmvFkitFMwxjFeHuc6HQnx4ZOxIZvo48xClANCwmZt2N
+ XT5WpfGKedXYl0ZY=
+X-Received: by 2002:a05:620a:6d4:: with SMTP id
+ 20mr7988850qky.81.1581281942809; 
+ Sun, 09 Feb 2020 12:59:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqySBNwoTD2v6qnoYc3haWDuIEiwfdm0Rz7BJ4Y1iM2CClMHbLfkWaJ0Q8fuJrjv9QAH1/1xAA==
+X-Received: by 2002:a05:620a:6d4:: with SMTP id
+ 20mr7988840qky.81.1581281942562; 
+ Sun, 09 Feb 2020 12:59:02 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+ by smtp.gmail.com with ESMTPSA id h8sm4997217qtm.51.2020.02.09.12.58.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 09 Feb 2020 12:59:01 -0800 (PST)
+Date: Sun, 9 Feb 2020 15:58:57 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v14 08/11] virtio-iommu-pci: Introduce the x-dt-binding
+ option
+Message-ID: <20200209155639-mutt-send-email-mst@kernel.org>
+References: <20200207093203.3788-1-eric.auger@redhat.com>
+ <20200207093203.3788-9-eric.auger@redhat.com>
+ <20200207100540.GA1999431@myrica>
+ <20200207052405-mutt-send-email-mst@kernel.org>
+ <20200207230405.GJ720553@xz-x1>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.38
+In-Reply-To: <20200207230405.GJ720553@xz-x1>
+X-MC-Unique: H20WUhj8ON6ybmID9SKh7g-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -141,45 +107,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, quintela@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, Eric Auger <eric.auger@redhat.com>,
+ bharatb.linux@gmail.com, qemu-arm@nongnu.org, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUmljaGFyZCBIZW5kZXJz
-b24gPHJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmc+DQo+IFNlbnQ6IFN1bmRheSwgRmVicnVh
-cnkgOSwgMjAyMCAxMjoxOCBQTQ0KPiBUbzogVGF5bG9yIFNpbXBzb24gPHRzaW1wc29uQHF1aWNp
-bmMuY29tPjsgUmljaGFyZCBIZW5kZXJzb24NCj4gPHJ0aEB0d2lkZGxlLm5ldD47IHFlbXUtZGV2
-ZWxAbm9uZ251Lm9yZw0KPiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4N
-Cj4gU3ViamVjdDogUmU6IFtQQVRDSF0gQWRkIHN1cHBvcnQgZm9yIGEgaGVscGVyIHdpdGggNyBh
-cmd1bWVudHMNCj4gV2UgY2FuIG9wdGltaXplIHRoZW0uDQo+DQo+IEhvd2V2ZXIsIHlvdSBzaG91
-bGQgcHJlZmVyIHRvIHVzZSB0Y2dfZ2VuX2FkZGlfKiBvdmVyIHRjZ19nZW5fYWRkXyoNCj4gKGV0
-Yykgd2hlbg0KPiB5b3Uga25vdyB0aGF0IG9uZSBvcGVyYW5kIGlzIGNvbnN0YW50LiAgVGhpcyB3
-aWxsIG9wdGltaXplIGF3YXkgdGhlIGFkZCB6ZXJvDQo+IGltbWVkaWF0ZWx5IGFzIG9wcG9zZWQg
-dG8gYWxsb2NhdGluZyBtZW1vcnkgYW5kIHdhbGtpbmcgdGhlIGRhdGENCj4gc3RydWN0dXJlcyB0
-bw0KPiBlbGltaW5hdGUgaXQgbGF0ZXIuDQoNCk9LLCB3aWxsIHdvcmsgb24gdGhpcy4NCg0KPg0K
-PiBXaHkgYXJlIHlvdSB1c2luZyBhIGxvY2FsIHRlbXBvcmFyeSBmb3IgRUE/ICBUaGF0IHNob3Vs
-ZCBiZSBkZWFkDQo+IGltbWVkaWF0ZWx5DQo+IGFmdGVyIHRoaXMgc2xvdCBpcyBjb21wbGV0ZS4N
-Cg0KVGhlIGRlY2xhcmF0aW9uIG9mIEVBIGlzIGFkZGVkIGJ5IHRoZSBnZW5lcmF0b3IuICBJdCdz
-IGRlY2xhcmVkIGFzIGEgbG9jYWwgdGVtcCB0byBiZSBjb25zZXJ2YXRpdmUgaW4gY2FzZSB0aGVy
-ZSBpcyBjb250cm9sIGZsb3cuICBJJ2xsIHdvcmsgb24gbWFraW5nIHRoZSBnZW5lcmF0b3Igc21h
-cnRlci4gIEkgdGhpbmsgaXQgd2lsbCB3b3JrIHRvIGNoZWNrIGlmIHRoZSBpbnN0cnVjdGlvbiBp
-cyBwcmVkaWNhdGVkIGFuZCB1c2UgYSB0ZW1wIGlmIGl0IGlzbid0Lg0KDQoNCj4NCj4gV2hhdCdz
-IHdpdGggdHdvIHRlbXBvcmFyaWVzIGJvdGggbmFtZWQgIm5ld192YWx1ZSI/DQo+DQoNCkl0J3Mg
-YWN0dWFsbHkgYW4gYXJyYXkgdGhhdCBwYXJhbGxlbHMgdGhlIEdQUnMuICBJJ20ganVzdCBwYXNz
-aW5nIHRoZSBzYW1lIHN0cmluZyB0byBlYWNoIGNhbGwgdG8gdGNnX2dsb2JhbF9tZW1fbmV3LiAg
-SSdsbCBjaGFuZ2UgaXQgdG8gYmUgYSB1bmlxdWUgc3RyaW5nIGZvciBlYWNoLg0KDQo+ID4+IEZv
-ciBhIGNvbmRpdGlvbmFsIGxvYWQgaW4gc2xvdCAwLCB3ZSBjYW4gbG9hZCBkaXJlY3RseSBpbnRv
-IHRoZSBmaW5hbA0KPiA+PiBkZXN0aW5hdGlvbiByZWdpc3RlciBhbmQgc2tpcCB0aGUgdGVtcG9y
-YXJ5Lg0KPiA+DQo+ID4gSW4gZ2VuZXJhbCwgdGhlcmUgd2lsbCBiZSBsb3RzIG9mIGNoZWNrcyB3
-ZSB3b3VsZCBuZWVkIHRvIHBlcmZvcm0gYmVmb3JlDQo+ID4gY29uY2x1ZGluZyB0aGF0IGFuIGlu
-c3RydWN0aW9uIGNhbiB3cml0ZSBkaXJlY3RseSBpbnRvIHRoZSBkZXN0aW5hdGlvbi4gIEZvcg0K
-PiA+IGV4YW1wbGUsIHdlIGhhdmUgdG8gbWFrZSBzdXJlIG5vIG90aGVyIGluc3RydWN0aW9uIGxh
-dGVyIGluIHRoZSBwYWNrZXQNCj4gcmVhZHMNCj4gPiByNy4NCj4NCj4gV2hpY2ggaXMgb2YgY291
-cnNlIGFsbCB0cml2aWFsIGZvciBzbG90IDAsIGJlaW5nIGxhc3QuDQoNClNsb3QgMCBtaWdodCBi
-ZSBsYXN0IGluIHRoZSBlbmNvZGluZywgYnV0IHRoYXQgZG9lc24ndCBtZWFuIGl0IGlzIHRoZSBs
-YXN0IG9uZSB0byBleGVjdXRlLiAgUmVtZW1iZXIgdGhhdCB0aGUgcGFja2V0IGdldHMgcmVvcmRl
-cmVkIGJlZm9yZSBUQ0cgZ2VuZXJhdGlvbiBzbyB0aGF0IC5uZXcgZGVmaW5pdGlvbnMgYXJlIGJl
-Zm9yZSB0aGVpciB1c2VzLiAgU28sIGlmIHRoZSByZXN1bHQgb2YgdGhlIHNsb3QgMCBpbnN0cnVj
-dGlvbiBpcyB1c2VkIGJ5IGEgLm5ldyByZWZlcmVuY2UsIGl0IHdvbid0IGJlIGxhc3QuDQoNCg==
+On Fri, Feb 07, 2020 at 06:04:05PM -0500, Peter Xu wrote:
+> On Fri, Feb 07, 2020 at 05:24:54AM -0500, Michael S. Tsirkin wrote:
+> > On Fri, Feb 07, 2020 at 11:05:40AM +0100, Jean-Philippe Brucker wrote:
+> > > Hi Eric,
+> > >=20
+> > > On Fri, Feb 07, 2020 at 10:32:00AM +0100, Eric Auger wrote:
+> > > > At the moment, the kernel only supports device tree
+> > > > integration of the virtio-iommu. DT bindings between the
+> > > > PCI root complex and the IOMMU must be created by the machine
+> > > > in conformance to:
+> > > >=20
+> > > > Documentation/devicetree/bindings/virtio/iommu.txt.
+> > > >=20
+> > > > To make sure the end-user is aware of this, force him to use the
+> > > > temporary device option "x-dt-binding" and also double check the
+> > > > machine has a hotplug handler for the virtio-iommu-pci device.
+> > > > This hotplug handler is in charge of creating those DT bindings.
+> > > >=20
+> > > > Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> > > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> > > [...]
+> > > > @@ -39,6 +42,21 @@ static void virtio_iommu_pci_realize(VirtIOPCIPr=
+oxy *vpci_dev, Error **errp)
+> > > >      VirtIOIOMMUPCI *dev =3D VIRTIO_IOMMU_PCI(vpci_dev);
+> > > >      DeviceState *vdev =3D DEVICE(&dev->vdev);
+> > > > =20
+> > > > +    if (!dev->dt_binding) {
+> > > > +        error_setg(errp,
+> > > > +                   "Instantiation currently only is possible if th=
+e machine "
+> > > > +                   "creates device tree iommu-map bindings, ie. AC=
+PI is not "
+> > > > +                   "yet supported");
+> > > > +        error_append_hint(errp, "use -virtio-iommu-pci,x-dt-bindin=
+g\n");
+> > >=20
+> > > "use -device virtio-iommu-pci,x-dt-binding"?
+> > >=20
+> > > Can the option be safely removed as soon as we implement a topology
+> > > description for the remaining platforms?  Or will we need to carry it
+> > > forever for backward-compatibility (ie. ensure that an old command-li=
+ne
+> > > invocation that contains this option still works)?
+> > >=20
+> > > Thanks,
+> > > Jean
+> >=20
+> > I'd worry that if we actually document it then users will come to
+> > depend on it for sure, even though it starts with x-.
+>=20
+> I thought x- parameters can be dropped directly with totally no
+> grarantee...  Otherwise how do we differenciate x- with the common
+> parameters, and how do we introduce remove-prone parameters?
+>=20
+> Thanks,
+
+It's all about not breaking users. Yes we document that x-
+interfaces are unstable. But that documentation is only=20
+good for well-behaved users such as libvirt. End-users
+tend not to read the docs and the subtleties of
+stable/unstable interface are lost on them, so we really must never
+actively ask end users to set an x- flag.
+
+
+> --=20
+> Peter Xu
+
 
