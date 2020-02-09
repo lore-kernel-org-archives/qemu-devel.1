@@ -2,100 +2,81 @@ Return-Path: <SRS0=SBSl=35=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6EF2C2BA83
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 20:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A377DC2BA83
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 22:52:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB15020733
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 20:59:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68EEC207FF
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 22:52:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g8ZuSnCb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB15020733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPnTS8jy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EEC207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0tgE-00066o-Sm
-	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 15:59:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41558)
+	id 1j0vRh-0008Lg-DX
+	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 17:52:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j0tfZ-0005GT-5d
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:59:10 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j0vQw-0007lh-Pd
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 17:52:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j0tfX-0001er-G0
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:59:08 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38289
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j0tfX-0001eW-Ci
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 15:59:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581281947;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4TgsTYlq2uWpX5l3dOcoMSrO707rEi65LVX3fRa5d4g=;
- b=g8ZuSnCboqB1QRrMYtTCpLGRs60vlSKcve8LhptpxT6REkXUvwVOKnFNklNqzrGiGX7rZK
- zjj373CuNpkIy0SLn6wPFuOv+dVBp7fretCVikLLxhwjfVmFsDTNabW8Q18PFS2RvfIarX
- mqKGf+Cv8B0tqhm5avibxjsLdkqmOk4=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-H20WUhj8ON6ybmID9SKh7g-1; Sun, 09 Feb 2020 15:59:03 -0500
-Received: by mail-qk1-f197.google.com with SMTP id i11so3508325qki.12
- for <qemu-devel@nongnu.org>; Sun, 09 Feb 2020 12:59:03 -0800 (PST)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j0vQv-0005gu-JW
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 17:52:10 -0500
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:44732)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1j0vQv-0005fP-CI; Sun, 09 Feb 2020 17:52:09 -0500
+Received: by mail-io1-xd42.google.com with SMTP id z16so5472536iod.11;
+ Sun, 09 Feb 2020 14:52:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gd64rIV7kYV4G/rTlVnwwyOn7DZScBsCVv3MQfDpVK8=;
+ b=TPnTS8jy1rGL7kr0zvVWh2HW1FYf5NgJjByBAcZDfEVhPXRLLjPUxDkXaNORTWDl0l
+ lTvK61HWf+vVBkhLsV2QB/9ZX1J5cQkjnWKmYCRcgQEG6ttutjV5EhKRe64+jCHt+u2F
+ Xx8Hf8TfhqvhLl5i58EiZnautj1ECTAH4r1CQY8tQWsqgUd+Q0tkaWRVEjrj6kmngnC/
+ H0sccIHugpKC/v9/lnlgx5JcrGDVRnnB+fQnwmtKbV8CGENkP0WGaIIwt6u1HO3njomE
+ k52zNepUVjjrvOW69dx/9IGNKRIiZtsQgjbYfYojIQ7OCrIFDtEbK701vo8MKzeJc39l
+ pVKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=b8IZa3WqHO9P3WUfVwvQeYuuFSFdaUexg28Zj2YYOh4=;
- b=tYODguxufG3noMfMm3xjrsU1MMey2To2dQQsO31+ReoHOr1dykoCTkg5gBIaTk/6x/
- lBVZUB5e5+VRnJyiwFMpSvxoE/b2S6ixP1K+23FpzgNT6ADrIUohgAvuAvA9fiyBeUaE
- NXQSHswKqsIhIiiFYOXxqtUhQKZHIxuwpmouD/cleksJjI3isdIF98rE4Tg8vN/V8mEr
- 0LUtu1HAwkpmRai8J06mpBJ7bspaWDEKaqohXMznUFVDo2bxpddDUO5zcMcSsGQfe8DQ
- 9i84dUz+uej6JdeelBidTQtlraiQ3A9pZAPHmhRuGb9qvicM+WgN6pWSjrVe3XRivzxD
- /zLA==
-X-Gm-Message-State: APjAAAWw3KrND6Min8BmCHHoTG3Tl3TqeuTyph14ghZLIcrFfjXweGmc
- NXEVO3vC8NxicW3N63VNfQi6NDlzFRhjmvFkitFMwxjFeHuc6HQnx4ZOxIZvo48xClANCwmZt2N
- XT5WpfGKedXYl0ZY=
-X-Received: by 2002:a05:620a:6d4:: with SMTP id
- 20mr7988850qky.81.1581281942809; 
- Sun, 09 Feb 2020 12:59:02 -0800 (PST)
-X-Google-Smtp-Source: APXvYqySBNwoTD2v6qnoYc3haWDuIEiwfdm0Rz7BJ4Y1iM2CClMHbLfkWaJ0Q8fuJrjv9QAH1/1xAA==
-X-Received: by 2002:a05:620a:6d4:: with SMTP id
- 20mr7988840qky.81.1581281942562; 
- Sun, 09 Feb 2020 12:59:02 -0800 (PST)
-Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id h8sm4997217qtm.51.2020.02.09.12.58.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 09 Feb 2020 12:59:01 -0800 (PST)
-Date: Sun, 9 Feb 2020 15:58:57 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v14 08/11] virtio-iommu-pci: Introduce the x-dt-binding
- option
-Message-ID: <20200209155639-mutt-send-email-mst@kernel.org>
-References: <20200207093203.3788-1-eric.auger@redhat.com>
- <20200207093203.3788-9-eric.auger@redhat.com>
- <20200207100540.GA1999431@myrica>
- <20200207052405-mutt-send-email-mst@kernel.org>
- <20200207230405.GJ720553@xz-x1>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gd64rIV7kYV4G/rTlVnwwyOn7DZScBsCVv3MQfDpVK8=;
+ b=qlnJllr1/NWvbGfpUvdiGOU1iZZpbAIiU9BbQ15v4dSur+w3Iiw2i2QXPXnV3StBzc
+ IthA0H6wrNBqhy/AyGLZUkFaKEVCWV+il+DQ5YlEd6INdxb+1DypCw3jnEuBl+tT9gOv
+ 02SiOeSYsgtWO5HleKcrzCRXL+asUu16Q+VmWBfmK0tC+86eJNBwvJtLPddRHnOvmC6z
+ 1qqh9AivWv9pZouUFBenk8c84HhM+6/qZs3SbxGU8HxpEPupyCDZyTFvQwxdu5ybsX32
+ Xel73QoAQJOYdhRRs3X2EvgIgxKNx88Cczk4mY4sZa27KGoK/oR67Tu82kV4cNHt1rrP
+ p6Zw==
+X-Gm-Message-State: APjAAAWS1lwk6N398+tJlvSbgzelzRigCLAeAcUETv4ROOpdOxe/JbgM
+ 45Gcs6m43QGDWjQlEvn2R3JJGGsPCkLcRkEsaQs=
+X-Google-Smtp-Source: APXvYqwUa3mANuJD19EcXkwz3HC0IrDZcdf9Zs1Lmwp/vKa9fg7dIrptp172h7S3dT2vcOO80aDvzrKRIdOtpBWQu+M=
+X-Received: by 2002:a05:6602:2815:: with SMTP id
+ d21mr6774912ioe.217.1581288728370; 
+ Sun, 09 Feb 2020 14:52:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200207230405.GJ720553@xz-x1>
-X-MC-Unique: H20WUhj8ON6ybmID9SKh7g-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200208165645.15657-1-f4bug@amsat.org>
+ <20200208165645.15657-3-f4bug@amsat.org>
+In-Reply-To: <20200208165645.15657-3-f4bug@amsat.org>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Sun, 9 Feb 2020 23:51:57 +0100
+Message-ID: <CAPan3WoYkSB4ySUfjz-8efH3eaFgjcVC1TQb2Jc9j-cN0fCcoA@mail.gmail.com>
+Subject: Re: [PATCH v3 02/13] hw/arm/raspi: Correct the board descriptions
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: multipart/alternative; boundary="000000000000f12171059e2c7840"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,79 +88,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, quintela@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, Eric Auger <eric.auger@redhat.com>,
- bharatb.linux@gmail.com, qemu-arm@nongnu.org, eric.auger.pro@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 07, 2020 at 06:04:05PM -0500, Peter Xu wrote:
-> On Fri, Feb 07, 2020 at 05:24:54AM -0500, Michael S. Tsirkin wrote:
-> > On Fri, Feb 07, 2020 at 11:05:40AM +0100, Jean-Philippe Brucker wrote:
-> > > Hi Eric,
-> > >=20
-> > > On Fri, Feb 07, 2020 at 10:32:00AM +0100, Eric Auger wrote:
-> > > > At the moment, the kernel only supports device tree
-> > > > integration of the virtio-iommu. DT bindings between the
-> > > > PCI root complex and the IOMMU must be created by the machine
-> > > > in conformance to:
-> > > >=20
-> > > > Documentation/devicetree/bindings/virtio/iommu.txt.
-> > > >=20
-> > > > To make sure the end-user is aware of this, force him to use the
-> > > > temporary device option "x-dt-binding" and also double check the
-> > > > machine has a hotplug handler for the virtio-iommu-pci device.
-> > > > This hotplug handler is in charge of creating those DT bindings.
-> > > >=20
-> > > > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> > > [...]
-> > > > @@ -39,6 +42,21 @@ static void virtio_iommu_pci_realize(VirtIOPCIPr=
-oxy *vpci_dev, Error **errp)
-> > > >      VirtIOIOMMUPCI *dev =3D VIRTIO_IOMMU_PCI(vpci_dev);
-> > > >      DeviceState *vdev =3D DEVICE(&dev->vdev);
-> > > > =20
-> > > > +    if (!dev->dt_binding) {
-> > > > +        error_setg(errp,
-> > > > +                   "Instantiation currently only is possible if th=
-e machine "
-> > > > +                   "creates device tree iommu-map bindings, ie. AC=
-PI is not "
-> > > > +                   "yet supported");
-> > > > +        error_append_hint(errp, "use -virtio-iommu-pci,x-dt-bindin=
-g\n");
-> > >=20
-> > > "use -device virtio-iommu-pci,x-dt-binding"?
-> > >=20
-> > > Can the option be safely removed as soon as we implement a topology
-> > > description for the remaining platforms?  Or will we need to carry it
-> > > forever for backward-compatibility (ie. ensure that an old command-li=
-ne
-> > > invocation that contains this option still works)?
-> > >=20
-> > > Thanks,
-> > > Jean
-> >=20
-> > I'd worry that if we actually document it then users will come to
-> > depend on it for sure, even though it starts with x-.
->=20
-> I thought x- parameters can be dropped directly with totally no
-> grarantee...  Otherwise how do we differenciate x- with the common
-> parameters, and how do we introduce remove-prone parameters?
->=20
-> Thanks,
+--000000000000f12171059e2c7840
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-It's all about not breaking users. Yes we document that x-
-interfaces are unstable. But that documentation is only=20
-good for well-behaved users such as libvirt. End-users
-tend not to read the docs and the subtleties of
-stable/unstable interface are lost on them, so we really must never
-actively ask end users to set an x- flag.
+Hi Philippe,
 
 
-> --=20
-> Peter Xu
+On Sat, Feb 8, 2020 at 5:57 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+>
+wrote:
 
+> We hardcode the board revision as 0xa21041 for the raspi2, and
+> 0xa02082 for the raspi3:
+>
+>   166 static void raspi_init(MachineState *machine, int version)
+>   167 {
+>   ...
+>   194     int board_rev =3D version =3D=3D 3 ? 0xa02082 : 0xa21041;
+>
+> These revision codes are for the 2B and 3B models, see:
+>
+> https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-c=
+odes/README.md
+>
+> Correct the board description.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/arm/raspi.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index f2ccabc662..818146fdbb 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -221,7 +221,7 @@ static void raspi2_init(MachineState *machine)
+>
+>  static void raspi2_machine_init(MachineClass *mc)
+>  {
+> -    mc->desc =3D "Raspberry Pi 2";
+> +    mc->desc =3D "Raspberry Pi 2B";
+>      mc->init =3D raspi2_init;
+>      mc->block_default_type =3D IF_SD;
+>      mc->no_parallel =3D 1;
+> @@ -243,7 +243,7 @@ static void raspi3_init(MachineState *machine)
+>
+>  static void raspi3_machine_init(MachineClass *mc)
+>  {
+> -    mc->desc =3D "Raspberry Pi 3";
+> +    mc->desc =3D "Raspberry Pi 3B";
+>
+
+Could this patch be replaced by patch #11 "hw/arm/raspi: Extract the board
+model from the board revision"?
+
+Regards,
+Niek
+
+
+>      mc->init =3D raspi3_init;
+>      mc->block_default_type =3D IF_SD;
+>      mc->no_parallel =3D 1;
+> --
+> 2.21.1
+>
+>
+
+--=20
+Niek Linnenbank
+
+--000000000000f12171059e2c7840
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><div>Hi Philippe,</div><div><br></div></d=
+iv><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On =
+Sat, Feb 8, 2020 at 5:57 PM Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mail=
+to:f4bug@amsat.org">f4bug@amsat.org</a>&gt; wrote:<br></div><blockquote cla=
+ss=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid =
+rgb(204,204,204);padding-left:1ex">We hardcode the board revision as 0xa210=
+41 for the raspi2, and<br>
+0xa02082 for the raspi3:<br>
+<br>
+=C2=A0 166 static void raspi_init(MachineState *machine, int version)<br>
+=C2=A0 167 {<br>
+=C2=A0 ...<br>
+=C2=A0 194=C2=A0 =C2=A0 =C2=A0int board_rev =3D version =3D=3D 3 ? 0xa02082=
+ : 0xa21041;<br>
+<br>
+These revision codes are for the 2B and 3B models, see:<br>
+<a href=3D"https://www.raspberrypi.org/documentation/hardware/raspberrypi/r=
+evision-codes/README.md" rel=3D"noreferrer" target=3D"_blank">https://www.r=
+aspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md<=
+/a><br>
+<br>
+Correct the board description.<br>
+<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
+t.org" target=3D"_blank">f4bug@amsat.org</a>&gt;<br>
+---<br>
+=C2=A0hw/arm/raspi.c | 4 ++--<br>
+=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c<br>
+index f2ccabc662..818146fdbb 100644<br>
+--- a/hw/arm/raspi.c<br>
++++ b/hw/arm/raspi.c<br>
+@@ -221,7 +221,7 @@ static void raspi2_init(MachineState *machine)<br>
+<br>
+=C2=A0static void raspi2_machine_init(MachineClass *mc)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 mc-&gt;desc =3D &quot;Raspberry Pi 2&quot;;<br>
++=C2=A0 =C2=A0 mc-&gt;desc =3D &quot;Raspberry Pi 2B&quot;;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;init =3D raspi2_init;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;block_default_type =3D IF_SD;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;no_parallel =3D 1;<br>
+@@ -243,7 +243,7 @@ static void raspi3_init(MachineState *machine)<br>
+<br>
+=C2=A0static void raspi3_machine_init(MachineClass *mc)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 mc-&gt;desc =3D &quot;Raspberry Pi 3&quot;;<br>
++=C2=A0 =C2=A0 mc-&gt;desc =3D &quot;Raspberry Pi 3B&quot;;<br></blockquote=
+><div><br></div><div>Could this patch be replaced by patch #11 &quot;hw/arm=
+/raspi: Extract the board model from the board revision&quot;?</div><div><b=
+r></div><div>Regards,</div><div>Niek<br></div><div>=C2=A0</div><blockquote =
+class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px sol=
+id rgb(204,204,204);padding-left:1ex">
+=C2=A0 =C2=A0 =C2=A0mc-&gt;init =3D raspi3_init;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;block_default_type =3D IF_SD;<br>
+=C2=A0 =C2=A0 =C2=A0mc-&gt;no_parallel =3D 1;<br>
+-- <br>
+2.21.1<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
+
+--000000000000f12171059e2c7840--
 
