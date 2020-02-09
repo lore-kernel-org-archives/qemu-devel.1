@@ -2,133 +2,101 @@ Return-Path: <SRS0=SBSl=35=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAEF9C35250
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 05:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23733C35250
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 07:50:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A04692072C
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 05:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E161E20733
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 07:50:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="zNMSsbX9";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="PwQFGdil"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04692072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d1VTu770"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E161E20733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0eqq-0002G8-RY
-	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 00:09:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54255)
+	id 1j0hLx-0000iR-Vx
+	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 02:50:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44430)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@quicinc.com>) id 1j0eq4-0001Cj-9g
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 00:09:01 -0500
+ (envelope-from <mst@redhat.com>) id 1j0hLI-0000EN-80
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 02:49:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@quicinc.com>) id 1j0eq3-0001vz-5k
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 00:09:00 -0500
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:13950)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
- id 1j0eq2-0001ry-OA
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 00:08:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1581224938; x=1612760938;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=sZj4mFFX7BRjAETUieFTtBKsi5LJtnDok4RXc87d34w=;
- b=zNMSsbX9J0RrEq6s8kRiWR0AHaRHHah2C98mnap+HP81y2cjR4FAqtKM
- frtrUXCWbr6CzvlFiQRUrsja2zQunmmmO8FlwGWTNqan0BPTF0q6wCBDc
- kYfe4mwmYIuwm2TnH6fkaf+NRBvUK7HNhfeNDnKonq4jqPKnrOw7/Yt7p Y=;
-Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
- by alexa-out-sd-01.qualcomm.com with ESMTP; 08 Feb 2020 21:08:49 -0800
-Received: from nasanexm01c.na.qualcomm.com ([10.85.0.83])
- by ironmsg03-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 08 Feb 2020 21:08:49 -0800
-Received: from NASANEXM01C.na.qualcomm.com (10.85.0.83) by
- NASANEXM01C.na.qualcomm.com (10.85.0.83) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Sat, 8 Feb 2020 21:08:48 -0800
-Received: from NAM04-CO1-obe.outbound.protection.outlook.com (199.106.107.6)
- by NASANEXM01C.na.qualcomm.com (10.85.0.83) with Microsoft SMTP Server (TLS)
- id 15.0.1473.3 via Frontend Transport; Sat, 8 Feb 2020 21:08:48 -0800
-Received: from SN6PR02MB4895.namprd02.prod.outlook.com (52.135.113.208) by
- SN6PR02MB4781.namprd02.prod.outlook.com (52.135.116.213) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Sun, 9 Feb 2020 05:08:46 +0000
-Received: from SN6PR02MB4895.namprd02.prod.outlook.com
- ([fe80::4d4:4ae5:df44:3251]) by SN6PR02MB4895.namprd02.prod.outlook.com
- ([fe80::4d4:4ae5:df44:3251%4]) with mapi id 15.20.2707.024; Sun, 9 Feb 2020
- 05:08:46 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: Richard Henderson <rth@twiddle.net>, Richard Henderson
- <richard.henderson@linaro.org>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH] Add support for a helper with 7 arguments
-Thread-Topic: [PATCH] Add support for a helper with 7 arguments
-Thread-Index: AQHV3HWNrLXzUmuR802n/46fb+QBo6gPp2wAgAACx8CAADlQAIACaQnw
-Date: Sun, 9 Feb 2020 05:08:46 +0000
-Message-ID: <SN6PR02MB4895FE0821C3927B41636AB0DE1E0@SN6PR02MB4895.namprd02.prod.outlook.com>
-References: <1580942510-2820-1-git-send-email-tsimpson@quicinc.com>
- <b308434a-1ee8-4fb5-0e60-4dfdd047c959@linaro.org>
- <BYAPR02MB4886E14CC87B1169B2F6BE2BDE1C0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <a01b3358-a598-9d01-f3c8-d9a84fb7dd28@twiddle.net>
-In-Reply-To: <a01b3358-a598-9d01-f3c8-d9a84fb7dd28@twiddle.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=tsimpson@quicinc.com; 
-x-originating-ip: [70.115.140.19]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ed78c5f4-0a20-4e34-c330-08d7ad1e244e
-x-ms-traffictypediagnostic: SN6PR02MB4781:
-x-microsoft-antispam-prvs: <SN6PR02MB47811C508D09357D920C2D3BDE1E0@SN6PR02MB4781.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0308EE423E
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(366004)(376002)(346002)(136003)(39860400002)(189003)(199004)(5660300002)(26005)(110136005)(52536014)(66446008)(2906002)(7696005)(64756008)(66556008)(66476007)(66946007)(478600001)(86362001)(316002)(8676002)(8936002)(81166006)(81156014)(76116006)(186003)(9686003)(71200400001)(6506007)(55016002)(4326008)(53546011)(33656002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:SN6PR02MB4781;
- H:SN6PR02MB4895.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OEA1l0cB/S1QyC7yD2dm4oQZ1nBJEbT0eFX9OUBYkHCNfj0kLVlxPtdX1lz/D18Cdwqfhop1o+zu55vjP0ZgoAslAjsa/cngUg4F+QB3Xi7jALDzJ4mXSydSNWUPq9c3EkCrmf6+cHnR6EjT5qmCVQW936OEMRVoEB0lxJo5A8ho6FkvoeAZCHSo+UW1bcn11a5SDUO2aDT1Ki7dPS2a6c64yd+73ZLv1xYEcvZVv8MtHRWF6A78hPUuMAX+7diCXM1clKpWV/KjGLEc+KKboS8DRzVpiNHswgP8ggZ1Evpj5XV0kxcO2G6IHdZadtI0mTrqod5gnwolwZH5wetNUaxZK3+vIue3bEshnQLpLwn4uQepHLNm3FjthjsCDKddxI7TbA71BYbwTFxyznCdft3tmXPaOt4QpbMBT87pNDVcn1/jfXCjDg/igIULRUbQ
-x-ms-exchange-antispam-messagedata: SLWO5G/dGy60zjBtqzi4nCgtfuLw8AayPq0QgzRcF5u8yi5bUiUTbX77iAFaQmm3MfBxntLosYzheO9bRwx+ScvJCKTe+l44cMsCHzRu92HXFvOvdCGD0QDMnJwpJvata/nfMpDPd+GXgPaUyObyew==
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aeWLXXY4PUuuKufyzH53YAAPlg2R0cMTznlIXjKBbl9T7gEyui12fJ0xmsj9F2tOfp4arVE05remmJ1DnWfiECehjPei4jx3lheUS1cXKXzDq89rRRKaHHcNfxSEOeNlAYQbKLRxoArgJgJftnLhMynqufV66BouikUZupEit0h/wYE0VldLSwU/EXwZctvwrMQgnVuoMQj+XjCAIvjImxdqklh8QYAY8Y08BNdGZVQG7Giaj0DhM9V5XAyuByCNMHPM5y4Mct1x0XPQDxqZxoZQ9AoBKBrlIoT6vnObJZTwgutkk3Y1LebloC7QAfmh3bB+e4OkncxEUf7lBqld8A==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TmSqGiy3ccXqMpH078u9S+tJJWHf0NT16LbpuEihHmE=;
- b=dLiE1uSFrbSi2Kf/WgIfYd4j+Z2El/868+VGa6f5x/3fJNtKBPs+XcWzIqBLk0CAk8D71fm2PCBFjOLX4v4GxJCiMShzM7JA7o1wLrplAYfUICyCU+gJLQw7bksPHJ3kV2Pih2KXhey5qFskyJbRpcc/WvJpp+FYRoR5VJ+pmekGJ8HoLOH3JDWrzVxX/nnuaFSZRrU6h/gB8IDutJEqr6vF+5AU5c3N/Fve9o70g7GGuzaDNSmfyKvMqmJrOxY3oohaihfHqpj47D6O/+fC8y6W0wbwb2jd4v3QgTi+Eu5ymUFpiwlH8X92Xjl+WxRwxQC+2g2UOJSjd8Sfx4u7CA==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TmSqGiy3ccXqMpH078u9S+tJJWHf0NT16LbpuEihHmE=;
- b=PwQFGdilw1/Qod2XW7shy+59VKpqM8wBSzNHiVQwURvjAsEjJR4jRKPy79jiGS7DKxyuKvakR5reHP2bZaB8qMzUzQFRGZzu0YAQzdITK9ULPactXwr2o4yANlReeDsNdYNQP8F6QQl7XCXJeJWyvKOzGmPYdgDyEG5X2Fou0Wo=
-x-ms-exchange-crosstenant-network-message-id: ed78c5f4-0a20-4e34-c330-08d7ad1e244e
-x-ms-exchange-crosstenant-originalarrivaltime: 09 Feb 2020 05:08:46.3971 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: /q4i1JiGkw8/P4pUv2c3F6/PpHvMgYW5XmqdSEGTRYgvL0XS2pZJOKoqeHUd6WdA4mEKu4ajbQY/Qkx43Xdpcg==
-x-ms-exchange-transport-crosstenantheadersstamped: SN6PR02MB4781
-x-originatororg: quicinc.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <mst@redhat.com>) id 1j0hLF-0005Mt-LG
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 02:49:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50240
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j0hLF-0005HB-9y
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 02:49:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581234560;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QGaF0tV0BJ0+NvSYlHAFoFJNQjtLdNbrd/EkPHQsIHk=;
+ b=d1VTu770oCxFRR6BJMpRuucLIOMi+THec6TdnPQGIZWu7cytJrh/yAUbtAmPKQ+2A2zCj7
+ a+elYjbsuw+GOkGRJEz2iIHSossDj3NrRQi1hrODzOkT/WWjepNxn5CIVBT4+SfMT9XtJo
+ PC08R2++MVp2f4Ca3WLgNOFHCr3bjK8=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-Gtc4AdVJOqWUjULJ0CYpag-1; Sun, 09 Feb 2020 02:49:16 -0500
+Received: by mail-qk1-f199.google.com with SMTP id y6so2541685qki.13
+ for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 23:49:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=PVmN1YUoVFUlADWAK0P0uJ/vuhRwYwRZUwiYuM6b9/4=;
+ b=m72E6vDRgyrTdfhSm0eaVz4ySA/KI5H6e1usiWn64SEK264wM1qHjQOjQckU2HgH+s
+ GVY5li7XuN/MPPuWdl09VfOc2Ag8IGJZs3nV+o7ysOxcZ0YHDUTgAGD2fEyRo6vkCt5R
+ j2NHw71yoHvS2SnFEnKI2ASN1hnXaOmzFZ8Zdr7ge+avRslpxGu+WZEXOTLTzG5B6WQ9
+ 2NY9sioIGsI7CbccEDHZPu/SR3IiUm/86axs5O1VetN5AKzXjEcppalHVNxnUug3aSBH
+ j5op0XV9BV5YHWXr63jFgUzVNlYBgF89CoCriwi+CGAEN1TFlSu58lz1bx69CU5HxIMm
+ yKYA==
+X-Gm-Message-State: APjAAAWCZ5knTu1jn/rLyWX2zxWxmZdGrvpKfwegWI9Q9zkWnpRKJqkM
+ wiu3I/NhUGLUeQtPynriRd/izJ5cm7GLrW8RfGycOlzybxQvBZzZGu5OgY/bcVu++xHGl39yBYM
+ pG4Qdr1ahHKbnY4g=
+X-Received: by 2002:ae9:e115:: with SMTP id g21mr5747410qkm.187.1581234556404; 
+ Sat, 08 Feb 2020 23:49:16 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyTbRfoV9CeYgj15idM1vs8U3sFvl7F7DFNlN3JewiXFKuVI3Woz7X7ksqP35fpUnQ7EpjTHA==
+X-Received: by 2002:ae9:e115:: with SMTP id g21mr5747389qkm.187.1581234556050; 
+ Sat, 08 Feb 2020 23:49:16 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+ by smtp.gmail.com with ESMTPSA id x22sm4173676qtq.30.2020.02.08.23.49.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 08 Feb 2020 23:49:14 -0800 (PST)
+Date: Sun, 9 Feb 2020 02:49:09 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Subject: Re: [PATCH v1 2/4] virtio: increase virtuqueue size for virtio-scsi
+ and virtio-blk
+Message-ID: <20200209024650-mutt-send-email-mst@kernel.org>
+References: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
+ <20200129140702.5411-3-dplotnikov@virtuozzo.com>
+ <20200130145840.GH180311@stefanha-x1.localdomain>
+ <92f392e9-eb05-5c85-4d50-208110720a22@virtuozzo.com>
+ <20200205111905.GE58062@stefanha-x1.localdomain>
+ <683b80a8-0d40-7f14-e3f4-628d2b38037f@virtuozzo.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.38
+In-Reply-To: <683b80a8-0d40-7f14-e3f4-628d2b38037f@virtuozzo.com>
+X-MC-Unique: Gtc4AdVJOqWUjULJ0CYpag-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -140,58 +108,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ ehabkost@redhat.com, qemu-block@nongnu.org,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, mreitz@redhat.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com, den@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gT24gMi83LzIwIDEyOjQzIFBNLCBUYXlsb3IgU2ltcHNvbiB3cm90ZToNCj4gPg0KPiA+
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9tOiBSaWNoYXJkIEhlbmRlcnNv
-biA8cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZz4NCj4gPj4NCj4gPj4gQnV0IEkgZW5jb3Vy
-YWdlIHlvdSB0byByZS10aGluayB5b3VyIHB1cmVseSBtZWNoYW5pY2FsIGFwcHJvYWNoIHRvIHRo
-ZQ0KPiA+PiBoZXhhZ29uIHBvcnQuICBJdCBzZWVtcyB0byBtZSB0aGF0IHlvdSBzaG91bGQgYmUg
-ZG9pbmcgbXVjaCBtb3JlDQo+IGR1cmluZw0KPiA+PiB0aGUgdHJhbnNsYXRpb24gcGhhc2Ugc28g
-dGhhdCB5b3UgY2FuIG1pbmltaXplIHRoZSBudW1iZXIgb2YgaGVscGVycyB0aGF0DQo+ID4+IHlv
-dSByZXF1aXJlLg0KPiA+DQo+ID4gVGhlcmUgYXJlIGEgY291cGxlIG9mIHRoaW5ncyB3ZSBjb3Vs
-ZCBkbw0KPiA+IC0gU2hvcnQgdGVybTogQWRkICNpZmRlZidzIHRvIHRoZSBnZW5lcmF0ZWQgY29k
-ZSBzbyB0aGF0IHRoZSBoZWxwZXIgaXNuJ3QNCj4gPiAgIGNvbXBpbGVkIHdoZW4gdGhlcmUgaXMg
-YSBmV1JBUF88dGFnPiBkZWZpbmVkLiAgVGhlcmUgYXJlIGN1cnJlbnRseSB+NTAwDQo+ID4gICBp
-bnN0cnVjdGlvbnMgd2hlcmUgdGhpcyBpcyB0aGUgY2FzZS4NCj4NCj4gRGVmaW5pdGVseS4NCg0K
-T0ssIGRvbmUuDQoNCj4NCj4gPiAtIExvbmcgdGVybTogSW50ZWdyYXRlIHJldi5uZydzIGFwcHJv
-YWNoIHRoYXQgdXNlcyBmbGV4L2Jpc29uIHRvIHBhcnNlIHRoZQ0KPiA+IHNlbWFudGljcyBhbmQg
-Z2VuZXJhdGUgVENHIGNvZGUuDQo+IFRoZXJlIGlzIHBlcmhhcHMgYW4gaW50ZXJtZWRpYXRlIHN0
-ZXAgdGhhdCBtZXJlbHkgc3BlY2lhbC1jYXNlcyB0aGUNCj4gbG9hZC9zdG9yZQ0KPiBpbnNucy4g
-IFdpdGggcmFyZSBleGNlcHRpb25zIChoYWghKSB0aGVzZSBhcmUgdGhlIGNhc2VzIHRoYXQgd2ls
-bCBtb3N0IG9mdGVuDQo+IHJhaXNlIGFuIGV4Y2VwdGlvbi4gIE1vcmVvdmVyLCB0aGV5IGFyZSB0
-aGUgKm9ubHkqIGNhc2VzIHRoYXQgY2FuIHJhaXNlIGFuDQo+IGV4Y2VwdGlvbiB3aXRob3V0IHJl
-cXVpcmluZyBhIGhlbHBlciBjYWxsIGFueXdheS4NCj4NCj4gVGhlcmUgYXJlIGEgbnVtYmVyIG9m
-IGNhc2VzIHRoYXQgSSBjYW4gdGhpbmsgb2Y6DQo+DQo+IHsNCj4gICByNiA9IG1lbWIocjEpDQo+
-ICAgcjcgPSBtZW1iKHIyKQ0KPiB9DQo+DQo+IHFlbXVfbGQgICB0MCwgcjEsIE1PX1VCLCBtbXVf
-aWR4DQo+IHFlbXVfbGQgICB0MSwgcjIsIE1PX1VCLCBtbXVfaWR4DQo+IG1vdiAgICAgICByNiwg
-dDANCj4gbW92ICAgICAgIHI3LCB0MQ0KPg0KDQpIZXJlIGlzIHRoZSBUQ0cgd2UgZ2VuZXJhdGUg
-Y3VycmVudGx5Lg0KIG1vdmlfaTMyIHRtcDAsJDB4MA0KIGFkZF9pMzIgbG9jMixyMSx0bXAwDQog
-cWVtdV9sZF9pMzIgbG9jMyxsb2MyLHNiLDANCiBtb3ZfaTMyIG5ld192YWx1ZSxsb2MzDQogbW92
-aV9pMzIgdG1wMCwkMHgwDQogYWRkX2kzMiBsb2MyLHIyLHRtcDANCiBxZW11X2xkX2kzMiBsb2Mz
-LGxvYzIsc2IsMA0KIG1vdl9pMzIgbmV3X3ZhbHVlLGxvYzMNCiBtb3ZfaTMyIHI2LG5ld192YWx1
-ZQ0KIG1vdl9pMzIgcjcsbmV3X3ZhbHVlDQpJIGNvdWxkIHdvcmsgb24gZWxpbWluYXRpbmcgdGhl
-IGFkZCBvZiB6ZXJvIGFuZCB0aGUgZXh0cmEgY29waWVzLiAgSXMgVENHIGFibGUgdG8gb3B0aW1p
-emUgdGhlc2UgYmVmb3JlIGVtaXR0aW5nIHRoZSBob3N0IGNvZGU/DQoNCg0KPiB7DQo+ICAgcjYg
-PSBtZW1iKHIxKQ0KPiAgIG1lbWIocjIpID0gcjcNCj4gfQ0KPg0KPiBxZW11X2xkICAgdDAsIHIx
-LCBNT19VQiwgbW11X2lkeA0KPiBxZW11X3N0ICAgcjcsIHIyLCBNT19VQiwgbW11X2lkeA0KPiBt
-b3YgICAgICAgcjYsIHQwDQo+DQo+IFRoZXNlIGJlaW5nIHRoZSAibm9ybWFsIiBjYXNlIHdoZXJl
-aW4gdGhlIG1lbW9wcyBhcmUgdW5jb25kaXRpb25hbCwgYW5kDQo+IGNhbg0KPiBzaW1wbHkgdXNl
-IGEgdGVtcCBmb3Igc2VtYW50aWNzLiAgU2ltaWxhcmx5IGZvciBNRU1PUCwgTlYsIG9yIFNZU1RF
-TSBpbnNucw0KPiBpbg0KPiBzbG90MC4NCj4NCj4gew0KPiAgIHI2ID0gbWVtYihyMSkNCj4gICBp
-ZiAocDApIHI3ID0gbWVtYihyNykNCj4gfQ0KPg0KPiBxZW11X2xkICAgbDAsIHIxLCBNT19VQiwg
-bW11X2lkeA0KPiBhbmRpICAgICAgdDEsIHAwLCAxDQo+ICAgICAgICAgYnJjb25kaSAgIHQxLCAw
-LCBMMQ0KPiAgICAgICAgIHFlbXVfbGQgICByNywgcjIsIE1PX1VCLCBtbXVfaWR4DQo+ICBMMToN
-Cj4gbW92ICAgICAgIHI2LCBsMA0KPg0KPiBGb3IgYSBjb25kaXRpb25hbCBsb2FkIGluIHNsb3Qg
-MCwgd2UgY2FuIGxvYWQgZGlyZWN0bHkgaW50byB0aGUgZmluYWwNCj4gZGVzdGluYXRpb24gcmVn
-aXN0ZXIgYW5kIHNraXAgdGhlIHRlbXBvcmFyeS4NCg0KSW4gZ2VuZXJhbCwgdGhlcmUgd2lsbCBi
-ZSBsb3RzIG9mIGNoZWNrcyB3ZSB3b3VsZCBuZWVkIHRvIHBlcmZvcm0gYmVmb3JlIGNvbmNsdWRp
-bmcgdGhhdCBhbiBpbnN0cnVjdGlvbiBjYW4gd3JpdGUgZGlyZWN0bHkgaW50byB0aGUgZGVzdGlu
-YXRpb24uICBGb3IgZXhhbXBsZSwgd2UgaGF2ZSB0byBtYWtlIHN1cmUgbm8gb3RoZXIgaW5zdHJ1
-Y3Rpb24gbGF0ZXIgaW4gdGhlIHBhY2tldCByZWFkcyByNy4gIEFsc28sIHdlIGhhdmUgdG8gY2hl
-Y2sgaWYgdGhlcmUgYXJlIGFueSAubmV3IHJlZmVyZW5jZXMgdG8gcjcgLSB0aGVzZSB3aWxsIHJl
-YWQgZnJvbSBuZXdfdmFsdWVbN10uDQoNCg==
+On Fri, Feb 07, 2020 at 11:48:05AM +0300, Denis Plotnikov wrote:
+>=20
+>=20
+> On 05.02.2020 14:19, Stefan Hajnoczi wrote:
+> > On Tue, Feb 04, 2020 at 12:59:04PM +0300, Denis Plotnikov wrote:
+> > >=20
+> > > On 30.01.2020 17:58, Stefan Hajnoczi wrote:
+> > > > On Wed, Jan 29, 2020 at 05:07:00PM +0300, Denis Plotnikov wrote:
+> > > > > The goal is to reduce the amount of requests issued by a guest on
+> > > > > 1M reads/writes. This rises the performance up to 4% on that kind=
+ of
+> > > > > disk access pattern.
+> > > > >=20
+> > > > > The maximum chunk size to be used for the guest disk accessing is
+> > > > > limited with seg_max parameter, which represents the max amount o=
+f
+> > > > > pices in the scatter-geather list in one guest disk request.
+> > > > >=20
+> > > > > Since seg_max is virqueue_size dependent, increasing the virtqueu=
+e
+> > > > > size increases seg_max, which, in turn, increases the maximum siz=
+e
+> > > > > of data to be read/write from guest disk.
+> > > > >=20
+> > > > > More details in the original problem statment:
+> > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03721.ht=
+ml
+> > > > >=20
+> > > > > Suggested-by: Denis V. Lunev <den@openvz.org>
+> > > > > Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> > > > > ---
+> > > > >    hw/core/machine.c          | 3 +++
+> > > > >    include/hw/virtio/virtio.h | 2 +-
+> > > > >    2 files changed, 4 insertions(+), 1 deletion(-)
+> > > > >=20
+> > > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > > > > index 3e288bfceb..8bc401d8b7 100644
+> > > > > --- a/hw/core/machine.c
+> > > > > +++ b/hw/core/machine.c
+> > > > > @@ -28,6 +28,9 @@
+> > > > >    #include "hw/mem/nvdimm.h"
+> > > > >    GlobalProperty hw_compat_4_2[] =3D {
+> > > > > +    { "virtio-blk-device", "queue-size", "128"},
+> > > > > +    { "virtio-scsi-device", "virtqueue_size", "128"},
+> > > > > +    { "vhost-blk-device", "virtqueue_size", "128"},
+> > > > vhost-blk-device?!  Who has this?  It's not in qemu.git so please o=
+mit
+> > > > this line. ;-)
+> > > So in this case the line:
+> > >=20
+> > > { "vhost-blk-device", "seg_max_adjust", "off"},
+> > >=20
+> > > introduced by my patch:
+> > >=20
+> > > commit 1bf8a989a566b2ba41c197004ec2a02562a766a4
+> > > Author: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> > > Date:=A0=A0 Fri Dec 20 17:09:04 2019 +0300
+> > >=20
+> > >  =A0=A0=A0 virtio: make seg_max virtqueue size dependent
+> > >=20
+> > > is also wrong. It should be:
+> > >=20
+> > > { "vhost-scsi-device", "seg_max_adjust", "off"},
+> > >=20
+> > > Am I right?
+> > It's just called "vhost-scsi":
+> >=20
+> > include/hw/virtio/vhost-scsi.h:#define TYPE_VHOST_SCSI "vhost-scsi"
+> >=20
+> > > > On the other hand, do you want to do this for the vhost-user-blk,
+> > > > vhost-user-scsi, and vhost-scsi devices that exist in qemu.git?  Th=
+ose
+> > > > devices would benefit from better performance too.
+> After thinking about that for a while, I think we shouldn't extend queue
+> sizes for vhost-user-blk, vhost-user-scsi and vhost-scsi.
+> This is because increasing the queue sizes seems to be just useless for
+> them: the all thing is about increasing the queue sizes for increasing
+> seg_max (it limits the max block query size from the guest). For
+> virtio-blk-device and virtio-scsi-device it makes sense, since they have
+> seg-max-adjust property which, if true, sets seg_max to virtqueue_size-2.
+> vhost-scsi also have this property but it seems the property just doesn't
+> affect anything (remove it?).
+> Also vhost-user-blk, vhost-user-scsi and vhost-scsi don't do any seg_max
+> settings. If I understand correctly, their backends are ment to be
+> responsible for doing that.
+
+The queue size is set by qemu IIRC.
+
+> So, what about changing the queue sizes just for virtio-blk-device and
+> virtio-scsi-device?
+
+
+Hmm that would break ability to migrate between userspace and vhost
+backends, would it not?
+
+
+> Denis
+>=20
+> > > It seems to be so. We also have the test checking those settings:
+> > > tests/acceptance/virtio_seg_max_adjust.py
+> > > For now it checks virtio-scsi-pci and virtio-blk-pci.
+> > > I'm going to extend it for the virtqueue size checking.
+> > > If I change vhost-user-blk, vhost-user-scsi and vhost-scsi it's worth
+> > > to check those devices too. But I don't know how to form a command li=
+ne
+> > > for that 3 devices since they should involve some third party compone=
+nts as
+> > > backends (kernel modules, DPDK, etc.) and they seems to be not availa=
+ble in
+> > > the
+> > > qemu git.
+> > > Is there any way to do it with some qit.qemu available stubs or somet=
+hing
+> > > else?
+> > > If so, could you please point out the proper way to do it?
+> > qemu.git has contrib/vhost-user-blk/ and contrib/vhost-user-scsi/ if
+> > you need to test those vhost-user devices without external dependencies=
+.
+> >=20
+> > Stefan
+
 
