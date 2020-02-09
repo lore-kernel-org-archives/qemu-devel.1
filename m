@@ -2,101 +2,87 @@ Return-Path: <SRS0=SBSl=35=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23733C35250
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 07:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7647C35250
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 11:27:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E161E20733
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 07:50:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d1VTu770"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E161E20733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9195720733
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Feb 2020 11:27:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9195720733
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0hLx-0000iR-Vx
-	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 02:50:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44430)
+	id 1j0kkA-0007rr-JX
+	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 06:27:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j0hLI-0000EN-80
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 02:49:25 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j0kjG-0007BH-6v
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 06:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j0hLF-0005Mt-LG
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 02:49:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50240
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j0hLF-0005HB-9y
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 02:49:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581234560;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QGaF0tV0BJ0+NvSYlHAFoFJNQjtLdNbrd/EkPHQsIHk=;
- b=d1VTu770oCxFRR6BJMpRuucLIOMi+THec6TdnPQGIZWu7cytJrh/yAUbtAmPKQ+2A2zCj7
- a+elYjbsuw+GOkGRJEz2iIHSossDj3NrRQi1hrODzOkT/WWjepNxn5CIVBT4+SfMT9XtJo
- PC08R2++MVp2f4Ca3WLgNOFHCr3bjK8=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-Gtc4AdVJOqWUjULJ0CYpag-1; Sun, 09 Feb 2020 02:49:16 -0500
-Received: by mail-qk1-f199.google.com with SMTP id y6so2541685qki.13
- for <qemu-devel@nongnu.org>; Sat, 08 Feb 2020 23:49:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=PVmN1YUoVFUlADWAK0P0uJ/vuhRwYwRZUwiYuM6b9/4=;
- b=m72E6vDRgyrTdfhSm0eaVz4ySA/KI5H6e1usiWn64SEK264wM1qHjQOjQckU2HgH+s
- GVY5li7XuN/MPPuWdl09VfOc2Ag8IGJZs3nV+o7ysOxcZ0YHDUTgAGD2fEyRo6vkCt5R
- j2NHw71yoHvS2SnFEnKI2ASN1hnXaOmzFZ8Zdr7ge+avRslpxGu+WZEXOTLTzG5B6WQ9
- 2NY9sioIGsI7CbccEDHZPu/SR3IiUm/86axs5O1VetN5AKzXjEcppalHVNxnUug3aSBH
- j5op0XV9BV5YHWXr63jFgUzVNlYBgF89CoCriwi+CGAEN1TFlSu58lz1bx69CU5HxIMm
- yKYA==
-X-Gm-Message-State: APjAAAWCZ5knTu1jn/rLyWX2zxWxmZdGrvpKfwegWI9Q9zkWnpRKJqkM
- wiu3I/NhUGLUeQtPynriRd/izJ5cm7GLrW8RfGycOlzybxQvBZzZGu5OgY/bcVu++xHGl39yBYM
- pG4Qdr1ahHKbnY4g=
-X-Received: by 2002:ae9:e115:: with SMTP id g21mr5747410qkm.187.1581234556404; 
- Sat, 08 Feb 2020 23:49:16 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyTbRfoV9CeYgj15idM1vs8U3sFvl7F7DFNlN3JewiXFKuVI3Woz7X7ksqP35fpUnQ7EpjTHA==
-X-Received: by 2002:ae9:e115:: with SMTP id g21mr5747389qkm.187.1581234556050; 
- Sat, 08 Feb 2020 23:49:16 -0800 (PST)
-Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id x22sm4173676qtq.30.2020.02.08.23.49.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 08 Feb 2020 23:49:14 -0800 (PST)
-Date: Sun, 9 Feb 2020 02:49:09 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Subject: Re: [PATCH v1 2/4] virtio: increase virtuqueue size for virtio-scsi
- and virtio-blk
-Message-ID: <20200209024650-mutt-send-email-mst@kernel.org>
-References: <20200129140702.5411-1-dplotnikov@virtuozzo.com>
- <20200129140702.5411-3-dplotnikov@virtuozzo.com>
- <20200130145840.GH180311@stefanha-x1.localdomain>
- <92f392e9-eb05-5c85-4d50-208110720a22@virtuozzo.com>
- <20200205111905.GE58062@stefanha-x1.localdomain>
- <683b80a8-0d40-7f14-e3f4-628d2b38037f@virtuozzo.com>
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j0kjD-0002gb-UF
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 06:26:21 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:38720
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1j0kjD-0002ea-O0
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 06:26:19 -0500
+Received: from host86-175-83-30.range86-175.btcentralplus.com ([86.175.83.30]
+ helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1j0kjH-0007j2-S3; Sun, 09 Feb 2020 11:26:28 +0000
+To: jasper.lowell@bt.com, qemu-devel@nongnu.org
+References: <CWXP123MB2262B6F3159B7AA7AB010F4183020@CWXP123MB2262.GBRP123.PROD.OUTLOOK.COM>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <f0f00ecd-1989-9bc1-02e0-8a9b4819f051@ilande.co.uk>
+Date: Sun, 9 Feb 2020 11:26:11 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <683b80a8-0d40-7f14-e3f4-628d2b38037f@virtuozzo.com>
-X-MC-Unique: Gtc4AdVJOqWUjULJ0CYpag-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <CWXP123MB2262B6F3159B7AA7AB010F4183020@CWXP123MB2262.GBRP123.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.175.83.30
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: Emulating Solaris 10 on SPARC64 sun4u
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,133 +94,287 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- ehabkost@redhat.com, qemu-block@nongnu.org,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, mreitz@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com, den@virtuozzo.com
+Cc: atar4qemu@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 07, 2020 at 11:48:05AM +0300, Denis Plotnikov wrote:
->=20
->=20
-> On 05.02.2020 14:19, Stefan Hajnoczi wrote:
-> > On Tue, Feb 04, 2020 at 12:59:04PM +0300, Denis Plotnikov wrote:
-> > >=20
-> > > On 30.01.2020 17:58, Stefan Hajnoczi wrote:
-> > > > On Wed, Jan 29, 2020 at 05:07:00PM +0300, Denis Plotnikov wrote:
-> > > > > The goal is to reduce the amount of requests issued by a guest on
-> > > > > 1M reads/writes. This rises the performance up to 4% on that kind=
- of
-> > > > > disk access pattern.
-> > > > >=20
-> > > > > The maximum chunk size to be used for the guest disk accessing is
-> > > > > limited with seg_max parameter, which represents the max amount o=
-f
-> > > > > pices in the scatter-geather list in one guest disk request.
-> > > > >=20
-> > > > > Since seg_max is virqueue_size dependent, increasing the virtqueu=
-e
-> > > > > size increases seg_max, which, in turn, increases the maximum siz=
-e
-> > > > > of data to be read/write from guest disk.
-> > > > >=20
-> > > > > More details in the original problem statment:
-> > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03721.ht=
-ml
-> > > > >=20
-> > > > > Suggested-by: Denis V. Lunev <den@openvz.org>
-> > > > > Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> > > > > ---
-> > > > >    hw/core/machine.c          | 3 +++
-> > > > >    include/hw/virtio/virtio.h | 2 +-
-> > > > >    2 files changed, 4 insertions(+), 1 deletion(-)
-> > > > >=20
-> > > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > > > index 3e288bfceb..8bc401d8b7 100644
-> > > > > --- a/hw/core/machine.c
-> > > > > +++ b/hw/core/machine.c
-> > > > > @@ -28,6 +28,9 @@
-> > > > >    #include "hw/mem/nvdimm.h"
-> > > > >    GlobalProperty hw_compat_4_2[] =3D {
-> > > > > +    { "virtio-blk-device", "queue-size", "128"},
-> > > > > +    { "virtio-scsi-device", "virtqueue_size", "128"},
-> > > > > +    { "vhost-blk-device", "virtqueue_size", "128"},
-> > > > vhost-blk-device?!  Who has this?  It's not in qemu.git so please o=
-mit
-> > > > this line. ;-)
-> > > So in this case the line:
-> > >=20
-> > > { "vhost-blk-device", "seg_max_adjust", "off"},
-> > >=20
-> > > introduced by my patch:
-> > >=20
-> > > commit 1bf8a989a566b2ba41c197004ec2a02562a766a4
-> > > Author: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> > > Date:=A0=A0 Fri Dec 20 17:09:04 2019 +0300
-> > >=20
-> > >  =A0=A0=A0 virtio: make seg_max virtqueue size dependent
-> > >=20
-> > > is also wrong. It should be:
-> > >=20
-> > > { "vhost-scsi-device", "seg_max_adjust", "off"},
-> > >=20
-> > > Am I right?
-> > It's just called "vhost-scsi":
-> >=20
-> > include/hw/virtio/vhost-scsi.h:#define TYPE_VHOST_SCSI "vhost-scsi"
-> >=20
-> > > > On the other hand, do you want to do this for the vhost-user-blk,
-> > > > vhost-user-scsi, and vhost-scsi devices that exist in qemu.git?  Th=
-ose
-> > > > devices would benefit from better performance too.
-> After thinking about that for a while, I think we shouldn't extend queue
-> sizes for vhost-user-blk, vhost-user-scsi and vhost-scsi.
-> This is because increasing the queue sizes seems to be just useless for
-> them: the all thing is about increasing the queue sizes for increasing
-> seg_max (it limits the max block query size from the guest). For
-> virtio-blk-device and virtio-scsi-device it makes sense, since they have
-> seg-max-adjust property which, if true, sets seg_max to virtqueue_size-2.
-> vhost-scsi also have this property but it seems the property just doesn't
-> affect anything (remove it?).
-> Also vhost-user-blk, vhost-user-scsi and vhost-scsi don't do any seg_max
-> settings. If I understand correctly, their backends are ment to be
-> responsible for doing that.
+On 05/02/2020 06:31, jasper.lowell@bt.com wrote:
 
-The queue size is set by qemu IIRC.
+> I'm currently working towards emulating Solaris 10 on sun4u.
+> 
+>  
+> 
+> The Solaris 10 ISO image I am attempting to boot is the one from the Oracle
+> 
+> download page at
+> https://www.oracle.com/solaris/solaris10/downloads/solaris10-get-jsp-downloads.html.
+> 
+> Image: sol-10-u11-ga-sparc-dvd.iso
+> 
+> MD5:   53e8b066f7f250ce2fd2cef063f8072b
+> 
+>  
+> 
+> I am using QEMU commit 7bd9d0a9e26c7a3c67c0f174f0009ba19969b158.
+> 
+>  
+> 
+> The command I am using to run QEMU is:
+> 
+> ./qemu/sparc64-softmmu/qemu-system-sparc64 -bios
+> ./openbios/obj-sparc64/openbios-builtin.elf -cdrom
+> ./iso/solaris/sol-10-u11-ga-sparc-dvd.iso -boot d -nographic -m 3G
+> 
+>  
+> 
+> ```
+> 
+> CPUs: 1 x SUNW,UltraSPARC-IIi
+> 
+> UUID: 00000000-0000-0000-0000-000000000000
+> 
+> Welcome to OpenBIOS v1.1 built on Feb 5 2020 19:15
+> 
+>   Type 'help' for detailed information
+> 
+> Trying cdrom:f...
+> 
+> Not a bootable ELF image
+> 
+> Not a bootable a.out image
+> 
+>  
+> 
+> Loading FCode image...
+> 
+> Loaded 7420 bytes
+> 
+> entry point is 0x4000
+> 
+> Evaluating FCode...
+> 
+> Evaluating FCode...
+> 
+> Ignoring failed claim for va 1000000 memsz af6d6!
+> 
+> Ignoring failed claim for va 1402000 memsz 4dcc8!
+> 
+> Ignoring failed claim for va 1800000 memsz 510c8!
+> 
+> SunOS Release 5.10 Version Generic_147147-26 64-bit
+> 
+> Copyright (c) 1983, 2013, Oracle and/or its affiliates. All rights reserved.
+> 
+> could not find debugger-vocabulary-hook>threads:interpret: exception -13 caught
+> 
+> interpret \ Copyright (c) 1995-1999 by Sun Microsystems, Inc.
+> 
+> \ All rights reserved.
+> 
+> \
+> 
+> \ ident "@(#)data64.fth  1.3     00/07/17 SMI"
+> 
+>  
+> 
+> hex
+> 
+>  
+> 
+> only forth also definitions
+> 
+> vocabulary kdbg-words
+> 
+> also kdbg-words definitions
+> 
+>  
+> 
+> defer p@
+> 
+> defer p!
+> 
+> ['] x@ is p@
+> 
+> ['] x! is p!
+> 
+>  
+> 
+> 8 constant ptrsize
+> 
+>  
+> 
+> d# 32 constant nbitsminor
+> 
+> h# ffffffff constant maxmin
+> 
+> \
+> 
+> \ Copyright 2008 Sun Microsystems, Inc.  All rights reserved.
+> 
+> \ Use is subject to license terms.
+> 
+> \
+> 
+>  
+> 
+> \ #pragma ident  "@(#)kdbg.fth    1.20    08/06/06 SMI"
+> 
+>  
+> 
+> h# 7ff constant v9bias
+> 
+> h# unix-tte:interpret: exception -13 caught
+> 
+> interpret ' unix-tte is va>tte-data failed with error ffffffffffffffed
+> 
+> WARNING: consconfig: cannot find driver for screen device /pci@1fe,0/pci@1,1/QEMU,VGA@2
+> 
+> Configuring devices.
+> 
+> WARNING: Interrupt not seen after set_features
+> 
+> Using RPC Bootparams for network configuration information.
+> 
+> Attempting to configure interface hme0...
+> 
+> WARNING: Power off requested from power button or SC, powering down the system!
+> 
+> Skipped interface hme0
+> 
+> svc:/system/filesystem/local:default: WARNING: /usr/sbin/zfs mount -a failed: one or
+> more file systems failed to mount
+> 
+> Serial console, reverting to text install
+> 
+> Beginning system identification...
+> 
+> Searching for configuration file(s)...
+> 
+> Search complete.
+> 
+> Discovering additional network configuration...
+> 
+> ```
+> 
+>  
+> 
+> The installation menu is shown after but the console is unresponsive.
+> 
+>  
+> 
+> After some debugging, it looks like the QEMU front-end is correctly filling
+> 
+> the serial receive buffer with characters, and then starts dropping them once
+> 
+> the number of characters in the buffer reach the interrupt level. The interrupt
+> 
+> level happens to be 1 when booting Solaris 10. This looks like normal behaviour
+> 
+> to me.
+> 
+>  
+> 
+> I started looking at why the serial receive buffer might not be consumed and
+> 
+> considered that interrupts might not be being raised correctly. I ran with
+> 
+> tracing and there were no interrupts for IRQ 0x2b like there are when using
+> 
+> OpenBSD. When inspecting the registers of the serial device it looks like the
+> 
+> Interrupt Enable Register is set to zero.
+> 
+>  
+> 
+> If Solaris 10 was using the device is polling mode, it should be reading the RBR
+> 
+> or at least the LSR. When tracing serial_ioport_read and serial_ioport_write,
+> 
+> once the menu is hit, I don't see any read or writes to the serial device
+> 
+> registers despite me trying to send characters and use the menu.
+> 
+>  
+> 
+> The driver Solaris 10 is using for the device appears to be similar/same as
+> 
+> /usr/src/uts/sun4/io/su_driver.c in the OpenSolaris code found at
+> https://github.com/nxmirrors/onnv.
+> 
+>  
+> 
+> ```
+> 
+> asy->asy_hwtype = ASY16550AF;
+> 
+> OUTB(FIFOR, 0x00); /* clear fifo register */
+> 
+> asy->asy_trig_level = 0x00; /* sets the fifo Threshold to 1 */
+> 
+>  
+> 
+> /* set/Enable FIFO */
+> 
+> OUTB(FIFOR, FIFO_ON | FIFODMA | FIFOTXFLSH | FIFORXFLSH |
+> 
+> (asy->asy_trig_level & 0xff));
+> 
+>  
+> 
+> if ((INB(ISR) & 0xc0) == 0xc0)
+> 
+>     asy->asy_use_fifo = FIFO_ON; /* QEMU REACHES HERE. */
+> 
+> else {
+> 
+>     asy->asy_hwtype = ASY8250;
+> 
+>     OUTB(FIFOR, 0x00); /* NO FIFOs */
+> 
+>     asy->asy_trig_level = 0;
+> 
+> }
+> 
+> ```
+> 
+>  
+> 
+> From what I can tell when tracing serial_ioport_write and serial_ioport_read,
+> 
+> Solaris 10 correctly identifies the serial device and successfully attaches it.
+> 
+> In the asyattach function (OpenSolaris driver), interrupts are disabled by zeroing the
+> 
+> Interrupt Enable Register. From what I'm reading in OpenSolaris source code, interrupts
+> 
+> are reenabled when the device is "opened". This seems like consistent and
+> 
+> correct behaviour though I'm not sure why the device is not being opened to be
+> 
+> used by the serial console.
+> 
+>  
+> 
+> Is this an issue anyone else has tried to debug?
+> 
+> Are there any leads that I can follow up on for why the serial console becomes
+> unresponsive
+> 
+> on Solaris 10?
 
-> So, what about changing the queue sizes just for virtio-blk-device and
-> virtio-scsi-device?
+It has been a while since I've looked at booting Solaris >= 10 but certainly the
+messages above about set_features and the frozen console suggest that something is
+going amiss with interrupt routing, although since Linux and NetBSD were fine the
+last time I ran my OpenBIOS release tests then Solaris must be doing something
+different here.
+
+Note that the serial interrupts are routed from the ebus into sabre so the first
+thing to check would be that the end-to-end routing from device to CPU looks correct
+when using Solaris.
 
 
-Hmm that would break ability to migrate between userspace and vhost
-backends, would it not?
+ATB,
 
-
-> Denis
->=20
-> > > It seems to be so. We also have the test checking those settings:
-> > > tests/acceptance/virtio_seg_max_adjust.py
-> > > For now it checks virtio-scsi-pci and virtio-blk-pci.
-> > > I'm going to extend it for the virtqueue size checking.
-> > > If I change vhost-user-blk, vhost-user-scsi and vhost-scsi it's worth
-> > > to check those devices too. But I don't know how to form a command li=
-ne
-> > > for that 3 devices since they should involve some third party compone=
-nts as
-> > > backends (kernel modules, DPDK, etc.) and they seems to be not availa=
-ble in
-> > > the
-> > > qemu git.
-> > > Is there any way to do it with some qit.qemu available stubs or somet=
-hing
-> > > else?
-> > > If so, could you please point out the proper way to do it?
-> > qemu.git has contrib/vhost-user-blk/ and contrib/vhost-user-scsi/ if
-> > you need to test those vhost-user devices without external dependencies=
-.
-> >=20
-> > Stefan
-
+Mark.
 
