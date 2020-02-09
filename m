@@ -2,58 +2,56 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DATE_IN_PAST_12_24,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D25C352A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 08:17:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82888C352A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 08:27:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 069CC2080C
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 08:17:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 069CC2080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 470E7208C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 08:27:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470E7208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j14GE-00008l-8o
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 03:17:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36624)
+	id 1j14Pe-0003R7-H8
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 03:27:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1j14Bi-0003qE-Ro
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 03:13:04 -0500
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1j14P4-00031s-8k
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 03:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1j14Bg-0008Ff-IR
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 03:13:02 -0500
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57472)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1j14Bf-0008Cm-MY; Mon, 10 Feb 2020 03:13:00 -0500
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.5349-0.0192359-0.445864;
- DS=CONTINUE|ham_alarm|0.0401062-0.000542533-0.959351; FP=0|0|0|0|0|-1|-1|-1;
- HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=9; RT=9; SR=0;
- TI=SMTPD_---.GmO5bfp_1581322371; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.GmO5bfp_1581322371)
- by smtp.aliyun-inc.com(10.147.40.44); Mon, 10 Feb 2020 16:12:53 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: richard.henderson@linaro.org, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v4 4/4] target/riscv: add vector configure instruction
-Date: Mon, 10 Feb 2020 16:12:40 +0800
-Message-Id: <20200210081240.11481-5-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200210081240.11481-1-zhiwei_liu@c-sky.com>
-References: <20200210081240.11481-1-zhiwei_liu@c-sky.com>
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1j14P0-0000tj-OA
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 03:26:49 -0500
+Received: from [192.146.154.1] (port=16508 helo=mcp01.nutanix.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1j14P0-0000tI-D2
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 03:26:46 -0500
+Received: from localhost.localdomain (unknown [10.40.36.165])
+ by mcp01.nutanix.com (Postfix) with ESMTP id 651461007A33;
+ Mon, 10 Feb 2020 08:26:45 +0000 (UTC)
+Date: Sun, 9 Feb 2020 12:43:35 -0500
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v2 3/3] Lift max memory slots limit imposed by vhost-user
+Message-ID: <20200209174335.GA15050@localhost.localdomain>
+References: <1579143426-18305-1-git-send-email-raphael.norwitz@nutanix.com>
+ <1579143426-18305-4-git-send-email-raphael.norwitz@nutanix.com>
+ <20200206032332-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200206032332-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 192.146.154.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,359 +63,664 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vsetvl and vsetvli are two configure instructions for vl, vtype. TB flags
-should update after configure instructions. The (ill, lmul, sew ) of vtype
-and the bit of (VSTART == 0 && VL == VLMAX) will be placed within tb_flags.
+On Thu, Feb 06, 2020 at 03:32:38AM -0500, Michael S. Tsirkin wrote:
+>=20
+> On Wed, Jan 15, 2020 at 09:57:06PM -0500, Raphael Norwitz wrote:
+> > The current vhost-user implementation in Qemu imposes a limit on the
+> > maximum number of memory slots exposed to a VM using a vhost-user
+> > device. This change provides a new protocol feature
+> > VHOST_USER_F_CONFIGURE_SLOTS which, when enabled, lifts this limit an=
+d
+> > allows a VM with a vhost-user device to expose a configurable number =
+of
+> > memory slots, up to the ACPI defined maximum. Existing backends which
+> > do not support this protocol feature are unaffected.
+>=20
+> Hmm ACPI maximum seems to be up to 512 - is this too much to fit in a
+> single message?  So can't we just increase the number (after negotiatin=
+g
+> with remote) and be done with it, instead of add/remove?  Or is there
+> another reason to prefer add/remove?
+>
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- MAINTAINERS                             |  1 +
- target/riscv/Makefile.objs              |  2 +-
- target/riscv/cpu.h                      | 61 +++++++++++++++++++---
- target/riscv/helper.h                   |  2 +
- target/riscv/insn32.decode              |  5 ++
- target/riscv/insn_trans/trans_rvv.inc.c | 69 +++++++++++++++++++++++++
- target/riscv/translate.c                | 17 +++++-
- target/riscv/vector_helper.c            | 49 ++++++++++++++++++
- 8 files changed, 195 insertions(+), 11 deletions(-)
- create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
- create mode 100644 target/riscv/vector_helper.c
+As mentioned in my cover letter, we experimented with simply increasing t=
+he
+message size and it didn=E2=80=99t work on our setup. We debugged down to=
+ the socket
+layer and found that on the receiving end the messages were truncated at
+around 512 bytes, or around 16 memory regions.=C2=A0To support 512 memory=
+ regions
+we would need a message size of around=C2=A0=C2=A032 <bytes per region> *=
+ 512 <regions>
++ 8 <bytes for padding and region count> ~=3D 16k packet size. That would=
+ be 64
+times larger than the next largest message size. We thought it would be c=
+leaner
+and more in line with the rest of the protocol to keep the message sizes
+smaller. In particular, we thought memory regions should be treated like =
+the
+rings, which are sent over one message at a time instead of in one large =
+message.
+Whether or not such a large message size can be made to work in our case,
+separate messages will always work on Linux, and most likely all other UN=
+IX
+platforms QEMU is used on.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e72b5e5f69..015e9239b5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -266,6 +266,7 @@ M: Palmer Dabbelt <palmer@dabbelt.com>
- M: Alistair Francis <Alistair.Francis@wdc.com>
- M: Sagar Karandikar <sagark@eecs.berkeley.edu>
- M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-+M: LIU Zhiwei <zhiwei_liu@c-sky.com>
- L: qemu-riscv@nongnu.org
- S: Supported
- F: target/riscv/
-diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-index ff651f69f6..ff38df6219 100644
---- a/target/riscv/Makefile.objs
-+++ b/target/riscv/Makefile.objs
-@@ -1,4 +1,4 @@
--obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o
-+obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o vector_helper.o gdbstub.o
- obj-$(CONFIG_SOFTMMU) += pmp.o
- 
- ifeq ($(CONFIG_SOFTMMU),y)
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index bf2b4b55af..f857845285 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -21,6 +21,7 @@
- #define RISCV_CPU_H
- 
- #include "hw/core/cpu.h"
-+#include "hw/registerfields.h"
- #include "exec/cpu-defs.h"
- #include "fpu/softfloat-types.h"
- 
-@@ -98,6 +99,10 @@ typedef struct CPURISCVState CPURISCVState;
- 
- #define RV_VLEN_MAX 512
- 
-+FIELD(VTYPE, LMUL, 0, 2)
-+FIELD(VTYPE, SEW, 2, 3)
-+FIELD(VTYPE, VILL, sizeof(target_ulong) * 8 - 2, 1)
-+
- struct CPURISCVState {
-     target_ulong gpr[32];
-     uint64_t fpr[32]; /* assume both F and D extensions */
-@@ -306,16 +311,61 @@ void riscv_cpu_set_fflags(CPURISCVState *env, target_ulong);
- #define TB_FLAGS_MMU_MASK   3
- #define TB_FLAGS_MSTATUS_FS MSTATUS_FS
- 
-+typedef CPURISCVState CPUArchState;
-+typedef RISCVCPU ArchCPU;
-+#include "exec/cpu-all.h"
-+
-+FIELD(TB_FLAGS, VL_EQ_VLMAX, 2, 1)
-+FIELD(TB_FLAGS, LMUL, 3, 2)
-+FIELD(TB_FLAGS, SEW, 5, 3)
-+FIELD(TB_FLAGS, VILL, 8, 1)
-+
-+/*
-+ * A simplification for VLMAX
-+ * = (1 << LMUL) * VLEN / (8 * (1 << SEW))
-+ * = (VLEN << LMUL) / (8 << SEW)
-+ * = (VLEN << LMUL) >> (SEW + 3)
-+ * = VLEN >> (SEW + 3 - LMUL)
-+ */
-+static inline uint32_t vext_get_vlmax(RISCVCPU *cpu, target_ulong vtype)
-+{
-+    uint8_t sew, lmul;
-+
-+    sew = FIELD_EX64(vtype, VTYPE, SEW);
-+    lmul = FIELD_EX64(vtype, VTYPE, LMUL);
-+    return cpu->cfg.vlen >> (sew + 3 - lmul);
-+}
-+
- static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
--                                        target_ulong *cs_base, uint32_t *flags)
-+                                        target_ulong *cs_base, uint32_t *pflags)
- {
-+    uint32_t flags = 0;
-+    uint32_t vlmax;
-+    uint8_t vl_eq_vlmax;
-+
-     *pc = env->pc;
-     *cs_base = 0;
-+
-+    if (env->misa & RVV) {
-+        vlmax = vext_get_vlmax(env_archcpu(env), env->vext.vtype);
-+        vl_eq_vlmax = (env->vext.vstart == 0) && (vlmax == env->vext.vl);
-+        flags = FIELD_DP32(flags, TB_FLAGS, VILL,
-+                    FIELD_EX64(env->vext.vtype, VTYPE, VILL));
-+        flags = FIELD_DP32(flags, TB_FLAGS, SEW,
-+                    FIELD_EX64(env->vext.vtype, VTYPE, SEW));
-+        flags = FIELD_DP32(flags, TB_FLAGS, LMUL,
-+                    FIELD_EX64(env->vext.vtype, VTYPE, LMUL));
-+        flags = FIELD_DP32(flags, TB_FLAGS, VL_EQ_VLMAX, vl_eq_vlmax);
-+    } else {
-+        flags = FIELD_DP32(flags, TB_FLAGS, VILL, 1);
-+    }
-+
- #ifdef CONFIG_USER_ONLY
--    *flags = TB_FLAGS_MSTATUS_FS;
-+    flags |= TB_FLAGS_MSTATUS_FS;
- #else
--    *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
-+    flags |= cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
- #endif
-+    *pflags = flags;
- }
- 
- int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
-@@ -356,9 +406,4 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops);
- 
- void riscv_cpu_register_gdb_regs_for_features(CPUState *cs);
- 
--typedef CPURISCVState CPUArchState;
--typedef RISCVCPU ArchCPU;
--
--#include "exec/cpu-all.h"
--
- #endif /* RISCV_CPU_H */
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index debb22a480..3c28c7e407 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -76,3 +76,5 @@ DEF_HELPER_2(mret, tl, env, tl)
- DEF_HELPER_1(wfi, void, env)
- DEF_HELPER_1(tlb_flush, void, env)
- #endif
-+/* Vector functions */
-+DEF_HELPER_3(vsetvl, tl, env, tl, tl)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 77f794ed70..5dc009c3cd 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -62,6 +62,7 @@
- @r_rm    .......   ..... ..... ... ..... ....... %rs2 %rs1 %rm %rd
- @r2_rm   .......   ..... ..... ... ..... ....... %rs1 %rm %rd
- @r2      .......   ..... ..... ... ..... ....... %rs1 %rd
-+@r2_zimm . zimm:11  ..... ... ..... ....... %rs1 %rd
- 
- @sfence_vma ....... ..... .....   ... ..... ....... %rs2 %rs1
- @sfence_vm  ....... ..... .....   ... ..... ....... %rs1
-@@ -203,3 +204,7 @@ fcvt_w_d   1100001  00000 ..... ... ..... 1010011 @r2_rm
- fcvt_wu_d  1100001  00001 ..... ... ..... 1010011 @r2_rm
- fcvt_d_w   1101001  00000 ..... ... ..... 1010011 @r2_rm
- fcvt_d_wu  1101001  00001 ..... ... ..... 1010011 @r2_rm
-+
-+# *** RV32V Extension ***
-+vsetvli         0 ........... ..... 111 ..... 1010111  @r2_zimm
-+vsetvl          1000000 ..... ..... 111 ..... 1010111  @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-new file mode 100644
-index 0000000000..da82c72bbf
---- /dev/null
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -0,0 +1,69 @@
-+/*
-+ * RISC-V translation routines for the RVV Standard Extension.
-+ *
-+ * Copyright (c) 2020 C-SKY Limited. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl * a)
-+{
-+    TCGv s1, s2, dst;
-+    s2 = tcg_temp_new();
-+    dst = tcg_temp_new();
-+
-+    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
-+    if (a->rs1 == 0) {
-+        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
-+        s1 = tcg_const_tl(RV_VLEN_MAX);
-+    } else {
-+        s1 = tcg_temp_new();
-+        gen_get_gpr(s1, a->rs1);
-+    }
-+    gen_get_gpr(s2, a->rs2);
-+    gen_helper_vsetvl(dst, cpu_env, s1, s2);
-+    gen_set_gpr(a->rd, dst);
-+    tcg_gen_movi_tl(cpu_pc, ctx->pc_succ_insn);
-+    exit_tb(ctx);
-+    ctx->base.is_jmp = DISAS_NORETURN;
-+
-+    tcg_temp_free(s1);
-+    tcg_temp_free(s2);
-+    tcg_temp_free(dst);
-+    return true;
-+}
-+
-+static bool trans_vsetvli(DisasContext *ctx, arg_vsetvli * a)
-+{
-+    TCGv s1, s2, dst;
-+    s2 = tcg_const_tl(a->zimm);
-+    dst = tcg_temp_new();
-+
-+    /* Using x0 as the rs1 register specifier, encodes an infinite AVL */
-+    if (a->rs1 == 0) {
-+        /* As the mask is at least one bit, RV_VLEN_MAX is >= VLMAX */
-+        s1 = tcg_const_tl(RV_VLEN_MAX);
-+    } else {
-+        s1 = tcg_temp_new();
-+        gen_get_gpr(s1, a->rs1);
-+    }
-+    gen_helper_vsetvl(dst, cpu_env, s1, s2);
-+    gen_set_gpr(a->rd, dst);
-+    gen_goto_tb(ctx, 0, ctx->pc_succ_insn);
-+    ctx->base.is_jmp = DISAS_NORETURN;
-+
-+    tcg_temp_free(s1);
-+    tcg_temp_free(s2);
-+    tcg_temp_free(dst);
-+    return true;
-+}
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 14dc71156b..cc356aabd8 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -55,6 +55,12 @@ typedef struct DisasContext {
-        to reset this known value.  */
-     int frm;
-     bool ext_ifencei;
-+    /* vector extension */
-+    bool vill;
-+    uint8_t lmul;
-+    uint8_t sew;
-+    uint16_t vlen;
-+    bool vl_eq_vlmax;
- } DisasContext;
- 
- #ifdef TARGET_RISCV64
-@@ -704,6 +710,7 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
- #include "insn_trans/trans_rva.inc.c"
- #include "insn_trans/trans_rvf.inc.c"
- #include "insn_trans/trans_rvd.inc.c"
-+#include "insn_trans/trans_rvv.inc.c"
- #include "insn_trans/trans_privileged.inc.c"
- 
- /* Include the auto-generated decoder for 16 bit insn */
-@@ -735,14 +742,20 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     CPURISCVState *env = cs->env_ptr;
-     RISCVCPU *cpu = RISCV_CPU(cs);
-+    uint32_t tb_flags = ctx->base.tb->flags;
- 
-     ctx->pc_succ_insn = ctx->base.pc_first;
--    ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
--    ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
-+    ctx->mem_idx = tb_flags & TB_FLAGS_MMU_MASK;
-+    ctx->mstatus_fs = tb_flags & TB_FLAGS_MSTATUS_FS;
-     ctx->priv_ver = env->priv_ver;
-     ctx->misa = env->misa;
-     ctx->frm = -1;  /* unknown rounding mode */
-     ctx->ext_ifencei = cpu->cfg.ext_ifencei;
-+    ctx->vlen = cpu->cfg.vlen;
-+    ctx->vill = FIELD_EX32(tb_flags, TB_FLAGS, VILL);
-+    ctx->sew = FIELD_EX32(tb_flags, TB_FLAGS, SEW);
-+    ctx->lmul = FIELD_EX32(tb_flags, TB_FLAGS, LMUL);
-+    ctx->vl_eq_vlmax = FIELD_EX32(tb_flags, TB_FLAGS, VL_EQ_VLMAX);
- }
- 
- static void riscv_tr_tb_start(DisasContextBase *db, CPUState *cpu)
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-new file mode 100644
-index 0000000000..e0f2415345
---- /dev/null
-+++ b/target/riscv/vector_helper.c
-@@ -0,0 +1,49 @@
-+/*
-+ * RISC-V Vector Extension Helpers for QEMU.
-+ *
-+ * Copyright (c) 2020 C-SKY Limited. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "exec/helper-proto.h"
-+#include <math.h>
-+
-+target_ulong HELPER(vsetvl)(CPURISCVState *env, target_ulong s1,
-+     target_ulong s2)
-+{
-+    int vlmax, vl;
-+    RISCVCPU *cpu = env_archcpu(env);
-+    uint16_t sew = 1 << FIELD_EX64(s2, VTYPE, SEW);
-+
-+    if (sew > cpu->cfg.elen) { /* only set vill bit. */
-+        env->vext.vtype = FIELD_DP64(0, VTYPE, VILL, 1);
-+        env->vext.vl = 0;
-+        env->vext.vstart = 0;
-+        return 0;
-+    }
-+
-+    vlmax = vext_get_vlmax(cpu, s2);
-+    if (s1 <= vlmax) {
-+        vl = s1;
-+    } else {
-+        vl = vlmax;
-+    }
-+    env->vext.vl = vl;
-+    env->vext.vtype = s2;
-+    env->vext.vstart = 0;
-+    return vl;
-+}
--- 
-2.23.0
+> >=20
+> > This feature works by using three new messages,
+> > VHOST_USER_GET_MAX_MEM_SLOTS, VHOST_USER_ADD_MEM_REG and
+> > VHOST_USER_REM_MEM_REG. VHOST_USER_GET_MAX_MEM_SLOTS gets the
+> > number of memory slots the backend is willing to accept when the
+> > backend is initialized. Then, when the memory tables are set or updat=
+ed,
+> > a series of VHOST_USER_ADD_MEM_REG and VHOST_USER_REM_MEM_REG message=
+s
+> > are sent to transmit the regions to map and/or unmap instead of tryin=
+g
+> > to send all the regions in one fixed size VHOST_USER_SET_MEM_TABLE
+> > message.
+> >=20
+> > The vhost_user struct maintains a shadow state of the VM=E2=80=99s me=
+mory
+> > regions. When the memory tables are modified, the
+> > vhost_user_set_mem_table() function compares the new device memory st=
+ate
+> > to the shadow state and only sends regions which need to be unmapped =
+or
+> > mapped in. The regions which must be unmapped are sent first, followe=
+d
+> > by the new regions to be mapped in. After all the messages have been
+> > sent, the shadow state is set to the current virtual device state.
+> >=20
+> > The current feature implementation does not work with postcopy migrat=
+ion
+> > and cannot be enabled if the VHOST_USER_PROTOCOL_F_REPLY_ACK feature =
+has
+> > also been negotiated.
+>=20
+> Hmm what would it take to lift the restrictions?
+> conflicting features like this makes is very hard for users to make
+> an informed choice what to support.
+>
 
+We would need a setup with a backend which supports these features (REPLY=
+_ACK
+and postcopy migration). At first glance it looks like DPDK could work bu=
+t
+I'm not sure how easy it will be to test postcopy migration with the reso=
+urces
+we have.
+=20
+> > Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+> > Signed-off-by: Peter Turschmid <peter.turschm@nutanix.com>
+> > Suggested-by: Mike Cui <cui@nutanix.com>
+> > ---
+> >  docs/interop/vhost-user.rst |  43 ++++++++
+> >  hw/virtio/vhost-user.c      | 254 ++++++++++++++++++++++++++++++++++=
+++++++----
+> >  2 files changed, 275 insertions(+), 22 deletions(-)
+> >=20
+> > diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rs=
+t
+> > index 5f8b3a4..ae9acf2 100644
+> > --- a/docs/interop/vhost-user.rst
+> > +++ b/docs/interop/vhost-user.rst
+> > @@ -786,6 +786,7 @@ Protocol features
+> >    #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
+> >    #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD 12
+> >    #define VHOST_USER_PROTOCOL_F_RESET_DEVICE   13
+> > +  #define VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS   14
+> > =20
+> >  Master message types
+> >  --------------------
+> > @@ -1205,6 +1206,48 @@ Master message types
+> >    Only valid if the ``VHOST_USER_PROTOCOL_F_RESET_DEVICE`` protocol
+> >    feature is set by the backend.
+> > =20
+> > +``VHOST_USER_GET_MAX_MEM_SLOTS``
+> > +  :id: 35
+> > +  :equivalent ioctl: N/A
+> > +  :slave payload: u64
+> > +
+> > +  When the VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS protocol feature ha=
+s been
+> > +  successfully negotiated, this message is submitted by master to th=
+e
+> > +  slave. The slave should return the message with a u64 payload
+> > +  containing the maximum number of memory slots for QEMU to expose t=
+o
+> > +  the guest. This message is not supported with postcopy migration o=
+r if
+> > +  the VHOST_USER_PROTOCOL_F_REPLY_ACK feature has also been negotiat=
+ed.
+> > +
+> > +``VHOST_USER_ADD_MEM_REG``
+> > +  :id: 36
+> > +  :equivalent ioctl: N/A
+> > +  :slave payload: memory region
+> > +
+> > +  When the VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS protocol feature ha=
+s been
+> > +  successfully negotiated, this message is submitted by master to th=
+e slave.
+> > +  The message payload contains a memory region descriptor struct, de=
+scribing
+> > +  a region of guest memory which the slave device must map in. When =
+the
+> > +  VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS protocol feature has been su=
+ccessfully
+> > +  negotiated, along with the VHOST_USER_REM_MEM_REG message, this me=
+ssage is
+> > +  used to set and update the memory tables of the slave device. This=
+ message
+> > +  is not supported with postcopy migration or if the
+> > +  VHOST_USER_PROTOCOL_F_REPLY_ACK feature has also been negotiated.
+> > +
+> > +``VHOST_USER_REM_MEM_REG``
+> > +  :id: 37
+> > +  :equivalent ioctl: N/A
+> > +  :slave payload: memory region
+> > +
+> > +  When the VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS protocol feature ha=
+s been
+> > +  successfully negotiated, this message is submitted by master to th=
+e slave.
+> > +  The message payload contains a memory region descriptor struct, de=
+scribing
+> > +  a region of guest memory which the slave device must unmap. When t=
+he
+> > +  VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS protocol feature has been su=
+ccessfully
+> > +  negotiated, along with the VHOST_USER_ADD_MEM_REG message, this me=
+ssage is
+> > +  used to set and update the memory tables of the slave device. This=
+ message
+> > +  is not supported with postcopy migration or if the
+> > +  VHOST_USER_PROTOCOL_F_REPLY_ACK feature has also been negotiated.
+> > +
+> >  Slave message types
+> >  -------------------
+> > =20
+> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> > index af83fdd..fed6d02 100644
+> > --- a/hw/virtio/vhost-user.c
+> > +++ b/hw/virtio/vhost-user.c
+> > @@ -35,11 +35,29 @@
+> >  #include <linux/userfaultfd.h>
+> >  #endif
+> > =20
+> > -#define VHOST_MEMORY_MAX_NREGIONS    8
+> > +#define VHOST_MEMORY_LEGACY_NREGIONS    8
+>=20
+> Hardly legacy when this is intended to always be used e.g. with
+> postcopy, right?
+>
+
+How about 'BASELINE'?
+=20
+> >  #define VHOST_USER_F_PROTOCOL_FEATURES 30
+> >  #define VHOST_USER_SLAVE_MAX_FDS     8
+> > =20
+> >  /*
+> > + * Set maximum number of RAM slots supported to
+> > + * the maximum number supported by the target
+> > + * hardware plaform.
+> > + */
+> > +#if defined(TARGET_X86) || defined(TARGET_X86_64) || \
+> > +    defined(TARGET_ARM) || defined(TARGET_ARM_64)
+> > +#include "hw/acpi/acpi.h"
+> > +#define VHOST_USER_MAX_RAM_SLOTS ACPI_MAX_RAM_SLOTS
+> > +
+> > +#elif defined(TARGET_PPC) || defined(TARGET_PPC_64)
+> > +#include "hw/ppc/spapr.h"
+> > +#define VHOST_USER_MAX_RAM_SLOTS SPAPR_MAX_RAM_SLOTS
+> > +
+> > +#else
+> > +#define VHOST_USER_MAX_RAM_SLOTS 512
+> > +#endif
+> > +
+> > +/*
+> >   * Maximum size of virtio device config space
+> >   */
+> >  #define VHOST_USER_MAX_CONFIG_SIZE 256
+> > @@ -59,6 +77,7 @@ enum VhostUserProtocolFeature {
+> >      VHOST_USER_PROTOCOL_F_HOST_NOTIFIER =3D 11,
+> >      VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD =3D 12,
+> >      VHOST_USER_PROTOCOL_F_RESET_DEVICE =3D 13,
+> > +    VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS =3D 14,
+> >      VHOST_USER_PROTOCOL_F_MAX
+> >  };
+> > =20
+> > @@ -100,6 +119,9 @@ typedef enum VhostUserRequest {
+> >      VHOST_USER_SET_INFLIGHT_FD =3D 32,
+> >      VHOST_USER_GPU_SET_SOCKET =3D 33,
+> >      VHOST_USER_RESET_DEVICE =3D 34,
+> > +    VHOST_USER_GET_MAX_MEM_SLOTS =3D 35,
+> > +    VHOST_USER_ADD_MEM_REG =3D 36,
+> > +    VHOST_USER_REM_MEM_REG =3D 37,
+> >      VHOST_USER_MAX
+> >  } VhostUserRequest;
+> > =20
+> > @@ -121,9 +143,14 @@ typedef struct VhostUserMemoryRegion {
+> >  typedef struct VhostUserMemory {
+> >      uint32_t nregions;
+> >      uint32_t padding;
+> > -    VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
+> > +    VhostUserMemoryRegion regions[VHOST_MEMORY_LEGACY_NREGIONS];
+> >  } VhostUserMemory;
+> > =20
+> > +typedef struct VhostUserMemRegMsg {
+> > +    uint32_t padding;
+> > +    VhostUserMemoryRegion region;
+> > +} VhostUserMemRegMsg;
+> > +
+> >  typedef struct VhostUserLog {
+> >      uint64_t mmap_size;
+> >      uint64_t mmap_offset;
+> > @@ -182,6 +209,7 @@ typedef union {
+> >          struct vhost_vring_state state;
+> >          struct vhost_vring_addr addr;
+> >          VhostUserMemory memory;
+> > +        VhostUserMemRegMsg mem_reg;
+> >          VhostUserLog log;
+> >          struct vhost_iotlb_msg iotlb;
+> >          VhostUserConfig config;
+> > @@ -210,7 +238,7 @@ struct vhost_user {
+> >      int slave_fd;
+> >      NotifierWithReturn postcopy_notifier;
+> >      struct PostCopyFD  postcopy_fd;
+> > -    uint64_t           postcopy_client_bases[VHOST_MEMORY_MAX_NREGIO=
+NS];
+> > +    uint64_t           postcopy_client_bases[VHOST_USER_MAX_RAM_SLOT=
+S];
+> >      /* Length of the region_rb and region_rb_offset arrays */
+> >      size_t             region_rb_len;
+> >      /* RAMBlock associated with a given region */
+> > @@ -222,6 +250,13 @@ struct vhost_user {
+> > =20
+> >      /* True once we've entered postcopy_listen */
+> >      bool               postcopy_listen;
+> > +
+> > +    /* Maximum number of RAM slots supported by the backend */
+> > +    uint64_t memory_slots;
+> > +
+> > +    /* Our current regions */
+> > +    int num_shadow_regions;
+> > +    VhostUserMemoryRegion shadow_regions[VHOST_USER_MAX_RAM_SLOTS];
+> >  };
+> > =20
+> >  static bool ioeventfd_enabled(void)
+> > @@ -370,7 +405,7 @@ int vhost_user_gpu_set_socket(struct vhost_dev *d=
+ev, int fd)
+> >  static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t b=
+ase,
+> >                                     struct vhost_log *log)
+> >  {
+> > -    int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > +    int fds[VHOST_USER_MAX_RAM_SLOTS];
+> >      size_t fd_num =3D 0;
+> >      bool shmfd =3D virtio_has_feature(dev->protocol_features,
+> >                                      VHOST_USER_PROTOCOL_F_LOG_SHMFD)=
+;
+> > @@ -429,7 +464,7 @@ static int vhost_user_fill_set_mem_table_msg(stru=
+ct vhost_user *u,
+> >          fd =3D memory_region_get_fd(mr);
+> >          if (fd > 0) {
+> >              if (postcopy) {
+> > -                assert(*fd_num < VHOST_MEMORY_MAX_NREGIONS);
+> > +                assert(*fd_num < VHOST_MEMORY_LEGACY_NREGIONS);
+> >                  trace_vhost_user_set_mem_table_withfd(*fd_num, mr->n=
+ame,
+> >                                                        reg->memory_si=
+ze,
+> >                                                        reg->guest_phy=
+s_addr,
+> > @@ -437,7 +472,7 @@ static int vhost_user_fill_set_mem_table_msg(stru=
+ct vhost_user *u,
+> >                                                        offset);
+> >                  u->region_rb_offset[i] =3D offset;
+> >                  u->region_rb[i] =3D mr->ram_block;
+> > -            } else if (*fd_num =3D=3D VHOST_MEMORY_MAX_NREGIONS) {
+> > +            } else if (*fd_num =3D=3D VHOST_MEMORY_LEGACY_NREGIONS) =
+{
+> >                  error_report("Failed preparing vhost-user memory tab=
+le msg");
+> >                  return -1;
+> >              }
+> > @@ -474,7 +509,7 @@ static int vhost_user_set_mem_table_postcopy(stru=
+ct vhost_dev *dev,
+> >                                               struct vhost_memory *me=
+m)
+> >  {
+> >      struct vhost_user *u =3D dev->opaque;
+> > -    int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > +    int fds[VHOST_MEMORY_LEGACY_NREGIONS];
+> >      size_t fd_num =3D 0;
+> >      VhostUserMsg msg_reply;
+> >      int region_i, msg_i;
+> > @@ -523,7 +558,7 @@ static int vhost_user_set_mem_table_postcopy(stru=
+ct vhost_dev *dev,
+> >      }
+> > =20
+> >      memset(u->postcopy_client_bases, 0,
+> > -           sizeof(uint64_t) * VHOST_MEMORY_MAX_NREGIONS);
+> > +           sizeof(uint64_t) * VHOST_USER_MAX_RAM_SLOTS);
+> > =20
+> >      /* They're in the same order as the regions that were sent
+> >       * but some of the regions were skipped (above) if they
+> > @@ -564,18 +599,151 @@ static int vhost_user_set_mem_table_postcopy(s=
+truct vhost_dev *dev,
+> >      return 0;
+> >  }
+> > =20
+> > +static inline bool reg_equal(VhostUserMemoryRegion *shadow_reg,
+> > +                             struct vhost_memory_region *vdev_reg)
+> > +{
+> > +    if (shadow_reg->guest_phys_addr =3D=3D vdev_reg->guest_phys_addr=
+ &&
+> > +        shadow_reg->userspace_addr =3D=3D vdev_reg->userspace_addr &=
+&
+> > +        shadow_reg->memory_size =3D=3D vdev_reg->memory_size) {
+> > +        return true;
+> > +    } else {
+> > +        return false;
+> > +    }
+> > +}
+> > +
+> > +static int vhost_user_send_add_remove_regions(struct vhost_dev *dev,
+> > +                                              struct vhost_memory *m=
+em,
+> > +                                              VhostUserMsg *msg)
+> > +{
+> > +    struct vhost_user *u =3D dev->opaque;
+> > +    int i, j, fd;
+> > +    bool found[VHOST_USER_MAX_RAM_SLOTS] =3D {};
+> > +    bool matching =3D false;
+> > +    struct vhost_memory_region *reg;
+> > +    ram_addr_t offset;
+> > +    MemoryRegion *mr;
+> > +
+> > +    /*
+> > +     * Ensure the VHOST_USER_PROTOCOL_F_REPLY_ACK has not been
+> > +     * negotiated and no postcopy migration is in progress.
+> > +     */
+> > +    assert(!virtio_has_feature(dev->protocol_features,
+> > +                               VHOST_USER_PROTOCOL_F_REPLY_ACK));
+> > +    if (u->postcopy_listen && u->postcopy_fd.handler) {
+> > +        error_report("Postcopy migration is not supported when the "
+> > +                     "VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS feature =
+"
+> > +                     "has been negotiated");
+> > +        return -1;
+> > +    }
+> > +
+> > +    msg->hdr.size =3D sizeof(msg->payload.mem_reg.padding);
+> > +    msg->hdr.size +=3D sizeof(VhostUserMemoryRegion);
+> > +
+> > +    /*
+> > +     * Send VHOST_USER_REM_MEM_REG for memory regions in our shadow =
+state
+> > +     * which are not found not in the device's memory state.
+>=20
+> double negation - could not parse this.
+>
+
+Apologies - typo here. It should say =E2=80=9CSend VHOST_USER_REM_MEM_REG=
+ for memory
+regions in our shadow state which are not found in the device's memory st=
+ate.=E2=80=9D=20
+i.e. send messages to remove regions in the shadow state but not in the u=
+pdated
+device state.=20
+=20
+> > +     */
+> > +    for (i =3D 0; i < u->num_shadow_regions; ++i) {
+> > +        reg =3D dev->mem->regions;
+> > +
+> > +        for (j =3D 0; j < dev->mem->nregions; j++) {
+> > +            reg =3D dev->mem->regions + j;
+> > +
+> > +            assert((uintptr_t)reg->userspace_addr =3D=3D reg->usersp=
+ace_addr);
+> > +            mr =3D memory_region_from_host((void *)(uintptr_t)reg->u=
+serspace_addr,
+> > +                                         &offset);
+> > +            fd =3D memory_region_get_fd(mr);
+> > +
+> > +            if (reg_equal(&u->shadow_regions[i], reg)) {
+> > +                matching =3D true;
+> > +                found[j] =3D true;
+> > +                break;
+> > +            }
+> > +        }
+> > +
+> > +        if (fd > 0 && !matching) {
+> > +            msg->hdr.request =3D VHOST_USER_REM_MEM_REG;
+> > +            msg->payload.mem_reg.region.userspace_addr =3D reg->user=
+space_addr;
+> > +            msg->payload.mem_reg.region.memory_size =3D reg->memory_=
+size;
+> > +            msg->payload.mem_reg.region.guest_phys_addr =3D
+> > +                reg->guest_phys_addr;
+> > +            msg->payload.mem_reg.region.mmap_offset =3D offset;
+> > +
+> > +            if (vhost_user_write(dev, msg, &fd, 1) < 0) {
+> > +                return -1;
+> > +            }
+> > +        }
+> > +    }
+> > +
+> > +    /*
+> > +     * Send messages to add regions present in the device which are =
+not
+> > +     * in our shadow state.
+> > +     */
+> > +    for (i =3D 0; i < dev->mem->nregions; ++i) {
+> > +        reg =3D dev->mem->regions + i;
+> > +
+> > +        /*
+> > +         * If the region was in both the shadow and vdev state we do=
+n't
+> > +         * need to send a VHOST_USER_ADD_MEM_REG message for it.
+> > +         */
+> > +        if (found[i]) {
+> > +            continue;
+> > +        }
+> > +
+> > +        assert((uintptr_t)reg->userspace_addr =3D=3D reg->userspace_=
+addr);
+> > +        mr =3D memory_region_from_host((void *)(uintptr_t)reg->users=
+pace_addr,
+> > +                                     &offset);
+> > +        fd =3D memory_region_get_fd(mr);
+> > +
+> > +        if (fd > 0) {
+> > +            msg->hdr.request =3D VHOST_USER_ADD_MEM_REG;
+> > +            msg->payload.mem_reg.region.userspace_addr =3D reg->user=
+space_addr;
+> > +            msg->payload.mem_reg.region.memory_size =3D reg->memory_=
+size;
+> > +            msg->payload.mem_reg.region.guest_phys_addr =3D
+> > +                reg->guest_phys_addr;
+> > +            msg->payload.mem_reg.region.mmap_offset =3D offset;
+> > +
+> > +            if (vhost_user_write(dev, msg, &fd, 1) < 0) {
+> > +                return -1;
+> > +            }
+> > +        }
+> > +    }
+> > +
+> > +    /* Make our shadow state match the updated device state. */
+> > +    u->num_shadow_regions =3D dev->mem->nregions;
+> > +    for (i =3D 0; i < dev->mem->nregions; ++i) {
+> > +        reg =3D dev->mem->regions + i;
+> > +        u->shadow_regions[i].guest_phys_addr =3D reg->guest_phys_add=
+r;
+> > +        u->shadow_regions[i].userspace_addr =3D reg->userspace_addr;
+> > +        u->shadow_regions[i].memory_size =3D reg->memory_size;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >  static int vhost_user_set_mem_table(struct vhost_dev *dev,
+> >                                      struct vhost_memory *mem)
+> >  {
+> >      struct vhost_user *u =3D dev->opaque;
+> > -    int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > +    int fds[VHOST_MEMORY_LEGACY_NREGIONS];
+> >      size_t fd_num =3D 0;
+> >      bool do_postcopy =3D u->postcopy_listen && u->postcopy_fd.handle=
+r;
+> >      bool reply_supported =3D virtio_has_feature(dev->protocol_featur=
+es,
+> >                                                VHOST_USER_PROTOCOL_F_=
+REPLY_ACK);
+> > +    bool config_slots =3D
+> > +        virtio_has_feature(dev->protocol_features,
+> > +                           VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS);
+> > =20
+> >      if (do_postcopy) {
+> > -        /* Postcopy has enough differences that it's best done in it=
+'s own
+> > +        if (config_slots) {
+> > +            error_report("Postcopy migration not supported with "
+> > +                         "VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS feat=
+ure "
+> > +                         "enabled.");
+> > +            return -1;
+> > +        }
+> > +
+> > +        /*
+> > +         * Postcopy has enough differences that it's best done in it=
+'s own
+> >           * version
+> >           */
+> >          return vhost_user_set_mem_table_postcopy(dev, mem);
+> > @@ -589,17 +757,22 @@ static int vhost_user_set_mem_table(struct vhos=
+t_dev *dev,
+> >          msg.hdr.flags |=3D VHOST_USER_NEED_REPLY_MASK;
+> >      }
+> > =20
+> > -    if (vhost_user_fill_set_mem_table_msg(u, dev, &msg, fds, &fd_num=
+,
+> > -                                          false) < 0) {
+> > -        return -1;
+> > -    }
+> > -
+> > -    if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
+> > -        return -1;
+> > -    }
+> > +    if (config_slots && !reply_supported) {
+> > +        if (vhost_user_send_add_remove_regions(dev, mem, &msg) < 0) =
+{
+> > +            return -1;
+> > +        }
+> > +    } else {
+> > +        if (vhost_user_fill_set_mem_table_msg(u, dev, &msg, fds, &fd=
+_num,
+> > +                                              false) < 0) {
+> > +            return -1;
+> > +        }
+> > +        if (vhost_user_write(dev, &msg, fds, fd_num) < 0) {
+> > +            return -1;
+> > +        }
+> > =20
+> > -    if (reply_supported) {
+> > -        return process_message_reply(dev, &msg);
+> > +        if (reply_supported) {
+> > +            return process_message_reply(dev, &msg);
+> > +        }
+> >      }
+> > =20
+> >      return 0;
+> > @@ -764,7 +937,7 @@ static int vhost_set_vring_file(struct vhost_dev =
+*dev,
+> >                                  VhostUserRequest request,
+> >                                  struct vhost_vring_file *file)
+> >  {
+> > -    int fds[VHOST_MEMORY_MAX_NREGIONS];
+> > +    int fds[VHOST_USER_MAX_RAM_SLOTS];
+> >      size_t fd_num =3D 0;
+> >      VhostUserMsg msg =3D {
+> >          .hdr.request =3D request,
+> > @@ -866,6 +1039,23 @@ static int vhost_user_get_features(struct vhost=
+_dev *dev, uint64_t *features)
+> >      return vhost_user_get_u64(dev, VHOST_USER_GET_FEATURES, features=
+);
+> >  }
+> > =20
+> > +static int vhost_user_get_max_memslots(struct vhost_dev *dev,
+> > +                                       uint64_t *max_memslots)
+> > +{
+> > +    uint64_t backend_max_memslots;
+> > +    int err;
+> > +
+> > +    err =3D vhost_user_get_u64(dev, VHOST_USER_GET_MAX_MEM_SLOTS,
+> > +                             &backend_max_memslots);
+> > +    if (err < 0) {
+> > +        return err;
+> > +    }
+> > +
+> > +    *max_memslots =3D MIN(backend_max_memslots, VHOST_USER_MAX_RAM_S=
+LOTS);
+> > +
+> > +    return *max_memslots;
+> > +}
+> > +
+> >  static int vhost_user_set_owner(struct vhost_dev *dev)
+> >  {
+> >      VhostUserMsg msg =3D {
+> > @@ -1439,6 +1629,24 @@ static int vhost_user_backend_init(struct vhos=
+t_dev *dev, void *opaque)
+> >                           "slave-req protocol features.");
+> >              return -1;
+> >          }
+> > +
+> > +        /* get max memory regions if backend supports configurable R=
+AM slots */
+> > +        if (!virtio_has_feature(dev->protocol_features,
+> > +                                VHOST_USER_PROTOCOL_F_CONFIGURE_SLOT=
+S)) {
+> > +            u->memory_slots =3D VHOST_MEMORY_LEGACY_NREGIONS;
+> > +        } else if (virtio_has_feature(dev->protocol_features,
+> > +                           VHOST_USER_PROTOCOL_F_REPLY_ACK)) {
+> > +            error_report("The VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS =
+protocol "
+> > +                         "feature is not supported when the "
+> > +                         "VHOST_USER_PROTOCOL_F_REPLY_ACK features h=
+as also "
+> > +                         "been negotiated");
+> > +            return -1;
+> > +        } else {
+> > +            err =3D vhost_user_get_max_memslots(dev, &u->memory_slot=
+s);
+> > +            if (err < 0) {
+> > +                return err;
+> > +            }
+> > +        }
+> >      }
+> > =20
+> >      if (dev->migration_blocker =3D=3D NULL &&
+> > @@ -1502,7 +1710,9 @@ static int vhost_user_get_vq_index(struct vhost=
+_dev *dev, int idx)
+> > =20
+> >  static int vhost_user_memslots_limit(struct vhost_dev *dev)
+> >  {
+> > -    return VHOST_MEMORY_MAX_NREGIONS;
+> > +    struct vhost_user *u =3D dev->opaque;
+> > +
+> > +    return u->memory_slots;
+> >  }
+> > =20
+> >  static bool vhost_user_requires_shm_log(struct vhost_dev *dev)
+> > --=20
+> > 1.8.3.1
+>=20
+>=20
 
