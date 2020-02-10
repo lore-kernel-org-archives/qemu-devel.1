@@ -2,62 +2,110 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A183FC352A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A76F1C352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:27:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76CF52080C
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:19:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76CF52080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72B152082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:27:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPVWN8a5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B152082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j175o-0002GA-I6
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 06:19:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59816)
+	id 1j17DT-0005Wt-KV
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 06:27:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1j175C-0001kF-5b
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:18:31 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j17CD-0004iv-TQ
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1j175A-00022m-Ra
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:18:30 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2700 helo=huawei.com)
+ (envelope-from <pbonzini@redhat.com>) id 1j17CA-0007Ex-Un
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:25:43 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41540
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1j1757-0001rJ-E8; Mon, 10 Feb 2020 06:18:25 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 81946A329E95B9C74D68;
- Mon, 10 Feb 2020 19:18:16 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Mon, 10 Feb 2020
- 19:18:07 +0800
-Subject: Re: [PATCH v22 4/9] ACPI: Build Hardware Error Source Table
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
- <1578483143-14905-5-git-send-email-gengdongjiu@huawei.com>
- <20200205164328.00006f1e@Huawei.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <f24fb648-a06b-0b97-1afa-e4ed6137a7d4@huawei.com>
-Date: Mon, 10 Feb 2020 19:18:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j17CA-0007Eb-Pw
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:25:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581333942;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DFcr+kDhdbToD6dYS/e2hsvNMgMtLb4QX8gVHGYRbxs=;
+ b=ZPVWN8a5xFsN8CNY6aOVtkJsrDc6HCHrMN9rfmu6ACpr4evQK7280C2SzBQY5K+7Xbq24f
+ P2qrQZpP9PZXbJrXOGeUBbuIbDDKLwvb+E9gBQBNnydrFG0IQqLiOj6clwjqff6SFLyhTo
+ 4h898S7SmyPnD99JwOZn83msC2wl1E0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-D8GyLo1dPEegS3PqLCMsIQ-1; Mon, 10 Feb 2020 06:25:38 -0500
+Received: by mail-wm1-f70.google.com with SMTP id q125so2889865wme.1
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 03:25:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=DFcr+kDhdbToD6dYS/e2hsvNMgMtLb4QX8gVHGYRbxs=;
+ b=rA7ncBqkLme5etcv2DeeXQmJsRSVHCfInYgQ8QFanLJA+ffh+sbqAnMTgWeSns5AQL
+ Bcu/z6YfWtxcwxGZ6vzrPt/MtPkiGQWJDN+wgi4BtSB3E4vPpBoXRXt0iKK7OXuaT8Ye
+ yD8yBJg8qtCfHQeACBPihfSf7CH5XfQoCU3UQj/CFzZpaZsgzLRaiSnb1u3e5C8R8Xj6
+ oFrRm58f0ZL3fKR7a/WQt3abGoKsHhJJODpXjfVOAR5NbqLjUwjyDMhCtfvMLxUWpA9d
+ 3SvWOGGZS/rscZThc7up64eJeCCKHMhqpBRLjSvZMaaLx/2MUx3W19ctNWvz+W3tr8Ig
+ aFGg==
+X-Gm-Message-State: APjAAAUqBYxzTtrg5DcE1w3ovWwUJpsTHaWlqkMFwd9WuHx4PwE0qE1A
+ uQH6cMfPXgjW/Lh/yjoWWlrNp84AV+9ggtDEnE25nVpVP3rIhw+Sd+KsfA/oiYUAYNJQdqvCcup
+ csAZ13s8hIdk8E7w=
+X-Received: by 2002:a05:600c:21c6:: with SMTP id
+ x6mr15044838wmj.177.1581333937234; 
+ Mon, 10 Feb 2020 03:25:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx25MmZr+G16qgpWo9s9YYWOlY+yRo+ap88gdbim+NTAK1mCSGCWFKdCoo+YZKH648mp7wzug==
+X-Received: by 2002:a05:600c:21c6:: with SMTP id
+ x6mr15044820wmj.177.1581333936998; 
+ Mon, 10 Feb 2020 03:25:36 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56?
+ ([2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56])
+ by smtp.gmail.com with ESMTPSA id a8sm202969wmc.20.2020.02.10.03.25.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 10 Feb 2020 03:25:36 -0800 (PST)
+Subject: Re: VW ELF loader
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
+ <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
+ <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
+ <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
+ <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
+ <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
+ <20200205060634.GI60221@umbus.fritz.box>
+ <62d62fab-46a4-240b-037b-409ba859b93d@redhat.com>
+ <47e6a49d-f1c7-aaf6-b9ef-7e81773cff6e@ozlabs.ru>
+ <8993c6b4-2a2c-b7e5-8342-4db480d0af9d@redhat.com>
+ <20200210073008.GE22584@umbus.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c40f83a1-6dbd-7223-e825-0ab153a36aed@redhat.com>
+Date: Mon, 10 Feb 2020 12:25:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200205164328.00006f1e@Huawei.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200210073008.GE22584@umbus.fritz.box>
 Content-Language: en-US
+X-MC-Unique: D8GyLo1dPEegS3PqLCMsIQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,183 +117,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, ehabkost@redhat.com,
- kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
- qemu-devel@nongnu.org, linuxarm@huawei.com, shannon.zhaosl@gmail.com,
- zhengxiang9@huawei.com, qemu-arm@nongnu.org, james.morse@arm.com,
- xuwei5@huawei.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <conny@cornelia-huck.de>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/02/20 08:30, David Gibson wrote:
+>> Anything you put in the host is potential attack surface.
+> Ok, it is attack surface you're concerned about.  That wasn't totally
+> clear before this point.
 
+Part that, part having to add backend hooks that weren't needed so far.
 
-On 2020/2/6 0:43, Jonathan Cameron wrote:
-> On Wed, 8 Jan 2020 19:32:18 +0800
-> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-> 
->> This patch builds Hardware Error Source Table(HEST) via fw_cfg blobs.
->> Now it only supports ARMv8 SEA, a type of Generic Hardware Error
->> Source version 2(GHESv2) error source. Afterwards, we can extend
->> the supported types if needed. For the CPER section, currently it
->> is memory section because kernel mainly wants userspace to handle
->> the memory errors.
->>
->> This patch follows the spec ACPI 6.2 to build the Hardware Error
->> Source table. For more detailed information, please refer to
->> document: docs/specs/acpi_hest_ghes.rst
->>
->> build_append_ghes_notify() will help to add Hardware Error Notification
->> to ACPI tables without using packed C structures and avoid endianness
->> issues as API doesn't need explicit conversion.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->> Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
-> 
-> Hi. 
-> 
-> I was forwards porting my old series adding CCIX error injection support
-> and came across a place this could 'possibly' be improved.
+>> Plus, you're not doing a different thing than anyone else and as
+>> you've found out it may be easy for block device but not for
+>> everything else.
+>
+> Uh.. was that supposed to be "we *are* doing a different thing than
+> anyone else"?
 
-Jonathan, It is great that you add CCIX error injection support based on this series.
-thanks for using it.
+Alexey's question was "what is exactly the benefit", so "not doing a
+different thing" is the answer (one of them).
 
-> 
-> I say possibly because it's really about enabling more flexibility
-> in how this code is reused than actually 'fixing' anything here.
-> 
-> If you don't make the change here, I'll just add a precursor patch to my
-> series.  Just seems nice to tidy it up at source.
+>> Every platform that QEMU supports is just using a firmware to do
+>> firmware things; it can be U-Boot, EDK-2, SLOF, SeaBIOS, qboot, with
+>> varying level of complexity.  Some are doing -kernel in QEMU rather than
+>> firmware, but that's where things end.
+>
+> Well, yeah, but AIUI those platforms actually have a defined hardware
+> environment on which the firmware is running.  For PAPR we don't, we
+> *only* have a specification for the "hardware"+"firmware" environment
+> as seen by the OS together.
 
-sure, I make a change to make your patch work well.
+PAPR is a specification for the environment as seen by the OS.  But "-M
+pseries" is already a defined hardware environment on which SLOF is
+running.  There's nothing that prevents you from defining more of that
+environment in order to run Linux (for petitboot) or your own
+pseudo-OpenFirmware driver provider inside it.
 
-> 
-> The rest of the partMake your patch very good work.s of this series I am using seems to work great.
-
-
-
-
-> 
-> Thanks!
-> 
-> Jonathan
-> 
->> ---
->>  hw/acpi/ghes.c           | 118 ++++++++++++++++++++++++++++++++++++++++++++++-
->>  hw/arm/virt-acpi-build.c |   2 +
->>  include/hw/acpi/ghes.h   |  40 ++++++++++++++++
->>  3 files changed, 159 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
->> index b7fdbbb..9d37798 100644
->> --- a/hw/acpi/ghes.c
->> +++ b/hw/acpi/ghes.c
->> @@ -34,9 +34,42 @@
->> +
-> ...
->> +/* Build Generic Hardware Error Source version 2 (GHESv2) */
->> +static void build_ghes_v2(GArray *table_data, int source_id, BIOSLinker *linker)
-> This function takes source ID, which uses the enum of all sources registered.
-> However, it doesn't use it to locate the actual physical addresses.
-> 
-> Currently the code effectively assumes the value is 0.
-
-yes, because there is only one source, so the value is 0.
-
-> 
->> +{
->> +    uint64_t address_offset;
->> +    /*
->> +     * Type:
->> +     * Generic Hardware Error Source version 2(GHESv2 - Type 10)
->> +     */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_SOURCE_GENERIC_ERROR_V2, 2);
->> +    /* Source Id */
->> +    build_append_int_noprefix(table_data, source_id, 2);
->> +    /* Related Source Id */
->> +    build_append_int_noprefix(table_data, 0xffff, 2);
->> +    /* Flags */
->> +    build_append_int_noprefix(table_data, 0, 1);
->> +    /* Enabled */
->> +    build_append_int_noprefix(table_data, 1, 1);
->> +
->> +    /* Number of Records To Pre-allocate */
->> +    build_append_int_noprefix(table_data, 1, 4);
->> +    /* Max Sections Per Record */
->> +    build_append_int_noprefix(table_data, 1, 4);
->> +    /* Max Raw Data Length */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
->> +
->> +    address_offset = table_data->len;
->> +    /* Error Status Address */
->> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
->> +                     4 /* QWord access */, 0);
->> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->> +        address_offset + GAS_ADDR_OFFSET,
->> +        sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
-> 
-> The offset here would need to be source_id * sizeof(uint64_t) I think
-> 
->> +
->> +    /*
->> +     * Notification Structure
->> +     * Now only enable ARMv8 SEA notification type
->> +     */
->> +    build_ghes_hw_error_notification(table_data, ACPI_GHES_NOTIFY_SEA);
-> Perhaps a switch for this to allow for other options later.
-
-OK, I will make this change in order to easily support more hardware error source.
-
-> 
-> 	switch (source_id) {
-> 	case ACPI_HEST_SRC_ID_SEA:
-> 		...
-> 		break;
-> 	default:
-> 	//print some error message.
-> 
-> 	}
-
-ok
-
->> +
->> +    /* Error Status Block Length */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
->> +
->> +    /*
->> +     * Read Ack Register
->> +     * ACPI 6.1: 18.3.2.8 Generic Hardware Error Source
->> +     * version 2 (GHESv2 - Type 10)
->> +     */
->> +    address_offset = table_data->len;
->> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
->> +                     4 /* QWord access */, 0);
->> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->> +        address_offset + GAS_ADDR_OFFSET,
->> +        sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
->> +        ACPI_GHES_ERROR_SOURCE_COUNT * sizeof(uint64_t));
-> 
-> Offset of (ACPI_GHES_ERROR_SOURCE_COUNT + source_id) * sizeof(uint64_t)
-yes, It due to I only support one source, the source_id is zero and not use it.
-In order to easily extend, I will add this change.
-
-> 
->> +
->> +    /*
->> +     * Read Ack Preserve
->> +     * We only provide the first bit in Read Ack Register to OSPM to write
->> +     * while the other bits are preserved.
->> +     */
->> +    build_append_int_noprefix(table_data, ~0x1ULL, 8);
->> +    /* Read Ack Write */
->> +    build_append_int_noprefix(table_data, 0x1, 8);
->> +}
-> 
-> 
-> 
-> .
-> 
+Paolo
 
 
