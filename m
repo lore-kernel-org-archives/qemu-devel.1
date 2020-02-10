@@ -2,108 +2,85 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCB8C352A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA63C352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:30:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AA6C2082F
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:27:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47F5D2082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:30:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ETsKsZDC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA6C2082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c4yHuYBY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47F5D2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j17Dw-0006QJ-FU
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 06:27:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32812)
+	id 1j17HB-0000BZ-Dl
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 06:30:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j17Cc-000532-H6
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:26:13 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j17GV-00087F-QQ
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:30:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j17Cb-0007LU-8n
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:26:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51552
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j17Cb-0007Ke-4Y
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:26:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581333967;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=E3mZLwM5CSlwellmhNbORrRxevhseR/PtyhovYXU9ds=;
- b=ETsKsZDCwkdNwJAJydNDQgPhjv9jjOMdQUhnzfZtRKrjR2ycIrBgPVMUiQqZAO8o2nowVz
- al/W5REQlZex9BiLeA59tBUMlfJGugMr4G1JSm2IP8bQbsqnzTWJLqHgDdmF2GeXiEc6Yb
- SrUQ1Oe9hRBsO7p3/64SQkRbUf+yPAI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-OSEU7I-SMcKFh7rXIzHbyw-1; Mon, 10 Feb 2020 06:26:06 -0500
-Received: by mail-wr1-f72.google.com with SMTP id s13so4833144wrb.21
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 03:26:06 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1j17GU-0000vU-Ev
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:30:11 -0500
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:46606)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j17GU-0000vD-8c
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:30:10 -0500
+Received: by mail-oi1-x235.google.com with SMTP id a22so8810857oid.13
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 03:30:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=7eZubyIFK5C7/ohFjd4JLmykUS580I+PSc2YXxS9zVU=;
+ b=c4yHuYBYwdEclEt2LEArn7k0gBPhflLo9lEP1O55iwHTH9C9n4tbJUxVWEv4UY7Xwd
+ 0MN+YyJpPuculFyEXx+fWru0pp/PcabImA25OGDV1Lh5YV1R2JBszp78VKfrW6PvDLLu
+ NhVeQi2BN7qL8JzwnqQjzjomHcUWvxFiHi7yLf9QVbAUGSrWTvB3Wd+lZrWbYrCOPGof
+ LTVtv7KrYM6qZkm0HJaFGFEFMNLfdiZmqfUQfxBIBi6J6jMKHfQNtZL9g94ThHz91vgQ
+ sdvK60YF7wKJ6KdWBftMgQaV7/F7dZKEZP5xwcmVleBMNjE8VoYNStcY07TFSf9/1tDm
+ va6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=E3mZLwM5CSlwellmhNbORrRxevhseR/PtyhovYXU9ds=;
- b=KVI0NjcOq7aztaKTVT9eZTbvMeKlRF/Qo9VCDZotg+aZfKoha/jYrcc1f2MFT7UTl7
- NVCza5B/4qH2y5lyZJRNzeVapLH6LnS2hzHQriUX5FsAVPMetZDxc2uLo02zQQq0LewB
- IflwaF4kYjgIyPoJ2zzgXqfLUAw97+n1jdCqcSDjT5isFgbbk9Z9GSGHyR5NeyAFuURk
- BmT0cCmYONjDntzfmb3x0LoZiTg3d9pBB/vDccbCssXjH9uAfVNGoQ5f9jz+y1/1Xg7K
- +d+FPfpO8ZGI4g9jDLH9cJHFdKWnvPBARX27JQKNBCiCZUeDqjiRVV39pb+BaI5APpJo
- dSrg==
-X-Gm-Message-State: APjAAAXCLICgQsq9GR1xmDE1r70RClH0cJx4DWSLRqwgT63ezKlW+F0o
- 8XHheBXjKAR+fvgfP7uteqls2dcld6eJDxo3CTDVtHBb3eHG+iJWLQ9jRVKqO0ftBgYF4lSd4bO
- 8obs7a7+RNpbEi0g=
-X-Received: by 2002:adf:e483:: with SMTP id i3mr1432627wrm.215.1581333965107; 
- Mon, 10 Feb 2020 03:26:05 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxPJh6JiANAhtDBXwvUr/WBDBgZIIn6DTFVzrIlQibdMNVFSWJWT5atvqTVelV8B/hF/vq/oA==
-X-Received: by 2002:adf:e483:: with SMTP id i3mr1432595wrm.215.1581333964835; 
- Mon, 10 Feb 2020 03:26:04 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56?
- ([2001:b07:6468:f312:a9f0:cbc3:a8a6:fc56])
- by smtp.gmail.com with ESMTPSA id x7sm129639wrq.41.2020.02.10.03.26.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 10 Feb 2020 03:26:04 -0800 (PST)
-Subject: Re: VW ELF loader
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200203012842.GD52446@umbus.fritz.box>
- <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
- <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
- <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
- <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
- <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
- <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
- <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
- <20200205060634.GI60221@umbus.fritz.box>
- <62d62fab-46a4-240b-037b-409ba859b93d@redhat.com>
- <20200210072802.GD22584@umbus.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <29abb8fe-f094-689f-2e3d-5462692048fd@redhat.com>
-Date: Mon, 10 Feb 2020 12:26:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=7eZubyIFK5C7/ohFjd4JLmykUS580I+PSc2YXxS9zVU=;
+ b=i2ugst04VPMxY2W4mgLzUTjYLA817KYFXrEyEds4iwFKIj8wzUcw0zvqy9LLn/1l6a
+ L3gY67X/GNIEeZ2dxowEcet5BsqCoGypOLqKdqhEnSVafyk1krzHYJUDdt9yzTSlIXAK
+ lsVkSbpjsG78z83Yo6QN5e0hmvkXcHYTQyAdv2kyIlA44XgVwa/G77q8iybNY+depUpX
+ xRylC9Gcr2B0nkM4LlhonTURbdlJ/Kj7lHy5441/bpTlLMSQ9Y1IEmU+gLcGZ7C2ZBdy
+ fhtydBQgWQBB7K8COxQVUsUcNNSezdN6QDoRl0VPXcq4ewhB549tQLOZqhsBzqI9F6/v
+ XjBA==
+X-Gm-Message-State: APjAAAXpP6+jm0V423IgZ7G8I3+IwbXd9uVpUue/3n9/KxYTX8k/ttZn
+ pW9cOGLmQa8D4DBfs9f6HoQGOM90NcJRxdoXoo9D/g==
+X-Google-Smtp-Source: APXvYqwNyvUF+HK823NskJV9Ks/gCTELZemkiSv3T416lXM6HfhgylpjEwYeFSn39bEf1/skgD5RrisZJPoNK+vAa4s=
+X-Received: by 2002:aca:3d7:: with SMTP id 206mr539854oid.98.1581334209250;
+ Mon, 10 Feb 2020 03:30:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200210072802.GD22584@umbus.fritz.box>
-Content-Language: en-US
-X-MC-Unique: OSEU7I-SMcKFh7rXIzHbyw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <875zgm2vqv.fsf@dusky.pond.sub.org>
+ <CAJSP0QWCn_vv2Vs-UWc9nPHjdBQq9KMkiQ7D91+RwHM_okTzZw@mail.gmail.com>
+ <CAFEAcA9NfGivg0C_enAT_8+_mmbQSi6H=7G+4w7RdJwXP7yUtA@mail.gmail.com>
+ <20200210110812.GB3269@redhat.com>
+In-Reply-To: <20200210110812.GB3269@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Feb 2020 11:29:58 +0000
+Message-ID: <CAFEAcA8TtfNsd8v5sWTTBj8KikKen23Op4ttoLM3Ac60vFJiNQ@mail.gmail.com>
+Subject: Re: Summary of Re: Making QEMU easier for management tools and
+ applications
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::235
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,87 +92,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <conny@cornelia-huck.de>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/02/20 08:28, David Gibson wrote:
-> On Thu, Feb 06, 2020 at 09:27:01AM +0100, Paolo Bonzini wrote:
->> On 05/02/20 07:06, David Gibson wrote:
->>> On Tue, Feb 04, 2020 at 12:26:32AM +0100, Paolo Bonzini wrote:
->> I'm really sorry if what I am saying is stupid; but I was thinking of a
->> firmware entrypoint like
->>
->> 	if (op == "read" || op == "write")
->> 		do_driver_stuff(op);
->> 	else
->> 		hypercall();
-> 
-> Um... I'm not really clear on where you're imagining this going.  In
-> the OF model, device operations are done by "opening" a device tree
-> node then executing methods on it, so you can't really even get to
-> this point without a bunch of DT stuff.
+On Mon, 10 Feb 2020 at 11:08, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> On Mon, Feb 10, 2020 at 11:01:48AM +0000, Peter Maydell wrote:
+> > On Mon, 10 Feb 2020 at 10:57, Stefan Hajnoczi <stefanha@gmail.com> wrot=
+e:
+> > > I'm in favor of simplifying QEMU at the expense of an incompatible CL=
+I
+> > > change in QEMU 6.0.
+> >
+> > If we want to do wholesale incompatible changes to the CLI
+> > I think we definitely need some kind of tool where a user
+> > can say "here's my old command line, what's the new style
+> > equivalent?". Otherwise we're going to have a deluge of
+> > user issues where their old working setups broke and
+> > QEMU didn't give them any useful hints about why.
+>
+> There is a risk that if we promise to have a fully automated conversion
+> that it will be alot of work, and could force us to introduce hacks into
+> the new impl just to satisfy conversion.  IMHO we shouldn't be afraid of
+> declaring that some parts of the old syntax can NOT be directly transform=
+ed
+> into new syntax, simply for the sake of making a new impl more practical
+> to move forward with.
 
-Could you delegate that part to QEMU, as in the v6 patches?  The
-firmware would record the path<->ihandle association on open and close,
-and then you can use that when GRUB does "read" and "write" to invoke
-the appropriate driver.
+Agreed, but we should at least be able to handle the easy
+stuff and say "this is the general kind of new option syntax
+and set of options you want" for most of the rest.
 
->> This is not even close to pseudocode, but hopefully enough to give the
->> idea.  Perhaps what I don't understand is why you can't start the
->> firmware with r3 pointing to the device tree, and stash it for when you
->> leave control to GRUB.
-> 
-> Again, I'm not even really sure what you mean by this.  We already
-> enter SLOF with r3 pointing to a device tree.  I'm not sure what
-> stashing it would accomplish.  GRUB as it stands expects an OF style
-> entry point though, not a flat tree style entry point.
+> An alternative approach to mitigate the disruption is to *not* make any
+> incompatible changes to qemu-system-XXXX. Instead introduce new binaries
+> with the new syntax and any other architectural  changes we wish to make.
+> The old binaries can be deprecated but remain around for an extended
+> period of time, to give people and apps time to migrate. We can provide
+> rough guidance and perhaps partially automated conversion to help people
+> move, but not aim for a 100% automated conversion.
 
-Again, sorry if what I'm saying makes little sense.  The terminology is
-certainly off.  What I mean is:
+I think our history of failing to actually complete transitions
+would predict that we'd end up with both the old and the new
+binaries essentially forever.
 
-- read the device tree, instantiate all PCI and virtio drivers
-
-- keep the device tree around for use while GRUB is running
-
-- find and invoke GRUB
-
-- on the OF entry point, wrap open and close + handle the disk and
-network entry points, and pass everything else to QEMU.
-
->> The TTY can use the simple
->> getchar/putchar hypercalls,
-> 
-> Yes... though if people attach a graphical console they might be
-> pretty surprised that they don't get anything on there.
-
-They wouldn't with Alexey's code either, would they?  And it would be
-yet another QEMU backend to hook into, while with firmware it would be
-lots of code to write but super-boring and something that has been done
-countless times.
-
-> We can possibly ignore the spapr virtual devices.  They seemed like
-> they'd be important for people transitioning from guests under
-> PowerVM, but honestly I'm not sure they've ever been used much.
-> 
-> We do support emulated (or passthrough) PCI devices.  I don't know if
-> they're common enough that we need boot support for them.  Netboot
-> from a vfio network adaptor might be something people want.
-
-Can you get that with SLOF?
-
-> USB storage is also a fairly likely candidate, and that would add a
-> *lot* of extra complexity, since we'd need both the HCD and storage
-> drivers.
-
-Any reason to make it USB and not a virtio-blk device?  (On x86 these
-days you only add USB storage disks to a VM in order to get drivers to
-Windows).
-
-Paolo
-
+thanks
+-- PMM
 
