@@ -2,97 +2,96 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC813C352A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 16:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C83EC352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 16:06:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9781A24685
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 16:05:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1899D2080C
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 16:06:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="inMewh56"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9781A24685
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="caaRwXUf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1899D2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1BZM-00052k-Ly
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 11:05:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44425)
+	id 1j1BZT-0005BN-5p
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 11:06:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j1BYL-0003aH-Vu
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 11:04:58 -0500
+ (envelope-from <mst@redhat.com>) id 1j1BYT-0003ce-Rj
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 11:05:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j1BYJ-00011a-Mj
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 11:04:52 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49380)
+ (envelope-from <mst@redhat.com>) id 1j1BYS-00019o-KU
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 11:05:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38227
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j1BYJ-0000zy-30
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 11:04:51 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j1BYS-000193-GI
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 11:05:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581350689;
+ s=mimecast20190719; t=1581350699;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=R2d3HFmHtNJKNW+bi1Vdd5USAIrrlYQAE6MZCWK13k0=;
- b=inMewh56/3AK66F1mRiz1cqlnLIODd9VlZMkUJ7MfXMtfE/XXBfpI2pLuOtJZwKwOcxWlj
- bHHcdN3z/PEWejQS0hyvprMqvRnLmJobWaPpehka3XV8/RtOxhVCQKikb2QtjuCHb98Wme
- BpZmJjF3RRSIX1CeNRb4+Wt2ZJHW0eA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-LTOc0kdrOGCDDCLTH5GJVA-1; Mon, 10 Feb 2020 11:04:48 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FE10107ACC9;
- Mon, 10 Feb 2020 16:04:46 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-243.ams2.redhat.com
- [10.36.117.243])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F9D727065;
- Mon, 10 Feb 2020 16:04:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A62AA11385C9; Mon, 10 Feb 2020 17:04:39 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Getting whole-tree patches reviewed and merged
-References: <87d0bmchq0.fsf@dusky.pond.sub.org>
- <1B253197-5592-472A-AA26-E0614A13C91A@redhat.com>
- <87o8v52hz9.fsf@dusky.pond.sub.org>
- <8CF8359B-1E52-4F7A-944E-C1C14FEC4F92@redhat.com>
- <87r200zzje.fsf@dusky.pond.sub.org>
- <20200120100849.GB345995@stefanha-x1.localdomain>
- <871rrtmkko.fsf@dusky.pond.sub.org>
- <20200121113224.GD630615@stefanha-x1.localdomain>
- <CAJ+F1C+anMuBE6pOu8JNOoaNnDw8a47Dc1f6MhnxH=rRNqMF=Q@mail.gmail.com>
- <87wo9lc4oe.fsf_-_@dusky.pond.sub.org>
- <20200121143658.GB597037@redhat.com>
- <871rrs97ld.fsf@dusky.pond.sub.org>
- <CAJ+F1CJ68_QM7zhqoL-bom3vFSNprN3zOV5FUBtrJWg4nAai5g@mail.gmail.com>
- <CAFEAcA-C5Kvp-tUZfXSeAiFAHW-YXb+ddwFqyo5Y=0ziPhFbDA@mail.gmail.com>
- <871rrs136l.fsf_-_@dusky.pond.sub.org>
- <f450e310-3614-5e03-b932-ecba95970c95@redhat.com>
- <dc1c60f7-3f88-2d86-9f03-88cca1b6d49e@redhat.com>
-Date: Mon, 10 Feb 2020 17:04:39 +0100
-In-Reply-To: <dc1c60f7-3f88-2d86-9f03-88cca1b6d49e@redhat.com> (Paolo
- Bonzini's message of "Mon, 10 Feb 2020 12:26:04 +0100")
-Message-ID: <874kvypgx4.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ bh=34RIxkxpBoTPoqvMocx2Ectb6O+UdVXCYCZ8rJhSlwY=;
+ b=caaRwXUfOz/CSrqPe3h8+IUajmPMul1UvGz33u2SvYaRvey0QUOntpw0r88sRER9jsZo4h
+ rBifHAK2XEVa1XP0rUbbGBl+O5G+QvFwVb1bxbL41fiSUMmu/cn6+t76Z95eFxbb+I+ooI
+ 8qUaonsOEytrqScU5J8Lsb+zJmDwZOA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-72-kwOJe7xCP6WSvko1X8de2A-1; Mon, 10 Feb 2020 11:04:32 -0500
+Received: by mail-wm1-f71.google.com with SMTP id n17so3399581wmk.1
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 08:04:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=eLFyI3VORtpOUV6GICPIYqBzs5fFnO6XF3iRlIaU+8Q=;
+ b=OE1tkEuAWhbgQfZcUzWt87RzmpvjZkKhPpf/C61EBpO8/FvnC4EpKMdU3/V9ACjvi1
+ ETqKTsOq1h4OSECqknuMeeWwMcv7rczhLkVCfhDuOy/N7y4GZ8KPCn815JUGJFhIUKdZ
+ gZ4pD9/p2sAqxxPyWbkbII9ORPQRltS/CbnTVQNO2/zag4yo3yFLdAVcQWa+A3VC/qz5
+ RVNp1sG6XP7PIDO9T2UoW9gJVYxL8wm/h8vKLGz4G7avfhacO7ZJy4eR+d+TLOr05bQO
+ EqboAMY4t0Sm/VlbjjLWi5IXht3qjo1zLHeYuIfyJFrxV9I6AJengAtQqiRxVkGWj8xH
+ sTDw==
+X-Gm-Message-State: APjAAAXlCcbs7wxlE6niHeymfe0x2naiVsI3CAwxkrcRpmBWfBLQ7RBs
+ yFx9PKC5j3YVo43UpVNC3fHbcaJ+4emZikncmPUx48gpWf62htNpCT44pKlvcZaHPL7LLjqMoRj
+ zeRpBK//cGyrU7rk=
+X-Received: by 2002:a7b:c774:: with SMTP id x20mr15863748wmk.67.1581350671572; 
+ Mon, 10 Feb 2020 08:04:31 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzvwLrkEQR0eNlMkOydxZFqlCLIEelJUxiABKVW2SDGAV2txNtCNhoCsFvqUmHnf4Vh+bjpiw==
+X-Received: by 2002:a7b:c774:: with SMTP id x20mr15863730wmk.67.1581350671371; 
+ Mon, 10 Feb 2020 08:04:31 -0800 (PST)
+Received: from redhat.com (bzq-155-47.red.bezeqint.net. [62.219.155.47])
+ by smtp.gmail.com with ESMTPSA id y12sm1133427wrw.88.2020.02.10.08.04.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 10 Feb 2020 08:04:30 -0800 (PST)
+Date: Mon, 10 Feb 2020 11:04:28 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Subject: Re: [PATCH v2 0/3] vhost-user: Lift Max Ram Slots Limitation
+Message-ID: <20200210110330-mutt-send-email-mst@kernel.org>
+References: <1579143426-18305-1-git-send-email-raphael.norwitz@nutanix.com>
+ <20200206033248-mutt-send-email-mst@kernel.org>
+ <20200209171442.GA14809@localhost.localdomain>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: LTOc0kdrOGCDDCLTH5GJVA-1
+In-Reply-To: <20200209171442.GA14809@localhost.localdomain>
+X-MC-Unique: kwOJe7xCP6WSvko1X8de2A-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,70 +103,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- qemu-devel <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Dominik Csapak <d.csapak@proxmox.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Sun, Feb 09, 2020 at 12:14:42PM -0500, Raphael Norwitz wrote:
+> On Thu, Feb 06, 2020 at 03:33:13AM -0500, Michael S. Tsirkin wrote:
+> >=20
+> > On Wed, Jan 15, 2020 at 09:57:03PM -0500, Raphael Norwitz wrote:
+> > >=20
+> > > Changes since V1:
+> > >     * Kept the assert in vhost_user_set_mem_table_postcopy, but moved=
+ it
+> > >       to prevent corruption
+> > >     * Made QEMU send a single VHOST_USER_GET_MAX_MEMSLOTS message at
+> > >       startup and cache the returned value so that QEMU does not need=
+ to
+> > >       query the backend every time vhost_backend_memslots_limit is ca=
+lled.
+> >=20
+> > I'm a bit confused about what happens on reconnect.
+> > Can you clarify pls?
+> >=20
+> >From what I can see, backends which support reconnect call vhost_dev_ini=
+t,
+> which then calls vhost_user_backend_init(), as vhost-user-blk does here:
+> https://github.com/qemu/qemu/blob/master/hw/block/vhost-user-blk.c#L315. =
+The
+> ram slots limit is fetched in vhost_user_backend_init() so every time the
+> device reconnects the limit should be refetched.=20
 
-> On 07/02/20 22:53, Eric Blake wrote:
->> On 1/21/20 11:16 PM, Markus Armbruster wrote:
->>> Peter Maydell <peter.maydell@linaro.org> writes:
->>>
->>>> On Tue, 21 Jan 2020 at 15:11, Marc-Andr=C3=A9 Lureau
->>>> <marcandre.lureau@gmail.com> wrote:
->>>>> There are plenty of refactoring to do. The problem when touching the
->>>>> whole code-base, imho, is review time. It may take a couple of
->>>>> hours/days to come up with a cocci/spatch, and make various patches
->>>>> here and there. But it takes often weeks and a lot of constant push t=
-o
->>>>> various folks to get all the reviews (as seens by the qdev prop-ptr
->>>>> series earlier for example). How can we better address whole code-bas=
-e
->>>>> changes?
->>>>
->>>> It depends. If it's literally just a cocci/spatch mechanical
->>>> transformation, I think we should be OK with reviewing that
->>>> transform and then applying it; we don't need to get acks
->>>> from every submaintainer for that kind of thing.
->>>
->>> I go one step further: I prefer mechanical changes committed together,
->>> not torn apart and routed through N+1 trees, where N is the number of
->>> active maintainers picking patches from the series, and 1 is the
->>> maintainer taking pity of the inevitable leftovers.
->>>
->>> Tearing a patch series apart may be in order when it's invasive enough
->>> to risk many conflicts.=C2=A0 The subsystem maintainer may need tighter
->>> control over merging order then, and routing picked patches through his
->>> own tree may be the practical way to get it.
->>=20
->> And the pending work on ERRP_AUTO_PROPAGATE is an example of that -
->> Vladimir has been trying to get the improvements in for some time, but
->> it touches so many files, and is awkward to review whether it is split
->> into over 100 patches per maintainer area or when it is consolidates
->> into few but large patches.
->
-> If I can help with ERRP_AUTO_PROPAGATE, I can merge it through my tree.
+Right. Point is, we might have validated using an old limit.
+Reconnect needs to verify limit did not change or at least
+did not decrease.
 
-Right now I'm to blame: I need to review the infrastructure and its
-pattern of use.
-
-Once that's done, the next questions are what level of review we want
-for the instances of the pattern, and how to merge the thing.
-
-One way is to split along subsystems boundaries, and ask subsystem
-maintainers to merge their part.  Infrastructure has to go first, of
-course.  That would be my job as error subsystem maintainer.  Getting
-everything merged via pretty much every subsystem we have will likely be
-a drawn out affair.
-
-Another way is to go ahead and merge everything, damn the torpedoes.
+--=20
+MST
 
 
