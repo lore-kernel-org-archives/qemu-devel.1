@@ -2,80 +2,90 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDA1C352A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 12:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C19C7C352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 12:12:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25E7E2082F
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 12:07:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C0A92082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 12:12:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QY8FNc0K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25E7E2082F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Iu2XimD9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C0A92082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j17qJ-000513-9q
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 07:07:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38015)
+	id 1j17vk-0006wa-PB
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 07:12:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38560)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j17pP-000441-L3
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:06:16 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j17ux-0006VN-9s
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:12:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j17pO-0003HC-Ft
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:06:15 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39117)
+ (envelope-from <alex.bennee@linaro.org>) id 1j17uw-0005yk-AQ
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:11:59 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38166)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j17pO-0003Gu-9v
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:06:14 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 77so6033742oty.6
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 04:06:14 -0800 (PST)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j17uw-0005yO-3L
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:11:58 -0500
+Received: by mail-wm1-x344.google.com with SMTP id a9so10326875wmj.3
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 04:11:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=uAN3ghp/n/6vh/1hlFbQCNGnTqkVyNFft3uJxIbliGg=;
- b=QY8FNc0Kp0TUtJ0cyXAf4ojvtLP0ghyzIPsYpFYEy6Q2yF1OmK3bNvB7jPQdvAvZGM
- tz0LhGZB89kbeJT16DUJHSCEmVeweg9adc/CZC6ZP1icofuDLUzlUNfhfiPeGpb016dk
- gr87VHVECiUOxSx/tzlSBfwh0Ca2zxmTNpbbFNKFbAk2jSwO7PEqFqG5g2W7KN1vRqh/
- p2yZ3hOkicdcROlNztQfxdRKDJaszv9aVqrt46pKAGhlKe9Mjt8vHDDSeI9Vp+M8yOpd
- v89YERToITSBqojrMY1xYJkhIGymHdU/2LELoFzvwKJP2Ue2giF9M1dvPiKPkFHtVz/p
- bWcg==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ELqzTL4WJEOeGwpgFeLy77FEvzUr6pg05mSePVO7cIg=;
+ b=Iu2XimD9aieuxdeSRmdCEj+f1SZEri1i7GiiO19pXO26GmnA0fLIxIC1/E/MT0FNOx
+ omfS2CFnmcoxDAnNCuxZUTwVxyCJBskWyZc/f0BFC0GG3U5i8oZQ8a4NQ8pptV1iqqYO
+ jiMByT6DsTt3ITWzK5eZu6F+zVlQhYjwNojA6QvIW6d0BAwrdxZVZ81TwX4y2hCK6MZb
+ ku4KaV6kikxDKSIdpk3kNh+jIWr4gLLh3whVwp0uPT98+11L+d5e9/vT4bYV8b9ltXuM
+ GK/BC4E1+yTDlXvgWQ+o7fT74paGczmHbVS9+E9q4KSH5vGzfPYcUzLoh+id1bOWkeOH
+ Fy0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=uAN3ghp/n/6vh/1hlFbQCNGnTqkVyNFft3uJxIbliGg=;
- b=LwmKa39wi3HXGa0505OZXb1znxDAQvCBLJHCeomQ94NO+2A6YlPNDFIsFLGeV0WIu1
- +yrIAn+H6JgDfbEgzTLS4Sa50my2siEE5bq7NI6YXZsO/eLs8u1GY4O+Hf7HBocnF+TX
- Vqe3uru2QT8rvV4Sak2Eif8yMqkNwQxsEKTAr+UScGqm2w9EHy5YuiK7f0ndXMkirzRZ
- kWObPmJnJ10iawxUgEXQGhAtT/A3g1b7hAzahjT9wNXACue3j5UUtuNHihTKELawqwXe
- +chqmSUoDX8YE9nzqRKKtfuMX7cmOIuOlQmXxamBBAXHatcwKIlnI0oChb6o3m4amySo
- mPIQ==
-X-Gm-Message-State: APjAAAUdakVdkzznjqmrLbGXvhyc2YMmDqTVi3f1G1+u7fMMM/aLZ3Z7
- RYNaaeiZ8srk7oMpb1PHiN/Vcp4So3TTnL0ff9XVbbl0
-X-Google-Smtp-Source: APXvYqxnfzn/nURGyqLTYnJFcmqDDDwU60QCwzw+1KaPpGYxe3y2nlYLp4qJ9AUrVfKUS0Sq1IjPGqYi6MiFwS43ijs=
-X-Received: by 2002:a05:6830:13d3:: with SMTP id
- e19mr803438otq.135.1581336372835; 
- Mon, 10 Feb 2020 04:06:12 -0800 (PST)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ELqzTL4WJEOeGwpgFeLy77FEvzUr6pg05mSePVO7cIg=;
+ b=cXe2AkrM2W/DHBalRUvSAEYYRtHuuT8AttKDbWdPsMDXxsCiv3Yj+npfXebuLZ4UAX
+ bUUUUVxDQUjGBjNEgfbnSkcRVHY7mYSdKhFtzmDig5me6xisItrs0MqU99oKECxa17S4
+ qeKEBjTKqRP4+/AJN/1dXb9fSxXP+lX02SXNwb7Ohd+kf3HGn1Qx4B0/Mc7Ew27Zn3Yg
+ 9+tGbcUI/rASr0PnyTSPIAgB6Hl8S3XyShKr6TeLU1gokJyH+4HM6t3A+u8Q5+v9+09Z
+ j7yBc7RCrK71h/vzw03cADnB/Ub2TrjSnVmbDqL2W01U3+A9rbvZzzJ3Dgpielq9o7nK
+ 9KIQ==
+X-Gm-Message-State: APjAAAWnaRc3B2zjoVRdDmckYmED0jSpxp1GGYD84wzPu8wRfe31wsJm
+ FXkdm9Yh5mKgqmvU2xAAP2qm3Q==
+X-Google-Smtp-Source: APXvYqzUrm6PIL3szxZ7wSm7VN+ShI2cDqxkwaviaRCMt1uJAQroesDDhrIHnB5FO9qHhdJCRkG3Pw==
+X-Received: by 2002:a1c:e388:: with SMTP id
+ a130mr15071212wmh.176.1581336716435; 
+ Mon, 10 Feb 2020 04:11:56 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c4sm352676wml.7.2020.02.10.04.11.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 10 Feb 2020 04:11:55 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D5A361FF87;
+ Mon, 10 Feb 2020 12:11:47 +0000 (GMT)
+References: <20200207210124.141119-1-wainersm@redhat.com>
+ <20200207210124.141119-2-wainersm@redhat.com>
+User-agent: mu4e 1.3.8; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Subject: Re: [PATCH 1/1] travis.yml: Fix Travis YAML configuration warnings
+In-reply-to: <20200207210124.141119-2-wainersm@redhat.com>
+Date: Mon, 10 Feb 2020 12:11:47 +0000
+Message-ID: <878sla3am4.fsf@zen.linaroharston>
 MIME-Version: 1.0
-References: <20200207143343.30322-1-peter.maydell@linaro.org>
-In-Reply-To: <20200207143343.30322-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Feb 2020 12:06:01 +0000
-Message-ID: <CAFEAcA9JtxMtc2N-=XQeKeDdZF17FpS4pTvr+6z6srZFxqqU_g@mail.gmail.com>
-Subject: Re: [PULL 00/48] target-arm queue
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,44 +97,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: fam@euphon.net, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Feb 2020 at 14:33, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> The big thing here is RTH's patchset implementing ARMv8.1-VHE
-> emulation; otherwise just a handful of smaller fixes.
->
-> thanks
-> -- PMM
->
-> The following changes since commit 346ed3151f1c43e72c40cb55b392a1d4cface62c:
->
->   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-update-20200206.0' into staging (2020-02-07 11:52:15 +0000)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200207
->
-> for you to fetch changes up to af6c91b490e9b1bce7a168f8a9c848f3e60f616e:
->
->   stellaris: delay timer_new to avoid memleaks (2020-02-07 14:04:28 +0000)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * monitor: fix query-cpu-model-expansion crash when using machine type none
->  * Support emulation of the ARMv8.1-VHE architecture feature
->  * bcm2835_dma: fix bugs in TD mode handling
->  * docs/arm-cpu-features: Make kvm-no-adjvtime comment clearer
->  * stellaris, stm32f2xx_timer, armv7m_systick: fix minor memory leaks
->
-> ----------------------------------------------------------------
 
-Applied, thanks.
+Wainer dos Santos Moschetta <wainersm@redhat.com> writes:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+> This fixes the following warnings Travis has detected on the
+> YAML configuration:
+>
+> - 'on root: missing os, using the default "linux"'
+> - 'on root: the key matrix is an alias for jobs, using jobs'
+> - 'on jobs.include.python: unexpected sequence, using the first value (3.=
+5)'
+> - 'on jobs.include.python: unexpected sequence, using the first value (3.=
+6)'
+>
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
--- PMM
+Queued to testing/next, thanks.
+
+--=20
+Alex Benn=C3=A9e
 
