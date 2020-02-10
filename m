@@ -2,78 +2,100 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 985B4C352A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 17:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FFFCC352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 17:08:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6335E208C4
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 17:07:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AE6A20842
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 17:08:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vu6GJQtt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6335E208C4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SPPg1bZ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE6A20842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1CX0-0005yw-I2
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 12:07:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47294)
+	id 1j1CYC-000729-BT
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 12:08:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j1CSC-00015c-1F
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:02:36 -0500
+ (envelope-from <philmd@redhat.com>) id 1j1CT0-00025h-Cm
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:03:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j1CSA-0001uK-FG
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:02:35 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39965
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j1CSy-0002pF-U5
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:03:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27740
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j1CSA-0001tE-7i
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:02:34 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1CSy-0002ot-PV
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:03:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581354153;
+ s=mimecast20190719; t=1581354204;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aWHWaqf1yZGeBYxNjr5jxMy3R8OlxHw+TcblnHpuKqs=;
- b=Vu6GJQttN2SYd1Khe7kZgn/B7WxS61wSUFG9JyceCuIY5fo0MYlFaIxGIlQk08HarPyHQQ
- 4P3D8CpiWFLVkEFKQTgzcoqP9MIj2eDgiRm18nJFeg2qJrDES26GGn+ZsE7+ym4y2ECk5s
- d4B0b+9Ta+lLwD8Ddem42TnLlEIQasM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-O924298SPLSJiGdwVoTBVQ-1; Mon, 10 Feb 2020 12:02:23 -0500
-X-MC-Unique: O924298SPLSJiGdwVoTBVQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD2BB1005514
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 17:02:22 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.86])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6716D26FAA;
- Mon, 10 Feb 2020 17:02:17 +0000 (UTC)
-Date: Mon, 10 Feb 2020 17:02:07 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH v2 2/2] virtiofsd: add it to the tools list
-Message-ID: <20200210170207.GI411895@stefanha-x1.localdomain>
-References: <20200207095412.794912-1-lvivier@redhat.com>
- <20200207095412.794912-2-lvivier@redhat.com>
+ bh=PltalCh91sZEwyrH93DAz7mZjcsH4pChA5yTbNFaIE8=;
+ b=SPPg1bZ9Bu1MnFKrzD7GhAbyJX26qrXtKnjFgU1p0RH/S0NbvAHARl9PJSGoIVbM1IevG5
+ P6mjH/5q0JSi5R3NEOw2Ydu7aFmontXf41v+AcWrcyfU5g3sV+KjuoDWBmTNfr1/BExI7d
+ Ue+AQ37pIjqO6YwqzHBZmClz1QxODns=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-19-Z3un5-JdMOCPz472PNqpqg-1; Mon, 10 Feb 2020 12:03:08 -0500
+Received: by mail-wm1-f70.google.com with SMTP id m18so619wmc.4
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 09:03:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CsVN9YzWEcVWH16CgE8Vfz796Et/lOyp88xvd4FoXvo=;
+ b=P3lTZrxeR34QkOvmLeBPHB8U7BGouHvsYi5YHyYt5dyiVQs709YW242SkUdVfsMV99
+ lMIGBu4cCTh4A/esPJCloZsdAjKiwLyTTPo6rGBIuLkS9pU+mQvAGVmdw4ChvUwl+tqe
+ oN/sQVRV0UuU5qeDj0IE8ZiEV06nxeoyYfW/zUbyZ0h0JxK15dqfYGRKk7P4dNxIPaOH
+ 2IOXDFo0bIE9VBbQ+MegljJtgVfx62LZb0E/dGSxRCfv7t+bSISx79i+hfAYhO3OVkhB
+ L+PiEtp5v4daxjbTf4SRBHbok7dhsHWvX8Yzl1uR2B0XWw2JwNd6O0cy4ZL1e7CoHAbH
+ RHgA==
+X-Gm-Message-State: APjAAAUvRdlTLgx6/kpDNyjkpJk2SqdunZoBh5BJcO6xLHc/kNHlpmzz
+ eOhHFpTVwt6vMsMcLKkW3Pc4Y/CeWIDHGq4W35AuNCwVl/HM9rz8yeVmmb5sXpnpAeYThfAgQNQ
+ FfBcDCPnvG6FYM+4=
+X-Received: by 2002:a7b:c459:: with SMTP id l25mr15964368wmi.17.1581354186794; 
+ Mon, 10 Feb 2020 09:03:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzyjxi5JRSclbxLv8vy+CFA+U7o59oIZNL/uRie/nMbgicDXjIahYewxMdP8xD5xBc0pBm+pg==
+X-Received: by 2002:a7b:c459:: with SMTP id l25mr15964354wmi.17.1581354186604; 
+ Mon, 10 Feb 2020 09:03:06 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id n10sm1406880wrt.14.2020.02.10.09.03.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 10 Feb 2020 09:03:06 -0800 (PST)
+Subject: Re: [PATCH] MAINTAINERS: Add Philippe, Alex and Wainer to the
+ Gitlab-CI section
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200210155115.9371-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <70ca97cb-1075-5618-fdcf-85d530bbba1d@redhat.com>
+Date: Mon, 10 Feb 2020 18:03:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200207095412.794912-2-lvivier@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200210155115.9371-1-thuth@redhat.com>
+Content-Language: en-US
+X-MC-Unique: Z3un5-JdMOCPz472PNqpqg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="UthUFkbMtH2ceUK2"
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,44 +107,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---UthUFkbMtH2ceUK2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 07, 2020 at 10:54:12AM +0100, Laurent Vivier wrote:
-> it will be built only when tools are enabled (always enabled by default)
+On 2/10/20 4:51 PM, Thomas Huth wrote:
+> Initially, I was the only one who was using Gitlab while most developers
+> had their git trees still on other systems, but that has changed nowadays=
+.
+> There is now much more interest in the Gitlab-CI today, so it would be
+> good to have more than only one maintainer / reviewer for the gitlab-ci.y=
+ml
+> file. Alex, Wainer and Philippe kindly offered their help here, so let's
+> add them to the corresponding section in the MAINTAINERS file now.
 >=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Thanks for the trust.
+Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
+
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Cc: Wainer Moschetta <wainersm@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---UthUFkbMtH2ceUK2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5BjI8ACgkQnKSrs4Gr
-c8jcVAgAvQWJaT3jZTYB1LJckac+SqSeBY+rthmIR6xATBxWvkNf063vs6IiPRAD
-LsC6g0wEbgUusmCNIjNvk+ok5iXZVaE9L/DZHpEdEDCg3l4QPLck8U1Jh0QK8DgO
-HaVdxhp6wWUgZyvZzOqTVsp+JIz3RfsWwX1jSjq7zGE0xF/X9sHaCoDrhYi5Z7WW
-cp4eN4M5zDRjuoH3FbOC4RjaSxu1P68AzFLflrnqdse183lAuumxk9PxdLrt4Ayw
-smd+KHwZ99Np9uao72cCa8/2ejnSBB9LPemZPjx7K9tlvPQpihTicXsQPd01fpc0
-+pwDdgc/BXWLZxcPQvL7oWlUK5RY6A==
-=u9O8
------END PGP SIGNATURE-----
-
---UthUFkbMtH2ceUK2--
+>   MAINTAINERS | 3 +++
+>   1 file changed, 3 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e72b5e5f69..64ef7a1906 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2743,6 +2743,9 @@ W: https://cirrus-ci.com/github/qemu/qemu
+>  =20
+>   GitLab Continuous Integration
+>   M: Thomas Huth <thuth@redhat.com>
+> +M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> +M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> +R: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>   S: Maintained
+>   F: .gitlab-ci.yml
+>  =20
+>=20
 
 
