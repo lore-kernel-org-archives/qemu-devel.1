@@ -2,85 +2,83 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA63C352A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265DEC352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:44:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47F5D2082F
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:30:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E300E20733
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:44:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c4yHuYBY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47F5D2082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIgZ8Ilm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E300E20733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j17HB-0000BZ-Dl
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 06:30:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33397)
+	id 1j17U2-0003aX-VO
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 06:44:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j17GV-00087F-QQ
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:30:12 -0500
+ (envelope-from <rjones@redhat.com>) id 1j17TM-00036B-EE
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:43:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j17GU-0000vU-Ev
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:30:11 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:46606)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j17GU-0000vD-8c
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:30:10 -0500
-Received: by mail-oi1-x235.google.com with SMTP id a22so8810857oid.13
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 03:30:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=7eZubyIFK5C7/ohFjd4JLmykUS580I+PSc2YXxS9zVU=;
- b=c4yHuYBYwdEclEt2LEArn7k0gBPhflLo9lEP1O55iwHTH9C9n4tbJUxVWEv4UY7Xwd
- 0MN+YyJpPuculFyEXx+fWru0pp/PcabImA25OGDV1Lh5YV1R2JBszp78VKfrW6PvDLLu
- NhVeQi2BN7qL8JzwnqQjzjomHcUWvxFiHi7yLf9QVbAUGSrWTvB3Wd+lZrWbYrCOPGof
- LTVtv7KrYM6qZkm0HJaFGFEFMNLfdiZmqfUQfxBIBi6J6jMKHfQNtZL9g94ThHz91vgQ
- sdvK60YF7wKJ6KdWBftMgQaV7/F7dZKEZP5xwcmVleBMNjE8VoYNStcY07TFSf9/1tDm
- va6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=7eZubyIFK5C7/ohFjd4JLmykUS580I+PSc2YXxS9zVU=;
- b=i2ugst04VPMxY2W4mgLzUTjYLA817KYFXrEyEds4iwFKIj8wzUcw0zvqy9LLn/1l6a
- L3gY67X/GNIEeZ2dxowEcet5BsqCoGypOLqKdqhEnSVafyk1krzHYJUDdt9yzTSlIXAK
- lsVkSbpjsG78z83Yo6QN5e0hmvkXcHYTQyAdv2kyIlA44XgVwa/G77q8iybNY+depUpX
- xRylC9Gcr2B0nkM4LlhonTURbdlJ/Kj7lHy5441/bpTlLMSQ9Y1IEmU+gLcGZ7C2ZBdy
- fhtydBQgWQBB7K8COxQVUsUcNNSezdN6QDoRl0VPXcq4ewhB549tQLOZqhsBzqI9F6/v
- XjBA==
-X-Gm-Message-State: APjAAAXpP6+jm0V423IgZ7G8I3+IwbXd9uVpUue/3n9/KxYTX8k/ttZn
- pW9cOGLmQa8D4DBfs9f6HoQGOM90NcJRxdoXoo9D/g==
-X-Google-Smtp-Source: APXvYqwNyvUF+HK823NskJV9Ks/gCTELZemkiSv3T416lXM6HfhgylpjEwYeFSn39bEf1/skgD5RrisZJPoNK+vAa4s=
-X-Received: by 2002:aca:3d7:: with SMTP id 206mr539854oid.98.1581334209250;
- Mon, 10 Feb 2020 03:30:09 -0800 (PST)
+ (envelope-from <rjones@redhat.com>) id 1j17TK-0006dJ-Jd
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:43:27 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56972
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rjones@redhat.com>) id 1j17TK-0006cn-Fg
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:43:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581335005;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KFfk2qL1MEp6uvjStfGuGk9XdqcASnDP2fJin18aIPc=;
+ b=eIgZ8IlmBk744SBBZ4QCiqf8kCS+kBHR3/RN8+aRC2P7LJYglHgO2HFQ6y+ySMT5KE/JVo
+ o4otitL+fAI7/ZfIwLHuvJxd3+uHbAaI5Y4eos291pAALoh9I/YJm+OVG/1kEAr3J7jPPJ
+ uBtbCvp3bFnM3e8JFBKtBnEDfnKELvE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-2dPVMSL0PBSjBjubmPUZNA-1; Mon, 10 Feb 2020 06:43:21 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C5911800D42;
+ Mon, 10 Feb 2020 11:43:20 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A26B61001281;
+ Mon, 10 Feb 2020 11:43:17 +0000 (UTC)
+Date: Mon, 10 Feb 2020 11:43:16 +0000
+From: "Richard W.M. Jones" <rjones@redhat.com>
+To: Mykola Ivanets <stenavin@gmail.com>, pbonzini@redhat.com,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Subject: Re: [Libguestfs] [RFC] lib: allow to specify physical/logical block
+ size for disks
+Message-ID: <20200210114316.GW3888@redhat.com>
+References: <20200207232528.13461-1-stenavin@gmail.com>
 MIME-Version: 1.0
-References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
- <875zgm2vqv.fsf@dusky.pond.sub.org>
- <CAJSP0QWCn_vv2Vs-UWc9nPHjdBQq9KMkiQ7D91+RwHM_okTzZw@mail.gmail.com>
- <CAFEAcA9NfGivg0C_enAT_8+_mmbQSi6H=7G+4w7RdJwXP7yUtA@mail.gmail.com>
- <20200210110812.GB3269@redhat.com>
-In-Reply-To: <20200210110812.GB3269@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Feb 2020 11:29:58 +0000
-Message-ID: <CAFEAcA8TtfNsd8v5sWTTBj8KikKen23Op4ttoLM3Ac60vFJiNQ@mail.gmail.com>
-Subject: Re: Summary of Re: Making QEMU easier for management tools and
- applications
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200207232528.13461-1-stenavin@gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 2dPVMSL0PBSjBjubmPUZNA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::235
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,56 +90,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Cc: libguestfs@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 10 Feb 2020 at 11:08, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
->
-> On Mon, Feb 10, 2020 at 11:01:48AM +0000, Peter Maydell wrote:
-> > On Mon, 10 Feb 2020 at 10:57, Stefan Hajnoczi <stefanha@gmail.com> wrot=
-e:
-> > > I'm in favor of simplifying QEMU at the expense of an incompatible CL=
-I
-> > > change in QEMU 6.0.
-> >
-> > If we want to do wholesale incompatible changes to the CLI
-> > I think we definitely need some kind of tool where a user
-> > can say "here's my old command line, what's the new style
-> > equivalent?". Otherwise we're going to have a deluge of
-> > user issues where their old working setups broke and
-> > QEMU didn't give them any useful hints about why.
->
-> There is a risk that if we promise to have a fully automated conversion
-> that it will be alot of work, and could force us to introduce hacks into
-> the new impl just to satisfy conversion.  IMHO we shouldn't be afraid of
-> declaring that some parts of the old syntax can NOT be directly transform=
-ed
-> into new syntax, simply for the sake of making a new impl more practical
-> to move forward with.
+On Sat, Feb 08, 2020 at 01:25:28AM +0200, Mykola Ivanets wrote:
+> From: Nikolay Ivanets <stenavin@gmail.com>
+>=20
+> I faced with situation where libguestfs cannot recognize partitions on a
+> disk image which was partitioned on a system with "4K native" sector
+> size support.
 
-Agreed, but we should at least be able to handle the easy
-stuff and say "this is the general kind of new option syntax
-and set of options you want" for most of the rest.
+Do you have a small test case for this?
 
-> An alternative approach to mitigate the disruption is to *not* make any
-> incompatible changes to qemu-system-XXXX. Instead introduce new binaries
-> with the new syntax and any other architectural  changes we wish to make.
-> The old binaries can be deprecated but remain around for an extended
-> period of time, to give people and apps time to migrate. We can provide
-> rough guidance and perhaps partially automated conversion to help people
-> move, but not aim for a 100% automated conversion.
+> In order to fix the issue we need to allow users to specify desired
+> physical and/or logical block size per drive basis.
 
-I think our history of failing to actually complete transitions
-would predict that we'd end up with both the old and the new
-binaries essentially forever.
+It seems like physical_block_size / logical_block_size in qemu are
+completely undocumented.  However I did some experiments with patching
+libguestfs and examining the qemu and parted code.  Here are my
+observations:
 
-thanks
--- PMM
+(1) Setting only physical_block_size =3D 4096 seems to do nothing.
+
+(2) Setting only logical_block_size =3D 4096 is explicitly rejected by
+virtio-scsi:
+
+https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/scsi/scsi-disk.c;h=3D10d=
+0794d60f196f177563aae00bed2181f5c1bb1;hb=3DHEAD#l2352
+
+(A similar test exists for virtio-blk)
+
+(3) Setting both physical_block_size =3D logical_block_size =3D 4096
+changes how parted partitions GPT disks.  The partition table is
+clearly using 4K sectors as you can see by examining the disk
+afterwards with hexdump.
+
+(4) Neither setting changes MBR partitioning by parted, although my
+interpretation of Wikipedia indicates that it should be possible to
+create a MBR disk with 4K sector size.  Maybe I'm doing something
+wrong, or parted just doesn't support this case.
+
+So it appears that we should just have one blocksize control (maybe
+called "sectorsize"?) which sets both physical_block_size and
+logical_block_size to the same value.  It may also be worth enforcing
+that blocksize/sectorsize must be set to 512 or 4096 (which we can
+relax later if necessary).
+
+Rich.
+
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjon=
+es
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
+
 
