@@ -2,79 +2,84 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB00C35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 19:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCDEC35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 19:57:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 729FE20715
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 19:49:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F8E720838
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 19:57:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MHc6QfLE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 729FE20715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k+DKdY4K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F8E720838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1F44-0007Wf-Hs
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 14:49:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51212)
+	id 1j1FBk-0003NV-9r
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 14:57:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49605)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1j1EzX-0004R9-3t
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:45:12 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j1FA0-0002Ei-HL
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:56:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1j1EzR-0007W6-Mr
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:45:07 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46655
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1j1EzR-0007Tt-Ha
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:45:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581363904;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CB7ogxanCwTl3KhojwycpYzXdMiK9Zrb4b+oeBFh5K4=;
- b=MHc6QfLEH5oHgQILt5BcTPWe2EP0dzCrB2z8v1Q3ChifN7N6sCCrUWpV3IGZ8TIkLs13mr
- 6eHhVpdhCjzW/P0YSCbETqPgKukkGKXp21QvOB/zXoMvrPXVb8fhhVKLJdL1HTlOH4GaAW
- AE2kT2aYdxTkSROVOa5e4f/7fkAtRYw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-4L9-IKF6O4SPIY1jAdRc0Q-1; Mon, 10 Feb 2020 14:44:59 -0500
-X-MC-Unique: 4L9-IKF6O4SPIY1jAdRc0Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8FEA107ACC5;
- Mon, 10 Feb 2020 19:44:56 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AA0F019C70;
- Mon, 10 Feb 2020 19:44:54 +0000 (UTC)
-Date: Mon, 10 Feb 2020 12:44:54 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20200210124454.12e0419a@w520.home>
-In-Reply-To: <20200210094954.GA4530@joy-OptiPlex-7040>
-References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
- <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
- <20200210094954.GA4530@joy-OptiPlex-7040>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ (envelope-from <palmerdabbelt@google.com>) id 1j1F9z-0001IE-D7
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:56:00 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:47062)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
+ id 1j1F9z-0001GJ-5b
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:55:59 -0500
+Received: by mail-pg1-x543.google.com with SMTP id b35so4434918pgm.13
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 11:55:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:subject:in-reply-to:cc:from:to:message-id;
+ bh=6kF9UfsZ1jw1wbmZv09k+yzUSsgoqRNX+mimxCpXgYk=;
+ b=k+DKdY4KWK6qnSn1YnOCiQssHprcn/USicBrd/6JrYhKH7sL0dGUwBUHKEavtgLkMN
+ 3CXgNUQMXO3EX81FLOB7HWB/2tsa8V9jX11lIbrDQ2osUPs1ZKzliK5FNudGuQnRmZDA
+ y+meFqMtr9hnP4g3p9BmDDmhINsnB4IBZLnp3Kn//HT0x32v9IwjAhAl+T8/2rsS84mR
+ 5tqOL46L6sQ39zCARYMdpqRsvBIqC1FEx+KbB3YBNwsUgduWhb8w48e2tq4JbCQGEwlG
+ /3ADvznznghqjVee4uhi8WUNj2RjDl2ApLG0rT6IbAnWkXGVD8NV9WmXjJGIZWpJ5i8V
+ M05w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id;
+ bh=6kF9UfsZ1jw1wbmZv09k+yzUSsgoqRNX+mimxCpXgYk=;
+ b=TYt9hVHT95xqqCef2iURTZ6MqOt3hqGvSenow9dHrYd1i8X/AlmQfXBbdxmLSNkdah
+ V2TLV2QciSO1dslxGbOcuj3fzrUbkORlo0C6A7y/CSCpILzgK+8cZxd1AoI2behmiVBY
+ dt43pifsJTiL17YCgj6hjwfLuJXaMf1FpVOF9gn5ZgY86ChkJtKWIvRlmh2o9v3OQB36
+ f4rNEDsBMDoYo0IiN/LE9X5WjZOk4nDQxCSdMEP9I9G2UAO/CEblKOe+JYp7H0TO15sb
+ w17oLxKyunLA+G4BPCnkU21R0YXZE78f7WP+ZTxl9yvK2PVPx7StpjkPddHMq1ZngrFA
+ PIgg==
+X-Gm-Message-State: APjAAAVFpGq9rHjaa4HqlUEDVOd/A8DQOSZDNGYsVhawfdOHBAXSAgey
+ wgVXdMjgvYCaohKldH/C+D3QLQ==
+X-Google-Smtp-Source: APXvYqwsJvz4M1fEusHUVJ97adnxPpEouJLd4aIa4zi1ocBlGUZ9kyK+WtvLpHQtS5N//KI1ECh1Vw==
+X-Received: by 2002:a63:b047:: with SMTP id z7mr3272214pgo.431.1581364556758; 
+ Mon, 10 Feb 2020 11:55:56 -0800 (PST)
+Received: from localhost ([2600:1012:b161:af3e:21a9:6308:301b:ae65])
+ by smtp.gmail.com with ESMTPSA id a17sm245795pjv.6.2020.02.10.11.55.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 10 Feb 2020 11:55:56 -0800 (PST)
+Date: Mon, 10 Feb 2020 11:55:56 -0800 (PST)
+X-Google-Original-Date: Mon, 10 Feb 2020 11:55:53 PST (-0800)
+Subject: Re: [PATCH] riscv: sifive_u: Add a "serial" property for board serial
+ number
+In-Reply-To: <mhng-e3089574-e78c-4b6c-961e-cac55f0f23d4@palmerdabbelt-glaptop1>
+CC: Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, sagark@eecs.berkeley.edu,
+ qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+From: Palmer Dabbelt <palmerdabbelt@google.com>
+To: bmeng.cn@gmail.com
+Message-ID: <mhng-3370fb0c-3076-4a05-8bcd-ac7fce08d408@palmerdabbelt-glaptop1>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,108 +91,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi
- L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 10 Feb 2020 04:49:54 -0500
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Wed, 29 Jan 2020 07:29:11 PST (-0800), Palmer Dabbelt wrote:
+> On Fri, 10 Jan 2020 07:52:05 GMT (+0000), bmeng.cn@gmail.com wrote:
+>> Hi Palmer,
+>>
+>> On Fri, Nov 22, 2019 at 10:38 AM Palmer Dabbelt
+>> <palmerdabbelt@google.com> wrote:
+>>>
+>>> On Thu, 21 Nov 2019 17:10:18 PST (-0800), bmeng.cn@gmail.com wrote:
+>>> > On Sat, Nov 16, 2019 at 11:08 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>>> >>
+>>> >> At present the board serial number is hard-coded to 1, and passed
+>>> >> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+>>> >> the serial number to generate a unique MAC address for the on-chip
+>>> >> ethernet controller. When multiple QEMU 'sifive_u' instances are
+>>> >> created and connected to the same subnet, they all have the same
+>>> >> MAC address hence it creates a unusable network.
+>>> >>
+>>> >> A new "serial" property is introduced to specify the board serial
+>>> >> number. When not given, the default serial number 1 is used.
+>>> >>
+>>> >> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>>> >> ---
+>>> >>
+>>> >>  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
+>>> >>  include/hw/riscv/sifive_u.h |  1 +
+>>> >>  2 files changed, 21 insertions(+), 1 deletion(-)
+>>> >>
+>>> >
+>>> > ping?
+>>>
+>>> Sorry, it looks like I dropped this one.  I've put it in the queue for 5.0,
+>>> with a
+>>>
+>>> Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+>>
+>> Has this been applied somewhere?
+>
+> Weird, not sure how I managed to screw this up again.  It's actually on for-master as
+>
+>     * a828041ba6 - riscv: sifive_u: Add a "serial" property for board serial number (50 seconds ago) <Bin Meng>
+>
+> with any luck I'll manage to avoid screwing it up a third time.
 
-> On Sat, Feb 08, 2020 at 03:42:31AM +0800, Kirti Wankhede wrote:
-> > VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> > - Start pinned and unpinned pages tracking while migration is active
-> > - Stop pinned and unpinned dirty pages tracking. This is also used to
-> >   stop dirty pages tracking if migration failed or cancelled.
-> > - Get dirty pages bitmap. This ioctl returns bitmap of dirty pages, its
-> >   user space application responsibility to copy content of dirty pages
-> >   from source to destination during migration.
-> > 
-> > To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> > structure. Bitmap size is calculated considering smallest supported page
-> > size. Bitmap is allocated when dirty logging is enabled for those
-> > vfio_dmas whose vpfn list is not empty or whole range is mapped, in
-> > case of pass-through device.
-> > 
-> > There could be multiple option as to when bitmap should be populated:
-> > * Polulate bitmap for already pinned pages when bitmap is allocated for
-> >   a vfio_dma with the smallest supported page size. Updates bitmap from
-> >   page pinning and unpinning functions. When user application queries
-> >   bitmap, check if requested page size is same as page size used to
-> >   populated bitmap. If it is equal, copy bitmap. But if not equal,
-> >   re-populated bitmap according to requested page size and then copy to
-> >   user.
-> >   Pros: Bitmap gets populated on the fly after dirty tracking has
-> >         started.
-> >   Cons: If requested page size is different than smallest supported
-> >         page size, then bitmap has to be re-populated again, with
-> >         additional overhead of allocating bitmap memory again for
-> >         re-population of bitmap.
-> > 
-> > * Populate bitmap when bitmap is queried by user application.
-> >   Pros: Bitmap is populated with requested page size. This eliminates
-> >         the need to re-populate bitmap if requested page size is
-> >         different than smallest supported pages size.
-> >   Cons: There is one time processing time, when bitmap is queried.
-> > 
-> > I prefer later option with simple logic and to eliminate over-head of
-> > bitmap repopulation in case of differnt page sizes. Later option is
-> > implemented in this patch.
-> > 
-> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > ---
-> >  drivers/vfio/vfio_iommu_type1.c | 299 ++++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 287 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index d386461e5d11..df358dc1c85b 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-[snip]
-> > @@ -830,6 +924,113 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
-> >  	return bitmap;
-> >  }
-> >  
-> > +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> > +				  size_t size, uint64_t pgsize,
-> > +				  unsigned char __user *bitmap)
-> > +{
-> > +	struct vfio_dma *dma;
-> > +	dma_addr_t i = iova, iova_limit;
-> > +	unsigned int bsize, nbits = 0, l = 0;
-> > +	unsigned long pgshift = __ffs(pgsize);
-> > +
-> > +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
-> > +		int ret, j;
-> > +		unsigned int npages = 0, shift = 0;
-> > +		unsigned char temp = 0;
-> > +
-> > +		/* mark all pages dirty if all pages are pinned and mapped. */
-> > +		if (dma->iommu_mapped) {
-> > +			iova_limit = min(dma->iova + dma->size, iova + size);
-> > +			npages = iova_limit/pgsize;
-> > +			bitmap_set(dma->bitmap, 0, npages);  
-> for pass-through devices, it's not good to always return all pinned pages as
-> dirty. could it also call vfio_pin_pages to track dirty pages? or any
-> other interface provided to do that?
+Ah, OK -- the issue here is that this fails "make check", specifically
 
-See patch 7/7.  Thanks,
+    $ make check-qtest-riscv64
+    make[1]: Entering directory '/home/palmerdabbelt/life/riscv/qemu/slirp'
+    make[1]: Nothing to be done for 'all'.
+    make[1]: Leaving directory '/home/palmerdabbelt/life/riscv/qemu/slirp'
+            CHK version_gen.h
+      TEST    check-qtest-riscv64: tests/qtest/cdrom-test
+      TEST    check-qtest-riscv64: tests/qtest/device-introspect-test
+    /home/palmerdabbelt/life/riscv/qemu/hw/riscv/sifive_u.c:406:riscv_sifive_u_soc_init: Object 0x55baf3feea00 is not an instance of type sifive_u-machine
+    Broken pipe
+    tests/qtest/libqtest.c:149: kill_qemu() detected QEMU death from signal 6 (Aborted)
+    ERROR - too few tests run (expected 6, got 5)
+    make: *** [/home/palmerdabbelt/life/riscv/qemu/tests/Makefile.include:630: check-qtest-riscv64] Error 1
 
-Alex
+which is probably how it kept getting disappeared -- I just forgot to reply on
+the list.  I'm going to hold it back from the PR I'm staging right now, LMK if
+you have a fix.
 
+>
+>>
+>> Regards,
+>> Bin
 
