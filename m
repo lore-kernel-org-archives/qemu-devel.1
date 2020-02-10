@@ -2,63 +2,80 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B68F5C352A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 09:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2ADC352A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 09:47:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C5DB214DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 09:40:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C5DB214DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 680A42080C
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 09:47:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CsWJl2QL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 680A42080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j15YZ-0007q6-Ps
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 04:40:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45864)
+	id 1j15ed-000228-Kp
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 04:46:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <msuchanek@suse.de>) id 1j15Xr-0006sg-Qz
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:40:01 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j15dS-0001Bt-PX
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:45:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <msuchanek@suse.de>) id 1j15Xq-0000PH-9a
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:39:59 -0500
-Received: from mx2.suse.de ([195.135.220.15]:41374)
+ (envelope-from <imammedo@redhat.com>) id 1j15dR-0004TH-Cv
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:45:46 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26311
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <msuchanek@suse.de>)
- id 1j15Xq-0000Mc-03; Mon, 10 Feb 2020 04:39:58 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
- by mx2.suse.de (Postfix) with ESMTP id EB186ADEE;
- Mon, 10 Feb 2020 09:39:55 +0000 (UTC)
-Date: Mon, 10 Feb 2020 10:39:52 +0100
-From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: Restrictions of libnet (was: Re: VW ELF loader)
-Message-ID: <20200210093952.GC4113@kitsune.suse.cz>
-References: <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
- <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
- <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
- <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
- <d13eea1d-7942-47e0-6189-a66ce9639db4@redhat.com>
- <20200204095403.04d9dd29.conny@cornelia-huck.de>
- <4794cf7a-7b53-5fea-c89d-baa01d3ed0ce@redhat.com>
- <20200205053049.GF60221@umbus.fritz.box>
- <bfe9398a-7108-9bf7-8589-6d01580bbb3a@redhat.com>
- <20200210075516.GF22584@umbus.fritz.box>
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j15dR-0004SU-96
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:45:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581327944;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=g75Y4UAu1ITHdKckEUKo/WrgFjKe0JEqcBdbE3J8Eqc=;
+ b=CsWJl2QL0iEYg45XO0dn5vhEcJ64V/BHXZEQrb9Gj55jTNLS/6FUMpLsQAVwDFj/YEQXCz
+ U2dvGMl38aAUXoa8BDVOznJN8GBdOSMtwetsjbLUOvZnKkqJijDhIjgrfNzvtlfK1m8jQ7
+ wGr9qKecq1UIRNYxGjeIgyiBrZOy2tE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-ZvAE1F6dNWq6sN_JytTh3Q-1; Mon, 10 Feb 2020 04:45:43 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C3E3101FC60;
+ Mon, 10 Feb 2020 09:45:41 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 93F677FB60;
+ Mon, 10 Feb 2020 09:45:36 +0000 (UTC)
+Date: Mon, 10 Feb 2020 10:45:35 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH v3 07/13] hw/arm/raspi: Make machines children of
+ abstract RaspiMachineClass
+Message-ID: <20200210104535.46c9bad7@redhat.com>
+In-Reply-To: <20200208165645.15657-8-f4bug@amsat.org>
+References: <20200208165645.15657-1-f4bug@amsat.org>
+ <20200208165645.15657-8-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200210075516.GF22584@umbus.fritz.box>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic]
-X-Received-From: 195.135.220.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: ZvAE1F6dNWq6sN_JytTh3Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,103 +87,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Cornelia Huck <conny@cornelia-huck.de>, qemu-devel <qemu-devel@nongnu.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Esteban Bosse <estebanbosse@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ Philippe =?UTF-8?B?TWF0?= =?UTF-8?B?aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 10, 2020 at 06:55:16PM +1100, David Gibson wrote:
-> On Wed, Feb 05, 2020 at 07:24:04AM +0100, Thomas Huth wrote:
-> > On 05/02/2020 06.30, David Gibson wrote:
-> > > On Tue, Feb 04, 2020 at 10:20:14AM +0100, Thomas Huth wrote:
-> > >> On 04/02/2020 09.54, Cornelia Huck wrote:
-> > >>> On Tue, 4 Feb 2020 07:16:46 +0100
-> > >>> Thomas Huth <thuth@redhat.com> wrote:
-> > >>>
-> > >>>> On 04/02/2020 00.26, Paolo Bonzini wrote:
-> > >>>>>
-> > >>>>>
-> > >>>>> Il mar 4 feb 2020, 00:20 Alexey Kardashevskiy <aik@ozlabs.ru
-> > >>>>> <mailto:aik@ozlabs.ru>> ha scritto:
-> > >>>>>
-> > >>>>>     Speaking seriously, what would I put into the guest?
-> > >>>>>
-> > >>>>> Only things that would be considered drivers. Ignore the partitions
-> > >>>>> issue for now so that you can just pass the device tree services to QEMU
-> > >>>>> with hypercalls.
-> > >>>>>
-> > >>>>>     Netboot's dhcp/tftp/ip/ipv6 client? It is going to be another SLOF,
-> > >>>>>     smaller but adhoc with only a couple of people knowing it.
-> > >>>>>
-> > >>>>>
-> > >>>>> You can generalize and reuse the s390 code. All you have to write is the
-> > >>>>> PCI scan and virtio-pci setup.  
-> > >>>>
-> > >>>> Well, for netbooting, the s390-ccw bios uses the libnet code from SLOF,
-> > >>>> so re-using this for a slim netboot client on ppc64 would certainly be
-> > >>>> feasible (especially since there are also already virtio drivers in SLOF
-> > >>>> that are written in C), but I think it is not very future proof. The
-> > >>>> libnet from SLOF only supports UDP, and no TCP. So for advanced boot
-> > >>>> scenarios like booting from HTTP or even HTTPS, you need something else
-> > >>>> (i.e. maybe grub is the better option, indeed).
-> > >>>
-> > >>> That makes me wonder what that means for s390: We're inheriting
-> > >>> libnet's limitations, but we don't have grub -- do we need to come up
-> > >>> with something different? Or improve libnet?
-> > >>
-> > >> I don't think that it makes sense to re-invent the wheel yet another
-> > >> time and write yet another TCP implementation (which is likely quite a
-> > >> bit of work, too, especially if you also want to do secure HTTPS in the
-> > >> end). So yes, in the long run (as soon as somebody seriously asks for
-> > >> HTTP booting on s390x) we need something different here.
-> > >>
-> > >> Now looking at our standard s390x bootloader zipl - this has been giving
-> > >> us a headache a couple of times in the past, too (from a distro point of
-> > >> view since s390x is the only major platform left that does not use grub,
-> > >> but also from a s390-ccw bios point of view, see e.g.
-> > >> https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03046.html and
-> > >> related discussions).
-> > >>
-> > >> So IMHO the s390x world should move towards grub2, too. We could e.g.
-> > >> link it initially into the s390-ccw bios bios ... and if that works out
-> > >> well, later also use it as normal bootloader instead of zipl (not sure
-> > >> if that works in all cases, though, IIRC there were some size
-> > >> constraints and stuff like that).
-> > > 
-> > > petitboot would be another reasonable thing to consider here.  Since
-> > > it's Linux based, you have all the drivers you have there.  It's not
-> > > quite grub, but it does at least parse the same configuration files.
-> > > 
-> > > You do need kexec() of course, I don't know if you have that already
-> > > for s390 or not.
-> > 
-> > AFAIK we have kexec on s390. So yes, petitboot would be another option
-> > for replacing the s390-ccw bios. But when it comes to LPARs and z/VMs, I
-> > don't think it's really feasible to replace the zipl bootloader there
-> > with petitboot, so in that case grub2 still sounds like the better
-> > option to me.
-> 
-> Actually, between that and Paolo's suggestions, I thought of another
-> idea that could be helpful for both s390 and power.  Could we load
-> non-kexec() things (legacy kernels, non-Linux OSes) from Petitboot by
-> having it kexec() into a shim mini-kernel that just sets up the boot
-> environment for the other thing.
-> 
-> What I'm imagining is that petitboot loads everything that will be
-> needed for the other OS into RAM - probably as (or part of) the
-> "initrd" image.  That means the shim doesn't need to have drivers or
-> a network stack to load that in.  It just needs to construct
-> environment and jump into the real kernel.
+On Sat,  8 Feb 2020 17:56:39 +0100
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-How does that differ from what kexec normally does?
+> QOM'ify RaspiMachineState. Now machines inherit of RaspiMachineClass.
+>=20
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-It does support the kernel format that is usually booted on the
-architecture.
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 
-Thanks
+> ---
+> v3: Fixed typo in description (Zolt=C3=A1n)
+> ---
+>  hw/arm/raspi.c | 56 +++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 49 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index b3e6f72b55..62b8df3c2e 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -34,10 +34,28 @@
+>  /* Registered machine type (matches RPi Foundation bootloader and U-Boot=
+) */
+>  #define MACH_TYPE_BCM2708   3138
+> =20
+> -typedef struct RasPiState {
+> +typedef struct RaspiMachineState {
+> +    /*< private >*/
+> +    MachineState parent_obj;
+> +    /*< public >*/
+>      BCM283XState soc;
+>      MemoryRegion ram;
+> -} RasPiState;
+> +} RaspiMachineState;
+> +
+> +typedef struct RaspiMachineClass {
+> +    /*< private >*/
+> +    MachineClass parent_obj;
+> +    /*< public >*/
+> +} RaspiMachineClass;
+> +
+> +#define TYPE_RASPI_MACHINE       MACHINE_TYPE_NAME("raspi-common")
+> +#define RASPI_MACHINE(obj) \
+> +    OBJECT_CHECK(RaspiMachineState, (obj), TYPE_RASPI_MACHINE)
+> +
+> +#define RASPI_MACHINE_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(RaspiMachineClass, (klass), TYPE_RASPI_MACHINE)
+> +#define RASPI_MACHINE_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(RaspiMachineClass, (obj), TYPE_RASPI_MACHINE)
+> =20
+>  /*
+>   * Board revision codes:
+> @@ -211,7 +229,7 @@ static void setup_boot(MachineState *machine, int ver=
+sion, size_t ram_size)
+> =20
+>  static void raspi_init(MachineState *machine, uint32_t board_rev)
+>  {
+> -    RasPiState *s =3D g_new0(RasPiState, 1);
+> +    RaspiMachineState *s =3D RASPI_MACHINE(machine);
+>      int version =3D board_version(board_rev);
+>      uint64_t ram_size =3D board_ram_size(board_rev);
+>      uint32_t vcram_size;
+> @@ -264,8 +282,10 @@ static void raspi2_init(MachineState *machine)
+>      raspi_init(machine, 0xa21041);
+>  }
+> =20
+> -static void raspi2_machine_init(MachineClass *mc)
+> +static void raspi2_machine_class_init(ObjectClass *oc, void *data)
+>  {
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +
+>      mc->desc =3D "Raspberry Pi 2B";
+>      mc->init =3D raspi2_init;
+>      mc->block_default_type =3D IF_SD;
+> @@ -278,7 +298,6 @@ static void raspi2_machine_init(MachineClass *mc)
+>      mc->default_ram_size =3D 1 * GiB;
+>      mc->ignore_memory_transaction_failures =3D true;
+>  };
+> -DEFINE_MACHINE("raspi2", raspi2_machine_init)
+> =20
+>  #ifdef TARGET_AARCH64
+>  static void raspi3_init(MachineState *machine)
+> @@ -286,8 +305,10 @@ static void raspi3_init(MachineState *machine)
+>      raspi_init(machine, 0xa02082);
+>  }
+> =20
+> -static void raspi3_machine_init(MachineClass *mc)
+> +static void raspi3_machine_class_init(ObjectClass *oc, void *data)
+>  {
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +
+>      mc->desc =3D "Raspberry Pi 3B";
+>      mc->init =3D raspi3_init;
+>      mc->block_default_type =3D IF_SD;
+> @@ -299,5 +320,26 @@ static void raspi3_machine_init(MachineClass *mc)
+>      mc->default_cpus =3D BCM283X_NCPUS;
+>      mc->default_ram_size =3D 1 * GiB;
+>  }
+> -DEFINE_MACHINE("raspi3", raspi3_machine_init)
+>  #endif
+> +
+> +static const TypeInfo raspi_machine_types[] =3D {
+> +    {
+> +        .name           =3D MACHINE_TYPE_NAME("raspi2"),
+> +        .parent         =3D TYPE_RASPI_MACHINE,
+> +        .class_init     =3D raspi2_machine_class_init,
+> +#ifdef TARGET_AARCH64
+> +    }, {
+> +        .name           =3D MACHINE_TYPE_NAME("raspi3"),
+> +        .parent         =3D TYPE_RASPI_MACHINE,
+> +        .class_init     =3D raspi3_machine_class_init,
+> +#endif
+> +    }, {
+> +        .name           =3D TYPE_RASPI_MACHINE,
+> +        .parent         =3D TYPE_MACHINE,
+> +        .instance_size  =3D sizeof(RaspiMachineState),
+> +        .class_size     =3D sizeof(RaspiMachineClass),
+> +        .abstract       =3D true,
+> +    }
+> +};
+> +
+> +DEFINE_TYPES(raspi_machine_types)
 
-Michal
 
