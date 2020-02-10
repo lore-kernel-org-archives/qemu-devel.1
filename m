@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C8DCC352A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 14:21:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F46EC352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 14:21:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6696A2070A
+	by mail.kernel.org (Postfix) with ESMTPS id E8F382070A
 	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 14:21:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6696A2070A
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F382070A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j19wd-0003mN-Gj
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 09:21:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55266)
+	id 1j19we-0003op-3D
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 09:21:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55286)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j19vi-0002AU-1s
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:20:55 -0500
+ (envelope-from <bounces@canonical.com>) id 1j19vk-0002Aq-8d
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:20:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j19vg-0000Tr-MI
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:20:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49550)
+ (envelope-from <bounces@canonical.com>) id 1j19vi-0000V2-Ub
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:20:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49670)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j19vg-0000TM-HF
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:20:52 -0500
+ id 1j19vi-0000Uk-PQ
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:20:54 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j19vf-0002Uq-8S
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:20:51 +0000
+ id 1j19vh-0002YY-Pp
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:20:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 015D52E80DE
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:20:51 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B3C8C2E80AD
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:20:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Feb 2020 14:13:54 -0000
+Date: Mon, 10 Feb 2020 14:14:15 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1859656@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -62,7 +62,7 @@ X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
  =?utf-8?q?=29?=
 References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <158134403431.19711.4414252229802680097.malone@wampee.canonical.com>
+Message-Id: <158134405538.19258.7821198707423917014.malone@gac.canonical.com>
 Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
  initial deploy
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -71,7 +71,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 948a758a6421af4fe638786577cf58eddcb62a9f
+X-Launchpad-Hash: 1d77ad573b57d6e558cc00c689f98d2afb11d79b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -89,9 +89,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "Guest XML "as it was once working""
-   https://bugs.launchpad.net/maas/+bug/1859656/+attachment/5327027/+files/=
-vm1-as-deployed-by-maas.xml
+** Attachment added: "Serial log "as it was once working""
+   https://bugs.launchpad.net/maas/+bug/1859656/+attachment/5327028/+files/=
+working-guest-serial.log
 
 -- =
 
