@@ -2,84 +2,80 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AACF5C3B184
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 09:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 947B5C352A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 09:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83E28208C4
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 09:51:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83E28208C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5D09A208C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 09:52:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJNamd2z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D09A208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j15jD-0005Zb-N2
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 04:51:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46932)
+	id 1j15jc-000650-Ix
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 04:52:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j15i8-0004sL-81
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:50:37 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j15iV-0005C0-HR
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:51:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j15i7-0007sx-6Y
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:50:36 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2075 helo=huawei.com)
+ (envelope-from <imammedo@redhat.com>) id 1j15iT-00086v-Eh
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:50:58 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55130
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j15i4-0007mA-Kf; Mon, 10 Feb 2020 04:50:32 -0500
-Received: from lhreml706-cah.china.huawei.com (unknown [172.18.7.106])
- by Forcepoint Email with ESMTP id 122535701E639931E78C;
- Mon, 10 Feb 2020 09:50:23 +0000 (GMT)
-Received: from lhreml702-chm.china.huawei.com (10.201.108.51) by
- lhreml706-cah.china.huawei.com (10.201.108.47) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Mon, 10 Feb 2020 09:50:22 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml702-chm.china.huawei.com (10.201.108.51) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Mon, 10 Feb 2020 09:50:22 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Mon, 10 Feb 2020 09:50:22 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Topic: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Index: AQHVzV43w2nN4JnxQEOUTwT8NpSKx6gLQ1MAgAAWtoCAACc+AIABYS3wgAAIyYCAAR1e4IAAFJiAgAAHflCAADtYAIABo1pQgARLAwCAAABbwA==
-Date: Mon, 10 Feb 2020 09:50:22 +0000
-Message-ID: <49b54eea65cd49ae832cd6ec21eae64a@huawei.com>
-References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
- <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
- <20200204162320.67e5d353@redhat.com>
- <74eaaa45-0d20-9a21-fbf8-6d29deb248eb@redhat.com>
- <4ce41554-8b8e-dbb5-5fe9-43af09950f23@redhat.com>
- <8e0b2c762e914c64bebfab5fc7441661@huawei.com>
- <133f274e-e942-7008-93d2-8edb1bc4d7ae@redhat.com>
- <52fff289cca14874ad493fc25806fe3d@huawei.com>
- <f041380c-afcb-f8d8-89db-8f48c7b46767@redhat.com>
- <e97fa28c653044b8bab66aeca2374682@huawei.com>
- <0ff4d2c1-ebd3-1d2f-07e8-a4f13be07ceb@redhat.com>
- <6bf255ecb88446f1b08ee4ab21a85f02@huawei.com>
- <69848dd3-fac4-ec6b-78a8-a052124f4fc3@redhat.com>
-In-Reply-To: <69848dd3-fac4-ec6b-78a8-a052124f4fc3@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j15iT-00086a-Au
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 04:50:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581328256;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lgND+WbSjy59JQeQH0Hq6JuIAJkZjVWDvNJPT1uiqK8=;
+ b=BJNamd2zVPTtCxmy/drJVQkBW8BmDKHY+//s16ehvbYDiQoyKWeJPauN12jnFwhrYDnX4y
+ QFeHhhwx8Mf2iD+wJiruM7qYnAs+b9cUh0gSwyJ4ItqSJiUKR/U3SjpWn3aW7sH0t1QNWv
+ HBhBmNWGJgASE7OFqrXinEOr/bdMPv0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-390-Y4-qKZ8uNwmRM9hTNCDffA-1; Mon, 10 Feb 2020 04:50:53 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E204D13E6;
+ Mon, 10 Feb 2020 09:50:49 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 956FE87B08;
+ Mon, 10 Feb 2020 09:50:44 +0000 (UTC)
+Date: Mon, 10 Feb 2020 10:50:42 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH v3 08/13] hw/arm/raspi: Make board_rev a field of
+ RaspiMachineClass
+Message-ID: <20200210105042.7e76e4e6@redhat.com>
+In-Reply-To: <20200208165645.15657-9-f4bug@amsat.org>
+References: <20200208165645.15657-1-f4bug@amsat.org>
+ <20200208165645.15657-9-f4bug@amsat.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: Y4-qKZ8uNwmRM9hTNCDffA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,57 +87,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Esteban Bosse <estebanbosse@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGF2aWQgSGlsZGVuYnJh
-bmQgW21haWx0bzpkYXZpZEByZWRoYXQuY29tXQ0KPiBTZW50OiAxMCBGZWJydWFyeSAyMDIwIDA5
-OjI5DQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVt
-LnRob2RpQGh1YXdlaS5jb20+Ow0KPiBJZ29yIE1hbW1lZG92IDxpbWFtbWVkb0ByZWRoYXQuY29t
-Pg0KPiBDYzogcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyB4aWFvZ3Vhbmdyb25nLmVyaWNAZ21h
-aWwuY29tOw0KPiBtc3RAcmVkaGF0LmNvbTsgc2hhbm5vbi56aGFvc2xAZ21haWwuY29tOyBxZW11
-LWRldmVsQG5vbmdudS5vcmc7DQo+IHh1d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMaW51
-eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47DQo+IGVyaWMuYXVnZXJAcmVkaGF0LmNvbTsgcWVt
-dS1hcm1Abm9uZ251Lm9yZzsgbGVyc2VrQHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtQQVRD
-SCB2MiAxLzddIGV4ZWM6IEZpeCBmb3IgcWVtdV9yYW1fcmVzaXplKCkgY2FsbGJhY2sNCj4gDQo+
-ID4+IENhbiB5b3UgbG9vayB0aGUgb3JpZ2luYWwgdmFsdWUgdXAgc29tZWhvdyBhbmQgdXMgdGhl
-IHJlc2l6ZSBjYWxsYmFjaw0KPiA+PiBvbmx5IGFzIGEgbm90aWZpY2F0aW9uIHRoYXQgc29tZXRo
-aW5nIGNoYW5nZWQ/ICh0aGF0IHZhbHVlIHdvdWxkIGhhdmUgdG8NCj4gPj4gYmUgc3RvcmVkIHNv
-bWV3aGVyZSBhbmQgbWlncmF0ZWQgSSBhc3N1bWUgLSBtYXliZSB0aGF0J3MgYWxyZWFkeSBiZWlu
-Zw0KPiA+PiBkb25lKQ0KPiA+DQo+ID4gT2suIEkgd2lsbCB0YWtlIGEgbG9vayBhdCB0aGF0LiBC
-dXQgY2FuIHdlIGluc3RlYWQgcGFzcyB0aGUgYmxvY2stPnVzZWRfbGVuZ3RoDQo+IHRvDQo+ID4g
-ZndfY2ZnX2FkZF9maWxlX2NhbGxiYWNrKCkuIFRoYXQgd2F5IHdlIGRvbuKAmXQgaGF2ZSB0byBj
-aGFuZ2UgdGhlDQo+IHFlbXVfcmFtX3Jlc2l6ZSgpDQo+ID4gYXMgd2VsbC4gSSB0aGluayBJZ29y
-IGhhcyBzdWdnZXN0ZWQgdGhpcyBiZWZvcmVbMV0gYW5kIEkgaGFkIGEgZ28gYXQgaXQgYmVmb3Jl
-DQo+IGNvbWluZyB1cA0KPiA+IHdpdGggdGhlICJyZXFfbGVuZ3RoIiBwcm9wb3NhbCBoZXJlLg0K
-PiANCj4gWW91IG1lYW4sIHBhc3NpbmcgdGhlIG9sZCBzaXplIGFzIHdlbGw/IEkgZG9uJ3Qgc2Vl
-IGhvdyB0aGF0IHdpbGwgc29sdmUNCj4gdGhlIGlzc3VlLCBidXQgeWVhaCwgbm90aGluZyBzcGVh
-a3MgYWdhaW5zdCBzaW1wbHkgc2VuZGluZyB0aGUgb2xkIGFuZA0KPiB0aGUgbmV3IHNpemUuDQoN
-Ck5vcGUuIEkgYWN0dWFsbHkgbWVhbnQgdXNpbmcgdGhlIGJsb2NrLT51c2VkX2xlbmd0aCB0byBz
-dG9yZSBpbiB0aGUgDQpzLT5maWxlcy0+ZltpbmRleF0uc2l6ZS4gDQoNCnZpcnRfYWNwaV9zZXR1
-cCgpDQogIGFjcGlfYWRkX3JvbV9ibG9iKCkNCiAgICByb21fYWRkX2Jsb2IoKQ0KICAgICAgcm9t
-X3NldF9tcigpICAtLT4gdXNlZF9sZW5ndGggID0gcGFnZSBhbGlnbmVkIGJsb2Igc2l6ZQ0KICAg
-ICAgICBmd19jZmdfYWRkX2ZpbGVfY2FsbGJhY2soKSAgLS0+IHVzZXMgYWN0dWFsIGJsb2Igc2l6
-ZS4NCg0KDQpSaWdodCBub3cgd2hhdCB3ZSBkbyBpcyB1c2UgdGhlIGFjdHVhbCBibG9iIHNpemUg
-dG8gc3RvcmUgaW4gRldDZmdFbnRyeS4NCkluc3RlYWQgcGFzcyB0aGUgUkFNQmxvY2sgdXNlZF9s
-ZW5ndGggdG8gZndfY2ZnX2FkZF9maWxlX2NhbGxiYWNrKCkuDQpPZiBjb3Vyc2UgYnkgdGhpcywg
-dGhlIGZpcm13YXJlIHdpbGwgc2VlIGFuIGFsaWduZWQgc2l6ZSwgYnV0IHRoYXQgaXMgZmluZSBJ
-IHRoaW5rLg0KQnV0IGF0IHRoZSBzYW1lIHRpbWUgdGhpcyBtZWFucyB0aGUgcWVtdV9yYW1fcmVz
-aXplKCkgY2FuIHN0YXkgYXMgaXQgaXMgDQpiZWNhdXNlIGl0IHdpbGwgaW52b2tlIHRoZSBjYWxs
-YmFjayB3aGVuIHRoZSBzaXplIGNoYW5nZXMgYmV5b25kIHRoZSBhbGlnbmVkDQpwYWdlIHNpemUu
-IEFuZCBhbHNvIGR1cmluZyBtaWdyYXRpb24sIHRoZXJlIHdvbid0IGJlIGFueSBpbmNvbnNpc3Rl
-bmN5IGFzIGV2ZXJ5b25lDQp3b3JrcyBvbiBhbGlnbmVkIHBhZ2Ugc2l6ZS4NCg0KRG9lcyB0aGF0
-IG1ha2Ugc2Vuc2U/IE9yIEkgYW0gYWdhaW4gbWlzc2luZyBzb21ldGhpbmcgaGVyZT8NCg0KVGhh
-bmtzLA0KU2hhbWVlcg0KDQo+IC0tDQo+IFRoYW5rcywNCj4gDQo+IERhdmlkIC8gZGhpbGRlbmIN
-Cg0K
+On Sat,  8 Feb 2020 17:56:40 +0100
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+
+> We want to have a common class_init(). The only value that
+> matters (and changes) is the board revision.
+> Pass the board_rev as class_data to class_init().
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/arm/raspi.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 62b8df3c2e..fbfcd29732 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -46,6 +46,7 @@ typedef struct RaspiMachineClass {
+>      /*< private >*/
+>      MachineClass parent_obj;
+>      /*< public >*/
+> +    uint32_t board_rev;
+>  } RaspiMachineClass;
+> =20
+>  #define TYPE_RASPI_MACHINE       MACHINE_TYPE_NAME("raspi-common")
+> @@ -227,9 +228,11 @@ static void setup_boot(MachineState *machine, int ve=
+rsion, size_t ram_size)
+>      arm_load_kernel(ARM_CPU(first_cpu), machine, &binfo);
+>  }
+> =20
+> -static void raspi_init(MachineState *machine, uint32_t board_rev)
+> +static void raspi_init(MachineState *machine)
+>  {
+> +    RaspiMachineClass *mc =3D RASPI_MACHINE_GET_CLASS(machine);
+>      RaspiMachineState *s =3D RASPI_MACHINE(machine);
+> +    uint32_t board_rev =3D mc->board_rev;
+>      int version =3D board_version(board_rev);
+>      uint64_t ram_size =3D board_ram_size(board_rev);
+>      uint32_t vcram_size;
+> @@ -279,13 +282,16 @@ static void raspi_init(MachineState *machine, uint3=
+2_t board_rev)
+> =20
+>  static void raspi2_init(MachineState *machine)
+>  {
+> -    raspi_init(machine, 0xa21041);
+> +    raspi_init(machine);
+>  }
+> =20
+>  static void raspi2_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+> +    RaspiMachineClass *rmc =3D RASPI_MACHINE_CLASS(oc);
+> +    uint32_t board_rev =3D (uint32_t)(uintptr_t)data;
+> =20
+> +    rmc->board_rev =3D board_rev;
+
+instead of doing a bit obscure ".class_data     =3D (void *)0xa21041," and
+using it here, I'd just do
+
+       rmc->board_rev =3D 0xa21041;
+
+using value specific for each leaf class
+
+with this change
+ Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+>      mc->desc =3D "Raspberry Pi 2B";
+>      mc->init =3D raspi2_init;
+>      mc->block_default_type =3D IF_SD;
+> @@ -302,13 +308,16 @@ static void raspi2_machine_class_init(ObjectClass *=
+oc, void *data)
+>  #ifdef TARGET_AARCH64
+>  static void raspi3_init(MachineState *machine)
+>  {
+> -    raspi_init(machine, 0xa02082);
+> +    raspi_init(machine);
+>  }
+> =20
+>  static void raspi3_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+> +    RaspiMachineClass *rmc =3D RASPI_MACHINE_CLASS(oc);
+> +    uint32_t board_rev =3D (uint32_t)(uintptr_t)data;
+> =20
+> +    rmc->board_rev =3D board_rev;
+>      mc->desc =3D "Raspberry Pi 3B";
+>      mc->init =3D raspi3_init;
+>      mc->block_default_type =3D IF_SD;
+> @@ -327,11 +336,13 @@ static const TypeInfo raspi_machine_types[] =3D {
+>          .name           =3D MACHINE_TYPE_NAME("raspi2"),
+>          .parent         =3D TYPE_RASPI_MACHINE,
+>          .class_init     =3D raspi2_machine_class_init,
+> +        .class_data     =3D (void *)0xa21041,
+>  #ifdef TARGET_AARCH64
+>      }, {
+>          .name           =3D MACHINE_TYPE_NAME("raspi3"),
+>          .parent         =3D TYPE_RASPI_MACHINE,
+>          .class_init     =3D raspi3_machine_class_init,
+> +        .class_data     =3D (void *)0xa02082,
+>  #endif
+>      }, {
+>          .name           =3D TYPE_RASPI_MACHINE,
+
 
