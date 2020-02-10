@@ -2,79 +2,85 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3833CC352A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1178C352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:02:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D83C20733
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:02:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D83C20733
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BC6F920733
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 11:02:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JEbrGRE/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC6F920733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j16pq-0003p6-6u
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 06:02:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57567)
+	id 1j16q9-0004Fx-Up
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 06:02:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j16p0-0003A2-GK
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:01:48 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j16pG-0003Kh-4g
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:02:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j16ou-0007dE-6d
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:01:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41236)
+ (envelope-from <peter.maydell@linaro.org>) id 1j16pE-00086A-Rk
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:02:01 -0500
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:38997)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j16ot-0007Lz-W8
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:01:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j16oe-0004jf-BV
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 11:01:24 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 53E882E80C0
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 11:01:24 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j16pE-00084s-MQ
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 06:02:00 -0500
+Received: by mail-ot1-x32c.google.com with SMTP id 77so5869585oty.6
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 03:02:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ivVJaBVvGDqf6sjfWVzYQDCxtvGXZVbjmdYpdniNsuU=;
+ b=JEbrGRE/OK4TFb2ZPVdbjep8GHIlLOyPJfNcptrDfSJixXxuXdMgE3o2wTP+r+kE+n
+ gOxF/hWFhL5PINV1ZXnJ1Mo0hNBWOIL7tOBo3YM7uG8j1GToyXA6lCDrPSmjO8X/GU2o
+ cjD0GcSLPOm5iAwdJj4uXaITSDGzaYUmUbK0fj8hyyXcwbCqRw1yKLnlGo3jtnUc8OYD
+ v9NdE1RNQb1EdG3O4ynFusfm79iFTuAy2L+HevkxlB72yribGuRAu2HnU+1cqDidf03s
+ bFKuVDfOmYqwRXFlOcR6Q1Mn5QvCCb81iz5+P9EYASqjLmjZQpzSPv7+eeFUOPFDQqae
+ n/Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ivVJaBVvGDqf6sjfWVzYQDCxtvGXZVbjmdYpdniNsuU=;
+ b=UNFwSfO3gp59JTX+oVaIF2yRKs+H8BIpt34KUl4pKmVmSzYXnUYZBPT9VpJ/QzptkW
+ DvxOFVb7E/3OvcKJ+S/zrAMxR7IWXRlLeHERE8Q95Dx7N5V/f9z+UuMsVdZNx9MmwQJg
+ rcUyncED9fVmw5IUCpBL8p9EbrzaYdIyr5K7aWM8FC0tRVTtn4igmZ4ChVFzNp5tAVZf
+ NBW+YhubPVzM/Kaa9Utf9At6SCcsBHLBtAvd9yIE5dOWrNxvtpfFT1zOUHGAEbAyZhC1
+ PSR7jJOTgzj9vpu/6fuLmP+5+dqemWclQ1JGJX/o2LA3usCDTeGIHsLmY3WEGICCEAI1
+ yc7g==
+X-Gm-Message-State: APjAAAUVogCsc/IFMjd/rqVrQhLnr2vx0JlHekN2VARC+gPh7Y4+nAv+
+ Vr6p3uJg3Sn4ROPeWYkoihQE/V99QwGG9kan0Pgr3A==
+X-Google-Smtp-Source: APXvYqyTSsiAq/426EKY4BG9UhvNHzq+COCbZfJTC4pDxHG9XQVztnC8FrYJgfqXMco22Ec0qu0CojkPZGwQkKRHxao=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr571517otq.97.1581332519913; 
+ Mon, 10 Feb 2020 03:01:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Feb 2020 10:52:07 -0000
-From: Frank Heimes <1859656@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=maas; status=New; importance=Undecided;
- assignee=lee.trager@canonical.com; 
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
- assignee=maas; 
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fheimes ltrager paelzer sfeole
-X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
-X-Launchpad-Bug-Modifier: Frank Heimes (fheimes)
-References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <158133192734.8965.10747491506558255647.malone@chaenomeles.canonical.com>
-Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
- initial deploy
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: bf2277c564c7ca8268ec53b930956578ac342106
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <875zgm2vqv.fsf@dusky.pond.sub.org>
+ <CAJSP0QWCn_vv2Vs-UWc9nPHjdBQq9KMkiQ7D91+RwHM_okTzZw@mail.gmail.com>
+In-Reply-To: <CAJSP0QWCn_vv2Vs-UWc9nPHjdBQq9KMkiQ7D91+RwHM_okTzZw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Feb 2020 11:01:48 +0000
+Message-ID: <CAFEAcA9NfGivg0C_enAT_8+_mmbQSi6H=7G+4w7RdJwXP7yUtA@mail.gmail.com>
+Subject: Re: Summary of Re: Making QEMU easier for management tools and
+ applications
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,252 +89,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In between I found the time to setup an env. build upon older releases:
+On Mon, 10 Feb 2020 at 10:57, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> I'm in favor of simplifying QEMU at the expense of an incompatible CLI
+> change in QEMU 6.0.
 
-$ lsb_release -a
-No LSB modules are available.
-Distributor ID:	Ubuntu
-Description:	Ubuntu 18.04.1 LTS
-Release:	18.04
-Codename:	bionic
+If we want to do wholesale incompatible changes to the CLI
+I think we definitely need some kind of tool where a user
+can say "here's my old command line, what's the new style
+equivalent?". Otherwise we're going to have a deluge of
+user issues where their old working setups broke and
+QEMU didn't give them any useful hints about why.
 
-$ dpkg -l | grep -i qemu
-ii  qemu-block-extra:s390x                1:2.11+dfsg-1ubuntu7             =
-      s390x        extra block backend modules for qemu-system and qemu-uti=
-ls
-ii  qemu-kvm                              1:2.11+dfsg-1ubuntu7             =
-      s390x        QEMU Full virtualization on x86 hardware
-ii  qemu-system-common                    1:2.11+dfsg-1ubuntu7             =
-      s390x        QEMU full system emulation binaries (common files)
-ii  qemu-system-s390x                     1:2.11+dfsg-1ubuntu7             =
-      s390x        QEMU full system emulation binaries (s390x)
-ii  qemu-utils                            1:2.11+dfsg-1ubuntu7             =
-      s390x        QEMU utilities
-
-$ apt-cache policy maas
-maas:
-  Installed: 2.6.0-7803-g6fc5f26eb-0ubuntu1~18.04.1
-  Candidate: 2.6.0-7803-g6fc5f26eb-0ubuntu1~18.04.1
-  Version table:
- *** 2.6.0-7803-g6fc5f26eb-0ubuntu1~18.04.1 500
-        500 http://ppa.launchpad.net/maas-maintainers/testing/ubuntu bionic=
-/main s390x Packages
-        100 /var/lib/dpkg/status
-     2.4.2-7034-g2f5deb8b8-0ubuntu1 500
-        500 http://us.ports.ubuntu.com/ubuntu-ports bionic-updates/main s39=
-0x Packages
-        500 http://ports.ubuntu.com/ubuntu-ports bionic-updates/main s390x =
-Packages
-        500 http://aus.ports.ubuntu.com/ubuntu-ports bionic-updates/main s3=
-90x Packages
-     2.4.0~beta2-6865-gec43e47e6-0ubuntu1 500
-        500 http://us.ports.ubuntu.com/ubuntu-ports bionic/main s390x Packa=
-ges
-        500 http://ports.ubuntu.com/ubuntu-ports bionic/main s390x Packages
-
-In this environment MAAS is not able to Commission ("Failed commissioning").
-Trying to start the vm manually with virsh ends up with:
-
-$ virsh start vm1 --console
-Domain vm1 started
-Connected to domain vm1
-Escape character is ^]
-done
-  Using IPv4 address: 192.168.122.102
-  Requesting file "boots390x.bin" via TFTP from 192.168.122.1
-  Receiving data:  0 KBytesfile not found: boots390x.bin
-Failed to load OS from network
-
-So that is expecting, since the qemu packages version 1:2.11+dfsg-
-1ubuntu7 were initially used - the GA version, that's not known to work
-- the needed patch came later.
-
-The first qemu packages that should be good are the ones with version 1:2.1=
-1+dfsg-1ubuntu7.7.
-But (after discussing with cpaelzer) the qemu packages didn't really change=
-d since 1:2.11+dfsg-1ubuntu7.7, I thought that I now upgrade to the latest =
-ones (1:2.11+dfsg-1ubuntu7.22):
-
-$ sudo apt install qemu-block-extra qemu-kvm qemu-system-common qemu-system=
--s390x qemu-utils =
-
-Reading package lists... Done
-Building dependency tree       =
-
-Reading state information... Done
-Suggested packages:
-  debootstrap
-Recommended packages:
-  sharutils
-The following packages will be upgraded:
-  qemu-block-extra qemu-kvm qemu-system-common qemu-system-s390x qemu-utils
-5 upgraded, 0 newly installed, 0 to remove and 167 not upgraded.
-Need to get 3,249 kB of archives.
-After this operation, 32.8 kB of additional disk space will be used.
-Get:1 http://us.ports.ubuntu.com/ubuntu-ports bionic-proposed/main s390x qe=
-mu-utils s390x 1:2.11+dfsg-1ubuntu7.22 [811 kB]
-Get:2 http://us.ports.ubuntu.com/ubuntu-ports bionic-proposed/main s390x qe=
-mu-system-common s390x 1:2.11+dfsg-1ubuntu7.22 [671 kB]
-Get:3 http://us.ports.ubuntu.com/ubuntu-ports bionic-proposed/main s390x qe=
-mu-block-extra s390x 1:2.11+dfsg-1ubuntu7.22 [37.3 kB]
-Get:4 http://us.ports.ubuntu.com/ubuntu-ports bionic-proposed/main s390x qe=
-mu-kvm s390x 1:2.11+dfsg-1ubuntu7.22 [12.5 kB]
-Get:5 http://us.ports.ubuntu.com/ubuntu-ports bionic-proposed/main s390x qe=
-mu-system-s390x s390x 1:2.11+dfsg-1ubuntu7.22 [1,717 kB]
-Fetched 3,249 kB in 0s (8,360 kB/s)        =
-
-(Reading database ... 67530 files and directories currently installed.)
-Preparing to unpack .../qemu-utils_1%3a2.11+dfsg-1ubuntu7.22_s390x.deb ...
-Unpacking qemu-utils (1:2.11+dfsg-1ubuntu7.22) over (1:2.11+dfsg-1ubuntu7) =
-...
-Preparing to unpack .../qemu-system-common_1%3a2.11+dfsg-1ubuntu7.22_s390x.=
-deb .
-..
-Unpacking qemu-system-common (1:2.11+dfsg-1ubuntu7.22) over (1:2.11+dfsg-1u=
-buntu
-7) ...
-Preparing to unpack .../qemu-block-extra_1%3a2.11+dfsg-1ubuntu7.22_s390x.de=
-b ...
-Unpacking qemu-block-extra:s390x (1:2.11+dfsg-1ubuntu7.22) over (1:2.11+dfs=
-g-1ub
-untu7) ...
-Preparing to unpack .../qemu-kvm_1%3a2.11+dfsg-1ubuntu7.22_s390x.deb ...
-Unpacking qemu-kvm (1:2.11+dfsg-1ubuntu7.22) over (1:2.11+dfsg-1ubuntu7) ...
-Preparing to unpack .../qemu-system-s390x_1%3a2.11+dfsg-1ubuntu7.22_s390x.d=
-eb ..
-.
-Unpacking qemu-system-s390x (1:2.11+dfsg-1ubuntu7.22) over (1:2.11+dfsg-1ub=
-untu7
-) ...
-Setting up qemu-block-extra:s390x (1:2.11+dfsg-1ubuntu7.22) ...
-Setting up qemu-utils (1:2.11+dfsg-1ubuntu7.22) ...
-Processing triggers for man-db (2.8.3-2) ...
-Setting up qemu-system-common (1:2.11+dfsg-1ubuntu7.22) ...
-Setting up qemu-system-s390x (1:2.11+dfsg-1ubuntu7.22) ...
-Setting up qemu-kvm (1:2.11+dfsg-1ubuntu7.22) ...
-
-And with that the Commissioning worked and ended correctly,
-and I was also able to complete a Deployment afterwards.
-
-I deployed 19.04 (disco, since I think that Sean faced the issue while
-he tried to deploy disco, too) and it worked. The system (vm1) came up
-and I was able to login:
-
-$ ssh ubuntu@192.168.122.201 =
-
-The authenticity of host '192.168.122.201 (192.168.122.201)' can't be estab=
-lished.
-ECDSA key fingerprint is SHA256:WMeXfn4hIAc38WUnXqPuhASMLjiig+uzdhqfkjzR7mI.
-Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added '192.168.122.201' (ECDSA) to the list of known h=
-osts.
-Welcome to Ubuntu 19.04 (GNU/Linux 5.0.0-38-generic s390x)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/advantage
-
-  System information as of Mon Feb 10 10:44:33 UTC 2020
-
-  System load:  0.19              Processes:           95
-  Usage of /:   42.4% of 7.27GB   Users logged in:     0
-  Memory usage: 15%               IP address for enc1: 192.168.122.201
-  Swap usage:   0%
-
-4 updates can be installed immediately.
-4 of these updates are security updates.
-
-
-The programs included with the Ubuntu system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
-applicable law.
-
-To run a command as administrator (user "root"), use "sudo <command>".
-See "man sudo_root" for details.
-
-ubuntu@vm1:~$
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859656
-
-Title:
-  [2.6] Unable to reboot s390x KVM machine after initial deploy
-
-Status in MAAS:
-  New
-Status in QEMU:
-  Incomplete
-Status in Ubuntu on IBM z Systems:
-  Triaged
-
-Bug description:
-  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
-  Arch: S390x
-
-  Appears that MAAS can not find the s390x bootloader to boot from the
-  disk, not sure how maas determines this.  However this was working in
-  the past. I had originally thought that if the maas machine was
-  deployed then it defaulted to boot from disk.
-
-  If I force the VM to book from disk, the VM starts up as expected.
-
-  Reproduce:
-
-  - Deploy Disco on S390x KVM instance
-  - Reboot it
-
-  on the KVM console...
-
-  Connected to domain s2lp6g001
-  Escape character is ^]
-  done
-  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
-  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
-  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
-  Trying pxelinux.cfg files...
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  Failed to load OS from network
-
-  =3D=3D> /var/log/maas/rackd.log <=3D=3D
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
-0x.bin requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
-5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-1-52-54-00-e5-d7-bb requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA0 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64B requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF6 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-A requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
- requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
-efault requested by 10.246.75.160
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
+thanks
+-- PMM
 
