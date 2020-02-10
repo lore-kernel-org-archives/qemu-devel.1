@@ -2,89 +2,82 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C0DC35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 18:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6A9C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 18:10:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F310420715
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 18:00:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B84F32082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 18:10:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vTwuFsXR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F310420715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RRDoGS8q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B84F32082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1DM8-0008Tq-4h
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 13:00:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57754)
+	id 1j1DVi-0003CF-RM
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 13:10:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j1DLP-0007xw-NN
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:59:40 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j1DUl-0002gE-3e
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 13:09:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j1DLO-0005KJ-MY
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:59:39 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40117)
+ (envelope-from <peter.maydell@linaro.org>) id 1j1DUi-0006yi-E4
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 13:09:18 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42614)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j1DLN-0005JN-P3
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 12:59:37 -0500
-Received: by mail-pg1-x541.google.com with SMTP id z7so4296620pgk.7
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 09:59:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
- :content-transfer-encoding;
- bh=aHgzZrsrwcWeQ87VMrWjH4rMXOkj/mrqsMJ6vGEraG4=;
- b=vTwuFsXRyylgRKGarS+ot9yCdYqTChm7nPjrlyI3dcpgTLF6UgViuj0/epNyF8QYFy
- ha+damVOOgwrHRPkVOmTwrdH7NIDl92QvTV9NUCrWL0oBG4C4a9oxdMXJUkQXekhgsFe
- vrt3J/Hl5RNu79mwXJtxn+IsCeTaJb2d4wQqlx0zNNFRn5XM/6pSF4mHp01Fs2FbtPqu
- 8cClocKFDbKi1m5Pf3nwBNduLXUkEdT1+Oc3zHpvhcb3L4W5ukl7wcfRyE/peFOIoM/Z
- Q2WbLT4nDaYTYlMD5J7x8bbjE5TDiC4gwv+le0/bYx8+jia2fU+zh0eYEzbx4OFv5zLQ
- DnBA==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j1DUi-0006w7-5T
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 13:09:16 -0500
+Received: by mail-ot1-x341.google.com with SMTP id 66so7262062otd.9
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 10:09:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=z4vi1RO6L2pZwC/JNY6BOweuUPcnUa1hKWdV5oxN7VM=;
+ b=RRDoGS8qYs5VCpFf5rNfoZlqqrwCt9OvW9ZpfUjI3ZMa6qcrSrBWsl2q+U8OXT6p3v
+ uXx5HUcsX+6I8vnlIJ4d9VJN6trX5loJAoWBscv0Uh0wQVjJpITzK3VL+5qSFS2hUcEN
+ X7xkRvl6OBzUKcAO0wNMCgZLRTOpYoQeYqLg8Ox1m0J7Cg7xDQx7tr9+snDUvYOhNDVf
+ emn3W9rk5UyFpGn9CBfkUjK1kd+48Wizi1NjQ4W8WffUhQZuh4nwkDxqo8LBDMAx7UCT
+ D2SpedgSPTopH194IdqPlsmsBVGvy+l+zW2I1OxB9o+RIx/nOHEOcg8F1qfRvuWuRuc4
+ HNkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=aHgzZrsrwcWeQ87VMrWjH4rMXOkj/mrqsMJ6vGEraG4=;
- b=b+c1CHpf949z7DxPV567CH7090YL+8CnWy2kgwsPBYbq8dkBuiLbwG4XCxW3OWtC68
- ecE7h5LI260kZYys0zqEhJlXPfeNbpV/WZsUuUaA6EdipaKmRDS409d+DX885CC3RutU
- wNF1wzPbKE8JH1yz9EZ93tLoozCGeD10Z4DVpV+Iv4cHQ0eZ2MlgKisyybjFfVdZlu/9
- Ky+MZO/lepv9ONuKlXacOV0W6U8ZLGygD8Rgu2Lxmk2z5G3o0jcJ5+srPrXBTDeH6LcO
- xjP8VsRjtydFJLYspDVS1TCPy+bebX0hndipRXnkP/wvLYko5gm1ThBuHtPniD1XpdL6
- 8Z8w==
-X-Gm-Message-State: APjAAAXvRl107FQAneOAWLWARH71RshyV94M/Iamn4Dzp1VVUL5NYJoi
- 6Tqz6zgxa25HxmNM7jpWRZ96CFYBTCQ=
-X-Google-Smtp-Source: APXvYqzz7JxOl4/fuWUB8t5abHmZ1dcaoJ7fcrxkXF6ka3tgscWf0jYlxHx85/e3Vwc/VkfJ+0lhMg==
-X-Received: by 2002:a63:2701:: with SMTP id n1mr2834110pgn.332.1581357576255; 
- Mon, 10 Feb 2020 09:59:36 -0800 (PST)
-Received: from localhost (pat_11.qualcomm.com. [192.35.156.11])
- by smtp.gmail.com with ESMTPSA id h26sm1155458pfr.9.2020.02.10.09.59.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 10 Feb 2020 09:59:35 -0800 (PST)
-Date: Mon, 10 Feb 2020 09:59:35 -0800 (PST)
-X-Google-Original-Date: Mon, 10 Feb 2020 07:10:57 PST (-0800)
-Subject: Re: [PATCH] riscv: Separate FPU register size from core register size
- in gdbstub [v2]
-In-Reply-To: <87sgjwr3sz.fsf@keithp.org>
-CC: qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- sagark@eecs.berkeley.edu, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- qemu-riscv@nongnu.org
-From: Palmer Dabbelt <palmerdabbelt@google.com>
-To: keithp@keithp.com
-Message-ID: <mhng-640eeb10-fc1a-41fd-b870-5f76e8fcdab4@palmerdabbelt-glaptop1>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=z4vi1RO6L2pZwC/JNY6BOweuUPcnUa1hKWdV5oxN7VM=;
+ b=W707iOHchRjF89orwpRZeWDYGZkW3yIHLgeu/wMafCNh9qIaR0m+xCOC5Y8IHl9sRW
+ bipgrE+Hfa3CMUdtj1BlN5WacZ6LtKhYsXABMM7H0qHnWB9p+x2qe9yw/57ivQvpqcSD
+ RYQd74xEnhj6mkW7I4uZj23gBHWHf5rLVAc7quUt3PkgBMFQJhTaISe0LhSfXlvw9pIP
+ SKTNMk0IIIdsaSyU7KKVEIwCYCEhdS9DMsNOL26UK3RMCQpYhZ+2BJTwudwyFYkP3EWH
+ fpQp2aNrhjGplGe3bSKBgxlDo+PljQ6yFJwpYFLWKFSqdp52+QnoNIUI1+LhyiI36+nl
+ WHeQ==
+X-Gm-Message-State: APjAAAUgmZkxcY1n3sbqOqB3Jvhdy3+KrHUz5JWGLmg6VQLLOdVSuN2V
+ Pf/J1jsiiMTC222/YPTGiN21wdra4uug4Ix7HoLWTQ==
+X-Google-Smtp-Source: APXvYqzzACkc9g6T6+PstP96+T4Z8k288XxTvQQPnxyPypiQ8dhdCfGsxV46sWHx/ucdC3/gnzEOmIW7h0I/vgEKrGw=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr2014114otd.91.1581358155197; 
+ Mon, 10 Feb 2020 10:09:15 -0800 (PST)
+MIME-Version: 1.0
+References: <20200210092348.398611-1-stefanha@redhat.com>
+In-Reply-To: <20200210092348.398611-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Feb 2020 18:09:04 +0000
+Message-ID: <CAFEAcA9QzVVqRQmB3QS0Q_bn+-6itvH6HCJftU8DFdrjGAHgcw@mail.gmail.com>
+Subject: Re: [PULL 0/2] Block patches
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,24 +89,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 Jan 2020 14:13:16 PST (-0800), keithp@keithp.com wrote:
-> Palmer Dabbelt <palmerdabbelt@google.com> writes:
+On Mon, 10 Feb 2020 at 09:23, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
->> This isn't working for me.  When I apply it on top of my for-master (which is
->> very close to master), I get 
+> The following changes since commit 346ed3151f1c43e72c40cb55b392a1d4cface6=
+2c:
 >
->>     warning: while parsing target description (at line 1): Could not load XML document "riscv-64bit-fpu.xml"
+>   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-update-2020020=
+6.0' into staging (2020-02-07 11:52:15 +0000)
 >
-> If you're building from an existing directory, I think you'll have to
-> force re-creation of riscv32-softmmu/gdbstub-xml.c
+> are available in the Git repository at:
+>
+>   https://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 11a18c84db4a71497d3d40769688a01b6f64b2ad:
+>
+>   hw/core: Allow setting 'virtio-blk-device.scsi' property on OSX host (2=
+020-02-07 16:49:39 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
+>
+> Philippe Mathieu-Daud=C3=A9 (1):
+>   hw/core: Allow setting 'virtio-blk-device.scsi' property on OSX host
+>
+> Vladimir Sementsov-Ogievskiy (1):
+>   block: fix crash on zero-length unaligned write and read
 
-That worked, thanks.  It's in the queue, with a note in case I forget again :)
 
->
-> -- 
-> -keith
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
