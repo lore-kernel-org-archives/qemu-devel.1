@@ -2,172 +2,83 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A593C2BA83
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 00:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF8C6C2BA83
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 00:35:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3117920870
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 00:32:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9126B20870
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 00:35:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="JjUYbNAG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3117920870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rkk27CIX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9126B20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j0x0G-0002Hp-Cy
-	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 19:32:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58300)
+	id 1j0x2T-0003Mn-Qd
+	for qemu-devel@archiver.kernel.org; Sun, 09 Feb 2020 19:35:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1j0wzF-0001YO-By
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 19:31:42 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j0x1u-0002w1-BJ
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 19:34:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1j0wzD-0005zl-Vq
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 19:31:40 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41799)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j0x1t-0000eQ-9r
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 19:34:26 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43921)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j0wzD-0005yO-Jx
- for qemu-devel@nongnu.org; Sun, 09 Feb 2020 19:31:39 -0500
-Received: by mail-pl1-x642.google.com with SMTP id t14so2101548plr.8
- for <qemu-devel@nongnu.org>; Sun, 09 Feb 2020 16:31:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=gC0yiQD4U2JtB5MOenwrFdRsPZ7RgM9Krk3I9+imWMo=;
- b=JjUYbNAGtbVFc9xm7FWPGqTyMJ4i4O4nI2yFm0nHTrye6z5HtCQCAIuef4atjAoO7X
- lzL8TDybLcXLvBdfXTidka8MeeqxgCNmFDQU24e0Ah79S6skxOeZnMEyccewuURRMA32
- /U+G0XkA+FrQN9lE+QOA7EBCuAQF4+ia0zfYaCIxvrR6kSgMDfWOBqc/MuTo6eyDL97+
- myUTCcEZSLSdgwKQneihqLglcUpHyXq0SXuEVgJzhbvQwfpUh3OI7dMNqY3Sq7RLpOfB
- xRLKpJ4j4zbE9JNmEOZQ3I5nTws0enyY+sM0cIT4k3vBo2sGm7gsWhg4eF9ApOWYmhU6
- 2oqA==
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1j0x1t-0000dO-2h
+ for qemu-devel@nongnu.org; Sun, 09 Feb 2020 19:34:25 -0500
+Received: by mail-oi1-x243.google.com with SMTP id p125so7615272oif.10
+ for <qemu-devel@nongnu.org>; Sun, 09 Feb 2020 16:34:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=zIkQcP9BpIJyzgjaUlbE7kr2g9ZhmdNsQJmm2E9D+OI=;
+ b=rkk27CIX4HotpKyIdedfP6NCwrbnxtEEhneMkbxadbWS40SnL81MKLutEaJ200ZxDS
+ CFXxHeFV0TFoE1zn5dX+lYTLrrH9gLESeqGMm256kgtFtrboumn3A/U/hwl1uleVkc2t
+ r8u3VB8goIcSUebab6cI5xSUcYOtO/zGSmCVlomjRUkXmRp1Nr69K5RrHeWCOkFGZClF
+ IXRHLks4DnvSL7bF/7py1J+rjFOyKPMzQvv3b0kfKDWn9j4WWR+bEXDHYTkAZPHlBJf5
+ P0INFFAMSP4usi5T7U/RYNqqfZEWhnlufWcw+4t2Mu8fZD7iTQnVkDXMF1XlZTvH3hkJ
+ 636Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=gC0yiQD4U2JtB5MOenwrFdRsPZ7RgM9Krk3I9+imWMo=;
- b=La1MKe44LUjuspYvItSCQeiuBsiugHvI9tdmR06XwqJiRGrdGEBvW7VUf3kXfPG53w
- 3GcWEDs36e1SghM78yoJcdC7Ocq5Abmu8mz4p+Y9hsJPFdN1mgBUfcP89A71dfKmF54X
- mqpPOuLwOJT7bfrAa6l6tkfOciknMP4b8PTOFu9GuJJprkbbhETeU4BEtXdqRsFWS7uH
- NyasxkU+LIghGYQ3g6Oql/wOUNSJatGoMLGF250U8lKnYci9mUuZ+3MmzqgDNiPzY6f/
- KG8AWYsMyyt2HOMWQRVQW787cB2kJKpeUxwSAB0pbIenAZcIB5CS61aC9LAj5QdjdLY1
- sg9g==
-X-Gm-Message-State: APjAAAWcwqjU+0q5nf/h0dkv3gwGWCNCnNXd76JxYD0aY7hPjk8Q/b3w
- QZP4xcGqCW4RKvEWocFHeHdsgw==
-X-Google-Smtp-Source: APXvYqwpsL+QLIpIOSmQWJbjkmv6Hy2DZrc9tNtxJ4OgW6VUgwKZqehP+XgU7RHLVcBHV63D18l4tA==
-X-Received: by 2002:a17:90b:3cc:: with SMTP id
- go12mr17385264pjb.89.1581294698138; 
- Sun, 09 Feb 2020 16:31:38 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id z4sm10192066pfn.42.2020.02.09.16.31.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 09 Feb 2020 16:31:37 -0800 (PST)
-Subject: Re: VW ELF loader
-To: Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
- <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
- <20200203012842.GD52446@umbus.fritz.box>
- <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
- <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
- <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
- <20200205055851.GH60221@umbus.fritz.box>
- <73105e0b-c0a0-009f-aeba-fec818d3088c@redhat.com>
- <23090d06-320e-91b5-f73e-c17e065fcad8@ozlabs.ru>
- <dbea9886-04d8-f9fe-f79d-31d8abe76615@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <274037e5-9bd5-8507-4b4b-067a86225787@ozlabs.ru>
-Date: Mon, 10 Feb 2020 11:31:33 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=zIkQcP9BpIJyzgjaUlbE7kr2g9ZhmdNsQJmm2E9D+OI=;
+ b=YctEfx6ovz2veeBuuuHaR0wqjcRfXeG65k/Zu+aVma8AYn4t5HHX74Jodyw7l2DPaw
+ XWFyanV0XW945mtrSRDn0SgW6oq5Tr41PN5ckHlU5Hq60BinF008Mc9FQgDi518Eu6dj
+ V6vCr4F6+AfV595XlonmMmh713sAGaqmkJqUou5RAK5mYQDgk568f2oTj7x3mTdV2Ia2
+ 4o4l5CzlG+LDQz37JIV9CauqpetBqp2qsRtg7L5OfFAdLJ3NbtTiDRHZyFuPwIo7jfe4
+ MU1jIafoHxd5D+/KLOx+2R+NVy69lMRDKHJvoQd0YfIndI6PFgW+E0ptVXnLp14yw+EE
+ M3qw==
+X-Gm-Message-State: APjAAAUWnrtpMdAZe4KJNtMwtVStxGOXS3VYEkArPJoCwbwAu5yOk5Qd
+ yIsUZskpfRuPHgT5RviIVcq3Qs0TbxkFDW75SXA=
+X-Google-Smtp-Source: APXvYqxdMu2xEz1KJRw9ierzzo4H2rgiCx3pGAy8C0LDwEZUbTO6tpdpUrYsmEYd7IR9O7edsnKggRWC5O4yfSsohw8=
+X-Received: by 2002:a05:6808:64e:: with SMTP id
+ z14mr8706218oih.79.1581294864034; 
+ Sun, 09 Feb 2020 16:34:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <dbea9886-04d8-f9fe-f79d-31d8abe76615@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Sun, 9 Feb 2020 16:34:23 -0800 (PST)
+In-Reply-To: <20200206173040.17337-1-peter.maydell@linaro.org>
+References: <20200206173040.17337-1-peter.maydell@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 10 Feb 2020 01:34:23 +0100
+Message-ID: <CAL1e-=hx4hKuj0r7v6zcpjS5EE2pKoP2JLnUFYEQfdADzfkt1g@mail.gmail.com>
+Subject: Re: [PATCH 00/29] Convert QAPI doc comments to generate rST instead
+ of texinfo
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000a7ee70059e2de667"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -179,51 +90,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Thomas Huth <thuth@redhat.com>,
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Cornelia Huck <conny@cornelia-huck.de>,
- Stefano Garzarella <sgarzare@redhat.com>
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--000000000000a7ee70059e2de667
+Content-Type: text/plain; charset="UTF-8"
+
+On Thursday, February 6, 2020, Peter Maydell <peter.maydell@linaro.org>
+wrote:
+
+>
+> > This series switches all our QAPI doc > > > comments over from
+> > texinfo format to rST.
+>
+>
+Regardeless of the outcome of the discussions over this series, I just want
+to say that I support it as a potential user of the document (there is no
+"Supported-by:" mark or similar, so this is all I can do). Also, as a
+general participant in QEMU community,  I seems to me this is a significant
+step in shaping up QEMU documentation.
+
+Best regards,
+Aleksandar
 
 
-On 07/02/2020 10:46, Paolo Bonzini wrote:
-> On 07/02/20 00:23, Alexey Kardashevskiy wrote:
->>> Right, not unlike what you get with vof=on. :)  I'm not against at all
->>> that idea.  I just don't understand what you refer to below as (2).
->>> Does petitboot not have the problem because it kexecs the new kernel?
->>
->> Petitboot does not have this problem *if* it runs without SLOF, i.e.
->> directly via -kernel and -initrd and uses OF CI (cut down version, about
->> v3-v4 of my patchset, without block devices and grub lookup). In this
->> case there is one device tree instance, fully synchronized with the
->> machine state.
->>
->> If there is still SLOF and (2) is happening, then petitboot is screwed
->> as any other kernel.
-> 
-> Ok, so "minimal pseudo-OpenFirmware in QEMU" is doable and can get
-> everything right;
 
-I am not convinced that ditching drivers is not right; I am moving elf +
-mbr + gpt + grub loading to the guest though so 20 bytes blob becomes
-FDT-less firmmare, a few kbytes big.
+>
+>
 
-> it's just work to set up PCI and do all that other
-> do_driver_stuff(), so you can either do it yourself or use
-> Linux+petitboot.  Is this correct?
+--000000000000a7ee70059e2de667
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Except using the "just" word, yes, correct ;)
+<br><br>On Thursday, February 6, 2020, Peter Maydell &lt;<a href=3D"mailto:=
+peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; wrote:<br><block=
+quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
+ solid;padding-left:1ex"><br>&gt; This series switches all our QAPI doc &gt=
+; &gt; &gt; comments over from<br>&gt; texinfo format to rST.<br>
+<br></blockquote><div><br></div><div>Regardeless of the outcome of the disc=
+ussions over this series, I just want to say that I support it as a potenti=
+al user of the document (there is no &quot;Supported-by:&quot; mark or simi=
+lar, so this is all I can do). Also, as a general=C2=A0participant in QEMU =
+community, =C2=A0I seems to me this is a significant step in shaping up QEM=
+U documentation.</div><div><br></div><div>Best regards,</div><div>Aleksanda=
+r</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" st=
+yle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+<br>
+</blockquote>
 
-> Also, can a normal distro kernel run via -kernel/-initrd + the minimal
-> firmware in QEMU?
-
-Yes.
-
-
--- 
-Alexey
+--000000000000a7ee70059e2de667--
 
