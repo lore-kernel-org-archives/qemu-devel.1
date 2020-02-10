@@ -2,73 +2,82 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C66B9C3B186
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 15:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 745FBC352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 15:51:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A007020715
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 15:41:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A007020715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 416E92082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 15:51:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQyTh9EA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416E92082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1BC1-0002Sj-RC
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 10:41:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40698)
+	id 1j1BLQ-0005UT-Bs
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 10:51:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j1BBE-0001ns-TY
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 10:41:02 -0500
+ (envelope-from <bmeng.cn@gmail.com>) id 1j1BKo-00051P-CE
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 10:50:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j1BBB-0008PK-8H
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 10:41:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48472)
+ (envelope-from <bmeng.cn@gmail.com>) id 1j1BKn-00054w-F8
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 10:50:54 -0500
+Received: from mail-yw1-xc30.google.com ([2607:f8b0:4864:20::c30]:39296)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j1BBB-0008NI-2n
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 10:40:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j1BAz-00083n-81
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 15:40:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 060CB2E80C3
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 15:40:45 +0000 (UTC)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>) id 1j1BKn-00054Y-9p
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 10:50:53 -0500
+Received: by mail-yw1-xc30.google.com with SMTP id h126so3607702ywc.6
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 07:50:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dOCR7tcu25txfw+Gge+2MKpyOiAxmLhi1Ars9U1SoPU=;
+ b=dQyTh9EATIKSrhkqbAlM34dpFYi6fP1nhETtm7C06PekkEvCb8+F2FbU2+4Bq8mNlN
+ +B852x0RqWBn+9c5MyZGpDO4yac8VOVuDKeH2G1HAY5liqowEWmZlqwvX6Q7AHFRpNQo
+ FZMMRupPc3NIpxYs1sv4u2rEn6tSJv//trm3Oju5A87cGkr8T4bs6uMmmAGRS6nH3mRj
+ w5psYJSqinRWx+qUMpMAVDpD7jYHSNS3cvDVOFzhp8oNNhWLF8Gkhi5uronmUAOVCw88
+ yBgUqc8zxjZkbqMHn/f2uZEiHPHTU9cGAs+iqorMg847aU2+4LTXrYfMGpSy2ECPGIge
+ HTCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dOCR7tcu25txfw+Gge+2MKpyOiAxmLhi1Ars9U1SoPU=;
+ b=gCxbNkec5Ifdkvq3GHGYTERhjYZcSxuwtp0nkSVr2PBygp8RJZxdBJvwG7NWzPBrUj
+ O3gpss1DXZAH5ZeeCsZ35iV9hcUCwHjQO5HBfUqE30DR7dI0E+z6yEOR+GG7YUq/boSD
+ 5jqgcpBQpipP1I/jKvQ4N9+zFhpW1Vl9S10QQ3+AiyabQDM4zBpnxuTdf61oXBdRu0uU
+ oq9+jDLytKAGLGNmcf9JRXcLe+CDTgv/keer/3/s+MTxJZJsOkEaO1LKYQKBh+xcRpKH
+ 4jy80ra2kLtgOzRCRxowew51rjfLbTI3DoS1o/UK/pGu/sfoQRXPcfdmgWILucQbmUnh
+ ahsQ==
+X-Gm-Message-State: APjAAAVSzsW7b4QvBElgjI5rMzLRx4uHRjAp/h1lzyQ/fPKp6AZP7FRx
+ IkWqwUtqNtp3ejSroHX/SKaP8ftfyE0Z81Bn0f8=
+X-Google-Smtp-Source: APXvYqzn2DYRpRC77ds7AbTzIZarJeGp+T+8ifsNOfTnUDb/NAazPKAzRGacU/xI93P3kGWh2qaDw5p532ZmfgJm3AE=
+X-Received: by 2002:a81:8606:: with SMTP id w6mr1469377ywf.137.1581349850773; 
+ Mon, 10 Feb 2020 07:50:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Feb 2020 15:33:17 -0000
-From: Thierry Briot <1862619@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier tebounet
-X-Launchpad-Bug-Reporter: Thierry Briot (tebounet)
-X-Launchpad-Bug-Modifier: Thierry Briot (tebounet)
-References: <158133547000.19789.14380673630783179726.malonedeb@wampee.canonical.com>
-Message-Id: <158134879794.30590.5702353034805141066.malone@gac.canonical.com>
-Subject: [Bug 1862619] Re: "-serial telnet::xxxx,
- server" causes "Device 'serial0' is in use"
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b574a969c1eb99e6b41b97a662332f091e139dbd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+References: <CANA1cB+D-Uth0C-6qNE5HcAJkQeDsCbKqmYG7uHsLqbbofSsZQ@mail.gmail.com>
+ <CANA1cBKtbYqnxnSacEK3sXOYM987J5+MacpKWHdKHwB5sk672w@mail.gmail.com>
+In-Reply-To: <CANA1cBKtbYqnxnSacEK3sXOYM987J5+MacpKWHdKHwB5sk672w@mail.gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Mon, 10 Feb 2020 23:50:40 +0800
+Message-ID: <CAEUhbmUsK7u9ubVH+4vidgQUDmO4oN5AdSUZPXiioMFgMHg-Jg@mail.gmail.com>
+Subject: Re: Question: SiFive U SPI and SD
+To: Nikita Ermakov <arei@altlinux.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c30
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,49 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1862619 <1862619@bugs.launchpad.net>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Effectively, no more error !
-Now, my hppa machine is booted on its installation support for HP-UX 10.20,=
- et I am connected with telnet in an other terminal. I don't know what I mu=
-st enter now (on a real machine, the installation starts automatically, if =
-I remember well what I did in 1990 !)
+Hi Nikita,
 
--- =
+On Sun, Feb 9, 2020 at 10:56 PM Nikita Ermakov <arei@altlinux.org> wrote:
+>
+> Hello!
+>
+> I am trying to make an SD card working on the sifive_u (hw/riscv/sifive_u.c) SoC machine.
+> As far as I understand there is no way to connect an SD card to the SoC with cmdline for now. So, I started to dig in to the QEMU internals and especially sifive_u SoC implementation to try to understand how I could connect SD card to this SoC.
+>
+> From what I understood I need to:
+> 1) Implement SiFive U SPI controller.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1862619
+This one is definitely needed.
 
-Title:
-  "-serial telnet::xxxx,server" causes "Device 'serial0' is in use"
+> 2) Implement spi-sd adapter in a way like the hw/sd/ssi-sd.c
 
-Status in QEMU:
-  New
+I believe we can just use hw/sd/ssi-sd.c.
 
-Bug description:
-  I start qemu version 4.2.50 in a first terminal :
+>
+> Probably I should merge 1) and 2) into one hw/riscv/sifive_u_spi.c source file.
+>
+> Could somebody correct me please if I am wrong at some point?
+> I am newbie in the QEMU internals :)
+>
+> The purpose is why I want to implement this is to boot up the Linux kernel on '-machine sifive_u' and load rootfs from SD.
 
-  $ sudo ./qemu-system-hppa -boot d -serial telnet::4441,server -drive
-  if=3Dscsi,bus=3D0,index=3D6,file=3D./hpux.img,format=3Draw -serial mon:st=
-dio -D
-  /tmp/foo -nographic -m 512 -d nochain -cdrom
-  ./HPUX_9.05_Installation_Disc_S700.iso -D /tmp/foo -net
-  nic,model=3Dtulip  -net tap
-
-  qemu-system-hppa: -serial telnet::4441,server: info: QEMU waiting for
-  connection on: disconnected:telnet:0.0.0.0:4441,server
-
-  In another terminal, I launch "telnet localhost 4441"
-
-  And in the qemu window I have the following error:
-
-  Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:220:
-  qemu-system-hppa: Device 'serial0' is in use
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1862619/+subscriptions
+Regards,
+Bin
 
