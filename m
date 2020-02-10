@@ -2,99 +2,81 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CCDC35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 19:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 782B0C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 19:36:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BF4F20661
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 19:34:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BF4F20661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33DCF20715
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 19:36:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D/T+9Q8t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33DCF20715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Eoz-0007Xm-1B
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 14:34:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52517)
+	id 1j1ErR-00011x-9u
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 14:36:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57821)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pasic@linux.ibm.com>) id 1j1Eo6-00077w-GD
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:33:23 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1j1Eq9-0000Ae-1f
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:35:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pasic@linux.ibm.com>) id 1j1Eo4-0005WK-IR
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:33:21 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26962)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1j1Eo4-0005RK-99
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:33:20 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01AJWhTn103084
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:33:15 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y1u5693x8-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:33:15 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
- Mon, 10 Feb 2020 19:33:12 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 10 Feb 2020 19:33:09 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01AJX8ib25428200
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 10 Feb 2020 19:33:08 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C2FBAAE051;
- Mon, 10 Feb 2020 19:33:08 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A114DAE053;
- Mon, 10 Feb 2020 19:33:08 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.20])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 10 Feb 2020 19:33:08 +0000 (GMT)
-Date: Mon, 10 Feb 2020 20:33:06 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v4 38/80] s390x/s390-virtio-ccw: use memdev for RAM
-In-Reply-To: <20200206141553.706bc17b@redhat.com>
-References: <1580483390-131164-1-git-send-email-imammedo@redhat.com>
- <1580483390-131164-39-git-send-email-imammedo@redhat.com>
- <20200205211123.43914b0c.pasic@linux.ibm.com>
- <20200206141553.706bc17b@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (envelope-from <robert.foley@linaro.org>) id 1j1Eq7-0000v2-UB
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:35:28 -0500
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:45445)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1j1Eq7-0000sO-Kt
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:35:27 -0500
+Received: by mail-lj1-x244.google.com with SMTP id f25so8642486ljg.12
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 11:35:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ANlq9UNfnyfQq8LaVwLtXx+qhv/e22hUkK+FJ331+t8=;
+ b=D/T+9Q8t2bnLzjAUy1k8NSsK8d9+UUsefkWKI0GhGeFVyxTwN3REwEBQDyiMjUZk2E
+ M44x7PoiEOqthTpajhoSL/oABNGWHKLjAfNfOwg/t0C98sEN6eWbBeGPdh3/cChzEIDh
+ b+/6GriAD5vCKxyXQuf/kB6lg8Gi+0w/LpSaIbX/H+fB3TaQeUHASN6/t3o0jX3NGuJn
+ iMUKL0QhDqFtkfLdH3AjEVwgVpWtMb0wW6+1TdooobHzNLA3n20vM1Zahx3+QZUTouy1
+ b0GIyqQeDUDWa2H4d2zbyxOK1l4Wj/WA9MjKzKNhVWqvgvbSjPtij4WMUwvGZGM77Ywo
+ 1+Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ANlq9UNfnyfQq8LaVwLtXx+qhv/e22hUkK+FJ331+t8=;
+ b=fbZ2VMqHaWVPhNRA1I5e6DYeCMGIlEMrHpVSuxHnoZNR0YKRREniCt0bGrKn29PX0d
+ q0LgUS9fzWtFgEsTCI7kE7NzZCNo31BV3dfgLRz1i9HAfmQW7UMHE361UQzRkJAXd5fw
+ zTmNJsag5g4OwucpOF5VuPmm9KksL56Z2iOv5JmxmanLi9yyL7kOMqB+9h5gPvxDRwTY
+ Uz2PtI07YkMNrQ3VjAPkk2wpmPame79OW6Mdot/ILm7rCqMITOXOXmQCf2ioHHtUV2KN
+ SVSGUSoqhDL/PgGXqc90i8fmKAYu+nq9gVs7oynpGQutJkKfX58HeTQBWlM8ChZxeS1X
+ L/xQ==
+X-Gm-Message-State: APjAAAW1k3TEPxAsTpkAm3eeWcgLR/bXpfxRuLhqkc7HXCuxtMoywO+R
+ TrG5V6+htQUyVREuKUv2Hqfo26CuiUczDbmdTYQZyw==
+X-Google-Smtp-Source: APXvYqzG6UOK/yKLitkKWF1EFsrgAsb6h+Y+dpFko4K3KYM3gIkSsvOio61A8zYoP97NNA5pGt/v1IRn29ScnJGdr+M=
+X-Received: by 2002:a2e:81d0:: with SMTP id s16mr1917164ljg.166.1581363325754; 
+ Mon, 10 Feb 2020 11:35:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021019-0008-0000-0000-000003519CE8
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021019-0009-0000-0000-00004A723BCC
-Message-Id: <20200210203306.44a6696a.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-10_07:2020-02-10,
- 2020-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 phishscore=0
- mlxlogscore=876 impostorscore=0 bulkscore=0 priorityscore=1501
- adultscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002100144
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+References: <20200207150118.23007-1-alex.bennee@linaro.org>
+ <20200207150118.23007-6-alex.bennee@linaro.org>
+In-Reply-To: <20200207150118.23007-6-alex.bennee@linaro.org>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Mon, 10 Feb 2020 14:34:50 -0500
+Message-ID: <CAEyhzFv1YxBZY5weU+hiGHwUq-6MFnRZfKgfnyeV8CuALLAVtw@mail.gmail.com>
+Subject: Re: [PATCH v1 5/5] tests/plugins: make howvec clean-up after itself.
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,27 +88,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, robhenry@microsoft.com, aaron@os.amperecomputing.com,
+ cota@braap.org, kuhn.chenqun@huawei.com, Peter Puhov <peter.puhov@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 6 Feb 2020 14:15:53 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
+On Fri, 7 Feb 2020 at 10:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+> TCG plugins are responsible for their own memory usage and although
+> the plugin_exit is tied to the end of execution in this case it is
+> still poor practice. Ensure we delete the hash table and related data
+> when we are done to be a good plugin citizen.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  tests/plugin/howvec.c | 12 +++++++++++-
+>  static void plugin_exit(qemu_plugin_id_t id, void *p)
+>  {
+>      g_autoptr(GString) report =3D g_string_new("Instruction Classes:\n")=
+;
+> @@ -213,12 +220,15 @@ static void plugin_exit(qemu_plugin_id_t id, void *=
+p)
+>          g_list_free(it);
+>      }
+>
+> +    g_list_free(counts);
+> +    g_hash_table_destroy(insns);
+> +
 
-> > Tested-by: Halil Pasic <pasic@linux.ibm.com>
-> > Acked-by: Halil Pasic <pasic@linux.ibm.com>  
-> Thanks,
-> 
-> Could you also take a look at patches 3-7/8o that makes this possible?
-> (it never hurts to have second pair of eyes on a code that affects
-> everyone).
+Just one minor comment.  Seems like there might be an option to use
+g_autoptr(GList) for counts.
 
-Sorry, I'm in the middle of debugging something, and it does not look
-like I will be able to do a proper review on this soon. I did a quick
-scan through the code and I did not see anything fishy.
+Reviewed-by: Robert Foley <robert.foley@linaro.org>
 
-Regards,
-Halil
-
+>      qemu_plugin_outs(report->str);
+>  }
+>
+>  static void plugin_init(void)
+>  {
+> -    insns =3D g_hash_table_new(NULL, g_direct_equal);
+> +    insns =3D g_hash_table_new_full(NULL, g_direct_equal, NULL, &free_re=
+cord);
+>  }
+>
+>  static void vcpu_insn_exec_before(unsigned int cpu_index, void *udata)
+> --
+> 2.20.1
+>
 
