@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F449C352A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 14:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB16C352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 14:42:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED58420842
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 14:42:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED58420842
+	by mail.kernel.org (Postfix) with ESMTPS id 85B6620838
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 14:42:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85B6620838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1AGE-0004Cw-59
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 09:42:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58701)
+	id 1j1AGF-0004Dw-AM
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 09:42:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58702)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j1AFG-0002tD-RJ
+ (envelope-from <bounces@canonical.com>) id 1j1AFG-0002tE-RJ
  for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:41:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j1AFF-0003Zm-Fb
+ (envelope-from <bounces@canonical.com>) id 1j1AFF-0003Ze-EU
  for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:41:06 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57656)
+Received: from indium.canonical.com ([91.189.90.7]:57580)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j1AFF-0003YD-9m
+ id 1j1AFF-0003Xf-7t
  for qemu-devel@nongnu.org; Mon, 10 Feb 2020 09:41:05 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j1AFC-0006Fr-MA
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:41:02 +0000
+ id 1j1AFA-0006Hc-Pj
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:41:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A663D2E80C0
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:41:02 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id BF7442E80D1
+ for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 14:41:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Feb 2020 14:33:00 -0000
+Date: Mon, 10 Feb 2020 14:31:27 -0000
 From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1859656@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -62,7 +62,7 @@ X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
  =?utf-8?q?=29?=
 References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <158134518103.8732.3152596533083031336.malone@chaenomeles.canonical.com>
+Message-Id: <158134508767.26233.14077435725685992448.malone@soybean.canonical.com>
 Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
  initial deploy
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -71,7 +71,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 320349312b04a786091eb71cf898a7d5dc57b18d
+X-Launchpad-Hash: e1a1ba452049110cd220baad0fabac507230e5e5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -89,18 +89,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I flipped =
+The assumption from here was that this only appeared to be working due
+to:
 
-    <boot dev=3D'hd'/>
-    <boot dev=3D'network'/>
+a) Deploy =3D netboot + reboot from disk =3D working
 
-to
+but at the same time
 
-    <boot dev=3D'hd'/>
-    <boot dev=3D'network'/>
+b) Start =3D netboot (fail) + no fallback =3D fail
 
-And JFH started it from the MAAS UI again.
-Now things work (obviously as expected)
+
+To get that from Maas UI we stopped the guest (it went down as expected).
+Then from Maas we said "power on" again.
+
+There on (b) it failed as maas didn't provide it with an install image.
+If you track it in the console you see:
+
+$virsh start vm1 --console
+setlocale: No such file or directory
+Domain vm1 started
+Connected to domain vm1
+Escape character is ^]
+done
+  Using IPv4 address: 192.168.122.102
+  Using TFTP server: 192.168.122.1
+  Bootfile name: 'boots390x.bin'
+  Receiving data:  0 KBytes
+  TFTP error: file not found: boots390x.bin
+Trying pxelinux.cfg files...
+  Receiving data:  0 KBytes
+  Receiving data:  0 KBytes
+Failed to load OS from network
+
+Maas tries a few times as we see the guest flip between "shut off" and "pau=
+sed" state.
+But then fives up.
+
+The super-TL;DR matching the current insights is:
+- deploy s390x Maas-KVM @ s390x worked and still does
+- poweroff/poweron s390x Maas-KVM @ s390x never worked and still does not
+
+To fix the latter we either need
+a) upstream to implement a fallback to the next boot mechanism
+b) maas to modify the XML after deploy to boot from disk
 
 -- =
 
