@@ -2,79 +2,81 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B49AC35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 20:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE5CAC352A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 21:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D069320838
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 20:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEB6B20733
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 21:38:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o34iiC11"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D069320838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXBQTrWQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB6B20733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1FH5-0008TH-Vx
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 15:03:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60269)
+	id 1j1GlN-000530-RJ
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 16:38:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j1FDg-0005kK-Dj
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:59:55 -0500
+ (envelope-from <eblake@redhat.com>) id 1j1GkL-0004Md-VQ
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 16:37:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j1FDe-0000ln-JW
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 14:59:48 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41692)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j1FDe-0000fP-A6; Mon, 10 Feb 2020 14:59:46 -0500
-Received: by mail-lj1-x241.google.com with SMTP id h23so8750970ljc.8;
- Mon, 10 Feb 2020 11:59:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Icuuk++aNduIcarR/Zk6fEKxpiChaPqvlsjC4Iz8A2A=;
- b=o34iiC11DFFRJAt0ckd0NNDa67DKFzTRYWMKwbrfOfm0ysjBtax4prqtJ/SYGj/6pm
- Ec4z46oNw+mO/cdnn8WpMsD2+NkwP1qg06rhvq+6fMSBFpPVKZql8RT3naa3Fj4nIhWe
- PHcV1vN1eBVEsrPvOegskYoS9tkTi6XZqwHQtJOXA3ODPTEAKzcGJuYdPZTxRJAgTyr9
- yaFW6CBoufHPnVez/nMX83OkVwz4HLEsaPFnNPhPpCjPpQQqxOoqTe7ko/TZssHnBWEK
- 7slNNZJ+R0d/Q3Ecuova+iP2ESDuAgx6LusooylbBbzc3C7AwCLcteFUXo9lHO+Eg0gT
- JOng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Icuuk++aNduIcarR/Zk6fEKxpiChaPqvlsjC4Iz8A2A=;
- b=kNhziSwkPZCa9j0IO+wnxJo3zK+WHMrBq+JkusV/hjdKIR4+0L+8a+8A2cD5IZybu7
- mSjzzyNpRrJ5fXkqNuJdxXuFl8wmoBkczI0ZTZ70/qj5p4W6an2mbwOYfMLeA1alZY0S
- /VPClVZ/C9x8FKVz0jUYq3autDW8H2UCB0pCv/fpBefagq59zavlEfkyPrOEnqsHdKey
- /QmYssXOiESE+NNZ9Y3IGGR19Kx3XavchHtUEYYYRBWDlVtTgYkVNUDKjbU5f2m9Gfqa
- 2XmlDm4u+73D8wCAAOJ5kQj+WRyhSESWTd9vPM9/xdsk3fhp3ZtA3Qz0Pu4z9hV5prpy
- dtkg==
-X-Gm-Message-State: APjAAAUBtkQZ2jTDyTByc613v0hMyvxa0UZzRWRl4SjI7hYY15sTwqUt
- AZLRmh0L/GoP6tMkJGBWv12L0VG5gqdLjhd+ymA=
-X-Google-Smtp-Source: APXvYqwCODtH/HLIsKhXGaHp1iz9FWMT1y3c/t3DV7u/ruWV2twPiwmwpMsA7an9qh3wNL9nv4JDP4KeJ7Ic7Na1Dr4=
-X-Received: by 2002:a2e:8119:: with SMTP id d25mr1964626ljg.76.1581364783097; 
- Mon, 10 Feb 2020 11:59:43 -0800 (PST)
+ (envelope-from <eblake@redhat.com>) id 1j1GkI-0006Wr-UV
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 16:37:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38783
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j1GkI-0006UL-QC
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 16:37:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581370654;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=FNPJLAwxlqp6XYsrI52R3aM36dx1U5zMd2uuI+0CAw4=;
+ b=CXBQTrWQHawG+eMIMrkV5U5nmhcQ0CId+VlHo6RNP6Romg06BJrz4SKEgwyPq77civwwYn
+ MfMBa2xoxpPdaiAKElN08G1zci5t6XyvdKBAPXFomy0vMeuVOrPkIE9P9G5jVsF9RsoIMA
+ e2Mtdm86z19EKUIKPgERp0tzVU5NuWc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-323-o5p4pWqfOUGlSo6mQhP9jA-1; Mon, 10 Feb 2020 16:37:26 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A55C08017CC;
+ Mon, 10 Feb 2020 21:37:24 +0000 (UTC)
+Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 61FD35C1D4;
+ Mon, 10 Feb 2020 21:37:21 +0000 (UTC)
+To: "nbd@other.debian.org" <nbd@other.debian.org>,
+ QEMU <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>, "libguestfs@redhat.com" <libguestfs@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Subject: Cross-project NBD extension proposal: NBD_INFO_INIT_STATE
+Organization: Red Hat, Inc.
+Message-ID: <a4394fde-f459-dcb5-1698-013e1e24c388@redhat.com>
+Date: Mon, 10 Feb 2020 15:37:20 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <cover.1580518859.git.alistair.francis@wdc.com>
- <mhng-f46568ad-b708-4cc5-92ba-d7bd931020ce@palmerdabbelt-glaptop1>
-In-Reply-To: <mhng-f46568ad-b708-4cc5-92ba-d7bd931020ce@palmerdabbelt-glaptop1>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 10 Feb 2020 11:52:25 -0800
-Message-ID: <CAKmqyKM-vr6No_JZaK0-ySm17U6Ez5xp6zzBHkfhDkJyPnxfqg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/35] Add RISC-V Hypervisor Extension v0.5
-To: Palmer Dabbelt <palmerdabbelt@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: o5p4pWqfOUGlSo6mQhP9jA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,143 +88,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, "Richard W.M. Jones" <rjones@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 10, 2020 at 10:50 AM Palmer Dabbelt
-<palmerdabbelt@google.com> wrote:
->
-> On Fri, 31 Jan 2020 17:01:35 PST (-0800), Alistair Francis wrote:
-> > This patch series adds the RISC-V Hypervisor extension v0.5. This is the
-> > latest draft spec of the Hypervisor extension.
-> >
-> > The Hypervisor extension is disabled by default, so this series should
-> > result in no changes to anyone using QEMU unless they enable the
-> > extension. The extention can be enabled with the -cpu property (see
-> > below).
-> >
-> > Testing of this implementation has been done by using the baremetal
-> > Xvisor Hypervisor. We are able to run two Linux guests (that's all I
-> > have tried) as guests in 64-bit. In 32-bit so far I can only run
-> > baremetal guests, but I think this is a baremetal boot loader issue and
-> > not an issue in QEMU.
-> >
-> > The RISC-V KVM implementation was also written using these patches. The
-> > KVM implementation is currently under review.
-> >
-> > At the moment this spec is in a draft state and is subject to change. As
-> > QEMU is extreamly useful in early bring up I think it makes sense for
-> > QEMU to support non-frozen extensions.
-> >
-> > Thanks to Anup for doing the initial port of Xvisor. The port is avaliable here:
-> > https://github.com/avpatel/xvisor-next and will run on QEMU.
-> >
-> > Also thanks to Atish for implementing the SBI call support in Xvisor and
-> > for lots of help debugging.
-> >
-> > To run this yourself:
-> >  1. Apply this patch series to QEMU. The latest branch can be found here:
-> >       https://github.com/alistair23/qemu/tree/mainline/alistair/riscv-hyp-ext-v0.5.next
-> >  2. Get the version of OpenSBI that supports the H extension. This can
-> >     be found here:
-> >       https://github.com/avpatel/opensbi/tree/riscv_hyp_ext_0_5_v1
-> >  3. Build the next release of Xvisor. It is available here:
-> >       https://github.com/avpatel/xvisor-next
-> >  4. Make sure you build the Xvisor tests, see here for details:
-> >       https://github.com/avpatel/xvisor-next/tree/master/tests/riscv/virt64/linux
-> >  5. Run QEMU:
-> >      ./riscv64-softmmu/qemu-system-riscv64 -nographic \
-> >        -machine virt -cpu rv64,x-h=true \
-> >        -serial mon:stdio -serial null -m 4G \
-> >        -device loader,file=vmm.bin,addr=0x80200000 \
-> >        -kernel fw_jump.elf \
-> >        -initrd vmm-disk-linux.img \
-> >        -append "vmm.console=uart@10000000 vmm.bootcmd=\"vfs mount initrd /;vfs run /boot.xscript;vfs cat /system/banner.txt\""
-> >
-> >    Once you get to the prompt you can start the geust by running:
-> >      guest kick guest0
-> >    You can then bind to the serial port using:
-> >      vserial bind guest0/uart0
-> >    Then you can start Linux using:
-> >      autoexec
-> >
-> >  This was all tested with the mainline 5.2/5.3 kernels.
-> >
-> > There is very early work on a Xen port as well which is avaliable here:
-> > https://github.com/alistair23/xen/tree/alistair/riscv-port
-> >
-> > ToDo/Issues
-> >  - Get 32-bit fully working
-> >
-> > v2:
-> >  - Don't use riscv_cpu_set_force_hs_excep() for 2nd stage MMU fauls as
-> >    the v0.5 spec has a specific fault
-> >  - Address review comments
-> >  - Rebase on master
-> >  - Remove pointers for mstatus
-> >
-> > Alistair Francis (35):
-> >   target/riscv: Convert MIP CSR to target_ulong
-> >   target/riscv: Add the Hypervisor extension
-> >   target/riscv: Add the Hypervisor CSRs to CPUState
-> >   target/riscv: Add support for the new execption numbers
-> >   target/riscv: Rename the H irqs to VS irqs
-> >   target/riscv: Add the virtulisation mode
-> >   target/riscv: Add the force HS exception mode
-> >   target/riscv: Fix CSR perm checking for HS mode
-> >   target/riscv: Print priv and virt in disas log
-> >   target/riscv: Dump Hypervisor registers if enabled
-> >   target/riscv: Add Hypervisor CSR access functions
-> >   target/riscv: Add Hypervisor virtual CSRs accesses
-> >   target/riscv: Add Hypervisor machine CSRs accesses
-> >   target/riscv: Add virtual register swapping function
-> >   target/riscv: Set VS bits in mideleg for Hyp extension
-> >   target/riscv: Extend the MIE CSR to support virtulisation
-> >   target/riscv: Extend the SIP CSR to support virtulisation
-> >   target/riscv: Add support for virtual interrupt setting
-> >   target/ricsv: Flush the TLB on virtulisation mode changes
-> >   target/riscv: Generate illegal instruction on WFI when V=1
-> >   target/riscv: Add hypvervisor trap support
-> >   target/riscv: Add Hypervisor trap return support
-> >   target/riscv: Add hfence instructions
-> >   target/riscv: Remove the hret instruction
-> >   target/riscv: Only set TB flags with FP status if enabled
-> >   target/riscv: Disable guest FP support based on virtual status
-> >   target/riscv: Mark both sstatus and msstatus_hs as dirty
-> >   target/riscv: Respect MPRV and SPRV for floating point ops
-> >   target/riscv: Allow specifying MMU stage
-> >   target/riscv: Implement second stage MMU
-> >   target/riscv: Raise the new execptions when 2nd stage translation
-> >     fails
-> >   target/riscv: Set htval and mtval2 on execptions
-> >   target/riscv: Add support for the 32-bit MSTATUSH CSR
-> >   target/riscv: Add the MSTATUS_MPV_ISSET helper macro
-> >   target/riscv: Allow enabling the Hypervisor extension
-> >
-> >  target/riscv/cpu.c                            |  57 ++-
-> >  target/riscv/cpu.h                            |  58 ++-
-> >  target/riscv/cpu_bits.h                       | 111 ++--
-> >  target/riscv/cpu_helper.c                     | 481 ++++++++++++++++--
-> >  target/riscv/csr.c                            | 369 +++++++++++++-
-> >  target/riscv/gdbstub.c                        |  11 +-
-> >  target/riscv/insn32.decode                    |  22 +-
-> >  .../riscv/insn_trans/trans_privileged.inc.c   |  45 +-
-> >  target/riscv/op_helper.c                      |  71 ++-
-> >  target/riscv/translate.c                      |  34 ++
-> >  10 files changed, 1130 insertions(+), 129 deletions(-)
->
-> Thanks.  I'm going to send out the current queue, just to make sure it doesn't
-> get blocked, and then dig through all this.  It should be essentially ready to
-> go, IIRC there were just a few patches that changed enough to warrant a review.
+I will be following up to this email with four separate threads each 
+addressed to the appropriate single list, with proposed changes to:
+- the NBD protocol
+- qemu: both server and client
+- libnbd: client
+- nbdkit: server
 
-Sounds good.
+The feature in question adds a new optional NBD_INFO_ packet to the 
+NBD_OPT_GO portion of handshake, adding up to 16 bits of information 
+that the server can advertise to the client at connection time about any 
+known initial state of the export [review to this series may propose 
+slight changes, such as using 32 bits; but hopefully by having all four 
+series posted in tandem it becomes easier to see whether any such tweaks 
+are warranted, and can keep such tweaks interoperable before any of the 
+projects land the series upstream].  For now, only 2 of those 16 bits 
+are defined: NBD_INIT_SPARSE (the image has at least one hole) and 
+NBD_INIT_ZERO (the image reads completely as zero); the two bits are 
+orthogonal and can be set independently, although it is easy enough to 
+see completely sparse files with both bits set.  Also, advertising the 
+bits is orthogonal to whether the base:allocation metacontext is used, 
+although a server with all possible extensions is likely to have the two 
+concepts match one another.
 
-This series should be pretty straight forward to review. It's very
-similar to the previous one.
+The new bits are added as an information chunk rather than as runtime 
+flags; this is because the intended client of this information is 
+operations like copying a sparse image into an NBD server destination. 
+Such a client only cares at initialization if it needs to perform a 
+pre-zeroing pass or if it can rely on the destination already reading as 
+zero.  Once the client starts making modifications, burdening the server 
+with the ability to do a live runtime probe of current reads-as-zero 
+state does not help the client, and burning per-export flags for 
+something that quickly goes stale on the first edit was not thought to 
+be wise, similarly, adding a new NBD_CMD did not seem worthwhile.
 
-Alistair
+The existing 'qemu-img convert source... nbd://...' is the first command 
+line example that can benefit from the new information; the goal of 
+adding a protocol extension was to make this benefit automatic without 
+the user having to specify the proposed --target-is-zero when possible. 
+I have a similar thread pending for qemu which adds similar 
+known-reads-zero information to qcow2 files:
+https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg08075.html
+
+That qemu series is at v1, and based on review it has had so far, it 
+will need some interface changes for v2, which means my qemu series here 
+will need a slight rebasing, but I'm posting this series to all lists 
+now to at least demonstrate what is possible when we have better startup 
+information.
+
+Note that with this new bit, it is possible to learn if a destination is 
+sparse as part of NBD_OPT_GO rather than having to use block-status 
+commands.  With existing block-status commands, you can use an O(n) scan 
+of block-status to learn if an image reads as all zeroes (or 
+short-circuit in O(1) time if the first offset is reported as probable 
+data rather than reading as zero); but with this new bit, the answer is 
+O(1).  So even with Vladimir's recent change to make the spec permit 4G 
+block-status even when max block size is 32M, or the proposed work to 
+add 64-bit block-status, you still end up with more on-the-wire traffic 
+for block-status to learn if an image is all zeroes than if the server 
+just advertises this bit.  But by keeping both extensions orthogonal, a 
+server can implement whichever one or both reporting methods it finds 
+easiest, and a client can work with whatever a server supplies with sane 
+fallbacks when the server lacks either extension.  Conversely, 
+block-status tracks live changes to the image, while this bit is only 
+valid at connection time.
+
+My repo for each of the four projects contains a tag 'nbd-init-v1':
+  https://repo.or.cz/nbd/ericb.git/shortlog/refs/tags/nbd-init-v1
+  https://repo.or.cz/qemu/ericb.git/shortlog/refs/tags/nbd-init-v1
+  https://repo.or.cz/libnbd/ericb.git/shortlog/refs/tags/nbd-init-v1
+  https://repo.or.cz/nbdkit/ericb.git/shortlog/refs/tags/nbd-init-v1
+
+For doing interoperability testing, I find it handy to use:
+
+PATH=/path/to/built/qemu:/path/to/built/nbdkit:$PATH
+/path/to/libnbd/run your command here
+
+to pick up just-built qemu-nbd, nbdsh, and nbdkit that all support the 
+feature.
+
+For quickly setting flags:
+nbdkit eval init_sparse='exit 0' init_zero='exit 0' ...
+
+For quickly checking flags:
+qemu-nbd --list ... | grep init
+nbdsh -u uri... -c 'print(h.get_init_flags())'
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
