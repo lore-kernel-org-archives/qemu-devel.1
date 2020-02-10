@@ -2,87 +2,83 @@ Return-Path: <SRS0=Q7uJ=36=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F259C352A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 12:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1706C352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 12:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B68B20873
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 12:27:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1A99214DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 12:28:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RCYy5Thl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B68B20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfkprqNH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1A99214DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j189y-00037Z-GX
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 07:27:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40451)
+	id 1j18BP-0004Cp-1e
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 07:28:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40664)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j189M-0002QC-SS
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:26:55 -0500
+ (envelope-from <stenavin@gmail.com>) id 1j18Ao-0003cZ-5v
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:28:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j189J-0004wu-Fa
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:26:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29013
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j189J-0004wP-A3
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:26:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581337608;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yJOUdqnRoX4n5q15YShb09JIW4Qe1yDZFMTL6QZ8I94=;
- b=RCYy5ThlTZYM3iU2HOd12w974i1hVMMqbD2GNQ3ChHQd9j+rc9UrNdc2RBIP1opN9VaOq9
- US33W427GHLuEz5+9eTg/V/ptoyF1HAlu+GNs0wLEMxKa88gij1EGsRWm32ExGzlaLLpnu
- /JiYrzXGkeQEW6uc9xRq5nwRPAh7+Ow=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-I9YOcEN8OR2w9pNrsLk65w-1; Mon, 10 Feb 2020 07:26:46 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65E5A107ACC5;
- Mon, 10 Feb 2020 12:26:42 +0000 (UTC)
-Received: from linux.fritz.box (unknown [10.36.118.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 535A790F57;
- Mon, 10 Feb 2020 12:26:31 +0000 (UTC)
-Date: Mon, 10 Feb 2020 13:26:30 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: qmp-shell for GSoC/Outreachy?
-Message-ID: <20200210122630.GB5955@linux.fritz.box>
-References: <20200124095027.GA824327@redhat.com>
- <20200127143505.GD5669@linux.fritz.box>
- <20200127202925.GE3419@work-vm>
- <20200128105932.GC6431@linux.fritz.box>
- <20200205130946.GC5768@dhcp-200-226.str.redhat.com>
- <a45df5ab-3cad-0fbe-901f-4bc1ba28d38e@redhat.com>
- <20200205194944.GP3210@work-vm> <877e10xdd6.fsf@dusky.pond.sub.org>
- <20200206142143.GA4926@linux.fritz.box>
- <e0c6b15c-5411-6112-0327-ef9d51424153@redhat.com>
+ (envelope-from <stenavin@gmail.com>) id 1j18Am-0005tG-Ty
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 07:28:22 -0500
+Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:40454)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stenavin@gmail.com>)
+ id 1j18Am-0005so-PM; Mon, 10 Feb 2020 07:28:20 -0500
+Received: by mail-oi1-x233.google.com with SMTP id a142so8996924oii.7;
+ Mon, 10 Feb 2020 04:28:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=KCPoT2lJcBEaaSXkgsBUWuCOqh678TzTT+/anZXpPn8=;
+ b=jfkprqNHyhRxFri92X63BVgzNzc6n9ys4lglNkGTtVojbPtsgmSV8zKHDkunxQLLsV
+ rCQzpQFNi62JwonZhfUA5BqtX6I2QL6X2642YFPQYJXv27krEwdORTrfuZO+oyKkLZFk
+ G4xPnH+b+QpBpuVq/J8/oUJ4fDIJcKntaq/Dma2LFGfUSRE/yPUajFBQw7ho02IvssZS
+ 4WHzZoZHbfuIJjjoyfo/JwqC0Uvfz6AHTIcFllE3Ru8PQo4HqyNlI5h3P6ch3l6P/TT6
+ Sg6JfH3ci1dSRsybmE81XzsoEKzp087DCEXS9avYZiD2o6aBIm8rjzne1KqLZQI0bRGF
+ dZkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=KCPoT2lJcBEaaSXkgsBUWuCOqh678TzTT+/anZXpPn8=;
+ b=WQu2ZiCT2suagoOKvRQWpgw+JtzeWlmc8mfnBqGpu42hnJKElEbQVpuhM3enjb840G
+ Q3qoAldX3LoNiIkJfF+BGRyTtq2tE0ncZZERK4vuq9bH7/oWmbbCj0SKQECRqW9LCgHH
+ nGWKWtUmCVS72SmVW2B7zGSJcApKJKUIRWiG1CdlYOFZD5KmrCt2m9VN1bIPmOCnwBLk
+ ogeqb6ZyGr8AJrrxSPiZrr1Em5iydvBYQRLyPfiD5zitAOovqQXTvFcvvsfR+ANtxRu9
+ tBUqM0UG+gcokdbX07yCMZQAShS3Z7Du84AuDptFZY0vObms/FRue/cfVTrUWWZe19Kb
+ IJxA==
+X-Gm-Message-State: APjAAAWyZnirBLemJErh+EguzTQvDLdtV8o35tnDpOndzGqQJE8aXS7v
+ DXnq+xz+/WJdfpLPh+llN3fuvhThYty724/IIOE=
+X-Google-Smtp-Source: APXvYqxVlrlEv8FYi3YczQxtCbSXB6g49lTv+7f6gmYmWFWfL0yPwNcXdaulBP3k8t1IqvS6aoc/TwRwwxRzWCzhMi8=
+X-Received: by 2002:a05:6808:8fc:: with SMTP id
+ d28mr683268oic.152.1581337699688; 
+ Mon, 10 Feb 2020 04:28:19 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <e0c6b15c-5411-6112-0327-ef9d51424153@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: I9YOcEN8OR2w9pNrsLk65w-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+References: <20200207232528.13461-1-stenavin@gmail.com>
+ <20200210114316.GW3888@redhat.com>
+In-Reply-To: <20200210114316.GW3888@redhat.com>
+From: Nikolay Ivanets <stenavin@gmail.com>
+Date: Mon, 10 Feb 2020 14:28:08 +0200
+Message-ID: <CAHwdxNdvLd9THPZz=xHd7m8Aw3myC1xM73WN_Fh-Xf5tor9Wig@mail.gmail.com>
+Subject: Re: [Libguestfs] [RFC] lib: allow to specify physical/logical block
+ size for disks
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::233
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,307 +90,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ libguestfs@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.02.2020 um 22:23 hat John Snow geschrieben:
-> On 2/6/20 9:21 AM, Kevin Wolf wrote:
-> > I think this subthread shows that we actually have many separate
-> > projects that people wish to have someone work on. Each of them is
-> > probably a bit too small for a whole GSoC, but all of them together are
-> > probably too much. So I'll guess the student would pick maybe two of
-> > them, and if time is left at the end, more can be added as a bonus.
-> >=20
->=20
-> You're right, I am bundling together a few things.
->=20
-> > 1. Something like --monitor mode=3Dqmp-shell that just spawns an extern=
-al
-> >    Python script and passes it a QMP socket. This is the fundamental
-> >    building block for having any kind of external monitor script
-> >    actually integrated in QEMU, so I think just running the existing
-> >    qmp-shell this way (with proper support for at least stdio and vc
-> >    chardevs) would make sense as a first milestone.
->=20
-> This is a good standalone task, but
->=20
-> > 2. Rewriting qmp-shell to use a better syntax for nested data
-> >    structures. This would have to be defined before the project starts.
-> >=20
->=20
-> ... Can't start until we define the proper interface, because then we
-> have to support it. Right now, qmp-shell is a developer toy because it's
-> hidden in the tree.
->=20
-> Promoting it to prime-time will be fruitless unless we come up with a
-> convincing TUI for it.
-
-I'm not sure what you mean by "support". We wouldn't have to support it
-any more than qmp-shell in the initial phase. It wouldn't even have to
-be any less hidden.
-
-And in fact, even in the long run, as it is meant for human use, the
-compatibility promise (if this is what you mean) would be the same as
-HMP - we change it whenever we think that this improves its usability
-for humans.
-
-There is a big difference between making qmp-shell more usable and
-promoting it to prime-time.
-
-> > 3. Improving qmp-shell UI-wise, e.g. by having better autocompletion,
-> >    support for counting brackets, or whatever else was mentioned. We
-> >    have a few ideas, and there's room for the student to add their own
-> >    ideas, too.
->=20
-> Yes, this is all just great sugar. Completely optional, non-necessary.
-> Forgive me for bringing up things like this so often.
->=20
-> Not requisite to start on the project, but are great auxiliary tasks
-> that would make it really shiny. Perfect GSoC/outreachy material.
-
-I think some amount of sugar will actually be necessary. We don't want
-to have something that barely works, but something that people would
-actually prefer to HMP.
-
-> > 4. Something HMP-like. This isn't QMP any more, so it could as well be =
+=D0=BF=D0=BD, 10 =D0=BB=D1=8E=D1=82. 2020 =D0=BE 13:43 Richard W.M. Jones <=
+rjones@redhat.com> =D0=BF=D0=B8=D1=88=D0=B5:
+>
+> On Sat, Feb 08, 2020 at 01:25:28AM +0200, Mykola Ivanets wrote:
+> > From: Nikolay Ivanets <stenavin@gmail.com>
+> >
+> > I faced with situation where libguestfs cannot recognize partitions on =
 a
-> >    separate script (hmp-shell?). But it could also be integrated in
-> >    qmp-shell in the form of additional commands that are implemented
-> >    client-side. Or maybe have a single shell, but have a QMP mode and a=
-n
-> >    HMP mode and the user can switch between these modes.
-> >=20
-> >    The syntax for the HMP shell/mode could be the same or different fro=
-m
-> >    the QMP syntax. This would have to be defined beforehand, too.
-> >=20
->=20
-> More or less my suggestion for offering e.g. "?info block" sugar
-> commands in the qmp-shell: an interface for executing sugar commands in
-> a unified human shell.
->=20
-> So, I don't know if "The final death of HMP" is something we want to
-> pursue as a project
+> > disk image which was partitioned on a system with "4K native" sector
+> > size support.
+>
+> Do you have a small test case for this?
 
-I would start with "Creating something that could eventually evolve into
-something that makes HMP useless".
+We can easily create one with patched libguestfs and attach disk to
+unpatched libguestfs.
 
-> (Even though I bring it up often, I consider it an open question -- do
-> we want this? I actually don't know. I had assumed that working on a
-> fancy qmp-shell would only be interesting if it meant the death of
-> HMP, but perhaps I am wrong.)
+> > In order to fix the issue we need to allow users to specify desired
+> > physical and/or logical block size per drive basis.
+>
+> It seems like physical_block_size / logical_block_size in qemu are
+> completely undocumented.  However I did some experiments with patching
+> libguestfs and examining the qemu and parted code.  Here are my
+> observations:
+>
+> (1) Setting only physical_block_size =3D 4096 seems to do nothing.
 
-I don't know either. I can tell you when I see the alternative. Having
-the alternative implemented as an external script allows for some
-experimentation without fully committing to it yet. qmp-shell has lived
-for a long time in the tree without replacing HMP, so if we just end up
-with a more usable qmp-shell that still doesn't replace HMP, I would
-still see it as progress.
+See my thoughts on this in previous email.
 
-> Before we integrate qmp-shell into the GUI, I suspect we at least want
-> to answer ourselves what we want qmp-shell to be:
->=20
-> - QMP only, but nice for humans to interface with, or
-> - QMP with extras, like "?info block"
->=20
-> This mission statement will inform our basic premise for the syntax,
-> and getting the basic syntax right is important for having a
-> successful GSoC/outreachy project.
+> (2) Setting only logical_block_size =3D 4096 is explicitly rejected by
+> virtio-scsi:
+>
+> https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/scsi/scsi-disk.c;h=3D1=
+0d0794d60f196f177563aae00bed2181f5c1bb1;hb=3DHEAD#l2352
+>
+> (A similar test exists for virtio-blk)
+>
+> (3) Setting both physical_block_size =3D logical_block_size =3D 4096
+> changes how parted partitions GPT disks.  The partition table is
+> clearly using 4K sectors as you can see by examining the disk
+> afterwards with hexdump.
+>
+> (4) Neither setting changes MBR partitioning by parted, although my
+> interpretation of Wikipedia indicates that it should be possible to
+> create a MBR disk with 4K sector size.  Maybe I'm doing something
+> wrong, or parted just doesn't support this case.
+>
+> So it appears that we should just have one blocksize control (maybe
+> called "sectorsize"?) which sets both physical_block_size and
+> logical_block_size to the same value.  It may also be worth enforcing
+> that blocksize/sectorsize must be set to 512 or 4096 (which we can
+> relax later if necessary).
 
-I think the former would be a subset of the latter, so starting with the
-former shouldn't result in wasted work.
+If we stick with the only parameter, I think blocksize might be better name=
+,
+especially if we want to split this parameter somewhere latter.
 
-Personally, I like the idea of supporting some extras to perform high
-level operations that QMP doesn't provide. I don't like the idea of
-prefixing the extras with "?" to make them second-class commands.
-Instead of having "?info block", I think "query-block" should be able to
-print something readable by default and switching it to raw JSON would
-be optional.
+Here are more precise restrictions:
 
-> > 5. Probably more that I just forgot now.
-> >=20
-> > Suggesting the exact goals is part of the student application process,
-> > but for fundamental things like the syntax we should probably already
-> > know what we want.
-> >=20
->=20
-> The goals for the intership yes, but I am merely suggesting we come up
-> with a goal for what we want qmp-shell *to be* and what it is for, and
-> why it will benefit us.
->=20
-> Otherwise, it will be hard to offer direction to a student trying to
-> write code in a very political and opinionated area of our codebase.
->=20
-> So as requisites, I think we just need to answer:
->=20
-> - Do we want to get rid of HMP?
+Both values must be a power of 2 between 512 and 32768.
+logical_block_size must be
+less or equals to physical_block_size.
 
-Possibly.
-
-> - Roughly, how do we want qmp-shell to act? Is it a REPL?
-
-What else would it be?
-
-> Are we convinced there is a workable QMP-compatible syntax that will
-> be "easy to use" (subjective) and "easy to parse" (subjective) in such
-> a system?
-
-I think so. QMP-compatible basically just means that we need to be able
-to distinguish QTypes (where the schema doesn't already disambiguate)
-and to allow nesting.
-
-> - Do we like the existing syntax? (I assume we do not.)
-
-It makes sense for scalar options, so I think we'll want to keep these
-cases working. We'll probably want something different for lists and
-dicts.
-
-Compared to HMP, a difference is that qmp-shell always requires you to
-specify the option name. Introducing "positional arguments" like in HMP
-could probably make things considerably easier to use.
-
-> And all the rest is details that can be worked out by discussions,
-> review, the student proposal, etc.
->=20
-> >>>> I think those are the hardest parts.
-> >>>>
-> >>>> Below, some musings:
-> >>>>
-> >>>> - An integrated QMP shell would be a great usability boost to users =
-of
-> >>>> bare QEMU.
-> >>>>
-> >>>> - It is undesirable in general to support two interfaces. Feature
-> >>>> disparity is a problem, as is needing to document and test two separ=
-ate
-> >>>> interfaces. The quality disparity between the two is also an issue.
-> >>>>
-> >>>> - Offering HMP via the GTK interface but not QMP is a discoverabilit=
-y
-> >>>> problem. Unfamiliar users might assume that HMP is our flagship
-> >>>> interface. It is not.
-> >>>>
-> >>>> - We are unlikely to re-expand HMP to cover everything QMP does; wri=
-ting
-> >>>> a QMP shell that makes QMP easy to interface with is a better soluti=
-on
-> >>>> for removing redundancy and complexity.
-> >=20
-> > I'm not entirely convinced of this because QMP is often too low-level t=
-o
-> > actually address the practical high-level needs of users.
-> >=20
-> > But these HMP-ish things are probably easier to maintain as scripts
-> > outside of the QEMU binary, so I think some kind of "QMP with
-> > extensions" for human could be the solution.
-> >=20
-> > Once it's an external script, it will also be easy to exchange the shel=
-l
-> > for another one depending on user preference, or to hack in whatever
-> > functionality they are missing.
-> >=20
->=20
-> Yes! This is exactly what I want with "?info block" style commands in
-> qmp-shell: standalone qmp-shell extensions that implement one nugget of
-> functionality that make a task easy at the human level.
->=20
-> Things that are important to "make easy" will get extensions.
->=20
-> Things that aren't, won't.
->=20
-> Let's say we do remove HMP: Anyone who misses some of that functionality
-> ... Well, if you care, please do contribute a qmp-shell plugin that adds =
-it.
-
-I think we should keep removing HMP completely out of this discussion.
-If at some point we agree that qmp-shell has been improved to the extent
-that none of us use HMP any more anyway, that's probably the point when
-we should talk about removing HMP.
-
-Let's just talk about improving qmp-shell for now.
-
-> >>>> - I suspect that the target audience for users of naked QEMU are:
-> >>>>   - QEMU developers
-> >>>>   - Upper-layer developers (RHV, oVirt, KubeVirt, libvirt, kata, et =
-al)
-> >>>> researching, testing, and debugging integration.
-> >>>>   - Devops professionals testing, implementing and debugging
-> >>>>     configuration & infrastructure
-> >>>>   - Security/infosec researchers
-> >>>>   - Embedded platform developers
-> >>>>   - Academic researchers
-> >=20
-> > Maybe kernel developers should be mentioned separately, but yes, this
-> > list looks plausible to me.
->=20
-> Oh, sure. This list is primarily here to state that there are very valid
-> reasons to make QEMU usable *directly* to people because there are
-> extremely valid reasons to be driving it directly.
->=20
-> I think the *exact nature* of all of these use cases is not as important
-> so much as they unambiguously exist.
->=20
-> These users are technical, but may or may not be intricately familiar
-> with QEMU inner workings.
-
-Yes, I agree.
-
-> Two takeaways:
->=20
-> - Having some sugar that doesn't assume they know *too much* is
-> important. A little bit of hand-holding is nice.
->=20
-> - Having an interface that does not get in your way when you know
-> exactly what you want is important to QEMU developers. (Allowing
-> raw/direct QMP input, showing raw/pretty-printed incoming and outgoing
-> QMP for writing documentation, etc.)
-
-Yes, even if we have human-oriented output for a command, there should
-always be a way to see the raw JSON. And probably also a way to send raw
-JSON.
-
-> >>>> So please correct me if I am off the mark;
-> >>>>
-> >>>> Design Goals:
-> >>>>   - The removal of HMP
-> >>>>   - An easy-to-use interface that remains reasonably "close" to the
-> >>>> machine API such that it provides a smooth transition to scripting Q=
-EMU.
-> >>>>   - Integration with our GTK interface for discoverability and conve=
-nience
-> >=20
-> > As I listed above, I think these are actually three separate projects,
-> > rather than goals for a single big projects.
->=20
-> Yes, so let me say that the *deliverable* goals for a GSoC/Outreachy
-> project should just simply be *compatible* with our long-term roadmap/goa=
-ls.
-
-That's a good way to phrase it.
-
-> Having an idea for where we want to head will allow us to define a
-> tighter bound on what we want this summer without wasting effort.
->=20
-> (And will allow us to give more rapid feedback to the student without
-> arguing between ourselves what we even want. I just want us to agree on
-> a mission statement.)
-
-We should have a rough idea, but I don't think we need to know exactly
-what the final state will look like. Let's keep some room for
-experimentation. And even if we now implement something that turns out a
-less than optional decision later, we can still change it. It's a human
-interface, we don't have to be careful with respect to compatibility.
-
-Kevin
-
+--
+  Mykola Ivanets
 
