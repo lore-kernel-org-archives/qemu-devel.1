@@ -7,123 +7,81 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C047C352A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 10:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B20C352A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 10:27:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26E8420733
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 10:13:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4213A2080C
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Feb 2020 10:27:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IpEDU2fR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26E8420733
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hbxYgJMB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4213A2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j163t-0005jc-Au
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 05:13:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50037)
+	id 1j16IH-0002tL-F4
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 05:27:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j163C-0005Gq-Rd
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 05:12:25 -0500
+ (envelope-from <thuth@redhat.com>) id 1j16Hf-0002Cd-UT
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 05:27:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j163B-00066v-0q
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 05:12:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40061
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1j16Hd-0000Pl-SW
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 05:27:18 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20504
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j163A-000665-Qt
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 05:12:20 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1j16Hd-0000Oz-Ks
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 05:27:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581329540;
+ s=mimecast20190719; t=1581330436;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7CjRIe3TGxOfvF4dkwS8EYe9HolfAusZZeDN0uJGpGc=;
- b=IpEDU2fRNF5/VZXMlrjKpu8nMnLrjN/09RwY43G0CvHSZ6VdWhE0Xm6//opuLndbXudTlf
- oAWfQFhtUvlawHE9z6IyXhoDtEZCj+wjZGOTXFzr14qvnYHCNhiIwwIgRdK0le/3slEWQP
- 3BJf606BlWz3Op6fEBQOrq6HlDxCu/M=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=3I1JFY4Uk5ZJJe8bsZVXIweUHXgN2+/GrubmWyn6ecU=;
+ b=hbxYgJMBripsLTe8ywiodB+5j4TDjK3xIGP0vN/u8p6LKWzF/2vuPI5AMB/6VUrOFDrNqx
+ ty37jYEo6Pfob7lG/CuzhkE+KfytNiaQ8eE96y7H3LtvCMu8PAlGUHDY+qhZwg/UB8kq6m
+ TUqOY2khOiF5aloXIDEgB1Zr1w3gBLw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-7-AonS8RMGm83oLRRyE6Zg-1; Mon, 10 Feb 2020 05:12:18 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-358-gvisQ3hQOLWKGW1cKue-RQ-1; Mon, 10 Feb 2020 05:27:15 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4ADB3DBB5;
- Mon, 10 Feb 2020 10:12:17 +0000 (UTC)
-Received: from [10.36.117.242] (ovpn-117-242.ams2.redhat.com [10.36.117.242])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AAE5189F2A;
- Mon, 10 Feb 2020 10:12:12 +0000 (UTC)
-Subject: Re: [PATCH v1 13/13] exec: Ram blocks with resizable anonymous
- allocations under POSIX
-To: qemu-devel@nongnu.org
-References: <20200203183125.164879-1-david@redhat.com>
- <20200203183125.164879-14-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <4030a9f7-9a21-edd9-0344-4860fb92eabe@redhat.com>
-Date: Mon, 10 Feb 2020 11:12:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC56213EA;
+ Mon, 10 Feb 2020 10:27:10 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-219.ams2.redhat.com [10.36.116.219])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B4828ED0B;
+ Mon, 10 Feb 2020 10:26:54 +0000 (UTC)
+Subject: Re: Tricore default machine
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200207161948.15972-1-philmd@redhat.com>
+ <20200207161948.15972-2-philmd@redhat.com>
+ <9590e020-226d-bc85-e496-95b4f0116f69@redhat.com>
+ <e4157357-7697-a2d5-8662-f5bd12d74619@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f7b72c47-4202-d220-7b29-bd5ad6283700@redhat.com>
+Date: Mon, 10 Feb 2020 11:26:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200203183125.164879-14-david@redhat.com>
+In-Reply-To: <e4157357-7697-a2d5-8662-f5bd12d74619@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 7-AonS8RMGm83oLRRyE6Zg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: gvisQ3hQOLWKGW1cKue-RQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,111 +93,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Chris Wulff <crwulff@gmail.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Anthony Green <green@moxielogic.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+ Jia Liu <proljc@gmail.com>, qemu-trivial@nongnu.org,
+ Helge Deller <deller@gmx.de>, David Hildenbrand <david@redhat.com>,
+ Magnus Damm <magnus.damm@gmail.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
+ Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>,
+ qemu-riscv@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03.02.20 19:31, David Hildenbrand wrote:
-> We can now make use of resizable anonymous allocations to implement
-> actually resizable ram blocks. Resizable anonymous allocations are
-> not implemented under WIN32 yet and are not available when using
-> alternative allocators. Fall back to the existing handling.
-> 
-> We also have to fallback to the existing handling in case any ram block
-> notifier does not support resizing (esp., AMD SEV, HAX) yet. Remember
-> in RAM_RESIZEABLE_ALLOC if we are using resizable anonymous allocations.
-> 
-> As the mmap()-hackery will invalidate some madvise settings, we have to
-> re-apply them after resizing. After resizing, notify the ram block
-> notifiers.
-> 
-> The benefit of actually resizable ram blocks is that e.g., under Linux,
-> only the actual size will be reserved (even if
-> "/proc/sys/vm/overcommit_memory" is set to "never"). Additional memory will
-> be reserved when trying to resize, which allows to have ram blocks that
-> start small but can theoretically grow very large.
-> 
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Cc: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  exec.c                    | 68 +++++++++++++++++++++++++++++++++++----
->  hw/core/numa.c            | 10 ++++--
->  include/exec/cpu-common.h |  2 ++
->  include/exec/memory.h     |  8 +++++
->  4 files changed, 79 insertions(+), 9 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index fc65c4f7ca..a59d1efde3 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2053,6 +2053,16 @@ void qemu_ram_unset_migratable(RAMBlock *rb)
->      rb->flags &= ~RAM_MIGRATABLE;
->  }
->  
-> +bool qemu_ram_is_resizable(RAMBlock *rb)
-> +{
-> +    return rb->flags & RAM_RESIZEABLE;
-> +}
-> +
-> +bool qemu_ram_is_resizable_alloc(RAMBlock *rb)
-> +{
-> +    return rb->flags & RAM_RESIZEABLE_ALLOC;
-> +}
-> +
->  /* Called with iothread lock held.  */
->  void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
->  {
-> @@ -2139,6 +2149,8 @@ static void qemu_ram_apply_settings(void *host, size_t length)
->   */
->  int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
->  {
-> +    const uint64_t oldsize = block->used_length;
-> +
->      assert(block);
->  
->      newsize = HOST_PAGE_ALIGN(newsize);
-> @@ -2147,7 +2159,7 @@ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
->          return 0;
->      }
->  
-> -    if (!(block->flags & RAM_RESIZEABLE)) {
-> +    if (!qemu_ram_is_resizable(block)) {
->          error_setg_errno(errp, EINVAL,
->                           "Length mismatch: %s: 0x" RAM_ADDR_FMT
->                           " in != 0x" RAM_ADDR_FMT, block->idstr,
-> @@ -2163,10 +2175,26 @@ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
->          return -EINVAL;
->      }
->  
-> +    if (qemu_ram_is_resizable_alloc(block)) {
-> +        g_assert(ram_block_notifiers_support_resize());
-> +        if (qemu_anon_ram_resize(block->host, block->used_length,
-> +                                 newsize, block->flags & RAM_SHARED) == NULL) {
-> +            error_setg_errno(errp, -ENOMEM,
-> +                             "Could not allocate enough memory.");
-> +            return -ENOMEM;
-> +        }
-> +    }
-> +
+On 10/02/2020 11.08, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 2/10/20 10:35 AM, Thomas Huth wrote:
+>> On 07/02/2020 17.19, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> The MachineClass is already zeroed on creation.
+>>>
+>>> Note: The code setting is_default=3D0 in hw/i386/pc_piix.c is
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 different (related to compat optio=
+ns). When adding a
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 new versioned machine, we want it =
+to be the new default,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 so we have to mark the previous on=
+e as not default.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> v3: new patch
+>>> ---
+>>> =C2=A0 hw/lm32/lm32_boards.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 1 -
+>>> =C2=A0 hw/lm32/milkymist.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 1 -
+>>> =C2=A0 hw/m68k/q800.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 | 1 -
+>>> =C2=A0 hw/microblaze/petalogix_ml605_mmu.c | 1 -
+>>> =C2=A0 hw/tricore/tricore_testboard.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 1=
+ -
+>>> =C2=A0 5 files changed, 5 deletions(-)
+>> [...]
+>>> diff --git a/hw/tricore/tricore_testboard.c
+>>> b/hw/tricore/tricore_testboard.c
+>>> index 20c9ccb3ce..8ec2b5bddd 100644
+>>> --- a/hw/tricore/tricore_testboard.c
+>>> +++ b/hw/tricore/tricore_testboard.c
+>>> @@ -105,7 +105,6 @@ static void ttb_machine_init(MachineClass *mc)
+>>> =C2=A0 {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mc->desc =3D "a minimal TriCore board";
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mc->init =3D tricoreboard_init;
+>>> -=C2=A0=C2=A0=C2=A0 mc->is_default =3D 0;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mc->default_cpu_type =3D TRICORE_CPU_TYP=
+E_NAME("tc1796");
+>>> =C2=A0 }
+>>
+>> I wonder whether we should simply make that machine the default for
+>> qemu-system-tricore? There is only one machine here, and not having a
+>> default machine always causes some headaches in the tests...
+>> (see e.g. tests/qemu-iotests/check for example)
+>=20
+> Or make it generic? If a architecture has a single machine, use it by
+> default?
 
-I'll most probably rework to have separate paths when growing/shrinking,
-with a different sequence of steps. (e.g., perform actual shrinking as
-last step, so all mappings remain valid, and ignore errors (which are
-unlikely either way)).
+Sounds like a good idea, too ... we've got a couple of targets that have
+only one machine.
 
-
--- 
-Thanks,
-
-David / dhildenb
+ Thomas
 
 
