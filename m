@@ -2,64 +2,84 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86260C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1970BC352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:43:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5255420656
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:43:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8B1C20656
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:43:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="hZAxxvMh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5255420656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X9Mn8Qbc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8B1C20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Xgk-0005Cq-Ev
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 10:43:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45842)
+	id 1j1XhL-0006Jn-07
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 10:43:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1j1Xfc-0003Zq-Pn
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:41:53 -0500
+ (envelope-from <eblake@redhat.com>) id 1j1Xg3-0004Yz-Nq
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:42:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1j1Xfb-0007fa-T8
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:41:52 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:59579)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1j1XfX-0007aR-OA; Tue, 11 Feb 2020 10:41:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=hYq/iRsqbaLUfycGuUuP8x/H/zmOcy3b+yAmboyGBGM=; 
- b=hZAxxvMhZSzsUZuK6smIwhnOh/fdPIkYxlyPRkuAGqd+NHVp/c/VeEe/d2Z3KJbGjoI2NETOhe2+e0r5x696vBDTVQJzl53ml6c4SVWpSea+uUdx9g/L77wIrX2T8O36P3CGmWsR7K5JVNL3gudJlp585KLvIWl8LRuHCP+RmzlwvyZ0OBpStm3K2q1ZCinYkkLZ7Y7fgKtgTvuJvW021DDiuJ9dDOguh9ecG6bKp4Z8koNTSIXhpA/acxYGRYOQaN8AKTvbCfwsegZbKkrShInDqGCTb4xzmkS+I6yGRt9Le0CknR5E5OQtamLDcZF/CJ7XGAp1uDrfKSaCFJ9YPw==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1j1XfU-0007Un-9C; Tue, 11 Feb 2020 16:41:44 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1j1XfT-0002Vt-Vz; Tue, 11 Feb 2020 16:41:43 +0100
-From: Alberto Garcia <berto@igalia.com>
+ (envelope-from <eblake@redhat.com>) id 1j1Xg2-0007oe-S5
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:42:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51547
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j1Xg2-0007oa-Ow
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:42:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581435738;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cIidgrc2pE4u/Z57O4Ut34mz10kw/YVFKodOUzpts7M=;
+ b=X9Mn8Qbc1vAQEfJB2mCcjtZBU7i5ibDvQdoAlnGnspDXdL0DBHrWc2Yvij2Z2HQ1OB6qNP
+ xcQvayhH3HcOMizrZaYpA6F+JitfdYRqVyyK6zfktk/50oTT8bH/us1vcpEKbDcxuBzQFt
+ E1zQz2W2uIWYPygVvo4fGi+aWTviKhw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-SoS750ogPdWlmyeekgX6dQ-1; Tue, 11 Feb 2020 10:42:11 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71E9A107B267;
+ Tue, 11 Feb 2020 15:42:10 +0000 (UTC)
+Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 067A289F36;
+ Tue, 11 Feb 2020 15:42:09 +0000 (UTC)
+Subject: Re: [PATCH v2 27/33] tests: Use child_of_bds instead of child_file
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Subject: Re: [PATCH v2 03/33] block: Add BdrvChildRole
-In-Reply-To: <20200204170848.614480-4-mreitz@redhat.com>
 References: <20200204170848.614480-1-mreitz@redhat.com>
- <20200204170848.614480-4-mreitz@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Tue, 11 Feb 2020 16:41:43 +0100
-Message-ID: <w51lfp9b07c.fsf@maestria.local.igalia.com>
+ <20200204170848.614480-28-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <0dbe2c8c-7e2e-e587-50c7-976aa2b34e09@redhat.com>
+Date: Tue, 11 Feb 2020 09:42:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+In-Reply-To: <20200204170848.614480-28-mreitz@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: SoS750ogPdWlmyeekgX6dQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,21 +92,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue 04 Feb 2020 06:08:18 PM CET, Max Reitz wrote:
-> +    /* Child to COW from (backing child) */
-> +    BDRV_CHILD_COW          = (1 << 3),
+On 2/4/20 11:08 AM, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
 
-Without the comment in brackets I'm not sure that I would have
-understood that this is meant for backing files.
+Another sparse commit message.
 
-This is the "child that contains the data that is not allocated in the
-parent", or something like that, right?
+>   tests/test-bdrv-drain.c     | 29 +++++++++++++++++------------
+>   tests/test-bdrv-graph-mod.c |  6 ++++--
+>   2 files changed, 21 insertions(+), 14 deletions(-)
+> 
 
-Berto
+Just touches the tests - so if the testsuite passes, the patch must be 
+correct ;)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
