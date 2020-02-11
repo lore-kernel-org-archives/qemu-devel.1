@@ -2,83 +2,83 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2531C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 11:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C58C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 11:10:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE94A20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 11:07:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AA9D20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 11:10:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/neRcEv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE94A20714
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TD9ufx2Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AA9D20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1TOT-0004Ae-VQ
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 06:07:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40125)
+	id 1j1TRS-0006BL-M8
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 06:10:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41215)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1j1TNe-0003WW-Bz
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:07:07 -0500
+ (envelope-from <quintela@redhat.com>) id 1j1TQn-0005eo-Ee
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:10:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1j1TNc-0003Yp-Fp
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:07:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45619
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1j1TQl-0005UU-KF
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:10:16 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51248
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1j1TNc-0003Wt-C2
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:07:00 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j1TQl-0005Tm-Fr
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:10:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581419219;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1581419414;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=v/AxO3U4DbQkb5lERfD2KADAqkDhwUydyw9DTcxHZB8=;
- b=W/neRcEvYPHTAvZJBVa+UJSYSrbJEyj0jjeh8N08MM5MtO6pq1kedIR4pxyEnxbS0VsdvG
- vnUA5chr1vngshhUQGgs4EJ2ebEl1D505AU4X1PoSotHUpyajhEWsatgxYfRFA+sbCRVxx
- M1GTjIwWrCzD0Zmc0AFdsX46jvSKOfA=
+ in-reply-to:in-reply-to:references:references;
+ bh=Jgpxh73rVnJyIFNHW+O3Jka6hIvUe2KmRVF7cASmRjc=;
+ b=TD9ufx2ZRGV18lDZ9iLD64Z6XFGATikP1LxhtSX/o6xXUM/lRU1M/G4OrZqIhv9HTOJcjr
+ 3EAM2TUSFenvDlqsnnEDfL5yi8HFcWVTxxyeumhn6KD6kEoKGcwZOHrd6hct4CRdkmVi3/
+ 8/tT89REYMtjbz1jzad0Asiuc/FQhPE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-VIh2R19gOOqEUKUqV4xIvA-1; Tue, 11 Feb 2020 06:06:57 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-301-VTyUFDDGNICvlVCXDpulNg-1; Tue, 11 Feb 2020 06:10:10 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A078A800D5E;
- Tue, 11 Feb 2020 11:06:56 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-131.ams2.redhat.com [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F38D95C11E;
- Tue, 11 Feb 2020 11:06:55 +0000 (UTC)
-Subject: Re: [qemu-web PATCH] Force background color
-To: athurh <athurh@gmail.com>, qemu-devel@nongnu.org
-References: <20200208004617.340419-1-athurh@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <b3cef32e-d43f-9414-0230-fb0f2f5c3c96@redhat.com>
-Date: Tue, 11 Feb 2020 12:06:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3A3518B9F54
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 11:10:09 +0000 (UTC)
+Received: from redhat.com (ovpn-117-143.ams2.redhat.com [10.36.117.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C3B346055B;
+ Tue, 11 Feb 2020 11:10:06 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>
+Subject: Re: [PATCH] migration/rdma: rdma_accept_incoming_migration fix error
+ handling
+In-Reply-To: <20200210194459.112085-1-dgilbert@redhat.com> (David Alan
+ Gilbert's message of "Mon, 10 Feb 2020 19:44:59 +0000")
+References: <20200210194459.112085-1-dgilbert@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Tue, 11 Feb 2020 12:10:04 +0100
+Message-ID: <871rr1gz1v.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <20200208004617.340419-1-athurh@gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: VIh2R19gOOqEUKUqV4xIvA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: VTyUFDDGNICvlVCXDpulNg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,40 +90,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, peterx@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/02/2020 01.46, athurh wrote:
-> Browsers can have a different default background color defined.
-> Setting the background image overwrites other background definitions.
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> rdma_accept_incoming_migration is called from an fd handler and
+> can't return an Error * anywhere.
+> Currently it's leaking Error's in errp/local_err - there's
+> no point putting them in there unless we can report them.
+>
+> Turn most into fprintf's, and the last into an error_reportf_err
+> where it's coming up from another function.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  assets/css/style-desktop.css | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/assets/css/style-desktop.css b/assets/css/style-desktop.css
-> index 44ea0c7..b6c5aa1 100644
-> --- a/assets/css/style-desktop.css
-> +++ b/assets/css/style-desktop.css
-> @@ -33,12 +33,14 @@
->  	{
->  		/* 90% transparent */
->  		background: url(../images/qemu_head_200.png) no-repeat fixed 2em 80px;
-> +		background-color: #FFF;
->  	}
->  
->  	body.homepage
->  	{
->  		/* 90% transparent */
->  		background: url(../images/qemu_head_400_faint.png) no-repeat fixed center 60%;
-> +		background-color: #FFF;
->  	}
->  
->  	body,input,textarea,select
-> 
+>  migration/rdma.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index 2379b8345b..f67161c98f 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -3980,13 +3980,13 @@ static void rdma_accept_incoming_migration(void *=
+opaque)
+>      RDMAContext *rdma =3D opaque;
+>      int ret;
+>      QEMUFile *f;
+> -    Error *local_err =3D NULL, **errp =3D &local_err;
+> +    Error *local_err =3D NULL;
+> =20
+>      trace_qemu_rdma_accept_incoming_migration();
+>      ret =3D qemu_rdma_accept(rdma);
+> =20
+>      if (ret) {
+> -        ERROR(errp, "RDMA Migration initialization failed!");
+> +        fprintf(stderr, "RDMA ERROR: Migration initialization failed");
+>          return;
 
-Thanks, applied.
+this should end in "\n" right?
 
- Thomas
+Appart from that.
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+BTW, I can include the \n when I queue the patch, no need to resend
+
+
+>      }
+> =20
+> @@ -3998,13 +3998,16 @@ static void rdma_accept_incoming_migration(void *=
+opaque)
+> =20
+>      f =3D qemu_fopen_rdma(rdma, "rb");
+>      if (f =3D=3D NULL) {
+> -        ERROR(errp, "could not qemu_fopen_rdma!");
+> +        fprintf(stderr, "RDMA ERROR: could not qemu_fopen_rdma");
+>          qemu_rdma_cleanup(rdma);
+>          return;
+>      }
+> =20
+>      rdma->migration_started_on_destination =3D 1;
+> -    migration_fd_process_incoming(f, errp);
+> +    migration_fd_process_incoming(f, &local_err);
+> +    if (local_err) {
+> +        error_reportf_err(local_err, "RDMA ERROR:");
+> +    }
+>  }
+> =20
+>  void rdma_start_incoming_migration(const char *host_port, Error **errp)
 
 
