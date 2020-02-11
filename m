@@ -2,87 +2,98 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D82CC35242
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 19:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0363FC35242
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 19:45:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10A6820842
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 19:45:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4AD420842
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 19:45:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kVIrv8KN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10A6820842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="csnMNOnf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4AD420842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1bSw-0005er-7P
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 14:45:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33625)
+	id 1j1bT1-0005mn-Sl
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 14:45:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j1bQZ-00038D-1W
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:42:36 -0500
+ (envelope-from <peterx@redhat.com>) id 1j1bRi-0004PC-AH
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:43:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j1bQX-000275-Ln
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:42:34 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46471)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j1bQX-000257-Fr
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:42:33 -0500
-Received: by mail-pf1-x443.google.com with SMTP id k29so5985470pfp.13
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 11:42:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cuIlZvUXMnVPxJ3FgP3jCwxFvB2IJPIWn75y+XC+HB0=;
- b=kVIrv8KNznyyr35Wb8dBxsS5No5cIV2FxJPS4OBmMFTW+0waDjoNPNdjdaox9rznOO
- Nw40AsEZmj6q7PaEL8byPVWhzBCcg/51IaPOKwGSgaxlkM4Jf4o2JlhJ6QreMNcOaLzV
- aHPBQy538pz7u+u4nattRixtiLcholEoQBMd1C52Q+khjZnwiKFQi3NGL1LRQQ1eSTlJ
- azAVcoJQRxpP7+RtyUhkXvOij2KRSx4J4G7MUGUJktmLxEEqWfkBatMpJTIGRcPUwB0/
- vgYf9PYFTxQBR3SH26Mb12zZEaEbR3Y2feyluEKOOtKobGDxNkInP13yzdEk6mHGr7NJ
- 4Xng==
+ (envelope-from <peterx@redhat.com>) id 1j1bRe-0004ai-OX
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:43:45 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38280
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j1bRe-0004Yk-Da
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:43:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581450221;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WLLnLUhGFese7WXU57belUDihGti22d23Zz/SC8bjDA=;
+ b=csnMNOnf30JCsfepd3/U9Ai2LReQGpHcUDpwWpzatvuh3+ZvuysV47afXqXkOpYbhkSIfV
+ W6okFnerNE9EzFruGDnU3PTChGvkVPMaMJyjPIpTLy2pxm+A7+1BfCte34KOsTI9G+/t90
+ EEhs0YuV2/zwgtgANuqqmKE8oD2q6Ps=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-PopxtpsXNmucZ-zLc4mzww-1; Tue, 11 Feb 2020 14:43:34 -0500
+Received: by mail-qt1-f200.google.com with SMTP id c22so7330946qtn.23
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 11:43:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=cuIlZvUXMnVPxJ3FgP3jCwxFvB2IJPIWn75y+XC+HB0=;
- b=i4qC9IsDu3PcjIueYWQ3Sv0APDSroPbtTNUkWJK3WmSr4nL1PNrB1tOhC0IPowYxJG
- RPO1K+mHQpwD7bXwQbDyyol5RrWOD3jd6gVZtZDD8FR9FzWFa5uzCN9yV9ZrlwlxqTiT
- xVDYI9jtTFrblSneR9rd9mUjhK1MEQx4SrKWC6ApBTTt0jvRp1/rFh0gJ7ldP9bcbuf1
- rFmt6tHCjv3SkGREVqbSjJdRSfZiieeqduJHhC14GPGWSYweq9zJYWrImcyH4NteTEK3
- JtYD+tt6MHeui1Xhsde/3f226N+y+wYJ26Qhp3KPwmnf7bgMgz0wZzqkDCvSHFW0NO6K
- ua7g==
-X-Gm-Message-State: APjAAAV026J7vm89cH5RAOiuJrQ/qhGp+nPh+5dV22mpfVKqnYkx0yzS
- t7ESeZqOThQLkoJGmbgNv/ZHiQAZS8A=
-X-Google-Smtp-Source: APXvYqztrVHkJawv27iuRxx0N+94cQKYfeOk6Qfj9Ssc0J/KNCcgph2bzEtypZXv6mr2Q64ukYRmvg==
-X-Received: by 2002:aa7:96b0:: with SMTP id g16mr4461787pfk.99.1581450152039; 
- Tue, 11 Feb 2020 11:42:32 -0800 (PST)
-Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
- [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id b18sm5306281pfd.63.2020.02.11.11.42.31
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=h7KUPmf86zB702J560kJNk/Uikfj86BS/GU0xdCnSuI=;
+ b=dWhB0m36VpoBCSeymMJv+YMhRXXvhsPxRFagcW3gnAGkYHl6EEDigPGP0nCYZ7QbRU
+ tKUMtlVLAdRhayDHpyc0O8WqpDFoqovfXabnp24p0xoxgL3/MVMMskEiWjd6wlIreRbx
+ cw1I1RVwRNt54mB/VpwJRlbwPAFSnc2PMNbh2di6SvbcSsYrAOPr+BgkWTjJ8PUyP1+4
+ 6Fpu7R6qpJHY1ah1dPdSeBT98Sekttv3RXllH2nqTnazMB8sYB7mEgUCAb2FD6PDv0GG
+ K8GE4FjlyTgk3Mwhlzv/VU+DL5HQ7ctA25IDSRIfnfoyJDcC0OHmU3ORKNVj09TkRnSA
+ k1OA==
+X-Gm-Message-State: APjAAAXwKuinrc3hnaMw0YAFQD10WXUAU0t3Hd9OsaHeJHlWEvP3FcpQ
+ JMz1LcRjjtO/AmrM24sc/W157ynUIUqn58vA5XHEjD5oS86UaxcE3EYDwPIFy/UpGVDFEmNzce+
+ iSXCzjcJSpmZA8QU=
+X-Received: by 2002:a05:620a:412:: with SMTP id
+ 18mr7737126qkp.213.1581450214429; 
+ Tue, 11 Feb 2020 11:43:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzaQKrkmzYTPMBwqDXhjjHJJr6Jkmjr2WXR0RK4oj5iaQ+jZhyfSdQZUhqw4MyroKiz2WqNWw==
+X-Received: by 2002:a05:620a:412:: with SMTP id
+ 18mr7737098qkp.213.1581450214196; 
+ Tue, 11 Feb 2020 11:43:34 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+ by smtp.gmail.com with ESMTPSA id x197sm2540447qkb.28.2020.02.11.11.43.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 11 Feb 2020 11:42:31 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] target/arm: Split out aa64_va_parameter_tbi,
- aa64_va_parameter_tbid
-Date: Tue, 11 Feb 2020 11:42:28 -0800
-Message-Id: <20200211194228.16907-3-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200211194228.16907-1-richard.henderson@linaro.org>
-References: <20200211194228.16907-1-richard.henderson@linaro.org>
+ Tue, 11 Feb 2020 11:43:33 -0800 (PST)
+Date: Tue, 11 Feb 2020 14:43:31 -0500
+From: Peter Xu <peterx@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be string
+ option
+Message-ID: <20200211194331.GK984290@xz-x1>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+In-Reply-To: <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
+X-MC-Unique: PopxtpsXNmucZ-zLc4mzww-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,183 +105,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: kevin.tian@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ qemu-devel@nongnu.org, eric.auger@redhat.com, alex.williamson@redhat.com,
+ pbonzini@redhat.com, hao.wu@intel.com, yi.y.sun@intel.com,
+ Richard Henderson <rth@twiddle.net>, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For the purpose of rebuild_hflags_a64, we do not need to compute
-all of the va parameters, only tbi.  Moreover, we can compute them
-in a form that is more useful to storing in hflags.
+On Wed, Jan 29, 2020 at 04:16:44AM -0800, Liu, Yi L wrote:
+> From: Liu Yi L <yi.l.liu@intel.com>
+>=20
+> Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabiliti=
+es
+> related to scalable mode translation, thus there are multiple combination=
+s.
+> While this vIOMMU implementation wants simplify it for user by providing
+> typical combinations. User could config it by "x-scalable-mode" option. T=
+he
+> usage is as below:
+>=20
+> "-device intel-iommu,x-scalable-mode=3D["legacy"|"modern"]"
 
-This eliminates the need for aa64_va_parameter_both, so fold that
-in to aa64_va_parameter.  The remaining calls to aa64_va_parameter
-are in get_phys_addr_lpae and in pauth_helper.c.
+Maybe also "off" when someone wants to explicitly disable it?
 
-This reduces the total cpu consumption of aa64_va_parameter in a
-kernel boot plus a kvm guest kernel boot from 3% to 0.5%.
+>=20
+>  - "legacy": gives support for SL page table
+>  - "modern": gives support for FL page table, pasid, virtual command
+>  -  if not configured, means no scalable mode support, if not proper
+>     configured, will throw error
+>=20
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 27 +++++++++++++++++++++++++--
+>  hw/i386/intel_iommu_internal.h |  3 +++
+>  include/hw/i386/intel_iommu.h  |  2 ++
+>  3 files changed, 30 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 1c1eb7f..33be40c 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3078,7 +3078,7 @@ static Property vtd_properties[] =3D {
+>      DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
+>                        VTD_HOST_ADDRESS_WIDTH),
+>      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALS=
+E),
+> -    DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, =
+FALSE),
+> +    DEFINE_PROP_STRING("x-scalable-mode", IntelIOMMUState, scalable_mode=
+_str),
+>      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> @@ -3708,8 +3708,11 @@ static void vtd_init(IntelIOMMUState *s)
+>      }
+> =20
+>      /* TODO: read cap/ecap from host to decide which cap to be exposed. =
+*/
+> -    if (s->scalable_mode) {
+> +    if (s->scalable_mode && !s->scalable_modern) {
+>          s->ecap |=3D VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> +    } else if (s->scalable_mode && s->scalable_modern) {
+> +        s->ecap |=3D VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
+> +                   | VTD_ECAP_FLTS | VTD_ECAP_PSS;
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/internals.h |  3 --
- target/arm/helper.c    | 68 +++++++++++++++++++++++-------------------
- 2 files changed, 37 insertions(+), 34 deletions(-)
+This patch might be good to be the last one after all the impls are
+ready.
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 6d4a942bde..6ac84bbca7 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1042,15 +1042,12 @@ typedef struct ARMVAParameters {
-     unsigned tsz    : 8;
-     unsigned select : 1;
-     bool tbi        : 1;
--    bool tbid       : 1;
-     bool epd        : 1;
-     bool hpd        : 1;
-     bool using16k   : 1;
-     bool using64k   : 1;
- } ARMVAParameters;
- 
--ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
--                                        ARMMMUIdx mmu_idx);
- ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
-                                    ARMMMUIdx mmu_idx, bool data);
- 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index a008c70c87..9ebd7e9459 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -10067,12 +10067,34 @@ static uint8_t convert_stage2_attrs(CPUARMState *env, uint8_t s2attrs)
- }
- #endif /* !CONFIG_USER_ONLY */
- 
--ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
--                                        ARMMMUIdx mmu_idx)
-+static int aa64_va_parameter_tbi(uint64_t tcr, ARMMMUIdx mmu_idx)
-+{
-+    if (regime_has_2_ranges(mmu_idx)) {
-+        return extract64(tcr, 37, 2);
-+    } else if (mmu_idx == ARMMMUIdx_Stage2) {
-+        return 0; /* VTCR_EL2 */
-+    } else {
-+        return extract32(tcr, 20, 1);
-+    }
-+}
-+
-+static int aa64_va_parameter_tbid(uint64_t tcr, ARMMMUIdx mmu_idx)
-+{
-+    if (regime_has_2_ranges(mmu_idx)) {
-+        return extract64(tcr, 51, 2);
-+    } else if (mmu_idx == ARMMMUIdx_Stage2) {
-+        return 0; /* VTCR_EL2 */
-+    } else {
-+        return extract32(tcr, 29, 1);
-+    }
-+}
-+
-+ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
-+                                   ARMMMUIdx mmu_idx, bool data)
- {
-     uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
--    bool tbi, tbid, epd, hpd, using16k, using64k;
--    int select, tsz;
-+    bool epd, hpd, using16k, using64k;
-+    int select, tsz, tbi;
- 
-     if (!regime_has_2_ranges(mmu_idx)) {
-         select = 0;
-@@ -10081,11 +10103,9 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-         using16k = extract32(tcr, 15, 1);
-         if (mmu_idx == ARMMMUIdx_Stage2) {
-             /* VTCR_EL2 */
--            tbi = tbid = hpd = false;
-+            hpd = false;
-         } else {
--            tbi = extract32(tcr, 20, 1);
-             hpd = extract32(tcr, 24, 1);
--            tbid = extract32(tcr, 29, 1);
-         }
-         epd = false;
-     } else {
-@@ -10099,28 +10119,30 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-             epd = extract32(tcr, 7, 1);
-             using64k = extract32(tcr, 14, 1);
-             using16k = extract32(tcr, 15, 1);
--            tbi = extract64(tcr, 37, 1);
-             hpd = extract64(tcr, 41, 1);
--            tbid = extract64(tcr, 51, 1);
-         } else {
-             int tg = extract32(tcr, 30, 2);
-             using16k = tg == 1;
-             using64k = tg == 3;
-             tsz = extract32(tcr, 16, 6);
-             epd = extract32(tcr, 23, 1);
--            tbi = extract64(tcr, 38, 1);
-             hpd = extract64(tcr, 42, 1);
--            tbid = extract64(tcr, 52, 1);
-         }
-     }
-     tsz = MIN(tsz, 39);  /* TODO: ARMv8.4-TTST */
-     tsz = MAX(tsz, 16);  /* TODO: ARMv8.2-LVA  */
- 
-+    /* Present TBI as a composite with TBID.  */
-+    tbi = aa64_va_parameter_tbi(tcr, mmu_idx);
-+    if (!data) {
-+        tbi &= ~aa64_va_parameter_tbid(tcr, mmu_idx);
-+    }
-+    tbi = (tbi >> select) & 1;
-+
-     return (ARMVAParameters) {
-         .tsz = tsz,
-         .select = select,
-         .tbi = tbi,
--        .tbid = tbid,
-         .epd = epd,
-         .hpd = hpd,
-         .using16k = using16k,
-@@ -10128,16 +10150,6 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
-     };
- }
- 
--ARMVAParameters aa64_va_parameters(CPUARMState *env, uint64_t va,
--                                   ARMMMUIdx mmu_idx, bool data)
--{
--    ARMVAParameters ret = aa64_va_parameters_both(env, va, mmu_idx);
--
--    /* Present TBI as a composite with TBID.  */
--    ret.tbi &= (data || !ret.tbid);
--    return ret;
--}
--
- #ifndef CONFIG_USER_ONLY
- static ARMVAParameters aa32_va_parameters(CPUARMState *env, uint32_t va,
-                                           ARMMMUIdx mmu_idx)
-@@ -11957,21 +11969,15 @@ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
- {
-     uint32_t flags = rebuild_hflags_aprofile(env);
-     ARMMMUIdx stage1 = stage_1_mmu_idx(mmu_idx);
--    ARMVAParameters p0 = aa64_va_parameters_both(env, 0, stage1);
-+    uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
-     uint64_t sctlr;
-     int tbii, tbid;
- 
-     flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
- 
-     /* Get control bits for tagged addresses.  */
--    if (regime_has_2_ranges(mmu_idx)) {
--        ARMVAParameters p1 = aa64_va_parameters_both(env, -1, stage1);
--        tbid = (p1.tbi << 1) | p0.tbi;
--        tbii = tbid & ~((p1.tbid << 1) | p0.tbid);
--    } else {
--        tbid = p0.tbi;
--        tbii = tbid & !p0.tbid;
--    }
-+    tbid = aa64_va_parameter_tbi(tcr, mmu_idx);
-+    tbii = tbid & ~aa64_va_parameter_tbid(tcr, mmu_idx);
- 
-     flags = FIELD_DP32(flags, TBFLAG_A64, TBII, tbii);
-     flags = FIELD_DP32(flags, TBFLAG_A64, TBID, tbid);
--- 
-2.20.1
+>      }
+> =20
+>      vtd_reset_caches(s);
+> @@ -3845,6 +3848,26 @@ static bool vtd_decide_config(IntelIOMMUState *s, =
+Error **errp)
+>          return false;
+>      }
+> =20
+> +    if (s->scalable_mode_str &&
+> +        (strcmp(s->scalable_mode_str, "modern") &&
+> +         strcmp(s->scalable_mode_str, "legacy"))) {
+> +        error_setg(errp, "Invalid x-scalable-mode config");
+
+Maybe "..., Please use 'modern', 'legacy', or 'off'." to show options.
+
+> +        return false;
+> +    }
+> +
+> +    if (s->scalable_mode_str &&
+> +        !strcmp(s->scalable_mode_str, "legacy")) {
+> +        s->scalable_mode =3D true;
+> +        s->scalable_modern =3D false;
+> +    } else if (s->scalable_mode_str &&
+> +        !strcmp(s->scalable_mode_str, "modern")) {
+> +        s->scalable_mode =3D true;
+> +        s->scalable_modern =3D true;
+> +    } else {
+> +        s->scalable_mode =3D false;
+> +        s->scalable_modern =3D false;
+> +    }
+> +
+>      return true;
+>  }
+> =20
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_interna=
+l.h
+> index 862033e..c4dbb2c 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -190,8 +190,11 @@
+>  #define VTD_ECAP_PT                 (1ULL << 6)
+>  #define VTD_ECAP_MHMV               (15ULL << 20)
+>  #define VTD_ECAP_SRS                (1ULL << 31)
+> +#define VTD_ECAP_PSS                (19ULL << 35)
+> +#define VTD_ECAP_PASID              (1ULL << 40)
+>  #define VTD_ECAP_SMTS               (1ULL << 43)
+>  #define VTD_ECAP_SLTS               (1ULL << 46)
+> +#define VTD_ECAP_FLTS               (1ULL << 47)
+> =20
+>  /* CAP_REG */
+>  /* (offset >> 4) << 24 */
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.=
+h
+> index 8571a85..1ef2917 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -244,6 +244,8 @@ struct IntelIOMMUState {
+> =20
+>      bool caching_mode;              /* RO - is cap CM enabled? */
+>      bool scalable_mode;             /* RO - is Scalable Mode supported? =
+*/
+> +    char *scalable_mode_str;        /* RO - admin's Scalable Mode config=
+ */
+> +    bool scalable_modern;           /* RO - is modern SM supported? */
+> =20
+>      dma_addr_t root;                /* Current root table pointer */
+>      bool root_scalable;             /* Type of root table (scalable or n=
+ot) */
+> --=20
+> 2.7.4
+>=20
+
+--=20
+Peter Xu
 
 
