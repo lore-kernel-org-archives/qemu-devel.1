@@ -2,120 +2,73 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF467C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:49:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC763C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88779206DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:49:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JjUksOkw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88779206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9D95520675
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:51:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D95520675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1WrC-00065s-KT
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:49:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54733)
+	id 1j1Wsp-0007LF-QB
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:51:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59815)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WqE-0005Us-Ni
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:48:48 -0500
+ (envelope-from <bounces@canonical.com>) id 1j1WsF-0006uz-03
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:50:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WqD-0005DK-8t
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:48:46 -0500
-Received: from mail-eopbgr140128.outbound.protection.outlook.com
- ([40.107.14.128]:17238 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j1WqC-0005By-Gn
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:48:45 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hx7/roA92iCidYSJd/eN4a9AEF6CZpi0RGnOlYIlIQn7/R4yo+HtpU2Q8QwhwERirD+nBgocTGtMgdosmpkMI2jwoqb1dC3pqhecdG+RDO8bOfdYGgwqbQzov8/koMyVxS6Bk22m6NyrOKLIwkGUH/SfRQDejGPjvtOrl9zCBHCmUc7xcbiyEGwIma2rtTNvMzqexu4xW63gDQWqMXHFIaz5qosnwZFtNqNH8EJOBS5NBj3M6xpRhlua27D6mk0u+DMaa4IJxWoqqBUfl9qk5RqKfss3s9vOT/OLb9JiBZATKin+k6HGWltfBwNcbESp/YyLdnjFeEQ1R873Nk/OMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UJhowy0bYVhjlJFUirCnJb8gkBcAvI+G4RvctFfIL2Y=;
- b=b/KJnHWc+N57HL+nJhLpEmpCIK+hgcVhqrG4VmJiY2R60M3QworKiqDmj7I27TeAgXuhXO+MDGziA8W29jpaPnefaPfbd2BuUunZVK+TJdObc8ecApyabtWBieckDwWe9itsyXK5huF8HxoYX/4R0zvQkt819k0VSDOQcANBsV2NXOBS163SjuZs6VWCFDCtaxu4iTWUVdHtLvFArgukBwTpk4qhPM7NXMMcsxsDqLlu5TQ0IPEgq9lVIaVfTCjAYex1i3WGqBaM8XlXcNdP/jSbOWcV2V3qdXHDU71NQxtpd9efzHzMh/HGJ37sxmvNklvedxYUqwj1gkVRya+rVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UJhowy0bYVhjlJFUirCnJb8gkBcAvI+G4RvctFfIL2Y=;
- b=JjUksOkwSDcrq8QW/rrQr8LtbbF4ciuhjzMLvOtGOujcBMCrA1Y7XUq5I4+lOJ6VUJNUcB+0g0wTACxV9bgVzFztXMeEH8stdYnSc/N1KOTV5GSfmpfMteTm2tv2XOp8s7yRkfpAsVgw4Bfpq9e7bkNfImJuKu6NDQlGWsUn3nY=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=dplotnikov@virtuozzo.com; 
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
- AM0PR08MB4067.eurprd08.prod.outlook.com (20.178.202.85) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.25; Tue, 11 Feb 2020 14:48:42 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::5558:d9d2:7f7d:e4]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::5558:d9d2:7f7d:e4%2]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
- 14:48:41 +0000
-Subject: Re: [PATCH v1 0/2] Improve virtio_check_params test
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200211142551.13072-1-dplotnikov@virtuozzo.com>
- <1b7ccdc2-2e3e-32d2-c82b-fb1e6cddd998@redhat.com>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <65c2d1b2-f7d8-ec97-d5f2-8757281b2964@virtuozzo.com>
-Date: Tue, 11 Feb 2020 17:48:39 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <1b7ccdc2-2e3e-32d2-c82b-fb1e6cddd998@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-ClientProxiedBy: HE1PR0402CA0004.eurprd04.prod.outlook.com
- (2603:10a6:3:d0::14) To AM0PR08MB3745.eurprd08.prod.outlook.com
- (2603:10a6:208:ff::27)
+ (envelope-from <bounces@canonical.com>) id 1j1Ws9-00083m-Uy
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:50:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46888)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j1Ws9-00082F-PO
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:50:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j1Ws7-0001kN-4Q
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:50:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 14BE52E80CE
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:50:43 +0000 (UTC)
 MIME-Version: 1.0
-Received: from [192.168.1.63] (178.34.162.57) by
- HE1PR0402CA0004.eurprd04.prod.outlook.com (2603:10a6:3:d0::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21 via Frontend Transport; Tue, 11 Feb 2020 14:48:41 +0000
-X-Originating-IP: [178.34.162.57]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a50f0b47-5e7a-4811-d528-08d7af017c81
-X-MS-TrafficTypeDiagnostic: AM0PR08MB4067:
-X-Microsoft-Antispam-PRVS: <AM0PR08MB40679AEA27965078C953077BCF180@AM0PR08MB4067.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-Forefront-PRVS: 0310C78181
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(396003)(136003)(366004)(39850400004)(376002)(346002)(199004)(189003)(2906002)(186003)(956004)(16526019)(2616005)(8676002)(8936002)(16576012)(966005)(81156014)(81166006)(316002)(478600001)(31686004)(52116002)(4326008)(6486002)(36756003)(31696002)(5660300002)(86362001)(66476007)(66946007)(66556008)(53546011)(26005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4067;
- H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Lg/6VrZtl0LuT1HEt5Z88S/NgFa9Xazekr696DgS+mDO5LMaM+Xsnv5OEAPs89lVWDHLFWlc5XN7a65GKSJGu8M0qFGaroyrjTpXXc6KPmwNzUNWyFGFnS0HcdVwPdR5nVakdag08AjtfVvVrQBKyrzLe5P5bJk5ZWb0W5jk3IDzZxYvHCvPsguIPQa6OshmM5LeNV3/1oH3gke9IsL4z1sx5d2wLdy0Ut3RM9GV/yRtaRgXlXLm58TiEy8IG5haIut8of59mGDB9ET3xS2iLrJCehrx9PWR/u6K1uK17n5DYoc5yBdrqjCZl6s17Y3EzSawDOCliQGI8LBurbJSeHqRV8UGlkS3Ef7uRCxT3NkpcJgARVd0u9KG792YsIHOEd+WQ0/ORnNmHnEbRYCuurxJETcVWiho1AUNV56q7qS8EpMHQ43rmc0u4j4PfjK6YRYk+bK9nWdh8nXAanPMyYWkumcaEfXgHLMzU2mGU+4Rm3PXvAgOL8jmnbiU+Tc/p+nceltk2+lz6yV+z7ZJ6Q==
-X-MS-Exchange-AntiSpam-MessageData: 8PxXLuHtAO2mjsUx14+ZmZeFIrNV0TkGIkc4agp6qfNH+/JvarpIBWPXUamvqxyHA+QYDjQ8PCuH/roft6w6kfhK3R5CIwVIMl3YLAUw3XojekuivxUXyTdlN9I6QW+ooW6Gek1TvToFhnudiARhaA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a50f0b47-5e7a-4811-d528-08d7af017c81
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2020 14:48:41.6984 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V+TsVH4OGb0RMmBoX3yYRcGjjuqkjJhe4/1G3+A7e9MJKJfQzQ1LtuvM6tDEcyNhs09xd0m4d3jJhCmByqghcgMvQdwxUK85AMl4/szQsAA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4067
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.14.128
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Feb 2020 14:42:47 -0000
+From: Thomas Huth <1661386@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bonzini dgilbert-h matwey-kornilov th-huth
+X-Launchpad-Bug-Reporter: Matwey V. Kornilov (matwey-kornilov)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
+Message-Id: <158143216740.3624.3045704956517936916.malone@soybean.canonical.com>
+Subject: [Bug 1661386] Re: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: efcf7bed143b4aecca3515ea3ffe86183d30fcb0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -124,47 +77,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, wainersm@redhat.com
+Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+There was a fix for this assertion message wrt PMU registers in December 20=
+17 already:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D0b368a10c71af96f6cf
+Thus, can you still reproduce this issue with the latest version of QEMU, o=
+r is the problem gone now?
 
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-On 11.02.2020 17:37, Philippe Mathieu-Daud=E9 wrote:
-> Hi Denis,
->
-> On 2/11/20 3:25 PM, Denis Plotnikov wrote:
->> * fixed failing on non-existed machine type removal
->> * the test refactored to add more parameters to check
->>
->> Gereral questions left:
->> =A0=A0=A0 How to restric test for using:
->> =A0=A0=A0 1. on a set of target OS-es
->> =A0=A0=A0 2. on a set target architectures
->>
->> Denis Plotnikov (2):
->> =A0=A0 tests/acceptance/virtio_check_params: remove excluded machine typ=
-es
->> =A0=A0=A0=A0 carefully
->> =A0=A0 tests/acceptance/virtio_check_params: prepare to check different
->> =A0=A0=A0=A0 params
->>
->> =A0 tests/acceptance/virtio_check_params.py | 52 ++++++++++++++++-------=
---
->> =A0 1 file changed, 33 insertions(+), 19 deletions(-)
->>
->
-> Have you noticed my other series suggested by Cornelia?
->
-> It runs your test on S390X and PPC:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675092.html
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675095.html
->
-> Hi, Philippe
-Seems that I've missed them. I just made patches upon the fresh master.
-Can I get a git tree which has those patches applied? Or should I wait=20
-while the patches landed to qemu master and the rebase on them?
+-- =
 
-Denis
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661386
+
+Title:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hello,
+
+  =
+
+  I see the following when try to run qemu from master as the following:
+
+  # ./x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+  loglevel=3D7' -m 1024 -serial stdio
+  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  First broken commit has been bisected:
+
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
+
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  My cpuinfo is the following:
+
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 44
+  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+  stepping        : 2
+  microcode       : 0x14
+  cpu MHz         : 3066.775
+  cache size      : 12288 KB
+  physical id     : 0
+  siblings        : 2
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
+onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
+perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
+lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+  bugs            :
+  bogomips        : 6133.55
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 40 bits physical, 48 bits virtual
+  power management:
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
 
