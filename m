@@ -6,74 +6,70 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 371FCC352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5947CC352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:52:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00CD720842
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2501E20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:52:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PTXf827x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00CD720842
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="izmUFSQJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2501E20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1SCe-0008DP-75
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 04:51:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46582)
+	id 1j1SDT-0000gz-BH
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 04:52:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j1SAO-0004XL-VK
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:49:17 -0500
+ (envelope-from <philmd@redhat.com>) id 1j1SBR-0006SF-Su
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:50:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j1SAN-0000k6-Vz
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:49:16 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60023
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j1SBQ-0001Hq-Kg
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:50:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57228
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j1SAN-0000jt-TA
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:49:15 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1SBQ-0001Ha-GE
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:50:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581414555;
+ s=mimecast20190719; t=1581414620;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T5lkbv7VOEBH6UyHXpdFHxi64kb48QdEc1Ba7+bYC+s=;
- b=PTXf827xf6MSjRugNPXAwLRRf8Kee5vH/Fc1VhWcfcWgAaFw7CvEL/SWAF1728BoVcaRKy
- BQ9KBhJHlRm9RmVMoQw/3uo1J6QTc4zAfQ/FartjedlaUTz8Ri42YUpTkWjYtgOYUHt2HR
- oqR31HFiOuCk7XuROfnZlr9LSOqyKN0=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=I/QS6QzeIWG5iv9yWE9Vw+sGPF69fQbBmrDYUidEQe4=;
+ b=izmUFSQJmygXLzOQKbnn8AODb4wkx/+2T3RQnDeYB79FYD9si09IuCTjQWVpnfEEe20rqR
+ SZT772GmhuzJ3/DXHFDmrZT7jEPGm8fFH2oPCK+ZqjV39Joc7UoEFxEgsdx79pDgFciPuo
+ his4JskT3FuAJETjtACfF2IzsqCB+N4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-134-v1K-TQ7kOZuXmgYs5J8PHg-1; Tue, 11 Feb 2020 04:49:11 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-304-SbZGpjPLPw2L73nFwgDchQ-1; Tue, 11 Feb 2020 04:50:15 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C78B21005502;
- Tue, 11 Feb 2020 09:49:10 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-117-79.ams2.redhat.com [10.36.117.79])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E26F165D3;
- Tue, 11 Feb 2020 09:49:09 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 1/3] qcow2: update_refcount(): Reset old_table_index after
- qcow2_cache_put()
-Date: Tue, 11 Feb 2020 10:48:58 +0100
-Message-Id: <20200211094900.17315-2-kwolf@redhat.com>
-In-Reply-To: <20200211094900.17315-1-kwolf@redhat.com>
-References: <20200211094900.17315-1-kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E9941093D80
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 09:50:15 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-81.brq.redhat.com [10.40.205.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 40DFA10016DA;
+ Tue, 11 Feb 2020 09:50:07 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] gitlab-ci: Move EDK2 YAML config to .gitlab-ci.d directory
+Date: Tue, 11 Feb 2020 10:50:04 +0100
+Message-Id: <20200211095004.29647-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: v1K-TQ7kOZuXmgYs5J8PHg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: SbZGpjPLPw2L73nFwgDchQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,39 +81,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pbutsykin@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the case that update_refcount() frees a refcount block, it evicts it
-from the metadata cache. Before doing so, however, it returns the
-currently used refcount block to the cache because it might be the same.
-Returning the refcount block early means that we need to reset
-old_table_index so that we reload the refcount block in the next
-iteration if it is actually still in use.
+We plan to let maintainers managing their own GitLab CI jobs.
+The .gitlab-ci.d directory will contain all the new GitLab files,
+to keep the root directory cleaner.
 
-Fixes: f71c08ea8e60f035485a512fd2af8908567592f0
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+The EDK2 job was introduced before .gitlab-ci.d was suggested as
+a common directory. Move the YAML file, update its references.
+
+Suggested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- block/qcow2-refcount.c | 1 +
- 1 file changed, 1 insertion(+)
+Supersedes: <20200211065022.11134-1-philmd@redhat.com>
+v2: Reworded subject/description (Thomas)
+---
+ .gitignore                                   | 1 +
+ .gitlab-ci-edk2.yml =3D> .gitlab-ci.d/edk2.yml | 2 +-
+ .gitlab-ci.yml                               | 2 +-
+ MAINTAINERS                                  | 3 +--
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+ rename .gitlab-ci-edk2.yml =3D> .gitlab-ci.d/edk2.yml (98%)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index f67ac6b2d8..b06a9fa9ce 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -889,6 +889,7 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(Bloc=
-kDriverState *bs,
-                                                 offset);
-             if (table !=3D NULL) {
-                 qcow2_cache_put(s->refcount_block_cache, &refcount_block);
-+                old_table_index =3D -1;
-                 qcow2_cache_discard(s->refcount_block_cache, table);
-             }
+diff --git a/.gitignore b/.gitignore
+index bc0a035f9c..18288eacd1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -95,6 +95,7 @@
+ *.tp
+ *.vr
+ *.d
++!/.gitlab-ci.d
+ !/scripts/qemu-guest-agent/fsfreeze-hook.d
+ *.o
+ .sdk
+diff --git a/.gitlab-ci-edk2.yml b/.gitlab-ci.d/edk2.yml
+similarity index 98%
+rename from .gitlab-ci-edk2.yml
+rename to .gitlab-ci.d/edk2.yml
+index 088ba4b43a..a9990b7147 100644
+--- a/.gitlab-ci-edk2.yml
++++ b/.gitlab-ci.d/edk2.yml
+@@ -2,7 +2,7 @@ docker-edk2:
+  stage: build
+  rules: # Only run this job when the Dockerfile is modified
+  - changes:
+-   - .gitlab-ci-edk2.yml
++   - .gitlab-ci.d/edk2.yml
+    - .gitlab-ci.d/edk2/Dockerfile
+    when: always
+  image: docker:19.03.1
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index c15e394f09..dae6045d78 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -1,5 +1,5 @@
+ include:
+-  - local: '/.gitlab-ci-edk2.yml'
++  - local: '/.gitlab-ci.d/edk2.yml'
 =20
+ before_script:
+  - apt-get update -qq
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c7717df720..fb00a55f41 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2391,8 +2391,7 @@ F: roms/edk2
+ F: roms/edk2-*
+ F: tests/data/uefi-boot-images/
+ F: tests/uefi-test-tools/
+-F: .gitlab-ci-edk2.yml
+-F: .gitlab-ci.d/edk2/
++F: .gitlab-ci.d/edk2*
+=20
+ Usermode Emulation
+ ------------------
 --=20
-2.20.1
+2.21.1
 
 
