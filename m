@@ -2,80 +2,83 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B67C35242
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 451DBC352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:11:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF390206DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:09:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF390206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2079720848
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:11:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BHNBKsUt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2079720848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Zyr-0003LE-42
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:09:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40674)
+	id 1j1a0P-0004w4-Ax
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:11:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55412)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j1ZqZ-0005dg-AC
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:01:20 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j1Zx5-0001mc-Iw
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:08:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j1ZqX-0004Xu-OD
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:01:19 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40924)
+ (envelope-from <peter.maydell@linaro.org>) id 1j1Zx4-0008Mj-O1
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:08:03 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45825)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j1ZqW-0004U5-OR
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:01:17 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j1ZqO-0003ZW-Lb
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 18:01:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 991932E80C3
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 18:01:08 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j1Zx4-0008M7-Iv
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:08:02 -0500
+Received: by mail-oi1-x243.google.com with SMTP id v19so13646196oic.12
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 10:08:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dwkkUPqGDdR/wWJtwxvHi2VmYaPkaIbZdAek5Ju+HNU=;
+ b=BHNBKsUt3gJ02ECYVlI2Njg7iWsQxihGdKPr7C/ylWwnn4cZoqMolgpghWDSVzGIQP
+ IG0EY8wh8stJ5Gki63y8V0AnN+SyM3dw3MnLSSc5nCZaUK3lQtOesvDvI4OtlGqn4hTd
+ FgPThDybczPM4vvLRyZCoIqjfO5E3Loq8HZNEGmdw46nyJrPArkZfVWDyk7NOfhQyLtd
+ WRjOINXY8TLv3CWZ4yxGSi65SkJ7BXQWhO67NJ4jd3c+n4WLfS5UcZ8Hog76n0Ah9xK0
+ DZW/HoEusLAkxtG1env4d2gq35mfYEjs0j0DThZcLTrxvNEK1+xFQGCaFfqsu3dxCe3F
+ w1SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dwkkUPqGDdR/wWJtwxvHi2VmYaPkaIbZdAek5Ju+HNU=;
+ b=td+OmRfg/RRhjtj0805VMrILnhNMDFd+504+L20VNzHO+A77o3uQ8FpjyHAl4GRnvn
+ Dz3ZZkkffxD8vDqpmcB5lquvLjTuvOyfX23jE8tylwQU9vuE05rBHi6h57fGyXeOgHKC
+ S8BCLGTU6Lg0zmWE8pBKNWrfQpShDimU2rQKHmrH42a0AowbQ8Oswusi8ymysDBoW/Iu
+ KCBF7fPCpjz6/q006MXaDi3zH3QbUaJqCYLpPRWSv7zfZlCfawdKfzHBI1AP9xCC557b
+ 0XoDKxJpGMai/3WagZkArHrSK5TcZbfKaNkBqNPzZPAxtReclsLvZGFvD+kekuE/1CMv
+ VIlQ==
+X-Gm-Message-State: APjAAAUyN+kt6bZz8FARwmhTRx+jqNFlg2qlpq1Ev447Bvtb6XOldSax
+ ERf7zX4VqsxBl3PoNERrbSyUd8diqKtZbQLTsBuDNw==
+X-Google-Smtp-Source: APXvYqyztVL89I2poCtt6uF4VgGJEQS3eawGKb/E1SaItQXkCUbbZb9v4oVEBEFbTflHTtYok1VgQn3PDMYw2FyKG/A=
+X-Received: by 2002:a05:6808:289:: with SMTP id
+ z9mr3575813oic.48.1581444481948; 
+ Tue, 11 Feb 2020 10:08:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Feb 2020 17:53:27 -0000
-From: Adam Collard <adam.collard@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=maas; status=Triaged; importance=Low;
- assignee=lee.trager@canonical.com; 
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Triaged; importance=High;
- assignee=maas; 
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke fheimes ltrager paelzer sfeole
-X-Launchpad-Bug-Reporter: Sean Feole (sfeole)
-X-Launchpad-Bug-Modifier: Adam Collard (adam-collard)
-References: <157902669328.14768.4315907500950527119.malonedeb@wampee.canonical.com>
-Message-Id: <158144360935.29381.14308644594559554929.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1859656] Re: [2.6] Unable to reboot s390x KVM machine after
- initial deploy
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e6838e1459aa9824ea7278df8d3929b3d393a8d9
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Tue, 11 Feb 2020 13:08:34 -0500
+References: <20200208125816.14954-1-richard.henderson@linaro.org>
+ <20200208125816.14954-10-richard.henderson@linaro.org>
+In-Reply-To: <20200208125816.14954-10-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Feb 2020 18:07:51 +0000
+Message-ID: <CAFEAcA_bxGXGvwbYSv=M9o97UGYfGXn23rTC_jkqfGf=8w0Q+Q@mail.gmail.com>
+Subject: Re: [PATCH v4 09/20] target/arm: Remove CPSR_RESERVED
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,90 +87,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859656 <1859656@bugs.launchpad.net>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: maas
-       Status: New =3D> Triaged
+On Sat, 8 Feb 2020 at 12:58, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The only remaining use was in op_helper.c.  Use PSTATE_SS
+> directly, and move the commentary so that it is more obvious
+> what is going on.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h       | 6 ------
+>  target/arm/op_helper.c | 9 ++++++++-
+>  2 files changed, 8 insertions(+), 7 deletions(-)
 
-** Changed in: maas
-   Importance: Undecided =3D> Low
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859656
-
-Title:
-  [2.6] Unable to reboot s390x KVM machine after initial deploy
-
-Status in MAAS:
-  Triaged
-Status in QEMU:
-  Incomplete
-Status in Ubuntu on IBM z Systems:
-  Triaged
-
-Bug description:
-  MAAS version: 2.6.1 (7832-g17912cdc9-0ubuntu1~18.04.1)
-  Arch: S390x
-
-  Appears that MAAS can not find the s390x bootloader to boot from the
-  disk, not sure how maas determines this.  However this was working in
-  the past. I had originally thought that if the maas machine was
-  deployed then it defaulted to boot from disk.
-
-  If I force the VM to book from disk, the VM starts up as expected.
-
-  Reproduce:
-
-  - Deploy Disco on S390x KVM instance
-  - Reboot it
-
-  on the KVM console...
-
-  Connected to domain s2lp6g001
-  Escape character is ^]
-  done
-  =C2=A0=C2=A0Using IPv4 address: 10.246.75.160
-  =C2=A0=C2=A0Using TFTP server: 10.246.72.3
-  =C2=A0=C2=A0Bootfile name: 'boots390x.bin'
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0TFTP error: file not found: boots390x.bin
-  Trying pxelinux.cfg files...
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  =C2=A0=C2=A0Receiving data:  0 KBytes
-  Failed to load OS from network
-
-  =3D=3D> /var/log/maas/rackd.log <=3D=3D
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] boots39=
-0x.bin requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/6=
-5a9ca43-9541-49be-b315-e2ca85936ea2 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-1-52-54-00-e5-d7-bb requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA0 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64BA requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64B requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF64 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF6 requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-AF requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
-A requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/0=
- requested by 10.246.75.160
-  2020-01-14 18:21:24 provisioningserver.rackdservices.tftp: [info] s390x/d=
-efault requested by 10.246.75.160
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/maas/+bug/1859656/+subscriptions
+thanks
+-- PMM
 
