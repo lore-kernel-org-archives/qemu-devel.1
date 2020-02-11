@@ -2,94 +2,117 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D8BC352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF467C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:49:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FD4F20708
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:44:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88779206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:49:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GcTzQr9A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FD4F20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JjUksOkw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88779206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1WmF-0004GQ-Jq
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:44:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53526)
+	id 1j1WrC-00065s-KT
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:49:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pmathieu@redhat.com>) id 1j1Wlb-0003fV-Tc
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:44:01 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WqE-0005Us-Ni
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:48:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmathieu@redhat.com>) id 1j1Wla-0002cp-Er
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:43:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49907
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1j1Wla-0002ce-Aj
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:43:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581432237;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7Dm8yZ2czQFGm0IoMtfw733Ltb9lhpwVi3xdSGCntNs=;
- b=GcTzQr9AUBUdCHwzpkPmcC7FcHVQcrlcBhwcVZtuspgjBs9QpCOk5PFES4UThrREnEkRhn
- +JdjQsogDE+TisyY30fvzaClb0dIyWIOvOiaxw9jfOFGWhEeaMSa7MnY2fK3I+S5WB7pUe
- mks3kdZjcFNgA6htANZnaFsF+qMV7WI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-85-m8B6B7VxO7-YdBEAvE-OIg-1; Tue, 11 Feb 2020 09:43:39 -0500
-Received: by mail-wr1-f72.google.com with SMTP id d15so6996401wru.1
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 06:43:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=7Dm8yZ2czQFGm0IoMtfw733Ltb9lhpwVi3xdSGCntNs=;
- b=jQ72s1Rph3iQIlYUJcw1kTM6CyFoPLEDGcWJia+GZacZYN1SYFnpw854x+Q7alW5ci
- fQTM7wyv2kkP8vQBy2iW66R4E6K4kn40v/S047psPxU8a7AVdwIYhX8daF5jXc+hKFF/
- 3xcI3/0cG/kziAfKMxgUKORXmcNregB1pHl1N9R8Y4LnaSBIGxQktB1DVf6v4w7s+k7x
- tMazS4KK61q1Xx7rU+obpx3jvwKQmn4RGcFjjLj47ZRKN2UzRrSC7Ha0TwQP55M8O2X2
- M4jttw6RM2am37bSp9ZDz9Z3Kn9OxQdE3PXLJY2pIxfbg2MnRNFzpd74MLE7Scmd6IRC
- QPrw==
-X-Gm-Message-State: APjAAAXwhTzoppG2aTWaXha+fbSlIKWU27YOYzncx4DZb1mK6mcc7PnR
- jZwyZCjTDjgmu6xnxg8JPrCicS3JfE7GOrh0xSIAAidE8Mk7XR5K7BefHBYYUJ7ezHZkuSKD8xQ
- tLaiCxKh41Vo6uFgD2t2nibWTis77SIw=
-X-Received: by 2002:adf:f6c1:: with SMTP id y1mr8675548wrp.17.1581432218422;
- Tue, 11 Feb 2020 06:43:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzeAbs+05ONikP3Q+hRb0Dwm3+jZlSmmLqWUlMYwLL2gLaDsSHoYdVf+ySA9QqDP/61tFR+trjE9ILx1nJ1aTs=
-X-Received: by 2002:adf:f6c1:: with SMTP id y1mr8675530wrp.17.1581432218222;
- Tue, 11 Feb 2020 06:43:38 -0800 (PST)
-MIME-Version: 1.0
-References: <1581381644-13678-1-git-send-email-tsimpson@quicinc.com>
- <1581381644-13678-56-git-send-email-tsimpson@quicinc.com>
- <fd38e134-8314-f206-9a04-0e41119105f6@redhat.com>
- <BYAPR02MB48865F7264F3F5B2D8735385DE180@BYAPR02MB4886.namprd02.prod.outlook.com>
- <0541dc03-b3f8-8612-9921-e1df9546ce87@redhat.com>
-In-Reply-To: <0541dc03-b3f8-8612-9921-e1df9546ce87@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Tue, 11 Feb 2020 15:43:26 +0100
-Message-ID: <CAP+75-UX=6n4Y7tWN+cfoZmgmeoc2X-=mpkCD6_tj5+UDMuzKA@mail.gmail.com>
-Subject: Re: [RFC PATCH 55/66] Hexagon HVX import instruction encodings
-To: Taylor Simpson <tsimpson@quicinc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-X-MC-Unique: m8B6B7VxO7-YdBEAvE-OIg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WqD-0005DK-8t
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:48:46 -0500
+Received: from mail-eopbgr140128.outbound.protection.outlook.com
+ ([40.107.14.128]:17238 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1j1WqC-0005By-Gn
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:48:45 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hx7/roA92iCidYSJd/eN4a9AEF6CZpi0RGnOlYIlIQn7/R4yo+HtpU2Q8QwhwERirD+nBgocTGtMgdosmpkMI2jwoqb1dC3pqhecdG+RDO8bOfdYGgwqbQzov8/koMyVxS6Bk22m6NyrOKLIwkGUH/SfRQDejGPjvtOrl9zCBHCmUc7xcbiyEGwIma2rtTNvMzqexu4xW63gDQWqMXHFIaz5qosnwZFtNqNH8EJOBS5NBj3M6xpRhlua27D6mk0u+DMaa4IJxWoqqBUfl9qk5RqKfss3s9vOT/OLb9JiBZATKin+k6HGWltfBwNcbESp/YyLdnjFeEQ1R873Nk/OMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UJhowy0bYVhjlJFUirCnJb8gkBcAvI+G4RvctFfIL2Y=;
+ b=b/KJnHWc+N57HL+nJhLpEmpCIK+hgcVhqrG4VmJiY2R60M3QworKiqDmj7I27TeAgXuhXO+MDGziA8W29jpaPnefaPfbd2BuUunZVK+TJdObc8ecApyabtWBieckDwWe9itsyXK5huF8HxoYX/4R0zvQkt819k0VSDOQcANBsV2NXOBS163SjuZs6VWCFDCtaxu4iTWUVdHtLvFArgukBwTpk4qhPM7NXMMcsxsDqLlu5TQ0IPEgq9lVIaVfTCjAYex1i3WGqBaM8XlXcNdP/jSbOWcV2V3qdXHDU71NQxtpd9efzHzMh/HGJ37sxmvNklvedxYUqwj1gkVRya+rVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UJhowy0bYVhjlJFUirCnJb8gkBcAvI+G4RvctFfIL2Y=;
+ b=JjUksOkwSDcrq8QW/rrQr8LtbbF4ciuhjzMLvOtGOujcBMCrA1Y7XUq5I4+lOJ6VUJNUcB+0g0wTACxV9bgVzFztXMeEH8stdYnSc/N1KOTV5GSfmpfMteTm2tv2XOp8s7yRkfpAsVgw4Bfpq9e7bkNfImJuKu6NDQlGWsUn3nY=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
+ AM0PR08MB4067.eurprd08.prod.outlook.com (20.178.202.85) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.25; Tue, 11 Feb 2020 14:48:42 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::5558:d9d2:7f7d:e4]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::5558:d9d2:7f7d:e4%2]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
+ 14:48:41 +0000
+Subject: Re: [PATCH v1 0/2] Improve virtio_check_params test
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200211142551.13072-1-dplotnikov@virtuozzo.com>
+ <1b7ccdc2-2e3e-32d2-c82b-fb1e6cddd998@redhat.com>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <65c2d1b2-f7d8-ec97-d5f2-8757281b2964@virtuozzo.com>
+Date: Tue, 11 Feb 2020 17:48:39 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <1b7ccdc2-2e3e-32d2-c82b-fb1e6cddd998@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+Content-Language: en-US
+X-ClientProxiedBy: HE1PR0402CA0004.eurprd04.prod.outlook.com
+ (2603:10a6:3:d0::14) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
+MIME-Version: 1.0
+Received: from [192.168.1.63] (178.34.162.57) by
+ HE1PR0402CA0004.eurprd04.prod.outlook.com (2603:10a6:3:d0::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21 via Frontend Transport; Tue, 11 Feb 2020 14:48:41 +0000
+X-Originating-IP: [178.34.162.57]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a50f0b47-5e7a-4811-d528-08d7af017c81
+X-MS-TrafficTypeDiagnostic: AM0PR08MB4067:
+X-Microsoft-Antispam-PRVS: <AM0PR08MB40679AEA27965078C953077BCF180@AM0PR08MB4067.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Forefront-PRVS: 0310C78181
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(396003)(136003)(366004)(39850400004)(376002)(346002)(199004)(189003)(2906002)(186003)(956004)(16526019)(2616005)(8676002)(8936002)(16576012)(966005)(81156014)(81166006)(316002)(478600001)(31686004)(52116002)(4326008)(6486002)(36756003)(31696002)(5660300002)(86362001)(66476007)(66946007)(66556008)(53546011)(26005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4067;
+ H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Lg/6VrZtl0LuT1HEt5Z88S/NgFa9Xazekr696DgS+mDO5LMaM+Xsnv5OEAPs89lVWDHLFWlc5XN7a65GKSJGu8M0qFGaroyrjTpXXc6KPmwNzUNWyFGFnS0HcdVwPdR5nVakdag08AjtfVvVrQBKyrzLe5P5bJk5ZWb0W5jk3IDzZxYvHCvPsguIPQa6OshmM5LeNV3/1oH3gke9IsL4z1sx5d2wLdy0Ut3RM9GV/yRtaRgXlXLm58TiEy8IG5haIut8of59mGDB9ET3xS2iLrJCehrx9PWR/u6K1uK17n5DYoc5yBdrqjCZl6s17Y3EzSawDOCliQGI8LBurbJSeHqRV8UGlkS3Ef7uRCxT3NkpcJgARVd0u9KG792YsIHOEd+WQ0/ORnNmHnEbRYCuurxJETcVWiho1AUNV56q7qS8EpMHQ43rmc0u4j4PfjK6YRYk+bK9nWdh8nXAanPMyYWkumcaEfXgHLMzU2mGU+4Rm3PXvAgOL8jmnbiU+Tc/p+nceltk2+lz6yV+z7ZJ6Q==
+X-MS-Exchange-AntiSpam-MessageData: 8PxXLuHtAO2mjsUx14+ZmZeFIrNV0TkGIkc4agp6qfNH+/JvarpIBWPXUamvqxyHA+QYDjQ8PCuH/roft6w6kfhK3R5CIwVIMl3YLAUw3XojekuivxUXyTdlN9I6QW+ooW6Gek1TvToFhnudiARhaA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a50f0b47-5e7a-4811-d528-08d7af017c81
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2020 14:48:41.6984 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: V+TsVH4OGb0RMmBoX3yYRcGjjuqkjJhe4/1G3+A7e9MJKJfQzQ1LtuvM6tDEcyNhs09xd0m4d3jJhCmByqghcgMvQdwxUK85AMl4/szQsAA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4067
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 40.107.14.128
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,92 +124,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
+Cc: cohuck@redhat.com, wainersm@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 11, 2020 at 3:40 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 2/11/20 3:35 PM, Taylor Simpson wrote:
-> > Hi Philippe,
-> >
-> > Thanks for all your feedback.  I' get your comments addressed soon.
-> >
-> > I'm sorry you had trouble applying this patch.
->
-> No problem.
->
-> > The target/hexagon/imported/encode.def should have been created by patc=
-h 17.  Did you apply that one?
->
-> Ah, I haven't received patch #17, and can't find it on the list.
 
-Oops I was looking at incorrect list =3D)
 
-Here it is:
-https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg02526.html
-
-And patchew received it...
-https://patchew.org/QEMU/1581381644-13678-1-git-send-email-tsimpson@quicinc=
-.com/
-
+On 11.02.2020 17:37, Philippe Mathieu-Daud=E9 wrote:
+> Hi Denis,
 >
-> >
-> > Taylor
-> >
-> >
-> >
-> >> -----Original Message-----
-> >> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >> Sent: Tuesday, February 11, 2020 1:02 AM
-> >> To: Taylor Simpson <tsimpson@quicinc.com>; qemu-devel@nongnu.org
-> >> Cc: richard.henderson@linaro.org; laurent@vivier.eu; riku.voipio@iki.f=
-i;
-> >> aleksandar.m.mail@gmail.com
-> >> Subject: Re: [RFC PATCH 55/66] Hexagon HVX import instruction encoding=
-s
-> >>
-> >>> +#define EXTNAME mmvec
-> >>> +#include "mmvec/encode_ext.def"
-> >>> +#undef EXTNAME
-> >>> diff --git a/target/hexagon/imported/encode.def
-> >> b/target/hexagon/imported/encode.def
-> >>> index 33c3396..d1b3510 100644
-> >>> --- a/target/hexagon/imported/encode.def
-> >>> +++ b/target/hexagon/imported/encode.def
-> >>> @@ -71,6 +71,7 @@
-> >>>
-> >>>    #include "encode_pp.def"
-> >>>    #include "encode_subinsn.def"
-> >>> +#include "allextenc.def"
-> >>>
-> >>>    #ifdef __SELF_DEF_FIELD32
-> >>>    #undef __SELF_DEF_FIELD32
-> >>
-> >> I had a problem applying this one:
-> >>
-> >> Applying: Hexagon HVX import instruction encodings
-> >> error: target/hexagon/imported/encode.def: does not exist in index
-> >> Patch failed at 0054 Hexagon HVX import instruction encodings
-> >> hint: Use 'git am --show-current-patch' to see the failed patch
-> >> When you have resolved this problem, run "git am --continue".
-> >> If you prefer to skip this patch, run "git am --skip" instead.
-> >> To restore the original branch and stop patching, run "git am --abort"=
-.
-> >>
-> >> Resolved by doing:
-> >>
-> >> (review/hexagon|AM 54/65)$ touch target/hexagon/imported/encode.def
-> >> (review/hexagon|AM 54/65)$ git add target/hexagon/imported/encode.def
-> >> (review/hexagon|AM 54/65)$ git am --continue
-> >> Applying: Hexagon HVX import instruction encodings
-> >> Applying: Hexagon HVX import semantics
-> >> ...
-> >
+> On 2/11/20 3:25 PM, Denis Plotnikov wrote:
+>> * fixed failing on non-existed machine type removal
+>> * the test refactored to add more parameters to check
+>>
+>> Gereral questions left:
+>> =A0=A0=A0 How to restric test for using:
+>> =A0=A0=A0 1. on a set of target OS-es
+>> =A0=A0=A0 2. on a set target architectures
+>>
+>> Denis Plotnikov (2):
+>> =A0=A0 tests/acceptance/virtio_check_params: remove excluded machine typ=
+es
+>> =A0=A0=A0=A0 carefully
+>> =A0=A0 tests/acceptance/virtio_check_params: prepare to check different
+>> =A0=A0=A0=A0 params
+>>
+>> =A0 tests/acceptance/virtio_check_params.py | 52 ++++++++++++++++-------=
+--
+>> =A0 1 file changed, 33 insertions(+), 19 deletions(-)
+>>
+>
+> Have you noticed my other series suggested by Cornelia?
+>
+> It runs your test on S390X and PPC:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675092.html
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg675095.html
+>
+> Hi, Philippe
+Seems that I've missed them. I just made patches upon the fresh master.
+Can I get a git tree which has those patches applied? Or should I wait=20
+while the patches landed to qemu master and the rebase on them?
 
+Denis
 
