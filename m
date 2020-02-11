@@ -2,73 +2,69 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38233C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 13:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F82C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 13:36:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03FEF20675
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 13:35:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="MFDBCRgV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03FEF20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 1F8092070A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 13:36:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F8092070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tencent.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1VhZ-0000U3-0O
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 08:35:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49401)
+	id 1j1Vii-00026O-9U
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 08:36:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rvkagan@yandex-team.ru>) id 1j1U7K-0006CW-40
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:54:15 -0500
+ (envelope-from <bauerchen@tencent.com>) id 1j1ULI-0001ct-Qf
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 07:08:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rvkagan@yandex-team.ru>) id 1j1U7I-0005Ta-UC
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:54:14 -0500
-Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:48390)
+ (envelope-from <bauerchen@tencent.com>) id 1j1UL7-0004ys-Po
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 07:08:31 -0500
+Received: from mail6.tencent.com ([220.249.245.26]:41909)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rvkagan@yandex-team.ru>)
- id 1j1U7D-0005Kw-G8; Tue, 11 Feb 2020 06:54:08 -0500
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id C90722E157B;
- Tue, 11 Feb 2020 14:54:02 +0300 (MSK)
-Received: from vla5-58875c36c028.qloud-c.yandex.net
- (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- RRyd5SKXoO-s2wGAHb5; Tue, 11 Feb 2020 14:54:02 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1581422042; bh=Tt2vqKivAOJ6aDB2/qFN9hpnhVxIgNZjPRUUlCBjKtc=;
- h=Message-Id:Date:Subject:To:From:Cc;
- b=MFDBCRgVazOl5HjER1qK34Bjt1ENXwclmQ4cgx+OAQ7fKdC+hh51gaVaR6XgdrXB7
- 7l6kesBXornwMaYENQS/902X/wWkeEP+WrMFgR+l0vyRWFjcB+dBXGfR4bPguei6uw
- 9M3Gh9idcIs/uk/aPhI8FNOaB298sdA/xjvQWsVw=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:408:5417:48f1:724b:1a04])
- by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- fOc4LbSE0T-s2W4Kl6A; Tue, 11 Feb 2020 14:54:02 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-From: Roman Kagan <rvkagan@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] block: make BlockConf.*_size properties 32-bit
-Date: Tue, 11 Feb 2020 14:54:01 +0300
-Message-Id: <20200211115401.43230-1-rvkagan@yandex-team.ru>
-X-Mailer: git-send-email 2.24.1
+ (Exim 4.71) (envelope-from <bauerchen@tencent.com>)
+ id 1j1UL7-0004qQ-0o
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 07:08:29 -0500
+Received: from EX-SZ018.tencent.com (unknown [10.28.6.39])
+ by mail6.tencent.com (Postfix) with ESMTP id 5E89BCCA33;
+ Tue, 11 Feb 2020 20:08:42 +0800 (CST)
+Received: from EX-SZ003.tencent.com (10.28.6.15) by EX-SZ018.tencent.com
+ (10.28.6.39) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Tue, 11 Feb
+ 2020 20:08:18 +0800
+Received: from EX-SZ005.tencent.com (10.28.6.29) by EX-SZ003.tencent.com
+ (10.28.6.15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Tue, 11 Feb
+ 2020 20:08:18 +0800
+Received: from EX-SZ005.tencent.com ([fe80::1c8:f876:daf6:e9c0]) by
+ EX-SZ005.tencent.com ([fe80::1c8:f876:daf6:e9c0%4]) with mapi id
+ 15.01.1713.004; Tue, 11 Feb 2020 20:08:18 +0800
+From: =?utf-8?B?YmF1ZXJjaGVuKOmZiOiSmeiSmSk=?= <bauerchen@tencent.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: Requesting review  about optimizing large guest start up time
+Thread-Topic: Requesting review  about optimizing large guest start up time
+Thread-Index: AQHV4NMV+rH5F4FwIUiLta/s/6EHWw==
+Date: Tue, 11 Feb 2020 12:08:18 +0000
+Message-ID: <e9dfa1311de74824983e769ea197c2e6@tencent.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [9.19.161.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 95.108.205.193
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 220.249.245.26
 X-Mailman-Approved-At: Tue, 11 Feb 2020 08:34:09 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,138 +77,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org
+Cc: "pbonzini >" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Devices (virtio-blk, scsi, etc.) and the block layer are happy to use
-32-bit for logical_block_size, physical_block_size, and min_io_size.
-However, the properties in BlockConf are defined as uint16_t limiting
-the values to 32768.
-
-This appears unnecessary tight, and we've seen bigger block sizes handy
-at times.
-
-Make them 32 bit instead and lift the limitation.
-
-Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
----
- hw/core/qdev-properties.c    | 21 ++++++++++++---------
- include/hw/block/block.h     |  8 ++++----
- include/hw/qdev-properties.h |  2 +-
- 3 files changed, 17 insertions(+), 14 deletions(-)
-
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 7f93bfeb88..5f84e4a3b8 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -716,30 +716,32 @@ const PropertyInfo qdev_prop_pci_devfn =3D {
-=20
- /* --- blocksize --- */
-=20
-+#define MIN_BLOCK_SIZE 512
-+#define MAX_BLOCK_SIZE 2147483648
-+
- static void set_blocksize(Object *obj, Visitor *v, const char *name,
-                           void *opaque, Error **errp)
- {
-     DeviceState *dev =3D DEVICE(obj);
-     Property *prop =3D opaque;
--    uint16_t value, *ptr =3D qdev_get_prop_ptr(dev, prop);
-+    uint32_t value, *ptr =3D qdev_get_prop_ptr(dev, prop);
-     Error *local_err =3D NULL;
--    const int64_t min =3D 512;
--    const int64_t max =3D 32768;
-=20
-     if (dev->realized) {
-         qdev_prop_set_after_realize(dev, name, errp);
-         return;
-     }
-=20
--    visit_type_uint16(v, name, &value, &local_err);
-+    visit_type_uint32(v, name, &value, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-     }
-     /* value of 0 means "unset" */
--    if (value && (value < min || value > max)) {
-+    if (value && (value < MIN_BLOCK_SIZE || value > MAX_BLOCK_SIZE)) {
-         error_setg(errp, QERR_PROPERTY_VALUE_OUT_OF_RANGE,
--                   dev->id ? : "", name, (int64_t)value, min, max);
-+                   dev->id ? : "", name, (int64_t)value,
-+                   (int64_t)MIN_BLOCK_SIZE, (int64_t)MAX_BLOCK_SIZE);
-         return;
-     }
-=20
-@@ -755,9 +757,10 @@ static void set_blocksize(Object *obj, Visitor *v, c=
-onst char *name,
- }
-=20
- const PropertyInfo qdev_prop_blocksize =3D {
--    .name  =3D "uint16",
--    .description =3D "A power of two between 512 and 32768",
--    .get   =3D get_uint16,
-+    .name  =3D "uint32",
-+    .description =3D "A power of two between " stringify(MIN_BLOCK_SIZE)
-+                   " and " stringify(MAX_BLOCK_SIZE),
-+    .get   =3D get_uint32,
-     .set   =3D set_blocksize,
-     .set_default_value =3D set_default_value_uint,
- };
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index d7246f3862..9dd6bba56a 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -18,9 +18,9 @@
-=20
- typedef struct BlockConf {
-     BlockBackend *blk;
--    uint16_t physical_block_size;
--    uint16_t logical_block_size;
--    uint16_t min_io_size;
-+    uint32_t physical_block_size;
-+    uint32_t logical_block_size;
-+    uint32_t min_io_size;
-     uint32_t opt_io_size;
-     int32_t bootindex;
-     uint32_t discard_granularity;
-@@ -51,7 +51,7 @@ static inline unsigned int get_physical_block_exp(Block=
-Conf *conf)
-                           _conf.logical_block_size),                    =
-\
-     DEFINE_PROP_BLOCKSIZE("physical_block_size", _state,                =
-\
-                           _conf.physical_block_size),                   =
-\
--    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    =
-\
-+    DEFINE_PROP_UINT32("min_io_size", _state, _conf.min_io_size, 0),    =
-\
-     DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    =
-\
-     DEFINE_PROP_UINT32("discard_granularity", _state,                   =
-\
-                        _conf.discard_granularity, -1),                  =
-\
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 906e697c58..ebdeeb4866 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -193,7 +193,7 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
- #define DEFINE_PROP_BIOS_CHS_TRANS(_n, _s, _f, _d) \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_bios_chs_trans, int)
- #define DEFINE_PROP_BLOCKSIZE(_n, _s, _f) \
--    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint16_t)
-+    DEFINE_PROP_UNSIGNED(_n, _s, _f, 0, qdev_prop_blocksize, uint32_t)
- #define DEFINE_PROP_PCI_HOST_DEVADDR(_n, _s, _f) \
-     DEFINE_PROP(_n, _s, _f, qdev_prop_pci_host_devaddr, PCIHostDeviceAdd=
-ress)
- #define DEFINE_PROP_OFF_AUTO_PCIBAR(_n, _s, _f, _d) \
---=20
-2.24.1
-
+RnJvbSBjODgyYjE1NTQ2NjMxM2ZjZDg1YWMzMzBhNDVhNTczZTYwOGIwZDc0IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBiYXVlcmNoZW4gPGJhdWVyY2hlbkB0ZW5jZW50LmNvbT4KRGF0
+ZTogVHVlLCAxMSBGZWIgMjAyMCAxNzoxMDozNSArMDgwMApTdWJqZWN0OiBbUEFUQ0hdIE9wdGlt
+aXplOiBsYXJnZSBndWVzdCBzdGFydC11cCBpbiBtZW0tcHJlYWxsb2MKTUlNRS1WZXJzaW9uOiAx
+LjAKQ29udGVudC1UeXBlOiB0ZXh0L3BsYWluOyBjaGFyc2V0PXV0Zi04CkNvbnRlbnQtVHJhbnNm
+ZXItRW5jb2Rpbmc6IDhiaXQKCltkZXNjXToKwqAgwqAgTGFyZ2UgbWVtb3J5IFZNIHN0YXJ0cyBz
+bG93bHkgd2hlbiB1c2luZyAtbWVtLXByZWFsbG9jLCBhbmQKwqAgwqAgdGhlcmUgYXJlIHNvbWUg
+YXJlYXMgdG8gb3B0aW1pemUgaW4gY3VycmVudCBtZXRob2Q7CgrCoCDCoCAx44CBbW1hcCB3aWxs
+IGJlIHVzZWQgdG8gYWxsb2MgdGhyZWFkcyBzdGFjayBkdXJpbmcgY3JlYXRlIHBhZ2UKwqAgwqAg
+Y2xlYXJpbmcgdGhyZWFkcywgYW5kIGl0IHdpbGwgYXR0ZW1wdCBtbS0+bW1hcF9zZW0gZm9yIHdy
+aXRlCsKgIMKgIGxvY2ssIGJ1dCBjbGVhcmluZyB0aHJlYWRzIGhhdmUgaG9sZCByZWFkIGxvY2ss
+IHRoaXMgY29tcGV0aXRpb24KwqAgwqAgd2lsbCBjYXVzZSB0aHJlYWRzIGNyZWF0ZWlvbiB2ZXJ5
+IHNsb3c7CgrCoCDCoCAy44CBbWV0aG9kcyBvZiBjYWxjdWF0aW5nIHBhZ2VzIGZvciBwZXIgdGhy
+ZWFkcyBpcyBub3Qgd2VsbDtpZiB3ZSB1c2UKwqAgwqAgNjQgdGhyZWFkcyB0byBzcGxpdCAxNjAg
+aHVnZXBhZ2UsNjMgdGhyZWFkcyBjbGVhciAycGFnZSwxIHRocmVhZArCoCDCoCBjbGVhciAzNCBw
+YWdlLHNvIHRoZSBlbnRpcmUgc3BlZWQgaXMgdmVyeSBzbG93OwoKwqAgwqAgdG8gc29sdmUgdGhl
+IGZpcnN0IHByb2JsZW0sd2UgYWRkIGEgbXV0ZXggaW4gdGhyZWFkIGZ1bmN0aW9uLGFuZArCoCDC
+oCBzdGFydCBhbGwgdGhyZWFkcyB3aGVuIGFsbCB0aHJlYWRzIGZpbmlzaGVkIGNyZWF0ZWlvbjsK
+wqAgwqAgYW5kIHRoZSBzZWNvbmQgcHJvYmxlbSwgd2Ugc3ByZWFkIHJlbWFpbmRlciB0byBvdGhl
+ciB0aHJlYWRzLGluCsKgIMKgIHNpdHVhdGlvbiB0aGF0IDE2MCBodWdlcGFnZSBhbmQgNjQgdGhy
+ZWFkcywgdGhlcmUgYXJlIDMyIHRocmVhZHMKwqAgwqAgY2xlYXIgMyBwYWdlcyxhbmQgMzIgdGhy
+ZWFkcyBjbGVhciAyIHBhZ2VzOwpbdGVzdF06CsKgIMKgIDMyMEcgODRjIFZNIHN0YXJ0IHRpbWUg
+Y2FuIGJlIHJlZHVjZWQgdG8gMTBzCsKgIMKgIDY4MEcgODRjIFZNIHN0YXJ0IHRpbWUgY2FuIGJl
+IHJlZHVjZWQgdG8gMThzCgpTaWduZWQtb2ZmLWJ5OiBiYXVlcmNoZW4gPGJhdWVyY2hlbkB0ZW5j
+ZW50LmNvbT4KUmV2aWV3ZWQtYnk6UGFuIFJ1aSA8cnVpcHBhbkB0ZW5jZW50LmNvbT4KUmV2aWV3
+ZWQtYnk6SXZhbiBSZW4gPGl2YW5yZW5AdGVuY2VudC5jb20+Ci0tLQrCoHV0aWwvb3NsaWItcG9z
+aXguYyB8IDQ0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tCsKg
+MSBmaWxlIGNoYW5nZWQsIDM2IGluc2VydGlvbnMoKyksIDggZGVsZXRpb25zKC0pCgpkaWZmIC0t
+Z2l0IGEvdXRpbC9vc2xpYi1wb3NpeC5jIGIvdXRpbC9vc2xpYi1wb3NpeC5jCmluZGV4IDVhMjkx
+Y2MuLmU5NzM2OWIgMTAwNjQ0Ci0tLSBhL3V0aWwvb3NsaWItcG9zaXguYworKysgYi91dGlsL29z
+bGliLXBvc2l4LmMKQEAgLTc2LDYgKzc2LDEwIEBAIHN0YXRpYyBNZW1zZXRUaHJlYWQgKm1lbXNl
+dF90aHJlYWQ7CsKgc3RhdGljIGludCBtZW1zZXRfbnVtX3RocmVhZHM7CsKgc3RhdGljIGJvb2wg
+bWVtc2V0X3RocmVhZF9mYWlsZWQ7CsKgCitzdGF0aWMgUWVtdU11dGV4IHBhZ2VfbXV0ZXg7Citz
+dGF0aWMgUWVtdUNvbmQgcGFnZV9jb25kOworc3RhdGljIHZvbGF0aWxlIGJvb2wgdGhyZWFkX2Ny
+ZWF0ZV9mbGFnOworCsKgaW50IHFlbXVfZ2V0X3RocmVhZF9pZCh2b2lkKQrCoHsKwqAjaWYgZGVm
+aW5lZChfX2xpbnV4X18pCkBAIC00MDMsNiArNDA3LDE0IEBAIHN0YXRpYyB2b2lkICpkb190b3Vj
+aF9wYWdlcyh2b2lkICphcmcpCsKgIMKgIMKgTWVtc2V0VGhyZWFkICptZW1zZXRfYXJncyA9IChN
+ZW1zZXRUaHJlYWQgKilhcmc7CsKgIMKgIMKgc2lnc2V0X3Qgc2V0LCBvbGRzZXQ7CsKgCisgwqAg
+wqAvKndhaXQgZm9yIGFsbCB0aHJlYWRzIGNyZWF0ZSBmaW5pc2hlZCAqLworIMKgIMKgcWVtdV9t
+dXRleF9sb2NrKCZwYWdlX211dGV4KTsKKyDCoCDCoHdoaWxlKCF0aHJlYWRfY3JlYXRlX2ZsYWcp
+eworIMKgIMKgIMKgIMKgcWVtdV9jb25kX3dhaXQoJnBhZ2VfY29uZCwgJnBhZ2VfbXV0ZXgpOwor
+IMKgIMKgfQorIMKgIMKgcWVtdV9tdXRleF91bmxvY2soJnBhZ2VfbXV0ZXgpOworCisKwqAgwqAg
+wqAvKiB1bmJsb2NrIFNJR0JVUyAqLwrCoCDCoCDCoHNpZ2VtcHR5c2V0KCZzZXQpOwrCoCDCoCDC
+oHNpZ2FkZHNldCgmc2V0LCBTSUdCVVMpOwpAQCAtNDQ4LDMwICs0NjAsNDYgQEAgc3RhdGljIGlu
+bGluZSBpbnQgZ2V0X21lbXNldF9udW1fdGhyZWFkcyhpbnQgc21wX2NwdXMpCsKgIMKgIMKgcmV0
+dXJuIHJldDsKwqB9CsKgCitzdGF0aWMgdm9pZCBjYWxjX3BhZ2VfcGVyX3RocmVhZChzaXplX3Qg
+bnVtcGFnZXMsIGludCBtZW1zZXRfdGhyZWFkcywgc2l6ZV90ICpwYWdlc19wZXJfdGhyZWFkKXsK
+KyDCoCDCoGludCBhdmcgPSBudW1wYWdlcyAvIG1lbXNldF90aHJlYWRzICsgMTsKKyDCoCDCoGlu
+dCBpID0gMDsKKyDCoCDCoGludCBsYXN0ID0gYXZnICogbWVtc2V0X3RocmVhZHMgLSBudW1wYWdl
+czsKKyDCoCDCoGZvciAoaSA9IDA7IGkgPCBtZW1zZXRfdGhyZWFkczsgaSsrKQorIMKgIMKgewor
+IMKgIMKgIMKgIMKgaWYobWVtc2V0X3RocmVhZHMgLSBpIDw9IGxhc3QpeworIMKgIMKgIMKgIMKg
+IMKgIMKgcGFnZXNfcGVyX3RocmVhZFtpXSA9IGF2ZyAtIDE7CisgwqAgwqAgwqAgwqB9ZWxzZQor
+IMKgIMKgIMKgIMKgIMKgIMKgcGFnZXNfcGVyX3RocmVhZFtpXSA9IGF2ZzsKKyDCoCDCoH0KK30K
+KwrCoHN0YXRpYyBib29sIHRvdWNoX2FsbF9wYWdlcyhjaGFyICphcmVhLCBzaXplX3QgaHBhZ2Vz
+aXplLCBzaXplX3QgbnVtcGFnZXMsCsKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgaW50IHNtcF9jcHVzKQrCoHsKLSDCoCDCoHNpemVfdCBudW1wYWdlc19wZXJfdGhy
+ZWFkOwotIMKgIMKgc2l6ZV90IHNpemVfcGVyX3RocmVhZDsKKyDCoCDCoHNpemVfdCAqbnVtcGFn
+ZXNfcGVyX3RocmVhZDsKwqAgwqAgwqBjaGFyICphZGRyID0gYXJlYTsKwqAgwqAgwqBpbnQgaSA9
+IDA7CsKgCsKgIMKgIMKgbWVtc2V0X3RocmVhZF9mYWlsZWQgPSBmYWxzZTsKKyDCoCDCoHRocmVh
+ZF9jcmVhdGVfZmxhZyA9IGZhbHNlOwrCoCDCoCDCoG1lbXNldF9udW1fdGhyZWFkcyA9IGdldF9t
+ZW1zZXRfbnVtX3RocmVhZHMoc21wX2NwdXMpOworIMKgIMKgbnVtcGFnZXNfcGVyX3RocmVhZCA9
+IGdfbmV3MChzaXplX3QsIG1lbXNldF9udW1fdGhyZWFkcyk7CsKgIMKgIMKgbWVtc2V0X3RocmVh
+ZCA9IGdfbmV3MChNZW1zZXRUaHJlYWQsIG1lbXNldF9udW1fdGhyZWFkcyk7Ci0gwqAgwqBudW1w
+YWdlc19wZXJfdGhyZWFkID0gKG51bXBhZ2VzIC8gbWVtc2V0X251bV90aHJlYWRzKTsKLSDCoCDC
+oHNpemVfcGVyX3RocmVhZCA9IChocGFnZXNpemUgKiBudW1wYWdlc19wZXJfdGhyZWFkKTsKKyDC
+oCDCoGNhbGNfcGFnZV9wZXJfdGhyZWFkKG51bXBhZ2VzLCBtZW1zZXRfbnVtX3RocmVhZHMsIG51
+bXBhZ2VzX3Blcl90aHJlYWQpOworCsKgIMKgIMKgZm9yIChpID0gMDsgaSA8IG1lbXNldF9udW1f
+dGhyZWFkczsgaSsrKSB7CsKgIMKgIMKgIMKgIMKgbWVtc2V0X3RocmVhZFtpXS5hZGRyID0gYWRk
+cjsKLSDCoCDCoCDCoCDCoG1lbXNldF90aHJlYWRbaV0ubnVtcGFnZXMgPSAoaSA9PSAobWVtc2V0
+X251bV90aHJlYWRzIC0gMSkpID8KLSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoG51bXBhZ2VzIDogbnVtcGFnZXNfcGVyX3RocmVhZDsKKyDCoCDC
+oCDCoCDCoG1lbXNldF90aHJlYWRbaV0ubnVtcGFnZXMgPSBudW1wYWdlc19wZXJfdGhyZWFkW2ld
+OwrCoCDCoCDCoCDCoCDCoG1lbXNldF90aHJlYWRbaV0uaHBhZ2VzaXplID0gaHBhZ2VzaXplOwrC
+oCDCoCDCoCDCoCDCoHFlbXVfdGhyZWFkX2NyZWF0ZSgmbWVtc2V0X3RocmVhZFtpXS5wZ3RocmVh
+ZCwgInRvdWNoX3BhZ2VzIiwKwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgZG9fdG91Y2hfcGFnZXMsICZtZW1zZXRfdGhyZWFkW2ldLArCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBRRU1VX1RIUkVBRF9KT0lOQUJMRSk7Ci0gwqAgwqAgwqAg
+wqBhZGRyICs9IHNpemVfcGVyX3RocmVhZDsKLSDCoCDCoCDCoCDCoG51bXBhZ2VzIC09IG51bXBh
+Z2VzX3Blcl90aHJlYWQ7CisgwqAgwqAgwqAgwqBhZGRyICs9IG51bXBhZ2VzX3Blcl90aHJlYWRb
+aV0gKiBocGFnZXNpemU7CisgwqAgwqAgwqAgwqBudW1wYWdlcyAtPSBudW1wYWdlc19wZXJfdGhy
+ZWFkW2ldOwrCoCDCoCDCoH0KKyDCoCDCoHRocmVhZF9jcmVhdGVfZmxhZyA9IHRydWU7CisgwqAg
+wqBxZW11X2NvbmRfYnJvYWRjYXN0KCZwYWdlX2NvbmQpOworCsKgIMKgIMKgZm9yIChpID0gMDsg
+aSA8IG1lbXNldF9udW1fdGhyZWFkczsgaSsrKSB7CsKgIMKgIMKgIMKgIMKgcWVtdV90aHJlYWRf
+am9pbigmbWVtc2V0X3RocmVhZFtpXS5wZ3RocmVhZCk7CsKgIMKgIMKgfQotLcKgCjEuOC4zLjE=
 
