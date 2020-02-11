@@ -2,69 +2,70 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDCCC35242
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 04:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 569A0C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 06:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4C7520842
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 04:21:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4C7520842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2D72720708
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 06:03:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D72720708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1N3B-0007Qo-SX
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 23:21:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37682)
+	id 1j1OdW-0007ij-9u
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 01:03:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1j1N2O-00068j-Lp
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 23:20:42 -0500
+ (envelope-from <jing2.liu@linux.intel.com>) id 1j1Ocf-0007HG-Mq
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:02:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1j1N2M-0007gO-BN
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 23:20:39 -0500
-Received: from mga02.intel.com ([134.134.136.20]:31693)
+ (envelope-from <jing2.liu@linux.intel.com>) id 1j1Oca-00070L-6o
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:02:13 -0500
+Received: from mga01.intel.com ([192.55.52.88]:3884)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1j1N2M-0007KP-1I
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 23:20:38 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+ (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+ id 1j1OcZ-0006eJ-Sh
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:02:08 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 10 Feb 2020 20:20:34 -0800
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 10 Feb 2020 22:02:05 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,427,1574150400"; d="scan'208";a="312957002"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga001.jf.intel.com with ESMTP; 10 Feb 2020 20:20:29 -0800
-Date: Mon, 10 Feb 2020 23:11:11 -0500
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20200211041111.GC4530@joy-OptiPlex-7040>
-References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
- <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
- <20200210094954.GA4530@joy-OptiPlex-7040>
- <20200210124454.12e0419a@w520.home>
- <20200211025251.GB4530@joy-OptiPlex-7040>
- <20200210204543.11bf8a3d@x1.home>
+X-IronPort-AV: E=Sophos;i="5.70,427,1574150400"; 
+ d="scan'208,217";a="221824516"
+Received: from liujing-mobl1.ccr.corp.intel.com (HELO [10.249.174.64])
+ ([10.249.174.64])
+ by orsmga007.jf.intel.com with ESMTP; 10 Feb 2020 22:02:02 -0800
+Subject: Re: [virtio-dev] Re: [PATCH v2 4/5] virtio-mmio: add MSI interrupt
+ feature support
+To: Jason Wang <jasowang@redhat.com>, Zha Bin <zhabin@linux.alibaba.com>,
+ linux-kernel@vger.kernel.org
+References: <cover.1581305609.git.zhabin@linux.alibaba.com>
+ <4c3d13be5a391b1fc50416838de57d903cbf8038.1581305609.git.zhabin@linux.alibaba.com>
+ <0c71ff9d-1a7f-cfd2-e682-71b181bdeae4@redhat.com>
+ <c42c8b49-5357-f341-2942-ba84afc25437@linux.intel.com>
+ <ad96269f-753d-54b8-a4ae-59d1595dd3b2@redhat.com>
+From: "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <5522f205-207b-b012-6631-3cc77dde3bfe@linux.intel.com>
+Date: Tue, 11 Feb 2020 14:02:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200210204543.11bf8a3d@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <ad96269f-753d-54b8-a4ae-59d1595dd3b2@redhat.com>
+Content-Type: multipart/alternative;
+ boundary="------------D7483FB5B3A21C0D59ACC0F5"
+Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.20
+X-Received-From: 192.55.52.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,137 +77,304 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: virtio-dev@lists.oasis-open.org, slp@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, chao.p.peng@linux.intel.com, gerry@linux.alibaba.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 11, 2020 at 11:45:43AM +0800, Alex Williamson wrote:
-> On Mon, 10 Feb 2020 21:52:51 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Tue, Feb 11, 2020 at 03:44:54AM +0800, Alex Williamson wrote:
-> > > On Mon, 10 Feb 2020 04:49:54 -0500
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > On Sat, Feb 08, 2020 at 03:42:31AM +0800, Kirti Wankhede wrote:  
-> > > > > VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> > > > > - Start pinned and unpinned pages tracking while migration is active
-> > > > > - Stop pinned and unpinned dirty pages tracking. This is also used to
-> > > > >   stop dirty pages tracking if migration failed or cancelled.
-> > > > > - Get dirty pages bitmap. This ioctl returns bitmap of dirty pages, its
-> > > > >   user space application responsibility to copy content of dirty pages
-> > > > >   from source to destination during migration.
-> > > > > 
-> > > > > To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> > > > > structure. Bitmap size is calculated considering smallest supported page
-> > > > > size. Bitmap is allocated when dirty logging is enabled for those
-> > > > > vfio_dmas whose vpfn list is not empty or whole range is mapped, in
-> > > > > case of pass-through device.
-> > > > > 
-> > > > > There could be multiple option as to when bitmap should be populated:
-> > > > > * Polulate bitmap for already pinned pages when bitmap is allocated for
-> > > > >   a vfio_dma with the smallest supported page size. Updates bitmap from
-> > > > >   page pinning and unpinning functions. When user application queries
-> > > > >   bitmap, check if requested page size is same as page size used to
-> > > > >   populated bitmap. If it is equal, copy bitmap. But if not equal,
-> > > > >   re-populated bitmap according to requested page size and then copy to
-> > > > >   user.
-> > > > >   Pros: Bitmap gets populated on the fly after dirty tracking has
-> > > > >         started.
-> > > > >   Cons: If requested page size is different than smallest supported
-> > > > >         page size, then bitmap has to be re-populated again, with
-> > > > >         additional overhead of allocating bitmap memory again for
-> > > > >         re-population of bitmap.
-> > > > > 
-> > > > > * Populate bitmap when bitmap is queried by user application.
-> > > > >   Pros: Bitmap is populated with requested page size. This eliminates
-> > > > >         the need to re-populate bitmap if requested page size is
-> > > > >         different than smallest supported pages size.
-> > > > >   Cons: There is one time processing time, when bitmap is queried.
-> > > > > 
-> > > > > I prefer later option with simple logic and to eliminate over-head of
-> > > > > bitmap repopulation in case of differnt page sizes. Later option is
-> > > > > implemented in this patch.
-> > > > > 
-> > > > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > > > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > > > ---
-> > > > >  drivers/vfio/vfio_iommu_type1.c | 299 ++++++++++++++++++++++++++++++++++++++--
-> > > > >  1 file changed, 287 insertions(+), 12 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > > > index d386461e5d11..df358dc1c85b 100644
-> > > > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > > > +++ b/drivers/vfio/vfio_iommu_type1.c  
-> > > [snip]  
-> > > > > @@ -830,6 +924,113 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
-> > > > >  	return bitmap;
-> > > > >  }
-> > > > >  
-> > > > > +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> > > > > +				  size_t size, uint64_t pgsize,
-> > > > > +				  unsigned char __user *bitmap)
-> > > > > +{
-> > > > > +	struct vfio_dma *dma;
-> > > > > +	dma_addr_t i = iova, iova_limit;
-> > > > > +	unsigned int bsize, nbits = 0, l = 0;
-> > > > > +	unsigned long pgshift = __ffs(pgsize);
-> > > > > +
-> > > > > +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
-> > > > > +		int ret, j;
-> > > > > +		unsigned int npages = 0, shift = 0;
-> > > > > +		unsigned char temp = 0;
-> > > > > +
-> > > > > +		/* mark all pages dirty if all pages are pinned and mapped. */
-> > > > > +		if (dma->iommu_mapped) {
-> > > > > +			iova_limit = min(dma->iova + dma->size, iova + size);
-> > > > > +			npages = iova_limit/pgsize;
-> > > > > +			bitmap_set(dma->bitmap, 0, npages);    
-> > > > for pass-through devices, it's not good to always return all pinned pages as
-> > > > dirty. could it also call vfio_pin_pages to track dirty pages? or any
-> > > > other interface provided to do that?  
-> > > 
-> > > See patch 7/7.  Thanks,
-> > >  
-> > hi Alex and Kirti,
-> > for pass-through devices, though patch 7/7 enables the vendor driver to
-> > set dirty pages by calling vfio_pin_pages, however, its overhead is much
-> > higher than the previous way of generating a bitmap directly to user.
-> > And it also requires pass-through device vendor driver to track guest
-> > operations to know when to call vfio_pin_pages.
-> > There are still use cases like a pass-through device is able to track
-> > dirty pages in its hardware buffer, so is there a way for it pass its
-> > dirty bitmap to user?
-> 
-> Not currently and this sounds like another argument in favor of using
-> the dirty bitmap per vfio_dma to directly track dirty pages.
-it may need an interface to get max iova in all vfio_dma and then generate a
-hardware bitmap for the whole guest system memory.
+This is a multi-part message in MIME format.
+--------------D7483FB5B3A21C0D59ACC0F5
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> Passthrough drivers could be provided an interface to set dirty bits
-> which could be merged with pfn list entries when the user requests the
-> bitmap, rather than requiring passthrough drivers to unnecessarily
-> allocate pfn list entries directly.  Thanks,
-yes, it's better.
-and for devices with ability to track dirty pages in hardware,
-maybe an interface to let vfio know where is the hardware bitmap?
 
-Thanks
-Yan
+On 2/11/2020 12:02 PM, Jason Wang wrote:
+>
+> On 2020/2/11 上午11:35, Liu, Jing2 wrote:
+>>
+>> On 2/11/2020 11:17 AM, Jason Wang wrote:
+>>>
+>>> On 2020/2/10 下午5:05, Zha Bin wrote:
+>>>> From: Liu Jiang<gerry@linux.alibaba.com>
+>>>>
+>>>> Userspace VMMs (e.g. Qemu microvm, Firecracker) take advantage of 
+>>>> using
+>>>> virtio over mmio devices as a lightweight machine model for modern
+>>>> cloud. The standard virtio over MMIO transport layer only supports one
+>>>> legacy interrupt, which is much heavier than virtio over PCI transport
+>>>> layer using MSI. Legacy interrupt has long work path and causes 
+>>>> specific
+>>>> VMExits in following cases, which would considerably slow down the
+>>>> performance:
+>>>>
+>>>> 1) read interrupt status register
+>>>> 2) update interrupt status register
+>>>> 3) write IOAPIC EOI register
+>>>>
+>>>> We proposed to add MSI support for virtio over MMIO via new feature
+>>>> bit VIRTIO_F_MMIO_MSI[1] which increases the interrupt performance.
+>>>>
+>>>> With the VIRTIO_F_MMIO_MSI feature bit supported, the virtio-mmio MSI
+>>>> uses msi_sharing[1] to indicate the event and vector mapping.
+>>>> Bit 1 is 0: device uses non-sharing and fixed vector per event 
+>>>> mapping.
+>>>> Bit 1 is 1: device uses sharing mode and dynamic mapping.
+>>>
+>>>
+>>> I believe dynamic mapping should cover the case of fixed vector?
+>>>
+>> Actually this bit *aims* for msi sharing or msi non-sharing.
+>>
+>> It means, when msi sharing bit is 1, device doesn't want vector per 
+>> queue
+>>
+>> (it wants msi vector sharing as name) and doesn't want a high 
+>> interrupt rate.
+>>
+>> So driver turns to !per_vq_vectors and has to do dynamical mapping.
+>>
+>> So they are opposite not superset.
+>>
+>> Thanks!
+>>
+>> Jing
+>
+>
+> I think you need add more comments on the command.
+>
+> E.g if I want to map vector 0 to queue 1, how do I need to do?
+>
+> write(1, queue_sel);
+> write(0, vector_sel);
+
+That's true. Besides, two commands are used for msi sharing mode,
+
+VIRTIO_MMIO_MSI_CMD_MAP_CONFIG and VIRTIO_MMIO_MSI_CMD_MAP_QUEUE.
+
+"To set up the event and vector mapping for MSI sharing mode, driver 
+SHOULD write a valid MsiVecSel followed by 
+VIRTIO_MMIO_MSI_CMD_MAP_CONFIG/VIRTIO_MMIO_MSI_CMD_MAP_QUEUE command to 
+map the configuration change/selected queue events respectively.  " (See 
+spec patch 5/5)
+
+So if driver detects the msi sharing mode, when it does setup vq, writes 
+the queue_sel (this already exists in setup vq), vector sel and then 
+MAP_QUEUE command to do the queue event mapping.
+
+For msi non-sharing mode, no special action is needed because we make 
+the rule of per_vq_vector and fixed relationship.
+
+Correct me if this is not that clear for spec/code comments.
+
+Thanks!
+
+Jing
+
+
+>
+> ?
+>
+> Thanks
+>
+>
+>>
+>>
+>>> Thanks
+>>>
+>>>
+>>>
+>>> ---------------------------------------------------------------------
+>>> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+>>> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+>>>
+>>
+>
+
+--------------D7483FB5B3A21C0D59ACC0F5
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <p><br>
+    </p>
+    <div class="moz-cite-prefix">On 2/11/2020 12:02 PM, Jason Wang
+      wrote:<br>
+    </div>
+    <blockquote type="cite"
+      cite="mid:ad96269f-753d-54b8-a4ae-59d1595dd3b2@redhat.com">
+      <br>
+      On 2020/2/11 上午11:35, Liu, Jing2 wrote:
+      <br>
+      <blockquote type="cite">
+        <br>
+        On 2/11/2020 11:17 AM, Jason Wang wrote:
+        <br>
+        <blockquote type="cite">
+          <br>
+          On 2020/2/10 下午5:05, Zha Bin wrote:
+          <br>
+          <blockquote type="cite">From: Liu
+            Jiang<a class="moz-txt-link-rfc2396E" href="mailto:gerry@linux.alibaba.com">&lt;gerry@linux.alibaba.com&gt;</a>
+            <br>
+            <br>
+            Userspace VMMs (e.g. Qemu microvm, Firecracker) take
+            advantage of using
+            <br>
+            virtio over mmio devices as a lightweight machine model for
+            modern
+            <br>
+            cloud. The standard virtio over MMIO transport layer only
+            supports one
+            <br>
+            legacy interrupt, which is much heavier than virtio over PCI
+            transport
+            <br>
+            layer using MSI. Legacy interrupt has long work path and
+            causes specific
+            <br>
+            VMExits in following cases, which would considerably slow
+            down the
+            <br>
+            performance:
+            <br>
+            <br>
+            1) read interrupt status register
+            <br>
+            2) update interrupt status register
+            <br>
+            3) write IOAPIC EOI register
+            <br>
+            <br>
+            We proposed to add MSI support for virtio over MMIO via new
+            feature
+            <br>
+            bit VIRTIO_F_MMIO_MSI[1] which increases the interrupt
+            performance.
+            <br>
+            <br>
+            With the VIRTIO_F_MMIO_MSI feature bit supported, the
+            virtio-mmio MSI
+            <br>
+            uses msi_sharing[1] to indicate the event and vector
+            mapping.
+            <br>
+            Bit 1 is 0: device uses non-sharing and fixed vector per
+            event mapping.
+            <br>
+            Bit 1 is 1: device uses sharing mode and dynamic mapping.
+            <br>
+          </blockquote>
+          <br>
+          <br>
+          I believe dynamic mapping should cover the case of fixed
+          vector?
+          <br>
+          <br>
+        </blockquote>
+        Actually this bit *aims* for msi sharing or msi non-sharing.
+        <br>
+        <br>
+        It means, when msi sharing bit is 1, device doesn't want vector
+        per queue
+        <br>
+        <br>
+        (it wants msi vector sharing as name) and doesn't want a high
+        interrupt rate.
+        <br>
+        <br>
+        So driver turns to !per_vq_vectors and has to do dynamical
+        mapping.
+        <br>
+        <br>
+        So they are opposite not superset.
+        <br>
+        <br>
+        Thanks!
+        <br>
+        <br>
+        Jing
+        <br>
+      </blockquote>
+      <br>
+      <br>
+      I think you need add more comments on the command.
+      <br>
+      <br>
+      E.g if I want to map vector 0 to queue 1, how do I need to do?
+      <br>
+      <br>
+      write(1, queue_sel);
+      <br>
+      write(0, vector_sel);
+      <br>
+    </blockquote>
+    <p>That's true. Besides, two commands are used for msi sharing mode,<br>
+    </p>
+    <p><span class="fontstyle0">VIRTIO_MMIO_MSI_CMD_MAP_CONFIG and
+        VIRTIO_MMIO_MSI_CMD_MAP_QUEUE.</span></p>
+    <p><span class="fontstyle0"><span class="fontstyle0">"To set up the
+          event and vector mapping for MSI sharing mode, driver SHOULD
+          write a valid </span><span class="fontstyle2">MsiVecSel </span><span
+          class="fontstyle0">followed by
+          VIRTIO_MMIO_MSI_CMD_MAP_CONFIG/VIRTIO_MMIO_MSI_CMD_MAP_QUEUE
+          command to map the configuration change/selected queue events
+          respectively.</span>  " (See spec patch 5/5)</span></p>
+    <p><span class="fontstyle0"></span> So if driver detects the msi
+      sharing mode, when it does setup vq, writes the queue_sel (this
+      already exists in setup vq), vector sel and then MAP_QUEUE command
+      to do the queue event mapping.</p>
+    <p>For msi non-sharing mode, no special action is needed because we
+      make the rule of per_vq_vector and fixed relationship.</p>
+    <p>Correct me if this is not that clear for spec/code comments.<br>
+    </p>
+    <p>Thanks!</p>
+    <p>Jing</p>
+    <p><br style=" font-style: normal; font-variant: normal;
+        font-weight: normal; letter-spacing: normal; line-height:
+        normal; orphans: 2; text-align: -webkit-auto; text-indent: 0px;
+        text-transform: none; white-space: normal; widows: 2;
+        word-spacing: 0px; -webkit-text-size-adjust: auto;
+        -webkit-text-stroke-width: 0px; ">
+    </p>
+    <blockquote type="cite"
+      cite="mid:ad96269f-753d-54b8-a4ae-59d1595dd3b2@redhat.com">
+      <br>
+      ?
+      <br>
+      <br>
+      Thanks
+      <br>
+      <br>
+      <br>
+      <blockquote type="cite">
+        <br>
+        <br>
+        <blockquote type="cite">Thanks
+          <br>
+          <br>
+          <br>
+          <br>
+---------------------------------------------------------------------
+          <br>
+          To unsubscribe, e-mail:
+          <a class="moz-txt-link-abbreviated" href="mailto:virtio-dev-unsubscribe@lists.oasis-open.org">virtio-dev-unsubscribe@lists.oasis-open.org</a>
+          <br>
+          For additional commands, e-mail:
+          <a class="moz-txt-link-abbreviated" href="mailto:virtio-dev-help@lists.oasis-open.org">virtio-dev-help@lists.oasis-open.org</a>
+          <br>
+          <br>
+        </blockquote>
+        <br>
+      </blockquote>
+      <br>
+    </blockquote>
+  </body>
+</html>
+
+--------------D7483FB5B3A21C0D59ACC0F5--
 
