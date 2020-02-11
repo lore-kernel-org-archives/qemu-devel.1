@@ -2,104 +2,96 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C0AC352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 10:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C04C2C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 10:21:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 028FE20870
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 10:09:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86E6E20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 10:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iKaT4vVq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 028FE20870
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpnBIj0g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86E6E20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1SU4-0005Bl-4D
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 05:09:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49718)
+	id 1j1Sft-00029i-LO
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 05:21:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j1STP-0004Xu-OX
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:08:56 -0500
+ (envelope-from <mst@redhat.com>) id 1j1Set-0001IT-59
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j1STN-0003Bc-VR
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:08:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37110
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1j1Seq-0001J3-VQ
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:20:45 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29760
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1STN-0003BO-RB
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:08:53 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j1Seq-0001IO-LZ
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:20:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581415732;
+ s=mimecast20190719; t=1581416443;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xK0zrMEkoSCleotxh27l/Mhp7k/XGqfNZX5CTg6/XPQ=;
- b=iKaT4vVq5bNs2j+tzKZo9AfkL93WEDLdKIy6CJ0PGV7tsqcIqYO83dFsxbvsmkcY6S/u7T
- 44AN7U4047yt6UF/lp3u9UjI5hVoQQ4wd2QqXtWUsWYGSkj/yVghzZU1LT/13NT1M4x/O3
- gbVWG/YdLioLjDI0V/HszGtr0OYo9So=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-eWCSN9nYMLuKHr52K6EpSg-1; Tue, 11 Feb 2020 05:08:47 -0500
-Received: by mail-wr1-f72.google.com with SMTP id w17so6644151wrr.9
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 02:08:47 -0800 (PST)
+ bh=1s72C7ex/dMKuhxXF26CRUSjnLXZ1e0+ts0EdmugKmo=;
+ b=ZpnBIj0gUN/krej4r8P4Uoj+Qz46PpzkZlOwaLxD44r0hsdY6C3BQcKZB1xGWDFUZF4OMN
+ cTiB2MjlFIjge0KNBE432JrZxHVuZxTJR0aUrjgXsX+PQv2zIKNMrdmS6OxwUhW3Xb0m/X
+ 1d6Rfjn2Mn+aZK0n7KiRnYF3V4b9f3Y=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-Wn0wTThpPgGwu9wJ-2ZV1Q-1; Tue, 11 Feb 2020 05:20:41 -0500
+Received: by mail-qk1-f200.google.com with SMTP id b23so6737785qkg.17
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 02:20:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=s213ryhI7rtPbGqQei6G9oTTZJ6HNcM1cOEDhlbYEVI=;
- b=A4C2E3OAT5Ab69GJE8tmOjbMV2TT1UfY4U3dbsfT++X96DqHrD1MqghQtLJuOiDwQx
- NwbrA/HygZt+ouN8dt0B2WPHRBgy5Q1Cm7Zmm8klBx6zbfxpUqeBEsboXn6EtSkQzsgJ
- zyvGtWtqKgZEJX6Ol0+upM3qBL0repwXsCC0r1lznBXja6tMQy7sEQkRAFQtaVvJ5vnj
- fhcwWlm/Bfmrq3C2r4sXWnj+LWq8WvhpCKrdf0slCMbsKwMl1Nc/AJGTMB3Vfd116262
- 68W6ABz6tFZnnvzvrIcWrqpoa0vbo+YBM35Y2cWjLaVo4ADmQ0Y+Sp7jjKjCwaVF/t3A
- KK9w==
-X-Gm-Message-State: APjAAAUmfC/Add3ibwaBchICY0DOHGhqyuV2CcDuXKuYIswkYt1R8e59
- gQZsbZ6s70z4qDHnLFaULPfZlKxlfXcIsF4QzYhUckN0uLfTOVoH7wF/iX4TI5Teb3SrwsDDP1j
- Ajz6sWBOzqF0BVlI=
-X-Received: by 2002:adf:f3d0:: with SMTP id g16mr8038195wrp.2.1581415726459;
- Tue, 11 Feb 2020 02:08:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwnvREcQuXjca4hmaonmq0B/buJ0iWVVO4ezB4IdBUyh49q+b0NRhQd+HKOLx7SjpCYrxNtyg==
-X-Received: by 2002:adf:f3d0:: with SMTP id g16mr8038152wrp.2.1581415726103;
- Tue, 11 Feb 2020 02:08:46 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id h18sm4748939wrv.78.2020.02.11.02.08.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 11 Feb 2020 02:08:45 -0800 (PST)
-Subject: Re: [PATCH 1/2] tests/acceptance: Extract boot_integratorcp() from
- test_integratorcp()
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, qemu-devel@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200131211102.29612-1-f4bug@amsat.org>
- <20200131211102.29612-2-f4bug@amsat.org>
- <c13e2bf5-2373-f33e-1aea-824c46b9f3cf@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c058ed6e-1296-ef9e-4844-97bf12bef1bd@redhat.com>
-Date: Tue, 11 Feb 2020 11:08:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=feQUUY6fJhQS0CpdNBDw+Mk6D8Vvj4K1BxtqjKhBPzE=;
+ b=nnl1vkfBMdSmeRcrhSJqs3VMvbaqxIyAu2IbOqmczjKUoP9Fu1rv2nw6FC0xjTLQqw
+ 5Kz5Q0eiuLvLs9gK070XseM/GE07nJaFzaVdxazb1UYzAw+nBh9EaEA75Cg9AI+SBRhD
+ bexdCucxOFzx0hb33Hqto1ct/loUO6WrQST+PeJE8Dmuz5dTm1e/cm73T96pG8HoCYwK
+ KzEGmAs9E5TTuDfaqZhmN+lpLTf0vNilEwmL63aepwKBPgCoJwoAd36UfvEC0i0gc+WJ
+ FxXf35cfBduKZfhq0niaCv095ZHaQx+8K+PAdUQMEVF2VGT717UhL2WXNhbO/HGmK3kj
+ fTOQ==
+X-Gm-Message-State: APjAAAUx8Uhal/P+9rh8Jn26bMKF3IxfIeOx0ti2iVpHl5WcBccUZmkh
+ /wAAdyRp800ULnxlN56Re8TtlMmSVt53DEEkPMeivxyEiyTFmNMFEE25yUzYs9ogxNok4HxKxBH
+ iExkI00ObmUiQA/g=
+X-Received: by 2002:ae9:e209:: with SMTP id c9mr4250188qkc.363.1581416441311; 
+ Tue, 11 Feb 2020 02:20:41 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxE/sU068BeKu2mek+4WU5NDGNB5mtqTMmGP9miz5EtdX3cLS7jhZncz33Fvm/ZTQMJKErZ2A==
+X-Received: by 2002:ae9:e209:: with SMTP id c9mr4250177qkc.363.1581416441019; 
+ Tue, 11 Feb 2020 02:20:41 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+ by smtp.gmail.com with ESMTPSA id 65sm1852688qtf.95.2020.02.11.02.20.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 11 Feb 2020 02:20:40 -0800 (PST)
+Date: Tue, 11 Feb 2020 05:20:35 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v2 7/7] tests/bios-tables-test: Update arm/virt memhp test
+Message-ID: <20200211051953-mutt-send-email-mst@kernel.org>
+References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
+ <20200117174522.22044-8-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <c13e2bf5-2373-f33e-1aea-824c46b9f3cf@redhat.com>
-Content-Language: en-US
-X-MC-Unique: eWCSN9nYMLuKHr52K6EpSg-1
+In-Reply-To: <20200117174522.22044-8-shameerali.kolothum.thodi@huawei.com>
+X-MC-Unique: Wn0wTThpPgGwu9wJ-2ZV1Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,79 +103,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
+ shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, xuwei5@hisilicon.com,
+ linuxarm@huawei.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
+ imammedo@redhat.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/1/20 8:06 AM, Thomas Huth wrote:
-> On 31/01/2020 22.11, Philippe Mathieu-Daud=C3=A9 wrote:
->> As we want to re-use this code, extract it as a new function.
->> Since we are using the PL011 serial console, add a Avocado tag
->> to ease filtering of tests.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>   tests/acceptance/machine_arm_integratorcp.py | 16 ++++++++++------
->>   1 file changed, 10 insertions(+), 6 deletions(-)
->>
->> diff --git a/tests/acceptance/machine_arm_integratorcp.py b/tests/accept=
-ance/machine_arm_integratorcp.py
->> index 4f9ab40f2f..748819916d 100644
->> --- a/tests/acceptance/machine_arm_integratorcp.py
->> +++ b/tests/acceptance/machine_arm_integratorcp.py
->> @@ -19,12 +19,7 @@ class IntegratorMachine(Test):
->>  =20
->>       timeout =3D 90
->>  =20
->> -    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted c=
-ode')
->> -    def test_integratorcp(self):
->> -        """
->> -        :avocado: tags=3Darch:arm
->> -        :avocado: tags=3Dmachine:integratorcp
->> -        """
->> +    def boot_integratorcp(self):
->>           kernel_url =3D ('https://github.com/zayac/qemu-arm/raw/master/=
-'
->>                         'arm-test/kernel/zImage.integrator')
->>           kernel_hash =3D '0d7adba893c503267c946a3cbdc63b4b54f25468'
->> @@ -40,4 +35,13 @@ class IntegratorMachine(Test):
->>                            '-initrd', initrd_path,
->>                            '-append', 'printk.time=3D0 console=3DttyAMA0=
-')
+On Fri, Jan 17, 2020 at 05:45:22PM +0000, Shameer Kolothum wrote:
+> Since we now have both pc-dimm and nvdimm support, update
+> test_acpi_virt_tcg_memhp() to include those.
 >=20
-> I wonder whether you might want to move the "console=3DttyAMA0" to the
-> test_integratorcp(), too, to get the text in the framebuffer in the
-> second test instead?
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-This is not a test, but a common method used by both tests, so both use it.
+And you can add a last patch on top updating the
+expected files and blowing out the allowed diff file.
+include the ASL changes in the log ...
 
+> ---
+>  tests/data/acpi/virt/NFIT.memhp | 0
+>  tests/data/acpi/virt/SSDT.memhp | 0
+>  tests/qtest/bios-tables-test.c  | 9 +++++++--
+>  3 files changed, 7 insertions(+), 2 deletions(-)
+>  create mode 100644 tests/data/acpi/virt/NFIT.memhp
+>  create mode 100644 tests/data/acpi/virt/SSDT.memhp
 >=20
->>           self.vm.launch()
->> +
->> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted c=
-ode')
->> +    def test_integratorcp(self):
->> +        """
->> +        :avocado: tags=3Darch:arm
->> +        :avocado: tags=3Dmachine:integratorcp
->> +        :avocado: tags=3Ddevice:pl011
->> +        """
->> +        self.boot_integratorcp()
->>           wait_for_console_pattern(self, 'Log in as root')
->>
+> diff --git a/tests/data/acpi/virt/NFIT.memhp b/tests/data/acpi/virt/NFIT.=
+memhp
+> new file mode 100644
+> index 0000000000..e69de29bb2
+> diff --git a/tests/data/acpi/virt/SSDT.memhp b/tests/data/acpi/virt/SSDT.=
+memhp
+> new file mode 100644
+> index 0000000000..e69de29bb2
+> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-tes=
+t.c
+> index f1ac2d7e96..695d2e7fac 100644
+> --- a/tests/qtest/bios-tables-test.c
+> +++ b/tests/qtest/bios-tables-test.c
+> @@ -913,12 +913,17 @@ static void test_acpi_virt_tcg_memhp(void)
+>      };
+> =20
+>      data.variant =3D ".memhp";
+> -    test_acpi_one(" -cpu cortex-a57"
+> +    test_acpi_one(" -machine nvdimm=3Don"
+> +                  " -cpu cortex-a57"
+>                    " -m 256M,slots=3D3,maxmem=3D1G"
+>                    " -object memory-backend-ram,id=3Dram0,size=3D128M"
+>                    " -object memory-backend-ram,id=3Dram1,size=3D128M"
+>                    " -numa node,memdev=3Dram0 -numa node,memdev=3Dram1"
+> -                  " -numa dist,src=3D0,dst=3D1,val=3D21",
+> +                  " -numa dist,src=3D0,dst=3D1,val=3D21"
+> +                  " -object memory-backend-ram,id=3Dram2,size=3D128M"
+> +                  " -object memory-backend-ram,id=3Dnvm0,size=3D128M"
+> +                  " -device pc-dimm,id=3Ddimm0,memdev=3Dram2,node=3D0"
+> +                  " -device nvdimm,id=3Ddimm1,memdev=3Dnvm0,node=3D1",
+>                    &data);
+> =20
+>      free_test_data(&data);
+> --=20
+> 2.17.1
 >=20
-> Anyway, patch looks fine,
->=20
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-Thanks!
-
-Peter, Thomas previous patch and these series are reviewed. Can you=20
-queue them in your target-arm.next tree?
 
 
