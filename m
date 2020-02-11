@@ -2,96 +2,115 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D1E4C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A839C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 17:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE46E2086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:59:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7+MtM7X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE46E2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E55BE20656
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 17:03:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E55BE20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Yt5-0002Ui-Va
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 11:59:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40322)
+	id 1j1YwE-0005ML-0Q
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 12:03:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41950)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1j1YsL-00023E-J7
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:59:07 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j1YtG-0002mD-B7
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 12:00:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1j1YsI-0004SK-CF
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:59:04 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32071
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j1YsH-0004QD-0m
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:59:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581440338;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VmEyefjPU4Rcw+cm701FUSOvWRfrtLQXR8l/ENdeeVA=;
- b=e7+MtM7XE54F2RbmlqaDmAhRqAtvEivVX0IL2dC4L8NekevTG+5yWimPzQzOO/PilsT1/g
- v4U3bNU5asQ4nw3wdjnbDkFdC1mhWjm3c8RP5ssOscX1fMnv/AkduiEilEWb62RXpz0UB/
- AKXjvVl1ng1jZzd8niz123p181wtXsA=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-GdXapIR7M-eXaY05izdbWA-1; Tue, 11 Feb 2020 11:58:47 -0500
-Received: by mail-qk1-f198.google.com with SMTP id c77so525467qke.7
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 08:58:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Y3V+nkHLeOz4JQ099NB1biGKPHWEnceBkoow8w0YGk8=;
- b=Hf0rxfzIe+2GC7Qdz+2BrtCN48tC2NbxPGMzDfaB5f5bjvjAPpbw7jDOCkNmB/rIny
- y3+STHPFKzywFfFLJHU08SdllMBmmhmROD+lvAdzsTx/0QyHt7hKva4EfX/sitqa+cew
- bYxL6diTk6z8MxH9gf7CbBC0s3wyZS8Ik5/pw17+dsDyuRDyJD+656dKvyow59DzpjHT
- 7TkzGn5swE4i8ZCZgT3MsCrksjxHamPTEy3U1LqjkZvdJ4IDnkXA2kGHA+3opFfq9Mcs
- 0V18LMo87efUCvewmUalTAljIaD+nrt+O7UNLss8Fsk468R+OlFqRJhLDc73oBVCU8RM
- QIAA==
-X-Gm-Message-State: APjAAAVpslyhw88iPtfMDFdwvXc/Rnq9ZvGPr4yaA/ja5uqrghnWP0KN
- i27rxyKCe7ARwHdZ+c19cukmfqE9GXSvBTIaoErn1z+WRFL9SaSInt5tgyTsmtDMtzviQs+iJd6
- yvw0bML296lPi29E=
-X-Received: by 2002:ad4:58b3:: with SMTP id ea19mr3818876qvb.80.1581440326792; 
- Tue, 11 Feb 2020 08:58:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw6WqLBlAKM/iCoc2pbfi9NA2KQCOkbT7LG18iuT/xB4amgNLBWMcmfTAyoYSiUyajtafWBUg==
-X-Received: by 2002:ad4:58b3:: with SMTP id ea19mr3818859qvb.80.1581440326526; 
- Tue, 11 Feb 2020 08:58:46 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
- by smtp.gmail.com with ESMTPSA id k50sm2554891qtc.90.2020.02.11.08.58.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 11 Feb 2020 08:58:45 -0800 (PST)
-Date: Tue, 11 Feb 2020 11:58:43 -0500
-From: Peter Xu <peterx@redhat.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
-Message-ID: <20200211165843.GG984290@xz-x1>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-4-git-send-email-yi.l.liu@intel.com>
- <20200131040644.GG15210@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A199306@SHSMSX104.ccr.corp.intel.com>
+ (envelope-from <laurent@vivier.eu>) id 1j1YtF-0005aC-34
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 12:00:02 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:33799)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j1YtE-0005Xn-PF
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 12:00:01 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M27Bp-1j41ij2YR7-002UAH; Tue, 11 Feb 2020 17:59:12 +0100
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200204171053.1718013-1-laurent@vivier.eu>
+ <20200204171053.1718013-4-laurent@vivier.eu>
+ <CAFEAcA_BVPRXkhVoq7=r6QsQ+upkg1YbiXEHmoR9R824QcjZ0Q@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Subject: Re: [PATCH v2 3/4] linux-user: fix TARGET_NSIG and _NSIG uses
+Message-ID: <8cbf7281-d613-d7fe-9651-20408d54caa9@vivier.eu>
+Date: Tue, 11 Feb 2020 17:59:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A199306@SHSMSX104.ccr.corp.intel.com>
-X-MC-Unique: GdXapIR7M-eXaY05izdbWA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAFEAcA_BVPRXkhVoq7=r6QsQ+upkg1YbiXEHmoR9R824QcjZ0Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:sqkptUNmfjslL82mq+EeIWFU16yQ1H6lqEMT0Npyw6WrrauXoTq
+ mVEfPIwDZ7WN8qaTtTp+pCSvL7bZUIBsExcnJ2PlTpoh6XSyxAS75hDvLmtc+puAthDmK9Y
+ 3sWwHDPWibQ7isQw7OvKdfmcj9/EOcoQxAZlaUQXRZwejPdSldBIlzK0+LxL7olfmA6YHI0
+ 8J+n11u3Tc4bZFXtHsodw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Ppn9qBtJUDE=:Z6DlZkXnA2GJJQgKbF++Jc
+ EL06gpVlN+kL9c7QHRp5OnzUquNuMhj8Nvz5dlricHQmKcy3BkqHWYHmxEMpwH7TjxVc6WRJW
+ wmiLVGRmK32T1EJEZEl7fMxaZOJyEwf4xXE0Y0SAs9eitbLxVW8jbaPwNl7oV0AuxwA/zi76o
+ L9t5PcFcVgrOz1dhRBkmcpiCK5OgUMW8BZasLY4sOYCR/SIm4XzsmjiGXFngTVPHgRXO2ZeYk
+ b+gvSwtwCAKo8YnmTb9S1FpIk4bVEVsPL8Lco0/gZ7/ZGgvWcruHJmtlhobZ5T/cRLwaIWhRL
+ xc9Aeeb/VD6Wmt8EYHTeLVYeh7gFMOppkUxJV+RydmFM+DURJ9TTVOoMlMmFExmp09go/mJq+
+ EmuW2K7uLotofm4nYnSkk9URw+ePlHDoJtGD2hPSCEuFyI9Vy5JK5dLKio+odzWmCgxx43Mnb
+ 8mQCnfsKmDUKsmDJrPtX6xXndQSMRKLjB6bF0fJD6KDDrGJAXvSp+iOb846ue8Px1T9k0Sp6A
+ GfJhfG5I1F5AkMJHO3oioLouh9vh2wbZNI8X1WqLu+2O29J22io2x0IeWcCW83b996qDqpWC9
+ g99HjqJS2KezaHOQexknotTxGPSJxBjQHOx9CEBG4bw+hRy7BxAi52r9RZs2GTn/oszRUBZPR
+ 7xUCPDsl92IXw0Flpp6SZ4fIbD41CwLe06pXbDyHiO6w9Rv1XtCjUdByp4wdfYErVm7hlLuGf
+ /QHqiUwoTMiRwYwQXWuJdXFVwu8Hf/45xS6L3heqyN+gTHFIyhDKmpsJ3Jnlc/uZ/8/+vP2df
+ 84KpA4I9ZworFTwIl64/DOSoXUssd7J28/U4JBINcg9cx/OBNqrkO+9oUX/fddAUfgtDFrI
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,83 +122,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Marlies Ruck <marlies.ruck@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Josh Kunz <jkz@google.com>, Taylor Simpson <tsimpson@quicinc.com>,
+ Matus Kysel <mkysel@tachyum.com>,
+ =?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <milos.stojanovic@rt-rk.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 31, 2020 at 11:42:13AM +0000, Liu, Yi L wrote:
-> > I'm not very clear on the relationship betwen an IOMMUContext and a
-> > DualStageIOMMUObject.  Can there be many IOMMUContexts to a
-> > DualStageIOMMUOBject?  The other way around?  Or is it just
-> > zero-or-one DualStageIOMMUObjects to an IOMMUContext?
->=20
-> It is possible. As the below patch shows, DualStageIOMMUObject is per vfi=
-o
-> container. IOMMUContext can be either per-device or shared across devices=
-,
-> it depends on vendor specific vIOMMU emulators.
+Le 11/02/2020 à 17:47, Peter Maydell a écrit :
+> On Tue, 4 Feb 2020 at 17:11, Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> Valid signal numbers are between 1 (SIGHUP) and SIGRTMAX.
+>>
+>> System includes define _NSIG to SIGRTMAX + 1, but
+>> QEMU (like kernel) defines TARGET_NSIG to TARGET_SIGRTMAX.
+>>
+>> Fix all the checks involving the signal range.
+>>
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>
+>> Notes:
+>>     v2: replace i, j by target_sig, host_sig
+>>
+>>  linux-user/signal.c | 52 ++++++++++++++++++++++++++++++++-------------
+>>  1 file changed, 37 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/linux-user/signal.c b/linux-user/signal.c
+>> index 246315571c09..c1e664f97a7c 100644
+>> --- a/linux-user/signal.c
+>> +++ b/linux-user/signal.c
+>> @@ -30,6 +30,15 @@ static struct target_sigaction sigact_table[TARGET_NSIG];
+> 
+> Optional follow-on patch: make sigact_table[] also size
+> TARGET_NSIG + 1, for consistency with target_to_host_signal_table[],
+> and remove all the "- 1"s when we index into it.
+> 
 
-Is there an example when an IOMMUContext can be not per-device?
+OK,
 
-It makes sense to me to have an object that is per-container (in your
-case, the DualStageIOMMUObject, IIUC), then we can connect that object
-to a device.  However I'm a bit confused on why we've got two abstract
-layers (the other one is IOMMUContext)?  That was previously for the
-whole SVA new APIs, now it's all moved over to the other new object,
-then IOMMUContext only register/unregister... Can we put the reg/unreg
-procedures into DualStageIOMMUObject as well?  Then we drop the
-IOMMUContext (or say, keep IOMMUContext and drop DualStageIOMMUObject
-but let IOMMUContext to be per-vfio-container, the major difference is
-the naming here, say, PASID allocation does not seem to be related to
-dual-stage at all).
+>> @@ -492,10 +514,10 @@ static void signal_table_init(void)
+>>          if (host_to_target_signal_table[host_sig] == 0) {
+>>              host_to_target_signal_table[host_sig] = host_sig;
+>>          }
+>> -    }
+>> -    for (host_sig = 1; host_sig < _NSIG; host_sig++) {
+>>          target_sig = host_to_target_signal_table[host_sig];
+>> -        target_to_host_signal_table[target_sig] = host_sig;
+>> +        if (target_sig <= TARGET_NSIG) {
+>> +            target_to_host_signal_table[target_sig] = host_sig;
+>> +        }
+> 
+> Why does this hunk apparently delete the for() line ?
 
-Besides that, not sure I read it right... but even with your current
-series, the container->iommu_ctx will always only be bound to the
-first device created within that container, since you've got:
+It effectively deletes the for() line because I merge the two "for
+(host_sig = 1; host_sig < _NSIG; host_sig++)" loops into one.
 
-    group =3D vfio_get_group(groupid, pci_device_iommu_address_space(pdev),
-                           pci_device_iommu_context(pdev), errp);
+> Why do we need the if() -- surely there should never be any
+> entries in host_to_target_signal_table[] that aren't
+> valid target signal numbers ?
+> 
 
-And:
+we have above the "host_to_target_signal_table[host_sig] = host_sig;"
+and host_sig can be greater than TARGET_NSIG.
 
-    if (vfio_connect_container(group, as, iommu_ctx, errp)) {
-        error_prepend(errp, "failed to setup container for group %d: ",
-                      groupid);
-        goto close_fd_exit;
-    }
+Setting like this allows to ignore them later in the target as we can
+compare them to TARGET_NSIG. This mapping 1:1 in the default case is the
+original behaviour.
 
-The iommu_ctx will be set to container->iommu_ctx if there's no
-existing container.
-
-> [RFC v3 10/25] vfio: register DualStageIOMMUObject to vIOMMU
-> https://www.spinics.net/lists/kvm/msg205198.html
->=20
-> Take Intel vIOMMU as an example, there is a per device structure which
-> includes IOMMUContext instance and a DualStageIOMMUObject pointer.
->=20
-> +struct VTDIOMMUContext {
-> +    VTDBus *vtd_bus;
-> +    uint8_t devfn;
-> +    IOMMUContext iommu_context;
-> +    DualStageIOMMUObject *dsi_obj;
-> +    IntelIOMMUState *iommu_state;
-> +};
-> https://www.spinics.net/lists/kvm/msg205196.html
->=20
-> I think this would leave space for vendor specific vIOMMU emulators to
-> design their own relationship between an IOMMUContext and a
-> DualStageIOMMUObject.
-
---=20
-Peter Xu
-
+Thanks,
+Laurent
 
