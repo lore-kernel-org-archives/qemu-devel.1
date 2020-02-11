@@ -2,74 +2,79 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D099BC352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 13:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB926C3B187
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 13:21:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A782B20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 13:11:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A782B20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7CB3C206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 13:21:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LvPkDxeM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CB3C206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1VKP-00042w-SQ
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 08:11:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34881)
+	id 1j1VTZ-0008Se-IM
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 08:21:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36987)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j1VJW-0003Y9-Mv
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 08:10:55 -0500
+ (envelope-from <philmd@redhat.com>) id 1j1VSS-0007b9-9a
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 08:20:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j1VJV-0008H0-Kf
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 08:10:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59124)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j1VJV-0008Ey-FN
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 08:10:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j1VJT-0000VS-N4
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 13:10:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AD8F12E80C0
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 13:10:51 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Feb 2020 13:03:00 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <philmd@redhat.com>) id 1j1VSQ-0008M5-FY
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 08:20:07 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27732
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1VSQ-0008LZ-9O
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 08:20:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581427205;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=caTRycrEYs+U5q73Kv4o7WZs3KXzKqalCNp3oCCBHX8=;
+ b=LvPkDxeMiKcQzeOPMYzIkOMtId3v3I9Up9An7BuEeATE7X6nHrRGHYQ+kXdMZdYTuP8Voi
+ 8RtgUME0dC73BsdPJ1ip/fosb+I6V8VCLdo8GXXLfclSfezoJ9bXpJ7kECu2LbhCm+BdsG
+ /Rz+FWhZipOSBlyW4U5QaPdKmjdQtlc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-rb31e-MvPQCRhi6CPYEtjw-1; Tue, 11 Feb 2020 08:20:01 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 623E61800D42;
+ Tue, 11 Feb 2020 13:20:00 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-81.brq.redhat.com [10.40.205.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F1CF5C1B2;
+ Tue, 11 Feb 2020 13:19:51 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: kawakami-k laurent-vivier pmaydell
-X-Launchpad-Bug-Reporter: Kentaro Kawakami (kawakami-k)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <158099412478.8645.15882160651412694280.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158142618081.24950.18175153360446949434.launchpad@soybean.canonical.com>
-Subject: [Bug 1862167] Re: Variation of SVE register size (qemu-user-aarch64)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 12c09aca935bee0cdd279b1501e7356354249054
+Subject: [PATCH] tests/acceptance/ppc_prep_40p: Do not run NetBSD test by
+ default
+Date: Tue, 11 Feb 2020 14:19:48 +0100
+Message-Id: <20200211131948.26142-1-philmd@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: rb31e-MvPQCRhi6CPYEtjw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,39 +83,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1862167 <1862167@bugs.launchpad.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, qemu-ppc@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: arm
+The ftp.netbsd.org server is slow and downloading the NetBSD ISO
+takes too long. Do not include this test in the default suite.
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+Similarly to commit 471c97a69b:
 
--- =
+  Currently the Avocado framework does not distinct the time spent
+  downloading assets vs. the time spent running a test. With big
+  assets (like a full VM image) the tests likely fail.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1862167
+  This is a limitation known by the Avocado team.
+  Until this issue get fixed, do not run this tests automatically.
 
-Title:
-  Variation of SVE register size (qemu-user-aarch64)
+  Tests can still be run setting the AVOCADO_TIMEOUT_EXPECTED
+  environment variable.
 
-Status in QEMU:
-  Invalid
+Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ tests/acceptance/ppc_prep_40p.py | 1 +
+ 1 file changed, 1 insertion(+)
 
-Bug description:
-  Specification of ARMv8-A SVE extention allows various values =E2=80=8B=E2=
-=80=8Bfor the
-  size of the SVE register. On the other hand, it seems that the current
-  qemu-aarch64 supports only the maximum length of 2048 bits as the SVE
-  register size. I am writing an assembler program for a CPU that is
-  compliant with ARMv8-A + SVE and has a 512-bit SVE register, but when
-  this is run with qemu-user-aarch64, a 2048-bit load / store
-  instruction is executed This causes a segmentation fault. Shouldn't
-  qeum-user-aarch64 have an option to specify the SVE register size?
+diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_prep_4=
+0p.py
+index b27572f212..efe06037ba 100644
+--- a/tests/acceptance/ppc_prep_40p.py
++++ b/tests/acceptance/ppc_prep_40p.py
+@@ -61,6 +61,7 @@ def test_openbios_192m(self):
+         wait_for_console_pattern(self, '>> CPU type PowerPC,604')
+=20
+     @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
++    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout=
+')
+     def test_openbios_and_netbsd(self):
+         """
+         :avocado: tags=3Darch:ppc
+--=20
+2.21.1
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1862167/+subscriptions
 
