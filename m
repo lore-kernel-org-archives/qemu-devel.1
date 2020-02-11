@@ -6,65 +6,67 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC763C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51687C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:56:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D95520675
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:51:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D95520675
+	by mail.kernel.org (Postfix) with ESMTPS id 2706F20675
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:56:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2706F20675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Wsp-0007LF-QB
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:51:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59815)
+	id 1j1Wxk-00018z-At
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:56:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j1WsF-0006uz-03
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:50:52 -0500
+ (envelope-from <bounces@canonical.com>) id 1j1Wwv-0000iw-AI
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j1Ws9-00083m-Uy
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:50:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46888)
+ (envelope-from <bounces@canonical.com>) id 1j1Wwt-0002BK-Mc
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:55:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47230)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j1Ws9-00082F-PO
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:50:45 -0500
+ id 1j1Wwt-0002AZ-Gr
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:55:39 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j1Ws7-0001kN-4Q
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:50:43 +0000
+ id 1j1Wws-0002Bf-BO
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:55:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 14BE52E80CE
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:50:43 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 538F32E80C3
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:55:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Feb 2020 14:42:47 -0000
-From: Thomas Huth <1661386@bugs.launchpad.net>
+Date: Tue, 11 Feb 2020 14:45:33 -0000
+From: Thomas Huth <1665389@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
  assignee=None; 
+X-Launchpad-Bug-Tags: kvm
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bonzini dgilbert-h matwey-kornilov th-huth
-X-Launchpad-Bug-Reporter: Matwey V. Kornilov (matwey-kornilov)
+X-Launchpad-Bug-Commenters: bonzini dgilbert-h ngoldin th-huth
+X-Launchpad-Bug-Reporter: Nadav Goldin (ngoldin)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
-Message-Id: <158143216740.3624.3045704956517936916.malone@soybean.canonical.com>
-Subject: [Bug 1661386] Re: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed
+References: <20170216160426.5716.21453.malonedeb@soybean.canonical.com>
+Message-Id: <158143233334.17295.11644255535580188971.malone@chaenomeles.canonical.com>
+Subject: [Bug 1665389] Re: Nested kvm guest fails to start on a emulated
+ Westmere CPU guest under a Broadwell CPU host
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: efcf7bed143b4aecca3515ea3ffe86183d30fcb0
+X-Launchpad-Hash: 2de1f07c26530b5581b37e61747320bd9fac82b6
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,16 +79,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
+Reply-To: Bug 1665389 <1665389@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There was a fix for this assertion message wrt PMU registers in December 20=
-17 already:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D0b368a10c71af96f6cf
-Thus, can you still reproduce this issue with the latest version of QEMU, o=
-r is the problem gone now?
+Can you still reproduce this issue with the latest version of QEMU
+(v4.2)?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -95,33 +94,107 @@ r is the problem gone now?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1661386
+https://bugs.launchpad.net/bugs/1665389
 
 Title:
-  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
+  Nested kvm guest fails to start on a emulated Westmere CPU guest under
+  a Broadwell CPU host
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  Hello,
+  Using latest master(5dae13), qemu fails to start any nested guest in a
+  Westmere emulated guest(layer 1), under a Broadwell host(layer 0),
+  with the error:
+
+  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  The qemu command used(though other CPUs didn't work either):
+  /usr/bin/qemu-custom -name guest=3D12ed9230-vm-el73,debug-threads=3Don -S=
+ -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/d=
+omain-5-12ed9230-vm-el73/master-key.aes -machine pc-i440fx-2.9,accel=3Dkvm,=
+usb=3Doff -cpu Westmere,+vmx -m 512 -realtime mlock=3Doff -smp 2,sockets=3D=
+2,cores=3D1,threads=3D1 -object iothread,id=3Diothread1 -uuid f4ce4eba-985f=
+-42a3-94c4-6e4a8a530347 -nographic -no-user-config -nodefaults -chardev soc=
+ket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-5-12ed9230-vm-el73=
+/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
+control -rtc base=3Dutc -no-shutdown -boot menu=3Doff,strict=3Don -device v=
+irtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 -drive file=3D/=
+root/lago/.lago/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnone,=
+id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci,s=
+csi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirtio-dis=
+k0,bootindex=3D1 -netdev tap,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D28 =
+-device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D54:52:c0:a7:c8:02,=
+bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -device isa-serial,cha=
+rdev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dcharchannel0,path=3D/v=
+ar/lib/libvirt/qemu/channel/target/domain-5-12ed9230-vm-el73/org.qemu.guest=
+_agent.0,server,nowait -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1=
+,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 -object=
+ rng-random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-pci,rng=
+=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timestamp=3Don
+  2017-02-16T15:14:45.840412Z qemu-custom: -chardev pty,id=3Dcharserial0: c=
+har device redirected to /dev/pts/2 (label charserial0)
+  qemu-custom: /root/qemu/target/i386/kvm.c:1849: kvm_put_msrs: Assertion `=
+ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
 
   =
 
-  I see the following when try to run qemu from master as the following:
+  The CPU flags in the Westmere guest:
+  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
+t pse36 clflush mmx fxsr sse sse2 syscall nx lm constant_tsc rep_good nopl =
+pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 x2apic popcnt aes hypervisor lah=
+f_lm arat tpr_shadow vnmi flexpriority ept vpid
 
-  # ./x86_64-softmmu/qemu-system-x86_64 --version
-  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
-  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
-  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
-  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
-  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
-  loglevel=3D7' -m 1024 -serial stdio
-  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
-  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+  The guest kernel is 3.10.0-514.2.2.el7.x86_64.
 
-  First broken commit has been bisected:
+  The CPU flags of the host(Broadwell): =
 
+  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
+t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb =
+rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology no=
+nstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx e=
+st tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt=
+ tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb=
+ intel_pt tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hl=
+e avx2 smep bmi2 erms invpcid rtm mpx rdseed adx smap clflushopt xsaveopt x=
+savec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window =
+hwp_epp
+
+  qemu command on the host - Broadwell(which works):
+  /usr/bin/qemu-kvm -name 4ffcd448-vm-el73,debug-threads=3Don -S -machine p=
+c-i440fx-2.6,accel=3Dkvm,usb=3Doff -cpu Westmere,+x2apic,+vmx,+vme -m 4096 =
+-realtime mlock=3Doff -smp 2,sockets=3D2,cores=3D1,threads=3D1 -object ioth=
+read,id=3Diothread1 -uuid 8cc0a2cf-d25a-4014-acdb-f159c376a532 -nographic -=
+no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib=
+/libvirt/qemu/domain-4-4ffcd448-vm-el73/monitor.sock,server,nowait -mon cha=
+rdev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown=
+ -boot menu=3Doff,strict=3Don -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
+0,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=
+=3D0x4 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago-init-files/=
+.lago/flags-tests/default/images/vm-el73_root.qcow2,format=3Dqcow2,if=3Dnon=
+e,id=3Ddrive-virtio-disk0,serial=3D1,discard=3Dunmap -device virtio-blk-pci=
+,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk0,id=3Dvirtio-d=
+isk0,bootindex=3D1 -drive file=3D/home/ngoldin/src/nvgoldin.github.com/lago=
+-init-files/.lago/flags-tests/default/images/vm-el73_additonal.qcow2,format=
+=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,serial=3D2,discard=3Dunmap -devic=
+e scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0=
+-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D2 -netdev tap,fd=3D29,id=3Dhostnet0,vho=
+st=3Don,vhostfd=3D31 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=
+=3D54:52:c0:a8:c9:02,bus=3Dpci.0,addr=3D0x2 -chardev pty,id=3Dcharserial0 -=
+device isa-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev socket,id=3Dc=
+harchannel0,path=3D/var/lib/libvirt/qemu/channel/target/domain-4-4ffcd448-v=
+m-el73/org.qemu.guest_agent.0,server,nowait -device virtserialport,bus=3Dvi=
+rtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dorg.qemu.=
+guest_agent.0 -object rng-random,id=3Dobjrng0,filename=3D/dev/random -devic=
+e virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.0,addr=3D0x9 -msg timest=
+amp=3Don
+
+  On the Broadwell host I'm using a distribution package if it matters
+  (qemu-kvm-2.6.2-5.fc24.x86_64 and 4.8.15-200.fc24.x86_64)
+
+  As the error indicates, I think this assertion was put in:
   commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
   Author: Paolo Bonzini <pbonzini@redhat.com>
   Date:   Wed Mar 30 22:55:29 2016 +0200
@@ -134,39 +207,13 @@ Bug description:
 
       Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-  My cpuinfo is the following:
-
-  processor       : 0
-  vendor_id       : GenuineIntel
-  cpu family      : 6
-  model           : 44
-  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
-  stepping        : 2
-  microcode       : 0x14
-  cpu MHz         : 3066.775
-  cache size      : 12288 KB
-  physical id     : 0
-  siblings        : 2
-  core id         : 0
-  cpu cores       : 2
-  apicid          : 0
-  initial apicid  : 0
-  fpu             : yes
-  fpu_exception   : yes
-  cpuid level     : 11
-  wp              : yes
-  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
-a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
-onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
-perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
-lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
-  bugs            :
-  bogomips        : 6133.55
-  clflush size    : 64
-  cache_alignment : 64
-  address sizes   : 40 bits physical, 48 bits virtual
-  power management:
+  I tried going back one commit before to 273c515, and then the error is go=
+ne and the nested guest comes up as expected. If I try to run with head at =
+the above commit(48e145c) the error output is slightly different, though it=
+ looks the same:
+  /root/qemu/target-i386/kvm.c:1713: kvm_put_msrs: Assertion `ret =3D=3D n'=
+ failed.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1665389/+subscriptions
 
