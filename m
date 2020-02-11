@@ -2,84 +2,73 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2506C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40D3C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:52:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF95320708
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:48:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ASpMZD+R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF95320708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9A82D20708
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:52:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A82D20708
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Yhw-0004ct-Vt
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 11:48:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58685)
+	id 1j1Ylf-0006rB-Pt
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 11:52:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j1YhM-0004E6-RC
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:47:45 -0500
+ (envelope-from <bounces@canonical.com>) id 1j1Yl1-0006Hz-Ow
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:51:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j1YhL-0001Yp-Gc
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:47:44 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35407)
+ (envelope-from <bounces@canonical.com>) id 1j1Yl0-0003kW-FA
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:51:31 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56232)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j1YhL-0001YW-98
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:47:43 -0500
-Received: by mail-ot1-x341.google.com with SMTP id r16so10803435otd.2
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 08:47:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=FB4ranumZ7Z/S4U4c5Fc02BpJKzPZxVyew8P5G0QiUw=;
- b=ASpMZD+RoRZaEv7DdX6WykJs/a2G59SrsBr5m0peVfgJ2/+bmc62NbWxuSPayQRUcQ
- wfCOPOpkqrXGiF4mDrmtFc33GwD8yjv1U9SshpD++KeyDFlfOAGRuOJDJ52BN5QIaCV1
- l4weUFWU6z9X2Zkn4tDqEm4WfUcmnQ6ciVGO7AUT1xSevwBEg2Ewg9gEfuPjq+mfK6jZ
- Q/GLEwIKUPpu57C3GhMKmRqPUPo+S85OsSIWAyFrKpuIc2fZ8IRoniPGM68sHzi5T6wi
- BJ5bxzgmhcaLGjFjFZT1QpQlOUk3noua9GfBQPTioTelkPXba+HcbrjN7PXLIbpZlUWF
- ukVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=FB4ranumZ7Z/S4U4c5Fc02BpJKzPZxVyew8P5G0QiUw=;
- b=gYqczqjBGAvF8oI3MgIvU6suZ0+18bjifxFxRT0JFS9qEM6Tc3XFRmkC73ixCxBo6w
- Pu0ppbix5HrIGY+TSMeKbppvAFv/nCq9wkFEZ/r7Splb8TLoL/ROlJQX/Lk247sEOgFp
- 4ABDFTs8oChoq6j2AQwSQZaaZS2aXXVzXUCTk+bIFRayfL48//FEJLtuhxL0/p0IT61i
- waA1OrJ3PtdkQ9SnxS14JqIm28ZAtBHd39f00GiA23sFRTzDMdKlpGnRokDsOjLExzPD
- 3oPnC+rJtwS3RV9rlF/5/9WT9V+YewrAH8qtMjy38ZHuBIDYqwCyYBdUttdlwA6QBQWj
- sagA==
-X-Gm-Message-State: APjAAAVU5o3ynD0ZeO64XxO9p2XiMUHKqTNs0RAEgwJdpzPYhiCi9Mqu
- GYxomnpYGs2SLCV1MlDJqU+fLn8hWxzz25D7CAH8/Q==
-X-Google-Smtp-Source: APXvYqx5QRQcO8JUmZARlPIsw030R5UboiOUU0Lliy29cwRMM8/75pkXJamvpLJpdOVIANzEk/InHtY8bUI4fQtf9J4=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr5617720otq.221.1581439661968; 
- Tue, 11 Feb 2020 08:47:41 -0800 (PST)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j1Yl0-0003k3-9z
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:51:30 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j1Yky-0004WE-DQ
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 16:51:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1BA962E80D4
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 16:51:28 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200204171053.1718013-1-laurent@vivier.eu>
- <20200204171053.1718013-4-laurent@vivier.eu>
-In-Reply-To: <20200204171053.1718013-4-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 11 Feb 2020 16:47:30 +0000
-Message-ID: <CAFEAcA_BVPRXkhVoq7=r6QsQ+upkg1YbiXEHmoR9R824QcjZ0Q@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] linux-user: fix TARGET_NSIG and _NSIG uses
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Feb 2020 16:37:25 -0000
+From: Thomas Huth <1661386@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bonzini dgilbert-h matwey-kornilov th-huth
+X-Launchpad-Bug-Reporter: Matwey V. Kornilov (matwey-kornilov)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20170202204510.26617.69309.malonedeb@wampee.canonical.com>
+Message-Id: <158143904664.29547.417848089163174657.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1661386] Re: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 37316a12f5284e932e6c9e4fe294762f107f6c75
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,77 +77,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marlies Ruck <marlies.ruck@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Josh Kunz <jkz@google.com>, Taylor Simpson <tsimpson@quicinc.com>,
- Matus Kysel <mkysel@tachyum.com>,
- =?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <milos.stojanovic@rt-rk.com>
+Reply-To: Bug 1661386 <1661386@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 4 Feb 2020 at 17:11, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Valid signal numbers are between 1 (SIGHUP) and SIGRTMAX.
->
-> System includes define _NSIG to SIGRTMAX + 1, but
-> QEMU (like kernel) defines TARGET_NSIG to TARGET_SIGRTMAX.
->
-> Fix all the checks involving the signal range.
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->
-> Notes:
->     v2: replace i, j by target_sig, host_sig
->
->  linux-user/signal.c | 52 ++++++++++++++++++++++++++++++++-------------
->  1 file changed, 37 insertions(+), 15 deletions(-)
->
-> diff --git a/linux-user/signal.c b/linux-user/signal.c
-> index 246315571c09..c1e664f97a7c 100644
-> --- a/linux-user/signal.c
-> +++ b/linux-user/signal.c
-> @@ -30,6 +30,15 @@ static struct target_sigaction sigact_table[TARGET_NSIG];
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-Optional follow-on patch: make sigact_table[] also size
-TARGET_NSIG + 1, for consistency with target_to_host_signal_table[],
-and remove all the "- 1"s when we index into it.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661386
 
-> @@ -492,10 +514,10 @@ static void signal_table_init(void)
->          if (host_to_target_signal_table[host_sig] == 0) {
->              host_to_target_signal_table[host_sig] = host_sig;
->          }
-> -    }
-> -    for (host_sig = 1; host_sig < _NSIG; host_sig++) {
->          target_sig = host_to_target_signal_table[host_sig];
-> -        target_to_host_signal_table[target_sig] = host_sig;
-> +        if (target_sig <= TARGET_NSIG) {
-> +            target_to_host_signal_table[target_sig] = host_sig;
-> +        }
+Title:
+  Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed
 
-Why does this hunk apparently delete the for() line ?
+Status in QEMU:
+  Fix Released
 
-Why do we need the if() -- surely there should never be any
-entries in host_to_target_signal_table[] that aren't
-valid target signal numbers ?
+Bug description:
+  Hello,
 
->      }
->  }
->
-> @@ -518,7 +540,7 @@ void signal_init(void)
->      act.sa_sigaction = host_signal_handler;
->      for(i = 1; i <= TARGET_NSIG; i++) {
->  #ifdef TARGET_GPROF
-> -        if (i == SIGPROF) {
-> +        if (i == TARGET_SIGPROF) {
->              continue;
->          }
->  #endif
-> --
+  =
 
-thanks
--- PMM
+  I see the following when try to run qemu from master as the following:
+
+  # ./x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 2.8.50 (v2.8.0-1006-g4e9f524)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  # ./x86_64-softmmu/qemu-system-x86_64 -machine accel=3Dkvm -nodefaults
+  -no-reboot -nographic -cpu host -vga none  -kernel .build.kernel.kvm
+  -initrd .build.initrd.kvm -append 'panic=3D1 no-kvmclock console=3DttyS0
+  loglevel=3D7' -m 1024 -serial stdio
+  qemu-system-x86_64: /home/matwey/lab/qemu/target/i386/kvm.c:1849:
+  kvm_put_msrs: Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+  First broken commit has been bisected:
+
+  commit 48e1a45c3166d659f781171a47dabf4a187ed7a5
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Mar 30 22:55:29 2016 +0200
+
+      target-i386: assert that KVM_GET/SET_MSRS can set all requested MSRs
+      =
+
+      This would have caught the bug in the previous patch.
+      =
+
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  My cpuinfo is the following:
+
+  processor       : 0
+  vendor_id       : GenuineIntel
+  cpu family      : 6
+  model           : 44
+  model name      : Intel(R) Xeon(R) CPU           X5675  @ 3.07GHz
+  stepping        : 2
+  microcode       : 0x14
+  cpu MHz         : 3066.775
+  cache size      : 12288 KB
+  physical id     : 0
+  siblings        : 2
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 0
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 11
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx rdtscp lm c=
+onstant_tsc arch_perfmon pebs bts nopl xtopology tsc_reliable nonstop_tsc a=
+perfmperf pni pclmulqdq vmx ssse3 cx16 sse4_1 sse4_2 popcnt aes hypervisor =
+lahf_lm ida arat epb dtherm tpr_shadow vnmi ept vpid
+  bugs            :
+  bogomips        : 6133.55
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 40 bits physical, 48 bits virtual
+  power management:
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661386/+subscriptions
 
