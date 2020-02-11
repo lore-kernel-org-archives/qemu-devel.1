@@ -7,87 +7,88 @@ X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08086C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACA3C35242
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:57:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7FE02082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:53:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C22312168B
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:57:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vCtkP7sc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7FE02082F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kDFKXo6U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C22312168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1afF-0003OI-0k
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:53:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60398)
+	id 1j1aib-0004qA-UP
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:57:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j1ae1-0002Nk-UJ
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:52:27 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j1ah2-00044f-OM
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:55:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j1ae0-0006Cy-Sz
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:52:25 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34655)
+ (envelope-from <richard.henderson@linaro.org>) id 1j1agv-0003W8-79
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:55:31 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:35874)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j1ae0-00069n-62
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:52:24 -0500
-Received: by mail-pf1-x443.google.com with SMTP id i6so5942821pfc.1
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 10:52:22 -0800 (PST)
+ id 1j1agv-0003PZ-0p
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:55:25 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id gv17so1632263pjb.1
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 10:55:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=CbZNzgjrGSjXcMZsbGNkGs/yDru9vx/NqV/8iaU0Se4=;
- b=vCtkP7scs1q1XB2DJNx2RGaUQPUxvxilT5wdGsSOc9iG5jQ+mFcemvIXyBgGAXzb70
- tOanwnHlN+pHNtgVuVanZ8+pDfJFGkOMdv01mp2jV9hkuCH0LtLq1U5Rjns6qTFA9yC2
- 1ci7P6/BX4scm7uVS44EI7Scwal/SwF/GjGMCVQxMFusCEQEFVM7v9ZpD46JZZqabjEb
- z8VR1Cf4fg5z7uE1i+wfZNLpQ2RM8KVk103+9Xnq/lowFPLO63oVepJ65lGl/jXYUwMR
- aHw7W4Oh+ImBnxFt2VgrJ1G4tzEDWp5m0QIGVPGxJLsoM+nesLICTh8IwC4K65CXzj9a
- +/og==
+ bh=CrXYayQlBzAnDNIH9v/PykxwmIx73+zl9SeUi1W1THc=;
+ b=kDFKXo6U72jz7asislCYB8xyb5faQYupFWSud9ziim9y3tjRoLHHogphq2e9E19/+0
+ h13JYPyXTsPjXEzU0wwLfE7zYWWm0WOaf5wxl0TUGLQcBFc9/KIGFBK3PCQbFI7Uf/zk
+ 1kl8d28zav83P6Sj9u5dGnNbzhZIPVg/kTwYNv/en8054XCX8D0eB+/DeRToYbS1Rw3k
+ j/kh9js8tUnIRf1WrqHHMD9iOStF+Rwz6aXpRemvoH4wLYR8Ktdo04LGY0QCXnsvsC32
+ jkihaQONYiaMHyrckYu/5cd2caBrHqfR3ZOSCvV8rLcg3pSpbJ8JJOzmyfCXsD1tDyx5
+ b31Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=CbZNzgjrGSjXcMZsbGNkGs/yDru9vx/NqV/8iaU0Se4=;
- b=ZexuN967FIVw+2yVSW8luXO+tExZOEagMPw1NuV3AKaIO1CXi/TeShLcij4khJE5TS
- oXhfCUdjVmJy8BD08KNcHSVUC1/RAKbFUtKUBT/8WOPPrp9bT3I6lFwFk0WW66PnTlkF
- TyTKMdpSv2fcQwrWkYFHEVKiZqc6RKlWXxFj39t/SY5cA8DaYNGzcZTA3+addY6SQeyt
- pqrkaeYdQ15iKBGSHNQPG/hSOL1oYJYN10tA1QNZqXpm2WijSRmzkFDn9Z37GEIBm6RC
- c/we6QSWQ8nB4r2t2l5uazOe0VIPKPA6wfaSyjQjAh6OJddsidcFwXvscFvx2Kv+zXgA
- ZLng==
-X-Gm-Message-State: APjAAAV1/SnHIkTGO5UAnTWK2NimaSJl+9IY6w+S/kfOFT1c9thU6sV3
- rmuluF2lZPMaqUNV+5/jlO79Cg==
-X-Google-Smtp-Source: APXvYqwa6BCt3r63/SOJBBqDI7rJDR3zFavMQrztXhPo5HqkwZBgiBlzGOPzvLb77yTkTp4rg32mSg==
-X-Received: by 2002:a63:1503:: with SMTP id v3mr4491495pgl.295.1581447141585; 
- Tue, 11 Feb 2020 10:52:21 -0800 (PST)
+ bh=CrXYayQlBzAnDNIH9v/PykxwmIx73+zl9SeUi1W1THc=;
+ b=YR285c/euOP84jBTyNrB0h+ZCerGdUbWU8a5M0C6wTdxBcBGx0btOHRxXRisHAKJnv
+ 1+/4Is9Aj2GzIzp65BHEi2eqzM4innuWlgx/nUCZPahC2N+lbsxAnahMoB+GskV1R47X
+ Twc/Cnkr5Kl7lsOcWZwyxSAwmQ+a0NSHvcnAekFpNIWDR+ywd93BWEhJQ7U/FrjCyX7T
+ YNOEUrkuZea5rIBV5ynxKNqniRlIbKAw4VgPSfeohz0NIfmhV6URGqPcAKMo61FHWGTK
+ 0NFKH8Rj5OEKMMIBctTRheRyPGCtcqxCZh81ofBMeDeO83dE9cspfvquca2TB0TBmVaR
+ YsGA==
+X-Gm-Message-State: APjAAAV+G/DvbFvxMBFLBevgndq49pwUR39npwkmiMzxIrGpq0NmuD00
+ hRKVnkztcWHZFfpLYhkSMsXPamhO8IU=
+X-Google-Smtp-Source: APXvYqw6Opy9yIfHYzBpr27o9cVt7A6IiwAwdeBrGKLJeghJZza5MIhHkcbCYfZDOp5FHZaC/tPRjg==
+X-Received: by 2002:a17:90a:bf0c:: with SMTP id
+ c12mr4954034pjs.112.1581447318919; 
+ Tue, 11 Feb 2020 10:55:18 -0800 (PST)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- 144sm5479098pfc.45.2020.02.11.10.52.20
+ z16sm4996348pff.125.2020.02.11.10.55.17
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 11 Feb 2020 10:52:20 -0800 (PST)
-Subject: Re: [PATCH 12/13] target/arm: Correct definition of PMCRDP
+ Tue, 11 Feb 2020 10:55:18 -0800 (PST)
+Subject: Re: [PATCH 13/13] target/arm: Correct handling of PMCR_EL0.LC bit
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20200211173726.22541-1-peter.maydell@linaro.org>
- <20200211173726.22541-13-peter.maydell@linaro.org>
+ <20200211173726.22541-14-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5e32fd9a-e872-93ff-b3e0-0e8fff5faa4c@linaro.org>
-Date: Tue, 11 Feb 2020 10:52:19 -0800
+Message-ID: <059ac7e7-c4ca-7456-69f7-80c3cb2cbf09@linaro.org>
+Date: Tue, 11 Feb 2020 10:55:16 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200211173726.22541-13-peter.maydell@linaro.org>
+In-Reply-To: <20200211173726.22541-14-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,19 +107,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 2/11/20 9:37 AM, Peter Maydell wrote:
-> The PMCR_EL0.DP bit is bit 5, which is 0x20, not 0x10.  0x10 is 'X'.
-> Correct our #define of PMCRDP and add the missing PMCRX.
+> The LC bit in the PMCR_EL0 register is supposed to be:
+>  * read/write
+>  * RES1 on an AArch64-only implementation
+>  * an architecturally UNKNOWN value on reset
+> (and use of LC==0 by software is deprecated).
 > 
-> We do have the correct behaviour for handling the DP bit being
-> set, so this fixes a guest-visible bug.
+> We were implementing it incorrectly as read-only always zero,
+> though we do have all the code needed to test it and behave
+> accordingly.
+> 
+> Instead make it a read-write bit which resets to 1 always, which
+> satisfies all the architectural requirements above.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/helper.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  target/arm/helper.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
+
+
 
