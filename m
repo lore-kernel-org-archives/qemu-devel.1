@@ -7,82 +7,75 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBDEC352A4
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 03:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21714C35242
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 03:18:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AE0A20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 03:09:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3DCB20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 03:18:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="be3cdmoG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AE0A20714
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YyEhYvO9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3DCB20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Lvu-0000bu-MJ
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 22:09:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43189)
+	id 1j1M4J-0003QW-4f
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 22:18:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1j1LvK-00008H-8x
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:09:19 -0500
+ (envelope-from <jasowang@redhat.com>) id 1j1M3d-00030n-AP
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:17:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1j1LvI-000806-6c
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:09:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56612
+ (envelope-from <jasowang@redhat.com>) id 1j1M3b-0000YZ-UG
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:17:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40030
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j1LvH-0007pH-Qp
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:09:16 -0500
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j1M3b-0000XB-QP
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:17:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581390554;
+ s=mimecast20190719; t=1581391070;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8Q7Hqr3sITkWEi8tRLqnHuyAR1xm70j8p0t1g5D37cY=;
- b=be3cdmoGIlCxCvGMCElQDc/OGCtG/uF9jQ4SzKxFg/M6DYLsK59XNp7MLMsHE/kJUlGQQl
- vDhZ0cRaoNroErdeJ8Xh2UMpzG7EhbM1B0kLVA++WT6UMuBD0i7Yy3F4dIvm+AmGSaH3y2
- uXu2lO0NZa+off2+BbWlnPX3fx0GT10=
+ bh=7Nf36Pd4q2AVY4oKU24K8vx0+ORsf2vbbJBRG1witbM=;
+ b=YyEhYvO9zwru6WyQf/OLqB81xbVf8pzHtxQo6aygej9FBO+WL7pOfu1T0UeCg0e7KsMyzW
+ i5a4EnKfWTq1/FligicgJ9AQMphlgCB2CzRv3Jl4YFnwUf76p/Q+eYbENmW9Yw+K2Fngtj
+ lk6knKAQ5NSzivu0CuEUsNZeGY8ezM8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-wTrOblwqNtequMEJNU1hfw-1; Mon, 10 Feb 2020 22:09:11 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-432-ryGiD3WYO_iQ5R0AcXlykw-1; Mon, 10 Feb 2020 22:17:48 -0500
+X-MC-Unique: ryGiD3WYO_iQ5R0AcXlykw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8E2D107ACC7;
- Tue, 11 Feb 2020 03:09:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72832184AEB0;
+ Tue, 11 Feb 2020 03:17:47 +0000 (UTC)
 Received: from [10.72.12.184] (ovpn-12-184.pek2.redhat.com [10.72.12.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E423A1001B09;
- Tue, 11 Feb 2020 03:09:08 +0000 (UTC)
-Subject: Re: [PATCH 1/1] hw/net/can: Introduce Xlnx ZynqMP CAN controller for
- QEMU
-To: Vikram Garhwal <fnuv@xilinx.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1580764010-310744-1-git-send-email-fnu.vikram@xilinx.com>
- <1580764010-310744-2-git-send-email-fnu.vikram@xilinx.com>
- <8aabde0d-62e9-96d5-0614-0e0ebff549ae@redhat.com>
- <DM6PR02MB5643F9E19DC0590E14612477BC190@DM6PR02MB5643.namprd02.prod.outlook.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 859ED83861;
+ Tue, 11 Feb 2020 03:17:39 +0000 (UTC)
+Subject: Re: [PATCH v2 4/5] virtio-mmio: add MSI interrupt feature support
+To: Zha Bin <zhabin@linux.alibaba.com>, linux-kernel@vger.kernel.org
+References: <cover.1581305609.git.zhabin@linux.alibaba.com>
+ <4c3d13be5a391b1fc50416838de57d903cbf8038.1581305609.git.zhabin@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b1b9932a-5566-5d2b-c333-8c466dcd322b@redhat.com>
-Date: Tue, 11 Feb 2020 11:09:07 +0800
+Message-ID: <0c71ff9d-1a7f-cfd2-e682-71b181bdeae4@redhat.com>
+Date: Tue, 11 Feb 2020 11:17:38 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <DM6PR02MB5643F9E19DC0590E14612477BC190@DM6PR02MB5643.namprd02.prod.outlook.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: wTrOblwqNtequMEJNU1hfw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <4c3d13be5a391b1fc50416838de57d903cbf8038.1581305609.git.zhabin@linux.alibaba.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,60 +87,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: virtio-dev@lists.oasis-open.org, slp@redhat.com, mst@redhat.com,
+ jing2.liu@linux.intel.com, qemu-devel@nongnu.org, chao.p.peng@linux.intel.com,
+ gerry@linux.alibaba.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/2/11 =E4=B8=8A=E5=8D=885:45, Vikram Garhwal wrote:
->>> +                }
->>> +            } else {
->>> +                /* Normal mode Tx. */
->>> +                generate_frame(&frame, data);
->>> +
->>> +                can_bus_client_send(&s->bus_client, &frame, 1);
->> I had a quick glance at can_bus_client_send():
->>
->> It did:
->>
->>   =C2=A0=C2=A0=C2=A0 QTAILQ_FOREACH(peer, &bus->clients, next) {
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (peer->info->can_receive=
-(peer)) {
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
-(peer =3D=3D client) {
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 /* No loopback support for now */
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 continue;
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
-(peer->info->receive(peer, frames, frames_cnt) > 0) {
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 ret =3D 1;
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>   =C2=A0=C2=A0=C2=A0 }
->>
->> which looks not correct. We need to use qemu_send_packet() instead of
->> calling peer->info->receive() directly which bypasses filters completely=
-.
-> [Vikram Garhwal] Can you please elaborate it bit more on why do we need t=
-o filter outgoing message? So, I can either add a filter before sending the=
- packets. I am unable to understand the use case for it. For any message wh=
-ich is incoming, we are filtering it for sure before storing in update_rx_f=
-ifo().
+On 2020/2/10 =E4=B8=8B=E5=8D=885:05, Zha Bin wrote:
+> From: Liu Jiang<gerry@linux.alibaba.com>
+>
+> Userspace VMMs (e.g. Qemu microvm, Firecracker) take advantage of using
+> virtio over mmio devices as a lightweight machine model for modern
+> cloud. The standard virtio over MMIO transport layer only supports one
+> legacy interrupt, which is much heavier than virtio over PCI transport
+> layer using MSI. Legacy interrupt has long work path and causes specifi=
+c
+> VMExits in following cases, which would considerably slow down the
+> performance:
+>
+> 1) read interrupt status register
+> 2) update interrupt status register
+> 3) write IOAPIC EOI register
+>
+> We proposed to add MSI support for virtio over MMIO via new feature
+> bit VIRTIO_F_MMIO_MSI[1] which increases the interrupt performance.
+>
+> With the VIRTIO_F_MMIO_MSI feature bit supported, the virtio-mmio MSI
+> uses msi_sharing[1] to indicate the event and vector mapping.
+> Bit 1 is 0: device uses non-sharing and fixed vector per event mapping.
+> Bit 1 is 1: device uses sharing mode and dynamic mapping.
 
 
-I might be not clear, I meant the netfilters supported by qemu which=20
-allows you to attach a filter to a specific NetClientState, see=20
-qemu_send_packet_async_with_flags. It doesn't mean the filter=20
-implemented in your own NIC model.
+I believe dynamic mapping should cover the case of fixed vector?
 
 Thanks
 
-
-> Also, I can see existing CAN models like CAN sja1000 and CAN Kavser are u=
-sing it same can_bus_client_send() function. However, this doesn't mean tha=
-t it is the correct way to send & receive packets.
 
 
