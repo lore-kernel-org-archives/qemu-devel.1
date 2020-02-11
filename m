@@ -2,67 +2,87 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE917C352A4
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 03:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBDEC352A4
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 03:09:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A57642080C
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 03:02:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57642080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8AE0A20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 03:09:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="be3cdmoG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AE0A20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Lp9-0006c9-QP
-	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 22:02:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33094)
+	id 1j1Lvu-0000bu-MJ
+	for qemu-devel@archiver.kernel.org; Mon, 10 Feb 2020 22:09:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43189)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1j1Lob-0006AX-00
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:02:22 -0500
+ (envelope-from <jasowang@redhat.com>) id 1j1LvK-00008H-8x
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:09:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1j1LoX-0000aw-PY
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:02:20 -0500
-Received: from mga07.intel.com ([134.134.136.100]:19569)
+ (envelope-from <jasowang@redhat.com>) id 1j1LvI-000806-6c
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:09:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56612
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1j1LoX-0000I1-Gt
- for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:02:17 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 10 Feb 2020 19:02:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,427,1574150400"; d="scan'208";a="431818732"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga005.fm.intel.com with ESMTP; 10 Feb 2020 19:02:09 -0800
-Date: Mon, 10 Feb 2020 21:52:51 -0500
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v12 Kernel 4/7] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20200211025251.GB4530@joy-OptiPlex-7040>
-References: <1581104554-10704-1-git-send-email-kwankhede@nvidia.com>
- <1581104554-10704-5-git-send-email-kwankhede@nvidia.com>
- <20200210094954.GA4530@joy-OptiPlex-7040>
- <20200210124454.12e0419a@w520.home>
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j1LvH-0007pH-Qp
+ for qemu-devel@nongnu.org; Mon, 10 Feb 2020 22:09:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581390554;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8Q7Hqr3sITkWEi8tRLqnHuyAR1xm70j8p0t1g5D37cY=;
+ b=be3cdmoGIlCxCvGMCElQDc/OGCtG/uF9jQ4SzKxFg/M6DYLsK59XNp7MLMsHE/kJUlGQQl
+ vDhZ0cRaoNroErdeJ8Xh2UMpzG7EhbM1B0kLVA++WT6UMuBD0i7Yy3F4dIvm+AmGSaH3y2
+ uXu2lO0NZa+off2+BbWlnPX3fx0GT10=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-wTrOblwqNtequMEJNU1hfw-1; Mon, 10 Feb 2020 22:09:11 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8E2D107ACC7;
+ Tue, 11 Feb 2020 03:09:09 +0000 (UTC)
+Received: from [10.72.12.184] (ovpn-12-184.pek2.redhat.com [10.72.12.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E423A1001B09;
+ Tue, 11 Feb 2020 03:09:08 +0000 (UTC)
+Subject: Re: [PATCH 1/1] hw/net/can: Introduce Xlnx ZynqMP CAN controller for
+ QEMU
+To: Vikram Garhwal <fnuv@xilinx.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <1580764010-310744-1-git-send-email-fnu.vikram@xilinx.com>
+ <1580764010-310744-2-git-send-email-fnu.vikram@xilinx.com>
+ <8aabde0d-62e9-96d5-0614-0e0ebff549ae@redhat.com>
+ <DM6PR02MB5643F9E19DC0590E14612477BC190@DM6PR02MB5643.namprd02.prod.outlook.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b1b9932a-5566-5d2b-c333-8c466dcd322b@redhat.com>
+Date: Tue, 11 Feb 2020 11:09:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200210124454.12e0419a@w520.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.100
+In-Reply-To: <DM6PR02MB5643F9E19DC0590E14612477BC190@DM6PR02MB5643.namprd02.prod.outlook.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: wTrOblwqNtequMEJNU1hfw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,120 +94,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 11, 2020 at 03:44:54AM +0800, Alex Williamson wrote:
-> On Mon, 10 Feb 2020 04:49:54 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Sat, Feb 08, 2020 at 03:42:31AM +0800, Kirti Wankhede wrote:
-> > > VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> > > - Start pinned and unpinned pages tracking while migration is active
-> > > - Stop pinned and unpinned dirty pages tracking. This is also used to
-> > >   stop dirty pages tracking if migration failed or cancelled.
-> > > - Get dirty pages bitmap. This ioctl returns bitmap of dirty pages, its
-> > >   user space application responsibility to copy content of dirty pages
-> > >   from source to destination during migration.
-> > > 
-> > > To prevent DoS attack, memory for bitmap is allocated per vfio_dma
-> > > structure. Bitmap size is calculated considering smallest supported page
-> > > size. Bitmap is allocated when dirty logging is enabled for those
-> > > vfio_dmas whose vpfn list is not empty or whole range is mapped, in
-> > > case of pass-through device.
-> > > 
-> > > There could be multiple option as to when bitmap should be populated:
-> > > * Polulate bitmap for already pinned pages when bitmap is allocated for
-> > >   a vfio_dma with the smallest supported page size. Updates bitmap from
-> > >   page pinning and unpinning functions. When user application queries
-> > >   bitmap, check if requested page size is same as page size used to
-> > >   populated bitmap. If it is equal, copy bitmap. But if not equal,
-> > >   re-populated bitmap according to requested page size and then copy to
-> > >   user.
-> > >   Pros: Bitmap gets populated on the fly after dirty tracking has
-> > >         started.
-> > >   Cons: If requested page size is different than smallest supported
-> > >         page size, then bitmap has to be re-populated again, with
-> > >         additional overhead of allocating bitmap memory again for
-> > >         re-population of bitmap.
-> > > 
-> > > * Populate bitmap when bitmap is queried by user application.
-> > >   Pros: Bitmap is populated with requested page size. This eliminates
-> > >         the need to re-populate bitmap if requested page size is
-> > >         different than smallest supported pages size.
-> > >   Cons: There is one time processing time, when bitmap is queried.
-> > > 
-> > > I prefer later option with simple logic and to eliminate over-head of
-> > > bitmap repopulation in case of differnt page sizes. Later option is
-> > > implemented in this patch.
-> > > 
-> > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > ---
-> > >  drivers/vfio/vfio_iommu_type1.c | 299 ++++++++++++++++++++++++++++++++++++++--
-> > >  1 file changed, 287 insertions(+), 12 deletions(-)
-> > > 
-> > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > index d386461e5d11..df358dc1c85b 100644
-> > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > +++ b/drivers/vfio/vfio_iommu_type1.c
-> [snip]
-> > > @@ -830,6 +924,113 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
-> > >  	return bitmap;
-> > >  }
-> > >  
-> > > +static int vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> > > +				  size_t size, uint64_t pgsize,
-> > > +				  unsigned char __user *bitmap)
-> > > +{
-> > > +	struct vfio_dma *dma;
-> > > +	dma_addr_t i = iova, iova_limit;
-> > > +	unsigned int bsize, nbits = 0, l = 0;
-> > > +	unsigned long pgshift = __ffs(pgsize);
-> > > +
-> > > +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
-> > > +		int ret, j;
-> > > +		unsigned int npages = 0, shift = 0;
-> > > +		unsigned char temp = 0;
-> > > +
-> > > +		/* mark all pages dirty if all pages are pinned and mapped. */
-> > > +		if (dma->iommu_mapped) {
-> > > +			iova_limit = min(dma->iova + dma->size, iova + size);
-> > > +			npages = iova_limit/pgsize;
-> > > +			bitmap_set(dma->bitmap, 0, npages);  
-> > for pass-through devices, it's not good to always return all pinned pages as
-> > dirty. could it also call vfio_pin_pages to track dirty pages? or any
-> > other interface provided to do that?
-> 
-> See patch 7/7.  Thanks,
->
-hi Alex and Kirti,
-for pass-through devices, though patch 7/7 enables the vendor driver to
-set dirty pages by calling vfio_pin_pages, however, its overhead is much
-higher than the previous way of generating a bitmap directly to user.
-And it also requires pass-through device vendor driver to track guest
-operations to know when to call vfio_pin_pages.
-There are still use cases like a pass-through device is able to track
-dirty pages in its hardware buffer, so is there a way for it pass its
-dirty bitmap to user?
+
+On 2020/2/11 =E4=B8=8A=E5=8D=885:45, Vikram Garhwal wrote:
+>>> +                }
+>>> +            } else {
+>>> +                /* Normal mode Tx. */
+>>> +                generate_frame(&frame, data);
+>>> +
+>>> +                can_bus_client_send(&s->bus_client, &frame, 1);
+>> I had a quick glance at can_bus_client_send():
+>>
+>> It did:
+>>
+>>   =C2=A0=C2=A0=C2=A0 QTAILQ_FOREACH(peer, &bus->clients, next) {
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (peer->info->can_receive=
+(peer)) {
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
+(peer =3D=3D client) {
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 /* No loopback support for now */
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 continue;
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
+(peer->info->receive(peer, frames, frames_cnt) > 0) {
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 ret =3D 1;
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>   =C2=A0=C2=A0=C2=A0 }
+>>
+>> which looks not correct. We need to use qemu_send_packet() instead of
+>> calling peer->info->receive() directly which bypasses filters completely=
+.
+> [Vikram Garhwal] Can you please elaborate it bit more on why do we need t=
+o filter outgoing message? So, I can either add a filter before sending the=
+ packets. I am unable to understand the use case for it. For any message wh=
+ich is incoming, we are filtering it for sure before storing in update_rx_f=
+ifo().
+
+
+I might be not clear, I meant the netfilters supported by qemu which=20
+allows you to attach a filter to a specific NetClientState, see=20
+qemu_send_packet_async_with_flags. It doesn't mean the filter=20
+implemented in your own NIC model.
 
 Thanks
-Yan
+
+
+> Also, I can see existing CAN models like CAN sja1000 and CAN Kavser are u=
+sing it same can_bus_client_send() function. However, this doesn't mean tha=
+t it is the correct way to send & receive packets.
+
 
