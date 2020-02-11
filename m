@@ -2,86 +2,82 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54894C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 08:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 592B7C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:22:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21E862070A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 08:59:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21E862070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 262322051A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:22:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LioFDl14"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 262322051A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1RO3-0003cy-8Q
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 03:59:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54537)
+	id 1j1Rkv-0001n2-GU
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 04:22:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1j1RNP-0003At-HM
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 03:58:40 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j1RkH-00014T-4y
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:22:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1j1RNN-0005TY-FQ
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 03:58:38 -0500
-Received: from mga07.intel.com ([134.134.136.100]:16096)
+ (envelope-from <dgilbert@redhat.com>) id 1j1RkE-0002Dl-UE
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:22:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42819
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1j1RNN-0005IV-6N
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 03:58:37 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Feb 2020 00:58:31 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; d="scan'208";a="226441917"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga008.jf.intel.com with ESMTP; 11 Feb 2020 00:58:30 -0800
-Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 11 Feb 2020 00:58:24 -0800
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX601.ccr.corp.intel.com (10.109.6.141) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 11 Feb 2020 16:58:22 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Tue, 11 Feb 2020 16:58:22 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, qemu-dev
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH V4 0/5] Introduce Advanced Watch Dog module
-Thread-Topic: [PATCH V4 0/5] Introduce Advanced Watch Dog module
-Thread-Index: AQHVtNkQRvIivFPjlkOOUrHE3VnstKfevUyAgBKjcBCAASn2AIAjdzsw
-Date: Tue, 11 Feb 2020 08:58:22 +0000
-Message-ID: <3049425105b94f6cb9cd846c84c95a84@intel.com>
-References: <20191217124554.30818-1-chen.zhang@intel.com>
- <fa1ed6cb-63d7-ee83-a5a0-b099b662fef2@intel.com>
- <0502a0db0a17484c9220b3a63c40b397@intel.com>
- <08a1a225-52c1-4e6c-85f7-fcf6612b5383@redhat.com>
-In-Reply-To: <08a1a225-52c1-4e6c-85f7-fcf6612b5383@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOTMwMTEzZDUtMTczOS00ZDFmLWI5ZGMtN2FjNjcwNTRiODAxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoieHc3WkRnWnNoUHArVVVtNVI5MVBuektCRlFoTWV4K3F4aWt6VnNMamRrS2E3SnVsamhYRlhFMHBtdjh0a1J4ZyJ9
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j1RkE-0002Cn-Ps
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:22:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581412934;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=EwWoIqZ7jy0neCAXzYyHq2cpqAjTTAJQhGK9Eb3Od+U=;
+ b=LioFDl14w93v039r34LOLmaaZFFuqXMlPS8FX9L1momcPb2KpoLmMG/i5v5Y549m7EX0f0
+ w1mM0YJDM3n58JAVBG3mZRmIkC7lG+1u+M1RYN8UzgZjj1+6EHkKiC1H2k1ogESoSh5nXS
+ 1BaSSAOj0KrZPk3328YKezWInQtqy54=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-RAPNOavgM2amdVqBvxEIVQ-1; Tue, 11 Feb 2020 04:22:12 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71719107ACC5
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 09:22:11 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 73EAC5C1D6;
+ Tue, 11 Feb 2020 09:22:02 +0000 (UTC)
+Date: Tue, 11 Feb 2020 09:22:00 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH] migration/rdma: rdma_accept_incoming_migration fix error
+ handling
+Message-ID: <20200211092200.GC2751@work-vm>
+References: <20200210194459.112085-1-dgilbert@redhat.com>
+ <20200210223347.GC984290@xz-x1>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.100
+In-Reply-To: <20200210223347.GC984290@xz-x1>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: RAPNOavgM2amdVqBvxEIVQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,96 +89,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyA8amFz
-b3dhbmdAcmVkaGF0LmNvbT4NCj4gU2VudDogTW9uZGF5LCBKYW51YXJ5IDIwLCAyMDIwIDEwOjU3
-IEFNDQo+IFRvOiBaaGFuZywgQ2hlbiA8Y2hlbi56aGFuZ0BpbnRlbC5jb20+OyBQYW9sbyBCb256
-aW5pDQo+IDxwYm9uemluaUByZWRoYXQuY29tPjsgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBo
-aWxtZEByZWRoYXQuY29tPjsNCj4gcWVtdS1kZXYgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4g
-Q2M6IFpoYW5nIENoZW4gPHpoYW5nY2tpZEBnbWFpbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFU
-Q0ggVjQgMC81XSBJbnRyb2R1Y2UgQWR2YW5jZWQgV2F0Y2ggRG9nIG1vZHVsZQ0KPiANCj4gDQo+
-IE9uIDIwMjAvMS8xOSDkuIvljYg1OjEwLCBaaGFuZywgQ2hlbiB3cm90ZToNCj4gPiBIaX4NCj4g
-Pg0KPiA+IEFueW9uZSBoYXZlIGNvbW1lbnRzIGFib3V0IHRoaXMgbW9kdWxlPw0KPiANCj4gDQo+
-IEhpIENoZW46DQo+IA0KPiBJIHdpbGwgdGFrZSBhIGxvb2sgYXQgdGhpcyBzZXJpZXMuDQoNClNv
-cnJ5IGZvciBzbG93IHJlcGx5IGR1ZSB0byBDTlkgYW5kIGV4dGVuZCBsZWF2ZS4NCk9LLCB3YWl0
-aW5nIHlvdXIgY29tbWVudHN+IFRoYW5rc34NCg0KPiANCj4gVHdvIGdlbmVyYWwgcXVlc3Rpb25z
-Og0KPiANCj4gLSBpZiBpdCBjYW4gZGV0ZWN0IG1vcmUgdGhhbiBuZXR3b3JrIHN0YWxsLCBpdCBz
-aG91bGQgbm90IGJlbG9uZyB0byAvbmV0DQoNClRoaXMgbW9kdWxlIHVzZSBuZXR3b3JrIGNvbm5l
-Y3Rpb24gc3RhdHVzIHRvIGRldGVjdCBhbGwgdGhlIGlzc3VlKEhvc3QgdG8gR3Vlc3QvSG9zdCB0
-byBIb3N0L0hvc3QgdG8gQWRtaW4uLi4pLg0KVGhlIHRhcmdldCBpcyBtb3JlIHRoYW4gbmV0d29y
-ayBidXQgYWxsIHVzZSBuZXR3b3JrIHdheS4gU28gaXQgaXMgbG9va3MgYSB0cmlja3kgcHJvYmxl
-bS4NCg0KPiAtIG5lZWQgdG8gY29udmluY2UgbGlidmlydCBndXlzIGZvciB0aGlzIHByb3Bvc2Fs
-LCBzaW5jZSB1c3VhbGx5IGl0J3MgdGhlIGR1dHkgb2YNCj4gdXBwZXIgbGF5ZXIgaW5zdGVhZCBv
-ZiBxZW11IGl0c2VsZg0KPiANCg0KWWVzLCBJdCBsb29rcyBhIHVwcGVyIGxheWVyIHJlc3BvbnNp
-YmlsaXR5LCBidXQgSW4gdGhlIGNvdmVyIGxhdHRlciBJIGhhdmUgZXhwbGFpbmVkIHRoZSByZWFz
-b24gd2h5IHdlIG5lZWQgdGhpcyBpbiBRZW11Lg0KIHRyeSB0byBtYWtlIHRoaXMgbW9kdWxlIGFz
-IHNpbXBsZSBhcyBwb3NzaWJsZS4gVGhpcyBtb2R1bGUgZ2l2ZSB1cHBlciBsYXllciBzb2Z0d2Fy
-ZSBhIG5ldyB3YXkgdG8gY29ubmVjdC9tb25pdG9yaW5nIFFlbXUuDQpBbmQgZHVlIHRvIGFsbCB0
-aGUgQ09MTyBjb2RlIGltcGxlbWVudCBpbiBRZW11IHNpZGUsIE1hbnkgY3VzdG9tZXIgd2FudCB0
-byB1c2UgdGhpcyBGVCBzb2x1dGlvbiB3aXRob3V0IG90aGVyIGRlcGVuZGVuY2llcywNCml0IGlz
-IHZlcnkgZWFzeSB0byBpbnRlZ3JhdGVkIHRvIHJlYWwgcHJvZHVjdC4gDQoNClRoYW5rcw0KWmhh
-bmcgQ2hlbg0KDQo+IFRoYW5rcw0KPiANCj4gDQo+ID4gV2UgaGF2ZSBzb21lIGNsaWVudHMgYWxy
-ZWFkeSB0cnkgdG8gdXNlIHRoaXMgbW9kdWxlIHdpdGggQ09MTy4gUGxlYXNlDQo+IHJldmlldyB0
-aGlzIHBhcnQuDQo+ID4gSWYgbm8gb25lIHdhbnQgdG8gbWFpbnRhaW4gdGhpcyBtb2R1bGUsIEkg
-Y2FuIG1haW50YWluIHRoaXMgbW9kdWxlIG15c2VsZi4NCj4gPg0KPiA+IFRoYW5rcw0KPiA+IFpo
-YW5nIENoZW4NCj4gPg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9t
-OiBRZW11LWRldmVsIDxxZW11LWRldmVsLQ0KPiA+PiBib3VuY2VzK2NoZW4uemhhbmc9aW50ZWwu
-Y29tQG5vbmdudS5vcmc+IE9uIEJlaGFsZiBPZiBaaGFuZywgQ2hlbg0KPiA+PiBTZW50OiBUdWVz
-ZGF5LCBKYW51YXJ5IDcsIDIwMjAgMTI6MzMgUE0NCj4gPj4gVG86IEphc29uIFdhbmcgPGphc293
-YW5nQHJlZGhhdC5jb20+OyBQYW9sbyBCb256aW5pDQo+ID4+IDxwYm9uemluaUByZWRoYXQuY29t
-PjsgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kNCj4gPHBoaWxtZEByZWRoYXQuY29tPjsNCj4gPj4g
-cWVtdS1kZXYgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gPj4gQ2M6IFpoYW5nIENoZW4gPHpo
-YW5nY2tpZEBnbWFpbC5jb20+DQo+ID4+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggVjQgMC81XSBJbnRy
-b2R1Y2UgQWR2YW5jZWQgV2F0Y2ggRG9nIG1vZHVsZQ0KPiA+Pg0KPiA+PiBIaSBBbGwsDQo+ID4+
-DQo+ID4+IE5vIG5ld3MgZm9yIGEgd2hpbGUgYWJvdXQgdGhpcyBzZXJpZXMuDQo+ID4+DQo+ID4+
-IFRoaXMgdmVyc2lvbiBhbHJlYWR5IGFkZCBuZXcgZG9jcyB0byBhZGRyZXNzIFBhb2xvJ3MgY29t
-bWVudHMuDQo+ID4+DQo+ID4+IFBsZWFzZSBnaXZlIG1lIG1vcmUgY29tbWVudHMuDQo+ID4+DQo+
-ID4+DQo+ID4+IFRoYW5rcw0KPiA+Pg0KPiA+PiBaaGFuZyBDaGVuDQo+ID4+DQo+ID4+DQo+ID4+
-IE9uIDEyLzE3LzIwMTkgODo0NSBQTSwgWmhhbmcsIENoZW4gd3JvdGU6DQo+ID4+PiBGcm9tOiBa
-aGFuZyBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT4NCj4gPj4+DQo+ID4+PiBBZHZhbmNlZCBX
-YXRjaCBEb2cgaXMgYW4gdW5pdmVyc2FsIG1vbml0b3JpbmcgbW9kdWxlIG9uIFZNTSBzaWRlLCBp
-dA0KPiA+Pj4gY2FuIGJlIHVzZWQgdG8gZGV0ZWN0IG5ldHdvcmsgZG93bihWTU0gdG8gZ3Vlc3Qs
-IFZNTSB0byBWTU0sDQo+IFZNTQ0KPiA+PiB0bw0KPiA+Pj4gYW5vdGhlciByZW1vdGUgc2VydmVy
-KSBhbmQgZG8gcHJldmlvdXNseSBzZXQgb3BlcmF0aW9uLiBDdXJyZW50IEFXRA0KPiA+Pj4gcGF0
-Y2gganVzdCBhY2NlcHQgYW55IGlucHV0IGFzIHRoZSBzaWduYWwgdG8gcmVmcmVzaCB0aGUgd2F0
-Y2hkb2cNCj4gPj4+IHRpbWVyLCBhbmQgd2UgY2FuIGFsc28gbWFrZSBhIGNlcnRhaW4gaW50ZXJh
-Y3RpdmUgcHJvdG9jb2wgaGVyZS4gRm9yDQo+ID4+PiB0aGUgb3V0cHV0cywgdXNlciBjYW4gcHJl
-LXdyaXRlIHNvbWUgY29tbWFuZCBvciBzb21lIG1lc3NhZ2VzIGluDQo+IHRoZQ0KPiA+Pj4gQVdE
-IG9wdC1zY3JpcHQuIFdlIG5vdGljZWQgdGhhdCB0aGVyZSBpcyBubyB3YXkgZm9yIFZNTSBjb21t
-dW5pY2F0ZQ0KPiA+Pj4gZGlyZWN0bHksIG1heWJlIHNvbWUgcGVvcGxlIHRoaW5rIHdlIGRvbid0
-IG5lZWQgc3VjaCB0aGluZ3ModXAgbGF5ZXINCj4gPj4+IHNvZnR3YXJlIGxpa2Ugb3BlbnN0YWNr
-IGNhbiBoYW5kbGUgaXQpLiBzbyB3ZSBlbmdhZ2VkIHdpdGggcmVhbA0KPiA+Pj4gY3VzdG9tZXIg
-Zm91bmQgdGhhdCB0aGV5IG5lZWQgYSBsaWdodHdlaWdodCBhbmQgZWZmaWNpZW50IG1lY2hhbmlz
-bQ0KPiA+Pj4gdG8gc29sdmUgc29tZSBwcmFjdGljYWwgcHJvYmxlbXMsDQo+ID4+Pg0KPiA+Pj4g
-Rm9yIGV4YW1wbGUgRWRnZSBDb21wdXRpbmcgY2FzZXModGhleSB0aGluayBoaWdoIGxldmVsIHNv
-ZnR3YXJlIGlzDQo+ID4+PiB0b28gaGVhdnkgdG8gdXNlIGluIEVkZ2Ugb3IgaXQgaXMgaGFyZCB0
-byBtYW5hZ2UgYW5kIGNvbWJpbmUgd2l0aCBWTQ0KPiBpbnN0YW5jZSkuDQo+ID4+PiBJdCBtYWtl
-IHVzZXIgaGF2ZSBiYXNpYyBWTS9Ib3N0IG5ldHdvcmsgbW9uaXRvcmluZyB0b29scyBhbmQgYmFz
-aWMNCj4gPj4+IGZhbHNlIHRvbGVyYW5jZSBhbmQgcmVjb3Zlcnkgc29sdXRpb24uLg0KPiA+Pj4N
-Cj4gPj4+IFBsZWFzZSBzZWUgdGhlIGRldGFpbCBkb2N1bWVudGF0aW9uIGluIHRoZSBsYXN0IHBh
-dGNoLg0KPiA+Pj4NCj4gPj4+IFY0Og0KPiA+Pj4gICAgLSBBZGQgbW9yZSBpbnRyb2R1Y3Rpb24g
-aW4gcWVtdS1vcHRpb25zLmh4DQo+ID4+PiAgICAtIEFkZHJlc3NlZCBQYW9sbydzIGNvbW1lbnRz
-IGFkZCBkb2NzL2F3ZC50eHQgZm9yIHRoZSBBV0QgbW9kdWxlDQo+ID4+IGRldGFpbC4NCj4gPj4+
-IFYzOg0KPiA+Pj4gICAgLSBSZWJhc2VkIG9uIFFlbXUgNC4yLjAtcmMxIGNvZGUuDQo+ID4+PiAg
-ICAtIEZpeCBjb21taXQgbWVzc2FnZSBpc3N1ZS4NCj4gPj4+DQo+ID4+PiBWMjoNCj4gPj4+ICAg
-IC0gQWRkcmVzc2VkIFBoaWxpcHBlIGNvbW1lbnRzIGFkZCBjb25maWd1cmUgc2VsZWN0b3IgZm9y
-IEFXRC4NCj4gPj4+DQo+ID4+PiBJbml0aWFsOg0KPiA+Pj4gICAgLSBJbml0aWFsIHZlcnNpb24u
-DQo+ID4+Pg0KPiA+Pj4NCj4gPj4+IFpoYW5nIENoZW4gKDUpOg0KPiA+Pj4gICAgIG5ldC9hd2Qu
-YzogSW50cm9kdWNlIEFkdmFuY2VkIFdhdGNoIERvZyBtb2R1bGUgZnJhbWV3b3JrDQo+ID4+PiAg
-ICAgbmV0L2F3ZC5jOiBJbml0YWlsaXplIGlucHV0L291dHB1dCBjaGFyZGV2DQo+ID4+PiAgICAg
-bmV0L2F3ZC5jOiBMb2FkIGFkdmFuY2VkIHdhdGNoIGRvZyB3b3JrZXIgdGhyZWFkIGpvYg0KPiA+
-Pj4gICAgIHZsLmM6IE1ha2UgQWR2YW5jZWQgV2F0Y2ggRG9nIGRlbGF5ZWQgaW5pdGlhbGl6YXRp
-b24NCj4gPj4+ICAgICBkb2NzL2F3ZC50eHQ6IEFkZCBkb2MgdG8gaW50cm9kdWNlIEFkdmFuY2Vk
-IFdhdGNoRG9nKEFXRCkNCj4gbW9kdWxlDQo+ID4+Pg0KPiA+Pj4gICAgY29uZmlndXJlICAgICAg
-ICAgfCAgIDkgKw0KPiA+Pj4gICAgZG9jcy9hd2QudHh0ICAgICAgfCAgODggKysrKysrKysrDQo+
-ID4+PiAgICBuZXQvTWFrZWZpbGUub2JqcyB8ICAgMSArDQo+ID4+PiAgICBuZXQvYXdkLmMgICAg
-ICAgICB8IDQ5MQ0KPiA+PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrDQo+ID4+PiAgICBxZW11LW9wdGlvbnMuaHggICB8ICAyMCArKw0KPiA+Pj4gICAgdmwu
-YyAgICAgICAgICAgICAgfCAgIDcgKw0KPiA+Pj4gICAgNiBmaWxlcyBjaGFuZ2VkLCA2MTYgaW5z
-ZXJ0aW9ucygrKQ0KPiA+Pj4gICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRvY3MvYXdkLnR4dA0KPiA+
-Pj4gICAgY3JlYXRlIG1vZGUgMTAwNjQ0IG5ldC9hd2QuYw0KPiA+Pj4NCg0K
+* Peter Xu (peterx@redhat.com) wrote:
+> On Mon, Feb 10, 2020 at 07:44:59PM +0000, Dr. David Alan Gilbert (git) wr=
+ote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >=20
+> > rdma_accept_incoming_migration is called from an fd handler and
+> > can't return an Error * anywhere.
+> > Currently it's leaking Error's in errp/local_err - there's
+> > no point putting them in there unless we can report them.
+> >=20
+> > Turn most into fprintf's, and the last into an error_reportf_err
+> > where it's coming up from another function.
+> >=20
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  migration/rdma.c | 11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/migration/rdma.c b/migration/rdma.c
+> > index 2379b8345b..f67161c98f 100644
+> > --- a/migration/rdma.c
+> > +++ b/migration/rdma.c
+> > @@ -3980,13 +3980,13 @@ static void rdma_accept_incoming_migration(void=
+ *opaque)
+> >      RDMAContext *rdma =3D opaque;
+> >      int ret;
+> >      QEMUFile *f;
+> > -    Error *local_err =3D NULL, **errp =3D &local_err;
+> > +    Error *local_err =3D NULL;
+> > =20
+> >      trace_qemu_rdma_accept_incoming_migration();
+> >      ret =3D qemu_rdma_accept(rdma);
+> > =20
+> >      if (ret) {
+> > -        ERROR(errp, "RDMA Migration initialization failed!");
+> > +        fprintf(stderr, "RDMA ERROR: Migration initialization failed")=
+;
+>=20
+> Is there any reason to explictly use stderr instead of the
+> error_reportf_err() below (then we simply jump to that for error
+> paths)?  The only difference of error_reportf_err() and stderr should
+> be when there's one HMP, while shall we always suggest to use
+> error_reportf_err() rather than stderr?
+
+Because the error_reportf_err is taking an Error* (from an error
+reported by migration_fd_process_incoming) where as we don't have an
+Error* at the earlier points.
+
+Dave
+
+> Thanks,
+>=20
+> >          return;
+> >      }
+> > =20
+> > @@ -3998,13 +3998,16 @@ static void rdma_accept_incoming_migration(void=
+ *opaque)
+> > =20
+> >      f =3D qemu_fopen_rdma(rdma, "rb");
+> >      if (f =3D=3D NULL) {
+> > -        ERROR(errp, "could not qemu_fopen_rdma!");
+> > +        fprintf(stderr, "RDMA ERROR: could not qemu_fopen_rdma");
+> >          qemu_rdma_cleanup(rdma);
+> >          return;
+> >      }
+> > =20
+> >      rdma->migration_started_on_destination =3D 1;
+> > -    migration_fd_process_incoming(f, errp);
+> > +    migration_fd_process_incoming(f, &local_err);
+> > +    if (local_err) {
+> > +        error_reportf_err(local_err, "RDMA ERROR:");
+> > +    }
+> >  }
+> > =20
+> >  void rdma_start_incoming_migration(const char *host_port, Error **errp=
+)
+> > --=20
+> > 2.24.1
+> >=20
+>=20
+> --=20
+> Peter Xu
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
