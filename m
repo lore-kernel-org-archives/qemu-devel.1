@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7466C35242
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 20:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB3BC3B187
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 20:37:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88D9920659
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 20:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12D4920659
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 20:37:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="QZiohgjW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88D9920659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="GeTXgNfH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12D4920659
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1cH9-000846-Dx
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 15:36:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34765)
+	id 1j1cHD-00085a-6T
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 15:36:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1j1cFi-0006MN-Ak
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 15:35:27 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alxndr@bu.edu>) id 1j1cFh-00087j-7x
+ (envelope-from <alxndr@bu.edu>) id 1j1cFh-0006MJ-M0
  for qemu-devel@nongnu.org; Tue, 11 Feb 2020 15:35:26 -0500
-Received: from mail-bn8nam11on2092.outbound.protection.outlook.com
- ([40.107.236.92]:44875 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1j1cFh-00086O-1J
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alxndr@bu.edu>) id 1j1cFg-00086B-GO
  for qemu-devel@nongnu.org; Tue, 11 Feb 2020 15:35:25 -0500
+Received: from mail-bn8nam11on2120.outbound.protection.outlook.com
+ ([40.107.236.120]:36865 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1j1cFg-00083m-AB
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 15:35:24 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ePWSDCE85i2wckDEuwTEv7Zbt6mtcXbE5MV6SrR4R/XpG6oBlLTycLKTcLemjWgnwrKNss8hvz+msS1WqmIq+Nz0VMawY6qokU5Xp3PAkOlhIuMsuvyyhop5+SpyfdH5b07q+Dt0U4CN2aWZyPBZisElsJveT1aHhNyNwV1QSMdTVFzvIUirLWcAh8JLont3COwNzXIGjwwJqpCNWp0QYjeoMezKgbmQHeS38w99L5v/QiZ0HdtX7RPFfVOwNI01XhojxNVoNIexfuYSYQNpHMR+/ewb+bGXI8JSsN3fZYBdj/ptNm36LugmYL6RKKxUPYjJTnebF4WtV0WdMyKxwQ==
+ b=UZ/2Fr/Hsz2dvgDD7C3qvUB616mkMH4SxGUTOohErequH1Ej3Ym6ATwNXFHR1iRhS+Ak0NrGz+XsXR62SghYGUfTvIWlbhKZhPnu514vUiIWuslyaSvK0upcn9vLmjY2J3lJYO+oHULi3firr2f9Fo3coQ9XKzvdJq/L+nK1FVZzRZzAhm2wP3J78LY9bM2SqGyBPJcyefF3SOxG6XS5brs/ZldI5fMaSZUMED882Y2JRR/iAggwYgBShik4lPjFmoMZf2/4HeJP0ekGHt2+rYwUgbjtUZxIoOPiX95+YRmko+10anhM375qxaEvn6e9bu4bVrldlC3133xZNc1ZPA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pPb+uhgPYlvdJyG/R+X2+zMJUtQFZJ0QzQ4q5gowrp4=;
- b=eugSuEYsIdQ8pfjmWJf1pcAPD12MWJG11isi1F0jjjSIytWRYRTlfShZIWuZN7fplWF7dp3Syh5m4ZG7J4OEtIgP5ILWQf6nuAzoxawN6yrx+rw4AbhQvHCoyq3Njelwee9LrWi2ipaeOlX8HoAOXQZxVOUPiJ+M5JPMM+OJh1MAFM10YBEDbEaqTXgp7BQ6XlJsKEQb54GT3ONCjIVYJgBHM4Bv5sFnZSxE58onG1zk+tv86+t+PTHrNBk9Q3h1mBpNLjbdJfM6HN5KJ5yVnix2DbLGIsyp3wY7kVGQI5arblpCUb9YdUeupabLvtjvIn0t+xw+U6kqIIc6i9GP+Q==
+ bh=kUMEykh+dDY//Vw1UGoqCnJC+qKIQtaWZcMAcdP4hV4=;
+ b=VDG3kpKO/mO9AIcVqpce/OzqfrsdiXarrnRWae9ll8gPwXV99tlKETVVxeRHBtj5zn6l8ZEd+mQXoK7I4Ub7z1TSZAX+FjbjokA9gnPyXoiQvmGKFZSomDJQdNWSFXZAjUKRLUr7FuCIlsEEB4jEqQiVDa/ttChN0lSTmpZzKTI/Y3kPGcIczTv/mEMiBfUbwvHbtafOoCMnf3A7SveSHUaJWGPD1GqcvlJ1iiHMmuCOKoE9Th/9u+zEDiAMv9NmC2E0uA6Cu8FKWHo78uFY9zGidnvgxmSsT82KodOFtZJYekCMRECTLhRmEkLjN6NO1bOfkakC7bl5BMEv8ZdGSw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pPb+uhgPYlvdJyG/R+X2+zMJUtQFZJ0QzQ4q5gowrp4=;
- b=QZiohgjW/UVRH6J5ll2TTpHF44Umvbe72F91+H3PwBtn4szK2Ws8B5Lp5K4gPc5LZCj7TsktjWac1SvrpOKDVQFO1ArzhpLSr/YR9gUA/C1xXgyqX8io20FxeG+1YrcqWwuJ9Fz04WebpP8BxrRH25rOQTwahTg5yqYFw3f/6gE=
+ bh=kUMEykh+dDY//Vw1UGoqCnJC+qKIQtaWZcMAcdP4hV4=;
+ b=GeTXgNfHTjKybVgymyD8QoqktLLRCTrudqvxIhTenRmdfeIHYUUVJ5VWNlqK366qkTToE7TQpuLHKEoRYCFl0AO1BEXvrXWn7lKzqy5NHl0uiRUWUddTmifnsjjv/K2GCw/FbuJUfD6/oPDqRl35IBhpAzSDrz10ZOmU7bJbgwQ=
 Authentication-Results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (52.135.102.32) by
  SN6PR03MB3599.namprd03.prod.outlook.com (52.135.87.155) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Tue, 11 Feb 2020 20:35:24 +0000
+ 15.20.2707.21; Tue, 11 Feb 2020 20:35:23 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::9c11:10cd:6e97:bbe8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::9c11:10cd:6e97:bbe8%7]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
- 20:35:24 +0000
+ 20:35:23 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 02/23] softmmu: move vl.c to softmmu/
-Date: Tue, 11 Feb 2020 15:34:49 -0500
-Message-ID: <20200211203510.3534-3-alxndr@bu.edu>
+Subject: [PATCH v9 01/23] checkpatch: replace vl.c in the top of repo check
+Date: Tue, 11 Feb 2020 15:34:48 -0500
+Message-ID: <20200211203510.3534-2-alxndr@bu.edu>
 X-Mailer: git-send-email 2.25.0
 In-Reply-To: <20200211203510.3534-1-alxndr@bu.edu>
 References: <20200211203510.3534-1-alxndr@bu.edu>
@@ -77,18 +77,18 @@ MIME-Version: 1.0
 Received: from mozz.bu.edu (128.197.127.33) by
  BL0PR02CA0124.namprd02.prod.outlook.com (2603:10b6:208:35::29) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.23 via Frontend Transport; Tue, 11 Feb 2020 20:35:23 +0000
+ 15.20.2707.23 via Frontend Transport; Tue, 11 Feb 2020 20:35:22 +0000
 X-Mailer: git-send-email 2.25.0
 X-Originating-IP: [128.197.127.33]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 818b6f64-7a8c-438f-de66-08d7af31eb91
+X-MS-Office365-Filtering-Correlation-Id: 2ecf2a23-424c-45e9-60bf-08d7af31ead5
 X-MS-TrafficTypeDiagnostic: SN6PR03MB3599:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB35999B4A5AA00CE83BB18F10BA180@SN6PR03MB3599.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:421;
+X-Microsoft-Antispam-PRVS: <SN6PR03MB35991441A68B2862A92DD303BA180@SN6PR03MB3599.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2657;
 X-Forefront-PRVS: 0310C78181
 X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(4636009)(39860400002)(346002)(136003)(396003)(376002)(366004)(199004)(189003)(36756003)(52116002)(7696005)(478600001)(6666004)(316002)(786003)(8676002)(8936002)(956004)(2616005)(4326008)(81156014)(5660300002)(75432002)(1076003)(81166006)(2906002)(66556008)(66476007)(66946007)(6486002)(26005)(186003)(16526019)(86362001)(6916009);
+ SFS:(10019020)(4636009)(39860400002)(346002)(136003)(396003)(376002)(366004)(199004)(189003)(36756003)(52116002)(7696005)(478600001)(6666004)(316002)(786003)(8676002)(8936002)(956004)(2616005)(4744005)(4326008)(81156014)(5660300002)(75432002)(1076003)(81166006)(2906002)(66556008)(66476007)(66946007)(6486002)(26005)(186003)(16526019)(86362001)(6916009);
  DIR:OUT; SFP:1102; SCL:1; SRVR:SN6PR03MB3599;
  H:SN6PR03MB3871.namprd03.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; A:1; MX:1; 
@@ -96,18 +96,18 @@ Received-SPF: None (protection.outlook.com: bu.edu does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Pf6G9dzRmMugIrZZ/i+fYR7rHShITsfnANsnfGKdq8xwsZa0MHzzcmrbfQu0xXe9lVUCoR8M8nCT8sg/20/8SAh5puaLw73QdxgIovSrUkZXyAlnig/NRI353ICnrFtkTP4Kq2A+ys0+KU4YIu4mIa/o38pj+fj/4k3wgsBmyHof+dn3WVDnrtC/M7EuoizSffjCTCDBPMPJgkWJJk4DBrYwJGTtO1R5/ADZf46DOWl28Y6Y0ofUrVkBvPJPZRS/aeMOyAJzVWRfSzxrsqaf7BcMEgJC81epCnTZDjYZx/9CFDW6WBWJNuNWcYdlBTxEOLTgDwDcow8ETdgw8r5E4YoRbWwZNusuMeAcUowX+TLiFazhgOw79aiAw1pbaorw3xw/1tzWwR0BVHArT/X90kzmJYwj10YMkSg+tYInEEgOvh3dCnD3XYmx7kkgdmlo
-X-MS-Exchange-AntiSpam-MessageData: BV6cjTXxxjeoJ6qWXWCQb2tw1ou+NxsuIODbrSOWjd2p+5YivCTDrIaj6q0nppr8FNbu4We2EO3Zjt9TUWYngNUQSZcizgMsr5n/X3jw9usOARm4EyQ/HuxR6Fv8dHiZZmHf4qhhwgvnP4SeKDWLBg==
+X-Microsoft-Antispam-Message-Info: PrpbYx3xFA//Adz8MI5UmozoqbxTDMhAPhXXj+YEjdspIKMyDpxphO6jzlnNwoCOESiHKKF1QFRkblTdBxysQzzWsbzipUw0QV1HBkYFMD7CbB6oi48oL9u2bj2nKX0UNcvdacJ+jHI/owkPo5XSLQZ7Yo9CmOAvShPG9gqEaE0xjgROWj+paWCmgqChONVIcW2ewRtj7xFl8n9qso1FmfUwpiQ403TMTGjAhMd27Wdvg7zbXOjKIFNjyTzFDTKbRSXYtoNmeiE2KLR13G7ea2v9XFCsobr2ayweOouSLQILGGU8ByS/vXb4BuyrrkWebI+ylxbZ9ci0IdiDqKLsVvTdW3CRaaU4kgCmU7sdK4npzd3Z5YZvSnTjpF/q9RuLwE/fbVxVrNwmHdnMGh/81z75nmO8rdTZjIyWoz7UVHh3zfp8zPhRqC9HrgSdzU/k
+X-MS-Exchange-AntiSpam-MessageData: E5txaHFvGK8+ESOIKUsgmm6129hz5Gr25who7WxWF4/hV6EHCpgw5XvNrxXzYNA1eVho+k68x6ZLR54T9BeRljXOmzjvWNzSQsXm89LYiKJo3qr61Ww9ssToxuC4WO8g/vj4yupDz+ioPVKQ3ce4WQ==
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 818b6f64-7a8c-438f-de66-08d7af31eb91
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2020 20:35:23.9476 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ecf2a23-424c-45e9-60bf-08d7af31ead5
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2020 20:35:23.0311 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OVIhdNZD3EyxrBSSUuJZKJ+b09qH+8dfLyyq7pvnCul+1IU3aCL0es+XKNiqPe6s
+X-MS-Exchange-CrossTenant-UserPrincipalName: KqpTD9RNFtaGN+qWkJFi67O1xLx/Jw4Q4nnMEAuiId0IJCzh+/nAIe0bjuOwrQGa
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3599
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.236.92
+X-Received-From: 40.107.236.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,53 +125,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+524b4c2c5c moves vl.c into softmmu/ , breaking the checkpatch
+top-of-kernel-tree check. Replace with checks for softmmu and linux-user
+
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 ---
- Makefile.objs         | 2 --
- Makefile.target       | 1 +
- softmmu/Makefile.objs | 2 ++
- vl.c =3D> softmmu/vl.c  | 0
- 4 files changed, 3 insertions(+), 2 deletions(-)
- create mode 100644 softmmu/Makefile.objs
- rename vl.c =3D> softmmu/vl.c (100%)
+ scripts/checkpatch.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 26b9cff954..8a1cbe8000 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -58,8 +58,6 @@ common-obj-y +=3D ui/
- common-obj-m +=3D ui/
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index ce43a306f8..2e2273b8a3 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -462,7 +462,7 @@ sub top_of_kernel_tree {
+ 	my @tree_check =3D (
+ 		"COPYING", "MAINTAINERS", "Makefile",
+ 		"README.rst", "docs", "VERSION",
+-		"vl.c"
++		"softmmu", "linux-user"
+ 	);
 =20
- common-obj-y +=3D dma-helpers.o
--common-obj-y +=3D vl.o
--vl.o-cflags :=3D $(GPROF_CFLAGS) $(SDL_CFLAGS)
- common-obj-$(CONFIG_TPM) +=3D tpm.o
-=20
- common-obj-y +=3D backends/
-diff --git a/Makefile.target b/Makefile.target
-index 6e61f607b1..06c36d1161 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -160,6 +160,7 @@ obj-y +=3D qapi/
- obj-y +=3D memory.o
- obj-y +=3D memory_mapping.o
- obj-y +=3D migration/ram.o
-+obj-y +=3D softmmu/
- LIBS :=3D $(libs_softmmu) $(LIBS)
-=20
- # Hardware support
-diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
-new file mode 100644
-index 0000000000..d80a5ffe5a
---- /dev/null
-+++ b/softmmu/Makefile.objs
-@@ -0,0 +1,2 @@
-+obj-y +=3D vl.o
-+vl.o-cflags :=3D $(GPROF_CFLAGS) $(SDL_CFLAGS)
-diff --git a/vl.c b/softmmu/vl.c
-similarity index 100%
-rename from vl.c
-rename to softmmu/vl.c
+ 	foreach my $check (@tree_check) {
 --=20
 2.25.0
 
