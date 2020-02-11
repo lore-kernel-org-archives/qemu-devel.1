@@ -2,93 +2,83 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EACA3C35242
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1813EC35242
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:58:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C22312168B
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:57:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E57242168B
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:58:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kDFKXo6U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C22312168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="egKrhI4I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E57242168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1aib-0004qA-UP
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:57:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38202)
+	id 1j1ak9-00067e-4D
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:58:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j1ah2-00044f-OM
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:55:35 -0500
+ (envelope-from <berrange@redhat.com>) id 1j1aj8-0005Hg-CR
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:57:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j1agv-0003W8-79
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:55:31 -0500
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:35874)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j1agv-0003PZ-0p
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:55:25 -0500
-Received: by mail-pj1-x1042.google.com with SMTP id gv17so1632263pjb.1
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 10:55:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=CrXYayQlBzAnDNIH9v/PykxwmIx73+zl9SeUi1W1THc=;
- b=kDFKXo6U72jz7asislCYB8xyb5faQYupFWSud9ziim9y3tjRoLHHogphq2e9E19/+0
- h13JYPyXTsPjXEzU0wwLfE7zYWWm0WOaf5wxl0TUGLQcBFc9/KIGFBK3PCQbFI7Uf/zk
- 1kl8d28zav83P6Sj9u5dGnNbzhZIPVg/kTwYNv/en8054XCX8D0eB+/DeRToYbS1Rw3k
- j/kh9js8tUnIRf1WrqHHMD9iOStF+Rwz6aXpRemvoH4wLYR8Ktdo04LGY0QCXnsvsC32
- jkihaQONYiaMHyrckYu/5cd2caBrHqfR3ZOSCvV8rLcg3pSpbJ8JJOzmyfCXsD1tDyx5
- b31Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CrXYayQlBzAnDNIH9v/PykxwmIx73+zl9SeUi1W1THc=;
- b=YR285c/euOP84jBTyNrB0h+ZCerGdUbWU8a5M0C6wTdxBcBGx0btOHRxXRisHAKJnv
- 1+/4Is9Aj2GzIzp65BHEi2eqzM4innuWlgx/nUCZPahC2N+lbsxAnahMoB+GskV1R47X
- Twc/Cnkr5Kl7lsOcWZwyxSAwmQ+a0NSHvcnAekFpNIWDR+ywd93BWEhJQ7U/FrjCyX7T
- YNOEUrkuZea5rIBV5ynxKNqniRlIbKAw4VgPSfeohz0NIfmhV6URGqPcAKMo61FHWGTK
- 0NFKH8Rj5OEKMMIBctTRheRyPGCtcqxCZh81ofBMeDeO83dE9cspfvquca2TB0TBmVaR
- YsGA==
-X-Gm-Message-State: APjAAAV+G/DvbFvxMBFLBevgndq49pwUR39npwkmiMzxIrGpq0NmuD00
- hRKVnkztcWHZFfpLYhkSMsXPamhO8IU=
-X-Google-Smtp-Source: APXvYqw6Opy9yIfHYzBpr27o9cVt7A6IiwAwdeBrGKLJeghJZza5MIhHkcbCYfZDOp5FHZaC/tPRjg==
-X-Received: by 2002:a17:90a:bf0c:: with SMTP id
- c12mr4954034pjs.112.1581447318919; 
- Tue, 11 Feb 2020 10:55:18 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- z16sm4996348pff.125.2020.02.11.10.55.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 11 Feb 2020 10:55:18 -0800 (PST)
-Subject: Re: [PATCH 13/13] target/arm: Correct handling of PMCR_EL0.LC bit
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200211173726.22541-1-peter.maydell@linaro.org>
- <20200211173726.22541-14-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <059ac7e7-c4ca-7456-69f7-80c3cb2cbf09@linaro.org>
-Date: Tue, 11 Feb 2020 10:55:16 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <berrange@redhat.com>) id 1j1aj5-0006yC-PF
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:57:41 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35829
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j1aj5-0006ue-D3
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:57:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581447458;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bzurVOrsVu08Xn65eKTOSc6rt1lI2cwbt5ZWDDa6Zu4=;
+ b=egKrhI4IUdPLGDOsJ7Hx5f8l/mgyRss+MrDwgFsbbJ0BvrZLHPhDO3CH/1kBpgPNIsTrZB
+ OHNtIjDvi7K1C91Xm3h4MaB42jTjt4s2s37ihCVyWwYlCHvJV21SdpcWZZkPWKklTAgn02
+ nSf1HB7kx2v0wxZHwFWC5YQylTeBboA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-wa2X5h2qORK2XsvmujfzIQ-1; Tue, 11 Feb 2020 13:57:35 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43111DB62
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 18:57:34 +0000 (UTC)
+Received: from redhat.com (ovpn-112-49.ams2.redhat.com [10.36.112.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D79E81001E91;
+ Tue, 11 Feb 2020 18:57:31 +0000 (UTC)
+Date: Tue, 11 Feb 2020 18:57:28 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v5 4/8] multifd: Add multifd-zlib-level parameter
+Message-ID: <20200211185728.GQ55376@redhat.com>
+References: <20200129115655.10414-1-quintela@redhat.com>
+ <20200129115655.10414-5-quintela@redhat.com>
+ <87eevhxtfv.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20200211173726.22541-14-peter.maydell@linaro.org>
+In-Reply-To: <87eevhxtfv.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: wa2X5h2qORK2XsvmujfzIQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,35 +90,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>,
- Aaron Lindsay <aaron@os.amperecomputing.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/11/20 9:37 AM, Peter Maydell wrote:
-> The LC bit in the PMCR_EL0 register is supposed to be:
->  * read/write
->  * RES1 on an AArch64-only implementation
->  * an architecturally UNKNOWN value on reset
-> (and use of LC==0 by software is deprecated).
-> 
-> We were implementing it incorrectly as read-only always zero,
-> though we do have all the code needed to test it and behave
-> accordingly.
-> 
-> Instead make it a read-write bit which resets to 1 always, which
-> satisfies all the architectural requirements above.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/helper.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
+On Thu, Jan 30, 2020 at 09:03:00AM +0100, Markus Armbruster wrote:
+> Juan Quintela <quintela@redhat.com> writes:
+>=20
+> > It will indicate which level use for compression.
+> >
+> > Signed-off-by: Juan Quintela <quintela@redhat.com>
+>=20
+> This is slightly confusing (there is no zlib compression), unless you
+> peek at the next patch (which adds zlib compression).
+>=20
+> Three ways to make it less confusing:
+>=20
+> * Squash the two commits
+>=20
+> * Swap them: first add zlib compression with level hardcoded to 1, then
+>   make the level configurable.
+>=20
+> * Have the first commit explain itself better.  Something like
+>=20
+>     multifd: Add multifd-zlib-level parameter
+>=20
+>     This parameter specifies zlib compression level.  The next patch
+>     will put it to use.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Wouldn't the "normal" best practice for QAPI design be to use a
+enum and discriminated union. eg
+
+  { 'enum': 'MigrationCompression',
+     'data': ['none', 'zlib'] }
+
+  { 'struct': 'MigrationCompressionParamsZLib',
+    'data': { 'compression-level' } }
+
+  { 'union':  'MigrationCompressionParams',
+    'base': { 'mode': 'MigrationCompression' },
+    'discriminator': 'mode',
+    'data': {
+      'zlib': 'MigrationCompressionParamsZLib',
+    }
+
+Of course this is quite different from how migration parameters are
+done today. Maybe it makes sense to stick with the flat list of
+migration parameters for consistency & ignore normal QAPI design
+practice ?
 
 
-r~
-
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
