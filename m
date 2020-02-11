@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 179DCC352A3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9EF4C3B188
 	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:26:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFCB720873
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:26:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFCB720873
+	by mail.kernel.org (Postfix) with ESMTPS id 7EEB620873
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:26:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EEB620873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1WV8-0002aM-33
+	id 1j1WV8-0002eS-LP
 	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:26:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50388)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50384)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WUC-0001Nf-2U
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WUB-0001Ne-VJ
  for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WUA-0002Rq-SR
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:26:00 -0500
-Received: from relay.sw.ru ([185.231.240.75]:45002)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WUA-0002Ra-O9
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:25:59 -0500
+Received: from relay.sw.ru ([185.231.240.75]:45006)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j1WUA-0002QC-LY
+ id 1j1WUA-0002QB-Gg
  for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:25:58 -0500
 Received: from dptest2.qa.sw.ru ([10.94.4.71])
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j1WU4-00009Q-IT; Tue, 11 Feb 2020 17:25:52 +0300
+ id 1j1WU4-00009Q-D7; Tue, 11 Feb 2020 17:25:52 +0300
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 2/2] tests/acceptance/virtio_check_params: prepare to check
- different params
-Date: Tue, 11 Feb 2020 17:25:51 +0300
-Message-Id: <20200211142551.13072-3-dplotnikov@virtuozzo.com>
+Subject: [PATCH v1 1/2] tests/acceptance/virtio_check_params: remove excluded
+ machine types carefully
+Date: Tue, 11 Feb 2020 17:25:50 +0300
+Message-Id: <20200211142551.13072-2-dplotnikov@virtuozzo.com>
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20200211142551.13072-1-dplotnikov@virtuozzo.com>
 References: <20200211142551.13072-1-dplotnikov@virtuozzo.com>
@@ -64,96 +64,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Before, the test failed if an excluded machine type was absent in the machine
+types lists.
+
 Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- tests/acceptance/virtio_check_params.py | 38 ++++++++++++++-----------
- 1 file changed, 22 insertions(+), 16 deletions(-)
+ tests/acceptance/virtio_check_params.py | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
 diff --git a/tests/acceptance/virtio_check_params.py b/tests/acceptance/virtio_check_params.py
-index deec89bf86..e578952a97 100644
+index 87e6c839d1..deec89bf86 100644
 --- a/tests/acceptance/virtio_check_params.py
 +++ b/tests/acceptance/virtio_check_params.py
-@@ -43,7 +43,7 @@ VM_DEV_PARAMS = {'virtio-scsi-pci': ['-device', 'virtio-scsi-pci,id=scsi0'],
- EXCLUDED_MACHINES = ['none', 'isapc', 'microvm']
+@@ -40,6 +40,8 @@ VM_DEV_PARAMS = {'virtio-scsi-pci': ['-device', 'virtio-scsi-pci,id=scsi0'],
+                                     '-drive',
+                                     'driver=null-co,id=drive0,if=none']}
  
++EXCLUDED_MACHINES = ['none', 'isapc', 'microvm']
++
  
--class VirtioMaxSegSettingsCheck(Test):
-+class VirtioParamsCheck(Test):
+ class VirtioMaxSegSettingsCheck(Test):
      @staticmethod
-     def make_pattern(props):
-         pattern_items = ['{0} = \w+'.format(prop) for prop in props]
-@@ -75,12 +75,12 @@ class VirtioMaxSegSettingsCheck(Test):
-                 props[p[0]] = p[1]
-         return query_ok, props, error
+@@ -117,6 +119,13 @@ class VirtioMaxSegSettingsCheck(Test):
+             return True
+         return False
  
--    def check_mt(self, mt, dev_type_name):
--        mt['device'] = dev_type_name # Only for the debug() call.
-+    def check_mt(self, mt, expected_vals, dev_type_name):
-+        msg = "mt: %s dev: %s" % (mt, dev_type_name) # For debug() call only.
-         logger = logging.getLogger('machine')
--        logger.debug(mt)
-+        logger.debug(msg)
-         with QEMUMachine(self.qemu_bin) as vm:
--            vm.set_machine(mt["name"])
-+            vm.set_machine(mt)
-             vm.add_args('-nodefaults')
-             for s in VM_DEV_PARAMS[dev_type_name]:
-                 vm.add_args(s)
-@@ -92,11 +92,15 @@ class VirtioMaxSegSettingsCheck(Test):
-                 error = sys.exc_info()[0]
- 
-         if not query_ok:
--            self.fail('machine type {0}: {1}'.format(mt['name'], error))
-+            self.fail('machine type {0}: {1}'.format(mt, error))
- 
-         for prop_name, prop_val in props.items():
--            expected_val = mt[prop_name]
--            self.assertEqual(expected_val, prop_val)
-+            expected_val = expected_vals[prop_name]
-+            msg = 'Property value mismatch for (MT: {0}, '\
-+                  'property name: {1}): expected value: "{2}" '\
-+                  'actual value: "{3}"'\
-+                  .format(mt, prop_name, expected_val, prop_val)
-+            self.assertEqual(expected_val, prop_val, msg)
- 
-     @staticmethod
-     def seg_max_adjust_enabled(mt):
-@@ -128,25 +132,27 @@ class VirtioMaxSegSettingsCheck(Test):
- 
++    @staticmethod
++    def filter_machines(machines):
++        for mt in EXCLUDED_MACHINES:
++            if mt in machines:
++                machines.remove(mt)
++        return machines
++
      @skip("break multi-arch CI")
      def test_machine_types(self):
--        # collect all machine types except 'none', 'isapc', 'microvm'
-+        # collect all machine types
-         with QEMUMachine(self.qemu_bin) as vm:
+         # collect all machine types except 'none', 'isapc', 'microvm'
+@@ -124,9 +133,8 @@ class VirtioMaxSegSettingsCheck(Test):
              vm.launch()
              machines = [m['name'] for m in vm.command('query-machines')]
              vm.shutdown()
- 
-+        # ..and exclude non-relevant ones
-         machines = self.filter_machines(machines)
+-        machines.remove('none')
+-        machines.remove('isapc')
+-        machines.remove('microvm')
++
++        machines = self.filter_machines(machines)
  
          for dev_type in DEV_TYPES:
--            # create the list of machine types and their parameters.
--            mtypes = list()
-+            # define expected parameters for each machine type
-+            mt_expected_vals = dict()
-             for m in machines:
-                 if self.seg_max_adjust_enabled(m):
-                     enabled = 'true'
-                 else:
-                     enabled = 'false'
--                mtypes.append({'name': m,
--                               DEV_TYPES[dev_type]['seg_max_adjust']: enabled})
- 
--            # test each machine type for a device type
--            for mt in mtypes:
--                self.check_mt(mt, dev_type)
-+                mt_expected_vals[m] = {
-+                    DEV_TYPES[dev_type]['seg_max_adjust']: enabled }
-+
-+            # test each machine type
-+            for mt in mt_expected_vals:
-+                self.check_mt(mt, mt_expected_vals[mt], dev_type)
+             # create the list of machine types and their parameters.
 -- 
 2.17.0
 
