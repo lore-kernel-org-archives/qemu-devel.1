@@ -2,93 +2,84 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 458ABC352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F95C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1268D20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D41DE20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:54:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="czqUf3QM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1268D20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LM6UidNF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D41DE20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Xrb-0000Hd-8j
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 10:54:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47926)
+	id 1j1Xs9-0001Jz-1i
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 10:54:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47997)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j1Xqv-0008GG-PU
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:53:34 -0500
+ (envelope-from <eblake@redhat.com>) id 1j1XrP-0000Ix-Qs
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:54:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j1Xqu-00032A-D8
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:53:33 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33451)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j1Xqu-00030x-4P
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:53:32 -0500
-Received: by mail-pf1-x441.google.com with SMTP id n7so5698059pfn.0
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 07:53:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9lFy3+MRR7TYYly5eGGTBavGK2tFmldkiIzr326jGWQ=;
- b=czqUf3QM3gjnueyJNa0yGj3Iw49keeCxC2H+pHMxhlJ83KMMtbB8uVvrctrDHX5nbN
- onSactF5wakAyH0HbT0j0ao5CHSxv5Pa/frwy457R3PIXA3wH8dH6XXwe1Av1BsIreFu
- 9kXkYWUt/w7Eb+8RAS0S86lf0mzdPh8vR5AZqxh1BpKxKlUZ5hsgqnJPMJg0DMR9iYjl
- rZ/TinAZLblY+88ULd+9Re46+doBzhpfiGnu/y6yPh4YlchvIrr2tP/efyHggbGsWD0z
- 1YpTRcY0F4o72jkVDyLUdIhGe70vNAGVeo+u86qc2m1g5xIML4yAvC4fQiMDEsdG79AZ
- nX8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9lFy3+MRR7TYYly5eGGTBavGK2tFmldkiIzr326jGWQ=;
- b=JddOdylBUi45OhHvHyILR6LwqDk5DeYyXGQH40UD6HDQZOkuo4lQYDXaecMe0vm+0I
- W5Ec+fG0QoyXnX1A3BStDNL/uPRdzMXNA9oWvUXoFsPzttq2xGIsAeP8bKe4yzqcQBDD
- jAnlLB511BVgf0m3a03LVr9krk5c0uZ8BdXDe80zXUmR1Kaz0mbOa1Oqhra6waGrMrgv
- 0FSrhgsix2XG3zBaekvuaJxd8WVwJTf/rdTezIay6SKFWb0rqGqLuHL8w4mt1t8xZFko
- XeZwJW7WfedO0FAl2PNZz9dIttQ3yS/TM56zW47bt4uHlym5YwNYtwTSE5f3DgsZNIeu
- LUpw==
-X-Gm-Message-State: APjAAAWQo3gLvJz+gzzGVmUuH/lGGW8+jQf7lWBYfUNV2y4nJOGQK1ab
- vgt7TGzYBQV3tnrZav9d/MfQuQ==
-X-Google-Smtp-Source: APXvYqxGoKYN75yWZb6ileXm0lw3EqYrHtO7FrYohtsNpyoeyvWVXYPr3DFXCOt7IQv3N8HbLijkzA==
-X-Received: by 2002:a62:342:: with SMTP id 63mr3830595pfd.19.1581436410470;
- Tue, 11 Feb 2020 07:53:30 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- f18sm4582819pgn.2.2020.02.11.07.53.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 11 Feb 2020 07:53:29 -0800 (PST)
-Subject: Re: [PATCH v4 1/4] target/riscv: add vector extension field in
- CPURISCVState
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200210081240.11481-1-zhiwei_liu@c-sky.com>
- <20200210081240.11481-2-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <cc4d0b93-013f-5cf5-4ff4-248ab99eec70@linaro.org>
-Date: Tue, 11 Feb 2020 07:53:27 -0800
+ (envelope-from <eblake@redhat.com>) id 1j1XrO-0003f8-AY
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:54:03 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25952
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j1XrO-0003e6-6V
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:54:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581436441;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RcpJzHdL5mk4H1qrth5fi1XwwPcPYGMLTSZEDdM3N+w=;
+ b=LM6UidNFscQO9PkHaaAa+YyoZjsTtzX75TGmjnsn7JPmAauMK2yI5Do92bvzxZY8/0rKt7
+ PhWdw/IdAbN/AF3tu21jfUvL3KTUwO28OUUKY+uXb739wvPZK8Cc1p6P5c9G+f9rui1jia
+ +LM3OsLUCxmLfndRCRHjdurKxZI8piw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-X46BtG2zPdCuQT1mMo3UtA-1; Tue, 11 Feb 2020 10:53:59 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99D8D477;
+ Tue, 11 Feb 2020 15:53:58 +0000 (UTC)
+Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 12FF388856;
+ Tue, 11 Feb 2020 15:53:57 +0000 (UTC)
+Subject: Re: [PATCH v2 32/33] block: Pass BdrvChildRole in remaining cases
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200204170848.614480-1-mreitz@redhat.com>
+ <20200204170848.614480-33-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <f4607467-cc6e-ce10-4afa-c2c2f8fb116f@redhat.com>
+Date: Tue, 11 Feb 2020 09:53:57 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200210081240.11481-2-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200204170848.614480-33-mreitz@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: X46BtG2zPdCuQT1mMo3UtA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,28 +91,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/10/20 8:12 AM, LIU Zhiwei wrote:
-> The 32 vector registers will be viewed as a continuous memory block.
-> It avoids the convension between element index and (regno,offset).
-> Thus elements can be directly accessed by offset from the first vector
-> base address.
+On 2/4/20 11:08 AM, Max Reitz wrote:
+> These calls have no real use for the child role yet, but it will not
+> harm to give one.
 > 
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Notably, the bdrv_root_attach_child() call in blockjob.c is left
+> unmodified because there is not much the generic BlockJob object wants
+> from its children.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  target/riscv/cpu.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>   block/block-backend.c | 11 +++++++----
+>   block/vvfat.c         |  2 +-
+>   2 files changed, 8 insertions(+), 5 deletions(-)
+> 
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-I still don't think you need to put stuff into a sub-structure.  These register
-names are unique in the manual, and not subdivided there.
+Is it worth an assert(role) somewhere now that you've converted all 
+callers to pass at least one role?
 
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-r~
 
