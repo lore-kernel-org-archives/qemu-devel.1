@@ -2,72 +2,75 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F99C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 06:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EA0C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 06:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 077A620714
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 06:31:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3119E206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 06:51:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="foBXMfKo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077A620714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2x46VvY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3119E206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1P4a-0007jv-SR
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 01:31:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39787)
+	id 1j1POQ-00045w-BM
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 01:51:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielcho@qnap.com>) id 1j1P3q-0007HD-FB
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:30:19 -0500
+ (envelope-from <philmd@redhat.com>) id 1j1PNY-0003gw-Qj
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:50:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielcho@qnap.com>) id 1j1P3p-0007bO-5W
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:30:18 -0500
-Received: from mail-io1-xd32.google.com ([2607:f8b0:4864:20::d32]:41702)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <danielcho@qnap.com>) id 1j1P3o-0007Vh-Uw
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:30:17 -0500
-Received: by mail-io1-xd32.google.com with SMTP id m25so10477509ioo.8
- for <qemu-devel@nongnu.org>; Mon, 10 Feb 2020 22:30:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
- h=mime-version:from:date:message-id:subject:to;
- bh=gfslSCwYzZVjE+dgBP+33vOGt3umviIy3E9A0Zzxq+g=;
- b=foBXMfKoTjz0Y+RHXBpK+AvEUzJD+EymmIxqWFspu39sgzhweFSCToXgj3xo35RIXk
- MXxGL/AJepSl48jDTrYLzCMBa6RsTiuQTaZ43FXD749TLo9peH+8Go74z1cGVe2RcvAL
- 3Zb3uqOFwLNQe+cK0nw09ruuTWD0h7Oc1cciw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=gfslSCwYzZVjE+dgBP+33vOGt3umviIy3E9A0Zzxq+g=;
- b=EA15easaNzjlf1NXsKsbMSsV0nRk9PTymrXGRqooj/p6/TqsPVa4HOUm3ZVZKEoQRn
- /pnq3iyJsRBdXCXE7Fdgk9P1UeBjzR/1f2xB5j3AlGFB8X9xgtrPsfEnSWC9BnE20jSj
- EWW+Xd9YM4/xP3KtDs+KyaMDCqIwEObtfrAicJljXurorIam/6SlgS1Pdg1OTME/AHb/
- 16sT6jwAfwsB6UVnkGT3uGLvsBoQa7sV7O/y/DWcu5OWhQSHiMzPjbIT40mrIkYiPsTJ
- Th4fph4TTOhaq3Rc/VmRiUPKUhkMzoMzgqNDqxyisYUJgkJPQHxBGDwkY6M8xBnXTfyy
- nHFA==
-X-Gm-Message-State: APjAAAXJbc5xDP1Q4aIkwdGoMs+2GGeAOz0dj6AbpQv99zEtk8s0gtyc
- pf6aVOeMyX2F5jAt6N2Getzd4WUpwaolde8SwkVmrUI2gl8=
-X-Google-Smtp-Source: APXvYqwXI+KUk4PbN+kwPPR70eg7Rw20EP3WwfSjTsKbgSeVWuxvarv5XVM1G+QctPz0VI13s5Gx8yd+T/fqw3SkgvA=
-X-Received: by 2002:a5d:905a:: with SMTP id v26mr12825180ioq.77.1581402614921; 
- Mon, 10 Feb 2020 22:30:14 -0800 (PST)
-MIME-Version: 1.0
-From: Daniel Cho <danielcho@qnap.com>
-Date: Tue, 11 Feb 2020 14:30:03 +0800
-Message-ID: <CA+XQNE44kZjcw=0dtzaS4HwbPcRG6GpcQ3g3QfL5VS84EBWS_g@mail.gmail.com>
-Subject: The issues about architecture of the COLO checkpoint
+ (envelope-from <philmd@redhat.com>) id 1j1PNW-0004V1-IU
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:50:39 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52394
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1PNW-0004Rx-78
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 01:50:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581403836;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=KuIPLCD7SPpysjcLxdGf5JfV+C6Ye/giVda+EkRd3g4=;
+ b=K2x46VvYvmBZrrDWU4RZ2b1qkcm84lvZFb10ABSt6zFM1rItb6WceTnC+MK0jAmLxV6QIn
+ 87AHVQcn+te27Fub3cfBKrihO1VPwen1lAHcvjnCmPHaSbJt1zYzVBt3wehXj4IWnYtkO1
+ +v4VHPFTAyk+3ES0YLEsu/pq5NHtgMU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-1ZyaK5vKOHaEoWv6l6qZwg-1; Tue, 11 Feb 2020 01:50:32 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4B841005502
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 06:50:31 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-81.brq.redhat.com [10.40.205.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 09B5B5C548;
+ Tue, 11 Feb 2020 06:50:24 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="0000000000001c3380059e46fd19"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d32
+Subject: [PATCH] gitlab-ci.yml: Add .gitlab-ci.d directory for GitLab specific
+ files
+Date: Tue, 11 Feb 2020 07:50:22 +0100
+Message-Id: <20200211065022.11134-1-philmd@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 1ZyaK5vKOHaEoWv6l6qZwg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,55 +82,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001c3380059e46fd19
-Content-Type: text/plain; charset="UTF-8"
+As we plan to let maintainers managing their own GitLab CI jobs,
+add a single directory to contain all the new files (to keep the
+root directory cleaner).
 
-Hi everyone,
-     We have some issues about setting COLO feature. Hope somebody could
-give us some advice.
+EDK2 job is the first user, move it there.
 
-Issue 1:
-     We dynamic to set COLO feature for PVM(2 core, 16G memory),  but the
-Primary VM will pause a long time(based on memory size) for waiting SVM
-start. Does it have any idea to reduce the pause time?
+Suggested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ .gitignore                                   | 1 +
+ .gitlab-ci-edk2.yml =3D> .gitlab-ci.d/edk2.yml | 2 +-
+ .gitlab-ci.yml                               | 2 +-
+ MAINTAINERS                                  | 3 +--
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+ rename .gitlab-ci-edk2.yml =3D> .gitlab-ci.d/edk2.yml (98%)
 
+diff --git a/.gitignore b/.gitignore
+index bc0a035f9c..18288eacd1 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -95,6 +95,7 @@
+ *.tp
+ *.vr
+ *.d
++!/.gitlab-ci.d
+ !/scripts/qemu-guest-agent/fsfreeze-hook.d
+ *.o
+ .sdk
+diff --git a/.gitlab-ci-edk2.yml b/.gitlab-ci.d/edk2.yml
+similarity index 98%
+rename from .gitlab-ci-edk2.yml
+rename to .gitlab-ci.d/edk2.yml
+index 088ba4b43a..a9990b7147 100644
+--- a/.gitlab-ci-edk2.yml
++++ b/.gitlab-ci.d/edk2.yml
+@@ -2,7 +2,7 @@ docker-edk2:
+  stage: build
+  rules: # Only run this job when the Dockerfile is modified
+  - changes:
+-   - .gitlab-ci-edk2.yml
++   - .gitlab-ci.d/edk2.yml
+    - .gitlab-ci.d/edk2/Dockerfile
+    when: always
+  image: docker:19.03.1
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index c15e394f09..dae6045d78 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -1,5 +1,5 @@
+ include:
+-  - local: '/.gitlab-ci-edk2.yml'
++  - local: '/.gitlab-ci.d/edk2.yml'
+=20
+ before_script:
+  - apt-get update -qq
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c7717df720..fb00a55f41 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2391,8 +2391,7 @@ F: roms/edk2
+ F: roms/edk2-*
+ F: tests/data/uefi-boot-images/
+ F: tests/uefi-test-tools/
+-F: .gitlab-ci-edk2.yml
+-F: .gitlab-ci.d/edk2/
++F: .gitlab-ci.d/edk2*
+=20
+ Usermode Emulation
+ ------------------
+--=20
+2.21.1
 
-Issue 2:
-     In https://github.com/qemu/qemu/blob/master/migration/colo.c#L503,
-could we move start_vm() before Line 488? Because at first checkpoint PVM
-will wait for SVM's reply, it cause PVM stop for a while.
-
-     We set the COLO feature on running VM, so we hope the running VM could
-continuous service for users.
-Do you have any suggestions for those issues?
-
-Best regards,
-Daniel Cho
-
---0000000000001c3380059e46fd19
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi everyone,=C2=A0<div><div></div><div>=C2=A0 =C2=A0 =C2=
-=A0We have some issues about setting COLO feature. Hope somebody could give=
- us some advice.</div><div><br></div><div>Issue 1:</div><div>=C2=A0 =C2=A0 =
-=C2=A0We dynamic to set COLO feature for PVM(2 core, 16G memory),=C2=A0 but=
- the Primary VM will pause a long time(based on memory size) for waiting=C2=
-=A0SVM start. Does it have any idea to reduce the pause time?</div><div><br=
-></div><div><br></div><div>Issue 2:</div><div>=C2=A0 =C2=A0 =C2=A0In=C2=A0<=
-a href=3D"https://github.com/qemu/qemu/blob/master/migration/colo.c#L503" t=
-arget=3D"_blank">https://github.com/qemu/qemu/blob/master/migration/colo.c#=
-L503</a>, could we move start_vm() before Line 488? Because at first checkp=
-oint PVM will wait for SVM&#39;s reply, it cause PVM stop for a while.=C2=
-=A0</div></div><div><br></div><div><div><div>=C2=A0 =C2=A0 =C2=A0We set the=
- COLO feature on running=C2=A0VM, so we hope the running VM could continuou=
-s=C2=A0service for users.=C2=A0</div></div></div><div>Do you have any sugge=
-stions for those issues?=C2=A0</div><div><br></div><div>Best regards,</div>=
-<div>Daniel Cho=C2=A0</div></div>
-
---0000000000001c3380059e46fd19--
 
