@@ -2,73 +2,55 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC601C3B187
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 179DCC352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:26:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A0342070A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:21:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0342070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DFCB720873
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:26:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFCB720873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1WPy-0008H5-Ly
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:21:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49572)
+	id 1j1WV8-0002aM-33
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:26:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j1WP8-0007CH-CE
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:20:47 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WUC-0001Nf-2U
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j1WP7-0006bG-1Z
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:20:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41116)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j1WP6-0006ZR-Rj
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:20:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j1WP5-0006kF-Om
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:20:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B865E2E80C7
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:20:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Feb 2020 14:11:48 -0000
-From: Thomas Huth <1657538@bugs.launchpad.net>
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j1WUA-0002Rq-SR
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:26:00 -0500
+Received: from relay.sw.ru ([185.231.240.75]:45002)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1j1WUA-0002QC-LY
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:25:58 -0500
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1j1WU4-00009Q-IT; Tue, 11 Feb 2020 17:25:52 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: c-kaiser intermediadc th-huth
-X-Launchpad-Bug-Reporter: luigiburdo (intermediadc)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20170118175149.27340.89188.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158143030842.17295.14194812508449746663.malone@chaenomeles.canonical.com>
-Subject: [Bug 1657538] Re: qemu 2.7.x 2.8 softmmu dont work on BE machine 
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 14828075d3f5dc8e073003543d4871a6f821e0bd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Subject: [PATCH v1 2/2] tests/acceptance/virtio_check_params: prepare to check
+ different params
+Date: Tue, 11 Feb 2020 17:25:51 +0300
+Message-Id: <20200211142551.13072-3-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20200211142551.13072-1-dplotnikov@virtuozzo.com>
+References: <20200211142551.13072-1-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,73 +59,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1657538 <1657538@bugs.launchpad.net>
+Cc: cohuck@redhat.com, philmd@redhat.com, wainersm@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looking through old bug tickets ... can you still reproduce the issue
-with the latest version of QEMU (v4.2) and a more recent Linux
-distribution?
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ tests/acceptance/virtio_check_params.py | 38 ++++++++++++++-----------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+diff --git a/tests/acceptance/virtio_check_params.py b/tests/acceptance/virtio_check_params.py
+index deec89bf86..e578952a97 100644
+--- a/tests/acceptance/virtio_check_params.py
++++ b/tests/acceptance/virtio_check_params.py
+@@ -43,7 +43,7 @@ VM_DEV_PARAMS = {'virtio-scsi-pci': ['-device', 'virtio-scsi-pci,id=scsi0'],
+ EXCLUDED_MACHINES = ['none', 'isapc', 'microvm']
+ 
+ 
+-class VirtioMaxSegSettingsCheck(Test):
++class VirtioParamsCheck(Test):
+     @staticmethod
+     def make_pattern(props):
+         pattern_items = ['{0} = \w+'.format(prop) for prop in props]
+@@ -75,12 +75,12 @@ class VirtioMaxSegSettingsCheck(Test):
+                 props[p[0]] = p[1]
+         return query_ok, props, error
+ 
+-    def check_mt(self, mt, dev_type_name):
+-        mt['device'] = dev_type_name # Only for the debug() call.
++    def check_mt(self, mt, expected_vals, dev_type_name):
++        msg = "mt: %s dev: %s" % (mt, dev_type_name) # For debug() call only.
+         logger = logging.getLogger('machine')
+-        logger.debug(mt)
++        logger.debug(msg)
+         with QEMUMachine(self.qemu_bin) as vm:
+-            vm.set_machine(mt["name"])
++            vm.set_machine(mt)
+             vm.add_args('-nodefaults')
+             for s in VM_DEV_PARAMS[dev_type_name]:
+                 vm.add_args(s)
+@@ -92,11 +92,15 @@ class VirtioMaxSegSettingsCheck(Test):
+                 error = sys.exc_info()[0]
+ 
+         if not query_ok:
+-            self.fail('machine type {0}: {1}'.format(mt['name'], error))
++            self.fail('machine type {0}: {1}'.format(mt, error))
+ 
+         for prop_name, prop_val in props.items():
+-            expected_val = mt[prop_name]
+-            self.assertEqual(expected_val, prop_val)
++            expected_val = expected_vals[prop_name]
++            msg = 'Property value mismatch for (MT: {0}, '\
++                  'property name: {1}): expected value: "{2}" '\
++                  'actual value: "{3}"'\
++                  .format(mt, prop_name, expected_val, prop_val)
++            self.assertEqual(expected_val, prop_val, msg)
+ 
+     @staticmethod
+     def seg_max_adjust_enabled(mt):
+@@ -128,25 +132,27 @@ class VirtioMaxSegSettingsCheck(Test):
+ 
+     @skip("break multi-arch CI")
+     def test_machine_types(self):
+-        # collect all machine types except 'none', 'isapc', 'microvm'
++        # collect all machine types
+         with QEMUMachine(self.qemu_bin) as vm:
+             vm.launch()
+             machines = [m['name'] for m in vm.command('query-machines')]
+             vm.shutdown()
+ 
++        # ..and exclude non-relevant ones
+         machines = self.filter_machines(machines)
+ 
+         for dev_type in DEV_TYPES:
+-            # create the list of machine types and their parameters.
+-            mtypes = list()
++            # define expected parameters for each machine type
++            mt_expected_vals = dict()
+             for m in machines:
+                 if self.seg_max_adjust_enabled(m):
+                     enabled = 'true'
+                 else:
+                     enabled = 'false'
+-                mtypes.append({'name': m,
+-                               DEV_TYPES[dev_type]['seg_max_adjust']: enabled})
+ 
+-            # test each machine type for a device type
+-            for mt in mtypes:
+-                self.check_mt(mt, dev_type)
++                mt_expected_vals[m] = {
++                    DEV_TYPES[dev_type]['seg_max_adjust']: enabled }
++
++            # test each machine type
++            for mt in mt_expected_vals:
++                self.check_mt(mt, mt_expected_vals[mt], dev_type)
+-- 
+2.17.0
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1657538
-
-Title:
-  qemu 2.7.x 2.8 softmmu dont work on BE machine
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Build on Be machine qemu 2.7.1 and 2.8 in pure softmmu (tgc) dont work on=
- big endian hardware .
-  tested with ppc-softmmu,i386-softmmu,arm-softmmu same result:
-
-  with :
-   ./qemu-system-i386 =
-
-  Gtk-Message: Failed to load module "overlay-scrollbar"
-  qemu-system-i386: Trying to execute code outside RAM or ROM at 0x000a0000
-  This usually means one of the following happened:
-
-  (1) You told QEMU to execute a kernel for the wrong machine type, and it =
-crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb=
- QEMU machine)
-  (2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execu=
-ted a ROM full of no-op instructions until it fell off the end
-  (3) Your guest kernel has a bug and crashed by jumping off into nowhere
-
-  This is almost always one of the first two, so check your command line an=
-d that you are using the right type of kernel for this machine.
-  If you think option (3) is likely then you can try debugging your guest w=
-ith the -d debug options; in particular -d guest_errors will cause the log =
-to include a dump of the guest register state at this point.
-
-  Execution cannot continue; stopping here.
-
-  =
-
-  I try to add the -L option with ../pc-bios/bios.bin =
-
-  and have the same result.
-
-  note the ppc-softmmu and ppc64-softmmu work in kvm mode only emulated
-  mode have issue.
-
-  =
-
-  tested on my hardware a  Qriq P5040 and G5 4x970MP with Ubuntu Mate 16.10 =
-
-  thanks
-  Luigi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1657538/+subscriptions
 
