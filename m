@@ -2,97 +2,99 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95028C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 11:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0078BC352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 11:24:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 624F920714
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 11:20:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9667206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 11:23:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCsRoueV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 624F920714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nz6sUxsr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9667206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Tai-0007SO-JC
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 06:20:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43101)
+	id 1j1Te2-000237-Ua
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 06:23:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j1TZZ-0006Hl-0H
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:19:22 -0500
+ (envelope-from <mst@redhat.com>) id 1j1TcG-0000e2-PE
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:22:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j1TZW-0005Z3-OI
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:19:20 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29498
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1j1TcF-0008Ce-KT
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:22:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34774
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j1TZW-0005YQ-Jm
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:19:18 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j1TcF-0008BU-Ft
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 06:22:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581419958;
+ s=mimecast20190719; t=1581420126;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cOZVQxmhcACBiEyvfJiPPgEZwxwrY/rcJZro8baG7hs=;
- b=QCsRoueVIWrJl3qjH9mQp806sSAeK0JDrTEzFawXxjUDcexXhwuUem66dtWNyRrUP1EHNJ
- tmhJEO1YL5VPR47Yj+4FfdRjANc3o7LZaSYqrVq4mYYL/kWJlhoWkHHOdndrV0O5jLF6Yn
- +36D/GVjNErmDsVApSPaMUQ5URspn4o=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-BcJkP-C0PfW5RsexFj8DVQ-1; Tue, 11 Feb 2020 06:19:14 -0500
-Received: by mail-qv1-f71.google.com with SMTP id u11so6920991qvo.8
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 03:19:14 -0800 (PST)
+ bh=OB3uQLDzV7BgDA+zxgZp33eaQ6qrglR0t6JlSC7m9QQ=;
+ b=Nz6sUxsri296qu8ZMToJB4enKqxZWhaWW4ujIHS0zFqrGwCt1Qe9Znn0AQuFgfpQPgfNao
+ mFyy0VdjVRlGYCNYgbjpwqWvuk6QRjzK4nlTCIHcspRHpQxeIBRQFqIjX8KeT6GErOw1AH
+ txODnaZfyda2E2AQXUg2zxe20S0Dl5c=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-ba3r4u_oPFi7Qanc5ll7cw-1; Tue, 11 Feb 2020 06:22:02 -0500
+Received: by mail-qk1-f197.google.com with SMTP id y6so6837011qki.13
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 03:22:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=zSGk4DByZIhPCN8YAGetuggpX02PP2LILdI0T2sXvxE=;
- b=c8X2BN3OaXoqd/RkFb3MxSE9970rJtKcG9pQACFyx7AzqPpGWLX7ZrrGnvnjn/6DtL
- kl8JrJxULw8ldTOM3XFCWucVvk8CtrMU9QNNlhCtJNPF1U77Dyw7dzP6rb3uqXz35Ojl
- hnpvSGYSUZl+yFOB57H1Pn4tHfAEnL7sGzyqEKHd9FePuey6smeH7XpQB69kFZqmfmBe
- vxqt1tDsUzmTtLQDPZuPqsWrXQUwyS5G0noIURo8iwRRsMbUCdEB0jBr+2ublTdRYPvi
- mrVEuwhV0jNaPVi4/xXLSJgu3mUUyovs4IZsoHVt6aqlHSVsYslW/+Ub07dyPqvQgc9D
- IUjw==
-X-Gm-Message-State: APjAAAU5hN9Y2yaEb0C39kaFdtzuyesD6Z+TdpGW9hv8qDBsOKIMru6e
- JM4ZRNtAPTM5DlP4TeexLzmkzuE2gwmHgyyZeMaZVkczRFWqhxkQWOwQUCC6+7dE6wexE37zzt/
- mDDVlP9EjeRH/2og=
-X-Received: by 2002:a05:6214:118d:: with SMTP id
- t13mr2296515qvv.5.1581419953558; 
- Tue, 11 Feb 2020 03:19:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwYkabWO8BaOzkqEcEDtxnu6+npU98PB75JpNvCUUh3RdtmsBY+hd7Uve9DjDBn8TDJQxQngQ==
-X-Received: by 2002:a05:6214:118d:: with SMTP id
- t13mr2296501qvv.5.1581419953351; 
- Tue, 11 Feb 2020 03:19:13 -0800 (PST)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=uywzlgED9FQaejQMPT8+w69RgaNeWiLfzY9AcwWvmwg=;
+ b=hrxk3x0W5WR/zstwu/otevv8zGgyfWTB1hc1gXZBf2YZBXyQWoCcY1QJ9gKMC0SeC8
+ /a5zEIL3tHdEX647pLkeytu2EoSrdGSamYWPn6lDiRJeKXI7/bH5xWAjAGcBW3oTFbw/
+ mVUeG2teAY+7o6GblB5M1u6lqkjzGkY/9gacmR38h3OqrjCA7kymNwDs2xPkCd8dhqOY
+ uhdGYbTy3QUjx+w4NtXttrDno1e/LiNFVFFn8zGgndtj+dUKbbzOMtPUgE23weSQDPFI
+ QxSUBbcAJoaAa+WR/wZUIteMHpHJh754XbIgHFJ3sIanbWdHgkzK2CS3u45jBjL0U4b9
+ DLnA==
+X-Gm-Message-State: APjAAAWzeoUG+VZaSU5b8DelzLsVj7nJ1lHh9p6Tq47RcxKLFDm6Fjgf
+ fTKL5+h8iXjbCuFTxWGoY5YoEOw3KdLe9bIyLgbqIDyv26v//1FpeiG6yX+8ND9+opTjot1y/pj
+ Ocdhf5XmopW3klMM=
+X-Received: by 2002:a37:4a46:: with SMTP id x67mr5025567qka.160.1581420122033; 
+ Tue, 11 Feb 2020 03:22:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz25NYgqQ4RyqKjzgoUmmDztlCipwhKzeimR0ml6ZS/X3NzdSxMN8c8069qeqewBEMoFh327Q==
+X-Received: by 2002:a37:4a46:: with SMTP id x67mr5025556qka.160.1581420121807; 
+ Tue, 11 Feb 2020 03:22:01 -0800 (PST)
 Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id 73sm1920892qtg.40.2020.02.11.03.19.10
+ by smtp.gmail.com with ESMTPSA id t23sm1896118qto.88.2020.02.11.03.21.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 11 Feb 2020 03:19:12 -0800 (PST)
-Date: Tue, 11 Feb 2020 06:19:08 -0500
+ Tue, 11 Feb 2020 03:22:00 -0800 (PST)
+Date: Tue, 11 Feb 2020 06:21:56 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Zha Bin <zhabin@linux.alibaba.com>
-Subject: Re: [PATCH v2 2/5] virtio-mmio: refactor common functionality
-Message-ID: <20200211061758-mutt-send-email-mst@kernel.org>
+To: "Liu, Jing2" <jing2.liu@linux.intel.com>
+Subject: Re: [virtio-dev] Re: [PATCH v2 4/5] virtio-mmio: add MSI interrupt
+ feature support
+Message-ID: <20200211061932-mutt-send-email-mst@kernel.org>
 References: <cover.1581305609.git.zhabin@linux.alibaba.com>
- <0268807dc26ecdf5620de9000758d05ca0b21f3f.1581305609.git.zhabin@linux.alibaba.com>
+ <4c3d13be5a391b1fc50416838de57d903cbf8038.1581305609.git.zhabin@linux.alibaba.com>
+ <0c71ff9d-1a7f-cfd2-e682-71b181bdeae4@redhat.com>
+ <c42c8b49-5357-f341-2942-ba84afc25437@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <0268807dc26ecdf5620de9000758d05ca0b21f3f.1581305609.git.zhabin@linux.alibaba.com>
-X-MC-Unique: BcJkP-C0PfW5RsexFj8DVQ-1
+In-Reply-To: <c42c8b49-5357-f341-2942-ba84afc25437@linux.intel.com>
+X-MC-Unique: ba3r4u_oPFi7Qanc5ll7cw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,120 +106,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, slp@redhat.com, jasowang@redhat.com,
- jing2.liu@linux.intel.com, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
- chao.p.peng@linux.intel.com, gerry@linux.alibaba.com
+Cc: virtio-dev@lists.oasis-open.org, Zha Bin <zhabin@linux.alibaba.com>,
+ slp@redhat.com, Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
+ qemu-devel@nongnu.org, chao.p.peng@linux.intel.com, gerry@linux.alibaba.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 10, 2020 at 05:05:18PM +0800, Zha Bin wrote:
-> From: Liu Jiang <gerry@linux.alibaba.com>
+On Tue, Feb 11, 2020 at 11:35:43AM +0800, Liu, Jing2 wrote:
 >=20
-> Common functionality is refactored into virtio_mmio_common.h
-> in order to MSI support in later patch set.
+> On 2/11/2020 11:17 AM, Jason Wang wrote:
+> >=20
+> > On 2020/2/10 =E4=B8=8B=E5=8D=885:05, Zha Bin wrote:
+> > > From: Liu Jiang<gerry@linux.alibaba.com>
+> > >=20
+> > > Userspace VMMs (e.g. Qemu microvm, Firecracker) take advantage of usi=
+ng
+> > > virtio over mmio devices as a lightweight machine model for modern
+> > > cloud. The standard virtio over MMIO transport layer only supports on=
+e
+> > > legacy interrupt, which is much heavier than virtio over PCI transpor=
+t
+> > > layer using MSI. Legacy interrupt has long work path and causes speci=
+fic
+> > > VMExits in following cases, which would considerably slow down the
+> > > performance:
+> > >=20
+> > > 1) read interrupt status register
+> > > 2) update interrupt status register
+> > > 3) write IOAPIC EOI register
+> > >=20
+> > > We proposed to add MSI support for virtio over MMIO via new feature
+> > > bit VIRTIO_F_MMIO_MSI[1] which increases the interrupt performance.
+> > >=20
+> > > With the VIRTIO_F_MMIO_MSI feature bit supported, the virtio-mmio MSI
+> > > uses msi_sharing[1] to indicate the event and vector mapping.
+> > > Bit 1 is 0: device uses non-sharing and fixed vector per event mappin=
+g.
+> > > Bit 1 is 1: device uses sharing mode and dynamic mapping.
+> >=20
+> >=20
+> > I believe dynamic mapping should cover the case of fixed vector?
+> >=20
+> Actually this bit *aims* for msi sharing or msi non-sharing.
 >=20
-> Signed-off-by: Liu Jiang <gerry@linux.alibaba.com>
-> Co-developed-by: Zha Bin <zhabin@linux.alibaba.com>
-> Signed-off-by: Zha Bin <zhabin@linux.alibaba.com>
-> Co-developed-by: Jing Liu <jing2.liu@linux.intel.com>
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
-> Co-developed-by: Chao Peng <chao.p.peng@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> It means, when msi sharing bit is 1, device doesn't want vector per queue
+>=20
+> (it wants msi vector sharing as name) and doesn't want a high interrupt
+> rate.
+>=20
+> So driver turns to !per_vq_vectors and has to do dynamical mapping.
+>=20
+> So they are opposite not superset.
+>=20
+> Thanks!
+>=20
+> Jing
 
-What does this proliferation of header files achieve?
-common with what?
+what's the point of all this flexibility? the cover letter
+complains about the code size of pci, then you go back
+and add a ton of options with no justification.
 
-> ---
->  drivers/virtio/virtio_mmio.c        | 21 +--------------------
->  drivers/virtio/virtio_mmio_common.h | 31 +++++++++++++++++++++++++++++++
->  2 files changed, 32 insertions(+), 20 deletions(-)
->  create mode 100644 drivers/virtio/virtio_mmio_common.h
+
+
 >=20
-> diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-> index 1733ab97..41e1c93 100644
-> --- a/drivers/virtio/virtio_mmio.c
-> +++ b/drivers/virtio/virtio_mmio.c
-> @@ -61,13 +61,12 @@
->  #include <linux/io.h>
->  #include <linux/list.h>
->  #include <linux/module.h>
-> -#include <linux/platform_device.h>
->  #include <linux/slab.h>
->  #include <linux/spinlock.h>
-> -#include <linux/virtio.h>
->  #include <linux/virtio_config.h>
->  #include <uapi/linux/virtio_mmio.h>
->  #include <linux/virtio_ring.h>
-> +#include "virtio_mmio_common.h"
-> =20
-> =20
-> =20
-> @@ -77,24 +76,6 @@
-> =20
-> =20
-> =20
-> -#define to_virtio_mmio_device(_plat_dev) \
-> -=09container_of(_plat_dev, struct virtio_mmio_device, vdev)
-> -
-> -struct virtio_mmio_device {
-> -=09struct virtio_device vdev;
-> -=09struct platform_device *pdev;
-> -
-> -=09void __iomem *base;
-> -=09unsigned long version;
-> -
-> -=09/* a list of queues so we can dispatch IRQs */
-> -=09spinlock_t lock;
-> -=09struct list_head virtqueues;
-> -
-> -=09unsigned short notify_base;
-> -=09unsigned short notify_multiplier;
-> -};
-> -
->  struct virtio_mmio_vq_info {
->  =09/* the actual virtqueue */
->  =09struct virtqueue *vq;
-> diff --git a/drivers/virtio/virtio_mmio_common.h b/drivers/virtio/virtio_=
-mmio_common.h
-> new file mode 100644
-> index 0000000..90cb304
-> --- /dev/null
-> +++ b/drivers/virtio/virtio_mmio_common.h
-> @@ -0,0 +1,31 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +#ifndef _DRIVERS_VIRTIO_VIRTIO_MMIO_COMMON_H
-> +#define _DRIVERS_VIRTIO_VIRTIO_MMIO_COMMON_H
-> +/*
-> + * Virtio MMIO driver - common functionality for all device versions
-> + *
-> + * This module allows virtio devices to be used over a memory-mapped dev=
-ice.
-> + */
-> +
-> +#include <linux/platform_device.h>
-> +#include <linux/virtio.h>
-> +
-> +#define to_virtio_mmio_device(_plat_dev) \
-> +=09container_of(_plat_dev, struct virtio_mmio_device, vdev)
-> +
-> +struct virtio_mmio_device {
-> +=09struct virtio_device vdev;
-> +=09struct platform_device *pdev;
-> +
-> +=09void __iomem *base;
-> +=09unsigned long version;
-> +
-> +=09/* a list of queues so we can dispatch IRQs */
-> +=09spinlock_t lock;
-> +=09struct list_head virtqueues;
-> +
-> +=09unsigned short notify_base;
-> +=09unsigned short notify_multiplier;
-> +};
-> +
-> +#endif
-> --=20
-> 1.8.3.1
+> > Thanks
+> >=20
+> >=20
+> >=20
+> > ---------------------------------------------------------------------
+> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> >=20
 
 
