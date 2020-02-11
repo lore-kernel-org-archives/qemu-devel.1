@@ -2,106 +2,74 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4866AC352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:40:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52508C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:42:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 151D420708
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:40:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VA5G/Ctk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 151D420708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 27BE7206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 14:42:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27BE7206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Wid-0001km-8h
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:40:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52891)
+	id 1j1Wk4-0002wG-BH
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 09:42:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j1Whx-00015p-Gb
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:40:14 -0500
+ (envelope-from <bounces@canonical.com>) id 1j1Wiz-0002EB-V4
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:41:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j1Whw-000148-Es
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:40:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48388
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1Whw-00013t-BN
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:40:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581432012;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TcFr0cnrHTTAW4AH1D/MKWrrR3+FcPd/pBf9B7yu9j4=;
- b=VA5G/CtkyOYzfiXyxNsssqSaTQV8S3StyFvDA5xjL/gFXg/kAx6IUBSL6mGUqgjpNMD5k8
- EVBXTmNJ+RR/kVqcL2WVKFLGrtFdZitB7ABJHoxNnZG0qVdj7OhYHWrAoOYqm5YyU3py2y
- HdL9Kg1+6FybaFNlc/lh/uaySCZAOMs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-RtkcCOzUNqSmF_M1wA2eqQ-1; Tue, 11 Feb 2020 09:40:10 -0500
-Received: by mail-wm1-f70.google.com with SMTP id b133so1189010wmb.2
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 06:40:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=w8YDB+nFDe6ADUNWgnur2rvXmvOWjWGVkhRTlCgwGvI=;
- b=XYChjPxKbz4bGkAjpt652K0D0EygMbXByRJLL+etWMK8pJFtmvcQr+Piwx63uJqzuh
- ydZjVEM0qDRKE9e5ZhZLfXeNVtjusDJBDhhfM8fb8JAkAuY3CjQR6MZxXZ16XKgH4A6C
- gkrubFNHvOqIJWmVvimlS6VEK4emtaycVqNgtZgCJf3R1LXdW7zOx22k1s49Z6iqMZTi
- hE2uvU1DrUkbIUULIe01eVrfd8mWKJBU0CqgLaUJzwq0elDBazU1BDOwT6K2Q6tH4eyI
- zZwVtJavMkTnGp5L5BYhQDDyQfnMrLY3TytUOz/I2gR41+GWbqBS615UpRgjqlr+3Zda
- gL7w==
-X-Gm-Message-State: APjAAAXmDCBe8MeTXMPybEetYoo61cEvAplBLj6Zu6katB/7op6XnNqv
- nVQDXPXD/elmUEVtqRdlMRHymRkFRo57MiK50M7oWPGfs7MXcHMQ4SelRhO7HdcPU+1hyWTZ31F
- VwBwT8unzfwOskTw=
-X-Received: by 2002:a7b:cb86:: with SMTP id m6mr6213639wmi.51.1581432009265;
- Tue, 11 Feb 2020 06:40:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxaVSJqrFNGII4KM5bpRI7IQ+VHLqzAfopQ244HJx8ONjA86PZUDmr/ZsDqMr7ftrl46gKmDA==
-X-Received: by 2002:a7b:cb86:: with SMTP id m6mr6213618wmi.51.1581432009089;
- Tue, 11 Feb 2020 06:40:09 -0800 (PST)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
- [88.26.246.243])
- by smtp.gmail.com with ESMTPSA id d22sm3939686wmd.39.2020.02.11.06.40.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 11 Feb 2020 06:40:08 -0800 (PST)
-Subject: Re: [RFC PATCH 55/66] Hexagon HVX import instruction encodings
-To: Taylor Simpson <tsimpson@quicinc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1581381644-13678-1-git-send-email-tsimpson@quicinc.com>
- <1581381644-13678-56-git-send-email-tsimpson@quicinc.com>
- <fd38e134-8314-f206-9a04-0e41119105f6@redhat.com>
- <BYAPR02MB48865F7264F3F5B2D8735385DE180@BYAPR02MB4886.namprd02.prod.outlook.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0541dc03-b3f8-8612-9921-e1df9546ce87@redhat.com>
-Date: Tue, 11 Feb 2020 15:40:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <bounces@canonical.com>) id 1j1Wiy-0001RY-Sg
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:41:17 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45342)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j1Wiy-0001R6-NT
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 09:41:16 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j1Wiw-0000tk-HM
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:41:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 66EF52E80C8
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 14:41:14 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB48865F7264F3F5B2D8735385DE180@BYAPR02MB4886.namprd02.prod.outlook.com>
-Content-Language: en-US
-X-MC-Unique: RtkcCOzUNqSmF_M1wA2eqQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Feb 2020 14:34:04 -0000
+From: Thomas Huth <1661815@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: shqking th-huth
+X-Launchpad-Bug-Reporter: shqking (shqking)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20170204082040.20702.26524.malonedeb@gac.canonical.com>
+Message-Id: <158143164456.4193.17045622028698450853.malone@soybean.canonical.com>
+Subject: [Bug 1661815] Re: Stack address is returned from function
+ translate_one
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="0a62c17273454a1313f81a74a2198ec30b44c7b6";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3244471e83f35aee0ea6e4b0a570da0864ebaf9b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -110,76 +78,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
+Reply-To: Bug 1661815 <1661815@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/11/20 3:35 PM, Taylor Simpson wrote:
-> Hi Philippe,
->=20
-> Thanks for all your feedback.  I' get your comments addressed soon.
->=20
-> I'm sorry you had trouble applying this patch.
+Fixed here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D344a7f656e8d211cdd6e
 
-No problem.
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-> The target/hexagon/imported/encode.def should have been created by patch =
-17.  Did you apply that one?
+-- =
 
-Ah, I haven't received patch #17, and can't find it on the list.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1661815
 
->=20
-> Taylor
->=20
->=20
->=20
->> -----Original Message-----
->> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Sent: Tuesday, February 11, 2020 1:02 AM
->> To: Taylor Simpson <tsimpson@quicinc.com>; qemu-devel@nongnu.org
->> Cc: richard.henderson@linaro.org; laurent@vivier.eu; riku.voipio@iki.fi;
->> aleksandar.m.mail@gmail.com
->> Subject: Re: [RFC PATCH 55/66] Hexagon HVX import instruction encodings
->>
->>> +#define EXTNAME mmvec
->>> +#include "mmvec/encode_ext.def"
->>> +#undef EXTNAME
->>> diff --git a/target/hexagon/imported/encode.def
->> b/target/hexagon/imported/encode.def
->>> index 33c3396..d1b3510 100644
->>> --- a/target/hexagon/imported/encode.def
->>> +++ b/target/hexagon/imported/encode.def
->>> @@ -71,6 +71,7 @@
->>>
->>>    #include "encode_pp.def"
->>>    #include "encode_subinsn.def"
->>> +#include "allextenc.def"
->>>
->>>    #ifdef __SELF_DEF_FIELD32
->>>    #undef __SELF_DEF_FIELD32
->>
->> I had a problem applying this one:
->>
->> Applying: Hexagon HVX import instruction encodings
->> error: target/hexagon/imported/encode.def: does not exist in index
->> Patch failed at 0054 Hexagon HVX import instruction encodings
->> hint: Use 'git am --show-current-patch' to see the failed patch
->> When you have resolved this problem, run "git am --continue".
->> If you prefer to skip this patch, run "git am --skip" instead.
->> To restore the original branch and stop patching, run "git am --abort".
->>
->> Resolved by doing:
->>
->> (review/hexagon|AM 54/65)$ touch target/hexagon/imported/encode.def
->> (review/hexagon|AM 54/65)$ git add target/hexagon/imported/encode.def
->> (review/hexagon|AM 54/65)$ git am --continue
->> Applying: Hexagon HVX import instruction encodings
->> Applying: Hexagon HVX import semantics
->> ...
->=20
+Title:
+  Stack address is returned from function translate_one
 
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  The vulnerable version is qemu-2.8.0, and the vulnerable function is
+  in "target-s390x/translate.c".
+
+  The code snippet is as following.
+
+  static ExitStatus translate_one(CPUS390XState *env, DisasContext *s)
+  {
+      const DisasInsn *insn;
+      ExitStatus ret =3D NO_EXIT;
+      DisasFields f;
+      ...
+      s->fields =3D &f;
+      ...
+      s->pc =3D s->next_pc;
+      return ret;
+  }
+
+  A stack address, i.e. the address of local variable "f" is returned
+  from current function through the output parameter "s->fields" as a
+  side effect.
+
+  This issue is one kind of undefined behaviors, according the C
+  Standard, 6.2.4 [ISO/IEC 9899:2011]
+  (https://www.securecoding.cert.org/confluence/display/c/DCL30-C.+Declare+=
+objects+with+appropriate+storage+durations)
+
+  This dangerous defect may lead to an exploitable vulnerability.
+  We suggest sanitizing "s->fields" as null before return.
+
+  Note that this issue is reported by shqking and Zhenwei Zou together.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1661815/+subscriptions
 
