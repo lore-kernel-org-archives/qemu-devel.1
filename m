@@ -2,63 +2,77 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DATE_IN_FUTURE_06_12,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29FC6C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD13FC352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:43:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 000EF2086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:23:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 000EF2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id A800B206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 09:43:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xe+9LSOO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A800B206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Rlq-0002ia-5K
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 04:23:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59365)
+	id 1j1S57-0001lh-TL
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 04:43:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chao.p.peng@linux.intel.com>) id 1j1RlH-0002Fc-SS
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:23:20 -0500
+ (envelope-from <thuth@redhat.com>) id 1j1S4K-0001BQ-W8
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:43:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chao.p.peng@linux.intel.com>) id 1j1RlG-0003cW-QV
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:23:19 -0500
-Received: from mga14.intel.com ([192.55.52.115]:5534)
+ (envelope-from <thuth@redhat.com>) id 1j1S4I-000414-DF
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:42:59 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35402
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chao.p.peng@linux.intel.com>)
- id 1j1RlG-0003aN-IL
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:23:18 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Feb 2020 01:23:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; d="scan'208";a="380377287"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.106])
- by orsmga004.jf.intel.com with ESMTP; 11 Feb 2020 01:23:13 -0800
-Date: Tue, 11 Feb 2020 16:05:41 +0000
-From: Chao Peng <chao.p.peng@linux.intel.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v2 0/5] virtio mmio specification enhancement
-Message-ID: <20200211160541.GA37446@chaop.bj.intel.com>
-References: <cover.1581305609.git.zhabin@linux.alibaba.com>
- <20200210062938-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200210062938-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1j1S4I-000407-0v
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 04:42:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581414177;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=fIjYrrtUzBal1nZOu55Pn0+XsFHbnXkUGqNALwbaVL0=;
+ b=Xe+9LSOOh84dMyZUt5M4ohOXIDtEdKBwXA1+jLa4FIWAZZ1lFA7zbIcdGFnm2qKJzm17Ww
+ 4RoI/kjHOU6AOaJP1P2OFvVuprsrvkVEsjElujSGuMXoykZvJ7xHUqMhtvpm20BeHIM4XR
+ vbHbVrJO7KKWHnxjU9EYPyR8cjDz6KU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-NMufFWx-M-mjWaUoX-a5ww-1; Tue, 11 Feb 2020 04:42:52 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1018B10054E3;
+ Tue, 11 Feb 2020 09:42:51 +0000 (UTC)
+Received: from thuth.com (ovpn-116-131.ams2.redhat.com [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E348E5C100;
+ Tue, 11 Feb 2020 09:42:42 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH] tests/acceptance: Add boot tests for sh4 and mips64 QEMU
+ advent calendar images
+Date: Tue, 11 Feb 2020 10:42:39 +0100
+Message-Id: <20200211094239.20725-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: NMufFWx-M-mjWaUoX-a5ww-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,78 +84,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-Cc: virtio-dev@lists.oasis-open.org, Zha Bin <zhabin@linux.alibaba.com>,
- slp@redhat.com, jasowang@redhat.com, jing2.liu@linux.intel.com,
- linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, gerry@linux.alibaba.com
+Cc: Magnus Damm <magnus.damm@gmail.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 10, 2020 at 06:44:50AM -0500, Michael S. Tsirkin wrote:
-> On Mon, Feb 10, 2020 at 05:05:16PM +0800, Zha Bin wrote:
-> > We have compared the number of files and the lines of code between
-> > virtio-mmio and virio-pci.
-> > 
-> > 				Virtio-PCI	    Virtio-MMIO	
-> > 	number of files(Linux)	    161			1
-> > 	lines of code(Linux)	    78237		538
-> 
-> 
-> 
-> Something's very wrong here. virtio PCI is 161 files?
-> Are you counting the whole PCI subsystem?
+Now that we can select the second serial console in the acceptance tests
+(see commit 746f244d9720 "Allow to use other serial consoles than default")=
+,
+we can also test the sh4 image from the QEMU advent calendar 2018.
 
-Right, that is just a rough statistics. Surely enough, some drivers will
-never get enabled in a typcial config.
+And another recent commit (ec860426dfbe "Fix handling of LL/SC instructions=
+")
+fixed a problem with qemu-system-mips64, so the mips64 from the advent
+calendar now works again and can be used for acceptance testing, too.
 
-> Sure enough:
-> 
-> $ find drivers/pci -name '*c' |wc -l
-> 150
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .travis.yml                            |  2 +-
+ tests/acceptance/boot_linux_console.py | 23 +++++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 3 deletions(-)
 
-and plus:
-$ find arch/x86/pci/ -name '*c' |wc -l
-22
+diff --git a/.travis.yml b/.travis.yml
+index 5887055951..71a0097878 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -313,7 +313,7 @@ matrix:
+     # Acceptance (Functional) tests
+     - name: "GCC check-acceptance"
+       env:
+-        - CONFIG=3D"--target-list=3Daarch64-softmmu,alpha-softmmu,arm-soft=
+mmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-sof=
+tmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86=
+_64-softmmu,xtensa-softmmu"
++        - CONFIG=3D"--target-list=3Daarch64-softmmu,alpha-softmmu,arm-soft=
+mmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64-softmmu,mips64el-so=
+ftmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sh=
+4-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
+         - TEST_CMD=3D"make check-acceptance"
+       after_script:
+         - python3 -c 'import json; r =3D json.load(open("tests/results/lat=
+est/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"=
+] not in ("PASS", "SKIP")]' | xargs cat
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
+_linux_console.py
+index 34d37eba3b..a38ee004b1 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -591,12 +591,12 @@ class BootLinuxConsole(Test):
+         console_pattern =3D 'No filesystem could mount root'
+         self.wait_for_console_pattern(console_pattern)
+=20
+-    def do_test_advcal_2018(self, day, tar_hash, kernel_name):
++    def do_test_advcal_2018(self, day, tar_hash, kernel_name, console=3D0)=
+:
+         tar_url =3D ('https://www.qemu-advent-calendar.org'
+                    '/2018/download/day' + day + '.tar.xz')
+         file_path =3D self.fetch_asset(tar_url, asset_hash=3Dtar_hash)
+         archive.extract(file_path, self.workdir)
+-        self.vm.set_console()
++        self.vm.set_console(console_index=3Dconsole)
+         self.vm.add_args('-kernel',
+                          self.workdir + '/day' + day + '/' + kernel_name)
+         self.vm.launch()
+@@ -670,6 +670,25 @@ class BootLinuxConsole(Test):
+         self.vm.add_args('-M', 'graphics=3Doff')
+         self.do_test_advcal_2018('15', tar_hash, 'invaders.elf')
+=20
++    def test_mips64_malta(self):
++        """
++        :avocado: tags=3Darch:mips64
++        :avocado: tags=3Dmachine:malta
++        :avocado: tags=3Dendian:big
++        """
++        tar_hash =3D '81b030201ec3f28cb1925297f6017d3a20d7ced5'
++        self.vm.add_args('-hda', self.workdir + '/day22/' + 'ri-li.qcow2',
++                         '-append', 'root=3D/dev/hda')
++        self.do_test_advcal_2018('22', tar_hash, 'vmlinux')
++
++    def test_sh4_r2d(self):
++        """
++        :avocado: tags=3Darch:sh4
++        :avocado: tags=3Dmachine:r2d
++        """
++        tar_hash =3D 'fe06a4fd8ccbf2e27928d64472939d47829d4c7e'
++        self.do_test_advcal_2018('09', tar_hash, 'zImage', console=3D1)
++
+     def test_sparc_ss20(self):
+         """
+         :avocado: tags=3Darch:sparc
+--=20
+2.18.1
 
-> 
-> That's not reasonable, this includes a bunch of drivers that
-> never run on a typical hypervisor.
-> 
-> MMIO is also not as small as you are trying to show:
-> 
-> $ cloc drivers/virtio/virtio_mmio.c include/uapi/linux/virtio_mmio.h
->        2 text files.
->        2 unique files.                              
->        0 files ignored.
-> 
-> github.com/AlDanial/cloc v 1.82  T=0.01 s (230.7 files/s, 106126.5 lines/s)
-> -------------------------------------------------------------------------------
-> Language                     files          blank        comment           code
-> -------------------------------------------------------------------------------
-> C                                1            144            100            535
-> C/C++ Header                     1             39             66             36
-> -------------------------------------------------------------------------------
-> SUM:                             2            183            166            571
-> -------------------------------------------------------------------------------
-> 
-> 
-> I don't doubt MMIO is smaller than PCI. Of course that's because it has
-> no features to speak of - just this patch already doubles it's size. If
-> we keep doing that because we want the features then they will reach
-> the same size in about 4 iterations.
-
-Since current virtio-mmio size is small enough, so adding any notable
-feature would easily double it. I have no objection that it may one day
-reach the same level of PCI, but in this patch some are actually
-generic changes and for MSI specific code we provide the option to
-confige away.
-
-Thanks,
-Chao
-
-> 
-> 
-> -- 
-> MST
 
