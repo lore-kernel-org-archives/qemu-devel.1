@@ -2,97 +2,81 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EA94C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7879C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09AED2082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:33:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 922042082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 15:35:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eBqFYcpy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09AED2082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TCk96Zrv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 922042082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1XXa-0002kM-8b
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 10:33:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44247)
+	id 1j1XZ1-0003tO-OY
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 10:35:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44561)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j1XWQ-0001qP-U0
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:32:24 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j1XYC-0003IN-VW
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:34:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j1XWP-0002sm-8Z
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:32:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27417
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1XWP-0002rd-45
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:32:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581435140;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9p7W8vCwgbs6Z24ZZ/d+o9d2u4NmLyjWKbsRozZS0B4=;
- b=eBqFYcpyXDHPssfVvawV9L2f6Eed5w9dwMUxm5Cs4Ca+fciarWnu2K0sl/vKowx/aFRX+/
- wSrnDBmLICaCNUxTU2tcUrt1KZn5uHtrkT1u+RvpVGKycwzJ4mbQMLqlKZbwnv7S24GOeE
- CyELCIzmzSv1lkOtwzscYNsUFCVG+HE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-GYbn-70FPXSOiGU6TwGczg-1; Tue, 11 Feb 2020 10:32:18 -0500
-Received: by mail-wm1-f70.google.com with SMTP id t17so1562041wmi.7
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 07:32:18 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1j1XYB-0003V7-Pl
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:34:12 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33518)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j1XYB-0003Ue-JT
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 10:34:11 -0500
+Received: by mail-ot1-x343.google.com with SMTP id b18so10516534otp.0
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 07:34:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=SC8tyGtOpHm57sc5gE2Q5QspKh0iTcK1s5Xp662IVFM=;
+ b=TCk96ZrvyLxBaska0vmDd8zhDDHL32wBx+GpxMYTZh8GrXAN9fDOQBd1PEOty+f6T1
+ vfDUvSX7ZHSIiW/dbUiu5BMA8AsYLDvPMAl3KLhhnRuE1TYR3JUUyzsXs9/FERrXgIQ0
+ /h6Pefrk7ao03J/OG9iA2qBYvgOMpcFGgqXYgfHA21BfmH6nNBBSJsupWnyc35MF4cQt
+ I8R7/t3gExWR92oy3Iq+GfwPHqZcUaB5OKtpOO6IHn8eA5fvKa05yhOpYh2QwK871uvQ
+ /kYmRzNk5o1EnbkPGwBpLr5Rl4nVsGM4Zwf9kXtwvubhbFB1qChTuxErjCDDkSUp6RrX
+ pe5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9p7W8vCwgbs6Z24ZZ/d+o9d2u4NmLyjWKbsRozZS0B4=;
- b=r+p0qENCWSBi/MoLpssDBaRhiVtApx2gnC/NsFpcOMBmiA8aChNC4qzwvnTFplgAbt
- 0N8p6Jmgezap1dwEPskTVTJYgaiF9ylTHmUDZQhV1hhLeJaSbzS+lavAMnZ7ULeJF4Xp
- H6MlmdqQJOLICz0i2d/7aX7o4EGRC4/4znIYIPEXZ+t7ZTCv/IBAhDO3wLMOE4vU6WhT
- 8+U1HKXFImO2FxPErl3kcI9G9wwL4JZpcrNADiwloNYTr871Etom8veS3v3hTu8lrTor
- xZ+Y8CNewINacO1okpq0LKuAbbDtQiU0KYas+DA8kHCCr/HSHch1IwSASml4i4wq88oD
- 0ZPw==
-X-Gm-Message-State: APjAAAXobx+LeGB5Q/0VA7ut1lCge0kLKlp0tXNTQDUcq3HVGnDkaFCx
- HUlGodieIgHfdHxSznJAoMWsl+jeM17xG6FbagLM1BXaUc4uc/23Ieu4CgM5c7YEaF3D2ibSj/w
- rjI2nUqatiN9xIbE=
-X-Received: by 2002:a5d:6646:: with SMTP id f6mr9748899wrw.276.1581435137407; 
- Tue, 11 Feb 2020 07:32:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzZ8UKqCcAYJWUin5du2aWHq/4ffUuKvvWRb03xiiVUPkSiifbOQe3Qf6VMMjIf5Zz02UNPdQ==
-X-Received: by 2002:a5d:6646:: with SMTP id f6mr9748884wrw.276.1581435137181; 
- Tue, 11 Feb 2020 07:32:17 -0800 (PST)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
- [88.26.246.243])
- by smtp.gmail.com with ESMTPSA id g79sm4026392wme.17.2020.02.11.07.32.16
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 11 Feb 2020 07:32:16 -0800 (PST)
-Subject: Re: [RFC PATCH 00/66] Hexagon patch series
-To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
-References: <1581381644-13678-1-git-send-email-tsimpson@quicinc.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cc5cf589-f27e-151e-964b-6a263e2f668d@redhat.com>
-Date: Tue, 11 Feb 2020 16:32:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SC8tyGtOpHm57sc5gE2Q5QspKh0iTcK1s5Xp662IVFM=;
+ b=PZ9NJelKWAg1gf8hykdinrCnKBGOKzythrgT2+ZCaqu9VQSByNdhqIRJ7n2JC4yGlE
+ losx4t17SnPLtRHAs8gezuyyzgcmjlViiYY/ZWUXdAlBkpoQkxRnRShVmvgQBzoQX0bq
+ 9YMeaW9WdPpI6Nxwv4JPs8jHoCvfETFvJJoSTF25loDi5CVPL38yPy6D5E/GO9NEgWEV
+ KFUnkbujxgbB96jYhtI5mkukckvft2GoeTDPghP5Bq+Y1CZAh1uV/al5Baxxku/OdUQD
+ izLT+VWdY9XlM2NexvlGWoJGuv1NQD7sWL0yRcp9XiSq7V3OAXg/eQZ9jjxiSNser8D1
+ bIfw==
+X-Gm-Message-State: APjAAAV6OsBv1SBB03nOC5LGM/KhJ/L6ldO0EyhhWE1NyhBpARF+dHSg
+ aCJhAvH0xottThz16mysNjiZs8yIWikG7803cZ13zg==
+X-Google-Smtp-Source: APXvYqxhAKVjdI+Q5/kjVBzMiDyMQfHBUGw1YvkgVaqNl4hsrZJ80QL4YuEgtGr+aDxrHsLz9SA+9eBupzonnI/zSlM=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr5759307ota.232.1581435250516; 
+ Tue, 11 Feb 2020 07:34:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1581381644-13678-1-git-send-email-tsimpson@quicinc.com>
-Content-Language: en-US
-X-MC-Unique: GYbn-70FPXSOiGU6TwGczg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20200130112510.15154-1-eric.auger@redhat.com>
+ <20200130112510.15154-5-eric.auger@redhat.com>
+In-Reply-To: <20200130112510.15154-5-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Feb 2020 15:33:59 +0000
+Message-ID: <CAFEAcA9rsncts+s4tVn4tY4zaMHKeqyJj1O4J=Ufx33fb=Nrcg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v2 4/9] arm: pmu: Check Required Event
+ Support
+To: Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,118 +88,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu,
- aleksandar.m.mail@gmail.com
+Cc: Andrew Jones <drjones@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ Marc Zyngier <maz@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Andre Przywara <andre.przywara@arm.com>,
+ Andrew Murray <andrew.murray@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Taylor,
+On Thu, 30 Jan 2020 at 11:25, Eric Auger <eric.auger@redhat.com> wrote:
+>
+> If event counters are implemented check the common events
+> required by the PMUv3 are implemented.
+>
+> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+> either INST_RETIRED or INST_SPEC). Some others only are
+> required if the implementation implements some other features.
+>
+> Check those wich are unconditionally required.
+>
+> This test currently fails on TCG as neither INST_RETIRED
+> or INST_SPEC are supported.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+>
 
-On 2/11/20 1:39 AM, Taylor Simpson wrote:
-> This series adds support for the Hexagon processor with Linux user support
-> 
-[...]>   MAINTAINERS                                  |    8 +
->   configure                                    |    9 +
->   default-configs/hexagon-linux-user.mak       |    1 +
->   disas/Makefile.objs                          |    1 +
->   disas/hexagon.c                              |   56 +
->   include/disas/dis-asm.h                      |    1 +
->   include/elf.h                                |    2 +
->   linux-user/elfload.c                         |   16 +
->   linux-user/hexagon/cpu_loop.c                |  173 ++
->   linux-user/hexagon/signal.c                  |  276 ++
->   linux-user/hexagon/sockbits.h                |   18 +
->   linux-user/hexagon/syscall_nr.h              |  346 +++
->   linux-user/hexagon/target_cpu.h              |   44 +
->   linux-user/hexagon/target_elf.h              |   38 +
->   linux-user/hexagon/target_fcntl.h            |   18 +
->   linux-user/hexagon/target_signal.h           |   34 +
->   linux-user/hexagon/target_structs.h          |   46 +
->   linux-user/hexagon/target_syscall.h          |   32 +
->   linux-user/hexagon/termbits.h                |   18 +
->   linux-user/syscall.c                         |    2 +
->   linux-user/syscall_defs.h                    |   33 +
->   scripts/qemu-binfmt-conf.sh                  |    6 +-
->   target/hexagon/Makefile.objs                 |  109 +
->   target/hexagon/arch.c                        |  664 +++++
->   target/hexagon/arch.h                        |   62 +
->   target/hexagon/attribs.h                     |   32 +
->   target/hexagon/attribs_def.h                 |  404 +++
->   target/hexagon/conv_emu.c                    |  370 +++
->   target/hexagon/conv_emu.h                    |   50 +
->   target/hexagon/cpu-param.h                   |   26 +
->   target/hexagon/cpu.c                         |  356 +++
->   target/hexagon/cpu.h                         |  207 ++
->   target/hexagon/cpu_bits.h                    |   37 +
->   target/hexagon/decode.c                      |  792 +++++
->   target/hexagon/decode.h                      |   39 +
->   target/hexagon/dectree.py                    |  354 +++
->   target/hexagon/do_qemu.py                    | 1198 ++++++++
->   target/hexagon/fma_emu.c                     |  918 ++++++
->   target/hexagon/fma_emu.h                     |   30 +
->   target/hexagon/gdbstub.c                     |  111 +
->   target/hexagon/gen_dectree_import.c          |  205 ++
->   target/hexagon/gen_semantics.c               |  101 +
->   target/hexagon/genptr.c                      |   62 +
->   target/hexagon/genptr.h                      |   25 +
->   target/hexagon/genptr_helpers.h              | 1022 +++++++
->   target/hexagon/helper.h                      |   38 +
->   target/hexagon/helper_overrides.h            | 1850 ++++++++++++
->   target/hexagon/hex_arch_types.h              |   42 +
->   target/hexagon/hex_regs.h                    |   97 +
->   target/hexagon/iclass.c                      |  109 +
->   target/hexagon/iclass.h                      |   46 +
->   target/hexagon/imported/allext.idef          |   25 +
->   target/hexagon/imported/allext_macros.def    |   25 +
->   target/hexagon/imported/allextenc.def        |   20 +
->   target/hexagon/imported/allidefs.def         |   92 +
->   target/hexagon/imported/alu.idef             | 1335 +++++++++
->   target/hexagon/imported/branch.idef          |  344 +++
->   target/hexagon/imported/compare.idef         |  639 +++++
->   target/hexagon/imported/encode.def           |  126 +
->   target/hexagon/imported/encode_pp.def        | 2283 +++++++++++++++
->   target/hexagon/imported/encode_subinsn.def   |  150 +
->   target/hexagon/imported/float.idef           |  498 ++++
->   target/hexagon/imported/iclass.def           |   52 +
->   target/hexagon/imported/ldst.idef            |  421 +++
->   target/hexagon/imported/macros.def           | 3970 ++++++++++++++++++++++++++
->   target/hexagon/imported/mmvec/encode_ext.def |  830 ++++++
->   target/hexagon/imported/mmvec/ext.idef       | 2809 ++++++++++++++++++
->   target/hexagon/imported/mmvec/macros.def     | 1110 +++++++
->   target/hexagon/imported/mpy.idef             | 1269 ++++++++
->   target/hexagon/imported/shift.idef           | 1211 ++++++++
->   target/hexagon/imported/subinsns.idef        |  152 +
->   target/hexagon/imported/system.idef          |  302 ++
->   target/hexagon/insn.h                        |  149 +
->   target/hexagon/internal.h                    |   54 +
->   target/hexagon/macros.h                      | 1499 ++++++++++
->   target/hexagon/mmvec/decode_ext_mmvec.c      |  673 +++++
->   target/hexagon/mmvec/decode_ext_mmvec.h      |   24 +
->   target/hexagon/mmvec/macros.h                |  668 +++++
->   target/hexagon/mmvec/mmvec.h                 |   87 +
->   target/hexagon/mmvec/system_ext_mmvec.c      |  265 ++
->   target/hexagon/mmvec/system_ext_mmvec.h      |   38 +
->   target/hexagon/op_helper.c                   |  507 ++++
->   target/hexagon/opcodes.c                     |  223 ++
->   target/hexagon/opcodes.h                     |   67 +
->   target/hexagon/printinsn.c                   |   93 +
->   target/hexagon/printinsn.h                   |   26 +
->   target/hexagon/q6v_decode.c                  |  416 +++
->   target/hexagon/reg_fields.c                  |   28 +
->   target/hexagon/reg_fields.h                  |   40 +
->   target/hexagon/reg_fields_def.h              |  109 +
->   target/hexagon/regmap.h                      |   38 +
->   target/hexagon/translate.c                   |  906 ++++++
->   target/hexagon/translate.h                   |  112 +
->   tests/tcg/configure.sh                       |    4 +-
->   tests/tcg/hexagon/float_convs.ref            |  748 +++++
->   tests/tcg/hexagon/float_madds.ref            |  768 +++++
->   96 files changed, 35737 insertions(+), 2 deletions(-)
+> +static bool is_event_supported(uint32_t n, bool warn)
+> +{
+> +       uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+> +       uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
+> +       bool supported;
+> +       uint64_t reg;
+> +
+> +       /*
+> +        * The low 32-bits of PMCEID0/1 respectly describe
 
-Please look at the file scripts/git.orderfile and if possible install it 
-before your next version (please wait at least 1 week between version, 
-for a so big series!). This script order files in patch in a way easier 
-to review by mail.
+"respectively"
 
+> +        * event support for events 0-31/32-63. Their High
+> +        * 32-bits describe support for extended events
+> +        * starting at 0x4000, using the same split.
+> +        */
+> +       if (n >= 0x0  && n <= 0x3F)
+> +               reg = (pmceid0 & 0xFFFFFFFF) | ((pmceid1 & 0xFFFFFFFF) << 32);
+> +       else if  (n >= 0x4000 && n <= 0x403F)
+> +               reg = (pmceid0 >> 32) | ((pmceid1 >> 32) << 32);
+> +       else
+> +               abort();
+> +
+> +       supported =  reg & (1UL << (n & 0x3F));
+> +
+> +       if (!supported && warn)
+> +               report_info("event %d is not supported", n);
+> +       return supported;
+> +}
+> +
+> +static void test_event_introspection(void)
+> +{
+> +       bool required_events;
+> +
+> +       if (!pmu.nb_implemented_counters) {
+> +               report_skip("No event counter, skip ...");
+> +               return;
+> +       }
+> +
+> +       /* PMUv3 requires an implementation includes some common events */
+> +       required_events = is_event_supported(0x0, true) /* SW_INCR */ &&
+> +                         is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+> +                         (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+> +                          is_event_supported(0x1B, true) /* INST_PREC */);
+> +
+> +       if (pmu.version == 0x4) {
+
+This condition will only test for v8.1-required events if the PMU
+is exactly 8.1, so you lose coverage if the implementation happens
+to support ARMv8.4-PMU. Hopefully you have already bailed out
+for "ID_AA64DFR0_EL1.PMUVer == 0xf" which means "non-standard IMPDEF
+PMU", in which case you can just check >= 0x4.
+
+> +               /* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+> +               required_events = required_events &&
+> +                                 is_event_supported(0x23, true) &&
+> +                                 is_event_supported(0x24, true);
+> +       }
+> +
+> +       report(required_events, "Check required events are implemented");
+> +}
+> +
+>  #endif
+
+thanks
+-- PMM
 
