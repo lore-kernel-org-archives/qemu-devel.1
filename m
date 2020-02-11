@@ -2,83 +2,93 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01FFCC35242
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E534C35242
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:36:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE6992082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:34:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45AB12070A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:36:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VYtUUgrw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE6992082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vhBwl2Nm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45AB12070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1aN7-0004yt-0W
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:34:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50501)
+	id 1j1aOS-0006BN-Gw
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:36:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55976)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j1aK3-0001W6-Ov
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:31:48 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j1aMN-00047B-GT
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:34:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j1aK2-0002HN-PC
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:31:47 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23234
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j1aK2-0002Fu-IZ
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:31:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581445905;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hd8VPzkhK8n9/lwhgrwAyRD2bhnpTGXUCuZRADWF3wk=;
- b=VYtUUgrwOaGygKk20gEBIN9XUFnx4iWU3Pcoygx1J4X7YsaReDQ22f5wuE3vrukY0bxdD6
- o9FUaUJn7TQw5b0mECFhqyvKGhjenAnpy5/Z9L3c/nGT9tZLlYR+z/iTuGJaFDvDyqeL4J
- Z9/v5n0PQKYE7SDF490Ak5Tavb7OwNY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-2Smuds_WMvW744S-HoF1CA-1; Tue, 11 Feb 2020 13:31:42 -0500
-X-MC-Unique: 2Smuds_WMvW744S-HoF1CA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 142A5477;
- Tue, 11 Feb 2020 18:31:40 +0000 (UTC)
-Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6303960499;
- Tue, 11 Feb 2020 18:31:35 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 5/9] arm: pmu: Basic event counter Tests
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200130112510.15154-1-eric.auger@redhat.com>
- <20200130112510.15154-6-eric.auger@redhat.com>
- <CAFEAcA9Yc9dKTCcP3fP93tQU62Q=2FYOoYGvUqfiOMY=pYV_RA@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <94fcec29-d44a-98cf-c397-b23b5d355eac@redhat.com>
-Date: Tue, 11 Feb 2020 19:31:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <richard.henderson@linaro.org>) id 1j1aMM-00072u-GC
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:34:11 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40755)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j1aMM-00070K-7w
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:34:10 -0500
+Received: by mail-pf1-x444.google.com with SMTP id q8so5905629pfh.7
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 10:34:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dD9Gwl0YviawrYH50yAj2nFcWE0R1gSfyvKEaJotWtg=;
+ b=vhBwl2NmTXULuDQPL8cDwcK4DWd+mTOC8TJKpwBLb/hzFaSHrnYEzEEISmMxeA5vEN
+ BleCTcc1y7SQMHAjSw3XhAl7kgdKha7vEl0RlQaNKgOvFO79D5W8uCNfxIds0KAN80W0
+ UCS5PKyjmlG3XPLSu5wilDDsLDh1xw/iuQWF3FOxhBzCHpKrYRMUSDoy+WKItjAJyILt
+ soFT3qZFDl6RoS5g8o3dqog/zHfZifFzllbU9R7JZXq/+ZnCfZ5wHDmFXoQb9FOs/z9N
+ slBviXW3t9O4A7LVQ1ZVFTzgQ8Zk9kY2IqsZZCSFm3p3qJ65YJ0e1gCxDJ2id3fNz6XA
+ +HFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dD9Gwl0YviawrYH50yAj2nFcWE0R1gSfyvKEaJotWtg=;
+ b=Sif7hu+3XEXUQiu7+fKsvJfS/xh7kyoGPD785z+MXwflgHdAyyNR1FqacVg+LXZvcB
+ L7SCEHZtMW7PITaeQEcmVDYgfynvYMP95XJpQnNg0LIW6wx1+qPvPo5NRzm9Ewde031W
+ w8IgeuAagZFBPtzLMJ5UX4vFFsloxVzwGNG/hJzl2IT0aX29LQgdIQGFjt2SzmQSVbvx
+ tUhglU5gNoTLS1ifSeS4pAqF6YPr+Pd/gO2ZgQ1HevpGNpiB7VG0TwViY8KEOXoZK3fL
+ u5SplVntF5FaRmKvG3ffO3PwLpmfFfPurypUfHHguVfkuIKnvAx28M/V0ng0R5W6TwCN
+ FNXw==
+X-Gm-Message-State: APjAAAVsfa21up/BsU/NBmi9Luk7reNC5SKz5D+4UyASEo1gHGvBovrR
+ 0rI9NWBH2Rp4caCSHGECRFtPNQ==
+X-Google-Smtp-Source: APXvYqw7F5n57V9rMdbCcYaYOkYGd4U7T9oaQJ88BN9LSSoGlxHrSh9EiGEddPngb65uKsw94OPeNQ==
+X-Received: by 2002:a63:e04a:: with SMTP id n10mr4336216pgj.341.1581446049050; 
+ Tue, 11 Feb 2020 10:34:09 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ l8sm3998719pjy.24.2020.02.11.10.34.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 11 Feb 2020 10:34:08 -0800 (PST)
+Subject: Re: [PATCH 05/13] target/arm: Add and use FIELD definitions for
+ ID_AA64DFR0_EL1
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200211173726.22541-1-peter.maydell@linaro.org>
+ <20200211173726.22541-6-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6a75d967-513d-93ef-b983-b8a35f78c2bf@linaro.org>
+Date: Tue, 11 Feb 2020 10:34:06 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Yc9dKTCcP3fP93tQU62Q=2FYOoYGvUqfiOMY=pYV_RA@mail.gmail.com>
+In-Reply-To: <20200211173726.22541-6-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,62 +100,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
- Marc Zyngier <maz@kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Andre Przywara <andre.przywara@arm.com>,
- Andrew Murray <andrew.murray@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.cs.columbia.edu,
- Eric Auger <eric.auger.pro@gmail.com>
+Cc: Eric Auger <eric.auger@redhat.com>,
+ Aaron Lindsay <aaron@os.amperecomputing.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On 2/11/20 9:37 AM, Peter Maydell wrote:
+>      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+> -        assert(extract32(cpu->id_aa64dfr0, 12, 4) == brps);
+> -        assert(extract32(cpu->id_aa64dfr0, 20, 4) == wrps);
+> -        assert(extract32(cpu->id_aa64dfr0, 28, 4) == ctx_cmps);
+> +        assert(FIELD_EX32(cpu->id_aa64dfr0, ID_AA64DFR0, BRPS) == brps);
+> +        assert(FIELD_EX32(cpu->id_aa64dfr0, ID_AA64DFR0, WRPS) == wrps);
+> +        assert(FIELD_EX32(cpu->id_aa64dfr0, ID_AA64DFR0, CTX_CMPS) == ctx_cmps);
 
-On 2/11/20 5:27 PM, Peter Maydell wrote:
-> On Thu, 30 Jan 2020 at 11:26, Eric Auger <eric.auger@redhat.com> wrote:
->>
->> Adds the following tests:
->> - event-counter-config: test event counter configuration
->> - basic-event-count:
->>   - programs counters #0 and #1 to count 2 required events
->>   (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
->>   to a value close enough to the 32b
->>   overflow limit so that we check the overflow bit is set
->>   after the execution of the asm loop.
->> - mem-access: counts MEM_ACCESS event on counters #0 and #1
->>   with and without 32-bit overflow.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
->> +static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
->> +{
->> +       int i;
->> +
->> +       if (pmu.nb_implemented_counters < nb_events) {
->> +               report_skip("Skip test as number of counters is too small (%d)",
->> +                           pmu.nb_implemented_counters);
->> +               return false;
->> +       }
->> +
->> +       for (i = 0; i < nb_events; i++) {
->> +               if (!is_event_supported(events[i], false)) {
->> +                       report_skip("Skip test as event %d is not supported",
->> +                                   events[i]);
-> 
-> Event numbers are given in hex in the Arm ARM and also
-> specified in hex in your test source code. I think it
-> would be more helpful if the message here used "0x%x", to
-> save the reader having to do the decimal-to-hex conversion
-> to find the event in the spec or the test case.
-Sure I will fix that
+Should really be FIELD_EX64.  Otherwise,
 
-Thanks
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+
+r~
+
 
 
