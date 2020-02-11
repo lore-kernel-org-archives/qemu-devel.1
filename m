@@ -2,76 +2,90 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1813EC35242
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:58:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1CCC35242
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 19:09:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E57242168B
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 18:58:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C38A2206D6
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 19:09:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="egKrhI4I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E57242168B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0YD41OV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C38A2206D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1ak9-00067e-4D
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 13:58:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41360)
+	id 1j1auH-0000eu-V4
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 14:09:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59517)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j1aj8-0005Hg-CR
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:57:43 -0500
+ (envelope-from <peterx@redhat.com>) id 1j1atL-00007a-9i
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:08:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j1aj5-0006yC-PF
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:57:41 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35829
+ (envelope-from <peterx@redhat.com>) id 1j1atI-0002AH-2S
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:08:13 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32824
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j1aj5-0006ue-D3
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 13:57:39 -0500
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j1atH-00027Y-U0
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 14:08:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581447458;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1581448090;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bzurVOrsVu08Xn65eKTOSc6rt1lI2cwbt5ZWDDa6Zu4=;
- b=egKrhI4IUdPLGDOsJ7Hx5f8l/mgyRss+MrDwgFsbbJ0BvrZLHPhDO3CH/1kBpgPNIsTrZB
- OHNtIjDvi7K1C91Xm3h4MaB42jTjt4s2s37ihCVyWwYlCHvJV21SdpcWZZkPWKklTAgn02
- nSf1HB7kx2v0wxZHwFWC5YQylTeBboA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-wa2X5h2qORK2XsvmujfzIQ-1; Tue, 11 Feb 2020 13:57:35 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43111DB62
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 18:57:34 +0000 (UTC)
-Received: from redhat.com (ovpn-112-49.ams2.redhat.com [10.36.112.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D79E81001E91;
- Tue, 11 Feb 2020 18:57:31 +0000 (UTC)
-Date: Tue, 11 Feb 2020 18:57:28 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v5 4/8] multifd: Add multifd-zlib-level parameter
-Message-ID: <20200211185728.GQ55376@redhat.com>
-References: <20200129115655.10414-1-quintela@redhat.com>
- <20200129115655.10414-5-quintela@redhat.com>
- <87eevhxtfv.fsf@dusky.pond.sub.org>
+ bh=zISgOSzBvEUeQus1hqwUUEZ16+KnIQxw/vCNscMqs4M=;
+ b=A0YD41OVNaWgILz7YCA6qmvOIOw9N7IIfydlyvcgtg5hO/wFO2RcEtobG3ZpMn+0ayYu0b
+ /nWBcHeawVXI40pBQjHUcYz+XGj9yKJQcEKU34z15R9GtPplmGpq7yMzJfGxqJPQgGbQP4
+ 4uWCrnaHhaQH8eUVdphR9E9D2xzB0tQ=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-Yc7xIp8yOXuLk2Ap0tFTHw-1; Tue, 11 Feb 2020 14:08:06 -0500
+Received: by mail-qt1-f199.google.com with SMTP id l25so7299095qtu.0
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 11:08:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=QeZKa3K6OW2+02/7q9K48BzrFmMElUkLMajzZiIzT6w=;
+ b=Y0ExTSj4zude9nlAtHZPctM/7u+bdftMTM7Ctus21M57UIkCGkX3KJ+ObnrLpDV4UP
+ TtPIk0ga2FW9Ple0SS/YcM+yX0yOJbm9Wobrgxmlpkhze+p3NjuUgad83903URY7FRqM
+ HaKSwmjHz6HDuD3qU5KQFdQV23veiQqAHZGFLmIP6DhXfQECNAzDll+As1m86+C5fv/h
+ FVZLVGXK9sboeK3AWEZJo5hNac1gv14jdIajddLVCOf0VqJnD6IwsGwu/d/UEclHst4d
+ YWzaJSZFUWf5/WJTZt+iIhsp06qlNZ50z60Uur6CXYp6/2gVEDJRpJxOE5YYQuMzjSNn
+ 9h9w==
+X-Gm-Message-State: APjAAAWG0FHfn53sNr6gU+9x7DLmjG9XZrdpr0EWAyw4CnByaHxVB6rM
+ fxub2HQt39kvkvupDmfigEvIo7UnwSfBoj6eEmxbON5WyeuGWY/P7QO2oHWnGcyGo40b3ne/uWw
+ zYbFAVJPti4xYQFU=
+X-Received: by 2002:a05:6214:923:: with SMTP id
+ dk3mr4111424qvb.96.1581448086555; 
+ Tue, 11 Feb 2020 11:08:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwZN0k9FUgTBnug2e1nb2U+7Hah/t3y++SpkSCUaYmPBw52LRTVszhDsMvutT8soVeGnIjo+w==
+X-Received: by 2002:a05:6214:923:: with SMTP id
+ dk3mr4111399qvb.96.1581448086193; 
+ Tue, 11 Feb 2020 11:08:06 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+ by smtp.gmail.com with ESMTPSA id x41sm2739974qtj.52.2020.02.11.11.08.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 11 Feb 2020 11:08:05 -0800 (PST)
+Date: Tue, 11 Feb 2020 14:08:02 -0500
+From: Peter Xu <peterx@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC v3 09/25] vfio: check VFIO_TYPE1_NESTING_IOMMU support
+Message-ID: <20200211190802.GH984290@xz-x1>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-10-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <87eevhxtfv.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: wa2X5h2qORK2XsvmujfzIQ-1
+In-Reply-To: <1580300216-86172-10-git-send-email-yi.l.liu@intel.com>
+X-MC-Unique: Yc7xIp8yOXuLk2Ap0tFTHw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -90,69 +104,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: kevin.tian@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
+ alex.williamson@redhat.com, pbonzini@redhat.com, hao.wu@intel.com,
+ yi.y.sun@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 30, 2020 at 09:03:00AM +0100, Markus Armbruster wrote:
-> Juan Quintela <quintela@redhat.com> writes:
+On Wed, Jan 29, 2020 at 04:16:40AM -0800, Liu, Yi L wrote:
+> From: Liu Yi L <yi.l.liu@intel.com>
 >=20
-> > It will indicate which level use for compression.
-> >
-> > Signed-off-by: Juan Quintela <quintela@redhat.com>
+> VFIO needs to check VFIO_TYPE1_NESTING_IOMMU
+> support with Kernel before further using it.
+> e.g. requires to check IOMMU UAPI version.
 >=20
-> This is slightly confusing (there is no zlib compression), unless you
-> peek at the next patch (which adds zlib compression).
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+>  hw/vfio/common.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
 >=20
-> Three ways to make it less confusing:
->=20
-> * Squash the two commits
->=20
-> * Swap them: first add zlib compression with level hardcoded to 1, then
->   make the level configurable.
->=20
-> * Have the first commit explain itself better.  Something like
->=20
->     multifd: Add multifd-zlib-level parameter
->=20
->     This parameter specifies zlib compression level.  The next patch
->     will put it to use.
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 0cc7ff5..a5e70b1 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1157,12 +1157,21 @@ static void vfio_put_address_space(VFIOAddressSpa=
+ce *space)
+>  static int vfio_get_iommu_type(VFIOContainer *container,
+>                                 Error **errp)
+>  {
+> -    int iommu_types[] =3D { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
+> +    int iommu_types[] =3D { VFIO_TYPE1_NESTING_IOMMU,
+> +                          VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
+>                            VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU =
+};
+> -    int i;
+> +    int i, version;
+> =20
+>      for (i =3D 0; i < ARRAY_SIZE(iommu_types); i++) {
+>          if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) =
+{
+> +            if (iommu_types[i] =3D=3D VFIO_TYPE1_NESTING_IOMMU) {
+> +                version =3D ioctl(container->fd,
+> +                                VFIO_NESTING_GET_IOMMU_UAPI_VERSION);
+> +                if (version < IOMMU_UAPI_VERSION) {
+> +                    printf("IOMMU UAPI incompatible for nesting\n");
 
-Wouldn't the "normal" best practice for QAPI design be to use a
-enum and discriminated union. eg
+There should have better alternatives than printf()... Maybe
+warn_report()?
 
-  { 'enum': 'MigrationCompression',
-     'data': ['none', 'zlib'] }
+> +                    continue;
+> +                }
+> +            }
+>              return iommu_types[i];
+>          }
+>      }
+> @@ -1278,6 +1287,7 @@ static int vfio_connect_container(VFIOGroup *group,=
+ AddressSpace *as,
+>      }
+> =20
+>      switch (container->iommu_type) {
+> +    case VFIO_TYPE1_NESTING_IOMMU:
+>      case VFIO_TYPE1v2_IOMMU:
+>      case VFIO_TYPE1_IOMMU:
+>      {
+> --=20
+> 2.7.4
+>=20
 
-  { 'struct': 'MigrationCompressionParamsZLib',
-    'data': { 'compression-level' } }
-
-  { 'union':  'MigrationCompressionParams',
-    'base': { 'mode': 'MigrationCompression' },
-    'discriminator': 'mode',
-    'data': {
-      'zlib': 'MigrationCompressionParamsZLib',
-    }
-
-Of course this is quite different from how migration parameters are
-done today. Maybe it makes sense to stick with the flat list of
-migration parameters for consistency & ignore normal QAPI design
-practice ?
-
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Peter Xu
 
 
