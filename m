@@ -2,78 +2,78 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C32F1C352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D2C4C352A3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:08:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CB1C2070A
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69BC72070A
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 16:08:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XtIe9PF/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB1C2070A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dtOW5kD+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69BC72070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1Y3R-0004DN-IT
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 11:06:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50219)
+	id 1j1Y5e-0007fi-KL
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 11:08:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51550)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j1Y0l-0008QU-AO
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:03:46 -0500
+ (envelope-from <drjones@redhat.com>) id 1j1Y4z-00070F-Ak
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:08:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j1Y0j-0005S2-Sq
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:03:43 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47735
+ (envelope-from <drjones@redhat.com>) id 1j1Y4x-0001gl-4x
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:08:04 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40802
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j1Y0j-0005Qe-NJ
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:03:41 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j1Y4x-0001fZ-0M
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 11:08:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581437021;
+ s=mimecast20190719; t=1581437282;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cepXeL6J/V993gFxgQax79jSoOuQ7Uj4dfUDVwJ31cA=;
- b=XtIe9PF/Z9P99Vkf5UyhqlBGgOCMATdW2TOVfYjON/NED0eOv3B0dtvHUClbxEFN7s9r8u
- 8CGqxeyAz06Wm7SRNWtNnh1du4+j2alL6hKRpCkwIVoY804dvH/H6GS65smAAtQsKWzgDD
- iU4cBg05jkSbZYAkECF/pZmtG8TR4i8=
+ bh=Etqe//LRT3pM0qb1yDS4eT6yXsXnFgQdg0GzoAov0i4=;
+ b=dtOW5kD+4Mwd+tNHaZct6UHGktVFG6cNyD81osNO6O0hBQr5xhvUYw9jK4c2oHc1kynG20
+ PVNoRuTXg0ASM25DBj7LO54m4gI4icPvnZ01v0BI0dQXvm2cMVrbe5X+qNnoauUsXKK9Ph
+ TJhFN4/awBiFfmpanMrisUT2OUDEYTQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-HebugjuXPwefBHc2Pw65Qg-1; Tue, 11 Feb 2020 11:03:38 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-229-Kn7K1Dw3MZq2mN87tEtssA-1; Tue, 11 Feb 2020 11:07:43 -0500
+X-MC-Unique: Kn7K1Dw3MZq2mN87tEtssA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2A378017CC;
- Tue, 11 Feb 2020 16:03:37 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.99])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 885095C109;
- Tue, 11 Feb 2020 16:03:34 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 4/4] iotests: add 282 luks qemu-img measure test
-Date: Tue, 11 Feb 2020 16:03:18 +0000
-Message-Id: <20200211160318.453650-5-stefanha@redhat.com>
-In-Reply-To: <20200211160318.453650-1-stefanha@redhat.com>
-References: <20200211160318.453650-1-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65421107ACC4;
+ Tue, 11 Feb 2020 16:07:41 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E648F26FDF;
+ Tue, 11 Feb 2020 16:07:35 +0000 (UTC)
+Date: Tue, 11 Feb 2020 17:07:33 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [kvm-unit-tests PATCH v2 0/9] KVM: arm64: PMUv3 Event Counter
+ Tests
+Message-ID: <20200211160733.zbqh3vbscdfgkkcd@kamzik.brq.redhat.com>
+References: <20200130112510.15154-1-eric.auger@redhat.com>
+ <CAFEAcA8iBvM2xguW2_6OFWDjPPEzEorief4F2aoh0Vitp466rQ@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: HebugjuXPwefBHc2Pw65Qg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8iBvM2xguW2_6OFWDjPPEzEorief4F2aoh0Vitp466rQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,92 +85,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Andre Przywara <andre.przywara@arm.com>,
+ Andrew Murray <andrew.murray@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhpcyB0ZXN0IGV4ZXJjaXNlcyB0aGUgYmxvY2svY3J5cHRvLmMgImx1a3MiIGJsb2NrIGRyaXZl
-cgouYmRydl9tZWFzdXJlKCkgY29kZS4KClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8
-c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0tCiB0ZXN0cy9xZW11LWlvdGVzdHMvMjgyICAgICB8IDkz
-ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCiB0ZXN0cy9xZW11LWlvdGVz
-dHMvMjgyLm91dCB8IDMwICsrKysrKysrKysrKwogdGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwICAg
-fCAgMSArCiAzIGZpbGVzIGNoYW5nZWQsIDEyNCBpbnNlcnRpb25zKCspCiBjcmVhdGUgbW9kZSAx
-MDA3NTUgdGVzdHMvcWVtdS1pb3Rlc3RzLzI4MgogY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3Fl
-bXUtaW90ZXN0cy8yODIub3V0CgpkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI4MiBi
-L3Rlc3RzL3FlbXUtaW90ZXN0cy8yODIKbmV3IGZpbGUgbW9kZSAxMDA3NTUKaW5kZXggMDAwMDAw
-MDAwMC4uNmM2MjA2NWFlZgotLS0gL2Rldi9udWxsCisrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8y
-ODIKQEAgLTAsMCArMSw5MyBAQAorIyEvdXNyL2Jpbi9lbnYgYmFzaAorIworIyBxZW11LWltZyBt
-ZWFzdXJlIHRlc3RzIGZvciBMVUtTIGltYWdlcworIworIyBDb3B5cmlnaHQgKEMpIDIwMjAgUmVk
-IEhhdCwgSW5jLgorIworIyBUaGlzIHByb2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiBy
-ZWRpc3RyaWJ1dGUgaXQgYW5kL29yIG1vZGlmeQorIyBpdCB1bmRlciB0aGUgdGVybXMgb2YgdGhl
-IEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBieQorIyB0aGUgRnJlZSBT
-b2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBvcgor
-IyAoYXQgeW91ciBvcHRpb24pIGFueSBsYXRlciB2ZXJzaW9uLgorIworIyBUaGlzIHByb2dyYW0g
-aXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxsIGJlIHVzZWZ1bCwKKyMgYnV0
-IFdJVEhPVVQgQU5ZIFdBUlJBTlRZOyB3aXRob3V0IGV2ZW4gdGhlIGltcGxpZWQgd2FycmFudHkg
-b2YKKyMgTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NF
-LiAgU2VlIHRoZQorIyBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBmb3IgbW9yZSBkZXRhaWxz
-LgorIworIyBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJh
-bCBQdWJsaWMgTGljZW5zZQorIyBhbG9uZyB3aXRoIHRoaXMgcHJvZ3JhbS4gIElmIG5vdCwgc2Vl
-IDxodHRwOi8vd3d3LmdudS5vcmcvbGljZW5zZXMvPi4KKyMKKworIyBjcmVhdG9yCitvd25lcj1z
-dGVmYW5oYUByZWRoYXQuY29tCisKK3NlcT1gYmFzZW5hbWUgJDBgCitlY2hvICJRQSBvdXRwdXQg
-Y3JlYXRlZCBieSAkc2VxIgorCitzdGF0dXM9MSAgICAjIGZhaWx1cmUgaXMgdGhlIGRlZmF1bHQh
-CisKK19jbGVhbnVwKCkKK3sKKyAgICBfY2xlYW51cF90ZXN0X2ltZworICAgIHJtIC1mICIkVEVT
-VF9JTUcuY29udmVydGVkIgorfQordHJhcCAiX2NsZWFudXA7IGV4aXQgXCRzdGF0dXMiIDAgMSAy
-IDMgMTUKKworIyBnZXQgc3RhbmRhcmQgZW52aXJvbm1lbnQsIGZpbHRlcnMgYW5kIGNoZWNrcwor
-LiAuL2NvbW1vbi5yYworLiAuL2NvbW1vbi5maWx0ZXIKKy4gLi9jb21tb24ucGF0dGVybgorCitf
-c3VwcG9ydGVkX2ZtdCBsdWtzCitfc3VwcG9ydGVkX3Byb3RvIGZpbGUKK19zdXBwb3J0ZWRfb3Mg
-TGludXgKKworU0VDUkVUPXNlY3JldCxpZD1zZWMwLGRhdGE9cGFzc3BocmFzZQorCitlY2hvICI9
-PSBtZWFzdXJlIDFHIGltYWdlIGZpbGUgPT0iCitlY2hvCisKKyRRRU1VX0lNRyBtZWFzdXJlIC0t
-b2JqZWN0ICIkU0VDUkVUIiBcCisJICAgICAgICAgIC1PICIkSU1HRk1UIiBcCisJCSAgLW8ga2V5
-LXNlY3JldD1zZWMwLGl0ZXItdGltZT0xMCBcCisJCSAgLS1zaXplIDFHCisKK2VjaG8KK2VjaG8g
-Ij09IGNyZWF0ZSAxRyBpbWFnZSBmaWxlIChzaXplIHNob3VsZCBiZSBubyBncmVhdGVyIHRoYW4g
-bWVhc3VyZWQpID09IgorZWNobworCitfbWFrZV90ZXN0X2ltZyAxRworc3RhdCAtYyAiaW1hZ2Ug
-ZmlsZSBzaXplIGluIGJ5dGVzOiAlcyIgIiRURVNUX0lNR19GSUxFIgorCitlY2hvCitlY2hvICI9
-PSBtb2RpZmllZCAxRyBpbWFnZSBmaWxlIChzaXplIHNob3VsZCBiZSBubyBncmVhdGVyIHRoYW4g
-bWVhc3VyZWQpID09IgorZWNobworCiskUUVNVV9JTyAtLW9iamVjdCAiJFNFQ1JFVCIgLS1pbWFn
-ZS1vcHRzICIkVEVTVF9JTUciIC1jICJ3cml0ZSAtUCAweDUxIDB4MTAwMDAgMHg0MDAiIHwgX2Zp
-bHRlcl9xZW11X2lvIHwgX2ZpbHRlcl90ZXN0ZGlyCitzdGF0IC1jICJpbWFnZSBmaWxlIHNpemUg
-aW4gYnl0ZXM6ICVzIiAiJFRFU1RfSU1HX0ZJTEUiCisKK2VjaG8KK2VjaG8gIj09IG1lYXN1cmUg
-cHJlYWxsb2NhdGlvbj1mYWxsb2MgMUcgaW1hZ2UgZmlsZSA9PSIKK2VjaG8KKworJFFFTVVfSU1H
-IG1lYXN1cmUgLS1vYmplY3QgIiRTRUNSRVQiIFwKKwkgICAgICAgICAgLU8gIiRJTUdGTVQiIFwK
-KwkJICAtbyBrZXktc2VjcmV0PXNlYzAsaXRlci10aW1lPTEwLHByZWFsbG9jYXRpb249ZmFsbG9j
-IFwKKwkJICAtLXNpemUgMUcKKworZWNobworZWNobyAiPT0gbWVhc3VyZSB3aXRoIGlucHV0IGlt
-YWdlIGZpbGUgPT0iCitlY2hvCisKK0lNR0ZNVD1yYXcgSU1HS0VZU0VDUkVUPSBJTUdPUFRTPSBf
-bWFrZV90ZXN0X2ltZyAxRyB8IF9maWx0ZXJfaW1nZm10CitRRU1VX0lPX09QVElPTlM9IElNR09Q
-VFNTWU5UQVg9ICRRRU1VX0lPIC1mIHJhdyAtYyAid3JpdGUgLVAgMHg1MSAweDEwMDAwIDB4NDAw
-IiAiJFRFU1RfSU1HX0ZJTEUiIHwgX2ZpbHRlcl9xZW11X2lvIHwgX2ZpbHRlcl90ZXN0ZGlyCisk
-UUVNVV9JTUcgbWVhc3VyZSAtLW9iamVjdCAiJFNFQ1JFVCIgXAorCSAgICAgICAgICAtTyAiJElN
-R0ZNVCIgXAorCQkgIC1vIGtleS1zZWNyZXQ9c2VjMCxpdGVyLXRpbWU9MTAgXAorCQkgIC1mIHJh
-dyBcCisJCSAgIiRURVNUX0lNR19GSUxFIgorCisjIHN1Y2Nlc3MsIGFsbCBkb25lCitlY2hvICIq
-KiogZG9uZSIKK3JtIC1mICRzZXEuZnVsbAorc3RhdHVzPTAKZGlmZiAtLWdpdCBhL3Rlc3RzL3Fl
-bXUtaW90ZXN0cy8yODIub3V0IGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI4Mi5vdXQKbmV3IGZpbGUg
-bW9kZSAxMDA2NDQKaW5kZXggMDAwMDAwMDAwMC4uOTk2Y2M0NGE2NwotLS0gL2Rldi9udWxsCisr
-KyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yODIub3V0CkBAIC0wLDAgKzEsMzAgQEAKK1FBIG91dHB1
-dCBjcmVhdGVkIGJ5IDI4MgorPT0gbWVhc3VyZSAxRyBpbWFnZSBmaWxlID09CisKK3JlcXVpcmVk
-IHNpemU6IDEwNzU4MTAzMDQKK2Z1bGx5IGFsbG9jYXRlZCBzaXplOiAxMDc1ODEwMzA0CisKKz09
-IGNyZWF0ZSAxRyBpbWFnZSBmaWxlIChzaXplIHNob3VsZCBiZSBubyBncmVhdGVyIHRoYW4gbWVh
-c3VyZWQpID09CisKK0Zvcm1hdHRpbmcgJ1RFU1RfRElSL3QuSU1HRk1UJywgZm10PUlNR0ZNVCBz
-aXplPTEwNzM3NDE4MjQKK2ltYWdlIGZpbGUgc2l6ZSBpbiBieXRlczogMTA3NTgxMDMwNAorCis9
-PSBtb2RpZmllZCAxRyBpbWFnZSBmaWxlIChzaXplIHNob3VsZCBiZSBubyBncmVhdGVyIHRoYW4g
-bWVhc3VyZWQpID09CisKK3dyb3RlIDEwMjQvMTAyNCBieXRlcyBhdCBvZmZzZXQgNjU1MzYKKzEg
-S2lCLCBYIG9wczsgWFg6WFg6WFguWCAoWFhYIFlZWS9zZWMgYW5kIFhYWCBvcHMvc2VjKQoraW1h
-Z2UgZmlsZSBzaXplIGluIGJ5dGVzOiAxMDc1ODEwMzA0CisKKz09IG1lYXN1cmUgcHJlYWxsb2Nh
-dGlvbj1mYWxsb2MgMUcgaW1hZ2UgZmlsZSA9PQorCityZXF1aXJlZCBzaXplOiAxMDc1ODEwMzA0
-CitmdWxseSBhbGxvY2F0ZWQgc2l6ZTogMTA3NTgxMDMwNAorCis9PSBtZWFzdXJlIHdpdGggaW5w
-dXQgaW1hZ2UgZmlsZSA9PQorCitGb3JtYXR0aW5nICdURVNUX0RJUi90LklNR0ZNVCcsIGZtdD1J
-TUdGTVQgc2l6ZT0xMDczNzQxODI0Cit3cm90ZSAxMDI0LzEwMjQgYnl0ZXMgYXQgb2Zmc2V0IDY1
-NTM2CisxIEtpQiwgWCBvcHM7IFhYOlhYOlhYLlggKFhYWCBZWVkvc2VjIGFuZCBYWFggb3BzL3Nl
-YykKK3JlcXVpcmVkIHNpemU6IDEwNzU4MTAzMDQKK2Z1bGx5IGFsbG9jYXRlZCBzaXplOiAxMDc1
-ODEwMzA0CisqKiogZG9uZQpkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwIGIv
-dGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwCmluZGV4IDE5MDQyMjMwMjAuLjZhMjVlZmVhNGQgMTAw
-NjQ0Ci0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9ncm91cAorKysgYi90ZXN0cy9xZW11LWlvdGVz
-dHMvZ3JvdXAKQEAgLTI4OSw0ICsyODksNSBAQAogMjc5IHJ3IGJhY2tpbmcgcXVpY2sKIDI4MCBy
-dyBtaWdyYXRpb24gcXVpY2sKIDI4MSBydyBxdWljaworMjgyIHF1aWNrCiAyODMgYXV0byBxdWlj
-awotLSAKMi4yNC4xCgo=
+On Tue, Feb 11, 2020 at 03:42:38PM +0000, Peter Maydell wrote:
+> On Thu, 30 Jan 2020 at 11:25, Eric Auger <eric.auger@redhat.com> wrote:
+> >
+> > This series implements tests exercising the PMUv3 event counters.
+> > It tests both the 32-bit and 64-bit versions. Overflow interrupts
+> > also are checked. Those tests only are written for arm64.
+> >
+> > It allowed to reveal some issues related to SW_INCR implementation
+> > (esp. related to 64-bit implementation), some problems related to
+> > 32-bit <-> 64-bit transitions and consistency of enabled states
+> > of odd and event counters (See [1]).
+> >
+> > Overflow interrupt testing relies of one patch from Andre
+> > ("arm: gic: Provide per-IRQ helper functions") to enable the
+> > PPI 23, coming from "arm: gic: Test SPIs and interrupt groups"
+> > (https://patchwork.kernel.org/cover/11234975/). Drew kindly
+> > provided "arm64: Provide read/write_sysreg_s".
+> >
+> > All PMU tests can be launched with:
+> > ./run_tests.sh -g pmu
+> > Tests also can be launched individually. For example:
+> > ./arm-run arm/pmu.flat -append 'chained-sw-incr'
+> >
+> > With KVM:
+> > - chain-promotion and chained-sw-incr are known to be failing.
+> >   [1] proposed a fix.
+> > - On TX2, I have some random failures due to MEM_ACCESS event
+> >   measured with a great disparity. This is not observed on
+> >   other machines I have access to.
+> > With TCG:
+> > - all new tests are skipped
+> 
+> I'm having a go at using this patchset to test the support
+> I'm adding for TCG for the v8.1 and v8.4 PMU extensions...
+> 
+> Q1: how can I get run_tests.sh to pass extra arguments to
+> QEMU ? The PMU events check will fail unless QEMU gets
+> the '-icount 8' to enable cycle-counting, but although
+> the underlying ./arm/run lets you add arbitrary extra
+> arguments to QEMU, run_tests.sh doesn't seem to. Trying to
+> pass them in via "QEMU=/path/to/qemu -icount 8" doesn't
+> work either.
+
+Alex Bennee once submit a patch[*] allowing that to work, but
+it never got merged. I just rebased it and tried it, but it
+doesn't work now. Too much has changed in the run scripts
+since his posting. I can try to rework it though.
+
+[*] https://github.com/rhdrjones/kvm-unit-tests/commit/9a8574bfd924f3e865611688e26bb12e53821747
+
+> 
+> Q2: do you know why arm/pmu.c:check_pmcr() insists that
+> PMCR.IMP is non-zero? The comment says "simple sanity check",
+> but architecturally a zero IMP field is permitted (meaning
+> "go look at MIDR_EL1 instead"). This causes TCG to fail this
+> test on '-cpu max', because in that case we set PMCR.IMP
+> to the same thing as MIDR_EL1.Implementer which is 0
+> ("software use", since QEMU is software...)
+
+Probably just a misunderstanding on the part of the author (and
+reviewers). Maybe Eric can fix that while preparing this series.
+
+Thanks,
+drew
 
 
