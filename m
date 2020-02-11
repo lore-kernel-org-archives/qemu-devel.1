@@ -2,82 +2,84 @@ Return-Path: <SRS0=pnX7=37=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 283EDC352A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 10:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C31C3B187
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 10:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7E1220842
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 10:55:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64ACB20842
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Feb 2020 10:57:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dg1u/Qlg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7E1220842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g/G4pFPY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64ACB20842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1TCX-0006rl-0Q
-	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 05:55:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36327)
+	id 1j1TEH-0008R1-Kl
+	for qemu-devel@archiver.kernel.org; Tue, 11 Feb 2020 05:57:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36655)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j1TBv-0006IE-L5
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:54:56 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j1TDe-0007b6-EU
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:56:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j1TBu-0003A9-Fv
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:54:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33010
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j1TBu-00039x-C6
- for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:54:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581418493;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iHY7ub2o3vjcoBWtVFe7KNkC1+w19KUXJy+zKfKAo+U=;
- b=Dg1u/QlgVdILnCNXdFBNVUUzTeLLsa7b4cpnaODgjwJfuBJ35Og3mevZLNYOT3PGT/aiv/
- Y7Cpd6GNTfltK4Fxcub6RJq72hYl9wYfOWkRd1vDsRzizZV/52tVwQH5xepGojFMEdLfFx
- 8uKmnu0AdwSo+DCgn4O7IcNMV+CVdZA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-iF-96TDFPtOJH7YpwpxbPQ-1; Tue, 11 Feb 2020 05:54:51 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E4848017DF
- for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 10:54:50 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 94EBD165D3;
- Tue, 11 Feb 2020 10:54:48 +0000 (UTC)
-Date: Tue, 11 Feb 2020 10:54:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v5 2/8] migration: Add support for modules
-Message-ID: <20200211105446.GE2751@work-vm>
-References: <20200129115655.10414-1-quintela@redhat.com>
- <20200129115655.10414-3-quintela@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j1TDd-0004Is-95
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:56:42 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42040)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j1TDd-0004Gy-2O
+ for qemu-devel@nongnu.org; Tue, 11 Feb 2020 05:56:41 -0500
+Received: by mail-ot1-x343.google.com with SMTP id 66so9603463otd.9
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 02:56:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=G+XEOGOOfB0mQPosFwswKb1XrazjLuBmq9VZcLpMzxA=;
+ b=g/G4pFPY7yIvKb386fQU+eLr1jLQ3Ys8B6gTEnT8OTzD2VMUxtrBDXmYhBoXR5kbWU
+ 8J8f0r9SgEE6ipdP+eWdH7p5MiUPG9WeEFP2o1xULynX/0JF1qVB8ce1x1j8ZZhiLmTs
+ KXQL8VHpX0XD2ge9GfyXBv9v2rLgJBTPUjDwEp84Xv8d6l1iP9MxLa+171Nx0THqb7rh
+ tzmUypP3x0qLAJgpYIz8MEPTRVzj8wz/AeQMfe1jS8SZmA5k4Nsf6s4dxN+NbbxmNOGS
+ CBZOVdQuDOGiDk9hGc8KmT8CYiHjrh3MND1g8W0dDjxthKkbsRrylWh/+eTzr9mBeyNK
+ yiXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=G+XEOGOOfB0mQPosFwswKb1XrazjLuBmq9VZcLpMzxA=;
+ b=P8NFoAdDpdx6xB9+goc1StGpwaGlYadpyNunPujhvrfimkQWDfZ0CljcWRpNIdvQYd
+ 7FJQCXTgm+XUFd16ekcDaMN2GgEmJLFs839yXErPvij0aINLXmDI/EOKH/JhOomQxm8k
+ Apicl5uySYn86dQo7cUz2PJR/w9qK4e2Poy7MR9PszD+o3G1snN3IMROgmExSQ2YlWhA
+ HOp989do2KURrr03caNKVZVC0LhySiHD3yjvtIeW8mtanluk9DKl4DkRkevHsVdLeUgb
+ 0hody8EzqFyF7h3y4AoXm3loD6tKii1m8wtJLYYToa/T6KztgpdhTXmpkdBMaBcfUa8i
+ PWFA==
+X-Gm-Message-State: APjAAAWWULZbr229/wip7RgLdqxdjbDBfJnBEijw8p2SiUBH6MCYrZHO
+ boO6rcUQmziu0Vjo5ANtxIUGe3osYjwtnAz/8OQIpA==
+X-Google-Smtp-Source: APXvYqwcQuf8FOnuPX4jZwefrnQDMCpvw8XDispIgmHGsKB8oJnDqybiqV3+reSDcoaWvjyxHVP/zuazIXGsHpTXjSQ=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr4807806ota.232.1581418599540; 
+ Tue, 11 Feb 2020 02:56:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200129115655.10414-3-quintela@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: iF-96TDFPtOJH7YpwpxbPQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+References: <20200210131523.27540-1-eric.auger@redhat.com>
+ <20200210131523.27540-2-eric.auger@redhat.com>
+ <5cbd1960-6138-f4d0-948f-1983cb0f93b0@redhat.com>
+ <e69f69c5-40f5-1fe5-f298-129324cc7055@redhat.com>
+In-Reply-To: <e69f69c5-40f5-1fe5-f298-129324cc7055@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 11 Feb 2020 10:56:28 +0000
+Message-ID: <CAFEAcA_TJ5gDMRNK=O-iaqksYL_aQFu7repo7wKi7pGb-A9cYQ@mail.gmail.com>
+Subject: Re: [RFC 1/2] tpm: Let the TPM TIS device be usable on ARM
+To: Auger Eric <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,71 +91,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Eric Auger <eric.auger.pro@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, ardb@kernel.org,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> So we don't have to compile everything in, or have ifdefs
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On Tue, 11 Feb 2020 at 08:35, Auger Eric <eric.auger@redhat.com> wrote:
+>
+> Hi Philippe,
+>
+> On 2/11/20 9:25 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > You don't need much to remove the RFC tag:
+> >
+> > - rename TYPE_TPM_TIS as TYPE_TPM_TIS_ISA
+> > - rename TPMState as TPMCommonState, add an abstract TYPE_TPM_TIS
+> > parent, let TYPE_TPM_TIS_ISA be a child
+> > - add TYPE_TPM_TIS_SYSBUS also child.
+> Yes I tried my luck without too much hopes ;-)
 
-As far as I can tell this matches the way all the rest of the module
-stuff works, so:
+There should be a few existing examples in the tree
+of devices that we provide in a sysbus and also
+an isa or pci flavour, that you can use as templates
+for how to structure the device.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-(Although I wish it was documented somewhere).
-
-Dave
-
-> ---
->  include/qemu/module.h | 2 ++
->  vl.c                  | 1 +
->  2 files changed, 3 insertions(+)
->=20
-> diff --git a/include/qemu/module.h b/include/qemu/module.h
-> index 65ba596e46..907cb5c0a5 100644
-> --- a/include/qemu/module.h
-> +++ b/include/qemu/module.h
-> @@ -40,6 +40,7 @@ static void __attribute__((constructor)) do_qemu_init_ =
-## function(void)    \
->  #endif
-> =20
->  typedef enum {
-> +    MODULE_INIT_MIGRATION,
->      MODULE_INIT_BLOCK,
->      MODULE_INIT_OPTS,
->      MODULE_INIT_QOM,
-> @@ -56,6 +57,7 @@ typedef enum {
->  #define xen_backend_init(function) module_init(function, \
->                                                 MODULE_INIT_XEN_BACKEND)
->  #define libqos_init(function) module_init(function, MODULE_INIT_LIBQOS)
-> +#define migration_init(function) module_init(function, MODULE_INIT_MIGRA=
-TION)
-> =20
->  #define block_module_load_one(lib) module_load_one("block-", lib)
->  #define ui_module_load_one(lib) module_load_one("ui-", lib)
-> diff --git a/vl.c b/vl.c
-> index b0f52c4d6e..9f8577955a 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2890,6 +2890,7 @@ int main(int argc, char **argv, char **envp)
->      qemu_init_exec_dir(argv[0]);
-> =20
->      module_call_init(MODULE_INIT_QOM);
-> +    module_call_init(MODULE_INIT_MIGRATION);
-> =20
->      qemu_add_opts(&qemu_drive_opts);
->      qemu_add_drive_opts(&qemu_legacy_drive_opts);
-> --=20
-> 2.24.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+-- PMM
 
