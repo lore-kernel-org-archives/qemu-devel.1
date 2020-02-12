@@ -2,79 +2,75 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C12C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:52:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C499CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:53:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFB0D2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:52:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 878002082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:53:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTUprPGK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFB0D2082F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RGfC24U7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 878002082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1sRL-0005R5-V1
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:52:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39381)
+	id 1j1sS2-00070B-Nk
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:53:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j1sIw-0007Wk-NS
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:52 -0500
+ (envelope-from <david@redhat.com>) id 1j1sIO-0006F3-6u
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j1sIv-0004HW-Ht
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:50 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31265
+ (envelope-from <david@redhat.com>) id 1j1sIM-0003cv-Qt
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:16 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29467
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j1sIv-0004HA-EA
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:49 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j1sIM-0003cc-If
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581515029;
+ s=mimecast20190719; t=1581514994;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PeNV+R9SkRzKBUQroDIA7kCYiKwN6U06vRHB5GJs2/4=;
- b=WTUprPGKFGVnUM6ZbQwk3xW5zb5quqr2KmtcucZ+skYzUvNq6z3Dcz2wr9N47C5J74h+qK
- 84bBSJGh8riDfhutMg8gPjIQRu7nS3rzal0J8bleQp0T5gRILEZCiJz9c+cxO8xO6RorzU
- gZmDv1oCAMw2xRRe/JRKdjIriogkCjI=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=b3uKpoDUURGdcSnKDy/uidtkYSwTOgnldzk0XYQuajQ=;
+ b=RGfC24U7Re8w8ANwHGs2edE0ByHIx4jvj8vs4jMEnFZxlfb1n2wTqDOaC9H0LcVNXT1Hmo
+ ReGUbRGHq9yZ7GeIOcXFyxi0QR4b8tO4kGF4yCB6JtiseVaF0FzsdOJ5MRZWYATZHZSzw7
+ zz5DSWAgDcj/p0nFhwk6NE2wT/7XD4M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-T93ADSFIMOOdDdh7nezg0w-1; Wed, 12 Feb 2020 08:43:47 -0500
+ us-mta-30-SzZIsSCmMKSLfKaPxtJ4ZQ-1; Wed, 12 Feb 2020 08:43:12 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B530BDBA3;
- Wed, 12 Feb 2020 13:43:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80E20107ACCC;
+ Wed, 12 Feb 2020 13:43:10 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-117-92.ams2.redhat.com [10.36.117.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4B41D1001B08;
- Wed, 12 Feb 2020 13:43:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D4FFB1001281;
+ Wed, 12 Feb 2020 13:42:55 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 fixed 08/16] util/mmap-alloc: Factor out calculation of
- pagesize to mmap_pagesize()
-Date: Wed, 12 Feb 2020 14:42:46 +0100
-Message-Id: <20200212134254.11073-9-david@redhat.com>
-In-Reply-To: <20200212134254.11073-1-david@redhat.com>
-References: <20200212134254.11073-1-david@redhat.com>
+Subject: [PATCH v2 fixed 00/16] Ram blocks with resizable anonymous
+ allocations under POSIX
+Date: Wed, 12 Feb 2020 14:42:38 +0100
+Message-Id: <20200212134254.11073-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: T93ADSFIMOOdDdh7nezg0w-1
+X-MC-Unique: SzZIsSCmMKSLfKaPxtJ4ZQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,100 +82,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+ Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- David Hildenbrand <david@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, David Hildenbrand <david@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>,
- Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Greg Kurz <groug@kaod.org>, Paul Durrant <paul@xen.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Factor it out and add a comment.
+We already allow resizable ram blocks for anonymous memory, however, they
+are not actually resized. All memory is mmaped() R/W, including the memory
+exceeding the used_length, up to the max_length.
 
-Reviewed-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
-Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-Cc: Greg Kurz <groug@kaod.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- util/mmap-alloc.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+When resizing, effectively only the boundary is moved. Implement actually
+resizable anonymous allocations and make use of them in resizable ram
+blocks when possible. Memory exceeding the used_length will be
+inaccessible. Especially ram block notifiers require care.
 
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 27dcccd8ec..82f02a2cec 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -82,17 +82,27 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
-     return qemu_real_host_page_size;
- }
-=20
-+static inline size_t mmap_pagesize(int fd)
-+{
-+#if defined(__powerpc64__) && defined(__linux__)
-+    /* Mappings in the same segment must share the same page size */
-+    return qemu_fd_getpagesize(fd);
-+#else
-+    return qemu_real_host_page_size;
-+#endif
-+}
-+
- void *qemu_ram_mmap(int fd,
-                     size_t size,
-                     size_t align,
-                     bool shared,
-                     bool is_pmem)
- {
-+    const size_t pagesize =3D mmap_pagesize(fd);
-     int flags;
-     int map_sync_flags =3D 0;
-     int guardfd;
-     size_t offset;
--    size_t pagesize;
-     size_t total;
-     void *guardptr;
-     void *ptr;
-@@ -113,7 +123,6 @@ void *qemu_ram_mmap(int fd,
-      * anonymous memory is OK.
-      */
-     flags =3D MAP_PRIVATE;
--    pagesize =3D qemu_fd_getpagesize(fd);
-     if (fd =3D=3D -1 || pagesize =3D=3D qemu_real_host_page_size) {
-         guardfd =3D -1;
-         flags |=3D MAP_ANONYMOUS;
-@@ -123,7 +132,6 @@ void *qemu_ram_mmap(int fd,
-     }
- #else
-     guardfd =3D -1;
--    pagesize =3D qemu_real_host_page_size;
-     flags =3D MAP_PRIVATE | MAP_ANONYMOUS;
- #endif
-=20
-@@ -198,15 +206,10 @@ void *qemu_ram_mmap(int fd,
-=20
- void qemu_ram_munmap(int fd, void *ptr, size_t size)
- {
--    size_t pagesize;
-+    const size_t pagesize =3D mmap_pagesize(fd);
-=20
-     if (ptr) {
-         /* Unmap both the RAM block and the guard page */
--#if defined(__powerpc64__) && defined(__linux__)
--        pagesize =3D qemu_fd_getpagesize(fd);
--#else
--        pagesize =3D qemu_real_host_page_size;
--#endif
-         munmap(ptr, size + pagesize);
-     }
- }
+Having actually resizable anonymous allocations (via mmap-hackery) allows
+to reserve a big region in virtual address space and grow the
+accessible/usable part on demand. Even if "/proc/sys/vm/overcommit_memory"
+is set to "never" under Linux, huge reservations will succeed. If there is
+not enough memory when resizing (to populate parts of the reserved region),
+trying to resize will fail. Only the actually used size is reserved in the
+OS.
+
+E.g., virtio-mem [1] wants to reserve big resizable memory regions and
+grow the usable part on demand. I think this change is worth sending out
+individually. Accompanied by a bunch of minor fixes and cleanups.
+
+Especially, memory notifiers already handle resizing by first removing
+the old region, and then re-adding the resized region. prealloc is
+currently not possible with resizable ram blocks. mlock() should continue
+to work as is. Resizing is currently rare and must only happen on the
+start of an incoming migration, or during resets. No code path (except
+HAX and SEV ram block notifiers) should access memory outside of the usable
+range - and if we ever find one, that one has to be fixed (I did not
+identify any).
+
+v1 -> v2:
+- Add "util: vfio-helpers: Fix qemu_vfio_close()"
+- Add "util: vfio-helpers: Remove Error parameter from
+       qemu_vfio_undo_mapping()"
+- Add "util: vfio-helpers: Factor out removal from
+       qemu_vfio_undo_mapping()"
+- "util/mmap-alloc: ..."
+ -- Minor changes due to review feedback (e.g., assert alignment, return
+    bool when resizing)
+- "util: vfio-helpers: Implement ram_block_resized()"
+ -- Reserve max_size in the IOVA address space.
+ -- On resize, undo old mapping and do new mapping. We can later implement
+    a new ioctl to resize the mapping directly.
+- "numa: Teach ram block notifiers about resizable ram blocks"
+ -- Pass size/max_size to ram block notifiers, which makes things easier an
+    cleaner
+- "exec: Ram blocks with resizable anonymous allocations under POSIX"
+ -- Adapt to new ram block notifiers
+ -- Shrink after notifying. Always trigger ram block notifiers on resizes
+ -- Add a safety net that all ram block notifiers registered at runtime
+    support resizes.
+
+[1] https://lore.kernel.org/kvm/20191212171137.13872-1-david@redhat.com/
+
+David Hildenbrand (16):
+  util: vfio-helpers: Factor out and fix processing of existing ram
+    blocks
+  util: vfio-helpers: Fix qemu_vfio_close()
+  util: vfio-helpers: Remove Error parameter from
+    qemu_vfio_undo_mapping()
+  util: vfio-helpers: Factor out removal from qemu_vfio_undo_mapping()
+  exec: Factor out setting ram settings (madvise ...) into
+    qemu_ram_apply_settings()
+  exec: Reuse qemu_ram_apply_settings() in qemu_ram_remap()
+  exec: Drop "shared" parameter from ram_block_add()
+  util/mmap-alloc: Factor out calculation of pagesize to mmap_pagesize()
+  util/mmap-alloc: Factor out reserving of a memory region to
+    mmap_reserve()
+  util/mmap-alloc: Factor out populating of memory to mmap_populate()
+  util/mmap-alloc: Prepare for resizable mmaps
+  util/mmap-alloc: Implement resizable mmaps
+  numa: Teach ram block notifiers about resizable ram blocks
+  util: vfio-helpers: Implement ram_block_resized()
+  util: oslib: Resizable anonymous allocations under POSIX
+  exec: Ram blocks with resizable anonymous allocations under POSIX
+
+ exec.c                     | 104 +++++++++++++++++++----
+ hw/core/numa.c             |  53 +++++++++++-
+ hw/i386/xen/xen-mapcache.c |   7 +-
+ include/exec/cpu-common.h  |   3 +
+ include/exec/memory.h      |   8 ++
+ include/exec/ramlist.h     |  14 +++-
+ include/qemu/mmap-alloc.h  |  21 +++--
+ include/qemu/osdep.h       |   6 +-
+ stubs/ram-block.c          |  20 -----
+ target/i386/hax-mem.c      |   5 +-
+ target/i386/sev.c          |  18 ++--
+ util/mmap-alloc.c          | 165 +++++++++++++++++++++++--------------
+ util/oslib-posix.c         |  37 ++++++++-
+ util/oslib-win32.c         |  14 ++++
+ util/trace-events          |   9 +-
+ util/vfio-helpers.c        | 145 +++++++++++++++++++++-----------
+ 16 files changed, 450 insertions(+), 179 deletions(-)
+
 --=20
 2.24.1
 
