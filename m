@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A85C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D0DC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:42:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D0F420659
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:41:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E3F520659
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:42:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUmhtLCM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D0F420659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R42hRv3/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E3F520659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1sGf-0002oT-0I
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:41:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38035)
+	id 1j1sHQ-0004Kn-8P
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:42:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38107)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j1sBo-0001uN-IE
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:36:29 -0500
+ (envelope-from <david@redhat.com>) id 1j1sC0-0002O7-SW
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:36:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j1sBn-0006Eh-53
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:36:28 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58916
+ (envelope-from <david@redhat.com>) id 1j1sBz-0006Nn-GJ
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:36:40 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52806
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j1sBn-0006Dc-0z
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:36:27 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j1sBz-0006NV-CK
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:36:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581514586;
+ s=mimecast20190719; t=1581514599;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bM2sLCVmdoxBoIAr1ChW/OgRh7L93CZY2ADROzfXC+w=;
- b=GUmhtLCMzkq6ubWsrqwSuhW9xCIOrBDjCKLsGJyomISbrmGVeFETlNxfvBcE+cAOs0BFeb
- zLihwDF0DAXSCXBjOX/fseZ3g5sNtzpefozJbkfIWYiaDF4ma1tG7vKj0b6E/L0MEgM3jV
- FEVwXxU4/r7cyvX/wUW8V/1P3sZZgz4=
+ bh=8EJilu8UQEI4Ua/3JwUxBBHVuhlt2FuhAXQHVUGsLTc=;
+ b=R42hRv3/+N85+5K+XwsJTWU2qmYd9V/YBWzjAKX/kKvp03bfRZ/GzcKjUMnnrTKAQoa7jI
+ BsHGGSvqrvW65zZ9SkI/Gx2TrcmgQabBSkoUlywGbChlv3YS90cmZASsQcFsiFQA7Y6Dxf
+ DR2DaGDJNWG+JnVDNIegexOmFUj0jik=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-ZfL7LalrN6OLFr_Fabu8OA-1; Wed, 12 Feb 2020 08:36:22 -0500
+ us-mta-181-67-pY_7JN4uM5wcOc2HeTg-1; Wed, 12 Feb 2020 08:36:37 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70739800D48;
- Wed, 12 Feb 2020 13:36:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5CB219057A2;
+ Wed, 12 Feb 2020 13:36:36 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-117-92.ams2.redhat.com [10.36.117.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACA5526FB6;
- Wed, 12 Feb 2020 13:36:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F0B7F19C69;
+ Wed, 12 Feb 2020 13:36:34 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 05/16] pc: Support for virtio-mem-pci
-Date: Wed, 12 Feb 2020 14:35:50 +0100
-Message-Id: <20200212133601.10555-6-david@redhat.com>
+Subject: [PATCH v2 10/16] hostmem: Factor out applying settings
+Date: Wed, 12 Feb 2020 14:35:55 +0100
+Message-Id: <20200212133601.10555-11-david@redhat.com>
 In-Reply-To: <20200212133601.10555-1-david@redhat.com>
 References: <20200212133601.10555-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: ZfL7LalrN6OLFr_Fabu8OA-1
+X-MC-Unique: 67-pY_7JN4uM5wcOc2HeTg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,158 +94,190 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We want to reuse the functionality when resizing resizable memory
+region.
+
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/i386/Kconfig |  1 +
- hw/i386/pc.c    | 42 ++++++++++++++++++++++++------------------
- 2 files changed, 25 insertions(+), 18 deletions(-)
+ backends/hostmem.c | 137 +++++++++++++++++++++++++--------------------
+ 1 file changed, 76 insertions(+), 61 deletions(-)
 
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index cdc851598c..e8ce582edd 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -35,6 +35,7 @@ config PC
-     select ACPI_PCI
-     select ACPI_VMGENID
-     select VIRTIO_PMEM_SUPPORTED
-+    select VIRTIO_MEM_SUPPORTED
-=20
- config PC_PCI
-     bool
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2ddce4230a..ed8850f31d 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -85,6 +85,7 @@
- #include "hw/net/ne2000-isa.h"
- #include "standard-headers/asm-x86/bootparam.h"
- #include "hw/virtio/virtio-pmem-pci.h"
-+#include "hw/virtio/virtio-mem-pci.h"
- #include "hw/mem/memory-device.h"
- #include "sysemu/replay.h"
- #include "qapi/qmp/qerror.h"
-@@ -1648,8 +1649,8 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_d=
-ev,
-     numa_cpu_pre_plug(cpu_slot, dev, errp);
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index e773bdfa6e..2c8e4567e1 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -308,15 +308,85 @@ size_t host_memory_backend_pagesize(HostMemoryBackend=
+ *memdev)
  }
+ #endif
 =20
--static void pc_virtio_pmem_pci_pre_plug(HotplugHandler *hotplug_dev,
--                                        DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_pre_plug(HotplugHandler *hotplug_dev,
-+                                      DeviceState *dev, Error **errp)
++static void host_memory_backend_apply_settings(HostMemoryBackend *backend,
++                                               Error **errp)
++{
++    const uint64_t sz =3D memory_region_size(&backend->mr);
++    void *ptr =3D memory_region_get_ram_ptr(&backend->mr);
++    MachineState *ms =3D MACHINE(qdev_get_machine());
++    Error *local_err =3D NULL;
++
++    if (backend->merge) {
++        qemu_madvise(ptr, sz, QEMU_MADV_MERGEABLE);
++    }
++    if (!backend->dump) {
++        qemu_madvise(ptr, sz, QEMU_MADV_DONTDUMP);
++    }
++#ifdef CONFIG_NUMA
++   unsigned long lastbit =3D find_last_bit(backend->host_nodes, MAX_NODES)=
+;
++   /* lastbit =3D=3D MAX_NODES means maxnode =3D 0 */
++   unsigned long maxnode =3D (lastbit + 1) % (MAX_NODES + 1);
++   /*
++    * Ensure policy won't be ignored in case memory is preallocated before
++    * mbind(). note: MPOL_MF_STRICT is ignored on hugepages so this doesn'=
+t
++    * catch hugepage case.
++    */
++   unsigned flags =3D MPOL_MF_STRICT | MPOL_MF_MOVE;
++
++   /*
++    * Check for invalid host-nodes and policies and give more verbose erro=
+r
++    * messages than mbind().
++    */
++   if (maxnode && backend->policy =3D=3D MPOL_DEFAULT) {
++       error_setg(errp, "host-nodes must be empty for policy default,"
++                  " or you should explicitly specify a policy other"
++                  " than default");
++       return;
++   } else if (maxnode =3D=3D 0 && backend->policy !=3D MPOL_DEFAULT) {
++       error_setg(errp, "host-nodes must be set for policy %s",
++                  HostMemPolicy_str(backend->policy));
++       return;
++   }
++
++   /*
++    * We can have up to MAX_NODES nodes, but we need to pass maxnode+1 as
++    * argument to mbind() due to an old Linux bug (feature?) which cuts of=
+f the
++    * last specified node. This means backend->host_nodes must have MAX_NO=
+DES+1
++    * bits available.
++    */
++   assert(sizeof(backend->host_nodes) >=3D
++          BITS_TO_LONGS(MAX_NODES + 1) * sizeof(unsigned long));
++   assert(maxnode <=3D MAX_NODES);
++   if (mbind(ptr, sz, backend->policy,
++             maxnode ? backend->host_nodes : NULL, maxnode + 1, flags)) {
++       if (backend->policy !=3D MPOL_DEFAULT || errno !=3D ENOSYS) {
++           error_setg_errno(errp, errno,
++                            "cannot bind memory to host NUMA nodes");
++           return;
++       }
++   }
++#endif
++    /*
++     * Preallocate memory after the NUMA policy has been instantiated. Thi=
+s is
++     * necessary to guarantee memory is allocated with specified NUMA poli=
+cy
++     * in place.
++     */
++    if (backend->prealloc) {
++        os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
++                        ms->smp.cpus, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++}
++
+ static void
+ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
  {
-     HotplugHandler *hotplug_dev2 =3D qdev_get_bus_hotplug_handler(dev);
+     HostMemoryBackend *backend =3D MEMORY_BACKEND(uc);
+     HostMemoryBackendClass *bc =3D MEMORY_BACKEND_GET_CLASS(uc);
+-    MachineState *ms =3D MACHINE(qdev_get_machine());
      Error *local_err =3D NULL;
-@@ -1660,7 +1661,7 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandle=
-r *hotplug_dev,
-          * order. This should never be the case on x86, however better add
-          * a safety net.
-          */
--        error_setg(errp, "virtio-pmem-pci not supported on this bus.");
-+        error_setg(errp, "virtio based memory devices not supported on thi=
-s bus.");
-         return;
+-    void *ptr;
+-    uint64_t sz;
+=20
+     if (bc->alloc) {
+         bc->alloc(backend, &local_err);
+@@ -324,64 +394,9 @@ host_memory_backend_memory_complete(UserCreatable *uc,=
+ Error **errp)
+             goto out;
+         }
+=20
+-        ptr =3D memory_region_get_ram_ptr(&backend->mr);
+-        sz =3D memory_region_size(&backend->mr);
+-
+-        if (backend->merge) {
+-            qemu_madvise(ptr, sz, QEMU_MADV_MERGEABLE);
+-        }
+-        if (!backend->dump) {
+-            qemu_madvise(ptr, sz, QEMU_MADV_DONTDUMP);
+-        }
+-#ifdef CONFIG_NUMA
+-        unsigned long lastbit =3D find_last_bit(backend->host_nodes, MAX_N=
+ODES);
+-        /* lastbit =3D=3D MAX_NODES means maxnode =3D 0 */
+-        unsigned long maxnode =3D (lastbit + 1) % (MAX_NODES + 1);
+-        /* ensure policy won't be ignored in case memory is preallocated
+-         * before mbind(). note: MPOL_MF_STRICT is ignored on hugepages so
+-         * this doesn't catch hugepage case. */
+-        unsigned flags =3D MPOL_MF_STRICT | MPOL_MF_MOVE;
+-
+-        /* check for invalid host-nodes and policies and give more verbose
+-         * error messages than mbind(). */
+-        if (maxnode && backend->policy =3D=3D MPOL_DEFAULT) {
+-            error_setg(errp, "host-nodes must be empty for policy default,=
+"
+-                       " or you should explicitly specify a policy other"
+-                       " than default");
+-            return;
+-        } else if (maxnode =3D=3D 0 && backend->policy !=3D MPOL_DEFAULT) =
+{
+-            error_setg(errp, "host-nodes must be set for policy %s",
+-                       HostMemPolicy_str(backend->policy));
+-            return;
+-        }
+-
+-        /* We can have up to MAX_NODES nodes, but we need to pass maxnode+=
+1
+-         * as argument to mbind() due to an old Linux bug (feature?) which
+-         * cuts off the last specified node. This means backend->host_node=
+s
+-         * must have MAX_NODES+1 bits available.
+-         */
+-        assert(sizeof(backend->host_nodes) >=3D
+-               BITS_TO_LONGS(MAX_NODES + 1) * sizeof(unsigned long));
+-        assert(maxnode <=3D MAX_NODES);
+-        if (mbind(ptr, sz, backend->policy,
+-                  maxnode ? backend->host_nodes : NULL, maxnode + 1, flags=
+)) {
+-            if (backend->policy !=3D MPOL_DEFAULT || errno !=3D ENOSYS) {
+-                error_setg_errno(errp, errno,
+-                                 "cannot bind memory to host NUMA nodes");
+-                return;
+-            }
+-        }
+-#endif
+-        /* Preallocate memory after the NUMA policy has been instantiated.
+-         * This is necessary to guarantee memory is allocated with
+-         * specified NUMA policy in place.
+-         */
+-        if (backend->prealloc) {
+-            os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
+-                            ms->smp.cpus, &local_err);
+-            if (local_err) {
+-                goto out;
+-            }
++        host_memory_backend_apply_settings(backend, &local_err);
++        if (local_err) {
++            goto out;
+         }
      }
-     /*
-@@ -1675,8 +1676,8 @@ static void pc_virtio_pmem_pci_pre_plug(HotplugHandle=
-r *hotplug_dev,
-     error_propagate(errp, local_err);
- }
-=20
--static void pc_virtio_pmem_pci_plug(HotplugHandler *hotplug_dev,
--                                    DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_plug(HotplugHandler *hotplug_dev,
-+                                  DeviceState *dev, Error **errp)
- {
-     HotplugHandler *hotplug_dev2 =3D qdev_get_bus_hotplug_handler(dev);
-     Error *local_err =3D NULL;
-@@ -1694,15 +1695,15 @@ static void pc_virtio_pmem_pci_plug(HotplugHandler =
-*hotplug_dev,
-     error_propagate(errp, local_err);
- }
-=20
--static void pc_virtio_pmem_pci_unplug_request(HotplugHandler *hotplug_dev,
--                                              DeviceState *dev, Error **er=
-rp)
-+static void pc_virtio_md_pci_unplug_request(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **errp=
-)
- {
-     /* We don't support virtio pmem hot unplug */
-     error_setg(errp, "virtio pmem device unplug not supported.");
- }
-=20
--static void pc_virtio_pmem_pci_unplug(HotplugHandler *hotplug_dev,
--                                      DeviceState *dev, Error **errp)
-+static void pc_virtio_md_pci_unplug(HotplugHandler *hotplug_dev,
-+                                    DeviceState *dev, Error **errp)
- {
-     /* We don't support virtio pmem hot unplug */
- }
-@@ -1714,8 +1715,9 @@ static void pc_machine_device_pre_plug_cb(HotplugHand=
-ler *hotplug_dev,
-         pc_memory_pre_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_pre_plug(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_pre_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_pre_plug(hotplug_dev, dev, errp);
-     }
- }
-=20
-@@ -1726,8 +1728,9 @@ static void pc_machine_device_plug_cb(HotplugHandler =
-*hotplug_dev,
-         pc_memory_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_plug(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_plug(hotplug_dev, dev, errp);
-     }
- }
-=20
-@@ -1738,8 +1741,9 @@ static void pc_machine_device_unplug_request_cb(Hotpl=
-ugHandler *hotplug_dev,
-         pc_memory_unplug_request(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_unplug_request(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_unplug_request(hotplug_dev, dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug request for not supported de=
-vice"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -1753,8 +1757,9 @@ static void pc_machine_device_unplug_cb(HotplugHandle=
-r *hotplug_dev,
-         pc_memory_unplug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_cb(hotplug_dev, dev, errp);
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
--        pc_virtio_pmem_pci_unplug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+               object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-+        pc_virtio_md_pci_unplug(hotplug_dev, dev, errp);
-     } else {
-         error_setg(errp, "acpi: device unplug for not supported device"
-                    " type: %s", object_get_typename(OBJECT(dev)));
-@@ -1766,7 +1771,8 @@ static HotplugHandler *pc_get_hotplug_handler(Machine=
-State *machine,
- {
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
-         object_dynamic_cast(OBJECT(dev), TYPE_CPU) ||
--        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)) {
-+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI) ||
-+        object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
-         return HOTPLUG_HANDLER(machine);
-     }
-=20
+ out:
 --=20
 2.24.1
 
