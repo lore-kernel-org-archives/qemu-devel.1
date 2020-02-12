@@ -2,77 +2,58 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E47A3C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C4BDC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:05:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2A1920659
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:04:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5OZDX2h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A1920659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4599420659
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:05:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4599420659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1rgd-0004bA-Rd
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:04:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33203)
+	id 1j1rhl-0006Ov-Ap
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:05:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jtomko@redhat.com>) id 1j1rfI-00047U-RJ
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:03:13 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j1rgD-0004an-O9
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:03:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jtomko@redhat.com>) id 1j1rf7-0007ec-Vc
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:02:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50039
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1j1rf7-0007di-Rn
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:02:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581512560;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=gTMLPn9wN+YLWSEELMI/0wurbY1WH5fJvPq4HhxIH0M=;
- b=E5OZDX2hKAZS4wcMfJOIaxYuoEFXxkt2+YpHTtPjVBrr25OWXlX7m8/si0xmHdUfNTR0tv
- xIKPWoKRXWYQHPmDfh166SnS+/cfg4FjEtMPf3nN/uTq3DV+PbU429cw7ctnGOEAmnoCdS
- uUsKRBveBHntIouYkjVeqjx4QDtXyiw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-5h__sVEKPsaUD9Dppbbp5g-1; Wed, 12 Feb 2020 08:02:26 -0500
-X-MC-Unique: 5h__sVEKPsaUD9Dppbbp5g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6545C107B7D6
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 13:02:25 +0000 (UTC)
-Received: from lpt (unknown [10.43.2.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 46ABB390;
- Wed, 12 Feb 2020 13:02:24 +0000 (UTC)
-Date: Wed, 12 Feb 2020 14:02:21 +0100
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-To: Andrea Bolognani <abologna@redhat.com>
-Subject: Re: [PATCH] qapi: Expand documentation for LostTickPolicy
-Message-ID: <20200212130221.GB2893@lpt>
-References: <20200211183744.210298-1-abologna@redhat.com>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j1rfp-00088Q-UE
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:03:49 -0500
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:32937)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j1rfo-00085D-ID
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:03:25 -0500
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 68F22DD661;
+ Wed, 12 Feb 2020 22:03:23 +0900 (JST)
+Received: from yo-satoh-debian.localdomain
+ (ae231051.dynamic.ppp.asahi-net.or.jp [14.3.231.51])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 3B6B824008E;
+ Wed, 12 Feb 2020 22:03:23 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v30 18/22] hw/rx: Honor -accel qtest
+Date: Wed, 12 Feb 2020 22:03:07 +0900
+Message-Id: <20200212130311.127515-19-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200212130311.127515-1-ysato@users.sourceforge.jp>
+References: <20200212130311.127515-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-In-Reply-To: <20200211183744.210298-1-abologna@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="jq0ap7NbKX2Kqbes"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,58 +65,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---jq0ap7NbKX2Kqbes
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: Richard Henderson <richard.henderson@linaro.org>
 
-On Tue, Feb 11, 2020 at 07:37:44PM +0100, Andrea Bolognani wrote:
->The current documentation is fairly terse and not easy to decode
->for someone who's not intimately familiar with the inner workings
->of timer devices. Expand on it by providing a somewhat verbose
+Issue an error if no kernel, no bios, and not qtest'ing.
+Fixes make check-qtest-rx: test/qom-test.
 
-Perchance exorbitantly circumlocutory, but definitely an improvement.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-16-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+We could squash this with the previous patch
+---
+ hw/rx/rx62n.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
->description of what behavior each policy will result in, as seen
->from both the guest OS and host point of view.
->
->Signed-off-by: Andrea Bolognani <abologna@redhat.com>
->---
->This information is reported pretty much word by word in
->
->  https://libvirt.org/formatdomain.html#elementsTime
->
->so I'm hoping I can get the QEMU documentation updated and then just
->merge back the changes.
->
-> qapi/misc.json | 34 +++++++++++++++++++++++-----------
-> 1 file changed, 23 insertions(+), 11 deletions(-)
-
-Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
-
-Jano
-
---jq0ap7NbKX2Kqbes
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl5D91EACgkQ+YPwO/Ma
-t51F9AgAqgXPJhN77M5T7lKpcHMcupY6UaeCL8+nlyZy8xkbOBrHZnZFKdvBh9tK
-8QJeesHSlfLYHOTk+RI7QXf80sBzhhm/GT9AwREldILo36qvAGIlObVG2p/obTqU
-uzZLy9b2Pu0CGVhuuZ7uunNizaldDNvQ0/qSMrmEIQUG8p6FaFR1QDs2mcOT2oKo
-z907s2MXSnf3LucKroa6RpH4W0670xYq+3DYSN/tFEOJbktKKVc0oxBiKPTZdAAi
-ufdDKB91wWWYV3tcPynFZGpSK++KyQDpSWZl3eh21pOtOmKkMApZEjMBvT9ukDOF
-oukRKaxK4AACgCYbWCt+M6Z5xSm9mg==
-=VUut
------END PGP SIGNATURE-----
-
---jq0ap7NbKX2Kqbes--
+diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+index bd4cd4b6ea..c488934f09 100644
+--- a/hw/rx/rx62n.c
++++ b/hw/rx/rx62n.c
+@@ -21,12 +21,14 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/rx/rx62n.h"
+ #include "hw/loader.h"
+ #include "hw/sysbus.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
+ #include "cpu.h"
+=20
+ /*
+@@ -191,8 +193,14 @@ static void rx62n_realize(DeviceState *dev, Error **=
+errp)
+     memory_region_init_rom(&s->c_flash, NULL, "codeflash",
+                            RX62N_CFLASH_SIZE, errp);
+     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
+h);
++
+     if (!s->kernel) {
+-        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++        if (bios_name) {
++            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++        }  else if (!qtest_enabled()) {
++            error_report("No bios or kernel specified");
++            exit(1);
++        }
+     }
+=20
+     /* Initialize CPU */
+--=20
+2.20.1
 
 
