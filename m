@@ -2,60 +2,72 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D29FC352A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 01:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AAF5C352A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 02:00:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51A6420724
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 01:53:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A6420724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6C26F20659
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 02:00:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C26F20659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=yifanlu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j23gb-0006n5-Je
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 20:53:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49936)
+	id 1j23nQ-000232-J8
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 21:00:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j23bd-0005y7-7Q
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 20:47:54 -0500
+ (envelope-from <bounces@canonical.com>) id 1j20DX-0001aT-Nc
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:10:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j23bc-0004Vs-59
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 20:47:53 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:40552 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1j23bb-0004Td-Tf
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 20:47:52 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id EC6BB1A215C;
- Thu, 13 Feb 2020 02:46:47 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id B133F1A215E;
- Thu, 13 Feb 2020 02:46:47 +0100 (CET)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+ (envelope-from <bounces@canonical.com>) id 1j20DV-0003Qw-Jf
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:10:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44714)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j20DV-0003Pi-Dy
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:10:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j20DT-0004tR-VS
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 22:10:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E4A902E8042
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 22:10:43 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 12 Feb 2020 22:01:07 -0000
+From: Yifan <me@yifanlu.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 7/9] linux-user: x86_64: Update syscall numbers to kernel
- 5.5 level
-Date: Thu, 13 Feb 2020 02:46:31 +0100
-Message-Id: <1581558393-9182-8-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1581558393-9182-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1581558393-9182-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: yifanlu
+X-Launchpad-Bug-Reporter: Yifan (yifanlu)
+X-Launchpad-Bug-Modifier: Yifan (yifanlu)
+Message-Id: <158154486735.14935.3370403781300872079.malonedeb@soybean.canonical.com>
+Subject: [Bug 1863025] [NEW] Use-after-free after flush in TCG accelerator
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9484060313346fba58f007d3cdcf5834e322216c
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Wed, 12 Feb 2020 20:59:15 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -64,61 +76,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- laurent@vivier.eu, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1863025 <1863025@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Public bug reported:
 
-Update x86_64 syscall numbers based on Linux kernel v5.5.
+I believe I found a UAF in TCG that can lead to a guest VM escape. The
+security list informed me "This can not be treated as a security issue."
+and to post it here. I am looking at the 4.2.0 source code. The issue
+requires a race and I will try to describe it in terms of three
+concurrent threads.
 
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Richard Henderson <rth@twiddle.net>
-CC: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/x86_64/syscall_nr.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Thread A:
 
-diff --git a/linux-user/x86_64/syscall_nr.h b/linux-user/x86_64/syscall_nr.h
-index 9b6981e..e5d14ec 100644
---- a/linux-user/x86_64/syscall_nr.h
-+++ b/linux-user/x86_64/syscall_nr.h
-@@ -328,5 +328,29 @@
- #define TARGET_NR_membarrier            324
- #define TARGET_NR_mlock2                325
- #define TARGET_NR_copy_file_range       326
-+#define TARGET_NR_preadv2               327
-+#define TARGET_NR_pwritev2              328
-+#define TARGET_NR_pkey_mprotect         329
-+#define TARGET_NR_pkey_alloc            330
-+#define TARGET_NR_pkey_free             331
-+#define TARGET_NR_statx                 332
-+#define TARGET_NR_io_pgetevents         333
-+#define TARGET_NR_rseq                  334
-+/*
-+ * don't use numbers 387 through 423, add new calls after the last
-+ * 'common' entry
-+ */
-+#define TARGET_NR_pidfd_send_signal     424
-+#define TARGET_NR_io_uring_setup        425
-+#define TARGET_NR_io_uring_enter        426
-+#define TARGET_NR_io_uring_register     427
-+#define TARGET_NR_open_tree             428
-+#define TARGET_NR_move_mount            429
-+#define TARGET_NR_fsopen                430
-+#define TARGET_NR_fsconfig              431
-+#define TARGET_NR_fsmount               432
-+#define TARGET_NR_fspick                433
-+#define TARGET_NR_pidfd_open            434
-+#define TARGET_NR_clone3                435
- 
- #endif
--- 
-2.7.4
+A1. qemu_tcg_cpu_thread_fn runs work loop
+A2. qemu_wait_io_event =3D> qemu_wait_io_event_common =3D> process_queued_c=
+pu_work
+A3. start_exclusive critical section entered
+A4. do_tb_flush is called, TB memory freed/re-allocated
+A5. end_exclusive exits critical section
 
+Thread B:
+
+B1. qemu_tcg_cpu_thread_fn runs work loop
+B2. tcg_cpu_exec =3D> cpu_exec =3D> tb_find =3D> tb_gen_code
+B3. tcg_tb_alloc obtains a new TB
+
+Thread C:
+
+C1. qemu_tcg_cpu_thread_fn runs work loop
+C2. cpu_exec_step_atomic executes
+C3. TB obtained with tb_lookup__cpu_state or tb_gen_code
+C4. start_exclusive critical section entered
+C5. cpu_tb_exec executes the TB code
+C6. end_exclusive exits critical section
+
+Consider the following sequence of events:
+=C2=A0=C2=A0B2 =3D> B3 =3D> C3 (same TB as B2) =3D> A3 =3D> A4 (TB freed) =
+=3D> A5 =3D> B2 =3D>
+=C2=A0=C2=A0B3 (re-allocates TB from B2) =3D> C4 =3D> C5 (freed/reused TB n=
+ow executing) =3D> C6
+
+In short, because thread C uses the TB in the critical section, there is
+no guarantee that the pointer has not been "freed" (rather the memory is
+marked as re-usable) and therefore a use-after-free occurs.
+
+Since the TCG generated code can be in the same memory as the TB data
+structure, it is possible for an attacker to overwrite the UAF pointer
+with code generated from TCG. This can overwrite key pointer values and
+could lead to code execution on the host outside of the TCG sandbox.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Description changed:
+
+- I believe I found a UAF in TCG that can lead to a guest VM escape. The se=
+curity =
+
+- list informed me "This can not be treated as a security issue." and to po=
+st it =
+
+- here. I am looking at the 4.2.0 source code. The issue requires a race an=
+d I =
+
+- will try to describe it in terms of three concurrent threads.
+- =
+
+- I am looking =
+
+- at the 4.2.0 source code. The issue requires a race and I will try to des=
+cribe =
+
+- it in terms of three concurrent threads.
++ I believe I found a UAF in TCG that can lead to a guest VM escape. The
++ security list informed me "This can not be treated as a security issue."
++ and to post it here. I am looking at the 4.2.0 source code. The issue
++ requires a race and I will try to describe it in terms of three
++ concurrent threads.
+  =
+
+  Thread A:
+  =
+
+  A1. qemu_tcg_cpu_thread_fn runs work loop
+  A2. qemu_wait_io_event =3D> qemu_wait_io_event_common =3D> process_queued=
+_cpu_work
+  A3. start_exclusive critical section entered
+  A4. do_tb_flush is called, TB memory freed/re-allocated
+  A5. end_exclusive exits critical section
+  =
+
+  Thread B:
+  =
+
+  B1. qemu_tcg_cpu_thread_fn runs work loop
+  B2. tcg_cpu_exec =3D> cpu_exec =3D> tb_find =3D> tb_gen_code
+  B3. tcg_tb_alloc obtains a new TB
+  =
+
+  Thread C:
+  =
+
+  C1. qemu_tcg_cpu_thread_fn runs work loop
+  C2. cpu_exec_step_atomic executes
+  C3. TB obtained with tb_lookup__cpu_state or tb_gen_code
+  C4. start_exclusive critical section entered
+  C5. cpu_tb_exec executes the TB code
+  C6. end_exclusive exits critical section
+  =
+
+  Consider the following sequence of events:
+-   B2 =3D> B3 =3D> C3 (same TB as B2) =3D> A3 =3D> A4 (TB freed) =3D> A5 =
+=3D> B2 =3D> =
+
+-   B3 (re-allocates TB from B2) =3D> C4 =3D> C5 (freed/reused TB now execu=
+ting) =3D> C6
++ =C2=A0=C2=A0B2 =3D> B3 =3D> C3 (same TB as B2) =3D> A3 =3D> A4 (TB freed)=
+ =3D> A5 =3D> B2 =3D>
++ =C2=A0=C2=A0B3 (re-allocates TB from B2) =3D> C4 =3D> C5 (freed/reused TB=
+ now executing) =3D> C6
+  =
+
+- In short, because thread C uses the TB in the critical section, there is =
+no =
+
+- guarantee that the pointer has not been "freed" (rather the memory is mar=
+ked as =
+
+- re-usable) and therefore a use-after-free occurs.
++ In short, because thread C uses the TB in the critical section, there is
++ no guarantee that the pointer has not been "freed" (rather the memory is
++ marked as re-usable) and therefore a use-after-free occurs.
+  =
+
+- Since the TCG generated code can be in the same memory as the TB data str=
+ucture,
+- it is possible for an attacker to overwrite the UAF pointer with code gen=
+erated
+- from TCG. This can overwrite key pointer values and could lead to code =
+
+- execution on the host outside of the TCG sandbox.
++ Since the TCG generated code can be in the same memory as the TB data
++ structure, it is possible for an attacker to overwrite the UAF pointer
++ with code generated from TCG. This can overwrite key pointer values and
++ could lead to code execution on the host outside of the TCG sandbox.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863025
+
+Title:
+  Use-after-free after flush in TCG accelerator
+
+Status in QEMU:
+  New
+
+Bug description:
+  I believe I found a UAF in TCG that can lead to a guest VM escape. The
+  security list informed me "This can not be treated as a security
+  issue." and to post it here. I am looking at the 4.2.0 source code.
+  The issue requires a race and I will try to describe it in terms of
+  three concurrent threads.
+
+  Thread A:
+
+  A1. qemu_tcg_cpu_thread_fn runs work loop
+  A2. qemu_wait_io_event =3D> qemu_wait_io_event_common =3D> process_queued=
+_cpu_work
+  A3. start_exclusive critical section entered
+  A4. do_tb_flush is called, TB memory freed/re-allocated
+  A5. end_exclusive exits critical section
+
+  Thread B:
+
+  B1. qemu_tcg_cpu_thread_fn runs work loop
+  B2. tcg_cpu_exec =3D> cpu_exec =3D> tb_find =3D> tb_gen_code
+  B3. tcg_tb_alloc obtains a new TB
+
+  Thread C:
+
+  C1. qemu_tcg_cpu_thread_fn runs work loop
+  C2. cpu_exec_step_atomic executes
+  C3. TB obtained with tb_lookup__cpu_state or tb_gen_code
+  C4. start_exclusive critical section entered
+  C5. cpu_tb_exec executes the TB code
+  C6. end_exclusive exits critical section
+
+  Consider the following sequence of events:
+  =C2=A0=C2=A0B2 =3D> B3 =3D> C3 (same TB as B2) =3D> A3 =3D> A4 (TB freed)=
+ =3D> A5 =3D> B2 =3D>
+  =C2=A0=C2=A0B3 (re-allocates TB from B2) =3D> C4 =3D> C5 (freed/reused TB=
+ now executing) =3D> C6
+
+  In short, because thread C uses the TB in the critical section, there
+  is no guarantee that the pointer has not been "freed" (rather the
+  memory is marked as re-usable) and therefore a use-after-free occurs.
+
+  Since the TCG generated code can be in the same memory as the TB data
+  structure, it is possible for an attacker to overwrite the UAF pointer
+  with code generated from TCG. This can overwrite key pointer values
+  and could lead to code execution on the host outside of the TCG
+  sandbox.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863025/+subscriptions
 
