@@ -2,69 +2,115 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E204C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CECAAC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:05:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 020B02082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:04:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020B02082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A36A22082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:05:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36A22082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1uV1-0004BE-13
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:04:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58989)
+	id 1j1uVt-00058L-Sb
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:05:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59012)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j1uUN-0003ll-2D
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:49 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j1uUP-0003ln-44
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j1uUK-0007tE-UZ
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:46 -0500
-Resent-Date: Wed, 12 Feb 2020 11:03:46 -0500
-Resent-Message-Id: <E1j1uUK-0007tE-UZ@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21164)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j1uUK-0007sF-LI
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:44 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1581523410; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=b3pQXSRQ7WWXQcMh6WglNAkDAueNy3XuOxOU3xvMp1ohRGPfslbPzZ+TNM+rVbc4vGAlV06sAEnHNbuzakV8A9r76mAIiPDRnv7fZ/ovbqCcDNvvEwPHebrGAFMPU2W/hWmwKDlRpvDHeRm5883bIwAAN17rBLAmSQiuW3pLy+k=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1581523410;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ro+YlfwS9W/ltQoTHBMeh4qIsNMSCIA/m5vgJjCgjW0=; 
- b=GHDhntN2IIIa2FGDAKCaZb0iav2Ut7RcloyMMX2CmiDORF6pGv0Q1FYeFKNiZotWYFp+yLYvqJ24pvOeDKVqMk+U7HUepya5kKGw8l+LKNyZdC3SWNWMG7QSQt79s54o1OZ/OC54CtUHU0SRx9f0c0zRPY8/TuYjQSpL245Izhw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1581523404863900.7750590088241;
- Wed, 12 Feb 2020 08:03:24 -0800 (PST)
-In-Reply-To: <20200212130311.127515-1-ysato@users.sourceforge.jp>
-Subject: Re: [PATCH v30 00/22] Add RX archtecture support
-Message-ID: <158152340346.15549.11538961957277175578@a1bbccc8075a>
+ (envelope-from <laurent@vivier.eu>) id 1j1uUN-0007v3-9e
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:48 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:55221)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j1uUM-0007tO-WC
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:47 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MHoAg-1jEY4i0bhu-00EvQX; Wed, 12 Feb 2020 17:03:38 +0100
+Subject: Re: [PATCH v2] linux-user: implement TARGET_SO_PEERSEC
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200204211901.1731821-1-laurent@vivier.eu>
+ <713318de-21ee-4137-0580-c6d852bea008@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <93a00c06-f42d-0c7d-79a4-0dcd1bc488c5@vivier.eu>
+Date: Wed, 12 Feb 2020 17:03:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ysato@users.sourceforge.jp
-Date: Wed, 12 Feb 2020 08:03:24 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <713318de-21ee-4137-0580-c6d852bea008@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:fV82ZGFijwlKCvu+43dM/KlN54NYBuBvj0mF6qVqwsx9O1qBBsV
+ fENNip3QDKSlh+OkXOb0elPMuKMG44q07daMAn5Lf2iThTN9NS/x3+PtR/4k4COlF61TG2U
+ iZb4YPkDfLXhA8AvD4i+KziBw5WJTGTu1ECF6jE1ec0UeRXMC30cw9QPagc01VD4UH/HAix
+ LbLeod2QezNPY/IjsF8qw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7ESfgyPq8Hs=:VTAC01pQl1bFhx7RKsW6CC
+ wGKO1ZMJC9YcdkYKuRI1ubcmL4VYox+7ANYHnX0Qx2utW7RJ9NVD0Bo5PjcsfT2gsYAS2pUZy
+ ZWPXughK4cOgKm1ShcVi0Lt7QazQiipFJ1MBLrmhrEr+6HGc570yAw5pGsxEv240uRaORGCrM
+ mUnh4Ixs53Bkr5fwaOBex12ih+2JtRjaQkqisWCdVWhVuk8LaeRKh/X96EsEHVIW8Y9kJBu76
+ bRZxRdooui8x5XMq3GPBbdVMp5XVheafRobgR16V79Pu9jc1uWeWu9s9kQQP/dFBjA5nczUMq
+ 0PoLDIzFM+/J4VT/YbeOb4GEJ3TpjGmoWZyZq4iVynSXjxsC8UVotF/I4LhQxDMS7hns7dlGW
+ gicBhw+/rkf6du41I1qp6291Lys8w44NMIVDLjnRoA6OnH387FIjSt//uG0KW8ZW+dFo/Ovx1
+ h2mdENbrEPmf7kOuZoAiftcOE0QwOKYbw2RfAAGt49FXBFGkbbMaaLKFNdN60YEOf37vqQIzx
+ IfCpnK2/kgmW5N+HTc/au/ip8ImXPXU3o1dq3cChu3ozPsOQbQrDrKnozAagzJYz26LVIFtt5
+ MlWjO/lccagiA4MvBgxT/QB89tNoEXQXM86vaIKtdoqcVNciBbY9VMcAPSIFymZuMIDpPZLMj
+ +4XowCEVfVjhgbfC8zRyREdfZjOhePKVqTizuv/Ndpy1t+ukfh4VbLyM01rplmhjgmEYNaq20
+ 5zQsgL0zOKrfXXreNfr+2bvh7ou9CvwHA8pi9+A0e3EjgKA4vYqt4KZ+XueMDzxQc4UmWdsJa
+ nQbHCKjMibtZL90VJfebkKZkuo0D033DzEmgfKXxL6GbHd64JhPPhq2ZtiAWaqhSvZ5K5yd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,156 +122,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: philmd@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- ysato@users.sourceforge.jp
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ =?UTF-8?Q?Matthias_L=c3=bcscher?= <lueschem@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIxMjEzMDMxMS4xMjc1
-MTUtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcC8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYzMCAwMC8yMl0gQWRkIFJYIGFy
-Y2h0ZWN0dXJlIHN1cHBvcnQKTWVzc2FnZS1pZDogMjAyMDAyMTIxMzAzMTEuMTI3NTE1LTEteXNh
-dG9AdXNlcnMuc291cmNlZm9yZ2UuanAKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
-c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
-LSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwMjEyMTMwMzExLjEyNzUxNS0xLXlzYXRv
-QHVzZXJzLnNvdXJjZWZvcmdlLmpwIC0+IHBhdGNoZXcvMjAyMDAyMTIxMzAzMTEuMTI3NTE1LTEt
-eXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwpiYWJjODRhIHFlbXUtZG9jLnRleGk6IEFkZCBSWCBzZWN0aW9uLgowMjY3MWEzIEJvb3RMaW51
-eENvbnNvbGVUZXN0OiBUZXN0IHRoZSBSWC1WaXJ0IG1hY2hpbmUKYTdiMTcxZiBBZGQgcngtc29m
-dG1tdQoxNTdkMDYxIGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2Mk4gbWljcm9jb250cm9sbGVyIHRv
-IHRoZSBSWDYyTiBDUFUgY29yZQo2ZGQ5ZTI5IGh3L3J4OiBIb25vciAtYWNjZWwgcXRlc3QKNTMx
-ZjJlNyBody9yeDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmluaXRpb24KMmY4NDM4NCBody9jaGFy
-OiBSWDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkKZWZiNjcyZCBody90
-aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcwoyZWNjOGU4IGh3L2ludGM6IFJYNjJO
-IGludGVycnVwdCBjb250cm9sbGVyIChJQ1VhKQpjNDhiMWUzIHRhcmdldC9yeDogRHVtcCBieXRl
-cyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseQpjZjZiZDIzIHRhcmdldC9yeDogQ29s
-bGVjdCBhbGwgYnl0ZXMgZHVyaW5nIGRpc2Fzc2VtYmx5CjA2MzBmNTcgdGFyZ2V0L3J4OiBFbWl0
-IGFsbCBkaXNhc3NlbWJseSBpbiBvbmUgcHJ0KCkKYzY4MjMyZSB0YXJnZXQvcng6IFVzZSBwcnRf
-bGRtaSBmb3IgWENIR19tciBkaXNhc3NlbWJseQowYzcxNWNmIHRhcmdldC9yeDogUmVwbGFjZSBv
-cGVyYW5kIHdpdGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVyCjU2ODIzZTggdGFyZ2V0L3J4OiBE
-aXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJpbmcKYmVjODhjNiB0YXJnZXQvcng6
-IFJYIGRpc2Fzc2VtYmxlcgplMDg3NzU2IHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24KNzZmYmY0
-YiB0YXJnZXQvcng6IFRDRyBoZWxwZXIKMDc3Yjc0OSB0YXJnZXQvcng6IFRDRyB0cmFuc2xhdGlv
-bgowNzcwODNkIGh3L3JlZ2lzdGVyZmllbGRzLmg6IEFkZCA4Yml0IGFuZCAxNmJpdCByZWdpc3Rl
-ciBtYWNyb3MKMGUwYjA2NCBxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3Qx
-NgplMDU3ZDBkIE1BSU5UQUlORVJTOiBBZGQgUlgKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjIg
-Q2hlY2tpbmcgY29tbWl0IGUwNTdkMGQxZWFhNyAoTUFJTlRBSU5FUlM6IEFkZCBSWCkKMi8yMiBD
-aGVja2luZyBjb21taXQgMGUwYjA2NDBlN2U4IChxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDgg
-YW5kIGV4dHJhY3QxNikKMy8yMiBDaGVja2luZyBjb21taXQgMDc3MDgzZGI5MTUyIChody9yZWdp
-c3RlcmZpZWxkcy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0ZXIgbWFjcm9zKQpVc2Ugb2Yg
-dW5pbml0aWFsaXplZCB2YWx1ZSBpbiBjb25jYXRlbmF0aW9uICguKSBvciBzdHJpbmcgYXQgLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgbGluZSAyNDkwLgpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlw
-bGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzI3
-OiBGSUxFOiBpbmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6MjU6CisjZGVmaW5lIFJFRzgocmVn
-LCBhZGRyKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XAorICAgIGVudW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSB9OwoK
-RVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2Vk
-IGluIGEgZG8gLSB3aGlsZSBsb29wCiMzMTogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxk
-cy5oOjI5OgorI2RlZmluZSBSRUcxNihyZWcsIGFkZHIpICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IEFfICMjIHJlZyA9IChhZGRy
-KSB9OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBlbnVt
-IHsgUl8gIyMgcmVnID0gKGFkZHIpIC8gMiB9OwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdz
-LCA1NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-Cgo0LzIyIENoZWNraW5nIGNvbW1pdCAwNzdiNzQ5MTZlODYgKHRhcmdldC9yeDogVENHIHRyYW5z
-bGF0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
-bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8yMiBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzIyIENoZWNraW5nIGNvbW1pdCA3NmZiZjRiNzFl
-NzMgKHRhcmdldC9yeDogVENHIGhlbHBlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
-ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjE6IApuZXcgZmls
-ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NTAgbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzIyIENoZWNraW5n
-IGNvbW1pdCBlMDg3NzU2ZTgwYmMgKHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24pCldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzIyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
-YXJuaW5ncywgNjU5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMjIgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KNy8yMiBDaGVja2luZyBjb21taXQgYmVjODhjNjVjNmQ5ICh0YXJnZXQvcng6IFJY
-IGRpc2Fzc2VtYmxlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
-ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0
-NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDk3IGxpbmVzIGNoZWNrZWQKClBhdGNo
-IDcvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8yMiBDaGVja2luZyBjb21taXQgNTY4
-MjNlODE2MTZlICh0YXJnZXQvcng6IERpc2Fzc2VtYmxlIHJ4X2luZGV4X2FkZHIgaW50byBhIHN0
-cmluZykKOS8yMiBDaGVja2luZyBjb21taXQgMGM3MTVjZmNhZjUwICh0YXJnZXQvcng6IFJlcGxh
-Y2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcikKMTAvMjIgQ2hlY2tpbmcg
-Y29tbWl0IGM2ODIzMmU5Y2JhYSAodGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIg
-ZGlzYXNzZW1ibHkpCjExLzIyIENoZWNraW5nIGNvbW1pdCAwNjMwZjU3MWNlN2YgKHRhcmdldC9y
-eDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpKQoxMi8yMiBDaGVja2luZyBjb21t
-aXQgY2Y2YmQyM2Y1Zjk5ICh0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNh
-c3NlbWJseSkKMTMvMjIgQ2hlY2tpbmcgY29tbWl0IGM0OGIxZTMxMGQwNiAodGFyZ2V0L3J4OiBE
-dW1wIGJ5dGVzIGZvciBlYWNoIGluc24gZHVyaW5nIGRpc2Fzc2VtYmx5KQoxNC8yMiBDaGVja2lu
-ZyBjb21taXQgMmVjYzhlOGQ2MmQ3IChody9pbnRjOiBSWDYyTiBpbnRlcnJ1cHQgY29udHJvbGxl
-ciAoSUNVYSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0LzIy
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzIyIENoZWNraW5nIGNvbW1pdCBlZmI2NzJk
-NmJjZWUgKGh3L3RpbWVyOiBSWDYyTiBpbnRlcm5hbCB0aW1lciBtb2R1bGVzKQpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiM1MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDg0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoxNi8yMiBDaGVja2luZyBjb21taXQgMmY4NDM4NDhjNGQxIChody9jaGFyOiBSWDYy
-TiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzQzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
-NDAwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-CjE3LzIyIENoZWNraW5nIGNvbW1pdCA1MzFmMmU3YmE0ZTkgKGh3L3J4OiBSWCBUYXJnZXQgaGFy
-ZHdhcmUgZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
-KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjM6IApuZXcgZmlsZSBtb2RlIDEw
-MDY0NAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzEyODogRklMRTogaHcvcngvcngtdmly
-dC5jOjczOgorICAgICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxNDY6IEZJTEU6IGh3
-L3J4L3J4LXZpcnQuYzo5MToKKyAgICAgICAgLyogVGhlIGtlcm5lbCBpbWFnZSBpcyBsb2FkZWQg
-aW50byAkCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2Vw
-YXJhdGUgbGluZQojMTQ2OiBGSUxFOiBody9yeC9yeC12aXJ0LmM6OTE6CisgICAgICAgIC8qIFRo
-ZSBrZXJuZWwgaW1hZ2UgaXMgbG9hZGVkIGludG8gCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1
-c2UgKiBvbiBzdWJzZXF1ZW50IGxpbmVzCiMxNDc6IEZJTEU6IGh3L3J4L3J4LXZpcnQuYzo5MjoK
-KyAgICAgICAgLyogVGhlIGtlcm5lbCBpbWFnZSBpcyBsb2FkZWQgaW50byAKKyAgICAgICAgICAg
-dGhlIGxhdHRlciBoYWxmIG9mIHRoZSBTRFJBTSBzcGFjZS4gKi8KCldBUk5JTkc6IEJsb2NrIGNv
-bW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojMTQ3OiBGSUxFOiBo
-dy9yeC9yeC12aXJ0LmM6OTI6CisgICAgICAgICAgIHRoZSBsYXR0ZXIgaGFsZiBvZiB0aGUgU0RS
-QU0gc3BhY2UuICovCgp0b3RhbDogMiBlcnJvcnMsIDQgd2FybmluZ3MsIDQ5MyBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAxNy8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTgvMjIgQ2hlY2tp
-bmcgY29tbWl0IDZkZDllMjkyOTRjNyAoaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdCkKMTkvMjIg
-Q2hlY2tpbmcgY29tbWl0IDE1N2QwNjFmNjk2YyAoaHcvcng6IFJlc3RyaWN0IHRoZSBSWDYyTiBt
-aWNyb2NvbnRyb2xsZXIgdG8gdGhlIFJYNjJOIENQVSBjb3JlKQoyMC8yMiBDaGVja2luZyBjb21t
-aXQgYTdiMTcxZmNmMjJiIChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
-IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjk6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4MyBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAyMC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMS8yMiBD
-aGVja2luZyBjb21taXQgMDI2NzFhM2U3ZDFhIChCb290TGludXhDb25zb2xlVGVzdDogVGVzdCB0
-aGUgUlgtVmlydCBtYWNoaW5lKQoyMi8yMiBDaGVja2luZyBjb21taXQgYmFiYzg0YTRmMjdjIChx
-ZW11LWRvYy50ZXhpOiBBZGQgUlggc2VjdGlvbi4pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMjEyMTMwMzExLjEyNzUxNS0xLXlzYXRvQHVz
-ZXJzLnNvdXJjZWZvcmdlLmpwL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+Le 12/02/2020 à 16:56, Philippe Mathieu-Daudé a écrit :
+> On 2/4/20 10:19 PM, Laurent Vivier wrote:
+>> "The purpose of this option is to allow an application to obtain the
+>> security credentials of a Unix stream socket peer.  It is analogous to
+>> SO_PEERCRED (which provides authentication using standard Unix
+>> credentials
+>> of pid, uid and gid), and extends this concept to other security
+>> models." -- https://lwn.net/Articles/62370/
+>>
+>> Until now it was passed to the kernel with an "int" argument and
+>> fails when it was supported by the host because the parameter is
+>> like a filename: it is always a \0-terminated string with no embedded
+>> \0 characters, but is not guaranteed to be ASCII or UTF-8.
+>>
+>> I've tested the option with the following program:
+>>
+>>      /*
+>>       * cc -o getpeercon getpeercon.c
+>>       */
+>>
+>>      #include <stdio.h>
+>>      #include <sys/types.h>
+>>      #include <sys/socket.h>
+>>      #include <netinet/in.h>
+>>      #include <arpa/inet.h>
+>>
+>>      int main(void)
+>>      {
+>>          int fd;
+>>          struct sockaddr_in server, addr;
+>>          int ret;
+>>          socklen_t len;
+>>          char buf[256];
+>>
+>>          fd = socket(PF_INET, SOCK_STREAM, 0);
+>>          if (fd == -1) {
+>>              perror("socket");
+>>              return 1;
+>>          }
+>>
+>>          server.sin_family = AF_INET;
+>>          inet_aton("127.0.0.1", &server.sin_addr);
+>>          server.sin_port = htons(40390);
+>>
+>>          connect(fd, (struct sockaddr*)&server, sizeof(server));
+>>
+>>          len = sizeof(buf);
+>>          ret = getsockopt(fd, SOL_SOCKET, SO_PEERSEC, buf, &len);
+>>          if (ret == -1) {
+>>              perror("getsockopt");
+>>              return 1;
+>>          }
+>>          printf("%d %s\n", len, buf);
+>>          return 0;
+>>      }
+>>
+>> On host:
+>>
+>>    $ ./getpeercon
+>>    33 system_u:object_r:unlabeled_t:s0
+>>
+>> With qemu-aarch64/bionic without the patch:
+>>
+>>    $ ./getpeercon
+>>    getsockopt: Numerical result out of range
+>>
+>> With the patch:
+>>
+>>    $ ./getpeercon
+>>    33 system_u:object_r:unlabeled_t:s0
+>>
+>> Bug: https://bugs.launchpad.net/qemu/+bug/1823790
+>> Reported-by: Matthias Lüscher <lueschem@gmail.com>
+>> Tested-by: Matthias Lüscher <lueschem@gmail.com>
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>
+>> Notes:
+>>      v2: use correct length in unlock_user()
+>>
+>>   linux-user/syscall.c | 22 ++++++++++++++++++++++
+>>   1 file changed, 22 insertions(+)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index d60142f0691c..c930577686da 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -2344,6 +2344,28 @@ static abi_long do_getsockopt(int sockfd, int
+>> level, int optname,
+>>               }
+>>               break;
+>>           }
+>> +        case TARGET_SO_PEERSEC: {
+>> +            char *name;
+>> +
+>> +            if (get_user_u32(len, optlen)) {
+>> +                return -TARGET_EFAULT;
+>> +            }
+>> +            if (len < 0) {
+>> +                return -TARGET_EINVAL;
+>> +            }
+>> +            name = lock_user(VERIFY_WRITE, optval_addr, len, 0);
+>> +            if (!name) {
+>> +                return -TARGET_EFAULT;
+>> +            }
+>> +            lv = len;
+>> +            ret = get_errno(getsockopt(sockfd, level, SO_PEERSEC,
+>> +                                       name, &lv));
+> 
+> Can we get lv > len?
+
+No:
+
+getsockopt(2)
+
+"For  getsockopt(), optlen is a value-result argument, initially
+containing the size of the buffer pointed to by optval, and modified on
+return to  indicate the  actual  size  of  the value returned."
+
+> 
+>> +            if (put_user_u32(lv, optlen)) {
+>> +                ret = -TARGET_EFAULT;
+>> +            }
+>> +            unlock_user(name, optval_addr, lv);
+> 
+> Maybe safer to use len instead of lv here?
+
+No:
+
+this is the length of the buffer we must copy back to the user. Kernel
+has only modified lv length, not len.
+
+linux-user/qemu.h
+
+/* Unlock an area of guest memory.  The first LEN bytes must be
+   flushed back to guest memory. host_ptr = NULL is explicitly
+   allowed and does nothing. */
+static inline void unlock_user(void *host_ptr, abi_ulong guest_addr,
+                               long len)
+
+
+Thanks,
+Laurent
+
 
