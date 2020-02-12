@@ -2,73 +2,100 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A7AC352A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 22:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39CBDC352A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 22:50:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A73820848
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 22:41:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A73820848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 042C420848
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 22:50:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="arEuMBVH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 042C420848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j20hO-0007KE-I2
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 17:41:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46418)
+	id 1j20pg-0002wV-4a
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 17:50:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j20gc-0006oB-JW
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:40:51 -0500
+ (envelope-from <pmathieu@redhat.com>) id 1j20nh-0001Xf-CT
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:48:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j20gb-0008Oq-AW
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:40:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47508)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j20gb-0008OI-5W
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:40:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j20gZ-0006vM-JW
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 22:40:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8ED292E8074
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 22:40:47 +0000 (UTC)
+ (envelope-from <pmathieu@redhat.com>) id 1j20ne-0003co-Ja
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:48:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46091
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1j20ne-0003aN-B0
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 17:48:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581547685;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qr50x6WXUegzP8QDAQETMfuqnQLhTICpS5/SjcktxS4=;
+ b=arEuMBVHqUl+AirnGgGn9KBH0YFRbytNAAB7HYs4iSKcnSu/zbWMCfenF42EhpW/0/Z+P2
+ plWwilVhSA+VwWUjJ29VObe4vgJBtfuG6s+0eSOgdcFCYGMT0fGup/3TN2MiP/47d9I/cR
+ 9U2TNZlV2+kHwXsxd4KR3rBvQ5DX6Tw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-WdjKvxmZNi6k2qPLEzaFxw-1; Wed, 12 Feb 2020 17:48:00 -0500
+Received: by mail-wr1-f69.google.com with SMTP id o9so1461592wrw.14
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 14:48:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=qr50x6WXUegzP8QDAQETMfuqnQLhTICpS5/SjcktxS4=;
+ b=adtTMho87+BldETUwyvgP7ZDx+kWegixVQlSKgmbjpw0VVQkfZ5RKxF/IUmTNC0+YT
+ b+4wI7S2Uxrx61LZjVGEoVZ+jWzoVOXUUvRvzLyMTWkmKGp9YXaw9skMO/85CXXaWn8L
+ Hb1+v+hgKSllb6ihONcTMMtj8C7Kcm+GVG6JbC4x/ANAus4s2rdJl5oUdpCPsR6bmeLp
+ 18/LYyeuwogv/byuh4pT3bG1TLT8mBYfGqPkG2Nj+vHwFLnzuigJrI7D1Ce4bZEKL9xD
+ dv6BUOn8Qo9IUhvpgBIgjvCkSogF5ueYmkOEC9Jfe029OAO9CnLaruaV967NvWwlA5/8
+ 9gpQ==
+X-Gm-Message-State: APjAAAUkUwNhHCsp72IIK+EInDuzMmWh+KaM+ig7c14pEN79TC/9H5h8
+ CTlWUsbx5yCFXwDyNOCdU3plqgKHFVuanVzM9h0oegvbtnn04dU2jGBQihJ6ONLbkRydZAnBOSp
+ /hozxugEkdGEmX8lG9A4iqgjU/dne8GM=
+X-Received: by 2002:a05:600c:291d:: with SMTP id
+ i29mr1406992wmd.39.1581547679064; 
+ Wed, 12 Feb 2020 14:47:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzkkkajuOAGQn03d4KVw6IEiwdhEQ+sOUOFwsP9BTOTp+De9/HKqdlfjRuu659vt8sCRZqyKxxftP3pH6RefJA=
+X-Received: by 2002:a05:600c:291d:: with SMTP id
+ i29mr1406969wmd.39.1581547678738; 
+ Wed, 12 Feb 2020 14:47:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200108200020.4745-1-nieklinnenbank@gmail.com>
+ <20200108200020.4745-8-nieklinnenbank@gmail.com>
+ <8be03fbb-74f2-e688-76b1-ab504f25f8e4@redhat.com>
+ <20200120175918.GA2949@minyard.net>
+ <CAPan3WpJ_L7OyiC0hod0e436xOUZ2sHCfQqRmAsvD7hTPrBsDg@mail.gmail.com>
+ <20200203131017.GE2626@minyard.net>
+ <CAPan3Wr=JFwHPChPfN6kng9ZZhrbprc8ZuXjHS5cErPuV-FzJg@mail.gmail.com>
+ <CAPan3WrE77GePz-mgz1otf1iiK8nDZ+RK2NF5ueRoHbDmpS1_w@mail.gmail.com>
+In-Reply-To: <CAPan3WrE77GePz-mgz1otf1iiK8nDZ+RK2NF5ueRoHbDmpS1_w@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Wed, 12 Feb 2020 23:47:47 +0100
+Message-ID: <CAP+75-XQKisiLaTFXc2JuCvORkfFjfs0UPzjzyj1PrKGScR7Ow@mail.gmail.com>
+Subject: Re: [PATCH v3 07/17] hw/arm/allwinner: add Security Identifier device
+To: Niek Linnenbank <nieklinnenbank@gmail.com>
+X-MC-Unique: WdjKvxmZNi6k2qPLEzaFxw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Feb 2020 22:33:40 -0000
-From: Chris Hoy <1862887@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: builds
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: chrs-hoy
-X-Launchpad-Bug-Reporter: Chris Hoy (chrs-hoy)
-X-Launchpad-Bug-Modifier: Chris Hoy (chrs-hoy)
-References: <158149024287.24857.8410135131433041908.malonedeb@gac.canonical.com>
-Message-Id: <158154682102.24991.10084721959749770485.malone@gac.canonical.com>
-Subject: [Bug 1862887] Re: qemu does not load pulseaudio modules properly
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 99ef504ef35874ca0a514220657e8f42cb39f1f2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,108 +104,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1862887 <1862887@bugs.launchpad.net>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Yury Kotov <yury-kotov@yandex-team.ru>, qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-EDIT: This is for Arch 2020.02.01
+)-.On Wed, Feb 12, 2020 at 10:31 PM Niek Linnenbank
+<nieklinnenbank@gmail.com> wrote:
+>
+> Hi Corey,
+>
+> On Thu, Feb 6, 2020 at 10:09 PM Niek Linnenbank <nieklinnenbank@gmail.com=
+> wrote:
+>>
+>> Hi Corey,
+>>
+>> On Mon, Feb 3, 2020 at 2:10 PM Corey Minyard <cminyard@mvista.com> wrote=
+:
+>>>
+>>> On Sun, Feb 02, 2020 at 10:27:49PM +0100, Niek Linnenbank wrote:
+>>> > Hi Corey,
+>>> >
+>>> > Thanks for reviewing!
+>>> >
+>>> > On Mon, Jan 20, 2020 at 6:59 PM Corey Minyard <cminyard@mvista.com> w=
+rote:
+>>> >
+>>> > > On Sat, Jan 18, 2020 at 04:25:08PM +0100, Philippe Mathieu-Daud=C3=
+=A9 wrote:
+>>> > > > Cc'ing Corey/David for good advices about using UUID.
+>>> > >
+>>> > > Is there any reason you didn't use the built-in qemu UUID for this?=
+  It
+>>> > > would simplify things in general.
+>>> > >
+>>> >
+>>> > Currently the Allwinner SID device is using the QemuUUID type from
+>>> > include/qemu/uuid.h.
+>>> > Is that the build-in UUID you are referring to or should I use someth=
+ing
+>>> > else?
+>>>
+>>> You are using the QemuUUID type, which is of course what you should do,
+>>> but you aren't using the UUID generated by qemu (at least that I can fi=
+nd).
+>>> That in include/sysemu/sysemu.h and is named qemu_uuid.  Whether you
+>>> should use that or not depends on your needs.  If you just need some
+>>> uuid, then that's what you should probably use.  If you need something
+>>> the user can individually control for this device, for instance, then
+>>> that probably won't do.
+>>
+>>
+>> Ah I did not know about the qemu_uuid variable, thanks for pointing that=
+ out.
+>> Basically the SID identifier is a number that is unique for each board t=
+hat comes
+>> out of the factory. It is currently used by U-Boot to as input to genera=
+te a MAC address.
+>>
+>> If I understand correctly, qemu_uuid is optional and by default zero.
+>> However the SID value should not be zero, as otherwise U-Boot can't pick=
+ a MAC address
+>> resulting in a non-working ethernet device.
+>>
+>> Currently the hw/arm/orangepi.c machine specifies a fixed SID to be used=
+ for the emulated board,
+>> also containing a prefix (8100c002) that indicates the H3 chipset. One t=
+hing that I am strugling with is that
 
--- =
+Suggestion while reading this, you might display a warning if the user
+provided UUID doesn't start with 8100c002.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1862887
+>> I'm not able to override the property using '-global', if hw/arm/orangep=
+i.c initializes the property with qdev_prop_set_string:
+>>
+>> $ qemu-system-arm -M orangepi-pc -kernel u-boot -nographic -nic user \
+>> -global allwinner-sid.identifier=3D8100c002-0001-0002-0003-000044556688
+>>
+>> If I don't set the property in hw/arm/orangepi.c, I can set it with '-gl=
+obal'. Do you perhaps have a
+>> recommendation how to improve that? Basically what is needed is that the=
+ machine sets the default
+>> property including the chip prefix, and that the user can override it. A=
+lthough it is not required for a
+>> working emulated board, it would be a nice-to-have that the user can set=
+ it.
+>
+>
+> FYI and possibly others who have a similar usecase, I figured out how to =
+do this. In the machine init function,
+> after creating the new SoC object, simply check if the identifier has a v=
+alue:
+>
+> +    if (qemu_uuid_is_null(&s->h3->sid.identifier)) {
+> +        qdev_prop_set_string(DEVICE(s->h3), "identifier",
+> +                             "8100c002-0001-0002-0003-000044556677");
 
-Title:
-  qemu does not load pulseaudio modules properly
+Similarly, display a warning "No UUID provided, using default one..."
+(or generate one 8100c002-XXX)?
 
-Status in QEMU:
-  New
+> +    }
+>
+> That way, if the user passed -global to override it, the machine will not=
+ overrule the user's value
+> and by default the machine sets an identifier containing the H3 specific =
+chip prefix.
+>
+[...]
+>>> > > > > --- /dev/null
+>>> > > > > +++ b/hw/misc/allwinner-sid.c
+>>> > > > > @@ -0,0 +1,170 @@
+>>> > > > > +/*
+>>> > > > > + * Allwinner Security ID emulation
+>>> > > > > + *
+>>> > > > > + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.co=
+m>
+>>> > > > > + *
+>>> > > > > + * This program is free software: you can redistribute it and/=
+or
+>>> > > modify
+>>> > > > > + * it under the terms of the GNU General Public License as pub=
+lished
+>>> > > by
+>>> > > > > + * the Free Software Foundation, either version 2 of the Licen=
+se, or
+>>> > > > > + * (at your option) any later version.
+>>> > > > > + *
+>>> > > > > + * This program is distributed in the hope that it will be use=
+ful,
+>>> > > > > + * but WITHOUT ANY WARRANTY; without even the implied warranty=
+ of
+>>> > > > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See t=
+he
+>>> > > > > + * GNU General Public License for more details.
+>>> > > > > + *
+>>> > > > > + * You should have received a copy of the GNU General Public L=
+icense
+>>> > > > > + * along with this program.  If not, see <
+>>> > > http://www.gnu.org/licenses/>.
+>>> > > > > + */
+>>> > > > > +
+>>> > > > > +#include "qemu/osdep.h"
+>>> > > > > +#include "qemu/units.h"
+>>> > > > > +#include "hw/sysbus.h"
+>>> > > > > +#include "migration/vmstate.h"
+>>> > > > > +#include "qemu/log.h"
+>>> > > > > +#include "qemu/module.h"
+>>> > > > > +#include "qemu/guest-random.h"
+>>> > > > > +#include "qapi/error.h"
+>>> > > > > +#include "hw/qdev-properties.h"
+>>> > > > > +#include "hw/misc/allwinner-sid.h"
+>>> > > > > +#include "trace.h"
+>>> > > > > +
+>>> > > > > +/* SID register offsets */
+>>> > > > > +enum {
+>>> > > > > +    REG_PRCTL =3D 0x40,   /* Control */
+>>> > > > > +    REG_RDKEY =3D 0x60,   /* Read Key */
+>>> > > > > +};
+>>> > > > > +
+>>> > > > > +/* SID register flags */
+>>> > > > > +enum {
+>>> > > > > +    REG_PRCTL_WRITE   =3D 0x0002, /* Unknown write flag */
+>>> > > > > +    REG_PRCTL_OP_LOCK =3D 0xAC00, /* Lock operation */
+>>> > > > > +};
+>>> > > > > +
+>>> > > > > +static uint64_t allwinner_sid_read(void *opaque, hwaddr offset=
+,
+>>> > > > > +                                   unsigned size)
+>>> > > > > +{
+>>> > > > > +    const AwSidState *s =3D AW_SID(opaque);
+>>> > > > > +    uint64_t val =3D 0;
+>>> > > > > +
+>>> > > > > +    switch (offset) {
+>>> > > > > +    case REG_PRCTL:    /* Control */
+>>> > > > > +        val =3D s->control;
+>>> > > > > +        break;
+>>> > > > > +    case REG_RDKEY:    /* Read Key */
+>>> > > > > +        val =3D s->rdkey;
+>>> > > > > +        break;
+>>> > > > > +    default:
+>>> > > > > +        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offs=
+et
+>>> > > 0x%04x\n",
+>>> > > > > +                      __func__, (uint32_t)offset);
+>>> > > > > +        return 0;
+>>> > > > > +    }
+>>> > > > > +
+>>> > > > > +    trace_allwinner_sid_read(offset, val, size);
+>>> > > > > +
+>>> > > > > +    return val;
+>>> > > > > +}
+>>> > > > > +
+>>> > > > > +static void allwinner_sid_write(void *opaque, hwaddr offset,
+>>> > > > > +                                uint64_t val, unsigned size)
+>>> > > > > +{
+>>> > > > > +    AwSidState *s =3D AW_SID(opaque);
+>>> > > > > +
+>>> > > > > +    trace_allwinner_sid_write(offset, val, size);
+>>> > > > > +
+>>> > > > > +    switch (offset) {
+>>> > > > > +    case REG_PRCTL:    /* Control */
+>>> > > > > +        s->control =3D val;
+>>> > > > > +
+>>> > > > > +        if ((s->control & REG_PRCTL_OP_LOCK) &&
+>>> > > > > +            (s->control & REG_PRCTL_WRITE)) {
+>>> > > > > +            uint32_t id =3D s->control >> 16;
+>>> > > > > +
+>>> > > > > +            if (id < sizeof(QemuUUID)) {
+>>> > > > > +                s->rdkey =3D (s->identifier.data[id]) |
+>>> > > > > +                           (s->identifier.data[id + 1] << 8) |
+>>> > > > > +                           (s->identifier.data[id + 2] << 16) =
+|
+>>> > > > > +                           (s->identifier.data[id + 3] << 24);
 
-Bug description:
-  Hello,
+Maybe you want:
 
-  This is on Arch-linux(latest) and the qemu 4.2.0 version made from git cl=
-one https://github.com/spheenik/qemu.git
-  with:
-   ./configure --prefix=3D/opt/qemu-test --python=3D/usr/bin/python2 --targ=
-et-list=3Dx86_64-softmmu =
+  s->rdkey =3D ldl_le_p(s->identifier.data);
 
-  --audio-drv-list=3Dpa --disable-werror
-  added to the build.
+>>> > > > > +            }
+>>> > > > > +        }
+>>> > > > > +        s->control &=3D ~REG_PRCTL_WRITE;
+>>> > > > > +        break;
+>>> > > > > +    case REG_RDKEY:    /* Read Key */
+>>> > > > > +        break;
+>>> > > > > +    default:
+>>> > > > > +        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offs=
+et
+>>> > > 0x%04x\n",
+>>> > > > > +                      __func__, (uint32_t)offset);
+>>> > > > > +        break;
+>>> > > > > +    }
+>>> > > > > +}
+> > > > > +}
+[...]
 
-  I've been workin on a passthrough Windows 10 vm this month and have been =
-steadily seeing some promising progress. My block/issue at the moment is in=
-tegrating the audio now that the GPU has been succesfully passed through. =
-
-  I've been going back and forth between the audio options for Pulseaudio a=
-nd cannot change the following issue:
-  pulseaudio: pa_context_connect() failed
-  pulseaudio: Reason: Connection refused
-  pulseaudio: Failed to initialize PA contextlibusb: error [udev_hotplug_ev=
-ent] ignoring udev action bind
-  I leave my current operable build followed by some of the options that I =
-have tried using to correct this despite the following errors not changing
-
-  This is my current operable build:
-
-  #!/bin/bash
-
-  vmname=3D"windows10vm"
-
-  if ps -ef | grep /opt/qemu-test/bin/qemu-system-x86_64 | grep -q multifun=
-ction=3Don; then
-  echo "A passthrough VM is already running." &
-  exit 1
-
-  else
-
-  /opt/qemu-test/bin/qemu-system-x86_64 \
-  -m 12G \
-  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../win2.i=
-mg \
-  -drive file=3D.../Win10_1909_English_x64.iso,index=3D1,media=3Dcdrom \
-  -drive file=3D.../virtio-win-0.1.171.iso,index=3D2,media=3Dcdrom \
-  -boot order=3Ddc \
-  -bios /usr/share/ovmf/x64/OVMF_CODE.fd \
-  -name $vmname,process=3D$vmname \
-  -machine type=3Dq35,accel=3Dkvm,vmport=3Doff \
-  -cpu host,kvm=3Doff \
-  -smp 3,sockets=3D1,cores=3D3,threads=3D1 \
-  -device virtio-balloon \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -vga none \
-  -nographic \
-  -serial none \
-  -parallel none \
-  -soundhw hda \
-  -usb \
-  -device usb-host,vendorid=3D...,productid=3D... \
-  -device usb-host,vendorid=3D...,productid=3D... \
-  -device usb-host,vendorid=3D...,productid=3D... \
-  -device vfio-pci,host=3D...,multifunction=3Don \
-  -device vfio-pci,host=3D... \
-  -device e1000,netdev=3Dnet0 \
-  -netdev user,id=3Dnet0,hostfwd=3Dtcp::...-:22 \
-
-  Here's a list of setting combinations I had tried to resolve this:
-
-  #export QEMU_AUDIO_DRV=3Dpa
-  #QEMU_ALSA_DAC_BUFFER_SIZE=3D512 QEMU_ALSA_DAC_PERIOD_SIZE=3D170
-  #export QEMU_PA_SAMPLES=3D8192 =
-
-  #export QEMU_AUDIO_TIMER_PERIOD=3D99
-  #export QEMU_PA_SERVER=3D/run/user/1000/pulse/native
-  #export QEMU_PA_SINK=3Dalsa_output.usb-C-Media_Electronics_Inc._USB_Audio=
-_Device-00.analog-stereo
-  #export QEMU_PA_SOURCE=3Dinput
-
-  -audiodev pa,id=3Dpa1,server=3Dserver=3D/run/user/1000/pulse/native
-
-  At best I have removed an XDG_RUNTIME_DIR error but other than that
-  this build has no audio compatability.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1862887/+subscriptions
 
