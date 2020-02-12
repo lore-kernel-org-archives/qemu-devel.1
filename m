@@ -2,94 +2,115 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBED1C352A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D73C352A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 887D824677
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:37:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V0K8+r3o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 887D824677
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 983FF24671
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:39:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 983FF24671
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1ylU-0004wE-MO
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 15:37:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42353)
+	id 1j1ynT-0006pd-H4
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 15:39:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42747)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j1ykL-0003H5-Qm
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:36:37 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j1ymf-0006KW-GC
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:38:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j1ykK-0007CQ-M8
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:36:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54093
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1ykK-0007AW-Ic
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:36:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581539792;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=T3ylHUH4ZoFjUTnyfUiMekT5X2Pd1nXmD9oE7o/4Elk=;
- b=V0K8+r3oA758YunzhwvHIjaG/XTAHdZTjifG4WKVyFiKjzadVcG6phDxJKuLwnPX/xwKDm
- 5b8Pq2Yi4Q6ljYqTFLQ+INkxeFODKHEiW+E1C54N5GgEIYGTNc5DlvJ6SjJA0J79cbdAqn
- 0wJj4B4IuOrqPxsul1tD0K5fCbdXWmg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-FTucVd5DOyKd_A69X99GQQ-1; Wed, 12 Feb 2020 15:36:30 -0500
-Received: by mail-wm1-f72.google.com with SMTP id 7so1201790wmf.9
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 12:36:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=z3rfLLywh1BohS0upHcyh0haLkZZAmJBOAw7ZMtEqQs=;
- b=YXrf8dRR4kdFN64xbw3snK/GGe+WkPItmRMLZbKnshUhLKNuFH3oIXSuKYK0lBV4Ff
- G28j31zqS6+J2ysTE1jpNfpJ2AfbdetQuvhZkCsQBwIyofNL35uxqz8uRoR6GZLLmlAX
- 3p/Pnx/3LwrhSHW4aqnPb+e4dn8M0RzV022NEFgmu/t44rDJ1OLTclTBWvkZnkcvy/bs
- znv2XPlXbTDBPCWT7qetB+1xJWR8AIvO2/JqUu8B3WCT/KqqDWdh29ZM0hXQmtHpWIFl
- FiGUFPC5hLVDqj/9tOohBRWnH1/0Ojj7YAyGw1p74+mtiJFxrD/wqhCHAPxFWj3emSpI
- c6Lg==
-X-Gm-Message-State: APjAAAXQlQ4c7j6HMFUTcZIGf0LuElBe5No9Jo+0iQXlT9KV4OiomCd+
- wMbjqrpDXGWZQMlSaycFb2azZhrtknx+or/g8qX3vuYHuGo0IjZ9oO/moSf6HgGDAY/WTygXFvk
- jv2nti5nE/jX1vzU=
-X-Received: by 2002:a5d:6b03:: with SMTP id v3mr16165556wrw.289.1581539788719; 
- Wed, 12 Feb 2020 12:36:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyaQ9A8EpHQ5Q0Tppb+wagHGk27YGHBBvx95vQ0AU99gCrKMT9bLrj8fE6pr7sNvBX1PN7W6w==
-X-Received: by 2002:a5d:6b03:: with SMTP id v3mr16165544wrw.289.1581539788544; 
- Wed, 12 Feb 2020 12:36:28 -0800 (PST)
-Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id y139sm2265308wmd.24.2020.02.12.12.36.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 12:36:28 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] tests/acceptance/machine_sparc_leon3: Do not run HelenOS
- test by default
-Date: Wed, 12 Feb 2020 21:36:27 +0100
-Message-Id: <20200212203627.16592-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
+ (envelope-from <laurent@vivier.eu>) id 1j1yme-0000Gv-Do
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:38:57 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:49683)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j1yme-00009V-5I
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:38:56 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mq2rM-1jp2qx06hm-00n82H; Wed, 12 Feb 2020 21:38:25 +0100
+Subject: Re: [PATCH 6/9] linux-user: sh4: Update syscall numbers to kernel 5.5
+ level
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1580818058-16159-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1580818058-16159-7-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <5cca58bc-57eb-b3b3-5a97-f2754d9d461f@vivier.eu>
+Date: Wed, 12 Feb 2020 21:38:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-MC-Unique: FTucVd5DOyKd_A69X99GQQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1580818058-16159-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:DiDOzXP0Aj0Hy0MhAT4DDA714xqxPYr7VC/MACK/e1qtaaK6lm7
+ lpypDLkASNvBnNUmLDHooY/IOug1k7jeW9YqzgCf4axkx/roX+PIwFs3hBqo8UBKjmVjc+E
+ WlzGdesIyM4C09tKggmcioK6HF4j+wY/bfep+GxPSXwNT81h32RE5tPFlA0S/QxwOzOcXl6
+ +UHSWmbBSLAsoZDpTtaMg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Zd8zjOP0TGk=:MQbuHZhiFA/TBd8rWGwLAW
+ IeaB2oHrtz1qeHBC0sgI9TV06xNUWISTpzZAsd57YiqB7HLXikww+afBRRGzgbwXS4xB1jSY5
+ KDhVDwZHIPkIbuoq9eTQn7utG66nsCzVc7V/wpDIWQm5EXD/OIKzfo6QqD+jZg/dc+3ukEwzD
+ j12kJc04prwbiRpupeR7x0KtEPt1H6bf6213NmLs8UBSKYu9b/R/pHWXnW8KfCanebxTkp+xQ
+ 9YIZMNTQ1qRyCU2rxoxIoVWo6B165ioS9lRTRucnJiMvshTj3tk15mjUJvoI9nH5mt1BBchPE
+ 214uyqcpiDaonQqiAGpEY9Xk+ZsDQ9ryylqbhb2uO/1EmF7BoYxxgCf/DOWqMBWFV6mrE4aBc
+ TJkR5Yg+1g9ai0JOVK9PVRWQMGDd9L8GgBioFmLgj5v7zEEz9BV9Fv4SXlx7ubjpLsOv12jIj
+ kIUx0cgChQqgZodYD1G+vRjAf20IBTvCQfFk2OJCW8FmQh95Bc4clHE+ywDtqRjLi7k0/cKa4
+ kn9cQcHEMZHCxgWE4QlZ3RDG/4MGpFM7bjPYG+xGZKO/M8xiZIL/zTB5ZsDl8PHPxn0nTK+Fb
+ Y2gHQsU/iw1WFuwRVjLPqU3vEHYxqrJ32E4n9osJzuZ5ov1XWiJ7wXSXgHp0RZjkd+9vsSXgL
+ chvOJIZQWOWg+a7PRHq8zfjp9J1F2nmRtGlYrx785gG8Z0uFi5D36K6EmnuUbgg65EXSm2Vw8
+ eswjImxMI+m6p0M+IiI6A59lFidrHehKi+m406BgSXEhidifQLeIqm1Ee7QNRFnMcznB9JXZn
+ G5Y/uOmzDEn09SBNv60CKUU+eU4elvfDtWnsQ0SGNvwxpcKEJqTG/+oeTKJ6FFktpaELsFJ
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,64 +122,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, Cleber Rosa <crosa@redhat.com>
+Cc: amarkovic@wavecomp.com, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The www.helenos.org server is slow and downloading the Leon3 binary
-takes too long [*]. Do not include this test in the default suite.
+Le 04/02/2020 à 13:07, Aleksandar Markovic a écrit :
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> Update sh4 syscall numbers based on Linux kernel v5.5.
+> 
+> CC: Aurelien Jarno <aurelien@aurel32.net>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  linux-user/sh4/syscall_nr.h | 48 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 48 insertions(+)
+>
 
-Similarly to commit 471c97a69b:
-
-  Currently the Avocado framework does not distinct the time spent
-  downloading assets vs. the time spent running a test. With big
-  assets (like a full VM image) the tests likely fail.
-
-  This is a limitation known by the Avocado team.
-  Until this issue get fixed, do not run this tests automatically.
-
-  Tests can still be run setting the AVOCADO_TIMEOUT_EXPECTED
-  environment variable.
-
-[*] https://travis-ci.org/stsquad/qemu/jobs/649599880#L4198
-
-Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v2: Add missing staged hunk...
----
- tests/acceptance/machine_sparc_leon3.py | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/tests/acceptance/machine_sparc_leon3.py b/tests/acceptance/mac=
-hine_sparc_leon3.py
-index f77e210ccb..27e4717a51 100644
---- a/tests/acceptance/machine_sparc_leon3.py
-+++ b/tests/acceptance/machine_sparc_leon3.py
-@@ -5,6 +5,9 @@
- # This work is licensed under the terms of the GNU GPL, version 2 or
- # later. See the COPYING file in the top-level directory.
-=20
-+import os
-+
-+from avocado import skipUnless
- from avocado_qemu import Test
- from avocado_qemu import wait_for_console_pattern
-=20
-@@ -13,6 +16,7 @@ class Leon3Machine(Test):
-=20
-     timeout =3D 60
-=20
-+    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeout=
-')
-     def test_leon3_helenos_uimage(self):
-         """
-         :avocado: tags=3Darch:sparc
---=20
-2.21.1
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
