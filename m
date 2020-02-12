@@ -2,69 +2,84 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26ED8C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 14:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAAF3C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 14:57:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEC1E20873
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 14:44:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEC1E20873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 857B820714
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 14:57:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gRTPusGZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857B820714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1tFQ-0001gK-2Z
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 09:44:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48877)
+	id 1j1tSY-0006Zh-MZ
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 09:57:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50551)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j1tEo-0000yP-C3
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 09:43:40 -0500
+ (envelope-from <cohuck@redhat.com>) id 1j1tRy-00066v-Uq
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 09:57:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j1tEl-0002Rm-9a
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 09:43:36 -0500
-Resent-Date: Wed, 12 Feb 2020 09:43:36 -0500
-Resent-Message-Id: <E1j1tEl-0002Rm-9a@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21155)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j1tEl-0002NS-1h
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 09:43:35 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1581518599; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=iEZaYc+CMzJuZmD+aE52QukmrZHXZfJh7IuItKcvFtUU/g2EDEnge89YtXoAHiWMY/jnoHEorLf60qdVq6RcN+21L+yi+T2aYGtLk/vykE9DZM9wblgsua21vkYFA/7n1OB7PJOtemfoS0y61StcccGxhxDJi1zHUWws1VJwZCQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1581518599;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=oi9Hv0uPWUfzK33Wd+fqTurcYXGhQ0UJjFEpvlIMOlo=; 
- b=DXBf9YacaR5OeGHzw+8V+EqSCdUKm5SeFWeqMojpnFUZrMJ13UtYXDNkZfzLXml3GCkl8VXp3UMHnkSg/sMd4CfPO/WWVWcPfaUDxkzXNti42LfQoYhfnmqP6SuIMHqcul0d/zevTaAgaFhDQ/JJ6+mi4JAPQhDRVsEa14e/0Xo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1581518593575864.4333704930266;
- Wed, 12 Feb 2020 06:43:13 -0800 (PST)
-In-Reply-To: <20200212130311.127515-1-ysato@users.sourceforge.jp>
-Subject: Re: [PATCH v30 00/22] Add RX archtecture support
-Message-ID: <158151859231.15549.3616063648171919581@a1bbccc8075a>
+ (envelope-from <cohuck@redhat.com>) id 1j1tRv-00077l-CV
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 09:57:14 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43776
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j1tRu-00076r-Ta
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 09:57:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581519429;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=k4SugdQsmL0TmO67dyyVZaD8V5q+XGb95Bl7LLxss9M=;
+ b=gRTPusGZ2z+em/h7+aT7SMZ+qOuxC9HQbU0Jfbn50IuYVF2wPJevUYlPRAGJxArly14Jvg
+ wJe+06HC/R/Ibh9v4hEMbes3mh+JXJJtoQYjJ6+CX3V3hgM7B7qg1+IbkM2fa4ejJ7y4Wd
+ YkyduGqXrvNqunL/+SrZc0MigVHIR3Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-2rmHmCOTOv2L_iwB3VwT7A-1; Wed, 12 Feb 2020 09:57:08 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACF59800D41;
+ Wed, 12 Feb 2020 14:57:06 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A53CA5DA83;
+ Wed, 12 Feb 2020 14:57:02 +0000 (UTC)
+Date: Wed, 12 Feb 2020 15:57:00 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Tony Krowiak
+ <akrowiak@linux.ibm.com>
+Subject: Re: [PATCH RFC 2/2] docs: rstfy vfio-ap documentation
+Message-ID: <20200212155700.3d0a879e.cohuck@redhat.com>
+In-Reply-To: <20200207163218.207a931f.cohuck@redhat.com>
+References: <20200128180142.15132-1-cohuck@redhat.com>
+ <20200128180142.15132-3-cohuck@redhat.com>
+ <CAFEAcA9wM4r=OfLnREQOQAcqOEdSr3=bHsjoO9mvn4VogMhQLw@mail.gmail.com>
+ <20200207163218.207a931f.cohuck@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ysato@users.sourceforge.jp
-Date: Wed, 12 Feb 2020 06:43:13 -0800 (PST)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 2rmHmCOTOv2L_iwB3VwT7A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,152 +91,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: philmd@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- ysato@users.sourceforge.jp
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIxMjEzMDMxMS4xMjc1
-MTUtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcC8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYzMCAwMC8yMl0gQWRkIFJYIGFy
-Y2h0ZWN0dXJlIHN1cHBvcnQKTWVzc2FnZS1pZDogMjAyMDAyMTIxMzAzMTEuMTI3NTE1LTEteXNh
-dG9AdXNlcnMuc291cmNlZm9yZ2UuanAKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
-c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmZiNDkyMmEgcWVtdS1k
-b2MudGV4aTogQWRkIFJYIHNlY3Rpb24uCmVkZDRkNzYgQm9vdExpbnV4Q29uc29sZVRlc3Q6IFRl
-c3QgdGhlIFJYLVZpcnQgbWFjaGluZQoxZjBlNjVlIEFkZCByeC1zb2Z0bW11CmVkZjNmNDkgaHcv
-cng6IFJlc3RyaWN0IHRoZSBSWDYyTiBtaWNyb2NvbnRyb2xsZXIgdG8gdGhlIFJYNjJOIENQVSBj
-b3JlCjdlOGIyZDIgaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdApiNDVhOTBiIGh3L3J4OiBSWCBU
-YXJnZXQgaGFyZHdhcmUgZGVmaW5pdGlvbgozOTNhOWZmIGh3L2NoYXI6IFJYNjJOIHNlcmlhbCBj
-b21tdW5pY2F0aW9uIGludGVyZmFjZSAoU0NJKQpmYjAzZTMzIGh3L3RpbWVyOiBSWDYyTiBpbnRl
-cm5hbCB0aW1lciBtb2R1bGVzCjE0YWY4NDkgaHcvaW50YzogUlg2Mk4gaW50ZXJydXB0IGNvbnRy
-b2xsZXIgKElDVWEpCjA5N2RiNWNkIHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNu
-IGR1cmluZyBkaXNhc3NlbWJseQpkNmI0OWQxIHRhcmdldC9yeDogQ29sbGVjdCBhbGwgYnl0ZXMg
-ZHVyaW5nIGRpc2Fzc2VtYmx5CmVlMGU0NTggdGFyZ2V0L3J4OiBFbWl0IGFsbCBkaXNhc3NlbWJs
-eSBpbiBvbmUgcHJ0KCkKYzA2ZDk3OCB0YXJnZXQvcng6IFVzZSBwcnRfbGRtaSBmb3IgWENIR19t
-ciBkaXNhc3NlbWJseQo2N2VjYjM2IHRhcmdldC9yeDogUmVwbGFjZSBvcGVyYW5kIHdpdGggcHJ0
-X2xkbWkgaW4gZGlzYXNzZW1ibGVyCjBiZTFlZjUgdGFyZ2V0L3J4OiBEaXNhc3NlbWJsZSByeF9p
-bmRleF9hZGRyIGludG8gYSBzdHJpbmcKZWE3Njg1ZSB0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxl
-cgo0NmUzZTJiIHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24KNWJjNDEyOSB0YXJnZXQvcng6IFRD
-RyBoZWxwZXIKYzE4ZGVkOCB0YXJnZXQvcng6IFRDRyB0cmFuc2xhdGlvbgowMzU2NzEyIGh3L3Jl
-Z2lzdGVyZmllbGRzLmg6IEFkZCA4Yml0IGFuZCAxNmJpdCByZWdpc3RlciBtYWNyb3MKYmIxYjkx
-ZCBxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3QxNgozY2JlZWU2IE1BSU5U
-QUlORVJTOiBBZGQgUlgKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjIgQ2hlY2tpbmcgY29tbWl0
-IDNjYmVlZTYxMTcyNCAoTUFJTlRBSU5FUlM6IEFkZCBSWCkKMi8yMiBDaGVja2luZyBjb21taXQg
-YmIxYjkxZDYxMTc2IChxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3QxNikK
-My8yMiBDaGVja2luZyBjb21taXQgMDM1NjcxMjg0NmQxIChody9yZWdpc3RlcmZpZWxkcy5oOiBB
-ZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0ZXIgbWFjcm9zKQpVc2Ugb2YgdW5pbml0aWFsaXplZCB2
-YWx1ZSBpbiBjb25jYXRlbmF0aW9uICguKSBvciBzdHJpbmcgYXQgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgbGluZSAyNDkwLgpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVtZW50cyBz
-aG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzI3OiBGSUxFOiBpbmNsdWRl
-L2h3L3JlZ2lzdGVyZmllbGRzLmg6MjU6CisjZGVmaW5lIFJFRzgocmVnLCBhZGRyKSAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBB
-XyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSB9OwoKRVJST1I6IE1hY3JvcyB3
-aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGls
-ZSBsb29wCiMzMTogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI5OgorI2RlZmlu
-ZSBSRUcxNihyZWcsIGFkZHIpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBcCisgICAgZW51bSB7IEFfICMjIHJlZyA9IChhZGRyKSB9OyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBlbnVtIHsgUl8gIyMgcmVnID0g
-KGFkZHIpIC8gMiB9OwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NiBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCAzLzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzIyIENoZWNraW5n
-IGNvbW1pdCBjMThkZWQ4ZTdlMDggKHRhcmdldC9yeDogVENHIHRyYW5zbGF0aW9uKQpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiMyMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDMwNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8yMiBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgo1LzIyIENoZWNraW5nIGNvbW1pdCA1YmM0MTI5NzQ0NTUgKHRhcmdldC9yeDog
-VENHIGhlbHBlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
-cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjE6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NTAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8y
-MiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzIyIENoZWNraW5nIGNvbW1pdCA0NmUzZTJi
-MTNlMzEgKHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
-ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIyOiAK
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjU5IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDYvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8yMiBD
-aGVja2luZyBjb21taXQgZWE3Njg1ZWM3MmNjICh0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcikK
-V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
-UyBuZWVkIHVwZGF0aW5nPwojMzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJy
-b3JzLCAxIHdhcm5pbmdzLCAxNDk3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMjIgaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KOC8yMiBDaGVja2luZyBjb21taXQgMGJlMWVmNWQ2NDFhICh0YXJn
-ZXQvcng6IERpc2Fzc2VtYmxlIHJ4X2luZGV4X2FkZHIgaW50byBhIHN0cmluZykKOS8yMiBDaGVj
-a2luZyBjb21taXQgNjdlY2IzNmQ2ZmYxICh0YXJnZXQvcng6IFJlcGxhY2Ugb3BlcmFuZCB3aXRo
-IHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcikKMTAvMjIgQ2hlY2tpbmcgY29tbWl0IGMwNmQ5Nzg1
-MjBjZSAodGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkpCjEx
-LzIyIENoZWNraW5nIGNvbW1pdCBlZTBlNDU4ODRiMzUgKHRhcmdldC9yeDogRW1pdCBhbGwgZGlz
-YXNzZW1ibHkgaW4gb25lIHBydCgpKQoxMi8yMiBDaGVja2luZyBjb21taXQgZDZiNDlkMWZkNDkw
-ICh0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseSkKMTMvMjIg
-Q2hlY2tpbmcgY29tbWl0IDA5N2RiNWNkYzMwNiAodGFyZ2V0L3J4OiBEdW1wIGJ5dGVzIGZvciBl
-YWNoIGluc24gZHVyaW5nIGRpc2Fzc2VtYmx5KQoxNC8yMiBDaGVja2luZyBjb21taXQgMTRhZjg0
-OTNmNWY4IChody9pbnRjOiBSWDYyTiBpbnRlcnJ1cHQgY29udHJvbGxlciAoSUNVYSkpCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzQwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgNDQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0LzIyIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCjE1LzIyIENoZWNraW5nIGNvbW1pdCBmYjAzZTMzNDU3OTUgKGh3L3RpbWVy
-OiBSWDYyTiBpbnRlcm5hbCB0aW1lciBtb2R1bGVzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MDogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDg0NSBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAxNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNi8yMiBD
-aGVja2luZyBjb21taXQgMzkzYTlmZmUwMzVlIChody9jaGFyOiBSWDYyTiBzZXJpYWwgY29tbXVu
-aWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVk
-IGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQzOiAKbmV3IGZpbGUg
-bW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDAwIGxpbmVzIGNoZWNr
-ZWQKClBhdGNoIDE2LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIyIENoZWNraW5n
-IGNvbW1pdCBiNDVhOTBiMzllMDMgKGh3L3J4OiBSWCBUYXJnZXQgaGFyZHdhcmUgZGVmaW5pdGlv
-bikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
-TkVSUyBuZWVkIHVwZGF0aW5nPwojMjM6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHRy
-YWlsaW5nIHdoaXRlc3BhY2UKIzEyODogRklMRTogaHcvcngvcngtdmlydC5jOjczOgorICAgICQK
-CkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiMxNDY6IEZJTEU6IGh3L3J4L3J4LXZpcnQuYzo5
-MToKKyAgICAgICAgLyogVGhlIGtlcm5lbCBpbWFnZSBpcyBsb2FkZWQgaW50byAkCgpXQVJOSU5H
-OiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTQ2
-OiBGSUxFOiBody9yeC9yeC12aXJ0LmM6OTE6CisgICAgICAgIC8qIFRoZSBrZXJuZWwgaW1hZ2Ug
-aXMgbG9hZGVkIGludG8gCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgKiBvbiBzdWJzZXF1
-ZW50IGxpbmVzCiMxNDc6IEZJTEU6IGh3L3J4L3J4LXZpcnQuYzo5MjoKKyAgICAgICAgLyogVGhl
-IGtlcm5lbCBpbWFnZSBpcyBsb2FkZWQgaW50byAKKyAgICAgICAgICAgdGhlIGxhdHRlciBoYWxm
-IG9mIHRoZSBTRFJBTSBzcGFjZS4gKi8KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRy
-YWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQojMTQ3OiBGSUxFOiBody9yeC9yeC12aXJ0LmM6
-OTI6CisgICAgICAgICAgIHRoZSBsYXR0ZXIgaGFsZiBvZiB0aGUgU0RSQU0gc3BhY2UuICovCgp0
-b3RhbDogMiBlcnJvcnMsIDQgd2FybmluZ3MsIDQ5MyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNy8y
-MiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTgvMjIgQ2hlY2tpbmcgY29tbWl0IDdlOGIy
-ZDIxMWZmYSAoaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdCkKMTkvMjIgQ2hlY2tpbmcgY29tbWl0
-IGVkZjNmNDliZmU1NCAoaHcvcng6IFJlc3RyaWN0IHRoZSBSWDYyTiBtaWNyb2NvbnRyb2xsZXIg
-dG8gdGhlIFJYNjJOIENQVSBjb3JlKQoyMC8yMiBDaGVja2luZyBjb21taXQgMWYwZTY1ZTFkYTky
-IChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
-KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjk6IApuZXcgZmlsZSBtb2RlIDEw
-MDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4MyBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAyMC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMS8yMiBDaGVja2luZyBjb21taXQg
-ZWRkNGQ3NjM2NmI5IChCb290TGludXhDb25zb2xlVGVzdDogVGVzdCB0aGUgUlgtVmlydCBtYWNo
-aW5lKQoyMi8yMiBDaGVja2luZyBjb21taXQgZmI0OTIyYTNlZGM3IChxZW11LWRvYy50ZXhpOiBB
-ZGQgUlggc2VjdGlvbi4pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
-Lm9yZy9sb2dzLzIwMjAwMjEyMTMwMzExLjEyNzUxNS0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdl
-LmpwL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Fri, 7 Feb 2020 16:32:18 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Fri, 7 Feb 2020 12:43:03 +0000
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> 
+> > On Tue, 28 Jan 2020 at 19:39, Cornelia Huck <cohuck@redhat.com> wrote:  
+> > >
+> > > Move to system/, as this is mostly about configuring vfio-ap.
+> > >
+> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>    
+
+> > > -   Example 1: Valid configuration:
+> > > -   ------------------------------
+> > > -   Guest1: adapters 1,2  domains 5,6
+> > > -   Guest2: adapter  1,2  domain 7
+> > > +Example 1: Valid configuration
+> > > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > +Guest1: adapters 1,2  domains 5,6
+> > > +Guest2: adapter  1,2  domain 7    
+> > 
+> > These don't render correctly -- rST thinks the "Example 1..." line
+> > is a subsection heading because of the underlining, and then renders
+> > the next two lines as runon-text:
+> > "Guest1: adapters 1,2 domains 5,6 Guest2: adapter 1,2 domain 7"
+> > 
+> > Depending on what you want, you could try one of:
+> >  * use a literal block (which gets you fixed-width font, preserved
+> >    whitespace and linebreaks)
+> >  * use a bulleted list
+> >  * use one of rST's table formats  
+> 
+> Hm... I think this is supposed to be:
+> - header ("Example 1: ...")
+> - config
+> - explanation why this is a valid config
+> 
+> Maybe a table? Tony, any preferences?
+> 
+> > 
+> > (is it deliberate that line 1 is "adapters" and line 2 is "adapter" ?)  
+> 
+> I don't think so.
+> 
+> >   
+> > > -   This is valid because both guests have a unique set of APQNs: Guest1 has
+> > > -   APQNs (1,5), (1,6), (2,5) and (2,6); Guest2 has APQNs (1,7) and (2,7).
+> > > +This is valid because both guests have a unique set of APQNs: Guest1 has
+> > > +APQNs (1,5), (1,6), (2,5) and (2,6); Guest2 has APQNs (1,7) and (2,7).
+
+This section now looks like this:
+
+Example 1: Valid configuration                                                  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                                  
+                                                                                
++----------+--------+--------+                                                  
+|          | Guest1 | Guest2 |                                                  
++==========+========+========+                                                  
+| adapters |  1, 2  |  1, 2  |                                                  
++----------+--------+--------+                                                  
+| domains  |  5, 6  |  7     |                                                  
++----------+--------+--------+                                                  
+                                                                                
+This is valid because both guests have a unique set of APQNs:                   
+                                                                                
+* Guest1 has APQNs (1,5), (1,6), (2,5) and (2,6);                               
+* Guest2 has APQNs (1,7) and (2,7).
+
+Seems more readable to me, also in the rendered html. (Not sure if
+switching rows/columns would be better.)
+
 
