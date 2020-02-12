@@ -2,61 +2,83 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59466C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 05:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 027FEC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 05:46:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 200E1206ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 05:24:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dvOG2YH3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 200E1206ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id CAFA020714
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 05:46:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAFA020714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1kVl-0003aC-9J
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 00:24:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37915)
+	id 1j1kqs-0006Hd-09
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 00:46:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j1kV4-00032L-Ov
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 00:23:53 -0500
+ (envelope-from <chen.zhang@intel.com>) id 1j1kpv-0005pT-5c
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 00:45:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j1kV2-00075y-Qc
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 00:23:50 -0500
-Received: from ozlabs.org ([203.11.71.1]:51933)
+ (envelope-from <chen.zhang@intel.com>) id 1j1kps-00071x-VT
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 00:45:22 -0500
+Received: from mga09.intel.com ([134.134.136.24]:41745)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j1kV1-0006ze-Kk; Wed, 12 Feb 2020 00:23:48 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48HSjN2FrQz9sRJ; Wed, 12 Feb 2020 16:23:36 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581485016;
- bh=jIWnJf/P5cbNQ3HsxCS9rVqTxbvwhCynCHcBHmj60oI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=dvOG2YH3Cb9dvrf248dFVUz9WsfP7rst7L4GVjXMCiDubv15oSuggvLHxftABwxSx
- JFNr+Jf1Zio+zGOiORH0RtrorPoIPZjnwVeuLQXA7n6+gqgUAKxmPCz3viKuCsWQ9o
- zi7XY5U0rk6QoWXEqgq+aM3VZYj7dSiuRhop6fT4=
-Date: Wed, 12 Feb 2020 16:23:30 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Subject: Re: [PATCH v6 0/4] ppc: spapr: virtual NVDIMM support
-Message-ID: <20200212052330.GW22584@umbus.fritz.box>
-References: <158131055152.2897.1684848646085925139.stgit@lep8c.aus.stglabs.ibm.com>
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1j1kps-0006wn-NW
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 00:45:20 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 11 Feb 2020 21:45:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; d="scan'208";a="347449892"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by fmsmga001.fm.intel.com with ESMTP; 11 Feb 2020 21:45:11 -0800
+Received: from shsmsx606.ccr.corp.intel.com (10.109.6.216) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 11 Feb 2020 21:45:04 -0800
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX606.ccr.corp.intel.com (10.109.6.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 12 Feb 2020 13:45:03 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Wed, 12 Feb 2020 13:45:03 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr. David Alan Gilbert"
+ <dgilbert@redhat.com>, Daniel Cho <danielcho@qnap.com>
+Subject: RE: The issues about architecture of the COLO checkpoint
+Thread-Topic: The issues about architecture of the COLO checkpoint
+Thread-Index: AQHV4KTcP1R3sKJVikmfjsOVjXKwRqgVv2IAgACfSoCAAKv5kA==
+Date: Wed, 12 Feb 2020 05:45:03 +0000
+Message-ID: <2b09c8650b944c908c0c95fefe6d759f@intel.com>
+References: <CA+XQNE44kZjcw=0dtzaS4HwbPcRG6GpcQ3g3QfL5VS84EBWS_g@mail.gmail.com>
+ <20200211174756.GA2798@work-vm> <8737854e2826400fa4d14dc408cfd947@huawei.com>
+In-Reply-To: <8737854e2826400fa4d14dc408cfd947@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTRjZjgwZDYtNzAxYi00NGJkLTkwM2EtY2Q2ZDQ4NzBmOTdhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZDlPRlwvZXRjQ2NnQ1o4RjM5WnF0bDV4UDV1VHpTdHp4R0QxbVowWm1VV29DOGNUOGFcL243TXJVdVJndGROZHh5In0=
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="yBbBYFH0ZHvzMoI/"
-Content-Disposition: inline
-In-Reply-To: <158131055152.2897.1684848646085925139.stgit@lep8c.aus.stglabs.ibm.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,182 +90,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, qemu-ppc@nongnu.org,
- xiaoguangrong.eric@gmail.com, mst@redhat.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---yBbBYFH0ZHvzMoI/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Feb 09, 2020 at 10:55:51PM -0600, Shivaprasad G Bhat wrote:
-> The patchset attempts to implement the virtual NVDIMM for pseries.
+> -----Original Message-----
+> From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Sent: Wednesday, February 12, 2020 11:18 AM
+> To: Dr. David Alan Gilbert <dgilbert@redhat.com>; Daniel Cho
+> <danielcho@qnap.com>; Zhang, Chen <chen.zhang@intel.com>
+> Cc: qemu-devel@nongnu.org
+> Subject: RE: The issues about architecture of the COLO checkpoint
 >=20
-> PAPR semantics is such that each NVDIMM device is comprising of
-> multiple SCM(Storage Class Memory) blocks. The hypervisor is expected
-> to prepare the FDT for the NVDIMM device and send guest a hotplug
-> interrupt with new type RTAS_LOG_V6_HP_TYPE_PMEM currently handled by
-> the upstream kernel. In response to that interrupt, the guest requests
-> the hypervisor to bind each of the SCM blocks of the NVDIMM device
-> using hcalls. There can be SCM block unbind requests in case of driver
-> errors or unplug(not supported now) use cases. The NVDIMM label
-> read/writes are done through hcalls.
+> Hi,
 >=20
-> Since each virtual NVDIMM device is divided into multiple SCM blocks,
-> the bind, unbind, and queries using hcalls on those blocks can come
-> independently. This doesnt fit well into the qemu device semantics,
-> where the map/unmap are done at the (whole)device/object level
-> granularity. The patchset uses the existing NVDIMM class structures
-> for the implementation. The bind/unbind is left to happen at the
-> device_add/del phase itself instead of at hcalls on-demand.
+> Thank you Dave,
 >=20
-> The guest kernel makes bind/unbind requests for the virtual NVDIMM
-> device at the region level granularity. Without interleaving, each
-> virtual NVDIMM device is presented as separate region. Hence it is
-> safe to do bind/unbind everything during the object_add/del.
+> I'll reply here directly.
 >=20
-> The free device-memory region which is used for memory hotplug are
-> done using multiple LMBs of size(256MiB) and are expected to be
-> aligned to 256 MiB. As the SCM blocks are mapped to the same region,
-> the SCM blocks also need to be aligned to this size for the subsequent
-> memory hotplug to work. The minimum SCM block size is set to this size
-> for that reason and can be made user configurable in future if required.
->=20
-> The first patch moves around the existing static function to common
-> area for using it in the subsequent patches. Second patch adds new uuid
-> property to the nvdimm device. Third patch adds FDT entries and basic
-> device support, the fourth patch adds the hcalls implementation.
->=20
-> The patches are also available at
-> https://github.com/ShivaprasadGBhat/qemu.git - pseries-nvdimm-v6 branch
-> and can be used with the upstream kernel. ndctl can be used for
-> configuring the nvdimms inside the guest.
-> This is how it can be used ..
-> Ex :
-> For coldplug, the device to be added in qemu command line as shown below
-> -object=20
-> memory-backend-file,id=3Dmemnvdimm0,prealloc=3Dyes,mem-path=3D/tmp/nvdimm=
-0,share=3Dyes,size=3D1073872896
-> -device=20
-> nvdimm,label-size=3D128k,uuid=3D75a3cdd7-6a2f-4791-8d15-fe0a920e8e9e,memd=
-ev=3Dmemnvdimm0,id=3Dnvdimm0,slot=3D0
->=20
-> For hotplug, the device to be added from monitor as below
-> object_add=20
-> memory-backend-file,id=3Dmemnvdimm0,prealloc=3Dyes,mem-path=3D/tmp/nvdimm=
-0,share=3Dyes,size=3D1073872896
-> device_add=20
-> nvdimm,label-size=3D128k,uuid=3D75a3cdd7-6a2f-4791-8d15-fe0a920e8e9e,memd=
-ev=3Dmemnvdimm0,id=3Dnvdimm0,slot=3D0
-
-Applied to ppc-for-5.0, thanks.
-
->=20
-> ---
-> v5: https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg07472.html
-> Changes from v5:
->      - Moved most of the nvdimm code from spapr.c to spapr_nvdimm.c
->      - Addressed all style/logic comments.
-> v4: https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03455.html
-> Changes from v4:
->      - The nvdimm occupied GPA area is marked as available for hotplug, t=
-he
->        existing code takes care of if the dimm device is actually present=
- there
->        or used by nvdimm.
->      - fixed all comments for hcall implementation code on style/logic is=
-sues.
-> v3: https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg03452.html
-> Changes from v3:
->      - Moved NVDIMM uuid property addition to new patch.
->      - Moved the SCM hcalls to new file
->      - Changed the metadata read/write hcalls to use st/ldX_be_p macros.
->      - Fixed all comments on v3
-> v2: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg02785.html
-> Changes from v2:
->      - Creating the drc indices for the nvdimm devices in advance as
->        suggested based on the number of user specified max slots property.
->      - Removed the hard dependency on -machine nvdimm=3Don, enabled by
->        default on the current latest pseries machine version.
->      - Renamed the functions to spapr_dt_X as suggested.
->      - Metadata is byteswapped before read/write to take care of endianne=
-ss
->        semantics during the hcall.
-> v1 : http://lists.nongnu.org/archive/html/qemu-devel/2019-02/msg01545.html
-> Changes from v1:
->      - Rebased to upstream, this required required dt_populate implementa=
-tion
->        for nvdimm hotplug support
->      - Added uuid option to nvdimm device
->      - Removed the memory region sizing down code as suggested by Igor,
->        now erroring out if NVDIMM size excluding the label area is not
->        aligned to 256MB, so patch 2 from previous series no longer needed.
->      - Removed un-implemented hcalls
->      - Changed the hcalls to different kinds of checks and return
->        different values.
->      - Addressed comments for v1
-> ---
->=20
-> Shivaprasad G Bhat (4):
->       mem: move nvdimm_device_list to utilities
->       nvdimm: add uuid property to nvdimm
->       spapr: Add NVDIMM device support
->       spapr: Add Hcalls to support PAPR NVDIMM device
+> -----Original Message-----
+> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
+> Sent: Wednesday, February 12, 2020 1:48 AM
+> To: Daniel Cho <danielcho@qnap.com>; chen.zhang@intel.com;
+> Zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Cc: qemu-devel@nongnu.org
+> Subject: Re: The issues about architecture of the COLO checkpoint
 >=20
 >=20
->  default-configs/ppc64-softmmu.mak |    1=20
->  hw/acpi/nvdimm.c                  |   28 --
->  hw/mem/Kconfig                    |    2=20
->  hw/mem/nvdimm.c                   |   40 +++
->  hw/ppc/Makefile.objs              |    2=20
->  hw/ppc/spapr.c                    |   69 +++++
->  hw/ppc/spapr_drc.c                |   19 +
->  hw/ppc/spapr_events.c             |    4=20
->  hw/ppc/spapr_nvdimm.c             |  475 +++++++++++++++++++++++++++++++=
-++++++
->  include/hw/mem/nvdimm.h           |    7 +
->  include/hw/ppc/spapr.h            |    8 +
->  include/hw/ppc/spapr_drc.h        |    9 +
->  include/hw/ppc/spapr_nvdimm.h     |   37 +++
->  include/qemu/nvdimm-utils.h       |    7 +
->  util/Makefile.objs                |    1=20
->  util/nvdimm-utils.c               |   29 ++
->  16 files changed, 699 insertions(+), 39 deletions(-)
->  create mode 100644 hw/ppc/spapr_nvdimm.c
->  create mode 100644 include/hw/ppc/spapr_nvdimm.h
->  create mode 100644 include/qemu/nvdimm-utils.h
->  create mode 100644 util/nvdimm-utils.c
+> cc'ing in COLO people:
+>=20
+>=20
+> * Daniel Cho (danielcho@qnap.com) wrote:
+> > Hi everyone,
+> >      We have some issues about setting COLO feature. Hope somebody
+> > could give us some advice.
+> >
+> > Issue 1:
+> >      We dynamic to set COLO feature for PVM(2 core, 16G memory),  but
+> > the Primary VM will pause a long time(based on memory size) for
+> > waiting SVM start. Does it have any idea to reduce the pause time?
+> >
+>=20
+> Yes, we do have some ideas to optimize this downtime.
+>=20
+> The main problem for current version is, for each checkpoint, we have to
+> send the whole PVM's pages
+> To SVM, and then copy the whole VM's state into SVM from ram cache, in
+> this process, we need both of them be paused.
+> Just as you said, the downtime is based on memory size.
+>=20
+> So firstly, we need to reduce the sending data while do checkpoint, actua=
+lly,
+> we can migrate parts of PVM's dirty pages in background
+> While both of VMs are running. And then we load these pages into ram
+> cache (backup memory) in SVM temporarily. While do checkpoint,
+> We just send the last dirty pages of PVM to slave side and then copy the =
+ram
+> cache into SVM. Further on, we don't have
+> To send the whole PVM's dirty pages, we can only send the pages that
+> dirtied by PVM or SVM during two checkpoints. (Because
+> If one page is not dirtied by both PVM and SVM, the data of this pages wi=
+ll
+> keep same in SVM, PVM, backup memory). This method can reduce
+> the time that consumed in sending data.
+>=20
+> For the second problem, we can reduce the memory copy by two methods,
+> first one, we don't have to copy the whole pages in ram cache,
+> We can only copy the pages that dirtied by PVM and SVM in last checkpoint=
+.
+> Second, we can use userfault missing function to reduce the
+> Time consumed in memory copy. (For the second time, in theory, we can
+> reduce time consumed in memory into ms level).
+>=20
+> You can find the first optimization in attachment, it is based on an old =
+qemu
+> version (qemu-2.6), it should not be difficult to rebase it
+> Into master or your version. And please feel free to send the new version=
+ if
+> you want into community ;)
+>=20
 >=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks Hailiang!
+By the way, Do you have time to push the patches to upstream?
+I think this is a better and faster option.
 
---yBbBYFH0ZHvzMoI/
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks
+Zhang Chen
 
------BEGIN PGP SIGNATURE-----
+> >
+> > Issue 2:
+> >      In
+> > https://github.com/qemu/qemu/blob/master/migration/colo.c#L503,
+> > could we move start_vm() before Line 488? Because at first checkpoint
+> > PVM will wait for SVM's reply, it cause PVM stop for a while.
+> >
+>=20
+> No, that makes no sense, because if PVM runs firstly, it still need to wa=
+it for
+> The network packets from SVM to compare before send it to client side.
+>=20
+>=20
+> Thanks,
+> Hailiang
+>=20
+> >      We set the COLO feature on running VM, so we hope the running VM
+> > could continuous service for users.
+> > Do you have any suggestions for those issues?
+> >
+> > Best regards,
+> > Daniel Cho
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5Di9AACgkQbDjKyiDZ
-s5L3+A//V3nYz6dU4FccF1U225GXbcyNYmhW1fkmIxFLnPbe96APFHoHzQT1I2Fe
-DsxMLHK4YlZONSd8Yr5vLh1iJijES0+YTn1sKGKM/pBUaKsB4ItDtxmvMHdSYPsu
-/mBTycBRuuHf/KtAUqJlCW1b51ii5keEz6Ew/s87nhY2iRB++HYWbFSUNAGiuWEL
-j6ZFHA86q5ZlCzpjJzTmaiMlTur5GJ35Q3TcfRFp7GQ6ZNjEKw2QVN9zC3gDqo1B
-Z6423nlLNQ3Q4gBKqyec1IS+9dHQMQ8px9I50H2C4YkJsUOmIi+q99N/4v9hm815
-r9zhfmYW8WXNFhYof8DFvj9oXXQaKw354GS5+IzuCinI5Hxs9DiCnU3DtUrjkVvl
-25AnZufIrmD52FDVS225WNhwbgW6/we1Z8XLz792mM5tVjItLJhb7KspsJbZcvfS
-E3gv7BODaWVpgZEEMGhrwdnX3Q9fMW8yzH9x6qzJo+Xat/d4CRBSIU8xNqru801m
-zCdIis/8uAaQLMECFydtodr2wq536PFv0yvp/eWjp74vvyexpbWrifYqdePGNNdh
-KJPMnAt3nihxEWt4u2f34IvvFIULSxOwCEJa3swGyTrYWsIDfrrqZ+Pvg49epH3z
-vWld3NAqm7QmH/kUCx06JesgzYpKhdH64Du1UNncfULJQzLYR6w=
-=uXYy
------END PGP SIGNATURE-----
-
---yBbBYFH0ZHvzMoI/--
 
