@@ -2,61 +2,81 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB1AC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:31:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4613C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:34:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1B86206DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:31:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1B86206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=uter.be
+	by mail.kernel.org (Postfix) with ESMTPS id B9C64206DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:34:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9C64206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1mUa-0006ea-Lh
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 02:31:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55808)
- by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from <w@uter.be>)
- id 1j1mRB-00057q-D6
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:27:58 -0500
+	id 1j1mXk-0000qU-S7
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 02:34:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56646)
+ by lists.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <yi.l.liu@intel.com>) id 1j1mWT-0008Ar-N7
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:33:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <w@uter.be>) id 1j1mRA-0004kk-EA
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:27:57 -0500
-Received: from latin.grep.be ([2a01:4f8:140:52e5::2]:34962)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <w@uter.be>)
- id 1j1mRA-0004ZK-8V; Wed, 12 Feb 2020 02:27:56 -0500
-Received: from [105.186.91.62] (helo=gangtai.home.grep.be)
- by latin.grep.be with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.92) (envelope-from <w@uter.be>)
- id 1j1mQs-0003OD-RC; Wed, 12 Feb 2020 08:27:38 +0100
-Received: from wouter by gangtai.home.grep.be with local (Exim 4.93)
- (envelope-from <w@uter.be>)
- id 1j1mQj-0006QW-NK; Wed, 12 Feb 2020 09:27:29 +0200
-Date: Wed, 12 Feb 2020 09:27:29 +0200
-From: Wouter Verhelst <w@uter.be>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Subject: Re: Cross-project NBD extension proposal: NBD_INFO_INIT_STATE
-Message-ID: <20200212072729.GA22254@grep.be>
-References: <a4394fde-f459-dcb5-1698-013e1e24c388@redhat.com>
- <20200210221234.GH3888@redhat.com>
- <cc6e1e2e-d3a9-c498-354b-d382b5623ca0@redhat.com>
- <20200210225255.GJ3888@redhat.com>
+ (envelope-from <yi.l.liu@intel.com>) id 1j1mWS-0008Te-OP
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:33:25 -0500
+Received: from mga18.intel.com ([134.134.136.126]:21427)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j1mWS-0008Sj-FJ
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:33:24 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 11 Feb 2020 23:33:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; d="scan'208";a="432224082"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+ by fmsmga005.fm.intel.com with ESMTP; 11 Feb 2020 23:33:22 -0800
+Received: from FMSMSX109.amr.corp.intel.com (10.18.116.9) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 11 Feb 2020 23:33:22 -0800
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ fmsmsx109.amr.corp.intel.com (10.18.116.9) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 11 Feb 2020 23:33:22 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.225]) with mapi id 14.03.0439.000;
+ Wed, 12 Feb 2020 15:33:20 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [RFC v3 15/25] intel_iommu: process pasid cache invalidation
+Thread-Topic: [RFC v3 15/25] intel_iommu: process pasid cache invalidation
+Thread-Index: AQHV1p1PAzphlBRtJ0alU6uXzLVYlKgV/TkAgAFCrnA=
+Date: Wed, 12 Feb 2020 07:33:20 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A1BA59E@SHSMSX104.ccr.corp.intel.com>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-16-git-send-email-yi.l.liu@intel.com>
+ <20200211201728.GM984290@xz-x1>
+In-Reply-To: <20200211201728.GM984290@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYWUxZjBiMzAtODQyNi00NGM3LWI1Y2YtNTQ5ZDdhNmUxM2ZmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNlRsWGt4SzYxZDYxaTM1UEFkRVNnQ2d5RXFlR21aMGRJcUYzZGMzZFlGS25WNFFrczRDUEV3QkJqbGhpY0ltayJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200210225255.GJ3888@redhat.com>
-X-Speed: Gates' Law: Every 18 months, the speed of software halves.
-Organization: none
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:140:52e5::2
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,35 +88,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, "nbd@other.debian.org" <nbd@other.debian.org>,
- "libguestfs@redhat.com" <libguestfs@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo
+ Habkost <ehabkost@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-
-On Mon, Feb 10, 2020 at 10:52:55PM +0000, Richard W.M. Jones wrote:
-> But anyway ... could a flag indicating that the whole image is sparse
-> be useful, either as well as NBD_INIT_SPARSE or instead of it?  You
-> could use it to avoid an initial disk trim, which is something that
-> mke2fs does:
-
-Yeah, I think that could definitely be useful. I honestly can't see a
-use for NBD_INIT_SPARSE as defined in this proposal; and I don't think
-it's generally useful to have a feature if we can't think of a use case
-for it (that creates added complexity for no benefit).
-
-If we can find a reasonable use case for NBD_INIT_SPARSE as defined in
-this proposal, then just add a third bit (NBD_INIT_ALL_SPARSE or
-something) that says "the whole image is sparse". Otherwise, I think we
-should redefine NBD_INIT_SPARSE to say that.
-
--- 
-To the thief who stole my anti-depressants: I hope you're happy
-
-  -- seen somewhere on the Internet on a photo of a billboard
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
+RmVicnVhcnkgMTIsIDIwMjAgNDoxNyBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRl
+bC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYzIDE1LzI1XSBpbnRlbF9pb21tdTogcHJvY2Vz
+cyBwYXNpZCBjYWNoZSBpbnZhbGlkYXRpb24NCj4gDQo+IE9uIFdlZCwgSmFuIDI5LCAyMDIwIGF0
+IDA0OjE2OjQ2QU0gLTA4MDAsIExpdSwgWWkgTCB3cm90ZToNCj4gPiBGcm9tOiBMaXUgWWkgTCA8
+eWkubC5saXVAaW50ZWwuY29tPg0KPiA+DQo+ID4gVGhpcyBwYXRjaCBhZGRzIFBBU0lEIGNhY2hl
+IGludmFsaWRhdGlvbiBoYW5kbGluZy4gV2hlbiBndWVzdCBlbmFibGVkDQo+ID4gUEFTSUQgdXNh
+Z2VzIChlLmcuIFNWQSksIGd1ZXN0IHNvZnR3YXJlIHNob3VsZCBpc3N1ZSBhIHByb3BlciBQQVNJ
+RA0KPiA+IGNhY2hlIGludmFsaWRhdGlvbiB3aGVuIGNhY2hpbmctbW9kZSBpcyBleHBvc2VkLiBU
+aGlzIHBhdGNoIG9ubHkgYWRkcw0KPiA+IHRoZSBkcmFmdCBoYW5kbGluZyBvZiBwYXNpZCBjYWNo
+ZSBpbnZhbGlkYXRpb24uIERldGFpbGVkIGhhbmRsaW5nIHdpbGwNCj4gPiBiZSBhZGRlZCBpbiBz
+dWJzZXF1ZW50IHBhdGNoZXMuDQo+ID4NCj4gPiBDYzogS2V2aW4gVGlhbiA8a2V2aW4udGlhbkBp
+bnRlbC5jb20+DQo+ID4gQ2M6IEphY29iIFBhbiA8amFjb2IuanVuLnBhbkBsaW51eC5pbnRlbC5j
+b20+DQo+ID4gQ2M6IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCj4gPiBDYzogWWkgU3Vu
+IDx5aS55LnN1bkBsaW51eC5pbnRlbC5jb20+DQo+ID4gQ2M6IFBhb2xvIEJvbnppbmkgPHBib256
+aW5pQHJlZGhhdC5jb20+DQo+ID4gQ2M6IFJpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5u
+ZXQ+DQo+ID4gQ2M6IEVkdWFyZG8gSGFia29zdCA8ZWhhYmtvc3RAcmVkaGF0LmNvbT4NCj4gPiBT
+aWduZWQtb2ZmLWJ5OiBMaXUgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiANCj4gUmV2aWV3
+ZWQtYnk6IFBldGVyIFh1IDxwZXRlcnhAcmVkaGF0LmNvbT4NCg0KVGhhbmtz8J+Yig0KDQpSZWdh
+cmRzLA0KWWkgTGl1DQo=
 
