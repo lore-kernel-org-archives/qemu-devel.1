@@ -2,83 +2,97 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E858C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6D2C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:31:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33837206DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:29:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33837206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54545206DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:31:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FMUqswCK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54545206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1mSd-0005tr-C6
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 02:29:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55905)
+	id 1j1mUA-0007Ak-Gr
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 02:31:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1j1mRn-0005LR-N7
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:28:36 -0500
+ (envelope-from <mst@redhat.com>) id 1j1mTJ-0006XV-Nf
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:30:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1j1mRm-00053a-49
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:28:35 -0500
-Received: from mga17.intel.com ([192.55.52.151]:20113)
+ (envelope-from <mst@redhat.com>) id 1j1mTH-0005gl-GF
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:30:08 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24801
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j1mRl-00053C-RF
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:28:34 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Feb 2020 23:28:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; d="scan'208";a="380685886"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by orsmga004.jf.intel.com with ESMTP; 11 Feb 2020 23:28:31 -0800
-Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 11 Feb 2020 23:28:31 -0800
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 11 Feb 2020 23:28:25 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.158]) with mapi id 14.03.0439.000;
- Wed, 12 Feb 2020 15:28:24 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: RE: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be string
- option
-Thread-Topic: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be
- string option
-Thread-Index: AQHV1p1OaPbyEoP2OUqqqdiprp3R66gV87yAgAFI6dA=
-Date: Wed, 12 Feb 2020 07:28:24 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A1BA573@SHSMSX104.ccr.corp.intel.com>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
- <20200211194331.GK984290@xz-x1>
-In-Reply-To: <20200211194331.GK984290@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDUyZGRjOWEtYmVjMi00ODJlLTg3NzYtZjkxMmNhOTVkNmVmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNTZKVkhKSWVLc0lXZjZmUzhCT2tpWU1WOTFYR1c3SWpPUnU4ZUJlUlVUbmtiRkl3ekdNcG5uZVFRVGRkMDBUWCJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j1mTH-0005gZ-Bs
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:30:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581492606;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VR+eMMCh5fBQCk6SyclM0g2Ko01df0pB+L538/AEFFI=;
+ b=FMUqswCKDzxboreJaQYArjI6yAI6ynhyfVevy8kXkcRi4df+i7rrM37CpQOOOjTpDsFCxg
+ PmDA+gR4iYwA5RJT+RrJ4KPRlqmjHdNf3kZPe6mUtdpXuGMWPJYxrPCacQ5ufdEQ6M+ACI
+ DFb5IXBDzBA5hk6fqQl4oF75enOJlvA=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-212-sb4qsCb6OWGQwisU5GM1aA-1; Wed, 12 Feb 2020 02:30:04 -0500
+Received: by mail-qv1-f69.google.com with SMTP id v3so915853qvm.2
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 23:30:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=4x1as1g2yZr98MHN4k/1ke02no9RwRCiPwFENwA3Qiw=;
+ b=pOSAf7Y4FFqczPb6XhjMnrARbRZGOaUmUJb7CEOxup6TFfd+AZgF0O+VU0D6gGBzx7
+ sYfVHGwm7gjKZ1pGAyUrIjua+1/ZVvqDnyjt8S4OP9IykaP6qVlJwI7KLEI4DBmMQuyd
+ CmPfBycLiwb/EEPNtLX5/YB6j6Q3SSg7whC4y6mGKOqEUwjLlsVx07EsN0WSVR9av8/j
+ 892/ybJhuDa/CvgN/uPlvP4joeR1j+LETG9WjoPdOqHKQwyqb9ofueLpWmvChuIKp6FA
+ cCCTmdEbpbB7RnAIARMmm8sqZuqdAspvUcJY2ddfKPKcDi7foOnweEvftHCr1HTWReQP
+ xz/Q==
+X-Gm-Message-State: APjAAAUNVb/xHM+/cHpU/4wKYVpd56Vwsawy4+Q8KIXNttyRKp2mwZt5
+ jRhAOJKQTkUtwRmZz8Gb06elMLa5+rEY5Q0WtwaAuGGPGs8Wougp2CsUiSjdD0rWcNwnuCw1pcx
+ EhMoZ3E54kXVBt/U=
+X-Received: by 2002:ac8:969:: with SMTP id z38mr17806306qth.203.1581492603950; 
+ Tue, 11 Feb 2020 23:30:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwBSlkyW/UAB2wFI1BlviEOXV5VuXHDYwkwFSa1AA0YFbOLTQt3Gy0zGbRq/HqurS0H3MZ2ew==
+X-Received: by 2002:ac8:969:: with SMTP id z38mr17806294qth.203.1581492603714; 
+ Tue, 11 Feb 2020 23:30:03 -0800 (PST)
+Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
+ by smtp.gmail.com with ESMTPSA id n4sm3602146qti.55.2020.02.11.23.30.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 11 Feb 2020 23:30:02 -0800 (PST)
+Date: Wed, 12 Feb 2020 02:29:58 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Liu, Jing2" <jing2.liu@linux.intel.com>
+Subject: Re: [virtio-dev] Re: [PATCH v2 2/5] virtio-mmio: refactor common
+ functionality
+Message-ID: <20200212022842-mutt-send-email-mst@kernel.org>
+References: <cover.1581305609.git.zhabin@linux.alibaba.com>
+ <0268807dc26ecdf5620de9000758d05ca0b21f3f.1581305609.git.zhabin@linux.alibaba.com>
+ <20200211061758-mutt-send-email-mst@kernel.org>
+ <787bac48-3fd0-316a-a99a-8c93154dc8e2@linux.intel.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.151
+In-Reply-To: <787bac48-3fd0-316a-a99a-8c93154dc8e2@linux.intel.com>
+X-MC-Unique: sb4qsCb6OWGQwisU5GM1aA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,87 +104,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo
- Habkost <ehabkost@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: virtio-dev@lists.oasis-open.org, Zha Bin <zhabin@linux.alibaba.com>,
+ slp@redhat.com, jasowang@redhat.com, linux-kernel@vger.kernel.org,
+ qemu-devel@nongnu.org, chao.p.peng@linux.intel.com, gerry@linux.alibaba.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
-RmVicnVhcnkgMTIsIDIwMjAgMzo0NCBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRl
-bC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYzIDEzLzI1XSBpbnRlbF9pb21tdTogbW9kaWZ5
-IHgtc2NhbGFibGUtbW9kZSB0byBiZSBzdHJpbmcNCj4gb3B0aW9uDQo+IA0KPiBPbiBXZWQsIEph
-biAyOSwgMjAyMCBhdCAwNDoxNjo0NEFNIC0wODAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gRnJv
-bTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPg0KPiA+IEludGVsIFZULWQgMy4w
-IGludHJvZHVjZXMgc2NhbGFibGUgbW9kZSwgYW5kIGl0IGhhcyBhIGJ1bmNoIG9mDQo+ID4gY2Fw
-YWJpbGl0aWVzIHJlbGF0ZWQgdG8gc2NhbGFibGUgbW9kZSB0cmFuc2xhdGlvbiwgdGh1cyB0aGVy
-ZSBhcmUgbXVsdGlwbGUNCj4gY29tYmluYXRpb25zLg0KPiA+IFdoaWxlIHRoaXMgdklPTU1VIGlt
-cGxlbWVudGF0aW9uIHdhbnRzIHNpbXBsaWZ5IGl0IGZvciB1c2VyIGJ5DQo+ID4gcHJvdmlkaW5n
-IHR5cGljYWwgY29tYmluYXRpb25zLiBVc2VyIGNvdWxkIGNvbmZpZyBpdCBieQ0KPiA+ICJ4LXNj
-YWxhYmxlLW1vZGUiIG9wdGlvbi4gVGhlIHVzYWdlIGlzIGFzIGJlbG93Og0KPiA+DQo+ID4gIi1k
-ZXZpY2UgaW50ZWwtaW9tbXUseC1zY2FsYWJsZS1tb2RlPVsibGVnYWN5InwibW9kZXJuIl0iDQo+
-IA0KPiBNYXliZSBhbHNvICJvZmYiIHdoZW4gc29tZW9uZSB3YW50cyB0byBleHBsaWNpdGx5IGRp
-c2FibGUgaXQ/DQoNCmVtbW0sIEkgIHRoaW5rIHgtc2NhbGFibGUtbW9kZSBzaG91bGQgYmUgZGlz
-YWJsZWQgYnkgZGVmYXVsdC4gSXQgaXMgZW5hYmxlZA0Kb25seSB3aGVuICJsZWdhY3kiIG9yICJt
-b2Rlcm4iIGlzIGNvbmZpZ3VyZWQuIEknbSBmaW5lIHRvIGFkZCAib2ZmIiBhcyBhbg0KZXhwbGlj
-aXQgd2F5IHRvIHR1cm4gaXQgb2ZmIGlmIHlvdSB0aGluayBpdCBpcyBuZWNlc3NhcnkuIDotKQ0K
-DQo+ID4NCj4gPiAgLSAibGVnYWN5IjogZ2l2ZXMgc3VwcG9ydCBmb3IgU0wgcGFnZSB0YWJsZQ0K
-PiA+ICAtICJtb2Rlcm4iOiBnaXZlcyBzdXBwb3J0IGZvciBGTCBwYWdlIHRhYmxlLCBwYXNpZCwg
-dmlydHVhbCBjb21tYW5kDQo+ID4gIC0gIGlmIG5vdCBjb25maWd1cmVkLCBtZWFucyBubyBzY2Fs
-YWJsZSBtb2RlIHN1cHBvcnQsIGlmIG5vdCBwcm9wZXINCj4gPiAgICAgY29uZmlndXJlZCwgd2ls
-bCB0aHJvdyBlcnJvcg0KPiA+DQo+ID4gQ2M6IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwu
-Y29tPg0KPiA+IENjOiBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5AbGludXguaW50ZWwuY29tPg0K
-PiA+IENjOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gQ2M6IFlpIFN1biA8eWku
-eS5zdW5AbGludXguaW50ZWwuY29tPg0KPiA+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUBy
-ZWRoYXQuY29tPg0KPiA+IENjOiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0K
-PiA+IENjOiBFZHVhcmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+DQo+ID4gU2lnbmVk
-LW9mZi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5
-OiBZaSBTdW4gPHlpLnkuc3VuQGxpbnV4LmludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgaHcvaTM4
-Ni9pbnRlbF9pb21tdS5jICAgICAgICAgIHwgMjcgKysrKysrKysrKysrKysrKysrKysrKysrKy0t
-DQo+ID4gIGh3L2kzODYvaW50ZWxfaW9tbXVfaW50ZXJuYWwuaCB8ICAzICsrKw0KPiA+IGluY2x1
-ZGUvaHcvaTM4Ni9pbnRlbF9pb21tdS5oICB8ICAyICsrDQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwg
-MzAgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9o
-dy9pMzg2L2ludGVsX2lvbW11LmMgYi9ody9pMzg2L2ludGVsX2lvbW11LmMgaW5kZXgNCj4gPiAx
-YzFlYjdmLi4zM2JlNDBjIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0K
-PiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IEBAIC0zMDc4LDcgKzMwNzgsNyBA
-QCBzdGF0aWMgUHJvcGVydHkgdnRkX3Byb3BlcnRpZXNbXSA9IHsNCj4gPiAgICAgIERFRklORV9Q
-Uk9QX1VJTlQ4KCJhdy1iaXRzIiwgSW50ZWxJT01NVVN0YXRlLCBhd19iaXRzLA0KPiA+ICAgICAg
-ICAgICAgICAgICAgICAgICAgVlREX0hPU1RfQUREUkVTU19XSURUSCksDQo+ID4gICAgICBERUZJ
-TkVfUFJPUF9CT09MKCJjYWNoaW5nLW1vZGUiLCBJbnRlbElPTU1VU3RhdGUsIGNhY2hpbmdfbW9k
-ZSwNCj4gRkFMU0UpLA0KPiA+IC0gICAgREVGSU5FX1BST1BfQk9PTCgieC1zY2FsYWJsZS1tb2Rl
-IiwgSW50ZWxJT01NVVN0YXRlLCBzY2FsYWJsZV9tb2RlLA0KPiBGQUxTRSksDQo+ID4gKyAgICBE
-RUZJTkVfUFJPUF9TVFJJTkcoIngtc2NhbGFibGUtbW9kZSIsIEludGVsSU9NTVVTdGF0ZSwNCj4g
-PiArIHNjYWxhYmxlX21vZGVfc3RyKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0JPT0woImRtYS1k
-cmFpbiIsIEludGVsSU9NTVVTdGF0ZSwgZG1hX2RyYWluLCB0cnVlKSwNCj4gPiAgICAgIERFRklO
-RV9QUk9QX0VORF9PRl9MSVNUKCksDQo+ID4gIH07DQo+ID4gQEAgLTM3MDgsOCArMzcwOCwxMSBA
-QCBzdGF0aWMgdm9pZCB2dGRfaW5pdChJbnRlbElPTU1VU3RhdGUgKnMpDQo+ID4gICAgICB9DQo+
-ID4NCj4gPiAgICAgIC8qIFRPRE86IHJlYWQgY2FwL2VjYXAgZnJvbSBob3N0IHRvIGRlY2lkZSB3
-aGljaCBjYXAgdG8gYmUgZXhwb3NlZC4gKi8NCj4gPiAtICAgIGlmIChzLT5zY2FsYWJsZV9tb2Rl
-KSB7DQo+ID4gKyAgICBpZiAocy0+c2NhbGFibGVfbW9kZSAmJiAhcy0+c2NhbGFibGVfbW9kZXJu
-KSB7DQo+ID4gICAgICAgICAgcy0+ZWNhcCB8PSBWVERfRUNBUF9TTVRTIHwgVlREX0VDQVBfU1JT
-IHwgVlREX0VDQVBfU0xUUzsNCj4gPiArICAgIH0gZWxzZSBpZiAocy0+c2NhbGFibGVfbW9kZSAm
-JiBzLT5zY2FsYWJsZV9tb2Rlcm4pIHsNCj4gPiArICAgICAgICBzLT5lY2FwIHw9IFZURF9FQ0FQ
-X1NNVFMgfCBWVERfRUNBUF9TUlMgfCBWVERfRUNBUF9QQVNJRA0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgfCBWVERfRUNBUF9GTFRTIHwgVlREX0VDQVBfUFNTOw0KPiANCj4gVGhpcyBwYXRjaCBt
-aWdodCBiZSBnb29kIHRvIGJlIHRoZSBsYXN0IG9uZSBhZnRlciBhbGwgdGhlIGltcGxzIGFyZSBy
-ZWFkeS4NCg0KT2gsIHllcy4gTGV0IG1lIHJlb3JkZXIgaXQgaW4gbmV4dCB2ZXJzaW9uLg0KDQo+
-ID4gICAgICB9DQo+ID4NCj4gPiAgICAgIHZ0ZF9yZXNldF9jYWNoZXMocyk7DQo+ID4gQEAgLTM4
-NDUsNiArMzg0OCwyNiBAQCBzdGF0aWMgYm9vbCB2dGRfZGVjaWRlX2NvbmZpZyhJbnRlbElPTU1V
-U3RhdGUgKnMsDQo+IEVycm9yICoqZXJycCkNCj4gPiAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+
-ID4gICAgICB9DQo+ID4NCj4gPiArICAgIGlmIChzLT5zY2FsYWJsZV9tb2RlX3N0ciAmJg0KPiA+
-ICsgICAgICAgIChzdHJjbXAocy0+c2NhbGFibGVfbW9kZV9zdHIsICJtb2Rlcm4iKSAmJg0KPiA+
-ICsgICAgICAgICBzdHJjbXAocy0+c2NhbGFibGVfbW9kZV9zdHIsICJsZWdhY3kiKSkpIHsNCj4g
-PiArICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJJbnZhbGlkIHgtc2NhbGFibGUtbW9kZSBjb25m
-aWciKTsNCj4gDQo+IE1heWJlICIuLi4sIFBsZWFzZSB1c2UgJ21vZGVybicsICdsZWdhY3knLCBv
-ciAnb2ZmJy4iIHRvIHNob3cgb3B0aW9ucy4NCg0KR290IGl0Lg0KDQpUaGFua3MsDQpZaSBMaXUN
-Cg==
+On Wed, Feb 12, 2020 at 10:58:13AM +0800, Liu, Jing2 wrote:
+>=20
+> On 2/11/2020 7:19 PM, Michael S. Tsirkin wrote:
+> > On Mon, Feb 10, 2020 at 05:05:18PM +0800, Zha Bin wrote:
+> > > From: Liu Jiang <gerry@linux.alibaba.com>
+> > >=20
+> > > Common functionality is refactored into virtio_mmio_common.h
+> > > in order to MSI support in later patch set.
+> > >=20
+> > > Signed-off-by: Liu Jiang <gerry@linux.alibaba.com>
+> > > Co-developed-by: Zha Bin <zhabin@linux.alibaba.com>
+> > > Signed-off-by: Zha Bin <zhabin@linux.alibaba.com>
+> > > Co-developed-by: Jing Liu <jing2.liu@linux.intel.com>
+> > > Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+> > > Co-developed-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > What does this proliferation of header files achieve?
+> > common with what?
+>=20
+> We're considering that the virtio mmio structure is useful for virtio mmi=
+o
+> msi file so refactor out.
+
+I would not put msi in a separate file either.
+
+> e.g. to get the base of virtio_mmio_device from struct msi_desc *desc.
+>=20
+> Jing
+>=20
+>=20
+> > > ---
+> > >   drivers/virtio/virtio_mmio.c        | 21 +--------------------
+> > >   drivers/virtio/virtio_mmio_common.h | 31 ++++++++++++++++++++++++++=
++++++
+> > >   2 files changed, 32 insertions(+), 20 deletions(-)
+> > >   create mode 100644 drivers/virtio/virtio_mmio_common.h
+> > >=20
+> > > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmi=
+o.c
+> > > index 1733ab97..41e1c93 100644
+> > > --- a/drivers/virtio/virtio_mmio.c
+> > > +++ b/drivers/virtio/virtio_mmio.c
+> > > @@ -61,13 +61,12 @@
+> > >   #include <linux/io.h>
+> > >   #include <linux/list.h>
+> > >   #include <linux/module.h>
+> > > -#include <linux/platform_device.h>
+> > >   #include <linux/slab.h>
+> > >   #include <linux/spinlock.h>
+> > > -#include <linux/virtio.h>
+> > >   #include <linux/virtio_config.h>
+> > >   #include <uapi/linux/virtio_mmio.h>
+> > >   #include <linux/virtio_ring.h>
+> > > +#include "virtio_mmio_common.h"
+> > > @@ -77,24 +76,6 @@
+> > > -#define to_virtio_mmio_device(_plat_dev) \
+> > > -=09container_of(_plat_dev, struct virtio_mmio_device, vdev)
+> > > -
+> > > -struct virtio_mmio_device {
+> > > -=09struct virtio_device vdev;
+> > > -=09struct platform_device *pdev;
+> > > -
+> > > -=09void __iomem *base;
+> > > -=09unsigned long version;
+> > > -
+> > > -=09/* a list of queues so we can dispatch IRQs */
+> > > -=09spinlock_t lock;
+> > > -=09struct list_head virtqueues;
+> > > -
+> > > -=09unsigned short notify_base;
+> > > -=09unsigned short notify_multiplier;
+> > > -};
+> > > -
+> > >   struct virtio_mmio_vq_info {
+> > >   =09/* the actual virtqueue */
+> > >   =09struct virtqueue *vq;
+> > > diff --git a/drivers/virtio/virtio_mmio_common.h b/drivers/virtio/vir=
+tio_mmio_common.h
+> > > new file mode 100644
+> > > index 0000000..90cb304
+> > > --- /dev/null
+> > > +++ b/drivers/virtio/virtio_mmio_common.h
+> > > @@ -0,0 +1,31 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > > +#ifndef _DRIVERS_VIRTIO_VIRTIO_MMIO_COMMON_H
+> > > +#define _DRIVERS_VIRTIO_VIRTIO_MMIO_COMMON_H
+> > > +/*
+> > > + * Virtio MMIO driver - common functionality for all device versions
+> > > + *
+> > > + * This module allows virtio devices to be used over a memory-mapped=
+ device.
+> > > + */
+> > > +
+> > > +#include <linux/platform_device.h>
+> > > +#include <linux/virtio.h>
+> > > +
+> > > +#define to_virtio_mmio_device(_plat_dev) \
+> > > +=09container_of(_plat_dev, struct virtio_mmio_device, vdev)
+> > > +
+> > > +struct virtio_mmio_device {
+> > > +=09struct virtio_device vdev;
+> > > +=09struct platform_device *pdev;
+> > > +
+> > > +=09void __iomem *base;
+> > > +=09unsigned long version;
+> > > +
+> > > +=09/* a list of queues so we can dispatch IRQs */
+> > > +=09spinlock_t lock;
+> > > +=09struct list_head virtqueues;
+> > > +
+> > > +=09unsigned short notify_base;
+> > > +=09unsigned short notify_multiplier;
+> > > +};
+> > > +
+> > > +#endif
+> > > --=20
+> > > 1.8.3.1
+> >=20
+> > ---------------------------------------------------------------------
+> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> >=20
+
 
