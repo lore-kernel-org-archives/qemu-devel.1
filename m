@@ -6,85 +6,82 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF87C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 10:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A750CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 11:19:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA40C206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 10:51:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75E6E2073C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 11:19:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="foKPMbwh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA40C206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GXLa+3YX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75E6E2073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1pc9-0001Y3-Qz
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 05:51:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37855)
+	id 1j1q3Q-0007QE-HJ
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 06:19:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j1pbS-00018w-Vh
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:50:47 -0500
+ (envelope-from <stefanha@redhat.com>) id 1j1q2X-0006ib-Kn
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:18:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j1pbR-0008Ho-UG
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:50:46 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44751)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j1pbR-0008H5-Mc
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:50:45 -0500
-Received: by mail-wr1-x443.google.com with SMTP id m16so1617082wrx.11
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 02:50:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=3QfwizNo8Lw2tT2qYWgb5lpQAGCO0QRsu1VQeTjQIHg=;
- b=foKPMbwhTUhABzMdjVsW3FEmEsLDRDIirtnS6u0H06NEnNIsV8rzrnVpSFUXjn36CQ
- 2ZHn2an/BcE3NsrVFsLl+kd/7tI+K1tWmeeXNPbehU4qzghJbOI3UFfW3n4X6BvtJZDT
- yhTJFEh47xIFIjBKtxdqFaDQH2Vlt8XjvtnzY/w7f+zsA+hg3h9mmM2f3s1W6cIwlcMK
- D7REhQBAxGyI9HJrxqmXSg3yk9nzEL8qNiESr9u8bMpIOc3AYCKrvs+qvsyfcofOvKbm
- ZWraPY5k2uAuHg8nf+plnjQ3Nn0XIu/EtSDKo7pp04txM48ce+onGxWtUJclo1t2xnR1
- Sr3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=3QfwizNo8Lw2tT2qYWgb5lpQAGCO0QRsu1VQeTjQIHg=;
- b=pNl/wR5evPBMYZqsGsHIPP6CC2Srkh+Vq1oRNTD45wrvioSrwnb4V3cgk67FwCILoy
- JGsU7h7UM7Pr5WjYXJ1buXtbrNg/N7MngFhNe8qwlfoiyTmX1OScLdlTq35OIw1YyZg7
- st1Cg9GV80xFYKKVfLhywPae2c+LzcdplP0fbnDG+YWU3YkCK52VhLY5LB0FA0mY5y2p
- oAA7QCmNRadWXTGcYBWQuz7fZN8VpB+AzA0x6Z02tytXaHCpVGa4FoXxoOSCZn227iaY
- VHbjg9jEckxqZszqpM2zDO4ilWZCBkk2F0jQPh2THCz1wozjNTYzHjNq5gg3NmRp2r7l
- gLlA==
-X-Gm-Message-State: APjAAAUzbCxzqjHa2E+cQe7AhZd4Rz5sFO7Zzncm8WM0VY0u3CQ9L8em
- xHVIoSwuvgltxEjBK4O6jDQWJw==
-X-Google-Smtp-Source: APXvYqzey0ZnTzYQew/98Q2JUO2eIJgKWRJZbEjWZBMeONRTxShdyps2ZagvaAFurMNlr6AAV32HwA==
-X-Received: by 2002:adf:df8e:: with SMTP id z14mr13935672wrl.190.1581504644416; 
- Wed, 12 Feb 2020 02:50:44 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y6sm139207wrl.17.2020.02.12.02.50.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 02:50:43 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 667681FF87;
- Wed, 12 Feb 2020 10:50:42 +0000 (GMT)
-References: <20200212025145.24300-1-richard.henderson@linaro.org>
- <20200212025145.24300-3-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.8; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 2/2] target/arm: Use tcg_gen_gvec_5_ptr for sve FMLA/FCMLA
-In-reply-to: <20200212025145.24300-3-richard.henderson@linaro.org>
-Date: Wed, 12 Feb 2020 10:50:42 +0000
-Message-ID: <87h7zwxenx.fsf@zen.linaroharston>
+ (envelope-from <stefanha@redhat.com>) id 1j1q2W-00024A-Hn
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:18:45 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48668
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j1q2W-00023e-BE
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:18:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581506324;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=sHCOiCk1shu96TBgfuSoSEnJmXhBu3UDB/X0FaAfVi8=;
+ b=GXLa+3YXhhnz7wiYyyweQXw1PCtVswNIoZCN4IQpUn9EIU3j1jf40DBeQcIyLeqFinRQr8
+ ov0Yefyv5PAnxmvAYDNp9iUjGFY+yARNK/RzUQh8ge95iwqvMCR/eqyJhx8DyV/GHek5r+
+ cOsR2TijHlx+cNuSreC5FPmua7NvzAs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-LZ8iKLCAPAGO2_GYTQ9MTw-1; Wed, 12 Feb 2020 06:18:39 -0500
+X-MC-Unique: LZ8iKLCAPAGO2_GYTQ9MTw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C31C2DB60;
+ Wed, 12 Feb 2020 11:18:38 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A2C9019C69;
+ Wed, 12 Feb 2020 11:18:33 +0000 (UTC)
+Date: Wed, 12 Feb 2020 11:18:32 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v2 2/4] virtio-scsi: default num_queues to -smp N
+Message-ID: <20200212111832.GD464050@stefanha-x1.localdomain>
+References: <20200124100159.736209-3-stefanha@redhat.com>
+ <20200127141031.6e108839.cohuck@redhat.com>
+ <20200129154438.GC157595@stefanha-x1.localdomain>
+ <bc9680fc-c382-301f-a1fe-21740c918570@redhat.com>
+ <20200130105235.GC176651@stefanha-x1.localdomain>
+ <20200203102529.3op54zggtquoguuo@dritchie>
+ <20200203105744.GD1922177@redhat.com>
+ <20200203113949.hnjuqzkrqqwst54e@dritchie>
+ <20200211162041.GA432724@stefanha-x1.localdomain>
+ <20200211113108-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+In-Reply-To: <20200211113108-mutt-send-email-mst@kernel.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="C1iGAkRnbeBonpVg"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,87 +93,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, tsimpson@quicinc.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Sergio Lopez <slp@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--C1iGAkRnbeBonpVg
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+On Tue, Feb 11, 2020 at 11:31:17AM -0500, Michael S. Tsirkin wrote:
+> On Tue, Feb 11, 2020 at 04:20:41PM +0000, Stefan Hajnoczi wrote:
+> > On Mon, Feb 03, 2020 at 12:39:49PM +0100, Sergio Lopez wrote:
+> > > On Mon, Feb 03, 2020 at 10:57:44AM +0000, Daniel P. Berrang=E9 wrote:
+> > > > On Mon, Feb 03, 2020 at 11:25:29AM +0100, Sergio Lopez wrote:
+> > > > > On Thu, Jan 30, 2020 at 10:52:35AM +0000, Stefan Hajnoczi wrote:
+> > > > > > On Thu, Jan 30, 2020 at 01:29:16AM +0100, Paolo Bonzini wrote:
+> > > > > > > On 29/01/20 16:44, Stefan Hajnoczi wrote:
+> > > > > > > > On Mon, Jan 27, 2020 at 02:10:31PM +0100, Cornelia Huck wro=
+te:
+> > > > > > > >> On Fri, 24 Jan 2020 10:01:57 +0000
+> > > > > > > >> Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > I will create a 32 vCPU guest with 100 virtio-blk devices and verify
+> > that enabling multi-queue is successful.
+>=20
+> and that it's helpful for performance?
 
-> Now that we can pass 7 parameters, do not encode register
-> operands within simd_data.
+I may be a little while before the next revision of this patch series.
+Testing reveals scalability problems when creating so many virtqueues
+:).
 
-What defines the upper limit? Is it the ABI of the backend or just the
-efficiency of implementing the prologue for the call?
-> --- a/target/arm/sve_helper.c
-> +++ b/target/arm/sve_helper.c
-> @@ -3372,23 +3372,11 @@ DO_ZPZ_FP(sve_ucvt_dd, uint64_t,     , uint64_to_=
-float64)
->=20=20
->  #undef DO_ZPZ_FP
->=20=20
-> -/* 4-operand predicated multiply-add.  This requires 7 operands to pass
-> - * "properly", so we need to encode some of the registers into DESC.
-> - */
-> -QEMU_BUILD_BUG_ON(SIMD_DATA_SHIFT + 20 > 32);
-> -
-> -static void do_fmla_zpzzz_h(CPUARMState *env, void *vg, uint32_t desc,
-> +static void do_fmla_zpzzz_h(void *vd, void *vn, void *vm, void *va, void=
- *vg,
-> +                            float_status *status, uint32_t desc,
->                              uint16_t neg1, uint16_t neg3)
->  {
->      intptr_t i =3D simd_oprsz(desc);
-> -    unsigned rd =3D extract32(desc, SIMD_DATA_SHIFT, 5);
-> -    unsigned rn =3D extract32(desc, SIMD_DATA_SHIFT + 5, 5);
-> -    unsigned rm =3D extract32(desc, SIMD_DATA_SHIFT + 10, 5);
-> -    unsigned ra =3D extract32(desc, SIMD_DATA_SHIFT + 15, 5);
-> -    void *vd =3D &env->vfp.zregs[rd];
-> -    void *vn =3D &env->vfp.zregs[rn];
-> -    void *vm =3D &env->vfp.zregs[rm];
-> -    void *va =3D &env->vfp.zregs[ra];
-<snip>
-> @@ -4010,25 +4001,14 @@ static bool trans_FCMLA_zpzzz(DisasContext *s, ar=
-g_FCMLA_zpzzz *a)
->      }
->      if (sve_access_check(s)) {
->          unsigned vsz =3D vec_full_reg_size(s);
-> -        unsigned desc;
-> -        TCGv_i32 t_desc;
-> -        TCGv_ptr pg =3D tcg_temp_new_ptr();
-> -
-> -        /* We would need 7 operands to pass these arguments "properly".
-> -         * So we encode all the register numbers into the descriptor.
-> -         */
-> -        desc =3D deposit32(a->rd, 5, 5, a->rn);
-> -        desc =3D deposit32(desc, 10, 5, a->rm);
-> -        desc =3D deposit32(desc, 15, 5, a->ra);
-> -        desc =3D deposit32(desc, 20, 2, a->rot);
-> -        desc =3D sextract32(desc, 0, 22);
-> -        desc =3D simd_desc(vsz, vsz, desc);
-> -
-> -        t_desc =3D tcg_const_i32(desc);
-> -        tcg_gen_addi_ptr(pg, cpu_env, pred_full_reg_offset(s, a->pg));
-> -        fns[a->esz - 1](cpu_env, pg, t_desc);
-> -        tcg_temp_free_i32(t_desc);
-> -        tcg_temp_free_ptr(pg);
-> +        TCGv_ptr status =3D get_fpstatus_ptr(a->esz =3D=3D MO_16);
-> +        tcg_gen_gvec_5_ptr(vec_full_reg_offset(s, a->rd),
-> +                           vec_full_reg_offset(s, a->rn),
-> +                           vec_full_reg_offset(s, a->rm),
-> +                           vec_full_reg_offset(s, a->ra),
-> +                           pred_full_reg_offset(s, a->pg),
-> +                           status, vsz, vsz, a->rot, fns[a->esz]);
-> +        tcg_temp_free_ptr(status);
->      }
->      return true;
->  }
+I've measured boot time, memory consumption, and random read IOPS.  They
+are all significantly worse (32 vCPUs, 24 GB RAM, 101 virtio-blk
+devices, 32 queues/device).
 
-Good to see the code simplified ;-)
+Time to see what's going on and whether some general scalability
+improvements are possible here before we enable multi-queue by default.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Stefan
 
---=20
-Alex Benn=C3=A9e
+--C1iGAkRnbeBonpVg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5D3wcACgkQnKSrs4Gr
+c8h+8QgAvY0Nfx4IDDcmHMAEfXo1jqhtFZ6DHg/a0L/rP7WHybR2JJ0O1sk8C6Dk
+X6hctZm/AbxFWqkvt031Y9nmZ52+yyWsTjJq/NUve3tPMY/E1puyKMoqgDFPFQXB
+Xxpfi1NqsFLgmPfSKUvVyuXf3dq54+Zr5yYo7HlRTOWCgeltqnakwmpMRNr9pYgO
+PQH2t7ygcwFZTGpNsRrnXB0UG0e9Ayt4lfzfn9htV2PgqhlsXkzz2T9pIlPMyboZ
+/weMBrcg9EfNXHhkFRkJirpHE0fIZXy0Rz/yFY2Bj0k7gFtvZn1uFotX7+Fm8i+j
+i0jaE73hFYhKMTiUkbLrBxDsJC1NhQ==
+=+J2u
+-----END PGP SIGNATURE-----
+
+--C1iGAkRnbeBonpVg--
+
 
