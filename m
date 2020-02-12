@@ -2,113 +2,81 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BFAC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCE9C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:26:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6991B2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:25:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6991B2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id CD19420873
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:26:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G0sly2LV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD19420873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1oGx-000874-Kd
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 04:25:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46832)
+	id 1j1oHn-0000zv-3B
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 04:26:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j1oGF-0007Bq-Cz
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:24:48 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1j1oHA-0000GM-0s
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j1oGE-0007pE-77
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:24:47 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:52613)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j1oGB-0007lP-LM; Wed, 12 Feb 2020 04:24:43 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MaIvV-1iyDLh43pl-00WCY0; Wed, 12 Feb 2020 10:24:17 +0100
-Subject: Re: [PATCH] nbd: Fix regression with multiple meta contexts
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200206173832.130004-1-eblake@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <f498beb4-dfd0-a7dc-33f8-5c62d3738c1b@vivier.eu>
-Date: Wed, 12 Feb 2020 10:24:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
-MIME-Version: 1.0
-In-Reply-To: <20200206173832.130004-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:dn5wGp1Qq8oPYx6BbqYNN6e1+5meXjMIpPgRMExRlT3fqHwkBnn
- ZXozVMQEWc/k7NIq4JlfveldUwZ6fD8b3AAmR5Dpu5LiTP4My75bU5WilShiII4+dkalswO
- 2Ok9k0S8B47h3AKcaqW7dONtnEfVJ2Ijp+ZHve8EK1otvGi3TJee+U6C0uIfGYcwVTbi/ut
- rt23mkQAG+uAtULboK53g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wEm5OAoscgo=:z+c9XRMFbNNvssyNICWiCT
- 0vp8CPMMDXkXKsRFoACoOzTZODkbvDjhItyxKr6NAXweMwrvQFwivuGF2jeKwcE/I2/XUJ7aR
- dfSQ3V/XnQYNPANbL25dg1nvHiyxb/gWEXjV3GqWyxfNSqn3Z0wi7V9RlTtN/FFB61NYjfmxK
- I5SyH2i/s6XaV0wRfN7xKpAa3DGFYLh3q1dEd6fRVw33vw30eN6SZjMHPdSiacn9Nbkf26yd4
- v0SB+OXtn+JmHrJBXLfQg3dJwWxMU7PF2SMusRj+IaOSpGrjfneg3vUoLuCe/6NhO73ubt5oA
- +qmX37KJa9oJapie+uXRbk7WLRBwOZi+EKduopSrcsR8HTHWcmwadCA9WiqrisygEktIQmrGe
- EZ4zMx69G9+ZEB7EyMVTvEagIeRT6tH0hXSVxLWX5G0NAcfGTpzFzc6Ji9h15mEdzNM+kwOPr
- eioUNzS1NTQ0brWlOScDJkAzmLWFhKJkd0UCIylwXopoEDYW+SY7y7UgqEB9XuoVtGVoHrZ3w
- IR4BctW3YnjnuIhX57DZBkuECeoG63NdbsVhcfbWHeqU5ZGQFY5BFoArhte+ZqAgzKIlIqKHY
- mADp6NqNRIkVJlxKqLlsJAQTqUAX4J0WRhXJ1a46c3YWPEbKIy+No5z3qIAaWBE4RRfjOLvBE
- AmnpScKd9xHnXYqpp1cgKbSAyfEhyIShgATqZ+39v8cIVymVMyCPbpv8LWe4HhF24k9H1zuk7
- +RyNwoCTDAckeyFsKfwbfEypyG2iO/rlvZRWbgfGUWk/0KnDC3qHmu6RwdQKteQKunqg2k5gF
- QkjkygzV799hcGEbRj0usUVKifjA1t5DmxBgFlsyk4T5Y1e0n82bOrNpO2yryNuxwLlt0D8
+ (envelope-from <mlevitsk@redhat.com>) id 1j1oH8-0008Q8-Nd
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:25:43 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36912
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1j1oH8-0008Pf-JG
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:25:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581499542;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LJ1hVtLfzTNfO/Tfveu2DGk1tH4AdkrgqduIY9Cd384=;
+ b=G0sly2LVehmf+8C8P3fx0IpK1lyUNB13G8Tmf/HfKSmRYl2bX+0cCIVu5pDt7uCcL5fBQp
+ sNotFpM6sL8nqnmgO7kDdU+3WT1b0y9AdTaQnoDUgtsWpCjKe88M3QFAWx9pE/zAHLhLKn
+ d/jxBr54IxsRx1Ctt9fkYwwnvvHgOcU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-lsqadGPZO8O5aS7mkdLnbg-1; Wed, 12 Feb 2020 04:25:37 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AED08017CC;
+ Wed, 12 Feb 2020 09:25:35 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3ED575D9E2;
+ Wed, 12 Feb 2020 09:25:33 +0000 (UTC)
+Message-ID: <94a2e5242bdc3158bdee58da611cf0c49aa4a582.camel@redhat.com>
+Subject: Re: [PATCH v5 07/26] nvme: add support for the abort command
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Klaus Jensen <k.jensen@samsung.com>, qemu-block@nongnu.org
+Date: Wed, 12 Feb 2020 11:25:22 +0200
+In-Reply-To: <20200204095208.269131-8-k.jensen@samsung.com>
+References: <20200204095208.269131-1-k.jensen@samsung.com>
+ <CGME20200204095219eucas1p1a7e88f8f4090988b3dee34d4d4bcc239@eucas1p1.samsung.com>
+ <20200204095208.269131-8-k.jensen@samsung.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: lsqadGPZO8O5aS7mkdLnbg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,36 +88,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, pannengyuan@huawei.com, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Klaus Jensen <its@irrelevant.dk>,
+ Javier Gonzalez <javier.gonz@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 06/02/2020 à 18:38, Eric Blake a écrit :
-> Detected by a hang in the libnbd testsuite.  If a client requests
-> multiple meta contexts (both base:allocation and qemu:dirty-bitmap:x)
-> at the same time, our attempt to silence a false-positive warning
-> about a potential uninitialized variable introduced botched logic: we
-> were short-circuiting the second context, and never sending the
-> NBD_REPLY_FLAG_DONE.  Combining two 'if' into one 'if/else' in
-> bdf200a55 was wrong (I'm a bit embarrassed that such a change was my
-> initial suggestion after the v1 patch, then I did not review the v2
-> patch that actually got committed). Revert that, and instead silence
-> the false positive warning by replacing 'return ret' with 'return 0'
-> (the value it always has at that point in the code, even though it
-> eluded the deduction abilities of the robot that reported the false
-> positive).
+On Tue, 2020-02-04 at 10:51 +0100, Klaus Jensen wrote:
+> Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
+> Section 5.1 ("Abort command").
 > 
-> Fixes: bdf200a5535
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> The Abort command is a best effort command; for now, the device always
+> fails to abort the given command.
+> 
+> Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
 > ---
+>  hw/block/nvme.c | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
 > 
-> It's never fun when a regression is caused by a patch taken through
-> qemu-trivial, proving that the patch was not trivial after all.
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index ba5089df9ece..e1810260d40b 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -731,6 +731,18 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+>      }
+>  }
+>  
+> +static uint16_t nvme_abort(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> +{
+> +    uint16_t sqid = le32_to_cpu(cmd->cdw10) & 0xffff;
+> +
+> +    req->cqe.result = 1;
+> +    if (nvme_check_sqid(n, sqid)) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+> +    return NVME_SUCCESS;
+> +}
 
-Do you want this one be merged using the trivial branch?
+Looks 100% up to spec.
 
-Thanks,
-Laurent
+In my nvme-mdev it looks like I implemented this wrongly by failing this with
+NVME_SC_ABORT_MISSING (which is defined in the kernel sources, but looks like a reserved
+error code in the spec. Not that it matters that much.
+
+Also unrelated to this but something I would like to point out 
+(this applies not only to this command but to all admin and IO commands) the device
+should check for various reserved fields in the command descriptor, which it doesn't currently.
+
+This is what I do:
+https://gitlab.com/maximlevitsky/linux/blob/mdev-work-5.2/drivers/nvme/mdev/adm.c#L783
+
+> +
+>  static inline void nvme_set_timestamp(NvmeCtrl *n, uint64_t ts)
+>  {
+>      trace_nvme_dev_setfeat_timestamp(ts);
+> @@ -848,6 +860,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          trace_nvme_dev_err_invalid_setfeat(dw10);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+> +
+Nitpick: Unrelated whitespace change.
+>      return NVME_SUCCESS;
+>  }
+>  
+> @@ -864,6 +877,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          return nvme_create_cq(n, cmd);
+>      case NVME_ADM_CMD_IDENTIFY:
+>          return nvme_identify(n, cmd);
+> +    case NVME_ADM_CMD_ABORT:
+> +        return nvme_abort(n, cmd, req);
+>      case NVME_ADM_CMD_SET_FEATURES:
+>          return nvme_set_feature(n, cmd, req);
+>      case NVME_ADM_CMD_GET_FEATURES:
+> @@ -1377,6 +1392,19 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>      id->ieee[2] = 0xb3;
+>      id->ver = cpu_to_le32(NVME_SPEC_VER);
+>      id->oacs = cpu_to_le16(0);
+> +
+> +    /*
+> +     * Because the controller always completes the Abort command immediately,
+> +     * there can never be more than one concurrently executing Abort command,
+> +     * so this value is never used for anything. Note that there can easily be
+> +     * many Abort commands in the queues, but they are not considered
+> +     * "executing" until processed by nvme_abort.
+> +     *
+> +     * The specification recommends a value of 3 for Abort Command Limit (four
+> +     * concurrently outstanding Abort commands), so lets use that though it is
+> +     * inconsequential.
+> +     */
+> +    id->acl = 3;
+Yep.
+>      id->frmw = 7 << 1;
+>      id->lpa = 1 << 0;
+>      id->sqes = (0x6 << 4) | 0x6;
+
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
 
