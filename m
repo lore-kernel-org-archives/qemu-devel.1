@@ -2,80 +2,85 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6770C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E2EC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B24B72073C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E5472073C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:34:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I9F7nq5H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B24B72073C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LbER5Gn6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E5472073C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1oO5-0003cU-Tz
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 04:32:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47911)
+	id 1j1oPa-0004af-O9
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 04:34:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1j1oNJ-00035v-MN
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:32:07 -0500
+ (envelope-from <jasowang@redhat.com>) id 1j1oOz-0004C3-Uu
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:33:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1j1oNI-0004MU-1t
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:32:05 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31372
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jasowang@redhat.com>) id 1j1oOy-0005j6-Sp
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:33:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51082
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1j1oNH-0004Ly-Tr
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:32:04 -0500
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j1oOy-0005im-PP
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:33:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581499923;
+ s=mimecast20190719; t=1581500028;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DPEeJ3IGR+NI4Auob27Krdhp8DJKltuiV/XRPquYkfk=;
- b=I9F7nq5H5G1Dq1nkfV9lskb+4P4k0VinssCeF64sJ8fZwDOo7xFkuhzdDt1bdSPmVjISe+
- E8MsF3SSSfhZxNyyKnoxtqdcfyTfy6fmcTQOfr/y6+OEuEIdA6Cj60av9iB/vMjIs8LYVj
- CEPZFOs+W3ZpahCrUa+ND2vtsYC8crs=
+ bh=RXSj4dp+3e1XmrSFNINy7OA1N1REvEZjNFMtm5OoDhU=;
+ b=LbER5Gn6+3mpuXY+O5BEZcVteGDR5iMT0YCxqvVuTdXLPXPjuXki2r+05D3E5TWDacSIyN
+ DrhEk03qKMpQyx41EJlt7IL+D8HGgo4nUm8P1wNneQ53JHatT4WQOqrIWy/oqGqD9uVWA4
+ dYG7+pr1T3HK6Cxu1Q+TYYPFkgcAdYM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-FgwKGzDDPtOxLjHhQiyccg-1; Wed, 12 Feb 2020 04:31:59 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-323-i4y7TRpeNXOk-ShitKUjMg-1; Wed, 12 Feb 2020 04:33:43 -0500
+X-MC-Unique: i4y7TRpeNXOk-ShitKUjMg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFB5B1005516;
- Wed, 12 Feb 2020 09:31:57 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 22C765DA85;
- Wed, 12 Feb 2020 09:31:54 +0000 (UTC)
-Message-ID: <9d2f45a97cce33a548ed98843e06b299b89b30e3.camel@redhat.com>
-Subject: Re: [PATCH v5 09/26] nvme: add temperature threshold feature
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Klaus Jensen <k.jensen@samsung.com>, qemu-block@nongnu.org
-Date: Wed, 12 Feb 2020 11:31:43 +0200
-In-Reply-To: <20200204095208.269131-10-k.jensen@samsung.com>
-References: <20200204095208.269131-1-k.jensen@samsung.com>
- <CGME20200204095221eucas1p1d5b1c9578d79e6bcc5714976bbe7dc11@eucas1p1.samsung.com>
- <20200204095208.269131-10-k.jensen@samsung.com>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: FgwKGzDDPtOxLjHhQiyccg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E30E11005513;
+ Wed, 12 Feb 2020 09:33:41 +0000 (UTC)
+Received: from [10.72.13.111] (ovpn-13-111.pek2.redhat.com [10.72.13.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 80EBE101D482;
+ Wed, 12 Feb 2020 09:33:10 +0000 (UTC)
+Subject: Re: [PATCH v2 1/5] virtio-mmio: add notify feature for per-queue
+From: Jason Wang <jasowang@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <cover.1581305609.git.zhabin@linux.alibaba.com>
+ <8a4ea95d6d77a2814aaf6897b5517353289a098e.1581305609.git.zhabin@linux.alibaba.com>
+ <20200211062205-mutt-send-email-mst@kernel.org>
+ <ef613d3a-0372-64f3-7644-2e88cc9d4355@redhat.com>
+ <20200212024158-mutt-send-email-mst@kernel.org>
+ <d4eb9cde-5d06-3df9-df28-15378a9c6929@redhat.com>
+Message-ID: <82d99b35-0c64-2eb2-9c23-7af2597b880b@redhat.com>
+Date: Wed, 12 Feb 2020 17:33:06 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <d4eb9cde-5d06-3df9-df28-15378a9c6929@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,185 +92,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Klaus Jensen <its@irrelevant.dk>,
- Javier Gonzalez <javier.gonz@samsung.com>
+Cc: virtio-dev@lists.oasis-open.org, Zha Bin <zhabin@linux.alibaba.com>,
+ slp@redhat.com, jing2.liu@linux.intel.com, linux-kernel@vger.kernel.org,
+ qemu-devel@nongnu.org, chao.p.peng@linux.intel.com, gerry@linux.alibaba.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2020-02-04 at 10:51 +0100, Klaus Jensen wrote:
-> It might seem wierd to implement this feature for an emulated device,
-> but it is mandatory to support and the feature is useful for testing
-> asynchronous event request support, which will be added in a later
-> patch.
 
-Absolutely but as the old saying is, rules are rules.
-At least, to the defense of the spec, making this mandatory
-forced the vendors to actually report some statistics about
-the device in neutral format as opposed to yet another
-vendor proprietary thing (I am talking about SMART log page).
-
-> 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-
-I noticed that you sign off some patches with your @samsung.com email,
-and some with @cnexlabs.com
-Is there a reason for that?
-
-
-> ---
->  hw/block/nvme.c      | 50 ++++++++++++++++++++++++++++++++++++++++++++
->  hw/block/nvme.h      |  2 ++
->  include/block/nvme.h |  7 ++++++-
->  3 files changed, 58 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 81514eaef63a..f72348344832 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -45,6 +45,9 @@
->  
->  #define NVME_SPEC_VER 0x00010201
->  #define NVME_MAX_QS PCI_MSIX_FLAGS_QSIZE
-> +#define NVME_TEMPERATURE 0x143
-> +#define NVME_TEMPERATURE_WARNING 0x157
-> +#define NVME_TEMPERATURE_CRITICAL 0x175
->  
->  #define NVME_GUEST_ERR(trace, fmt, ...) \
->      do { \
-> @@ -798,9 +801,31 @@ static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
->  static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  {
->      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> +    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
->      uint32_t result;
->  
->      switch (dw10) {
-> +    case NVME_TEMPERATURE_THRESHOLD:
-> +        result = 0;
-> +
-> +        /*
-> +         * The controller only implements the Composite Temperature sensor, so
-> +         * return 0 for all other sensors.
-> +         */
-> +        if (NVME_TEMP_TMPSEL(dw11)) {
-> +            break;
-> +        }
-> +
-> +        switch (NVME_TEMP_THSEL(dw11)) {
-> +        case 0x0:
-> +            result = cpu_to_le16(n->features.temp_thresh_hi);
-> +            break;
-> +        case 0x1:
-> +            result = cpu_to_le16(n->features.temp_thresh_low);
-> +            break;
-> +        }
-> +
-> +        break;
->      case NVME_VOLATILE_WRITE_CACHE:
->          result = blk_enable_write_cache(n->conf.blk);
->          trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
-> @@ -845,6 +870,23 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
->  
->      switch (dw10) {
-> +    case NVME_TEMPERATURE_THRESHOLD:
-> +        if (NVME_TEMP_TMPSEL(dw11)) {
-> +            break;
-> +        }
-> +
-> +        switch (NVME_TEMP_THSEL(dw11)) {
-> +        case 0x0:
-> +            n->features.temp_thresh_hi = NVME_TEMP_TMPTH(dw11);
-> +            break;
-> +        case 0x1:
-> +            n->features.temp_thresh_low = NVME_TEMP_TMPTH(dw11);
-> +            break;
-> +        default:
-> +            return NVME_INVALID_FIELD | NVME_DNR;
-> +        }
-> +
-> +        break;
->      case NVME_VOLATILE_WRITE_CACHE:
->          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
->          break;
-> @@ -1366,6 +1408,9 @@ static void nvme_init_state(NvmeCtrl *n)
->      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
->      n->sq = g_new0(NvmeSQueue *, n->params.num_queues);
->      n->cq = g_new0(NvmeCQueue *, n->params.num_queues);
-> +
-> +    n->temperature = NVME_TEMPERATURE;
-
-This appears not to be used in the patch.
-I think you should move that to the next patch that
-adds the get log page support.
-
-> +    n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
->  }
->  
->  static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
-> @@ -1447,6 +1492,11 @@ static void nvme_init_ctrl(NvmeCtrl *n)
->      id->acl = 3;
->      id->frmw = 7 << 1;
->      id->lpa = 1 << 0;
-> +
-> +    /* recommended default value (~70 C) */
-> +    id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
-> +    id->cctemp = cpu_to_le16(NVME_TEMPERATURE_CRITICAL);
-> +
->      id->sqes = (0x6 << 4) | 0x6;
->      id->cqes = (0x4 << 4) | 0x4;
->      id->nn = cpu_to_le32(n->num_namespaces);
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index a867bdfabafd..1518f32557a3 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -108,6 +108,7 @@ typedef struct NvmeCtrl {
->      uint64_t    irq_status;
->      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
->      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
-> +    uint16_t    temperature;
->  
->      NvmeNamespace   *namespaces;
->      NvmeSQueue      **sq;
-> @@ -115,6 +116,7 @@ typedef struct NvmeCtrl {
->      NvmeSQueue      admin_sq;
->      NvmeCQueue      admin_cq;
->      NvmeIdCtrl      id_ctrl;
-> +    NvmeFeatureVal  features;
->  } NvmeCtrl;
->  
->  static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index d2f65e8fe496..ff31cb32117c 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -616,7 +616,8 @@ enum NvmeIdCtrlOncs {
->  typedef struct NvmeFeatureVal {
->      uint32_t    arbitration;
->      uint32_t    power_mgmt;
-> -    uint32_t    temp_thresh;
-> +    uint16_t    temp_thresh_hi;
-> +    uint16_t    temp_thresh_low;
->      uint32_t    err_rec;
->      uint32_t    volatile_wc;
->      uint32_t    num_queues;
-> @@ -635,6 +636,10 @@ typedef struct NvmeFeatureVal {
->  #define NVME_INTC_THR(intc)     (intc & 0xff)
->  #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
->  
-> +#define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
-> +#define NVME_TEMP_TMPSEL(temp) ((temp >> 16) & 0xf)
-> +#define NVME_TEMP_TMPTH(temp)  (temp & 0xffff)
-> +
->  enum NvmeFeatureIds {
->      NVME_ARBITRATION                = 0x1,
->      NVME_POWER_MANAGEMENT           = 0x2,
+On 2020/2/12 =E4=B8=8B=E5=8D=884:53, Jason Wang wrote:
+>
+> On 2020/2/12 =E4=B8=8B=E5=8D=884:18, Michael S. Tsirkin wrote:
+>> On Wed, Feb 12, 2020 at 11:39:54AM +0800, Jason Wang wrote:
+>>> On 2020/2/11 =E4=B8=8B=E5=8D=887:33, Michael S. Tsirkin wrote:
+>>>> On Mon, Feb 10, 2020 at 05:05:17PM +0800, Zha Bin wrote:
+>>>>> From: Liu Jiang<gerry@linux.alibaba.com>
+>>>>>
+>>>>> The standard virtio-mmio devices use notification register to signa=
+l
+>>>>> backend. This will cause vmexits and slow down the performance=20
+>>>>> when we
+>>>>> passthrough the virtio-mmio devices to guest virtual machines.
+>>>>> We proposed to update virtio over MMIO spec to add the per-queue
+>>>>> notify feature VIRTIO_F_MMIO_NOTIFICATION[1]. It can allow the VMM =
+to
+>>>>> configure notify location for each queue.
+>>>>>
+>>>>> [1]https://lkml.org/lkml/2020/1/21/31
+>>>>>
+>>>>> Signed-off-by: Liu Jiang<gerry@linux.alibaba.com>
+>>>>> Co-developed-by: Zha Bin<zhabin@linux.alibaba.com>
+>>>>> Signed-off-by: Zha Bin<zhabin@linux.alibaba.com>
+>>>>> Co-developed-by: Jing Liu<jing2.liu@linux.intel.com>
+>>>>> Signed-off-by: Jing Liu<jing2.liu@linux.intel.com>
+>>>>> Co-developed-by: Chao Peng<chao.p.peng@linux.intel.com>
+>>>>> Signed-off-by: Chao Peng<chao.p.peng@linux.intel.com>
+>>>> Hmm. Any way to make this static so we don't need
+>>>> base and multiplier?
+>>> E.g page per vq?
+>>>
+>>> Thanks
+>> Problem is, is page size well defined enough?
+>> Are there cases where guest and host page sizes differ?
+>> I suspect there might be.
+>
+>
+> Right, so it looks better to keep base and multiplier, e.g for vDPA.
+>
+>
+>>
+>> But I also think this whole patch is unproven. Is someone actually
+>> working on QEMU code to support pass-trough of virtio-pci
+>> as virtio-mmio for nested guests? What's the performance
+>> gain like?
+>
+>
+> I don't know.
+>
+> Thanks
 
 
-Best regards,
-	Maxim Levitsky
+Btw, I think there's no need for a nested environment to test. Current=20
+eventfd hook to MSIX should still work for MMIO.
+
+Thanks
+
 
 
