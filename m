@@ -7,93 +7,93 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17076C3B186
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61BE1C3B188
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:30:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4D8D2467E
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:28:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29BCF2469A
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:30:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJoNi/L2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4D8D2467E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hbSkxjq+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29BCF2469A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1ycn-0006vd-IS
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 15:28:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41223)
+	id 1j1yeD-0000Xz-8v
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 15:30:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j1ybY-0005ap-Au
+ (envelope-from <philmd@redhat.com>) id 1j1ybY-0005ah-7c
  for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j1ybW-0001VE-B9
+ (envelope-from <philmd@redhat.com>) id 1j1ybW-0001VJ-Bm
  for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:27:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54793
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20551
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1ybW-0001U7-3G
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1ybW-0001UF-3p
  for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:27:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581539242;
+ s=mimecast20190719; t=1581539243;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uo6OUUUL9wc6T1GR+QhzDs9SttkwujTnvg+DFcT6Cpk=;
- b=GJoNi/L2ACUhQGy1eNg4N0gMh2Y7zoh2FSlqtHzuCfVAzy4AzuKJAL6Q2OJtcV1EvMOT1j
- mKCx1HUypzsEWbsQ6xQx6mEvwkB4bPXy7761Nwy7H73ndxbfIACtLXYBdDRz+y1VCqwD2/
- eBtLDarJ1Og/EHhJ9NWHHl5KIfAA4Ds=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-yFT7DmI9PCCV32vmf9NjQg-1; Wed, 12 Feb 2020 15:27:16 -0500
-Received: by mail-wr1-f70.google.com with SMTP id z15so1319600wrw.0
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 12:27:15 -0800 (PST)
+ bh=/pvYM7d48NNpCECZok6PLdb72r+aCwIa4RoEtGdV12U=;
+ b=hbSkxjq+Qm8KuE4Cje+wl5swmhESQbS8Xrp8fRNLeBJj+oP7jg5M7CqphFJH7Si4i8bn3p
+ 3uGZR3bh8k+g9p5cckOPLau/uzfQ0S2T+0sq/hd7Ji7M0jvcP/ZrW+BKrPixaNZdwF0OJh
+ 0lqNgG+Dcx1aw2BuIax4s+btpqopPsQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-389-lusoBBK0NJmuMSajhCC7BQ-1; Wed, 12 Feb 2020 15:27:14 -0500
+Received: by mail-wm1-f70.google.com with SMTP id n17so1213105wmk.1
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 12:27:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/8ShEv16ibh68iR2Xn39ntksyBo+vXY8veHScioM07c=;
- b=Q5bC2ZdsLqAjnI4pT79fXe3MCE/gBq5pQznGIbCHJ6Bvz1aZZ5FK6OLcHsOGI20jEJ
- nE9G2NLDalT3E3R415Pd/SwsXs4abDsUn8FzGubbHajIjDMrjwqOS8NpKsp27YnHEEUi
- Czpoz+ga8V/FyJKMSWX4g9nBK/sZUX1QfR2bFilW1Mustcd/qMawX5Xc5Sb3NNKWX1h3
- iM/8LVuJy8yMNzMCavZzZcV7SIwdihEq5bCUWLB2pRwyQ93C44KwFfbxZkLLu8OTZ2BH
- dSv87UE4CGa1qyq9uJZWBvQsx6F4a7E2H8P+VEUxAdF/Z7f8nWbIKM9/SIW4ICNIKunF
- 4RWA==
-X-Gm-Message-State: APjAAAUKqKB29SizpwYU70wk1m/3zfizUG+ff5gwfTHJeChEbdsP0yQS
- MxblcBfVb24HkSTUSieoMy/b75JbYxitN332LSl29yYmnq4sQZC9ms7nCsxJHtEEj+Wth0tB1Nl
- e9P88n/z7fU4UtkM=
-X-Received: by 2002:a05:600c:2290:: with SMTP id
- 16mr845235wmf.93.1581539234675; 
- Wed, 12 Feb 2020 12:27:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxMqu3xw9dVvpGmGKaK5fJLmnCMeSbofoiQXEYnIOupLANivVcJu+SJYaMHR3V/Kmi4pubvFQ==
-X-Received: by 2002:a05:600c:2290:: with SMTP id
- 16mr845214wmf.93.1581539234399; 
- Wed, 12 Feb 2020 12:27:14 -0800 (PST)
+ bh=xoUWrCAyReDiTTD0lt/rLk+igyCaLsky1TOc8aI0IsA=;
+ b=GnqI1wV7CNOslsvGe8sMYP4E/eSyWqZbBV3qIwkpasd68r9K05L6kIDywFKoDaSL7h
+ 5EXPHE9u6yOf6uqm9cQJjIEqq2Jkh3j0tqiY22z9zQe9KazkNGBI2mSMAVTsXmDT/MJH
+ vJ9hIdO0tJVip4g035pXBJrO+Jy0lbZj847onYHN7LgZSwi4sHMexsgGOvywZcKFSSuO
+ rkrRGgQCg4czkOxwt3Vnf+hIvCjT8oCLJ84FIn0wuifCQW3tVgyOHKVIDzTrmkfNLNpO
+ aZ45tZ8wcW2X7Nl3ZfKVZ0f5rud6DHUdUsvcTwmLXZgcMuy5VjxSsovA84C/IAvbFNGw
+ Aqjg==
+X-Gm-Message-State: APjAAAXckny/cCwbURC+kRzZIMzl+/qAyYCiENUPdbF3XmZltVDE3Kng
+ QAtavDdFE4CZm7kS9ih0qOw8+KXltjGOifVKmE+sS9ik/s6rAVqmkJCtkvbvALhAyu3jAoaT8Oi
+ V2AGY0ae3qcMxbLU=
+X-Received: by 2002:adf:b7c2:: with SMTP id t2mr17022353wre.269.1581539233508; 
+ Wed, 12 Feb 2020 12:27:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwicSQf+qOaywmpoLqQ6w9sx/m4GPVzTQD56Kb1kl884xqaOa+9zTHGDjKUUUUQSZ2PPFQgrA==
+X-Received: by 2002:adf:b7c2:: with SMTP id t2mr17022335wre.269.1581539233265; 
+ Wed, 12 Feb 2020 12:27:13 -0800 (PST)
 Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id x14sm1957035wmj.42.2020.02.12.12.27.13
+ by smtp.gmail.com with ESMTPSA id x14sm1957035wmj.42.2020.02.12.12.27.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 12:27:13 -0800 (PST)
+ Wed, 12 Feb 2020 12:27:12 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] tests/docker: Update VirGL to v0.8.0
-Date: Wed, 12 Feb 2020 21:27:09 +0100
-Message-Id: <20200212202709.12665-4-philmd@redhat.com>
+Subject: [PATCH 2/3] tests/docker: Remove obsolete VirGL --with-glx configure
+ option
+Date: Wed, 12 Feb 2020 21:27:08 +0100
+Message-Id: <20200212202709.12665-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200212202709.12665-1-philmd@redhat.com>
 References: <20200212202709.12665-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-MC-Unique: yFT7DmI9PCCV32vmf9NjQg-1
+X-MC-Unique: lusoBBK0NJmuMSajhCC7BQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,38 +113,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Building the qemu:debian-amd64 fails when building VirGL:
+The GLX configure option has been removed in 71c75f201d [*].
+We missed that when updating to v0.7.0 in commit fab3220f97.
 
-  make[2]: Entering directory '/usr/src/virglrenderer/src/gallium/auxiliary=
-'
-    CC       cso_cache/cso_cache.lo
-    CC       cso_cache/cso_hash.lo
-    CC       os/os_misc.lo
-    CC       util/u_debug.lo
-    CC       util/u_debug_describe.lo
-    CC       util/u_format.lo
-    GEN      util/u_format_table.c
-  Traceback (most recent call last):
-    File "./util/u_format_table.py", line 168, in <module>
-      main()
-    File "./util/u_format_table.py", line 164, in main
-      write_format_table(formats)
-    File "./util/u_format_table.py", line 132, in write_format_table
-      print("   %s,\t/* is_array */" % (bool_map(format.is_array()),))
-    File "/usr/src/virglrenderer/src/gallium/auxiliary/util/u_format_parse.=
-py", line 164, in is_array
-      return self.array_element() !=3D None
-    File "/usr/src/virglrenderer/src/gallium/auxiliary/util/u_format_parse.=
-py", line 73, in __eq__
-      return self.type =3D=3D other.type and self.norm =3D=3D other.norm an=
-d self.pure =3D=3D other.pure and self.size =3D=3D other.size
-  AttributeError: 'NoneType' object has no attribute 'type'
-  make[2]: Leaving directory '/usr/src/virglrenderer/src/gallium/auxiliary'
-  make[2]: *** [Makefile:906: util/u_format_table.c] Error 1
-  make[1]: *** [Makefile:631: install-recursive] Error 1
+This silents:
 
-VirGL commits a8962eda1..a613dcc82 fix this problem.
-Update to VirGL 0.8.0 which contains them.
+  configure: creating ./config.status
+  config.status: creating virglrenderer.pc
+  ...
+  configure: WARNING: unrecognized options: --with-glx
+
+[*] https://gitlab.freedesktop.org/virgl/virglrenderer/commit/71c75f201d
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
@@ -153,20 +132,21 @@ Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/do=
 ckerfiles/debian-amd64.docker
-index a1d40a56fa..c70c916343 100644
+index b67fad54cb..a1d40a56fa 100644
 --- a/tests/docker/dockerfiles/debian-amd64.docker
 +++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -28,7 +28,7 @@ RUN apt update && \
-         libepoxy-dev \
+@@ -29,7 +29,7 @@ RUN apt update && \
          libgbm-dev
  RUN git clone https://gitlab.freedesktop.org/virgl/virglrenderer.git /usr/=
 src/virglrenderer && \
--    cd /usr/src/virglrenderer && git checkout virglrenderer-0.7.0
-+    cd /usr/src/virglrenderer && git checkout virglrenderer-0.8.0
- RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --disable-tes=
+     cd /usr/src/virglrenderer && git checkout virglrenderer-0.7.0
+-RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --with-glx --=
+disable-tests && make install
++RUN cd /usr/src/virglrenderer && ./autogen.sh && ./configure --disable-tes=
 ts && make install
 =20
  # netmap
+ RUN apt update && \
 --=20
 2.21.1
 
