@@ -6,82 +6,80 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A750CC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 11:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C72C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 11:33:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75E6E2073C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 11:19:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E0C02073C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 11:33:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GXLa+3YX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75E6E2073C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YtwIrci4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E0C02073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1q3Q-0007QE-HJ
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 06:19:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43484)
+	id 1j1qGc-0002OO-KZ
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 06:33:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j1q2X-0006ib-Kn
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:18:46 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j1qFg-0001lM-84
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:32:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j1q2W-00024A-Hn
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:18:45 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48668
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j1q2W-00023e-BE
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:18:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581506324;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=sHCOiCk1shu96TBgfuSoSEnJmXhBu3UDB/X0FaAfVi8=;
- b=GXLa+3YXhhnz7wiYyyweQXw1PCtVswNIoZCN4IQpUn9EIU3j1jf40DBeQcIyLeqFinRQr8
- ov0Yefyv5PAnxmvAYDNp9iUjGFY+yARNK/RzUQh8ge95iwqvMCR/eqyJhx8DyV/GHek5r+
- cOsR2TijHlx+cNuSreC5FPmua7NvzAs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-LZ8iKLCAPAGO2_GYTQ9MTw-1; Wed, 12 Feb 2020 06:18:39 -0500
-X-MC-Unique: LZ8iKLCAPAGO2_GYTQ9MTw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C31C2DB60;
- Wed, 12 Feb 2020 11:18:38 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A2C9019C69;
- Wed, 12 Feb 2020 11:18:33 +0000 (UTC)
-Date: Wed, 12 Feb 2020 11:18:32 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v2 2/4] virtio-scsi: default num_queues to -smp N
-Message-ID: <20200212111832.GD464050@stefanha-x1.localdomain>
-References: <20200124100159.736209-3-stefanha@redhat.com>
- <20200127141031.6e108839.cohuck@redhat.com>
- <20200129154438.GC157595@stefanha-x1.localdomain>
- <bc9680fc-c382-301f-a1fe-21740c918570@redhat.com>
- <20200130105235.GC176651@stefanha-x1.localdomain>
- <20200203102529.3op54zggtquoguuo@dritchie>
- <20200203105744.GD1922177@redhat.com>
- <20200203113949.hnjuqzkrqqwst54e@dritchie>
- <20200211162041.GA432724@stefanha-x1.localdomain>
- <20200211113108-mutt-send-email-mst@kernel.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1j1qFf-0000Te-5c
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:32:20 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37697)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j1qFe-0000RW-Ti
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 06:32:19 -0500
+Received: by mail-oi1-x241.google.com with SMTP id q84so1694636oic.4
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 03:32:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=80zw9xdMPv9hJqgXoS8wWF3chba21JG7tFTCZZ/Txps=;
+ b=YtwIrci42SNkejdNjYyIDd+f3rho0WhmwsrHGjifiSRIXjQrU67J7pq63Xb4WtOFib
+ +ofqEpwmTh2g0g2YgAe9KvaL4CDaaPgCHhyPZa8ZL2aiQyH2bgBEvk8OtFcoz0f2WVFp
+ mpQyBzVCYvtMm6VqvYVMSbaS93qMccpZO21MBBQZ6kzowtyuG4EH4QLDlh024s7jE0Sl
+ Q2fJLMsKjRSn6G818oSvs3PlG7L9TxKGACkBWZzdKOkQLJTH0bHBDZnjhwP7RScIRv+0
+ UoTieBuV4s3FWsszkqW5bxNGU1aFKQLxhn5IUl4Z1ashVmE9mMUGc2SeAGrIQpZTE/2B
+ 5OXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=80zw9xdMPv9hJqgXoS8wWF3chba21JG7tFTCZZ/Txps=;
+ b=mDX+2dlVdv/knCN7kaxCuXDmoOu3Pa+os1KeTTetoy4gnmTLETNag0U/ZS3wXaB3bu
+ ljk+W6EcN4rKxjg8VaEAa8i60yMN0vqE1rcBHmGqmghv+nNTZEF/jc6Oj1o3G1mkQ2Pr
+ GmN1VTql4IUPRAGArC21+GiKqVaRFoZ3udi5pBnV2Lbkdl91jKR4w08m0VHuvaiNSNTb
+ bAxkIh08wd//yKWQnmnJhrxzRXRHmahXOMeKDWoFS9BzeGFExC8IxtGJSJOx5Zyc85Bt
+ pboiEMKMeLxXpXxsOnF/zXurEt/avsiZftjnA+vmUSi+gJIv05AfmH1VhFwsvr1GfOjc
+ VR7g==
+X-Gm-Message-State: APjAAAURw85uvKVMsNw1p4bBv82wtWPTkeXS50/ioDv/rK2VL8GoIs9D
+ 05xMjSr5wIdvfBYCECrEv3VVcARAVK2xxea4qwDzyw==
+X-Google-Smtp-Source: APXvYqwRlupXBskufDfp3PM6CRXisMioQ9MhvkhQX7L56uKLuicxpL2z9OeqIO3ilJTdUi/2hwFDoVcIqavyPDwX84M=
+X-Received: by 2002:a05:6808:289:: with SMTP id
+ z9mr5713362oic.48.1581507137915; 
+ Wed, 12 Feb 2020 03:32:17 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200211113108-mutt-send-email-mst@kernel.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="C1iGAkRnbeBonpVg"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200211173726.22541-1-peter.maydell@linaro.org>
+ <20200211173726.22541-3-peter.maydell@linaro.org>
+ <a29a217b-f602-8925-4265-9a78030b6d73@redhat.com>
+In-Reply-To: <a29a217b-f602-8925-4265-9a78030b6d73@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 12 Feb 2020 11:32:06 +0000
+Message-ID: <CAFEAcA-0_=T4paML4SN6uBYXnE-5-dpExrcdWUhyxVz7_C4yYg@mail.gmail.com>
+Subject: Re: [PATCH 02/13] target/arm: Add isar_feature_any_fp16 and document
+ naming/usage conventions
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,66 +91,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Sergio Lopez <slp@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>,
+ Aaron Lindsay <aaron@os.amperecomputing.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---C1iGAkRnbeBonpVg
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, 12 Feb 2020 at 06:24, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 2/11/20 6:37 PM, Peter Maydell wrote:
+> > @@ -185,7 +185,7 @@ uint32_t vfp_get_fpscr(CPUARMState *env)
+> >   void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
+> >   {
+> >       /* When ARMv8.2-FP16 is not supported, FZ16 is RES0.  */
+> > -    if (!cpu_isar_feature(aa64_fp16, env_archcpu(env))) {
+> > +    if (!cpu_isar_feature(any_fp16, env_archcpu(env))) {
+>
+> So we had a potential bug on aa32?
 
-On Tue, Feb 11, 2020 at 11:31:17AM -0500, Michael S. Tsirkin wrote:
-> On Tue, Feb 11, 2020 at 04:20:41PM +0000, Stefan Hajnoczi wrote:
-> > On Mon, Feb 03, 2020 at 12:39:49PM +0100, Sergio Lopez wrote:
-> > > On Mon, Feb 03, 2020 at 10:57:44AM +0000, Daniel P. Berrang=E9 wrote:
-> > > > On Mon, Feb 03, 2020 at 11:25:29AM +0100, Sergio Lopez wrote:
-> > > > > On Thu, Jan 30, 2020 at 10:52:35AM +0000, Stefan Hajnoczi wrote:
-> > > > > > On Thu, Jan 30, 2020 at 01:29:16AM +0100, Paolo Bonzini wrote:
-> > > > > > > On 29/01/20 16:44, Stefan Hajnoczi wrote:
-> > > > > > > > On Mon, Jan 27, 2020 at 02:10:31PM +0100, Cornelia Huck wro=
-te:
-> > > > > > > >> On Fri, 24 Jan 2020 10:01:57 +0000
-> > > > > > > >> Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > I will create a 32 vCPU guest with 100 virtio-blk devices and verify
-> > that enabling multi-queue is successful.
->=20
-> and that it's helpful for performance?
+No, because right now we don't support AA32 FP16 yet (so
+the aa32_fp16_arith check is temporarily testing an AA64
+ID reg, as noted in a TODO comment in that function), and
+anyway all our CPUs which have ARMv8 features also mandatorily
+have AArch64 currently. This is mainly tidyup so we are in
+a position to add a new v8-32-bit-only CPU if we want to.
 
-I may be a little while before the next revision of this patch series.
-Testing reveals scalability problems when creating so many virtqueues
-:).
-
-I've measured boot time, memory consumption, and random read IOPS.  They
-are all significantly worse (32 vCPUs, 24 GB RAM, 101 virtio-blk
-devices, 32 queues/device).
-
-Time to see what's going on and whether some general scalability
-improvements are possible here before we enable multi-queue by default.
-
-Stefan
-
---C1iGAkRnbeBonpVg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5D3wcACgkQnKSrs4Gr
-c8h+8QgAvY0Nfx4IDDcmHMAEfXo1jqhtFZ6DHg/a0L/rP7WHybR2JJ0O1sk8C6Dk
-X6hctZm/AbxFWqkvt031Y9nmZ52+yyWsTjJq/NUve3tPMY/E1puyKMoqgDFPFQXB
-Xxpfi1NqsFLgmPfSKUvVyuXf3dq54+Zr5yYo7HlRTOWCgeltqnakwmpMRNr9pYgO
-PQH2t7ygcwFZTGpNsRrnXB0UG0e9Ayt4lfzfn9htV2PgqhlsXkzz2T9pIlPMyboZ
-/weMBrcg9EfNXHhkFRkJirpHE0fIZXy0Rz/yFY2Bj0k7gFtvZn1uFotX7+Fm8i+j
-i0jaE73hFYhKMTiUkbLrBxDsJC1NhQ==
-=+J2u
------END PGP SIGNATURE-----
-
---C1iGAkRnbeBonpVg--
-
+thanks
+--- PMM
 
