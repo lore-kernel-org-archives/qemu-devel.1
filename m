@@ -2,83 +2,64 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.9 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 027FEC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 05:46:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3686C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 06:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAFA020714
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 05:46:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAFA020714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFB682073C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 06:06:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NR6p7Q8g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB682073C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1kqs-0006Hd-09
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 00:46:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41172)
+	id 1j1lA5-0000N8-SO
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 01:06:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1j1kpv-0005pT-5c
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 00:45:24 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j1l9M-0008Fm-Tw
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 01:05:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1j1kps-00071x-VT
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 00:45:22 -0500
-Received: from mga09.intel.com ([134.134.136.24]:41745)
+ (envelope-from <dgibson@ozlabs.org>) id 1j1l9L-0002P1-9G
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 01:05:28 -0500
+Received: from ozlabs.org ([203.11.71.1]:57615)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1j1kps-0006wn-NW
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 00:45:20 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Feb 2020 21:45:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; d="scan'208";a="347449892"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by fmsmga001.fm.intel.com with ESMTP; 11 Feb 2020 21:45:11 -0800
-Received: from shsmsx606.ccr.corp.intel.com (10.109.6.216) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 11 Feb 2020 21:45:04 -0800
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX606.ccr.corp.intel.com (10.109.6.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 12 Feb 2020 13:45:03 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Wed, 12 Feb 2020 13:45:03 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "Dr. David Alan Gilbert"
- <dgilbert@redhat.com>, Daniel Cho <danielcho@qnap.com>
-Subject: RE: The issues about architecture of the COLO checkpoint
-Thread-Topic: The issues about architecture of the COLO checkpoint
-Thread-Index: AQHV4KTcP1R3sKJVikmfjsOVjXKwRqgVv2IAgACfSoCAAKv5kA==
-Date: Wed, 12 Feb 2020 05:45:03 +0000
-Message-ID: <2b09c8650b944c908c0c95fefe6d759f@intel.com>
-References: <CA+XQNE44kZjcw=0dtzaS4HwbPcRG6GpcQ3g3QfL5VS84EBWS_g@mail.gmail.com>
- <20200211174756.GA2798@work-vm> <8737854e2826400fa4d14dc408cfd947@huawei.com>
-In-Reply-To: <8737854e2826400fa4d14dc408cfd947@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTRjZjgwZDYtNzAxYi00NGJkLTkwM2EtY2Q2ZDQ4NzBmOTdhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZDlPRlwvZXRjQ2NnQ1o4RjM5WnF0bDV4UDV1VHpTdHp4R0QxbVowWm1VV29DOGNUOGFcL243TXJVdVJndGROZHh5In0=
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1j1l9J-0002N7-Gi; Wed, 12 Feb 2020 01:05:27 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48HTdY0JYrz9sRJ; Wed, 12 Feb 2020 17:05:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1581487521;
+ bh=WvyJblUwCkZO6O8e6DNC1xLK1EeGD0Wv62YEl9vqe/U=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=NR6p7Q8gSGyzwk23Pn/kSwEA+fY0jLI2bkFLc3qiS9DTO9meN3Yo4FcggJa2vIqQ4
+ HvO2S4irCipC2M7m+AarbvvgQMeGYVyrBSOQsTmpbPnBcPApkhJ066429QLEerl4AU
+ AoOycV8uWFR3qP0vPXiqIn3fmiulWJKP1kgwPZC8=
+Date: Wed, 12 Feb 2020 16:43:04 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH qemu v6 1/6] ppc: Start CPU in the default mode which is
+ big-endian 32bit
+Message-ID: <20200212054304.GY22584@umbus.fritz.box>
+References: <20200203032943.121178-1-aik@ozlabs.ru>
+ <20200203032943.121178-2-aik@ozlabs.ru>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.24
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="ggC1wwkyYWqEab//"
+Content-Disposition: inline
+In-Reply-To: <20200203032943.121178-2-aik@ozlabs.ru>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,120 +71,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--ggC1wwkyYWqEab//
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Sent: Wednesday, February 12, 2020 11:18 AM
-> To: Dr. David Alan Gilbert <dgilbert@redhat.com>; Daniel Cho
-> <danielcho@qnap.com>; Zhang, Chen <chen.zhang@intel.com>
-> Cc: qemu-devel@nongnu.org
-> Subject: RE: The issues about architecture of the COLO checkpoint
+On Mon, Feb 03, 2020 at 02:29:38PM +1100, Alexey Kardashevskiy wrote:
+> At the moment we enforce 64bit mode on a CPU when reset. This does not
+> make difference as SLOF or Linux set the desired mode straight away.
+> However if we ever boot something other than these two,
+> this might not work as, for example, GRUB expects the default MSR state
+> and does not work properly.
 >=20
-> Hi,
->=20
-> Thank you Dave,
->=20
-> I'll reply here directly.
->=20
-> -----Original Message-----
-> From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> Sent: Wednesday, February 12, 2020 1:48 AM
-> To: Daniel Cho <danielcho@qnap.com>; chen.zhang@intel.com;
-> Zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Cc: qemu-devel@nongnu.org
-> Subject: Re: The issues about architecture of the COLO checkpoint
->=20
->=20
-> cc'ing in COLO people:
->=20
->=20
-> * Daniel Cho (danielcho@qnap.com) wrote:
-> > Hi everyone,
-> >      We have some issues about setting COLO feature. Hope somebody
-> > could give us some advice.
-> >
-> > Issue 1:
-> >      We dynamic to set COLO feature for PVM(2 core, 16G memory),  but
-> > the Primary VM will pause a long time(based on memory size) for
-> > waiting SVM start. Does it have any idea to reduce the pause time?
-> >
->=20
-> Yes, we do have some ideas to optimize this downtime.
->=20
-> The main problem for current version is, for each checkpoint, we have to
-> send the whole PVM's pages
-> To SVM, and then copy the whole VM's state into SVM from ram cache, in
-> this process, we need both of them be paused.
-> Just as you said, the downtime is based on memory size.
->=20
-> So firstly, we need to reduce the sending data while do checkpoint, actua=
-lly,
-> we can migrate parts of PVM's dirty pages in background
-> While both of VMs are running. And then we load these pages into ram
-> cache (backup memory) in SVM temporarily. While do checkpoint,
-> We just send the last dirty pages of PVM to slave side and then copy the =
-ram
-> cache into SVM. Further on, we don't have
-> To send the whole PVM's dirty pages, we can only send the pages that
-> dirtied by PVM or SVM during two checkpoints. (Because
-> If one page is not dirtied by both PVM and SVM, the data of this pages wi=
-ll
-> keep same in SVM, PVM, backup memory). This method can reduce
-> the time that consumed in sending data.
->=20
-> For the second problem, we can reduce the memory copy by two methods,
-> first one, we don't have to copy the whole pages in ram cache,
-> We can only copy the pages that dirtied by PVM and SVM in last checkpoint=
-.
-> Second, we can use userfault missing function to reduce the
-> Time consumed in memory copy. (For the second time, in theory, we can
-> reduce time consumed in memory into ms level).
->=20
-> You can find the first optimization in attachment, it is based on an old =
-qemu
-> version (qemu-2.6), it should not be difficult to rebase it
-> Into master or your version. And please feel free to send the new version=
- if
-> you want into community ;)
->=20
->=20
+> This removes setting MSR_SF from the PPC CPU reset.
 
-Thanks Hailiang!
-By the way, Do you have time to push the patches to upstream?
-I think this is a better and faster option.
+Hrm.  This is in the core cpu model so it doesn't just affect pseries,
+but powernv (and theoretically others) as well.  Generally the cpu
+model should have the bare metal behaviour, and we can override it in
+the pseries machine if necessary.
 
-Thanks
-Zhang Chen
+So for a bare metal POWER system, what mode do we start in?  I'm
+guessing it probably doesn't matter in practice, since the skiboot
+firmware also probably does a mode set on entry, but it'd be nice to
+get this right in theory.
 
-> >
-> > Issue 2:
-> >      In
-> > https://github.com/qemu/qemu/blob/master/migration/colo.c#L503,
-> > could we move start_vm() before Line 488? Because at first checkpoint
-> > PVM will wait for SVM's reply, it cause PVM stop for a while.
-> >
 >=20
-> No, that makes no sense, because if PVM runs firstly, it still need to wa=
-it for
-> The network packets from SVM to compare before send it to client side.
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  target/ppc/translate_init.inc.c | 6 ------
+>  1 file changed, 6 deletions(-)
 >=20
->=20
-> Thanks,
-> Hailiang
->=20
-> >      We set the COLO feature on running VM, so we hope the running VM
-> > could continuous service for users.
-> > Do you have any suggestions for those issues?
-> >
-> > Best regards,
-> > Daniel Cho
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 53995f62eab2..f6a676cf55e8 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10710,12 +10710,6 @@ static void ppc_cpu_reset(CPUState *s)
+>  #endif
+>  #endif
+> =20
+> -#if defined(TARGET_PPC64)
+> -    if (env->mmu_model & POWERPC_MMU_64) {
+> -        msr |=3D (1ULL << MSR_SF);
+> -    }
+> -#endif
+> -
+>      hreg_store_msr(env, msr, 1);
+> =20
+>  #if !defined(CONFIG_USER_ONLY)
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ggC1wwkyYWqEab//
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5DkGgACgkQbDjKyiDZ
+s5Lf0BAAx46Y/NIBsgjPmbQOrP3EetzV92nps0D19Fv29IJZzcWuoKud9UN60c4V
+aZn6L5USms2gemQtus2b9f1LBY70MdKyxHL8Qeq6khQizUEahC717D0yyJbU21dq
+QTu0zeCO7l+pPCbfmIF89TdWKwTwJJABMe03OIh6k5b0isDwUj7FO3GBcuAPv+7A
+XyMzGwo6Fr8GND2qdciy0hHLruvLXZbXCr5VV1dWuRYKOtmRYxT6OkNNgzlZFZmC
+FRZajfKpr/5/qIgmyqkA/92QgdvX//J1VvXPFFnGdUIL2+218sMQOfwHNfnulS8A
+ql5stgWIqC9JEYGzLIkFCyMMQiIxipHZikVXdny418r/NyGx8OJwKNdS0VFoUgAc
+6li6vnXWueuv2eAspvzQiwtikZlsWUdtEtPmUlxRJkgThCepFHKBwgBtM50qsR3U
+nXAEkKe9PToUs1FPBP0JkjGPLlJ++39Y5Wh8daeP9kjbDp1GaNsFeQZgbibHyXJz
+7mhuB3YQNDjhgx/I+OKJYEqTP2CmpCawdGER0cMqq/ozSH2oz5YmsK8eHcuLDqeH
+W6MQpo72n58QHeI6UUvcJtovOH0zNC7J944Kf4IyFVHlZTcRWxzcpeJdNdKaMhz7
+eIiCL5oxyo/5qhSMOluRnlTr5THytzzzAMj7Q8hF2y06dfTRiFg=
+=KmKI
+-----END PGP SIGNATURE-----
+
+--ggC1wwkyYWqEab//--
 
