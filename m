@@ -2,86 +2,80 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8671DC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B2BC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 10:22:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 416C520675
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:57:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98A402082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 10:22:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iu2+/6AA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416C520675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FMa8/tha"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98A402082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1olP-0001fu-E9
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 04:56:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51230)
+	id 1j1pAH-0004jE-NM
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 05:22:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <coiby.xu@gmail.com>) id 1j1ogu-000489-2r
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:52:23 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1j1p9X-0004D7-8N
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:21:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <coiby.xu@gmail.com>) id 1j1ogq-0006YH-Jj
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:52:20 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44728)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1j1ogq-0006XH-9K
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:52:16 -0500
-Received: by mail-pf1-x442.google.com with SMTP id y5so968666pfb.11
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 01:52:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=9an2w0N99Q+gjVdzTHMKJ08qTjypxg7oQztU8Id82QI=;
- b=Iu2+/6AA2wG4v0NqMFXyshgwKPTjC06GS1qMRjZJNLZD+Tm3rq1khlTmL1QKIEdAio
- FzH9RQWtKJd4MWstmv9E0suF7E2lxSx4+3l2nIMECWq9MHWDuSy5jAJxyHR4SeFKCYVh
- PT4YsW3o2yRrO5bNO8luIjfw2n1N5GhZlXUCNaGqLRmMkASTgkNzMpsun7AAdksG8q04
- CZp9hk0pVDvoDSDFSe86s76Bq4QhAo9zBCBvaxiDwOCO9931qLCQY+k9NCcCGCkaXA0R
- CJSjDX2wtYIryukrEKQGwcyyWLuLYB5A72eHuDYFYB8OBtf3WAiccBiVOytVYT0igwXk
- bafA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=9an2w0N99Q+gjVdzTHMKJ08qTjypxg7oQztU8Id82QI=;
- b=Rz5NXL8UR396Lq7jPt75r6Lnxshs2KOyN/NCkaFeTZlr/IsKcWsu6y6tAw3QEEzOCS
- VOEh8bYUh7iY+L6bLR+RHQTJuIapPr77Aur2TYDBaxBOJ7vRlD9Be2IUBNOVHyaj+31G
- ImSlB+I3Xym6+Ob9UOCeT5qrvpqVNoTTrrDF3ZjPioR7XaLYBj5oFmMkaJeNsLIYyzER
- GPZy+5iMI7weaiiZvFDPo0Nh+7mDAJACklQECxTL42JVep8sS09fcgVXL4cK7fc72SCP
- vU3ntXkOCuXaPZ7KU6iHMGm8+HhKNIuGZEffdloXD6a4YUpTUR3MgkaO+9syyGzsXMvm
- 19VA==
-X-Gm-Message-State: APjAAAVXfQdfc1yT2IRueeKTU1rGwlasJznRMca8vJUeZtgmfjJRqf8y
- DN3ojI7UeSS/uKAZs3ztyCp6PMH6
-X-Google-Smtp-Source: APXvYqzjI4sErYVOBo4d9pft1ZEGZpT4E+7PGUeeDqIIVd4Z/ze8YFmZF7/MzxkKkU325JFs4X5GaQ==
-X-Received: by 2002:a65:6216:: with SMTP id d22mr11591706pgv.437.1581501134558; 
- Wed, 12 Feb 2020 01:52:14 -0800 (PST)
-Received: from localhost.localdomain ([2402:9e80:0:1000::1:4ad5])
- by smtp.googlemail.com with ESMTPSA id o19sm6298595pjr.2.2020.02.12.01.52.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 01:52:14 -0800 (PST)
-From: Coiby Xu <coiby.xu@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 5/5] new qTest case to test the vhost-user-blk-server
-Date: Wed, 12 Feb 2020 17:51:37 +0800
-Message-Id: <20200212095137.7977-6-coiby.xu@gmail.com>
-X-Mailer: git-send-email 2.25.0
-In-Reply-To: <20200212095137.7977-1-coiby.xu@gmail.com>
-References: <20200212095137.7977-1-coiby.xu@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+ (envelope-from <mlevitsk@redhat.com>) id 1j1p9U-00018q-2q
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:21:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33635
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1j1p9T-00017D-MH
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:21:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581502910;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=w6a0w3GKpPtV+iniPqVZJa4Zy3NmWl2mvjrkaAXLmwg=;
+ b=FMa8/thaKbyxqk7k8QGfZFh1iFvQcVS9ZnqTldx44Xb6QgjqusreLvjziYxA3cwDFFLV7z
+ URk/5Gu9osjG7xm+bogC3aGXt4maU94XPYvp5hO6YqH9ZYehh5MGTbGNPC02oLBrkWiLSB
+ +J/kSJTJh3Zf0bQ6cDjDNAt4rN00SfU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-fkhp3AVqM0-LGmaDm6SjxA-1; Wed, 12 Feb 2020 05:21:42 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64A97800D41;
+ Wed, 12 Feb 2020 10:21:40 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 89B805C11B;
+ Wed, 12 Feb 2020 10:21:37 +0000 (UTC)
+Message-ID: <babbabaf9e1f2380cb174ffcd0ecc4fa9d4002c2.camel@redhat.com>
+Subject: Re: [PATCH v5 11/26] nvme: add support for the asynchronous event
+ request command
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Klaus Jensen <k.jensen@samsung.com>, qemu-block@nongnu.org
+Date: Wed, 12 Feb 2020 12:21:26 +0200
+In-Reply-To: <20200204095208.269131-12-k.jensen@samsung.com>
+References: <20200204095208.269131-1-k.jensen@samsung.com>
+ <CGME20200204095222eucas1p2a2351bfc0930b3939927e485f1417e29@eucas1p2.samsung.com>
+ <20200204095208.269131-12-k.jensen@samsung.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: fkhp3AVqM0-LGmaDm6SjxA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,908 +87,443 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, Coiby Xu <coiby.xu@gmail.com>,
- stefanha@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Klaus Jensen <its@irrelevant.dk>,
+ Javier Gonzalez <javier.gonz@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test case has the same tests as tests/virtio-blk-test.c except for
-tests have block_resize.
+On Tue, 2020-02-04 at 10:51 +0100, Klaus Jensen wrote:
+> Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
+> Section 5.2 ("Asynchronous Event Request command").
+> 
+> Mostly imported from Keith's qemu-nvme tree. Modified with a max number
+> of queued events (controllable with the aer_max_queued device
+> parameter). The spec states that the controller *should* retain
+> events, so we do best effort here.
+> 
+> Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+> ---
+>  hw/block/nvme.c       | 167 +++++++++++++++++++++++++++++++++++++++++-
+>  hw/block/nvme.h       |  14 +++-
+>  hw/block/trace-events |   9 +++
+>  include/block/nvme.h  |   8 +-
+>  4 files changed, 191 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 468c36918042..a186d95df020 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -325,6 +325,85 @@ static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
+>      timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
+>  }
+>  
+> +static void nvme_process_aers(void *opaque)
+> +{
+> +    NvmeCtrl *n = opaque;
+> +    NvmeAsyncEvent *event, *next;
+> +
+> +    trace_nvme_dev_process_aers(n->aer_queued);
+> +
+> +    QTAILQ_FOREACH_SAFE(event, &n->aer_queue, entry, next) {
+> +        NvmeRequest *req;
+> +        NvmeAerResult *result;
+> +
+> +        /* can't post cqe if there is nothing to complete */
+> +        if (!n->outstanding_aers) {
+> +            trace_nvme_dev_no_outstanding_aers();
+> +            break;
+> +        }
+> +
+> +        /* ignore if masked (cqe posted, but event not cleared) */
+> +        if (n->aer_mask & (1 << event->result.event_type)) {
+> +            trace_nvme_dev_aer_masked(event->result.event_type, n->aer_mask);
+> +            continue;
+> +        }
+> +
+> +        QTAILQ_REMOVE(&n->aer_queue, event, entry);
+> +        n->aer_queued--;
+> +
+> +        n->aer_mask |= 1 << event->result.event_type;
+> +        n->outstanding_aers--;
+> +
+> +        req = n->aer_reqs[n->outstanding_aers];
+> +
+> +        result = (NvmeAerResult *) &req->cqe.result;
+> +        result->event_type = event->result.event_type;
+> +        result->event_info = event->result.event_info;
+> +        result->log_page = event->result.log_page;
+> +        g_free(event);
+> +
+> +        req->status = NVME_SUCCESS;
+> +
+> +        trace_nvme_dev_aer_post_cqe(result->event_type, result->event_info,
+> +            result->log_page);
+> +
+> +        nvme_enqueue_req_completion(&n->admin_cq, req);
+> +    }
+> +}
+> +
+> +static void nvme_enqueue_event(NvmeCtrl *n, uint8_t event_type,
+> +    uint8_t event_info, uint8_t log_page)
+> +{
+> +    NvmeAsyncEvent *event;
+> +
+> +    trace_nvme_dev_enqueue_event(event_type, event_info, log_page);
+> +
+> +    if (n->aer_queued == n->params.aer_max_queued) {
+> +        trace_nvme_dev_enqueue_event_noqueue(n->aer_queued);
+> +        return;
+> +    }
+> +
+> +    event = g_new(NvmeAsyncEvent, 1);
+> +    event->result = (NvmeAerResult) {
+> +        .event_type = event_type,
+> +        .event_info = event_info,
+> +        .log_page   = log_page,
+> +    };
+> +
+> +    QTAILQ_INSERT_TAIL(&n->aer_queue, event, entry);
+> +    n->aer_queued++;
+> +
+> +    nvme_process_aers(n);
+> +}
+> +
+> +static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
+> +{
+> +    n->aer_mask &= ~(1 << event_type);
+> +    if (!QTAILQ_EMPTY(&n->aer_queue)) {
+> +        nvme_process_aers(n);
+> +    }
+> +}
+> +
+>  static void nvme_rw_cb(void *opaque, int ret)
+>  {
+>      NvmeRequest *req = opaque;
+> @@ -569,8 +648,8 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *cmd)
+>      return NVME_SUCCESS;
+>  }
+>  
+> -static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
+> -    uint64_t off, NvmeRequest *req)
+> +static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint8_t rae,
+> +    uint32_t buf_len, uint64_t off, NvmeRequest *req)
+>  {
+>      uint64_t prp1 = le64_to_cpu(cmd->prp1);
+>      uint64_t prp2 = le64_to_cpu(cmd->prp2);
+> @@ -619,6 +698,10 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
+>      smart.power_on_hours[0] = cpu_to_le64(
+>          (((current_ms - n->starttime_ms) / 1000) / 60) / 60);
+>  
+> +    if (!rae) {
+> +        nvme_clear_events(n, NVME_AER_TYPE_SMART);
+> +    }
+> +
+>      return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, prp1,
+>          prp2);
+>  }
+> @@ -671,13 +754,17 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>  
+>      switch (lid) {
+>      case NVME_LOG_ERROR_INFO:
+> +        if (!rae) {
+> +            nvme_clear_events(n, NVME_AER_TYPE_ERROR);
+> +        }
+> +
+>          if (off) {
+>              return NVME_INVALID_FIELD | NVME_DNR;
+>          }
+>  
+>          return NVME_SUCCESS;
+>      case NVME_LOG_SMART_INFO:
+> -        return nvme_smart_info(n, cmd, len, off, req);
+> +        return nvme_smart_info(n, cmd, rae, len, off, req);
+>      case NVME_LOG_FW_SLOT_INFO:
+>          return nvme_fw_log_info(n, cmd, len, off, req);
+>      default:
+> @@ -954,6 +1041,9 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          break;
+>      case NVME_TIMESTAMP:
+>          return nvme_get_feature_timestamp(n, cmd);
+> +    case NVME_ASYNCHRONOUS_EVENT_CONF:
+> +        result = cpu_to_le32(n->features.async_config);
+> +        break;
+>      default:
+>          trace_nvme_dev_err_invalid_getfeat(dw10);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+> @@ -1003,6 +1093,13 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>              return NVME_INVALID_FIELD | NVME_DNR;
+>          }
+>  
+> +        if (((n->temperature > n->features.temp_thresh_hi) ||
+> +            (n->temperature < n->features.temp_thresh_low)) &&
+> +            NVME_AEC_SMART(n->features.async_config) & NVME_SMART_TEMPERATURE) {
+> +            nvme_enqueue_event(n, NVME_AER_TYPE_SMART,
+> +                NVME_AER_INFO_SMART_TEMP_THRESH, NVME_LOG_SMART_INFO);
+> +        }
+> +
+>          break;
+>      case NVME_VOLATILE_WRITE_CACHE:
+>          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+> @@ -1016,6 +1113,9 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          break;
+>      case NVME_TIMESTAMP:
+>          return nvme_set_feature_timestamp(n, cmd);
+> +    case NVME_ASYNCHRONOUS_EVENT_CONF:
+> +        n->features.async_config = dw11;
+> +        break;
+>      default:
+>          trace_nvme_dev_err_invalid_setfeat(dw10);
+>          return NVME_INVALID_FIELD | NVME_DNR;
+> @@ -1024,6 +1124,25 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>      return NVME_SUCCESS;
+>  }
+>  
+> +static uint16_t nvme_aer(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> +{
+> +    trace_nvme_dev_aer(nvme_cid(req));
+> +
+> +    if (n->outstanding_aers > n->params.aerl) {
+> +        trace_nvme_dev_aer_aerl_exceeded();
+> +        return NVME_AER_LIMIT_EXCEEDED;
+> +    }
+> +
+> +    n->aer_reqs[n->outstanding_aers] = req;
+> +    n->outstanding_aers++;
+> +
+> +    if (!QTAILQ_EMPTY(&n->aer_queue)) {
+> +        nvme_process_aers(n);
+> +    }
+> +
+> +    return NVME_NO_COMPLETE;
+> +}
+> +
+>  static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>  {
+>      switch (cmd->opcode) {
+> @@ -1045,6 +1164,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          return nvme_set_feature(n, cmd, req);
+>      case NVME_ADM_CMD_GET_FEATURES:
+>          return nvme_get_feature(n, cmd, req);
+> +    case NVME_ADM_CMD_ASYNC_EV_REQ:
+> +        return nvme_aer(n, cmd, req);
+>      default:
+>          trace_nvme_dev_err_invalid_admin_opc(cmd->opcode);
+>          return NVME_INVALID_OPCODE | NVME_DNR;
+> @@ -1099,6 +1220,15 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
+>          }
+>      }
+>  
+> +    while (!QTAILQ_EMPTY(&n->aer_queue)) {
+> +        NvmeAsyncEvent *event = QTAILQ_FIRST(&n->aer_queue);
+> +        QTAILQ_REMOVE(&n->aer_queue, event, entry);
+> +        g_free(event);
+> +    }
+> +
+> +    n->aer_queued = 0;
+> +    n->outstanding_aers = 0;
+> +
+>      blk_flush(n->conf.blk);
+>      n->bar.cc = 0;
+>  }
+> @@ -1195,6 +1325,8 @@ static int nvme_start_ctrl(NvmeCtrl *n)
+>  
+>      nvme_set_timestamp(n, 0ULL);
+>  
+> +    QTAILQ_INIT(&n->aer_queue);
+> +
+>      return 0;
+>  }
+>  
+> @@ -1387,6 +1519,13 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+>                             "completion queue doorbell write"
+>                             " for nonexistent queue,"
+>                             " sqid=%"PRIu32", ignoring", qid);
+> +
+> +            if (n->outstanding_aers) {
+> +                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
+> +                    NVME_AER_INFO_ERR_INVALID_DB_REGISTER,
+> +                    NVME_LOG_ERROR_INFO);
+> +            }
+> +
+>              return;
+>          }
+>  
+> @@ -1397,6 +1536,12 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+>                             " beyond queue size, sqid=%"PRIu32","
+>                             " new_head=%"PRIu16", ignoring",
+>                             qid, new_head);
+> +
+> +            if (n->outstanding_aers) {
+> +                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
+> +                    NVME_AER_INFO_ERR_INVALID_DB_VALUE, NVME_LOG_ERROR_INFO);
+> +            }
+> +
+>              return;
+>          }
+>  
+> @@ -1425,6 +1570,13 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+>                             "submission queue doorbell write"
+>                             " for nonexistent queue,"
+>                             " sqid=%"PRIu32", ignoring", qid);
+> +
+> +            if (n->outstanding_aers) {
+> +                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
+> +                    NVME_AER_INFO_ERR_INVALID_DB_REGISTER,
+> +                    NVME_LOG_ERROR_INFO);
+> +            }
+> +
+>              return;
+>          }
+>  
+> @@ -1435,6 +1587,12 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+>                             " beyond queue size, sqid=%"PRIu32","
+>                             " new_tail=%"PRIu16", ignoring",
+>                             qid, new_tail);
+> +
+> +            if (n->outstanding_aers) {
+> +                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
+> +                    NVME_AER_INFO_ERR_INVALID_DB_VALUE, NVME_LOG_ERROR_INFO);
+> +            }
+> +
+>              return;
+>          }
+>  
+> @@ -1531,6 +1689,7 @@ static void nvme_init_state(NvmeCtrl *n)
+>      n->temperature = NVME_TEMPERATURE;
+>      n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
+>      n->starttime_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+> +    n->aer_reqs = g_new0(NvmeRequest *, n->params.aerl + 1);
+>  }
+>  
+>  static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
+> @@ -1610,6 +1769,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+>       * inconsequential.
+>       */
+>      id->acl = 3;
+> +    id->aerl = n->params.aerl;
+>      id->frmw = 7 << 1;
+>      id->lpa = 1 << 2;
+>  
+> @@ -1700,6 +1860,7 @@ static void nvme_exit(PCIDevice *pci_dev)
+>      g_free(n->namespaces);
+>      g_free(n->cq);
+>      g_free(n->sq);
+> +    g_free(n->aer_reqs);
+>  
+>      if (n->params.cmb_size_mb) {
+>          g_free(n->cmbuf);
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 89b0aafa02a2..1e715ab1d75c 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -6,16 +6,20 @@
+>  #define DEFINE_NVME_PROPERTIES(_state, _props) \
+>      DEFINE_PROP_STRING("serial", _state, _props.serial), \
+>      DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
+> -    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64)
+> +    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
+> +    DEFINE_PROP_UINT8("aerl", _state, _props.aerl, 3), \
+> +    DEFINE_PROP_UINT32("aer_max_queued", _state, _props.aer_max_queued, 64)
+>  
+>  typedef struct NvmeParams {
+>      char     *serial;
+>      uint32_t num_queues;
+>      uint32_t cmb_size_mb;
+> +    uint8_t  aerl;
+> +    uint32_t aer_max_queued;
+>  } NvmeParams;
+>  
+>  typedef struct NvmeAsyncEvent {
+> -    QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
+> +    QTAILQ_ENTRY(NvmeAsyncEvent) entry;
+>      NvmeAerResult result;
+>  } NvmeAsyncEvent;
+>  
+> @@ -102,6 +106,7 @@ typedef struct NvmeCtrl {
+>      uint32_t    num_namespaces;
+>      uint32_t    max_q_ents;
+>      uint64_t    ns_size;
+> +    uint8_t     outstanding_aers;
+>      uint32_t    cmbsz;
+>      uint32_t    cmbloc;
+>      uint8_t     *cmbuf;
+> @@ -111,6 +116,11 @@ typedef struct NvmeCtrl {
+>      uint16_t    temperature;
+>      uint64_t    starttime_ms;
+>  
+> +    uint8_t     aer_mask;
+> +    NvmeRequest **aer_reqs;
+> +    QTAILQ_HEAD(, NvmeAsyncEvent) aer_queue;
+> +    int         aer_queued;
+> +
+>      NvmeNamespace   *namespaces;
+>      NvmeSQueue      **sq;
+>      NvmeCQueue      **cq;
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index 7da088479f39..3952c36774cf 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -47,6 +47,15 @@ nvme_dev_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_
+>  nvme_dev_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
+>  nvme_dev_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
+>  nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
+> +nvme_dev_process_aers(int queued) "queued %d"
+> +nvme_dev_aer(uint16_t cid) "cid %"PRIu16""
+> +nvme_dev_aer_aerl_exceeded(void) "aerl exceeded"
+> +nvme_dev_aer_masked(uint8_t type, uint8_t mask) "type 0x%"PRIx8" mask 0x%"PRIx8""
+> +nvme_dev_aer_post_cqe(uint8_t typ, uint8_t info, uint8_t log_page) "type 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
+> +nvme_dev_enqueue_event(uint8_t typ, uint8_t info, uint8_t log_page) "type 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
+> +nvme_dev_enqueue_event_noqueue(int queued) "queued %d"
+> +nvme_dev_enqueue_event_masked(uint8_t typ) "type 0x%"PRIx8""
+> +nvme_dev_no_outstanding_aers(void) "ignoring event; no outstanding AERs"
+>  nvme_dev_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+>  nvme_dev_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
+>  nvme_dev_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index 9a6055adeb61..a24be047a311 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -386,8 +386,8 @@ enum NvmeAsyncEventRequest {
+>      NVME_AER_TYPE_SMART                     = 1,
+>      NVME_AER_TYPE_IO_SPECIFIC               = 6,
+>      NVME_AER_TYPE_VENDOR_SPECIFIC           = 7,
+> -    NVME_AER_INFO_ERR_INVALID_SQ            = 0,
+> -    NVME_AER_INFO_ERR_INVALID_DB            = 1,
+> +    NVME_AER_INFO_ERR_INVALID_DB_REGISTER   = 0,
+> +    NVME_AER_INFO_ERR_INVALID_DB_VALUE      = 1,
+>      NVME_AER_INFO_ERR_DIAG_FAIL             = 2,
+>      NVME_AER_INFO_ERR_PERS_INTERNAL_ERR     = 3,
+>      NVME_AER_INFO_ERR_TRANS_INTERNAL_ERR    = 4,
+> @@ -640,6 +640,10 @@ typedef struct NvmeFeatureVal {
+>  #define NVME_TEMP_TMPSEL(temp) ((temp >> 16) & 0xf)
+>  #define NVME_TEMP_TMPTH(temp)  (temp & 0xffff)
+>  
+> +#define NVME_AEC_SMART(aec)         (aec & 0xff)
+> +#define NVME_AEC_NS_ATTR(aec)       ((aec >> 8) & 0x1)
+> +#define NVME_AEC_FW_ACTIVATION(aec) ((aec >> 9) & 0x1)
+> +
+>  enum NvmeFeatureIds {
+>      NVME_ARBITRATION                = 0x1,
+>      NVME_POWER_MANAGEMENT           = 0x2,
 
-Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
----
- tests/libqos/vhost-user-blk.c | 126 ++++++
- tests/libqos/vhost-user-blk.h |  44 +++
- tests/vhost-user-blk-test.c   | 694 ++++++++++++++++++++++++++++++++++
- 3 files changed, 864 insertions(+)
- create mode 100644 tests/libqos/vhost-user-blk.c
- create mode 100644 tests/libqos/vhost-user-blk.h
- create mode 100644 tests/vhost-user-blk-test.c
 
-diff --git a/tests/libqos/vhost-user-blk.c b/tests/libqos/vhost-user-blk.c
-new file mode 100644
-index 0000000000..ec46b7ddb4
---- /dev/null
-+++ b/tests/libqos/vhost-user-blk.c
-@@ -0,0 +1,126 @@
-+/*
-+ * libqos driver framework
-+ *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qemu/module.h"
-+#include "standard-headers/linux/virtio_blk.h"
-+#include "libqos/qgraph.h"
-+#include "libqos/vhost-user-blk.h"
-+
-+#define PCI_SLOT                0x04
-+#define PCI_FN                  0x00
-+
-+/* virtio-blk-device */
-+static void *qvhost_user_blk_get_driver(QVhostUserBlk *v_blk,
-+                                    const char *interface)
-+{
-+    if (!g_strcmp0(interface, "vhost-user-blk")) {
-+        return v_blk;
-+    }
-+    if (!g_strcmp0(interface, "virtio")) {
-+        return v_blk->vdev;
-+    }
-+
-+    fprintf(stderr, "%s not present in vhost-user-blk-device\n", interface);
-+    g_assert_not_reached();
-+}
-+
-+static void *qvhost_user_blk_device_get_driver(void *object,
-+                                           const char *interface)
-+{
-+    QVhostUserBlkDevice *v_blk = object;
-+    return qvhost_user_blk_get_driver(&v_blk->blk, interface);
-+}
-+
-+static void *vhost_user_blk_device_create(void *virtio_dev,
-+                                      QGuestAllocator *t_alloc,
-+                                      void *addr)
-+{
-+    QVhostUserBlkDevice *vhost_user_blk = g_new0(QVhostUserBlkDevice, 1);
-+    QVhostUserBlk *interface = &vhost_user_blk->blk;
-+
-+    interface->vdev = virtio_dev;
-+
-+    vhost_user_blk->obj.get_driver = qvhost_user_blk_device_get_driver;
-+
-+    return &vhost_user_blk->obj;
-+}
-+
-+/* virtio-blk-pci */
-+static void *qvhost_user_blk_pci_get_driver(void *object, const char *interface)
-+{
-+    QVhostUserBlkPCI *v_blk = object;
-+    if (!g_strcmp0(interface, "pci-device")) {
-+        return v_blk->pci_vdev.pdev;
-+    }
-+    return qvhost_user_blk_get_driver(&v_blk->blk, interface);
-+}
-+
-+static void *vhost_user_blk_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
-+                                      void *addr)
-+{
-+    QVhostUserBlkPCI *vhost_user_blk = g_new0(QVhostUserBlkPCI, 1);
-+    QVhostUserBlk *interface = &vhost_user_blk->blk;
-+    QOSGraphObject *obj = &vhost_user_blk->pci_vdev.obj;
-+
-+    virtio_pci_init(&vhost_user_blk->pci_vdev, pci_bus, addr);
-+    interface->vdev = &vhost_user_blk->pci_vdev.vdev;
-+
-+    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_BLOCK);
-+
-+    obj->get_driver = qvhost_user_blk_pci_get_driver;
-+
-+    return obj;
-+}
-+
-+static void vhost_user_blk_register_nodes(void)
-+{
-+    /*
-+     * FIXME: every test using these two nodes needs to setup a
-+     * -drive,id=drive0 otherwise QEMU is not going to start.
-+     * Therefore, we do not include "produces" edge for virtio
-+     * and pci-device yet.
-+     */
-+
-+    char *arg = g_strdup_printf("id=drv0,chardev=char1,addr=%x.%x",
-+                                PCI_SLOT, PCI_FN);
-+
-+    QPCIAddress addr = {
-+        .devfn = QPCI_DEVFN(PCI_SLOT, PCI_FN),
-+    };
-+
-+    QOSGraphEdgeOptions opts = { };
-+
-+    /* virtio-blk-device */
-+    /** opts.extra_device_opts = "drive=drive0"; */
-+    qos_node_create_driver("vhost-user-blk-device", vhost_user_blk_device_create);
-+    qos_node_consumes("vhost-user-blk-device", "virtio-bus", &opts);
-+    qos_node_produces("vhost-user-blk-device", "vhost-user-blk");
-+
-+    /* virtio-blk-pci */
-+    opts.extra_device_opts = arg;
-+    add_qpci_address(&opts, &addr);
-+    qos_node_create_driver("vhost-user-blk-pci", vhost_user_blk_pci_create);
-+    qos_node_consumes("vhost-user-blk-pci", "pci-bus", &opts);
-+    qos_node_produces("vhost-user-blk-pci", "vhost-user-blk");
-+
-+    g_free(arg);
-+}
-+
-+libqos_init(vhost_user_blk_register_nodes);
-diff --git a/tests/libqos/vhost-user-blk.h b/tests/libqos/vhost-user-blk.h
-new file mode 100644
-index 0000000000..ef4ef09cca
---- /dev/null
-+++ b/tests/libqos/vhost-user-blk.h
-@@ -0,0 +1,44 @@
-+/*
-+ * libqos driver framework
-+ *
-+ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License version 2 as published by the Free Software Foundation.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#ifndef TESTS_LIBQOS_VHOST_USER_BLK_H
-+#define TESTS_LIBQOS_VHOST_USER_BLK_H
-+
-+#include "libqos/qgraph.h"
-+#include "libqos/virtio.h"
-+#include "libqos/virtio-pci.h"
-+
-+typedef struct QVhostUserBlk QVhostUserBlk;
-+typedef struct QVhostUserBlkPCI QVhostUserBlkPCI;
-+typedef struct QVhostUserBlkDevice QVhostUserBlkDevice;
-+
-+struct QVhostUserBlk {
-+    QVirtioDevice *vdev;
-+};
-+
-+struct QVhostUserBlkPCI {
-+    QVirtioPCIDevice pci_vdev;
-+    QVhostUserBlk blk;
-+};
-+
-+struct QVhostUserBlkDevice {
-+    QOSGraphObject obj;
-+    QVhostUserBlk blk;
-+};
-+
-+#endif
-diff --git a/tests/vhost-user-blk-test.c b/tests/vhost-user-blk-test.c
-new file mode 100644
-index 0000000000..528f034b55
---- /dev/null
-+++ b/tests/vhost-user-blk-test.c
-@@ -0,0 +1,694 @@
-+/*
-+ * QTest testcase for VirtIO Block Device
-+ *
-+ * Copyright (c) 2014 SUSE LINUX Products GmbH
-+ * Copyright (c) 2014 Marc Marí
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest-single.h"
-+#include "qemu/bswap.h"
-+#include "qemu/module.h"
-+#include "standard-headers/linux/virtio_blk.h"
-+#include "standard-headers/linux/virtio_pci.h"
-+#include "libqos/qgraph.h"
-+#include "libqos/vhost-user-blk.h"
-+#include "libqos/libqos-pc.h"
-+
-+/* TODO actually test the results and get rid of this */
-+#define qmp_discard_response(...) qobject_unref(qmp(__VA_ARGS__))
-+
-+#define TEST_IMAGE_SIZE         (64 * 1024 * 1024)
-+#define QVIRTIO_BLK_TIMEOUT_US  (30 * 1000 * 1000)
-+#define PCI_SLOT_HP             0x06
-+
-+typedef struct QVirtioBlkReq {
-+    uint32_t type;
-+    uint32_t ioprio;
-+    uint64_t sector;
-+    char *data;
-+    uint8_t status;
-+} QVirtioBlkReq;
-+
-+
-+#ifdef HOST_WORDS_BIGENDIAN
-+static const bool host_is_big_endian = true;
-+#else
-+static const bool host_is_big_endian; /* false */
-+#endif
-+
-+static inline void virtio_blk_fix_request(QVirtioDevice *d, QVirtioBlkReq *req)
-+{
-+    if (qvirtio_is_big_endian(d) != host_is_big_endian) {
-+        req->type = bswap32(req->type);
-+        req->ioprio = bswap32(req->ioprio);
-+        req->sector = bswap64(req->sector);
-+    }
-+}
-+
-+
-+static inline void virtio_blk_fix_dwz_hdr(QVirtioDevice *d,
-+    struct virtio_blk_discard_write_zeroes *dwz_hdr)
-+{
-+    if (qvirtio_is_big_endian(d) != host_is_big_endian) {
-+        dwz_hdr->sector = bswap64(dwz_hdr->sector);
-+        dwz_hdr->num_sectors = bswap32(dwz_hdr->num_sectors);
-+        dwz_hdr->flags = bswap32(dwz_hdr->flags);
-+    }
-+}
-+
-+static uint64_t virtio_blk_request(QGuestAllocator *alloc, QVirtioDevice *d,
-+                                   QVirtioBlkReq *req, uint64_t data_size)
-+{
-+    uint64_t addr;
-+    uint8_t status = 0xFF;
-+
-+    switch (req->type) {
-+    case VIRTIO_BLK_T_IN:
-+    case VIRTIO_BLK_T_OUT:
-+        g_assert_cmpuint(data_size % 512, ==, 0);
-+        break;
-+    case VIRTIO_BLK_T_DISCARD:
-+    case VIRTIO_BLK_T_WRITE_ZEROES:
-+        g_assert_cmpuint(data_size %
-+                         sizeof(struct virtio_blk_discard_write_zeroes), ==, 0);
-+        break;
-+    default:
-+        g_assert_cmpuint(data_size, ==, 0);
-+    }
-+
-+    addr = guest_alloc(alloc, sizeof(*req) + data_size);
-+
-+    virtio_blk_fix_request(d, req);
-+
-+    memwrite(addr, req, 16);
-+    memwrite(addr + 16, req->data, data_size);
-+    memwrite(addr + 16 + data_size, &status, sizeof(status));
-+
-+    return addr;
-+}
-+
-+/* Returns the request virtqueue so the caller can perform further tests */
-+static QVirtQueue *test_basic(QVirtioDevice *dev, QGuestAllocator *alloc)
-+{
-+    QVirtioBlkReq req;
-+    uint64_t req_addr;
-+    uint64_t capacity;
-+    uint64_t features;
-+    uint32_t free_head;
-+    uint8_t status;
-+    char *data;
-+    QTestState *qts = global_qtest;
-+    QVirtQueue *vq;
-+
-+    features = qvirtio_get_features(dev);
-+    features = features & ~(QVIRTIO_F_BAD_FEATURE |
-+                    (1u << VIRTIO_RING_F_INDIRECT_DESC) |
-+                    (1u << VIRTIO_RING_F_EVENT_IDX) |
-+                    (1u << VIRTIO_BLK_F_SCSI));
-+    qvirtio_set_features(dev, features);
-+
-+    capacity = qvirtio_config_readq(dev, 0);
-+    g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
-+
-+    vq = qvirtqueue_setup(dev, alloc, 0);
-+
-+    qvirtio_set_driver_ok(dev);
-+
-+    /* Write and read with 3 descriptor layout */
-+    /* Write request */
-+    req.type = VIRTIO_BLK_T_OUT;
-+    req.ioprio = 1;
-+    req.sector = 0;
-+    req.data = g_malloc0(512);
-+    strcpy(req.data, "TEST");
-+
-+    req_addr = virtio_blk_request(alloc, dev, &req, 512);
-+
-+    g_free(req.data);
-+
-+    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+    qvirtqueue_add(qts, vq, req_addr + 16, 512, false, true);
-+    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
-+
-+    qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                           QVIRTIO_BLK_TIMEOUT_US);
-+    status = readb(req_addr + 528);
-+    g_assert_cmpint(status, ==, 0);
-+
-+    guest_free(alloc, req_addr);
-+
-+    /* Read request */
-+    req.type = VIRTIO_BLK_T_IN;
-+    req.ioprio = 1;
-+    req.sector = 0;
-+    req.data = g_malloc0(512);
-+
-+    req_addr = virtio_blk_request(alloc, dev, &req, 512);
-+
-+    g_free(req.data);
-+
-+    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+    qvirtqueue_add(qts, vq, req_addr + 16, 512, true, true);
-+    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
-+
-+    qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                           QVIRTIO_BLK_TIMEOUT_US);
-+    status = readb(req_addr + 528);
-+    g_assert_cmpint(status, ==, 0);
-+
-+    data = g_malloc0(512);
-+    memread(req_addr + 16, data, 512);
-+    g_assert_cmpstr(data, ==, "TEST");
-+    g_free(data);
-+
-+    guest_free(alloc, req_addr);
-+
-+    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
-+        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+        void *expected;
-+
-+        /*
-+         * WRITE_ZEROES request on the same sector of previous test where
-+         * we wrote "TEST".
-+         */
-+        req.type = VIRTIO_BLK_T_WRITE_ZEROES;
-+        req.data = (char *) &dwz_hdr;
-+        dwz_hdr.sector = 0;
-+        dwz_hdr.num_sectors = 1;
-+        dwz_hdr.flags = 0;
-+
-+        virtio_blk_fix_dwz_hdr(dev, &dwz_hdr);
-+
-+        req_addr = virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr));
-+
-+        free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+        qvirtqueue_add(qts, vq, req_addr + 16, sizeof(dwz_hdr), false, true);
-+        qvirtqueue_add(qts, vq, req_addr + 16 + sizeof(dwz_hdr), 1, true,
-+                       false);
-+
-+        qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status = readb(req_addr + 16 + sizeof(dwz_hdr));
-+        g_assert_cmpint(status, ==, 0);
-+
-+        guest_free(alloc, req_addr);
-+
-+        /* Read request to check if the sector contains all zeroes */
-+        req.type = VIRTIO_BLK_T_IN;
-+        req.ioprio = 1;
-+        req.sector = 0;
-+        req.data = g_malloc0(512);
-+
-+        req_addr = virtio_blk_request(alloc, dev, &req, 512);
-+
-+        g_free(req.data);
-+
-+        free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+        qvirtqueue_add(qts, vq, req_addr + 16, 512, true, true);
-+        qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
-+
-+        qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status = readb(req_addr + 528);
-+        g_assert_cmpint(status, ==, 0);
-+
-+        data = g_malloc(512);
-+        expected = g_malloc0(512);
-+        memread(req_addr + 16, data, 512);
-+        g_assert_cmpmem(data, 512, expected, 512);
-+        g_free(expected);
-+        g_free(data);
-+
-+        guest_free(alloc, req_addr);
-+    }
-+
-+    if (features & (1u << VIRTIO_BLK_F_DISCARD)) {
-+        struct virtio_blk_discard_write_zeroes dwz_hdr;
-+
-+        req.type = VIRTIO_BLK_T_DISCARD;
-+        req.data = (char *) &dwz_hdr;
-+        dwz_hdr.sector = 0;
-+        dwz_hdr.num_sectors = 1;
-+        dwz_hdr.flags = 0;
-+
-+        virtio_blk_fix_dwz_hdr(dev, &dwz_hdr);
-+
-+        req_addr = virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr));
-+
-+        free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+        qvirtqueue_add(qts, vq, req_addr + 16, sizeof(dwz_hdr), false, true);
-+        qvirtqueue_add(qts, vq, req_addr + 16 + sizeof(dwz_hdr),
-+                       1, true, false);
-+
-+        qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status = readb(req_addr + 16 + sizeof(dwz_hdr));
-+        g_assert_cmpint(status, ==, 0);
-+
-+        guest_free(alloc, req_addr);
-+    }
-+
-+    if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
-+        /* Write and read with 2 descriptor layout */
-+        /* Write request */
-+        req.type = VIRTIO_BLK_T_OUT;
-+        req.ioprio = 1;
-+        req.sector = 1;
-+        req.data = g_malloc0(512);
-+        strcpy(req.data, "TEST");
-+
-+        req_addr = virtio_blk_request(alloc, dev, &req, 512);
-+
-+        g_free(req.data);
-+
-+        free_head = qvirtqueue_add(qts, vq, req_addr, 528, false, true);
-+        qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
-+        qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status = readb(req_addr + 528);
-+        g_assert_cmpint(status, ==, 0);
-+
-+        guest_free(alloc, req_addr);
-+
-+        /* Read request */
-+        req.type = VIRTIO_BLK_T_IN;
-+        req.ioprio = 1;
-+        req.sector = 1;
-+        req.data = g_malloc0(512);
-+
-+        req_addr = virtio_blk_request(alloc, dev, &req, 512);
-+
-+        g_free(req.data);
-+
-+        free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+        qvirtqueue_add(qts, vq, req_addr + 16, 513, true, false);
-+
-+        qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                               QVIRTIO_BLK_TIMEOUT_US);
-+        status = readb(req_addr + 528);
-+        g_assert_cmpint(status, ==, 0);
-+
-+        data = g_malloc0(512);
-+        memread(req_addr + 16, data, 512);
-+        g_assert_cmpstr(data, ==, "TEST");
-+        g_free(data);
-+
-+        guest_free(alloc, req_addr);
-+    }
-+
-+    return vq;
-+}
-+
-+static void basic(void *obj, void *data, QGuestAllocator *t_alloc)
-+{
-+    QVhostUserBlk *blk_if = obj;
-+    QVirtQueue *vq;
-+
-+    vq = test_basic(blk_if->vdev, t_alloc);
-+    qvirtqueue_cleanup(blk_if->vdev->bus, vq, t_alloc);
-+
-+}
-+
-+static void indirect(void *obj, void *u_data, QGuestAllocator *t_alloc)
-+{
-+    QVirtQueue *vq;
-+    QVhostUserBlk *blk_if = obj;
-+    QVirtioDevice *dev = blk_if->vdev;
-+    QVirtioBlkReq req;
-+    QVRingIndirectDesc *indirect;
-+    uint64_t req_addr;
-+    uint64_t capacity;
-+    uint64_t features;
-+    uint32_t free_head;
-+    uint8_t status;
-+    char *data;
-+    QTestState *qts = global_qtest;
-+
-+    features = qvirtio_get_features(dev);
-+    g_assert_cmphex(features & (1u << VIRTIO_RING_F_INDIRECT_DESC), !=, 0);
-+    features = features & ~(QVIRTIO_F_BAD_FEATURE |
-+                            (1u << VIRTIO_RING_F_EVENT_IDX) |
-+                            (1u << VIRTIO_BLK_F_SCSI));
-+    qvirtio_set_features(dev, features);
-+
-+    capacity = qvirtio_config_readq(dev, 0);
-+    g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
-+
-+    vq = qvirtqueue_setup(dev, t_alloc, 0);
-+    qvirtio_set_driver_ok(dev);
-+
-+    /* Write request */
-+    req.type = VIRTIO_BLK_T_OUT;
-+    req.ioprio = 1;
-+    req.sector = 0;
-+    req.data = g_malloc0(512);
-+    strcpy(req.data, "TEST");
-+
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
-+
-+    g_free(req.data);
-+
-+    indirect = qvring_indirect_desc_setup(qts, dev, t_alloc, 2);
-+    qvring_indirect_desc_add(dev, qts, indirect, req_addr, 528, false);
-+    qvring_indirect_desc_add(dev, qts, indirect, req_addr + 528, 1, true);
-+    free_head = qvirtqueue_add_indirect(qts, vq, indirect);
-+    qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                           QVIRTIO_BLK_TIMEOUT_US);
-+    status = readb(req_addr + 528);
-+    g_assert_cmpint(status, ==, 0);
-+
-+    g_free(indirect);
-+    guest_free(t_alloc, req_addr);
-+
-+    /* Read request */
-+    req.type = VIRTIO_BLK_T_IN;
-+    req.ioprio = 1;
-+    req.sector = 0;
-+    req.data = g_malloc0(512);
-+    strcpy(req.data, "TEST");
-+
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
-+
-+    g_free(req.data);
-+
-+    indirect = qvring_indirect_desc_setup(qts, dev, t_alloc, 2);
-+    qvring_indirect_desc_add(dev, qts, indirect, req_addr, 16, false);
-+    qvring_indirect_desc_add(dev, qts, indirect, req_addr + 16, 513, true);
-+    free_head = qvirtqueue_add_indirect(qts, vq, indirect);
-+    qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                           QVIRTIO_BLK_TIMEOUT_US);
-+    status = readb(req_addr + 528);
-+    g_assert_cmpint(status, ==, 0);
-+
-+    data = g_malloc0(512);
-+    memread(req_addr + 16, data, 512);
-+    g_assert_cmpstr(data, ==, "TEST");
-+    g_free(data);
-+
-+    g_free(indirect);
-+    guest_free(t_alloc, req_addr);
-+    qvirtqueue_cleanup(dev->bus, vq, t_alloc);
-+}
-+
-+
-+static void idx(void *obj, void *u_data, QGuestAllocator *t_alloc)
-+{
-+    QVirtQueue *vq;
-+    QVhostUserBlkPCI *blk = obj;
-+    QVirtioPCIDevice *pdev = &blk->pci_vdev;
-+    QVirtioDevice *dev = &pdev->vdev;
-+    QVirtioBlkReq req;
-+    uint64_t req_addr;
-+    uint64_t capacity;
-+    uint64_t features;
-+    uint32_t free_head;
-+    uint32_t write_head;
-+    uint32_t desc_idx;
-+    uint8_t status;
-+    char *data;
-+    QOSGraphObject *blk_object = obj;
-+    QPCIDevice *pci_dev = blk_object->get_driver(blk_object, "pci-device");
-+    QTestState *qts = global_qtest;
-+
-+    if (qpci_check_buggy_msi(pci_dev)) {
-+        return;
-+    }
-+
-+    qpci_msix_enable(pdev->pdev);
-+    qvirtio_pci_set_msix_configuration_vector(pdev, t_alloc, 0);
-+
-+    features = qvirtio_get_features(dev);
-+    features = features & ~(QVIRTIO_F_BAD_FEATURE |
-+                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
-+                            (1u << VIRTIO_F_NOTIFY_ON_EMPTY) |
-+                            (1u << VIRTIO_BLK_F_SCSI));
-+    qvirtio_set_features(dev, features);
-+
-+    capacity = qvirtio_config_readq(dev, 0);
-+    g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
-+
-+    vq = qvirtqueue_setup(dev, t_alloc, 0);
-+    qvirtqueue_pci_msix_setup(pdev, (QVirtQueuePCI *)vq, t_alloc, 1);
-+
-+    qvirtio_set_driver_ok(dev);
-+
-+    /* Write request */
-+    req.type = VIRTIO_BLK_T_OUT;
-+    req.ioprio = 1;
-+    req.sector = 0;
-+    req.data = g_malloc0(512);
-+    strcpy(req.data, "TEST");
-+
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
-+
-+    g_free(req.data);
-+
-+    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+    qvirtqueue_add(qts, vq, req_addr + 16, 512, false, true);
-+    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
-+    qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
-+                           QVIRTIO_BLK_TIMEOUT_US);
-+
-+    /* Write request */
-+    req.type = VIRTIO_BLK_T_OUT;
-+    req.ioprio = 1;
-+    req.sector = 1;
-+    req.data = g_malloc0(512);
-+    strcpy(req.data, "TEST");
-+
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
-+
-+    g_free(req.data);
-+
-+    /* Notify after processing the third request */
-+    qvirtqueue_set_used_event(qts, vq, 2);
-+    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+    qvirtqueue_add(qts, vq, req_addr + 16, 512, false, true);
-+    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
-+    qvirtqueue_kick(qts, dev, vq, free_head);
-+    write_head = free_head;
-+
-+    /* No notification expected */
-+    status = qvirtio_wait_status_byte_no_isr(qts, dev,
-+                                             vq, req_addr + 528,
-+                                             QVIRTIO_BLK_TIMEOUT_US);
-+    g_assert_cmpint(status, ==, 0);
-+
-+    guest_free(t_alloc, req_addr);
-+
-+    /* Read request */
-+    req.type = VIRTIO_BLK_T_IN;
-+    req.ioprio = 1;
-+    req.sector = 1;
-+    req.data = g_malloc0(512);
-+
-+    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
-+
-+    g_free(req.data);
-+
-+    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
-+    qvirtqueue_add(qts, vq, req_addr + 16, 512, true, true);
-+    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
-+
-+    qvirtqueue_kick(qts, dev, vq, free_head);
-+
-+    /* We get just one notification for both requests */
-+    qvirtio_wait_used_elem(qts, dev, vq, write_head, NULL,
-+                           QVIRTIO_BLK_TIMEOUT_US);
-+    g_assert(qvirtqueue_get_buf(qts, vq, &desc_idx, NULL));
-+    g_assert_cmpint(desc_idx, ==, free_head);
-+
-+    status = readb(req_addr + 528);
-+    g_assert_cmpint(status, ==, 0);
-+
-+    data = g_malloc0(512);
-+    memread(req_addr + 16, data, 512);
-+    g_assert_cmpstr(data, ==, "TEST");
-+    g_free(data);
-+
-+    guest_free(t_alloc, req_addr);
-+
-+    /* End test */
-+    qpci_msix_disable(pdev->pdev);
-+
-+    qvirtqueue_cleanup(dev->bus, vq, t_alloc);
-+}
-+
-+static void pci_hotplug(void *obj, void *data, QGuestAllocator *t_alloc)
-+{
-+    QVirtioPCIDevice *dev1 = obj;
-+    QVirtioPCIDevice *dev;
-+    QTestState *qts = dev1->pdev->bus->qts;
-+
-+    /* plug secondary disk */
-+    qtest_qmp_device_add(qts, "vhost-user-blk-pci", "drv1",
-+                         "{'addr': %s, 'chardev': 'char2'}",
-+                         stringify(PCI_SLOT_HP) ".0");
-+
-+    dev = virtio_pci_new(dev1->pdev->bus,
-+                         &(QPCIAddress) { .devfn = QPCI_DEVFN(PCI_SLOT_HP, 0)
-+                                        });
-+    g_assert_nonnull(dev);
-+    g_assert_cmpint(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
-+    qvirtio_pci_device_disable(dev);
-+    qos_object_destroy((QOSGraphObject *)dev);
-+
-+    /* unplug secondary disk */
-+    qpci_unplug_acpi_device_test(qts, "drv1", PCI_SLOT_HP);
-+}
-+
-+/*
-+ * Check that setting the vring addr on a non-existent virtqueue does
-+ * not crash.
-+ */
-+static void test_nonexistent_virtqueue(void *obj, void *data,
-+                                       QGuestAllocator *t_alloc)
-+{
-+    QVhostUserBlkPCI *blk = obj;
-+    QVirtioPCIDevice *pdev = &blk->pci_vdev;
-+    QPCIBar bar0;
-+    QPCIDevice *dev;
-+
-+    dev = qpci_device_find(pdev->pdev->bus, QPCI_DEVFN(4, 0));
-+    g_assert(dev != NULL);
-+    qpci_device_enable(dev);
-+
-+    bar0 = qpci_iomap(dev, 0, NULL);
-+
-+    qpci_io_writeb(dev, bar0, VIRTIO_PCI_QUEUE_SEL, 2);
-+    qpci_io_writel(dev, bar0, VIRTIO_PCI_QUEUE_PFN, 1);
-+
-+    g_free(dev);
-+}
-+
-+static const char *qtest_qemu_vu_binary(void)
-+{
-+    const char *qemu_vu_bin;
-+
-+    qemu_vu_bin = getenv("QTEST_QEMU_VU_BINARY");
-+    if (!qemu_vu_bin) {
-+        fprintf(stderr, "Environment variable QTEST_QEMU_VU_BINARY required\n");
-+        exit(0);
-+    }
-+
-+    return qemu_vu_bin;
-+}
-+
-+static void drive_destroy(void *path)
-+{
-+    unlink(path);
-+    g_free(path);
-+    qos_invalidate_command_line();
-+}
-+
-+
-+static char *drive_create(void)
-+{
-+ int fd, ret;
-+ /** vhost-user-blk won't recognize drive located in /tmp */
-+ char *t_path = g_strdup("qtest.XXXXXX");
-+
-+ /** Create a temporary raw image */
-+ fd = mkstemp(t_path);
-+ g_assert_cmpint(fd, >=, 0);
-+ ret = ftruncate(fd, TEST_IMAGE_SIZE);
-+ g_assert_cmpint(ret, ==, 0);
-+ close(fd);
-+
-+ g_test_queue_destroy(drive_destroy, t_path);
-+ return t_path;
-+}
-+
-+
-+
-+static void start_vhost_user_blk(const char *img_path, const char *sock_path)
-+{
-+    const char *vhost_user_blk_bin = qtest_qemu_vu_binary();
-+    /*
-+     * "qemu-vu -e" will exit when the client disconnects thus the launched
-+     *  qemu-vu process will not block scripts/tap-driver.pl
-+     */
-+    gchar *command = g_strdup_printf("exec %s "
-+                                     "-e "
-+                                     "-k %s "
-+                                     "-f raw "
-+                                     "%s",
-+                                     vhost_user_blk_bin,
-+                                     sock_path, img_path);
-+    g_test_message("starting vhost-user backend: %s", command);
-+    pid_t pid = fork();
-+    if (pid == 0) {
-+        execlp("/bin/sh", "sh", "-c", command, NULL);
-+        exit(1);
-+    }
-+    /*
-+     * make sure qemu-vu i.e. socket server is started before tests
-+     * otherwise qemu will complain,
-+     * "Failed to connect socket ... Connection refused"
-+     */
-+    g_usleep(G_USEC_PER_SEC);
-+}
-+
-+static void *vhost_user_blk_test_setup(GString *cmd_line, void *arg)
-+{
-+    /* create image file */
-+    const char *img_path = drive_create();
-+    const char *sock_path = "/tmp/vhost-user-blk_vhost.socket";
-+    start_vhost_user_blk(img_path, sock_path);
-+    /* "-chardev socket,id=char2" is used for pci_hotplug*/
-+    g_string_append_printf(cmd_line,
-+                           " -object memory-backend-memfd,id=mem,size=128M,share=on -numa node,memdev=mem "
-+                           "-chardev socket,id=char1,path=%s "
-+                           "-chardev socket,id=char2,path=%s",
-+                           sock_path, sock_path);
-+    return arg;
-+}
-+
-+static void register_vhost_user_blk_test(void)
-+{
-+    QOSGraphTestOptions opts = {
-+        .before = vhost_user_blk_test_setup,
-+    };
-+
-+    /*
-+     * tests for vhost-user-blk and vhost-user-blk-pci
-+     * The tests are borrowed from tests/virtio-blk-test.c. But some tests
-+     * regarding block_resize don't work for vhost-user-blk.
-+     * vhost-user-blk device doesn't have -drive, so tests containing
-+     * block_resize are also abandoned,
-+     *  - config
-+     *  - resize
-+     */
-+    qos_add_test("basic", "vhost-user-blk", basic, &opts);
-+    qos_add_test("indirect", "vhost-user-blk", indirect, &opts);
-+    qos_add_test("idx", "vhost-user-blk-pci", idx, &opts);
-+    qos_add_test("nxvirtq", "vhost-user-blk-pci",
-+                      test_nonexistent_virtqueue, &opts);
-+    qos_add_test("hotplug", "vhost-user-blk-pci", pci_hotplug, &opts);
-+}
-+
-+libqos_init(register_vhost_user_blk_test);
---
-2.25.0
+Overall looks very good. This feature is very tricky to
+get right due to somewhat unclear spec but after reading the
+spec again, it looks OK.
+
+I might have missed something though. I cross checked against my
+implementation of this and it looks like I misunderstood the spec
+in few places back then in my nvme-mdev implementation.
+
+Reminding to fix all the split code line alignment issues (when C statement is split over to next line it should be aligned on first '('). 
+There are plenty of these here.
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
 
