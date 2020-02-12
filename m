@@ -7,89 +7,90 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C930C352A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F06C8C352A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:37:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 190412173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:34:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB13524677
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 20:37:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cu42S3C1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 190412173E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZFPtwBcV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB13524677
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1yil-0002W3-93
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 15:34:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42048)
+	id 1j1ylP-0004gg-Pl
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 15:37:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42295)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j1yiB-00024P-Ia
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:34:20 -0500
+ (envelope-from <philmd@redhat.com>) id 1j1ykF-0003BN-M5
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:36:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j1yiA-0005CG-An
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:34:19 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55329
+ (envelope-from <philmd@redhat.com>) id 1j1ykE-0006zv-I9
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:36:27 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21179
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1yiA-0005C3-7U
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:34:18 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1ykE-0006z3-Ex
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 15:36:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581539657;
+ s=mimecast20190719; t=1581539784;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
- bh=1K44pwUiu8+Lt6ysKik91DAUVjLFEyH051mbxuTUuPU=;
- b=Cu42S3C1wzILTWnCYN7i7LPQUufJwNSeOaNJDOtGqTs6Q1lgHxcn6ZFtDQz1Q0ogSgDdot
- dy1tzXPP15iB8Hpjk/BE9hio/6xtcaIdAR8jGy+TVkmnHJ7TmtV5iu4lEJZJ5WikL1y1Dn
- KMjypXmxcA/+RMr6MCuXWhTlP1J7LIw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-H8SeDgk1OYSeYync1f8fYQ-1; Wed, 12 Feb 2020 15:34:12 -0500
-Received: by mail-wr1-f70.google.com with SMTP id m15so1286759wrs.22
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 12:34:11 -0800 (PST)
+ bh=T3ylHUH4ZoFjUTnyfUiMekT5X2Pd1nXmD9oE7o/4Elk=;
+ b=ZFPtwBcVCnxCZx8VSnT9G/rg/TRf1ZgbhlLdCiRgWYPh5T2cKy0ndkAp1BeMlAvqre3fsd
+ A3+EcqTfUwarztUdlTCbNSB3JasaFUm6eD0csVTdkItJH4cYByIu+4+HYv1Qc43tVCnyKV
+ VZphzTGTSHDINsnSVwwmGjcOmio8MmI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-155-tTbXZwVZMk6i72IBcAMyGA-1; Wed, 12 Feb 2020 15:36:22 -0500
+Received: by mail-wr1-f69.google.com with SMTP id v17so1295872wrm.17
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 12:36:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=Eqwom1vG0T6fxOCyRmjcBP3acBHjKDG3q8lvY7K6ZbQ=;
- b=Qs6gdHlKDtqRhjAH+CSGDIVpoDDzEhMwmGNszYAQFXOsvzY2ucLFYY0f9CcMqtJvvp
- twaAjPwT+1NG34z6wPo57gcey1mYE8tp3TIVtHmZ0q9mu91dhE07nEuiwh+vN+qob3jb
- uDFMWotjUUW2zoPkyVthXsAxiFR1R1aTjKH+rtUxWZe4z+utWMJy2jArnwtEd+0bsuCt
- jEH4DJp/AAVO94Jd7B68UNUc74YTzNiwaWIJJC6TcyvOacgcQjHz5OjarkjpRBxmzSy2
- x/SGbBHSl9A6McYalQk1YY9/8RQhUK4I5JZMAwlrsQ0pwJZn9P3s2j1uSHR+y0WuPg75
- 6s7Q==
-X-Gm-Message-State: APjAAAVv18U4DHPWXhX7T0oQUuhWsmc/LHb7PdzAz9J0op5z11OnsOEC
- 2aBbYewuLHhFm1hA/6X82mcq7lYAm/L6vxZ7f+qbHv8hM7l322RznJWMFdPFBcu8xFUYhxuYtOv
- 6ooJxNin5IdZ51kE=
-X-Received: by 2002:adf:9c8c:: with SMTP id d12mr16679028wre.404.1581539650622; 
- Wed, 12 Feb 2020 12:34:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqygqVG2SCm9aRP6kVfPRUy/XtLSoeUla58mw924VuACerAmthuWp8GjY2Noj8EeDnw/iHTEzg==
-X-Received: by 2002:adf:9c8c:: with SMTP id d12mr16679005wre.404.1581539650395; 
- Wed, 12 Feb 2020 12:34:10 -0800 (PST)
+ bh=z3rfLLywh1BohS0upHcyh0haLkZZAmJBOAw7ZMtEqQs=;
+ b=CK9yx5INtWVbJZ6Vi9NTh8rUzCr3LgoOXnksQh1+ea9Brl/oKU1f9ZQYBLk99EzJP4
+ WqxINUSUnnRKvMZPAPMb7A6W9/4r+hagVSVtBPQbmEBVrtFbW4bPa5Y/WQiUukSkpI07
+ ODBqf3j/o/TTkdmbVoeCvTNNDWyj1aPist8jXClXZIvs3Zr3CC/HElNhO0YUU8u4UwQA
+ Q/dBFDhJg5zAXWmpjlqOXdelJoWML8ZicaFtf+BrPePV3hE7/yxL0vk9pvN1KX59IVwq
+ syz/3QYex7tEec1YIRcDOR/8Mv/i2M0/7/GCWnWCIwOc4SVbx3iAQvx20cV/1nKugrBp
+ i5RQ==
+X-Gm-Message-State: APjAAAWLA3IgssvfM+astsSf6Q60XAxG0tI2S6Krao7oOLgjVCNe3lTO
+ GBkHYK3nnc3M4B/mY6N4IcDPqpuhGiWIQ15NpkHMUncfV3yZbFrv4DLgSicQ75DkJCbnSxFE4Si
+ mLbdVSigdk4QtuTQ=
+X-Received: by 2002:a5d:6151:: with SMTP id y17mr16674385wrt.110.1581539781512; 
+ Wed, 12 Feb 2020 12:36:21 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzq/RPJnOOsDlAp4yiE4m6wgW+jFQg6qnfCReO88HcemRyGkDAGt4MLqcjNROvVoBmY7gxMVw==
+X-Received: by 2002:a5d:6151:: with SMTP id y17mr16674366wrt.110.1581539781237; 
+ Wed, 12 Feb 2020 12:36:21 -0800 (PST)
 Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id s8sm2100487wrt.57.2020.02.12.12.34.09
+ by smtp.gmail.com with ESMTPSA id d22sm2124184wmd.39.2020.02.12.12.36.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 12:34:09 -0800 (PST)
+ Wed, 12 Feb 2020 12:36:20 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] tests/acceptance/machine_sparc_leon3: Do not run HelenOS test
- by default
-Date: Wed, 12 Feb 2020 21:34:08 +0100
-Message-Id: <20200212203408.15650-1-philmd@redhat.com>
+Subject: [PATCH v2] tests/acceptance/machine_sparc_leon3: Do not run HelenOS
+ test by default
+Date: Wed, 12 Feb 2020 21:36:19 +0100
+Message-Id: <20200212203619.16450-1-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-X-MC-Unique: H8SeDgk1OYSeYync1f8fYQ-1
+X-MC-Unique: tTbXZwVZMk6i72IBcAMyGA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,23 +130,27 @@ Similarly to commit 471c97a69b:
 Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/acceptance/machine_sparc_leon3.py | 2 ++
- 1 file changed, 2 insertions(+)
+v2: Add missing staged hunk...
+---
+ tests/acceptance/machine_sparc_leon3.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/tests/acceptance/machine_sparc_leon3.py b/tests/acceptance/mac=
 hine_sparc_leon3.py
-index f77e210ccb..8dba5998a1 100644
+index f77e210ccb..27e4717a51 100644
 --- a/tests/acceptance/machine_sparc_leon3.py
 +++ b/tests/acceptance/machine_sparc_leon3.py
-@@ -5,6 +5,7 @@
+@@ -5,6 +5,9 @@
  # This work is licensed under the terms of the GNU GPL, version 2 or
  # later. See the COPYING file in the top-level directory.
 =20
++import os
++
 +from avocado import skipUnless
  from avocado_qemu import Test
  from avocado_qemu import wait_for_console_pattern
 =20
-@@ -13,6 +14,7 @@ class Leon3Machine(Test):
+@@ -13,6 +16,7 @@ class Leon3Machine(Test):
 =20
      timeout =3D 60
 =20
