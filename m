@@ -2,72 +2,103 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31106C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BAF1C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:15:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 072A820724
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:02:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 072A820724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4F976206DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:15:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FE5NrWVY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F976206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1m2P-0000EP-9F
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 02:02:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51214)
+	id 1j1mF1-0004q8-FV
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 02:15:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53585)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j1m14-0007dM-Kn
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:01:07 -0500
+ (envelope-from <philmd@redhat.com>) id 1j1mE4-0003rL-TF
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:14:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j1m12-0007SU-VZ
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:00:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50194)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j1m12-0007RV-PE
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:00:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j1m11-00009W-G2
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 07:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 76EC82E80C0
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 07:00:55 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1j1mE3-0004Nz-38
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:14:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37348
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1mE2-0004NY-Nz
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:14:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581491662;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aT5UiNf8gz7EGwt9+XmRFIld/RnBLY/7qtRI4rhcrME=;
+ b=FE5NrWVYmvsvFtFENS/DG4EM1gHsE6nEKPRe2O8kwIkDLaskRsb2m3oW282D3GuKosFDLG
+ hJuUxU8t77LuTjNqN/Vju3nH3uFBqhMeAXCa+3mTGy4FQw7GcDDj7YxH/sZdAozKZe1aOk
+ FT0DJy1S2a6zJqR3BXsBOw7KU30Px/0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-PyeRKo5dMuKCM8ChjUbgfA-1; Wed, 12 Feb 2020 02:14:19 -0500
+Received: by mail-wm1-f72.google.com with SMTP id t17so348022wmi.7
+ for <qemu-devel@nongnu.org>; Tue, 11 Feb 2020 23:14:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=u3tnGTnKXIZFszcgkY4p1KSu60g0NmpIXqQvcc6mDgw=;
+ b=R34COIXqsppNANaGWkcVHEtkVCQTNLIvy/lDhmB1UHFzrMwUZRLTIAuNKy70P28sQH
+ PwXgMPeAP60EJ73CvQX0yKPhBaZ/zI4AbUyfe6ruUgV4N31Wj9QiZtl3auaGRW7qck/u
+ aT5ErMF2pW6FEpFaM+iT/NaUCH3c3puZ41XdL+uHDKaEGF30sItjQWAVEpIlXAl94CPq
+ eugomTCCklkd8z23Dqe3iOviUJ7PD/DDcQg2zYhiZ4f7LUqLnCC477l1My+tx5lCoIgz
+ niIWbBpkr54l1OJrydYyjIHlWi8D/887Z7/9+i4pHMFOPHDlTlE3V7QBrKLyx0yy5Xl8
+ NSnQ==
+X-Gm-Message-State: APjAAAUSlSQ/8rQ7ssCrGxxCQhjSLi3X1YRZaBWRTEE6g2+WpmeHwK9v
+ rXJsTrPCeMvScgTxQagF8n9c2ILmTQ/7lEouTK9SMGs27phPnpwImBKs4GheHLXjd+b/xGcSCtZ
+ mYtOLRo0xtluMIsI=
+X-Received: by 2002:adf:dcc2:: with SMTP id x2mr13317778wrm.24.1581491658739; 
+ Tue, 11 Feb 2020 23:14:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxuH0wWLtSVjrGN5rXX6zXAGIiDIt6OWW5TgbpXQ3GGBIsalhml1IpzTc/GlrfwSx/NiQcCRw==
+X-Received: by 2002:adf:dcc2:: with SMTP id x2mr13317746wrm.24.1581491658438; 
+ Tue, 11 Feb 2020 23:14:18 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id f8sm8471536wru.12.2020.02.11.23.14.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 11 Feb 2020 23:14:17 -0800 (PST)
+Subject: Re: [PATCH 13/13] target/arm: Correct handling of PMCR_EL0.LC bit
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200211173726.22541-1-peter.maydell@linaro.org>
+ <20200211173726.22541-14-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a9e33251-9f9d-dc6a-efd9-6f4fcba1a124@redhat.com>
+Date: Wed, 12 Feb 2020 08:14:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200211173726.22541-14-peter.maydell@linaro.org>
+Content-Language: en-US
+X-MC-Unique: PyeRKo5dMuKCM8ChjUbgfA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Feb 2020 06:50:42 -0000
-From: Chris Hoy <1862887@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: builds
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: chrs-hoy
-X-Launchpad-Bug-Reporter: Chris Hoy (chrs-hoy)
-X-Launchpad-Bug-Modifier: Chris Hoy (chrs-hoy)
-Message-Id: <158149024287.24857.8410135131433041908.malonedeb@gac.canonical.com>
-Subject: [Bug 1862887] [NEW] qemu does not load pulseaudio modules properly
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d5e55ea9acf7e42968691cccfaec927661e86bb5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,197 +107,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1862887 <1862887@bugs.launchpad.net>
+Cc: Eric Auger <eric.auger@redhat.com>,
+ Aaron Lindsay <aaron@os.amperecomputing.com>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 2/11/20 6:37 PM, Peter Maydell wrote:
+> The LC bit in the PMCR_EL0 register is supposed to be:
+>   * read/write
+>   * RES1 on an AArch64-only implementation
+>   * an architecturally UNKNOWN value on reset
+> (and use of LC=3D=3D0 by software is deprecated).
+>=20
+> We were implementing it incorrectly as read-only always zero,
+> though we do have all the code needed to test it and behave
+> accordingly.
+>=20
+> Instead make it a read-write bit which resets to 1 always, which
+> satisfies all the architectural requirements above.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   target/arm/helper.c | 13 +++++++++----
+>   1 file changed, 9 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index c6758bfbeb5..1d8eafceda8 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -1023,6 +1023,11 @@ static const ARMCPRegInfo v6_cp_reginfo[] =3D {
+>   #define PMCRC   0x4
+>   #define PMCRP   0x2
+>   #define PMCRE   0x1
+> +/*
+> + * Mask of PMCR bits writeable by guest (not including WO bits like C, P=
+,
+> + * which can be written as 1 to trigger behaviour but which stay RAZ).
+> + */
+> +#define PMCR_WRITEABLE_MASK (PMCRLC | PMCRDP | PMCRX | PMCRD | PMCRE)
+>  =20
+>   #define PMXEVTYPER_P          0x80000000
+>   #define PMXEVTYPER_U          0x40000000
+> @@ -1577,9 +1582,8 @@ static void pmcr_write(CPUARMState *env, const ARMC=
+PRegInfo *ri,
+>           }
+>       }
+>  =20
+> -    /* only the DP, X, D and E bits are writable */
+> -    env->cp15.c9_pmcr &=3D ~0x39;
+> -    env->cp15.c9_pmcr |=3D (value & 0x39);
 
-Hello,
+Ah this was missing PMCRLC indeed.
 
-This is on Arch-linux(latest) and the qemu 4.2.0 version made from git clon=
-e https://github.com/spheenik/qemu.git
-with:
- ./configure --prefix=3D/opt/qemu-test --python=3D/usr/bin/python2 --target=
--list=3Dx86_64-softmmu =
+I was tempted to use 'Fixes: 74594c9d813' but the PMCRLC is "Reserved,=20
+UNK/SBZP" in the ARMv7 reference manual.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
---audio-drv-list=3Dpa --disable-werror
-added to the build.
+> +    env->cp15.c9_pmcr &=3D ~PMCR_WRITEABLE_MASK;
+> +    env->cp15.c9_pmcr |=3D (value & PMCR_WRITEABLE_MASK);
+>  =20
+>       pmu_op_finish(env);
+>   }
+> @@ -5886,7 +5890,8 @@ static void define_pmu_regs(ARMCPU *cpu)
+>           .access =3D PL0_RW, .accessfn =3D pmreg_access,
+>           .type =3D ARM_CP_IO,
+>           .fieldoffset =3D offsetof(CPUARMState, cp15.c9_pmcr),
+> -        .resetvalue =3D (cpu->midr & 0xff000000) | (pmcrn << PMCRN_SHIFT=
+),
+> +        .resetvalue =3D (cpu->midr & 0xff000000) | (pmcrn << PMCRN_SHIFT=
+) |
+> +                      PMCRLC,
+>           .writefn =3D pmcr_write, .raw_writefn =3D raw_write,
+>       };
+>       define_one_arm_cp_reg(cpu, &pmcr);
+>=20
 
-I've been workin on a passthrough Windows 10 vm this month and have been st=
-eadily seeing some promising progress. My block/issue at the moment is inte=
-grating the audio now that the GPU has been succesfully passed through. =
-
-I've been going back and forth between the audio options for Pulseaudio and=
- cannot change the following issue:
-pulseaudio: pa_context_connect() failed
-pulseaudio: Reason: Connection refused
-pulseaudio: Failed to initialize PA contextlibusb: error [udev_hotplug_even=
-t] ignoring udev action bind
-I leave my current operable build followed by some of the options that I ha=
-ve tried using to correct this despite the following errors not changing
-
-This is my current operable build:
-
-#!/bin/bash
-
-vmname=3D"windows10vm"
-
-if ps -ef | grep /opt/qemu-test/bin/qemu-system-x86_64 | grep -q multifunct=
-ion=3Don; then
-echo "A passthrough VM is already running." &
-exit 1
-
-else
-
-/opt/qemu-test/bin/qemu-system-x86_64 \
--m 12G \
--drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../win2.img=
- \
--drive file=3D.../Win10_1909_English_x64.iso,index=3D1,media=3Dcdrom \
--drive file=3D.../virtio-win-0.1.171.iso,index=3D2,media=3Dcdrom \
--boot order=3Ddc \
--bios /usr/share/ovmf/x64/OVMF_CODE.fd \
--name $vmname,process=3D$vmname \
--machine type=3Dq35,accel=3Dkvm,vmport=3Doff \
--cpu host,kvm=3Doff \
--smp 3,sockets=3D1,cores=3D3,threads=3D1 \
--device virtio-balloon \
--rtc clock=3Dhost,base=3Dlocaltime \
--vga none \
--nographic \
--serial none \
--parallel none \
--soundhw hda \
--usb \
--device usb-host,vendorid=3D...,productid=3D... \
--device usb-host,vendorid=3D...,productid=3D... \
--device usb-host,vendorid=3D...,productid=3D... \
--device vfio-pci,host=3D...,multifunction=3Don \
--device vfio-pci,host=3D... \
--device e1000,netdev=3Dnet0 \
--netdev user,id=3Dnet0,hostfwd=3Dtcp::...-:22 \
-
-Here's a list of setting combinations I had tried to resolve this:
-
-#export QEMU_AUDIO_DRV=3Dpa
-#QEMU_ALSA_DAC_BUFFER_SIZE=3D512 QEMU_ALSA_DAC_PERIOD_SIZE=3D170
-#export QEMU_PA_SAMPLES=3D8192 =
-
-#export QEMU_AUDIO_TIMER_PERIOD=3D99
-#export QEMU_PA_SERVER=3D/run/user/1000/pulse/native
-#export QEMU_PA_SINK=3Dalsa_output.usb-C-Media_Electronics_Inc._USB_Audio_D=
-evice-00.analog-stereo
-#export QEMU_PA_SOURCE=3Dinput
-
--audiodev pa,id=3Dpa1,server=3Dserver=3D/run/user/1000/pulse/native
-
-At best I have removed an XDG_RUNTIME_DIR error but other than that this
-build has no audio compatability.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: builds
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1862887
-
-Title:
-  qemu does not load pulseaudio modules properly
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-
-  This is on Arch-linux(latest) and the qemu 4.2.0 version made from git cl=
-one https://github.com/spheenik/qemu.git
-  with:
-   ./configure --prefix=3D/opt/qemu-test --python=3D/usr/bin/python2 --targ=
-et-list=3Dx86_64-softmmu =
-
-  --audio-drv-list=3Dpa --disable-werror
-  added to the build.
-
-  I've been workin on a passthrough Windows 10 vm this month and have been =
-steadily seeing some promising progress. My block/issue at the moment is in=
-tegrating the audio now that the GPU has been succesfully passed through. =
-
-  I've been going back and forth between the audio options for Pulseaudio a=
-nd cannot change the following issue:
-  pulseaudio: pa_context_connect() failed
-  pulseaudio: Reason: Connection refused
-  pulseaudio: Failed to initialize PA contextlibusb: error [udev_hotplug_ev=
-ent] ignoring udev action bind
-  I leave my current operable build followed by some of the options that I =
-have tried using to correct this despite the following errors not changing
-
-  This is my current operable build:
-
-  #!/bin/bash
-
-  vmname=3D"windows10vm"
-
-  if ps -ef | grep /opt/qemu-test/bin/qemu-system-x86_64 | grep -q multifun=
-ction=3Don; then
-  echo "A passthrough VM is already running." &
-  exit 1
-
-  else
-
-  /opt/qemu-test/bin/qemu-system-x86_64 \
-  -m 12G \
-  -drive id=3Ddisk0,if=3Dvirtio,cache=3Dnone,format=3Draw,file=3D.../win2.i=
-mg \
-  -drive file=3D.../Win10_1909_English_x64.iso,index=3D1,media=3Dcdrom \
-  -drive file=3D.../virtio-win-0.1.171.iso,index=3D2,media=3Dcdrom \
-  -boot order=3Ddc \
-  -bios /usr/share/ovmf/x64/OVMF_CODE.fd \
-  -name $vmname,process=3D$vmname \
-  -machine type=3Dq35,accel=3Dkvm,vmport=3Doff \
-  -cpu host,kvm=3Doff \
-  -smp 3,sockets=3D1,cores=3D3,threads=3D1 \
-  -device virtio-balloon \
-  -rtc clock=3Dhost,base=3Dlocaltime \
-  -vga none \
-  -nographic \
-  -serial none \
-  -parallel none \
-  -soundhw hda \
-  -usb \
-  -device usb-host,vendorid=3D...,productid=3D... \
-  -device usb-host,vendorid=3D...,productid=3D... \
-  -device usb-host,vendorid=3D...,productid=3D... \
-  -device vfio-pci,host=3D...,multifunction=3Don \
-  -device vfio-pci,host=3D... \
-  -device e1000,netdev=3Dnet0 \
-  -netdev user,id=3Dnet0,hostfwd=3Dtcp::...-:22 \
-
-  Here's a list of setting combinations I had tried to resolve this:
-
-  #export QEMU_AUDIO_DRV=3Dpa
-  #QEMU_ALSA_DAC_BUFFER_SIZE=3D512 QEMU_ALSA_DAC_PERIOD_SIZE=3D170
-  #export QEMU_PA_SAMPLES=3D8192 =
-
-  #export QEMU_AUDIO_TIMER_PERIOD=3D99
-  #export QEMU_PA_SERVER=3D/run/user/1000/pulse/native
-  #export QEMU_PA_SINK=3Dalsa_output.usb-C-Media_Electronics_Inc._USB_Audio=
-_Device-00.analog-stereo
-  #export QEMU_PA_SOURCE=3Dinput
-
-  -audiodev pa,id=3Dpa1,server=3Dserver=3D/run/user/1000/pulse/native
-
-  At best I have removed an XDG_RUNTIME_DIR error but other than that
-  this build has no audio compatability.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1862887/+subscriptions
 
