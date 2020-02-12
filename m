@@ -2,95 +2,80 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3674FC352A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 18:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71970C352A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 19:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E04E2073C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 18:57:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E04E2073C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3A12321569
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 19:21:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dT8aLuaa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A12321569
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1xCX-0003N8-6w
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 13:57:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56858)
+	id 1j1xZt-0003SN-Ca
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 14:21:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60366)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j1x9S-0007gW-94
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 13:54:24 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1j1xZ7-0002yr-Oj
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 14:20:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j1x9R-0001OG-9g
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 13:54:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63848)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j1x9R-0001Ny-0F
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 13:54:21 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01CInteS164718
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 13:54:20 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y1tn5by1d-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 13:54:19 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Wed, 12 Feb 2020 18:54:16 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 12 Feb 2020 18:54:14 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01CIsDi654853644
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 12 Feb 2020 18:54:13 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E5C3811C04A;
- Wed, 12 Feb 2020 18:54:12 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BF61611C04C;
- Wed, 12 Feb 2020 18:54:12 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.71.236])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 12 Feb 2020 18:54:12 +0000 (GMT)
-Subject: [PATCH 3/3] pnv/phb3: Add missing break statement
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 12 Feb 2020 19:54:12 +0100
-In-Reply-To: <158153363409.3229002.13469293798150754920.stgit@bahia.lan>
-References: <158153363409.3229002.13469293798150754920.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+ (envelope-from <ehabkost@redhat.com>) id 1j1xZ5-0005Ih-Io
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 14:20:52 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49356
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1j1xZ5-0005I4-AH
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 14:20:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581535250;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=s0lXdHMdVKA2lMjrl9KywbEwQU1cAXTI72xDOQukghM=;
+ b=dT8aLuaaEvyPK2I5aZV5Ccao0JlAFlDbGvuCPoklJf+aI8gxH0kMTMGFpSxRDcINe1Vb/2
+ T3vZkLQuhPEcfsn1gEEIa8VJBevunpB57OKNK2/4MDrICJfYYKtFtHc0Cc80X4UxVICwap
+ z1nWCoiajm5uujGlLgmJ2BozzQqAaF4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-14-iXHHlpguOIiyJaHHuuYTyA-1; Wed, 12 Feb 2020 14:20:47 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C23948017CC
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 19:20:46 +0000 (UTC)
+Received: from localhost (ovpn-126-54.rdu2.redhat.com [10.10.126.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 881D15C10D;
+ Wed, 12 Feb 2020 19:20:46 +0000 (UTC)
+Date: Wed, 12 Feb 2020 14:20:45 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] target/i386: enable monitor and ucode revision with -cpu
+ max
+Message-ID: <20200212192045.GD30675@habkost.net>
+References: <1581521009-44121-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021218-0028-0000-0000-000003D9F3A5
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021218-0029-0000-0000-0000249E6807
-Message-Id: <158153365202.3229002.11521084761048102466.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-12_08:2020-02-12,
- 2020-02-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 adultscore=0
- malwarescore=0 mlxscore=0 impostorscore=0 phishscore=0 priorityscore=1501
- suspectscore=0 lowpriorityscore=0 mlxlogscore=905 spamscore=0
- clxscore=1034 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002120134
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <1581521009-44121-1-git-send-email-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: iXHHlpguOIiyJaHHuuYTyA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,33 +87,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We obviously don't want to print out an error message if addr points to
-a valid register.
+On Wed, Feb 12, 2020 at 04:23:29PM +0100, Paolo Bonzini wrote:
+> These two features were incorrectly tied to host_cpuid_required rather th=
+an
+> cpu->max_features.  As a result, -cpu max was not enabling either MONITOR
+> features or ucode revision.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Reported-by: Coverity CID 1419391 Missing break in switch
-Fixes: 9ae1329ee2fe "ppc/pnv: Add models for POWER8 PHB3 PCIe Host bridge"
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/pci-host/pnv_phb3_pbcq.c |    1 +
- 1 file changed, 1 insertion(+)
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-diff --git a/hw/pci-host/pnv_phb3_pbcq.c b/hw/pci-host/pnv_phb3_pbcq.c
-index f232228b0e28..7b9a121246a8 100644
---- a/hw/pci-host/pnv_phb3_pbcq.c
-+++ b/hw/pci-host/pnv_phb3_pbcq.c
-@@ -173,6 +173,7 @@ static void pnv_pbcq_pci_xscom_write(void *opaque, hwaddr addr,
-     case PBCQ_PCI_BAR2:
-         pbcq->pci_regs[reg] = val & 0xfffffffffc000000ull;
-         pnv_pbcq_update_map(pbcq);
-+        break;
-     default:
-         phb3_pbcq_error(pbcq, "%s @0x%"HWADDR_PRIx"=%"PRIx64, __func__,
-                         addr, val);
+--=20
+Eduardo
 
 
