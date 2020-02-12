@@ -2,115 +2,98 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CECAAC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:05:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 883E4C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:06:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A36A22082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:05:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36A22082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 54FEF2073C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:06:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUYdkrqS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54FEF2073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1uVt-00058L-Sb
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:05:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59012)
+	id 1j1uX4-00067v-FP
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:06:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j1uUP-0003ln-44
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:50 -0500
+ (envelope-from <peterx@redhat.com>) id 1j1uWT-0005iT-CK
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:05:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j1uUN-0007v3-9e
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:48 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:55221)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j1uUM-0007tO-WC
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:03:47 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MHoAg-1jEY4i0bhu-00EvQX; Wed, 12 Feb 2020 17:03:38 +0100
-Subject: Re: [PATCH v2] linux-user: implement TARGET_SO_PEERSEC
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200204211901.1731821-1-laurent@vivier.eu>
- <713318de-21ee-4137-0580-c6d852bea008@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <93a00c06-f42d-0c7d-79a4-0dcd1bc488c5@vivier.eu>
-Date: Wed, 12 Feb 2020 17:03:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <peterx@redhat.com>) id 1j1uWS-0001hl-34
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:05:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40527
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j1uWR-0001gt-VU
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:05:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581523554;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kDTzAWetViihjeQZuhjhJ8Q4Obs/fyUHT4EwEz960Fo=;
+ b=JUYdkrqSAHVokP7aR1BvS+cM8zv8fC/+TIGa+VCjnkSS3j0+aBkKM+OTNSUHKghr/m17b/
+ EP9izUyzsHatcN+tqyQuZg4/TCIY5QVAlGPcfyD4GGf4QeYqeruRoN8aFXBYXsrExZJOeJ
+ NPxlAJMgJ8hqMRRCyfy2qbC0/mtWXU4=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-DtmQzs3wO7SKTaa0CknGiQ-1; Wed, 12 Feb 2020 11:05:48 -0500
+Received: by mail-qk1-f198.google.com with SMTP id n126so1645983qkc.18
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 08:05:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=BuiFEByjTOdPJEqSzlof5kdw7dqIMMEevCIbGA7HPC0=;
+ b=lGNoO6NKKt6tBX6BU0al+fSfsPX/U7USwiyoQ8mfQ0xetGWOlR8CxnuJt+FoNJZrDh
+ BvShI7glzwjA7AVk7N55uVeAWpKxoX0aaQBXnR2T5B5zR+QGZH8pZ2z11uD6hZaWkvZ9
+ aSYhNjHdh39Knd7gWM3hfOmRZHe2VQ83LWNcgZhiJWhUMWm6oNYG1f37c5iOV91+P6qp
+ GSU2DWC2X94qeADDnC4CCIEOdw6wpXlNBQoZiiuAmChWmuGF+PvRlu2Bzc8aYBvMWY/U
+ IQGO0Zl+F4OYTOjgvxpxfYIhGmqi2riN3JQkjeQi25YTwPMkwANS+Ly6XRuawuU8rQ5t
+ NerQ==
+X-Gm-Message-State: APjAAAVaZe1OVvmacI+G4JQxQ757ESPsTnONOmyEpZbja9N5jwn/qD7R
+ CmzNGGC1EEM9It7DhM2hp0N063WQwdQi0XbwwjoB3t+NXvXrXNW7jdVtLQuphT+LfZHmyPQ6Z7d
+ VVWsH5TEXRCxt35o=
+X-Received: by 2002:aed:27de:: with SMTP id m30mr19941623qtg.151.1581523548234; 
+ Wed, 12 Feb 2020 08:05:48 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwNDm2UfrjOrDJPfYOACk8aWkMeivWc5hd+gjQaGVxgdqdXt5A3hx1c1nj6DLkByyf8owdTKg==
+X-Received: by 2002:aed:27de:: with SMTP id m30mr19941603qtg.151.1581523548025; 
+ Wed, 12 Feb 2020 08:05:48 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c8:32::2])
+ by smtp.gmail.com with ESMTPSA id v2sm376207qto.73.2020.02.12.08.05.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 12 Feb 2020 08:05:46 -0800 (PST)
+Date: Wed, 12 Feb 2020 11:05:44 -0500
+From: Peter Xu <peterx@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be string
+ option
+Message-ID: <20200212160544.GC1083891@xz-x1>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
+ <20200211194331.GK984290@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A1BA573@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <713318de-21ee-4137-0580-c6d852bea008@redhat.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A1BA573@SHSMSX104.ccr.corp.intel.com>
+X-MC-Unique: DtmQzs3wO7SKTaa0CknGiQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:fV82ZGFijwlKCvu+43dM/KlN54NYBuBvj0mF6qVqwsx9O1qBBsV
- fENNip3QDKSlh+OkXOb0elPMuKMG44q07daMAn5Lf2iThTN9NS/x3+PtR/4k4COlF61TG2U
- iZb4YPkDfLXhA8AvD4i+KziBw5WJTGTu1ECF6jE1ec0UeRXMC30cw9QPagc01VD4UH/HAix
- LbLeod2QezNPY/IjsF8qw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7ESfgyPq8Hs=:VTAC01pQl1bFhx7RKsW6CC
- wGKO1ZMJC9YcdkYKuRI1ubcmL4VYox+7ANYHnX0Qx2utW7RJ9NVD0Bo5PjcsfT2gsYAS2pUZy
- ZWPXughK4cOgKm1ShcVi0Lt7QazQiipFJ1MBLrmhrEr+6HGc570yAw5pGsxEv240uRaORGCrM
- mUnh4Ixs53Bkr5fwaOBex12ih+2JtRjaQkqisWCdVWhVuk8LaeRKh/X96EsEHVIW8Y9kJBu76
- bRZxRdooui8x5XMq3GPBbdVMp5XVheafRobgR16V79Pu9jc1uWeWu9s9kQQP/dFBjA5nczUMq
- 0PoLDIzFM+/J4VT/YbeOb4GEJ3TpjGmoWZyZq4iVynSXjxsC8UVotF/I4LhQxDMS7hns7dlGW
- gicBhw+/rkf6du41I1qp6291Lys8w44NMIVDLjnRoA6OnH387FIjSt//uG0KW8ZW+dFo/Ovx1
- h2mdENbrEPmf7kOuZoAiftcOE0QwOKYbw2RfAAGt49FXBFGkbbMaaLKFNdN60YEOf37vqQIzx
- IfCpnK2/kgmW5N+HTc/au/ip8ImXPXU3o1dq3cChu3ozPsOQbQrDrKnozAagzJYz26LVIFtt5
- MlWjO/lccagiA4MvBgxT/QB89tNoEXQXM86vaIKtdoqcVNciBbY9VMcAPSIFymZuMIDpPZLMj
- +4XowCEVfVjhgbfC8zRyREdfZjOhePKVqTizuv/Ndpy1t+ukfh4VbLyM01rplmhjgmEYNaq20
- 5zQsgL0zOKrfXXreNfr+2bvh7ou9CvwHA8pi9+A0e3EjgKA4vYqt4KZ+XueMDzxQc4UmWdsJa
- nQbHCKjMibtZL90VJfebkKZkuo0D033DzEmgfKXxL6GbHd64JhPPhq2ZtiAWaqhSvZ5K5yd
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,154 +105,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?Q?Matthias_L=c3=bcscher?= <lueschem@gmail.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/02/2020 à 16:56, Philippe Mathieu-Daudé a écrit :
-> On 2/4/20 10:19 PM, Laurent Vivier wrote:
->> "The purpose of this option is to allow an application to obtain the
->> security credentials of a Unix stream socket peer.  It is analogous to
->> SO_PEERCRED (which provides authentication using standard Unix
->> credentials
->> of pid, uid and gid), and extends this concept to other security
->> models." -- https://lwn.net/Articles/62370/
->>
->> Until now it was passed to the kernel with an "int" argument and
->> fails when it was supported by the host because the parameter is
->> like a filename: it is always a \0-terminated string with no embedded
->> \0 characters, but is not guaranteed to be ASCII or UTF-8.
->>
->> I've tested the option with the following program:
->>
->>      /*
->>       * cc -o getpeercon getpeercon.c
->>       */
->>
->>      #include <stdio.h>
->>      #include <sys/types.h>
->>      #include <sys/socket.h>
->>      #include <netinet/in.h>
->>      #include <arpa/inet.h>
->>
->>      int main(void)
->>      {
->>          int fd;
->>          struct sockaddr_in server, addr;
->>          int ret;
->>          socklen_t len;
->>          char buf[256];
->>
->>          fd = socket(PF_INET, SOCK_STREAM, 0);
->>          if (fd == -1) {
->>              perror("socket");
->>              return 1;
->>          }
->>
->>          server.sin_family = AF_INET;
->>          inet_aton("127.0.0.1", &server.sin_addr);
->>          server.sin_port = htons(40390);
->>
->>          connect(fd, (struct sockaddr*)&server, sizeof(server));
->>
->>          len = sizeof(buf);
->>          ret = getsockopt(fd, SOL_SOCKET, SO_PEERSEC, buf, &len);
->>          if (ret == -1) {
->>              perror("getsockopt");
->>              return 1;
->>          }
->>          printf("%d %s\n", len, buf);
->>          return 0;
->>      }
->>
->> On host:
->>
->>    $ ./getpeercon
->>    33 system_u:object_r:unlabeled_t:s0
->>
->> With qemu-aarch64/bionic without the patch:
->>
->>    $ ./getpeercon
->>    getsockopt: Numerical result out of range
->>
->> With the patch:
->>
->>    $ ./getpeercon
->>    33 system_u:object_r:unlabeled_t:s0
->>
->> Bug: https://bugs.launchpad.net/qemu/+bug/1823790
->> Reported-by: Matthias Lüscher <lueschem@gmail.com>
->> Tested-by: Matthias Lüscher <lueschem@gmail.com>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>
->> Notes:
->>      v2: use correct length in unlock_user()
->>
->>   linux-user/syscall.c | 22 ++++++++++++++++++++++
->>   1 file changed, 22 insertions(+)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index d60142f0691c..c930577686da 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -2344,6 +2344,28 @@ static abi_long do_getsockopt(int sockfd, int
->> level, int optname,
->>               }
->>               break;
->>           }
->> +        case TARGET_SO_PEERSEC: {
->> +            char *name;
->> +
->> +            if (get_user_u32(len, optlen)) {
->> +                return -TARGET_EFAULT;
->> +            }
->> +            if (len < 0) {
->> +                return -TARGET_EINVAL;
->> +            }
->> +            name = lock_user(VERIFY_WRITE, optval_addr, len, 0);
->> +            if (!name) {
->> +                return -TARGET_EFAULT;
->> +            }
->> +            lv = len;
->> +            ret = get_errno(getsockopt(sockfd, level, SO_PEERSEC,
->> +                                       name, &lv));
-> 
-> Can we get lv > len?
+On Wed, Feb 12, 2020 at 07:28:24AM +0000, Liu, Yi L wrote:
+> > From: Peter Xu <peterx@redhat.com>
+> > Sent: Wednesday, February 12, 2020 3:44 AM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be s=
+tring
+> > option
+> >=20
+> > On Wed, Jan 29, 2020 at 04:16:44AM -0800, Liu, Yi L wrote:
+> > > From: Liu Yi L <yi.l.liu@intel.com>
+> > >
+> > > Intel VT-d 3.0 introduces scalable mode, and it has a bunch of
+> > > capabilities related to scalable mode translation, thus there are mul=
+tiple
+> > combinations.
+> > > While this vIOMMU implementation wants simplify it for user by
+> > > providing typical combinations. User could config it by
+> > > "x-scalable-mode" option. The usage is as below:
+> > >
+> > > "-device intel-iommu,x-scalable-mode=3D["legacy"|"modern"]"
+> >=20
+> > Maybe also "off" when someone wants to explicitly disable it?
+>=20
+> emmm, I  think x-scalable-mode should be disabled by default. It is enabl=
+ed
+> only when "legacy" or "modern" is configured. I'm fine to add "off" as an
+> explicit way to turn it off if you think it is necessary. :-)
 
-No:
+It's not necessary.  It'll be necessary when we remove "x-" and change
+the default value.  However it'll always be good to provide all
+options explicitly in the parameter starting from when we design it,
+imho.  It's still experimental, so... Your call. :)
 
-getsockopt(2)
-
-"For  getsockopt(), optlen is a value-result argument, initially
-containing the size of the buffer pointed to by optval, and modified on
-return to  indicate the  actual  size  of  the value returned."
-
-> 
->> +            if (put_user_u32(lv, optlen)) {
->> +                ret = -TARGET_EFAULT;
->> +            }
->> +            unlock_user(name, optval_addr, lv);
-> 
-> Maybe safer to use len instead of lv here?
-
-No:
-
-this is the length of the buffer we must copy back to the user. Kernel
-has only modified lv length, not len.
-
-linux-user/qemu.h
-
-/* Unlock an area of guest memory.  The first LEN bytes must be
-   flushed back to guest memory. host_ptr = NULL is explicitly
-   allowed and does nothing. */
-static inline void unlock_user(void *host_ptr, abi_ulong guest_addr,
-                               long len)
-
-
-Thanks,
-Laurent
+--=20
+Peter Xu
 
 
