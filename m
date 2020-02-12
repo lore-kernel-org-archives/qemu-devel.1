@@ -2,129 +2,104 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8454DC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AADC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:52:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 508EB20714
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:48:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74AA021569
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:52:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="dcKhC1wC";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="IgYtkVNU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 508EB20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2A8BTuk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74AA021569
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1vBU-0006Qm-H9
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:48:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36688)
+	id 1j1vFh-0001SV-Mv
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:52:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37858)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@quicinc.com>) id 1j1v5d-0004yz-Vx
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:42:19 -0500
+ (envelope-from <philmd@redhat.com>) id 1j1vF7-00010C-9m
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:52:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@quicinc.com>) id 1j1v5c-0002s2-G1
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:42:17 -0500
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:54655)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
- id 1j1v5c-0002o0-0N
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:42:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1581525736; x=1613061736;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=MngNjPpuZ8LMm4C/KfjVsfAiMb/T2IhJwmc5aqrnsV8=;
- b=dcKhC1wCnq7+Y/Usz6wr1UgzyUtKbaoTTisEAW9dYGSryjyyMnCsW/je
- 7Ez6ZtKkxCU73HLRlDHmbHptsKLRZEFpOt2Z/AFnKQQemLTvbiWc4B6KP
- X/Kb3bAJx8M21JJ2PJzu4uSoGAKsoixQflFd1QokFLbUAG8u8GiMts6AW Q=;
-Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
- by alexa-out-sd-01.qualcomm.com with ESMTP; 12 Feb 2020 08:42:14 -0800
-Received: from nasanexm03b.na.qualcomm.com ([10.85.0.98])
- by ironmsg-SD-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 12 Feb 2020 08:42:14 -0800
-Received: from nasanexm03d.na.qualcomm.com (10.85.0.91) by
- nasanexm03b.na.qualcomm.com (10.85.0.98) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Wed, 12 Feb 2020 08:42:14 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (199.106.107.6)
- by nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS)
- id 15.0.1473.3 via Frontend Transport; Wed, 12 Feb 2020 08:42:14 -0800
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
- BYAPR02MB4277.namprd02.prod.outlook.com (52.135.237.12) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.25; Wed, 12 Feb 2020 16:42:13 +0000
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62]) by BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::bde4:83e4:96ad:fe62%6]) with mapi id 15.20.2707.030; Wed, 12 Feb 2020
- 16:42:13 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: Laurent Vivier <laurent@vivier.eu>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [PATCH v3 0/4] linux-user: fix use of SIGRTMIN
-Thread-Topic: [PATCH v3 0/4] linux-user: fix use of SIGRTMIN
-Thread-Index: AQHV4aQAI8ElQXE8CEKfgmR6Uf7pZKgXw1iA
-Date: Wed, 12 Feb 2020 16:42:12 +0000
-Message-ID: <BYAPR02MB48860D7D29C1C09D45A4187CDE1B0@BYAPR02MB4886.namprd02.prod.outlook.com>
-References: <20200212125658.644558-1-laurent@vivier.eu>
-In-Reply-To: <20200212125658.644558-1-laurent@vivier.eu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=tsimpson@quicinc.com; 
-x-originating-ip: [199.106.103.59]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e3f868e3-c177-483f-d0a3-08d7afda82ea
-x-ms-traffictypediagnostic: BYAPR02MB4277:
-x-microsoft-antispam-prvs: <BYAPR02MB4277DC997167A326BAC51FC8DE1B0@BYAPR02MB4277.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5516;
-x-forefront-prvs: 0311124FA9
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(136003)(346002)(366004)(39860400002)(376002)(199004)(189003)(9686003)(52536014)(55016002)(8676002)(8936002)(66476007)(64756008)(26005)(7696005)(66556008)(478600001)(5660300002)(66946007)(66446008)(86362001)(81166006)(186003)(81156014)(53546011)(33656002)(71200400001)(110136005)(54906003)(6506007)(4326008)(76116006)(316002)(2906002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4277;
- H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ra3RGUVZAdXBxhlNIlfkn0boKn26CSKm1i2oiuajJa/PjiyyzqfnFZZaKEUWiBEpm2gdLkkS0r8ANw85fYNRKrurUcJiPqyhJX0/owgawPZyEH8QU4ppNAAYxVNtDiWQAcGMkmqD6maUJKgKqa2w1eyFKJFqbWx08RZrd9q87WRnqTZ7DiKxWxxHGYr46GT7jl7HV64twmXXuVq800lEiK82umCNwfILnf7kxOWk6lBO0E/VtmrNbFFVdXBTJ3FyOCGylNRDj+Q9ObpuA+H61ZpI5oIpM054oO2PGbJQtsjvi5+aYUqkYO3LNj7CdOk9IGPHlqUbXMA1YqM+B1yVSidyB2ZtC672dFy1bPihAi4L6H+M6KCLCy04Nry8bpl9k20iuNHD4RC+z51wMOHUSfsNVIgqjDIwZnKdlOzpKflJ6kM9r3FVO32mibiolyqf
-x-ms-exchange-antispam-messagedata: ZIQb6/zs19cPc9GFbGbtCMd4Wj0AxiykaWiLmtVw+NUvISf/5OSGFcfjsCvidAFq9r4ei9hr/fc+R3C8T8eaYL62S8FQoQhc/geWW3WV9ibfACq8iHOKK7eiV60T5GP+sy46W2D7HO8S41RAMi/qHQ==
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j4Lo++FdstCgX9Veyz9San2potAk3tU2kkTCzGdUBTsii+DiynRsojcB0lzKSkZmIhIJlB2McC75eY3KcdAqL8NBlIvSCFLYRtgnunN4kLWDZR5lYjXUrkinVPwIwTwDV7flqhqT7v5ikB4/L8/Fc+trwwb6HxDRhklBBA5cb28NLiwAaSLdYgiOL/xoddhQBYX4LiAK3Pm7JoFeQzQtsuWbkBbbg4eDsWEysGvMC48LVsJPrCxNeTi3STDOQRZr+kLNL2xNCPApcRsG/k7h3/x0uII8ZRa809DLIAakX4ar+WdOQgQdYJSy3dzyHU6seuvJQKxlqUA8PbBUALHrPA==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mp9A7L6Bssa/RnBXl4w7knNJ+RXSJxfNbZ3t4LhX42E=;
- b=lv8pN+z9ZSxE30glaPVyhMhcHqnYYd5Exfwamt7hZbwKClN2kAMsWBJ39JuvlTcdJV6Gc+LzEwZV8DKi+/rPzxS80iBnO8kHKaQ7VQrU6lw4ElPhg4Yek5YUn5eONCXdLKeU/bzOkJXlV5WEgkvnR2MRoWt+1z4QC/U+YbLm115VPF2QuJboIkH0Z6mUFYS+bQDBXdG82aZjXb200kpKP3In3G9txchVv9WhwL5AU9TlGhL+XKtpxRUhA3E7A7vGccvPGFK7j1OZHDdud79XE+wJktDXlaWa0eZcLrAe3FtqkC9od3pc86khZ93DDVGKqvTGcEQ7bB9n9BuhCmCTag==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mp9A7L6Bssa/RnBXl4w7knNJ+RXSJxfNbZ3t4LhX42E=;
- b=IgYtkVNUNZ/dLao5V9iZCtScC/OjWqHvN2ruwkXAVXRlOi+qkCOrxVLjyUQRzycKEBOTD4Br9FzDCHbNSJ3zYV9/dEeeXJVtQ7Pm6dlSmDMorksA8cdrOklv0nsQZhtwAaPoJW/fm4IXXkoj7ajdbWwr73Xev3EFPyKWAP48EZU=
-x-ms-exchange-crosstenant-network-message-id: e3f868e3-c177-483f-d0a3-08d7afda82ea
-x-ms-exchange-crosstenant-originalarrivaltime: 12 Feb 2020 16:42:12.8543 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: /ZkfKbyLbviTDeMV4U71qHpgnYJkNIkSbWuLi7QASWawyMWAdFIK7nxDW7wXjX4crj6k4HyxqB0RnnGGZQo4yg==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4277
-x-originatororg: quicinc.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <philmd@redhat.com>) id 1j1vF5-0004xF-5v
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:52:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49759
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j1vF4-0004vM-Si
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:52:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581526321;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=toe4BjHH54jWEJIIy/UXqtIJdBa4oxQY7Nao6USFnDc=;
+ b=U2A8BTukSZhaUaIEGWZFOJLFwiZEAC0Fn1sV1CR+cL8Wdl2S+WsRzbPpXRXfkDh6C5nR1i
+ eddswiTHcmV8jVcukVI91NFDZ9+NHaicYN/06QM97DgzCckqtb20Nn6wX4AOCq/6PJc+XA
+ Ayqym2kYh2WvzT7mrtokerReuegK6ZM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-375-J3PEHnlMOE-urghzVc5GtA-1; Wed, 12 Feb 2020 11:51:51 -0500
+Received: by mail-wm1-f69.google.com with SMTP id g26so949644wmk.6
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 08:51:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Bmj1HjtlA0nso458bDh9QxOkDXHjGZe6SMViR4xHzRU=;
+ b=TkiRq9U2UQerbk44+TwcC/Np7eRfkGVT2XI3DSfZXK+sCJrYNVoaIvcN3faoOrMlkA
+ Ye1q6f4DYnxYFG23iJaahsMz9rZ/FIkAkU1zcAcwh9K8Us3BHHJRjWidfHmYnfzjfrgA
+ EEfpkiQ9vB76fe0+S9PzpfD9qiDT/KaUpLFvDuXqRr8rrxK9KzbPpaEVAgj6v7YRBUi6
+ b9tjgAHT9EfAAA6EGNHBJwS/+S0GNNDuYY7Jb3ydkXPfcjl8m7jbanu8vdO1+pGiLDyf
+ FZRUErv1Eq20849sEeJs0C0UnbwXM8aL7lCPNjR5DgpF6F79Sss7gPf/R9qYy1lS6I5w
+ h4IQ==
+X-Gm-Message-State: APjAAAXV4Zc6bQOh0mgNjVqIQlEOneEXMOzoSHo/EhjNpLZzj/+uhuUj
+ NxdO/rVunBd7kxrY7I4ePcgj3OWIYNqymOtIse6lmp9bAhAF3H76J1iGhBiIWaYJdHkPRjc+L0u
+ zp6fUNqrqsWtFA3c=
+X-Received: by 2002:adf:e68d:: with SMTP id r13mr15947127wrm.349.1581526309919; 
+ Wed, 12 Feb 2020 08:51:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqym45x/Km+Q6kp/cs5HG2Q9R1RxXwH9oPr00YIZFgEqcMl5YFze3Y2h6Z0sY5eGPaVyIaYmOA==
+X-Received: by 2002:adf:e68d:: with SMTP id r13mr15947104wrm.349.1581526309692; 
+ Wed, 12 Feb 2020 08:51:49 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id x6sm1269094wmi.44.2020.02.12.08.51.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 12 Feb 2020 08:51:48 -0800 (PST)
+Subject: Re: [PATCH] docs: Fix virtiofsd.1 location
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <1908428819.7192207.1581512184275.JavaMail.zimbra@redhat.com>
+ <1608747495.7195569.1581513386780.JavaMail.zimbra@redhat.com>
+ <CAFEAcA-F-F1C4si7OXNkMnzE+9DHXtNnvCYv1eTx-nEpb4_OZw@mail.gmail.com>
+ <20200212142832.GC434563@redhat.com>
+ <CAFEAcA_VsdWJELxDuMJW9iaRsB-At_Dyf3Z6paOHWEp+VEhSgw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <625cd959-6031-0a27-f25b-e2be6dc7ec3a@redhat.com>
+Date: Wed, 12 Feb 2020 17:51:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.38
+In-Reply-To: <CAFEAcA_VsdWJELxDuMJW9iaRsB-At_Dyf3Z6paOHWEp+VEhSgw@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: J3PEHnlMOE-urghzVc5GtA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,52 +111,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Marlies Ruck <marlies.ruck@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Josh Kunz <jkz@google.com>, Matus Kysel <mkysel@tachyum.com>,
- "milos.stojanovic@rt-rk.com" <milos.stojanovic@rt-rk.com>
+Cc: Miroslav Rezanina <mrezanin@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGVzdGVkLWJ5OiBUYXlsb3IgU2ltcHNvbiA8dHNpbXBzb25AcXVpY2luYy5jb20+DQoNCj4gLS0t
-LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogTGF1cmVudCBWaXZpZXIgPGxhdXJlbnRA
-dml2aWVyLmV1Pg0KPiBTZW50OiBXZWRuZXNkYXksIEZlYnJ1YXJ5IDEyLCAyMDIwIDY6NTcgQU0N
-Cj4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogQWxla3NhbmRhciBNYXJrb3ZpYyA8
-YWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20+OyBMYXVyZW50IFZpdmllcg0KPiA8bGF1cmVu
-dEB2aXZpZXIuZXU+OyBNYXR1cyBLeXNlbCA8bWt5c2VsQHRhY2h5dW0uY29tPjsNCj4gbWlsb3Mu
-c3RvamFub3ZpY0BydC1yay5jb207IFJpa3UgVm9pcGlvIDxyaWt1LnZvaXBpb0Bpa2kuZmk+OyBK
-b3NoIEt1bnoNCj4gPGprekBnb29nbGUuY29tPjsgVGF5bG9yIFNpbXBzb24gPHRzaW1wc29uQHF1
-aWNpbmMuY29tPjsgUGV0ZXIgTWF5ZGVsbA0KPiA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPjsg
-TWFybGllcyBSdWNrIDxtYXJsaWVzLnJ1Y2tAZ21haWwuY29tPg0KPiBTdWJqZWN0OiBbUEFUQ0gg
-djMgMC80XSBsaW51eC11c2VyOiBmaXggdXNlIG9mIFNJR1JUTUlODQo+DQo+IFRoaXMgc2VyaWVz
-IGZpeGVzIHRoZSBwcm9ibGVtIG9mIHRoZSBmaXJzdCByZWFsLXRpbWUgc2lnbmFscyBhbHJlYWR5
-DQo+IGluIHVzZSBieSB0aGUgZ2xpYmMgdGhhdCBhcmUgbm90IGF2YWlsYWJsZSBmb3IgdGhlIHRh
-cmdldCBnbGliYy4NCj4NCj4gSW5zdGVhZCBvZiByZXZlcnRpbmcgdGhlIGZpcnN0IGFuZCBsYXN0
-IHJlYWwtdGltZSBzaWduYWxzIHdlIHJlbHkgb24NCj4gdGhlIHZhbHVlIHByb3ZpZGVkIGJ5IHRo
-ZSBnbGliYyAoU0lHUlRNSU4pIHRvIGtub3cgdGhlIGZpcnN0IGF2YWlsYWJsZQ0KPiBzaWduYWwg
-YW5kIHdlIG1hcCBhbGwgdGhlIHNpZ25hbHMgZnJvbSB0aGlzIHZhbHVlIHRvIFNJR1JUTUFYIG9u
-IHRvcA0KPiBvZiBUQVJHRVRfU0lHUlRNSU4uIFNvIHRoZSBjb25zZXF1ZW5jZSBpcyB3ZSBoYXZl
-IGxlc3MgYXZhaWxhYmxlIHNpZ25hbHMNCj4gaW4gdGhlIHRhcmdldCAoZ2VuZXJhbGx5IDIpIGJ1
-dCBhbGwgc2VlbXMgZmluZSBhcyBhdCBsZWFzdCAzMCBzaWduYWxzIGFyZQ0KPiBzdGlsbCBhdmFp
-bGFibGUuDQo+DQo+IFRoaXMgaGFzIGJlZW4gdGVzdGVkIHdpdGggR28gKGdvbGFuZyAxLjEwLjEg
-bGludXgvYXJtNjQsIGJpb25pYykgb24geDg2XzY0DQo+IGZlZG9yYSAzMS4gV2UgY2FuIGF2b2lk
-IHRoZSBmYWlsdXJlIGluIHRoaXMgY2FzZSBhbGxvd2luZyB0aGUgdW5zdXBwb3J0ZWQNCj4gc2ln
-bmFscyB3aGVuIHdlIGRvbid0IHByb3ZpZGUgdGhlICJhY3QiIHBhcmFtZXRlcnMgdG8gc2lnYWN0
-aW9uLCBvbmx5IHRoZQ0KPiAib2xkYWN0IiBvbmUuIEkgaGF2ZSBhbHNvIHJ1biB0aGUgTFRQIHN1
-aXRlIHdpdGggc2V2ZXJhbCB0YXJnZXQgYW5kIGRlYmlhbg0KPiBiYXNlZCBkaXN0cm9zLg0KPg0K
-PiB2MzogdXNlIHRyYWNlX2V2ZW50X2dldF9zdGF0ZV9iYWNrZW5kcygpDQo+ICAgICB1cGRhdGUg
-Y29tbWVudHMNCj4gICAgIEFkZCBSLWINCj4NCj4gdjI6IHRlc3RlZCB3aXRoIGdvbGFuZyAxLjEy
-LjEwIGxpbnV4L2FybTY0LCBlb2FuKQ0KPiAgICAgSWdub3JlIHVuc3VwcG9ydGVkIHNpZ25hbHMg
-cmF0aGVyIHRoYW4gcmV0dXJuaW5nIGFuIGVycm9yDQo+ICAgICByZXBsYWNlIGksIGogYnkgdGFy
-Z2V0X3NpZywgaG9zdF9zaWcNCj4NCj4gTGF1cmVudCBWaXZpZXIgKDQpOg0KPiAgIGxpbnV4LXVz
-ZXI6IGFkZCBtaXNzaW5nIFRBUkdFVF9TSUdSVE1JTiBmb3IgaHBwYQ0KPiAgIGxpbnV4LXVzZXI6
-IGNsZWFudXAgc2lnbmFsLmMNCj4gICBsaW51eC11c2VyOiBmaXggVEFSR0VUX05TSUcgYW5kIF9O
-U0lHIHVzZXMNCj4gICBsaW51eC11c2VyOiBmaXggdXNlIG9mIFNJR1JUTUlODQo+DQo+ICBsaW51
-eC11c2VyL2hwcGEvdGFyZ2V0X3NpZ25hbC5oIHwgICAxICsNCj4gIGxpbnV4LXVzZXIvc2lnbmFs
-LmMgICAgICAgICAgICAgfCAxMzQgKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0NCj4g
-IGxpbnV4LXVzZXIvdHJhY2UtZXZlbnRzICAgICAgICAgfCAgIDMgKw0KPiAgMyBmaWxlcyBjaGFu
-Z2VkLCAxMDYgaW5zZXJ0aW9ucygrKSwgMzIgZGVsZXRpb25zKC0pDQo+DQo+IC0tDQo+IDIuMjQu
-MQ0KDQo=
+On 2/12/20 5:02 PM, Peter Maydell wrote:
+> On Wed, 12 Feb 2020 at 14:28, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>>
+>> On Wed, Feb 12, 2020 at 02:18:19PM +0000, Peter Maydell wrote:
+>>> On Wed, 12 Feb 2020 at 13:16, Miroslav Rezanina <mrezanin@redhat.com> w=
+rote:
+>>>>
+>>>> Patch 6a7e2bbee5 docs: add virtiofsd(1) man page introduced new man
+>>>> page virtiofsd.1. Unfortunately, wrong file location is used as
+>>>> source for install command. This cause installation of docs fail.
+>>>>
+>>>> Fixing wrong location so installation is successful.
+>>>>
+>>>> Signed-off-by: Miroslav Rezanina <mrezanin@redhat.com>
+>>>
+>>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>>>
+>>> I noticed this in review of v1 of the patch
+>>> https://patchew.org/QEMU/20200127162514.56784-1-stefanha@redhat.com/
+>>> but missed that it hadn't been fixed in v2/v3.
+>>
+>> How come the mistake didn't break any of our CI ?  Looks like it
+>> should have failed due to non-existing source file
+
+We stopped testing in-tree builds 2 months ago:
+
+commit bc4486fb233573e77b6e9ad6d6379afb5e37ad8c
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Wed Dec 11 15:33:49 2019 +0100
+
+     ci: build out-of-tree
+
+     Most developers are using out-of-tree builds and it was discussed=20
+in the past
+     to only allow those.  To prepare for the transition, use=20
+out-of-tree builds
+     in all continuous integration jobs.
+
+>=20
+> I imagine all our CI setups use separate-build-dir and don't
+> test 'make install'. This only shows up if you do build-in-source-tree
+> and then 'make install'. (In a separate-build-dir setup, the
+> MANUAL_BUILDDIR is the same as the actual build dir,
+> which is the same as make's current working directory, so
+> forgetting it in the install rune doesn't matter. In a build from
+> the source tree, Sphinx requires the output to be to a
+> different directory than the source, so we have to create
+> a subdirectory to be the MANUAL_BUILDDIR.)
+>=20
+> thanks
+> -- PMM
+>=20
+
 
