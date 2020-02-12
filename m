@@ -2,84 +2,79 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEB0C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 12:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A768C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 12:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C18420714
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 12:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1658B20714
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 12:38:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P/MikSCz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C18420714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="epN6vtEk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1658B20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1rGr-0006zJ-8J
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 07:37:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58218)
+	id 1j1rHt-0008N5-8y
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 07:38:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58258)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rjones@redhat.com>) id 1j1rGA-00061X-HX
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:36:55 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1j1rGj-000739-I0
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:37:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rjones@redhat.com>) id 1j1rG9-0004vK-A4
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:36:54 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30662
+ (envelope-from <mlevitsk@redhat.com>) id 1j1rGi-0005JM-Eg
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:37:29 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20329
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rjones@redhat.com>) id 1j1rG9-0004uz-5p
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:36:53 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1j1rGi-0005Iy-A3
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:37:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581511012;
+ s=mimecast20190719; t=1581511048;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CVeZHRsTKZC0u825vtqliPy0X+ycHafuEX0u/5yCXWc=;
- b=P/MikSCzGqcoysv9iDm+arA1H8txowAiNRACc6N1g64QCtGP2mPBglXOR1JAB2vPFKxGYQ
- YUBNGt4+jhpy0HfIrfaUONfuDeXEHwTfItI22f8Dd+qp/7LTsqucGlwKOSzPwhMAT5Rnd1
- SZQuMIBYvaCOZ5L8OZJwcA7ucQVzax4=
+ bh=ch0Os69EavHi56PkV+gk7anWeI9LNbnZDQVQ0oXLcuM=;
+ b=epN6vtEkNekzoCBBQVoMhEjsy2srOA1rxlKCX1VTxTdzxFBEhut+i2riLwMEJa/TbjHnXH
+ 2RrHeES9WrtVTZL0r2MzU3z5SmUgpFh7IspLrlHuFVr8rkKvzyaOIdsj0unJ+fdgiqINAK
+ VuD5EQXDBHZbGn0u/lVlMT+dDBidrMA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-jSDNouKfOlCe4nxdjm7AsA-1; Wed, 12 Feb 2020 07:36:44 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-426-pi0NvwoVMJCj4jthK_4Jjg-1; Wed, 12 Feb 2020 07:37:24 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C17E0800D48;
- Wed, 12 Feb 2020 12:36:42 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B8E6226FB6;
- Wed, 12 Feb 2020 12:36:38 +0000 (UTC)
-Date: Wed, 12 Feb 2020 12:36:37 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: Cross-project NBD extension proposal: NBD_INFO_INIT_STATE
-Message-ID: <20200212123637.GX3888@redhat.com>
-References: <a4394fde-f459-dcb5-1698-013e1e24c388@redhat.com>
- <20200210221234.GH3888@redhat.com>
- <cc6e1e2e-d3a9-c498-354b-d382b5623ca0@redhat.com>
- <20200210225255.GJ3888@redhat.com> <20200212072729.GA22254@grep.be>
- <278d29cd-bc0d-19f0-c2a4-0191d16a677f@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <278d29cd-bc0d-19f0-c2a4-0191d16a677f@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: jSDNouKfOlCe4nxdjm7AsA-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E027F18C8C01;
+ Wed, 12 Feb 2020 12:37:22 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B35595C102;
+ Wed, 12 Feb 2020 12:37:20 +0000 (UTC)
+Message-ID: <dde54d12c2bb55c29ab7d19ab2cfc0dbf37ae1f0.camel@redhat.com>
+Subject: Re: [PATCH v5 24/26] nvme: change controller pci id
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Klaus Jensen <k.jensen@samsung.com>, qemu-block@nongnu.org
+Date: Wed, 12 Feb 2020 14:37:09 +0200
+In-Reply-To: <20200204095208.269131-25-k.jensen@samsung.com>
+References: <20200204095208.269131-1-k.jensen@samsung.com>
+ <CGME20200204095231eucas1p21019b1d857fcda9d67950e7d01de6b6a@eucas1p2.samsung.com>
+ <20200204095208.269131-25-k.jensen@samsung.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: pi0NvwoVMJCj4jthK_4Jjg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,70 +86,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Wouter Verhelst <w@uter.be>,
- "nbd@other.debian.org" <nbd@other.debian.org>,
- "libguestfs@redhat.com" <libguestfs@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Klaus Jensen <its@irrelevant.dk>,
+ Javier Gonzalez <javier.gonz@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 2020-02-04 at 10:52 +0100, Klaus Jensen wrote:
+> There are two reasons for changing this:
+> 
+>   1. The nvme device currently uses an internal Intel device id.
+> 
+>   2. Since commits "nvme: fix write zeroes offset and count" and "nvme:
+>      support multiple namespaces" the controller device no longer has
+>      the quirks that the Linux kernel think it has.
+> 
+>      As the quirks are applied based on pci vendor and device id, change
+>      them to get rid of the quirks.
+> 
+> To keep backward compatibility, add a new 'x-use-intel-id' parameter to
+> the nvme device to force use of the Intel vendor and device id. This is
+> off by default but add a compat property to set this for machines 4.2
+> and older.
+> 
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> ---
+>  hw/block/nvme.c   | 13 +++++++++----
+>  hw/block/nvme.h   |  4 +++-
+>  hw/core/machine.c |  1 +
+>  3 files changed, 13 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 3a377bc56734..bdef53a590b0 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -2467,8 +2467,15 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *pci_dev)
+>  
+>      pci_conf[PCI_INTERRUPT_PIN] = 1;
+>      pci_config_set_prog_interface(pci_conf, 0x2);
+> -    pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
+> -    pci_config_set_device_id(pci_conf, 0x5845);
+> +
+> +    if (n->params.use_intel_id) {
+> +        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
+> +        pci_config_set_device_id(pci_conf, 0x5846);
+> +    } else {
+> +        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_REDHAT);
+> +        pci_config_set_device_id(pci_conf, PCI_DEVICE_ID_REDHAT_NVME);
+> +    }
+> +
+>      pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
+>      pcie_endpoint_cap_init(pci_dev, 0x80);
+>  
+> @@ -2638,8 +2645,6 @@ static void nvme_class_init(ObjectClass *oc, void *data)
+>      pc->realize = nvme_realize;
+>      pc->exit = nvme_exit;
+>      pc->class_id = PCI_CLASS_STORAGE_EXPRESS;
+> -    pc->vendor_id = PCI_VENDOR_ID_INTEL;
+> -    pc->device_id = 0x5845;
+>      pc->revision = 2;
+>  
+>      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index c3cef0f024da..6b584f53ed64 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -12,7 +12,8 @@
+>      DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
+>      DEFINE_PROP_UINT8("aerl", _state, _props.aerl, 3), \
+>      DEFINE_PROP_UINT32("aer_max_queued", _state, _props.aer_max_queued, 64), \
+> -    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7)
+> +    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7), \
+> +    DEFINE_PROP_BOOL("x-use-intel-id", _state, _props.use_intel_id, false)
+>  
+>  typedef struct NvmeParams {
+>      char     *serial;
+> @@ -21,6 +22,7 @@ typedef struct NvmeParams {
+>      uint8_t  aerl;
+>      uint32_t aer_max_queued;
+>      uint8_t  mdts;
+> +    bool     use_intel_id;
+>  } NvmeParams;
+>  
+>  typedef struct NvmeAsyncEvent {
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 3e288bfceb7f..984412d98c9d 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -34,6 +34,7 @@ GlobalProperty hw_compat_4_2[] = {
+>      { "vhost-blk-device", "seg_max_adjust", "off"},
+>      { "usb-host", "suppress-remote-wake", "off" },
+>      { "usb-redir", "suppress-remote-wake", "off" },
+> +    { "nvme", "x-use-intel-id", "on"},
+>  };
+>  const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
+>  
 
-On Wed, Feb 12, 2020 at 06:09:11AM -0600, Eric Blake wrote:
-> On 2/12/20 1:27 AM, Wouter Verhelst wrote:
-> >Hi,
-> >
-> >On Mon, Feb 10, 2020 at 10:52:55PM +0000, Richard W.M. Jones wrote:
-> >>But anyway ... could a flag indicating that the whole image is sparse
-> >>be useful, either as well as NBD_INIT_SPARSE or instead of it?  You
-> >>could use it to avoid an initial disk trim, which is something that
-> >>mke2fs does:
-> >
-> >Yeah, I think that could definitely be useful. I honestly can't see a
-> >use for NBD_INIT_SPARSE as defined in this proposal; and I don't think
-> >it's generally useful to have a feature if we can't think of a use case
-> >for it (that creates added complexity for no benefit).
-> >
-> >If we can find a reasonable use case for NBD_INIT_SPARSE as defined in
-> >this proposal, then just add a third bit (NBD_INIT_ALL_SPARSE or
-> >something) that says "the whole image is sparse". Otherwise, I think we
-> >should redefine NBD_INIT_SPARSE to say that.
->=20
-> Okay, in v2, I will start with just two bits, NBD_INIT_SPARSE
-> (entire image is sparse, nothing is allocated) and NBD_INIT_ZERO
-> (entire image reads as zero), and save any future bits for later
-> additions.  Do we think that 16 bits is sufficient for the amount of
-> initial information likely to be exposed?
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-So as I understand the proposal, the 16 bit limit comes about because
-we want a round 4 byte reply, 16 bits are used by NBD_INFO_INIT_STATE
-and that leaves 16 bits feature bits.  Therefore the only way to go
-from there is to have 32 feature bits but an awkward unaligned 6 byte
-structure, or 48 feature bits (8 byte structure).
-
-I guess given those constraints we can stick with 16 feature bits, and
-if we ever needed more then we'd have to introduce NBD_INFO_INIT_STATE2.
-
-The only thing I can think of which might be useful is a "fully
-preallocated" bit which might be used as an indication that writes are
-fast and are unlikely to fail with ENOSPC.
-
-> Are we in agreement that
-> my addition of an NBD_INFO_ response to NBD_OPT_GO is the best way
-> to expose initial state bits?
-
-Seems reasonable to me.
-
-Rich.
-
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjon=
-es
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+Best regards,
+	Maxim Levitsky
 
 
