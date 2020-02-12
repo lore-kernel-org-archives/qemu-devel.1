@@ -2,89 +2,89 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B2BC352A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 10:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF87C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 10:51:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92F622082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 10:47:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA40C206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 10:51:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E5fJnv4L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92F622082F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="foKPMbwh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA40C206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1pYb-0000Gx-Qg
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 05:47:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37224)
+	id 1j1pc9-0001Y3-Qz
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 05:51:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37855)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j1pXv-00084Q-BC
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:47:08 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j1pbS-00018w-Vh
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:50:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j1pXu-0004qz-6v
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:47:07 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41532)
+ (envelope-from <alex.bennee@linaro.org>) id 1j1pbR-0008Ho-UG
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:50:46 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44751)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j1pXt-0004ok-VW
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:47:06 -0500
-Received: by mail-wr1-x444.google.com with SMTP id c9so1616305wrw.8
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 02:47:05 -0800 (PST)
+ id 1j1pbR-0008H5-Mc
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 05:50:45 -0500
+Received: by mail-wr1-x443.google.com with SMTP id m16so1617082wrx.11
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 02:50:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=FlVkBcyAUdBxF3UEtCbydT6aZE1E6dBsVvszd5bWrY8=;
- b=E5fJnv4Luv8VV2mtju19DubDVeISmnCSDZJ4Ex7j5w7mNCMnIfLk2lmaN6/dwyqViE
- uKi/GOFJFCyAa48uD1HKrD0gz+tCLoGQj+rIVfUATTk0WScCwtsCTy6PDkaK2JwiIFPW
- jQZhR0wHz2qoadQvw1kiENYyWimnWDwOcsY2K7fzVBo145U6BsgKADyKfey++b8Xyd5Y
- TCSdXnYFBeFagk5BCRfNN86SEdDJ93AfrZcWP/vhA/se6NY5miVPcNg8QuR2aV2eGmw7
- fk+TlIoHYydvTLSpQ6EL4NJrAwVggi1P2tG8cuSBVAN1oy3xqtj4toM48rw+ug3vhD6Z
- TW1Q==
+ bh=3QfwizNo8Lw2tT2qYWgb5lpQAGCO0QRsu1VQeTjQIHg=;
+ b=foKPMbwhTUhABzMdjVsW3FEmEsLDRDIirtnS6u0H06NEnNIsV8rzrnVpSFUXjn36CQ
+ 2ZHn2an/BcE3NsrVFsLl+kd/7tI+K1tWmeeXNPbehU4qzghJbOI3UFfW3n4X6BvtJZDT
+ yhTJFEh47xIFIjBKtxdqFaDQH2Vlt8XjvtnzY/w7f+zsA+hg3h9mmM2f3s1W6cIwlcMK
+ D7REhQBAxGyI9HJrxqmXSg3yk9nzEL8qNiESr9u8bMpIOc3AYCKrvs+qvsyfcofOvKbm
+ ZWraPY5k2uAuHg8nf+plnjQ3Nn0XIu/EtSDKo7pp04txM48ce+onGxWtUJclo1t2xnR1
+ Sr3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=FlVkBcyAUdBxF3UEtCbydT6aZE1E6dBsVvszd5bWrY8=;
- b=rRcYqneu1JuUohCTp5Jgd9rUc1GkV/adTMDCqbcxZppDt1KrRVqtrAtUSNvF3YAejr
- nwV/KcwMjLBM+5Xrauq2A4HeqtEm79PUCyG6M3T2uWSDNoPkV4QZNJ7s6ubvLff83AZn
- 2ge2H5B/VacIeOsBbyPuXCLm22tS+pIl4bxz3VPwQDNcd2FxEJtXi/jHvUHOb0f3uBUC
- 5o6YJdgbZPxJlz9C/9AWwKsHNm0UW1dY8AIVKGt+Su+G6IfNrQiiHzBS1HXZzX55o6TJ
- wSlLEzZAF1uUz9BT4JeH5g8Sr1BODsevVf1nSPUbTG0jLVNXnZ79iriCpifVlaHF2JP/
- soHQ==
-X-Gm-Message-State: APjAAAXTi/NISehMdmB+gJHJo3+rIRzbPdcEOpPhnWql3Nv99ij5gaAP
- J2AhV1pjTNJVMQnVKj2qTIU8mlikHBU=
-X-Google-Smtp-Source: APXvYqxzLJyUU6nLZj0+3yairoIexCXIur8n/TngwYeenGE6jdX0MfpABjEyZpc2FyKemLW8RipxVA==
-X-Received: by 2002:a5d:6789:: with SMTP id v9mr15392848wru.55.1581504424447; 
- Wed, 12 Feb 2020 02:47:04 -0800 (PST)
+ bh=3QfwizNo8Lw2tT2qYWgb5lpQAGCO0QRsu1VQeTjQIHg=;
+ b=pNl/wR5evPBMYZqsGsHIPP6CC2Srkh+Vq1oRNTD45wrvioSrwnb4V3cgk67FwCILoy
+ JGsU7h7UM7Pr5WjYXJ1buXtbrNg/N7MngFhNe8qwlfoiyTmX1OScLdlTq35OIw1YyZg7
+ st1Cg9GV80xFYKKVfLhywPae2c+LzcdplP0fbnDG+YWU3YkCK52VhLY5LB0FA0mY5y2p
+ oAA7QCmNRadWXTGcYBWQuz7fZN8VpB+AzA0x6Z02tytXaHCpVGa4FoXxoOSCZn227iaY
+ VHbjg9jEckxqZszqpM2zDO4ilWZCBkk2F0jQPh2THCz1wozjNTYzHjNq5gg3NmRp2r7l
+ gLlA==
+X-Gm-Message-State: APjAAAUzbCxzqjHa2E+cQe7AhZd4Rz5sFO7Zzncm8WM0VY0u3CQ9L8em
+ xHVIoSwuvgltxEjBK4O6jDQWJw==
+X-Google-Smtp-Source: APXvYqzey0ZnTzYQew/98Q2JUO2eIJgKWRJZbEjWZBMeONRTxShdyps2ZagvaAFurMNlr6AAV32HwA==
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr13935672wrl.190.1581504644416; 
+ Wed, 12 Feb 2020 02:50:44 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m68sm194281wme.48.2020.02.12.02.47.03
+ by smtp.gmail.com with ESMTPSA id y6sm139207wrl.17.2020.02.12.02.50.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 02:47:03 -0800 (PST)
+ Wed, 12 Feb 2020 02:50:43 -0800 (PST)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B1C461FF87;
- Wed, 12 Feb 2020 10:47:02 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 667681FF87;
+ Wed, 12 Feb 2020 10:50:42 +0000 (GMT)
 References: <20200212025145.24300-1-richard.henderson@linaro.org>
- <20200212025145.24300-2-richard.henderson@linaro.org>
+ <20200212025145.24300-3-richard.henderson@linaro.org>
 User-agent: mu4e 1.3.8; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 1/2] tcg: Add tcg_gen_gvec_5_ptr
-In-reply-to: <20200212025145.24300-2-richard.henderson@linaro.org>
-Date: Wed, 12 Feb 2020 10:47:02 +0000
-Message-ID: <87k14sxeu1.fsf@zen.linaroharston>
+Subject: Re: [PATCH 2/2] target/arm: Use tcg_gen_gvec_5_ptr for sve FMLA/FCMLA
+In-reply-to: <20200212025145.24300-3-richard.henderson@linaro.org>
+Date: Wed, 12 Feb 2020 10:50:42 +0000
+Message-ID: <87h7zwxenx.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,83 +104,78 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> Extend the vector generator infrastructure to handle
-> 5 vector arguments.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Now that we can pass 7 parameters, do not encode register
+> operands within simd_data.
+
+What defines the upper limit? Is it the ABI of the backend or just the
+efficiency of implementing the prologue for the call?
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -3372,23 +3372,11 @@ DO_ZPZ_FP(sve_ucvt_dd, uint64_t,     , uint64_to_=
+float64)
+>=20=20
+>  #undef DO_ZPZ_FP
+>=20=20
+> -/* 4-operand predicated multiply-add.  This requires 7 operands to pass
+> - * "properly", so we need to encode some of the registers into DESC.
+> - */
+> -QEMU_BUILD_BUG_ON(SIMD_DATA_SHIFT + 20 > 32);
+> -
+> -static void do_fmla_zpzzz_h(CPUARMState *env, void *vg, uint32_t desc,
+> +static void do_fmla_zpzzz_h(void *vd, void *vn, void *vm, void *va, void=
+ *vg,
+> +                            float_status *status, uint32_t desc,
+>                              uint16_t neg1, uint16_t neg3)
+>  {
+>      intptr_t i =3D simd_oprsz(desc);
+> -    unsigned rd =3D extract32(desc, SIMD_DATA_SHIFT, 5);
+> -    unsigned rn =3D extract32(desc, SIMD_DATA_SHIFT + 5, 5);
+> -    unsigned rm =3D extract32(desc, SIMD_DATA_SHIFT + 10, 5);
+> -    unsigned ra =3D extract32(desc, SIMD_DATA_SHIFT + 15, 5);
+> -    void *vd =3D &env->vfp.zregs[rd];
+> -    void *vn =3D &env->vfp.zregs[rn];
+> -    void *vm =3D &env->vfp.zregs[rm];
+> -    void *va =3D &env->vfp.zregs[ra];
+<snip>
+> @@ -4010,25 +4001,14 @@ static bool trans_FCMLA_zpzzz(DisasContext *s, ar=
+g_FCMLA_zpzzz *a)
+>      }
+>      if (sve_access_check(s)) {
+>          unsigned vsz =3D vec_full_reg_size(s);
+> -        unsigned desc;
+> -        TCGv_i32 t_desc;
+> -        TCGv_ptr pg =3D tcg_temp_new_ptr();
+> -
+> -        /* We would need 7 operands to pass these arguments "properly".
+> -         * So we encode all the register numbers into the descriptor.
+> -         */
+> -        desc =3D deposit32(a->rd, 5, 5, a->rn);
+> -        desc =3D deposit32(desc, 10, 5, a->rm);
+> -        desc =3D deposit32(desc, 15, 5, a->ra);
+> -        desc =3D deposit32(desc, 20, 2, a->rot);
+> -        desc =3D sextract32(desc, 0, 22);
+> -        desc =3D simd_desc(vsz, vsz, desc);
+> -
+> -        t_desc =3D tcg_const_i32(desc);
+> -        tcg_gen_addi_ptr(pg, cpu_env, pred_full_reg_offset(s, a->pg));
+> -        fns[a->esz - 1](cpu_env, pg, t_desc);
+> -        tcg_temp_free_i32(t_desc);
+> -        tcg_temp_free_ptr(pg);
+> +        TCGv_ptr status =3D get_fpstatus_ptr(a->esz =3D=3D MO_16);
+> +        tcg_gen_gvec_5_ptr(vec_full_reg_offset(s, a->rd),
+> +                           vec_full_reg_offset(s, a->rn),
+> +                           vec_full_reg_offset(s, a->rm),
+> +                           vec_full_reg_offset(s, a->ra),
+> +                           pred_full_reg_offset(s, a->pg),
+> +                           status, vsz, vsz, a->rot, fns[a->esz]);
+> +        tcg_temp_free_ptr(status);
+>      }
+>      return true;
+>  }
+
+Good to see the code simplified ;-)
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  include/tcg/tcg-op-gvec.h |  7 +++++++
->  tcg/tcg-op-gvec.c         | 32 ++++++++++++++++++++++++++++++++
->  2 files changed, 39 insertions(+)
->
-> diff --git a/include/tcg/tcg-op-gvec.h b/include/tcg/tcg-op-gvec.h
-> index 830d68f697..74534e2480 100644
-> --- a/include/tcg/tcg-op-gvec.h
-> +++ b/include/tcg/tcg-op-gvec.h
-> @@ -83,6 +83,13 @@ void tcg_gen_gvec_4_ptr(uint32_t dofs, uint32_t aofs, =
-uint32_t bofs,
->                          uint32_t maxsz, int32_t data,
->                          gen_helper_gvec_4_ptr *fn);
->=20=20
-> +typedef void gen_helper_gvec_5_ptr(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_pt=
-r,
-> +                                   TCGv_ptr, TCGv_ptr, TCGv_i32);
-> +void tcg_gen_gvec_5_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-> +                        uint32_t cofs, uint32_t eofs, TCGv_ptr ptr,
-> +                        uint32_t oprsz, uint32_t maxsz, int32_t data,
-> +                        gen_helper_gvec_5_ptr *fn);
-> +
->  /* Expand a gvec operation.  Either inline or out-of-line depending on
->     the actual vector size and the operations supported by the host.  */
->  typedef struct {
-> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-> index 41b4a3c661..327d9588e0 100644
-> --- a/tcg/tcg-op-gvec.c
-> +++ b/tcg/tcg-op-gvec.c
-> @@ -290,6 +290,38 @@ void tcg_gen_gvec_4_ptr(uint32_t dofs, uint32_t aofs=
-, uint32_t bofs,
->      tcg_temp_free_i32(desc);
->  }
->=20=20
-> +/* Generate a call to a gvec-style helper with five vector operands
-> +   and an extra pointer operand.  */
-> +void tcg_gen_gvec_5_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
-> +                        uint32_t cofs, uint32_t eofs, TCGv_ptr ptr,
-> +                        uint32_t oprsz, uint32_t maxsz, int32_t data,
-> +                        gen_helper_gvec_5_ptr *fn)
-> +{
-> +    TCGv_ptr a0, a1, a2, a3, a4;
-> +    TCGv_i32 desc =3D tcg_const_i32(simd_desc(oprsz, maxsz, data));
-> +
-> +    a0 =3D tcg_temp_new_ptr();
-> +    a1 =3D tcg_temp_new_ptr();
-> +    a2 =3D tcg_temp_new_ptr();
-> +    a3 =3D tcg_temp_new_ptr();
-> +    a4 =3D tcg_temp_new_ptr();
-> +
-> +    tcg_gen_addi_ptr(a0, cpu_env, dofs);
-> +    tcg_gen_addi_ptr(a1, cpu_env, aofs);
-> +    tcg_gen_addi_ptr(a2, cpu_env, bofs);
-> +    tcg_gen_addi_ptr(a3, cpu_env, cofs);
-> +    tcg_gen_addi_ptr(a4, cpu_env, eofs);
-> +
-> +    fn(a0, a1, a2, a3, a4, ptr, desc);
-> +
-> +    tcg_temp_free_ptr(a0);
-> +    tcg_temp_free_ptr(a1);
-> +    tcg_temp_free_ptr(a2);
-> +    tcg_temp_free_ptr(a3);
-> +    tcg_temp_free_ptr(a4);
-> +    tcg_temp_free_i32(desc);
-> +}
-> +
->  /* Return true if we want to implement something of OPRSZ bytes
->     in units of LNSZ.  This limits the expansion of inline code.  */
->  static inline bool check_size_impl(uint32_t oprsz, uint32_t lnsz)
-
 
 --=20
 Alex Benn=C3=A9e
