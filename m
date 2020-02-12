@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A21C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD0CC3B186
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:42:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D186B20714
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:42:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A975920714
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:42:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jSZ4NELS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D186B20714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d7lj4n+g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A975920714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1v5u-0004zT-WD
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:42:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36575)
+	id 1j1v5x-00059Q-SJ
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:42:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36612)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j1v4x-0003Bv-RT
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:36 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j1v53-0003Jb-05
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j1v4w-0001aD-PK
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:35 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:44969)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j1v51-0001ie-WE
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:40 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:36349)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j1v4w-0001Y0-Ii
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:34 -0500
-Received: by mail-wr1-x429.google.com with SMTP id m16so3169620wrx.11
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 08:41:34 -0800 (PST)
+ id 1j1v51-0001i9-QH
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:39 -0500
+Received: by mail-wm1-x335.google.com with SMTP id p17so3298332wma.1
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 08:41:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=l/AgXBV6DaQrKl5QgbkJnKxXBovTmb0GOhwB0Jdunvg=;
- b=jSZ4NELS3N5ZQHNUZStq1QI/1oxM94YeVO3gRLCkC67cqSUldMrrgybtFgQMaAQwAH
- YVyqCfAxTqFrV4kGm8CbhfohgMG/obUxBh0DiNBRtMlIYVyIB27QBWhe8DOgE6Z+uIEY
- wBfqFm2AVWKlsMhdibPh7FhZvfe51mp3usfIT6JBG3TN9GEvGlxRX5XTZjRhpvotrjAK
- 2i4knTHDMiMobvXJ0FzSIOvtt5Xy90SCufBi6qLKXLXlA16GSnBQ7YyAew8wssXJZBsV
- dTbfufe8BPvdYmt0kKD2xBzW9uVFz9GDgnu78B5KvLWOd/Vjpkphvt5YhhVMyVgxGToz
- SpNQ==
+ bh=Oo23LZ+bVDGb+bI6Wuhk5pe6slIqDak+OkHafTFG1M8=;
+ b=d7lj4n+gGvjSeLgmK0OhVz0NM90F/ZZqU2NfatMzFSfMg2FdpqcJW/t/bJxywR6LRu
+ DsbEF6qg6j8xQhoi8uzr+peOcrlRLJDx8caLvvKdVqipVLWzHq7+NnpEqje0rRoXl0ta
+ n3xugMBSBHdbC8tEuN3vrx5/mbyEBMZJXY9sdN4nXf18tzbCh2e+RarQgUyHETGSfHcU
+ mdhWNpH7Lzq+n2YH3RbwgiYGVs5+RgaAWCDre/PnnVOy+vKmwZrZNWOoQOtYRJYS8GRF
+ rX6z6E/rfX2QiAuphgA/WJFO4qkcfv3p+293pmZ9p7c/U8CBebODG/TXxr5rPctZq771
+ WAng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=l/AgXBV6DaQrKl5QgbkJnKxXBovTmb0GOhwB0Jdunvg=;
- b=j89lnLqUcFfUvP8Xm1ghgae3ZYQ6bn/hBDXtIlT4EtFdICPbhvjbOcDV80L97EvwBS
- F0CU9cvNsoGGeb4CH4eKSbgVbetS+SG31OLffy/zFELC6UOorqdhTIyweGiqGgleS5NO
- 4W255776mapkPvo7ZyH6A6tZFG6WI/Pl4ckSmmVM+ZobEzgh7lt8FPTWT+TvJLf3z7/G
- CziNwC6JjaYaSRRurMAHXzo4PY9Ciz6pL7GlLz8LITTHZbRqC9utXdNdwEY2RA8ZAnj7
- bFDiPRV5ctml8K2hEIrXeV/dgxMTRGvO78Efmr9+bCWbu0cq9JgVDwen7L+4IazOORrk
- Mm7g==
-X-Gm-Message-State: APjAAAXRCYRpEcCacC442TpDYAwyqumjsvKNnsNPEnEAJuix0/GBP3H5
- 68NQg5xWf6GLfjIu8tujkHTpCK4u
-X-Google-Smtp-Source: APXvYqzBu7Z+ywm1OvreW9HDbBFrfeBKev83gXRZumjYLb5gC6JszamV4ybcZk8MLia+9IsATDSZKA==
-X-Received: by 2002:adf:ec83:: with SMTP id z3mr15538203wrn.133.1581525693355; 
- Wed, 12 Feb 2020 08:41:33 -0800 (PST)
+ bh=Oo23LZ+bVDGb+bI6Wuhk5pe6slIqDak+OkHafTFG1M8=;
+ b=qXhSdZDk1/RDgtuSqoQyFNgXiwpHbOW4Z4cFtiPAsnRlk86XaE5HDt2cohXnWf72Zp
+ 4mBAxpdV+PgIEciL/7mm5GQZ4QOsoBVFz4sljC653w2zEIlaUVImNnOcUFD8z515NsFB
+ K7KPqmAuQD7MLMoi/dSzcrs3zHil0e7gYKoYGrsrboY9ctfYe3XxCU4vjh8ak4b7ICa1
+ AtYIXaPB7Pp06Rv/btbRuKBVltnBe0jACAlOWiaiGEnalXVGao2SeFLKGnZyFOazD5wP
+ YVhf75qx+NcRoFCu5AE+zYkVmk+ToFktAV6proTHBe/bNsBb6oNFx5+BlJoylvk/YSw2
+ JakQ==
+X-Gm-Message-State: APjAAAWVzkUJwHTCPNv/yZPdNQs56uKdWhiClsmOhZZBeaI0ec6Z1mZi
+ keFlx5Sm+BOsheEQ/4IZXgnx5rHk
+X-Google-Smtp-Source: APXvYqyYRPihTdET1TDMyHzIpvQHHZAjXmCNuf4dgq93R4RQuwG+DbeMzt8e0ijVbEB37AdsQXcRxw==
+X-Received: by 2002:a05:600c:21c5:: with SMTP id
+ x5mr13987288wmj.72.1581525698598; 
+ Wed, 12 Feb 2020 08:41:38 -0800 (PST)
 Received: from donizetti.fritz.box ([151.30.86.140])
- by smtp.gmail.com with ESMTPSA id a16sm1195122wrt.30.2020.02.12.08.41.32
+ by smtp.gmail.com with ESMTPSA id a16sm1195122wrt.30.2020.02.12.08.41.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 08:41:32 -0800 (PST)
+ Wed, 12 Feb 2020 08:41:37 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/9] seqlock: fix seqlock_write_unlock_impl function
-Date: Wed, 12 Feb 2020 17:41:22 +0100
-Message-Id: <20200212164129.6968-3-pbonzini@redhat.com>
+Subject: [PULL 5/9] exec: do not define use_icount for user-mode emulation
+Date: Wed, 12 Feb 2020 17:41:25 +0100
+Message-Id: <20200212164129.6968-6-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200212164129.6968-1-pbonzini@redhat.com>
 References: <20200212164129.6968-1-pbonzini@redhat.com>
@@ -81,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,47 +94,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Luc Michel <luc.michel@greensocs.com>
+use_icount is also defined by stubs/cpu-get-icount.c, we do not need
+to have a useless definition in exec.c.
 
-The seqlock write unlock function was incorrectly calling
-seqlock_write_begin() instead of seqlock_write_end(), and was releasing
-the lock before incrementing the sequence. This could lead to a race
-condition and a corrupted sequence number becoming odd even though the
-lock is not held.
-
-Signed-off-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200129144948.2161551-1-luc.michel@greensocs.com>
-Fixes: 988fcafc73 ("seqlock: add QemuLockable support", 2018-08-23)
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-id: <20200204161036.20889-1-pbonzini@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/qemu/seqlock.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ exec.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/qemu/seqlock.h b/include/qemu/seqlock.h
-index fd408b7ec5..8b6b4ee4bb 100644
---- a/include/qemu/seqlock.h
-+++ b/include/qemu/seqlock.h
-@@ -55,11 +55,11 @@ static inline void seqlock_write_lock_impl(QemuSeqLock *sl, QemuLockable *lock)
- #define seqlock_write_lock(sl, lock) \
-     seqlock_write_lock_impl(sl, QEMU_MAKE_LOCKABLE(lock))
+diff --git a/exec.c b/exec.c
+index 67e520d18e..5fc3746053 100644
+--- a/exec.c
++++ b/exec.c
+@@ -98,15 +98,15 @@ CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
+ /* current CPU in the current thread. It is only valid inside
+    cpu_exec() */
+ __thread CPUState *current_cpu;
+-/* 0 = Do not count executed instructions.
+-   1 = Precise instruction counting.
+-   2 = Adaptive rate instruction counting.  */
+-int use_icount;
  
--/* Lock out other writers and update the count.  */
-+/* Update the count and release the lock.  */
- static inline void seqlock_write_unlock_impl(QemuSeqLock *sl, QemuLockable *lock)
- {
-+    seqlock_write_end(sl);
-     qemu_lockable_unlock(lock);
--    seqlock_write_begin(sl);
- }
- #define seqlock_write_unlock(sl, lock) \
-     seqlock_write_unlock_impl(sl, QEMU_MAKE_LOCKABLE(lock))
+ uintptr_t qemu_host_page_size;
+ intptr_t qemu_host_page_mask;
+ 
+ #if !defined(CONFIG_USER_ONLY)
++/* 0 = Do not count executed instructions.
++   1 = Precise instruction counting.
++   2 = Adaptive rate instruction counting.  */
++int use_icount;
+ 
+ typedef struct PhysPageEntry PhysPageEntry;
+ 
 -- 
 2.21.0
 
