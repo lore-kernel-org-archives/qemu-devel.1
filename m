@@ -6,67 +6,68 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E464C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9060CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:50:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B6AC206B6
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DC2E206B6
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:50:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BSZhPomi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B6AC206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XMz2kupM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DC2E206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1sOZ-00081U-Jm
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:49:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39221)
+	id 1j1sOu-0000I7-HA
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:50:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39304)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j1sIW-0006SO-26
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:25 -0500
+ (envelope-from <david@redhat.com>) id 1j1sIl-000753-Hd
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j1sIR-0003gR-6W
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47158
+ (envelope-from <david@redhat.com>) id 1j1sIk-00044X-Dj
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58922
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j1sIQ-0003ff-TH
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:19 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j1sIk-000447-9u
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:43:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581514998;
+ s=mimecast20190719; t=1581515017;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=yNuQlSgldSAkpIuDIJbk/zpSbtxwoK8DXhH4/lGJbpk=;
- b=BSZhPomigrkX+nu0cr+P3CyJMgYtPp/c9iAHxHKYUZ7zGrQmRvP4nMRvIxHonHbHojDFj9
- 6hNbWvd+a/UqcGLx+5bawFFCHFn7G/6D46R1+Ix8KtLiZZmEPqiDBYZYI7DP6NpFArQg98
- 2DJB/00AbVElwKpouEh/B1VqymT7MLg=
+ bh=zxlDY+iam1eGvrSP9JAuoFgfMKsrZ8lZwfOq1IgFDoE=;
+ b=XMz2kupMbqLyupEc6zIXNc+UBJEXSjpkdUp/ukzeLmdrcXENIBJ+zMoCcNTiUTBJjnqvIV
+ uiGqoSoLb4EjPbdTN+6L2z8bgp5vU3T3JsHBrLehdipEXVWanEc7MoMrZTSM1Fjq3xA2RW
+ o3ySSkNMGX5+8JiLbkpnrQ9jdqctaF4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-DP7iRCqnOeOoOXvupSnS5Q-1; Wed, 12 Feb 2020 08:43:16 -0500
+ us-mta-56-5VpgLspdNxWtiMZ0y68tQQ-1; Wed, 12 Feb 2020 08:43:34 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0F0A801E67;
- Wed, 12 Feb 2020 13:43:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20B65800D4E;
+ Wed, 12 Feb 2020 13:43:33 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-117-92.ams2.redhat.com [10.36.117.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 75F601001B07;
- Wed, 12 Feb 2020 13:43:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3084C1001B08;
+ Wed, 12 Feb 2020 13:43:31 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 fixed 02/16] util: vfio-helpers: Fix qemu_vfio_close()
-Date: Wed, 12 Feb 2020 14:42:40 +0100
-Message-Id: <20200212134254.11073-3-david@redhat.com>
+Subject: [PATCH v2 fixed 05/16] exec: Factor out setting ram settings (madvise
+ ...) into qemu_ram_apply_settings()
+Date: Wed, 12 Feb 2020 14:42:43 +0100
+Message-Id: <20200212134254.11073-6-david@redhat.com>
 In-Reply-To: <20200212134254.11073-1-david@redhat.com>
 References: <20200212134254.11073-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: DP7iRCqnOeOoOXvupSnS5Q-1
+X-MC-Unique: 5VpgLspdNxWtiMZ0y68tQQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -86,52 +87,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>,
  "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
  Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu_vfio_undo_mapping() will decrement the number of mappings and
-reshuffle the array elements to fit into the reduced size.
+Factor all settings out into qemu_ram_apply_settings().
 
-Iterating over all elements like this does not work as expected, let's make
-sure to remove all mappings properly.
+For memory_try_enable_merging(), the important bit is that it won't be
+called with XEN - which is now still the case as new_block->host will
+remain NULL.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- util/vfio-helpers.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ exec.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index 71e02e7f35..d6332522c1 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -694,13 +694,11 @@ static void qemu_vfio_reset(QEMUVFIOState *s)
- /* Close and free the VFIO resources. */
- void qemu_vfio_close(QEMUVFIOState *s)
- {
--    int i;
--
-     if (!s) {
-         return;
+diff --git a/exec.c b/exec.c
+index 05cfe868ab..31a462a7d3 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2121,6 +2121,15 @@ static int memory_try_enable_merging(void *addr, siz=
+e_t len)
+     return qemu_madvise(addr, len, QEMU_MADV_MERGEABLE);
+ }
+=20
++static void qemu_ram_apply_settings(void *host, size_t length)
++{
++    memory_try_enable_merging(host, length);
++    qemu_ram_setup_dump(host, length);
++    qemu_madvise(host, length, QEMU_MADV_HUGEPAGE);
++    /* MADV_DONTFORK is also needed by KVM in absence of synchronous MMU *=
+/
++    qemu_madvise(host, length, QEMU_MADV_DONTFORK);
++}
++
+ /* Only legal before guest might have detected the memory size: e.g. on
+  * incoming migration, or right after reset.
+  *
+@@ -2271,7 +2280,6 @@ static void ram_block_add(RAMBlock *new_block, Error =
+**errp, bool shared)
+                 qemu_mutex_unlock_ramlist();
+                 return;
+             }
+-            memory_try_enable_merging(new_block->host, new_block->max_leng=
+th);
+         }
      }
--    for (i =3D 0; i < s->nr_mappings; ++i) {
--        qemu_vfio_undo_mapping(s, &s->mappings[i], NULL);
-+    while (s->nr_mappings) {
-+        qemu_vfio_undo_mapping(s, &s->mappings[s->nr_mappings - 1], NULL);
+=20
+@@ -2309,10 +2317,7 @@ static void ram_block_add(RAMBlock *new_block, Error=
+ **errp, bool shared)
+                                         DIRTY_CLIENTS_ALL);
+=20
+     if (new_block->host) {
+-        qemu_ram_setup_dump(new_block->host, new_block->max_length);
+-        qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_HUG=
+EPAGE);
+-        /* MADV_DONTFORK is also needed by KVM in absence of synchronous M=
+MU */
+-        qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_DON=
+TFORK);
++        qemu_ram_apply_settings(new_block->host, new_block->max_length);
+         ram_block_notify_add(new_block->host, new_block->max_length);
      }
-     ram_block_notifier_remove(&s->ram_notifier);
-     qemu_vfio_reset(s);
+ }
 --=20
 2.24.1
 
