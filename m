@@ -2,68 +2,77 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0686DC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:00:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E47A3C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:04:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C48AC20659
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:00:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C48AC20659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id B2A1920659
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 13:04:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5OZDX2h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A1920659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1rdC-0003KE-0U
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:00:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60899)
+	id 1j1rgd-0004bA-Rd
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 08:04:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j1rai-0007Zq-EU
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:58:28 -0500
+ (envelope-from <jtomko@redhat.com>) id 1j1rfI-00047U-RJ
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:03:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j1raO-0003r0-1h
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:58:08 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:46449)
+ (envelope-from <jtomko@redhat.com>) id 1j1rf7-0007ec-Vc
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:02:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50039
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j1raN-0003oq-Bj
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:57:47 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N95mR-1jWfpe0IJL-0163yD; Wed, 12 Feb 2020 13:57:05 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/4] linux-user: fix TARGET_NSIG and _NSIG uses
-Date: Wed, 12 Feb 2020 13:56:57 +0100
-Message-Id: <20200212125658.644558-4-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200212125658.644558-1-laurent@vivier.eu>
-References: <20200212125658.644558-1-laurent@vivier.eu>
+ (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1j1rf7-0007di-Rn
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 08:02:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581512560;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=gTMLPn9wN+YLWSEELMI/0wurbY1WH5fJvPq4HhxIH0M=;
+ b=E5OZDX2hKAZS4wcMfJOIaxYuoEFXxkt2+YpHTtPjVBrr25OWXlX7m8/si0xmHdUfNTR0tv
+ xIKPWoKRXWYQHPmDfh166SnS+/cfg4FjEtMPf3nN/uTq3DV+PbU429cw7ctnGOEAmnoCdS
+ uUsKRBveBHntIouYkjVeqjx4QDtXyiw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-5h__sVEKPsaUD9Dppbbp5g-1; Wed, 12 Feb 2020 08:02:26 -0500
+X-MC-Unique: 5h__sVEKPsaUD9Dppbbp5g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6545C107B7D6
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 13:02:25 +0000 (UTC)
+Received: from lpt (unknown [10.43.2.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 46ABB390;
+ Wed, 12 Feb 2020 13:02:24 +0000 (UTC)
+Date: Wed, 12 Feb 2020 14:02:21 +0100
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Subject: Re: [PATCH] qapi: Expand documentation for LostTickPolicy
+Message-ID: <20200212130221.GB2893@lpt>
+References: <20200211183744.210298-1-abologna@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:1K87h0YECN1DOrif4jlPfK1AnLqj9HcewBJexoZAsBxqOzEAoCa
- 8wki7Bqt4HO2/YvawsRV8yOP36fb3feib32cdwAiziJQ7OUputj2Coyju7uhut04/7Vwg2N
- gX+ojcj5Io/fzQRxLJSEEjNTr/IeDJcCnEIa6IL9Mr9Mzk+l/0Fw8Mbl7VPmWbi592AzFlK
- W1tbVSL3cKS2WQA9XTPTA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:jVLYmX8mgWQ=:qqbYrzwNtKwKUry5T3Gw1W
- /yLtjtgCh1heb0uWM9hJcQnqRSQAnFVi7Iy4DftS3fOjg+m3wJb1xsF6fdv8MvDtTGdEpCT93
- 9fu1ua5BVX54SKW9MmvibXt91+PhyWsLgR6rwTeVgFzHZ5wxl34rmf+Kf+9h6KS8yXLSgLSj+
- Yj//qC6HXqxwfAjztGWg1pSw0O+bGsI4V/Za0o6yYqDuow+bJqoQuGTU2EdrbmmLLZd1EqXnA
- fVIjrvZ38xt/sgdq/I+djMEZcorqEfkN92OVW4KaHlLJ+sPXRgObIf/pO9QZDrIPlgB03tEhg
- GMILCgf1BErzqIVg/bvRgevvQtlEEUfgDrJyuzNBAJTnlPELQpd4eFYOhrCKI0Yt7Ov/AW0Da
- qUM4JP/XUrLO4LEDOO89qtdiGM+Wxc03AjpJf3Qd0MM9xs6rPShQH7w7it4bA7F0QaxOQHnsp
- SJkamY+Pyxvwml1tLqaDrpixKXx/4hLUEP3tsetFD2Tq/qPlMDcITBX0hi797CAwhQokL4n78
- 8ZgwK87qQWPrwO+h6irkTlYygzp4d4G3xnH7P5KOhIzwKbvzV4pZNVLSO51TFC33Nj0SilS4r
- j586Be6gHR+KpIdGEW3s9nMem10boZBlNFvsdDKzIF8BXfJ7a8d9kteMRNKYhtSRkUeTVPWTj
- X7dSaVhDTSU1xT5uvYH3iJ2pW1Ikp4yaYnohtJlKMY8yGVTw6bXbLIl7SkmCzw/bsrNnMc0Gb
- QbeG3mPbdf/NTDfr043dAaTNFNlvUM2iLIIaBg3IjghcuGfyj2StwM7fm1hcXlRcdet9QcJ/G
- lamRSBp57M0upDx5Su8wy8NFRPJK35aVUKpcBisk/VYHJyrCfkyaiUW1nfd3nBqNaU1djaH
+In-Reply-To: <20200211183744.210298-1-abologna@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="jq0ap7NbKX2Kqbes"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,145 +84,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Marlies Ruck <marlies.ruck@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Josh Kunz <jkz@google.com>, Taylor Simpson <tsimpson@quicinc.com>,
- Matus Kysel <mkysel@tachyum.com>, milos.stojanovic@rt-rk.com
+Cc: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Valid signal numbers are between 1 (SIGHUP) and SIGRTMAX.
+--jq0ap7NbKX2Kqbes
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-System includes define _NSIG to SIGRTMAX + 1, but
-QEMU (like kernel) defines TARGET_NSIG to TARGET_SIGRTMAX.
+On Tue, Feb 11, 2020 at 07:37:44PM +0100, Andrea Bolognani wrote:
+>The current documentation is fairly terse and not easy to decode
+>for someone who's not intimately familiar with the inner workings
+>of timer devices. Expand on it by providing a somewhat verbose
 
-Fix all the checks involving the signal range.
+Perchance exorbitantly circumlocutory, but definitely an improvement.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
+>description of what behavior each policy will result in, as seen
+>from both the guest OS and host point of view.
+>
+>Signed-off-by: Andrea Bolognani <abologna@redhat.com>
+>---
+>This information is reported pretty much word by word in
+>
+>  https://libvirt.org/formatdomain.html#elementsTime
+>
+>so I'm hoping I can get the QEMU documentation updated and then just
+>merge back the changes.
+>
+> qapi/misc.json | 34 +++++++++++++++++++++++-----------
+> 1 file changed, 23 insertions(+), 11 deletions(-)
 
-Notes:
-    v2: replace i, j by target_sig, host_sig
+Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
 
- linux-user/signal.c | 52 ++++++++++++++++++++++++++++++++-------------
- 1 file changed, 37 insertions(+), 15 deletions(-)
+Jano
 
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 246315571c09..c1e664f97a7c 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -30,6 +30,15 @@ static struct target_sigaction sigact_table[TARGET_NSIG];
- static void host_signal_handler(int host_signum, siginfo_t *info,
-                                 void *puc);
- 
-+
-+/*
-+ * System includes define _NSIG as SIGRTMAX + 1,
-+ * but qemu (like the kernel) defines TARGET_NSIG as TARGET_SIGRTMAX
-+ * and the first signal is SIGHUP defined as 1
-+ * Signal number 0 is reserved for use as kill(pid, 0), to test whether
-+ * a process exists without sending it a signal.
-+ */
-+QEMU_BUILD_BUG_ON(__SIGRTMAX + 1 != _NSIG);
- static uint8_t host_to_target_signal_table[_NSIG] = {
-     [SIGHUP] = TARGET_SIGHUP,
-     [SIGINT] = TARGET_SIGINT,
-@@ -67,19 +76,24 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
-     [SIGSYS] = TARGET_SIGSYS,
-     /* next signals stay the same */
- };
--static uint8_t target_to_host_signal_table[_NSIG];
- 
-+static uint8_t target_to_host_signal_table[TARGET_NSIG + 1];
-+
-+/* valid sig is between 1 and _NSIG - 1 */
- int host_to_target_signal(int sig)
- {
--    if (sig < 0 || sig >= _NSIG)
-+    if (sig < 1 || sig >= _NSIG) {
-         return sig;
-+    }
-     return host_to_target_signal_table[sig];
- }
- 
-+/* valid sig is between 1 and TARGET_NSIG */
- int target_to_host_signal(int sig)
- {
--    if (sig < 0 || sig >= _NSIG)
-+    if (sig < 1 || sig > TARGET_NSIG) {
-         return sig;
-+    }
-     return target_to_host_signal_table[sig];
- }
- 
-@@ -100,11 +114,15 @@ static inline int target_sigismember(const target_sigset_t *set, int signum)
- void host_to_target_sigset_internal(target_sigset_t *d,
-                                     const sigset_t *s)
- {
--    int i;
-+    int host_sig, target_sig;
-     target_sigemptyset(d);
--    for (i = 1; i <= TARGET_NSIG; i++) {
--        if (sigismember(s, i)) {
--            target_sigaddset(d, host_to_target_signal(i));
-+    for (host_sig = 1; host_sig < _NSIG; host_sig++) {
-+        target_sig = host_to_target_signal(host_sig);
-+        if (target_sig < 1 || target_sig > TARGET_NSIG) {
-+            continue;
-+        }
-+        if (sigismember(s, host_sig)) {
-+            target_sigaddset(d, target_sig);
-         }
-     }
- }
-@@ -122,11 +140,15 @@ void host_to_target_sigset(target_sigset_t *d, const sigset_t *s)
- void target_to_host_sigset_internal(sigset_t *d,
-                                     const target_sigset_t *s)
- {
--    int i;
-+    int host_sig, target_sig;
-     sigemptyset(d);
--    for (i = 1; i <= TARGET_NSIG; i++) {
--        if (target_sigismember(s, i)) {
--            sigaddset(d, target_to_host_signal(i));
-+    for (target_sig = 1; target_sig <= TARGET_NSIG; target_sig++) {
-+        host_sig = target_to_host_signal(target_sig);
-+        if (host_sig < 1 || host_sig >= _NSIG) {
-+            continue;
-+        }
-+        if (target_sigismember(s, target_sig)) {
-+            sigaddset(d, host_sig);
-         }
-     }
- }
-@@ -492,10 +514,10 @@ static void signal_table_init(void)
-         if (host_to_target_signal_table[host_sig] == 0) {
-             host_to_target_signal_table[host_sig] = host_sig;
-         }
--    }
--    for (host_sig = 1; host_sig < _NSIG; host_sig++) {
-         target_sig = host_to_target_signal_table[host_sig];
--        target_to_host_signal_table[target_sig] = host_sig;
-+        if (target_sig <= TARGET_NSIG) {
-+            target_to_host_signal_table[target_sig] = host_sig;
-+        }
-     }
- }
- 
-@@ -518,7 +540,7 @@ void signal_init(void)
-     act.sa_sigaction = host_signal_handler;
-     for(i = 1; i <= TARGET_NSIG; i++) {
- #ifdef TARGET_GPROF
--        if (i == SIGPROF) {
-+        if (i == TARGET_SIGPROF) {
-             continue;
-         }
- #endif
--- 
-2.24.1
+--jq0ap7NbKX2Kqbes
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl5D91EACgkQ+YPwO/Ma
+t51F9AgAqgXPJhN77M5T7lKpcHMcupY6UaeCL8+nlyZy8xkbOBrHZnZFKdvBh9tK
+8QJeesHSlfLYHOTk+RI7QXf80sBzhhm/GT9AwREldILo36qvAGIlObVG2p/obTqU
+uzZLy9b2Pu0CGVhuuZ7uunNizaldDNvQ0/qSMrmEIQUG8p6FaFR1QDs2mcOT2oKo
+z907s2MXSnf3LucKroa6RpH4W0670xYq+3DYSN/tFEOJbktKKVc0oxBiKPTZdAAi
+ufdDKB91wWWYV3tcPynFZGpSK++KyQDpSWZl3eh21pOtOmKkMApZEjMBvT9ukDOF
+oukRKaxK4AACgCYbWCt+M6Z5xSm9mg==
+=VUut
+-----END PGP SIGNATURE-----
+
+--jq0ap7NbKX2Kqbes--
 
 
