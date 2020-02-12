@@ -2,102 +2,77 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FA7C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1E4FC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:17:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35DC120714
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:15:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADC3F20714
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 09:17:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzcnhagT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35DC120714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fKF2No0+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC3F20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1o7h-0000y1-0i
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 04:15:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44875)
+	id 1j1o9J-0002UO-Rv
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 04:17:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j1o6x-0000PW-AK
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:15:12 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1j1o87-0001Kp-7A
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j1o6v-000654-VZ
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:15:10 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53570
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mlevitsk@redhat.com>) id 1j1o85-0007FU-1J
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:16:22 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38445)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j1o6v-00063H-RO
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:15:09 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1j1o7z-0007CB-RE
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 04:16:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581498908;
+ s=mimecast20190719; t=1581498973;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zWBcaYCnmul0MivQLsQCV063q1kIrzRox1sk7SxSSWE=;
- b=ZzcnhagT8e1gcH3DVjdu1vMfHP0hoIMDIfPsdZcWgctcKbrK4PpskAzrgy7fkXAT0mDPrb
- 6uOMxTgF1BtfmPlSciZQlSQYntvyngkrefZA7i1NmnQ14cPAfU6z+A8kD7KtsSFU0XukRN
- hV8aAsIWjTAgojtNsFoZ17ScRw5qeJc=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-b8s4NDyHP5WHlWFZP41utQ-1; Wed, 12 Feb 2020 04:15:06 -0500
-Received: by mail-qt1-f198.google.com with SMTP id e37so853080qtk.7
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 01:15:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=emUnSXuU1gnGL6zBKl9lbYM4Of017ZRheWAF5EOYEWY=;
- b=V2ac1RQliVo7D7yKuBmPdYbu1vSRTjTcIueQBIO6vY0JvxyZwhdlIcwIY9BvwrnS0k
- eSXnM4aBWBKkSODxm/xaxRXpAV3IEVLRrQTPzNvH/mvTUmK6rHQvsp9enHOaqx0nNlt2
- HRvezxfpbBK4xcdPM4pZ+zczZ+mDm8B/XJGeh2szDqoDswW3O4jmQgUFDqwaIajRtbRk
- 3qYgnRs7yZrIdF8YFaHuXlgDeGA4r1wDOxqLZhqU79h0iOmMJB7EaVHbLjked3z6Yagg
- Q8unCTV8IS9N2Cpc/DkE3AqOpd79OK6UrUhsbag+gzb3Eg+PL4k/z//QbNCohJN5GAsZ
- Kgvg==
-X-Gm-Message-State: APjAAAWHme7ODV/Qu8BODh6zb/SB4BdMth37BIBetgrYVBlkxABhtoZN
- UzXqDcnYmiRl5/u77e6MExVpLzjO37my08K1LRbrnuHO4zqjen0adJ7SDwsMbySIFU7hmpbpO+9
- JBo4waR8o3qt6ok4=
-X-Received: by 2002:a37:9d44:: with SMTP id g65mr9308945qke.15.1581498906464; 
- Wed, 12 Feb 2020 01:15:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxlftBNRnpiBz+KvKNJz2frshDsvKQ2+OJG52e1nrZBO4xynJpwxurqShPM5E74UZozY6B2ag==
-X-Received: by 2002:a37:9d44:: with SMTP id g65mr9308935qke.15.1581498906290; 
- Wed, 12 Feb 2020 01:15:06 -0800 (PST)
-Received: from redhat.com (bzq-79-176-41-183.red.bezeqint.net. [79.176.41.183])
- by smtp.gmail.com with ESMTPSA id h14sm84919qke.99.2020.02.12.01.15.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 01:15:05 -0800 (PST)
-Date: Wed, 12 Feb 2020 04:15:01 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [virtio-dev] Re: [PATCH v2 4/5] virtio-mmio: add MSI interrupt
- feature support
-Message-ID: <20200212041317-mutt-send-email-mst@kernel.org>
-References: <c42c8b49-5357-f341-2942-ba84afc25437@linux.intel.com>
- <ad96269f-753d-54b8-a4ae-59d1595dd3b2@redhat.com>
- <5522f205-207b-b012-6631-3cc77dde3bfe@linux.intel.com>
- <45e22435-08d3-08fe-8843-d8db02fcb8e3@redhat.com>
- <20200211065319-mutt-send-email-mst@kernel.org>
- <c4a78a15-c889-df3f-3e1e-7df1a4d67838@redhat.com>
- <20200211070523-mutt-send-email-mst@kernel.org>
- <fdb19ef4-2003-6c6f-5c6f-c757a6320130@redhat.com>
- <20200211090003-mutt-send-email-mst@kernel.org>
- <4557a5e8-74eb-f238-1579-b7b558cb2969@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <4557a5e8-74eb-f238-1579-b7b558cb2969@redhat.com>
-X-MC-Unique: b8s4NDyHP5WHlWFZP41utQ-1
+ bh=5JkDH1B4lCtLpE4CvWTZmOnEMpHfE5iAVpg1lkIuOSk=;
+ b=fKF2No0+eeQl5Sq79mR2twXPQqhWEEWBONHCjW/Osb+syt708gzCVgTAUyGcdo0X7KUAtu
+ sqnoz43KZt8Tpcrw8oRM8zXID8EuyVtbRA7HPerljrPI31Fu9ZZ8YuTMon2Uxbo+CulC7U
+ DqOCebWwyZvDWyDZygrP56fX+u06Ft8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-OmuJGthHPzmMoQkeuN6dwQ-1; Wed, 12 Feb 2020 04:16:08 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A884E801E7A;
+ Wed, 12 Feb 2020 09:16:06 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C31B1001281;
+ Wed, 12 Feb 2020 09:16:04 +0000 (UTC)
+Message-ID: <bb13e4e3d519f1afa3af7eec98e4d16850801579.camel@redhat.com>
+Subject: Re: [PATCH v5 04/26] nvme: add missing fields in the identify data
+ structures
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Klaus Jensen <k.jensen@samsung.com>, qemu-block@nongnu.org
+Date: Wed, 12 Feb 2020 11:15:53 +0200
+In-Reply-To: <20200204095208.269131-5-k.jensen@samsung.com>
+References: <20200204095208.269131-1-k.jensen@samsung.com>
+ <CGME20200204095218eucas1p25d4623d82b1b7db3e555f3b27ca19763@eucas1p2.samsung.com>
+ <20200204095208.269131-5-k.jensen@samsung.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: OmuJGthHPzmMoQkeuN6dwQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,40 +86,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-dev@lists.oasis-open.org, Zha Bin <zhabin@linux.alibaba.com>,
- slp@redhat.com, "Liu, Jing2" <jing2.liu@linux.intel.com>,
- linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
- chao.p.peng@linux.intel.com, gerry@linux.alibaba.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Beata Michalska <beata.michalska@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Klaus Jensen <its@irrelevant.dk>,
+ Javier Gonzalez <javier.gonz@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 12, 2020 at 05:03:00PM +0800, Jason Wang wrote:
->=20
-> On 2020/2/11 =E4=B8=8B=E5=8D=8810:00, Michael S. Tsirkin wrote:
-> > > Yes, it can work but it may bring extra effort when you want to mask =
-a
-> > > vector which is was shared by a lot of queues.
-> > >=20
-> > > Thanks
-> > >=20
-> > masking should be per vq too.
-> >=20
-> > --=20
->=20
->=20
-> Yes, but if the vector is shard by e.g 16 queues, then all those virtqueu=
-es
-> needs to be masked which is expensive.
->=20
-> Thanks
+On Tue, 2020-02-04 at 10:51 +0100, Klaus Jensen wrote:
+> Not used by the device model but added for completeness. See NVM Express
+> 1.2.1, Section 5.11 ("Identify command"), Figure 90 and Figure 93.
+> 
+> Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+> ---
+>  include/block/nvme.h | 48 ++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 40 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index 8fb941c6537c..d2f65e8fe496 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -543,7 +543,13 @@ typedef struct NvmeIdCtrl {
+>      uint8_t     ieee[3];
+>      uint8_t     cmic;
+>      uint8_t     mdts;
+> -    uint8_t     rsvd255[178];
+> +    uint16_t    cntlid;
+> +    uint32_t    ver;
+> +    uint32_t    rtd3r;
+> +    uint32_t    rtd3e;
+> +    uint32_t    oaes;
+> +    uint32_t    ctratt;
+> +    uint8_t     rsvd100[156];
+>      uint16_t    oacs;
+>      uint8_t     acl;
+>      uint8_t     aerl;
+> @@ -551,10 +557,22 @@ typedef struct NvmeIdCtrl {
+>      uint8_t     lpa;
+>      uint8_t     elpe;
+>      uint8_t     npss;
+> -    uint8_t     rsvd511[248];
+> +    uint8_t     avscc;
+> +    uint8_t     apsta;
+> +    uint16_t    wctemp;
+> +    uint16_t    cctemp;
+> +    uint16_t    mtfa;
+> +    uint32_t    hmpre;
+> +    uint32_t    hmmin;
+> +    uint8_t     tnvmcap[16];
+> +    uint8_t     unvmcap[16];
+> +    uint32_t    rpmbs;
+> +    uint8_t     rsvd316[4];
+> +    uint16_t    kas;
+> +    uint8_t     rsvd322[190];
+>      uint8_t     sqes;
+>      uint8_t     cqes;
+> -    uint16_t    rsvd515;
+> +    uint16_t    maxcmd;
+>      uint32_t    nn;
+>      uint16_t    oncs;
+>      uint16_t    fuses;
+> @@ -562,8 +580,14 @@ typedef struct NvmeIdCtrl {
+>      uint8_t     vwc;
+>      uint16_t    awun;
+>      uint16_t    awupf;
+> -    uint8_t     rsvd703[174];
+> -    uint8_t     rsvd2047[1344];
+> +    uint8_t     nvscc;
+> +    uint8_t     rsvd531;
+> +    uint16_t    acwu;
+> +    uint8_t     rsvd534[2];
+> +    uint32_t    sgls;
+> +    uint8_t     rsvd540[228];
+> +    uint8_t     subnqn[256];
+> +    uint8_t     rsvd1024[1024];
+>      NvmePSD     psd[32];
+>      uint8_t     vs[1024];
+>  } NvmeIdCtrl;
+> @@ -653,13 +677,21 @@ typedef struct NvmeIdNs {
+>      uint8_t     mc;
+>      uint8_t     dpc;
+>      uint8_t     dps;
+> -
+>      uint8_t     nmic;
+>      uint8_t     rescap;
+>      uint8_t     fpi;
+>      uint8_t     dlfeat;
+> -
+> -    uint8_t     res34[94];
+> +    uint8_t     rsvd33;
+This is wrong. nawun comes right after dlfeat
+> +    uint16_t    nawun;
+> +    uint16_t    nawupf;
+And here the error cancels out since here there should be 'nacwu' field.
+> +    uint16_t    nabsn;
+> +    uint16_t    nabo;
+> +    uint16_t    nabspf;
+> +    uint8_t     rsvd46[2];
+> +    uint8_t     nvmcap[16];
+> +    uint8_t     rsvd64[40];
+> +    uint8_t     nguid[16];
+> +    uint64_t    eui64;
+>      NvmeLBAF    lbaf[16];
+>      uint8_t     res192[192];
+Not related to the patch, but maybe rename this to rsvd192 for the sake of consistency?
+>      uint8_t     vs[3712];
 
-I think that's ok - masking is rare. in fact if vectors can be
-changed atomically I'm no longer sure they are needed,
-maybe a destructive "disable" which can lose interrupts
-is enough.
 
---=20
-MST
+I reviewed this patch by cross referencing the nvme structures as defined in the kernel,
+and the spec.
+
+I prefer to merge this patch with all other spec updates you do in following patches,
+to bring nvme.h up to date to 1.3d,
+so that it will be easier to review this and remove some noise from other patches.
+
+Best regards,
+	Maxim Levitsky
 
 
