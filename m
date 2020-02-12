@@ -2,63 +2,83 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15844C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E858C2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2D2C206DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:23:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2D2C206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33837206DB
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 07:29:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33837206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1mNC-0004MJ-6G
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 02:23:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55034)
+	id 1j1mSd-0005tr-C6
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 02:29:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1j1mMa-0003sm-Qb
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:23:13 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1j1mRn-0005LR-N7
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:28:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1j1mMZ-0008GV-Tr
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:23:12 -0500
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:57283)
+ (envelope-from <yi.l.liu@intel.com>) id 1j1mRm-00053a-49
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:28:35 -0500
+Received: from mga17.intel.com ([192.55.52.151]:20113)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1j1mMZ-0008EU-F7; Wed, 12 Feb 2020 02:23:11 -0500
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07693641|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.268712-0.0350433-0.696245;
- DS=CONTINUE|ham_system_inform|0.364233-0.000436892-0.63533;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03279; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.GnByJJ2_1581492182; 
-Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.GnByJJ2_1581492182)
- by smtp.aliyun-inc.com(10.147.41.120);
- Wed, 12 Feb 2020 15:23:02 +0800
-Subject: Re: [PATCH v4 3/4] target/riscv: support vector extension csr
-To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200210081240.11481-1-zhiwei_liu@c-sky.com>
- <20200210081240.11481-4-zhiwei_liu@c-sky.com>
- <23fd0388-7b52-5105-9dc1-cc359b59d881@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <93368c51-436d-c8e7-0ce7-8bbe172a1645@c-sky.com>
-Date: Wed, 12 Feb 2020 15:23:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <23fd0388-7b52-5105-9dc1-cc359b59d881@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j1mRl-00053C-RF
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 02:28:34 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 11 Feb 2020 23:28:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,428,1574150400"; d="scan'208";a="380685886"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by orsmga004.jf.intel.com with ESMTP; 11 Feb 2020 23:28:31 -0800
+Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 11 Feb 2020 23:28:31 -0800
+Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
+ FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 11 Feb 2020 23:28:25 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX152.ccr.corp.intel.com ([169.254.6.158]) with mapi id 14.03.0439.000;
+ Wed, 12 Feb 2020 15:28:24 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be string
+ option
+Thread-Topic: [RFC v3 13/25] intel_iommu: modify x-scalable-mode to be
+ string option
+Thread-Index: AQHV1p1OaPbyEoP2OUqqqdiprp3R66gV87yAgAFI6dA=
+Date: Wed, 12 Feb 2020 07:28:24 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A1BA573@SHSMSX104.ccr.corp.intel.com>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-14-git-send-email-yi.l.liu@intel.com>
+ <20200211194331.GK984290@xz-x1>
+In-Reply-To: <20200211194331.GK984290@xz-x1>
+Accept-Language: en-US
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDUyZGRjOWEtYmVjMi00ODJlLTg3NzYtZjkxMmNhOTVkNmVmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNTZKVkhKSWVLc0lXZjZmUzhCT2tpWU1WOTFYR1c3SWpPUnU4ZUJlUlVUbmtiRkl3ekdNcG5uZVFRVGRkMDBUWCJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,56 +90,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo
+ Habkost <ehabkost@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2020/2/12 0:11, Richard Henderson wrote:
-> On 2/10/20 8:12 AM, LIU Zhiwei wrote:
->> +static int vs(CPURISCVState *env, int csrno)
->> +{
->> +    return 0;
->> +}
-> This should at least be testing RVV, a-la smode().
-Testing RVV is ok.
-
-  I'm not quite understand "a -1a smode()" here. Could you give more 
-details? Thanks.
-> You probably want to have all of the other tests vs RVV in this file use this
-> function, since this will need to grow the system mode enable test.
->
->> @@ -158,8 +167,10 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
->>           return -1;
->>       }
->>   #endif
->> -    *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
->> -        | (env->frm << FSR_RD_SHIFT);
->> +    *val = (env->vext.vxrm << FSR_VXRM_SHIFT)
->> +            | (env->vext.vxsat << FSR_VXSAT_SHIFT)
->> +            | (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
->> +            | (env->frm << FSR_RD_SHIFT);
->>       return 0;
->>   }
-> While we can be perfectly happy shifting 0's into place here, it would probably
-> be clearer to conditionalize on vs().
-OK.
->> @@ -172,10 +183,60 @@ static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
->>       env->mstatus |= MSTATUS_FS;
->>   #endif
->>       env->frm = (val & FSR_RD) >> FSR_RD_SHIFT;
->> +    env->vext.vxrm = (val & FSR_VXRM) >> FSR_VXRM_SHIFT;
->> +    env->vext.vxsat = (val & FSR_VXSAT) >> FSR_VXSAT_SHIFT;
->>       riscv_cpu_set_fflags(env, (val & FSR_AEXC) >> FSR_AEXC_SHIFT);
->>       return 0;
->>   }
-> You *must* test vs() here.
-OK.
->
->
-> r~
-
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
+RmVicnVhcnkgMTIsIDIwMjAgMzo0NCBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRl
+bC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYzIDEzLzI1XSBpbnRlbF9pb21tdTogbW9kaWZ5
+IHgtc2NhbGFibGUtbW9kZSB0byBiZSBzdHJpbmcNCj4gb3B0aW9uDQo+IA0KPiBPbiBXZWQsIEph
+biAyOSwgMjAyMCBhdCAwNDoxNjo0NEFNIC0wODAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gRnJv
+bTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPg0KPiA+IEludGVsIFZULWQgMy4w
+IGludHJvZHVjZXMgc2NhbGFibGUgbW9kZSwgYW5kIGl0IGhhcyBhIGJ1bmNoIG9mDQo+ID4gY2Fw
+YWJpbGl0aWVzIHJlbGF0ZWQgdG8gc2NhbGFibGUgbW9kZSB0cmFuc2xhdGlvbiwgdGh1cyB0aGVy
+ZSBhcmUgbXVsdGlwbGUNCj4gY29tYmluYXRpb25zLg0KPiA+IFdoaWxlIHRoaXMgdklPTU1VIGlt
+cGxlbWVudGF0aW9uIHdhbnRzIHNpbXBsaWZ5IGl0IGZvciB1c2VyIGJ5DQo+ID4gcHJvdmlkaW5n
+IHR5cGljYWwgY29tYmluYXRpb25zLiBVc2VyIGNvdWxkIGNvbmZpZyBpdCBieQ0KPiA+ICJ4LXNj
+YWxhYmxlLW1vZGUiIG9wdGlvbi4gVGhlIHVzYWdlIGlzIGFzIGJlbG93Og0KPiA+DQo+ID4gIi1k
+ZXZpY2UgaW50ZWwtaW9tbXUseC1zY2FsYWJsZS1tb2RlPVsibGVnYWN5InwibW9kZXJuIl0iDQo+
+IA0KPiBNYXliZSBhbHNvICJvZmYiIHdoZW4gc29tZW9uZSB3YW50cyB0byBleHBsaWNpdGx5IGRp
+c2FibGUgaXQ/DQoNCmVtbW0sIEkgIHRoaW5rIHgtc2NhbGFibGUtbW9kZSBzaG91bGQgYmUgZGlz
+YWJsZWQgYnkgZGVmYXVsdC4gSXQgaXMgZW5hYmxlZA0Kb25seSB3aGVuICJsZWdhY3kiIG9yICJt
+b2Rlcm4iIGlzIGNvbmZpZ3VyZWQuIEknbSBmaW5lIHRvIGFkZCAib2ZmIiBhcyBhbg0KZXhwbGlj
+aXQgd2F5IHRvIHR1cm4gaXQgb2ZmIGlmIHlvdSB0aGluayBpdCBpcyBuZWNlc3NhcnkuIDotKQ0K
+DQo+ID4NCj4gPiAgLSAibGVnYWN5IjogZ2l2ZXMgc3VwcG9ydCBmb3IgU0wgcGFnZSB0YWJsZQ0K
+PiA+ICAtICJtb2Rlcm4iOiBnaXZlcyBzdXBwb3J0IGZvciBGTCBwYWdlIHRhYmxlLCBwYXNpZCwg
+dmlydHVhbCBjb21tYW5kDQo+ID4gIC0gIGlmIG5vdCBjb25maWd1cmVkLCBtZWFucyBubyBzY2Fs
+YWJsZSBtb2RlIHN1cHBvcnQsIGlmIG5vdCBwcm9wZXINCj4gPiAgICAgY29uZmlndXJlZCwgd2ls
+bCB0aHJvdyBlcnJvcg0KPiA+DQo+ID4gQ2M6IEtldmluIFRpYW4gPGtldmluLnRpYW5AaW50ZWwu
+Y29tPg0KPiA+IENjOiBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5AbGludXguaW50ZWwuY29tPg0K
+PiA+IENjOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gQ2M6IFlpIFN1biA8eWku
+eS5zdW5AbGludXguaW50ZWwuY29tPg0KPiA+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUBy
+ZWRoYXQuY29tPg0KPiA+IENjOiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0K
+PiA+IENjOiBFZHVhcmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+DQo+ID4gU2lnbmVk
+LW9mZi1ieTogTGl1IFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5
+OiBZaSBTdW4gPHlpLnkuc3VuQGxpbnV4LmludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgaHcvaTM4
+Ni9pbnRlbF9pb21tdS5jICAgICAgICAgIHwgMjcgKysrKysrKysrKysrKysrKysrKysrKysrKy0t
+DQo+ID4gIGh3L2kzODYvaW50ZWxfaW9tbXVfaW50ZXJuYWwuaCB8ICAzICsrKw0KPiA+IGluY2x1
+ZGUvaHcvaTM4Ni9pbnRlbF9pb21tdS5oICB8ICAyICsrDQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwg
+MzAgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9o
+dy9pMzg2L2ludGVsX2lvbW11LmMgYi9ody9pMzg2L2ludGVsX2lvbW11LmMgaW5kZXgNCj4gPiAx
+YzFlYjdmLi4zM2JlNDBjIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0K
+PiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IEBAIC0zMDc4LDcgKzMwNzgsNyBA
+QCBzdGF0aWMgUHJvcGVydHkgdnRkX3Byb3BlcnRpZXNbXSA9IHsNCj4gPiAgICAgIERFRklORV9Q
+Uk9QX1VJTlQ4KCJhdy1iaXRzIiwgSW50ZWxJT01NVVN0YXRlLCBhd19iaXRzLA0KPiA+ICAgICAg
+ICAgICAgICAgICAgICAgICAgVlREX0hPU1RfQUREUkVTU19XSURUSCksDQo+ID4gICAgICBERUZJ
+TkVfUFJPUF9CT09MKCJjYWNoaW5nLW1vZGUiLCBJbnRlbElPTU1VU3RhdGUsIGNhY2hpbmdfbW9k
+ZSwNCj4gRkFMU0UpLA0KPiA+IC0gICAgREVGSU5FX1BST1BfQk9PTCgieC1zY2FsYWJsZS1tb2Rl
+IiwgSW50ZWxJT01NVVN0YXRlLCBzY2FsYWJsZV9tb2RlLA0KPiBGQUxTRSksDQo+ID4gKyAgICBE
+RUZJTkVfUFJPUF9TVFJJTkcoIngtc2NhbGFibGUtbW9kZSIsIEludGVsSU9NTVVTdGF0ZSwNCj4g
+PiArIHNjYWxhYmxlX21vZGVfc3RyKSwNCj4gPiAgICAgIERFRklORV9QUk9QX0JPT0woImRtYS1k
+cmFpbiIsIEludGVsSU9NTVVTdGF0ZSwgZG1hX2RyYWluLCB0cnVlKSwNCj4gPiAgICAgIERFRklO
+RV9QUk9QX0VORF9PRl9MSVNUKCksDQo+ID4gIH07DQo+ID4gQEAgLTM3MDgsOCArMzcwOCwxMSBA
+QCBzdGF0aWMgdm9pZCB2dGRfaW5pdChJbnRlbElPTU1VU3RhdGUgKnMpDQo+ID4gICAgICB9DQo+
+ID4NCj4gPiAgICAgIC8qIFRPRE86IHJlYWQgY2FwL2VjYXAgZnJvbSBob3N0IHRvIGRlY2lkZSB3
+aGljaCBjYXAgdG8gYmUgZXhwb3NlZC4gKi8NCj4gPiAtICAgIGlmIChzLT5zY2FsYWJsZV9tb2Rl
+KSB7DQo+ID4gKyAgICBpZiAocy0+c2NhbGFibGVfbW9kZSAmJiAhcy0+c2NhbGFibGVfbW9kZXJu
+KSB7DQo+ID4gICAgICAgICAgcy0+ZWNhcCB8PSBWVERfRUNBUF9TTVRTIHwgVlREX0VDQVBfU1JT
+IHwgVlREX0VDQVBfU0xUUzsNCj4gPiArICAgIH0gZWxzZSBpZiAocy0+c2NhbGFibGVfbW9kZSAm
+JiBzLT5zY2FsYWJsZV9tb2Rlcm4pIHsNCj4gPiArICAgICAgICBzLT5lY2FwIHw9IFZURF9FQ0FQ
+X1NNVFMgfCBWVERfRUNBUF9TUlMgfCBWVERfRUNBUF9QQVNJRA0KPiA+ICsgICAgICAgICAgICAg
+ICAgICAgfCBWVERfRUNBUF9GTFRTIHwgVlREX0VDQVBfUFNTOw0KPiANCj4gVGhpcyBwYXRjaCBt
+aWdodCBiZSBnb29kIHRvIGJlIHRoZSBsYXN0IG9uZSBhZnRlciBhbGwgdGhlIGltcGxzIGFyZSBy
+ZWFkeS4NCg0KT2gsIHllcy4gTGV0IG1lIHJlb3JkZXIgaXQgaW4gbmV4dCB2ZXJzaW9uLg0KDQo+
+ID4gICAgICB9DQo+ID4NCj4gPiAgICAgIHZ0ZF9yZXNldF9jYWNoZXMocyk7DQo+ID4gQEAgLTM4
+NDUsNiArMzg0OCwyNiBAQCBzdGF0aWMgYm9vbCB2dGRfZGVjaWRlX2NvbmZpZyhJbnRlbElPTU1V
+U3RhdGUgKnMsDQo+IEVycm9yICoqZXJycCkNCj4gPiAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+
+ID4gICAgICB9DQo+ID4NCj4gPiArICAgIGlmIChzLT5zY2FsYWJsZV9tb2RlX3N0ciAmJg0KPiA+
+ICsgICAgICAgIChzdHJjbXAocy0+c2NhbGFibGVfbW9kZV9zdHIsICJtb2Rlcm4iKSAmJg0KPiA+
+ICsgICAgICAgICBzdHJjbXAocy0+c2NhbGFibGVfbW9kZV9zdHIsICJsZWdhY3kiKSkpIHsNCj4g
+PiArICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJJbnZhbGlkIHgtc2NhbGFibGUtbW9kZSBjb25m
+aWciKTsNCj4gDQo+IE1heWJlICIuLi4sIFBsZWFzZSB1c2UgJ21vZGVybicsICdsZWdhY3knLCBv
+ciAnb2ZmJy4iIHRvIHNob3cgb3B0aW9ucy4NCg0KR290IGl0Lg0KDQpUaGFua3MsDQpZaSBMaXUN
+Cg==
 
