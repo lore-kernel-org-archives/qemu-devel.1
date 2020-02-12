@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB5AFC2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 12:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4155C352A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 12:56:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9105620659
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 12:56:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9105620659
+	by mail.kernel.org (Postfix) with ESMTPS id 9D82020659
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 12:56:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D82020659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1rZ8-0005vH-Nr
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 07:56:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60585)
+	id 1j1rZ9-0005xt-OC
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 07:56:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60587)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j1rYS-00059J-7Y
+ (envelope-from <bounces@canonical.com>) id 1j1rYS-00059K-FP
  for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:55:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j1rYR-0001y3-8h
+ (envelope-from <bounces@canonical.com>) id 1j1rYR-0001y9-9y
  for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:55:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59912)
+Received: from indium.canonical.com ([91.189.90.7]:59902)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j1rYR-0001xO-3G
+ id 1j1rYR-0001xL-4n
  for qemu-devel@nongnu.org; Wed, 12 Feb 2020 07:55:47 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j1rYP-0000CU-II
+ id 1j1rYP-0000J0-5i
  for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 12:55:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8985E2E8078
+ by loganberry.canonical.com (Postfix) with ESMTP id 0641A2E8078
  for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 12:55:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Feb 2020 12:47:10 -0000
+Date: Wed, 12 Feb 2020 12:45:17 -0000
 From: crocket <crockabiscuit@gmail.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: crockabiscuit laurent-vivier
 X-Launchpad-Bug-Reporter: crocket (crockabiscuit)
 X-Launchpad-Bug-Modifier: crocket (crockabiscuit)
 References: <157762661516.5433.16221584605990009162.malonedeb@gac.canonical.com>
-Message-Id: <158151163080.30257.15557388448715153689.malone@wampee.canonical.com>
+Message-Id: <158151151743.29423.2827524736516781132.malone@chaenomeles.canonical.com>
 Subject: [Bug 1857811] Re: qemu user static binary seems to lack support for
  network namespace.
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f44313ff4da10d840c05af7e98d2bfdbf2eaa854
+X-Launchpad-Hash: d03db767847d4493c0538cc2f16f00b39a0aca80
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,8 +83,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-You can obtain portage source code from
-https://gentoo.osuosl.org/distfiles/portage-2.3.84.tar.bz2
+def _configure_loopback_interface():
+	"""
+	Configure the loopback interface.
+	"""
+
+	# We add some additional addresses to work around odd behavior in glibc's
+	# getaddrinfo() implementation when the AI_ADDRCONFIG flag is set.
+	#
+	# For example:
+	#
+	#   struct addrinfo *res, hints =3D { .ai_family =3D AF_INET, .ai_flags =
+=3D AI_ADDRCONFIG };
+	#   getaddrinfo("localhost", NULL, &hints, &res);
+	#
+	# This returns no results if there are no non-loopback addresses
+	# configured for a given address family.
+	#
+	# Bug: https://bugs.gentoo.org/690758
+	# Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=3D12377#c13
+
+	# Avoid importing this module on systems that may not support netlink sock=
+ets.
+	from portage.util.netlink import RtNetlink
+
+	try:
+		with RtNetlink() as rtnl:
+			ifindex =3D rtnl.get_link_ifindex(b'lo')
+			rtnl.set_link_up(ifindex)
+			rtnl.add_address(ifindex, socket.AF_INET, '10.0.0.1', 8)
+			if _has_ipv6():
+				rtnl.add_address(ifindex, socket.AF_INET6, 'fd::1', 8)
+	except EnvironmentError as e:
+		writemsg("Unable to configure loopback interface: %s\n" % e.strerror, noi=
+selevel=3D-1)
+
+If I execute _configure_loopback_interface in a qemu-aarch64 chroot, I
+see the following error.
+
+Unable to configure loopback interface: Operation not supported
+
+https://bugs.gentoo.org/703276 explains the issue.
+
+** Bug watch added: Sourceware.org Bugzilla #12377
+   https://sourceware.org/bugzilla/show_bug.cgi?id=3D12377
 
 -- =
 
