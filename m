@@ -2,61 +2,100 @@ Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84DFC352A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 23:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7821C352A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 23:55:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B777521569
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 23:52:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F56E206E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 23:55:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gmSEyH34"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B777521569
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GXqDsuII"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F56E206E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j21oB-00030E-VV
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 18:52:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60643)
+	id 1j21rJ-0005tr-QD
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 18:55:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33129)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j21mb-0000ik-Rv
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 18:51:07 -0500
+ (envelope-from <philmd@redhat.com>) id 1j21qg-0005H7-5K
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 18:55:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j21ma-0004pL-Mk
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 18:51:05 -0500
-Received: from ozlabs.org ([203.11.71.1]:45405)
+ (envelope-from <philmd@redhat.com>) id 1j21qe-0000A3-8f
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 18:55:17 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44433
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j21mZ-0004nb-Hq; Wed, 12 Feb 2020 18:51:04 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48HxH73r17z9sPF; Thu, 13 Feb 2020 10:50:59 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581551459;
- bh=9AaV8EIijB3c/HD+ZEBPRd/vUs+20dxRBeRLER7h4x4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=gmSEyH34vGlyEhAJzh+WSfoOI6uF+XUoxrpgz4GhVrUhW6RYqFOiV3prrMDy9c0ml
- UjeE04sx4q5c6VjJ1JflfhWAHydj3Ym7SZy7suBI5ThuCInUFMWIeaoecpnfCcJAEa
- g0qJtJgXdL9qPFK16A5yuoTYJ1vncS1tgPLItUOY=
-Date: Thu, 13 Feb 2020 10:48:13 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH] target/ppc/cpu.h: Remove duplicate includes
-Message-ID: <20200212234813.GA124369@umbus.fritz.box>
-References: <20200212223207.5A37574637F@zero.eik.bme.hu>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j21qe-00009j-4r
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 18:55:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581551715;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=R4woObnsmSdZMMEHBC68PBlk6yPgGEqa4BBtrfc0mm4=;
+ b=GXqDsuIIy+CBJYBZHEfyvEJK2ynUGJCfde/IPU91ZBceW2h5dK25RdWiI+pDr7idxeLNjX
+ Why5I2AHh7/KkFDouf32Wtbd5DDfutAvhlFW9j9it2Ubzagos3ty+Mg/fcCOLn3G2xMh2j
+ vvCVwBf4OtCPtKsHN7Cj4T1SYnFqoLE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-269-OHYkU8dgMMG1cILttlQVjg-1; Wed, 12 Feb 2020 18:55:11 -0500
+Received: by mail-wr1-f72.google.com with SMTP id w17so1537797wrr.9
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 15:55:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=R4woObnsmSdZMMEHBC68PBlk6yPgGEqa4BBtrfc0mm4=;
+ b=aYSUC0bmzb5C13/2ZzauU76tyuUgM4CWnUyJl20j5zu1q05J7Wcod/tDA+Xll6tTpd
+ U1lI0ABFeIzMMybnvIbLLTUQjVgEgO7Tb8SyTRvjJQSrkr6I5SKM4GMLHdFzOrsj41vB
+ Ll8kUNeVpBucwiWxlBbAy00I8K49u1l+9XZkPun1wgwa8+VYm6Xp/5GWIiUpo4NSXig0
+ C4io4nLrs8WYiESC0mz6AXuXAW4c5F6dodnV3hH1XzpykygO6pT+ZJLmcdlrZcl7EXBf
+ ZW6RftZxgTV3uxvEJbNSDJwnVA84srPHSLzUdEQHClpwVX16/2Lp4fvXugJa1sO/gofU
+ Q5Xw==
+X-Gm-Message-State: APjAAAUeYHGHtsO2PkOEB0LvqPt3eJ2AVli1HKE/B4mUtcyabtJFtTlH
+ YilmwXSVqTJS3c7b0vEneO5BtxEYnwqpKWoLPbX5iU/oJ8t681e/sO67iwZ5x3XCHzg60iQxycr
+ /wnLYzoTViulsYNo=
+X-Received: by 2002:a5d:4204:: with SMTP id n4mr17481633wrq.123.1581551710468; 
+ Wed, 12 Feb 2020 15:55:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwSxQYQ6FRS7z+9ss8zG6WFoazTCqNvzW0ktjRibnlDOgXYWb+YKqI+KO8ZiMV7uUP7jnkFfA==
+X-Received: by 2002:a5d:4204:: with SMTP id n4mr17481606wrq.123.1581551710182; 
+ Wed, 12 Feb 2020 15:55:10 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id n8sm463957wrx.42.2020.02.12.15.55.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 12 Feb 2020 15:55:09 -0800 (PST)
+Subject: Re: [PATCH v5 5/6] hppa: Add emulation of Artist graphics
+To: Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
+References: <20191220211512.3289-1-svens@stackframe.org>
+ <20191220211512.3289-6-svens@stackframe.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <896a8b05-b3a4-846d-f129-73207282edd5@redhat.com>
+Date: Thu, 13 Feb 2020 00:55:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="jI8keyz6grp/JLjh"
-Content-Disposition: inline
-In-Reply-To: <20200212223207.5A37574637F@zero.eik.bme.hu>
+In-Reply-To: <20191220211512.3289-6-svens@stackframe.org>
+Content-Language: en-US
+X-MC-Unique: OHYkU8dgMMG1cILttlQVjg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,70 +107,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org
+Cc: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Sven,
 
---jI8keyz6grp/JLjh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 12, 2020 at 11:26:14PM +0100, BALATON Zoltan wrote:
-> Commit 74433bf083b added some includes but added them twice. Since
-> these are guarded against multiple inclusion including them once is
-> enough.
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-
-Applied to ppc-for-5.0, thanks.
-
+On 12/20/19 10:15 PM, Sven Schnelle wrote:
+> This adds emulation of Artist graphics good enough
+> to get a Text console on both Linux and HP-UX. The
+> X11 server from HP-UX also works.
+> 
+> Signed-off-by: Sven Schnelle <svens@stackframe.org>
 > ---
->  target/ppc/cpu.h | 2 --
->  1 file changed, 2 deletions(-)
->=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 3a1eb76004..07dd2b4da7 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -23,8 +23,6 @@
->  #include "qemu/int128.h"
->  #include "exec/cpu-defs.h"
->  #include "cpu-qom.h"
-> -#include "exec/cpu-defs.h"
-> -#include "cpu-qom.h"
-> =20
->  /* #define PPC_EMULATE_32BITS_HYPV */
-> =20
+>   hw/display/Kconfig       |    4 +
+>   hw/display/Makefile.objs |    1 +
+>   hw/display/artist.c      | 1450 ++++++++++++++++++++++++++++++++++++++
+>   hw/display/trace-events  |    9 +
+>   hw/hppa/Kconfig          |    1 +
+>   hw/hppa/hppa_hardware.h  |    1 +
+>   hw/hppa/machine.c        |    9 +
+>   7 files changed, 1475 insertions(+)
+>   create mode 100644 hw/display/artist.c
+> 
+> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+> index c500d1fc6d..15d59e10dc 100644
+> --- a/hw/display/Kconfig
+> +++ b/hw/display/Kconfig
+> @@ -91,6 +91,10 @@ config TCX
+>   config CG3
+>       bool
+>   
+> +config ARTIST
+> +    bool
+> +    select FRAMEBUFFER
+> +
+>   config VGA
+>       bool
+>   
+> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+> index f2182e3bef..5f03dfdcc4 100644
+> --- a/hw/display/Makefile.objs
+> +++ b/hw/display/Makefile.objs
+> @@ -40,6 +40,7 @@ common-obj-$(CONFIG_SM501) += sm501.o
+>   common-obj-$(CONFIG_TCX) += tcx.o
+>   common-obj-$(CONFIG_CG3) += cg3.o
+>   common-obj-$(CONFIG_NEXTCUBE) += next-fb.o
+> +common-obj-$(CONFIG_ARTIST) += artist.o
+>   
+>   obj-$(CONFIG_VGA) += vga.o
+>   
+> diff --git a/hw/display/artist.c b/hw/display/artist.c
+[...]
+> +static void draw_line_size(ARTISTState *s, bool update_start)
+> +{
+> +
+> +    int startx = artist_get_x(s->vram_start);
+> +    int starty = artist_get_y(s->vram_start);
+> +    int endx = artist_get_x(s->line_size);
+> +    int endy = artist_get_y(s->line_size);
+> +
+> +    trace_artist_draw_line(startx, starty, endx, endy);
+> +    draw_line(s, startx, starty, endx, endy, update_start, -1, -1);
+> +}
+> +
+> +static void draw_line_xy(ARTISTState *s, bool update_start)
+> +{
+> +
+> +    int startx = artist_get_x(s->vram_start);
+> +    int starty = artist_get_y(s->vram_start);
+> +    int sizex = artist_get_x(s->blockmove_size);
+> +    int sizey = artist_get_y(s->blockmove_size);
+> +    int linexy = s->line_xy >> 16;
+> +    int endx, endy;
+> +
+> +    endx = startx;
+> +    endy = starty;
+> +
+> +    if (sizex > 0) {
+> +        endx = startx + linexy;
+> +    }
+> +
+> +    if (sizex < 0) {
+> +        endx = startx;
+> +        startx -= linexy;
+> +    }
+> +
+> +    if (sizey > 0) {
+> +        endy = starty + linexy;
+> +    }
+> +
+> +    if (sizey < 0) {
+> +        endy = starty;
+> +        starty -= linexy;
+> +    }
+> +
+> +    if (startx < 0) {
+> +        startx = 0;
+> +    }
+> +
+> +    if (endx < 0) {
+> +        endx = 0;
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+If negative, set to zero.
 
---jI8keyz6grp/JLjh
-Content-Type: application/pgp-signature; name="signature.asc"
+> +    }
+> +
+> +    if (starty < 0) {
+> +        starty = 0;
+> +    }
+> +
+> +    if (endy < 0) {
+> +        endy = 0;
 
------BEGIN PGP SIGNATURE-----
+Ditto.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5Ejr0ACgkQbDjKyiDZ
-s5K1uBAAi4YYocwjXtjZZoa5hUG7QG2n6wSmTF1/eUw/KIrF4jIQm2y5DwxkWq+w
-FWtPVbMPit//jrbyvtzmpzHMQbiDbnePP5zfaySl7dDJbrw3nkErJF8YyCMIhQpM
-ohVIjTwcFj0PqVFv65vlHo2ecwFh26oXe3BX5foUtb3XSBNrrMeyQwaP6xYmyQtd
-wdsa3d0BRlkZIAhtRiceVel4rcB3HXQ5kxNaTmaNDAtkTNp/LKXpTSYvfEJMAK2N
-28Z89k6tdC9dYJ0FhX6tj4EJCAr1YjUTWwSgwmE3WyYxK5w/jF5N2bklQ0IGAM76
-5r8MZcWpqvlr69nw8JZfVPI3F4Ee1zEuY8HkW1fvw+u5W5griWaBNpn16TZncP2z
-YTZJqhf+CwTCNgop+XrFJrBdfnUur9w8bSkoyhuk7KdebPWp9XLxTOE51/CTtaXG
-NNGs81V6MuCxcEQGi8yl9dU2wfHSFcwKmV+bWziAWoOUA4V3WOzltJm+2K9QZHAO
-HQDrrX0zwRJ9AXB6GD9qcZDlA4UW64Mdgo+/73eoRw5ByIcjo5T8KyTo7LB20yK0
-FF/49l+Vj61LwSi9aoqrNQSME+/LzS6H5LoOQhx/DCj3aD7aWYJjHZaGBMbvBiKE
-UykmQt8bIIrCzD6nwsdo1crnsbeKq2ImPwinJ8UMuO653RUH3BI=
-=/MHu
------END PGP SIGNATURE-----
+> +    }
+> +
+> +
+> +    if (endx < 0) {
+> +        return;
 
---jI8keyz6grp/JLjh--
+Here Coverity points:
+
+ >>>     CID 1419388:  Control flow issues  (DEADCODE)
+ >>>     Execution cannot reach this statement: "return;".
+
+> +    }
+> +
+> +    if (endy < 0) {
+> +        return;
+
+Here again.
+
+> +    }
+> +
+> +    trace_artist_draw_line(startx, starty, endx, endy);
+> +    draw_line(s, startx, starty, endx, endy, false, -1, -1);
+> +}
+> +
+> +static void draw_line_end(ARTISTState *s, bool update_start)
+> +{
+> +
+> +    int startx = artist_get_x(s->vram_start);
+> +    int starty = artist_get_y(s->vram_start);
+> +    int endx = artist_get_x(s->line_end);
+> +    int endy = artist_get_y(s->line_end);
+> +
+> +    trace_artist_draw_line(startx, starty, endx, endy);
+> +    draw_line(s, startx, starty, endx, endy, update_start, -1, -1);
+> +}
+
 
