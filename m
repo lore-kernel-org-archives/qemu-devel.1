@@ -7,81 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8887C2BA83
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E528FC2BA83
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:44:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9554720714
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:44:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2A1320714
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 16:44:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ailBCaG4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9554720714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLg9vX/c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A1320714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j1v7N-0000FF-N8
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:44:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36624)
+	id 1j1v7v-0001GS-T8
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 11:44:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36561)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j1v55-0003PZ-81
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:44 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j1v4w-0003Av-Ui
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j1v54-0001lW-2n
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:43 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:45701)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j1v4v-0001XS-Pv
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:34 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:45697)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j1v53-0001kI-Sx
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:42 -0500
-Received: by mail-wr1-x433.google.com with SMTP id g3so3175561wrs.12
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 08:41:41 -0800 (PST)
+ id 1j1v4v-0001VW-Jn
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 11:41:33 -0500
+Received: by mail-wr1-x430.google.com with SMTP id g3so3174969wrs.12
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 08:41:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Yp9J3Sdvti8kkDmOijc4vUS6SBVhz37pfagJZGeOW6o=;
- b=ailBCaG4TCTkPA5mxR1PSHwKqickulvu+C/zHMVk7yRJ10By3WN/ZPNeVwiy42t4zt
- CwKHzqbl/Ql1IdNfk5jEhz58gtkKBZNE1vi96lwjMaAmCAm9KSyvLhSLdmDDrO4R7/13
- lngQ3NVhFAw1O1YzspDsEZ1olsx4D704nAOzTgt9SwRrkFmo2x8j02J80rBprV3ceQKw
- FgSo3PXdc3JnU6sMKUtu2P7sT4Yl5o1kBl1bQIjlJcpa/dFk/M+/gnSHh6Ty733dDRze
- qYJ5WOKcfbhwmUFKu/7YxNmMtbP3kTrZ0l/+FXDPZ4XhHrNCo8GSmckbYt2Hsv/kEcMI
- 73bA==
+ bh=JT9C6l5cMam9Id8e97W1nQcd6eNpyd3ZDkBP7+S4YoY=;
+ b=kLg9vX/ceW2zrRYHMBPJQ+F88tGJek7bOgDLHOVfBEfnyhiuhRJJJptq+NyUShj2mu
+ TR4K54dYUOM5aqSSGmriAdosVdUlUMr9a4XZZTEl7PAciMUIk7EaaRx1NX6PnA4LShzg
+ IBW7ETBzOQoZCMi1YSkP79u6znaUzIn8kpLGhstAKdK45J3r+TtH8TGiQYq/v2JjZ55k
+ beUdsOZM8gUNG0VF034LMTgIuONKAkkcmwA2H7vFfv5obujXCGMVDe+0VmZBG8QSMFQ1
+ 4XHWM+g74VMCxGh0tE4dbfJFpFPQaQL0l5JYCqA7ZCybxRMKI8dfDMr6lxhR75qA7jU7
+ ETnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Yp9J3Sdvti8kkDmOijc4vUS6SBVhz37pfagJZGeOW6o=;
- b=JuqL3oXLFGrR8E6UqKy5rXqTd89FWVhoAuQHsKf7N6LaKb1H7C4funWhDQ7a2Xqn5r
- hEkI7z4PSWBSdjIEb0ae+0vNy+oVCwf4MznlGedKL/W7bGRoPhGhUPpbYHPwOfwWG9ry
- FJ5ILqEYHSA8Mb0GYru7LFRaZS/ik7bSZnpkNykwu6VpVtddVaShPrLj7/GsefmDilhP
- zEpgQkrPGqYjKKA6+V9wL/3Ik9eYAG8bJiqpdSp/QS8d/r8uZpXrc8JzP0K0y51VBul/
- lreizseFiPVRP+NNG32CRNXKxXEQfK9GWkPiQZoWY9v4RsLCOJdw3Z5SLJYrDRo16AfX
- Bjkw==
-X-Gm-Message-State: APjAAAVcJI7WTqd/Q2zcnvyk9RYOMkrc9JKXLnB2w/Capqj0O0z07eMV
- JPtUCs4fcmgiCO4OsLzcHdzbC0mI
-X-Google-Smtp-Source: APXvYqynxyW7pu+cCTXgugSscnx59Lb6tH7dPxrYdnmSqQ4o8AdS891gbaekg4qGW2tYY3exztNgCQ==
-X-Received: by 2002:adf:f80c:: with SMTP id s12mr16090640wrp.1.1581525700560; 
- Wed, 12 Feb 2020 08:41:40 -0800 (PST)
+ bh=JT9C6l5cMam9Id8e97W1nQcd6eNpyd3ZDkBP7+S4YoY=;
+ b=ZW2kp4xkBOM/7aFyHCes7T9MPtmqOv4/fgnuvZr3cLFhUoV6Jf9CE8KAadGcXa+q6D
+ tPs0NwFD29lEkDqcxaMgIkugehATcWqOi22nhq/6xpYiVpoNV+SbhEPHL+/uKDFQko/J
+ zPMCILeqtcIx/tmaG+D6gSCtjWKXg7RNxCUzs6SWcOxAodT2sTlY/8IBWYWWA/35dK5P
+ SAuBvCt6hB/g9Bs2TakG+Vn8RfCGvmLs2NcG+MUD+kIZpcjqH9Qzc21yi7N4hSuqRII1
+ uF6CFvcdCyHd+pH3GzP6ugqXXcIBF/M2V754sTRpnKGgog+n2SElF/ShuxlM4tus8DXG
+ F7IA==
+X-Gm-Message-State: APjAAAWxLmcqxibfldWBBZhUU2wdVzujXaIgtoHdAuFnCR1M5xKA1h2c
+ sFf4Xi2UE5bYVZerVv3DgLdTN0em
+X-Google-Smtp-Source: APXvYqxyyAik/Ns4GkKTfUdfqSItmebsY6yELfJdH6bnYaGSr97vGniXdBcoHI75bE1Y48oFNM2hkA==
+X-Received: by 2002:a5d:5188:: with SMTP id k8mr1161196wrv.151.1581525692348; 
+ Wed, 12 Feb 2020 08:41:32 -0800 (PST)
 Received: from donizetti.fritz.box ([151.30.86.140])
- by smtp.gmail.com with ESMTPSA id a16sm1195122wrt.30.2020.02.12.08.41.38
+ by smtp.gmail.com with ESMTPSA id a16sm1195122wrt.30.2020.02.12.08.41.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 08:41:40 -0800 (PST)
+ Wed, 12 Feb 2020 08:41:31 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 6/9] build: move TARGET_GPROF to config-host.mak
-Date: Wed, 12 Feb 2020 17:41:26 +0100
-Message-Id: <20200212164129.6968-7-pbonzini@redhat.com>
+Subject: [PULL 1/9] vl: Don't mismatch g_strsplit()/g_free()
+Date: Wed, 12 Feb 2020 17:41:21 +0100
+Message-Id: <20200212164129.6968-2-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200212164129.6968-1-pbonzini@redhat.com>
 References: <20200212164129.6968-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::430
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,130 +92,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Pan Nengyuan <pannengyuan@huawei.com>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TARGET_GPROF is the same for all targets, write it to
-config-host.mak instead.
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: <20200204161104.21077-1-pbonzini@redhat.com>
+It's a mismatch between g_strsplit and g_free, it will cause a memory leak as follow:
+
+[root@localhost]# ./aarch64-softmmu/qemu-system-aarch64 -accel help
+Accelerators supported in QEMU binary:
+tcg
+kvm
+=================================================================
+==1207900==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 8 byte(s) in 2 object(s) allocated from:
+    #0 0xfffd700231cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31cb)
+    #1 0xfffd6ec57163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
+    #2 0xfffd6ec724d7 in g_strndup (/lib64/libglib-2.0.so.0+0x724d7)
+    #3 0xfffd6ec73d3f in g_strsplit (/lib64/libglib-2.0.so.0+0x73d3f)
+    #4 0xaaab66be5077 in main /mnt/sdc/qemu-master/qemu-4.2.0-rc0/vl.c:3517
+    #5 0xfffd6e140b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+    #6 0xaaab66bf0f53  (./build/aarch64-softmmu/qemu-system-aarch64+0x8a0f53)
+
+Direct leak of 2 byte(s) in 2 object(s) allocated from:
+    #0 0xfffd700231cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31cb)
+    #1 0xfffd6ec57163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
+    #2 0xfffd6ec7243b in g_strdup (/lib64/libglib-2.0.so.0+0x7243b)
+    #3 0xfffd6ec73e6f in g_strsplit (/lib64/libglib-2.0.so.0+0x73e6f)
+    #4 0xaaab66be5077 in main /mnt/sdc/qemu-master/qemu-4.2.0-rc0/vl.c:3517
+    #5 0xfffd6e140b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+    #6 0xaaab66bf0f53  (./build/aarch64-softmmu/qemu-system-aarch64+0x8a0f53)
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Message-Id: <20200110091710.53424-2-pannengyuan@huawei.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- bsd-user/syscall.c   | 6 +++---
- configure            | 4 +++-
- linux-user/exit.c    | 4 ++--
- linux-user/signal.c  | 2 +-
- tests/check-block.sh | 2 +-
- 5 files changed, 10 insertions(+), 8 deletions(-)
+ vl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
-index 0d45b654bb..d38ec7a162 100644
---- a/bsd-user/syscall.c
-+++ b/bsd-user/syscall.c
-@@ -330,7 +330,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
- 
-     switch(num) {
-     case TARGET_FREEBSD_NR_exit:
--#ifdef TARGET_GPROF
-+#ifdef CONFIG_GPROF
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-@@ -432,7 +432,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, abi_long arg1,
- 
-     switch(num) {
-     case TARGET_NETBSD_NR_exit:
--#ifdef TARGET_GPROF
-+#ifdef CONFIG_GPROF
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-@@ -511,7 +511,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, abi_long arg1,
- 
-     switch(num) {
-     case TARGET_OPENBSD_NR_exit:
--#ifdef TARGET_GPROF
-+#ifdef CONFIG_GPROF
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-diff --git a/configure b/configure
-index 115dc38085..16f94cd96b 100755
---- a/configure
-+++ b/configure
-@@ -6771,6 +6771,9 @@ fi
- if test "$l2tpv3" = "yes" ; then
-   echo "CONFIG_L2TPV3=y" >> $config_host_mak
- fi
-+if test "$gprof" = "yes" ; then
-+  echo "CONFIG_GPROF=y" >> $config_host_mak
-+fi
- if test "$cap_ng" = "yes" ; then
-   echo "CONFIG_LIBCAP_NG=y" >> $config_host_mak
- fi
-@@ -7951,7 +7954,6 @@ alpha)
- esac
- 
- if test "$gprof" = "yes" ; then
--  echo "TARGET_GPROF=y" >> $config_target_mak
-   if test "$target_linux_user" = "yes" ; then
-     cflags="-p $cflags"
-     ldflags="-p $ldflags"
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-index a362ef67d2..1594015444 100644
---- a/linux-user/exit.c
-+++ b/linux-user/exit.c
-@@ -18,7 +18,7 @@
-  */
- #include "qemu/osdep.h"
- #include "qemu.h"
--#ifdef TARGET_GPROF
-+#ifdef CONFIG_GPROF
- #include <sys/gmon.h>
- #endif
- 
-@@ -28,7 +28,7 @@ extern void __gcov_dump(void);
- 
- void preexit_cleanup(CPUArchState *env, int code)
- {
--#ifdef TARGET_GPROF
-+#ifdef CONFIG_GPROF
-         _mcleanup();
- #endif
- #ifdef CONFIG_GCOV
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 5ca6d62b15..02f860ecb9 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -509,7 +509,7 @@ void signal_init(void)
-     act.sa_flags = SA_SIGINFO;
-     act.sa_sigaction = host_signal_handler;
-     for(i = 1; i <= TARGET_NSIG; i++) {
--#ifdef TARGET_GPROF
-+#ifdef CONFIG_GPROF
-         if (i == SIGPROF) {
-             continue;
-         }
-diff --git a/tests/check-block.sh b/tests/check-block.sh
-index 679aedec50..ad320c21ba 100755
---- a/tests/check-block.sh
-+++ b/tests/check-block.sh
-@@ -16,7 +16,7 @@ if [ "$#" -ne 0 ]; then
-     format_list="$@"
- fi
- 
--if grep -q "TARGET_GPROF=y" *-softmmu/config-target.mak 2>/dev/null ; then
-+if grep -q "CONFIG_GPROF=y" config-host.mak 2>/dev/null ; then
-     echo "GPROF is enabled ==> Not running the qemu-iotests."
-     exit 0
- fi
+diff --git a/vl.c b/vl.c
+index 7dcb0879c4..c5beda7d48 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3501,7 +3501,7 @@ int main(int argc, char **argv, char **envp)
+                             gchar **optname = g_strsplit(typename,
+                                                          ACCEL_CLASS_SUFFIX, 0);
+                             printf("%s\n", optname[0]);
+-                            g_free(optname);
++                            g_strfreev(optname);
+                         }
+                         g_free(typename);
+                     }
 -- 
 2.21.0
 
