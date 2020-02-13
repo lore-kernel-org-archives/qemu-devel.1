@@ -2,102 +2,83 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1104C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D57E3C3B18B
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:56:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCBB82168B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:54:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A47FC24670
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:56:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LunB8F9S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCBB82168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="eLd84K1h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A47FC24670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2EwQ-0007wI-06
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 08:54:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51692)
+	id 1j2Eyw-0001NH-UM
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 08:56:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j2Eve-00078K-7q
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:53:19 -0500
+ (envelope-from <rvkagan@yandex-team.ru>) id 1j2EyF-0000t9-Rd
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:56:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j2Evd-0003Er-1f
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:53:18 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32877
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <rvkagan@yandex-team.ru>) id 1j2EyE-0004hS-J2
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:55:59 -0500
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:59684)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j2Evc-0003Dn-UE
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:53:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581601996;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=v74zuWvJsToqbhALqcqyXmxJpMnNTkbGA769JD+fqHY=;
- b=LunB8F9SZ0TvfWu52XbPusud05UT2lZwqWQ2DuIDU7FmYv2rYHVtiE1cT6Sjydpoei+bhE
- ka4FYO6q4AGUFFz+oqSCg3nW73xfuQ2mZ1rsVvaBROcmjjVWFYf3naP7t/ihOnNJNJeOUl
- 5nAg6H3CPqVTpPk+cjX2Evv2sKbfSu0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-v5WByW7JPdWS5X1kqeRKdg-1; Thu, 13 Feb 2020 08:53:14 -0500
-Received: by mail-wm1-f71.google.com with SMTP id a189so2039436wme.2
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 05:53:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fd3QGAjx1cwbZudQ3kK3BytgAiXrgfi56WUJfwbT0/0=;
- b=WXQq3uIX9dOVnRnjKCHlAQvHPUaHjl3aWCfsHIYjj/XH3O+DIsFTajdKbGlrHQeNq4
- LMfJUtkEY+x+0zLs5WRHY1J50lmw4UjqM2V7c6/7TYz4t9Rad5333DPJasyBpSVlnPg8
- FjINen1ZXPYEnyNyhC6QuE2dzugBCMklCumUv3B+yVtBwVsqW3MSbhhierzQxDlgZThj
- ysN/y5Q1IFuNj9fJRmzbt/Rz6s0lHOsZesX5+tdY/Ws4svlOMoW88c9e+Ak0gGIS66M+
- XzARkK1Ki6szLTLEzgPBEDyz4OSFGvyoKLMg/NR97i5OCRCPnpLgMRpMHbPTjAe/+g4m
- s2Lw==
-X-Gm-Message-State: APjAAAVmbzRsZlCtKjOeYn5EY0oD0Il5yf53ACh8PFHo/8022wv/kXiA
- CEl0HtEuuMmBix5xx+gTNJRG/GkJZR3zhv2nYydUBdpboCFVOxbaZnJZLxJJ6dqMAwAuFGu/Byj
- mKbcG8T4xwVS0djI=
-X-Received: by 2002:a5d:4a91:: with SMTP id o17mr20883500wrq.232.1581601993298; 
- Thu, 13 Feb 2020 05:53:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyu3+XAGEr7Fx8LemATYPJlVFI6E//z8+8oKgPmPEkOk6jwSxTEI8WZbMiRU/Oz1ehW5Lc/aw==
-X-Received: by 2002:a5d:4a91:: with SMTP id o17mr20883461wrq.232.1581601992930; 
- Thu, 13 Feb 2020 05:53:12 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id o4sm2916430wrx.25.2020.02.13.05.53.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 13 Feb 2020 05:53:12 -0800 (PST)
-Subject: Re: [PATCH v3 03/13] hw/arm/raspi: Extract the version from the board
- revision
-To: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20200208165645.15657-1-f4bug@amsat.org>
- <20200208165645.15657-4-f4bug@amsat.org>
- <CAFEAcA8raRKW5OYJzO1kHs263_uJ_LucCa9tKgg70iX0jGqcGQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8570a6c6-9fd2-2e65-3c12-b4fb04fa9f80@redhat.com>
-Date: Thu, 13 Feb 2020 14:53:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1j2Ey8-0004Zk-UJ; Thu, 13 Feb 2020 08:55:53 -0500
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id E3A732E1499;
+ Thu, 13 Feb 2020 16:55:49 +0300 (MSK)
+Received: from sas1-9998cec34266.qloud-c.yandex.net
+ (sas1-9998cec34266.qloud-c.yandex.net [2a02:6b8:c14:3a0e:0:640:9998:cec3])
+ by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ D1tmjkwwKL-tkDaKjK7; Thu, 13 Feb 2020 16:55:49 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1581602149; bh=jZYTCpwFF8xFglMbM2jQWwFxXoTxoB2OukxsAclx/r8=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=eLd84K1hE+JGWvPZeoFJTIDjjMEiqCQ3pmdO+beW3/gBnzRPIok11MARiB1XtGJzz
+ 5BkgQ717KPOYBU6mSgSRiQfRW3OxcfwjD+3pg8kDemoDdqWudFDdXeGC1m0LvQEn4p
+ dYL/S/zjv2eakxMhnTX2OLlYnBjtr0fJiJJUq+X4=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+ [2a02:6b8:0:408:5417:48f1:724b:1a04])
+ by sas1-9998cec34266.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ 3Oky1AkYN0-tkWi3dKb; Thu, 13 Feb 2020 16:55:46 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+Date: Thu, 13 Feb 2020 16:55:44 +0300
+From: Roman Kagan <rvkagan@yandex-team.ru>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH] block: make BlockConf.*_size properties 32-bit
+Message-ID: <20200213135544.GA103102@rvkaganb>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+ Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org
+References: <20200211115401.43230-1-rvkagan@yandex-team.ru>
+ <c79721ac-357f-6b9f-6d71-53f2cb72ef6e@redhat.com>
+ <20200213080151.GA85593@rvkaganb>
+ <d869f498-0d6b-1a7f-72b5-bc5f2088b119@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8raRKW5OYJzO1kHs263_uJ_LucCa9tKgg70iX0jGqcGQ@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: v5WByW7JPdWS5X1kqeRKdg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d869f498-0d6b-1a7f-72b5-bc5f2088b119@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 5.45.199.163
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,89 +90,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joaquin de Andres <me@xcancerberox.com.ar>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Esteban Bosse <estebanbosse@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/13/20 2:40 PM, Peter Maydell wrote:
-> On Sat, 8 Feb 2020 at 16:57, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->>
->> The board revision encode the board version. Add a helper
->> to extract the version, and use it.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>   hw/arm/raspi.c | 31 +++++++++++++++++++++++++++----
->>   1 file changed, 27 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
->> index 818146fdbb..f285e2988f 100644
->> --- a/hw/arm/raspi.c
->> +++ b/hw/arm/raspi.c
->> @@ -16,6 +16,7 @@
->>   #include "qapi/error.h"
->>   #include "cpu.h"
->>   #include "hw/arm/bcm2836.h"
->> +#include "hw/registerfields.h"
->>   #include "qemu/error-report.h"
->>   #include "hw/boards.h"
->>   #include "hw/loader.h"
->> @@ -37,6 +38,28 @@ typedef struct RasPiState {
->>       MemoryRegion ram;
->>   } RasPiState;
->>
->> +/*
->> + * Board revision codes:
->> + * www.raspberrypi.org/documentation/hardware/raspberrypi/revision-code=
-s/
->> + */
->> +FIELD(REV_CODE, REVISION,           0, 4);
->> +FIELD(REV_CODE, TYPE,               4, 8);
->> +FIELD(REV_CODE, PROCESSOR,         12, 4);
->> +FIELD(REV_CODE, MANUFACTURER,      16, 4);
->> +FIELD(REV_CODE, MEMORY_SIZE,       20, 3);
->> +FIELD(REV_CODE, STYLE,             23, 1);
->> +
->> +static int board_processor_id(uint32_t board_rev)
->> +{
->> +    assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style *=
-/
->> +    return FIELD_EX32(board_rev, REV_CODE, PROCESSOR);
->> +}
->> +
->> +static int board_version(uint32_t board_rev)
->> +{
->> +    return board_processor_id(board_rev) + 1;
->=20
-> This uses the 'processor' field, which basically means the SoC
-> (0 for BCM2835, 1 for BCM2836, 2 for BCMM2837, 3 for BCM2711).
-> We use 'version' for a wider range of things in our code here:
->   * do we need SMP setup?
->   * which address does the firmware image go?
->   * do we need to set up SMC vectors so no-op SMC works?
->   * as well as "which SoC do we instantiate"?
->=20
-> We think of 'version' as basically "raspi 2 or 3?", but
-> according to the table in your url you can get a version of
-> the raspi 2b with a BCM2837 SoC, which confuses this idea.
->=20
-> Anyway, since what we have in this patch works OK for the set
-> of board models we support, I'm happy to leave the patch as-is,
-> but maybe worth checking and considering what in our code we
-> should really be making conditional on "actually the SoC type"
-> and what on something else...
+On Thu, Feb 13, 2020 at 06:47:10AM -0600, Eric Blake wrote:
+> On 2/13/20 2:01 AM, Roman Kagan wrote:
+> > On Wed, Feb 12, 2020 at 03:44:19PM -0600, Eric Blake wrote:
+> > > On 2/11/20 5:54 AM, Roman Kagan wrote:
+> > > > Devices (virtio-blk, scsi, etc.) and the block layer are happy to use
+> > > > 32-bit for logical_block_size, physical_block_size, and min_io_size.
+> > > > However, the properties in BlockConf are defined as uint16_t limiting
+> > > > the values to 32768.
+> > > > 
+> > > > This appears unnecessary tight, and we've seen bigger block sizes handy
+> > > > at times.
+> > > 
+> > > What larger sizes?  I could see 64k or maybe even 1M block sizes,...
+> > 
+> > We played exactly with these two :)
+> > 
+> > > > 
+> > > > Make them 32 bit instead and lift the limitation.
+> > > > 
+> > > > Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
+> > > > ---
+> > > >    hw/core/qdev-properties.c    | 21 ++++++++++++---------
+> > > >    include/hw/block/block.h     |  8 ++++----
+> > > >    include/hw/qdev-properties.h |  2 +-
+> > > >    3 files changed, 17 insertions(+), 14 deletions(-)
+> > > > 
+> > > > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> > > > index 7f93bfeb88..5f84e4a3b8 100644
+> > > > --- a/hw/core/qdev-properties.c
+> > > > +++ b/hw/core/qdev-properties.c
+> > > > @@ -716,30 +716,32 @@ const PropertyInfo qdev_prop_pci_devfn = {
+> > > >    /* --- blocksize --- */
+> > > > +#define MIN_BLOCK_SIZE 512
+> > > > +#define MAX_BLOCK_SIZE 2147483648
+> > > 
+> > > ...but 2G block sizes are going to have tremendous performance problems.
+> > > 
+> > > I'm not necessarily opposed to the widening to a 32-bit type, but think you
+> > > need more justification or a smaller number for the max block size,
+> > 
+> > I thought any smaller value would just be arbitrary and hard to reason
+> > about, so I went ahead with the max value that fit in the type and could
+> > be made visibile to the guest.
+> 
+> You've got bigger problems than what is visible to the guest. block/qcow2.c
+> operates on a cluster at a time; if you are stating that it now requires
+> reading multiple clusters to operate on one, qcow2 will have to do lots of
+> wasteful read-modify-write cycles.
 
-Yes you are right, version =3D (2, 3) was too simple, I replaced the=20
-'version' check by 'processor_id' in the series introducing the raspi4=20
-(with other cleanups).
-Eventually this file will only use the board_rev fields directly.
+I'm failing to see how this is supposed to happen.  The guest will issue
+requests bigger than the cluster size; why would it cause RMW?
 
+Big logical_block_size would cause RMW in the guest if it wants to
+perform smaller writes, but that's up to the user to take this tradeoff,
+isn't it?
+
+> You really need a strong reason to
+> support a maximum larger than 2M other than just "so the guest can
+> experiment with it".
+
+Do I get you right that your suggestion is to cap the block size
+property at 2MB?
+
+Thanks,
+Roman.
+
+> > 
+> > Besides this is a property that is set explicitly, so I don't see a
+> > problem leaving this up to the user.
+> > 
+> > > particularly since qcow2 refuses to use cluster sizes larger than 2M and it
+> > > makes no sense to allow a block size larger than a cluster size.
+> > 
+> > This still doesn't contradict passing a bigger value to the guest, for
+> > experimenting if nothing else.
+> > 
+> > Thanks,
+> > Roman.
+> > 
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
 
