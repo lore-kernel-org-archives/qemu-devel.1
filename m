@@ -2,62 +2,89 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA784C3B18F
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 23:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CC6C352A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 23:03:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8D2020675
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 23:02:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E67720675
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 23:03:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="qD8qhRs6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8D2020675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HGy8wIBT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E67720675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2NVB-0004mU-PG
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 18:02:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51098)
+	id 1j2NW1-0005yi-En
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 18:03:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40059)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j2NQy-00075R-Mw
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 17:58:13 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j2NKT-00052q-9j
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 17:51:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j2NQx-0006V9-8x
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 17:58:12 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:39985 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j2NQv-0006Gt-PS; Thu, 13 Feb 2020 17:58:10 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48JX3Z6Y7dz9sRG; Fri, 14 Feb 2020 09:58:02 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581634682;
- bh=diOphC0RvZAzk7sd5XPNf8YAh2BCWesdZSoV6j22MaM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=qD8qhRs6zuK3fcjQRL/o3f3ozpXTYjbqWXUGHktynbVSnv5hygwXzpKX7wRbSNvto
- ZHYi1Bv5bvokdJ73XNuQ5Krs/fOx5wjnRA42D8J6bOGdT5wVDABm6xfq827mLZXx0a
- H5bEs0xYkPNbfdgOKYyhnLHUCDiajmn0pBsXU4s8=
-Date: Fri, 14 Feb 2020 09:57:56 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 0/2] spapr: Use vIOMMU translation for virtio by default
-Message-ID: <20200213225756.GI124369@umbus.fritz.box>
-References: <20200213005837.131791-1-david@gibson.dropbear.id.au>
- <20200213124643.7b205d44@bahia.lan>
+ (envelope-from <alex.bennee@linaro.org>) id 1j2NKR-00042G-8o
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 17:51:28 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55728)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j2NKQ-0003zK-W2
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 17:51:27 -0500
+Received: by mail-wm1-x341.google.com with SMTP id q9so8049030wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 14:51:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=PR3MIDvz3PtDDaollGFXmkX1Ue3lMr6ulNQeQQNdSxU=;
+ b=HGy8wIBTjh4t+t0UcTdaF4nKqSFidG8Nzy8TP43VSwJ7xA3QuJwKqzhfg0tOlb+td1
+ RhzwZ+hVAHoz7hV2mntzn4VR5vk6q7NLN72XjpUbrmx1sEkQ5Hx8NhHc/VaL5fmMI76i
+ FZMlLlSSdCeM4WTi26riXAe5p7rYxa+Gx4LLFOO9XJv+3bCnXbNbwakjLDpoMilcTSkM
+ 0cxA3f3QnQFq/l8QJmaxls/yeHRS0miiJpLDfzU2PHdDawb8K27y+16taT0X2w8I6wbT
+ XWMLXBFXI6GEiAHDNiJrak3o84kR7ZRhTUR2PsnKfFsB/b+FT6KW2W3AnKOq6baH1DjD
+ mmYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=PR3MIDvz3PtDDaollGFXmkX1Ue3lMr6ulNQeQQNdSxU=;
+ b=tK6uE3UhUbF9W2FALvPHoa2RXxQ+fRe/uYzYFgJ4JnuPD0uXCBKdVC1ju2McSBdBdB
+ EhBrzwz0SvZk2IzIU7AaNlIOCRJp0hjzllynDah7Gx/N8G48oD3J4LYSPkOoZ7M+1Z07
+ o/y5uHEnO8Lc3e/Be9u/+DVlVC1vbXejcDdOeFq5rZk8ISpwsvi0PKb/WIpRKgrb2IIg
+ 4HNZ1N8YayFSovLpLqold34oGvRm4n07ArajkTz7RPqvQSdrp7hsbycJtsSWqqUoNHkB
+ WAkIn0VWp/PcZBHVg3eCU2CJLxvpyDTYNfQo32KByWEZPqgpE2NCsS8Wmb/l/5Uui0L9
+ u2bA==
+X-Gm-Message-State: APjAAAWgj05n401qn5YURZMXI5UZalw69gKAFgNBRI0Ki6TVurRMnPjm
+ w8zIkmcMoM4lTO79qqUtkCEj1Q==
+X-Google-Smtp-Source: APXvYqxTgiN1o3Q+dQ0mTQfcNpsXh9e+wirhn5EeQL4LcPZiT8+4V4WR27RCBlqDCv3vYRViWcqJ7g==
+X-Received: by 2002:a1c:df09:: with SMTP id w9mr276099wmg.143.1581634285619;
+ Thu, 13 Feb 2020 14:51:25 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id w15sm4698048wrs.80.2020.02.13.14.51.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 13 Feb 2020 14:51:20 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id AAAE51FF9C;
+ Thu, 13 Feb 2020 22:51:10 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v2 12/19] tests/plugin: prevent uninitialized warning
+Date: Thu, 13 Feb 2020 22:51:02 +0000
+Message-Id: <20200213225109.13120-13-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200213225109.13120-1-alex.bennee@linaro.org>
+References: <20200213225109.13120-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="vs0rQTeTompTJjtd"
-Content-Disposition: inline
-In-Reply-To: <20200213124643.7b205d44@bahia.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,106 +96,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, mst@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, clg@kaod.org, mdroth@us.ibm.com, paulus@samba.org
+Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
+ robert.foley@linaro.org, pbonzini@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Euler Robot <euler.robot@huawei.com>, richard.henderson@linaro.org,
+ f4bug@amsat.org, robhenry@microsoft.com, marcandre.lureau@redhat.com,
+ aaron@os.amperecomputing.com, cota@braap.org, stefanha@redhat.com,
+ kuhn.chenqun@huawei.com, peter.puhov@linaro.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Chen Qun <kuhn.chenqun@huawei.com>
 
---vs0rQTeTompTJjtd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+According to the glibc function requirements, we need initialise
+ the variable. Otherwise there will be compilation warnings:
 
-On Thu, Feb 13, 2020 at 12:46:43PM +0100, Greg Kurz wrote:
-> On Thu, 13 Feb 2020 11:58:35 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > Upcoming Secure VM support for pSeries machines introduces some
-> > complications for virtio, since the transfer buffers need to be
-> > explicitly shared so that the hypervisor can access them.
-> >=20
-> > While it's not strictly speaking dependent on it, the fact that virtio
-> > devices bypass normal platform IOMMU translation complicates the issue
-> > on the guest side.  Since there are some significan downsides to
-> > bypassing the vIOMMU anyway, let's just disable that.
-> >=20
-> > There's already a flag to do this in virtio, just turn it on by
-> > default for forthcoming pseries machine types.
-> >=20
-> > Any opinions on whether dropping support for the older guest kernels
-> > is acceptable at this point?
-> >=20
->=20
-> As expected, this breaks compatibility with existing RHEL 6.10 guests. Ea=
-ch
-> patch in this series requires an extra -global option to be specified on
-> the command line in order to boot successfully.
->=20
-> Patch 1: -global virtio-pci.disable-legacy=3Dauto
-> Patch 2: -global virtio-pci.iommu_platform=3Doff
+glib-autocleanups.h:28:3: warning: ‘out’ may be
+used uninitialized in this function [-Wmaybe-uninitialized]
+   g_free (*pp);
+   ^~~~~~~~~~~~
 
-Right, or setting an older machine type.
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200206093238.203984-1-kuhn.chenqun@huawei.com>
+[AJB: uses Thomas's single line allocation]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ tests/plugin/bb.c   | 6 +++---
+ tests/plugin/insn.c | 3 +--
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-> As seen on the RH site [1], RHEL6 will reach "End of Maintenance Support
-> or Maintenance Support 2 (Product retirement)" on November 30, 2020 and
-> "End of Extended Life-cycle Support" on June 30, 2024.
->=20
-> Not sure if it's okay to drop support for RHEL6 this soon.
+diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
+index f30bea08dcc..df19fd359df 100644
+--- a/tests/plugin/bb.c
++++ b/tests/plugin/bb.c
+@@ -22,9 +22,9 @@ static bool do_inline;
+ 
+ static void plugin_exit(qemu_plugin_id_t id, void *p)
+ {
+-    g_autofree gchar *out;
+-    out = g_strdup_printf("bb's: %" PRIu64", insns: %" PRIu64 "\n",
+-                          bb_count, insn_count);
++    g_autofree gchar *out = g_strdup_printf(
++        "bb's: %" PRIu64", insns: %" PRIu64 "\n",
++        bb_count, insn_count);
+     qemu_plugin_outs(out);
+ }
+ 
+diff --git a/tests/plugin/insn.c b/tests/plugin/insn.c
+index 0a8f5a0000e..a9a6e412373 100644
+--- a/tests/plugin/insn.c
++++ b/tests/plugin/insn.c
+@@ -44,8 +44,7 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
+ 
+ static void plugin_exit(qemu_plugin_id_t id, void *p)
+ {
+-    g_autofree gchar *out;
+-    out = g_strdup_printf("insns: %" PRIu64 "\n", insn_count);
++    g_autofree gchar *out = g_strdup_printf("insns: %" PRIu64 "\n", insn_count);
+     qemu_plugin_outs(out);
+ }
+ 
+-- 
+2.20.1
 
-Hm, yeah.  I'm happy enough to do this upstream, downstream will
-require some discussion.
-
-> RHEL 7.7 guests seem to be unaffected.
-
-Yeah, I already checked and RHEL7 has backported support for modern
-virtio and the iommu platform flag.
-
->=20
-> [1] https://access.redhat.com/support/policy/updates/errata/#Life_Cycle_D=
-ates
->=20
-> > Changes since v1:
-> >  * Added information on which guest kernel versions will no longer
-> >    work with these changes
-> >  * Use Michael Tsirkin's suggested better way of handling the machine
-> >    type change
-> >=20
-> > David Gibson (2):
-> >   spapr: Disable legacy virtio devices for pseries-5.0 and later
-> >   spapr: Enable virtio iommu_platform=3Don by default
-> >=20
-> >  hw/ppc/spapr.c | 16 +++++++++++++++-
-> >  1 file changed, 15 insertions(+), 1 deletion(-)
-> >=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---vs0rQTeTompTJjtd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5F1HQACgkQbDjKyiDZ
-s5Kp8BAA5s7lU2O9pHRUGE1w1AN9HLT/I2wsICxTCpqzYDu1TcZky+lZVaGa5u+8
-edLRQogRxd9vkK7o4QEAbsJVr705X8tR6C5iF4ErV1vkmxljFmMSMfpFg/qVPcXd
-sSXo/Owdio7dQRPlHPGc7vXFlPWsihcOKIAvX4Sy8uij7iA+2/pqIk81jJoUNPaD
-/9cFSNSHlqtvHbN+Sqzr06RYMcmRIrSMOFsQxalmiSgw/Xcujf5nWnkhEMRE0j1p
-eT2N2EWM76N8I9pU4lKJNx4zwzHtJeJvQGFXEiTVz1FbkWaJmBEnN+V0l/+R/nRn
-wONTAaQO+gR/PAaqSuoLLTUbErR4+yWDuuwsJ8vS69aRuHl9BexjD1AzKVSC9D6i
-PU+HNboNdMfjbuQe9NcKjPU2UBdbrRpPGRbmKWM5V6mtCSincIfkR3O4IcQ9Lblf
-CCGkNPAKswEtoQQEFkGI+LPIkhMn2Exwg49oNH61CT9epLrTamysheijozxLAo3O
-HVLZHD9JKyD8rIU0jYMq3N5OmdS8iJZ1zlj9jQWjpneRL9abOflAvLYujRzwtFH2
-VhxnsJ0ToStrc42ZgxLZNeeqDXc5Hx/ajl4pVWvPisJdPEgAfg9ao6K2b4rQjf7h
-60mYOz9rv/FUfpiNZ8UvtL85OcncvnyJby11/9E2u0wkN3tq628=
-=K/Ky
------END PGP SIGNATURE-----
-
---vs0rQTeTompTJjtd--
 
