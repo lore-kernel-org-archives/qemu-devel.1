@@ -7,78 +7,97 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0E3C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1104C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:54:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA05D2168B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:53:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCBB82168B
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:54:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f91rJqt0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA05D2168B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LunB8F9S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCBB82168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2EvU-0006lf-6v
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 08:53:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51467)
+	id 1j2EwQ-0007wI-06
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 08:54:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j2EuU-0006Dg-5e
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:52:08 -0500
+ (envelope-from <philmd@redhat.com>) id 1j2Eve-00078K-7q
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:53:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j2EuS-0002dr-PT
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:52:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57441
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j2Evd-0003Er-1f
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:53:18 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32877
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j2EuS-0002dJ-LZ
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:52:04 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j2Evc-0003Dn-UE
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:53:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581601922;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1581601996;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9bdlxpebOLDXwDCiTdWFGG+Pcudohv2k1GHzwI5d88I=;
- b=f91rJqt0QupB/vuwEVWrb22RafD6uCD9ynJcUA4rF334h7mZbiV5FS178hDP28ucXNI948
- DU1+SnTrYKQv6jf+4lG7ZG2k2xr3f5g1BzMjUQ7y9SJopBZNDZg2Jacr16Sx5FuFXwcmgP
- VhaFCYHSOT+QTyKFW7lG1KCGDe3kV/U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-RKlJvaIFNCetrWs0X-GmNQ-1; Thu, 13 Feb 2020 08:51:53 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8B748017DF;
- Thu, 13 Feb 2020 13:51:52 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.112.14])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 22F7A5C1D6;
- Thu, 13 Feb 2020 13:51:47 +0000 (UTC)
-Date: Thu, 13 Feb 2020 13:51:45 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Yubo Miao <miaoyubo@huawei.com>
-Subject: Re: [RFC 2/2] pci-expender-bus:Add pcie-root-port to pxb-pcie under
- arm.
-Message-ID: <20200213135145.GN594756@redhat.com>
-References: <20200213074952.544-1-miaoyubo@huawei.com>
- <20200213074952.544-3-miaoyubo@huawei.com>
+ bh=v74zuWvJsToqbhALqcqyXmxJpMnNTkbGA769JD+fqHY=;
+ b=LunB8F9SZ0TvfWu52XbPusud05UT2lZwqWQ2DuIDU7FmYv2rYHVtiE1cT6Sjydpoei+bhE
+ ka4FYO6q4AGUFFz+oqSCg3nW73xfuQ2mZ1rsVvaBROcmjjVWFYf3naP7t/ihOnNJNJeOUl
+ 5nAg6H3CPqVTpPk+cjX2Evv2sKbfSu0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38-v5WByW7JPdWS5X1kqeRKdg-1; Thu, 13 Feb 2020 08:53:14 -0500
+Received: by mail-wm1-f71.google.com with SMTP id a189so2039436wme.2
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 05:53:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fd3QGAjx1cwbZudQ3kK3BytgAiXrgfi56WUJfwbT0/0=;
+ b=WXQq3uIX9dOVnRnjKCHlAQvHPUaHjl3aWCfsHIYjj/XH3O+DIsFTajdKbGlrHQeNq4
+ LMfJUtkEY+x+0zLs5WRHY1J50lmw4UjqM2V7c6/7TYz4t9Rad5333DPJasyBpSVlnPg8
+ FjINen1ZXPYEnyNyhC6QuE2dzugBCMklCumUv3B+yVtBwVsqW3MSbhhierzQxDlgZThj
+ ysN/y5Q1IFuNj9fJRmzbt/Rz6s0lHOsZesX5+tdY/Ws4svlOMoW88c9e+Ak0gGIS66M+
+ XzARkK1Ki6szLTLEzgPBEDyz4OSFGvyoKLMg/NR97i5OCRCPnpLgMRpMHbPTjAe/+g4m
+ s2Lw==
+X-Gm-Message-State: APjAAAVmbzRsZlCtKjOeYn5EY0oD0Il5yf53ACh8PFHo/8022wv/kXiA
+ CEl0HtEuuMmBix5xx+gTNJRG/GkJZR3zhv2nYydUBdpboCFVOxbaZnJZLxJJ6dqMAwAuFGu/Byj
+ mKbcG8T4xwVS0djI=
+X-Received: by 2002:a5d:4a91:: with SMTP id o17mr20883500wrq.232.1581601993298; 
+ Thu, 13 Feb 2020 05:53:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyu3+XAGEr7Fx8LemATYPJlVFI6E//z8+8oKgPmPEkOk6jwSxTEI8WZbMiRU/Oz1ehW5Lc/aw==
+X-Received: by 2002:a5d:4a91:: with SMTP id o17mr20883461wrq.232.1581601992930; 
+ Thu, 13 Feb 2020 05:53:12 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id o4sm2916430wrx.25.2020.02.13.05.53.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 13 Feb 2020 05:53:12 -0800 (PST)
+Subject: Re: [PATCH v3 03/13] hw/arm/raspi: Extract the version from the board
+ revision
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200208165645.15657-1-f4bug@amsat.org>
+ <20200208165645.15657-4-f4bug@amsat.org>
+ <CAFEAcA8raRKW5OYJzO1kHs263_uJ_LucCa9tKgg70iX0jGqcGQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <8570a6c6-9fd2-2e65-3c12-b4fb04fa9f80@redhat.com>
+Date: Thu, 13 Feb 2020 14:53:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200213074952.544-3-miaoyubo@huawei.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: RKlJvaIFNCetrWs0X-GmNQ-1
+In-Reply-To: <CAFEAcA8raRKW5OYJzO1kHs263_uJ_LucCa9tKgg70iX0jGqcGQ@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: v5WByW7JPdWS5X1kqeRKdg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,95 +109,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: peter.maydell@linaro.org, mst@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, shannon.zhaosl@gmail.com, imammedo@redhat.com
+Cc: Joaquin de Andres <me@xcancerberox.com.ar>,
+ Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Esteban Bosse <estebanbosse@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 03:49:52PM +0800, Yubo Miao wrote:
-> From: miaoyubo <miaoyubo@huawei.com>
+On 2/13/20 2:40 PM, Peter Maydell wrote:
+> On Sat, 8 Feb 2020 at 16:57, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
+> wrote:
+>>
+>> The board revision encode the board version. Add a helper
+>> to extract the version, and use it.
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>   hw/arm/raspi.c | 31 +++++++++++++++++++++++++++----
+>>   1 file changed, 27 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+>> index 818146fdbb..f285e2988f 100644
+>> --- a/hw/arm/raspi.c
+>> +++ b/hw/arm/raspi.c
+>> @@ -16,6 +16,7 @@
+>>   #include "qapi/error.h"
+>>   #include "cpu.h"
+>>   #include "hw/arm/bcm2836.h"
+>> +#include "hw/registerfields.h"
+>>   #include "qemu/error-report.h"
+>>   #include "hw/boards.h"
+>>   #include "hw/loader.h"
+>> @@ -37,6 +38,28 @@ typedef struct RasPiState {
+>>       MemoryRegion ram;
+>>   } RasPiState;
+>>
+>> +/*
+>> + * Board revision codes:
+>> + * www.raspberrypi.org/documentation/hardware/raspberrypi/revision-code=
+s/
+>> + */
+>> +FIELD(REV_CODE, REVISION,           0, 4);
+>> +FIELD(REV_CODE, TYPE,               4, 8);
+>> +FIELD(REV_CODE, PROCESSOR,         12, 4);
+>> +FIELD(REV_CODE, MANUFACTURER,      16, 4);
+>> +FIELD(REV_CODE, MEMORY_SIZE,       20, 3);
+>> +FIELD(REV_CODE, STYLE,             23, 1);
+>> +
+>> +static int board_processor_id(uint32_t board_rev)
+>> +{
+>> +    assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style *=
+/
+>> +    return FIELD_EX32(board_rev, REV_CODE, PROCESSOR);
+>> +}
+>> +
+>> +static int board_version(uint32_t board_rev)
+>> +{
+>> +    return board_processor_id(board_rev) + 1;
 >=20
-> Since devices could not directly plugged into pxb-pcie, under arm, one
-> pcie-root port is plugged into pxb-pcie. Due to the bus for each pxb-pcie
-> is defined as 2 in acpi dsdt tables(one for pxb-pcie, one for pcie-root-p=
-ort),
-> only one device could be plugged into one pxb-pcie.
+> This uses the 'processor' field, which basically means the SoC
+> (0 for BCM2835, 1 for BCM2836, 2 for BCMM2837, 3 for BCM2711).
+> We use 'version' for a wider range of things in our code here:
+>   * do we need SMP setup?
+>   * which address does the firmware image go?
+>   * do we need to set up SMC vectors so no-op SMC works?
+>   * as well as "which SoC do we instantiate"?
+>=20
+> We think of 'version' as basically "raspi 2 or 3?", but
+> according to the table in your url you can get a version of
+> the raspi 2b with a BCM2837 SoC, which confuses this idea.
+>=20
+> Anyway, since what we have in this patch works OK for the set
+> of board models we support, I'm happy to leave the patch as-is,
+> but maybe worth checking and considering what in our code we
+> should really be making conditional on "actually the SoC type"
+> and what on something else...
 
-What is the cause of this arm specific requirement for pxb-pcie and
-more importantly can be fix it so that we don't need this patch ?
-I think it is highly undesirable to have such a per-arch difference
-in configuration of the pxb-pcie device. It means any mgmt app
-which already supports pxb-pcie will be broken and need to special
-case arm.
-
->=20
-> Signed-off-by: miaoyubo <miaoyubo@huawei.com>
-> ---
->  hw/pci-bridge/pci_expander_bridge.c | 9 +++++++++
->  include/hw/pci/pcie_port.h          | 1 +
->  2 files changed, 10 insertions(+)
->=20
-> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expa=
-nder_bridge.c
-> index 47aaaf8fd1..3d896dd452 100644
-> --- a/hw/pci-bridge/pci_expander_bridge.c
-> +++ b/hw/pci-bridge/pci_expander_bridge.c
-> @@ -15,6 +15,7 @@
->  #include "hw/pci/pci.h"
->  #include "hw/pci/pci_bus.h"
->  #include "hw/pci/pci_host.h"
-> +#include "hw/pci/pcie_port.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/pci/pci_bridge.h"
->  #include "qemu/range.h"
-> @@ -233,7 +234,15 @@ static void pxb_dev_realize_common(PCIDevice *dev, b=
-ool pcie, Error **errp)
-> =20
->      ds =3D qdev_create(NULL, TYPE_PXB_HOST);
->      if (pcie) {
-> +#ifdef __aarch64__
-> +        bus =3D pci_root_bus_new(ds, "pxb-pcie-internal",
-> +                               NULL, NULL, 0, TYPE_PXB_PCIE_BUS);
-> +        bds =3D qdev_create(BUS(bus), "pcie-root-port");
-> +        bds->id =3D dev_name;
-> +        qdev_prop_set_uint8(bds, PCIE_ROOT_PORT_PROP_CHASSIS, pxb->bus_n=
-r);
-> +#else
->          bus =3D pci_root_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_P=
-CIE_BUS);
-> +#endif
->      } else {
->          bus =3D pci_root_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE=
-_PXB_BUS);
->          bds =3D qdev_create(BUS(bus), "pci-bridge");
-> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-> index 4b3d254b08..b41d473220 100644
-> --- a/include/hw/pci/pcie_port.h
-> +++ b/include/hw/pci/pcie_port.h
-> @@ -64,6 +64,7 @@ int pcie_chassis_add_slot(struct PCIESlot *slot);
->  void pcie_chassis_del_slot(PCIESlot *s);
-> =20
->  #define TYPE_PCIE_ROOT_PORT         "pcie-root-port-base"
-> +#define PCIE_ROOT_PORT_PROP_CHASSIS "chassis"
->  #define PCIE_ROOT_PORT_CLASS(klass) \
->       OBJECT_CLASS_CHECK(PCIERootPortClass, (klass), TYPE_PCIE_ROOT_PORT)
->  #define PCIE_ROOT_PORT_GET_CLASS(obj) \
-> --=20
-> 2.19.1
->=20
->=20
->=20
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Yes you are right, version =3D (2, 3) was too simple, I replaced the=20
+'version' check by 'processor_id' in the series introducing the raspi4=20
+(with other cleanups).
+Eventually this file will only use the board_rev fields directly.
 
 
