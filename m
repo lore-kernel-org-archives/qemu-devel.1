@@ -2,91 +2,72 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D69C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:48:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81417C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41F952168B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:48:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYM+8I1w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41F952168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 568F820873
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:51:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 568F820873
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2Dun-0003NY-FM
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 07:48:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43031)
+	id 1j2Dxe-000533-Hq
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 07:51:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j2Dtq-0002vc-Od
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:47:23 -0500
+ (envelope-from <bounces@canonical.com>) id 1j2Dx0-0004U6-IP
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:50:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j2Dto-0002B1-Ab
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:47:22 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45183
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j2Dto-0002AE-6d
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:47:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581598038;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SrhUWHbuo2+hzsFW2k27Wzo8kufp8Phw+1/+5XPZwrQ=;
- b=BYM+8I1wCxnDFsDbchkCfUEGfzOjN5flk0VbuZq2CCbSCFSR7lgx15/t2T7biRB6Rvn94/
- U+Cf7G6WfJUBXwuGYiNC13A1H/yDivybhPahUitVf96qaCd7ggZT4bd4AX4hcqBpDee8Au
- 9iTvpoYk0ZUT2gYU20Cm8phfaRF6Mww=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-wv6dz4wTOUOIbU5GmvWOrg-1; Thu, 13 Feb 2020 07:47:13 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F22AA100550E;
- Thu, 13 Feb 2020 12:47:11 +0000 (UTC)
-Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4268126FCF;
- Thu, 13 Feb 2020 12:47:11 +0000 (UTC)
-Subject: Re: [PATCH] block: make BlockConf.*_size properties 32-bit
-To: Roman Kagan <rvkagan@yandex-team.ru>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org
-References: <20200211115401.43230-1-rvkagan@yandex-team.ru>
- <c79721ac-357f-6b9f-6d71-53f2cb72ef6e@redhat.com>
- <20200213080151.GA85593@rvkaganb>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <d869f498-0d6b-1a7f-72b5-bc5f2088b119@redhat.com>
-Date: Thu, 13 Feb 2020 06:47:10 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <bounces@canonical.com>) id 1j2Dwy-00047r-Rz
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:50:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38464)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j2Dwy-00047D-Lw
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:50:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j2Dwx-0006ng-2l
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 12:50:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0F6832E80C3
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 12:50:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200213080151.GA85593@rvkaganb>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: wv6dz4wTOUOIbU5GmvWOrg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 13 Feb 2020 12:42:35 -0000
+From: Cheng Jiang <1863096@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: chengjiang
+X-Launchpad-Bug-Reporter: Cheng Jiang (chengjiang)
+X-Launchpad-Bug-Modifier: Cheng Jiang (chengjiang)
+Message-Id: <158159775529.28653.1884388369388986202.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1863096] [NEW] vhost-user multi-queues interrupt failed when
+ Qemu reconnection happens
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7507caa2ca503eef65fbe2479285e517f6560d87
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,77 +76,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1863096 <1863096@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/13/20 2:01 AM, Roman Kagan wrote:
-> On Wed, Feb 12, 2020 at 03:44:19PM -0600, Eric Blake wrote:
->> On 2/11/20 5:54 AM, Roman Kagan wrote:
->>> Devices (virtio-blk, scsi, etc.) and the block layer are happy to use
->>> 32-bit for logical_block_size, physical_block_size, and min_io_size.
->>> However, the properties in BlockConf are defined as uint16_t limiting
->>> the values to 32768.
->>>
->>> This appears unnecessary tight, and we've seen bigger block sizes handy
->>> at times.
->>
->> What larger sizes?  I could see 64k or maybe even 1M block sizes,...
-> 
-> We played exactly with these two :)
-> 
->>>
->>> Make them 32 bit instead and lift the limitation.
->>>
->>> Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
->>> ---
->>>    hw/core/qdev-properties.c    | 21 ++++++++++++---------
->>>    include/hw/block/block.h     |  8 ++++----
->>>    include/hw/qdev-properties.h |  2 +-
->>>    3 files changed, 17 insertions(+), 14 deletions(-)
->>>
->>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
->>> index 7f93bfeb88..5f84e4a3b8 100644
->>> --- a/hw/core/qdev-properties.c
->>> +++ b/hw/core/qdev-properties.c
->>> @@ -716,30 +716,32 @@ const PropertyInfo qdev_prop_pci_devfn = {
->>>    /* --- blocksize --- */
->>> +#define MIN_BLOCK_SIZE 512
->>> +#define MAX_BLOCK_SIZE 2147483648
->>
->> ...but 2G block sizes are going to have tremendous performance problems.
->>
->> I'm not necessarily opposed to the widening to a 32-bit type, but think you
->> need more justification or a smaller number for the max block size,
-> 
-> I thought any smaller value would just be arbitrary and hard to reason
-> about, so I went ahead with the max value that fit in the type and could
-> be made visibile to the guest.
+Public bug reported:
 
-You've got bigger problems than what is visible to the guest. 
-block/qcow2.c operates on a cluster at a time; if you are stating that 
-it now requires reading multiple clusters to operate on one, qcow2 will 
-have to do lots of wasteful read-modify-write cycles.  You really need a 
-strong reason to support a maximum larger than 2M other than just "so 
-the guest can experiment with it".
+After upgrade qemu to v4.2.0, vhost-user multi-queues interrupt failed
+with event idx interrupt mode when reconnection happens.
 
-> 
-> Besides this is a property that is set explicitly, so I don't see a
-> problem leaving this up to the user.
-> 
->> particularly since qcow2 refuses to use cluster sizes larger than 2M and it
->> makes no sense to allow a block size larger than a cluster size.
-> 
-> This still doesn't contradict passing a bigger value to the guest, for
-> experimenting if nothing else.
-> 
-> Thanks,
-> Roman.
-> 
+Test Environment:
+DPDK version: DPDK v19.11
+Other software versions: qemu 4.2.0.
+OS: Linux 4.15.0-20-generic
+Compiler: gcc (Ubuntu 7.3.0-16ubuntu3) 7.3.0
+Hardware platform: Purley.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+The reproduce step is:
+1. Launch l3fwd-power example app with client mode::
 
+    ./l3fwd-power -l 1-16 \
+    -n 4 --socket-mem 1024,1024 --legacy-mem --no-pci\
+    --log-level=3D9 \
+    --vdev 'eth_vhost0,iface=3D/vhost-net0,queues=3D16,client=3D1' \
+    -- -p 0x1 \
+    --parse-ptype 1 \
+    --config "(0,0,1),(0,1,2),(0,2,3),(0,3,4),(0,4,5),(0,5,6),(0,6,7),(0,7,=
+8),(0,8,9),(0,9,10),(0,10,11),(0,11,12),(0,12,13),(0,13,14),(0,14,15),(0,15=
+,16)"
+
+2. Launch VM1 with server mode:
+
+3. Relauch l3fwd-power sample to for reconnection:
+
+    ./l3fwd-power -l 1-16 \
+    -n 4 --socket-mem 1024,1024 --legacy-mem --no-pci\
+    --log-level=3D9 \
+    --vdev 'eth_vhost0,iface=3D/vhost-net0,queues=3D16,client=3D1' \
+    -- -p 0x1 \
+    --parse-ptype 1 \
+    --config "(0,0,1),(0,1,2),(0,2,3),(0,3,4),(0,4,5),(0,5,6),(0,6,7),(0,7,=
+8),(0,8,9),(0,9,10),(0,10,11),(0,11,12),(0,12,13),(0,13,14),(0,14,15),(0,15=
+,16)"
+
+4. Set vitio-net with 16 quques and give vitio-net ip address:
+
+    ethtool -L [ens3] combined 16    # [ens3] is the name of virtio-net
+    ifconfig [ens3] 1.1.1.1
+
+5. Send packets with different IPs from virtio-net, notice to bind each
+vcpu to different send packets process::
+
+    taskset -c 0 ping 1.1.1.2
+    taskset -c 1 ping 1.1.1.3
+    taskset -c 2 ping 1.1.1.4
+    taskset -c 3 ping 1.1.1.5
+    taskset -c 4 ping 1.1.1.6
+    taskset -c 5 ping 1.1.1.7
+    taskset -c 6 ping 1.1.1.8
+    taskset -c 7 ping 1.1.1.9
+    taskset -c 8 ping 1.1.1.2
+    taskset -c 9 ping 1.1.1.2
+    taskset -c 10 ping 1.1.1.2
+    taskset -c 11 ping 1.1.1.2
+    taskset -c 12 ping 1.1.1.2
+    taskset -c 13 ping 1.1.1.2
+    taskset -c 14 ping 1.1.1.2
+    taskset -c 15 ping 1.1.1.2
+
+If everything ok, then we can see the result such as following:
+
+    L3FWD_POWER: lcore 0 is waked up from rx interrupt on port 0 queue 0
+    ...
+    ...
+    L3FWD_POWER: lcore 15 is waked up from rx interrupt on port 0 queue 15
+
+But we can't see the log above because of the bug.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863096
+
+Title:
+  vhost-user multi-queues interrupt failed when Qemu reconnection
+  happens
+
+Status in QEMU:
+  New
+
+Bug description:
+  After upgrade qemu to v4.2.0, vhost-user multi-queues interrupt failed
+  with event idx interrupt mode when reconnection happens.
+
+  Test Environment:
+  DPDK version: DPDK v19.11
+  Other software versions: qemu 4.2.0.
+  OS: Linux 4.15.0-20-generic
+  Compiler: gcc (Ubuntu 7.3.0-16ubuntu3) 7.3.0
+  Hardware platform: Purley.
+
+  The reproduce step is:
+  1. Launch l3fwd-power example app with client mode::
+
+      ./l3fwd-power -l 1-16 \
+      -n 4 --socket-mem 1024,1024 --legacy-mem --no-pci\
+      --log-level=3D9 \
+      --vdev 'eth_vhost0,iface=3D/vhost-net0,queues=3D16,client=3D1' \
+      -- -p 0x1 \
+      --parse-ptype 1 \
+      --config "(0,0,1),(0,1,2),(0,2,3),(0,3,4),(0,4,5),(0,5,6),(0,6,7),(0,=
+7,8),(0,8,9),(0,9,10),(0,10,11),(0,11,12),(0,12,13),(0,13,14),(0,14,15),(0,=
+15,16)"
+
+  2. Launch VM1 with server mode:
+
+  3. Relauch l3fwd-power sample to for reconnection:
+
+      ./l3fwd-power -l 1-16 \
+      -n 4 --socket-mem 1024,1024 --legacy-mem --no-pci\
+      --log-level=3D9 \
+      --vdev 'eth_vhost0,iface=3D/vhost-net0,queues=3D16,client=3D1' \
+      -- -p 0x1 \
+      --parse-ptype 1 \
+      --config "(0,0,1),(0,1,2),(0,2,3),(0,3,4),(0,4,5),(0,5,6),(0,6,7),(0,=
+7,8),(0,8,9),(0,9,10),(0,10,11),(0,11,12),(0,12,13),(0,13,14),(0,14,15),(0,=
+15,16)"
+
+  4. Set vitio-net with 16 quques and give vitio-net ip address:
+
+      ethtool -L [ens3] combined 16    # [ens3] is the name of virtio-net
+      ifconfig [ens3] 1.1.1.1
+
+  5. Send packets with different IPs from virtio-net, notice to bind
+  each vcpu to different send packets process::
+
+      taskset -c 0 ping 1.1.1.2
+      taskset -c 1 ping 1.1.1.3
+      taskset -c 2 ping 1.1.1.4
+      taskset -c 3 ping 1.1.1.5
+      taskset -c 4 ping 1.1.1.6
+      taskset -c 5 ping 1.1.1.7
+      taskset -c 6 ping 1.1.1.8
+      taskset -c 7 ping 1.1.1.9
+      taskset -c 8 ping 1.1.1.2
+      taskset -c 9 ping 1.1.1.2
+      taskset -c 10 ping 1.1.1.2
+      taskset -c 11 ping 1.1.1.2
+      taskset -c 12 ping 1.1.1.2
+      taskset -c 13 ping 1.1.1.2
+      taskset -c 14 ping 1.1.1.2
+      taskset -c 15 ping 1.1.1.2
+
+  If everything ok, then we can see the result such as following:
+
+      L3FWD_POWER: lcore 0 is waked up from rx interrupt on port 0 queue 0
+      ...
+      ...
+      L3FWD_POWER: lcore 15 is waked up from rx interrupt on port 0 queue 15
+
+  But we can't see the log above because of the bug.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863096/+subscriptions
 
