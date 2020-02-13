@@ -2,70 +2,88 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E529DC352A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26504C352A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:23:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1CBB2168B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:19:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D566120873
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:23:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lyfZ8bW0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1CBB2168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tEI+Wq+M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D566120873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46817 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j252X-0001SK-SR
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 22:19:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59879)
+	id 1j255x-0003gH-0i
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 22:23:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j251v-00011D-Aj
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:19:08 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j255B-0002BP-95
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:22:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j251t-0002R5-CZ
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:19:06 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:44313)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j251r-0002HZ-IX; Wed, 12 Feb 2020 22:19:05 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48J1v648K5z9sPJ; Thu, 13 Feb 2020 14:18:58 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581563938;
- bh=R0wsqkK4T4TVxGp4P3KWchDaWTAZGKfzMxsopPtLOQ4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=lyfZ8bW0IyOypqTzYf/iBN8KJYNhS9MJhB6MDmnw12tExi56WENNeFCpHBYKZwKZ3
- nDXaOcIrbjzG6i+uHYxeiMuTnrHdzRH0oTOr2LWEnU7vWioXX6RBZJfqcVets3rJ5V
- q3CDkhEMMgcGPcxTJNkmDBwXvllbIEINiBfvOGHA=
-Date: Thu, 13 Feb 2020 14:16:29 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-Subject: Re: Restrictions of libnet (was: Re: VW ELF loader)
-Message-ID: <20200213031629.GD124369@umbus.fritz.box>
-References: <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
- <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
- <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
- <d13eea1d-7942-47e0-6189-a66ce9639db4@redhat.com>
- <20200204095403.04d9dd29.conny@cornelia-huck.de>
- <4794cf7a-7b53-5fea-c89d-baa01d3ed0ce@redhat.com>
- <20200205053049.GF60221@umbus.fritz.box>
- <bfe9398a-7108-9bf7-8589-6d01580bbb3a@redhat.com>
- <20200210075516.GF22584@umbus.fritz.box>
- <20200210093952.GC4113@kitsune.suse.cz>
+ (envelope-from <richard.henderson@linaro.org>) id 1j255A-0008W3-7e
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:22:29 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38429)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j255A-0008Uj-2M
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:22:28 -0500
+Received: by mail-pl1-x642.google.com with SMTP id t6so1750871plj.5
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 19:22:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=b0SUyaJJjQZuc34rLJlUYZCom+bkortVckKDUk4LlxA=;
+ b=tEI+Wq+MT+AsYiUz4cgA7Dp9LDe139xyevHXaao51NWk4Qy+oHi8p3FQTzxyP6TQoL
+ vn3yo3aKQhiqaWVSgTQBnM/i1ZWcF5GRjHnqZqpIKSop9zahZmSW2lPkOX/K6XirkBqm
+ /hEGcr3q0MjJCWTwiswI8i2EZOSz4V9Sot3kp/G5Jn0xXD8rkcDjqidnN4iRidn+LqYn
+ CL0QQQPBoVyX1fX+aG0+o5NWXugfdCywTMVZr0ky8Jl71dNhDP1GxrSAI0cSSXXvXP/L
+ qubE268Myx0bhtFagMfU4vyfzI6m5q6blBQnJK5Yu3TiEkvqqwctKFggO0iwgVl/PAua
+ rVRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=b0SUyaJJjQZuc34rLJlUYZCom+bkortVckKDUk4LlxA=;
+ b=f5KhhQ7ouOqjRD1qePlmcoiYc/ZdLcd+1DwgoY5WItmNHCaxBy5ueaYsmZo3BH4OnW
+ 56gkZJjrqUiyy7vCNNUYs7Q5aZFeqZulBaJ5P5pxgkFcENsojOtjicf6+LncNSIp4B1W
+ FCaDoxvLRNfe8YPQS2kobvmFrsjsx5G5IkOMybGvAIqoODk3XPzHXExpOInOJmpj6Hia
+ cWsS1k88XpbEBDyxqamrlTzCsbi4MmGiODywfJSa4P8IQj5Ss+pKgsdV/hnf9f3jgJB+
+ XHoRVkEiMUnicuTWELG/jqtmZ/eECjvQdoc6f6JTTEVxvlDUjDxScTTxAezJ6aKnaSEH
+ y8Lg==
+X-Gm-Message-State: APjAAAWxg+NATTcSOE4LDEJ8C9eWP6aU9bs58/MF6DYAHHNjTbX5OsbD
+ uAwwl+zaIO8376E9kyRSmcnLX/VDHDs=
+X-Google-Smtp-Source: APXvYqwfbIZVmRRrcKRrI/Zf0x2uc2Ci6u8Lf9830+GAo06JS18B/AG1p2+VTYZEwfxWryFoWSgQvg==
+X-Received: by 2002:a17:90a:bf83:: with SMTP id
+ d3mr2634922pjs.77.1581564146790; 
+ Wed, 12 Feb 2020 19:22:26 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id l15sm536067pgi.31.2020.02.12.19.22.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 12 Feb 2020 19:22:26 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/5] target/i386: Renumber EXCP_SYSCALL
+Date: Wed, 12 Feb 2020 19:22:19 -0800
+Message-Id: <20200213032223.14643-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200213032223.14643-1-richard.henderson@linaro.org>
+References: <20200213032223.14643-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="wLAMOaPNJ0fu1fTG"
-Content-Disposition: inline
-In-Reply-To: <20200210093952.GC4113@kitsune.suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,171 +95,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Cornelia Huck <conny@cornelia-huck.de>, qemu-devel <qemu-devel@nongnu.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, laurent@vivier.eu,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We are not short of numbers for EXCP_*.  There is no need to confuse things
+by having EXCP_VMEXIT and EXCP_SYSCALL overlap, even though the former is
+only used for system mode and the latter is only used for user mode.
 
---wLAMOaPNJ0fu1fTG
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/i386/cpu.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-On Mon, Feb 10, 2020 at 10:39:52AM +0100, Michal Such=E1nek wrote:
-> On Mon, Feb 10, 2020 at 06:55:16PM +1100, David Gibson wrote:
-> > On Wed, Feb 05, 2020 at 07:24:04AM +0100, Thomas Huth wrote:
-> > > On 05/02/2020 06.30, David Gibson wrote:
-> > > > On Tue, Feb 04, 2020 at 10:20:14AM +0100, Thomas Huth wrote:
-> > > >> On 04/02/2020 09.54, Cornelia Huck wrote:
-> > > >>> On Tue, 4 Feb 2020 07:16:46 +0100
-> > > >>> Thomas Huth <thuth@redhat.com> wrote:
-> > > >>>
-> > > >>>> On 04/02/2020 00.26, Paolo Bonzini wrote:
-> > > >>>>>
-> > > >>>>>
-> > > >>>>> Il mar 4 feb 2020, 00:20 Alexey Kardashevskiy <aik@ozlabs.ru
-> > > >>>>> <mailto:aik@ozlabs.ru>> ha scritto:
-> > > >>>>>
-> > > >>>>>     Speaking seriously, what would I put into the guest?
-> > > >>>>>
-> > > >>>>> Only things that would be considered drivers. Ignore the partit=
-ions
-> > > >>>>> issue for now so that you can just pass the device tree service=
-s to QEMU
-> > > >>>>> with hypercalls.
-> > > >>>>>
-> > > >>>>>     Netboot's dhcp/tftp/ip/ipv6 client? It is going to be anoth=
-er SLOF,
-> > > >>>>>     smaller but adhoc with only a couple of people knowing it.
-> > > >>>>>
-> > > >>>>>
-> > > >>>>> You can generalize and reuse the s390 code. All you have to wri=
-te is the
-> > > >>>>> PCI scan and virtio-pci setup. =20
-> > > >>>>
-> > > >>>> Well, for netbooting, the s390-ccw bios uses the libnet code fro=
-m SLOF,
-> > > >>>> so re-using this for a slim netboot client on ppc64 would certai=
-nly be
-> > > >>>> feasible (especially since there are also already virtio drivers=
- in SLOF
-> > > >>>> that are written in C), but I think it is not very future proof.=
- The
-> > > >>>> libnet from SLOF only supports UDP, and no TCP. So for advanced =
-boot
-> > > >>>> scenarios like booting from HTTP or even HTTPS, you need somethi=
-ng else
-> > > >>>> (i.e. maybe grub is the better option, indeed).
-> > > >>>
-> > > >>> That makes me wonder what that means for s390: We're inheriting
-> > > >>> libnet's limitations, but we don't have grub -- do we need to com=
-e up
-> > > >>> with something different? Or improve libnet?
-> > > >>
-> > > >> I don't think that it makes sense to re-invent the wheel yet anoth=
-er
-> > > >> time and write yet another TCP implementation (which is likely qui=
-te a
-> > > >> bit of work, too, especially if you also want to do secure HTTPS i=
-n the
-> > > >> end). So yes, in the long run (as soon as somebody seriously asks =
-for
-> > > >> HTTP booting on s390x) we need something different here.
-> > > >>
-> > > >> Now looking at our standard s390x bootloader zipl - this has been =
-giving
-> > > >> us a headache a couple of times in the past, too (from a distro po=
-int of
-> > > >> view since s390x is the only major platform left that does not use=
- grub,
-> > > >> but also from a s390-ccw bios point of view, see e.g.
-> > > >> https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03046.htm=
-l and
-> > > >> related discussions).
-> > > >>
-> > > >> So IMHO the s390x world should move towards grub2, too. We could e=
-=2Eg.
-> > > >> link it initially into the s390-ccw bios bios ... and if that work=
-s out
-> > > >> well, later also use it as normal bootloader instead of zipl (not =
-sure
-> > > >> if that works in all cases, though, IIRC there were some size
-> > > >> constraints and stuff like that).
-> > > >=20
-> > > > petitboot would be another reasonable thing to consider here.  Since
-> > > > it's Linux based, you have all the drivers you have there.  It's not
-> > > > quite grub, but it does at least parse the same configuration files.
-> > > >=20
-> > > > You do need kexec() of course, I don't know if you have that already
-> > > > for s390 or not.
-> > >=20
-> > > AFAIK we have kexec on s390. So yes, petitboot would be another option
-> > > for replacing the s390-ccw bios. But when it comes to LPARs and z/VMs=
-, I
-> > > don't think it's really feasible to replace the zipl bootloader there
-> > > with petitboot, so in that case grub2 still sounds like the better
-> > > option to me.
-> >=20
-> > Actually, between that and Paolo's suggestions, I thought of another
-> > idea that could be helpful for both s390 and power.  Could we load
-> > non-kexec() things (legacy kernels, non-Linux OSes) from Petitboot by
-> > having it kexec() into a shim mini-kernel that just sets up the boot
-> > environment for the other thing.
-> >=20
-> > What I'm imagining is that petitboot loads everything that will be
-> > needed for the other OS into RAM - probably as (or part of) the
-> > "initrd" image.  That means the shim doesn't need to have drivers or
-> > a network stack to load that in.  It just needs to construct
-> > environment and jump into the real kernel.
->=20
-> How does that differ from what kexec normally does?
->=20
-> It does support the kernel format that is usually booted on the
-> architecture.
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 576f309bbf..08b4422f36 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -999,9 +999,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define EXCP11_ALGN	17
+ #define EXCP12_MCHK	18
+ 
+-#define EXCP_SYSCALL    0x100 /* only happens in user only emulation
+-                                 for syscall instruction */
+-#define EXCP_VMEXIT     0x100
++#define EXCP_VMEXIT     0x100 /* only for system emulation */
++#define EXCP_SYSCALL    0x101 /* only for user emulation */
+ 
+ /* i386-specific interrupt pending bits.  */
+ #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
+-- 
+2.20.1
 
-It's not a question of format, but of environment.
-
-By the time a kexec() occurs there won't be any OF client interface
-available, whether or not there ever was one.  So, kexec() won't be
-able to exec things which expect that to be present.  That includes
-grub, AIX, and (probably) FreeBSD.
-
-Note that while it's the same image, Linux kernels for POWER for a
-long time have been able to boot in one of two ways.  One expects the
-flattened tree, and an already instantiated RTAS - this method is used
-directly by RTAS.  The other expects an OF client interface - it
-slurps the device tree out of that and produces the flattened tree,
-instantiates RTAS and then jumps to the flat tree entry point.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---wLAMOaPNJ0fu1fTG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5Ev4oACgkQbDjKyiDZ
-s5LY/A//TDA/iKle4xaWCE1lXCEnZbmLQ/ZRGRVIESTxeS5XQajILZ+7N1BbW6Dk
-psItXdW/ubNLx7UKx5IkWN3a7w3tNaTM7Fl5dauMNgcRV2BCBlSb+OjiZb85GjMP
-fj83zfWtVGQYSR/FhBJ8TjKrfns2fVrXWlzcBdrKw4Gf0MefAcVnUdIVQNKxjACT
-MEyxOfxgMzhI7XI9MZlqCmurSlGI3k1sp57AHTqNaO77sGGy9BQR2Zm6/1ToR8+Y
-Wl05Klideoes6Ge/ne5Ann4jeqykElSEGzJfMf/LUwtw94S57PEm9+9iW/wVYBfn
-HuXLqKGCWSxSpIKE19TmNOI/rgdvciA76a6KRSSrpePNa1Nzsih/0t2zVyGtHuKA
-kcZTWHrEjpBCqrNfEhJ5wB3NuqWBZxqKKp0iwENp/BB7gLyEoA9aBHnUj07hJKYV
-LpHYFoJL7Ba4kS7hdGIr50L+vfeDH+kNhkCJZR2RZd4rXf1IKGIkWQXs1sGMlPeZ
-eZUgVOc++F/F248AdOkV7HsImfkRtt8rY/NMOfeu29bawHMg4PY7dh+VPUwsvj/U
-CXsxFdNP6RoNzI6OxehcJV2smevCmEpp7lzPSJ2ayFJz2HSfmaddotzQHyZVEnQm
-H0cFRo1DE/rb++WppFZKfB4be77JS4dy+cgOlF5Zhg2oWndubZM=
-=RBye
------END PGP SIGNATURE-----
-
---wLAMOaPNJ0fu1fTG--
 
