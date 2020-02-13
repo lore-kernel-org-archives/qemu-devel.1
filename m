@@ -2,101 +2,96 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A8CC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E09DC3B18B
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:22:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FBD124689
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:20:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BC05246A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:22:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fNbVUqZV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FBD124689
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hUjPngqp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC05246A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2GIN-0004RM-1M
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:20:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36744)
+	id 1j2GJv-0006Yh-DD
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:22:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33527)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1j2G70-0005ZW-LJ
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:09:07 -0500
+ (envelope-from <mst@redhat.com>) id 1j2Fok-00061M-LZ
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:50:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1j2G6w-00074k-Vc
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:09:05 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35707
+ (envelope-from <mst@redhat.com>) id 1j2Foh-0005gt-84
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:50:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31049
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j2G6w-00073H-RH
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:09:02 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j2Foh-0005dS-2t
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:50:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581606542;
+ s=mimecast20190719; t=1581605409;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/RP4jL+liXOr7+owGoE1uisFYbkKabx8mrOWiLhVUgk=;
- b=fNbVUqZV57v/9BFlacRccv+wdsQk6ntTrZAPenamYgKfyxJ4IR1S6eaVYWisKfr3zsjlz5
- 7M4BuSY8cURpruVmw/vz7TM7BW9Cm0PX3GUpN/we84nX8/R9eSHB9Yg1QO9We0qeRot22p
- jQamYBFVLAXHvEqip2VX4Js53klIkG0=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13--N5pNiBlOS6qFip21CCGbw-1; Thu, 13 Feb 2020 10:08:57 -0500
-Received: by mail-qv1-f69.google.com with SMTP id n11so3672197qvp.15
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 07:08:57 -0800 (PST)
+ bh=k76DfKGktXC3gCKxb0MlmatUxUtATJH1V5XwEodiORI=;
+ b=hUjPngqpXtP0t1ykrQiYKgjF1z7F5rnM7jls501DVF+DgYd3Yql+GMYsNISmU0PvxPm4np
+ iqJb03yOAPQCwfBggQxb7y7U+ZEv2Bb+e6KRYBPqPKSQjH/AFyAu0trQ0R6e0WkhCWC8wu
+ ONP1vcdp7Oqnv+pKx8Te/Ypn7Zmoli0=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-oU-dOP61PXK0KnZI6o9DXQ-1; Thu, 13 Feb 2020 09:50:07 -0500
+Received: by mail-qv1-f72.google.com with SMTP id p3so3645392qvt.9
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:50:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=TTCs0FYlF7ncgzuKAoKWZgYBOizTPZCqyTpm/Xkwuxg=;
- b=uO3PeMaIjMm4gmwrmCetUCdBX8EeIcJK6hkwesSAnfaCEC9Ki2jiBvL+LejaZP4JuA
- weewfmCipPiSaHLCsniQpnQHfaqO9jNZq4eTfVIKEOZG+ueZXQcdDP7tQ7SkkMJHA5xb
- n01ZVAgQkwe7zSvwGQCSy7QkFyBASn9c/PDaB0k70mEXTTg5U6SNwKCDgEv8eoHTA++l
- IrV5v9oHEjm1ln2InWNL8RgUkSGP7FBN+OHcIVLmFDepNfTv8fOf7iJYHy4kMiUE3WRE
- GPZwX6caQCa9AtWMsmKoFNjZH6aBf+5iRsMnDFnYlYLIDcBmNn2oyXo2KnZRJ2arnZJS
- g2PA==
-X-Gm-Message-State: APjAAAV2+TCtDfc7/6Q8r9LrZEl3X8X9A9KoV1ah9vQ4I9xxrx4IsT/t
- 8W2YnwYH4rxSfjcbJ+Mv/Yvj7cdPZozn7HQZZg+mvTrCuF+g10hKdpXdyCqUVfD7600oLyqkCUA
- 7yLEpViVurQIS/fI=
-X-Received: by 2002:a05:620a:663:: with SMTP id
- a3mr16110922qkh.310.1581606537257; 
- Thu, 13 Feb 2020 07:08:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzUgLATtaYNS3Kg0ZyRQURNj5rc+bKl6duQGjBd/h/0kPnf2VPQA4IkJPSzdtqTGd9fGBjJUw==
-X-Received: by 2002:a05:620a:663:: with SMTP id
- a3mr16110888qkh.310.1581606536927; 
- Thu, 13 Feb 2020 07:08:56 -0800 (PST)
-Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca.
- [72.137.123.47])
- by smtp.gmail.com with ESMTPSA id l19sm1441196qkl.3.2020.02.13.07.08.54
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=eovNYun51mc439+hX2zwVKiuy2KZyB2kwXBRWB23szI=;
+ b=dTyVMaQspt8dt9hMvo917+JstUK7T+Xglw4HJpvJfn21S3R+uVkgTTiTnu/r/oePVf
+ zOQ2uTLzzq2PACTugcNXeSc5gMSAiAMtlk68RGHBpRXpssi4yXulLHHw0I8fHWCTA5Nc
+ eJTbT2g5pVKfzpP3/TQBcKYE1A2d3vIkLsKRZf5tsrXRWNP9THDYdpWJrrZIczVLRo0e
+ 0p1I8OOA53C5ysxBtAPlvQFvIjL+3SbeW1Vk9bJ7TYIxkeUrNuTT4lX14R2rW2mC0Bwv
+ MjRCGxouX/Z97o8DjNGg6qfy35mLFQ3ZKyHuHGBbf807eMIbtgWnYHcKTXIQGdBi4Urp
+ JX9g==
+X-Gm-Message-State: APjAAAUOKfLcOX+a3n28fEuJuJ0baPRfbU3g82alsqfEwL3IjW46gMxN
+ SQGdOQWgreaIC6i1EcjA8tptSJY0ca9ac9z6wpCc1R7uZaCsYbYCbhbil2PFK6qgdHLPZE6edqH
+ miPttTKTl1NdSiNc=
+X-Received: by 2002:ac8:5502:: with SMTP id j2mr12366823qtq.127.1581605406552; 
+ Thu, 13 Feb 2020 06:50:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx5WKYG2+h//TLgvRBup1A9MTHLSuATjesCJf2FrpLOLV/OY+QO8VbJEw+GjAO/eXrrwYDn5w==
+X-Received: by 2002:ac8:5502:: with SMTP id j2mr12366797qtq.127.1581605406253; 
+ Thu, 13 Feb 2020 06:50:06 -0800 (PST)
+Received: from redhat.com (bzq-79-176-28-95.red.bezeqint.net. [79.176.28.95])
+ by smtp.gmail.com with ESMTPSA id
+ o189sm1424567qkd.124.2020.02.13.06.50.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 07:08:56 -0800 (PST)
-Date: Thu, 13 Feb 2020 10:08:53 -0500
-From: Peter Xu <peterx@redhat.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC v3 14/25] intel_iommu: add virtual command capability support
-Message-ID: <20200213150853.GB1103216@xz-x1>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-15-git-send-email-yi.l.liu@intel.com>
- <20200211215630.GN984290@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A1BBBF4@SHSMSX104.ccr.corp.intel.com>
- <20200213143110.GA1103216@xz-x1>
+ Thu, 13 Feb 2020 06:50:05 -0800 (PST)
+Date: Thu, 13 Feb 2020 09:50:02 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: "V." <mail@winaoe.org>
+Subject: Re: [PATCH/RFC 0/1] Vhost User Cross Cable: Intro
+Message-ID: <20200213094723-mutt-send-email-mst@kernel.org>
+References: <98d1e1f0-0e53-d207-78ce-ea9717673985@winaoe.org>
 MIME-Version: 1.0
-In-Reply-To: <20200213143110.GA1103216@xz-x1>
-X-MC-Unique: -N5pNiBlOS6qFip21CCGbw-1
+In-Reply-To: <98d1e1f0-0e53-d207-78ce-ea9717673985@winaoe.org>
+X-MC-Unique: oU-dOP61PXK0KnZI6o9DXQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,46 +103,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 09:31:10AM -0500, Peter Xu wrote:
-
-[...]
-
-> > > Apart of this: also I just noticed (when reading the latter part of
-> > > the series) that the time that a pasid table walk can consume will
-> > > depend on this value too.  I'd suggest to make this as small as we
-> > > can, as long as it satisfies the usage.  We can even bump it in the
-> > > future.
-> >=20
-> > I see. This looks to be an optimization. right? Instead of modify the
-> > value of this macro,  I think we can do this optimization by tracking
-> > the allocated PASIDs in QEMU. Thus, the pasid table walk  would be more
-> > efficient and also no dependency on the VTD_MAX_HPASID. Does it make
-> > sense to you? :-)
+On Wed, Jan 08, 2020 at 02:54:30AM +0100, V. wrote:
+> Hi List,
 >=20
-> Yeah sounds good. :)
+> For my VM setup I tend to use a lot of VM to VM single network links to d=
+o routing, switching and bridging in VM's instead of the host.
+> Also stemming from a silly fetish to sometimes use some OpenBSD VMs as fi=
+rewall, but that is besides the point here.
+> I am using the standard, tested and true method of using a whole bunch=A0=
+ of bridges, having 2 vhost taps each.
+> This works and it's fast, but it is a nightmare to manage with all the in=
+terfaces on the host.
+>=20
+> So, I looked a bit into how I can improve this, basically coming down to =
+"How to connect 2 VM's together in a really fast and easy way".
+> This however, is not as straightforward as I thought, without going the w=
+hole route of OVS/Snabb/any other big feature bloated
+> software switch.
+> Cause really, all I want is to connect 2 VM's in a fast and easy way. Sho=
+uldn't be that hard right?
+>=20
+> Anyways, I end up finding tests/vhost-user-bridge.c, which is very nicely=
+ doing half of what I wanted.
 
-Just to make sure it's safe even for when the global allocation is not
-happening (full emulation devices?  Do they need the PASID table walk
-too?).  Anyway, be careful to not miss some valid PASID entries, or we
-can still use the MIN(PASID_MAX, CONTEXT_ENTRY_SIZE) to be safe as a
-first version.  Thanks,
+BTW you can easily run two vhost user bridges and connect them back to
+back, right?
+
+> After some doubling of the vhosts and eliminating udp, I came up with a V=
+host User Cross Cable. (patch in next post).
+
+Hmm you forgot --thread=3Dshallow so your posts aren't linked.
+
+
+
+> It just opens 2 vhost sockets instead of 1 and does the forwarding betwee=
+n them.
+> A terrible hack and slash of vhost-user-bridge.c, probably now with bugs =
+causing the dead of many puppies and the end of humanity,
+> but it works!
+
+I think generally this approach has value, maybe a separate utility,
+maybe as a flag for vhost-user-bridge.
 
 --=20
-Peter Xu
+MST
 
 
