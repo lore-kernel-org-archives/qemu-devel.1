@@ -2,88 +2,49 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7BCC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 893DAC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:18:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 174222168B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:17:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mw+QBuyD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 174222168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5FCDD218AC
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:18:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FCDD218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2GFT-0008To-7X
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:17:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60609)
+	id 1j2GFl-0000lf-H2
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:18:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2FhP-0004qy-Ke
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:41 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j2Fy5-0002hf-1B
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:59:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2FhO-0002Qx-0j
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:39 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:52747)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2FhN-0002M7-OM
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:37 -0500
-Received: by mail-wm1-x335.google.com with SMTP id p9so6543264wmc.2
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:42:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=uzVG4rPZtI9QEgU8YI9WvM2Scl3ZA8+l5Ifz+hNMkdM=;
- b=Mw+QBuyDSWMLGHyUZGFJWyXB0b1/fz4xhmQJIKU2a+q3avfb2rF3voCPHkGkF7qJiY
- tniBTLu8OG5bMrT7qrsEF9d1fDUJbSrtN6TUtiLpse5WqLaZ6EBkMP6F4JONTJgTtyRl
- iBsOEkYXffm7VmJeqC0GBB9OW8r3jLYdWSZm2L4eMgldzw0fGzZwqLixwvLWV2/GjdD1
- P7sbivq6L48iHVIPziHNvkwA5AX213O33oVdOBB6eaqDFB0/ooZgTLv5TYIUBUKjcYZu
- 4ZRWhHHt0OgNYk6i+S7/01iujJsVl72XgyNcLWFNVihnPmYtN/jLxBwpUGD0I5PwuhpM
- C28A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=uzVG4rPZtI9QEgU8YI9WvM2Scl3ZA8+l5Ifz+hNMkdM=;
- b=gzJtKR10VK63g1zHN/ERmHpd6P7mf+rNfQhWBiY9tnIKVDvuKnk0lHuaJ2b9mg9suu
- jzDcWsNUx/87baaE8jUjHW0yJ/fR4lKrFCP7wI6YHmYeIYDHVrFBaolfB7LJoNzowO/d
- ronKe0lcRwEvn9AbI/htOSdPJtAqjm916zn4zQD7HYxv9Nc9LBuvRAAOubS592+t9ALo
- X+ezXwNqIMPaw8U4UZIMRFs3Tm4ZclCuD2a98B9qkh8hiJS4/ogPq5lfX67GocdN0z1m
- ZDg/sHDDeHLQLBLbb6tBj9hZbOIqhIldD0t0ugPydUwafHnXFCQmFQrrlOSSP7WrIzq3
- rAFw==
-X-Gm-Message-State: APjAAAWJ6z5pJ+O3mJlR+k+//se/iuCF+Pl3GxZzdQ6PL4ULbd0TwV3k
- l+A8Elkilor4kdQMCB1rSNXTuyEJ1Z4=
-X-Google-Smtp-Source: APXvYqxgqLZkAGbM27b9E+u2gvPYWMVxCiL0lgbjWwAgz8PxFqRZ/xF6Jxn5CFpfuzX6RAJrPmTK4Q==
-X-Received: by 2002:a1c:7c11:: with SMTP id x17mr6624815wmc.168.1581604953549; 
- Thu, 13 Feb 2020 06:42:33 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e22sm3362454wme.45.2020.02.13.06.42.32
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 06:42:32 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j2Fy0-0002XX-Bl
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:59:50 -0500
+Received: from relay.sw.ru ([185.231.240.75]:39750)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1j2Fy0-0002Qu-3v; Thu, 13 Feb 2020 09:59:48 -0500
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1j2Fxf-0003g2-UX; Thu, 13 Feb 2020 17:59:28 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 41/46] hw/arm/raspi: Let class_init() directly call
- raspi_machine_init()
-Date: Thu, 13 Feb 2020 14:41:40 +0000
-Message-Id: <20200213144145.818-42-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200213144145.818-1-peter.maydell@linaro.org>
-References: <20200213144145.818-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::335
+Subject: [PATCH v2] virtio: increase virtuqueue size for virtio-scsi and
+ virtio-blk
+Date: Thu, 13 Feb 2020 17:59:27 +0300
+Message-Id: <20200213145927.7539-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,80 +56,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com,
+ qemu-block@nongnu.org, mst@redhat.com, mreitz@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+v1:
+  * seg_max default value changing removed
 
-raspi_machine_init() access to board_rev via RaspiMachineClass.
-raspi2_init() and raspi3_init() do nothing. Call raspi_machine_init
-directly.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-id: 20200208165645.15657-10-f4bug@amsat.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/raspi.c | 16 +++-------------
- 1 file changed, 3 insertions(+), 13 deletions(-)
+The goal is to reduce the amount of requests issued by a guest on
+1M reads/writes. This rises the performance up to 4% on that kind of
+disk access pattern.
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index fbfcd297326..1628b0dda7c 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -228,7 +228,7 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-     arm_load_kernel(ARM_CPU(first_cpu), machine, &binfo);
- }
+The maximum chunk size to be used for the guest disk accessing is
+limited with seg_max parameter, which represents the max amount of
+pices in the scatter-geather list in one guest disk request.
+
+Since seg_max is virqueue_size dependent, increasing the virtqueue
+size increases seg_max, which, in turn, increases the maximum size
+of data to be read/write from a guest disk.
+
+More details in the original problem statment:
+https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03721.html
+
+Suggested-by: Denis V. Lunev <den@openvz.org>
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ hw/block/virtio-blk.c | 2 +-
+ hw/core/machine.c     | 2 ++
+ hw/scsi/virtio-scsi.c | 2 +-
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 09f46ed85f..142863a3b2 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -1272,7 +1272,7 @@ static Property virtio_blk_properties[] = {
+     DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging, 0,
+                     true),
+     DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
+-    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
++    DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 256),
+     DEFINE_PROP_BOOL("seg-max-adjust", VirtIOBlock, conf.seg_max_adjust, true),
+     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
+                      IOThread *),
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 2501b540ec..3427d6cf4c 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -28,6 +28,8 @@
+ #include "hw/mem/nvdimm.h"
  
--static void raspi_init(MachineState *machine)
-+static void raspi_machine_init(MachineState *machine)
- {
-     RaspiMachineClass *mc = RASPI_MACHINE_GET_CLASS(machine);
-     RaspiMachineState *s = RASPI_MACHINE(machine);
-@@ -280,11 +280,6 @@ static void raspi_init(MachineState *machine)
-     setup_boot(machine, version, machine->ram_size - vcram_size);
- }
- 
--static void raspi2_init(MachineState *machine)
--{
--    raspi_init(machine);
--}
--
- static void raspi2_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -293,7 +288,7 @@ static void raspi2_machine_class_init(ObjectClass *oc, void *data)
- 
-     rmc->board_rev = board_rev;
-     mc->desc = "Raspberry Pi 2B";
--    mc->init = raspi2_init;
-+    mc->init = raspi_machine_init;
-     mc->block_default_type = IF_SD;
-     mc->no_parallel = 1;
-     mc->no_floppy = 1;
-@@ -306,11 +301,6 @@ static void raspi2_machine_class_init(ObjectClass *oc, void *data)
- };
- 
- #ifdef TARGET_AARCH64
--static void raspi3_init(MachineState *machine)
--{
--    raspi_init(machine);
--}
--
- static void raspi3_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -319,7 +309,7 @@ static void raspi3_machine_class_init(ObjectClass *oc, void *data)
- 
-     rmc->board_rev = board_rev;
-     mc->desc = "Raspberry Pi 3B";
--    mc->init = raspi3_init;
-+    mc->init = raspi_machine_init;
-     mc->block_default_type = IF_SD;
-     mc->no_parallel = 1;
-     mc->no_floppy = 1;
+ GlobalProperty hw_compat_4_2[] = {
++    { "virtio-blk-device", "queue-size", "128"},
++    { "virtio-scsi-device", "virtqueue_size", "128"},
+     { "virtio-blk-device", "x-enable-wce-if-config-wce", "off" },
+     { "virtio-blk-device", "seg-max-adjust", "off"},
+     { "virtio-scsi-device", "seg_max_adjust", "off"},
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 3b61563609..472bbd233b 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -965,7 +965,7 @@ static void virtio_scsi_device_unrealize(DeviceState *dev, Error **errp)
+ static Property virtio_scsi_properties[] = {
+     DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
+     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
+-                                         parent_obj.conf.virtqueue_size, 128),
++                                         parent_obj.conf.virtqueue_size, 256),
+     DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSI,
+                       parent_obj.conf.seg_max_adjust, true),
+     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_sectors,
 -- 
-2.20.1
+2.17.0
 
 
