@@ -2,60 +2,103 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5680DC3B189
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 09:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BC7C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 09:52:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A28520848
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 09:51:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A28520848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 953F32073C
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 09:52:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lx7l+IjU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953F32073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2B9O-0007EJ-Aw
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 04:51:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46058)
+	id 1j2BAT-0008Kp-Rq
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 04:52:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengzhimin1@huawei.com>) id 1j2AxE-000732-2S
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:38:41 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j2B9Z-0007Tk-Ra
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fengzhimin1@huawei.com>) id 1j2AxC-0005Em-0q
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:38:39 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2780 helo=huawei.com)
+ (envelope-from <pbonzini@redhat.com>) id 1j2B9S-0001iT-Rp
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:51:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58093
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fengzhimin1@huawei.com>)
- id 1j2AxB-00052d-LY
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:38:37 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id B5A68D545394A53FED95;
- Thu, 13 Feb 2020 17:38:25 +0800 (CST)
-Received: from huawei.com (10.173.220.198) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Thu, 13 Feb 2020
- 17:38:16 +0800
-From: Zhimin Feng <fengzhimin1@huawei.com>
-To: <quintela@redhat.com>, <dgilbert@redhat.com>, <armbru@redhat.com>,
- <eblake@redhat.com>
-Subject: [PATCH RFC 14/14] migration/rdma: RDMA cleanup for multifd migration
-Date: Thu, 13 Feb 2020 17:37:55 +0800
-Message-ID: <20200213093755.370-15-fengzhimin1@huawei.com>
-X-Mailer: git-send-email 2.24.0.windows.2
-In-Reply-To: <20200213093755.370-1-fengzhimin1@huawei.com>
-References: <20200213093755.370-1-fengzhimin1@huawei.com>
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j2B9S-0001hF-OP
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:51:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581587478;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TP0m2c13yyONsZNdLdHsAJAuP1rHHUZwpMtw2OLT8bE=;
+ b=Lx7l+IjUJJYBrvzb8CAlitZVxxCwxiXd2Fv/OprhCspAL9GRm0x2d15JI26vdfeo9nER3R
+ uLeE7Lro1BwDbL9pp5OoL42nM/hBL1x3835F/R9wv7teYXKrWeSytq69EcYTmYO5hlfF2f
+ BSKDpCVny8pJFGX8E7SAZ6bYklLKR0M=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-93-9R701eP4N5OjDJ_R0G8gmw-1; Thu, 13 Feb 2020 04:51:15 -0500
+Received: by mail-wr1-f70.google.com with SMTP id w6so2108040wrm.16
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 01:51:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=cmm16DNMsP8pVSAp45gWrcl4ndwwoJBsG0NSvPreCwU=;
+ b=iGtkBfnlJpgsMRf5IbIj3iG3A5s+YvRua9MEEejIX8uoAX6RR9XFTckj15bSl03Sov
+ RUHijz0t5VG7Iyb+Cvo6KNVkCb4/YBgI5vszrXK6dla57/ScgjIwuG7bDUsRB65dmH3x
+ NZU0rg80/oPudcxKxOjzHjpPMirLhO4S662BtL0YWCqKX5ii3xD5KzAdHT89BNbKXj48
+ Iu7BFQ0lCyGfUT8synwtYav9pMy7FhjHiLXEMfBI5pkNhEi4GHzHnJdmro8lAJrfks5M
+ fJM84BrotNqR2wJ2iOzHI3xmWmKd/h9TWyzR4rkbr0LXVM8yGxQRW+VnfM9WwkkkqLMs
+ wF9g==
+X-Gm-Message-State: APjAAAXL4srIcNkk0GV7C+APGgrOwmzTVraLaXZ1/57jbxt/wuj24bNd
+ z91wfs2XunJ0iL7zojGLn2pqIgpy3oN70CTmgez/Aa5bBcLdtYqBRNipDpuPlY4cGI2Ik92FCCF
+ qxyMI8CJKbmcXKoA=
+X-Received: by 2002:a1c:9cce:: with SMTP id f197mr5089016wme.133.1581587474828; 
+ Thu, 13 Feb 2020 01:51:14 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxm+tc9KyzaZUic3nO7OU0rqKF1OZC4zCWwwrLZsZp+R/FhiQCSVz4EixLhYZQJga4mmbDFbg==
+X-Received: by 2002:a1c:9cce:: with SMTP id f197mr5088979wme.133.1581587474547; 
+ Thu, 13 Feb 2020 01:51:14 -0800 (PST)
+Received: from [192.168.10.150] ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id e16sm2208668wrs.73.2020.02.13.01.51.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 13 Feb 2020 01:51:13 -0800 (PST)
+Subject: Re: Question about (and problem with) pflash data access
+To: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Guenter Roeck <linux@roeck-us.net>
+References: <20200212184648.GA584@roeck-us.net>
+ <504e7722-0b60-ec02-774d-26a7320e5309@redhat.com>
+ <20200212230918.GA27242@roeck-us.net>
+ <560224fe-f0a3-c64a-6689-e824225cfbb9@redhat.com>
+ <279d959f-f7e5-65e1-9c68-459f3fed56d3@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <52f0b829-151a-3dd0-0ec7-c3155185510c@redhat.com>
+Date: Thu, 13 Feb 2020 10:51:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.220.198]
-X-CFilter-Loop: Reflected
+In-Reply-To: <279d959f-f7e5-65e1-9c68-459f3fed56d3@ozlabs.ru>
+Content-Language: en-US
+X-MC-Unique: 9R701eP4N5OjDJ_R0G8gmw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,87 +110,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jemmy858585@gmail.com, Zhimin Feng <fengzhimin1@huawei.com>,
- qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Zhimin Feng <fengzhimin1@huawei.com>
----
- migration/multifd.c | 6 ++++++
- migration/rdma.c    | 5 ++---
- migration/rdma.h    | 1 +
- 3 files changed, 9 insertions(+), 3 deletions(-)
+On 13/02/20 08:40, Alexey Kardashevskiy wrote:
+>>>
+>>> memory-region: system
+>>> =C2=A0=C2=A0 0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 0000000000000000-0000000001ffffff (prio 0, rom=
+d): omap_sx1.flash0-1
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 0000000000000000-0000000001ffffff (prio 0, rom=
+): omap_sx1.flash0-0
+>> Eh two memory regions with same size and same priority... Is this legal?
+>=20
+> I'd say yes if used with memory_region_set_enabled() to make sure only
+> one is enabled. Having both enabled is weird and we should print a
+> warning.
 
-diff --git a/migration/multifd.c b/migration/multifd.c
-index ba5e0b11d0..886c8e1271 100644
---- a/migration/multifd.c
-+++ b/migration/multifd.c
-@@ -429,6 +429,9 @@ void multifd_save_cleanup(void)
-         g_free(p->packet);
-         p->packet =3D NULL;
-         if (migrate_use_rdma()) {
-+            p->rdma->listen_id =3D NULL;
-+            p->rdma->channel =3D NULL;
-+            qemu_rdma_cleanup(p->rdma);
-             g_free(p->rdma);
-         }
-     }
-@@ -835,6 +838,9 @@ int multifd_load_cleanup(Error **errp)
-         g_free(p->packet);
-         p->packet =3D NULL;
-         if (migrate_use_rdma()) {
-+            p->rdma->listen_id =3D NULL;
-+            p->rdma->channel =3D NULL;
-+            qemu_rdma_cleanup(p->rdma);
-             g_free(p->rdma);
-         }
-     }
-diff --git a/migration/rdma.c b/migration/rdma.c
-index b7b56c0493..0a48713d03 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -2096,11 +2096,11 @@ static int qemu_rdma_write(QEMUFile *f, RDMAConte=
-xt *rdma,
-     return 0;
- }
-=20
--static void qemu_rdma_cleanup(RDMAContext *rdma)
-+void qemu_rdma_cleanup(RDMAContext *rdma)
- {
-     int idx;
-=20
--    if (rdma->cm_id && rdma->connected) {
-+    if (rdma->channel && rdma->cm_id && rdma->connected) {
-         if ((rdma->error_state ||
-              migrate_get_current()->state =3D=3D MIGRATION_STATUS_CANCEL=
-LING) &&
-             !rdma->received_error) {
-@@ -2181,7 +2181,6 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
-     rdma->host =3D NULL;
- }
-=20
--
- static int qemu_rdma_source_init(RDMAContext *rdma, bool pin_all, Error =
-**errp)
- {
-     int ret, idx;
-diff --git a/migration/rdma.h b/migration/rdma.h
-index 7dc3895698..b78f79ddc2 100644
---- a/migration/rdma.h
-+++ b/migration/rdma.h
-@@ -283,6 +283,7 @@ int qemu_rdma_exchange_send(RDMAContext *rdma, RDMACo=
-ntrolHeader *head,
- int qemu_rdma_registration(void *opaque);
- int qemu_rdma_block_for_wrid(RDMAContext *rdma, int wrid_requested,
-                              uint32_t *byte_len);
-+void qemu_rdma_cleanup(RDMAContext *rdma);
-=20
- void rdma_start_outgoing_migration(void *opaque, const char *host_port,
-                                    Error **errp);
---=20
-2.19.1
+Yeah, it's undefined which one becomes visible.
 
+Paolo
 
 
