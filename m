@@ -2,52 +2,51 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F072C3B188
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 01:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E44C352A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 01:48:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18B2420659
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 01:48:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18B2420659
+	by mail.kernel.org (Postfix) with ESMTPS id 32A4C21739
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 01:48:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A4C21739
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j23cT-0007Zz-7c
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 20:48:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49894)
+	id 1j23cV-0007dL-Cp
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 20:48:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49883)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j23bc-0005xv-7N
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j23bc-0005xt-04
  for qemu-devel@nongnu.org; Wed, 12 Feb 2020 20:47:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j23ba-0004TC-UK
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 20:47:52 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:38856 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j23ba-0004St-S4
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 20:47:51 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:40548 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1j23ba-0002yC-NJ
+ id 1j23ba-0004Qv-HC
  for qemu-devel@nongnu.org; Wed, 12 Feb 2020 20:47:50 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 830251A2147;
+ by mail.rt-rk.com (Postfix) with ESMTP id D97151A2155;
  Thu, 13 Feb 2020 02:46:47 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 6840B1A1FF3;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id A70CD1A215C;
  Thu, 13 Feb 2020 02:46:47 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/9] linux-user: alpha: Update syscall numbers to kernel
- 5.5 level
-Date: Thu, 13 Feb 2020 02:46:25 +0100
-Message-Id: <1581558393-9182-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v2 6/9] linux-user: sh4: Update syscall numbers to kernel 5.5
+ level
+Date: Thu, 13 Feb 2020 02:46:30 +0100
+Message-Id: <1581558393-9182-7-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1581558393-9182-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1581558393-9182-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -64,66 +63,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, laurent@vivier.eu,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Update alpha syscall numbers based on Linux kernel v5.5.
+Update sh4 syscall numbers based on Linux kernel v5.5.
 
-CC: Richard Henderson <rth@twiddle.net>
+CC: Aurelien Jarno <aurelien@aurel32.net>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/alpha/syscall_nr.h | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ linux-user/sh4/syscall_nr.h | 48 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/linux-user/alpha/syscall_nr.h b/linux-user/alpha/syscall_nr.h
-index 2e5541b..c29fc17 100644
---- a/linux-user/alpha/syscall_nr.h
-+++ b/linux-user/alpha/syscall_nr.h
-@@ -453,5 +453,40 @@
- #define TARGET_NR_getrandom                     511
- #define TARGET_NR_memfd_create                  512
- #define TARGET_NR_execveat                      513
-+#define TARGET_NR_seccomp                       514
-+#define TARGET_NR_bpf                           515
-+#define TARGET_NR_userfaultfd                   516
-+#define TARGET_NR_membarrier                    517
-+#define TARGET_NR_mlock2                        518
-+#define TARGET_NR_copy_file_range               519
-+#define TARGET_NR_preadv2                       520
-+#define TARGET_NR_pwritev2                      521
-+#define TARGET_NR_statx                         522
-+#define TARGET_NR_io_pgetevents                 523
-+#define TARGET_NR_pkey_mprotect                 524
-+#define TARGET_NR_pkey_alloc                    525
-+#define TARGET_NR_pkey_free                     526
-+#define TARGET_NR_rseq                          527
-+#define TARGET_NR_statfs64                      528
-+#define TARGET_NR_fstatfs64                     529
-+#define TARGET_NR_getegid                       530
-+#define TARGET_NR_geteuid                       531
-+#define TARGET_NR_getppid                       532
-+/*
-+ * all other architectures have common numbers for new syscall, alpha
-+ * is the exception.
-+ */
-+#define TARGET_NR_pidfd_send_signal             534
-+#define TARGET_NR_io_uring_setup                535
-+#define TARGET_NR_io_uring_enter                536
-+#define TARGET_NR_io_uring_register             537
-+#define TARGET_NR_open_tree                     538
-+#define TARGET_NR_move_mount                    539
-+#define TARGET_NR_fsopen                        540
-+#define TARGET_NR_fsconfig                      541
-+#define TARGET_NR_fsmount                       542
-+#define TARGET_NR_fspick                        543
-+#define TARGET_NR_pidfd_open                    544
-+/* 545 reserved for clone3 */
+diff --git a/linux-user/sh4/syscall_nr.h b/linux-user/sh4/syscall_nr.h
+index d53a2a0..8c21fcf 100644
+--- a/linux-user/sh4/syscall_nr.h
++++ b/linux-user/sh4/syscall_nr.h
+@@ -389,5 +389,53 @@
+ #define TARGET_NR_copy_file_range       380
+ #define TARGET_NR_preadv2               381
+ #define TARGET_NR_pwritev2              382
++#define TARGET_NR_statx                 383
++#define TARGET_NR_pkey_mprotect         384
++#define TARGET_NR_pkey_alloc            385
++#define TARGET_NR_pkey_free             386
++#define TARGET_NR_rseq                  387
++/* room for arch specific syscalls */
++#define TARGET_NR_semget                         393
++#define TARGET_NR_semctl                         394
++#define TARGET_NR_shmget                         395
++#define TARGET_NR_shmctl                         396
++#define TARGET_NR_shmat                          397
++#define TARGET_NR_shmdt                          398
++#define TARGET_NR_msgget                         399
++#define TARGET_NR_msgsnd                         400
++#define TARGET_NR_msgrcv                         401
++#define TARGET_NR_msgctl                         402
++#define TARGET_NR_clock_gettime64                403
++#define TARGET_NR_clock_settime64                404
++#define TARGET_NR_clock_adjtime64                405
++#define TARGET_NR_clock_getres_time64            406
++#define TARGET_NR_clock_nanosleep_time64         407
++#define TARGET_NR_timer_gettime64                408
++#define TARGET_NR_timer_settime64                409
++#define TARGET_NR_timerfd_gettime64              410
++#define TARGET_NR_timerfd_settime64              411
++#define TARGET_NR_utimensat_time64               412
++#define TARGET_NR_pselect6_time64                413
++#define TARGET_NR_ppoll_time64                   414
++#define TARGET_NR_io_pgetevents_time64           416
++#define TARGET_NR_recvmmsg_time64                417
++#define TARGET_NR_mq_timedsend_time64            418
++#define TARGET_NR_mq_timedreceive_time64         419
++#define TARGET_NR_semtimedop_time64              420
++#define TARGET_NR_rt_sigtimedwait_time64         421
++#define TARGET_NR_futex_time64                   422
++#define TARGET_NR_sched_rr_get_interval_time64   423
++#define TARGET_NR_pidfd_send_signal              424
++#define TARGET_NR_io_uring_setup                 425
++#define TARGET_NR_io_uring_enter                 426
++#define TARGET_NR_io_uring_register              427
++#define TARGET_NR_open_tree                      428
++#define TARGET_NR_move_mount                     429
++#define TARGET_NR_fsopen                         430
++#define TARGET_NR_fsconfig                       431
++#define TARGET_NR_fsmount                        432
++#define TARGET_NR_fspick                         433
++#define TARGET_NR_pidfd_open                     434
++/* 435 reserved for clone3 */
  
  #endif
 -- 
