@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74279C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E7DCC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:15:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F26272168B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:14:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF4BC2168B
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:15:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rTsIpSY8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F26272168B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wb2dCeNI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF4BC2168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2GBp-0003dI-UO
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:14:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60445)
+	id 1j2GCn-0005PY-Tf
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:15:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2FhC-0004h0-1c
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:31 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j2FhP-0004pB-0Y
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Fh9-0002E2-IC
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:25 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:45635)
+ (envelope-from <peter.maydell@linaro.org>) id 1j2FhN-0002Q3-No
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:38 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:51274)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2Fh9-0002Ch-Ak
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:23 -0500
-Received: by mail-wr1-x432.google.com with SMTP id g3so6966051wrs.12
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:42:23 -0800 (PST)
+ id 1j2FhN-0002Je-Gl
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:37 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id t23so6545404wmi.1
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:42:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=0V9qaj2G2nmmxYotWQnlHB27wnLxZhF+76Y+FiGCx/w=;
- b=rTsIpSY8J60vHPgMSsgls0LVjtAbOncOPwLOgdXHg0i/K62RxM8RTpbBEwvIOgAamM
- oqjHa4cwkPt7yjAstcn45jNJY9+uCeykwKVjibnrosihNSyRtFYxY3zQSAkGvHHUKSoP
- ATLXrJt1lG2JSTQ0WaTlMvUhPbTVUzP93lK/l59xHVXQbQTU4HA8uc3jTq+D3iZIEd25
- pPrb2dDntVAt6FIq6Kgit4E1R64agOakFreMRTwWx/b/RByK72GCPRvn9Kxv02nmeKlt
- Cd3z2WbvHK+2AR91YApyv4qT2qpohhyHQm+JaYmorgWeZNlxwp2LiVOQv6IWnRhyVDdX
- 5aHg==
+ bh=N0Kibz+Zwr8u1oAxdBoyGL/jmEs53LkcKtGIGXIk9Jc=;
+ b=wb2dCeNIurBpUwfbb+APC04g/OdzVnWqKdQvnLa1cLt/2n93PP9Vf1kWWSq8fEkjlk
+ KJZ2xAPZbx8IrjqXXwMKL6k2a4b+MB417a8gGkizabplGLFcLGXLDMcw3/RGsNZi46tY
+ yegTzrkI/t2qo2MjxOg2Qayz3jda1whapC657j3/CaPmZuRZxx4WJx7mbBR7vxbG7Y5V
+ 1jQy4VZ/9Tl1cTGYuNeDUO+35ibMXhHeQ5JTvulG8hePM9XzFr7H4GykaeU+2Jqcjx9R
+ cDgceb3pbdCBkciuAdXtYq/4rRZJlWeylBXOOiuK0siJwYGO4LSaQSjkp8YL8R1+d+xO
+ BejA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0V9qaj2G2nmmxYotWQnlHB27wnLxZhF+76Y+FiGCx/w=;
- b=Ohah7Xa4IXwfMJhgd+pGKrfjX1e4sarKdLNZ9A2I4hC6dyI74Sk3eexi9fqs31pwYc
- Zl5X2CsUOCfXLODOOH/LQfpcdlPpsAZ7fwuSW1sxCHENS7uyw7OS8hiLJKwd0ePoZtBy
- FPvH77LS1tz3bQsd7c3+M1LFQRWIf+bsD0uHZajc2QrARmCoGsTeo+qQPj0qxEv9UTuN
- CzdLhewt+1sory60aTzfSSRhuinZfE1a8AVUgYXRjqhX27vNx3Yx7CrfCyXi2E2ANjMl
- Y3jT0Mzu/E9D992ffLGmTMOJ1kYDpbfTSM/sZ0ulteeFAC2e0GV1CgPOP6NL8GvQeqhz
- aVkw==
-X-Gm-Message-State: APjAAAVuCljxFiRL9ksgUjl1Nl2R54N64ojTEFNeYQQxLvxWMJs9k0ce
- RC2bjga5hhX/B9M4vNB5h0wLZHE8Z3U=
-X-Google-Smtp-Source: APXvYqyMVaERweryGGfOLiSU31R8QyKF1cO1hs1XWsnMXH3PIYDv2GYyi9eyEWpUHLWXZo81ffJfKQ==
-X-Received: by 2002:adf:e610:: with SMTP id p16mr23567702wrm.81.1581604941961; 
- Thu, 13 Feb 2020 06:42:21 -0800 (PST)
+ bh=N0Kibz+Zwr8u1oAxdBoyGL/jmEs53LkcKtGIGXIk9Jc=;
+ b=uily8rNaLX37ezcvUErvrew1jQEYk0i/MZj8Sc6maGdqvy6W1qWPJDP8/NGXTAZw7n
+ eXLRUSV3CFAHSS9BDMspNMARxO6oJOZ/TlhzSxjRn/WHKhgLXEmNfTc0b6c+yUu4g9i/
+ M3LSGvlEzbMYr1qRegl4IZnHAIUZbrwHMkqjjMLLKQSrCdNe+Ulh7IuIBXDVxC6KrTUz
+ jpgCRgaxa+t9NsrmhS1C3SFy+9DVct0CknN8drlA373mXnC/MQB8Uds3Vnnhs0x7/IXM
+ iiPE3dtmvGWtq9v8oKhk4t2PYfcXTzrdjdsHPkUl7qRmDT9fnPUoxKAm/XjsLnqe+E87
+ Gaxw==
+X-Gm-Message-State: APjAAAXmUoSUyPk62cJEXOXPax1/Rl21+IlAN53rXXdejr0G7xBTbCpk
+ d7NKSh3d91yuyCC0WHkIlwBC0ijscnY=
+X-Google-Smtp-Source: APXvYqzi9MoiaVJPVAlZNkKtGHYFbUaHRSDbd+RDOerdVtWFt31e4cAwDTdWIBb07cjHAXsupdXEog==
+X-Received: by 2002:a7b:cbc9:: with SMTP id n9mr6268103wmi.89.1581604948544;
+ Thu, 13 Feb 2020 06:42:28 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e22sm3362454wme.45.2020.02.13.06.42.21
+ by smtp.gmail.com with ESMTPSA id e22sm3362454wme.45.2020.02.13.06.42.27
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 06:42:21 -0800 (PST)
+ Thu, 13 Feb 2020 06:42:27 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 30/46] hw/arm: ast2400/ast2500: Wire up EHCI controllers
-Date: Thu, 13 Feb 2020 14:41:29 +0000
-Message-Id: <20200213144145.818-31-peter.maydell@linaro.org>
+Subject: [PULL 36/46] hw/arm/raspi: Extract the RAM size from the board
+ revision
+Date: Thu, 13 Feb 2020 14:41:35 +0000
+Message-Id: <20200213144145.818-37-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200213144145.818-1-peter.maydell@linaro.org>
 References: <20200213144145.818-1-peter.maydell@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,149 +99,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Guenter Roeck <linux@roeck-us.net>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Initialize EHCI controllers on AST2400 and AST2500 using the existing
-TYPE_PLATFORM_EHCI. After this change, booting ast2500-evb into Linux
-successfully instantiates a USB interface.
+The board revision encode the amount of RAM. Add a helper
+to extract the RAM size, and use it.
+Since the amount of RAM is fixed (it is impossible to physically
+modify to have more or less RAM), do not allow sizes different
+than the one anounced by the manufacturer.
 
-ehci-platform 1e6a3000.usb: EHCI Host Controller
-ehci-platform 1e6a3000.usb: new USB bus registered, assigned bus number 1
-ehci-platform 1e6a3000.usb: irq 21, io mem 0x1e6a3000
-ehci-platform 1e6a3000.usb: USB 2.0 started, EHCI 1.00
-usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 5.05
-usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
-usb usb1: Product: EHCI Host Controller
-
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20200206183437.3979-1-linux@roeck-us.net
+Acked-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20200208165645.15657-5-f4bug@amsat.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/aspeed_soc.h |  6 ++++++
- hw/arm/aspeed_soc.c         | 25 +++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ hw/arm/raspi.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index 90ac7f7ffa3..78b9f6ae532 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -26,8 +26,10 @@
- #include "target/arm/cpu.h"
- #include "hw/gpio/aspeed_gpio.h"
- #include "hw/sd/aspeed_sdhci.h"
-+#include "hw/usb/hcd-ehci.h"
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index f285e2988fc..dcd8d2d6d38 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -13,6 +13,7 @@
  
- #define ASPEED_SPIS_NUM  2
-+#define ASPEED_EHCIS_NUM 2
- #define ASPEED_WDTS_NUM  4
- #define ASPEED_CPUS_NUM  2
- #define ASPEED_MACS_NUM  4
-@@ -50,6 +52,7 @@ typedef struct AspeedSoCState {
-     AspeedXDMAState xdma;
-     AspeedSMCState fmc;
-     AspeedSMCState spi[ASPEED_SPIS_NUM];
-+    EHCISysBusState ehci[ASPEED_EHCIS_NUM];
-     AspeedSDMCState sdmc;
-     AspeedWDTState wdt[ASPEED_WDTS_NUM];
-     FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
-@@ -71,6 +74,7 @@ typedef struct AspeedSoCClass {
-     uint32_t silicon_rev;
-     uint64_t sram_size;
-     int spis_num;
-+    int ehcis_num;
-     int wdts_num;
-     int macs_num;
-     const int *irqmap;
-@@ -94,6 +98,8 @@ enum {
-     ASPEED_FMC,
-     ASPEED_SPI1,
-     ASPEED_SPI2,
-+    ASPEED_EHCI1,
-+    ASPEED_EHCI2,
-     ASPEED_VIC,
-     ASPEED_SDMC,
-     ASPEED_SCU,
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index b5e809a1d3f..696c7fda14b 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -30,6 +30,7 @@ static const hwaddr aspeed_soc_ast2400_memmap[] = {
-     [ASPEED_IOMEM]  = 0x1E600000,
-     [ASPEED_FMC]    = 0x1E620000,
-     [ASPEED_SPI1]   = 0x1E630000,
-+    [ASPEED_EHCI1]  = 0x1E6A1000,
-     [ASPEED_VIC]    = 0x1E6C0000,
-     [ASPEED_SDMC]   = 0x1E6E0000,
-     [ASPEED_SCU]    = 0x1E6E2000,
-@@ -59,6 +60,8 @@ static const hwaddr aspeed_soc_ast2500_memmap[] = {
-     [ASPEED_FMC]    = 0x1E620000,
-     [ASPEED_SPI1]   = 0x1E630000,
-     [ASPEED_SPI2]   = 0x1E631000,
-+    [ASPEED_EHCI1]  = 0x1E6A1000,
-+    [ASPEED_EHCI2]  = 0x1E6A3000,
-     [ASPEED_VIC]    = 0x1E6C0000,
-     [ASPEED_SDMC]   = 0x1E6E0000,
-     [ASPEED_SCU]    = 0x1E6E2000,
-@@ -91,6 +94,8 @@ static const int aspeed_soc_ast2400_irqmap[] = {
-     [ASPEED_UART5]  = 10,
-     [ASPEED_VUART]  = 8,
-     [ASPEED_FMC]    = 19,
-+    [ASPEED_EHCI1]  = 5,
-+    [ASPEED_EHCI2]  = 13,
-     [ASPEED_SDMC]   = 0,
-     [ASPEED_SCU]    = 21,
-     [ASPEED_ADC]    = 31,
-@@ -180,6 +185,11 @@ static void aspeed_soc_init(Object *obj)
-                               sizeof(s->spi[i]), typename);
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
+ #include "hw/arm/bcm2836.h"
+@@ -49,6 +50,12 @@ FIELD(REV_CODE, MANUFACTURER,      16, 4);
+ FIELD(REV_CODE, MEMORY_SIZE,       20, 3);
+ FIELD(REV_CODE, STYLE,             23, 1);
+ 
++static uint64_t board_ram_size(uint32_t board_rev)
++{
++    assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
++    return 256 * MiB << FIELD_EX32(board_rev, REV_CODE, MEMORY_SIZE);
++}
++
+ static int board_processor_id(uint32_t board_rev)
+ {
+     assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
+@@ -191,15 +198,17 @@ static void raspi_init(MachineState *machine, uint32_t board_rev)
+ {
+     RasPiState *s = g_new0(RasPiState, 1);
+     int version = board_version(board_rev);
++    uint64_t ram_size = board_ram_size(board_rev);
+     uint32_t vcram_size;
+     DriveInfo *di;
+     BlockBackend *blk;
+     BusState *bus;
+     DeviceState *carddev;
+ 
+-    if (machine->ram_size > 1 * GiB) {
+-        error_report("Requested ram size is too large for this machine: "
+-                     "maximum is 1GB");
++    if (machine->ram_size != ram_size) {
++        char *size_str = size_to_str(ram_size);
++        error_report("Invalid RAM size, should be %s", size_str);
++        g_free(size_str);
+         exit(1);
      }
  
-+    for (i = 0; i < sc->ehcis_num; i++) {
-+        sysbus_init_child_obj(obj, "ehci[*]", OBJECT(&s->ehci[i]),
-+                              sizeof(s->ehci[i]), TYPE_PLATFORM_EHCI);
-+    }
-+
-     snprintf(typename, sizeof(typename), "aspeed.sdmc-%s", socname);
-     sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc),
-                           typename);
-@@ -364,6 +374,19 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-                         s->spi[i].ctrl->flash_window_base);
-     }
- 
-+    /* EHCI */
-+    for (i = 0; i < sc->ehcis_num; i++) {
-+        object_property_set_bool(OBJECT(&s->ehci[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->ehci[i]), 0,
-+                        sc->memmap[ASPEED_EHCI1 + i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->ehci[i]), 0,
-+                           aspeed_soc_get_irq(s, ASPEED_EHCI1 + i));
-+    }
-+
-     /* SDMC - SDRAM Memory Controller */
-     object_property_set_bool(OBJECT(&s->sdmc), true, "realized", &err);
-     if (err) {
-@@ -472,6 +495,7 @@ static void aspeed_soc_ast2400_class_init(ObjectClass *oc, void *data)
-     sc->silicon_rev  = AST2400_A1_SILICON_REV;
-     sc->sram_size    = 0x8000;
-     sc->spis_num     = 1;
-+    sc->ehcis_num    = 1;
-     sc->wdts_num     = 2;
-     sc->macs_num     = 2;
-     sc->irqmap       = aspeed_soc_ast2400_irqmap;
-@@ -496,6 +520,7 @@ static void aspeed_soc_ast2500_class_init(ObjectClass *oc, void *data)
-     sc->silicon_rev  = AST2500_A1_SILICON_REV;
-     sc->sram_size    = 0x9000;
-     sc->spis_num     = 2;
-+    sc->ehcis_num    = 2;
-     sc->wdts_num     = 3;
-     sc->macs_num     = 2;
-     sc->irqmap       = aspeed_soc_ast2500_irqmap;
 -- 
 2.20.1
 
