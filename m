@@ -2,73 +2,89 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA1DC352A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4146AC352A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EEB320714
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:21:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EEB320714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id 09876206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:24:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MulYmPTt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09876206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j22Fv-0001rL-HO
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 19:21:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36962)
+	id 1j22Iu-0003ff-56
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 19:24:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37170)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j22FG-0001P8-Ca
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:20:43 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j22I5-0002Vi-Io
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j22FF-0002rK-0X
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:20:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33986)
+ (envelope-from <richard.henderson@linaro.org>) id 1j22I4-0005US-85
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:37 -0500
+Received: from mail-pj1-x102f.google.com ([2607:f8b0:4864:20::102f]:51092)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j22FE-0002qD-Qp
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:20:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j22FD-0007zd-GD
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 00:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6F0232E8078
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 00:20:39 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 13 Feb 2020 00:14:01 -0000
-From: Richard Henderson <rth@twiddle.net>
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j22I4-0005T5-1b
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:36 -0500
+Received: by mail-pj1-x102f.google.com with SMTP id r67so1582252pjb.0
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 16:23:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=phq3yzj8+XV7i3YphGGJ++evMQVs3ZsJi7SU5H9jqIc=;
+ b=MulYmPTtF1asFISSljn05V3IVmuiI4DK92t/mUsAWD4QNhzIdgfYUrm+cTDl/45riR
+ V4c4f2r731yoJYLP5znOG0CRbsUlB5fXPNylDJBRs8FPqVXMrmSAZS73ipa7kBG9cXEx
+ +dVYdwIQ1q6JmJ9nGrFuIUGdv0nmjj2lboWQF71FrxiNrmrc/JoK4BadItvn23MBT/KY
+ vJzijVABRIhKDq7onxwDyiP6okmtTgErwq+LgZ9rOGCOL07Pn8R65zQsLwctZX1z8lVr
+ bZac+FfmRIIh+t/6DASXDbZk/ZGN0EpAjm9NdhGj8jkLsMEweroxSr4KzvbJeMrl1QN+
+ +wiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=phq3yzj8+XV7i3YphGGJ++evMQVs3ZsJi7SU5H9jqIc=;
+ b=lKY7oiyMGYwX2vHbpyPR0gTchIdqQhmGF5a2U2ePsR4WFXoOX1+XxBTJ1Q+ky7wfLV
+ kba67bbePmx3FiseEZ052x4fLlEXWVzt3aghymttnyE67rUaQuspi+xQfCEE2NqmiUP/
+ A59bv8OGCk+Ixd5IvRP3IeLRTC4H/uIeQy8F2RVoqPbcyjPMSdWHQW9rQpR1zdYgn2sS
+ aPalKdnsz6zKpdwXw+jQgfj8aGhNmZSXQ1Wx4V8ABNDYND3w21Qb25Jm1bSuTFnhj0U9
+ 52PwUNEm00Wan0Bzv/DvEfBcUeG+gkvTyXngF+g6XGPht2bHoxAg2XP+mHQLx5M40pGR
+ Y8+Q==
+X-Gm-Message-State: APjAAAUHJvNIgZxh6nK1Q3Zlk4au6OFo6nTpGVzDggD53qc6rUR7hAT3
+ IuZiAR/PrVPbxVaMzmCJqGZr45W3LgI=
+X-Google-Smtp-Source: APXvYqzV4trUCuJ2KUmV2leOKkj7JTaGTsJglYodPPkOeJARu/42nVQl68+LHTI/POVftMunU/A2RA==
+X-Received: by 2002:a17:90a:c390:: with SMTP id
+ h16mr1919422pjt.131.1581553414015; 
+ Wed, 12 Feb 2020 16:23:34 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id j4sm365277pfh.152.2020.02.12.16.23.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 12 Feb 2020 16:23:33 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jermy-07 rth
-X-Launchpad-Bug-Reporter: Marco (jermy-07)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <158152698766.24807.871332888169155245.malonedeb@gac.canonical.com>
-Message-Id: <158155284107.24991.7515469629366138529.malone@gac.canonical.com>
-Subject: [Bug 1862986] Re: qemu-s390x crashes when run on aarch64
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 194b15a8633caf240b47f49427dabded20b76902
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Subject: [PULL 0/3] tcg patch queue
+Date: Wed, 12 Feb 2020 16:23:29 -0800
+Message-Id: <20200213002332.31821-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::102f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,108 +93,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1862986 <1862986@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-You need to provide the test binary.
+The following changes since commit e18e5501d8ac692d32657a3e1ef545b14e72b730:
 
-I can run a chroot of s390x ubuntu bionic on aarch64 just fine,
-so it must be something specific to your test.
+  Merge remote-tracking branch 'remotes/dgilbert-gitlab/tags/pull-virtiofs-20200210' into staging (2020-02-10 18:09:14 +0000)
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+are available in the Git repository at:
 
--- =
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20200212
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1862986
+for you to fetch changes up to 2445971604c1cfd3ec484457159f4ac300fb04d2:
 
-Title:
-  qemu-s390x crashes when run on aarch64
+  tcg: Add tcg_gen_gvec_5_ptr (2020-02-12 14:58:36 -0800)
 
-Status in QEMU:
-  Incomplete
+----------------------------------------------------------------
+Fix breakpoint invalidation.
+Add support for tcg helpers with 7 arguments.
+Add support for gvec helpers with 5 arguments.
 
-Bug description:
-  All tested versions (2.11 and 4.2) qemu-s390x crashes with a segfault
-  when run on an aarch64 odroid Ubuntu.
+----------------------------------------------------------------
+Max Filippov (1):
+      exec: flush CPU TB cache in breakpoint_invalidate
 
+Richard Henderson (1):
+      tcg: Add tcg_gen_gvec_5_ptr
 
-  Steps to reproduce:
+Taylor Simpson (1):
+      tcg: Add support for a helper with 7 arguments
 
-  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x "/root/wo=
-rkspace/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_or=
-ig"
-  Segmentation fault (core dumped)
-  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x --version
-  qemu-s390x version 4.2.0
-  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x "/root/workspac=
-e/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig"
-  Segmentation fault (core dumped)
-  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x --version
-  qemu-s390x version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.22)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-
-  qemu-arm does work on the same machine:
-
-  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-arm bitcoin-0.19.0.1-=
-armhf/bin/test_bitcoin -t amount_tests
-  Running 4 test cases...
-
-  *** No errors detected
-  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-arm bitcoin-0.1=
-9.0.1-armhf/bin/test_bitcoin -t amount_tests
-  Running 4 test cases...
-
-  *** No errors detected
-
-
-  =
-
-  What kind of debug information would be helpful for this issue report?
-  GDB for the self-compiled latest release is not particularly helpful:
-
-  (gdb) run
-  Starting program: /usr/local/bin/qemu-s390x /root/workspace/bitcoin-core/=
-build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
-".
-  [New Thread 0x7fb7a2a140 (LWP 28264)]
-
-  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
-  0x000000555596b218 in __bss_start__ ()
-  (gdb) bt
-  #0  0x000000555596b218 in __bss_start__ ()
-  #1  0x00000055556120a8 in ?? ()
-  #2  0x00000055579904b0 in ?? ()
-  Backtrace stopped: previous frame inner to this frame (corrupt stack?)
-
-
-  =
-
-  A bit more information is available in the version shipped by Ubuntu:
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-s390x /root/workspace/bitcoin-core/build/=
-bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
-".
-  [New Thread 0x7fb7a01180 (LWP 28271)]
-
-  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
-  0x0000005555738f98 in code_gen_buffer ()
-  (gdb) bt
-  #0  0x0000005555738f98 in code_gen_buffer ()
-  #1  0x00000055555e96c8 in cpu_exec ()
-  #2  0x00000055555ee430 in cpu_loop ()
-  #3  0x00000055555c3328 in main ()
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1862986/+subscriptions
+ include/exec/helper-gen.h   | 13 +++++++++++++
+ include/exec/helper-head.h  |  2 ++
+ include/exec/helper-proto.h |  6 ++++++
+ include/exec/helper-tcg.h   |  7 +++++++
+ include/tcg/tcg-op-gvec.h   |  7 +++++++
+ exec.c                      | 15 +++++++--------
+ tcg/tcg-op-gvec.c           | 32 ++++++++++++++++++++++++++++++++
+ 7 files changed, 74 insertions(+), 8 deletions(-)
 
