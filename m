@@ -2,74 +2,77 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE83DC352A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 19:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DBDC352A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 19:31:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C26D520656
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 19:10:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35BEB20661
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 19:31:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AWBgtVD8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C26D520656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cn+KE6Az"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35BEB20661
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2Jsl-0001oE-Vh
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 14:10:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58343)
+	id 1j2KCk-0007Nf-8t
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 14:31:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43259)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j2Jrz-0001JT-T0
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:09:53 -0500
+ (envelope-from <quintela@redhat.com>) id 1j2KBW-0006kv-R1
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j2Jrw-0004ds-V5
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:09:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20971
+ (envelope-from <quintela@redhat.com>) id 1j2KBU-0006I2-OQ
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:30:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39104
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j2Jrw-0004ac-Ot
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:09:48 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j2KBU-0006EM-BF
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:30:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581620987;
+ s=mimecast20190719; t=1581622199;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TD/1DjpBRZBG9PQeyFQZrql99MccnY1E4dxyuL0vEl4=;
- b=AWBgtVD8gNd50dzgTCzWogzsgroZ1cYwwzD+n7q5Akc501Hb5bOyXMTr6qRoq6dfTPXBqE
- adyXF+lNr/eKYapILzqJSRfoRlJVifr+Fe0St1jKFitj2mCxs1Q6NQtsaK8pWr37BJQB0x
- sI1i3lccB8GXeb6rzuXSDGsJRCwVI3g=
+ bh=ezfC9km92R+gv3ucYaZoaadU3Ri6rOcoi6A6zidaKuI=;
+ b=Cn+KE6Azgpf8li5BTRpUbS3jHize54ByPi1aQbSuMD5DXgXXIDxcrrhFjeZyH6Zocn5Wxy
+ fYr0ev9XXK5FjgO7ao5jE9BEvOdO0/W57NGxi52ZsHWKb/ykpyJTgOxTnc0mT5sPyfQhkj
+ 0EhoJIqu+T9uLUCAW0ejUKJmbxtpCxE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-w24qH3UbOfSeKE6EA4hdew-1; Thu, 13 Feb 2020 14:09:46 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-256-fGpu54jSPgq8zfac6GZUcQ-1; Thu, 13 Feb 2020 14:29:57 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC8C11083E81;
- Thu, 13 Feb 2020 19:09:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05814800EB8
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 19:29:57 +0000 (UTC)
 Received: from redhat.com (ovpn-116-40.ams2.redhat.com [10.36.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 984A26031E;
- Thu, 13 Feb 2020 19:09:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BDC41001DEF;
+ Thu, 13 Feb 2020 19:29:56 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH RFC] memory: Don't allow to resize RAM while migrating
-In-Reply-To: <20200213172016.196609-1-david@redhat.com> (David Hildenbrand's
- message of "Thu, 13 Feb 2020 18:20:16 +0100")
-References: <20200213172016.196609-1-david@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v5 1/8] multifd: Add multifd-method parameter
+In-Reply-To: <20200211185016.GP55376@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
+ =?utf-8?Q?rang=C3=A9=22's?=
+ message of "Tue, 11 Feb 2020 18:50:16 +0000")
+References: <20200129115655.10414-1-quintela@redhat.com>
+ <20200129115655.10414-2-quintela@redhat.com>
+ <20200211185016.GP55376@redhat.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Thu, 13 Feb 2020 20:09:37 +0100
-Message-ID: <877e0ql2xa.fsf@secure.laptop>
+Date: Thu, 13 Feb 2020 20:29:51 +0100
+Message-ID: <8736bel1zk.fsf@secure.laptop>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: w24qH3UbOfSeKE6EA4hdew-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: fGpu54jSPgq8zfac6GZUcQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -88,85 +91,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: quintela@redhat.com
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Shannon Zhao <shannon.zhao@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Hildenbrand <david@redhat.com> wrote:
-> Resizing while migrating is dangerous and does not work as expected.
-> The whole migration code works on the usable_length of ram blocks and doe=
-s
-> not expect this to change at random points in time.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> On Wed, Jan 29, 2020 at 12:56:48PM +0100, Juan Quintela wrote:
+>> This will store the compression method to use.  We start with none.
+>>=20
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>>  hw/core/qdev-properties.c    | 13 +++++++++++++
+>>  include/hw/qdev-properties.h |  3 +++
+>>  migration/migration.c        | 13 +++++++++++++
+>>  monitor/hmp-cmds.c           | 13 +++++++++++++
+>>  qapi/migration.json          | 30 +++++++++++++++++++++++++++---
+>>  tests/qtest/migration-test.c | 14 ++++++++++----
+>>  6 files changed, 79 insertions(+), 7 deletions(-)
+>>=20
+>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>> index 7f93bfeb88..4442844d37 100644
+>> --- a/hw/core/qdev-properties.c
+>> +++ b/hw/core/qdev-properties.c
+>> @@ -8,6 +8,7 @@
 >
-> Precopy: The ram block size must not change on the source, after
-> ram_save_setup(), so as long as the guest is still running on the source.
+>> @@ -488,6 +488,19 @@
+>>  ##
+>>  { 'command': 'query-migrate-capabilities', 'returns':   ['MigrationCapa=
+bilityStatus']}
+>> =20
+>> +##
+>> +# @MultiFDMethod:
+>> +#
+>> +# An enumeration of multifd compression.
+>> +#
+>> +# @none: no compression.
+>> +#
+>> +# Since: 5.0
+>> +#
+>> +##
+>> +{ 'enum': 'MultiFDMethod',
+>> +  'data': [ 'none' ] }
 >
-> Postcopy: The ram block size must not change on the target, after
-> synchronizing the RAM block list (ram_load_precopy()).
->
-> AFAIKS, resizing can be trigger *after* (but not during) a reset in
-> ACPI code by the guest
-> - hw/arm/virt-acpi-build.c:acpi_ram_update()
-> - hw/i386/acpi-build.c:acpi_ram_update()
->
-> I see no easy way to work around this. Fail hard instead of failing
-> somewhere in migration code due to strange other reasons. AFAIKs, the
-> rebuilts will be triggered during reboot, so this should not affect
-> running guests, but only guests that reboot at a very bad time and
-> actually require size changes.
->
-> Let's further limit the impact by checking if an actual resize of the
-> RAM (in number of pages) is required.
->
-> Don't perform the checks in qemu_ram_resize(), as that's called during
-> migration when syncing the used_length. Update documentation.
->
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Shannon Zhao <shannon.zhao@linaro.org>
-> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
+> I feel like "MultiFDMethod" is better called "MultiFDCompression"
 
-
->
-> Any idea how to avoid killing the guest? Anything obvious I am missing?
-
-If you avoid the resize, it should be ok for both precopy & postcopy.
-
-But, as you point, if acpi guest is the one changing sizes, we are in
-trouble.  But really, it makes exactly zero sense to reset during
-migrate.  if we _could_ catch the reset, the "intelligent" thing to do
-is:
-
-- detect reset
-- launch guest on destination from zero.
-
-I.e. not migration at all.  This would be my "better" idea, but I have
-no clue how to catch that kind of things in a sane way that works in
-every architecture.
-
-You get the:
-
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-
-because:
-- your code change makes sense
-- the documentation update is good.
+Changed.
 
 Thanks, Juan.
 
