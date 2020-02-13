@@ -2,69 +2,70 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E98CBC352A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E529DC352A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:19:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEE8520724
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:10:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEE8520724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B1CBB2168B
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:19:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lyfZ8bW0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1CBB2168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j24tk-0007g4-0l
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 22:10:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59206)
+	id 1j252X-0001SK-SR
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 22:19:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59879)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j24t2-0006gT-3o
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:09:57 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j251v-00011D-Aj
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:19:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j24t0-00087d-Cg
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:09:55 -0500
-Resent-Date: Wed, 12 Feb 2020 22:09:55 -0500
-Resent-Message-Id: <E1j24t0-00087d-Cg@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21134)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j24t0-00082h-7T; Wed, 12 Feb 2020 22:09:54 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1581563379; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=BxXlXYGu3Pbh//xSFWHceCxpVy1z6pPwSHJjDu5+DuJ+iZScCb9Crt3b0x0vAt1m7JpHzFwYkZTTJZCKm+Cnk3128jJeGeSJYhVI6M3hcQUn4ZMFJus9bHmJF3ffQj4PeQjciXiGEbTbosAs24AqC4iqVchRzvf2QZ4V0dI4dtM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1581563379;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=2qrPk11StMim88jkk3UxfLuh5HqkdvdT46pcDWIH1BY=; 
- b=GBP72be1d6YTx1LS9lx/hr7ewrEJun3m/s4ozztLohofWUqyc/cb2rVtkHQIwbz7TYW/2rEXdi5oeS/h4s3P7u2QUrn9F6NCmK+N5ayNMAfYrxHlBXD2Uyyq7BT9afaholGoxBwaE5wO5v/P8lZwMrqZJfHO5zxH/AXS/cqV7wo=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1581563376483364.5326312713074;
- Wed, 12 Feb 2020 19:09:36 -0800 (PST)
-In-Reply-To: <20200213023532.902-1-fangying1@huawei.com>
-Subject: Re: [PATCH 0/4] arm64: Add the cpufreq device to show cpufreq info to
- guest
-Message-ID: <158156337473.23372.16619241886120636354@a1bbccc8075a>
+ (envelope-from <dgibson@ozlabs.org>) id 1j251t-0002R5-CZ
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:19:06 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:44313)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1j251r-0002HZ-IX; Wed, 12 Feb 2020 22:19:05 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48J1v648K5z9sPJ; Thu, 13 Feb 2020 14:18:58 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1581563938;
+ bh=R0wsqkK4T4TVxGp4P3KWchDaWTAZGKfzMxsopPtLOQ4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=lyfZ8bW0IyOypqTzYf/iBN8KJYNhS9MJhB6MDmnw12tExi56WENNeFCpHBYKZwKZ3
+ nDXaOcIrbjzG6i+uHYxeiMuTnrHdzRH0oTOr2LWEnU7vWioXX6RBZJfqcVets3rJ5V
+ q3CDkhEMMgcGPcxTJNkmDBwXvllbIEINiBfvOGHA=
+Date: Thu, 13 Feb 2020 14:16:29 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+Subject: Re: Restrictions of libnet (was: Re: VW ELF loader)
+Message-ID: <20200213031629.GD124369@umbus.fritz.box>
+References: <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
+ <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
+ <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
+ <d13eea1d-7942-47e0-6189-a66ce9639db4@redhat.com>
+ <20200204095403.04d9dd29.conny@cornelia-huck.de>
+ <4794cf7a-7b53-5fea-c89d-baa01d3ed0ce@redhat.com>
+ <20200205053049.GF60221@umbus.fritz.box>
+ <bfe9398a-7108-9bf7-8589-6d01580bbb3a@redhat.com>
+ <20200210075516.GF22584@umbus.fritz.box>
+ <20200210093952.GC4113@kitsune.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: fangying1@huawei.com
-Date: Wed, 12 Feb 2020 19:09:36 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="wLAMOaPNJ0fu1fTG"
+Content-Disposition: inline
+In-Reply-To: <20200210093952.GC4113@kitsune.suse.cz>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,84 +77,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com, mst@redhat.com,
- i.mitsyanko@gmail.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, guoheyi@huawei.com
+Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ Cornelia Huck <conny@cornelia-huck.de>, qemu-devel <qemu-devel@nongnu.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIxMzAyMzUzMi45MDIt
-MS1mYW5neWluZzFAaHVhd2VpLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
-Y2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1p
-bWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVk
-b3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgaHcv
-YWNwaS9jcHVmcmVxLm8KICBDQyAgICAgIGh3L2FjcGkvaXBtaS5vCi90bXAvcWVtdS10ZXN0L3Ny
-Yy9ody9hY3BpL2NwdWZyZXEuYzogSW4gZnVuY3Rpb24gJ2NwdWZyZXFfcmVhZCc6Ci90bXAvcWVt
-dS10ZXN0L3NyYy9ody9hY3BpL2NwdWZyZXEuYzo3MTo0NzogZXJyb3I6IGZvcm1hdCAnJWx4JyBl
-eHBlY3RzIGFyZ3VtZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50
-IDIgaGFzIHR5cGUgJ2h3YWRkcicge2FrYSAnbG9uZyBsb25nIHVuc2lnbmVkIGludCd9IFstV2Vy
-cm9yPWZvcm1hdD1dCiAgICAgICAgIHdhcm5fcmVwb3J0KCJjcHVmcmVxX3JlYWQ6IG9mZnNldCAw
-eCVseCBvdXQgb2YgcmFuZ2UiLCBvZmZzZXQpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICB+fl4gICAgICAgICAgICAgICAgfn5+fn5+CiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICVsbHgKL3RtcC9xZW11LXRlc3Qvc3JjL2h3
-L2FjcGkvY3B1ZnJlcS5jOjEyNzo1MjogZXJyb3I6IGZvcm1hdCAnJWx4JyBleHBlY3RzIGFyZ3Vt
-ZW50IG9mIHR5cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50IDIgaGFzIHR5cGUg
-J2h3YWRkcicge2FrYSAnbG9uZyBsb25nIHVuc2lnbmVkIGludCd9IFstV2Vycm9yPWZvcm1hdD1d
-CiAgICAgICAgIGVycm9yX3ByaW50ZigiY3B1ZnJlcV9yZWFkOiBCYWQgb2Zmc2V0IDB4JWx4XG4i
-LCBvZmZzZXQpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIH5+XiAgICAgfn5+fn5+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgJWxseAovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jcHVmcmVxLmM6IElu
-IGZ1bmN0aW9uICdjcHVmcmVxX3dyaXRlJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvY3B1
-ZnJlcS5jOjE0Mzo0OTogZXJyb3I6IGZvcm1hdCAnJWx4JyBleHBlY3RzIGFyZ3VtZW50IG9mIHR5
-cGUgJ2xvbmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50IDIgaGFzIHR5cGUgJ2h3YWRkcicg
-e2FrYSAnbG9uZyBsb25nIHVuc2lnbmVkIGludCd9IFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAg
-IGVycm9yX3ByaW50ZigiY3B1ZnJlcV93cml0ZTogb2Zmc2V0IDB4JWx4IG91dCBvZiByYW5nZSIs
-IG9mZnNldCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-fn5eICAgICAgICAgICAgICAgIH5+fn5+fgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICVsbHgKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvY3B1ZnJlcS5j
-OjE1Mzo1MzogZXJyb3I6IGZvcm1hdCAnJWx4JyBleHBlY3RzIGFyZ3VtZW50IG9mIHR5cGUgJ2xv
-bmcgdW5zaWduZWQgaW50JywgYnV0IGFyZ3VtZW50IDIgaGFzIHR5cGUgJ2h3YWRkcicge2FrYSAn
-bG9uZyBsb25nIHVuc2lnbmVkIGludCd9IFstV2Vycm9yPWZvcm1hdD1dCiAgICAgICAgIGVycm9y
-X3ByaW50ZigiY3B1ZnJlcV93cml0ZTogQmFkIG9mZnNldCAweCVseFxuIiwgb2Zmc2V0KTsKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfn5eICAgICB+
-fn5+fn4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-JWxseAovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jcHVmcmVxLmM6IEluIGZ1bmN0aW9uICdD
-UFBDX1JlYWQnOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvYWNwaS9jcHVmcmVxLmM6MTc2OjQ0OiBl
-cnJvcjogcGFzc2luZyBhcmd1bWVudCA0IG9mICdxZW11X3N0cnRvdWwnIGZyb20gaW5jb21wYXRp
-YmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10KICAg
-ICByZXQgPSBxZW11X3N0cnRvdWwoYnVmZmVyLCAmZW5kcHRyLCAwLCAmaHopOwogICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fgpJbiBmaWxlIGluY2x1ZGVkIGZy
-b20gL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2FjcGkvY3B1ZnJlcS5jOjMwOgotLS0KICAgICAgICAg
-ICAgICAgICAgdW5zaWduZWQgbG9uZyAqcmVzdWx0KTsKICAgICAgICAgICAgICAgICAgfn5+fn5+
-fn5+fn5+fn5+Xn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3Jz
-Cm1ha2U6ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogaHcvYWNwaS9jcHVm
-cmVxLm9dIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
-VHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2Vy
-L2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFBy
-b2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBD
-b21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5x
-ZW11Lmluc3RhbmNlLnV1aWQ9OTY5OGNiNjg4MGM0NGNiMDk4NGE4NDJiMmJlMGZjNzAnLCAnLXUn
-LCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScs
-ICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
-JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScs
-ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
-Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLV9zaWFfYjNkL3NyYy9kb2NrZXItc3JjLjIwMjAtMDIt
-MTItMjIuMDcuMjguMTY4NTM6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92
-YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBz
-dGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9OTY5
-OGNiNjg4MGM0NGNiMDk4NGE4NDJiMmJlMGZjNzAKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBF
-cnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAtX3NpYV9iM2Qvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRv
-cmFdIEVycm9yIDIKCnJlYWwgICAgMm02Ljk4MHMKdXNlciAgICAwbTguMjU5cwoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAyMTMwMjM1
-MzIuOTAyLTEtZmFuZ3lpbmcxQGh1YXdlaS5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3Jh
-Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+--wLAMOaPNJ0fu1fTG
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Feb 10, 2020 at 10:39:52AM +0100, Michal Such=E1nek wrote:
+> On Mon, Feb 10, 2020 at 06:55:16PM +1100, David Gibson wrote:
+> > On Wed, Feb 05, 2020 at 07:24:04AM +0100, Thomas Huth wrote:
+> > > On 05/02/2020 06.30, David Gibson wrote:
+> > > > On Tue, Feb 04, 2020 at 10:20:14AM +0100, Thomas Huth wrote:
+> > > >> On 04/02/2020 09.54, Cornelia Huck wrote:
+> > > >>> On Tue, 4 Feb 2020 07:16:46 +0100
+> > > >>> Thomas Huth <thuth@redhat.com> wrote:
+> > > >>>
+> > > >>>> On 04/02/2020 00.26, Paolo Bonzini wrote:
+> > > >>>>>
+> > > >>>>>
+> > > >>>>> Il mar 4 feb 2020, 00:20 Alexey Kardashevskiy <aik@ozlabs.ru
+> > > >>>>> <mailto:aik@ozlabs.ru>> ha scritto:
+> > > >>>>>
+> > > >>>>>     Speaking seriously, what would I put into the guest?
+> > > >>>>>
+> > > >>>>> Only things that would be considered drivers. Ignore the partit=
+ions
+> > > >>>>> issue for now so that you can just pass the device tree service=
+s to QEMU
+> > > >>>>> with hypercalls.
+> > > >>>>>
+> > > >>>>>     Netboot's dhcp/tftp/ip/ipv6 client? It is going to be anoth=
+er SLOF,
+> > > >>>>>     smaller but adhoc with only a couple of people knowing it.
+> > > >>>>>
+> > > >>>>>
+> > > >>>>> You can generalize and reuse the s390 code. All you have to wri=
+te is the
+> > > >>>>> PCI scan and virtio-pci setup. =20
+> > > >>>>
+> > > >>>> Well, for netbooting, the s390-ccw bios uses the libnet code fro=
+m SLOF,
+> > > >>>> so re-using this for a slim netboot client on ppc64 would certai=
+nly be
+> > > >>>> feasible (especially since there are also already virtio drivers=
+ in SLOF
+> > > >>>> that are written in C), but I think it is not very future proof.=
+ The
+> > > >>>> libnet from SLOF only supports UDP, and no TCP. So for advanced =
+boot
+> > > >>>> scenarios like booting from HTTP or even HTTPS, you need somethi=
+ng else
+> > > >>>> (i.e. maybe grub is the better option, indeed).
+> > > >>>
+> > > >>> That makes me wonder what that means for s390: We're inheriting
+> > > >>> libnet's limitations, but we don't have grub -- do we need to com=
+e up
+> > > >>> with something different? Or improve libnet?
+> > > >>
+> > > >> I don't think that it makes sense to re-invent the wheel yet anoth=
+er
+> > > >> time and write yet another TCP implementation (which is likely qui=
+te a
+> > > >> bit of work, too, especially if you also want to do secure HTTPS i=
+n the
+> > > >> end). So yes, in the long run (as soon as somebody seriously asks =
+for
+> > > >> HTTP booting on s390x) we need something different here.
+> > > >>
+> > > >> Now looking at our standard s390x bootloader zipl - this has been =
+giving
+> > > >> us a headache a couple of times in the past, too (from a distro po=
+int of
+> > > >> view since s390x is the only major platform left that does not use=
+ grub,
+> > > >> but also from a s390-ccw bios point of view, see e.g.
+> > > >> https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03046.htm=
+l and
+> > > >> related discussions).
+> > > >>
+> > > >> So IMHO the s390x world should move towards grub2, too. We could e=
+=2Eg.
+> > > >> link it initially into the s390-ccw bios bios ... and if that work=
+s out
+> > > >> well, later also use it as normal bootloader instead of zipl (not =
+sure
+> > > >> if that works in all cases, though, IIRC there were some size
+> > > >> constraints and stuff like that).
+> > > >=20
+> > > > petitboot would be another reasonable thing to consider here.  Since
+> > > > it's Linux based, you have all the drivers you have there.  It's not
+> > > > quite grub, but it does at least parse the same configuration files.
+> > > >=20
+> > > > You do need kexec() of course, I don't know if you have that already
+> > > > for s390 or not.
+> > >=20
+> > > AFAIK we have kexec on s390. So yes, petitboot would be another option
+> > > for replacing the s390-ccw bios. But when it comes to LPARs and z/VMs=
+, I
+> > > don't think it's really feasible to replace the zipl bootloader there
+> > > with petitboot, so in that case grub2 still sounds like the better
+> > > option to me.
+> >=20
+> > Actually, between that and Paolo's suggestions, I thought of another
+> > idea that could be helpful for both s390 and power.  Could we load
+> > non-kexec() things (legacy kernels, non-Linux OSes) from Petitboot by
+> > having it kexec() into a shim mini-kernel that just sets up the boot
+> > environment for the other thing.
+> >=20
+> > What I'm imagining is that petitboot loads everything that will be
+> > needed for the other OS into RAM - probably as (or part of) the
+> > "initrd" image.  That means the shim doesn't need to have drivers or
+> > a network stack to load that in.  It just needs to construct
+> > environment and jump into the real kernel.
+>=20
+> How does that differ from what kexec normally does?
+>=20
+> It does support the kernel format that is usually booted on the
+> architecture.
+
+It's not a question of format, but of environment.
+
+By the time a kexec() occurs there won't be any OF client interface
+available, whether or not there ever was one.  So, kexec() won't be
+able to exec things which expect that to be present.  That includes
+grub, AIX, and (probably) FreeBSD.
+
+Note that while it's the same image, Linux kernels for POWER for a
+long time have been able to boot in one of two ways.  One expects the
+flattened tree, and an already instantiated RTAS - this method is used
+directly by RTAS.  The other expects an OF client interface - it
+slurps the device tree out of that and produces the flattened tree,
+instantiates RTAS and then jumps to the flat tree entry point.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--wLAMOaPNJ0fu1fTG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5Ev4oACgkQbDjKyiDZ
+s5LY/A//TDA/iKle4xaWCE1lXCEnZbmLQ/ZRGRVIESTxeS5XQajILZ+7N1BbW6Dk
+psItXdW/ubNLx7UKx5IkWN3a7w3tNaTM7Fl5dauMNgcRV2BCBlSb+OjiZb85GjMP
+fj83zfWtVGQYSR/FhBJ8TjKrfns2fVrXWlzcBdrKw4Gf0MefAcVnUdIVQNKxjACT
+MEyxOfxgMzhI7XI9MZlqCmurSlGI3k1sp57AHTqNaO77sGGy9BQR2Zm6/1ToR8+Y
+Wl05Klideoes6Ge/ne5Ann4jeqykElSEGzJfMf/LUwtw94S57PEm9+9iW/wVYBfn
+HuXLqKGCWSxSpIKE19TmNOI/rgdvciA76a6KRSSrpePNa1Nzsih/0t2zVyGtHuKA
+kcZTWHrEjpBCqrNfEhJ5wB3NuqWBZxqKKp0iwENp/BB7gLyEoA9aBHnUj07hJKYV
+LpHYFoJL7Ba4kS7hdGIr50L+vfeDH+kNhkCJZR2RZd4rXf1IKGIkWQXs1sGMlPeZ
+eZUgVOc++F/F248AdOkV7HsImfkRtt8rY/NMOfeu29bawHMg4PY7dh+VPUwsvj/U
+CXsxFdNP6RoNzI6OxehcJV2smevCmEpp7lzPSJ2ayFJz2HSfmaddotzQHyZVEnQm
+H0cFRo1DE/rb++WppFZKfB4be77JS4dy+cgOlF5Zhg2oWndubZM=
+=RBye
+-----END PGP SIGNATURE-----
+
+--wLAMOaPNJ0fu1fTG--
 
