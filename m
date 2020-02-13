@@ -2,86 +2,88 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA57EC3B187
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0477AC352A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:24:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A6EC206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:24:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6AA3206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:24:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H+4JnBeM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A6EC206B6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t7qUbzd9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6AA3206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j22Iu-0003iF-MX
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 19:24:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37179)
+	id 1j22Iy-0003oY-1d
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 19:24:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j22I6-0002Vk-0J
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:39 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j22I8-0002X7-Gc
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j22I4-0005VP-Tp
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:37 -0500
-Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:42972)
+ (envelope-from <richard.henderson@linaro.org>) id 1j22I7-0005Yh-Bd
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:40 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35941)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j22I4-0005UP-OR
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:36 -0500
-Received: by mail-pl1-x630.google.com with SMTP id e8so1583102plt.9
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 16:23:36 -0800 (PST)
+ id 1j22I7-0005Xe-5y
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:23:39 -0500
+Received: by mail-pl1-x644.google.com with SMTP id a6so1594605plm.3
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 16:23:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=uAQRooIFC1RVgmc7hgLv35x85QYxjKufqRBZQSXx1kU=;
- b=H+4JnBeMPUr2Uy8/74M40WQCNRuLSR+7rf3uOtB1kS0rKIqWegr9mrhTEw2Zgroeny
- k6MC5Tf1aBgCXt45JHeY/eOPoKd1Kqwd8cQio1y35ymzipVnwFEiTXzzqUhEXO6zmtHY
- Ds8NeDnH3i/JSIZZwjhjJNMTSEtfwyZQsj2hcxRp0HNxthclU8TT1k/AW2L2vn2BwExj
- ZDbAJ/N9w6Uq9LwaoWWyzgy36d1JjggwsCajAx8doSZALfKDRg1yWB2DRKO6Y4uUe0xf
- pde/YyN/7d3ZJV7EGtGhNZW5H43oVK8G4gPzKuyDeiN+HvOyjw/B3MEIDXJURdVEVAX1
- /QMQ==
+ bh=c4AW/Bq5GW+BzA+6gDLmVxKMMXGf/BYTygbPUAb8Kco=;
+ b=t7qUbzd9aT12EgxgQUJUcRZohEiyj18dQ/+wVd8dCAqBrGH6suOs5fZMUpCViqifoH
+ wW0TNaRvbBFdBiMaArITAZRcCLbeJFtdkdMSIbfd4N3O+anTuChhfz5G6W5yKLGQeLeE
+ 8fmes6TkW8pRzMNLCg1/ZG36F0U/9QBfi278+M/etGDIgig4c5PC5gXT4/RSfH0RzJT/
+ is1FvGjXkNooUTzWP+RTdQP4ivE6Ih+jPShaAlrZ50ap+qKPVS7x6dYXoY5ytv1MmctN
+ uZViF5z8RwctCM1TmMyAgV9TBNUjrZSdpjMFsgqHl6WAox1BkJuRUyfOZJRZ3Skr0QuC
+ ZLFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=uAQRooIFC1RVgmc7hgLv35x85QYxjKufqRBZQSXx1kU=;
- b=ts13ygFEk7S7wULSvAKN8S09oyYcZKrTJ+cXe+et77ADa/LcM7PrI5cuorYtYIew49
- /68Oxcf/fRMtjAQ5KkN7qURcA7vK4JkRtkNfAJS9DFaEQgRaHBNzkj0p8MhnVJSQPXYG
- 5Z8v6W8+gBx1cHcXuG/QApcSOWt/o7i2ye9rAysUYciS5hb1gpxqk20H/PmkAO27Z5tw
- kl0RS8qQiqGwFqdEGJxlDkZqTEE24KtTwf17WbTRzeECX81Dn1FSYfByCQjZmKMUniLb
- /3SS+BFqyvJDcG7Dbzqhzv6lC3XOOko8LfGeIkFomq60DaSMUmswaVI2agD/nbEkuckP
- SAfw==
-X-Gm-Message-State: APjAAAX57llQ/RUlYBJRVgm1JZVdAgwGIkqL9E8CjaPSqxbVoOx5xg/u
- 4pHZwRxeAqGEjNMLlDsdiytYMXJ+ULI=
-X-Google-Smtp-Source: APXvYqzWtcWejBVgaY6bmnYutJotS68gtPh1Aso1M34Gk1uPysHhb+o7dnsOyg/KlosxY+YXgjo+sg==
-X-Received: by 2002:a17:90a:9c1:: with SMTP id 59mr1877816pjo.65.1581553415251; 
- Wed, 12 Feb 2020 16:23:35 -0800 (PST)
+ bh=c4AW/Bq5GW+BzA+6gDLmVxKMMXGf/BYTygbPUAb8Kco=;
+ b=XyfxrUTFERT9YpgV0apsHMTHufNMpcRpyHoj5bFj0eTW5zM4r1Yl3Rvbb66KJ58U4l
+ o4gvYs86rgPeZJtDNtYnT4bKIdhEYxQFm4od6XPHAWjKFpGjB4Pj/KcxiKrOBFuOc7sz
+ MtreDqm/9uwi3zuC85T1DnGz3L5ID6w1oexbt1ZGLQnMc4QFtVryYd0fkl+H6JIQVJMr
+ v1ZKervGLughk9mkUhLJxtifTJkb3aERzO83AbgWK911jKSSsT5CY2tD1LEc+QGkpwcu
+ 44CXuremu7MCZ6/5415N6uotdMK9VXMg9VZ0PF4bubYynCwrcmxSd+hp7zY5fA9cwYc/
+ YBBA==
+X-Gm-Message-State: APjAAAW4JmBdFD3fF0NG9mYr+P54YvUO3PbWKYyRN/9dFpsKq14lxVji
+ pL1ZWQfAX7beS8GU8fdC0a2zyCTZf0g=
+X-Google-Smtp-Source: APXvYqwrhdOTUxtnU/YboFEUeHlnHpB0o9DD9z8owCifwcGwGcYumdPdme9fj3RZlOfNkglj0Zv9Bw==
+X-Received: by 2002:a17:90a:b009:: with SMTP id
+ x9mr1951391pjq.124.1581553417777; 
+ Wed, 12 Feb 2020 16:23:37 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id j4sm365277pfh.152.2020.02.12.16.23.34
+ by smtp.gmail.com with ESMTPSA id j4sm365277pfh.152.2020.02.12.16.23.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Feb 2020 16:23:34 -0800 (PST)
+ Wed, 12 Feb 2020 16:23:37 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/3] exec: flush CPU TB cache in breakpoint_invalidate
-Date: Wed, 12 Feb 2020 16:23:30 -0800
-Message-Id: <20200213002332.31821-2-richard.henderson@linaro.org>
+Subject: [PULL 3/3] tcg: Add tcg_gen_gvec_5_ptr
+Date: Wed, 12 Feb 2020 16:23:32 -0800
+Message-Id: <20200213002332.31821-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200213002332.31821-1-richard.henderson@linaro.org>
 References: <20200213002332.31821-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::630
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,63 +95,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Max Filippov <jcmvbkbc@gmail.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org, Taylor Simpson <tsimpson@quicinc.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Filippov <jcmvbkbc@gmail.com>
+Extend the vector generator infrastructure to handle
+5 vector arguments.
 
-When a breakpoint is inserted at location for which there's currently no
-virtual to physical translation no action is taken on CPU TB cache. If a
-TB for that virtual address already exists but is not visible ATM the
-breakpoint won't be hit next time an instruction at that address will be
-executed.
-
-Flush entire CPU TB cache in breakpoint_invalidate to force
-re-translation of all TBs for the breakpoint address.
-
-This change fixes the following scenario:
-- linux user application is running
-- a breakpoint is inserted from QEMU gdbstub for a user address that is
-  not currently present in the target CPU TLB
-- an instruction at that address is executed, but the external debugger
-  doesn't get control.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
-Message-Id: <20191127220602.10827-2-jcmvbkbc@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Taylor Simpson <tsimpson@quicinc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- exec.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ include/tcg/tcg-op-gvec.h |  7 +++++++
+ tcg/tcg-op-gvec.c         | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index 67e520d18e..7f4074f95e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1019,14 +1019,13 @@ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
+diff --git a/include/tcg/tcg-op-gvec.h b/include/tcg/tcg-op-gvec.h
+index 830d68f697..74534e2480 100644
+--- a/include/tcg/tcg-op-gvec.h
++++ b/include/tcg/tcg-op-gvec.h
+@@ -83,6 +83,13 @@ void tcg_gen_gvec_4_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+                         uint32_t maxsz, int32_t data,
+                         gen_helper_gvec_4_ptr *fn);
  
- static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
- {
--    MemTxAttrs attrs;
--    hwaddr phys = cpu_get_phys_page_attrs_debug(cpu, pc, &attrs);
--    int asidx = cpu_asidx_from_attrs(cpu, attrs);
--    if (phys != -1) {
--        /* Locks grabbed by tb_invalidate_phys_addr */
--        tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
--                                phys | (pc & ~TARGET_PAGE_MASK), attrs);
--    }
-+    /*
-+     * There may not be a virtual to physical translation for the pc
-+     * right now, but there may exist cached TB for this pc.
-+     * Flush the whole TB cache to force re-translation of such TBs.
-+     * This is heavyweight, but we're debugging anyway.
-+     */
-+    tb_flush(cpu);
++typedef void gen_helper_gvec_5_ptr(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_ptr,
++                                   TCGv_ptr, TCGv_ptr, TCGv_i32);
++void tcg_gen_gvec_5_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
++                        uint32_t cofs, uint32_t eofs, TCGv_ptr ptr,
++                        uint32_t oprsz, uint32_t maxsz, int32_t data,
++                        gen_helper_gvec_5_ptr *fn);
++
+ /* Expand a gvec operation.  Either inline or out-of-line depending on
+    the actual vector size and the operations supported by the host.  */
+ typedef struct {
+diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+index 41b4a3c661..327d9588e0 100644
+--- a/tcg/tcg-op-gvec.c
++++ b/tcg/tcg-op-gvec.c
+@@ -290,6 +290,38 @@ void tcg_gen_gvec_4_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
+     tcg_temp_free_i32(desc);
  }
- #endif
  
++/* Generate a call to a gvec-style helper with five vector operands
++   and an extra pointer operand.  */
++void tcg_gen_gvec_5_ptr(uint32_t dofs, uint32_t aofs, uint32_t bofs,
++                        uint32_t cofs, uint32_t eofs, TCGv_ptr ptr,
++                        uint32_t oprsz, uint32_t maxsz, int32_t data,
++                        gen_helper_gvec_5_ptr *fn)
++{
++    TCGv_ptr a0, a1, a2, a3, a4;
++    TCGv_i32 desc = tcg_const_i32(simd_desc(oprsz, maxsz, data));
++
++    a0 = tcg_temp_new_ptr();
++    a1 = tcg_temp_new_ptr();
++    a2 = tcg_temp_new_ptr();
++    a3 = tcg_temp_new_ptr();
++    a4 = tcg_temp_new_ptr();
++
++    tcg_gen_addi_ptr(a0, cpu_env, dofs);
++    tcg_gen_addi_ptr(a1, cpu_env, aofs);
++    tcg_gen_addi_ptr(a2, cpu_env, bofs);
++    tcg_gen_addi_ptr(a3, cpu_env, cofs);
++    tcg_gen_addi_ptr(a4, cpu_env, eofs);
++
++    fn(a0, a1, a2, a3, a4, ptr, desc);
++
++    tcg_temp_free_ptr(a0);
++    tcg_temp_free_ptr(a1);
++    tcg_temp_free_ptr(a2);
++    tcg_temp_free_ptr(a3);
++    tcg_temp_free_ptr(a4);
++    tcg_temp_free_i32(desc);
++}
++
+ /* Return true if we want to implement something of OPRSZ bytes
+    in units of LNSZ.  This limits the expansion of inline code.  */
+ static inline bool check_size_impl(uint32_t oprsz, uint32_t lnsz)
 -- 
 2.20.1
 
