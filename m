@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FDEC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8292CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:03:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BD4B206DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:03:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5243D206DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:03:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nbRdmOjV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BD4B206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tGwlv/+U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5243D206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2IpX-0000RB-6F
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 13:03:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33735)
+	id 1j2Iph-0000mU-FY
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 13:03:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2IjZ-0000KA-1m
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:06 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j2Ijp-0000hi-JP
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2IjX-0002WJ-4G
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:04 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35172)
+ (envelope-from <peter.maydell@linaro.org>) id 1j2Ijn-000304-US
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:21 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:44779)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2IjW-0002Qb-Sb
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:03 -0500
-Received: by mail-wm1-x341.google.com with SMTP id b17so7802588wmb.0
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 09:56:58 -0800 (PST)
+ id 1j2Ijn-0002vV-Lu
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:19 -0500
+Received: by mail-wr1-x432.google.com with SMTP id m16so7783223wrx.11
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 09:57:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fLHmDYlQWfVhICZYevuL8zWZyC/V25dFeDELII/rZe0=;
- b=nbRdmOjVYe+iQDa1VUiH9cMvYBXgtoW5pQWEPpqGeiVioM1n33HMFS/UmSzWDzM5Ju
- qjjWvT11C6fIgGtWotWjMy/WjpwJdLApmGTZLT52g9UIO1jNKk92VeCPk2Dn2jkbxW0t
- HIDY3anAa0jcHaSUncmh0pJTLR75UHEQp2KkaPPETu6lfmG2QChU7NPkFkdWsx2IFaE9
- B76D514cfJzk3IVGs694et2/oLLHFE01agoIzBJVq3JmMUpQLtcp5xkDAnhi6L/MTHi6
- vJmPTeu9qI3f17b24PJ13omw5X2YDEvIcKsAftH8fqerlTzp+Sa3XnIHQvT1F5+YvfVp
- r83g==
+ bh=WG/jZg+6Ema0IEye1yAbgm9SmgPhpVrIhKYh9qk0Xfs=;
+ b=tGwlv/+UqN4qdPmNebjLy5ZzPY0u+Eun/MdjMic5tj70EOCfrKbrZfbgPA8Ie3acGQ
+ zmc27OEVXzXo1O1O8ZkfC6RmHxpXhA0D4cCPmshhMQ8gPyjEYkCb0QlQ8Rxzsqq3pAPb
+ z39ETamZGVDjB9DHBJh9fbzBougvxNVHdJA0wvjI86UkUsE+NVlJuXnNjj70FreR3aBZ
+ 5lrAohY1/81WXo0hY/g9LS3roCI4sbvnd1ajsdbUtSySp9H89q96AAK6LBJx8R6W2PBs
+ rvxfFRlyCN+USwFR3WXr+OiCjX1ECL+I8QGWsqMZMBieOCUdlnu6g/hsHfTgQ2onxo2V
+ OHeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=fLHmDYlQWfVhICZYevuL8zWZyC/V25dFeDELII/rZe0=;
- b=hglR01z3AwIttx1gUkCX9wlTDC2Rgta3Y3sfHXBwM2CwuDUz1zckt5e1ZlknrhNhv2
- b3nWLM32PMXnOlE5rjyIktAIwmd9e5TU+t6hOSYqlBlzF4Q1qZI4aK9UbpRjF6IdRCv2
- Brz5oS7T+qMXIphBvNudq6/COJz9gkwn/j7ldo7t8KE+hicWgmyWKK0iU5a4V23HzQI4
- iqTmLCzE1phVGiBg1lumB+zfcFMT2kpQQx1VxPg4s6tNm45deDT6Le2Ogw6QdcRc6Afp
- fqCnT4sx722PXKlSc+/4crR/X4i0O7UTnc4yvBvUIxgl1RR9Onpyi9GZOdO4K/zb9XXa
- ox+w==
-X-Gm-Message-State: APjAAAXStY6ZkjwAJZJufkv1SZkF6gMsjr0q7Tyh2PbtyDGQDvQZ1nwV
- aQq/qcQVYj3FQtkDzkHi7UT0CVj/wZs=
-X-Google-Smtp-Source: APXvYqxzY+gNirlHFe6Hw3LMktCz1UNWii9+LvHgOX44Jfd3R1gJ9Dcex+yCTesEwg7YGdKp4sidUw==
-X-Received: by 2002:a05:600c:2c53:: with SMTP id
- r19mr6976901wmg.39.1581616617124; 
- Thu, 13 Feb 2020 09:56:57 -0800 (PST)
+ bh=WG/jZg+6Ema0IEye1yAbgm9SmgPhpVrIhKYh9qk0Xfs=;
+ b=dM8M0FJteGHLguqcA8FBJbgUCypqFwhYzuxA+ZSu58hK4CURfUuP8n7dhi1uEhXoj6
+ HsKcW6tS71NX6vga9LLKZxVb+G/1U4dBDYCMe6bAiJyVJRuTxHLNHtljLPQ/7lI+0qk4
+ 7QwLiJT90FNtdi66qxC6X0QtoOfKVdLeJf3S9KXVVxK6ELTqpQYX6vYQG9qEq8fxJkiQ
+ xw2yrGQpO1ZsNopI0UV9GW7+Q9DXlthN4I1/AQWI1qSwK4KukS6dGhrcV5KLXgzaYMF0
+ Dg2hx1dAmdQDrK08+jImgLKYacVQwRScaIoVkG3LrwRETagPyQD5ncvHDpG7OYkkQAU4
+ SKDg==
+X-Gm-Message-State: APjAAAX+hJocSTgqJAB0Iql868au6GaqWJKlW8jnecz4TUzUZxqd+I7Q
+ mK0XjhDGsQgoRmI38/DlnOiG4naJtlw=
+X-Google-Smtp-Source: APXvYqwXE0njSEe2USltb+IakH4cDPz2qDiqRPzhSgHNttD9hrIN2f8wvlQOpjNGbT94eYYZ38Lq6Q==
+X-Received: by 2002:adf:db84:: with SMTP id u4mr23300767wri.317.1581616632071; 
+ Thu, 13 Feb 2020 09:57:12 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p26sm3692913wmc.24.2020.02.13.09.56.55
+ by smtp.gmail.com with ESMTPSA id p26sm3692913wmc.24.2020.02.13.09.57.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 09:56:56 -0800 (PST)
+ Thu, 13 Feb 2020 09:57:11 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 05/30] qga/qapi-schema.json: Fix indent level on doc
- comments
-Date: Thu, 13 Feb 2020 17:56:22 +0000
-Message-Id: <20200213175647.17628-6-peter.maydell@linaro.org>
+Subject: [PATCH v2 15/30] qapi/{block, misc, tmp,
+ net}.json: Use explicit bulleted lists
+Date: Thu, 13 Feb 2020 17:56:32 +0000
+Message-Id: <20200213175647.17628-16-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200213175647.17628-1-peter.maydell@linaro.org>
 References: <20200213175647.17628-1-peter.maydell@linaro.org>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,190 +101,187 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The texinfo doc generation doesn't care much about indentation
-levels, but we would like to add a rST backend, and rST does care
-about indentation.
+A JSON block comment like this:
+     Returns: nothing on success
+              If @node is not a valid block device, DeviceNotFound
+              If @name is not found, GenericError with an explanation
 
-Make the doc comments more strongly consistent about indentation
-for multiline constructs like:
+renders like this:
 
-@arg: description line 1
-      description line 2
+     Returns: nothing on success If node is not a valid block device,
+     DeviceNotFound If name is not found, GenericError with an explanation
 
-Returns: line one
-         line 2
+because whitespace is not significant.
 
-so that there is always exactly one space after the colon, and
-subsequent lines align with the first.
+Use an actual bulleted list, so that the formatting is correct.
 
-This commit is a purely whitespace change, and it does not alter the
-generated .texi files (because the texi generation code strips away
-all the extra whitespace).  This does mean that we end up with some
-over-length lines.
-
-Note that when the documentation for an argument fits on a single
-line like this:
-
-@arg: one line only
-
-then stray extra spaces after the ':' don't affect the rST output, so
-I have not attempted to methodically fix them, though the preference
-is a single space here too.
+This commit gathers up the remaining json files which had
+places needing this fix.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- qga/qapi-schema.json | 62 ++++++++++++++++++++++----------------------
- 1 file changed, 31 insertions(+), 31 deletions(-)
+v1->v2: minor commit msg tweak
+---
+ qapi/block.json | 33 ++++++++++++++-------------------
+ qapi/misc.json  | 36 ++++++++++++++++--------------------
+ qapi/tpm.json   |  4 ++--
+ 3 files changed, 32 insertions(+), 41 deletions(-)
 
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 23ce6af597d..7661b2b3b45 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -416,7 +416,7 @@
- # Returns: GuestFsfreezeStatus ("thawed", "frozen", etc., as defined below)
+diff --git a/qapi/block.json b/qapi/block.json
+index 65eaacf31ad..da19834db41 100644
+--- a/qapi/block.json
++++ b/qapi/block.json
+@@ -115,15 +115,12 @@
  #
- # Note: This may fail to properly report the current state as a result of
--# some other guest processes having issued an fs freeze/thaw.
-+#       some other guest processes having issued an fs freeze/thaw.
+ # For the arguments, see the documentation of BlockdevSnapshotInternal.
  #
- # Since: 0.15.0
- ##
-@@ -431,13 +431,13 @@
- # unfreeze.
+-# Returns: nothing on success
+-#
+-#          If @device is not a valid block device, GenericError
+-#
+-#          If any snapshot matching @name exists, or @name is empty,
+-#          GenericError
+-#
+-#          If the format of the image used does not support it,
+-#          BlockFormatFeatureNotSupported
++# Returns: - nothing on success
++#          - If @device is not a valid block device, GenericError
++#          - If any snapshot matching @name exists, or @name is empty,
++#            GenericError
++#          - If the format of the image used does not support it,
++#            BlockFormatFeatureNotSupported
  #
- # Note: On Windows, the command is implemented with the help of a
--# Volume Shadow-copy Service DLL helper. The frozen state is limited
--# for up to 10 seconds by VSS.
-+#       Volume Shadow-copy Service DLL helper. The frozen state is limited
-+#       for up to 10 seconds by VSS.
+ # Since: 1.7
  #
- # Returns: Number of file systems currently frozen. On error, all filesystems
--# will be thawed. If no filesystems are frozen as a result of this call,
--# then @guest-fsfreeze-status will remain "thawed" and calling
--# @guest-fsfreeze-thaw is not necessary.
-+#          will be thawed. If no filesystems are frozen as a result of this call,
-+#          then @guest-fsfreeze-status will remain "thawed" and calling
-+#          @guest-fsfreeze-thaw is not necessary.
+@@ -154,12 +151,12 @@
  #
- # Since: 0.15.0
- ##
-@@ -455,7 +455,7 @@
- #               Invalid mount points are ignored.
+ # @name: optional the snapshot's name to be deleted
  #
- # Returns: Number of file systems currently frozen. On error, all filesystems
--# will be thawed.
-+#          will be thawed.
+-# Returns: SnapshotInfo on success
+-#          If @device is not a valid block device, GenericError
+-#          If snapshot not found, GenericError
+-#          If the format of the image used does not support it,
+-#          BlockFormatFeatureNotSupported
+-#          If @id and @name are both not specified, GenericError
++# Returns: - SnapshotInfo on success
++#          - If @device is not a valid block device, GenericError
++#          - If snapshot not found, GenericError
++#          - If the format of the image used does not support it,
++#            BlockFormatFeatureNotSupported
++#          - If @id and @name are both not specified, GenericError
  #
- # Since: 2.2
- ##
-@@ -511,12 +511,12 @@
- # Discard (or "trim") blocks which are not in use by the filesystem.
+ # Since: 1.7
  #
- # @minimum:
--#       Minimum contiguous free range to discard, in bytes. Free ranges
--#       smaller than this may be ignored (this is a hint and the guest
--#       may not respect it).  By increasing this value, the fstrim
--#       operation will complete more quickly for filesystems with badly
--#       fragmented free space, although not all blocks will be discarded.
--#       The default value is zero, meaning "discard every free block".
-+#           Minimum contiguous free range to discard, in bytes. Free ranges
-+#           smaller than this may be ignored (this is a hint and the guest
-+#           may not respect it).  By increasing this value, the fstrim
-+#           operation will complete more quickly for filesystems with badly
-+#           fragmented free space, although not all blocks will be discarded.
-+#           The default value is zero, meaning "discard every free block".
+@@ -197,10 +194,8 @@
+ # @force: If true, eject regardless of whether the drive is locked.
+ #         If not specified, the default value is false.
  #
- # Returns: A @GuestFilesystemTrimResponse which contains the
- #          status of all trimmed paths. (since 2.4)
-@@ -693,7 +693,7 @@
- # @ip-addresses: List of addresses assigned to @name
+-# Returns:  Nothing on success
+-#
+-#           If @device is not a valid block device, DeviceNotFound
+-#
++# Returns: - Nothing on success
++#          - If @device is not a valid block device, DeviceNotFound
+ # Notes:    Ejecting a device with no media results in success
  #
- # @statistics: various statistic counters related to @name
--# (since 2.11)
-+#              (since 2.11)
+ # Since: 0.14.0
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 626a342b008..06c80b58a24 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -418,12 +418,10 @@
  #
- # Since: 1.1
- ##
-@@ -743,7 +743,7 @@
- # This is a read-only operation.
+ # Return information about the balloon device.
  #
- # Returns: The list of all VCPUs the guest knows about. Each VCPU is put on the
--# list exactly once, but their order is unspecified.
-+#          list exactly once, but their order is unspecified.
+-# Returns: @BalloonInfo on success
+-#
+-#          If the balloon driver is enabled but not functional because the KVM
+-#          kernel module cannot support it, KvmMissingCap
+-#
+-#          If no balloon device is present, DeviceNotActive
++# Returns: - @BalloonInfo on success
++#          - If the balloon driver is enabled but not functional because the KVM
++#            kernel module cannot support it, KvmMissingCap
++#          - If no balloon device is present, DeviceNotActive
+ #
+ # Since: 0.14.0
+ #
+@@ -480,8 +478,8 @@
+ #
+ # @bar: the index of the Base Address Register for this region
+ #
+-# @type: 'io' if the region is a PIO region
+-#        'memory' if the region is a MMIO region
++# @type: - 'io' if the region is a PIO region
++#        - 'memory' if the region is a MMIO region
+ #
+ # @size: memory size
+ #
+@@ -992,10 +990,10 @@
+ #
+ # @value: the target size of the balloon in bytes
+ #
+-# Returns: Nothing on success
+-#          If the balloon driver is enabled but not functional because the KVM
++# Returns: - Nothing on success
++#          - If the balloon driver is enabled but not functional because the KVM
+ #            kernel module cannot support it, KvmMissingCap
+-#          If no balloon device is present, DeviceNotActive
++#          - If no balloon device is present, DeviceNotActive
+ #
+ # Notes: This command just issues a request to the guest.  When it returns,
+ #        the balloon size may not have changed.  A guest can change the balloon
+@@ -1074,8 +1072,8 @@
+ #       If @device is 'vnc' and @target is 'password', this is the new VNC
+ #       password to set.  See change-vnc-password for additional notes.
+ #
+-# Returns: Nothing on success.
+-#          If @device is not a valid block device, DeviceNotFound
++# Returns: - Nothing on success.
++#          - If @device is not a valid block device, DeviceNotFound
+ #
+ # Notes: This interface is deprecated, and it is strongly recommended that you
+ #        avoid using it.  For changing block devices, use
+@@ -1225,11 +1223,9 @@
+ #
+ # @opaque: A free-form string that can be used to describe the fd.
+ #
+-# Returns: @AddfdInfo on success
+-#
+-#          If file descriptor was not received, FdNotSupplied
+-#
+-#          If @fdset-id is a negative value, InvalidParameterValue
++# Returns: - @AddfdInfo on success
++#          - If file descriptor was not received, FdNotSupplied
++#          - If @fdset-id is a negative value, InvalidParameterValue
+ #
+ # Notes: The list of fd sets is shared by all monitor connections.
+ #
+@@ -1257,8 +1253,8 @@
+ #
+ # @fd: The file descriptor that is to be removed.
+ #
+-# Returns: Nothing on success
+-#          If @fdset-id or @fd is not found, FdNotFound
++# Returns: - Nothing on success
++#          - If @fdset-id or @fd is not found, FdNotFound
+ #
+ # Since: 1.2.0
+ #
+diff --git a/qapi/tpm.json b/qapi/tpm.json
+index 63878aa0f47..dc1f0817399 100644
+--- a/qapi/tpm.json
++++ b/qapi/tpm.json
+@@ -96,8 +96,8 @@
+ #
+ # A union referencing different TPM backend types' configuration options
+ #
+-# @type: 'passthrough' The configuration options for the TPM passthrough type
+-#        'emulator' The configuration options for TPM emulator backend type
++# @type: - 'passthrough' The configuration options for the TPM passthrough type
++#        - 'emulator' The configuration options for TPM emulator backend type
  #
  # Since: 1.5
- ##
-@@ -937,8 +937,8 @@
- # This is a read-only operation.
- #
- # Returns: The list of all memory blocks the guest knows about.
--# Each memory block is put on the list exactly once, but their order
--# is unspecified.
-+#          Each memory block is put on the list exactly once, but their order
-+#          is unspecified.
- #
- # Since: 2.3
- ##
-@@ -971,9 +971,9 @@
- # @response: the result of memory block operation.
- #
- # @error-code: the error number.
--#               When memory block operation fails, we assign the value of
--#               'errno' to this member, it indicates what goes wrong.
--#               When the operation succeeds, it will be omitted.
-+#              When memory block operation fails, we assign the value of
-+#              'errno' to this member, it indicates what goes wrong.
-+#              When the operation succeeds, it will be omitted.
- #
- # Since: 2.3
- ##
-@@ -1040,15 +1040,15 @@
- # @exited: true if process has already terminated.
- # @exitcode: process exit code if it was normally terminated.
- # @signal: signal number (linux) or unhandled exception code
--#       (windows) if the process was abnormally terminated.
-+#          (windows) if the process was abnormally terminated.
- # @out-data: base64-encoded stdout of the process
- # @err-data: base64-encoded stderr of the process
--#       Note: @out-data and @err-data are present only
--#       if 'capture-output' was specified for 'guest-exec'
-+#            Note: @out-data and @err-data are present only
-+#            if 'capture-output' was specified for 'guest-exec'
- # @out-truncated: true if stdout was not fully captured
--#       due to size limitation.
-+#                 due to size limitation.
- # @err-truncated: true if stderr was not fully captured
--#       due to size limitation.
-+#                 due to size limitation.
- #
- # Since: 2.5
- ##
-@@ -1131,8 +1131,8 @@
- 
- ##
- # @GuestUser:
--# @user:       Username
--# @domain:     Logon domain (windows only)
-+# @user: Username
-+# @domain: Logon domain (windows only)
- # @login-time: Time of login of this user on the computer. If multiple
- #              instances of the user are logged in, the earliest login time is
- #              reported. The value is in fractional seconds since epoch time.
-@@ -1156,10 +1156,10 @@
- ##
- # @GuestTimezone:
- #
--# @zone:    Timezone name. These values may differ depending on guest/OS and
--#           should only be used for informational purposes.
--# @offset:  Offset to UTC in seconds, negative numbers for time zones west of
--#           GMT, positive numbers for east
-+# @zone: Timezone name. These values may differ depending on guest/OS and
-+#        should only be used for informational purposes.
-+# @offset: Offset to UTC in seconds, negative numbers for time zones west of
-+#          GMT, positive numbers for east
- #
- # Since: 2.10
  ##
 -- 
 2.20.1
