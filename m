@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D36BBC352A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 20:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D8AC352A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 20:29:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A47A6217BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 20:27:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 100A124684
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 20:29:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKoTqw6V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A47A6217BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gWSChvHb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 100A124684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2L4l-0004C1-Q0
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 15:27:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44351)
+	id 1j2L7U-00067I-1u
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 15:29:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1j2L2Z-00025I-B9
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 15:24:52 -0500
+ (envelope-from <wainersm@redhat.com>) id 1j2L6h-0005iB-D5
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 15:29:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1j2L2X-0005qY-7B
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 15:24:51 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28813
+ (envelope-from <wainersm@redhat.com>) id 1j2L6g-0000Tx-22
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 15:29:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23747
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1j2L2X-0005pA-2O
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 15:24:49 -0500
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1j2L6f-0000Rj-TU
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 15:29:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581625488;
+ s=mimecast20190719; t=1581625744;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1JfrV3R3U6fsvWIf//S18w/1Nd77SECfsn7uVUow0Og=;
- b=AKoTqw6VGYBut+bB14CU1NyM+oEwM3epRgajAy8pntzBq7q4NkALcrpW32tWo/qgEERzRz
- Fm/6+ur/Egm8SggDHK7S0qK3iQCyMr4ZEj+laapHlOYc+elztsMfnYMjKdBb/OMalsFG7D
- HWv+bcqvZVTmMjx/6rRR+zmTOv9OKeQ=
+ bh=h0jrHRmyKXESYC21YjJBCQbKdMN66qCn5iecIaWEg+4=;
+ b=gWSChvHbniCQc5M+yOjTNMPvNzEQ5zBOVtnCd2sug+s7Y3kPFmhuRpof6vf+dZ2ojwKt2e
+ o5yH/3Lspog3swhvJuFaYWstdlXQetM04r4aZDxdlV8JFRpVCDvFINXnbF13e24ATzWtR5
+ y8ZMuKDTOpsnN3Z1O6ROhqfe8rSV/8A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-OGN49DWgN0e4dI115XCYIQ-1; Thu, 13 Feb 2020 15:24:40 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-169-It0bUXmMOtiKTd2cb5hWyw-1; Thu, 13 Feb 2020 15:28:56 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C33431857343;
- Thu, 13 Feb 2020 20:24:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6364618B5FAA;
+ Thu, 13 Feb 2020 20:28:55 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-116-24.gru2.redhat.com
  [10.97.116.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A5B775C1BB;
- Thu, 13 Feb 2020 20:24:30 +0000 (UTC)
-Subject: Re: [PATCH] tests/acceptance/ppc_prep_40p: Use cdn.netbsd.org hostname
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F2F606E40A;
+ Thu, 13 Feb 2020 20:28:49 +0000 (UTC)
+Subject: Re: [PATCH v2] tests/acceptance/machine_sparc_leon3: Do not run
+ HelenOS test by default
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-References: <20200211134504.9156-1-philmd@redhat.com>
+References: <20200212203627.16592-1-philmd@redhat.com>
 From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <ceea0b44-6925-72c7-e593-1111da4541bf@redhat.com>
-Date: Thu, 13 Feb 2020 18:24:29 -0200
+Message-ID: <c588253f-a205-a309-6983-09607c1e61e6@redhat.com>
+Date: Thu, 13 Feb 2020 18:28:47 -0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200211134504.9156-1-philmd@redhat.com>
+In-Reply-To: <20200212203627.16592-1-philmd@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: OGN49DWgN0e4dI115XCYIQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: It0bUXmMOtiKTd2cb5hWyw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -91,23 +92,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Cleber Rosa <crosa@redhat.com>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Fabien Chouteau <chouteau@adacore.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2/11/20 11:45 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Use NetBSD content delivery network to get faster downloads.
+On 2/12/20 6:36 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> The www.helenos.org server is slow and downloading the Leon3 binary
+> takes too long [*]. Do not include this test in the default suite.
 >
-> Suggested-by: Kamil Rytarowski <kamil@netbsd.org>
+> Similarly to commit 471c97a69b:
+>
+>    Currently the Avocado framework does not distinct the time spent
+>    downloading assets vs. the time spent running a test. With big
+>    assets (like a full VM image) the tests likely fail.
+>
+>    This is a limitation known by the Avocado team.
+>    Until this issue get fixed, do not run this tests automatically.
+>
+>    Tests can still be run setting the AVOCADO_TIMEOUT_EXPECTED
+>    environment variable.
+>
+> [*] https://travis-ci.org/stsquad/qemu/jobs/649599880#L4198
+>
+> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->   tests/acceptance/ppc_prep_40p.py | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-
+> v2: Add missing staged hunk...
+> ---
+>   tests/acceptance/machine_sparc_leon3.py | 4 ++++
+>   1 file changed, 4 insertions(+)
 
 LGTM.
 
@@ -115,34 +132,29 @@ Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
 
 >
-> diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_prep=
-_40p.py
-> index efe06037ba..6729d96f5e 100644
-> --- a/tests/acceptance/ppc_prep_40p.py
-> +++ b/tests/acceptance/ppc_prep_40p.py
-> @@ -34,7 +34,7 @@ def test_factory_firmware_and_netbsd(self):
->                       '7020-40p/P12H0456.IMG')
->           bios_hash =3D '1775face4e6dc27f3a6ed955ef6eb331bf817f03'
->           bios_path =3D self.fetch_asset(bios_url, asset_hash=3Dbios_hash=
-)
-> -        drive_url =3D ('https://ftp.netbsd.org/pub/NetBSD/NetBSD-archive=
-/'
-> +        drive_url =3D ('https://cdn.netbsd.org/pub/NetBSD/NetBSD-archive=
-/'
->                        'NetBSD-4.0/prep/installation/floppy/generic_com0.=
-fs')
->           drive_hash =3D 'dbcfc09912e71bd5f0d82c7c1ee43082fb596ceb'
->           drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive_h=
-ash)
-> @@ -67,7 +67,7 @@ def test_openbios_and_netbsd(self):
->           :avocado: tags=3Darch:ppc
->           :avocado: tags=3Dmachine:40p
+> diff --git a/tests/acceptance/machine_sparc_leon3.py b/tests/acceptance/m=
+achine_sparc_leon3.py
+> index f77e210ccb..27e4717a51 100644
+> --- a/tests/acceptance/machine_sparc_leon3.py
+> +++ b/tests/acceptance/machine_sparc_leon3.py
+> @@ -5,6 +5,9 @@
+>   # This work is licensed under the terms of the GNU GPL, version 2 or
+>   # later. See the COPYING file in the top-level directory.
+>  =20
+> +import os
+> +
+> +from avocado import skipUnless
+>   from avocado_qemu import Test
+>   from avocado_qemu import wait_for_console_pattern
+>  =20
+> @@ -13,6 +16,7 @@ class Leon3Machine(Test):
+>  =20
+>       timeout =3D 60
+>  =20
+> +    @skipUnless(os.getenv('AVOCADO_TIMEOUT_EXPECTED'), 'Test might timeo=
+ut')
+>       def test_leon3_helenos_uimage(self):
 >           """
-> -        drive_url =3D ('https://ftp.netbsd.org/pub/NetBSD/iso/7.1.2/'
-> +        drive_url =3D ('https://cdn.netbsd.org/pub/NetBSD/iso/7.1.2/'
->                        'NetBSD-7.1.2-prep.iso')
->           drive_hash =3D 'ac6fa2707d888b36d6fa64de6e7fe48e'
->           drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive_h=
-ash,
+>           :avocado: tags=3Darch:sparc
 
 
