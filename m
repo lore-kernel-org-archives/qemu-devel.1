@@ -2,57 +2,79 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB5AC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:35:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B61E3C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:36:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 629DA20578
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:35:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 629DA20578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F16E20578
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:36:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7YEMxro"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F16E20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2DiC-0005aJ-I0
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 07:35:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40362)
+	id 1j2Dip-0006mC-Ny
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 07:35:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j2Dca-0004TZ-KN
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:29:33 -0500
+ (envelope-from <bmeng.cn@gmail.com>) id 1j2Ddl-0006sM-98
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:30:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j2DcZ-0005x9-0R
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:29:32 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51434 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1j2DcY-0005vz-Qm
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:29:30 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D567D1A1E65;
- Thu, 13 Feb 2020 13:29:27 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 8F4951A1D77;
- Thu, 13 Feb 2020 13:29:27 +0100 (CET)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 7/9] linux-user: x86_64: Update syscall numbers to kernel
- 5.5 level
-Date: Thu, 13 Feb 2020 13:29:12 +0100
-Message-Id: <1581596954-2305-8-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1581596954-2305-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1581596954-2305-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (envelope-from <bmeng.cn@gmail.com>) id 1j2Ddj-0006od-SW
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:30:45 -0500
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:36915)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1j2Ddj-0006nK-NK; Thu, 13 Feb 2020 07:30:43 -0500
+Received: by mail-yw1-xc44.google.com with SMTP id l5so2502873ywd.4;
+ Thu, 13 Feb 2020 04:30:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fpTaUf8q+PPxyFmXzrg+tjSsNXG8nNZhHyqmFn4KNbw=;
+ b=c7YEMxro7WI9INakdYK0VP44w6y0MZ3LJ2TlpO3bWenRKdAOPmbPggZL96TjoIQqHs
+ oBIBuBtONXaER9HfiY9rSUrPWvSyre5cNIo0E6ITXDI5zjYckxHIW2RvNKb7+MtRvMnn
+ yiX+JP43roE+R22Nd52USLZ7Xu2WO2w0Fb9XY4LwgCcgbF/PjrFR4znzBHC8+czUOusv
+ AFTHBGoWEIq481yGDKluLi8kiCM/MSXpafJNV8E3OG4zosCT0Bzjc4zgT3xOAsmVXvKy
+ gpDNM71lzl0iCxaUVB93MvCswXxiI5tovcrNttnDvm5x2iHvNIMrIN4XcNmnry77J8Fa
+ w0MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fpTaUf8q+PPxyFmXzrg+tjSsNXG8nNZhHyqmFn4KNbw=;
+ b=lKCvtkkV4Roko3hXBxrP5xf+5T9j5x8t1nAUF/bDq9Z7SMTvB8VT9O0qqfgOSSkuZ6
+ Gi3eZ4mfE4uF6waJ9qPmMsIEsKUc0kC0hYv1OZa4RKqoL4TDANYqjciVW1uq02ygEFzQ
+ hzvxLFkt3ZP0q7Xa3r6WKs5cC4oDbvK/CllddCrn7Xz7gmfmrOcn3LAi2Ab/+LhbCQZB
+ jgis/U5oKLmPhYWvYu6AyruG/wtsCPTmtcGQ7X5FP6/bR4LiXOQQugcEmiJ0h3feseHc
+ CEf0Gxem9Ffl9aZ3FZ64SCpsK5S7Xt4OrDknTyBLGpllaKzCUD6pEH6fF1x/eMFBBKuF
+ V21Q==
+X-Gm-Message-State: APjAAAV+7/v7mUWhpYQp50R0Kx6Spvu9iKw2xCvi7FdkmOK5153CA3EW
+ cjPkH7h5IBqJMqJd1V79PEw5hUj9mZZTL/ah9DU=
+X-Google-Smtp-Source: APXvYqyBycb4QemjbfWjCs8fItbMDPnlVSpEelaax7mOX0mrlamaciPsdYmMNCtQssUmdBmJqQ/8e6ysxaXYc0KZYyM=
+X-Received: by 2002:a0d:eb0d:: with SMTP id u13mr2898570ywe.257.1581597042884; 
+ Thu, 13 Feb 2020 04:30:42 -0800 (PST)
+MIME-Version: 1.0
+References: <20200212172921.36796-1-palmerdabbelt@google.com>
+In-Reply-To: <20200212172921.36796-1-palmerdabbelt@google.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Thu, 13 Feb 2020 20:30:32 +0800
+Message-ID: <CAEUhbmVBJvHGhQBVX5=TjMtL-+KKE=4L7LVS5GnFotLh85uBcg@mail.gmail.com>
+Subject: Re: [PULL] RISC-V Patches for the 5.0 Soft Freeze, Part 2
+To: Palmer Dabbelt <palmerdabbelt@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,61 +86,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- laurent@vivier.eu, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Hi Palmer,
 
-Update x86_64 syscall numbers based on Linux kernel v5.5.
+On Thu, Feb 13, 2020 at 1:30 AM Palmer Dabbelt <palmerdabbelt@google.com> wrote:
+>
+> The following changes since commit 81a23caf47956778c5a5056ad656d1ef92bf9659:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2020-02-10 17:08:51 +0000)
+>
+> are available in the Git repository at:
+>
+>   git@github.com:palmer-dabbelt/qemu.git tags/riscv-for-master-5.0-sf2
+>
+> for you to fetch changes up to 9c8fdcece53e05590441785ab22d91a22da36e29:
+>
+>   MAINTAINERS: Add maintainer entry for Goldfish RTC (2020-02-10 12:01:39 -0800)
+>
+> ----------------------------------------------------------------
+> RISC-V Patches for the 5.0 Soft Freeze, Part 2
+>
+> This is a fairly light-weight pull request, but I wanted to send it out to
+> avoid the Goldfish stuff getting buried as the next PR should contain the H
+> extension implementation.
+>
+> As far as this PR goes, it contains:
+>
+> * The addition of syscon device tree nodes for reboot and poweroff, which
+>   allows Linux to control QEMU without an additional driver.  The existing
+>   device was already compatible with the syscon interface.
+> * A fix to our GDB stub to avoid confusing XLEN and FLEN, specifically useful
+>   for rv32id-based systems.
+> * A device emulation for the Goldfish RTC device, a simple memory-mapped RTC.
+> * The addition of the Goldfish RTC device to the RISC-V virt board.
+>
+> This passes "make check" and boots buildroot for me.
+>
 
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Richard Henderson <rth@twiddle.net>
-CC: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/x86_64/syscall_nr.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+This PR is still missing: http://patchwork.ozlabs.org/patch/1199516/
 
-diff --git a/linux-user/x86_64/syscall_nr.h b/linux-user/x86_64/syscall_nr.h
-index 9b6981e..e5d14ec 100644
---- a/linux-user/x86_64/syscall_nr.h
-+++ b/linux-user/x86_64/syscall_nr.h
-@@ -328,5 +328,29 @@
- #define TARGET_NR_membarrier            324
- #define TARGET_NR_mlock2                325
- #define TARGET_NR_copy_file_range       326
-+#define TARGET_NR_preadv2               327
-+#define TARGET_NR_pwritev2              328
-+#define TARGET_NR_pkey_mprotect         329
-+#define TARGET_NR_pkey_alloc            330
-+#define TARGET_NR_pkey_free             331
-+#define TARGET_NR_statx                 332
-+#define TARGET_NR_io_pgetevents         333
-+#define TARGET_NR_rseq                  334
-+/*
-+ * don't use numbers 387 through 423, add new calls after the last
-+ * 'common' entry
-+ */
-+#define TARGET_NR_pidfd_send_signal     424
-+#define TARGET_NR_io_uring_setup        425
-+#define TARGET_NR_io_uring_enter        426
-+#define TARGET_NR_io_uring_register     427
-+#define TARGET_NR_open_tree             428
-+#define TARGET_NR_move_mount            429
-+#define TARGET_NR_fsopen                430
-+#define TARGET_NR_fsconfig              431
-+#define TARGET_NR_fsmount               432
-+#define TARGET_NR_fspick                433
-+#define TARGET_NR_pidfd_open            434
-+#define TARGET_NR_clone3                435
- 
- #endif
--- 
-2.7.4
+> ----------------------------------------------------------------
+>
+> Peter: I'm sending hw/rtc code because it was suggested that the Goldfish
+> implementation gets handled via the RISC-V tree as our virt board is the only
+> user.  I'm happy to do things differently in the future (maybe send
+> goldfish-specific PRs?) if that's better for you.  Just LMK what makes sense, I
+> anticipate that this'll be a pretty low traffic device so I'm fine with pretty
+> much anything.
+>
 
+Regards,
+Bin
 
