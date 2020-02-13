@@ -2,92 +2,114 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8047FC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A60C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:33:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57759222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:33:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65695222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:33:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ilxu9p45"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57759222C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="my6IOFvg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65695222C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2JIJ-0005Hf-JQ
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 13:32:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47760)
+	id 1j2JIh-00069T-J8
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 13:33:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43167)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j2J6X-0006qJ-Hc
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 13:20:50 -0500
+ (envelope-from <Babu.Moger@amd.com>) id 1j2J3u-0003eP-4I
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 13:18:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j2J6T-00069O-8F
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 13:20:47 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34555)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j2J6T-000616-0x
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 13:20:45 -0500
-Received: by mail-pg1-x543.google.com with SMTP id j4so3551919pgi.1
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 10:20:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=mrycwskl5pvPO64L7Ue9xswCdopqbG7ifptehKNfIOg=;
- b=ilxu9p45EZ+17nmkXQUzlwbcmOJbELfU7c3J9+8punSbapIaeN5ExOiYTcFGKCknwS
- ZR6uSr2l091QQBNDSHdkjyaZ5lZHCAImsTD9qlJX6NZEpz+suyq56KnEywnkDBMbxslR
- I18ft2L3DRBX6ejFx0jfamuuDpcrRbc+l0t9wV+4ULvuUfJsCk4sny7dz+eoaAQWhJTu
- 02pDxlestMNKo2P6Dktj0WJ1/kJUJLZsIpv2ir09o+tmQru1jKsq8shN5136ksT3S0ne
- px0gHPYN/jUaeH+oo9IUq8Xtk3WgJRzIU02rckrDhHpFSV6nAGnFMqbIE2bb2gV/jglV
- vEnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mrycwskl5pvPO64L7Ue9xswCdopqbG7ifptehKNfIOg=;
- b=OawBuTO/GAZ11FCtFVpnyVSiGbLPOQrPmsw9dHnmnm+0musM8yyLAc6cskTAAFUqPa
- mOSXD7GrpbZFYXAE+WWQi4i8RzaDXKtrYRyKpLotiEjqiIDyIlUn4JoNG/Dnp40zqwPw
- P6JxV6Wh+OOYKTeu0csdOwI2dHdLSUevpCmMOw1+qrYp9CiT7W/e/oTgD4XwnXBYP0iU
- iAGAAFxIijg1I8oMknzKdt+flAGehTVIaThinZfyBOVPh20ysuEgZPHCOvaC7YbbefAs
- 01JZN2vJpmFtIkb+se1ii8wuubuplJt6rIAUUUpyk1EOE5PuYdK3EOwSokcuj5X0iGrv
- dZdw==
-X-Gm-Message-State: APjAAAU9+ZgPbhk4QBIB88F7zfHM6CtjZnblOAJESq01Sa6RnJiDKb9C
- 8upUVhkoUPz98ZH69Nd5cDfEgQ==
-X-Google-Smtp-Source: APXvYqy+Xyy6rL54cp8a8loTRl5wNI7qQJj4S7vyO332WcWph42Fdbw6o2rRl9dmxnM6pNGf0ZHHPw==
-X-Received: by 2002:a63:2309:: with SMTP id j9mr19339081pgj.54.1581618038815; 
- Thu, 13 Feb 2020 10:20:38 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- v9sm3526676pja.26.2020.02.13.10.20.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 13 Feb 2020 10:20:38 -0800 (PST)
-Subject: Re: [PATCH 2/2] util: add util function buffer_zero_avx512()
-To: Robert Hoo <robert.hu@linux.intel.com>, qemu-devel@nongnu.org,
- pbonzini@redhat.com, laurent@vivier.eu, philmd@redhat.com,
- berrange@redhat.com
-References: <1581580379-54109-1-git-send-email-robert.hu@linux.intel.com>
- <1581580379-54109-3-git-send-email-robert.hu@linux.intel.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ee2ef44a-737b-e989-7f20-18a69e19d430@linaro.org>
-Date: Thu, 13 Feb 2020 10:20:36 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <1581580379-54109-3-git-send-email-robert.hu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+ (envelope-from <Babu.Moger@amd.com>) id 1j2J3r-0001Bl-Vv
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 13:18:06 -0500
+Received: from mail-dm6nam11on2054.outbound.protection.outlook.com
+ ([40.107.223.54]:52256 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1j2J3r-00018r-Q2
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 13:18:03 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CCWKWSKaljpv6Nfc+VB0Wkb8/BDl32m2+snxXAXtW90LS4eky9QqgIVxNWOiQAI7iSuiz4Kuo4KciDsHhI1ol8mxtSRUbml9wZng2knwmO732V5TMlqnMydIYpaq+54t5dKzgg6J28fj+SX05F+Rk5+MGj0iewLrEJx6s5QZy/Utjj7bsozacTx3081sgDLhchNypBjdvzU8+fnxyFfKL66uiAuvGfmh5iqWRyD4aUKGIaJdYJipVQGMbIdyjA01skQ9joR++ARGRO6jB5kTIPksuo5rdXi+cj+EkB8SX/y3xPIYhCdFn7bIVdgdNgdLL90K0reiPb28pjVaLXx0zA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9tsL/MUJX5I/sqAwLygswH8EhwfKNLXQYS5v4pDYVkA=;
+ b=ilMA9e/8qOa318bXu5Rac8nE1LFZd5s6WTBx1AKV1X79QvzVwcuxtc45hyXUXWRViIxrRgi16O5oXm80fCRPQdbnufYtbtebsOIqi3z8p+5/yt+/9HTvdhyBtrx0XIF2a/Iu5zd/M/0Aq7Jr2QVaceftrtHZ88bFm+vI4fGn4AzBsbNuOZnDjXfeUaRqReLmkAVw2HaCjwWwmD0pKz1RXFv5POibCF/JaXA3h/Kpnm8/lMkwRIHCpd/cG4P7N03l12w1wbbdiIQlNOA3QT9pjGcaGUp8XxunVYj8rBTubD1ACGPgbOOQFa5elIHBFzEwZzIWZOWg768AkNFELEdtbQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9tsL/MUJX5I/sqAwLygswH8EhwfKNLXQYS5v4pDYVkA=;
+ b=my6IOFvg8Lnp1H3L/la9zZ69xFyWV3S4tlCWPmM7EPUA0G4zlzH0G2hoGMPNbXmDZrVgAnkf3WdiO4uBfkkkac33GyvFb+/ywdFCAYrdHMdpVH86yKIeUFXeuyHFPm5owJ+QEyQb/ycgJRB2D4jxW6qgUyhmjaUPyD3bvYW2mIw=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com (10.172.71.23) by
+ CY4PR12MB1222.namprd12.prod.outlook.com (10.168.166.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.26; Thu, 13 Feb 2020 18:18:02 +0000
+Received: from CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::e0cc:653a:e9bc:aa8e]) by CY4PR12MB1574.namprd12.prod.outlook.com
+ ([fe80::e0cc:653a:e9bc:aa8e%2]) with mapi id 15.20.2707.030; Thu, 13 Feb 2020
+ 18:18:02 +0000
+Subject: [PATCH v4 14/16] hw/i386: Move arch_id decode inside x86_cpus_init
+From: Babu Moger <babu.moger@amd.com>
+To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
+ rth@twiddle.net, mst@redhat.com, imammedo@redhat.com
+Date: Thu, 13 Feb 2020 12:17:59 -0600
+Message-ID: <158161787984.48948.11401269513856632633.stgit@naples-babu.amd.com>
+In-Reply-To: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
+References: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
+User-Agent: StGit/unknown-version
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-ClientProxiedBy: DM6PR17CA0032.namprd17.prod.outlook.com
+ (2603:10b6:5:1b3::45) To CY4PR12MB1574.namprd12.prod.outlook.com
+ (2603:10b6:910:e::23)
+MIME-Version: 1.0
+Received: from naples-babu.amd.com (165.204.78.2) by
+ DM6PR17CA0032.namprd17.prod.outlook.com (2603:10b6:5:1b3::45) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.24 via Frontend Transport; Thu, 13 Feb 2020 18:18:01 +0000
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 662c555e-a083-4921-e5e5-08d7b0b10fe8
+X-MS-TrafficTypeDiagnostic: CY4PR12MB1222:|CY4PR12MB1222:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1222B2D71DC587EB0FE9AA0D951A0@CY4PR12MB1222.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-Forefront-PRVS: 031257FE13
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(366004)(39860400002)(346002)(136003)(376002)(396003)(189003)(199004)(52116002)(66946007)(66556008)(66476007)(7696005)(26005)(5660300002)(103116003)(956004)(55016002)(4326008)(86362001)(2906002)(44832011)(186003)(16526019)(478600001)(316002)(81156014)(81166006)(8936002)(8676002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:CY4PR12MB1222;
+ H:CY4PR12MB1574.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vJ44Y/Y1k6ETRHolTONzcOcz3MDlvzyEL9/IuBVZn0uK5+s8Z6YqjjEgFZZtlWY6Yyy/5I+tAvD7RtpJ3jAHsMZN7kteAS58aDRXPUj0qT3I2jo8s1wj/Imk1C//wWp6WE8aW09oLEjdkXjwmRnsnwyLb0qj8FCNkzUuqAHp07HUrwhuvOUPT30py5iyoErAdw/BgjM4I5XAheYYnOArh/AThnjxM8yZ08bzL2dSggQlejFS4P+0pkzb8cK0Nu1ZjAA/iiyr/meu8E6UPRklL3+XqjCbSeayMUvf3mbNdZY7yt/YencglIsXDttpInpPkUyn96NGupquUg6TXJFF6I8lEDDIiIts8ZweY57of8FB0v1omGo2zCXwcles2Stz5XXr2FXvlCkiiBAZQAHFhipUNT1WePj8XekztVfPbcXwOGwjPygg/yoVibxZYghG
+X-MS-Exchange-AntiSpam-MessageData: rDPsLegkW6VVKhnLo+VY43Zvx47DkSFblIpHznnKiu/2cRU8kOo2STbhHN8ogAvDn4Pp+zLxg8u7EB/PPjBoP7nPcmnAzpbAy/HAd5e4Op2Hx5dGPEbDGa6ekpmUy9e0yeRtbRlch+cZY+aBMHNkQw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 662c555e-a083-4921-e5e5-08d7b0b10fe8
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2020 18:18:02.0105 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sapVXe9pWq77rVbWB2A54LHhjSBBeq9Edl0Lj7sAtXXbkN5pO+M6LlhMsWb7p26X
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1222
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.223.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,67 +121,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.hu@intel.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/12/20 11:52 PM, Robert Hoo wrote:
-> And initialize buffer_is_zero() with it, when Intel AVX512F is
-> available on host.
-> 
-> This function utilizes Intel AVX512 fundamental instructions which
-> perform over previous AVX2 instructions.
+Apicid calculation depends on knowing the total number of numa nodes
+for EPYC cpu models. Right now, we are calculating the arch_id while
+parsing the numa(parse_numa). At this time, it is not known how many
+total numa nodes are configured in the system.
 
-Is it not still true that any AVX512 insn will cause the entire cpu package,
-not just the current core, to drop frequency by 20%?
+Move the arch_id inside x86_cpus_init. At this time smp parameter is already
+completed and numa node information is available.
 
-As far as I know one should only use the 512-bit instructions when you can
-overcome that frequency drop, which seems unlikely in this case.  That said...
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+---
+ hw/i386/x86.c |   16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index b825861b85..472dc3eb77 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -127,6 +127,9 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+     MachineState *ms = MACHINE(x86ms);
+     MachineClass *mc = MACHINE_GET_CLASS(x86ms);
+ 
++    /* Initialize apicid handlers first */
++    x86_check_apicid_handlers(ms);
++
+     x86_cpu_set_default_version(default_cpu_version);
+ 
+     /*
+@@ -140,6 +143,11 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
+                                                       ms->smp.max_cpus - 1) + 1;
+     possible_cpus = mc->possible_cpu_arch_ids(ms);
++
++    for (i = 0; i < ms->smp.cpus; i++) {
++        ms->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(x86ms, i);
++    }
++
+     for (i = 0; i < ms->smp.cpus; i++) {
+         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+     }
+@@ -164,8 +172,7 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+    init_topo_info(&topo_info, x86ms);
+ 
+    assert(idx < ms->possible_cpus->len);
+-   x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+-                               &topo_info, &topo_ids);
++   x86_topo_ids_from_idx(&topo_info, idx, &topo_ids);
+    return topo_ids.pkg_id % ms->numa_state->num_nodes;
+ }
+ 
+@@ -199,10 +206,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+ 
+         ms->possible_cpus->cpus[i].type = ms->cpu_type;
+         ms->possible_cpus->cpus[i].vcpus_count = 1;
+-        ms->possible_cpus->cpus[i].arch_id =
+-            x86_cpu_apic_id_from_index(x86ms, i);
+-        x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+-                                 &topo_info, &topo_ids);
++        x86_topo_ids_from_idx(&topo_info, i, &topo_ids);
+         ms->possible_cpus->cpus[i].props.has_socket_id = true;
+         ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
+         if (x86ms->smp_dies > 1) {
 
-> +    if (unlikely(len < 64)) { /*buff less than 512 bits, unlikely*/
-> +        return buffer_zero_int(buf, len);
-> +    }
-
-First, len < 64 has been eliminated already in select_accel_fn.
-Second, len < 256 is not handled properly by the code below...
-
-
-> +    /* Begin with an unaligned head of 64 bytes.  */
-> +    t = _mm512_loadu_si512(buf);
-> +    p = (__m512i *)(((uintptr_t)buf + 5 * 64) & -64);
-> +    e = (__m512i *)(((uintptr_t)buf + len) & -64);
-> +
-> +    /* Loop over 64-byte aligned blocks of 256.  */
-> +    while (p < e) {
-> +        __builtin_prefetch(p);
-> +        if (unlikely(_mm512_test_epi64_mask(t, t))) {
-> +            return false;
-> +        }
-> +        t = p[-4] | p[-3] | p[-2] | p[-1];
-> +        p += 4;
-> +    }
-> +
-> +    t |= _mm512_loadu_si512(buf + len - 4 * 64);
-> +    t |= _mm512_loadu_si512(buf + len - 3 * 64);
-> +    t |= _mm512_loadu_si512(buf + len - 2 * 64);
-> +    t |= _mm512_loadu_si512(buf + len - 1 * 64);
-
-... because this final sequence loads 256 bytes.
-
-Rather than make a second test vs 256 in buffer_zero_avx512, I wonder if it
-would be better to have select_accel_fn do the job.  Have a global variable
-buffer_accel_size alongside buffer_accel so there's only one branch
-(mis)predict to worry about.
-
-FWIW, something that the compiler should do, but doesn't currently, is use
-vpternlogq to perform a 3-input OR.  Something like
-
-    /* 0xfe -> orABC */
-    t = _mm512_ternarylogic_epi64(t, p[-4], p[-3], 0xfe);
-    t = _mm512_ternarylogic_epi64(t, p[-2], p[-1], 0xfe);
-
-
-r~
 
