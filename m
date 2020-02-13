@@ -2,58 +2,82 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FCAC3B186
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 02:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B765C352A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 02:41:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB57E20675
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 02:38:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB57E20675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4080D20873
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 02:41:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4080D20873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j24OY-00039l-13
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 21:38:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55477)
+	id 1j24Rp-00052S-GK
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 21:41:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fangying1@huawei.com>) id 1j24M6-0007FY-8S
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 21:35:55 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1j24Qw-0004Xm-K0
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 21:40:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fangying1@huawei.com>) id 1j24M4-0000bq-Gb
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 21:35:54 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:57584 helo=huawei.com)
+ (envelope-from <yi.l.liu@intel.com>) id 1j24Qu-0007CW-Py
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 21:40:53 -0500
+Received: from mga09.intel.com ([134.134.136.24]:20585)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fangying1@huawei.com>)
- id 1j24M0-0000T4-7f; Wed, 12 Feb 2020 21:35:48 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 53FE1CF72C5DD6B4C053;
- Thu, 13 Feb 2020 10:35:46 +0800 (CST)
-Received: from localhost (10.133.205.53) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Thu, 13 Feb 2020
- 10:35:36 +0800
-From: Ying Fang <fangying1@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
-Subject: [PATCH 3/4] arm: Add the cpufreq device model
-Date: Thu, 13 Feb 2020 10:35:31 +0800
-Message-ID: <20200213023532.902-4-fangying1@huawei.com>
-X-Mailer: git-send-email 2.22.0.windows.1
-In-Reply-To: <20200213023532.902-1-fangying1@huawei.com>
-References: <20200213023532.902-1-fangying1@huawei.com>
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j24Qu-00077z-IA
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 21:40:52 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 12 Feb 2020 18:40:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,434,1574150400"; d="scan'208";a="233976128"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by orsmga003.jf.intel.com with ESMTP; 12 Feb 2020 18:40:48 -0800
+Received: from fmsmsx101.amr.corp.intel.com (10.18.124.199) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 12 Feb 2020 18:40:47 -0800
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx101.amr.corp.intel.com (10.18.124.199) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 12 Feb 2020 18:40:47 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.222]) with mapi id 14.03.0439.000;
+ Thu, 13 Feb 2020 10:40:45 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [RFC v3 14/25] intel_iommu: add virtual command capability support
+Thread-Topic: [RFC v3 14/25] intel_iommu: add virtual command capability
+ support
+Thread-Index: AQHV1p1OZ3QtxF5MCUauWTZBa4G1JagWGOQAgAJEBHA=
+Date: Thu, 13 Feb 2020 02:40:45 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A1BBBF4@SHSMSX104.ccr.corp.intel.com>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-15-git-send-email-yi.l.liu@intel.com>
+ <20200211215630.GN984290@xz-x1>
+In-Reply-To: <20200211215630.GN984290@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzUxYTFjZGUtOTJkNy00YTRjLWJmYjYtMzI3OWJmZDNlYTNjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiRm9aQ05WbnNpbVNubTdqOGRLd2h1WkhFaTdaaWsrNFZMZEl0REpoSERUbTF2ZE1TZVdPY1NiVTVCMDZjdWJKNyJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.205.53]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,308 +89,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com, mst@redhat.com,
- i.mitsyanko@gmail.com, shannon.zhaosl@gmail.com, guoheyi@huawei.com
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo
+ Habkost <ehabkost@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On ARM64 platform, CPU frequency is retrieved by ACPI CPPC,
-so here we create the virtual cpufreq device to present
-the CPPC registers and ACPI _CPC objects.
-
-The default frequency is set host CPU nominal frequency, which
-is obtained from the host CPPC sysfs. Other performance data
-are set to the same value, since we don't support guest performance scali=
-ng.
-
-Performance counters are also not emulated and they simply return 1
-if readed, and guest should fallback to use the desired performance
-value as the current performance.
-
-Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-Signed-off-by: Ying Fang <fangying1@huawei.com>
----
- hw/acpi/Makefile.objs |   1 +
- hw/acpi/cpufreq.c     | 247 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 248 insertions(+)
- create mode 100644 hw/acpi/cpufreq.c
-
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 777da07f4d..61530675d4 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -16,6 +16,7 @@ common-obj-y +=3D bios-linker-loader.o
- common-obj-y +=3D aml-build.o utils.o
- common-obj-$(CONFIG_ACPI_PCI) +=3D pci.o
- common-obj-$(CONFIG_TPM) +=3D tpm.o
-+common-obj-$(CONFIG_CPUFREQ) +=3D cpufreq.o
-=20
- common-obj-$(CONFIG_IPMI) +=3D ipmi.o
- common-obj-$(call lnot,$(CONFIG_IPMI)) +=3D ipmi-stub.o
-diff --git a/hw/acpi/cpufreq.c b/hw/acpi/cpufreq.c
-new file mode 100644
-index 0000000000..f38087884a
---- /dev/null
-+++ b/hw/acpi/cpufreq.c
-@@ -0,0 +1,247 @@
-+/*
-+ * ACPI CPPC register device
-+ *
-+ * Support for showing CPU frequency in guest OS.
-+ *
-+ * Copyright (c) 2019 HUAWEI TECHNOLOGIES CO.,LTD.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License alo=
-ng
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
-+#include "chardev/char.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+#include "qemu/option.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/acpi/acpi-defs.h"
-+#include "qemu/cutils.h"
-+#include "qemu/error-report.h"
-+#include "hw/boards.h"
-+
-+#define TYPE_CPUFREQ "cpufreq"
-+#define CPUFREQ(obj) OBJECT_CHECK(CpufreqState, (obj), TYPE_CPUFREQ)
-+#define NOMINAL_FREQ_FILE "/sys/devices/system/cpu/cpu0/acpi_cppc/nomina=
-l_freq"
-+#define CPU_MAX_FREQ_FILE "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_=
-max_freq"
-+#define HZ_MAX_LENGTH 1024
-+#define MAX_SUPPORT_SPACE 0x10000
-+
-+typedef struct CpufreqState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    uint32_t HighestPerformance;
-+    uint32_t NominalPerformance;
-+    uint32_t LowestNonlinearPerformance;
-+    uint32_t LowestPerformance;
-+    uint32_t GuaranteedPerformance;
-+    uint32_t DesiredPerformance;
-+    uint64_t ReferencePerformanceCounter;
-+    uint64_t DeliveredPerformanceCounter;
-+    uint32_t PerformanceLimited;
-+    uint32_t LowestFreq;
-+    uint32_t NominalFreq;
-+    uint32_t reg_size;
-+} CpufreqState;
-+
-+
-+static uint64_t cpufreq_read(void *opaque, hwaddr offset,
-+                           unsigned size)
-+{
-+    CpufreqState *s =3D (CpufreqState *)opaque;
-+    uint64_t r;
-+    uint64_t n;
-+
-+    MachineState *ms =3D MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus =3D ms->smp.cpus;
-+
-+    if (offset >=3D smp_cpus * CPPC_REG_PER_CPU_STRIDE) {
-+        warn_report("cpufreq_read: offset 0x%lx out of range", offset);
-+        return 0;
-+    }
-+
-+    n =3D offset % CPPC_REG_PER_CPU_STRIDE;
-+    switch (n) {
-+    case 0:
-+        r =3D s->HighestPerformance;
-+        break;
-+    case 4:
-+        r =3D s->NominalPerformance;
-+        break;
-+    case 8:
-+        r =3D s->LowestNonlinearPerformance;
-+        break;
-+    case 12:
-+        r =3D s->LowestPerformance;
-+        break;
-+    case 16:
-+        r =3D s->GuaranteedPerformance;
-+        break;
-+    case 20:
-+        r =3D s->DesiredPerformance;
-+        break;
-+    /*
-+     * We don't have real counters and it is hard to emulate, so always =
-set the
-+     * counter value to 1 to rely on Linux to use the DesiredPerformance=
- value
-+     * directly.
-+     */
-+    case 24:
-+        r =3D s->ReferencePerformanceCounter;
-+        break;
-+    /*
-+     * Guest may still access the register by 32bit; add the process to
-+     * eliminate unnecessary warnings
-+     */
-+    case 28:
-+        r =3D s->ReferencePerformanceCounter >> 32;
-+        break;
-+    case 32:
-+        r =3D s->DeliveredPerformanceCounter;
-+        break;
-+    case 36:
-+        r =3D s->DeliveredPerformanceCounter >> 32;
-+        break;
-+
-+    case 40:
-+        r =3D s->PerformanceLimited;
-+        break;
-+    case 44:
-+        r =3D s->LowestFreq;
-+        break;
-+    case 48:
-+        r =3D s->NominalFreq;
-+        break;
-+    default:
-+        error_printf("cpufreq_read: Bad offset 0x%lx\n", offset);
-+        r =3D 0;
-+        break;
-+    }
-+    return r;
-+}
-+
-+static void cpufreq_write(void *opaque, hwaddr offset,
-+                           uint64_t value, unsigned size)
-+{
-+    uint64_t n;
-+
-+    MachineState *ms =3D MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus =3D ms->smp.cpus;
-+
-+    if (offset >=3D smp_cpus * CPPC_REG_PER_CPU_STRIDE) {
-+        error_printf("cpufreq_write: offset 0x%lx out of range", offset)=
-;
-+        return;
-+    }
-+
-+    n =3D offset % CPPC_REG_PER_CPU_STRIDE;
-+
-+    switch (n) {
-+    case 20:
-+        break;
-+    default:
-+        error_printf("cpufreq_write: Bad offset 0x%lx\n", offset);
-+    }
-+}
-+
-+static uint32_t CPPC_Read(const char *hostpath)
-+{
-+    int fd;
-+    char buffer[HZ_MAX_LENGTH] =3D { 0 };
-+    uint64_t hz;
-+    int len;
-+    const char *endptr =3D NULL;
-+    int ret;
-+
-+    fd =3D qemu_open(hostpath, O_RDONLY);
-+    if (fd < 0) {
-+        return 0;
-+    }
-+
-+    len =3D read(fd, buffer, HZ_MAX_LENGTH);
-+    qemu_close(fd);
-+    if (len <=3D 0) {
-+        return 0;
-+    }
-+    ret =3D qemu_strtoul(buffer, &endptr, 0, &hz);
-+    if (ret < 0) {
-+        return 0;
-+    }
-+    return (uint32_t)hz;
-+}
-+
-+static const MemoryRegionOps cpufreq_ops =3D {
-+    .read =3D cpufreq_read,
-+    .write =3D cpufreq_write,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void hz_init(CpufreqState *s)
-+{
-+    uint32_t hz;
-+
-+    hz =3D CPPC_Read(NOMINAL_FREQ_FILE);
-+    if (hz =3D=3D 0) {
-+        hz =3D CPPC_Read(CPU_MAX_FREQ_FILE);
-+        /* Value in CpuMaxFrequency is in KHz unit; convert to MHz */
-+        hz =3D hz / 1000;
-+    }
-+
-+    s->HighestPerformance =3D hz;
-+    s->NominalPerformance =3D hz;
-+    s->LowestNonlinearPerformance =3D hz;
-+    s->LowestPerformance =3D hz;
-+    s->GuaranteedPerformance =3D hz;
-+    s->DesiredPerformance =3D hz;
-+    s->ReferencePerformanceCounter =3D 1;
-+    s->DeliveredPerformanceCounter =3D 1;
-+    s->PerformanceLimited =3D 0;
-+    s->LowestFreq =3D hz;
-+    s->NominalFreq =3D hz;
-+}
-+
-+static void cpufreq_init(Object *obj)
-+{
-+    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-+    CpufreqState *s =3D CPUFREQ(obj);
-+
-+    MachineState *ms =3D MACHINE(qdev_get_machine());
-+    unsigned int smp_cpus =3D ms->smp.cpus;
-+
-+    s->reg_size =3D smp_cpus * CPPC_REG_PER_CPU_STRIDE;
-+    if (s->reg_size > MAX_SUPPORT_SPACE) {
-+        error_report("Required space 0x%x excesses the maximun size 0x%x=
-",
-+                 s->reg_size, MAX_SUPPORT_SPACE);
-+        abort();
-+    }
-+
-+    memory_region_init_io(&s->iomem, OBJECT(s), &cpufreq_ops, s, "cpufre=
-q",
-+                          s->reg_size);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    hz_init(s);
-+    return;
-+}
-+
-+static const TypeInfo cpufreq_info =3D {
-+    .name          =3D TYPE_CPUFREQ,
-+    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(CpufreqState),
-+    .instance_init =3D cpufreq_init,
-+};
-+
-+static void cpufreq_register_types(void)
-+{
-+    type_register_static(&cpufreq_info);
-+}
-+
-+type_init(cpufreq_register_types)
---=20
-2.19.1
-
-
+PiBGcm9tOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwg
+RmVicnVhcnkgMTIsIDIwMjAgNTo1NyBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRl
+bC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYzIDE0LzI1XSBpbnRlbF9pb21tdTogYWRkIHZp
+cnR1YWwgY29tbWFuZCBjYXBhYmlsaXR5IHN1cHBvcnQNCj4gDQo+IE9uIFdlZCwgSmFuIDI5LCAy
+MDIwIGF0IDA0OjE2OjQ1QU0gLTA4MDAsIExpdSwgWWkgTCB3cm90ZToNCj4gPiArLyoNCj4gPiAr
+ICogVGhlIGJhc2ljIGlkZWEgaXMgdG8gbGV0IGh5cGVydmlzb3IgdG8gc2V0IGEgcmFuZ2UgZm9y
+IGF2YWlsYWJsZQ0KPiA+ICsgKiBQQVNJRHMgZm9yIFZNcy4gT25lIG9mIHRoZSByZWFzb25zIGlz
+IFBBU0lEICMwIGlzIHJlc2VydmVkIGJ5DQo+ID4gKyAqIFJJRF9QQVNJRCB1c2FnZS4gV2UgaGF2
+ZSBubyBpZGVhIGhvdyBtYW55IHJlc2VydmVkIFBBU0lEcyBpbiBmdXR1cmUsDQo+ID4gKyAqIHNv
+IGhlcmUganVzdCBhbiBldmFsdWF0ZWQgdmFsdWUuIEhvbmVzdGx5LCBzZXQgaXQgYXMgIjEiIGlz
+IGVub3VnaA0KPiA+ICsgKiBhdCBjdXJyZW50IHN0YWdlLg0KPiA+ICsgKi8NCj4gPiArI2RlZmlu
+ZSBWVERfTUlOX0hQQVNJRCAgICAgICAgICAgICAgMQ0KPiA+ICsjZGVmaW5lIFZURF9NQVhfSFBB
+U0lEICAgICAgICAgICAgICAweEZGRkZGDQo+IA0KPiBPbmUgbW9yZSBxdWVzdGlvbjogSSBzZWUg
+dGhhdCBQQVNJRCBpcyBkZWZpbmVkIGFzIDIwYml0cyBsb25nLiAgSXQncw0KPiBmaW5lLiAgSG93
+ZXZlciBJIHN0YXJ0IHRvIGdldCBjb25mdXNlZCBvbiBob3cgdGhlIFNjYWxhYmxlIE1vZGUgUEFT
+SUQNCj4gRGlyZWN0b3J5IGNvdWxkIHNlcnZpY2UgdGhhdCBtdWNoIG9mIFBBU0lEIGVudHJpZXMu
+DQo+IA0KPiBJJ20gbG9va2luZyBhdCBzcGVjIDMuNC4zLCBGaWd1cmUgMy04Lg0KPiANCj4gRmly
+c3RseSwgd2Ugb25seSBoYXZlIHR3byBsZXZlbHMgZm9yIGEgUEFTSUQgdGFibGUuICBUaGUgY29u
+dGV4dCBlbnRyeQ0KPiBvZiBhIGRldmljZSBzdG9yZXMgYSBwb2ludGVyIHRvIHRoZSAiU2NhbGFi
+bGUgTW9kZSBQQVNJRCBEaXJlY3RvcnkiDQo+IHBhZ2UuIEkgc2VlIHRoYXQgdGhlcmUncmUgMl4x
+NCBlbnRyaWVzIGluICJTY2FsYWJsZSBNb2RlIFBBU0lEDQo+IERpcmVjdG9yeSIgcGFnZSwgZWFj
+aCBpcyBhICJTY2FsYWJsZSBNb2RlIFBBU0lEIFRhYmxlIi4NCj4gSG93ZXZlci4uLiBob3cgZG8g
+d2UgZml0IGluIHRoZSA0SyBwYWdlIGlmIGVhY2ggZW50cnkgaXMgYSBwb2ludGVyIG9mDQo+IHg4
+Nl82NCAoOCBieXRlcykgd2hpbGUgdGhlcmUncmUgMl4xNCBlbnRyaWVzPyAgQSBzaW1wbGUgbWF0
+aCBnaXZlcyBtZQ0KPiA0Sy84ID0gNTEyLCB3aGljaCBtZWFucyB0aGUgIlNjYWxhYmxlIE1vZGUg
+UEFTSUQgRGlyZWN0b3J5IiBwYWdlIGNhbg0KPiBvbmx5IGhhdmUgNTEyIGVudHJpZXMsIHRoZW4g
+aG93IHRoZSAyXjE0IGNvbWUgZnJvbT8gIEhtbT8/DQoNCkkgY2hlY2tlZCB3aXRoIEtldmluLiBU
+aGUgc3BlYyBkb2Vzbid0IHNheSB0aGUgZGlyIHRhYmxlIGlzIDRLLiBJdCBzYXlzIDRLDQpvbmx5
+IGZvciBwYXNpZCB0YWJsZS4gQWxzbywgaWYgeW91IGxvb2sgYXQgOS40LCBzY2FsYWJlLW1vZGUg
+Y29udGV4dCBlbnRyeQ0KaW5jbHVkZXMgYSBQRFRTIGZpZWxkIHRvIHNwZWNpZnkgdGhlIGFjdHVh
+bCBzaXplIG9mIHRoZSBkaXJlY3RvcnkgdGFibGUuDQoNCj4gQXBhcnQgb2YgdGhpczogYWxzbyBJ
+IGp1c3Qgbm90aWNlZCAod2hlbiByZWFkaW5nIHRoZSBsYXR0ZXIgcGFydCBvZg0KPiB0aGUgc2Vy
+aWVzKSB0aGF0IHRoZSB0aW1lIHRoYXQgYSBwYXNpZCB0YWJsZSB3YWxrIGNhbiBjb25zdW1lIHdp
+bGwNCj4gZGVwZW5kIG9uIHRoaXMgdmFsdWUgdG9vLiAgSSdkIHN1Z2dlc3QgdG8gbWFrZSB0aGlz
+IGFzIHNtYWxsIGFzIHdlDQo+IGNhbiwgYXMgbG9uZyBhcyBpdCBzYXRpc2ZpZXMgdGhlIHVzYWdl
+LiAgV2UgY2FuIGV2ZW4gYnVtcCBpdCBpbiB0aGUNCj4gZnV0dXJlLg0KDQpJIHNlZS4gVGhpcyBs
+b29rcyB0byBiZSBhbiBvcHRpbWl6YXRpb24uIHJpZ2h0PyBJbnN0ZWFkIG9mIG1vZGlmeSB0aGUN
+CnZhbHVlIG9mIHRoaXMgbWFjcm8sICBJIHRoaW5rIHdlIGNhbiBkbyB0aGlzIG9wdGltaXphdGlv
+biBieSB0cmFja2luZw0KdGhlIGFsbG9jYXRlZCBQQVNJRHMgaW4gUUVNVS4gVGh1cywgdGhlIHBh
+c2lkIHRhYmxlIHdhbGsgIHdvdWxkIGJlIG1vcmUNCmVmZmljaWVudCBhbmQgYWxzbyBubyBkZXBl
+bmRlbmN5IG9uIHRoZSBWVERfTUFYX0hQQVNJRC4gRG9lcyBpdCBtYWtlDQpzZW5zZSB0byB5b3U/
+IDotKQ0KDQpSZWdhcmRzLA0KWWkgTGl1DQo=
 
