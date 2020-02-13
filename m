@@ -2,79 +2,99 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2D54C3B189
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4BAC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:35:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B227920675
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:35:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B5CB20675
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:35:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SOdYdeOn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B227920675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZHUzxY/4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B5CB20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2GWW-0008Rj-U2
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:35:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45651)
+	id 1j2GWu-0000Jn-PN
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:35:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j2GUy-0007Wh-6n
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:33:54 -0500
+ (envelope-from <philmd@redhat.com>) id 1j2GV0-0007XR-3A
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:33:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j2GUv-0006rI-Cl
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:33:51 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37537
+ (envelope-from <philmd@redhat.com>) id 1j2GUy-0006uk-06
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:33:53 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29879
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j2GUv-0006pl-8e
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:33:49 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j2GUx-0006ox-Sl
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:33:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581608028;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1581608026;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zPvEH8Mzcl+eY8F2e6aHCjg9d41U5lr+/0NzmEpBBVw=;
- b=SOdYdeOn9sj5pBCbgwU1AEiIno7VqrQYAMrYyUUKAmw/0j38bybJqRs+Fw+WqhG/9guUX+
- jlStUuuBCntvmDPgHhEDJHcFtvFsoB+LamWYIbQak0b5SoVGDH4DbyUDtR4ZUsRb2N0WGA
- 15MxQGQ3ILixO+hmrbhwHWaYy8pMtoM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-h9jvieWQNgW1UKSTC3omgw-1; Thu, 13 Feb 2020 10:33:45 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF4AF1005502
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 15:33:44 +0000 (UTC)
-Received: from redhat.com (ovpn-116-40.ams2.redhat.com [10.36.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D09026FAA;
- Thu, 13 Feb 2020 15:33:44 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v5 7/8] multifd: Add multifd-zstd-level parameter
-In-Reply-To: <87wo8q4m84.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Thu, 13 Feb 2020 15:04:43 +0100")
-References: <20200129115655.10414-1-quintela@redhat.com>
- <20200129115655.10414-8-quintela@redhat.com>
- <20200211184749.GI2751@work-vm> <87wo8q4m84.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Thu, 13 Feb 2020 16:33:40 +0100
-Message-ID: <87imkalcx7.fsf@secure.laptop>
+ bh=GDWid6/iq8siU8ZHevmjU4sE5uKGLFLX3QyEuxy3bsw=;
+ b=ZHUzxY/41PCmSI5T/ZxUUbcXehYsLvqnBLjMLSLa+SUgdAaYh2sPvDQlGurGCd2vANLl+i
+ Mrf9FtiEVXu5O5PQfMZXuJkGzY2CYKn1jjJdUFX6yDE8vL5BLLS4t2d19eQ50w/F6MY1vD
+ 0cSHE1E9HXCilpT/j7plgeYd6AgAINk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-wh8a24o0PFGD9s4QztFBRg-1; Thu, 13 Feb 2020 10:33:40 -0500
+Received: by mail-wr1-f70.google.com with SMTP id t6so2495250wru.3
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 07:33:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lnyI72nC5aJyDHvLxnHY68BclaJOoav9SKihz+lhs3s=;
+ b=jeD3fdfscrOTNH114mEHhGTdQHiBdL3YLubH2crMs9CebNVpuU4t89pZpO4dfIG4ld
+ Hct8AKvbBb/pyihbV66nswzJAixr76LDNzqUscRrKlqeW6q7kSJmpvx4TIfIVbN0kKqR
+ wvadWl9MA+p1dt9da5d/JscX6qnN8rE9w2z5b4jtfxn++5XV1FbAKXeTMH4CpcjV+9vN
+ 9s7KmHX9owNKOTXy7WTsoUmArVgQIfIcug4+AOP17x2EXHlrD4AvDd1lZruoKx4Ux1EM
+ mmD7Gl9fNnsK0YC69n++WpFKN3BrHXMUnMMMBGtcfQC3Mb02a4X6Q9ZdzyXaD0+qvFok
+ uQyA==
+X-Gm-Message-State: APjAAAXl2uHv2W3CW20VC1DrleeBYngZpYHwo/3HiGHOySzAtfIXYs8B
+ DJjabCTshxnNLLEJ5Y0GrEhicNxDNoXBZNzXQWKBJL9e1Pu4aDGM7yrWVQGlE3IqmYr1xecQbVG
+ ARZKk1bsemVNsax8=
+X-Received: by 2002:adf:fe50:: with SMTP id m16mr23495891wrs.217.1581608019534; 
+ Thu, 13 Feb 2020 07:33:39 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxg/1vydOdoQIVQxpqJka6ohDjJsEBhtsdTV8ZkKJuOBOl3rs7y1oILJtTWgHUWvWlsniXojg==
+X-Received: by 2002:adf:fe50:: with SMTP id m16mr23495868wrs.217.1581608019289; 
+ Thu, 13 Feb 2020 07:33:39 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id t128sm3618227wmf.28.2020.02.13.07.33.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 13 Feb 2020 07:33:38 -0800 (PST)
+Subject: Re: [PATCH v3 12/13] hw/arm/raspi: Use a unique
+ raspi_machine_class_init() method
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200208165645.15657-1-f4bug@amsat.org>
+ <20200208165645.15657-13-f4bug@amsat.org>
+ <CAFEAcA8e4NqwKPM6qx=vKm6NOz__=S90trhUuhaSNe_yJ8GeXg@mail.gmail.com>
+ <0d72fad3-3eef-66ff-2162-f0c07ba01ff2@redhat.com>
+ <CAFEAcA9x6=Hxqwjacc3ZXUJy1P0xxKt-oqiZf1Fm=f1d8f63xQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d3e9caeb-345c-4596-eff1-059a8cc94a8e@redhat.com>
+Date: Thu, 13 Feb 2020 16:33:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: h9jvieWQNgW1UKSTC3omgw-1
+In-Reply-To: <CAFEAcA9x6=Hxqwjacc3ZXUJy1P0xxKt-oqiZf1Fm=f1d8f63xQ@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: wh8a24o0PFGD9s4QztFBRg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
@@ -89,101 +109,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Joaquin de Andres <me@xcancerberox.com.ar>,
+ Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Esteban Bosse <estebanbosse@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
->
->> * Juan Quintela (quintela@redhat.com) wrote:
->>> Signed-off-by: Juan Quintela <quintela@redhat.com>
->>> ---
->>>  migration/migration.c | 15 +++++++++++++++
->>>  monitor/hmp-cmds.c    |  4 ++++
->>>  qapi/migration.json   | 29 ++++++++++++++++++++++++++---
->>>  3 files changed, 45 insertions(+), 3 deletions(-)
->>>=20
->>> diff --git a/migration/migration.c b/migration/migration.c
->>> index 3b081e8147..b690500545 100644
->>> --- a/migration/migration.c
->>> +++ b/migration/migration.c
->>> @@ -91,6 +91,8 @@
->>>  #define DEFAULT_MIGRATE_MULTIFD_METHOD MULTIFD_METHOD_NONE
->>>  /*0: means nocompress, 1: best speed, ... 9: best compress ratio */
->>>  #define DEFAULT_MIGRATE_MULTIFD_ZLIB_LEVEL 1
->>> +/* 0: means nocompress, 1: best speed, ... 20: best compress ratio */
->>> +#define DEFAULT_MIGRATE_MULTIFD_ZSTD_LEVEL 1
->>> =20
->>>  /* Background transfer rate for postcopy, 0 means unlimited, note
->>>   * that page requests can still exceed this limit.
->>> @@ -805,6 +807,8 @@ MigrationParameters *qmp_query_migrate_parameters(E=
-rror **errp)
->>>      params->multifd_method =3D s->parameters.multifd_method;
->>>      params->has_multifd_zlib_level =3D true;
->>>      params->multifd_zlib_level =3D s->parameters.multifd_zlib_level;
->>> +    params->has_multifd_zstd_level =3D true;
->>> +    params->multifd_zstd_level =3D s->parameters.multifd_zstd_level;
+On 2/13/20 3:32 PM, Peter Maydell wrote:
+> On Thu, 13 Feb 2020 at 14:16, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+>> On 2/13/20 2:59 PM, Peter Maydell wrote:
+>>> The natural way to implement this is to have the .class_data
+>>> be a pointer to a struct which is in an array and defines
+>>> relevant per-class stuff, the same way we do in
+>>> bcm2836_register_types(). That way the struct can indicate
+>>> both the board revision number and also "is this a legacy
+>>> board that needs transaction-failures disabled?".
 >>
->> Do we really want different 'multifd_...._level's or just one
->> 'multifd_compress_level' - or even just reuse the existing
->> 'compress-level' parameter.
->
-> compress-level,
+>> IIUC Igor insists explaining that he doesn't accept anymore a
+>> ".class_data pointer to a struct which is in an array and defines
+>> relevant per-class stuff" and we should not use this pattern anymore.
+>=20
+> Huh? How else would you do this? I'm kinda dubious about the
+> pattern this patch series uses of just stuffing a 32-bit board
+> ID number into the class_data field, to be honest -- I let that
+> pass partly not to hold up the series but partly because I
+> expect that we'll need to turn it back into a proper pointer
+> to a data struct soonish.
 
-possible values: 1 to 9 deprecated
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg678305.html
 
-> multifd-zlib-level
+Igor> we sometimes use .class_data when creating many
+       derived types (typical example CPU types (x86))
+       where it's impractical to code leaf class_init
+       functions. I'd use .class_data in cases where I
+       can't get away with explicit .class_init
 
-possible values: 1 to 9, default 1
-(zlib default is -1, let the lib decide)
+Which I understand as:
 
-, and multifd-zstd-level apply
-
-possible values: 1 to 19, default 1
-(zstd default is 3)
-
-> "normal" live migration compression, multifd zlib live migration
-> compression, and multifd zstd live migration compression, respectively.
->
-> Any live migration can only use one of the three compressions.
->
-> Correct?
-
-Yeap.
-
->> The only tricky thing about combining them is how to handle
->> the difference in allowed ranges;  When would the right time be
->> to check it?
->>
->> Markus/Eric: Any idea?
->
-> To have an informed opinion, I'd have to dig through the migration
-> code.
-
-Problem is _how_ to setup them.  if we setup zstd compression method,
-put the value at 19, and then setup zlib compression method, what should
-we do?
-
-Truncate to 9?
-Give one error?
-Don't allow the zlib setup?
-
-Too complicated.
-
-> Documentation of admissible range will become a bit awkward, too.
->
-> Too many migration parameters...
-
-Sure, but the other option is taking a value and live with it.
-I am all for leaving the library default and call it a day.
-
-Later, Juan.
+- avoid .class_data (pointers to structures)
+- explicitly set ObjectClass::fields in .class_init()
+   by open-coding all.
 
 
