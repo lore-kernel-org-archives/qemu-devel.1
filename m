@@ -2,86 +2,88 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 214AEC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B810C3B18C
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:03:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E559C24649
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:03:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B3602465D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:03:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u8Mm/N4h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E559C24649
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SwbREz+7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B3602465D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2G1h-0006fO-20
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:03:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60234)
+	id 1j2G1w-0006zy-8r
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:03:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Fgx-0004Mj-8W
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:12 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j2FhR-0004uk-Oh
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Fgt-0001os-0G
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:11 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:39374)
+ (envelope-from <peter.maydell@linaro.org>) id 1j2FhO-0002RP-7k
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:39 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35099)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2Fgs-0001nQ-QW
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:06 -0500
-Received: by mail-wr1-x429.google.com with SMTP id y11so6975643wrt.6
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:42:06 -0800 (PST)
+ id 1j2FhN-0002LX-Vf
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:38 -0500
+Received: by mail-wm1-x342.google.com with SMTP id b17so7045716wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:42:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=qM64BUtAr1z/gzsTM4GBdk2IcG0HXVAZX8dYXOH96BA=;
- b=u8Mm/N4hZAl7gR3keulCxy1dyGb85TerAxIlKCGkr2IB5Y1unMbOBN0GZGEdmGDcq+
- cosGMYRLAk+Uwa2ryQhFssnZybaQrI99GCaXQWI5rO0MvZq/tYUkMfpJpzBtmbqrsm7M
- 40Qg4gA/2Iz+2tkNWVXXqgz80yX9BJQ5rD8MHVHdeeuLFBLD4e2Zt+IOAMUHZRL93d3N
- 6kmse1eTAlKT8HLrFpHuDMAwUE+JAquhaIa3/gIDt+HWC0q3PM1xkDsAOE6v1MyyYRf6
- 1icvjRzdUf4LMAe6h+nQwQTtcd8K6m6eIHR9GqOz2AwoWpsHrZB0D/en5rE4WtdomCLH
- 9jkQ==
+ bh=UA8JO5a7csYlOT0FpOll3VhjQ+P4Rnh4Fm3iNx+U6Js=;
+ b=SwbREz+7s60pP+S44IV7mT0OtICjhRjglpby+mYEsg0Yym+ElBFRqsQeAt1X0ihZVW
+ 55v4fGSMDRE4UUHAVuPF9+ds3ehdLD7YqEj4lpVnEBLQUsyK45i4CzFmabBI3RHckyET
+ npcdT1V0ie5KxKwQf18hnP1+sM3kgg3voBt1ol8fP9BQiA8XNXAe3/RNt5jEZJ42bHqF
+ xssUhQBOoZpu0+s/Tb2FmLlTNVdU+YNYYYFWnqTWZmHi4RRAewlaLnFe49w5xdRMoJnJ
+ 9VBgbGXTw3ms4cNLZxWGpNC4PAhHIBX+Io4w+GuHK82keBLoiquY5O8CMj7IRVbV6/Zy
+ ZZNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=qM64BUtAr1z/gzsTM4GBdk2IcG0HXVAZX8dYXOH96BA=;
- b=ELstgiutbkY16pnJAgQiNd4Pc57xnASUDllAPoiJBgp2Oag30g0SZEiJ5Hcp0WqltY
- W8DwM+yaHLo/EWz3WwAhYExUAfP0sADc8zV3sAj2rBiNnX6lDp2AqHZ5h1HEXKIQS04F
- POa9fIuWlQhUGiSQLLFCIJO7tAFSRorvoZEVwlPiurQrjhRUa+zbEk+NiNTMg62X+hH6
- 8hLH2FMlCA4TJoxZveXw9vHiwPJcHxZr9RQD8HhB5oHhfpNCkIhWzTUyQ7/bSQdIjKQf
- jk2vhWGlE099iaYaHBDF5BmSx2iX2guEuWw9osFDBfgVznUB+f8PPLenJ7Z/2LR2LGkH
- bVkA==
-X-Gm-Message-State: APjAAAXPnMjDf/0B2Z22f41mDJyqplsgKXYW5E/YnUI3/PIShDc4wQhJ
- +Hi5BbxS0Yt6wtjEcLff6b/KOBlN/x4=
-X-Google-Smtp-Source: APXvYqwqUbpX6PPHB0K9/5wXy3zMloZ19RB8C0BLOWDYrkejCReBbhBvEVYigW8YoF/RfQNpTwtaqw==
-X-Received: by 2002:a5d:638f:: with SMTP id p15mr21851653wru.402.1581604925465; 
- Thu, 13 Feb 2020 06:42:05 -0800 (PST)
+ bh=UA8JO5a7csYlOT0FpOll3VhjQ+P4Rnh4Fm3iNx+U6Js=;
+ b=aPexbUEAGrC3fK8tTCVFfRxyDdtq4hTKgifPD/fxmkuu96NDAXhNJzv9sj7wcxkUYM
+ FxQucuVZRGsUNdrVVIsHDDdY3QIbsYZvT3497E3jn/xwXTfvmy72PUQg0EWbie2g9ENy
+ pa/Xf65OgNqQ2/JqDQ2hJM2h9u/Cpi5BqDV0wh7t7Q4bXpN7uiYOcmJzTkcKng7yyRlG
+ 9ea0gEPwJEmhTk38laQyptstVv4NZW8YcPqRfcRwogva3oeqIenJbyBCQcfNn/uCsRiu
+ RYDtGUkFSjByvJH2qMPMZx9Gdfa7PeW2j6MuaxAq8K3VSE17cATaMvkfRBKOqNaLV5DT
+ VXqQ==
+X-Gm-Message-State: APjAAAVZH7JCfIVAM7w6pXQR/z0IQEhziPhpcuAKhVFShVTOsji1uJ/n
+ uYw3g5WMolDB1rg1kKgNR5ns3GnL8lQ=
+X-Google-Smtp-Source: APXvYqyvpDwisoXO0nByDuL7QJ3PNteQwFWDkoVoQg/8lwDI8/csSV9rWbkTiFLIhs4tqaHMCo2C7g==
+X-Received: by 2002:a05:600c:211:: with SMTP id
+ 17mr6142604wmi.60.1581604952483; 
+ Thu, 13 Feb 2020 06:42:32 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e22sm3362454wme.45.2020.02.13.06.42.04
+ by smtp.gmail.com with ESMTPSA id e22sm3362454wme.45.2020.02.13.06.42.31
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 06:42:04 -0800 (PST)
+ Thu, 13 Feb 2020 06:42:31 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/46] target/arm: Split out aarch32_cpsr_valid_mask
-Date: Thu, 13 Feb 2020 14:41:13 +0000
-Message-Id: <20200213144145.818-15-peter.maydell@linaro.org>
+Subject: [PULL 40/46] hw/arm/raspi: Make board_rev a field of RaspiMachineClass
+Date: Thu, 13 Feb 2020 14:41:39 +0000
+Message-Id: <20200213144145.818-41-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200213144145.818-1-peter.maydell@linaro.org>
 References: <20200213144145.818-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,116 +99,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Split this helper out of msr_mask in translate.c.  At the same time,
-transform the negative reductive logic to positive accumulative logic.
-It will be usable along the exception paths.
+We want to have a common class_init(). The only value that
+matters (and changes) is the board revision.
+Pass the board_rev as class_data to class_init().
 
-While touching msr_mask, fix up formatting.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20200208165645.15657-9-f4bug@amsat.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200208125816.14954-6-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/internals.h | 21 +++++++++++++++++++++
- target/arm/translate.c | 40 +++++++++++++++++-----------------------
- 2 files changed, 38 insertions(+), 23 deletions(-)
+ hw/arm/raspi.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 6be8b2d1a9b..4d4896fcdcf 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1061,6 +1061,27 @@ static inline bool arm_mmu_idx_is_stage1_of_2(ARMMMUIdx mmu_idx)
-     }
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index 62b8df3c2e7..fbfcd297326 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -46,6 +46,7 @@ typedef struct RaspiMachineClass {
+     /*< private >*/
+     MachineClass parent_obj;
+     /*< public >*/
++    uint32_t board_rev;
+ } RaspiMachineClass;
+ 
+ #define TYPE_RASPI_MACHINE       MACHINE_TYPE_NAME("raspi-common")
+@@ -227,9 +228,11 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
+     arm_load_kernel(ARM_CPU(first_cpu), machine, &binfo);
  }
  
-+static inline uint32_t aarch32_cpsr_valid_mask(uint64_t features,
-+                                               const ARMISARegisters *id)
-+{
-+    uint32_t valid = CPSR_M | CPSR_AIF | CPSR_IL | CPSR_NZCV | CPSR_J;
-+
-+    if ((features >> ARM_FEATURE_V4T) & 1) {
-+        valid |= CPSR_T;
-+    }
-+    if ((features >> ARM_FEATURE_V5) & 1) {
-+        valid |= CPSR_Q; /* V5TE in reality*/
-+    }
-+    if ((features >> ARM_FEATURE_V6) & 1) {
-+        valid |= CPSR_E | CPSR_GE;
-+    }
-+    if ((features >> ARM_FEATURE_THUMB2) & 1) {
-+        valid |= CPSR_IT;
-+    }
-+
-+    return valid;
-+}
-+
- /*
-  * Parameters of a given virtual address, as extracted from the
-  * translation control register (TCR) for a given regime.
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index d58c328e08e..20f89ace2fd 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -2734,39 +2734,33 @@ static inline void gen_mulxy(TCGv_i32 t0, TCGv_i32 t1, int x, int y)
- /* Return the mask of PSR bits set by a MSR instruction.  */
- static uint32_t msr_mask(DisasContext *s, int flags, int spsr)
+-static void raspi_init(MachineState *machine, uint32_t board_rev)
++static void raspi_init(MachineState *machine)
  {
--    uint32_t mask;
-+    uint32_t mask = 0;
++    RaspiMachineClass *mc = RASPI_MACHINE_GET_CLASS(machine);
+     RaspiMachineState *s = RASPI_MACHINE(machine);
++    uint32_t board_rev = mc->board_rev;
+     int version = board_version(board_rev);
+     uint64_t ram_size = board_ram_size(board_rev);
+     uint32_t vcram_size;
+@@ -279,13 +282,16 @@ static void raspi_init(MachineState *machine, uint32_t board_rev)
  
--    mask = 0;
--    if (flags & (1 << 0))
-+    if (flags & (1 << 0)) {
-         mask |= 0xff;
--    if (flags & (1 << 1))
-+    }
-+    if (flags & (1 << 1)) {
-         mask |= 0xff00;
--    if (flags & (1 << 2))
-+    }
-+    if (flags & (1 << 2)) {
-         mask |= 0xff0000;
--    if (flags & (1 << 3))
-+    }
-+    if (flags & (1 << 3)) {
-         mask |= 0xff000000;
-+    }
- 
--    /* Mask out undefined bits.  */
--    mask &= ~CPSR_RESERVED;
--    if (!arm_dc_feature(s, ARM_FEATURE_V4T)) {
--        mask &= ~CPSR_T;
--    }
--    if (!arm_dc_feature(s, ARM_FEATURE_V5)) {
--        mask &= ~CPSR_Q; /* V5TE in reality*/
--    }
--    if (!arm_dc_feature(s, ARM_FEATURE_V6)) {
--        mask &= ~(CPSR_E | CPSR_GE);
--    }
--    if (!arm_dc_feature(s, ARM_FEATURE_THUMB2)) {
--        mask &= ~CPSR_IT;
--    }
--    /* Mask out execution state and reserved bits.  */
-+    /* Mask out undefined and reserved bits.  */
-+    mask &= aarch32_cpsr_valid_mask(s->features, s->isar);
-+
-+    /* Mask out execution state.  */
-     if (!spsr) {
--        mask &= ~(CPSR_EXEC | CPSR_RESERVED);
-+        mask &= ~CPSR_EXEC;
-     }
-+
-     /* Mask out privileged bits.  */
--    if (IS_USER(s))
-+    if (IS_USER(s)) {
-         mask &= CPSR_USER;
-+    }
-     return mask;
+ static void raspi2_init(MachineState *machine)
+ {
+-    raspi_init(machine, 0xa21041);
++    raspi_init(machine);
  }
  
+ static void raspi2_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
++    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
++    uint32_t board_rev = (uint32_t)(uintptr_t)data;
+ 
++    rmc->board_rev = board_rev;
+     mc->desc = "Raspberry Pi 2B";
+     mc->init = raspi2_init;
+     mc->block_default_type = IF_SD;
+@@ -302,13 +308,16 @@ static void raspi2_machine_class_init(ObjectClass *oc, void *data)
+ #ifdef TARGET_AARCH64
+ static void raspi3_init(MachineState *machine)
+ {
+-    raspi_init(machine, 0xa02082);
++    raspi_init(machine);
+ }
+ 
+ static void raspi3_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
++    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
++    uint32_t board_rev = (uint32_t)(uintptr_t)data;
+ 
++    rmc->board_rev = board_rev;
+     mc->desc = "Raspberry Pi 3B";
+     mc->init = raspi3_init;
+     mc->block_default_type = IF_SD;
+@@ -327,11 +336,13 @@ static const TypeInfo raspi_machine_types[] = {
+         .name           = MACHINE_TYPE_NAME("raspi2"),
+         .parent         = TYPE_RASPI_MACHINE,
+         .class_init     = raspi2_machine_class_init,
++        .class_data     = (void *)0xa21041,
+ #ifdef TARGET_AARCH64
+     }, {
+         .name           = MACHINE_TYPE_NAME("raspi3"),
+         .parent         = TYPE_RASPI_MACHINE,
+         .class_init     = raspi3_machine_class_init,
++        .class_data     = (void *)0xa02082,
+ #endif
+     }, {
+         .name           = TYPE_RASPI_MACHINE,
 -- 
 2.20.1
 
