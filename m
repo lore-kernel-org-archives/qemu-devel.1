@@ -2,51 +2,52 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92527C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 14:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE58C3B189
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 14:27:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57BB720873
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 14:27:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57BB720873
+	by mail.kernel.org (Postfix) with ESMTPS id A8E6820873
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 14:27:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8E6820873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2FSf-00013X-IA
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 09:27:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57057)
+	id 1j2FSg-00016i-Qz
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 09:27:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1j2FRc-00083y-Kc
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1j2FRc-00083x-KT
  for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:26:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1j2FRZ-0007Ur-0s
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1j2FRZ-0007Uw-11
  for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:26:19 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:47109 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:47242 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1j2FRX-00058Q-Un
+ id 1j2FRX-00059a-VP
  for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:26:16 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 0388C1A20E0;
+ by mail.rt-rk.com (Postfix) with ESMTP id 21EF61A214E;
  Thu, 13 Feb 2020 15:25:11 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
  [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id A51D01A2084;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id B9DF81A1E01;
  Thu, 13 Feb 2020 15:25:10 +0100 (CET)
 From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/2] tests/tcg/multiarch: Add tests for implemented rtc
- ioctls
-Date: Thu, 13 Feb 2020 15:25:04 +0100
-Message-Id: <1581603905-21565-2-git-send-email-Filip.Bozuta@rt-rk.com>
+Subject: [PATCH v2 2/2] tests/tcg/multiarch: Add tests for implemented alsa
+ sound timer ioctls
+Date: Thu, 13 Feb 2020 15:25:05 +0100
+Message-Id: <1581603905-21565-3-git-send-email-Filip.Bozuta@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1581603905-21565-1-git-send-email-Filip.Bozuta@rt-rk.com>
 References: <1581603905-21565-1-git-send-email-Filip.Bozuta@rt-rk.com>
@@ -68,40 +69,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds tests for following 22 implemented rtc ioctls:
+This patch adds tests for following 14 implemented alsa timer ioctls:
 
-* RTC_AIE_ON     * RTC_ALM_SET      * RTC_WKALM_SET
-* RTC_AIE_OFF    * RTC_ALM_READ     * RTC_WKALM_RD
-* RTC_UIE_ON     * RTC_RD_TIME      * RTC_PLL_GET
-* RTC_UIE_OFF    * RTC_SET_TIME     * RTC_PLL_SET
-* RTC_PIE_ON     * RTC_IRQP_READ    * RTC_VL_READ
-* RTC_PIE_OFF    * RTC_IRQP_SET     * RTC_VL_CLR
-* RTC_WIE_ON     * RTC_EPOCH_READ
-* RTC_WIE_OFF    * RTC_EPOCH_SET
+* SNDRV_TIMER_IOCTL_PVERSION        * SNDRV_TIMER_IOCTL_INFO
+* SNDRV_TIMER_IOCTL_NEXT_DEVICE     * SNDRV_TIMER_IOCTL_PARAMS
+* SNDRV_TIMER_IOCTL_TREAD           * SNDRV_TIMER_IOCTL_STATUS
+* SNDRV_TIMER_IOCTL_GINFO           * SNDRV_TIMER_IOCTL_START
+* SNDRV_TIMER_IOCTL_GPARAMS         * SNDRV_TIMER_IOCTL_STOP
+* SNDRV_TIMER_IOCTL_GSTATUS         * SNDRV_TIMER_IOCTL_CONTINUE
+* SNDRV_TIMER_IOCTL_SELECT          * SNDRV_TIMER_IOCTL_PAUSE
 
 Names and descriptions of these ioctls can be found in patches that
 implement them.
 
 Test folder for these ioctl tests is located at
-"tests/tcg/multiarch/rtc-ioctl-tests/"
+"tests/tcg/multiarch/alsa-timer-ioctl-tests/"
 
-There are two folders located in the test folder, one for test that was written
-manually ("/manual-test") and one the test that was obtained remotely ("/remote-test").
+There are two folders located in the test folder, one for test that  was written
+manually ("/manual-test") and one for the test that  was obtained remotely ("/remote-test").
 
 Manual test:
 
-    This test was written manually to test all the implemented rtc ioctls and
-    was added at "/manual-test/rtc-ioctl-manual-test.c". A separate test function
-    was written for each ioctl. Each of these functions uses a global test macro
-    'TEST_RTC_IOCTL' to run these tests. The file can be run to test all ioctls
-    or it can test only the specified ioctls. This depends on the commands
-    specified when running the test.
+    This test was written manually to test all the implemented alsa timer ioctls
+    and was added at "/manual-test/alsa-timer-ioctl-manual-test.c". A separate test
+    function was written for each ioctl. Each of these functions uses a global test
+    macro 'TEST_ALSA_IOCTL' to run these tests. The file can be run to test all ioctls
+    or it can test only the specified ioctls. This depends on the commands specified
+    when running the test.
 
     For Example (assuming 'rtc-ioctl-manual-test' is the compiled .exe file):
 
-      running './rtc-ioctl-manual-test RTC_AIE_ON' tests only the ioctl RTC_AIE_ON
-      running './rtc-ioctl-manual-test  RTC_AIE_ON RTC_SET_TIME RTC_ALM_READ' tests
-      ioctls RTC_AIE_ON, RTC_SET_TIME, RTC_ALM_READ
+      running './alsa-timer-ioctl-manual-test SNDRV_TIMER_IOCTL_TREAD' tests only the
+      ioctl SNDRV_TIMER_IOCTL_TREAD
+
+      running './alsa-timer-ioctl-manual-test  SNDRV_TIMER_IOCTL_INFO SNDRV_TIMER_IOCTL_STOP
+      SNDRV_TIMER_IOCTL_PAUSE' tests ioctls SNDRV_TIMER_IOCTL_INFO, SNDRV_TIMER_IOCTL_STOP,
+      SNDRV_TIMER_IOCTL_PAUSE
 
     If no ioctl is specified when running the test file, all the ioctls
     are tested:
@@ -110,41 +113,41 @@ Manual test:
 
 Remote test:
 
-    Besides the manual test, a remote rtc ioctl test was added at
-    "/remote-test/rtc-test.c". The test file "rtc-test.c" was downloaded
-    from linux kernel and is located at "linux/drivers/rtc/rtc-test.c".
-    This file was modified a little bit so that it doesn't have styling
-    problems identified by "scripts/checkpatch.pl". It is used to further
-    test functionalities of some rtc ioctls by running rtc clock at different
-    frequencies.
+    Besides the manual tests, a remote alsa timer ioctl test was added at
+    "/remote-test/timer.c". This test file was downloaded from a git repository
+    that contains alsa ioctl test suite. This repository is located at
+    "https://github.com/takaswie/alsa-ioctl-test". It is used to test all of the
+    alsa timer ioctls at once by running a test macro defined in that file.
+    The file was modified a little bit by adding an output line that shows which
+    test passed and at which test the program aborts. It was also modified so that
+    it doesn't have styling problems detected by 'scripts/checkpatch.pl'.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 ---
- .../manual-test/rtc-ioctl-manual-test.c            | 352 +++++++++++++++++++++
- .../rtc-ioctl-tests/remote-test/rtc-test.c         | 226 +++++++++++++
- 2 files changed, 578 insertions(+)
- create mode 100644 tests/tcg/multiarch/rtc-ioctl-tests/manual-test/rtc-ioctl-manual-test.c
- create mode 100644 tests/tcg/multiarch/rtc-ioctl-tests/remote-test/rtc-test.c
+ .../manual-test/alsa-timer-ioctl-manual-test.c     | 294 +++++++++++++++++++++
+ .../alsa-timer-ioctl-tests/remote-test/timer.c     | 158 +++++++++++
+ 2 files changed, 452 insertions(+)
+ create mode 100644 tests/tcg/multiarch/alsa-timer-ioctl-tests/manual-test/alsa-timer-ioctl-manual-test.c
+ create mode 100644 tests/tcg/multiarch/alsa-timer-ioctl-tests/remote-test/timer.c
 
-diff --git a/tests/tcg/multiarch/rtc-ioctl-tests/manual-test/rtc-ioctl-manual-test.c b/tests/tcg/multiarch/rtc-ioctl-tests/manual-test/rtc-ioctl-manual-test.c
+diff --git a/tests/tcg/multiarch/alsa-timer-ioctl-tests/manual-test/alsa-timer-ioctl-manual-test.c b/tests/tcg/multiarch/alsa-timer-ioctl-tests/manual-test/alsa-timer-ioctl-manual-test.c
 new file mode 100644
-index 0000000..f073442
+index 0000000..95803ff
 --- /dev/null
-+++ b/tests/tcg/multiarch/rtc-ioctl-tests/manual-test/rtc-ioctl-manual-test.c
-@@ -0,0 +1,352 @@
++++ b/tests/tcg/multiarch/alsa-timer-ioctl-tests/manual-test/alsa-timer-ioctl-manual-test.c
+@@ -0,0 +1,294 @@
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <stdbool.h>
-+#include <linux/rtc.h>
-+#include <fcntl.h>
-+#include <linux/input.h>
-+#include <sys/types.h>
-+#include <unistd.h>
 +#include <string.h>
++#include <sys/types.h>
++#include <fcntl.h>
++#include <sys/ioctl.h>
++#include <sound/asound.h>
 +
 +#define ERROR -1
 +
-+#define TEST_RTC_IOCTL(fd, command, argument, supported)      \
++#define TEST_ALSA_IOCTL(fd, command, argument, supported)     \
 +    do {                                                      \
 +        printf("%s:\n", #command);                            \
 +        if (ioctl(fd, command, argument) == ERROR) {          \
@@ -154,302 +157,245 @@ index 0000000..f073442
 +        }                                                     \
 +    } while (0)
 +
-+static bool test_aie_on(int fd, bool supported)
++static bool test_pversion(int fd, bool supported)
 +{
-+    TEST_RTC_IOCTL(fd, RTC_AIE_ON, NULL, supported);
++    int version = 0;
++
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_PVERSION, &version, supported);
 +    if (supported) {
-+        printf("Alarm interrupt enabled!\n\n");
++        printf("Timer version: %d\n", version);
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_aie_off(int fd, bool supported)
++static bool test_next_device(int fd, bool supported)
 +{
-+    TEST_RTC_IOCTL(fd, RTC_AIE_OFF, NULL, supported);
++    struct snd_timer_id id = {1, 0, 0, 0, 0};
++
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_NEXT_DEVICE, &id, supported);
 +    if (supported) {
-+        printf("Alarm interrupt disabled!\n\n");
++        printf("Timer dev_class: %d\n", id.dev_class);
++        printf("Timer dev_sclass: %d\n", id.dev_class);
++        printf("Timer card: %d\n", id.dev_class);
++        printf("Timer device: %d\n", id.dev_class);
++        printf("Timer subdevice: %d\n", id.dev_class);
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_pie_on(int fd, bool supported)
++static bool test_tread(int fd, bool supported)
 +{
-+    TEST_RTC_IOCTL(fd, RTC_PIE_ON, NULL, supported);
++    int tread = 1;
++
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_TREAD, &tread, supported);
 +    if (supported) {
-+        printf("Periodic interrupt enabled!\n\n");
++        printf("Enhanced read enabled!\n");
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_pie_off(int fd, bool supported)
++static bool test_ginfo(int fd, bool supported)
 +{
-+    TEST_RTC_IOCTL(fd, RTC_PIE_OFF, NULL, supported);
++    struct snd_timer_id id = {SNDRV_TIMER_CLASS_GLOBAL,
++                              SNDRV_TIMER_SCLASS_NONE, -1,
++                              SNDRV_TIMER_GLOBAL_SYSTEM, 0};
++    struct snd_timer_ginfo ginfo;
++    ginfo.tid = id;
++
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_GINFO, &ginfo, supported);
 +    if (supported) {
-+        printf("Periodic interrupt disabled!\n\n");
++        printf("Timer flags: %u\n", ginfo.flags);
++        printf("Card number: %d\n", ginfo.card);
++        printf("Timer identification: %s\n", ginfo.id);
++        printf("Timer name: %s\n", ginfo.name);
++        printf("Average period resolution: %luns\n", ginfo.resolution);
++        printf("Minimal period resolution: %luns\n", ginfo.resolution_min);
++        printf("Maximal period resolution: %luns\n", ginfo.resolution_max);
++        printf("Active timer clients: %u\n", ginfo.clients);
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_uie_on(int fd, bool supported)
++static bool test_gparams(int fd, bool supported)
 +{
-+    TEST_RTC_IOCTL(fd, RTC_UIE_ON, NULL, supported);
++    struct snd_timer_id id = {SNDRV_TIMER_CLASS_GLOBAL,
++                              SNDRV_TIMER_SCLASS_NONE, -1,
++                              SNDRV_TIMER_GLOBAL_SYSTEM, 0};
++    struct snd_timer_gparams gparams;
++    gparams.tid = id;
++
++    gparams.period_num = 2;
++    gparams.period_den = 3;
++
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_GPARAMS, &gparams, supported);
 +    if (supported) {
-+        printf("Update interrupt enabled!\n\n");
++        printf("Period duration numerator set: %lus\n", gparams.period_num);
++        printf("Period duration denominator set: %lus\n", gparams.period_den);
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_uie_off(int fd, bool supported)
++static bool test_gstatus(int fd, bool supported)
 +{
-+    TEST_RTC_IOCTL(fd, RTC_UIE_OFF, NULL, supported);
++    struct snd_timer_id id = {SNDRV_TIMER_CLASS_GLOBAL,
++                              SNDRV_TIMER_SCLASS_NONE, -1,
++                              SNDRV_TIMER_GLOBAL_SYSTEM, 0};
++    struct snd_timer_gstatus gstatus;
++    gstatus.tid = id;
++
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_GSTATUS, &gstatus, supported);
 +    if (supported) {
-+        printf("Update interrupt disabled!\n\n");
++        printf("Current period resolution: %luns\n", gstatus.resolution);
++        printf("Period resolution numerator: %lu\n", gstatus.resolution_num);
++        printf("Period resolution denominator: %lu\n", gstatus.resolution_den);
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_wie_on(int fd, bool supported)
++static bool test_select(int fd, bool supported)
 +{
-+    TEST_RTC_IOCTL(fd, RTC_WIE_ON, NULL, supported);
++    struct snd_timer_id id = {SNDRV_TIMER_CLASS_GLOBAL,
++                              SNDRV_TIMER_SCLASS_NONE, -1,
++                              SNDRV_TIMER_GLOBAL_SYSTEM, 0};
++    struct snd_timer_select select;
++    select.id = id;
++
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_SELECT, &select, supported);
 +    if (supported) {
-+        printf("Watchdog interrupt enabled!\n\n");
++        printf("Global timer selected!\n");
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_wie_off(int fd, bool supported)
++static bool test_info(int fd, bool supported)
 +{
-+    TEST_RTC_IOCTL(fd, RTC_WIE_OFF, NULL, supported);
++    struct snd_timer_info info = {0};
++
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_INFO, &info, supported);
 +    if (supported) {
-+        printf("Watchdog interrupt disabled!\n\n");
++        printf("timer flags: %u\n", info.flags);
++        printf("card number: %d\n", info.card);
++        printf("timer identificator: %s\n", info.id);
++        printf("timer name: %s\n", info.name);
++        printf("average period resolution: %luns\n", info.resolution);
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_set_time(int fd, bool supported)
++static bool test_params(int fd, bool supported)
 +{
-+    struct rtc_time alarm_time = {54, 34, 13, 26, 8, 120, 0, 0, 0};
++    struct snd_timer_params params = {0};
++    params.ticks = 1;
++    params.filter = SNDRV_TIMER_EVENT_TICK;
 +
-+    TEST_RTC_IOCTL(fd, RTC_SET_TIME, &alarm_time, supported);
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_PARAMS, &params, supported);
 +    if (supported) {
-+        printf("Time set:\n");
-+        printf("Second: %d, Minute: %d, Hour: %d, "
-+               "Day: %d, Month: %d, Year: %d\n\n",
-+               alarm_time.tm_sec, alarm_time.tm_min, alarm_time.tm_hour,
-+               alarm_time.tm_mday, alarm_time.tm_mon, alarm_time.tm_year);
++        printf("Resolution in ticks set: %u\n", params.ticks);
++        printf("Event filter set: %d\n", params.filter);
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_rd_time(int fd, bool supported)
++static bool test_status(int fd, bool supported)
 +{
-+    struct rtc_time alarm_time;
++    struct snd_timer_status status = {0};
 +
-+    TEST_RTC_IOCTL(fd, RTC_RD_TIME, &alarm_time, supported);
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_STATUS, &status, supported);
 +    if (supported) {
-+        printf("Time read:\n");
-+        printf("Second: %d, Minute: %d, Hour: %d, "
-+               "Day: %d, Month: %d, Year: %d\n\n",
-+               alarm_time.tm_sec, alarm_time.tm_min, alarm_time.tm_hour,
-+               alarm_time.tm_mday, alarm_time.tm_mon, alarm_time.tm_year);
++        printf("Current period resolution: %dns\n", status.resolution);
++        printf("Master tick lost: %d\n", status.lost);
++        printf("Read queue overruns: %d\n", status.overrun);
++        printf("Queue size: %d\n", status.queue);
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_alm_set(int fd, bool supported)
++static bool test_start(int fd, bool supported)
 +{
-+    struct rtc_time alarm_time = {13, 35, 12};
-+
-+    TEST_RTC_IOCTL(fd, RTC_ALM_SET, &alarm_time, supported);
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_START, NULL, supported);
 +    if (supported) {
-+        printf("Alarm time set:\n");
-+        printf("Second: %d, Minute: %d, Hour: %d\n\n",
-+               alarm_time.tm_sec, alarm_time.tm_min, alarm_time.tm_hour);
++        printf("Alsa sound timer started!\n");
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_alm_read(int fd, bool supported)
++static bool test_pause(int fd, bool supported)
 +{
-+    struct rtc_time alarm_time;
-+
-+    TEST_RTC_IOCTL(fd, RTC_ALM_READ, &alarm_time, supported);
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_PAUSE, NULL, supported);
 +    if (supported) {
-+        printf("Alarm time read:\n");
-+        printf("Second: %d, Minute: %d, Hour: %d\n\n",
-+               alarm_time.tm_sec, alarm_time.tm_min, alarm_time.tm_hour);
++        printf("Alsa sound timer paused!\n");
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_irqp_set(int fd, bool supported)
++static bool test_continue(int fd, bool supported)
 +{
-+    unsigned long interrupt_rate = 32;
-+
-+    TEST_RTC_IOCTL(fd, RTC_IRQP_SET, interrupt_rate, supported);
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_CONTINUE, NULL, supported);
 +    if (supported) {
-+        printf("Periodic interrupt set: %lu\n\n", interrupt_rate);
++        printf("Alsa sound timer continued!\n");
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
-+static bool test_irqp_read(int fd, bool supported)
++static bool test_stop(int fd, bool supported)
 +{
-+    unsigned long interrupt_rate;
-+
-+    TEST_RTC_IOCTL(fd, RTC_IRQP_READ, &interrupt_rate, supported);
++    TEST_ALSA_IOCTL(fd, SNDRV_TIMER_IOCTL_STOP, NULL, supported);
 +    if (supported) {
-+        printf("Periodic interrupt read: %lu\n\n", interrupt_rate);
-+    }
-+    return supported;
-+}
-+
-+static bool test_epoch_set(int fd, bool supported)
-+{
-+    unsigned long epoch = 5;
-+
-+    TEST_RTC_IOCTL(fd, RTC_EPOCH_SET, epoch, supported);
-+    if (supported) {
-+        printf("Epoch set: %lu\n\n", epoch);
-+    }
-+    return supported;
-+}
-+
-+static bool test_epoch_read(int fd, bool supported)
-+{
-+    unsigned long epoch;
-+
-+    TEST_RTC_IOCTL(fd, RTC_EPOCH_READ, epoch, supported);
-+    if (supported) {
-+        printf("Epoch read: %lu\n\n", epoch);
-+    }
-+    return supported;
-+}
-+
-+static bool test_wkalm_set(int fd, bool supported)
-+{
-+    struct rtc_time time = {25, 30, 10, 27, 8, 12, 0, 0, 0};
-+    struct rtc_wkalrm alarm = {0, 0, time};
-+
-+    TEST_RTC_IOCTL(fd, RTC_WKALM_SET, &alarm, supported);
-+    if (supported) {
-+        printf("Wakeup alarm set:\n");
-+        printf("Enabled: %d, Pending: %d\n", alarm.enabled, alarm.pending);
-+        printf("Second: %d, Minute: %d, Hour: %d\n\n",
-+               alarm.time.tm_sec, alarm.time.tm_min, alarm.time.tm_hour);
-+    }
-+    return supported;
-+}
-+
-+static bool test_wkalm_rd(int fd, bool supported)
-+{
-+    struct rtc_wkalrm alarm;
-+
-+    TEST_RTC_IOCTL(fd, RTC_WKALM_RD, &alarm, supported);
-+    if (supported) {
-+        printf("Wakeup alarm read:\n");
-+        printf("Enabled: %d, Pending: %d\n", alarm.enabled, alarm.pending);
-+        printf("Second: %d, Minute: %d, Hour: %d\n\n",
-+               alarm.time.tm_sec, alarm.time.tm_min, alarm.time.tm_hour);
-+    }
-+    return supported;
-+}
-+
-+static bool test_pll_set(int fd, bool supported)
-+{
-+    struct rtc_pll_info info = {1, 5, 50, 10, 20, 10, 15};
-+
-+    TEST_RTC_IOCTL(fd, RTC_PLL_SET, &info, supported);
-+    if (supported) {
-+        printf("Pll correction set:\n");
-+        printf("Pll ctrl: %d, Pll value: %d, Pll max %d, "
-+               "Pll min: %d, Pll posmult: %d, Pll negmult: %d, "
-+               "Pll clock: %lu\n\n",
-+               info.pll_ctrl, info.pll_value, info.pll_max,
-+               info.pll_min, info.pll_posmult, info.pll_negmult,
-+               info.pll_clock);
-+    }
-+    return supported;
-+}
-+
-+static bool test_pll_get(int fd, bool supported)
-+{
-+    struct rtc_pll_info info;
-+
-+    TEST_RTC_IOCTL(fd, RTC_PLL_GET, &info, supported);
-+    if (supported) {
-+        printf("Pll correction read:\n");
-+        printf("Pll ctrl: %d, Pll value: %d, Pll max %d, "
-+               "Pll min: %d, Pll posmult: %d, Pll negmult: %d, "
-+               "Pll clock: %lu\n\n",
-+               info.pll_ctrl, info.pll_value, info.pll_max,
-+               info.pll_min, info.pll_posmult, info.pll_negmult,
-+               info.pll_clock);
-+    }
-+    return supported;
-+}
-+
-+static bool test_vl_read(int fd, bool supported)
-+{
-+    int voltage_low;
-+
-+    TEST_RTC_IOCTL(fd, RTC_VL_READ, &voltage_low, supported);
-+    if (supported) {
-+        printf("Voltage low: %d\n\n", voltage_low);
-+    }
-+    return supported;
-+}
-+
-+static bool test_vl_clear(int fd, bool supported)
-+{
-+    TEST_RTC_IOCTL(fd, RTC_VL_CLR, NULL, supported);
-+    if (supported) {
-+        printf("Voltage low cleared!\n");
++        printf("Alsa sound timer stopped!\n");
++        printf("\n");
 +    }
 +    return supported;
 +}
 +
 +int main(int argc, char **argv)
 +{
-+    char ioctls[23][15] = {"RTC_AIE_ON", "RTC_AIE_OFF",
-+                           "RTC_UIE_ON", "RTC_UIE_OFF",
-+                           "RTC_PIE_ON", "RTC_PIE_OFF",
-+                           "RTC_WIE_ON", "RTC_WIE_OFF",
-+                           "RTC_ALM_SET", "RTC_ALM_READ",
-+                           "RTC_RD_TIME", "RTC_SET_TIME",
-+                           "RTC_IRQP_READ", "RTC_IRQP_SET",
-+                           "RTC_EPOCH_READ", "RTC_EPOCH_SET",
-+                           "RTC_WKALM_SET", "RTC_WKALM_RD",
-+                           "RTC_PLL_GET", "RTC_PLL_SET",
-+                           "RTC_VL_READ", "RTC_VL_CLR"};
++    char ioctls[15][35] = {"SNDRV_TIMER_IOCTL_PVERSION",
++                           "SNDRV_TIMER_IOCTL_INFO",
++                           "SNDRV_TIMER_IOCTL_NEXT_DEVICE",
++                           "SNDRV_TIMER_IOCTL_PARAMS",
++                           "SNDRV_TIMER_IOCTL_TREAD",
++                           "SNDRV_TIMER_IOCTL_STATUS",
++                           "SNDRV_TIMER_IOCTL_GINFO",
++                           "SNDRV_TIMER_IOCTL_START",
++                           "SNDRV_TIMER_IOCTL_GPARAMS",
++                           "SNDRV_TIMER_IOCTL_STOP",
++                           "SNDRV_TIMER_IOCTL_GSTATUS",
++                           "SNDRV_TIMER_IOCTL_CONTINUE",
++                           "SNDRV_TIMER_IOCTL_SELECT",
++                           "SNDRV_TIMER_IOCTL_PAUSE"};
 +
 +    bool (*const funcs[]) (int, bool) = {
-+          test_aie_on,
-+          test_aie_off,
-+          test_uie_on,
-+          test_uie_off,
-+          test_pie_on,
-+          test_pie_off,
-+          test_wie_on,
-+          test_wie_off,
-+          test_alm_set,
-+          test_alm_read,
-+          test_rd_time,
-+          test_set_time,
-+          test_irqp_read,
-+          test_irqp_set,
-+          test_epoch_read,
-+          test_epoch_set,
-+          test_wkalm_set,
-+          test_wkalm_rd,
-+          test_pll_get,
-+          test_pll_set,
-+          test_vl_read,
-+          test_vl_clear,
++          test_pversion,
++          test_next_device,
++          test_tread,
++          test_ginfo,
++          test_gparams,
++          test_gstatus,
++          test_select,
++          test_info,
++          test_params,
++          test_status,
++          test_start,
++          test_pause,
++          test_continue,
++          test_stop,
 +          NULL
 +    };
 +
-+    int fd = open("/dev/rtc", O_RDWR | O_NONBLOCK);
++    int fd = open("/dev/snd/timer", O_RDWR | O_NONBLOCK);
 +
 +    if (fd == ERROR) {
 +        perror("open");
@@ -463,7 +409,7 @@ index 0000000..f073442
 +            int j = 0;
 +            int found = 0;
 +
-+            for (int j = 0; j < 22; j++) {
++            for (int j = 0; j < 14; j++) {
 +                if (!strcmp(argv[i], ioctls[j])) {
 +                    found = 1;
 +                    funcs[j](fd, supported);
@@ -484,238 +430,170 @@ index 0000000..f073442
 +
 +    exit(EXIT_SUCCESS);
 +}
-diff --git a/tests/tcg/multiarch/rtc-ioctl-tests/remote-test/rtc-test.c b/tests/tcg/multiarch/rtc-ioctl-tests/remote-test/rtc-test.c
+diff --git a/tests/tcg/multiarch/alsa-timer-ioctl-tests/remote-test/timer.c b/tests/tcg/multiarch/alsa-timer-ioctl-tests/remote-test/timer.c
 new file mode 100644
-index 0000000..a56c3c7
+index 0000000..d45f0b2
 --- /dev/null
-+++ b/tests/tcg/multiarch/rtc-ioctl-tests/remote-test/rtc-test.c
-@@ -0,0 +1,226 @@
-+/*
-+ *  Real Time Clock Driver Test/Example Program
-+ *
-+ *  Compile with:
-+ *      gcc -s -Wall -Wstrict-prototypes rtctest.c -o rtctest
-+ *
-+ *  Copyright (C) 1996, Paul Gortmaker.
-+ *
-+ *  Released under the GNU General Public License, version 2,
-+ *  included herein by reference.
-+ *
-+ */
-+
++++ b/tests/tcg/multiarch/alsa-timer-ioctl-tests/remote-test/timer.c
+@@ -0,0 +1,158 @@
 +#include <stdio.h>
-+#include <linux/rtc.h>
-+#include <sys/ioctl.h>
-+#include <sys/time.h>
++#include <stdlib.h>
++#include <stdbool.h>
++
 +#include <sys/types.h>
++#include <sys/stat.h>
 +#include <fcntl.h>
-+#include <unistd.h>
++
++#include <sys/ioctl.h>
++
 +#include <errno.h>
++#include <string.h>
++
++#include <sound/asound.h>
++
++static void build_system_timer_id(struct snd_timer_id *tid)
++{
++    tid->dev_class = SNDRV_TIMER_CLASS_GLOBAL;
++    tid->dev_sclass = SNDRV_TIMER_SCLASS_NONE;
++    tid->card = -1;
++    tid->device = SNDRV_TIMER_GLOBAL_SYSTEM;
++    tid->subdevice = 0;
++}
++
++#define TEST_IOCTL(fd, command, argument, expected)                     \
++    do {                                                                \
++        if (ioctl(fd, command, argument) < 0 && errno != expected) {    \
++            printf("%s: %s\n", #command, strerror(errno));              \
++            return false;                                               \
++        }                                                               \
++        printf("%s: Test passed!\n", #command);                         \
++        return true;                                                    \
++    } while (0)
++
++static bool check_pversion(int fd)
++{
++    int version = 0;
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_PVERSION, &version, 0);
++}
++
++static bool check_next_device(int fd)
++{
++    struct snd_timer_id id = {0};
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_NEXT_DEVICE, &id, 0);
++}
++
++static bool check_tread(int fd)
++{
++    int tread = 1;
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_TREAD, &tread, 0);
++}
++
++static bool check_ginfo(int fd)
++{
++    struct snd_timer_ginfo ginfo = {0};
++    build_system_timer_id(&ginfo.tid);
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_GINFO, &ginfo, 0);
++}
++
++static bool check_gparams(int fd)
++{
++    struct snd_timer_gparams gparams = {0};
++    build_system_timer_id(&gparams.tid);
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_GPARAMS, &gparams, ENOSYS);
++}
++
++static bool check_gstatus(int fd)
++{
++    struct snd_timer_gstatus gstatus = {0};
++    build_system_timer_id(&gstatus.tid);
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_GSTATUS, &gstatus, 0);
++}
++
++static bool check_select(int fd)
++{
++    struct snd_timer_select select = {0};
++    build_system_timer_id(&select.id);
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_SELECT, &select, 0);
++}
++
++static bool check_info(int fd)
++{
++    struct snd_timer_info info = {0};
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_INFO, &info, 0);
++}
++
++static bool check_params(int fd)
++{
++    struct snd_timer_params params = {0};
++    params.ticks = 1;
++    params.filter = SNDRV_TIMER_EVENT_TICK;
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_PARAMS, &params, 0);
++}
++
++static bool check_status(int fd)
++{
++    struct snd_timer_status status = {0};
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_STATUS, &status, 0);
++}
++
++static bool check_start(int fd)
++{
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_START, NULL, 0);
++}
++
++static bool check_stop(int fd)
++{
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_STOP, NULL, 0);
++}
++
++static bool check_continue(int fd)
++{
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_CONTINUE, NULL, 0);
++}
++
++static bool check_pause(int fd)
++{
++    TEST_IOCTL(fd, SNDRV_TIMER_IOCTL_PAUSE, NULL, 0);
++}
 +
 +int main(void)
 +{
-+    int i, fd, retval, irqcount = 0;
-+    unsigned long tmp, data;
-+    struct rtc_time rtc_tm;
++    bool (*const funcs[])(int) = {
++        check_pversion,
++        check_next_device,
++        check_tread,
++        check_ginfo,
++        check_gparams,
++        check_gstatus,
++        check_select,
++        check_info,
++        check_params,
++        check_status,
++        check_start,
++        check_pause,
++        check_continue,
++        check_stop,
++        NULL,
++    };
++    unsigned int i;
++    int fd;
 +
-+    fd = open("/dev/rtc", O_RDONLY);
-+
-+    if (fd ==  -1) {
-+        perror("/dev/rtc");
-+        exit(errno);
++    fd = open("/dev/snd/timer", O_RDONLY);
++    if (fd < 0) {
++        printf("%s\n", strerror(errno));
++        return EXIT_FAILURE;
 +    }
 +
-+    fprintf(stderr, "\n\t\t\tRTC Driver Test Example.\n\n");
-+
-+    /* Turn on update interrupts (one per second) */
-+    retval = ioctl(fd, RTC_UIE_ON, 0);
-+    if (retval == -1) {
-+        perror("ioctl");
-+        exit(errno);
-+    }
-+
-+    fprintf(stderr,
-+            "Counting 5 update (1/sec) interrupts from reading /dev/rtc:");
-+    fflush(stderr);
-+
-+    for (i = 1; i < 6; i++) {
-+        /* This read will block */
-+        retval = read(fd, &data, sizeof(unsigned long));
-+
-+        if (retval == -1) {
-+            perror("read");
-+            exit(errno);
-+        }
-+
-+        fprintf(stderr, " %d", i);
-+        fflush(stderr);
-+        irqcount++;
-+    }
-+
-+    fprintf(stderr, "\nAgain, from using select(2) on /dev/rtc:");
-+    fflush(stderr);
-+
-+    for (i = 1; i < 6; i++) {
-+        struct timeval tv = {5, 0};    /* 5 second timeout on select */
-+        fd_set readfds;
-+
-+        FD_ZERO(&readfds);
-+        FD_SET(fd, &readfds);
-+
-+        /* The select will wait until an RTC interrupt happens. */
-+        retval = select(fd + 1, &readfds, NULL, NULL, &tv);
-+        if (retval == -1) {
-+            perror("select");
-+            exit(errno);
-+        }
-+
-+        /* This read won't block unlike the select-less case above. */
-+        retval = read(fd, &data, sizeof(unsigned long));
-+        if (retval == -1) {
-+            perror("read");
-+            exit(errno);
-+        }
-+
-+        fprintf(stderr, " %d", i);
-+        fflush(stderr);
-+        irqcount++;
-+    }
-+
-+    /* Turn off update interrupts */
-+    retval = ioctl(fd, RTC_UIE_OFF, 0);
-+    if (retval == -1) {
-+        perror("ioctl");
-+        exit(errno);
-+    }
-+
-+    /* Read the RTC time/date */
-+    retval = ioctl(fd, RTC_RD_TIME, &rtc_tm);
-+    if (retval == -1) {
-+        perror("ioctl");
-+        exit(errno);
-+    }
-+
-+    fprintf(stderr, "\n\nCurrent RTC date/time is %d-%d-%d, %02d:%02d:%02d.\n",
-+            rtc_tm.tm_mday, rtc_tm.tm_mon + 1, rtc_tm.tm_year + 1900,
-+            rtc_tm.tm_hour, rtc_tm.tm_min, rtc_tm.tm_sec);
-+
-+    /* Set the alarm to 5 sec in the future, and check for rollover */
-+    rtc_tm.tm_sec += 5;
-+    if (rtc_tm.tm_sec >= 60) {
-+        rtc_tm.tm_sec %= 60;
-+        rtc_tm.tm_min++;
-+    }
-+
-+    if (rtc_tm.tm_min == 60) {
-+        rtc_tm.tm_min = 0;
-+        rtc_tm.tm_hour++;
-+    }
-+
-+    if (rtc_tm.tm_hour == 24) {
-+        rtc_tm.tm_hour = 0;
-+    }
-+
-+    retval = ioctl(fd, RTC_ALM_SET, &rtc_tm);
-+    if (retval == -1) {
-+        perror("ioctl");
-+        exit(errno);
-+    }
-+
-+    /* Read the current alarm settings */
-+    retval = ioctl(fd, RTC_ALM_READ, &rtc_tm);
-+    if (retval == -1) {
-+        perror("ioctl");
-+        exit(errno);
-+    }
-+
-+    fprintf(stderr, "Alarm time now set to %02d:%02d:%02d.\n",
-+            rtc_tm.tm_hour, rtc_tm.tm_min, rtc_tm.tm_sec);
-+
-+    /* Enable alarm interrupts */
-+    retval = ioctl(fd, RTC_AIE_ON, 0);
-+    if (retval == -1) {
-+        perror("ioctl");
-+        exit(errno);
-+    }
-+
-+    fprintf(stderr, "Waiting 5 seconds for alarm...");
-+    fflush(stderr);
-+    /* This blocks until the alarm ring causes an interrupt */
-+    retval = read(fd, &data, sizeof(unsigned long));
-+    if (retval == -1) {
-+        perror("read");
-+        exit(errno);
-+    }
-+
-+    irqcount++;
-+    fprintf(stderr, " okay. Alarm rang.\n");
-+
-+    /* Disable alarm interrupts */
-+    retval = ioctl(fd, RTC_AIE_OFF, 0);
-+    if (retval == -1) {
-+        perror("ioctl");
-+        exit(errno);
-+    }
-+
-+    /* Read periodic IRQ rate */
-+    retval = ioctl(fd, RTC_IRQP_READ, &tmp);
-+    if (retval == -1) {
-+        perror("ioctl");
-+        exit(errno);
-+    }
-+
-+    fprintf(stderr, "\nPeriodic IRQ rate was %ldHz.\n", tmp);
-+
-+    fprintf(stderr, "Counting 20 interrupts at:");
-+    fflush(stderr);
-+
-+    /* The frequencies 128Hz, 256Hz, ... 8192Hz are only allowed for root. */
-+    for (tmp = 2; tmp <= 64; tmp *= 2) {
-+
-+        retval = ioctl(fd, RTC_IRQP_SET, tmp);
-+        if (retval == -1) {
-+            perror("ioctl");
-+            exit(errno);
-+        }
-+
-+        fprintf(stderr, "\n%ldHz:\t", tmp);
-+        fflush(stderr);
-+
-+        /* Enable periodic interrupts */
-+        retval = ioctl(fd, RTC_PIE_ON, 0);
-+        if (retval == -1) {
-+            perror("ioctl");
-+            exit(errno);
-+        }
-+
-+        for (i = 1; i < 21; i++) {
-+            /* This blocks */
-+            retval = read(fd, &data, sizeof(unsigned long));
-+            if (retval == -1) {
-+                perror("read");
-+                exit(errno);
-+            }
-+            fprintf(stderr, " %d", i);
-+            fflush(stderr);
-+            irqcount++;
-+        }
-+
-+        /* Disable periodic interrupts */
-+        retval = ioctl(fd, RTC_PIE_OFF, 0);
-+        if (retval == -1) {
-+            perror("ioctl");
-+            exit(errno);
++    i = 0;
++    while (funcs[i]) {
++        if (!funcs[i++](fd)) {
++            printf("Timer test aborts.\n");
++            return EXIT_FAILURE;
 +        }
 +    }
 +
-+    fprintf(stderr, "\n\n\t\t\t *** Test complete ***\n");
-+    fprintf(stderr, "\nTyping \"cat /proc/interrupts\" will show %d
-+            more events on IRQ 8.\n\n", irqcount);
-+
-+    close(fd);
-+    return 0;
-+
-+} /* end main */
++    return EXIT_SUCCESS;
++}
 -- 
 2.7.4
 
