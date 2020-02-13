@@ -2,81 +2,93 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A153C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:43:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E6CBC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:46:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA30B217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:43:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GkonhpLX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA30B217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 40D07218AC
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:46:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D07218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2Elt-0005vG-08
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 08:43:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49812)
+	id 1j2EpE-0008Jq-D5
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 08:46:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j2ElF-0005RQ-9K
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:42:34 -0500
+ (envelope-from <bounces@canonical.com>) id 1j2AIT-0000uI-Hw
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 03:56:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j2ElD-0007Z5-Uk
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:42:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42225
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j2ElD-0007Yh-QL
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:42:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581601351;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=xdPKQfrZ1RBDe4hqhlglMERfhsJPUIIP0SAu6YT/YJA=;
- b=GkonhpLXl99TwyJFxdbV8fAoqBSZ2mVrGvth0/p4xB0AkkiJCP5QVy8nb6HPhhfYy+9+UH
- LszQxnvcT52pbuPjM8QG3t0YxSP5lBhKF/W1jIlNqXOpB3ufUq9sUErr2pVW4UHXY+NuLv
- s/VNQGqpiOyL/uChYhNlUg32T6/xMBY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-Waoq8wDlOuWrOgDAuZ8ZMQ-1; Thu, 13 Feb 2020 08:42:29 -0500
-X-MC-Unique: Waoq8wDlOuWrOgDAuZ8ZMQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBAB3107ACC4;
- Thu, 13 Feb 2020 13:42:27 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0B5A09008B;
- Thu, 13 Feb 2020 13:42:24 +0000 (UTC)
-Date: Thu, 13 Feb 2020 13:42:23 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v9 22/23] fuzz: add virtio-scsi fuzz target
-Message-ID: <20200213134223.GE544499@stefanha-x1.localdomain>
-References: <20200211203510.3534-1-alxndr@bu.edu>
- <20200211203510.3534-23-alxndr@bu.edu>
+ (envelope-from <bounces@canonical.com>) id 1j2AIS-0000i8-2x
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 03:56:33 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35682)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j2AIR-0000ho-TZ
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 03:56:32 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j2AIP-00060a-Tp
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 08:56:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id DC7762E8073
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 08:56:29 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200211203510.3534-23-alxndr@bu.edu>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="XuV1QlJbYrcVoo+x"
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 13 Feb 2020 08:41:19 -0000
+From: Ike Panhc <ike.pan@canonical.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=kunpeng920; status=Incomplete; importance=Undecided; 
+ assignee=None; 
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=rafaeldtinoco@ubuntu.com; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Medium; assignee=rafaeldtinoco@ubuntu.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=Incomplete; importance=Medium;
+ assignee=rafaeldtinoco@ubuntu.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Incomplete; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug-Tags: ikeradar patch qemu-img
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: andrew-cloke dannf iveskim jan-glauber-i jnsnow
+ kongzizaixian lizhengui rafaeldtinoco
+X-Launchpad-Bug-Reporter: dann frazier (dannf)
+X-Launchpad-Bug-Modifier: Ike Panhc (ikepanhc)
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Message-Id: <158158328096.15701.15708213588803537175.launchpad@soybean.canonical.com>
+Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
+ Aarch64 when converting images
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: b87eefa28c67aa47a749e3f6f5c4de5d637e6356
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Thu, 13 Feb 2020 08:44:55 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,80 +97,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, darren.kenny@oracle.com, bsd@redhat.com,
- pbonzini@redhat.com
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---XuV1QlJbYrcVoo+x
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+** Tags added: ikeradar
 
-On Tue, Feb 11, 2020 at 03:35:09PM -0500, Alexander Bulekov wrote:
-> diff --git a/tests/qtest/fuzz/virtio_scsi_fuzz.c b/tests/qtest/fuzz/virtio_scsi_fuzz.c
-> new file mode 100644
-> index 0000000000..f62f512a26
-> --- /dev/null
-> +++ b/tests/qtest/fuzz/virtio_scsi_fuzz.c
-> @@ -0,0 +1,214 @@
-> +/*
-> + * virtio-serial Fuzzing Target
-> + *
-> + * Copyright Red Hat Inc., 2019
-> + *
-> + * Authors:
-> + *  Alexander Bulekov   <alxndr@bu.edu>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "tests/qtest/libqtest.h"
-> +#include "tests/qtest/libqos/virtio-net.h"
+-- =
 
-virtio-net?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805256
 
-> +static void register_virtio_scsi_fuzz_targets(void)
-> +{
-> +    fuzz_add_qos_target(&(FuzzTarget){
-> +                .name = "virtio-scsi-fuzz",
-> +                .description = "Fuzz the virtio-net virtual queues, forking"
+Title:
+  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
+  converting images
 
-s/net/scsi/
+Status in kunpeng920:
+  Incomplete
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  Incomplete
+Status in qemu source package in Bionic:
+  Incomplete
+Status in qemu source package in Disco:
+  Incomplete
+Status in qemu source package in Eoan:
+  Incomplete
+Status in qemu source package in Focal:
+  Incomplete
 
-> +                                "for each fuzz run",
-> +                .pre_vm_init = &counter_shm_init,
-> +                .pre_fuzz = &virtio_scsi_pre_fuzz,
-> +                .fuzz = virtio_scsi_fork_fuzz,},
-> +                "virtio-scsi",
-> +                &(QOSGraphTestOptions){.before = virtio_scsi_test_setup}
-> +                );
-> +
-> +    fuzz_add_qos_target(&(FuzzTarget){
-> +                .name = "virtio-scsi-flags-fuzz",
-> +                .description = "Fuzz the virtio-net virtual queues, forking"
+Bug description:
+  Command:
 
-s/net/scsi/
+  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
 
---XuV1QlJbYrcVoo+x
-Content-Type: application/pgp-signature; name="signature.asc"
+  Hangs indefinitely approximately 30% of the runs.
 
------BEGIN PGP SIGNATURE-----
+  ----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5FUj8ACgkQnKSrs4Gr
-c8ix3gf+McQkkr7MrMnPmSpjSBo4tOpdjV2ErMC0TJ/ErfcBLaozrDb6Jj9kWQGA
-TCoekFbaNKIjcH8cJxGHa2+tV79QWrICyGdz2UpL1SQGxxNST6HfUQUzzZNhb+ao
-/4tGJQR6jznu81BxfRKueyUFtgI1xd/l0l/4YjYQS85CKoFisM0pWBawPBqkYxQC
-mIa+74sYd0YqBjwEHclZm2rVvMif2VKWxj83j5rgj1eZy1dbSrFopf/xJHFRaXxG
-C45d7tHiyNdiUjtYVjyi4iurMsXPMugrz1ofk7JhynaMYLDn2XUbYEX0e/FFfsc6
-bi8dhuOosKiQTNCUIaI4KQK8vfGOVg==
-=FTT0
------END PGP SIGNATURE-----
+  Workaround:
 
---XuV1QlJbYrcVoo+x--
+  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
 
+  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
+
+  ----
+
+  (gdb) thread 1
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf1ad81c in __GI_ppoll
+  #1 0x0000aaaaaabcf73c in ppoll
+  #2 qemu_poll_ns
+  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
+  #4 main_loop_wait
+  ...
+
+  (gdb) thread 2
+  ...
+  (gdb) bt
+  #0 syscall ()
+  #1 0x0000aaaaaabd41cc in qemu_futex_wait
+  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
+  #3 0x0000aaaaaabed05c in call_rcu_thread
+  #4 0x0000aaaaaabd34c8 in qemu_thread_start
+  #5 0x0000ffffbf25c880 in start_thread
+  #6 0x0000ffffbf1b6b9c in thread_start ()
+
+  (gdb) thread 3
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
+  #1 0x0000ffffbf2671b4 in __sigwait
+  #2 0x0000aaaaaabd1ddc in sigwait_compat
+  #3 0x0000aaaaaabd34c8 in qemu_thread_start
+  #4 0x0000ffffbf25c880 in start_thread
+  #5 0x0000ffffbf1b6b9c in thread_start
+
+  ----
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
+  ./disk01.ext4.qcow2 ./output.qcow2
+
+  [New Thread 0xffffbec5ad90 (LWP 72839)]
+  [New Thread 0xffffbe459d90 (LWP 72840)]
+  [New Thread 0xffffbdb57d90 (LWP 72841)]
+  [New Thread 0xffffacac9d90 (LWP 72859)]
+  [New Thread 0xffffa7ffed90 (LWP 72860)]
+  [New Thread 0xffffa77fdd90 (LWP 72861)]
+  [New Thread 0xffffa6ffcd90 (LWP 72862)]
+  [New Thread 0xffffa67fbd90 (LWP 72863)]
+  [New Thread 0xffffa5ffad90 (LWP 72864)]
+
+  [Thread 0xffffa5ffad90 (LWP 72864) exited]
+  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
+  [Thread 0xffffa77fdd90 (LWP 72861) exited]
+  [Thread 0xffffbdb57d90 (LWP 72841) exited]
+  [Thread 0xffffa67fbd90 (LWP 72863) exited]
+  [Thread 0xffffacac9d90 (LWP 72859) exited]
+  [Thread 0xffffa7ffed90 (LWP 72860) exited]
+
+  <HUNG w/ 3 threads in the stack trace showed before>
+  """
+
+  All the tasks left are blocked in a system call, so no task left to call
+  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
+  thread #1 (doing poll() in a pipe with thread #2).
+
+  Those 7 threads exit before disk conversion is complete (sometimes in
+  the beginning, sometimes at the end).
+
+  ----
+
+  [ Original Description ]
+
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+
+  Once hung, attaching gdb gives the following backtrace:
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
+igmask=3D0xffffc123b950)
+  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
+linux-gnu/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
+c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
