@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8E2C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CDBC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:11:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 616EC20659
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:09:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CB7C20659
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:11:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vy69K30E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 616EC20659
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U4TnXLX9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB7C20659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2IvL-0000Vc-HK
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 13:09:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34668)
+	id 1j2Ix2-00039W-Nl
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 13:11:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33982)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Ijz-00010f-7R
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:32 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j2Ijg-0000aZ-RF
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Ijy-0003Qf-8E
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:31 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52258)
+ (envelope-from <peter.maydell@linaro.org>) id 1j2Ije-0002kT-Mi
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:12 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39259)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2Ijx-0003OE-MC
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:29 -0500
-Received: by mail-wm1-x344.google.com with SMTP id p9so7260530wmc.2
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 09:57:29 -0800 (PST)
+ id 1j2Ije-0002i3-FS
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:10 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id y11so7799805wrt.6
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 09:57:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ct264XXsXB4Yfv0geBlQAhYKTLlUfdyjxR0wyex+U9E=;
- b=vy69K30E8Tpow7RS6CiPJZqBqe3hGrvGx7JEt2rZiJfq/XEKyKSoqJgM7cqQNWy0om
- R8K2ScwnoNun3EBxvPvmqW7dvHS7mih3M5T9uQOyuxxObnvdWTUQv9fIULodbx54Dr38
- A8qYoI3czQtXZPGK5pvLqJprf3r7Z3KEaDoZt9XZ3rsvmIlUVhRN3Adq7735fQKJmEP5
- cN+y+CK6d7sPv8LviGHGRQdB/BBQ96d7n/YUt70ASj9dEzPDXARADZMOpBBBdM3bOmIk
- WWZNhgIWKPqwbVLZLdJ4dscdfG0MpO0vmjpjmX6kaEAj4sNSUM7z0+lLnkL2DMFhtBR4
- 1j1Q==
+ bh=mu3MkvlL4TJMpHa8jn/jjpDGQdQ8pv8OsHnWYrWoDqc=;
+ b=U4TnXLX90XXMV2WdPCsrWE+e9/UtZoiIRLQHYGsYarcEufmuRhJy2eISqhnxib1TEj
+ gJLYJL9gi2/o9lXyw9VT2Lu1fy0Bc0KQFaqF9Ewd5l+xZMkiyt7yrLM4dR5ykjcSUENJ
+ 0HcXtuIHofsWeh9rqd09jGmt1wTsPGp1c28i369Ii/KFr9B3MeYNgZ6VrCyW4MS1Pshs
+ AHCSNhR2Id/oSL2Y5I1tkpd2W2xWR87vhDmOHAkRtnzkcSq1X+d/1wk7WvF0g76cBz1G
+ eb1JmfsQAoHw9voFVlATtbevDutPGdLHzX8n89GP4MQ7QIHEA18TfkQILa74MB0XAabd
+ sC4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ct264XXsXB4Yfv0geBlQAhYKTLlUfdyjxR0wyex+U9E=;
- b=PVHYjbT7gcpBoA80MLMl1+OrU/jrfsjt6MJLUwtqY1SQL6cQOWaP9zUOz2sZgbcPTL
- oX2eWmUUM4w4s3ey4oQeooTsnKyfwT9OnQZpzyoYtuFcXSg2BZWqMOo1AE/ocTo24FaF
- /aAbEt070XAUUWZKoQ8YEfiWjLXIy2C5ewZ/WqBvbFKf1exlEcX22vlrpkDulGBGTypu
- 1csONl1FrYfGVzxYhIsvwET7b1lRlAo/PdWKLliOj8PTHYY21HMIjZl4DCHRzRvBlFFo
- f7BM1WB14QrZpy8Hje2lLD+5KitTPchdHQNxcai1yhyVL93123hGpZihDFR38H+Xtr+K
- JIGQ==
-X-Gm-Message-State: APjAAAXtjJEhP2pLEfkgTlZJgvP2jGV8uDFZXpk6eM3fbabvbP1ZXF6C
- Z1vZArjktW9XT2MrKZ/DVJnYFio6Rag=
-X-Google-Smtp-Source: APXvYqzWMKxWaYMNG0D1Yi5KNLoRFDPgWALnrabznY45XJjxyvlu0s55ePaCXVt8nFcUlRyOsfvZ8Q==
-X-Received: by 2002:a05:600c:2301:: with SMTP id
- 1mr7090137wmo.147.1581616648392; 
- Thu, 13 Feb 2020 09:57:28 -0800 (PST)
+ bh=mu3MkvlL4TJMpHa8jn/jjpDGQdQ8pv8OsHnWYrWoDqc=;
+ b=blAvuUGKTPFSOjkKCqSDWnAnpD53GtyWkn9jR/nCHK3virT7gqnlYL98E54nUJ0ffX
+ ch6UIRhVkHzyfMVwMKi+KHSQnYP0G8NuZ0SOlECUjyyc3FPh91NFrg3pQiWNw0mC3IJe
+ VD1M9D3I04oIjDP0dxqgHtY2jzvGoMhlpxdkpyEq6K231qMENKk1PcdmokdHn6/G7qcd
+ AtdSUxVgwy8f7WFIKccdrScDRcCocv5d0jzrGYhYAVS90Et1lvDveMrsYEwNlGg8DSu7
+ f1yUtAMziRXTacSTNkJM/VDUt7mST6nd5cxZoi97RKL87jGw3/MmrhbsEm11+8yqiE8/
+ i3oA==
+X-Gm-Message-State: APjAAAWyjBvHWwPjado6ubuf/A9a4tM7pnjn1R9YnHqtgV59ompv5DVS
+ l1xgcKL176ns/yrbKd8SNpX5xGkpTYg=
+X-Google-Smtp-Source: APXvYqy0W4M2wcNg88Qiiym1yJKifncOYzw7oi0464jSEpr3YqhjaRF6+HBPXa4LOWg5uYwzlXZoFw==
+X-Received: by 2002:adf:e610:: with SMTP id p16mr24461231wrm.81.1581616629063; 
+ Thu, 13 Feb 2020 09:57:09 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p26sm3692913wmc.24.2020.02.13.09.57.27
+ by smtp.gmail.com with ESMTPSA id p26sm3692913wmc.24.2020.02.13.09.57.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 09:57:27 -0800 (PST)
+ Thu, 13 Feb 2020 09:57:08 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 28/30] qga/qapi-schema.json: Add some headings
-Date: Thu, 13 Feb 2020 17:56:45 +0000
-Message-Id: <20200213175647.17628-29-peter.maydell@linaro.org>
+Subject: [PATCH v2 13/30] qapi/block-core.json: Use explicit bulleted lists
+Date: Thu, 13 Feb 2020 17:56:30 +0000
+Message-Id: <20200213175647.17628-14-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200213175647.17628-1-peter.maydell@linaro.org>
 References: <20200213175647.17628-1-peter.maydell@linaro.org>
@@ -81,7 +80,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,44 +100,287 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add some section headings to the QGA json; this is purely so that we
-have some H1 headings, as otherwise each command ends up being
-visible in the interop/ manual's table of contents.  In an ideal
-world there might be a proper 'Introduction' section the way there is
-in qapi/qapi-schema.json.
+A JSON block comment like this:
+ Returns: nothing on success
+          If @node is not a valid block device, DeviceNotFound
+          If @name is not found, GenericError with an explanation
+
+renders like this:
+
+ Returns: nothing on success If node is not a valid block device,
+ DeviceNotFound If name is not found, GenericError with an explanation
+
+because whitespace is not significant.
+
+Use an actual bulleted list, so that the formatting is correct.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- qga/qapi-schema.json | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+v1->v2: minor commit msg tweak as suggested by Markus
+---
+ qapi/block-core.json | 108 +++++++++++++++++++++----------------------
+ 1 file changed, 54 insertions(+), 54 deletions(-)
 
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index f6fcb59f34b..d026f9478cf 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -1,14 +1,18 @@
- # *-*- Mode: Python -*-*
- 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 31f7a1281c6..082aca3f699 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1326,8 +1326,8 @@
+ #
+ # @size:  new image size in bytes
+ #
+-# Returns: nothing on success
+-#          If @device is not a valid block device, DeviceNotFound
++# Returns: - nothing on success
++#          - If @device is not a valid block device, DeviceNotFound
+ #
+ # Since: 0.14.0
+ #
+@@ -1510,8 +1510,8 @@
+ #
+ # For the arguments, see the documentation of BlockdevSnapshotSync.
+ #
+-# Returns: nothing on success
+-#          If @device is not a valid block device, DeviceNotFound
++# Returns: - nothing on success
++#          - If @device is not a valid block device, DeviceNotFound
+ #
+ # Since: 0.14.0
+ #
+@@ -1586,9 +1586,8 @@
+ #                when specifying the string or the image chain may
+ #                not be able to be reopened again.
+ #
+-# Returns: Nothing on success
+-#
+-#          If "device" does not exist or cannot be determined, DeviceNotFound
++# Returns: - Nothing on success
++#          - If "device" does not exist or cannot be determined, DeviceNotFound
+ #
+ # Since: 2.1
  ##
--#
--# General note concerning the use of guest agent interfaces:
--#
-+# = General note concerning the use of guest agent interfaces
-+##
-+
-+##
- # "unsupported" is a higher-level error than the errors that individual
- # commands might document. The caller should always be prepared to receive
- # QERR_UNSUPPORTED, even if the given command doesn't specify it, or doesn't
- # document any failure mode at all.
--#
-+##
-+
-+##
-+# = QEMU guest agent protocol commands and structs
+@@ -1674,9 +1673,9 @@
+ #                list without user intervention.
+ #                Defaults to true. (Since 3.1)
+ #
+-# Returns: Nothing on success
+-#          If @device does not exist, DeviceNotFound
+-#          Any other error returns a GenericError.
++# Returns: - Nothing on success
++#          - If @device does not exist, DeviceNotFound
++#          - Any other error returns a GenericError.
+ #
+ # Since: 1.3
+ #
+@@ -1704,8 +1703,8 @@
+ # The operation can be stopped before it has completed using the
+ # block-job-cancel command.
+ #
+-# Returns: nothing on success
+-#          If @device is not a valid block device, GenericError
++# Returns: - nothing on success
++#          - If @device is not a valid block device, GenericError
+ #
+ # Since: 1.6
+ #
+@@ -1730,8 +1729,8 @@
+ # The operation can be stopped before it has completed using the
+ # block-job-cancel command.
+ #
+-# Returns: nothing on success
+-#          If @device is not a valid block device, DeviceNotFound
++# Returns: - nothing on success
++#          - If @device is not a valid block device, DeviceNotFound
+ #
+ # Since: 2.3
+ #
+@@ -1925,8 +1924,8 @@
+ # format of the mirror image, default is to probe if mode='existing',
+ # else the format of the source.
+ #
+-# Returns: nothing on success
+-#          If @device is not a valid block device, GenericError
++# Returns: - nothing on success
++#          - If @device is not a valid block device, GenericError
+ #
+ # Since: 1.3
+ #
+@@ -2097,9 +2096,9 @@
+ #
+ # Create a dirty bitmap with a name on the node, and start tracking the writes.
+ #
+-# Returns: nothing on success
+-#          If @node is not a valid block device or node, DeviceNotFound
+-#          If @name is already taken, GenericError with an explanation
++# Returns: - nothing on success
++#          - If @node is not a valid block device or node, DeviceNotFound
++#          - If @name is already taken, GenericError with an explanation
+ #
+ # Since: 2.4
+ #
+@@ -2120,10 +2119,10 @@
+ # with block-dirty-bitmap-add. If the bitmap is persistent, remove it from its
+ # storage too.
+ #
+-# Returns: nothing on success
+-#          If @node is not a valid block device or node, DeviceNotFound
+-#          If @name is not found, GenericError with an explanation
+-#          if @name is frozen by an operation, GenericError
++# Returns: - nothing on success
++#          - If @node is not a valid block device or node, DeviceNotFound
++#          - If @name is not found, GenericError with an explanation
++#          - if @name is frozen by an operation, GenericError
+ #
+ # Since: 2.4
+ #
+@@ -2144,9 +2143,9 @@
+ # backup from this point in time forward will only backup clusters
+ # modified after this clear operation.
+ #
+-# Returns: nothing on success
+-#          If @node is not a valid block device, DeviceNotFound
+-#          If @name is not found, GenericError with an explanation
++# Returns: - nothing on success
++#          - If @node is not a valid block device, DeviceNotFound
++#          - If @name is not found, GenericError with an explanation
+ #
+ # Since: 2.4
+ #
+@@ -2165,9 +2164,9 @@
+ #
+ # Enables a dirty bitmap so that it will begin tracking disk changes.
+ #
+-# Returns: nothing on success
+-#          If @node is not a valid block device, DeviceNotFound
+-#          If @name is not found, GenericError with an explanation
++# Returns: - nothing on success
++#          - If @node is not a valid block device, DeviceNotFound
++#          - If @name is not found, GenericError with an explanation
+ #
+ # Since: 4.0
+ #
+@@ -2186,9 +2185,9 @@
+ #
+ # Disables a dirty bitmap so that it will stop tracking disk changes.
+ #
+-# Returns: nothing on success
+-#          If @node is not a valid block device, DeviceNotFound
+-#          If @name is not found, GenericError with an explanation
++# Returns: - nothing on success
++#          - If @node is not a valid block device, DeviceNotFound
++#          - If @name is not found, GenericError with an explanation
+ #
+ # Since: 4.0
+ #
+@@ -2215,11 +2214,11 @@
+ # of the source bitmaps. This can be used to achieve backup checkpoints, or in
+ # simpler usages, to copy bitmaps.
+ #
+-# Returns: nothing on success
+-#          If @node is not a valid block device, DeviceNotFound
+-#          If any bitmap in @bitmaps or @target is not found, GenericError
+-#          If any of the bitmaps have different sizes or granularities,
+-#              GenericError
++# Returns: - nothing on success
++#          - If @node is not a valid block device, DeviceNotFound
++#          - If any bitmap in @bitmaps or @target is not found, GenericError
++#          - If any of the bitmaps have different sizes or granularities,
++#            GenericError
+ #
+ # Since: 4.0
+ #
+@@ -2251,10 +2250,10 @@
+ #
+ # Get bitmap SHA256.
+ #
+-# Returns: BlockDirtyBitmapSha256 on success
+-#          If @node is not a valid block device, DeviceNotFound
+-#          If @name is not found or if hashing has failed, GenericError with an
+-#          explanation
++# Returns: - BlockDirtyBitmapSha256 on success
++#          - If @node is not a valid block device, DeviceNotFound
++#          - If @name is not found or if hashing has failed, GenericError with an
++#            explanation
+ #
+ # Since: 2.10
  ##
- 
- { 'pragma': { 'doc-required': true } }
+@@ -2371,8 +2370,8 @@
+ # the device will be removed from its group and the rest of its
+ # members will not be affected. The 'group' parameter is ignored.
+ #
+-# Returns: Nothing on success
+-#          If @device is not a valid block device, DeviceNotFound
++# Returns: - Nothing on success
++#          - If @device is not a valid block device, DeviceNotFound
+ #
+ # Since: 1.1
+ #
+@@ -2622,7 +2621,8 @@
+ #                list without user intervention.
+ #                Defaults to true. (Since 3.1)
+ #
+-# Returns: Nothing on success. If @device does not exist, DeviceNotFound.
++# Returns: - Nothing on success.
++#          - If @device does not exist, DeviceNotFound.
+ #
+ # Since: 1.1
+ #
+@@ -2656,8 +2656,8 @@
+ # @speed: the maximum speed, in bytes per second, or 0 for unlimited.
+ #         Defaults to 0.
+ #
+-# Returns: Nothing on success
+-#          If no background operation is active on this device, DeviceNotActive
++# Returns: - Nothing on success
++#          - If no background operation is active on this device, DeviceNotActive
+ #
+ # Since: 1.1
+ ##
+@@ -2696,8 +2696,8 @@
+ #         abandon the job immediately (even if it is paused) instead of waiting
+ #         for the destination to complete its final synchronization (since 1.3)
+ #
+-# Returns: Nothing on success
+-#          If no background operation is active on this device, DeviceNotActive
++# Returns: - Nothing on success
++#          - If no background operation is active on this device, DeviceNotActive
+ #
+ # Since: 1.1
+ ##
+@@ -2720,8 +2720,8 @@
+ #          the name of the parameter), but since QEMU 2.7 it can have
+ #          other values.
+ #
+-# Returns: Nothing on success
+-#          If no background operation is active on this device, DeviceNotActive
++# Returns: - Nothing on success
++#          - If no background operation is active on this device, DeviceNotActive
+ #
+ # Since: 1.3
+ ##
+@@ -2742,8 +2742,8 @@
+ #          the name of the parameter), but since QEMU 2.7 it can have
+ #          other values.
+ #
+-# Returns: Nothing on success
+-#          If no background operation is active on this device, DeviceNotActive
++# Returns: - Nothing on success
++#          - If no background operation is active on this device, DeviceNotActive
+ #
+ # Since: 1.3
+ ##
+@@ -2770,8 +2770,8 @@
+ #          the name of the parameter), but since QEMU 2.7 it can have
+ #          other values.
+ #
+-# Returns: Nothing on success
+-#          If no background operation is active on this device, DeviceNotActive
++# Returns: - Nothing on success
++#          - If no background operation is active on this device, DeviceNotActive
+ #
+ # Since: 1.3
+ ##
 -- 
 2.20.1
 
