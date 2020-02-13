@@ -2,85 +2,86 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B351CC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 14:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 107E2C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 14:43:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CD052073C
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 14:41:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFF052073C
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 14:43:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WP+5Lnmz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CD052073C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pzwh0JRN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFF052073C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2Ffo-0003Fw-E3
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 09:41:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59625)
+	id 1j2FiZ-0005uT-Ry
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 09:43:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Fes-0002Vm-7D
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:40:03 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j2Fgi-0004At-Io
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:41:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Fer-00067i-45
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:40:02 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46654)
+ (envelope-from <peter.maydell@linaro.org>) id 1j2Fgh-0001QH-Cv
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:41:56 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:40363)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2Feq-00065o-TY
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:40:01 -0500
-Received: by mail-ot1-x344.google.com with SMTP id g64so5727120otb.13
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:40:00 -0800 (PST)
+ id 1j2Fgg-0001Jw-3X
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:41:55 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id t3so6978710wru.7
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:41:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=A4EPPn1XD+DrC3EutJ1d+JoZYSjW6TenIzcHdxfjf7A=;
- b=WP+5LnmzPYpCz1W88JoUB3XPljfC+Y8gXRoZakD0QsCtzfuBycN0/X6D07SflZQzCb
- IQLogAZ5rX/hGMw2TJ6jnI9/r6z0YxK6sMD1Bjqxj4yTPeeweVLslHSW63m17T/eoHCZ
- IjAo3GMVWWsE189yVidUxOKy56SNv8kLO76+x+hjXp9Nqop0dfYQkLFjgZCYsyZgr6tf
- YTxw0JquFLwP+blpXdXFGBmWdFh9ikNYofnbAAxEgAL8gTxLR/qBVXgDHSV5eslBaRDZ
- qk2ov+BkDppxTBGMVUeK8FsCLRNQ2pDGeHhKwUniOUP8P/ikNjvQ1ORnBOo3F7nA5SPA
- ILTg==
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=5QW6Q1EJKNnfHRnGkMMq3g240uRrMtzhye8Daf9kap0=;
+ b=pzwh0JRNzbgzXLuIIOn36aAf5N0rkLo+dd+BOgXKPjML24IRd/apN5rEnlhmkTkH9X
+ fD69ZSNML4jKlH6+pK6Odcv+oWJ/uYoY6TWtpUQxLoXEUGYthpmh5eB78Pmql+zwfpv8
+ qP6dH3yH8Da1s+fA6KNjSVwvN58uI1ysrMAm0WQIDeONXGe08lmJZPjwwuIMewTHxF3+
+ ttSEPFtbXKiZNGNBvOvtD1H8OSQYRXZFN64wHJ+o8n31BuIGp+XhUslFQkAIa7zWdeZT
+ E+TY4BNvTRII0QV5RXkli2vhb5R2A3x69R79oouTYcceFFMiEitKGjzQConhecEu9VuP
+ wrXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=A4EPPn1XD+DrC3EutJ1d+JoZYSjW6TenIzcHdxfjf7A=;
- b=taiIvQhPOWnpW/kPUCvzh5PabJf2NOQBLVVMfFSjR1b35+GOrD/dTcBmegeZV0c1s0
- WowGkThtzyddny6mK3rQntjkwWF6VY+Xf9wONzW41V8GiIJ2ezXbAPQHy+dId+W4HaSd
- HRLohQOe4qa+y/Gl5T0g7vrtmNQAVSASx0C/vQQ5fMvbTPLoz9CIe5BB5ptnZmZMFxrD
- Ab38J/KrxhvbzpTgyuV6gBueuOugfk3CBG1kMe7oygsUGWo34qIa024MRnA6LcHu3r8s
- jRWZxKFzF0vvQfmFb8Nz1I7nkQ+4edjsZmhV/J1RaTdS5lvlWbqTv1P00ddfaYDtqoso
- ekIQ==
-X-Gm-Message-State: APjAAAUwucgt9c4qNstyiqCuRni4xujxoJF+ip6BvTXXzK7J2zHBQsW7
- CkFW7KDOObsyO3kk6ZhXAr7l14+DrP0g8qeQp5S53g==
-X-Google-Smtp-Source: APXvYqydj9Bn6PFD5jDxyVYkM5fsmTuxz5POgqf4lvuKlvngYkfNz0g6YXkdOktRWSsZSKwiLRaHTiD/9LMwYvCEBn4=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr12900017otq.221.1581604799968; 
- Thu, 13 Feb 2020 06:39:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20200212184648.GA584@roeck-us.net>
- <504e7722-0b60-ec02-774d-26a7320e5309@redhat.com>
- <20200212230918.GA27242@roeck-us.net>
- <560224fe-f0a3-c64a-6689-e824225cfbb9@redhat.com>
- <279d959f-f7e5-65e1-9c68-459f3fed56d3@ozlabs.ru>
- <52f0b829-151a-3dd0-0ec7-c3155185510c@redhat.com>
- <9f652340-1277-0eb2-bc2c-402b4209a220@roeck-us.net>
-In-Reply-To: <9f652340-1277-0eb2-bc2c-402b4209a220@roeck-us.net>
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=5QW6Q1EJKNnfHRnGkMMq3g240uRrMtzhye8Daf9kap0=;
+ b=eBGj8Xpobzkm4vuP2gdqJULZKCsZiwco15J5Df0j9swxSM8VS2VY4wRarwvs35baqp
+ Wm+kwrQczO/Tm5GEXKApFqd+SseV5XRU5VZQiTe1+zB40LElJMM/xOAs8QnlgSkIyyVj
+ h/KGF8CKUCuKlUUS0ebyyoOhL4RRwAOlG6E6Ik6g7jU1NmzMyI9RPjNss3FeaKRCDE0P
+ SMKtw5ebPWUCgYzwx6ZRb8B++wnrrWUSWGe46PgUTf21W8SImoOaMgBODJRkAu1pngUI
+ sxh8fBO+JfsFi8C034ieDWSLzJKCBC0FiVRtWMvCYtcLdgnklkcfSeC9FIojocWzttia
+ pc4Q==
+X-Gm-Message-State: APjAAAWvkS+LJh0jviOt4UlDmDNBfcJyjghrCmeMjLP4xFf0w5EOY5jD
+ 9136cdDzEz2dvL/APeyeWWdwXULk3Uc=
+X-Google-Smtp-Source: APXvYqztGyu3s8i3X8xYVHfovkIMdiGVfNGYiHwr5RYvXd5RKA4df+qv8ehBTQk/tFNr+SE1E/+8ig==
+X-Received: by 2002:adf:f986:: with SMTP id f6mr23124895wrr.182.1581604911259; 
+ Thu, 13 Feb 2020 06:41:51 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id e22sm3362454wme.45.2020.02.13.06.41.50
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 13 Feb 2020 06:41:50 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 13 Feb 2020 14:39:49 +0000
-Message-ID: <CAFEAcA8CyTqdqvT6xatkxb9EN49zD4OBaKrbaLpkyZg+eMoM6w@mail.gmail.com>
-Subject: Re: Question about (and problem with) pflash data access
-To: Guenter Roeck <linux@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
+To: qemu-devel@nongnu.org
+Subject: [PULL 03/46] bios-tables-test: prepare to change ARM virt ACPI DSDT
+Date: Thu, 13 Feb 2020 14:41:02 +0000
+Message-Id: <20200213144145.818-4-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200213144145.818-1-peter.maydell@linaro.org>
+References: <20200213144145.818-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,44 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- Alexey Kardashevskiy <aik@ozlabs.ru>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Feb 2020 at 14:26, Guenter Roeck <linux@roeck-us.net> wrote:
-> What really puzzles me is that there is no trace output for
-> flash data accesses (trace_pflash_data_read and trace_pflash_data_write),
-> meaning the actual flash data access must be handled elsewhere.
-> Can someone give me a hint where that might be ?
-> Clearly I am missing something about inner workings of qemu.
+From: Heyi Guo <guoheyi@huawei.com>
 
-Probably the device is in 'romd' mode. A QEMU MemoryRegion
-can be:
- * RAM (includes ROM for these purposes) -- backed by host
-   memory, reads and writes (if permitted) go straight to
-   the host memory via fastpath accesses
- * MMIO -- backed by a read and write accessor function,
-   all accesses go to these functions
- * "ROM device" -- a mix of the above where there is a
-   backing bit of host memory but also accessor functions.
-   When the device is in "romd" mode, reads go direct to
-   host memory, and writes still go to the accessor function.
-   When the device is not in "romd" mode, reads also go
-   to the accessor function.
+We are going to change ARM virt ACPI DSDT table, which will cause make
+check to fail, so temporarily add related golden masters to ignore
+list.
 
-We use this in the pflash devices to make the common case
-("just read the flash") fast. When the guest makes a write
-to flash that puts it into programming mode, we call
-memory_region_rom_device_set_romd(..., false) so we can
-intercept reads and make them do the right thing for
-programming mode.
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-id: 20200204014325.16279-2-guoheyi@huawei.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/qtest/bios-tables-test-allowed-diff.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-thanks
--- PMM
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8bf..32a401ae35f 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,4 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/virt/DSDT",
++"tests/data/acpi/virt/DSDT.memhp",
++"tests/data/acpi/virt/DSDT.numamem",
+-- 
+2.20.1
+
 
