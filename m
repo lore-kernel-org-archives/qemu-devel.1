@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36BF6C3B189
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6354CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:32:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 109AB217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:30:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109AB217F4
+	by mail.kernel.org (Postfix) with ESMTPS id 3A0C320578
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 12:32:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A0C320578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2Ddj-0006GM-4f
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 07:30:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40322)
+	id 1j2Df6-0008QB-6s
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 07:32:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40346)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j2DcZ-0004S0-Kt
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:29:32 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j2Dca-0004Sx-6y
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:29:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j2DcY-0005we-IX
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:29:31 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:51342 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1j2DcY-0005wB-4r
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:29:32 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:51268 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1j2DcY-0005vg-C1
+ id 1j2DcX-0005vW-V9
  for qemu-devel@nongnu.org; Thu, 13 Feb 2020 07:29:30 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 7D49D1A1FC7;
+ by mail.rt-rk.com (Postfix) with ESMTP id 673621A1D6D;
  Thu, 13 Feb 2020 13:29:27 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 451B21A1FF1;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 324A11A1FCA;
  Thu, 13 Feb 2020 13:29:27 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 4/9] linux-user: microblaze: Update syscall numbers to
- kernel 5.5 level
-Date: Thu, 13 Feb 2020 13:29:09 +0100
-Message-Id: <1581596954-2305-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v3 3/9] linux-user: m68k: Update syscall numbers to kernel 5.5
+ level
+Date: Thu, 13 Feb 2020 13:29:08 +0100
+Message-Id: <1581596954-2305-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1581596954-2305-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1581596954-2305-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -63,44 +63,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, laurent@vivier.eu,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: laurent@vivier.eu, Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Update microblaze syscall numbers based on Linux kernel v5.5.
+Update m68k syscall numbers based on Linux kernel v5.5.
 
-CC: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+CC: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/microblaze/syscall_nr.h | 45 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ linux-user/m68k/syscall_nr.h | 50 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 49 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/microblaze/syscall_nr.h b/linux-user/microblaze/syscall_nr.h
-index aa2eb93..ec1758e 100644
---- a/linux-user/microblaze/syscall_nr.h
-+++ b/linux-user/microblaze/syscall_nr.h
-@@ -393,5 +393,50 @@
- #define TARGET_NR_memfd_create          386
- #define TARGET_NR_bpf                   387
- #define TARGET_NR_execveat              388
-+#define TARGET_NR_userfaultfd           389
-+#define TARGET_NR_membarrier            390
-+#define TARGET_NR_mlock2                391
-+#define TARGET_NR_copy_file_range       392
-+#define TARGET_NR_preadv2               393
-+#define TARGET_NR_pwritev2              394
-+#define TARGET_NR_pkey_mprotect         395
-+#define TARGET_NR_pkey_alloc            396
-+#define TARGET_NR_pkey_free             397
-+#define TARGET_NR_statx                 398
-+#define TARGET_NR_io_pgetevents         399
-+#define TARGET_NR_rseq                  400
-+/* 401 and 402 are unused */
+diff --git a/linux-user/m68k/syscall_nr.h b/linux-user/m68k/syscall_nr.h
+index d33d8e9..01aee34 100644
+--- a/linux-user/m68k/syscall_nr.h
++++ b/linux-user/m68k/syscall_nr.h
+@@ -382,5 +382,53 @@
+ #define TARGET_NR_copy_file_range       376
+ #define TARGET_NR_preadv2               377
+ #define TARGET_NR_pwritev2              378
+-
++#define TARGET_NR_statx                 379
++#define TARGET_NR_seccomp               380
++#define TARGET_NR_pkey_mprotect         381
++#define TARGET_NR_pkey_alloc            382
++#define TARGET_NR_pkey_free             383
++#define TARGET_NR_rseq                  384
++/* room for arch specific calls */
++#define TARGET_NR_semget                393
++#define TARGET_NR_semctl                394
++#define TARGET_NR_shmget                395
++#define TARGET_NR_shmctl                396
++#define TARGET_NR_shmat                 397
++#define TARGET_NR_shmdt                 398
++#define TARGET_NR_msgget                399
++#define TARGET_NR_msgsnd                400
++#define TARGET_NR_msgrcv                401
++#define TARGET_NR_msgctl                402
 +#define TARGET_NR_clock_gettime64       403
 +#define TARGET_NR_clock_settime64       404
 +#define TARGET_NR_clock_adjtime64       405
@@ -132,8 +136,7 @@ index aa2eb93..ec1758e 100644
 +#define TARGET_NR_fsmount               432
 +#define TARGET_NR_fspick                433
 +#define TARGET_NR_pidfd_open            434
-+#define TARGET_NR_clone3                435
- 
++/* 435 reserved for clone3 */
  #endif
 -- 
 2.7.4
