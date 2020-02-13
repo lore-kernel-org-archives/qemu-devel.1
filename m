@@ -2,88 +2,101 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B84C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:19:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A8CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:20:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4410024686
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:19:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FBD124689
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:20:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SoKsJ7ZJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4410024686
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fNbVUqZV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FBD124689
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2GHP-00032K-H8
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:19:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60603)
+	id 1j2GIN-0004RM-1M
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:20:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36744)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2FhP-0004qb-Gr
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:41 -0500
+ (envelope-from <peterx@redhat.com>) id 1j2G70-0005ZW-LJ
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:09:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2FhN-0002QS-Tu
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:39 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53668)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2FhN-0002NB-LR
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 09:42:37 -0500
-Received: by mail-wm1-x343.google.com with SMTP id s10so6542783wmh.3
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 06:42:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=H2gaLGMf5euvRIXxKTQ5zYLvx8BCFxjRX5PrMkWbQvc=;
- b=SoKsJ7ZJIlfsqCATGm3t1EyJ43/X+p7ji9LtUAQ6vmoETh2SBKYtjlK5U6Ij7ZAYfx
- pwLwnQOOb381oZjYW6zGU3B/cTRNJc+MWwKhqoKgbiOOd53LB8BoBwoe8A+9hpBgaUBi
- 0rzQE8mVni2rWBgCfkt2jUD6m76sK+ANDuxyhGMT+lUCFjS17kUS4B1ChSjkuPNnqmpZ
- P8SVL7LzSLTCamZUlqFv1k20dGYQSiae1+ySEsNOwORur9O6m6E06HmVV3eQaK1oIFcF
- D7Yl3/3sW68UYhdgx9te8rkyY/oUN/I4WW8WVIW/YyoqGRDXlRxQxqN4Ji9JrbQDB7Rb
- YfxQ==
+ (envelope-from <peterx@redhat.com>) id 1j2G6w-00074k-Vc
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:09:05 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35707
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j2G6w-00073H-RH
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:09:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581606542;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/RP4jL+liXOr7+owGoE1uisFYbkKabx8mrOWiLhVUgk=;
+ b=fNbVUqZV57v/9BFlacRccv+wdsQk6ntTrZAPenamYgKfyxJ4IR1S6eaVYWisKfr3zsjlz5
+ 7M4BuSY8cURpruVmw/vz7TM7BW9Cm0PX3GUpN/we84nX8/R9eSHB9Yg1QO9We0qeRot22p
+ jQamYBFVLAXHvEqip2VX4Js53klIkG0=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13--N5pNiBlOS6qFip21CCGbw-1; Thu, 13 Feb 2020 10:08:57 -0500
+Received: by mail-qv1-f69.google.com with SMTP id n11so3672197qvp.15
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 07:08:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=H2gaLGMf5euvRIXxKTQ5zYLvx8BCFxjRX5PrMkWbQvc=;
- b=G3q2KJn2DOPvgcqb+W5rQ6bflmOiUj/Zn9VYQmFdIylzLo7Q50gKQUdE7vqQz+Pi4d
- CNE1m7RV2Ewpdbb2Rl1bJKjFU9+oYyYDyCBzKLHGNWm5A1LulvEwU+Qs8SFLpaEvIa0X
- Y9tFo7Y/2Qg3gXD/9QFtOBXULtPT8QtU223wUEHqFO7E4CYOeSmt/egSH6ZV6415HTb6
- kHSysZXsvbPl8sh49fo5b1TlVavH7/wIUkcWc8VgX5MvuZqdSRvMoXTJ8oNxjck7L77N
- qRkvT9Jkmex7vqZZzHmKGaPdsyzdW/zoJmmBNGbv+UK5QCETG/QTCax68zqZ/JsB6VGZ
- V1/w==
-X-Gm-Message-State: APjAAAVYP9X4ev4sIf0ThwC+0KDcWxDUMHBBCVE53evAtLHhP7FwTino
- s9cHIGvPgR9D3rxrWyatCBDmgOo87IE=
-X-Google-Smtp-Source: APXvYqxdU9Yy5oLbvgcfJyMFVcOMslSR9ciafr2LYAwtdBtL0DCCOOwW2SLigVx2odbGFGzO4W1tTw==
-X-Received: by 2002:a1c:2786:: with SMTP id n128mr6010122wmn.47.1581604955432; 
- Thu, 13 Feb 2020 06:42:35 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e22sm3362454wme.45.2020.02.13.06.42.34
- for <qemu-devel@nongnu.org>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=TTCs0FYlF7ncgzuKAoKWZgYBOizTPZCqyTpm/Xkwuxg=;
+ b=uO3PeMaIjMm4gmwrmCetUCdBX8EeIcJK6hkwesSAnfaCEC9Ki2jiBvL+LejaZP4JuA
+ weewfmCipPiSaHLCsniQpnQHfaqO9jNZq4eTfVIKEOZG+ueZXQcdDP7tQ7SkkMJHA5xb
+ n01ZVAgQkwe7zSvwGQCSy7QkFyBASn9c/PDaB0k70mEXTTg5U6SNwKCDgEv8eoHTA++l
+ IrV5v9oHEjm1ln2InWNL8RgUkSGP7FBN+OHcIVLmFDepNfTv8fOf7iJYHy4kMiUE3WRE
+ GPZwX6caQCa9AtWMsmKoFNjZH6aBf+5iRsMnDFnYlYLIDcBmNn2oyXo2KnZRJ2arnZJS
+ g2PA==
+X-Gm-Message-State: APjAAAV2+TCtDfc7/6Q8r9LrZEl3X8X9A9KoV1ah9vQ4I9xxrx4IsT/t
+ 8W2YnwYH4rxSfjcbJ+Mv/Yvj7cdPZozn7HQZZg+mvTrCuF+g10hKdpXdyCqUVfD7600oLyqkCUA
+ 7yLEpViVurQIS/fI=
+X-Received: by 2002:a05:620a:663:: with SMTP id
+ a3mr16110922qkh.310.1581606537257; 
+ Thu, 13 Feb 2020 07:08:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzUgLATtaYNS3Kg0ZyRQURNj5rc+bKl6duQGjBd/h/0kPnf2VPQA4IkJPSzdtqTGd9fGBjJUw==
+X-Received: by 2002:a05:620a:663:: with SMTP id
+ a3mr16110888qkh.310.1581606536927; 
+ Thu, 13 Feb 2020 07:08:56 -0800 (PST)
+Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca.
+ [72.137.123.47])
+ by smtp.gmail.com with ESMTPSA id l19sm1441196qkl.3.2020.02.13.07.08.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 06:42:34 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 43/46] hw/arm/raspi: Extract the board model from the board
- revision
-Date: Thu, 13 Feb 2020 14:41:42 +0000
-Message-Id: <20200213144145.818-44-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200213144145.818-1-peter.maydell@linaro.org>
-References: <20200213144145.818-1-peter.maydell@linaro.org>
+ Thu, 13 Feb 2020 07:08:56 -0800 (PST)
+Date: Thu, 13 Feb 2020 10:08:53 -0500
+From: Peter Xu <peterx@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC v3 14/25] intel_iommu: add virtual command capability support
+Message-ID: <20200213150853.GB1103216@xz-x1>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-15-git-send-email-yi.l.liu@intel.com>
+ <20200211215630.GN984290@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A1BBBF4@SHSMSX104.ccr.corp.intel.com>
+ <20200213143110.GA1103216@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <20200213143110.GA1103216@xz-x1>
+X-MC-Unique: -N5pNiBlOS6qFip21CCGbw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,67 +108,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Thu, Feb 13, 2020 at 09:31:10AM -0500, Peter Xu wrote:
 
-The board revision encode the model type. Add a helper
-to extract the model, and use it.
+[...]
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20200208165645.15657-12-f4bug@amsat.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/raspi.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+> > > Apart of this: also I just noticed (when reading the latter part of
+> > > the series) that the time that a pasid table walk can consume will
+> > > depend on this value too.  I'd suggest to make this as small as we
+> > > can, as long as it satisfies the usage.  We can even bump it in the
+> > > future.
+> >=20
+> > I see. This looks to be an optimization. right? Instead of modify the
+> > value of this macro,  I think we can do this optimization by tracking
+> > the allocated PASIDs in QEMU. Thus, the pasid table walk  would be more
+> > efficient and also no dependency on the VTD_MAX_HPASID. Does it make
+> > sense to you? :-)
+>=20
+> Yeah sounds good. :)
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index f0dcffbc2ef..0537fc0a2d1 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -101,6 +101,20 @@ static const char *board_soc_type(uint32_t board_rev)
-     return soc_types[proc_id];
- }
- 
-+static const char *board_type(uint32_t board_rev)
-+{
-+    static const char *types[] = {
-+        "A", "B", "A+", "B+", "2B", "Alpha", "CM1", NULL, "3B", "Zero",
-+        "CM3", NULL, "Zero W", "3B+", "3A+", NULL, "CM3+", "4B",
-+    };
-+    assert(FIELD_EX32(board_rev, REV_CODE, STYLE)); /* Only new style */
-+    int bt = FIELD_EX32(board_rev, REV_CODE, TYPE);
-+    if (bt >= ARRAY_SIZE(types) || !types[bt]) {
-+        return "Unknown";
-+    }
-+    return types[bt];
-+}
-+
- static void write_smpboot(ARMCPU *cpu, const struct arm_boot_info *info)
- {
-     static const uint32_t smpboot[] = {
-@@ -287,7 +301,7 @@ static void raspi2_machine_class_init(ObjectClass *oc, void *data)
-     uint32_t board_rev = (uint32_t)(uintptr_t)data;
- 
-     rmc->board_rev = board_rev;
--    mc->desc = "Raspberry Pi 2B";
-+    mc->desc = g_strdup_printf("Raspberry Pi %s", board_type(board_rev));
-     mc->init = raspi_machine_init;
-     mc->block_default_type = IF_SD;
-     mc->no_parallel = 1;
-@@ -308,7 +322,7 @@ static void raspi3_machine_class_init(ObjectClass *oc, void *data)
-     uint32_t board_rev = (uint32_t)(uintptr_t)data;
- 
-     rmc->board_rev = board_rev;
--    mc->desc = "Raspberry Pi 3B";
-+    mc->desc = g_strdup_printf("Raspberry Pi %s", board_type(board_rev));
-     mc->init = raspi_machine_init;
-     mc->block_default_type = IF_SD;
-     mc->no_parallel = 1;
--- 
-2.20.1
+Just to make sure it's safe even for when the global allocation is not
+happening (full emulation devices?  Do they need the PASID table walk
+too?).  Anyway, be careful to not miss some valid PASID entries, or we
+can still use the MIN(PASID_MAX, CONTEXT_ENTRY_SIZE) to be safe as a
+first version.  Thanks,
+
+--=20
+Peter Xu
 
 
