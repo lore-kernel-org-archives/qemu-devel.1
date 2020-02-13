@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27429C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 074ACC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:05:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDD4C206DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:03:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA7A6206DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 18:05:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kb54xXtc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDD4C206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a8FnFq0F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA7A6206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2IqD-0001m4-3p
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 13:03:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34049)
+	id 1j2Is8-0004Si-VQ
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 13:05:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Iji-0000cZ-C8
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:19 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j2IjZ-0000MD-Qk
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2Ijg-0002oZ-Pn
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:14 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38560)
+ (envelope-from <peter.maydell@linaro.org>) id 1j2IjX-0002XG-Bk
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:05 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:55116)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2Ijg-0002mD-FS
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:12 -0500
-Received: by mail-wr1-x441.google.com with SMTP id y17so7808311wrh.5
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 09:57:12 -0800 (PST)
+ id 1j2IjX-0002V6-22
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:57:03 -0500
+Received: by mail-wm1-x332.google.com with SMTP id g1so7246107wmh.4
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 09:57:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=4LajsEXnh86T0w1vg82Lrkoo26G75hwMO4oMmN11qAc=;
- b=kb54xXtc7RJX8XVCbxg40+dIhbauaqx9Tww9zaQt51zP1QopStJzoJckcNFDYqbR1F
- 1Itm4ZVvSpR/+1fs+Hvx8kChukL1cCjWzTv6nnkQ75aSHBDDWqDpMJPp624Nvn9DEfUd
- 4FfA8Zihvf+q8nam9sb/1ugLh+k9VkJBRnFOqYbGVw87EQV9dUfMzFQQ+b1uBLKM0vy3
- nOaIIoPFgE14OjU7VpTE8c/QyBP7yQ/Mabx/F6KUb+SHkrt99a9qy3qHh+FhpGQxqCTj
- X+lAHJy+PLC18UeiG+L6jhgjwmJWqN0Fs4Y9cAjEIsF9NFZjiXWYIik2PPcf9jVYa9pb
- DIjw==
+ bh=vejfpe8tmTeOtD0T1idJ1yF06muHUSuIJ0JKc90oK5k=;
+ b=a8FnFq0FdyXcQBKB79jagevKbkn4gNGuJ7mqUe9MuQM9+drUSpUWBTPTGu+ZPih7vD
+ uZdF6KujbEkcIykFVv77XCrAqjhYq+8pXG6aQbzaf/dt96ixWF+RHrssXNJZbVEKXWmN
+ TviIdSxSnFFqx+ogpxnhjW/Cnuf1GCOyffSI9tzreIinE0rmvIZPhSV/GTPxWLX5054c
+ Cr/FIfxcTXlQFn4LqD17FubUuYAkQEXD4ABhv/VK74C9dztir8KzbdxTFsgQFShg2yP7
+ iiBCevns4kKACxsfCJRnHqBSn/4kbaLXC5FXNaQpVQw9JXo0pfSlb+t2vqxrvY/Pv109
+ hiDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=4LajsEXnh86T0w1vg82Lrkoo26G75hwMO4oMmN11qAc=;
- b=fe7zxJQ9nKVfdI3MusdvUQ9pNDo/3lsnL12tOQQXfcj7yBQrF8Vx1PQ8PFCq6EKBVb
- 2dY0eN2ECYQNZFtAGH9a8kWVlhxrFsw1CBzrkHlgiEQwzpw9vPlgvxGRVnYknlnVl6Bt
- XFR8iviY1HgTIgAA6ti4USFAGUUw2G7oAU0fVTiBmMA38UAx3Q3y8oE+Kl4waGHzmDQu
- 47/0TzcdyIG81PmGcQmOexl7CRxtXlFMrw3z9LEjC4nwjRTaMcdnTHHEQ2KU+kugDcn/
- MUJIJDWISq09etImKfUGNo+pnNoloYh3INoN3+uBNPkmyzNT2VNM/Nxf4bV7ZZmJ5z3d
- 6wJQ==
-X-Gm-Message-State: APjAAAXMngF4mvjVC+tB8ChWIkXaqOrE/c60wtNDbR9PwDx/23XFIL51
- N7QO31E3dmx3oiGQHMAD1DGaCbYWZCA=
-X-Google-Smtp-Source: APXvYqxkS/RlD3x5yZSbU+s8h7a0nQYc9pLTThSf9jPh9bGApQ4fFPLe89gAovIKCa/qrQIQLBYz3g==
-X-Received: by 2002:adf:e8c9:: with SMTP id k9mr23234937wrn.168.1581616630810; 
- Thu, 13 Feb 2020 09:57:10 -0800 (PST)
+ bh=vejfpe8tmTeOtD0T1idJ1yF06muHUSuIJ0JKc90oK5k=;
+ b=mVkSS02/CqAuuc197Rv9YSHu0bQNTZD61SfnAds9fXQfW/WSr6WlV5Dbnm+uBJ1KRA
+ IQFWcFtFX3lXrZaZGxTBFlwDO4gVSNdKMuSFYwrqgsmec5U+4zPp47iN9IinMl6VIoxF
+ agBy9oiQlu+DRRgNRW/GSMDuTDDfBMxFYa4CYn8k4lOTgQfjDELf9K8qNhh+GPx5ofbB
+ 6DMBoca16HQ9h+jSrPIBGU/nUbHdKpASArnvwUpgq6srO8uHrJ4eP/q8WXKPTDG0/qaa
+ miP6Y3j092/cvyJ2s9s2EzORpkxJMAWvJtp6fTeXn28sLPtMfrfnGk6/ZDmjxknuVLMq
+ z6XA==
+X-Gm-Message-State: APjAAAVA1Q9M5tF1uQI1CAMLOyHiKNsJYQQ7mtqmhv+QqCWFml1eeODQ
+ gohNuW6jGvc2PzSVtJ8LGlscXPijcr0=
+X-Google-Smtp-Source: APXvYqxatoixZIAkGTfUzQYPndM3c4lxzQ/7Yt1mLoYGUg0sQZV8EvPUoU7NEwxxxomdGgsEaJa6ng==
+X-Received: by 2002:a1c:4857:: with SMTP id v84mr6951355wma.8.1581616621280;
+ Thu, 13 Feb 2020 09:57:01 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p26sm3692913wmc.24.2020.02.13.09.57.09
+ by smtp.gmail.com with ESMTPSA id p26sm3692913wmc.24.2020.02.13.09.57.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 09:57:10 -0800 (PST)
+ Thu, 13 Feb 2020 09:57:00 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 14/30] qapi/ui.json: Use explicit bulleted lists
-Date: Thu, 13 Feb 2020 17:56:31 +0000
-Message-Id: <20200213175647.17628-15-peter.maydell@linaro.org>
+Subject: [PATCH v2 08/30] qapi: Use ':' after @argument in doc comments
+Date: Thu, 13 Feb 2020 17:56:25 +0000
+Message-Id: <20200213175647.17628-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200213175647.17628-1-peter.maydell@linaro.org>
 References: <20200213175647.17628-1-peter.maydell@linaro.org>
@@ -80,7 +80,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,143 +100,425 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A JSON block comment like this:
- Returns: nothing on success
-          If @node is not a valid block device, DeviceNotFound
-          If @name is not found, GenericError with an explanation
+Some qapi doc comments have forgotten the ':' after the
+@argument, like this:
 
-renders like this:
+# @filename         Filename for the new image file
+# @size             Size of the virtual disk in bytes
 
- Returns: nothing on success If node is not a valid block device,
- DeviceNotFound If name is not found, GenericError with an explanation
+The result is that these are parsed as part of the body
+text and appear as a run-on line:
+  filename Filename for the new image file size Size of the virtual disk in bytes"
+followed by
+  filename: string
+    Not documented
+  size: int
+    Not documented
 
-because whitespace is not significant.
+in the 'Members' section.
 
-Use an actual bulleted list, so that the formatting is correct.
+Correct the formatting.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
-v1->v2: commit message tweak as suggested by Markus
----
- qapi/ui.json | 63 +++++++++++++++++++++++++++-------------------------
- 1 file changed, 33 insertions(+), 30 deletions(-)
+ qapi/block-core.json | 236 +++++++++++++++++++++----------------------
+ 1 file changed, 118 insertions(+), 118 deletions(-)
 
-diff --git a/qapi/ui.json b/qapi/ui.json
-index 088a8680efb..e4bd3d8ea76 100644
---- a/qapi/ui.json
-+++ b/qapi/ui.json
-@@ -12,8 +12,8 @@
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index db9ca688d49..c617bc2af63 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3235,9 +3235,9 @@
+ ##
+ # @SshHostKeyCheckMode:
  #
- # Sets the password of a remote display session.
+-# @none             Don't check the host key at all
+-# @hash             Compare the host key with a given hash
+-# @known_hosts      Check the host key against the known_hosts file
++# @none: Don't check the host key at all
++# @hash: Compare the host key with a given hash
++# @known_hosts: Check the host key against the known_hosts file
  #
--# @protocol: 'vnc' to modify the VNC server password
--#            'spice' to modify the Spice server password
-+# @protocol: - 'vnc' to modify the VNC server password
-+#            - 'spice' to modify the Spice server password
+ # Since: 2.12
+ ##
+@@ -3247,8 +3247,8 @@
+ ##
+ # @SshHostKeyCheckHashType:
  #
- # @password: the new password
+-# @md5              The given hash is an md5 hash
+-# @sha1             The given hash is an sha1 hash
++# @md5: The given hash is an md5 hash
++# @sha1: The given hash is an sha1 hash
  #
-@@ -23,8 +23,8 @@
- #             'disconnect' to disconnect existing clients
- #             'keep' to maintain existing clients
+ # Since: 2.12
+ ##
+@@ -3258,8 +3258,8 @@
+ ##
+ # @SshHostKeyHash:
  #
--# Returns: Nothing on success
--#          If Spice is not enabled, DeviceNotFound
-+# Returns: - Nothing on success
-+#          - If Spice is not enabled, DeviceNotFound
+-# @type             The hash algorithm used for the hash
+-# @hash             The expected hash value
++# @type: The hash algorithm used for the hash
++# @hash: The expected hash value
  #
- # Since: 0.14.0
+ # Since: 2.12
+ ##
+@@ -4265,13 +4265,13 @@
  #
-@@ -46,13 +46,14 @@
- # @protocol: the name of the remote display protocol 'vnc' or 'spice'
+ # Driver specific image creation options for file.
  #
- # @time: when to expire the password.
--#        'now' to expire the password immediately
--#        'never' to cancel password expiration
--#        '+INT' where INT is the number of seconds from now (integer)
--#        'INT' where INT is the absolute time in seconds
+-# @filename         Filename for the new image file
+-# @size             Size of the virtual disk in bytes
+-# @preallocation    Preallocation mode for the new image (default: off;
+-#                   allowed values: off,
+-#                   falloc (if defined CONFIG_POSIX_FALLOCATE),
+-#                   full (if defined CONFIG_POSIX))
+-# @nocow            Turn off copy-on-write (valid only on btrfs; default: off)
++# @filename: Filename for the new image file
++# @size: Size of the virtual disk in bytes
++# @preallocation: Preallocation mode for the new image (default: off;
++#                 allowed values: off,
++#                 falloc (if defined CONFIG_POSIX_FALLOCATE),
++#                 full (if defined CONFIG_POSIX))
++# @nocow: Turn off copy-on-write (valid only on btrfs; default: off)
  #
--# Returns: Nothing on success
--#          If @protocol is 'spice' and Spice is not active, DeviceNotFound
-+#        - 'now' to expire the password immediately
-+#        - 'never' to cancel password expiration
-+#        - '+INT' where INT is the number of seconds from now (integer)
-+#        - 'INT' where INT is the absolute time in seconds
-+#
-+# Returns: - Nothing on success
-+#          - If @protocol is 'spice' and Spice is not active, DeviceNotFound
+ # Since: 2.12
+ ##
+@@ -4286,12 +4286,12 @@
  #
- # Since: 0.14.0
+ # Driver specific image creation options for gluster.
  #
-@@ -201,9 +202,10 @@
- # @tls-port: The SPICE server's TLS port number.
+-# @location         Where to store the new image file
+-# @size             Size of the virtual disk in bytes
+-# @preallocation    Preallocation mode for the new image (default: off;
+-#                   allowed values: off,
+-#                   falloc (if defined CONFIG_GLUSTERFS_FALLOCATE),
+-#                   full (if defined CONFIG_GLUSTERFS_ZEROFILL))
++# @location: Where to store the new image file
++# @size: Size of the virtual disk in bytes
++# @preallocation: Preallocation mode for the new image (default: off;
++#                 allowed values: off,
++#                 falloc (if defined CONFIG_GLUSTERFS_FALLOCATE),
++#                 full (if defined CONFIG_GLUSTERFS_ZEROFILL))
  #
- # @auth: the current authentication type used by the server
--#        'none'  if no authentication is being used
--#        'spice' uses SASL or direct TLS authentication, depending on command
--#                line options
-+#
-+#        - 'none'  if no authentication is being used
-+#        - 'spice' uses SASL or direct TLS authentication, depending on command
-+#          line options
+ # Since: 2.12
+ ##
+@@ -4305,11 +4305,11 @@
  #
- # @mouse-mode: The mode in which the mouse cursor is displayed currently. Can
- #              be determined by the client or the server, or unknown if spice
-@@ -433,27 +435,28 @@
- # @host: The hostname the VNC server is bound to.  This depends on
- #        the name resolution on the host and may be an IP address.
+ # Driver specific image creation options for LUKS.
  #
--# @family: 'ipv6' if the host is listening for IPv6 connections
--#                    'ipv4' if the host is listening for IPv4 connections
--#                    'unix' if the host is listening on a unix domain socket
--#                    'unknown' otherwise
-+# @family: - 'ipv6' if the host is listening for IPv6 connections
-+#          - 'ipv4' if the host is listening for IPv4 connections
-+#          - 'unix' if the host is listening on a unix domain socket
-+#          - 'unknown' otherwise
+-# @file             Node to create the image format on
+-# @size             Size of the virtual disk in bytes
+-# @preallocation    Preallocation mode for the new image
+-#                   (since: 4.2)
+-#                   (default: off; allowed values: off, metadata, falloc, full)
++# @file: Node to create the image format on
++# @size: Size of the virtual disk in bytes
++# @preallocation: Preallocation mode for the new image
++#                 (since: 4.2)
++#                 (default: off; allowed values: off, metadata, falloc, full)
  #
- # @service: The service name of the server's port.  This may depends
- #           on the host system's service database so symbolic names should not
- #           be relied on.
+ # Since: 2.12
+ ##
+@@ -4324,8 +4324,8 @@
  #
- # @auth: the current authentication type used by the server
--#        'none' if no authentication is being used
--#        'vnc' if VNC authentication is being used
--#        'vencrypt+plain' if VEncrypt is used with plain text authentication
--#        'vencrypt+tls+none' if VEncrypt is used with TLS and no authentication
--#        'vencrypt+tls+vnc' if VEncrypt is used with TLS and VNC authentication
--#        'vencrypt+tls+plain' if VEncrypt is used with TLS and plain text auth
--#        'vencrypt+x509+none' if VEncrypt is used with x509 and no auth
--#        'vencrypt+x509+vnc' if VEncrypt is used with x509 and VNC auth
--#        'vencrypt+x509+plain' if VEncrypt is used with x509 and plain text auth
--#        'vencrypt+tls+sasl' if VEncrypt is used with TLS and SASL auth
--#        'vencrypt+x509+sasl' if VEncrypt is used with x509 and SASL auth
-+#
-+#        - 'none' if no authentication is being used
-+#        - 'vnc' if VNC authentication is being used
-+#        - 'vencrypt+plain' if VEncrypt is used with plain text authentication
-+#        - 'vencrypt+tls+none' if VEncrypt is used with TLS and no authentication
-+#        - 'vencrypt+tls+vnc' if VEncrypt is used with TLS and VNC authentication
-+#        - 'vencrypt+tls+plain' if VEncrypt is used with TLS and plain text auth
-+#        - 'vencrypt+x509+none' if VEncrypt is used with x509 and no auth
-+#        - 'vencrypt+x509+vnc' if VEncrypt is used with x509 and VNC auth
-+#        - 'vencrypt+x509+plain' if VEncrypt is used with x509 and plain text auth
-+#        - 'vencrypt+tls+sasl' if VEncrypt is used with TLS and SASL auth
-+#        - 'vencrypt+x509+sasl' if VEncrypt is used with x509 and SASL auth
+ # Driver specific image creation options for NFS.
  #
- # @clients: a list of @VncClientInfo of all currently connected clients
+-# @location         Where to store the new image file
+-# @size             Size of the virtual disk in bytes
++# @location: Where to store the new image file
++# @size: Size of the virtual disk in bytes
  #
-@@ -840,8 +843,8 @@
- # @hold-time: time to delay key up events, milliseconds. Defaults
- #             to 100
+ # Since: 2.12
+ ##
+@@ -4338,9 +4338,9 @@
  #
--# Returns: Nothing on success
--#          If key is unknown or redundant, InvalidParameter
-+# Returns: - Nothing on success
-+#          - If key is unknown or redundant, InvalidParameter
+ # Driver specific image creation options for parallels.
  #
- # Since: 1.3.0
+-# @file             Node to create the image format on
+-# @size             Size of the virtual disk in bytes
+-# @cluster-size     Cluster size in bytes (default: 1 MB)
++# @file: Node to create the image format on
++# @size: Size of the virtual disk in bytes
++# @cluster-size: Cluster size in bytes (default: 1 MB)
  #
+ # Since: 2.12
+ ##
+@@ -4354,11 +4354,11 @@
+ #
+ # Driver specific image creation options for qcow.
+ #
+-# @file             Node to create the image format on
+-# @size             Size of the virtual disk in bytes
+-# @backing-file     File name of the backing file if a backing file
+-#                   should be used
+-# @encrypt          Encryption options if the image should be encrypted
++# @file: Node to create the image format on
++# @size: Size of the virtual disk in bytes
++# @backing-file: File name of the backing file if a backing file
++#                should be used
++# @encrypt: Encryption options if the image should be encrypted
+ #
+ # Since: 2.12
+ ##
+@@ -4385,24 +4385,24 @@
+ #
+ # Driver specific image creation options for qcow2.
+ #
+-# @file             Node to create the image format on
+-# @data-file        Node to use as an external data file in which all guest
+-#                   data is stored so that only metadata remains in the qcow2
+-#                   file (since: 4.0)
+-# @data-file-raw    True if the external data file must stay valid as a
+-#                   standalone (read-only) raw image without looking at qcow2
+-#                   metadata (default: false; since: 4.0)
+-# @size             Size of the virtual disk in bytes
+-# @version          Compatibility level (default: v3)
+-# @backing-file     File name of the backing file if a backing file
+-#                   should be used
+-# @backing-fmt      Name of the block driver to use for the backing file
+-# @encrypt          Encryption options if the image should be encrypted
+-# @cluster-size     qcow2 cluster size in bytes (default: 65536)
+-# @preallocation    Preallocation mode for the new image (default: off;
+-#                   allowed values: off, falloc, full, metadata)
+-# @lazy-refcounts   True if refcounts may be updated lazily (default: off)
+-# @refcount-bits    Width of reference counts in bits (default: 16)
++# @file: Node to create the image format on
++# @data-file: Node to use as an external data file in which all guest
++#             data is stored so that only metadata remains in the qcow2
++#             file (since: 4.0)
++# @data-file-raw: True if the external data file must stay valid as a
++#                 standalone (read-only) raw image without looking at qcow2
++#                 metadata (default: false; since: 4.0)
++# @size: Size of the virtual disk in bytes
++# @version: Compatibility level (default: v3)
++# @backing-file: File name of the backing file if a backing file
++#                should be used
++# @backing-fmt: Name of the block driver to use for the backing file
++# @encrypt: Encryption options if the image should be encrypted
++# @cluster-size: qcow2 cluster size in bytes (default: 65536)
++# @preallocation: Preallocation mode for the new image (default: off;
++#                 allowed values: off, falloc, full, metadata)
++# @lazy-refcounts: True if refcounts may be updated lazily (default: off)
++# @refcount-bits: Width of reference counts in bits (default: 16)
+ #
+ # Since: 2.12
+ ##
+@@ -4425,13 +4425,13 @@
+ #
+ # Driver specific image creation options for qed.
+ #
+-# @file             Node to create the image format on
+-# @size             Size of the virtual disk in bytes
+-# @backing-file     File name of the backing file if a backing file
+-#                   should be used
+-# @backing-fmt      Name of the block driver to use for the backing file
+-# @cluster-size     Cluster size in bytes (default: 65536)
+-# @table-size       L1/L2 table size (in clusters)
++# @file: Node to create the image format on
++# @size: Size of the virtual disk in bytes
++# @backing-file: File name of the backing file if a backing file
++#                should be used
++# @backing-fmt: Name of the block driver to use for the backing file
++# @cluster-size: Cluster size in bytes (default: 65536)
++# @table-size: L1/L2 table size (in clusters)
+ #
+ # Since: 2.12
+ ##
+@@ -4448,10 +4448,10 @@
+ #
+ # Driver specific image creation options for rbd/Ceph.
+ #
+-# @location         Where to store the new image file. This location cannot
+-#                   point to a snapshot.
+-# @size             Size of the virtual disk in bytes
+-# @cluster-size     RBD object size
++# @location: Where to store the new image file. This location cannot
++#            point to a snapshot.
++# @size: Size of the virtual disk in bytes
++# @cluster-size: RBD object size
+ #
+ # Since: 2.12
+ ##
+@@ -4499,23 +4499,23 @@
+ #
+ # Driver specific image creation options for VMDK.
+ #
+-# @file         Where to store the new image file. This refers to the image
+-#               file for monolithcSparse and streamOptimized format, or the
+-#               descriptor file for other formats.
+-# @size         Size of the virtual disk in bytes
+-# @extents      Where to store the data extents. Required for monolithcFlat,
+-#               twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
+-#               monolithicFlat, only one entry is required; for
+-#               twoGbMaxExtent* formats, the number of entries required is
+-#               calculated as extent_number = virtual_size / 2GB. Providing
+-#               more extents than will be used is an error.
+-# @subformat    The subformat of the VMDK image. Default: "monolithicSparse".
+-# @backing-file The path of backing file. Default: no backing file is used.
+-# @adapter-type The adapter type used to fill in the descriptor. Default: ide.
+-# @hwversion    Hardware version. The meaningful options are "4" or "6".
+-#               Default: "4".
+-# @zeroed-grain Whether to enable zeroed-grain feature for sparse subformats.
+-#               Default: false.
++# @file: Where to store the new image file. This refers to the image
++#        file for monolithcSparse and streamOptimized format, or the
++#        descriptor file for other formats.
++# @size: Size of the virtual disk in bytes
++# @extents: Where to store the data extents. Required for monolithcFlat,
++#           twoGbMaxExtentSparse and twoGbMaxExtentFlat formats. For
++#           monolithicFlat, only one entry is required; for
++#           twoGbMaxExtent* formats, the number of entries required is
++#           calculated as extent_number = virtual_size / 2GB. Providing
++#           more extents than will be used is an error.
++# @subformat: The subformat of the VMDK image. Default: "monolithicSparse".
++# @backing-file: The path of backing file. Default: no backing file is used.
++# @adapter-type: The adapter type used to fill in the descriptor. Default: ide.
++# @hwversion: Hardware version. The meaningful options are "4" or "6".
++#             Default: "4".
++# @zeroed-grain: Whether to enable zeroed-grain feature for sparse subformats.
++#                Default: false.
+ #
+ # Since: 4.0
+ ##
+@@ -4533,9 +4533,9 @@
+ ##
+ # @SheepdogRedundancyType:
+ #
+-# @full             Create a fully replicated vdi with x copies
+-# @erasure-coded    Create an erasure coded vdi with x data strips and
+-#                   y parity strips
++# @full: Create a fully replicated vdi with x copies
++# @erasure-coded: Create an erasure coded vdi with x data strips and
++#                 y parity strips
+ #
+ # Since: 2.12
+ ##
+@@ -4545,7 +4545,7 @@
+ ##
+ # @SheepdogRedundancyFull:
+ #
+-# @copies           Number of copies to use (between 1 and 31)
++# @copies: Number of copies to use (between 1 and 31)
+ #
+ # Since: 2.12
+ ##
+@@ -4555,8 +4555,8 @@
+ ##
+ # @SheepdogRedundancyErasureCoded:
+ #
+-# @data-strips      Number of data strips to use (one of {2,4,8,16})
+-# @parity-strips    Number of parity strips to use (between 1 and 15)
++# @data-strips: Number of data strips to use (one of {2,4,8,16})
++# @parity-strips: Number of parity strips to use (between 1 and 15)
+ #
+ # Since: 2.12
+ ##
+@@ -4580,13 +4580,13 @@
+ #
+ # Driver specific image creation options for Sheepdog.
+ #
+-# @location         Where to store the new image file
+-# @size             Size of the virtual disk in bytes
+-# @backing-file     File name of a base image
+-# @preallocation    Preallocation mode for the new image (default: off;
+-#                   allowed values: off, full)
+-# @redundancy       Redundancy of the image
+-# @object-size      Object size of the image
++# @location: Where to store the new image file
++# @size: Size of the virtual disk in bytes
++# @backing-file: File name of a base image
++# @preallocation: Preallocation mode for the new image (default: off;
++#                 allowed values: off, full)
++# @redundancy: Redundancy of the image
++# @object-size: Object size of the image
+ #
+ # Since: 2.12
+ ##
+@@ -4603,8 +4603,8 @@
+ #
+ # Driver specific image creation options for SSH.
+ #
+-# @location         Where to store the new image file
+-# @size             Size of the virtual disk in bytes
++# @location: Where to store the new image file
++# @size: Size of the virtual disk in bytes
+ #
+ # Since: 2.12
+ ##
+@@ -4617,10 +4617,10 @@
+ #
+ # Driver specific image creation options for VDI.
+ #
+-# @file             Node to create the image format on
+-# @size             Size of the virtual disk in bytes
+-# @preallocation    Preallocation mode for the new image (default: off;
+-#                   allowed values: off, metadata)
++# @file: Node to create the image format on
++# @size: Size of the virtual disk in bytes
++# @preallocation: Preallocation mode for the new image (default: off;
++#                 allowed values: off, metadata)
+ #
+ # Since: 2.12
+ ##
+@@ -4645,17 +4645,17 @@
+ #
+ # Driver specific image creation options for vhdx.
+ #
+-# @file             Node to create the image format on
+-# @size             Size of the virtual disk in bytes
+-# @log-size         Log size in bytes, must be a multiple of 1 MB
+-#                   (default: 1 MB)
+-# @block-size       Block size in bytes, must be a multiple of 1 MB and not
+-#                   larger than 256 MB (default: automatically choose a block
+-#                   size depending on the image size)
+-# @subformat        vhdx subformat (default: dynamic)
+-# @block-state-zero Force use of payload blocks of type 'ZERO'. Non-standard,
+-#                   but default.  Do not set to 'off' when using 'qemu-img
+-#                   convert' with subformat=dynamic.
++# @file: Node to create the image format on
++# @size: Size of the virtual disk in bytes
++# @log-size: Log size in bytes, must be a multiple of 1 MB
++#            (default: 1 MB)
++# @block-size: Block size in bytes, must be a multiple of 1 MB and not
++#              larger than 256 MB (default: automatically choose a block
++#              size depending on the image size)
++# @subformat: vhdx subformat (default: dynamic)
++# @block-state-zero: Force use of payload blocks of type 'ZERO'. Non-standard,
++#                    but default.  Do not set to 'off' when using 'qemu-img
++#                    convert' with subformat=dynamic.
+ #
+ # Since: 2.12
+ ##
+@@ -4683,12 +4683,12 @@
+ #
+ # Driver specific image creation options for vpc (VHD).
+ #
+-# @file             Node to create the image format on
+-# @size             Size of the virtual disk in bytes
+-# @subformat        vhdx subformat (default: dynamic)
+-# @force-size       Force use of the exact byte size instead of rounding to the
+-#                   next size that can be represented in CHS geometry
+-#                   (default: false)
++# @file: Node to create the image format on
++# @size: Size of the virtual disk in bytes
++# @subformat: vhdx subformat (default: dynamic)
++# @force-size: Force use of the exact byte size instead of rounding to the
++#              next size that can be represented in CHS geometry
++#              (default: false)
+ #
+ # Since: 2.12
+ ##
+@@ -4703,7 +4703,7 @@
+ #
+ # Options for creating an image format on a given node.
+ #
+-# @driver           block driver to create the image format
++# @driver: block driver to create the image format
+ #
+ # Since: 2.12
+ ##
 -- 
 2.20.1
 
