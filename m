@@ -2,89 +2,80 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC8CC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 16:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15DEAC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 16:52:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16FDD24650
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 16:40:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16FDD24650
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id D6580206ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 16:52:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3Jv8j6V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6580206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2HXZ-0004vU-BI
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 11:40:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55107)
+	id 1j2HjR-0001Ml-1l
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 11:52:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56639)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j2HW8-00044C-6W
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 11:39:10 -0500
+ (envelope-from <drjones@redhat.com>) id 1j2Hif-0000xW-QH
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 11:52:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j2HW6-0007Xh-HV
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 11:39:08 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2077 helo=huawei.com)
+ (envelope-from <drjones@redhat.com>) id 1j2Hid-0005Zy-Tf
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 11:52:05 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27403
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1j2HW2-0007Nw-DU; Thu, 13 Feb 2020 11:39:02 -0500
-Received: from LHREML713-CAH.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id 633939760EC179041EB2;
- Thu, 13 Feb 2020 16:38:57 +0000 (GMT)
-Received: from lhreml704-chm.china.huawei.com (10.201.108.53) by
- LHREML713-CAH.china.huawei.com (10.201.108.36) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Thu, 13 Feb 2020 16:38:57 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml704-chm.china.huawei.com (10.201.108.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Thu, 13 Feb 2020 16:38:56 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Thu, 13 Feb 2020 16:38:56 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Topic: [PATCH v2 1/7] exec: Fix for qemu_ram_resize() callback
-Thread-Index: AQHVzV43w2nN4JnxQEOUTwT8NpSKx6gLQ1MAgAAWtoCAACc+AIABYS3wgAAIyYCAAR1e4IAAFJiAgAAHflCAADtYAIABo1pQgARLAwCAAABbwIAABn8AgAN5SJCAADkTAIABctiA
-Date: Thu, 13 Feb 2020 16:38:56 +0000
-Message-ID: <04adb50079bc45888f514721edb3cfa3@huawei.com>
-References: <20200117174522.22044-1-shameerali.kolothum.thodi@huawei.com>
- <20200117174522.22044-2-shameerali.kolothum.thodi@huawei.com>
- <20200204162320.67e5d353@redhat.com>
- <74eaaa45-0d20-9a21-fbf8-6d29deb248eb@redhat.com>
- <4ce41554-8b8e-dbb5-5fe9-43af09950f23@redhat.com>
- <8e0b2c762e914c64bebfab5fc7441661@huawei.com>
- <133f274e-e942-7008-93d2-8edb1bc4d7ae@redhat.com>
- <52fff289cca14874ad493fc25806fe3d@huawei.com>
- <f041380c-afcb-f8d8-89db-8f48c7b46767@redhat.com>
- <e97fa28c653044b8bab66aeca2374682@huawei.com>
- <0ff4d2c1-ebd3-1d2f-07e8-a4f13be07ceb@redhat.com>
- <6bf255ecb88446f1b08ee4ab21a85f02@huawei.com>
- <69848dd3-fac4-ec6b-78a8-a052124f4fc3@redhat.com>
- <49b54eea65cd49ae832cd6ec21eae64a@huawei.com>
- <b4ccf1d9-4514-6b63-5ef9-1d337f539267@redhat.com>
- <fad66252aa8f4b46816f21b5315b6358@huawei.com>
- <8f10dd72-9a19-b910-489c-eacc6a772046@redhat.com>
-In-Reply-To: <8f10dd72-9a19-b910-489c-eacc6a772046@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j2Hid-0005Yn-Pg
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 11:52:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581612722;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vWegnVtFFiE2vYMqXA24P9p7vLiR6FEenRzK02gGWlc=;
+ b=b3Jv8j6VBLXbdjd8Uym9L4xHVqfb3dn9e47pTs+9uswFJp7L7N9FEUYUZvqfTNu1tlNWNh
+ pVZWnPbFD0ddty1MkmPrU3Ow6faAHY2dZICzsU+lodPuryhR0xqM1pItPsLd9TK2WxQybY
+ UmPAt2H1oS7UJCf80zTDpr9iEXAJ03w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-129-qpkKJHShNgeBJoyviQ57QQ-1; Thu, 13 Feb 2020 11:51:55 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D0B3477
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 16:51:54 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A1705DA7B;
+ Thu, 13 Feb 2020 16:51:53 +0000 (UTC)
+Date: Thu, 13 Feb 2020 17:51:50 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Subject: Re: [PATCH] qapi: Expand documentation for LostTickPolicy
+Message-ID: <20200213165150.dxefqbb6ep7t5tk7@kamzik.brq.redhat.com>
+References: <20200211183744.210298-1-abologna@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200211183744.210298-1-abologna@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: qpkKJHShNgeBJoyviQ57QQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,159 +87,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "mst@redhat.com" <mst@redhat.com>,
- Juan Jose Quintela Carreira <quintela@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGF2aWQgSGlsZGVuYnJh
-bmQgW21haWx0bzpkYXZpZEByZWRoYXQuY29tXQ0KPiBTZW50OiAxMiBGZWJydWFyeSAyMDIwIDE4
-OjIxDQo+IFRvOiBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIDxzaGFtZWVyYWxpLmtvbG90aHVt
-LnRob2RpQGh1YXdlaS5jb20+Ow0KPiBJZ29yIE1hbW1lZG92IDxpbWFtbWVkb0ByZWRoYXQuY29t
-Pg0KPiBDYzogcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyB4aWFvZ3Vhbmdyb25nLmVyaWNAZ21h
-aWwuY29tOw0KPiBtc3RAcmVkaGF0LmNvbTsgc2hhbm5vbi56aGFvc2xAZ21haWwuY29tOyBxZW11
-LWRldmVsQG5vbmdudS5vcmc7DQo+IHh1d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+OyBMaW51
-eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT47DQo+IGVyaWMuYXVnZXJAcmVkaGF0LmNvbTsgcWVt
-dS1hcm1Abm9uZ251Lm9yZzsgbGVyc2VrQHJlZGhhdC5jb207DQo+IGRnaWxiZXJ0QHJlZGhhdC5j
-b207IEp1YW4gSm9zZSBRdWludGVsYSBDYXJyZWlyYSA8cXVpbnRlbGFAcmVkaGF0LmNvbT4NCj4g
-U3ViamVjdDogUmU6IFtQQVRDSCB2MiAxLzddIGV4ZWM6IEZpeCBmb3IgcWVtdV9yYW1fcmVzaXpl
-KCkgY2FsbGJhY2sNCg0KWy4uLl0NCg0KPiA+IEhtbS4uaXQgYnJlYWtzIHg4NiArIHNlYWJpb3Mg
-Ym9vdC4gVGhlIGlzc3VlIGlzIHNlYWJpb3MgZXhwZWN0cyBSU0RQIGluIEZTRUcNCj4gPiBtZW1v
-cnkuIFdpdGggdGhlIGFib3ZlIHByb3Bvc2VkIGNoYW5nZSwgUlNEUCB3aWxsIGJlIGFsaWduZWQg
-dG8gUEFHRV9TSVpFDQo+IGFuZA0KPiA+IHNlYWJpb3MgbWVtIGFsbG9jYXRpb24gZm9yIFJTRFAg
-ZmFpbHMgYXQsDQo+ID4NCj4gPg0KPiBodHRwczovL2dpdGh1Yi5jb20vY29yZWJvb3Qvc2VhYmlv
-cy9ibG9iL21hc3Rlci9zcmMvZncvcm9tZmlsZV9sb2FkZXIuYyNMOA0KPiA1DQo+ID4NCj4gPiBU
-byBnZXQgcGFzcyB0aGUgYWJvdmUsIEkgY2hhbmdlZCAiYWxsb2NfZnNlZyIgZmxhZyB0byBmYWxz
-ZSBpbiBidWlsZF9yc2RwKCksIGJ1dA0KPiA+IHNlYWJpb3Mgc2VlbXMgdG8gbWFrZSB0aGUgYXNz
-dW1wdGlvbiB0aGF0IFJTRFAgaGFzIHRvIGJlIHBsYWNlZCBpbiBGU0VHDQo+IG1lbW9yeQ0KPiA+
-IGhlcmUsDQo+ID4gaHR0cHM6Ly9naXRodWIuY29tL2NvcmVib290L3NlYWJpb3MvYmxvYi9tYXN0
-ZXIvc3JjL2Z3L2Jpb3N0YWJsZXMuYyNMMTI2DQo+ID4NCj4gPiBTbyBkb2VzbuKAmXQgbG9vayBs
-aWtlIHRoZXJlIGlzIGFuIGVhc3kgZml4IGZvciB0aGlzIHdpdGhvdXQgY2hhbmdpbmcgdGhlIHNl
-YWJpb3MNCj4gY29kZS4NCj4gPg0KPiA+IEJldHdlZW4sIE9WTUYgd29ya3MgZmluZSB3aXRoIHRo
-ZSBhbGlnbmVkIHNpemUgb24geDg2Lg0KPiA+DQo+ID4gT25lIHRoaW5nIHdlIGNhbiBkbyBpcyB0
-cmVhdCB0aGUgUlNEUCBjYXNlIHNlcGFyYXRlbHkgb3Igb25seSB1c2UgdGhlIGFsaWduZWQNCj4g
-PiBwYWdlIHNpemUgZm9yICJldGMvYWNwaS90YWJsZXMiIGFzIGJlbG93LA0KDQpbLi4uXQ0KDQo+
-ID4NCj4gPiBUaG91Z2h0cz8NCj4gDQo+IEkgZG9uJ3QgdGhpbmsgaW50cm9kdWNpbmcgbWVtb3J5
-X3JlZ2lvbl9nZXRfdXNlZF9sZW5ndGgoKSBpcyBhDQo+IGdvb2QgaWRlYS4gSSBhbHNvIGRpc2xp
-a2UsIHRoYXQgdGhlIHJhbSBibG9jayBzaXplIGNhbiBkaWZmZXINCj4gdG8gdGhlIG1lbW9yeSBy
-ZWdpb24gc2l6ZS4gSSB3YXNuJ3QgYXdhcmUgb2YgdGhhdCBjb25kaXRpb24sIHNvcnJ5IQ0KDQpS
-aWdodC4gVGhleSBjYW4gZGlmZmVyIGluIHNpemUgYW5kIGlzIHRoZSBjYXNlIGhlcmUuDQoNCj4g
-TWFraW5nIHRoZSBtZW1vcnkgcmVnaW9uIGFsd2F5cyBzdG9yZSBhbiBhbGlnbmVkIHNpemUgbWln
-aHQgYnJlYWsgb3RoZXIgdXNlDQo+IGNhc2VzLg0KPiANCj4gU3VtbWFyaXppbmcgdGhlIGlzc3Vl
-Og0KPiAxLiBNZW1vcnkgcmVnaW9ucyBjb250YWluIHJhbSBibG9ja3Mgd2l0aCBhIGRpZmZlcmVu
-dCBzaXplLCBpZiB0aGUgc2l6ZSBpcw0KPiAgICBub3QgcHJvcGVybHkgYWxpZ25lZC4gV2hpbGUg
-bWVtb3J5IHJlZ2lvbnMgY2FuIGhhdmUgYW4gdW5hbGlnbmVkIHNpemUsDQo+ICAgIHJhbSBibG9j
-a3MgY2FuJ3QuIFRoaXMgaXMgdHJ1ZSB3aGVuIGNyZWF0aW5nIHJlc2l6YWJsZSBtZW1vcnkgcmVn
-aW9uIHdpdGgNCj4gICAgYW4gdW5hbGlnbmVkIHNpemUuDQo+IDIuIFdoZW4gcmVzaXppbmcgYSBy
-YW0gYmxvY2svbWVtb3J5IHJlZ2lvbiwgdGhlIHNpemUgb2YgdGhlIG1lbW9yeSByZWdpb24NCj4g
-ICAgaXMgc2V0IHRvIHRoZSBhbGlnbmVkIHNpemUuIFRoZSBjYWxsYmFjayBpcyBjYWxsZWQgd2l0
-aCB0aGUgYWxpZ25lZCBzaXplLg0KPiAgICBUaGUgdW5hbGlnbmVkIHBpZWNlIGlzIGxvc3QuDQo+
-IDMuIFdoZW4gbWlncmF0aW5nLCB3ZSBtaWdyYXRlIHRoZSBhbGlnbmVkIHNpemUuDQo+IA0KPg0K
-PiBXaGF0IGFib3V0IHNvbWV0aGluZyBsaWtlIHRoaXM6ICh1bnRlc3RlZCkNCg0KVGhhbmtzIGZv
-ciB0aGF0LiBJIGhhZCBhIGdvIHdpdGggdGhlIGJlbG93IHBhdGNoIGFuZCBpdCBpbmRlZWQgZml4
-ZXMgdGhlIGlzc3VlDQpvZiBjYWxsYmFjayBub3QgYmVpbmcgY2FsbGVkIG9uIHJlc2l6ZS4gQnV0
-IHRoZSBtaWdyYXRpb24gZmFpbHMgd2l0aCB0aGUgYmVsb3cNCmVycm9yLA0KDQpGb3IgeDg2DQot
-LS0tLS0tLS0NCnFlbXUtc3lzdGVtLXg4Nl82NDogVW5rbm93biBjb21iaW5hdGlvbiBvZiBtaWdy
-YXRpb24gZmxhZ3M6IDB4MTQNCnFlbXUtc3lzdGVtLXg4Nl82NDogZXJyb3Igd2hpbGUgbG9hZGlu
-ZyBzdGF0ZSBmb3IgaW5zdGFuY2UgMHgwIG9mIGRldmljZSAncmFtJw0KcWVtdS1zeXN0ZW0teDg2
-XzY0OiBsb2FkIG9mIG1pZ3JhdGlvbiBmYWlsZWQ6IEludmFsaWQgYXJndW1lbnQgDQoNCkZvciBh
-cm02NA0KLS0tLS0tLS0tLS0tLS0NCnFlbXUtc3lzdGVtLWFhcmNoNjQ6IFJlY2VpdmVkIGFuIHVu
-ZXhwZWN0ZWQgY29tcHJlc3NlZCBwYWdlDQpxZW11LXN5c3RlbS1hYXJjaDY0OiBlcnJvciB3aGls
-ZSBsb2FkaW5nIHN0YXRlIGZvciBpbnN0YW5jZSAweDAgb2YgZGV2aWNlICdyYW0nDQpxZW11LXN5
-c3RlbS1hYXJjaDY0OiBsb2FkIG9mIG1pZ3JhdGlvbiBmYWlsZWQ6IEludmFsaWQgYXJndW1lbnQN
-CiANCkkgaGF2ZW7igJl0IGRlYnVnZ2VkIHRoaXMgZnVydGhlciBidXQgbG9va3MgbGlrZSB0aGVy
-ZSBpcyBhIGNvcnJ1cHRpb24gaGFwcGVuaW5nLg0KUGxlYXNlIGxldCBtZSBrbm93IGlmIHlvdSBo
-YXZlIGFueSBjbHVlLg0KDQpUaGFua3MsDQpTaGFtZWVyDQoNCj4gDQo+IEZyb20gZDg0YzIxYmM2
-N2UxNWFjZGFjMmY2MjY1Y2QxNTc2ZDhkZDkyMDIxMSBNb24gU2VwIDE3IDAwOjAwOjAwDQo+IDIw
-MDENCj4gRnJvbTogRGF2aWQgSGlsZGVuYnJhbmQgPGRhdmlkQHJlZGhhdC5jb20+DQo+IERhdGU6
-IFdlZCwgMTIgRmViIDIwMjAgMTk6MTY6MzQgKzAxMDANCj4gU3ViamVjdDogW1BBVENIIHYxXSB0
-bXANCj4gDQo+IFNpZ25lZC1vZmYtYnk6IERhdmlkIEhpbGRlbmJyYW5kIDxkYXZpZEByZWRoYXQu
-Y29tPg0KPiAtLS0NCj4gIGV4ZWMuYyAgICAgICAgICB8IDE0ICsrKysrKysrKysrKy0tDQo+ICBt
-aWdyYXRpb24vcmFtLmMgfCA0NCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0t
-LS0tLS0tLQ0KPiAgMiBmaWxlcyBjaGFuZ2VkLCA0NCBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlv
-bnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9leGVjLmMgYi9leGVjLmMNCj4gaW5kZXggMDVjZmU4
-NjhhYi4uZDQxYTFlMTFiNSAxMDA2NDQNCj4gLS0tIGEvZXhlYy5jDQo+ICsrKyBiL2V4ZWMuYw0K
-PiBAQCAtMjEzMCwxMSArMjEzMCwyMSBAQCBzdGF0aWMgaW50IG1lbW9yeV90cnlfZW5hYmxlX21l
-cmdpbmcodm9pZA0KPiAqYWRkciwgc2l6ZV90IGxlbikNCj4gICAqLw0KPiAgaW50IHFlbXVfcmFt
-X3Jlc2l6ZShSQU1CbG9jayAqYmxvY2ssIHJhbV9hZGRyX3QgbmV3c2l6ZSwgRXJyb3IgKiplcnJw
-KQ0KPiAgew0KPiArICAgIGNvbnN0IHJhbV9hZGRyX3QgdW5hbGlnbmVkX3NpemUgPSBuZXdzaXpl
-Ow0KPiArDQo+ICAgICAgYXNzZXJ0KGJsb2NrKTsNCj4gDQo+ICAgICAgbmV3c2l6ZSA9IEhPU1Rf
-UEFHRV9BTElHTihuZXdzaXplKTsNCj4gDQo+ICAgICAgaWYgKGJsb2NrLT51c2VkX2xlbmd0aCA9
-PSBuZXdzaXplKSB7DQo+ICsgICAgICAgIC8qDQo+ICsgICAgICAgICAqIFdlIGRvbid0IGhhdmUg
-dG8gcmVzaXplIHRoZSByYW0gYmxvY2sgKHdoaWNoIG9ubHkga25vd3MgYWxpZ25lZA0KPiArICAg
-ICAgICAgKiBzaXplcyksIGhvd2V2ZXIsIHdlIGhhdmUgdG8gbm90aWZ5IGlmIHRoZSB1bmFsaWdu
-ZWQgc2l6ZSBjaGFuZ2VkLg0KPiArICAgICAgICAgKi8NCj4gKyAgICAgICAgaWYgKGJsb2NrLT5y
-ZXNpemVkICYmIHVuYWxpZ25lZF9zaXplICE9DQo+IG1lbW9yeV9yZWdpb25fc2l6ZShibG9jay0+
-bXIpKSB7DQo+ICsgICAgICAgICAgICBibG9jay0+cmVzaXplZChibG9jay0+aWRzdHIsIHVuYWxp
-Z25lZF9zaXplLCBibG9jay0+aG9zdCk7DQo+ICsgICAgICAgICAgICBtZW1vcnlfcmVnaW9uX3Nl
-dF9zaXplKGJsb2NrLT5tciwgdW5hbGlnbmVkX3NpemUpOw0KPiArICAgICAgICB9DQo+ICAgICAg
-ICAgIHJldHVybiAwOw0KPiAgICAgIH0NCj4gDQo+IEBAIC0yMTU4LDkgKzIxNjgsOSBAQCBpbnQg
-cWVtdV9yYW1fcmVzaXplKFJBTUJsb2NrICpibG9jaywNCj4gcmFtX2FkZHJfdCBuZXdzaXplLCBF
-cnJvciAqKmVycnApDQo+ICAgICAgYmxvY2stPnVzZWRfbGVuZ3RoID0gbmV3c2l6ZTsNCj4gICAg
-ICBjcHVfcGh5c2ljYWxfbWVtb3J5X3NldF9kaXJ0eV9yYW5nZShibG9jay0+b2Zmc2V0LA0KPiBi
-bG9jay0+dXNlZF9sZW5ndGgsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgRElSVFlfQ0xJRU5UU19BTEwpOw0KPiAtICAgIG1lbW9yeV9yZWdpb25fc2V0X3NpemUo
-YmxvY2stPm1yLCBuZXdzaXplKTsNCj4gKyAgICBtZW1vcnlfcmVnaW9uX3NldF9zaXplKGJsb2Nr
-LT5tciwgdW5hbGlnbmVkX3NpemUpOw0KPiAgICAgIGlmIChibG9jay0+cmVzaXplZCkgew0KPiAt
-ICAgICAgICBibG9jay0+cmVzaXplZChibG9jay0+aWRzdHIsIG5ld3NpemUsIGJsb2NrLT5ob3N0
-KTsNCj4gKyAgICAgICAgYmxvY2stPnJlc2l6ZWQoYmxvY2stPmlkc3RyLCB1bmFsaWduZWRfc2l6
-ZSwgYmxvY2stPmhvc3QpOw0KPiAgICAgIH0NCj4gICAgICByZXR1cm4gMDsNCj4gIH0NCj4gZGlm
-ZiAtLWdpdCBhL21pZ3JhdGlvbi9yYW0uYyBiL21pZ3JhdGlvbi9yYW0uYw0KPiBpbmRleCBlZDIz
-ZWQxYzdjLi4yYWNjNGI4NWNhIDEwMDY0NA0KPiAtLS0gYS9taWdyYXRpb24vcmFtLmMNCj4gKysr
-IGIvbWlncmF0aW9uL3JhbS5jDQo+IEBAIC0xNzYxLDI4ICsxNzYxLDQzIEBAIHZvaWQgYWNjdF91
-cGRhdGVfcG9zaXRpb24oUUVNVUZpbGUgKmYsIHNpemVfdA0KPiBzaXplLCBib29sIHplcm8pDQo+
-ICAgICAgfQ0KPiAgfQ0KPiANCj4gLXN0YXRpYyB1aW50NjRfdCByYW1fYnl0ZXNfdG90YWxfY29t
-bW9uKGJvb2wgY291bnRfaWdub3JlZCkNCj4gK3N0YXRpYyB1aW50NjRfdCByYW1ibG9ja19yYW1f
-Ynl0ZXNfbWlncmF0aW9uKFJBTUJsb2NrICpibG9jaykNCj4gK3sNCj4gKyAgICAvKg0KPiArICAg
-ICAqIFdoZW4gcmVzaXppbmcgb24gdGhlIHRhcmdldCwgd2UgbmVlZCB0aGUgdW5hbGlnbmVkIHNp
-emUsDQo+ICsgICAgICogb3RoZXJ3aXNlLCB3ZSBsb3NlIHRoZSB1bmFsaWduZWQgc2l6ZSBkdXJp
-bmcgbWlncmF0aW9uLg0KPiArICAgICAqLw0KPiArICAgIGlmIChibG9jay0+bXIgJiYgKGJsb2Nr
-LT5mbGFncyAmIFJBTV9SRVNJWkVBQkxFKSkgew0KPiArICAgICAgICByZXR1cm4gbWVtb3J5X3Jl
-Z2lvbl9zaXplKGJsb2NrLT5tcik7DQo+ICsgICAgfSBlbHNlIHsNCj4gKyAgICAgICAgcmV0dXJu
-IGJsb2NrLT51c2VkX2xlbmd0aDsNCj4gKyAgICB9DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB1aW50
-NjRfdCByYW1fYnl0ZXNfdG90YWxfbWlncmF0aW9uKHZvaWQpDQo+ICB7DQo+ICAgICAgUkFNQmxv
-Y2sgKmJsb2NrOw0KPiAgICAgIHVpbnQ2NF90IHRvdGFsID0gMDsNCj4gDQo+ICAgICAgUkNVX1JF
-QURfTE9DS19HVUFSRCgpOw0KPiANCj4gLSAgICBpZiAoY291bnRfaWdub3JlZCkgew0KPiAtICAg
-ICAgICBSQU1CTE9DS19GT1JFQUNIX01JR1JBVEFCTEUoYmxvY2spIHsNCj4gLSAgICAgICAgICAg
-IHRvdGFsICs9IGJsb2NrLT51c2VkX2xlbmd0aDsNCj4gLSAgICAgICAgfQ0KPiAtICAgIH0gZWxz
-ZSB7DQo+IC0gICAgICAgIFJBTUJMT0NLX0ZPUkVBQ0hfTk9UX0lHTk9SRUQoYmxvY2spIHsNCj4g
-LSAgICAgICAgICAgIHRvdGFsICs9IGJsb2NrLT51c2VkX2xlbmd0aDsNCj4gLSAgICAgICAgfQ0K
-PiArICAgIFJBTUJMT0NLX0ZPUkVBQ0hfTUlHUkFUQUJMRShibG9jaykgew0KPiArICAgICAgICB0
-b3RhbCArPSByYW1ibG9ja19yYW1fYnl0ZXNfbWlncmF0aW9uKGJsb2NrKTsNCj4gICAgICB9DQo+
-ICAgICAgcmV0dXJuIHRvdGFsOw0KPiAgfQ0KPiANCj4gIHVpbnQ2NF90IHJhbV9ieXRlc190b3Rh
-bCh2b2lkKQ0KPiAgew0KPiAtICAgIHJldHVybiByYW1fYnl0ZXNfdG90YWxfY29tbW9uKGZhbHNl
-KTsNCj4gKyAgICBSQU1CbG9jayAqYmxvY2s7DQo+ICsgICAgdWludDY0X3QgdG90YWwgPSAwOw0K
-PiArDQo+ICsgICAgUkNVX1JFQURfTE9DS19HVUFSRCgpOw0KPiArDQo+ICsgICAgUkFNQkxPQ0tf
-Rk9SRUFDSF9OT1RfSUdOT1JFRChibG9jaykgew0KPiArICAgICAgICB0b3RhbCArPSBibG9jay0+
-dXNlZF9sZW5ndGg7DQo+ICsgICAgfQ0KPiArICAgIHJldHVybiB0b3RhbDsNCj4gIH0NCj4gDQo+
-ICBzdGF0aWMgdm9pZCB4YnpybGVfbG9hZF9zZXR1cCh2b2lkKQ0KPiBAQCAtMjQzMiwxMiArMjQ0
-NywxNyBAQCBzdGF0aWMgaW50IHJhbV9zYXZlX3NldHVwKFFFTVVGaWxlICpmLCB2b2lkDQo+ICpv
-cGFxdWUpDQo+ICAgICAgKCpyc3ApLT5mID0gZjsNCj4gDQo+ICAgICAgV0lUSF9SQ1VfUkVBRF9M
-T0NLX0dVQVJEKCkgew0KPiAtICAgICAgICBxZW11X3B1dF9iZTY0KGYsIHJhbV9ieXRlc190b3Rh
-bF9jb21tb24odHJ1ZSkgfA0KPiBSQU1fU0FWRV9GTEFHX01FTV9TSVpFKTsNCj4gKyAgICAgICAg
-cWVtdV9wdXRfYmU2NChmLCByYW1fYnl0ZXNfdG90YWxfbWlncmF0aW9uKCkgfA0KPiBSQU1fU0FW
-RV9GTEFHX01FTV9TSVpFKTsNCj4gDQo+ICAgICAgICAgIFJBTUJMT0NLX0ZPUkVBQ0hfTUlHUkFU
-QUJMRShibG9jaykgew0KPiAgICAgICAgICAgICAgcWVtdV9wdXRfYnl0ZShmLCBzdHJsZW4oYmxv
-Y2stPmlkc3RyKSk7DQo+ICAgICAgICAgICAgICBxZW11X3B1dF9idWZmZXIoZiwgKHVpbnQ4X3Qg
-KilibG9jay0+aWRzdHIsDQo+IHN0cmxlbihibG9jay0+aWRzdHIpKTsNCj4gLSAgICAgICAgICAg
-IHFlbXVfcHV0X2JlNjQoZiwgYmxvY2stPnVzZWRfbGVuZ3RoKTsNCj4gKyAgICAgICAgICAgIC8q
-DQo+ICsgICAgICAgICAgICAgKiBXaGVuIHJlc2l6aW5nIG9uIHRoZSB0YXJnZXQsIHdlIG5lZWQg
-dGhlIHVuYWxpZ25lZCBzaXplLA0KPiArICAgICAgICAgICAgICogb3RoZXJ3aXNlIHdlIGxvc2Ug
-dGhlIHVuYWxpZ25lZCBzaXNlIGR1cmluZyBtaWdyYXRpb24uDQo+ICsgICAgICAgICAgICAgKi8N
-Cj4gKyAgICAgICAgICAgIHFlbXVfcHV0X2JlNjQoZiwgcmFtYmxvY2tfcmFtX2J5dGVzX21pZ3Jh
-dGlvbihibG9jaykpOw0KPiArDQo+ICAgICAgICAgICAgICBpZiAobWlncmF0ZV9wb3N0Y29weV9y
-YW0oKSAmJiBibG9jay0+cGFnZV9zaXplICE9DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBxZW11X2hvc3RfcGFnZV9zaXplKSB7DQo+ICAgICAgICAgICAgICAg
-ICAgcWVtdV9wdXRfYmU2NChmLCBibG9jay0+cGFnZV9zaXplKTsNCj4gLS0NCj4gMi4yNC4xDQo+
-IA0KPiANCj4gLS0NCj4gVGhhbmtzLA0KPiANCj4gRGF2aWQgLyBkaGlsZGVuYg0KDQo=
+On Tue, Feb 11, 2020 at 07:37:44PM +0100, Andrea Bolognani wrote:
+> The current documentation is fairly terse and not easy to decode
+> for someone who's not intimately familiar with the inner workings
+> of timer devices. Expand on it by providing a somewhat verbose
+> description of what behavior each policy will result in, as seen
+> from both the guest OS and host point of view.
+>=20
+> Signed-off-by: Andrea Bolognani <abologna@redhat.com>
+> ---
+> This information is reported pretty much word by word in
+>=20
+>   https://libvirt.org/formatdomain.html#elementsTime
+>=20
+> so I'm hoping I can get the QEMU documentation updated and then just
+> merge back the changes.
+>=20
+>  qapi/misc.json | 34 +++++++++++++++++++++++-----------
+>  1 file changed, 23 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 33b94e3589..cd7445d29f 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -163,17 +163,29 @@
+>  ##
+>  # @LostTickPolicy:
+>  #
+> -# Policy for handling lost ticks in timer devices.
+> -#
+> -# @discard: throw away the missed tick(s) and continue with future injec=
+tion
+> -#           normally.  Guest time may be delayed, unless the OS has expl=
+icit
+> -#           handling of lost ticks
+> -#
+> -# @delay: continue to deliver ticks at the normal rate.  Guest time will=
+ be
+> -#         delayed due to the late tick
+> -#
+> -# @slew: deliver ticks at a higher rate to catch up with the missed tick=
+. The
+> -#        guest time should not be delayed once catchup is complete.
+> +# Policy for handling lost ticks in timer devices.  Ticks end up getting
+> +# lost when, for example, the guest is paused.
+> +#
+> +# @discard: throw away the missed ticks and continue with future injecti=
+on
+> +#           normally.  The guest OS will see the timer jump ahead by a
+> +#           potentially quite significant amount all at once, as if the
+> +#           intervening chunk of time had simply not existed; needless t=
+o
+> +#           say, such a sudden jump can easily confuse a guest OS which =
+is
+> +#           not specifically prepared to deal with it.  Assuming the gue=
+st
+> +#           OS can deal correctly with the time jump, the time in the gu=
+est
+> +#           and in the host should now match.
+> +#
+> +# @delay: continue to deliver ticks at the normal rate.  The guest OS wi=
+ll
+> +#         not notice anything is amiss, as from its point of view time w=
+ill
+> +#         have continued to flow normally.  The time in the guest should=
+ now
+> +#         be behind the time in the host by exactly the amount of time d=
+uring
+> +#         which ticks have been missed.
+> +#
+> +# @slew: deliver ticks at a higher rate to catch up with the missed tick=
+s.
+> +#        The guest OS will not notice anything is amiss, as from its poi=
+nt
+> +#        of view time will have continued to flow normally.  Once the ti=
+mer
+> +#        has managed to catch up with all the missing ticks, the time in
+> +#        the guest and in the host should match.
+>  #
+>  # Since: 2.0
+>  ##
+> --=20
+> 2.24.1
+>=20
+>
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
 
