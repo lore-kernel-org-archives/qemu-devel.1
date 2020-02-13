@@ -2,63 +2,166 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F25B0C352A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADB3FC3B188
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF96520873
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D8DB20724
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 03:10:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gJ2dKnwS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF96520873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="mJQ/3Lns"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D8DB20724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j24mz-0004bw-Vn
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 22:03:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58447)
+	id 1j24t9-0006fA-Mo
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 22:10:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59158)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j24mC-0003d3-GB
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:02:54 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1j24sX-00062b-DB
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:09:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j24mA-0004aA-Mw
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:02:52 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:42993 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j24mA-0004Rx-0Q; Wed, 12 Feb 2020 22:02:50 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48J1XN0db1z9sPJ; Thu, 13 Feb 2020 14:02:44 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581562964;
- bh=iBWZECdMc0Kh/WKMUYKchgMqMGJD3k67DDE1L6sgLnc=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=gJ2dKnwSIiuY+Do5KGpjaJXB4w8ftfAkO6r0IpgBhfwRaBZ+t1c0pMi9m1f2TpUIG
- YBoAplWaEBOhLhV6wj9fB455RkS5okCeeU4p2fPbXPem1zGsf2qDvzwUeEU/aGHmNS
- 94xvkvs5aI8fp1LMtDD2qhGloGgzE+ZrLOMuS6h0=
-Date: Thu, 13 Feb 2020 13:58:58 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH qemu v6 5/6] spapr: Allow changing offset for -kernel image
-Message-ID: <20200213025858.GC124369@umbus.fritz.box>
+ (envelope-from <aik@ozlabs.ru>) id 1j24sV-0007G7-PG
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:09:24 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:38488)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j24sV-0007Br-E1
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 22:09:23 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id j17so1761060pjz.3
+ for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 19:09:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=auDpdcR/A74x8wvOoj7Z2oCROUJ0l6EefFbCjTNRuss=;
+ b=mJQ/3Lns0aJabD/bxzNjgK0D41Bsi/CG5z0HF6RAtPxisfrlnaqMF/rcNvjJ9syc1F
+ WIQxGYFZWGsn/Kz/CVPM+wvPsVDZt4k4NSQivnmi/SVyI/njNX2YN7c9EU7Ra4rY7LdW
+ jftJ3HJOrw2LPp2PRUlnoXUR1TUzOgkhMeUS74MBow4XAxly+XBztGm6uqFPQZGgZiTP
+ 1dng1sDA7V7ureJQixWLywyBplbSvAuSrm1Yjdp7A131sCHki6iA44smHTfBpQDcEbgi
+ z5PGN6LL8CZzBCg2nN/5hFqN79YwTvS15/mDQWBqHUp+T4jZqb2apaVmXN9/CLICGzaV
+ Htlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=auDpdcR/A74x8wvOoj7Z2oCROUJ0l6EefFbCjTNRuss=;
+ b=FGSiYQS7cnKnyCFBraTTfcrt5OTab5AwOfYypy/FkYxMnwY83Mlmvu020iEjZZZ4f7
+ aIHPQ4XlBYrnxw4Nz0VM9Cs5glNpo8d+9P3CpLClsVV7lv/Cqise40bmFQiUOEDk8CUL
+ nilnttZq5+hGm490VPYw1DdF9vmDvCmquO7A6SJAA5TSamyJW1shQRhbzUcxKcqWqsjX
+ y4u6aKDjKQ6U8dkb1i0RzOEHf1N3NuBANA12/1OWuD1d1m4tTETB3atN48cyKiuEZRiX
+ sp2iBknpjYU8UqKLlzcy6GvvwpTB0GxJnbCj2doWQFbvH9oYEtKdapyiIiB71KQobbco
+ eikA==
+X-Gm-Message-State: APjAAAV2OD9stCPGS/NVlAvJcyj+7kHynMydh2CDKSG9VYPhcEW4lPc3
+ wioOk/pMjbebEfObxaAkwfBUlA==
+X-Google-Smtp-Source: APXvYqzqsExwB1ote2YGUnxPmQvsA2DzA2Mzni4doCMSDlUXkcnTevTZXPtWdIU+/xHjMENuXXstsQ==
+X-Received: by 2002:a17:902:b215:: with SMTP id
+ t21mr11443542plr.190.1581563361338; 
+ Wed, 12 Feb 2020 19:09:21 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id a35sm520660pgl.20.2020.02.12.19.09.18
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 12 Feb 2020 19:09:20 -0800 (PST)
+Subject: Re: [PATCH qemu v6 1/6] ppc: Start CPU in the default mode which is
+ big-endian 32bit
+To: David Gibson <david@gibson.dropbear.id.au>
 References: <20200203032943.121178-1-aik@ozlabs.ru>
- <20200203032943.121178-6-aik@ozlabs.ru>
+ <20200203032943.121178-2-aik@ozlabs.ru>
+ <20200212054304.GY22584@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <5b900904-ccb6-58c7-5e11-c8de1154cc52@ozlabs.ru>
+Date: Thu, 13 Feb 2020 14:09:17 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="xo44VMWPx7vlQ2+2"
-Content-Disposition: inline
-In-Reply-To: <20200203032943.121178-6-aik@ozlabs.ru>
+In-Reply-To: <20200212054304.GY22584@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,175 +180,60 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---xo44VMWPx7vlQ2+2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 03, 2020 at 02:29:42PM +1100, Alexey Kardashevskiy wrote:
-> This allows moving the kernel in the guest memory. The option is useful
-> for step debugging (as Linux is linked at 0x0); it also allows loading
-> grub which is normally linked to run at 0x20000.
->=20
-> This uses the existing kernel address by default.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+On 12/02/2020 16:43, David Gibson wrote:
+> On Mon, Feb 03, 2020 at 02:29:38PM +1100, Alexey Kardashevskiy wrote:
+>> At the moment we enforce 64bit mode on a CPU when reset. This does not
+>> make difference as SLOF or Linux set the desired mode straight away.
+>> However if we ever boot something other than these two,
+>> this might not work as, for example, GRUB expects the default MSR state
+>> and does not work properly.
+>>
+>> This removes setting MSR_SF from the PPC CPU reset.
+> 
+> Hrm.  This is in the core cpu model so it doesn't just affect pseries,
+> but powernv (and theoretically others) as well.  Generally the cpu
+> model should have the bare metal behaviour, and we can override it in
+> the pseries machine if necessary.
+> 
+> So for a bare metal POWER system, what mode do we start in?  I'm
+> guessing it probably doesn't matter in practice, since the skiboot
+> firmware also probably does a mode set on entry, but it'd be nice to
+> get this right in theory.
 
-Applied to ppc-for-5.0, since I think it makes sense even without the
-rest of the series.
 
-> ---
->  include/hw/ppc/spapr.h |  1 +
->  hw/ppc/spapr.c         | 38 +++++++++++++++++++++++++++++++-------
->  2 files changed, 32 insertions(+), 7 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 3b50f36c338a..32e831a395ae 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -164,6 +164,7 @@ struct SpaprMachineState {
->      void *fdt_blob;
->      long kernel_size;
->      bool kernel_le;
-> +    uint64_t kernel_addr;
->      uint32_t initrd_base;
->      long initrd_size;
->      uint64_t rtc_offset; /* Now used only during incoming migration */
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 60153bf0b771..b59e9dc360fe 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1054,7 +1054,7 @@ static void spapr_dt_chosen(SpaprMachineState *spap=
-r, void *fdt)
->      }
-> =20
->      if (spapr->kernel_size) {
-> -        uint64_t kprop[2] =3D { cpu_to_be64(KERNEL_LOAD_ADDR),
-> +        uint64_t kprop[2] =3D { cpu_to_be64(spapr->kernel_addr),
->                                cpu_to_be64(spapr->kernel_size) };
-> =20
->          _FDT(fdt_setprop(fdt, chosen, "qemu,boot-kernel",
-> @@ -1242,7 +1242,8 @@ void *spapr_build_fdt(SpaprMachineState *spapr, boo=
-l reset, size_t space)
->      /* Build memory reserve map */
->      if (reset) {
->          if (spapr->kernel_size) {
-> -            _FDT((fdt_add_mem_rsv(fdt, KERNEL_LOAD_ADDR, spapr->kernel_s=
-ize)));
-> +            _FDT((fdt_add_mem_rsv(fdt, spapr->kernel_addr,
-> +                                  spapr->kernel_size)));
->          }
->          if (spapr->initrd_size) {
->              _FDT((fdt_add_mem_rsv(fdt, spapr->initrd_base,
-> @@ -1270,7 +1271,9 @@ void *spapr_build_fdt(SpaprMachineState *spapr, boo=
-l reset, size_t space)
-> =20
->  static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
->  {
-> -    return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
-> +    SpaprMachineState *spapr =3D opaque;
-> +
-> +    return (addr & 0x0fffffff) + spapr->kernel_addr;
->  }
-> =20
->  static void emulate_spapr_hypercall(PPCVirtualHypervisor *vhyp,
-> @@ -2947,14 +2950,15 @@ static void spapr_machine_init(MachineState *mach=
-ine)
->          uint64_t lowaddr =3D 0;
-> =20
->          spapr->kernel_size =3D load_elf(kernel_filename, NULL,
-> -                                      translate_kernel_address, NULL,
-> +                                      translate_kernel_address, spapr,
->                                        NULL, &lowaddr, NULL, NULL, 1,
->                                        PPC_ELF_MACHINE, 0, 0);
->          if (spapr->kernel_size =3D=3D ELF_LOAD_WRONG_ENDIAN) {
->              spapr->kernel_size =3D load_elf(kernel_filename, NULL,
-> -                                          translate_kernel_address, NULL=
-, NULL,
-> +                                          translate_kernel_address, spap=
-r, NULL,
->                                            &lowaddr, NULL, NULL, 0,
-> -                                          PPC_ELF_MACHINE, 0, 0);
-> +                                          PPC_ELF_MACHINE,
-> +                                          0, 0);
->              spapr->kernel_le =3D spapr->kernel_size > 0;
->          }
->          if (spapr->kernel_size < 0) {
-> @@ -2968,7 +2972,7 @@ static void spapr_machine_init(MachineState *machin=
-e)
->              /* Try to locate the initrd in the gap between the kernel
->               * and the firmware. Add a bit of space just in case
->               */
-> -            spapr->initrd_base =3D (KERNEL_LOAD_ADDR + spapr->kernel_size
-> +            spapr->initrd_base =3D (spapr->kernel_addr + spapr->kernel_s=
-ize
->                                    + 0x1ffff) & ~0xffff;
->              spapr->initrd_size =3D load_image_targphys(initrd_filename,
->                                                       spapr->initrd_base,
-> @@ -3214,6 +3218,18 @@ static void spapr_set_vsmt(Object *obj, Visitor *v=
-, const char *name,
->      visit_type_uint32(v, name, (uint32_t *)opaque, errp);
->  }
-> =20
-> +static void spapr_get_kernel_addr(Object *obj, Visitor *v, const char *n=
-ame,
-> +                                  void *opaque, Error **errp)
-> +{
-> +    visit_type_uint64(v, name, (uint64_t *)opaque, errp);
-> +}
-> +
-> +static void spapr_set_kernel_addr(Object *obj, Visitor *v, const char *n=
-ame,
-> +                                  void *opaque, Error **errp)
-> +{
-> +    visit_type_uint64(v, name, (uint64_t *)opaque, errp);
-> +}
-> +
->  static char *spapr_get_ic_mode(Object *obj, Error **errp)
->  {
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
-> @@ -3319,6 +3335,14 @@ static void spapr_instance_init(Object *obj)
->      object_property_add_bool(obj, "vfio-no-msix-emulation",
->                               spapr_get_msix_emulation, NULL, NULL);
-> =20
-> +    object_property_add(obj, "kernel-addr", "uint64", spapr_get_kernel_a=
-ddr,
-> +                        spapr_set_kernel_addr, NULL, &spapr->kernel_addr,
-> +                        &error_abort);
-> +    object_property_set_description(obj, "kernel-addr",
-> +                                    stringify(KERNEL_LOAD_ADDR)
-> +                                    " for -kernel is the default",
-> +                                    NULL);
-> +    spapr->kernel_addr =3D KERNEL_LOAD_ADDR;
->      /* The machine class defines the default interrupt controller mode */
->      spapr->irq =3D smc->irq;
->      object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
+Huh. "Figure 65.  MSR setting due to interrupt" of PowerISA 3.0 says
+"The SF bit is set to 1" so after all the existing behavior is correct
+and my patch is just wrong. Cool.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---xo44VMWPx7vlQ2+2
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+> 
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>> ---
+>>  target/ppc/translate_init.inc.c | 6 ------
+>>  1 file changed, 6 deletions(-)
+>>
+>> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+>> index 53995f62eab2..f6a676cf55e8 100644
+>> --- a/target/ppc/translate_init.inc.c
+>> +++ b/target/ppc/translate_init.inc.c
+>> @@ -10710,12 +10710,6 @@ static void ppc_cpu_reset(CPUState *s)
+>>  #endif
+>>  #endif
+>>  
+>> -#if defined(TARGET_PPC64)
+>> -    if (env->mmu_model & POWERPC_MMU_64) {
+>> -        msr |= (1ULL << MSR_SF);
+>> -    }
+>> -#endif
+>> -
+>>      hreg_store_msr(env, msr, 1);
+>>  
+>>  #if !defined(CONFIG_USER_ONLY)
+> 
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5Eu3IACgkQbDjKyiDZ
-s5J1yBAAziMNYavRFaq7evV/iTWK/4lojmvQRl2andUC3kia+BiQ18GK5CLy7y0S
-VZHKzfxk0ab11Cj88oP9mza45N6PYTU16R7cQWHSUqik+wzsGCZdknz25+YVzZ0e
-PmOaaK8FV9H7+sU+e4uQhJtwhL8DpSLcXRp5VOceQY+d/x4DOm1GeAAzQ90BOeHw
-6lT2f2nG6lvRqjUP5jpuqX37IBiwgwGboo4d2HM5eoneXecL8JVLN9+0eQZorAHn
-Wl77Ii7ZJlmK2V729h0tVgGxMVghkjfbpFmdv5qA9fCyZtglsuSeett0f98ugk2x
-ExnBCuHz5feXRFIYwOlGGqpOhxEmbeLOy8lNWbmnnIzfRYSJR+EnPMjcg2nu1MEw
-8NszeZDazgig7I5KwYMEkY6iBJNIbYXYyDIE3vZbcZvJZZei/l37pozLu/OU6LWo
-q8qbqtDs0jMtfwegW5M6n2TtHV1l+yJUIdcox/QIwnSwSYe24ZrnXFnbANE1tP1K
-adB0n5JpYxDNTsCycPuhnnQULn3fS10NZIizLgagj/6zLFdYnWLUhy6/8PLpd3iT
-ZBzmu+LO16YNmtMngXltTqDAPN/2LHOdaJS/oI+MSAsC8SqS1zBWqJruJCHpwTXM
-ujr8wIlKCJIC8S/3B/ctSLrkoY4Nur1greunTQKx84dWOspKoPg=
-=HZdn
------END PGP SIGNATURE-----
-
---xo44VMWPx7vlQ2+2--
+-- 
+Alexey
 
