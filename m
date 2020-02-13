@@ -2,80 +2,86 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0092C2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3454CC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:49:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A581D217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:48:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EECDD217F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 13:49:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B7LTd3NP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A581D217F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X65LKHWp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EECDD217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2ErR-0003NP-Qq
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 08:48:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50360)
+	id 1j2Erc-0003i1-WC
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 08:49:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50519)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j2EoL-00081u-AM
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:45:46 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j2Eob-0008Do-SO
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:46:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j2EoF-0000Yx-0p
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:45:41 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51579
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1j2Eoa-0000jO-Nx
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:46:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22393
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j2EoE-0000Yg-T7
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:45:38 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1j2Eoa-0000ib-Ja
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 08:46:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581601538;
+ s=mimecast20190719; t=1581601557;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aGWb3j7hBbexZ89g551PL4PcAp6TmTiI6IUGkx8rOKQ=;
- b=B7LTd3NPPiS5y1trGs0GR3vgy1DwvCpOk6NC46+3tmi7lvyyBdqSn4Ihz8CZ/eeEje0Tes
- gwUIT/l+ZljbRMRU7mewUTd56QPpfMbjwkfi+DSj1GcmhfEKfYrTPDre2aI1wNlKJp/8MM
- qBTaa7dpxDPzjxXnitbH4/3+kQzxUlE=
+ bh=otGcj6+gTd0lM/N+nMk+ulE/cCS4tpnsiTP5cBC4dQY=;
+ b=X65LKHWpmcWJtaXHqr/V2ALGkAV9cXp1B1ShpfC+yPrK3Iqe9Bpz3BGdhfEXsqrh/np1ZV
+ S909uHowI/AnmLxmzYv5skF+fHA78A/wpsA+cB6F8pJIIqrxqFdgI17QTwA4mcRA2BG1n4
+ zw4ojePfYOZ6in80GXRAIo50ySfOFiE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-NAQehj_4Mmm8irIRQKFGqQ-1; Thu, 13 Feb 2020 08:45:33 -0500
-X-MC-Unique: NAQehj_4Mmm8irIRQKFGqQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-313--ql0KuwZNI6-eqcTRd5DpA-1; Thu, 13 Feb 2020 08:45:53 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 030E0100550E;
- Thu, 13 Feb 2020 13:45:32 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5FFED5C12E;
- Thu, 13 Feb 2020 13:45:28 +0000 (UTC)
-Date: Thu, 13 Feb 2020 13:45:27 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH] tracing: only allow -trace to override -D if set
-Message-ID: <20200213134527.GF544499@stefanha-x1.localdomain>
-References: <20200211111054.27538-1-alex.bennee@linaro.org>
- <20200212153459.GE432724@stefanha-x1.localdomain>
- <195b1312-e86b-3b4b-5447-29a21708c931@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9F4C1088380;
+ Thu, 13 Feb 2020 13:45:51 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ABED860499;
+ Thu, 13 Feb 2020 13:45:42 +0000 (UTC)
+Subject: Re: [PATCH v15 8/9] hw/arm/virt: Add the virtio-iommu device tree
+ mappings
+From: Auger Eric <eric.auger@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200208120022.1920-1-eric.auger@redhat.com>
+ <20200208120022.1920-9-eric.auger@redhat.com>
+ <CAFEAcA-n97LKaQo9haLdEv+c7k8QkK=LegP_gORr9z4WrBU2Ww@mail.gmail.com>
+ <5e4549f4-44c3-6a2c-a270-4923db8b455e@redhat.com>
+Message-ID: <b39be61a-0562-c747-2f47-ba9f966277d7@redhat.com>
+Date: Thu, 13 Feb 2020 14:45:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <195b1312-e86b-3b4b-5447-29a21708c931@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <5e4549f4-44c3-6a2c-a270-4923db8b455e@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: -ql0KuwZNI6-eqcTRd5DpA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="7mxbaLlpDEyR1+x6"
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,51 +93,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: jean-philippe@linaro.org, "Tian, Kevin" <kevin.tian@intel.com>,
+ tnowicki@marvell.com, "Michael S. Tsirkin" <mst@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ bharatb.linux@gmail.com, qemu-arm <qemu-arm@nongnu.org>,
+ Eric Auger <eric.auger.pro@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---7mxbaLlpDEyR1+x6
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Peter, Michael,
 
-On Wed, Feb 12, 2020 at 11:31:00PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 2/12/20 4:34 PM, Stefan Hajnoczi wrote:
-> > On Tue, Feb 11, 2020 at 11:10:54AM +0000, Alex Benn=E9e wrote:
-> > > Otherwise any -D settings the user may have made get ignored.
-> > >=20
-> > > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> > > ---
-> > >   trace/control.c | 11 ++++++++---
-> > >   1 file changed, 8 insertions(+), 3 deletions(-)
-> >=20
-> > Thanks, applied to my tracing tree:
-> > https://github.com/stefanha/qemu/commits/tracing
->=20
-> If possible, please add 'Fixes: e144a605a'.
+On 2/11/20 6:31 PM, Auger Eric wrote:
+> Hi Peter,
+> 
+> On 2/11/20 4:00 PM, Peter Maydell wrote:
+>> On Sat, 8 Feb 2020 at 12:01, Eric Auger <eric.auger@redhat.com> wrote:
+>>>
+>>> Adds the "virtio,pci-iommu" node in the host bridge node and
+>>> the RID mapping, excluding the IOMMU RID.
+>>>
+>>> This is done in the virtio-iommu-pci hotplug handler which
+>>> gets called only if no firmware is loaded or if -no-acpi is
+>>> passed on the command line. As non DT integration is
+>>> not yet supported by the kernel we must make sure we
+>>> are in DT mode. This limitation will be removed as soon
+>>> as the topology description feature gets supported.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> +static void create_virtio_iommu(VirtMachineState *vms, Error **errp)
+>>> +{
+>>> +    const char compat[] = "virtio,pci-iommu";
+>>> +    uint16_t bdf = vms->virtio_iommu_bdf;
+>>> +    char *node;
+>>> +
+>>> +    vms->iommu_phandle = qemu_fdt_alloc_phandle(vms->fdt);
+>>> +
+>>> +    node = g_strdup_printf("%s/virtio_iommu@%d", vms->pciehb_nodename, bdf);
+>>> +    qemu_fdt_add_subnode(vms->fdt, node);
+>>> +    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat));
+>>> +    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg",
+>>> +                                 1, bdf << 8, 1, 0, 1, 0,
+>>> +                                 1, 0, 1, 0);
+>>> +
+>>> +    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
+>>> +    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
+>>> +    g_free(node);
+>>> +
+>>> +    qemu_fdt_setprop_cells(vms->fdt, vms->pciehb_nodename, "iommu-map",
+>>> +                           0x0, vms->iommu_phandle, 0x0, bdf,
+>>> +                           bdf + 1, vms->iommu_phandle, bdf + 1, 0xffff - bdf);
+>>> +}
+>>
+>> This function name implies that we're creating the IOMMU device
+>> here (which would be a weird thing to do in a hotplug callback
+>> for some other device), but it looks like we're only adding
+>> device tree nodes ?
+> yes the actual iommu device is created through the -device option. I can
+> rename into create_iommu_dt_bindings
+So I renamed it into create_virtio_iommu_dt_bindings()
+>>
+>> Given that we write the FDT blob into the guest RAM on bootup,
+>> how does making changes to it here on hotplug (which I assume
+>> to be 'after boot, whenever the user hot-plugs something') work?
+> 
+> the virtio-iommu is not supposed to be hotplugged but rather
+> cold-plugged. I use this hotplug mechanism to detect its presence and
+> add the related dt mappings. Maybe I can add a check to detect if the
+> bootup is over?
+I added in virtio-iommu-pci virtio_iommu_pci_class_init()
+dc->hotpluggable = false;
 
-Done!
+As far as I understand this makes the virtio-iommu-pci device not
+hotpluggable (same is used for intel-iommu):
 
-Stefan
+(QEMU) device_add id=hot0 driver=virtio-iommu-pci bus=head.0 addr=4
+{"error": {"class": "GenericError", "desc": "Parameter 'driver' expects
+pluggable device type"}}
 
---7mxbaLlpDEyR1+x6
-Content-Type: application/pgp-signature; name="signature.asc"
+Is that OK?
 
------BEGIN PGP SIGNATURE-----
+Thanks
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5FUvcACgkQnKSrs4Gr
-c8hJdggAknMfSRJ2fXYrSAJRwXoodwYDN2h7y49z296PCcfiHYxWcwt/0ZSg1O8i
-v3FEn/dUGhs4UtTdW0QOSxUW3B16v8tMShPcmNuo/aeM6Hmemu0J3/3TW4PStTxj
-EGuyW0m539hSuei01AIIIueezkRA5LjOZZAxvHfuXrHvaD1xIZ0zaB6kiwxlAh9x
-6DSw3/3QlDrojqmlUugK5LPgIUXTTAzC/FfhFzxEom90lCWDZiZnmYAOEMsu8N71
-Jewl8+f7y1pNEADJK5KtSk1BwWKiQucsLe0A7gIJawjkfhxVk4w5DSxzSqjo5LXs
-bdhBeG955yVUuHxx8TxmElM2qYl8bg==
-=y82C
------END PGP SIGNATURE-----
+Eric
 
---7mxbaLlpDEyR1+x6--
+> 
+> Thoughts?
+> 
+> Eric
+>>
+>> thanks
+>> -- PMM
+>>
+> 
+> 
 
 
