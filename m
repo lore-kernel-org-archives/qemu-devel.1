@@ -2,61 +2,87 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E14AC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 09:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC43C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 09:44:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73D3620848
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 09:44:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73D3620848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C0BF20848
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 09:44:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJnNB1dK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C0BF20848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2B2h-00005k-M1
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 04:44:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45917)
+	id 1j2B3G-00010F-8B
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 04:44:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46735)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengzhimin1@huawei.com>) id 1j2Awz-0006gt-N6
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:38:26 -0500
+ (envelope-from <jasowang@redhat.com>) id 1j2B1Q-00072r-Es
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:43:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fengzhimin1@huawei.com>) id 1j2Awy-00050l-BH
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:38:25 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2770 helo=huawei.com)
+ (envelope-from <jasowang@redhat.com>) id 1j2B1O-00019j-W3
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:42:59 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38414
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fengzhimin1@huawei.com>)
- id 1j2Awy-0004tq-09
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:38:24 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id A5B0AE7CE3F2B8C58865;
- Thu, 13 Feb 2020 17:38:20 +0800 (CST)
-Received: from huawei.com (10.173.220.198) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Thu, 13 Feb 2020
- 17:38:14 +0800
-From: Zhimin Feng <fengzhimin1@huawei.com>
-To: <quintela@redhat.com>, <dgilbert@redhat.com>, <armbru@redhat.com>,
- <eblake@redhat.com>
-Subject: [PATCH RFC 11/14] migration/rdma: use multifd to migrate VM for
- rdma-pin-all mode
-Date: Thu, 13 Feb 2020 17:37:52 +0800
-Message-ID: <20200213093755.370-12-fengzhimin1@huawei.com>
-X-Mailer: git-send-email 2.24.0.windows.2
-In-Reply-To: <20200213093755.370-1-fengzhimin1@huawei.com>
-References: <20200213093755.370-1-fengzhimin1@huawei.com>
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j2B1O-00019H-Re
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 04:42:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581586978;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KyRax9WTiMAW7Zu3vAA5Nj0OKEpA3JbfVMnYVMZ/OpY=;
+ b=ZJnNB1dK42L5xdSLLML5u77DAUYeeGYDU08KzfQM5v1x8MVYCrBe0oK+7zC+pjtsDB51Ed
+ D5Ax2Axwl5jc+g63UhhHzMoAwWqnoaLQFnLXM/YmmnFuF0TZ+JVoUGFmgDWEpymrA2Gk73
+ ZX3kzAW1s3OU2miUC4WXcGPwm9y6QaY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-319-XrWPDVpWO8S1ZCF-CMpVTg-1; Thu, 13 Feb 2020 04:42:57 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87D588018A5;
+ Thu, 13 Feb 2020 09:42:55 +0000 (UTC)
+Received: from [10.72.13.212] (ovpn-13-212.pek2.redhat.com [10.72.13.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D8AB426E7B;
+ Thu, 13 Feb 2020 09:42:49 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v3] hw: net: cadence_gem: Fix build errors in
+ DB_PRINT()
+To: Bin Meng <bmeng.cn@gmail.com>
+References: <1565335544-23584-1-git-send-email-bmeng.cn@gmail.com>
+ <CAKmqyKOyTXgs5uZuukZjAEqQkTtf1U+vD=u9_470+OgsfaQdqQ@mail.gmail.com>
+ <CAEUhbmW0sCEN7mzSfCvUBSqhAGD3v5JyeDj2iSqs0MQJv13bag@mail.gmail.com>
+ <67e917c9-d080-5af1-22ea-ba6d9af4daee@redhat.com>
+ <CAEUhbmUswmWjiaAy+26mYkEMpciTP6u6=WDmVX2U9MKo=uR_qA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <91d39b2d-3077-a638-d253-be9acdb24f8a@redhat.com>
+Date: Thu, 13 Feb 2020 17:42:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.220.198]
-X-CFilter-Loop: Reflected
+In-Reply-To: <CAEUhbmUswmWjiaAy+26mYkEMpciTP6u6=WDmVX2U9MKo=uR_qA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: XrWPDVpWO8S1ZCF-CMpVTg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,182 +94,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jemmy858585@gmail.com, Zhimin Feng <fengzhimin1@huawei.com>,
- qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Alistair Francis <alistair23@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Zhimin Feng <fengzhimin1@huawei.com>
----
- migration/multifd.c | 15 ++++++++++++
- migration/rdma.c    | 58 +++++++++++++++++++++++++++++++++++++++++----
- migration/rdma.h    |  2 ++
- 3 files changed, 70 insertions(+), 5 deletions(-)
 
-diff --git a/migration/multifd.c b/migration/multifd.c
-index c986d4c247..ba5e0b11d0 100644
---- a/migration/multifd.c
-+++ b/migration/multifd.c
-@@ -519,12 +519,27 @@ static void *multifd_rdma_send_thread(void *opaque)
-         }
-         qemu_mutex_unlock(&p->mutex);
-=20
-+        /* To complete polling(CQE) */
-+        while (p->rdma->nb_sent) {
-+            ret =3D qemu_rdma_block_for_wrid(p->rdma, RDMA_WRID_RDMA_WRI=
-TE, NULL);
-+            if (ret < 0) {
-+                error_report("multifd RDMA migration: "
-+                             "complete polling error!");
-+                return NULL;
-+            }
-+        }
-+
-         /* Send FINISHED to the destination */
-         head.type =3D RDMA_CONTROL_REGISTER_FINISHED;
-         ret =3D qemu_rdma_exchange_send(p->rdma, &head, NULL, NULL, NULL=
-, NULL);
-         if (ret < 0) {
-+            error_report("multifd RDMA migration: "
-+                         "receiving remote info!");
-             return NULL;
-         }
-+
-+        /* sync main thread */
-+        qemu_sem_post(&p->sem);
-     }
-=20
- out:
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 4c48e9832c..873c17dc03 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -96,6 +96,23 @@ static const char *wrid_desc[] =3D {
-=20
- static const char *rdma_host_port;
-=20
-+/*
-+ * index of current RDMA channel for multifd
-+ */
-+static int current_RDMA_index;
-+
-+/*
-+ * Get the multifd RDMA channel used to send data.
-+ */
-+static int get_multifd_RDMA_channel(void)
-+{
-+    int thread_count =3D migrate_multifd_channels();
-+    current_RDMA_index++;
-+    current_RDMA_index %=3D thread_count;
-+
-+    return current_RDMA_index;
-+}
-+
- /*
-  * Negotiate RDMA capabilities during connection-setup time.
-  */
-@@ -1328,8 +1345,8 @@ static int qemu_rdma_wait_comp_channel(RDMAContext =
-*rdma)
-  * completions only need to be recorded, but do not actually
-  * need further processing.
-  */
--static int qemu_rdma_block_for_wrid(RDMAContext *rdma, int wrid_requeste=
-d,
--                                    uint32_t *byte_len)
-+int qemu_rdma_block_for_wrid(RDMAContext *rdma, int wrid_requested,
-+                             uint32_t *byte_len)
- {
-     int num_cq_events =3D 0, ret =3D 0;
-     struct ibv_cq *cq;
-@@ -1731,6 +1748,20 @@ static int qemu_rdma_write_one(QEMUFile *f, RDMACo=
-ntext *rdma,
-                                .repeat =3D 1,
-                              };
-=20
-+    /* use multifd to send data */
-+    if (migrate_use_multifd() && migrate_use_rdma_pin_all()) {
-+        int channel =3D get_multifd_RDMA_channel();
-+        int ret =3D 0;
-+        MultiFDSendParams *multifd_send_param =3D NULL;
-+        ret =3D get_multifd_send_param(channel, &multifd_send_param);
-+        if (ret) {
-+            error_report("rdma: error getting multifd_send_param(%d)", c=
-hannel);
-+            return -EINVAL;
-+        }
-+        rdma =3D multifd_send_param->rdma;
-+        block =3D &(rdma->local_ram_blocks.block[current_index]);
-+    }
-+
- retry:
-     sge.addr =3D (uintptr_t)(block->local_host_addr +
-                             (current_addr - block->offset));
-@@ -1948,8 +1979,21 @@ static int qemu_rdma_write_flush(QEMUFile *f, RDMA=
-Context *rdma)
-     }
-=20
-     if (ret =3D=3D 0) {
--        rdma->nb_sent++;
--        trace_qemu_rdma_write_flush(rdma->nb_sent);
-+        if (migrate_use_multifd() && migrate_use_rdma_pin_all()) {
-+            /* The multifd RDMA threads send data */
-+            MultiFDSendParams *multifd_send_param =3D NULL;
-+            ret =3D get_multifd_send_param(current_RDMA_index,
-+                                         &multifd_send_param);
-+            if (ret) {
-+                error_report("rdma: error getting multifd_send_param(%d)=
-",
-+                             current_RDMA_index);
-+                return ret;
-+            }
-+            multifd_send_param->rdma->nb_sent++;
-+        } else {
-+            rdma->nb_sent++;
-+            trace_qemu_rdma_write_flush(rdma->nb_sent);
-+        }
-     }
-=20
-     rdma->current_length =3D 0;
-@@ -3758,7 +3802,10 @@ static int qemu_rdma_registration_stop(QEMUFile *f=
-, void *opaque,
-     ret =3D qemu_rdma_exchange_send(rdma, &head, NULL, NULL, NULL, NULL)=
-;
-=20
-     if (migrate_use_multifd()) {
--        /* Inform src send_thread to send FINISHED signal */
-+        /*
-+         * Inform src send_thread to send FINISHED signal.
-+         * Wait for multifd RDMA send threads to poll the CQE.
-+         */
-         int i;
-         int thread_count =3D migrate_multifd_channels();
-         MultiFDSendParams *multifd_send_param =3D NULL;
-@@ -3770,6 +3817,7 @@ static int qemu_rdma_registration_stop(QEMUFile *f,=
- void *opaque,
-             }
-=20
-             qemu_sem_post(&multifd_send_param->sem_sync);
-+            qemu_sem_wait(&multifd_send_param->sem);
-         }
-     }
-=20
-diff --git a/migration/rdma.h b/migration/rdma.h
-index 86c89bdd1f..7dc3895698 100644
---- a/migration/rdma.h
-+++ b/migration/rdma.h
-@@ -281,6 +281,8 @@ int qemu_rdma_exchange_send(RDMAContext *rdma, RDMACo=
-ntrolHeader *head,
-                             int *resp_idx,
-                             int (*callback)(RDMAContext *rdma));
- int qemu_rdma_registration(void *opaque);
-+int qemu_rdma_block_for_wrid(RDMAContext *rdma, int wrid_requested,
-+                             uint32_t *byte_len);
-=20
- void rdma_start_outgoing_migration(void *opaque, const char *host_port,
-                                    Error **errp);
---=20
-2.19.1
+On 2020/2/13 =E4=B8=8B=E5=8D=885:39, Bin Meng wrote:
+> Hi Jason,
+>
+> On Mon, Aug 19, 2019 at 1:40 PM Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On 2019/8/19 =E4=B8=8B=E5=8D=881:24, Bin Meng wrote:
+>>> On Sat, Aug 10, 2019 at 9:58 AM Alistair Francis <alistair23@gmail.com>=
+ wrote:
+>>>> On Fri, Aug 9, 2019 at 12:26 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>>>>> When CADENCE_GEM_ERR_DEBUG is turned on, there are several
+>>>>> compilation errors in DB_PRINT(). Fix them.
+>>>>>
+>>>>> While we are here, update to use appropriate modifiers in
+>>>>> the same DB_PRINT() call.
+>>>>>
+>>>>> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>>>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>>>>
+>>> Ping?
+>>>
+>>> What's the status of this patch?
+>>>
+>>> Regards,
+>>> Bin
+>>
+>> Applied.
+> I checked latest qemu/master and found this patch isn't applied. Could
+> you please take a look?
+>
+> Regards,
+> Bin
 
+
+For some unknown reason it was lost, I've applied in my tree and it will=20
+be in the next pull request.
+
+Sorry.
 
 
