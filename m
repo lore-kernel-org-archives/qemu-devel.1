@@ -2,49 +2,50 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDBDC3B189
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 07:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3921C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 07:39:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57F5420873
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 07:37:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57F5420873
+	by mail.kernel.org (Postfix) with ESMTPS id C78EB20873
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 07:39:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C78EB20873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j294I-0003VA-HD
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 02:37:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56511)
+	id 1j295Y-0005Bx-0N
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 02:39:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56541)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fangying1@huawei.com>) id 1j293L-0001nE-H8
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 02:36:52 -0500
+ (envelope-from <fangying1@huawei.com>) id 1j293M-0001pC-Nv
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 02:36:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fangying1@huawei.com>) id 1j293K-00057k-BI
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 02:36:51 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2704 helo=huawei.com)
+ (envelope-from <fangying1@huawei.com>) id 1j293L-0005AZ-Ni
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 02:36:52 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2765 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <fangying1@huawei.com>)
- id 1j293F-00054T-AL; Thu, 13 Feb 2020 02:36:46 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 95436FE84DA4358ECCBC;
- Thu, 13 Feb 2020 15:36:39 +0800 (CST)
-Received: from localhost (10.133.205.53) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Thu, 13 Feb 2020
- 15:36:31 +0800
+ id 1j293J-00055t-1d; Thu, 13 Feb 2020 02:36:49 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 77AA469E7198E136C052;
+ Thu, 13 Feb 2020 15:36:45 +0800 (CST)
+Received: from localhost (10.133.205.53) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Thu, 13 Feb 2020
+ 15:36:34 +0800
 From: Ying Fang <fangying1@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
-Subject: [PATCH v2 0/4] arm64: Add the cpufreq device to show cpufreq info to
- guest
-Date: Thu, 13 Feb 2020 15:36:26 +0800
-Message-ID: <20200213073630.2125-1-fangying1@huawei.com>
+Subject: [PATCH v2 4/4] arm: Create the cpufreq device
+Date: Thu, 13 Feb 2020 15:36:30 +0800
+Message-ID: <20200213073630.2125-5-fangying1@huawei.com>
 X-Mailer: git-send-email 2.22.0.windows.1
+In-Reply-To: <20200213073630.2125-1-fangying1@huawei.com>
+References: <20200213073630.2125-1-fangying1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.133.205.53]
@@ -52,7 +53,7 @@ X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,40 +71,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On ARM64 platform, cpu frequency is retrieved via ACPI CPPC.
-A virtual cpufreq device based on ACPI CPPC is created to
-present cpu frequency info to the guest.
+Add the cpufreq device to arm64 virt machine
 
-The default frequency is set to host cpu nominal frequency,
-which is obtained from the host CPPC sysfs. Other performance
-data are set to the same value, since we don't support guest
-performance scaling here.
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
+---
+ default-configs/aarch64-softmmu.mak |  1 +
+ hw/acpi/Kconfig                     |  4 ++++
+ hw/arm/virt.c                       | 13 +++++++++++++
+ 3 files changed, 18 insertions(+)
 
-Performance counters are also not emulated and they simply
-return 1 if read, and guest should fallback to use desired
-performance value as the current performance.
-
-Guest kernel version above 4.18 is required to make it work.
-
-Ying Fang (4):
-  acpi: Add aml_generic_register
-  acpi/cppc: Add ACPI CPPC registers
-  arm: Add the cpufreq device model
-  arm: Create the cpufreq device
-
- default-configs/aarch64-softmmu.mak |   1 +
- hw/acpi/Kconfig                     |   4 +
- hw/acpi/Makefile.objs               |   1 +
- hw/acpi/aml-build.c                 |  22 +++
- hw/acpi/cpufreq.c                   | 249 ++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c            |  74 ++++++++-
- hw/arm/virt.c                       |  14 ++
- include/hw/acpi/acpi-defs.h         |  32 ++++
- include/hw/acpi/aml-build.h         |   3 +
- include/hw/arm/virt.h               |   1 +
- 10 files changed, 399 insertions(+), 2 deletions(-)
- create mode 100644 hw/acpi/cpufreq.c
-
+diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch6=
+4-softmmu.mak
+index 958b1e08e4..0a030e853f 100644
+--- a/default-configs/aarch64-softmmu.mak
++++ b/default-configs/aarch64-softmmu.mak
+@@ -6,3 +6,4 @@ include arm-softmmu.mak
+ CONFIG_XLNX_ZYNQMP_ARM=3Dy
+ CONFIG_XLNX_VERSAL=3Dy
+ CONFIG_SBSA_REF=3Dy
++CONFIG_CPUFREQ=3Dy
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 54209c6f2f..7d8aa58492 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -38,3 +38,7 @@ config ACPI_VMGENID
+     depends on PC
+=20
+ config ACPI_HW_REDUCED
++
++config CPUFREQ
++    bool
++    default y
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index ed9dc38b60..53638f9557 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -764,6 +764,17 @@ static void create_uart(const VirtMachineState *vms,=
+ int uart,
+     g_free(nodename);
+ }
+=20
++static void create_cpufreq(const VirtMachineState *vms, MemoryRegion *me=
+m)
++{
++    hwaddr base =3D vms->memmap[VIRT_CPUFREQ].base;
++    DeviceState *dev =3D qdev_create(NULL, "cpufreq");
++    SysBusDevice *s =3D SYS_BUS_DEVICE(dev);
++
++    qdev_init_nofail(dev);
++    memory_region_add_subregion(mem, base, sysbus_mmio_get_region(s, 0))=
+;
++}
++
++
+ static void create_rtc(const VirtMachineState *vms)
+ {
+     char *nodename;
+@@ -1723,6 +1734,8 @@ static void machvirt_init(MachineState *machine)
+=20
+     create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
+=20
++    create_cpufreq(vms, sysmem);
++
+     if (vms->secure) {
+         create_secure_ram(vms, secure_sysmem);
+         create_uart(vms, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
 --=20
 2.19.1
 
