@@ -1,104 +1,74 @@
-Return-Path: <SRS0=xDnh=4A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7821C352A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 23:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA1DC352A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:21:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F56E206E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Feb 2020 23:55:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GXqDsuII"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F56E206E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5EEB320714
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 00:21:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EEB320714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j21rJ-0005tr-QD
-	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 18:55:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33129)
+	id 1j22Fv-0001rL-HO
+	for qemu-devel@archiver.kernel.org; Wed, 12 Feb 2020 19:21:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j21qg-0005H7-5K
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 18:55:19 -0500
+ (envelope-from <bounces@canonical.com>) id 1j22FG-0001P8-Ca
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:20:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j21qe-0000A3-8f
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 18:55:17 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44433
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j21qe-00009j-4r
- for qemu-devel@nongnu.org; Wed, 12 Feb 2020 18:55:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581551715;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=R4woObnsmSdZMMEHBC68PBlk6yPgGEqa4BBtrfc0mm4=;
- b=GXqDsuIIy+CBJYBZHEfyvEJK2ynUGJCfde/IPU91ZBceW2h5dK25RdWiI+pDr7idxeLNjX
- Why5I2AHh7/KkFDouf32Wtbd5DDfutAvhlFW9j9it2Ubzagos3ty+Mg/fcCOLn3G2xMh2j
- vvCVwBf4OtCPtKsHN7Cj4T1SYnFqoLE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-OHYkU8dgMMG1cILttlQVjg-1; Wed, 12 Feb 2020 18:55:11 -0500
-Received: by mail-wr1-f72.google.com with SMTP id w17so1537797wrr.9
- for <qemu-devel@nongnu.org>; Wed, 12 Feb 2020 15:55:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=R4woObnsmSdZMMEHBC68PBlk6yPgGEqa4BBtrfc0mm4=;
- b=aYSUC0bmzb5C13/2ZzauU76tyuUgM4CWnUyJl20j5zu1q05J7Wcod/tDA+Xll6tTpd
- U1lI0ABFeIzMMybnvIbLLTUQjVgEgO7Tb8SyTRvjJQSrkr6I5SKM4GMLHdFzOrsj41vB
- Ll8kUNeVpBucwiWxlBbAy00I8K49u1l+9XZkPun1wgwa8+VYm6Xp/5GWIiUpo4NSXig0
- C4io4nLrs8WYiESC0mz6AXuXAW4c5F6dodnV3hH1XzpykygO6pT+ZJLmcdlrZcl7EXBf
- ZW6RftZxgTV3uxvEJbNSDJwnVA84srPHSLzUdEQHClpwVX16/2Lp4fvXugJa1sO/gofU
- Q5Xw==
-X-Gm-Message-State: APjAAAUeYHGHtsO2PkOEB0LvqPt3eJ2AVli1HKE/B4mUtcyabtJFtTlH
- YilmwXSVqTJS3c7b0vEneO5BtxEYnwqpKWoLPbX5iU/oJ8t681e/sO67iwZ5x3XCHzg60iQxycr
- /wnLYzoTViulsYNo=
-X-Received: by 2002:a5d:4204:: with SMTP id n4mr17481633wrq.123.1581551710468; 
- Wed, 12 Feb 2020 15:55:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwSxQYQ6FRS7z+9ss8zG6WFoazTCqNvzW0ktjRibnlDOgXYWb+YKqI+KO8ZiMV7uUP7jnkFfA==
-X-Received: by 2002:a5d:4204:: with SMTP id n4mr17481606wrq.123.1581551710182; 
- Wed, 12 Feb 2020 15:55:10 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id n8sm463957wrx.42.2020.02.12.15.55.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 12 Feb 2020 15:55:09 -0800 (PST)
-Subject: Re: [PATCH v5 5/6] hppa: Add emulation of Artist graphics
-To: Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
-References: <20191220211512.3289-1-svens@stackframe.org>
- <20191220211512.3289-6-svens@stackframe.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <896a8b05-b3a4-846d-f129-73207282edd5@redhat.com>
-Date: Thu, 13 Feb 2020 00:55:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <bounces@canonical.com>) id 1j22FF-0002rK-0X
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:20:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33986)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j22FE-0002qD-Qp
+ for qemu-devel@nongnu.org; Wed, 12 Feb 2020 19:20:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j22FD-0007zd-GD
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 00:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6F0232E8078
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 00:20:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191220211512.3289-6-svens@stackframe.org>
-Content-Language: en-US
-X-MC-Unique: OHYkU8dgMMG1cILttlQVjg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 13 Feb 2020 00:14:01 -0000
+From: Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jermy-07 rth
+X-Launchpad-Bug-Reporter: Marco (jermy-07)
+X-Launchpad-Bug-Modifier: Richard Henderson (rth)
+References: <158152698766.24807.871332888169155245.malonedeb@gac.canonical.com>
+Message-Id: <158155284107.24991.7515469629366138529.malone@gac.canonical.com>
+Subject: [Bug 1862986] Re: qemu-s390x crashes when run on aarch64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 194b15a8633caf240b47f49427dabded20b76902
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -107,156 +77,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+Reply-To: Bug 1862986 <1862986@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Sven,
+You need to provide the test binary.
 
-On 12/20/19 10:15 PM, Sven Schnelle wrote:
-> This adds emulation of Artist graphics good enough
-> to get a Text console on both Linux and HP-UX. The
-> X11 server from HP-UX also works.
-> 
-> Signed-off-by: Sven Schnelle <svens@stackframe.org>
-> ---
->   hw/display/Kconfig       |    4 +
->   hw/display/Makefile.objs |    1 +
->   hw/display/artist.c      | 1450 ++++++++++++++++++++++++++++++++++++++
->   hw/display/trace-events  |    9 +
->   hw/hppa/Kconfig          |    1 +
->   hw/hppa/hppa_hardware.h  |    1 +
->   hw/hppa/machine.c        |    9 +
->   7 files changed, 1475 insertions(+)
->   create mode 100644 hw/display/artist.c
-> 
-> diff --git a/hw/display/Kconfig b/hw/display/Kconfig
-> index c500d1fc6d..15d59e10dc 100644
-> --- a/hw/display/Kconfig
-> +++ b/hw/display/Kconfig
-> @@ -91,6 +91,10 @@ config TCX
->   config CG3
->       bool
->   
-> +config ARTIST
-> +    bool
-> +    select FRAMEBUFFER
-> +
->   config VGA
->       bool
->   
-> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-> index f2182e3bef..5f03dfdcc4 100644
-> --- a/hw/display/Makefile.objs
-> +++ b/hw/display/Makefile.objs
-> @@ -40,6 +40,7 @@ common-obj-$(CONFIG_SM501) += sm501.o
->   common-obj-$(CONFIG_TCX) += tcx.o
->   common-obj-$(CONFIG_CG3) += cg3.o
->   common-obj-$(CONFIG_NEXTCUBE) += next-fb.o
-> +common-obj-$(CONFIG_ARTIST) += artist.o
->   
->   obj-$(CONFIG_VGA) += vga.o
->   
-> diff --git a/hw/display/artist.c b/hw/display/artist.c
-[...]
-> +static void draw_line_size(ARTISTState *s, bool update_start)
-> +{
-> +
-> +    int startx = artist_get_x(s->vram_start);
-> +    int starty = artist_get_y(s->vram_start);
-> +    int endx = artist_get_x(s->line_size);
-> +    int endy = artist_get_y(s->line_size);
-> +
-> +    trace_artist_draw_line(startx, starty, endx, endy);
-> +    draw_line(s, startx, starty, endx, endy, update_start, -1, -1);
-> +}
-> +
-> +static void draw_line_xy(ARTISTState *s, bool update_start)
-> +{
-> +
-> +    int startx = artist_get_x(s->vram_start);
-> +    int starty = artist_get_y(s->vram_start);
-> +    int sizex = artist_get_x(s->blockmove_size);
-> +    int sizey = artist_get_y(s->blockmove_size);
-> +    int linexy = s->line_xy >> 16;
-> +    int endx, endy;
-> +
-> +    endx = startx;
-> +    endy = starty;
-> +
-> +    if (sizex > 0) {
-> +        endx = startx + linexy;
-> +    }
-> +
-> +    if (sizex < 0) {
-> +        endx = startx;
-> +        startx -= linexy;
-> +    }
-> +
-> +    if (sizey > 0) {
-> +        endy = starty + linexy;
-> +    }
-> +
-> +    if (sizey < 0) {
-> +        endy = starty;
-> +        starty -= linexy;
-> +    }
-> +
-> +    if (startx < 0) {
-> +        startx = 0;
-> +    }
-> +
-> +    if (endx < 0) {
-> +        endx = 0;
+I can run a chroot of s390x ubuntu bionic on aarch64 just fine,
+so it must be something specific to your test.
 
-If negative, set to zero.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> +    }
-> +
-> +    if (starty < 0) {
-> +        starty = 0;
-> +    }
-> +
-> +    if (endy < 0) {
-> +        endy = 0;
+-- =
 
-Ditto.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1862986
 
-> +    }
-> +
-> +
-> +    if (endx < 0) {
-> +        return;
+Title:
+  qemu-s390x crashes when run on aarch64
 
-Here Coverity points:
+Status in QEMU:
+  Incomplete
 
- >>>     CID 1419388:  Control flow issues  (DEADCODE)
- >>>     Execution cannot reach this statement: "return;".
+Bug description:
+  All tested versions (2.11 and 4.2) qemu-s390x crashes with a segfault
+  when run on an aarch64 odroid Ubuntu.
 
-> +    }
-> +
-> +    if (endy < 0) {
-> +        return;
 
-Here again.
+  Steps to reproduce:
 
-> +    }
-> +
-> +    trace_artist_draw_line(startx, starty, endx, endy);
-> +    draw_line(s, startx, starty, endx, endy, false, -1, -1);
-> +}
-> +
-> +static void draw_line_end(ARTISTState *s, bool update_start)
-> +{
-> +
-> +    int startx = artist_get_x(s->vram_start);
-> +    int starty = artist_get_y(s->vram_start);
-> +    int endx = artist_get_x(s->line_end);
-> +    int endy = artist_get_y(s->line_end);
-> +
-> +    trace_artist_draw_line(startx, starty, endx, endy);
-> +    draw_line(s, startx, starty, endx, endy, update_start, -1, -1);
-> +}
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x "/root/wo=
+rkspace/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_or=
+ig"
+  Segmentation fault (core dumped)
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x --version
+  qemu-s390x version 4.2.0
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x "/root/workspac=
+e/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig"
+  Segmentation fault (core dumped)
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x --version
+  qemu-s390x version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.22)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
+  qemu-arm does work on the same machine:
+
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-arm bitcoin-0.19.0.1-=
+armhf/bin/test_bitcoin -t amount_tests
+  Running 4 test cases...
+
+  *** No errors detected
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-arm bitcoin-0.1=
+9.0.1-armhf/bin/test_bitcoin -t amount_tests
+  Running 4 test cases...
+
+  *** No errors detected
+
+
+  =
+
+  What kind of debug information would be helpful for this issue report?
+  GDB for the self-compiled latest release is not particularly helpful:
+
+  (gdb) run
+  Starting program: /usr/local/bin/qemu-s390x /root/workspace/bitcoin-core/=
+build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
+".
+  [New Thread 0x7fb7a2a140 (LWP 28264)]
+
+  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
+  0x000000555596b218 in __bss_start__ ()
+  (gdb) bt
+  #0  0x000000555596b218 in __bss_start__ ()
+  #1  0x00000055556120a8 in ?? ()
+  #2  0x00000055579904b0 in ?? ()
+  Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+
+
+  =
+
+  A bit more information is available in the version shipped by Ubuntu:
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-s390x /root/workspace/bitcoin-core/build/=
+bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
+".
+  [New Thread 0x7fb7a01180 (LWP 28271)]
+
+  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
+  0x0000005555738f98 in code_gen_buffer ()
+  (gdb) bt
+  #0  0x0000005555738f98 in code_gen_buffer ()
+  #1  0x00000055555e96c8 in cpu_exec ()
+  #2  0x00000055555ee430 in cpu_loop ()
+  #3  0x00000055555c3328 in main ()
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1862986/+subscriptions
 
