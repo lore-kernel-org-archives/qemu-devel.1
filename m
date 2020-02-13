@@ -2,101 +2,107 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAD0C3B18B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF327C2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:26:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E1332469A
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:24:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EEA324685
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 15:26:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvSOqmGz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E1332469A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jF4RAiqx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EEA324685
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2GLT-0000XP-Cr
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:24:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41993)
+	id 1j2GOD-0003sg-PF
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 10:26:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1j2GC8-0004hS-NX
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:14:25 -0500
+ (envelope-from <philmd@redhat.com>) id 1j2GLw-0001UD-VA
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:24:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1j2GC7-0000KB-Dt
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:14:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20930
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j2GLu-0000nk-UG
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:24:32 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37131
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j2GC7-0000GO-93
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:14:23 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j2GLu-0000kx-7t
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 10:24:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581606861;
+ s=mimecast20190719; t=1581607469;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ade2SLj469FEqRgx9o4Hyyq2hjcS5wtLZnI6lrJkg3U=;
- b=VvSOqmGz4IrmYYMDYsnTSWPwnOKUmq05fIQ6jCXV7obz0Tu7zMNEuRbetz09on+mFV5LFl
- q2i/4E2XFi5cfgeTff2eQhVSuILJjH1z1eOAE4IBcNxz3M+nE/DR+Ga2p4mSWOlI5tSfkr
- aYbwlFf1RCbHk+xjeIUd3+34lkBZqTA=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-0silQa-2PDWzV--IiAyvVA-1; Thu, 13 Feb 2020 10:14:19 -0500
-Received: by mail-qv1-f72.google.com with SMTP id dr18so3675750qvb.14
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 07:14:19 -0800 (PST)
+ bh=NPerDuVjCJQ2UeO9FdNW7E1PeN/DO9lJmQRRxxb5QCo=;
+ b=jF4RAiqxUNdX5cmcg1PqxEZjSyvbypUhCLyOTjLqFgGcl390xqnecg+XeAbE1uoDtwWk7Q
+ qtObwhrtEWYiAUind+tiTHpo5TSwDLV8VyYBRXJP/5Bg+SeWpq2/M4ZRSWxU1VSK1iP93Y
+ ANwTk2yNnLfDTIpeyGzJUQqxoD3hTDc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-dk9GuXmQO-essY1y42Aigg-1; Thu, 13 Feb 2020 10:24:27 -0500
+Received: by mail-wm1-f70.google.com with SMTP id z7so2491898wmi.0
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 07:24:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=D7J324WQAoq2u/kCpVQoNxxqWQHNOPZCO9rtsI+SE2g=;
- b=Yx35rqXGzmQkAB4tFVjV0kWECCEniMMLXyjlfRBgMtylLUqwMFS0UlumoMU0IZn6W9
- L6H2qOktjlHiRp55ksv4Qgf3ivzF4058VlL5ELQLOurNUw/nOV3wWZlRxFSz9rtro/sX
- lml733jVTsJS3nn6ezLToYqlstRV8dPDXlQ7DJoBp9Ru86ipN2aa9x5Wt/I3h0aGlZFT
- Jw8MPbPpFuQy0HpRuHc3wqijNnxUZG3ykARDvCGvkCA95q2HxLmzaWEW/FQ+kNhAqI3U
- k4UTH6YuwcL2yZBAR4lD2GGaHXIBNcxKp4Pp7EhEizgTACsuJWxZraI55A7jcYR/nuUY
- 2Q6Q==
-X-Gm-Message-State: APjAAAUL+40bS7vxOuTeYuNjVIIKSuiY5MondLDO4QsjiSUCo8sqa0GJ
- WwpdR1ngCGr0Upv5/k/ZK8uJW2acVVZHiUrm8SLIa6NhDuei/S6zM1OQO6/HrW2KPK4bNIzVGvT
- nApww4O9fMlBIvFA=
-X-Received: by 2002:ac8:3fd7:: with SMTP id v23mr11839175qtk.293.1581606858701; 
- Thu, 13 Feb 2020 07:14:18 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz/olUw67aKcDa7V3uIGbnjWmagwwd8gdJGvG4T5y4R5j6P9/7zwS0mga+7AjKw14eAlN5l8Q==
-X-Received: by 2002:ac8:3fd7:: with SMTP id v23mr11839146qtk.293.1581606858479; 
- Thu, 13 Feb 2020 07:14:18 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c8:32::2])
- by smtp.gmail.com with ESMTPSA id 73sm1605499qtg.40.2020.02.13.07.14.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 07:14:17 -0800 (PST)
-Date: Thu, 13 Feb 2020 10:14:15 -0500
-From: Peter Xu <peterx@redhat.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC v3 16/25] intel_iommu: add PASID cache management
- infrastructure
-Message-ID: <20200213151415.GC1103216@xz-x1>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-17-git-send-email-yi.l.liu@intel.com>
- <20200211233548.GO984290@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A1BA669@SHSMSX104.ccr.corp.intel.com>
- <20200212152629.GA1083891@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A1BBCA9@SHSMSX104.ccr.corp.intel.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=NPerDuVjCJQ2UeO9FdNW7E1PeN/DO9lJmQRRxxb5QCo=;
+ b=ZHcm0lOFm6deDxZqhfdPBLD3PX6lebdHBrk+s25FS5ZM58uctq1rrgm+0X9ebOremg
+ yNSJqlYWwG0ywyz44CvX2Kc3PJY+WKqUBXyrPpRlNimtTnidY4++tbcJs3gtaPJJ+GwP
+ 7mb+bMFNGJdYxhU/PvKvuCg9HY/5pSV4FQiXOJW89lELl90zHsZ6P70Z5JDJZnB+jups
+ EfS5RA935N9gYC9bugmGU7AhWUuR2Mzw6V1iRGOxzay77D4QxwFqI5NeW4t3l0/z5YX1
+ AWJChw6egNUtvTg5OmikQd/87UPL5cR3mGJvh49SI8AZQWLImIUb1az1255g2VCk9Wik
+ ZerA==
+X-Gm-Message-State: APjAAAXjaQR9JiTMal2Vb95kK6HDd4aC/LGKdAjLzwK00OXh+wMTRkO0
+ pNP3gg3tdC0e0crsFDvwjb9Rjb/KwXB4FtX/Ba58EiOp+Bg+K0yYLyDttjZPZYPh9yJIlUjiNu8
+ d+/nw5NxWZwTgtas=
+X-Received: by 2002:a05:6000:1187:: with SMTP id
+ g7mr22452330wrx.109.1581607466344; 
+ Thu, 13 Feb 2020 07:24:26 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyGzlEF/gZuTP39LH+pqBaTAspiyKFHmoyM6RoEar+L/M8sKRnSPkKw1bLoUPkQHTp6V+zCIg==
+X-Received: by 2002:a05:6000:1187:: with SMTP id
+ g7mr22452291wrx.109.1581607465944; 
+ Thu, 13 Feb 2020 07:24:25 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id q130sm3756970wme.19.2020.02.13.07.24.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 13 Feb 2020 07:24:25 -0800 (PST)
+Subject: Re: Question about (and problem with) pflash data access
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Guenter Roeck <linux@roeck-us.net>
+References: <20200212184648.GA584@roeck-us.net>
+ <504e7722-0b60-ec02-774d-26a7320e5309@redhat.com>
+ <20200212230918.GA27242@roeck-us.net>
+ <560224fe-f0a3-c64a-6689-e824225cfbb9@redhat.com>
+ <279d959f-f7e5-65e1-9c68-459f3fed56d3@ozlabs.ru>
+ <52f0b829-151a-3dd0-0ec7-c3155185510c@redhat.com>
+ <9f652340-1277-0eb2-bc2c-402b4209a220@roeck-us.net>
+ <CAFEAcA8CyTqdqvT6xatkxb9EN49zD4OBaKrbaLpkyZg+eMoM6w@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ff42c7de-ef78-a0e5-9abe-9343947ff6d6@redhat.com>
+Date: Thu, 13 Feb 2020 16:24:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A1BBCA9@SHSMSX104.ccr.corp.intel.com>
-X-MC-Unique: 0silQa-2PDWzV--IiAyvVA-1
+In-Reply-To: <CAFEAcA8CyTqdqvT6xatkxb9EN49zD4OBaKrbaLpkyZg+eMoM6w@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: dk9GuXmQO-essY1y42Aigg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,41 +114,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Wu, Hao" <hao.wu@intel.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>, Richard Henderson <rth@twiddle.net>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 02:59:37AM +0000, Liu, Yi L wrote:
-> > - Remove the vtd_pasid_as check right below because it's not needed.
-> >=20
-> > >
-> > >
-> > > > > +        if (vtd_pasid_as &&
-> >                    ^^^^^^^^^^^^
->=20
-> yes, it is. In current series vtd_add_find_pasid_as() doesn=E2=80=99t che=
-ck the
-> result of vtd_pasid_as mem allocation, so no need to check vtd_pasid_as
-> here either. However, it might be better to check the allocation result
-> or it will result in issue if allocation failed. What's your preference
-> here?
+On 2/13/20 3:39 PM, Peter Maydell wrote:
+> On Thu, 13 Feb 2020 at 14:26, Guenter Roeck <linux@roeck-us.net> wrote:
+>> What really puzzles me is that there is no trace output for
+>> flash data accesses (trace_pflash_data_read and trace_pflash_data_write),
+>> meaning the actual flash data access must be handled elsewhere.
+>> Can someone give me a hint where that might be ?
 
-That should not be needed, because IIRC g_malloc0() will directly
-coredump if allocation fails.  Even if not, it'll coredump in
-vtd_add_find_pasid_as() soon when accessing the NULL pointer.
+If you can share built kernel/dtb/rootfs for this machine I can have a 
+look at it.
 
---=20
-Peter Xu
+>> Clearly I am missing something about inner workings of qemu.
+
+You can see all the pflash events using '-trace pflash*'.
+
+> 
+> Probably the device is in 'romd' mode. A QEMU MemoryRegion
+> can be:
+>   * RAM (includes ROM for these purposes) -- backed by host
+>     memory, reads and writes (if permitted) go straight to
+>     the host memory via fastpath accesses
+
+No tracing here.
+
+>   * MMIO -- backed by a read and write accessor function,
+>     all accesses go to these functions
+>   * "ROM device" -- a mix of the above where there is a
+>     backing bit of host memory but also accessor functions.
+>     When the device is in "romd" mode, reads go direct to
+>     host memory, and writes still go to the accessor function.
+>     When the device is not in "romd" mode, reads also go
+>     to the accessor function.
+> 
+> We use this in the pflash devices to make the common case
+> ("just read the flash") fast. When the guest makes a write
+> to flash that puts it into programming mode, we call
+> memory_region_rom_device_set_romd(..., false) so we can
+> intercept reads and make them do the right thing for
+> programming mode.
+> 
+> thanks
+> -- PMM
+> 
 
 
