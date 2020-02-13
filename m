@@ -2,62 +2,76 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F14DEC2BA83
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 17:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E16AC2BA83
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 17:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCA3D206DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 17:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4966D206DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 17:21:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DbqPIwZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCA3D206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1rG5SJg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4966D206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2I7y-0006Bp-VM
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 12:18:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33297)
+	id 1j2IB9-0007eZ-Gj
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 12:21:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1j2I76-0005dN-Np
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:17:22 -0500
+ (envelope-from <david@redhat.com>) id 1j2IAI-000724-Nx
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:20:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1j2I75-000408-H1
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:17:20 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:57914)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1j2I74-0003a7-WA; Thu, 13 Feb 2020 12:17:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
- bh=VW0xZuhRsG4PibYDsRGfffGxJBPLKMsp0cRTwwaNPlc=; 
- b=DbqPIwZ6+mnI0EUzT7vAfQprDcd3fi1e4DMXy1HQGTP0IvJBjOGQUVnuICZBh+jvExf6CdBPaSUjQ5+Mh3PUK9MqLUFPqBMc4gm+46YqUGXjL2iWEgvUaX5yyggT/VBIavf4YiFgB8kuwqHkrirrfbTYCLZwclVja6PxxK4JTYsimn1qN2prKT2x9+aOVgrvKfGnXaQbxc5PIzpG4clZLWqCOdlhNIXSjabCiuMjl2n6epu6PjHveYUkFLhih9ddCwts405mZ8Iq2doziuM5J6thK7gKjv8YbPHmJckZyediHQT6vp4mNS06SVzHjio5TEjHSR7qP26Gh4V6R43+PQ==;
-Received: from [192.168.12.213] (helo=perseus.local)
- by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1j2I6l-0007cD-1X; Thu, 13 Feb 2020 18:16:59 +0100
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1j2I6c-00049S-W0; Thu, 13 Feb 2020 18:16:50 +0100
-From: Alberto Garcia <berto@igalia.com>
+ (envelope-from <david@redhat.com>) id 1j2IAE-0007m6-VR
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:20:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33141
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j2IAE-0007hF-Ev
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 12:20:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581614432;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=TyKS8NmY79nY+30otfP1CmwSxMaLKzfk5QbHs4u8f+k=;
+ b=Q1rG5SJgpvA6j5AJzDROI7tT0nGUUcCOi7eZkox67dJo5Jhci0c5EQ66U2qdbmbV6nzfnV
+ wTHKQKESOauTjpJxFdmS9jEJ2lMmNeHGpEICvUgptMmMpWCBrtRysureglnctKbrWeUH4e
+ 9x0E21ajp+iZvs01WelIDs19FviKGeg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243--8UAPMSVMZKVMM3TMzN07Q-1; Thu, 13 Feb 2020 12:20:31 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4375800D41;
+ Thu, 13 Feb 2020 17:20:29 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-117-120.ams2.redhat.com [10.36.117.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 373645D9E5;
+ Thu, 13 Feb 2020 17:20:17 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] qcow2: Fix alignment checks in encrypted images
-Date: Thu, 13 Feb 2020 18:16:46 +0100
-Message-Id: <20200213171646.15876-1-berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
+Subject: [PATCH RFC] memory: Don't allow to resize RAM while migrating
+Date: Thu, 13 Feb 2020 18:20:16 +0100
+Message-Id: <20200213172016.196609-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: -8UAPMSVMZKVMM3TMzN07Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,74 +83,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Juan Quintela <quintela@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I/O requests to encrypted media should be aligned to the sector size
-used by the underlying encryption method, not to BDRV_SECTOR_SIZE.
-Fortunately this doesn't break anything at the moment because
-both existing QCRYPTO_BLOCK_*_SECTOR_SIZE have the same value as
-BDRV_SECTOR_SIZE.
+Resizing while migrating is dangerous and does not work as expected.
+The whole migration code works on the usable_length of ram blocks and does
+not expect this to change at random points in time.
 
-The checks in qcow2_co_preadv_encrypted() are also unnecessary because
-they are repeated immediately afterwards in qcow2_co_encdec().
+Precopy: The ram block size must not change on the source, after
+ram_save_setup(), so as long as the guest is still running on the source.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
+Postcopy: The ram block size must not change on the target, after
+synchronizing the RAM block list (ram_load_precopy()).
+
+AFAIKS, resizing can be trigger *after* (but not during) a reset in
+ACPI code by the guest
+- hw/arm/virt-acpi-build.c:acpi_ram_update()
+- hw/i386/acpi-build.c:acpi_ram_update()
+
+I see no easy way to work around this. Fail hard instead of failing
+somewhere in migration code due to strange other reasons. AFAIKs, the
+rebuilts will be triggered during reboot, so this should not affect
+running guests, but only guests that reboot at a very bad time and
+actually require size changes.
+
+Let's further limit the impact by checking if an actual resize of the
+RAM (in number of pages) is required.
+
+Don't perform the checks in qemu_ram_resize(), as that's called during
+migration when syncing the used_length. Update documentation.
+
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Shannon Zhao <shannon.zhao@linaro.org>
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- block/qcow2-threads.c | 12 ++++++++----
- block/qcow2.c         |  2 --
- 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 8f5a0d1ebe..77bb578cdf 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -246,12 +246,15 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t host_offset,
-         .len = len,
-         .func = func,
-     };
-+    uint64_t sector_size;
- 
--    assert(QEMU_IS_ALIGNED(guest_offset, BDRV_SECTOR_SIZE));
--    assert(QEMU_IS_ALIGNED(host_offset, BDRV_SECTOR_SIZE));
--    assert(QEMU_IS_ALIGNED(len, BDRV_SECTOR_SIZE));
-     assert(s->crypto);
- 
-+    sector_size = qcrypto_block_get_sector_size(s->crypto);
-+    assert(QEMU_IS_ALIGNED(guest_offset, sector_size));
-+    assert(QEMU_IS_ALIGNED(host_offset, sector_size));
-+    assert(QEMU_IS_ALIGNED(len, sector_size));
-+
-     return len == 0 ? 0 : qcow2_co_process(bs, qcow2_encdec_pool_func, &arg);
+Any idea how to avoid killing the guest? Anything obvious I am missing?
+
+---
+ exec.c                |  6 ++++--
+ include/exec/memory.h | 11 +++++++----
+ memory.c              | 12 ++++++++++++
+ 3 files changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/exec.c b/exec.c
+index 67e520d18e..faa6708414 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2116,8 +2116,10 @@ static int memory_try_enable_merging(void *addr, siz=
+e_t len)
+     return qemu_madvise(addr, len, QEMU_MADV_MERGEABLE);
  }
- 
-@@ -270,7 +273,8 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t host_offset,
-  *        will be written to the underlying storage device at
-  *        @host_offset
+=20
+-/* Only legal before guest might have detected the memory size: e.g. on
+- * incoming migration, or right after reset.
++/*
++ * RAM must not be resized while migration is active (except from migratio=
+n
++ * code). Care has to be taken if the guest might have already detected
++ * the memory.
   *
-- * @len - length of the buffer (must be a BDRV_SECTOR_SIZE multiple)
-+ * @len - length of the buffer (must be a multiple of the encryption
-+ *        sector size)
+  * As memory core doesn't know how is memory accessed, it is up to
+  * resize callback to update device state and/or add assertions to detect
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index e85b7de99a..1e5bfbe805 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -113,7 +113,8 @@ typedef struct IOMMUNotifier IOMMUNotifier;
+ #define RAM_SHARED     (1 << 1)
+=20
+ /* Only a portion of RAM (used_length) is actually used, and migrated.
+- * This used_length size can change across reboots.
++ * RAM must not be resized while migration is active (except from migratio=
+n
++ * code).
+  */
+ #define RAM_RESIZEABLE (1 << 2)
+=20
+@@ -843,7 +844,8 @@ void memory_region_init_ram_shared_nomigrate(MemoryRegi=
+on *mr,
+  *                                     RAM.  Accesses into the region will
+  *                                     modify memory directly.  Only an in=
+itial
+  *                                     portion of this RAM is actually use=
+d.
+- *                                     The used size can change across reb=
+oots.
++ *                                     The size must not change while migr=
+ation
++ *                                     is active.
   *
-  * Depending on the encryption method, @host_offset and/or @guest_offset
-  * may be used for generating the initialization vector for
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ef96606f8d..8dcee5efec 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2068,8 +2068,6 @@ qcow2_co_preadv_encrypted(BlockDriverState *bs,
-         goto fail;
-     }
- 
--    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
--    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
-     if (qcow2_co_decrypt(bs,
-                          file_cluster_offset + offset_into_cluster(s, offset),
-                          offset, buf, bytes) < 0)
--- 
-2.20.1
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+@@ -1464,8 +1466,9 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr);
+=20
+ /* memory_region_ram_resize: Resize a RAM region.
+  *
+- * Only legal before guest might have detected the memory size: e.g. on
+- * incoming migration, or right after reset.
++ * RAM must not be resized while migration is active (except from migratio=
+n
++ * code). Care has to be taken if the guest might have already detected
++ * the memory.
+  *
+  * @mr: a memory region created with @memory_region_init_resizeable_ram.
+  * @newsize: the new size the region
+diff --git a/memory.c b/memory.c
+index aeaa8dcc9e..7fa048aa3a 100644
+--- a/memory.c
++++ b/memory.c
+@@ -34,6 +34,7 @@
+ #include "sysemu/accel.h"
+ #include "hw/boards.h"
+ #include "migration/vmstate.h"
++#include "migration/misc.h"
+=20
+ //#define DEBUG_UNASSIGNED
+=20
+@@ -2204,6 +2205,17 @@ void memory_region_ram_resize(MemoryRegion *mr, ram_=
+addr_t newsize, Error **errp
+ {
+     assert(mr->ram_block);
+=20
++    /*
++     * Resizing RAM while migrating is not possible, as the used_length of
++     * RAM blocks must neither change on the source (precopy), nor on the
++     * target (postcopy) as long as migration code is active.
++     */
++    if (HOST_PAGE_ALIGN(newsize) !=3D mr->ram_block->used_length &&
++        !migration_is_idle()) {
++        error_setg(errp, "Cannot resize RAM while migrating.");
++        return;
++    }
++
+     qemu_ram_resize(mr->ram_block, newsize, errp);
+ }
+=20
+--=20
+2.24.1
 
 
