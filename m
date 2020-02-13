@@ -2,100 +2,80 @@ Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE199C352A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 19:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE83DC352A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 19:10:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92BC42168B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 19:03:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C26D520656
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 19:10:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQgQQ/WJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92BC42168B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AWBgtVD8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C26D520656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2Jm7-0006zY-Mw
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 14:03:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42885)
+	id 1j2Jsl-0001oE-Vh
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 14:10:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58343)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j2Jl1-00067R-RN
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:02:40 -0500
+ (envelope-from <quintela@redhat.com>) id 1j2Jrz-0001JT-T0
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:09:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j2Jl0-0006Iz-LD
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:02:39 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32468
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1j2Jrw-0004ds-V5
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:09:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20971
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j2Jl0-0006H4-H5
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:02:38 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j2Jrw-0004ac-Ot
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 14:09:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581620557;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1581620987;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=k5l0cpDNs72SdYpxM3AvRXNh6WU6PsGxpi4pOcJdpyM=;
- b=OQgQQ/WJprERvkZFJW4MLWXKP/d3zNb+gaSHJhQ6VPeRmM+et9XtC0u4/l0eOCzcOS6+oo
- ScZ8UF2jiGpUt8H7crSnBxS7iwLntnrqr2Dvn7kxORKSnYbgG0verEK6LEGgg1hQWa42Iv
- YX+Ns75TpKftRoSm/oH0LVAPMkybFMQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-LoqaqoVFOM6iZIhkzGBM5w-1; Thu, 13 Feb 2020 14:02:33 -0500
-Received: by mail-wr1-f69.google.com with SMTP id a12so2754155wrn.19
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 11:02:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=J6P5diqcf5X9RET4FJh19AItd0eodJa51znqthgQRcE=;
- b=BS/aT1qvc8l0Uv3eX1CQntcIkRdx4Dlq4wWdQR/DBttg/VHl86muEuTLpzPRp5QJWw
- IbHHwR2g/pECdj0bbTPD6sZJLXhrjN2gpl1BZmMST3j8SFwVeurzxgwR5BrSPI2lrl+x
- vpbS+GvDtS8H7csdnQhcJ0YqgiQJetA87mKalC3h04y0eBDTw7TiX33+7rHYEgotHgKd
- lTKg5FBp/AOy2swgfCBdFALQ8wFWeiAo/F3JHeEX6Ux4d+sWCxEzx09rPPLdZ9p9LC/n
- Qw9etYQEMUVGGVhhZUYDpsAov8gypN92PPgYmzjfaccWNeAiS7nvxuVJhVkMGCH/wY38
- z8OQ==
-X-Gm-Message-State: APjAAAW9Bnw+S3cRz6f1/sTIyztblUY8uf5g4pjW/xZBQrleXOtEkwd+
- 412+duAAkzlrad0S72nBzTJyLrcy8Wl1TIxi20dWX8zB8Khmel5oRUio4DnzQV6h/GipicaGM0M
- Dd/yC7bzYORSvTAw=
-X-Received: by 2002:a5d:5647:: with SMTP id j7mr23166889wrw.265.1581620552633; 
- Thu, 13 Feb 2020 11:02:32 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxka+K6cLsHv1a2uMBCTG7uDeYetBGx6x6eaN5HuKATZdCiZfs/tsdzdGSwHrP4PtbPh2MOzA==
-X-Received: by 2002:a5d:5647:: with SMTP id j7mr23166869wrw.265.1581620552440; 
- Thu, 13 Feb 2020 11:02:32 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id h2sm4143707wrt.45.2020.02.13.11.02.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 13 Feb 2020 11:02:31 -0800 (PST)
-Subject: Re: [PATCH v2 17/30] qapi/migration.json: Replace _this_ with *this*
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200213175647.17628-1-peter.maydell@linaro.org>
- <20200213175647.17628-18-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <41398e32-fc7f-21d4-2318-18e6453d4fee@redhat.com>
-Date: Thu, 13 Feb 2020 20:02:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=TD/1DjpBRZBG9PQeyFQZrql99MccnY1E4dxyuL0vEl4=;
+ b=AWBgtVD8gNd50dzgTCzWogzsgroZ1cYwwzD+n7q5Akc501Hb5bOyXMTr6qRoq6dfTPXBqE
+ adyXF+lNr/eKYapILzqJSRfoRlJVifr+Fe0St1jKFitj2mCxs1Q6NQtsaK8pWr37BJQB0x
+ sI1i3lccB8GXeb6rzuXSDGsJRCwVI3g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-72-w24qH3UbOfSeKE6EA4hdew-1; Thu, 13 Feb 2020 14:09:46 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC8C11083E81;
+ Thu, 13 Feb 2020 19:09:44 +0000 (UTC)
+Received: from redhat.com (ovpn-116-40.ams2.redhat.com [10.36.116.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 984A26031E;
+ Thu, 13 Feb 2020 19:09:39 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH RFC] memory: Don't allow to resize RAM while migrating
+In-Reply-To: <20200213172016.196609-1-david@redhat.com> (David Hildenbrand's
+ message of "Thu, 13 Feb 2020 18:20:16 +0100")
+References: <20200213172016.196609-1-david@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Thu, 13 Feb 2020 20:09:37 +0100
+Message-ID: <877e0ql2xa.fsf@secure.laptop>
 MIME-Version: 1.0
-In-Reply-To: <20200213175647.17628-18-peter.maydell@linaro.org>
-Content-Language: en-US
-X-MC-Unique: LoqaqoVFOM6iZIhkzGBM5w-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: w24qH3UbOfSeKE6EA4hdew-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,65 +87,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Reply-To: quintela@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Shannon Zhao <shannon.zhao@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/13/20 6:56 PM, Peter Maydell wrote:
-> The MigrationInfo::setup-time documentation is the only place where
-> we use _this_ inline markup for emphasis, commonly rendered in
-> italics.  rST doesn't recognize that markup and emits literal
-> underscores.
->=20
-> Switch to *this* instead.  Changes markup to strong emphasis with
-> Texinfo, commonly rendered as bold.  With rST, it will go right back
-> to emphasis / italics.
->=20
-> rST also uses **this** for strong (commonly rendered bold) where
-> Texinfo uses *this*. We have one place in the doc comments
-> which uses strong/bold markup, in qapi/introspect.json:
->      Note: the QAPI schema is also used to help define *internal*
->=20
-> When we switch to rST that will be rendered as emphasis / italics.
-> Markus (who wrote that) thinks that using emphasis / italics
-> there is an improvement, so we leave that markup alone.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+David Hildenbrand <david@redhat.com> wrote:
+> Resizing while migrating is dangerous and does not work as expected.
+> The whole migration code works on the usable_length of ram blocks and doe=
+s
+> not expect this to change at random points in time.
+>
+> Precopy: The ram block size must not change on the source, after
+> ram_save_setup(), so as long as the guest is still running on the source.
+>
+> Postcopy: The ram block size must not change on the target, after
+> synchronizing the RAM block list (ram_load_precopy()).
+>
+> AFAIKS, resizing can be trigger *after* (but not during) a reset in
+> ACPI code by the guest
+> - hw/arm/virt-acpi-build.c:acpi_ram_update()
+> - hw/i386/acpi-build.c:acpi_ram_update()
+>
+> I see no easy way to work around this. Fail hard instead of failing
+> somewhere in migration code due to strange other reasons. AFAIKs, the
+> rebuilts will be triggered during reboot, so this should not affect
+> running guests, but only guests that reboot at a very bad time and
+> actually require size changes.
+>
+> Let's further limit the impact by checking if an actual resize of the
+> RAM (in number of pages) is required.
+>
+> Don't perform the checks in qemu_ram_resize(), as that's called during
+> migration when syncing the used_length. Update documentation.
+>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Shannon Zhao <shannon.zhao@linaro.org>
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
-> v1->v2: updated commit message. Paras 1 and 2 are from Markus;
-> paras 3 and 4 are new, and mention a non-change agreed in
-> the thread off the cover letter of the v1 patch series.
-> ---
->   qapi/migration.json | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 11033b7a8e6..52f34299698 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -178,8 +178,8 @@
->   #                     expected downtime in milliseconds for the guest i=
-n last walk
->   #                     of the dirty bitmap. (since 1.3)
->   #
-> -# @setup-time: amount of setup time in milliseconds _before_ the
-> -#              iterations begin but _after_ the QMP command is issued. T=
-his is designed
-> +# @setup-time: amount of setup time in milliseconds *before* the
-> +#              iterations begin but *after* the QMP command is issued. T=
-his is designed
->   #              to provide an accounting of any activities (such as RDMA=
- pinning) which
->   #              may be expensive, but do not actually occur during the i=
-terative
->   #              migration rounds themselves. (since 1.6)
->=20
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+>
+> Any idea how to avoid killing the guest? Anything obvious I am missing?
+
+If you avoid the resize, it should be ok for both precopy & postcopy.
+
+But, as you point, if acpi guest is the one changing sizes, we are in
+trouble.  But really, it makes exactly zero sense to reset during
+migrate.  if we _could_ catch the reset, the "intelligent" thing to do
+is:
+
+- detect reset
+- launch guest on destination from zero.
+
+I.e. not migration at all.  This would be my "better" idea, but I have
+no clue how to catch that kind of things in a sane way that works in
+every architecture.
+
+You get the:
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+because:
+- your code change makes sense
+- the documentation update is good.
+
+Thanks, Juan.
 
 
