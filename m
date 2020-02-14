@@ -6,62 +6,73 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6ADDC35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 05:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AA82C35242
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 06:01:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3E522067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 05:37:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 495482187F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 06:01:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Xq4sSZ6y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3E522067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jHNBDR0T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 495482187F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2TfK-00049i-T4
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 00:37:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57711)
+	id 1j2U2N-0000Wq-GF
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 01:01:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j2TeX-0003L7-Ad
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 00:36:39 -0500
+ (envelope-from <gshan@redhat.com>) id 1j2U1H-0007zj-Ql
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 01:00:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j2TeW-0007MY-0U
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 00:36:37 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:34103 helo=ozlabs.org)
+ (envelope-from <gshan@redhat.com>) id 1j2U1G-0005BZ-1M
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 01:00:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43304
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1j2TeV-0007FF-3G
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 00:36:35 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48JhvH4G3Qz9sRN; Fri, 14 Feb 2020 16:36:27 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581658587;
- bh=zNdoB9TvN56rRqasUcuUJ/reZPQdWn4eEGEbEQxhf7g=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Xq4sSZ6yevHWgo7eyJ1ryOK/ibr0X/T3CGbch9K+3d9L0fY9I3uttzAelX1yBn7qU
- yQgy3rwNZHik1vXlUfyHex04RdUf4MX7H3BSoAy5QLSYs6O+TunsyBEoQZsazSKx1Y
- YBAni/lQhFydDEh8axlaW+3rPC2aS27BnZYOQ6HE=
-Date: Fri, 14 Feb 2020 16:36:20 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
-Message-ID: <20200214053620.GR124369@umbus.fritz.box>
-References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
- <1580300216-86172-4-git-send-email-yi.l.liu@intel.com>
- <20200131040644.GG15210@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A199306@SHSMSX104.ccr.corp.intel.com>
- <20200211165843.GG984290@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A1BA4D8@SHSMSX104.ccr.corp.intel.com>
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1j2U1F-00059j-Ks
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 01:00:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581660004;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=k17MgG0DMNlivzXLB/4xrLFHebz8qedy1MC8AxtAf74=;
+ b=jHNBDR0TPohGWy+bHMnosDJPhvqECuJiXhCupwxIR4SAtG1DBU4+HiDPiHIbJ69VS1GHs9
+ nN0TRK9MIFWT1U3ztRgyKTVd5lkMZljOHlXsl6pxQeH/O5sPwYJOTv1jSWEzYE3pTMIFi/
+ Iyfjx64t5NeCcql8YaQ9im21MNvfvVo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-413-VEKe6VICNtqezMQTwUAdMA-1; Fri, 14 Feb 2020 01:00:03 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 236F8101FC62;
+ Fri, 14 Feb 2020 06:00:01 +0000 (UTC)
+Received: from localhost.localdomain.com (vpn2-54-93.bne.redhat.com
+ [10.64.54.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99AD81001B30;
+ Fri, 14 Feb 2020 05:59:54 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Subject: [PATCH v3 0/2] hw/arm/virt: Simulate NMI Injection
+Date: Fri, 14 Feb 2020 16:59:48 +1100
+Message-Id: <20200214055950.62477-1-gshan@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="teKjxxMjPsACTz/N"
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A1BA4D8@SHSMSX104.ccr.corp.intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: VEKe6VICNtqezMQTwUAdMA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,87 +84,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "Wu, Hao" <hao.wu@intel.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
+ aik@ozlabs.ru, maz@kernel.org, richard.henderson@linaro.org,
+ eric.auger@redhat.com, shan.gavin@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This series simulates the behavior of receiving NMI interrupt for "virt"
+board. First of all, a new interrupt (SError) is supported for each CPU.
+The backend is either sending error events through kvm module or emulating
+the bahavior when TCG is enabled. The outcome is SError or data abort is
+raised to crash guest.
 
---teKjxxMjPsACTz/N
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For GICv2 or GICv3, a new IRQ line is added for each CPU and it's connected
+to the (above) introduced SError interrupt. The IRQ line of CPU#0 is raised
+when HMP/QMP "nmi" is issued, to crash the guest.
 
-On Wed, Feb 12, 2020 at 07:15:13AM +0000, Liu, Yi L wrote:
-> Hi Peter,
->=20
-> > From: Peter Xu <peterx@redhat.com>
-> > Sent: Wednesday, February 12, 2020 12:59 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
-> >=20
-> > On Fri, Jan 31, 2020 at 11:42:13AM +0000, Liu, Yi L wrote:
-> > > > I'm not very clear on the relationship betwen an IOMMUContext and a
-> > > > DualStageIOMMUObject.  Can there be many IOMMUContexts to a
-> > > > DualStageIOMMUOBject?  The other way around?  Or is it just
-> > > > zero-or-one DualStageIOMMUObjects to an IOMMUContext?
-> > >
-> > > It is possible. As the below patch shows, DualStageIOMMUObject is per=
- vfio
-> > > container. IOMMUContext can be either per-device or shared across dev=
-ices,
-> > > it depends on vendor specific vIOMMU emulators.
-> >=20
-> > Is there an example when an IOMMUContext can be not per-device?
->=20
-> No, I don=E2=80=99t have such example so far. But as IOMMUContext is got =
-=66rom
-> pci_device_iommu_context(),  in concept it possible to be not per-device.
-> It is kind of leave to vIOMMU to decide if different devices could share a
-> single IOMMUContext.
+Testing
+=3D=3D=3D=3D=3D=3D=3D
 
-On the "pseries" machine the vIOMMU only has one set of translations
-for a whole virtual PCI Host Bridge (vPHB).  So if you attach multiple
-devices to a single vPHB, I believe you'd get multiple devices in an
-IOMMUContext.  Well.. if we did the PASID stuff, which we don't at the
-moment.
+After the HMP/QMP "nmi" is issued in the following 4 environment, the guest=
+ is
+crashed as expected.
 
-Note that on pseries on the other hand it's routine to create multiple
-vPHBs, rather than multiple PCI roots being an oddity as it is on x86.
+   Accel     Mode                  Crashed    Parameter
+   ------------------------------------------------------------------------
+   kvm       aarch64               yes        -machine virt -cpu host
+   kvm       aarch32(cortex-a15)   yes        -machine virt -cpu host,aarch=
+64=3Doff
+   tcg       aarch64               yes        -machine virt -cpu max
+   tcg       aarch32(cortex-a15)   yes        -machine virt -cpu cortex-a15
+
+Changelog
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+v3:
+   * Support SError injection for aarch32                 (Richard Henderso=
+n)
+   * Export the SError injection through IRQ line         (Peter Maydell)
+   * Removed RFC tag as it seems in correct track         (Gavin Shan)
+v2:=20
+   * Redesigned to fully exploit SError interrupt
+
+Gavin Shan (2):
+  target/arm: Support SError injection
+  hw/arm/virt: Simulate NMI injection
+
+ hw/arm/virt.c                      | 34 ++++++++++++++-
+ hw/intc/arm_gic_common.c           |  3 ++
+ hw/intc/arm_gicv3_common.c         |  3 ++
+ include/hw/intc/arm_gic_common.h   |  1 +
+ include/hw/intc/arm_gicv3_common.h |  1 +
+ target/arm/cpu.c                   | 69 ++++++++++++++++++++++++------
+ target/arm/cpu.h                   | 17 +++++---
+ target/arm/helper.c                |  6 +++
+ target/arm/m_helper.c              |  8 ++++
+ 9 files changed, 122 insertions(+), 20 deletions(-)
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+2.23.0
 
---teKjxxMjPsACTz/N
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5GMdQACgkQbDjKyiDZ
-s5IT8hAAnJ3xZrpCbLQPvNZEpIYEhNe6qkpg2XIs9Wqs17VvHamJfhvLtB7rRaxq
-bwvkgKRWB971L16f3nnY4IH85UZDRcNLHmsNE4eQJ7s+emgnboH6hXpTeJO0i/8M
-7cL2zF6HtG7hNyCxGJgJw3qmz2ejik/jDUdlf4NFi+sOjl3y0TW6urTCXFXVRGSZ
-eXhA1TrQCgdDVsPeXize3n4GZNkbI91lVX1Si6TKtIDmmwanWPZD1vZ1Oq42jlPt
-Yqm7IeWuEf983d0PUC4QTZei/vbbPknNsMSX7fWCRtjgtz5Lf8flHY2Cns6VYoXu
-TvqDIA4xOOG1vcehBFC4cuPAxvyvtw4OqkTyMoQCDQ6z/kN15MmCVzmOEw0Dedhj
-z98Eb74lEycq3ppjp01XmFCyJWr3wAiz5pCRIYz78Hw+YREODi0jirdcJm4KtdOd
-98AjHzTRjqNHVXTcCE8o0XiM7iBPzcZLHma9N3+Re1csdyRzkh+so315eqpGHlM8
-pmPnMfKuipI0Fe9l8P02/rLlDhBz/rKJl94qAb3Gk4fCwC+lZpvziqgFVOrQVZbt
-yv05tqcHoPheIYjlKlR6uxO6Ro2aTExHr2WEGXTUlnljcoudCaDzk3xiFPQ0nQcE
-Xcul1RsnD/5mKDzEllr5LIP4F9cHPAM8jNfecK7nE8s4iAg9Bpo=
-=JD+i
------END PGP SIGNATURE-----
-
---teKjxxMjPsACTz/N--
 
