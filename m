@@ -2,62 +2,91 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A5EC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE304C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:51:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 096C8217F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:50:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 096C8217F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 828702067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:51:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvcUTuJK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 828702067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2ZTx-0004OA-5N
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 06:50:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55685)
+	id 1j2ZV4-0005VM-N3
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 06:51:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j2ZT0-0003UJ-HS
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:07 -0500
+ (envelope-from <pmathieu@redhat.com>) id 1j2ZT6-0003ko-T5
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j2ZSz-0003qp-8t
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:06 -0500
-Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:39267)
+ (envelope-from <pmathieu@redhat.com>) id 1j2ZT5-0003y0-I8
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26452
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j2ZSz-0003gC-3l
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:05 -0500
-Received: from player687.ha.ovh.net (unknown [10.110.115.67])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 5FA2A84054
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 12:48:55 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player687.ha.ovh.net (Postfix) with ESMTPSA id 8ED19F54B9F3;
- Fri, 14 Feb 2020 11:48:50 +0000 (UTC)
-Date: Fri, 14 Feb 2020 12:48:47 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 3/3] spapr: Migrate SpaprDrc::unplug_requested
-Message-ID: <20200214124847.25ecfb9e@bahia.lan>
-In-Reply-To: <20200214022900.GK124369@umbus.fritz.box>
-References: <158076936422.2118610.5626450767672103134.stgit@bahia.lan>
- <158076938222.2118610.14456984179352959929.stgit@bahia.lan>
- <20200214022900.GK124369@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1j2ZT5-0003xU-C4
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581680950;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gFvaTCTEaTis1kHxf/zXWMl8zUogwJE6vzDoyS7CHdU=;
+ b=FvcUTuJKfg8aA5Znt/mJXO92bf0X4vUzNPjgAnB0VDcBxMy7otmCpEwNUNX7E3z3G1cWiV
+ i3zNTK2viYjZ+UGWF+SbClPIFNgjDUFG3rytOtSkoVoaX4l7uin/mf/Zzdzo/9yTR6c7+u
+ B0e4Xbj4nplmICtTG+OarVpNePeJNNQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-18-Ler2HShQMM-8uURx10kW_w-1; Fri, 14 Feb 2020 06:49:07 -0500
+Received: by mail-wr1-f69.google.com with SMTP id s13so3866046wru.7
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 03:49:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xN3VCnO3L7pjsWeJ3JWTUgIjKKiRtnohYldnGla6cFI=;
+ b=DDDPjWk0jmQSYDBd+QK1qiUiqtjzD+q7ZP+3mwIBcgHeuNYUcBr8l8E2smB8JCXdkS
+ LJu8nvnuGdIod2t7kvmzFqR8MReaAngCpa2w2sK6y+NYb3g8a9UTUMPt26mfgQ4TywXY
+ yjKbS778fiSmtYqL8FYNH4Ui9+4Eo1vMRtIEtwY3P3GNUjt2qdw5rhnych9f6QhcMB2j
+ KsjTJbUiKAb9GG7tFNVUqx/TX3Yjn2+5yclDJnCRM9EJTAG6kQpOmQ/u+Adm20hkfo0s
+ URb3WIvVyIJSESLi3N2NQ0j1k8DCV8anTyuDYSfSJq/nYqVmNT19qoUKJxLYBKRg7N95
+ p5IQ==
+X-Gm-Message-State: APjAAAVtOSllVwFnxoYGg7D+sqNdA5zpb1WllWf4tLcIjlV3VIKPk1rm
+ hzYgA7Sz1JDaLlSQX1ug3evIE8fseu+Sf4YScbAeFV02Bc5fGSdOWV9SHVwaiWOsZU9rm9GzUox
+ BCzG6KHt6zdOsqCvdnnHxR/YCbxhraYQ=
+X-Received: by 2002:a05:600c:291d:: with SMTP id
+ i29mr4453164wmd.39.1581680946592; 
+ Fri, 14 Feb 2020 03:49:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxU/nAv/213va+gH14Su/o/3Q/V8aZOKJtmzscZoPiPvhzHlSesFNEbCTFqPY9xXFQCgJzlB0VyL67Ax1BhACk=
+X-Received: by 2002:a05:600c:291d:: with SMTP id
+ i29mr4453140wmd.39.1581680946276; 
+ Fri, 14 Feb 2020 03:49:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/VKIH+Zxl8u0Ts.wpDtmdrZB";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 9882867911085431270
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrjedtgdeffecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgesghdtreerredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheikeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+References: <2dc5a0962a38b912e4fa4900f9813b7ea1a9273c.1581670009.git.mprivozn@redhat.com>
+ <ef161708-2ecc-8d51-7dae-6a860659a8a9@redhat.com>
+In-Reply-To: <ef161708-2ecc-8d51-7dae-6a860659a8a9@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 14 Feb 2020 12:48:55 +0100
+Message-ID: <CAP+75-WjUiPgB-KuzYSDf=8Duyadm-qo3E+VuuPTkxVPOA2yVg@mail.gmail.com>
+Subject: Re: [PATCH] Report stringified errno in VFIO related errors
+To: Michal Privoznik <mprivozn@redhat.com>
+X-MC-Unique: Ler2HShQMM-8uURx10kW_w-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.43.105
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,148 +98,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/VKIH+Zxl8u0Ts.wpDtmdrZB
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 14 Feb 2020 13:29:00 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Mon, Feb 03, 2020 at 11:36:22PM +0100, Greg Kurz wrote:
-> > Hot unplugging a device is an asynchronous operation. If the guest is
-> > migrated after the event was sent but before it could release the
-> > device with RTAS, the destination QEMU doesn't know about the pending
-> > unplug operation and doesn't actually remove the device when the guest
-> > finally releases it. The device
-> >=20
-> > Migrate SpaprDrc::unplug_requested to fix the inconsistency. This is
-> > done with a subsection that is only sent if an unplug request is
-> > pending. This allows to preserve migration with older guests in the
-> > case of a pending hotplug request. This will cause migration to fail
-> > if the destination can't handle the subsection, but this is better
-> > than ending with an inconsistency.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
+On Fri, Feb 14, 2020 at 10:20 AM Michal Privoznik <mprivozn@redhat.com> wro=
+te:
+> On 2/14/20 9:47 AM, Michal Privoznik wrote:
+> > In a few places we report errno formatted as a negative integer.
+> > This is not as user friendly as it can be. Use strerror() and/or
+> > error_setg_errno() instead.
+> >
+> > Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
 > > ---
-> >  hw/ppc/spapr_drc.c |   27 +++++++++++++++++++++++++--
-> >  1 file changed, 25 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > index d512ac6e1e7f..6f5cab70fc6b 100644
-> > --- a/hw/ppc/spapr_drc.c
-> > +++ b/hw/ppc/spapr_drc.c
-> > @@ -455,6 +455,22 @@ void spapr_drc_reset(SpaprDrc *drc)
-> >      }
-> >  }
-> > =20
-> > +static bool spapr_drc_unplug_requested_needed(void *opaque)
-> > +{
-> > +    return spapr_drc_unplug_requested(opaque);
-> > +}
-> > +
-> > +static const VMStateDescription vmstate_spapr_drc_unplug_requested =3D=
- {
-> > +    .name =3D "spapr_drc/unplug_requested",
-> > +    .version_id =3D 1,
-> > +    .minimum_version_id =3D 1,
-> > +    .needed =3D spapr_drc_unplug_requested_needed,
-> > +    .fields  =3D (VMStateField []) {
-> > +        VMSTATE_BOOL(unplug_requested, SpaprDrc),
-> > +        VMSTATE_END_OF_LIST()
-> > +    }
-> > +};
-> > +
-> >  static bool spapr_drc_needed(void *opaque)
-> >  {
-> >      SpaprDrc *drc =3D (SpaprDrc *)opaque;
-> > @@ -467,8 +483,11 @@ static bool spapr_drc_needed(void *opaque)
-> >      /*
-> >       * We need to migrate the state if it's not equal to the expected
-> >       * long-term state, which is the same as the coldplugged initial
-> > -     * state */
-> > -    return !spapr_drc_device_ready(drc);
-> > +     * state, or if an unplug request is pending.
-> > +     */
-> > +    return
-> > +        spapr_drc_unplug_requested_needed(drc) ||
-> > +        !spapr_drc_device_ready(drc);
->=20
-> Hrm.  You start the series by splitting spapr_drc_device_ready() from
-> spapr_drc_needed().  But at this point, I'm pretty sure you've now got
-> all the callers of spapr_drc_device_ready() doing equivalent logic
-> about them, so they might as well be one function again.  That seems
-> pretty roundabout.
->=20
-
-Yeah... I did the split because an earlier draft of this series had
-a separate path at some point for the plug and unplug cases... but
-I agree these should be reunited.
-
-> I don't think the rationale for not using the drc_ready function from
-> the CAS path really makes sense.  It's not just an accident that those
-> use the same logic - in both cases what we're testing is "Is the DRC
-> in a state other than that of a default cold-plugged device?".
+> >   hw/vfio/common.c    | 2 +-
+> >   util/vfio-helpers.c | 6 +++---
+> >   2 files changed, 4 insertions(+), 4 deletions(-)
+> >
 >
+> BTW the reason I've noticed these is because I'm seeing some errors when
+> assigning my NVMe disk to qemu. This is the full command line:
+>
+>
+> /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 \
+> -name guest=3Dfedora,debug-threads=3Don \
+> -S \
+> -object
+> secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
+-fedora/master-key.aes
+> \
+> -machine pc-i440fx-4.1,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
+> -cpu host \
+> -m size=3D4194304k,slots=3D16,maxmem=3D1099511627776k \
+> -overcommit mem-lock=3Doff \
+> -smp 4,sockets=3D1,dies=3D1,cores=3D2,threads=3D2 \
+> -object iothread,id=3Diothread1 \
+> -object iothread,id=3Diothread2 \
+> -object iothread,id=3Diothread3 \
+> -object iothread,id=3Diothread4 \
+> -mem-prealloc \
+> -mem-path /hugepages2M/libvirt/qemu/2-fedora \
+> -numa node,nodeid=3D0,cpus=3D0,mem=3D4096 \
+> -uuid 63840878-0deb-4095-97e6-fc444d9bc9fa \
+> -no-user-config \
+> -nodefaults \
+> -chardev socket,id=3Dcharmonitor,fd=3D31,server,nowait \
+> -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+> -rtc base=3Dutc \
+> -no-shutdown \
+> -global PIIX4_PM.disable_s3=3D0 \
+> -global PIIX4_PM.disable_s4=3D0 \
+> -boot menu=3Don,strict=3Don \
+> -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 \
+> -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x4 \
+> -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 \
+> -blockdev
+> '{"driver":"file","filename":"/var/lib/libvirt/images/fedora.qcow2","node=
+-name":"libvirt-2-storage","auto-read-only":true,"discard":"unmap"}'
+> \
+> -blockdev
+> '{"node-name":"libvirt-2-format","read-only":false,"discard":"unmap","dri=
+ver":"qcow2","file":"libvirt-2-storage","backing":null}'
+> \
+> -device
+> scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-s=
+csi0-0-0-0,drive=3Dlibvirt-2-format,id=3Dscsi0-0-0-0,bootindex=3D1
+> \
+> -blockdev
+> '{"driver":"nvme","device":"0000:02:00.0","namespace":1,"node-name":"libv=
+irt-1-storage","auto-read-only":true,"discard":"unmap"}'
+> \
+> -blockdev
+> '{"node-name":"libvirt-1-format","read-only":false,"driver":"raw","file":=
+"libvirt-1-storage"}'
+> \
+> -device
+> virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x6,drive=3Dlibvirt-1-format=
+,id=3Dvirtio-disk0
+> \
+> -netdev tap,fd=3D33,id=3Dhostnet0,vhost=3Don,vhostfd=3D34 \
+> -device
+> virtio-net-pci,host_mtu=3D9000,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00=
+:a4:6f:91,bus=3Dpci.0,addr=3D0x3
+> \
+> -chardev pty,id=3Dcharserial0 \
+> -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+> -chardev socket,id=3Dcharchannel0,fd=3D35,server,nowait \
+> -device
+> virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3D=
+channel0,name=3Dorg.qemu.guest_agent.0
+> \
+> -spice port=3D5900,addr=3D0.0.0.0,disable-ticketing,seamless-migration=3D=
+on \
+> -device virtio-vga,id=3Dvideo0,virgl=3Don,max_outputs=3D1,bus=3Dpci.0,add=
+r=3D0x2 \
+> -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x7 \
+> -sandbox
+> on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourcecontrol=
+=3Ddeny \
+> -msg timestamp=3Don
+>
+> And these are the errors I see:
+>
+> 2020-02-14T09:06:18.183167Z qemu-system-x86_64: VFIO_MAP_DMA failed:
+> Invalid argument
+> 2020-02-14T09:10:49.753767Z qemu-system-x86_64: VFIO_MAP_DMA failed:
+> Cannot allocate memory
+> 2020-02-14T09:11:04.530344Z qemu-system-x86_64: VFIO_MAP_DMA failed: No
+> space left on device
+> 2020-02-14T09:11:04.531087Z qemu-system-x86_64: VFIO_MAP_DMA failed: No
+> space left on device
+> 2020-02-14T09:11:04.531230Z qemu-system-x86_64: VFIO_MAP_DMA failed: No
+> space left on device
+>
+>
+> I'm doing nothing with the disk inside the guest, but:
+>
+>    # dd if=3D/dev/vda of=3D/dev/null status=3Dprogress
+>
+> (the disk appears as /dev/vda in the guest). Surprisingly, I do not see
+> these errors when I use the traditional PCI assignment (-device
+> vfio-pci). My versions of kernel and qemu:
+>
+> moe ~ # uname -r
+> 5.4.15-gentoo
+> moe ~ # /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64
+> --version
+> QEMU emulator version 4.2.50 (v4.2.0-1439-g5d6542bea7-dirty)
+> Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+>
+> Do you guys want me to file a bug?
 
-"Is the DRC in a state other than that of a default cold-plugged device
-or is an unplug request pending ?" since the DRC of the device to be
-unplugged only transitions away from the "ready state" when the guest
-asks to isolate the device with the "set-indicator" RTAS call.
+As you already have all the information, and it is a simple
+copy/paste, I'd say "yes"
 
-> Changing the name might be sensible, but I still think we want a
-> common function for the two cases.
->=20
-
-I'll go for that. Maybe reverse the semantics, like if "the DRC has
-no attached device or it has an attached device without pending unplug
-request" then it is in a steady state that doesn't require anything
-special at CAS or migration time, eg. spapr_drc_steady() ?
-
-> >  }
-> > =20
-> >  static const VMStateDescription vmstate_spapr_drc =3D {
-> > @@ -479,6 +498,10 @@ static const VMStateDescription vmstate_spapr_drc =
-=3D {
-> >      .fields  =3D (VMStateField []) {
-> >          VMSTATE_UINT32(state, SpaprDrc),
-> >          VMSTATE_END_OF_LIST()
-> > +    },
-> > +    .subsections =3D (const VMStateDescription * []) {
-> > +        &vmstate_spapr_drc_unplug_requested,
-> > +        NULL
-> >      }
-> >  };
-> > =20
-> >=20
->=20
-
-
---Sig_/VKIH+Zxl8u0Ts.wpDtmdrZB
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl5GiSAACgkQcdTV5YIv
-c9YCdRAAhUFXVyRclZj/k7LeN3c8QJMx8hT5El92bE4x2S1rbjGrJ/1VjvvZj0Vb
-TD6L99kD2uy1BYx/aEmhsOnrbLrvcl5/RrURlRtBuR4t8VDEIC9xo4yVeDfsdFwg
-etNGFI2jWalcffTPEdGyIBS7rEF1eN5nwOHfW/y9zZs4x86LcHxW6G2MCGtVGLte
-GtlzFzVeLr79fMhnhBzzCItbCIo9WT/p1fGS+qmZVTZ6tgK9Uu8iEtPpAX8xSQ47
-iQ5Og5S7tkizg57OHWgLG07fK282kmjtGq8Uz6vi6J8CgeeIF44UtlQKiPoW8INB
-UkjAhXZBdn5yIk5p6x3Gd5ZUheBGX1pOa6CwLUyTzA9EO91OfHSeIGwyStJEEYQe
-Cqc93eDAjRmu0jkdKYWNN2fsYegPuxxOWImyohUJK/MtT4l74mwSl0B3ApaqtluV
-3Tx7L4HibUDfi0mknlwqdHk8cot087qOz7l0hSA49E/A7OG/p5tUrp/h5Msa1IfY
-F8FvPciVEQXv22sby3v6MhNK8vjkBQBRhoTWS60hS5CXnmdeW+n1OaT2cK4EChK8
-u9nYaEAbVI7NDvstuWFGWunS/+bY+n8gg7rXR/AbBgwFtdBsP5WxP+QOSKGZ0sU2
-CU6ieIFdBgz0VbiAbDBgtAN5LBLyGAbK4MrBqTOGmwUvDijPA14=
-=xj3w
------END PGP SIGNATURE-----
-
---Sig_/VKIH+Zxl8u0Ts.wpDtmdrZB--
 
