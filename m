@@ -2,118 +2,82 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E25C2C352A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D95C6C352A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 01:33:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6D4320848
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:53:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FF852082F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 01:33:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d9z2eHoT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6D4320848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p7srO0n9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FF852082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2PEK-0006Oq-Sh
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 19:53:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60700)
+	id 1j2Pqq-0002Wz-Nf
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 20:33:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53515)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2PDh-0005dO-Ga
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:52:38 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j2Poi-0001XX-T1
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 20:30:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2PDg-0005g8-Jn
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:52:37 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39991)
+ (envelope-from <alistair23@gmail.com>) id 1j2Pog-0000fX-6a
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 20:30:51 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34466)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2PDc-0005Xq-RI; Thu, 13 Feb 2020 19:52:32 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t3so8986950wru.7;
- Thu, 13 Feb 2020 16:52:32 -0800 (PST)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1j2Pof-0000Kl-S6; Thu, 13 Feb 2020 20:30:50 -0500
+Received: by mail-lj1-x242.google.com with SMTP id x7so8862657ljc.1;
+ Thu, 13 Feb 2020 17:30:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fGVZsEDy2WXuru7gaCHW74XLxBB1DMKe5RuopNUHGRk=;
- b=d9z2eHoTsFLdKYcJ0Qj5ONpxGcov/0TnvMXAwDBZuTI34uKWb/5SenunIBYK2cfAxc
- DSC9cY95yNiK16iHCn3Qb4oMEiaoP1hF6E3+Sc8Xo4Fpjf3Q2iGo6lXCgu579LHhoUOS
- SBxgKbYNFfSHqwqVb88XswohFD91o3D8yGxiJKywIKjLYAvit05qi1xNXOTaFLJyI8le
- b3wfasctIw5MtS2xO487BhR0UarbiFnFvJQeg8wvQgLSSMJDdw+to2QUoahiWGClcUEx
- 2qyzZyZmyNLOJlgdH7KCqx1ol8LSeDadVHp7kIWup8qvNZH4Yyi95/NMvNl2FtmgMeUn
- KPNw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=PqbS4KN6MLHZBYiZ0ntFOT+RStZcZCTFa2j29iozm7g=;
+ b=p7srO0n9jDlI3j+MWTjAG6mmhk2SaaVUYKAR44bhyVBE/LRs+CLnA6ElbIZks+nXRm
+ Z+Vrx3ROC2TwPKTtufay+wKDTP5hwEJHPYO+wQ7SSKyMlENwKrpqBQJnpE/fxht3LjuI
+ WiMk9XRaVdSIt50rU+fsmxOZGbZRP9GUM4zU1Hkzb2iFnDceIHo2M4vmKD/KTfZM0m1w
+ lzUbETc6ExCfwLDyCq6/bjdYXJFrA2zpyWFi9ZX78NaN0WP7zUZZXRwCB+kHqDRgKwih
+ L8/hhoRCkUZSR5M9eLhvhKVhok/6HwZNYHdJwzkQDAmQUTNc1SUEGoRmdb9OLuwN5bOW
+ AwMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=fGVZsEDy2WXuru7gaCHW74XLxBB1DMKe5RuopNUHGRk=;
- b=DSG2bZ9jhJaF7bRrgWfmVrJL0IOK5qwxpE5CgcUg6o6wsDLYAK2GD58gfyU/HqGMLc
- pndDkM70Mn65o+YfzwaHyVNA6a5BbFyDSRADuvdWKTMe3wDSWXzRTJY8E4+kSnvyqvg+
- KO2tig4sFwexjBGHosdMz59ZnrcSJiAqlAcZ9z8+PPMmcjOjB3wcFozie/73PwQcFiBv
- eYVm4fnGU9G78I2FXDjaVSBrWZ/mrnlVpJTWLq2fwB8Zc48VxafwHqO/8XPuk6z99QYY
- ayTpCWSlbWXYNUz8P+MYuoc9Ob5UtXjNXK5l2rSnLUbcuVC0LzMx5osNAKSJu3klaZrt
- Sg0A==
-X-Gm-Message-State: APjAAAUm2pB8zh/bbdSr3mtJmbXSS/dZOQiu/1tcgbA+aRLJLrBd0wQc
- 2mGWtzKuzNLThQETX2xBgtSttOGwlUI=
-X-Google-Smtp-Source: APXvYqyhE7MS+ALXV7VLVeJEVqhOq+I1fD7u5gTIRfUSnaaJl5MlSsAZ/qj3XA++vGEM0IbSoiS/TA==
-X-Received: by 2002:a5d:4446:: with SMTP id x6mr273704wrr.312.1581641551425;
- Thu, 13 Feb 2020 16:52:31 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id u4sm4832807wrt.37.2020.02.13.16.52.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 13 Feb 2020 16:52:30 -0800 (PST)
-Subject: Re: [PATCH v2 11/19] plugins/core: add missing break in
- cb_to_tcg_flags
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200213225109.13120-1-alex.bennee@linaro.org>
- <20200213225109.13120-12-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <31a6fc9f-9f61-d6f9-c720-1e41080c54dd@amsat.org>
-Date: Fri, 14 Feb 2020 01:52:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=PqbS4KN6MLHZBYiZ0ntFOT+RStZcZCTFa2j29iozm7g=;
+ b=aJRkq8pXMgB3iVctduNl9lEz1zH3wnXp+fzI3ZsqcaDwBXANbyK3CD1DTkNoqLfBR9
+ NwyUe1I+LvtfoVO0j6zEVZdT89p72c1E/sPdYYbHqc4p5W35W1j6qgI9xsMuTr2lNsi3
+ mEeZ7vapqYl1aH87l6oHraMmMydB9yGVMikHyPzgkvJyoiimcu4gKbG0qT3iYduPvrmC
+ bLmLIgYyNemMr6gX1hBnFJ3yTr0+awe5PLjwYxSRbzE121aHH04bdCwAjf9s2spcprhK
+ zEIoXZhtlNq3xIbLzATXbN6Z6ClTvFzB1uQjeVevNQsq+QSaUh7q7OKrBo6nef+1g8ZC
+ o8zA==
+X-Gm-Message-State: APjAAAUzL3GTGjUOFSPgvJalA3lX8Pp4VOleaW9dxclezs73YB07KyqN
+ a45XZWQ9X6ZYwOpcuPsmE5BKx1tRP5RFXE2MujI=
+X-Google-Smtp-Source: APXvYqxMRUMlHIZ3RbDAI9JLyvik1fq+e0P4MJtOgpwwXy1kEeV9CcZeigMA54HddTuue7vUeGFwkWQu4qteLsE9uhY=
+X-Received: by 2002:a2e:7609:: with SMTP id r9mr376130ljc.238.1581643842692;
+ Thu, 13 Feb 2020 17:30:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200213225109.13120-12-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200213225109.13120-1-alex.bennee@linaro.org>
+ <20200213225109.13120-15-alex.bennee@linaro.org>
+In-Reply-To: <20200213225109.13120-15-alex.bennee@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 13 Feb 2020 17:23:24 -0800
+Message-ID: <CAKmqyKNj2De1hRz3XU88rVnkZ4TytwcDTNuWXYB-Wa38rWv48Q@mail.gmail.com>
+Subject: Re: [PATCH v2 14/19] target/riscv: progressively load the instruction
+ during decode
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,44 +89,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- pbonzini@redhat.com, stefanb@linux.vnet.ibm.com, richard.henderson@linaro.org,
- qemu-stable@nongnu.org, robhenry@microsoft.com, marcandre.lureau@redhat.com,
- aaron@os.amperecomputing.com, cota@braap.org, stefanha@redhat.com,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org, aurelien@aurel32.net
+Cc: Fam Zheng <fam@euphon.net>,
+ "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>, robert.foley@linaro.org,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, stefanb@linux.vnet.ibm.com,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ robhenry@microsoft.com,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ aaron@os.amperecomputing.com, "Emilio G. Cota" <cota@braap.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, peter.puhov@linaro.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/13/20 11:51 PM, Alex Bennée wrote:
-> From: "Emilio G. Cota" <cota@braap.org>
-> 
-> Reported-by: Robert Henry <robhenry@microsoft.com>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+On Thu, Feb 13, 2020 at 3:08 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>
+> The plugin system would throw up a harmless warning when it detected
+> that a disassembly of an instruction didn't use all it's bytes. Fix
+> the riscv decoder to only load the instruction bytes it needs as it
+> needs them.
+>
+> This drops opcode from the ctx in favour if passing the appropriately
+> sized opcode down a few levels of the decode.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Message-Id: <20200105072940.32204-1-cota@braap.org>
 
-Fixes: 54cb65d8588
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Alistair
 
-> Cc: qemu-stable@nongnu.org
+>
 > ---
->  plugins/core.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/plugins/core.c b/plugins/core.c
-> index 9e1b9e7a915..ed863011baf 100644
-> --- a/plugins/core.c
-> +++ b/plugins/core.c
-> @@ -286,6 +286,7 @@ static inline uint32_t cb_to_tcg_flags(enum qemu_plugin_cb_flags flags)
->      switch (flags) {
->      case QEMU_PLUGIN_CB_RW_REGS:
->          ret = 0;
-> +        break;
->      case QEMU_PLUGIN_CB_R_REGS:
->          ret = TCG_CALL_NO_WG;
+> v2
+>   - use extract16 for uint16_t opcodes
+>
+> squash! target/riscv: progressively load the instruction during decode
+> ---
+>  target/riscv/instmap.h   |  8 ++++----
+>  target/riscv/translate.c | 40 +++++++++++++++++++++-------------------
+>  2 files changed, 25 insertions(+), 23 deletions(-)
+>
+> diff --git a/target/riscv/instmap.h b/target/riscv/instmap.h
+> index f8ad7d60fd5..40b6d2b64de 100644
+> --- a/target/riscv/instmap.h
+> +++ b/target/riscv/instmap.h
+> @@ -344,8 +344,8 @@ enum {
+>  #define GET_C_LW_IMM(inst)          ((extract32(inst, 6, 1) << 2) \
+>                                      | (extract32(inst, 10, 3) << 3) \
+>                                      | (extract32(inst, 5, 1) << 6))
+> -#define GET_C_LD_IMM(inst)          ((extract32(inst, 10, 3) << 3) \
+> -                                    | (extract32(inst, 5, 2) << 6))
+> +#define GET_C_LD_IMM(inst)          ((extract16(inst, 10, 3) << 3) \
+> +                                    | (extract16(inst, 5, 2) << 6))
+>  #define GET_C_J_IMM(inst)           ((extract32(inst, 3, 3) << 1) \
+>                                      | (extract32(inst, 11, 1) << 4) \
+>                                      | (extract32(inst, 2, 1) << 5) \
+> @@ -363,7 +363,7 @@ enum {
+>  #define GET_C_RD(inst)              GET_RD(inst)
+>  #define GET_C_RS1(inst)             GET_RD(inst)
+>  #define GET_C_RS2(inst)             extract32(inst, 2, 5)
+> -#define GET_C_RS1S(inst)            (8 + extract32(inst, 7, 3))
+> -#define GET_C_RS2S(inst)            (8 + extract32(inst, 2, 3))
+> +#define GET_C_RS1S(inst)            (8 + extract16(inst, 7, 3))
+> +#define GET_C_RS2S(inst)            (8 + extract16(inst, 2, 3))
+>
+>  #endif
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 14dc71156be..d5de7f468a7 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -44,7 +44,6 @@ typedef struct DisasContext {
+>      /* pc_succ_insn points to the instruction following base.pc_next */
+>      target_ulong pc_succ_insn;
+>      target_ulong priv_ver;
+> -    uint32_t opcode;
+>      uint32_t mstatus_fs;
+>      uint32_t misa;
+>      uint32_t mem_idx;
+> @@ -492,45 +491,45 @@ static void gen_set_rm(DisasContext *ctx, int rm)
+>      tcg_temp_free_i32(t0);
+>  }
+>
+> -static void decode_RV32_64C0(DisasContext *ctx)
+> +static void decode_RV32_64C0(DisasContext *ctx, uint16_t opcode)
+>  {
+> -    uint8_t funct3 =3D extract32(ctx->opcode, 13, 3);
+> -    uint8_t rd_rs2 =3D GET_C_RS2S(ctx->opcode);
+> -    uint8_t rs1s =3D GET_C_RS1S(ctx->opcode);
+> +    uint8_t funct3 =3D extract16(opcode, 13, 3);
+> +    uint8_t rd_rs2 =3D GET_C_RS2S(opcode);
+> +    uint8_t rs1s =3D GET_C_RS1S(opcode);
+>
+>      switch (funct3) {
+>      case 3:
+>  #if defined(TARGET_RISCV64)
+>          /* C.LD(RV64/128) -> ld rd', offset[7:3](rs1')*/
+>          gen_load_c(ctx, OPC_RISC_LD, rd_rs2, rs1s,
+> -                 GET_C_LD_IMM(ctx->opcode));
+> +                 GET_C_LD_IMM(opcode));
+>  #else
+>          /* C.FLW (RV32) -> flw rd', offset[6:2](rs1')*/
+>          gen_fp_load(ctx, OPC_RISC_FLW, rd_rs2, rs1s,
+> -                    GET_C_LW_IMM(ctx->opcode));
+> +                    GET_C_LW_IMM(opcode));
+>  #endif
 >          break;
-> 
+>      case 7:
+>  #if defined(TARGET_RISCV64)
+>          /* C.SD (RV64/128) -> sd rs2', offset[7:3](rs1')*/
+>          gen_store_c(ctx, OPC_RISC_SD, rs1s, rd_rs2,
+> -                  GET_C_LD_IMM(ctx->opcode));
+> +                  GET_C_LD_IMM(opcode));
+>  #else
+>          /* C.FSW (RV32) -> fsw rs2', offset[6:2](rs1')*/
+>          gen_fp_store(ctx, OPC_RISC_FSW, rs1s, rd_rs2,
+> -                     GET_C_LW_IMM(ctx->opcode));
+> +                     GET_C_LW_IMM(opcode));
+>  #endif
+>          break;
+>      }
+>  }
+>
+> -static void decode_RV32_64C(DisasContext *ctx)
+> +static void decode_RV32_64C(DisasContext *ctx, uint16_t opcode)
+>  {
+> -    uint8_t op =3D extract32(ctx->opcode, 0, 2);
+> +    uint8_t op =3D extract16(opcode, 0, 2);
+>
+>      switch (op) {
+>      case 0:
+> -        decode_RV32_64C0(ctx);
+> +        decode_RV32_64C0(ctx, opcode);
+>          break;
+>      }
+>  }
+> @@ -709,22 +708,25 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+>  /* Include the auto-generated decoder for 16 bit insn */
+>  #include "decode_insn16.inc.c"
+>
+> -static void decode_opc(DisasContext *ctx)
+> +static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t o=
+pcode)
+>  {
+>      /* check for compressed insn */
+> -    if (extract32(ctx->opcode, 0, 2) !=3D 3) {
+> +    if (extract16(opcode, 0, 2) !=3D 3) {
+>          if (!has_ext(ctx, RVC)) {
+>              gen_exception_illegal(ctx);
+>          } else {
+>              ctx->pc_succ_insn =3D ctx->base.pc_next + 2;
+> -            if (!decode_insn16(ctx, ctx->opcode)) {
+> +            if (!decode_insn16(ctx, opcode)) {
+>                  /* fall back to old decoder */
+> -                decode_RV32_64C(ctx);
+> +                decode_RV32_64C(ctx, opcode);
+>              }
+>          }
+>      } else {
+> +        uint32_t opcode32 =3D opcode;
+> +        opcode32 =3D deposit32(opcode32, 16, 16,
+> +                             translator_lduw(env, ctx->base.pc_next + 2)=
+);
+>          ctx->pc_succ_insn =3D ctx->base.pc_next + 4;
+> -        if (!decode_insn32(ctx, ctx->opcode)) {
+> +        if (!decode_insn32(ctx, opcode32)) {
+>              gen_exception_illegal(ctx);
+>          }
+>      }
+> @@ -776,9 +778,9 @@ static void riscv_tr_translate_insn(DisasContextBase =
+*dcbase, CPUState *cpu)
+>  {
+>      DisasContext *ctx =3D container_of(dcbase, DisasContext, base);
+>      CPURISCVState *env =3D cpu->env_ptr;
+> +    uint16_t opcode16 =3D translator_lduw(env, ctx->base.pc_next);
+>
+> -    ctx->opcode =3D translator_ldl(env, ctx->base.pc_next);
+> -    decode_opc(ctx);
+> +    decode_opc(env, ctx, opcode16);
+>      ctx->base.pc_next =3D ctx->pc_succ_insn;
+>
+>      if (ctx->base.is_jmp =3D=3D DISAS_NEXT) {
+> --
+> 2.20.1
+>
+>
 
