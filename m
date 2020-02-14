@@ -1,93 +1,176 @@
-Return-Path: <SRS0=ry7b=4B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABADEC352A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 23:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67258C352A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B2DF222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Feb 2020 23:44:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B3BF20848
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:02:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rp+T1fk2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B2DF222C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="rgGs3cLO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B3BF20848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2O9m-0003ty-H8
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 18:44:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57361)
+	id 1j2OR4-0000hN-C1
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 19:02:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2O7I-00086u-CU
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 18:41:57 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1j2OQL-0008Nm-Bf
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:01:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2O7G-0002tV-UB
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 18:41:56 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36572)
+ (envelope-from <aik@ozlabs.ru>) id 1j2OQJ-0000XB-OM
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:01:36 -0500
+Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:36052)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2O7G-0002sn-N1
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 18:41:54 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p17so8711082wma.1
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 15:41:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=p+fZQCjb1hbct71LIEEtkNrCEMO2FOGV6oj8x/rd5ec=;
- b=Rp+T1fk2ar45Lox5hxBgRY8s8RJdnbx6qLrZmBqdOuc5+LjY8TgsW/jH1TiHj7NYnS
- 4Y4Uu91+wuG0XPi4stINYFz2Vni/1pNEDrRLGEL3kfIjxRCnraewJfxtyTnX863OHKaI
- DEjamTVDKb0Y/SvyAMnIDavSpCdBB+ssFQ34bqYkAizbPlZwNU7XoMVjdOb1PBv4YlkS
- Vho/kqW4du+ps+aopVw7/BV1tHi5Tgifa9zDhfWpmg235/PFaoTNv9S6QLscppnbT0Iu
- kmaDPRBb0V/fuHZtGc2hV+MX0b+DKdUGnS86GA4BNsBVK8PrJ7MJzUxWPHeITsmO94/8
- 3c8A==
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j2OQJ-0000TF-5c
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:01:35 -0500
+Received: by mail-pf1-x42f.google.com with SMTP id 185so3905472pfv.3
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 16:01:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=bGOiCmoxWF9ODTUXgqIHkUTgm71yhCETRFyMybAq1DI=;
+ b=rgGs3cLOXeFDBtIOP0BVL4A5yk5ihh7KmIlObhiMrm9BFSzF/dOnY+1nQeQWeqwyhm
+ 8og0wqmG0p4pXmmDOQ59BvEU8XROTjm8ftPKZ4dmEEhAqLk9r97HRJoqiZlUpSn8spjN
+ QrzzbDsot16f2dY5UQ5LYh4J9n/2BmsRZkmp8VNwjuzaCahTlKbB9wztA8373Qjl0t55
+ qDatgf/T5aya70VGKwtFQpKkA/fgFALNwfWXpzXgfylHEheszQMUzp1oiWVj9paSbvBB
+ pp2oiVLIFqhQR0smYkmj/1Z8hrWnjxGW1x8qxA1oZ2+GnRd6M5Cbub7XG0uTeTjlFZqt
+ 0BkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=p+fZQCjb1hbct71LIEEtkNrCEMO2FOGV6oj8x/rd5ec=;
- b=uAllIbIjFRCj/xjMuvat9RHYlj5v6YoScXUep9/4WiZpYFlsYI/F5GBMCaBXmC+J3d
- TCOI9KDxQAKqmZ2VNdzir5fVM0//lZ2JNl8RRzqF7wvtSRpyN7rTbUxyexGJZMxAYOuS
- U65pa3FDDHI6K1rAuAcxtWFc7lcGg7tStZhCovTLpiilZ0ZbXpRZ8BgOZ90vTTCEyGMJ
- tLB1KKMCR29tZUDjRkukgwiP32TC6DePsW3gvpYKrPrQ8d+D3Geeg/6PN7TuzSnACOF1
- Onlzj2pT7ozu1OEinNUwr/WYlK1rUvnUQmT1lrkwdYBCd4lQSKRRDOWd0p+rvOpo01Pp
- bBrQ==
-X-Gm-Message-State: APjAAAXc2Nw7nEcxU+74vYJ9IaZG9QY3iMBb4AE0P4GaCJXhSPlfc6z/
- CRvSJNy7tARxIMv4QB8TBqo=
-X-Google-Smtp-Source: APXvYqw2/k2tOQFJZUxSddH4FUQ3B3yI4+J3AQqu86+jktT183OdndTjUrHLTVknxPzNbVCbLL5GJQ==
-X-Received: by 2002:a1c:960c:: with SMTP id y12mr482260wmd.9.1581637313731;
- Thu, 13 Feb 2020 15:41:53 -0800 (PST)
-Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id d4sm1521065wra.14.2020.02.13.15.41.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 15:41:53 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org,
- Helge Deller <deller@gmx.de>
-Subject: [PATCH 2/4] hw/hppa/dino: Fix reg800_keep_bits[] overrun (CID 1419393
- & 1419394)
-Date: Fri, 14 Feb 2020 00:41:46 +0100
-Message-Id: <20200213234148.8434-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200213234148.8434-1-f4bug@amsat.org>
-References: <20200213234148.8434-1-f4bug@amsat.org>
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=bGOiCmoxWF9ODTUXgqIHkUTgm71yhCETRFyMybAq1DI=;
+ b=HRK8lOJ622z4OTTYqF8ffUulLSlRr6tsmSNJlA19dCEqXmEGimV0l+kmS7RYIbWFJO
+ fOqJQLwMZcf8uTtqkxoIQkjllPW8+LlwrXrpU/0MMygoyGOl948L69QYS+05tgrSPZIE
+ UuwX6ycHLGXQxzGfvA1Ha7dGeSUWIYjwRK2x+TwsaXwiwEl/FNA1VvqDfK8TKF8Ks2Ws
+ Ud+XudCr71Y+Dso1mdhdsmeiwIv/tcbz/ogDgOXQcofY+YwgJoVDdeKlj+SaB18VpdSU
+ PYX+BHuvw0w/6ZqCZdUQgir2DLrbAc5ZRolqyNTIhhSZW/2TMBUEaPTA71BujXCjo3Dp
+ XMYA==
+X-Gm-Message-State: APjAAAUF1gqj66xv73g6e+WS0zvkxWlSwIQCDuE2HdBOlXp2xoT24Je+
+ LD7oSY5SILZOOY52gS/gNwk4ow==
+X-Google-Smtp-Source: APXvYqziC+1O77TNkwTXXLAaNOUrB5NXuEm46NHZrQeMdFjZemUCvehIWD+FDOrKE3vnXQnTRUa8Kg==
+X-Received: by 2002:a63:306:: with SMTP id 6mr430723pgd.337.1581638493342;
+ Thu, 13 Feb 2020 16:01:33 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id k9sm1110260pfh.153.2020.02.13.16.01.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 13 Feb 2020 16:01:32 -0800 (PST)
+Subject: Re: VW ELF loader
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <f881c2e7-be92-9695-6e19-2dd88cbc63c1@ozlabs.ru>
+ <e3ee4b4d-1b24-2900-4304-05fa521a9b47@redhat.com>
+ <20200203012842.GD52446@umbus.fritz.box>
+ <ec81cca1-d5fb-3f1e-b433-3328d81a117e@redhat.com>
+ <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
+ <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
+ <20200205055851.GH60221@umbus.fritz.box>
+ <73105e0b-c0a0-009f-aeba-fec818d3088c@redhat.com>
+ <23090d06-320e-91b5-f73e-c17e065fcad8@ozlabs.ru>
+ <dbea9886-04d8-f9fe-f79d-31d8abe76615@redhat.com>
+ <274037e5-9bd5-8507-4b4b-067a86225787@ozlabs.ru>
+ <9539866e-b3ca-cf29-5a05-164480f89075@ozlabs.ru>
+ <2dea0786-5e4b-bda0-5ca8-fdcb3a4f3e50@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <662013b2-6452-81c1-30c6-d9f0184f9eb0@ozlabs.ru>
+Date: Fri, 14 Feb 2020 11:01:26 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <2dea0786-5e4b-bda0-5ca8-fdcb3a4f3e50@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,162 +182,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Cornelia Huck <conny@cornelia-huck.de>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coverity reports:
 
-  *** CID 1419393:  Memory - corruptions  (OVERRUN)
-  /hw/hppa/dino.c: 363 in dino_chip_write_with_attrs()
-  357             /* These registers are read-only.  */
-  358             break;
-  359
-  360         case DINO_GMASK ... DINO_TLTIM:
-  361             i = (addr - DINO_GMASK) / 4;
-  362             val &= reg800_keep_bits[i];
-  >>>     CID 1419393:  Memory - corruptions  (OVERRUN)
-  >>>     Overrunning array "s->reg800" of 12 4-byte elements at element index 12 (byte offset 48) using index "i" (which evaluates to 12).
-  363             s->reg800[i] = val;
-  364             break;
-  365
-  366         default:
-  367             /* Controlled by dino_chip_mem_valid above.  */
-  368             g_assert_not_reached();
 
-and:
+On 13/02/2020 21:17, Paolo Bonzini wrote:
+> On 13/02/20 02:43, Alexey Kardashevskiy wrote:
+>>
+>> Ok. So, I have made a small firmware which does OF CI, loads GRUB and
+>> instantiates RTAS:
+>> https://github.com/aik/of1275
+>> Quite raw but gives the idea.
+>>
+>> It does not contain drivers and still relies on QEMU to hook an OF path
+>> to a backend. Is this a showstopper and without drivers it is no go? Thanks,
+> 
+> Yes, it's really the drivers.  Something like netboot wouldn't work for
+> example.
+> 
+> I don't have a problem with relying on QEMU for opening and closing OF
+> paths, but I really believe that read/write on ihandles should be done
+> within the firmware and not QEMU.
 
-  *** CID 1419394:  Memory - illegal accesses  (OVERRUN)
-  /hw/hppa/dino.c: 362 in dino_chip_write_with_attrs()
-  356         case DINO_IRR1:
-  357             /* These registers are read-only.  */
-  358             break;
-  359
-  360         case DINO_GMASK ... DINO_TLTIM:
-  361             i = (addr - DINO_GMASK) / 4;
-  >>>     CID 1419394:  Memory - illegal accesses  (OVERRUN)
-  >>>     Overrunning array "reg800_keep_bits" of 12 4-byte elements at element index 12 (byte offset 48) using index "i" (which evaluates to 12).
-  362             val &= reg800_keep_bits[i];
-  363             s->reg800[i] = val;
-  364             break;
-  365
-  366         default:
-  367             /* Controlled by dino_chip_mem_valid above.  */
+Moving read/write to the firmware is not a problem but there is a little
+mix up here :)
 
-Indeed the array should contain 13 entries, the undocumented
-register 0x82c is missing. Fix by increasing the array size
-and adding the missing register.
+An ihandle is open from a path and nothing there suggests drivers, it is
+up to the ihandle's "read" method what happens next.
 
-CID 1419393 can be verified with:
+If we do PCI drivers in the firmware, then the entire ihandle (==
+"opened instance of a phandle") business goes to the firmware and we are
+slowly bringing the existing mess back again.
 
-  $ echo x 0xfff80830 | hppa-softmmu/qemu-system-hppa -S -monitor stdio -display none
-  QEMU 4.2.50 monitor - type 'help' for more information
-  (qemu) x 0xfff80830
-  qemu/hw/hppa/dino.c:267:15: runtime error: index 12 out of bounds for type 'uint32_t [12]'
-  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/phil/source/qemu/hw/hppa/dino.c:267:15 in
-  00000000fff80830: 0x00000000
 
-and CID 1419394 with:
-
-  $ echo writeb 0xfff80830 0x69 \
-    | hppa-softmmu/qemu-system-hppa -S -accel qtest -qtest stdio -display none
-  [I 1581634452.654113] OPENED
-  [R +4.105415] writeb 0xfff80830 0x69
-  qemu/hw/hppa/dino.c:362:16: runtime error: index 12 out of bounds for type 'const uint32_t [12]'
-  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior qemu/hw/hppa/dino.c:362:16 in
-  =================================================================
-  ==29607==ERROR: AddressSanitizer: global-buffer-overflow on address 0x5577dae32f30 at pc 0x5577d93f2463 bp 0x7ffd97ea11b0 sp 0x7ffd97ea11a8
-  READ of size 4 at 0x5577dae32f30 thread T0
-      #0 0x5577d93f2462 in dino_chip_write_with_attrs qemu/hw/hppa/dino.c:362:16
-      #1 0x5577d9025664 in memory_region_write_with_attrs_accessor qemu/memory.c:503:12
-      #2 0x5577d9024920 in access_with_adjusted_size qemu/memory.c:539:18
-      #3 0x5577d9023608 in memory_region_dispatch_write qemu/memory.c:1482:13
-      #4 0x5577d8e3177a in flatview_write_continue qemu/exec.c:3166:23
-      #5 0x5577d8e20357 in flatview_write qemu/exec.c:3206:14
-      #6 0x5577d8e1fef4 in address_space_write qemu/exec.c:3296:18
-      #7 0x5577d8e20693 in address_space_rw qemu/exec.c:3306:16
-      #8 0x5577d9011595 in qtest_process_command qemu/qtest.c:432:13
-      #9 0x5577d900d19f in qtest_process_inbuf qemu/qtest.c:705:9
-      #10 0x5577d900ca22 in qtest_read qemu/qtest.c:717:5
-      #11 0x5577da8c4254 in qemu_chr_be_write_impl qemu/chardev/char.c:183:9
-      #12 0x5577da8c430c in qemu_chr_be_write qemu/chardev/char.c:195:9
-      #13 0x5577da8cf587 in fd_chr_read qemu/chardev/char-fd.c:68:9
-      #14 0x5577da9836cd in qio_channel_fd_source_dispatch qemu/io/channel-watch.c:84:12
-      #15 0x7faf44509ecc in g_main_context_dispatch (/lib64/libglib-2.0.so.0+0x4fecc)
-      #16 0x5577dab75f96 in glib_pollfds_poll qemu/util/main-loop.c:219:9
-      #17 0x5577dab74797 in os_host_main_loop_wait qemu/util/main-loop.c:242:5
-      #18 0x5577dab7435a in main_loop_wait qemu/util/main-loop.c:518:11
-      #19 0x5577d9514eb3 in main_loop qemu/vl.c:1682:9
-      #20 0x5577d950699d in main qemu/vl.c:4450:5
-      #21 0x7faf41a87f42 in __libc_start_main (/lib64/libc.so.6+0x23f42)
-      #22 0x5577d8cd4d4d in _start (qemu/build/sanitizer/hppa-softmmu/qemu-system-hppa+0x1256d4d)
-
-  0x5577dae32f30 is located 0 bytes to the right of global variable 'reg800_keep_bits' defined in 'qemu/hw/hppa/dino.c:87:23' (0x5577dae32f00) of size 48
-  SUMMARY: AddressSanitizer: global-buffer-overflow qemu/hw/hppa/dino.c:362:16 in dino_chip_write_with_attrs
-  Shadow bytes around the buggy address:
-    0x0aaf7b5be590: 00 f9 f9 f9 f9 f9 f9 f9 00 02 f9 f9 f9 f9 f9 f9
-    0x0aaf7b5be5a0: 07 f9 f9 f9 f9 f9 f9 f9 07 f9 f9 f9 f9 f9 f9 f9
-    0x0aaf7b5be5b0: 07 f9 f9 f9 f9 f9 f9 f9 00 00 00 00 00 00 00 00
-    0x0aaf7b5be5c0: 00 00 00 02 f9 f9 f9 f9 00 00 00 00 00 00 00 00
-    0x0aaf7b5be5d0: 00 00 00 00 00 00 00 00 00 00 00 03 f9 f9 f9 f9
-  =>0x0aaf7b5be5e0: 00 00 00 00 00 00[f9]f9 f9 f9 f9 f9 00 00 00 00
-    0x0aaf7b5be5f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0aaf7b5be600: 00 00 01 f9 f9 f9 f9 f9 00 00 00 00 07 f9 f9 f9
-    0x0aaf7b5be610: f9 f9 f9 f9 00 00 00 00 00 00 00 00 00 00 00 00
-    0x0aaf7b5be620: 00 00 00 05 f9 f9 f9 f9 00 00 00 00 07 f9 f9 f9
-    0x0aaf7b5be630: f9 f9 f9 f9 00 00 f9 f9 f9 f9 f9 f9 07 f9 f9 f9
-  Shadow byte legend (one shadow byte represents 8 application bytes):
-    Addressable:           00
-    Partially addressable: 01 02 03 04 05 06 07
-    Heap left redzone:       fa
-    Freed heap region:       fd
-    Stack left redzone:      f1
-    Stack mid redzone:       f2
-    Stack right redzone:     f3
-    Stack after return:      f5
-    Stack use after scope:   f8
-    Global redzone:          f9
-    Global init order:       f6
-    Poisoned by user:        f7
-    Container overflow:      fc
-    Array cookie:            ac
-    Intra object redzone:    bb
-    ASan internal:           fe
-    Left alloca redzone:     ca
-    Right alloca redzone:    cb
-    Shadow gap:              cc
-  ==29607==ABORTING
-
-Fixes: Covertiy CID 1419393 and 1419394 (commit 18092598a5)
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/hppa/dino.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index c237ad3b1b..8868e31793 100644
---- a/hw/hppa/dino.c
-+++ b/hw/hppa/dino.c
-@@ -83,7 +83,7 @@
- #define DINO_PCI_HOST_BRIDGE(obj) \
-     OBJECT_CHECK(DinoState, (obj), TYPE_DINO_PCI_HOST_BRIDGE)
- 
--#define DINO800_REGS ((DINO_TLTIM - DINO_GMASK) / 4)
-+#define DINO800_REGS (1 + (DINO_TLTIM - DINO_GMASK) / 4)
- static const uint32_t reg800_keep_bits[DINO800_REGS] = {
-     MAKE_64BIT_MASK(0, 1),  /* GMASK */
-     MAKE_64BIT_MASK(0, 7),  /* PAMR */
-@@ -96,6 +96,7 @@ static const uint32_t reg800_keep_bits[DINO800_REGS] = {
-     MAKE_64BIT_MASK(0, 30), /* BRDG_FEAT */
-     MAKE_64BIT_MASK(0, 25), /* PCIROR */
-     MAKE_64BIT_MASK(0, 22), /* PCIWOR */
-+    MAKE_64BIT_MASK(0, 32), /* Undocumented */
-     MAKE_64BIT_MASK(0, 9),  /* TLTIM */
- };
- 
 -- 
-2.21.1
-
+Alexey
 
