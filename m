@@ -2,70 +2,70 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51971C35242
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D32C3B194
 	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 03:24:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FDB720661
+	by mail.kernel.org (Postfix) with ESMTPS id 4959822314
 	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 03:24:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nxHAkWgK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FDB720661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gYZ0C/di"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4959822314
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2RaZ-00058h-8m
+	id 1j2RaZ-00058l-HW
 	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 22:24:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42413)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j2RZr-0004IR-LB
+ (envelope-from <dgibson@ozlabs.org>) id 1j2RZr-0004IS-LU
  for qemu-devel@nongnu.org; Thu, 13 Feb 2020 22:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j2RZp-0008Ku-V8
+ (envelope-from <dgibson@ozlabs.org>) id 1j2RZq-0008LL-48
  for qemu-devel@nongnu.org; Thu, 13 Feb 2020 22:23:39 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:52159)
+Received: from ozlabs.org ([203.11.71.1]:57555)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1j2RZp-0008BP-1z
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 22:23:37 -0500
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1j2RZp-0008C3-6i
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 22:23:38 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48Jdxw6n9pz9sRN; Fri, 14 Feb 2020 14:23:32 +1100 (AEDT)
+ id 48Jdxw6Ph9z9sRQ; Fri, 14 Feb 2020 14:23:32 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1581650612;
- bh=2za93kHvPaRBlbK0I4XIvwq/W8gsIYGDOurnDc/bPuA=;
+ bh=mITNkH86hrSsroXCNXhiFNfRMe2x8EH7T4vLWRvEd0M=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=nxHAkWgKfShfu+yOTEyrRvlzllfvlptxDTKk3nNTfdkPcyfJs8zjE5+T3czbR64pc
- eRnIiTxnqfkcuGtO6cza7JQaEPAGir7XbJqviqwWbaVNTvv5DkajuPTXJLS/KK/Nl6
- dJ5eAlmGxUNppcN347JKXX2qlk1EIwoCTdthhz1c=
-Date: Fri, 14 Feb 2020 14:23:25 +1100
+ b=gYZ0C/dicQwVInHKhzm03SZdeBgqGzMrPYiggJmuk0aXflsJ18Eu7pxWdzVqdtSr2
+ syAy/wOs7+POMSoytsWyLHBnVMhRz0a2BiJHNqf4AzZjpOl6MpRTBAnn4PV8NDLBui
+ HaypQnWxKKjiki51VOTjk2C9X3owRdt++rTGaXz4=
+Date: Fri, 14 Feb 2020 13:30:55 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
 Subject: Re: VW ELF loader
-Message-ID: <20200214032325.GN124369@umbus.fritz.box>
-References: <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
- <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
- <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
- <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
- <20200205060634.GI60221@umbus.fritz.box>
- <62d62fab-46a4-240b-037b-409ba859b93d@redhat.com>
- <47e6a49d-f1c7-aaf6-b9ef-7e81773cff6e@ozlabs.ru>
- <8993c6b4-2a2c-b7e5-8342-4db480d0af9d@redhat.com>
- <20200210073008.GE22584@umbus.fritz.box>
- <c40f83a1-6dbd-7223-e825-0ab153a36aed@redhat.com>
+Message-ID: <20200214023055.GM124369@umbus.fritz.box>
+References: <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
+ <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
+ <20200205055851.GH60221@umbus.fritz.box>
+ <73105e0b-c0a0-009f-aeba-fec818d3088c@redhat.com>
+ <23090d06-320e-91b5-f73e-c17e065fcad8@ozlabs.ru>
+ <dbea9886-04d8-f9fe-f79d-31d8abe76615@redhat.com>
+ <274037e5-9bd5-8507-4b4b-067a86225787@ozlabs.ru>
+ <9539866e-b3ca-cf29-5a05-164480f89075@ozlabs.ru>
+ <2dea0786-5e4b-bda0-5ca8-fdcb3a4f3e50@redhat.com>
+ <662013b2-6452-81c1-30c6-d9f0184f9eb0@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NJSRbAqOy4NeGDns"
+ protocol="application/pgp-signature"; boundary="VLAOICcq5m4DWEYr"
 Content-Disposition: inline
-In-Reply-To: <c40f83a1-6dbd-7223-e825-0ab153a36aed@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <662013b2-6452-81c1-30c6-d9f0184f9eb0@ozlabs.ru>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,91 +77,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <conny@cornelia-huck.de>,
+Cc: Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Cornelia Huck <conny@cornelia-huck.de>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+ Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---NJSRbAqOy4NeGDns
+--VLAOICcq5m4DWEYr
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 10, 2020 at 12:25:39PM +0100, Paolo Bonzini wrote:
-> On 10/02/20 08:30, David Gibson wrote:
-> >> Anything you put in the host is potential attack surface.
-> > Ok, it is attack surface you're concerned about.  That wasn't totally
-> > clear before this point.
+On Fri, Feb 14, 2020 at 11:01:26AM +1100, Alexey Kardashevskiy wrote:
 >=20
-> Part that, part having to add backend hooks that weren't needed so far.
 >=20
-> >> Plus, you're not doing a different thing than anyone else and as
-> >> you've found out it may be easy for block device but not for
-> >> everything else.
-> >
-> > Uh.. was that supposed to be "we *are* doing a different thing than
-> > anyone else"?
+> On 13/02/2020 21:17, Paolo Bonzini wrote:
+> > On 13/02/20 02:43, Alexey Kardashevskiy wrote:
+> >>
+> >> Ok. So, I have made a small firmware which does OF CI, loads GRUB and
+> >> instantiates RTAS:
+> >> https://github.com/aik/of1275
+> >> Quite raw but gives the idea.
+> >>
+> >> It does not contain drivers and still relies on QEMU to hook an OF path
+> >> to a backend. Is this a showstopper and without drivers it is no go? T=
+hanks,
+> >=20
+> > Yes, it's really the drivers.  Something like netboot wouldn't work for
+> > example.
+> >=20
+> > I don't have a problem with relying on QEMU for opening and closing OF
+> > paths, but I really believe that read/write on ihandles should be done
+> > within the firmware and not QEMU.
 >=20
-> Alexey's question was "what is exactly the benefit", so "not doing a
-> different thing" is the answer (one of them).
-
-Ah, right, I see.
-
-> >> Every platform that QEMU supports is just using a firmware to do
-> >> firmware things; it can be U-Boot, EDK-2, SLOF, SeaBIOS, qboot, with
-> >> varying level of complexity.  Some are doing -kernel in QEMU rather th=
-an
-> >> firmware, but that's where things end.
-> >
-> > Well, yeah, but AIUI those platforms actually have a defined hardware
-> > environment on which the firmware is running.  For PAPR we don't, we
-> > *only* have a specification for the "hardware"+"firmware" environment
-> > as seen by the OS together.
+> Moving read/write to the firmware is not a problem but there is a little
+> mix up here :)
 >=20
-> PAPR is a specification for the environment as seen by the OS.  But "-M
-> pseries" is already a defined hardware environment on which SLOF is
-> running.
+> An ihandle is open from a path and nothing there suggests drivers, it is
+> up to the ihandle's "read" method what happens next.
+>=20
+> If we do PCI drivers in the firmware, then the entire ihandle (=3D=3D
+> "opened instance of a phandle") business goes to the firmware and we are
+> slowly bringing the existing mess back again.
 
-"defined" might be a bit strong.  We have on multiple occasions
-required synchronized SLOF and qemu updates in order to keep
-presenting the same guest environment.
-
-> There's nothing that prevents you from defining more of that
-> environment in order to run Linux (for petitboot) or your own
-> pseudo-OpenFirmware driver provider inside it.
-
-Well, sure, but we don't want that definition to introduce lots of
-complexity we have to maintain on top of the existing HV and firmware
-interfaces that are defined.
-
-I realized what I said about the firmware interfaces requiring HV
-privilege was a bit misleading.  For the boot time firmware
-components, such as the OF client interface, that's mostly not true
-(with the big and hairy exception of the
-ibm,client-architecture-support feature negotiation mechanism).
-
-It is, however, true of the runtime RTAS interfaces.  In fact it's
-true to the point that, at least for most of the RTAS interfaces we
-care about, it's hard to imagine an in-guest implementation doing
-anything much other than repackaging the information it gets and
-forwarding it to the hypervisor.  For most purposes RTAS is pretty
-much an alternative hypercall mechanism.  So, I think implementing the
-RTAS entirely in qemu was the right choice.
-
-Where it gets complicated is that a number of RTAS calls need to match
-IDs with stuff from the boot time firmware.  Particularly phandles of
-device nodes, and some other IDs.
-
-Which would be fine if the boot time firmware took the device tree
-=66rom qemu and used it unmodified.  But.. it doesn't, quite.  In
-particular it assigns its own phandles, because it uses them as an
-internal index.  And worse, clients can alter the device tree, and
-this is used to a small extent - grub pokes a few values in there for
-use later.
+Right, even setting aside the specifics of how ihandles are managed,
+having the device tree in qemu but device handling in firmware seems
+like an even more complex interaction between qemu and firmware pieces
+of the environment, which is what we've been trying to avoid here.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -169,25 +135,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NJSRbAqOy4NeGDns
+--VLAOICcq5m4DWEYr
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5GEqoACgkQbDjKyiDZ
-s5Kk0xAAyvkeD7FXQalS8WVA7HjqxfRfm2XATpuf93q/ewgRj4er/tAm1HdosqRE
-G7xCHhpBVdtVg5+9sYX38bVkrW8pf3rGPUAhVgWZRax7eXIFqxYDwxwHUPkAba3C
-cH+8ubcmMemYO+M8YRp9Xc+6eOmeg7Bjcoy+8irAjNTRW4UlQlTQwLT7V0AGqdqc
-GEyL/9J17e8wDEs3QuP76zxPdsSo2uR19W17oK83amYqDxtpBIjDZW6Aa5Z349s7
-K4n+pHN2pZ09RTVSm29dKcG4WnGegWVW2H1B/fNFDQ602J6axzsUhbXHO8/YAK9N
-ikzWgi7MGYxWoeJwfO6zwKx6sru2H5lHwUyzliTLSJS1RjwLdbxZEXWCx79GaNFb
-Ezd31ob0LM/03Tapz/hBmD3NANpYFsX9K0BysVPh+wRRIImNhhGx2fJ+z6YVGKCv
-okYrhQAtXxQ5/T9tFcarIqwbcfQUFegzqDzFUl8w6vTZK4DBI6s3L0V+daWcEBt3
-M9k0my9+BZDE0/AtAZ6WXKIyKbnyCaUo49qtInvRrZGh9Ld4K1xmRAzyxm8FoPBH
-3CV+MGuI5ceUil0RfuFwGzNFTbrAR+ni6mOO32joomj4xLJfKmk8CPP5wivsfmz6
-kLEG5RmrO8hWdG6mHgKH/VK5CDljVeXgXLtD6K8bvThryjW5K7o=
-=PcVG
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5GBl8ACgkQbDjKyiDZ
+s5LEpRAAhqfRXcp0FuSD6aTQ/hkc1nAR80rqz/qF5d1E3sUW0gCP5LYtaLg5029D
+KwOJyb/veueNs2cro1v2dA7EE08gCmguUpG7G3qMJuTnQFsOM+z4WSz9Fqd3j2z+
+aVQMFdEIrStqGdIAQkcNMEBE4sXd+MT8I/+rBncBDgsMXanq0CDHBh2vImhBbh/K
+fIvcJ9MqJHc8VO3hh6bWRcxHa/iP+hOX7AvfRy/RliRufnHgw3gIdZNEh9aIMZoY
+S2IiwPIvSIr1qqcI3uvQuwdbTM5/0sABGb6Q8kqb7ALZIT/ubobZHnZSdDlHFwg7
+oS6knIRwQd/yLPeK27/26gQD6yRIvdxFV65iAk/dthfc//SeCchNS1kjy8fEGTEH
+HF41wl2iEFC+D7IpfTMg0d2qosmtuhjJW7MeYwSxwEwzjoXs0STA5Zza0JiT21pN
+dYENjTr60QpmxORZRwsm5vnHgj0Uy2qX5s3U+kj22nFAWh0zJXOHZiqz5P8N5L1K
+81z5679iQXy6TrUnsYiZl8a6+HrhUfoLxHl1PuLZSFTnzAAoiLEZyBefw+V7LdTP
+ZGYxvPnXVhD3uV+O+maqYdI5av+F5nWJAJrLiN3ofEZ1bEPAxeXPI3upVCKRYv+e
+2XlNyDVPt/WDpwfHxW2tUijnpMVAcUoBu+N10nOHuOY6Xp/3zVE=
+=Sobr
 -----END PGP SIGNATURE-----
 
---NJSRbAqOy4NeGDns--
+--VLAOICcq5m4DWEYr--
 
