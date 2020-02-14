@@ -2,82 +2,100 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 473C9C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8794C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:27:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F3C222314
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:26:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83DE324670
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:27:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J2MzAqci"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3C222314
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RiaSEgAv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83DE324670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2crG-0007wc-78
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 10:26:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47465)
+	id 1j2csP-0000hQ-Pl
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 10:27:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2cll-0005g8-9D
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:20:42 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j2cnj-0001lt-0n
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:22:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2clj-00014O-Su
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:20:40 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38529)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2clj-00013Q-MP
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:20:39 -0500
-Received: by mail-ot1-x343.google.com with SMTP id z9so9463946oth.5
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 07:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oGP8xTna9n3xc5N0hWrzsdpLsZ4Z8Y5JKlSsBOv9kx8=;
- b=J2MzAqciupf/AVPjMhv4bie3cpOrU9WY3+96PwzklmZvSfKKWdjqr3354CncuWINFG
- 34jStg3P3i7OSESa7ld1pgfTetpBuqFlxaLlBtAn9AwS438dky77tUNpkfVCSKWfOjVo
- LN5uBkxGes9A8/jSh7NxP0bITyf9EqBykmj3BMkNCDaexcbIU9lT2K4v9xxutGMe7eCT
- 6sJb2zms62xWpDQIEExJRZ+jTF0LcT2O/I8spFbQ8gLMeojMEVCi4SJ6yhswffNG3xtX
- BYqaq+hUjaRCroGpMxJeE59Ky3a3wU2F8HaMZ+RMalKXvdmnBS+DVNStYpdCnTlTRJZe
- xt6A==
+ (envelope-from <pbonzini@redhat.com>) id 1j2cnh-0002vl-MR
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:22:42 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25378
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j2cnh-0002vO-IV
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:22:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581693760;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Y7CZKFvtFbfLt9AaVAFJZtQQ9+l8gyhVhdTe2T2rcSg=;
+ b=RiaSEgAvTumLzAnuk9O2s2H7oZRUTB5keDZbeuar3BIWp7dO0m9zg3trHDo2LibSNBEKnm
+ DelC+W92qY5srvMqwxtPjX1qIqfDKQs2iRxbaX83idwoHeslLvchbSNZOkaZRoRJgQCg4n
+ 0hyoDogH41DwspPfccPLzRswxoT30ts=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-233-OfRjywoMOR2df8xx4e9VNA-1; Fri, 14 Feb 2020 10:22:38 -0500
+Received: by mail-wr1-f71.google.com with SMTP id u18so4177475wrn.11
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 07:22:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=oGP8xTna9n3xc5N0hWrzsdpLsZ4Z8Y5JKlSsBOv9kx8=;
- b=elpD5OQALQXBDnFwg5z1DwYIgeVF2yCYPP+wymY1nVW0inX9KiVtWwMTOUj2pZm443
- VzNNAygvLfSVEAK026d4TIvCE1OhnfO5c0oM8X9kEvV/JVPHLYiDTvaN9iRpznRUX2wi
- TsTL6l6n7YkrjVw8djuDfS57Gu8oA6usTjLC43yEp7WreQW7TeO63ZqZX6QmNw4BrfxZ
- P8qPUOktXoEGm5ae6Pf5BERGpJDt2dQIitYbl6jjWVGdZtXuusgQpoKqOfl7Kv+HDQYI
- XXXL+rbKhPJAI1YjFDJ0Jv85cDyaeUwsGVYcdtVxKilSUAXuSbW75wDV5/GjH5JlcCVp
- gK9A==
-X-Gm-Message-State: APjAAAUkRWEd5D32J0nzKC2J82q9ZZUZD0pnj2nMZ6yB1E0N/uiCdXQO
- 62zVCfgZoU2RSU0Th+VOVd0GUDt0JNtkudDsE6Ud0Q==
-X-Google-Smtp-Source: APXvYqzQaZvqHWvdxReoUBaLq6i5VKD+05MtqWu8HwKZxtGC9m7R9Ts9kxLV8hGT/DhzRAXdK01NrSiXM+yonjGWJQs=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr2576371otq.221.1581693637050; 
- Fri, 14 Feb 2020 07:20:37 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j8pkOtFy+XzItuL3W/aLXhe9j5ntVAMnKIPwQuoJRhI=;
+ b=G9gZivbgmaJdulXX9YUoUFU+muEITJwArhjHq919rrXJltDaLUSC5WwrLqzKCELwrY
+ pcMmVp5+j2jYluEKFkWXNZhVMokwQeehfoxEsIIgBfypzBwbxGoctgPj+SA170ijRuRr
+ O41RqqgEVgb643m/6fvAIInja3HTKx/ozksEO/yFHiqjUcsStrO33qaYJUA5xySEX3kp
+ Wen8foKaCHe5V+7LiOmYRixn7t6wS6WUYoSYwD0l4zuxMeY3GNo1F3OTPNLWjsYheXw0
+ gN3Pe7tqy6xCpkrukXngSIQr894uIZEzr5dr75p0fqWccUcF25gPGH4H20jNy0sZiwlE
+ vyKg==
+X-Gm-Message-State: APjAAAX/Gfn/R1N5ayYq06q6RwK4K8WvHuK5wRRmNKy6HbFzEBE5So4E
+ 5yw5Mx2tGWAb58IvaRAzhtGuN/lMHmNSoYwOloEJmnuaAmpaOx30c5zv2AiKROGR6TWOd0K0UR4
+ vKmo1A6RR0snOk0M=
+X-Received: by 2002:a7b:c318:: with SMTP id k24mr5505751wmj.54.1581693756948; 
+ Fri, 14 Feb 2020 07:22:36 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyymV7+kU+ggGILwsK0dA0UkMAmILQMujOlIy+5+ujW0Iw/dm9tb9JSPJ5N4X1m+ydGcpHWaA==
+X-Received: by 2002:a7b:c318:: with SMTP id k24mr5505680wmj.54.1581693755773; 
+ Fri, 14 Feb 2020 07:22:35 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4?
+ ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
+ by smtp.gmail.com with ESMTPSA id b13sm7885424wrq.48.2020.02.14.07.22.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 14 Feb 2020 07:22:35 -0800 (PST)
+Subject: Re: [PATCH] accel/tcg: fix race in cpu_exec_step_atomic (bug 1863025)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200214144952.15502-1-alex.bennee@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <244ec8f5-5f19-ca98-5cbe-c3ec39494222@redhat.com>
+Date: Fri, 14 Feb 2020 16:22:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20200213175647.17628-1-peter.maydell@linaro.org>
- <20200213175647.17628-19-peter.maydell@linaro.org>
- <87pneh1wul.fsf@dusky.pond.sub.org>
- <87v9o9rylz.fsf@dusky.pond.sub.org>
-In-Reply-To: <87v9o9rylz.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Feb 2020 15:20:26 +0000
-Message-ID: <CAFEAcA8b32o+CryKWZbDNj+KFcJPY8ToXW_fYaa_0FuDDE87WA@mail.gmail.com>
-Subject: Re: [PATCH v2 18/30] qapi: Delete all the "foo: dropped in n.n" notes
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <20200214144952.15502-1-alex.bennee@linaro.org>
+Content-Language: en-US
+X-MC-Unique: OfRjywoMOR2df8xx4e9VNA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,57 +107,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Bug 1863025 <1863025@bugs.launchpad.net>, Yifan <me@yifanlu.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 at 15:13, Markus Armbruster <armbru@redhat.com> wrote:
->
-> Markus Armbruster <armbru@redhat.com> writes:
->
-> > Peter Maydell <peter.maydell@linaro.org> writes:
-> >
-> >> A handful of QAPI doc comments include lines like
-> >> "ppcemb: dropped in 3.1". The doc comment parser will just
-> >> put these into whatever the preceding section was; sometimes
-> >> that's "Notes", and sometimes it's some random other section,
-> >> as with "NetClientDriver" where the "'dump': dropped in 2.12"
-> >> line ends up in the "Since:" section.
-> >>
-> >> This tends to render wrongly, more so in the upcoming rST
-> >> generator, but sometimes even in the texinfo, as in the case
-> >> of QKeyCode:
-> >>    ac_bookmarks
-> >>        since 2.10 altgr, altgr_r: dropped in 2.10
-> >>
-> >> We now have a better place to tell users about deprecated
-> >> and deleted functionality -- qemu-deprecated.texi.
-> >> So just remove all these "dropped in" remarks entirely.
->
-> The first sentence makes me expect we'll move these bits to the better
-> place.  The second then tells me we drop them, without giving a reason.
->
-> Suggest:
->
->    Since commit 3264ffced3 (v4.2.0), we have a better place to tell
->    users about deprecated and deleted functionality --
->    qemu-deprecated.texi.  These "dropped in" remarks all predate it, and
->    other feature drops of that vintage are not documented anywhere, so
->    moving these to qemu-deprecated.texi makes little sense.  Drop them
->    instead.
->
-> With something like that
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+On 14/02/20 15:49, Alex Benn=C3=A9e wrote:
+> The bug describes a race whereby cpu_exec_step_atomic can acquire a TB
+> which is invalidated by a tb_flush before we execute it. This doesn't
+> affect the other cpu_exec modes as a tb_flush by it's nature can only
+> occur on a quiescent system. The race was described as:
+>=20
+>   B2. tcg_cpu_exec =3D> cpu_exec =3D> tb_find =3D> tb_gen_code
+>   B3. tcg_tb_alloc obtains a new TB
+>=20
+>       C3. TB obtained with tb_lookup__cpu_state or tb_gen_code
+>           (same TB as B2)
+>=20
+>           A3. start_exclusive critical section entered
+>           A4. do_tb_flush is called, TB memory freed/re-allocated
+>           A5. end_exclusive exits critical section
+>=20
+>   B2. tcg_cpu_exec =3D> cpu_exec =3D> tb_find =3D> tb_gen_code
+>   B3. tcg_tb_alloc reallocates TB from B2
+>=20
+>       C4. start_exclusive critical section entered
+>       C5. cpu_tb_exec executes the TB code that was free in A4
+>=20
+> The simplest fix is to widen the exclusive period to include the TB
+> lookup. As a result we can drop the complication of checking we are in
+> the exclusive region before we end it.
 
-Yeah, I wrote the commit message on the assumption that we'd
-be modifying the commit contents to include documenting this
-stuff somewhere else. If we're happy not to document the
-feature-drops at all then we can modify the commit message instead.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-thanks
--- PMM
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Cc: Yifan <me@yifanlu.com>
+> Cc: Bug 1863025 <1863025@bugs.launchpad.net>
+> ---
+>  accel/tcg/cpu-exec.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 2560c90eec7..d95c4848a47 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -240,6 +240,8 @@ void cpu_exec_step_atomic(CPUState *cpu)
+>      uint32_t cf_mask =3D cflags & CF_HASH_MASK;
+> =20
+>      if (sigsetjmp(cpu->jmp_env, 0) =3D=3D 0) {
+> +        start_exclusive();
+> +
+>          tb =3D tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, cf_mask)=
+;
+>          if (tb =3D=3D NULL) {
+>              mmap_lock();
+> @@ -247,8 +249,6 @@ void cpu_exec_step_atomic(CPUState *cpu)
+>              mmap_unlock();
+>          }
+> =20
+> -        start_exclusive();
+> -
+>          /* Since we got here, we know that parallel_cpus must be true.  =
+*/
+>          parallel_cpus =3D false;
+>          cc->cpu_exec_enter(cpu);
+> @@ -271,14 +271,15 @@ void cpu_exec_step_atomic(CPUState *cpu)
+>          qemu_plugin_disable_mem_helpers(cpu);
+>      }
+> =20
+> -    if (cpu_in_exclusive_context(cpu)) {
+> -        /* We might longjump out of either the codegen or the
+> -         * execution, so must make sure we only end the exclusive
+> -         * region if we started it.
+> -         */
+> -        parallel_cpus =3D true;
+> -        end_exclusive();
+> -    }
+> +
+> +    /*
+> +     * As we start the exclusive region before codegen we must still
+> +     * be in the region if we longjump out of either the codegen or
+> +     * the execution.
+> +     */
+> +    g_assert(cpu_in_exclusive_context(cpu));
+> +    parallel_cpus =3D true;
+> +    end_exclusive();
+>  }
+> =20
+>  struct tb_desc {
+>=20
+
 
