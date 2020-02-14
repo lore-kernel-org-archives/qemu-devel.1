@@ -2,86 +2,103 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URG_BIZ autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A546C3B1B2
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49805C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:12:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF0442187F
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:07:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1448B22314
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:12:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xmkcU+or"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF0442187F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnC3YZ6g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1448B22314
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2fMp-0007tM-3g
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:07:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56368)
+	id 1j2fSD-00021B-6D
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:12:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2f81-0006Ht-GC
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:51:50 -0500
+ (envelope-from <peterx@redhat.com>) id 1j2fRb-0001Zx-BQ
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:12:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2f80-0001BT-3r
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:51:49 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55848)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2f7z-0001AT-T5
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:51:48 -0500
-Received: by mail-wm1-x343.google.com with SMTP id q9so10829876wmj.5
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 09:51:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=6KTNckWA4+ATf5z/mBrn8Lcv/aBBE2/oWgefPULbIw0=;
- b=xmkcU+orzKzljDZz60HJPquXMNvZrrirlkMCapLPwLD/z31OvkB3OCG5UlPyK45BgD
- opLSNY4PUkx9ypxds4CflLaTfp5opUklKscOEpLR7wX8jL+xyiK28r+xXhx2ktAaOkzB
- SOWGnBfgiQZq6u5leJMd7X6jYpe3f84IgnhUB52OUggp9TsiarFifmCrldCXQupvBHQn
- LsjEw4Z9TfKBCz/ynsaRDAT58X9Ap3EsG4HxfVe0B8kUK0Ymm64WhUb8qOHK2cajliN7
- JRgLzcmCMKXHbZv90Qw1IyvxMIAsP0MvhGvrc7SBS5PvY7Uk5+lJhocPQ8CEFfuSFe6X
- oIZg==
+ (envelope-from <peterx@redhat.com>) id 1j2fRZ-0005TI-Dk
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:12:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43708
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j2fRZ-0005SY-9M
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:12:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581703920;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cCDyWW+YXuXaTwfieaGljmIX92OmsSPpwtoelgx030E=;
+ b=KnC3YZ6gqfADhkUnAYlLVQ8sgGUkfCqL6pqQjnspnVT44xCpdJsoVMmwGr6MduJ93p92em
+ dV+oAd0oEof8Ofl+HOazNeKTIsoSSQo7upanHOs4Hf+DyhVIx8TFE3Mc4cZV5cmFKKWANt
+ uG1Qp3ng49jXgRZJ2VVnmz3ojcqHeoI=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-y9P6ROZUP-CdJ43IajP3hA-1; Fri, 14 Feb 2020 13:11:58 -0500
+Received: by mail-qv1-f72.google.com with SMTP id z39so6230962qve.5
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:11:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=6KTNckWA4+ATf5z/mBrn8Lcv/aBBE2/oWgefPULbIw0=;
- b=EcWyB5xCFsX1fkiqtJ4Kqg3e+anf2sFiN0idvMXfo1Yfv7gvqKbWv+slaMv8PAdl2W
- x2HYGRhUHT8vdukZIgUVGt83au8q7b/+h/zrm11yJ5fbANtPMqzSplnUllB9wPjrXof8
- io8IzL+yPrSgP2oNWZ14zP0i9aqeGO3Yegj/q4iH9u9xQ8kFlhWqJnZPcKdwE2RG09Hy
- hfWtdkv5nxFpD1Nq4z1dNoHyZ+mkylhPVdwNo5cSKtHBQ4cEIDU1TiSLiPLyWE99NddF
- XO0gbFTg+Ia2xKnIbSeXI6RBl5XMimlvLbmONxG7SSqff2myZ63Hog9tXep4t7EFQF7l
- A8Yw==
-X-Gm-Message-State: APjAAAUSNAwwgKQAEOCsyLyiBz1QdQGlLboLn5/s3Z46q1lXxkzi+3J+
- KApeYrbFQVKR5RZLypZRbZmuXw==
-X-Google-Smtp-Source: APXvYqx7WH2v6/xtGWAIansO3priUF8nzgK8bgy33UVia/oOToZukQY+9+ns+i5tfyQx1oJxKLZxbw==
-X-Received: by 2002:a1c:6645:: with SMTP id a66mr6125346wmc.121.1581702706955; 
- Fri, 14 Feb 2020 09:51:46 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v8sm8001857wrw.2.2020.02.14.09.51.45
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=aaLjfa80pqB2gzJieIfmy4toBGFs0CCwU8xIfF7/g2g=;
+ b=RhKwtNkK275YEkMO+OPGw1xxNfkg1+7lMVimU0Uz+zbvLfnHxHEUe+gLW50Tyt19zL
+ bjSqUfkirwk/Rk00Ke8OAlZ1I18D2lHwXkQRQUjrMlOuSYOWccsMH4mnNM1vM/KAtCo3
+ 0Cr39315jCbMrOAZdLfSFRB9j4AK2Bpv9TgVCKrV1qk5zLNMuUufG1E9kstfgtr5rJsE
+ bGfzCOkSH5zvSIFbCc5DqfbVibGkpSAl2gFu8tfx1JMuKj2LRitLAh4tu1DbFQymTHMv
+ QJw0CC6gHxECNFuEV3YQDn3TwYFxq2s3xwMWX31YDamiF5oa3gPrettmY9NbW72w1nYm
+ 51kw==
+X-Gm-Message-State: APjAAAWrHHlH9u8a1B8GvpHS9IVyaE26jGQwUZOGPyIYWXz32HwEYaOH
+ CAIjxHb/J9EIojZUP20lK0jtg3ICj4nR95C6pXAj7shH7HMcwbmvC2u+mSNBpYAOijoVNvTqxdW
+ Y85JOL58UTv5Rrtw=
+X-Received: by 2002:ac8:7258:: with SMTP id l24mr3576757qtp.154.1581703917937; 
+ Fri, 14 Feb 2020 10:11:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzHXYs7TGpi86VQexOC/QYpApNEXvlDoiKDuhVap9TsPDzOQXfGWYKKe+y/4bmtngvc6IRblQ==
+X-Received: by 2002:ac8:7258:: with SMTP id l24mr3576734qtp.154.1581703917649; 
+ Fri, 14 Feb 2020 10:11:57 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+ by smtp.gmail.com with ESMTPSA id a13sm3778138qkh.123.2020.02.14.10.11.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Feb 2020 09:51:46 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 21/21] target/arm: Correctly implement ACTLR2, HACTLR2
-Date: Fri, 14 Feb 2020 17:51:16 +0000
-Message-Id: <20200214175116.9164-22-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200214175116.9164-1-peter.maydell@linaro.org>
-References: <20200214175116.9164-1-peter.maydell@linaro.org>
+ Fri, 14 Feb 2020 10:11:47 -0800 (PST)
+Date: Fri, 14 Feb 2020 13:11:46 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH RFC] memory: Don't allow to resize RAM while migrating
+Message-ID: <20200214181146.GE1163818@xz-x1>
+References: <20200213172016.196609-1-david@redhat.com>
+ <20200214102514.GB3283@work-vm>
+ <30a66b1d-184e-a684-d0d2-c3921366b478@redhat.com>
+ <20200214104230.GC3283@work-vm>
+ <cd295e35-72ca-e335-35be-f38bb9026e48@redhat.com>
+ <20200214110226.GD3283@work-vm>
+ <9a15fd0e-77d1-b3a0-4824-665f85f79c71@redhat.com>
+ <bb33b209-2b15-4bbd-7fe9-3aa813e4c194@redhat.com>
+ <20200214172933.GC1163818@xz-x1>
+ <9597c9a9-05d2-d99d-e153-8ffc112910bc@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <9597c9a9-05d2-d99d-e153-8ffc112910bc@redhat.com>
+X-MC-Unique: y9P6ROZUP-CdJ43IajP3hA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,133 +110,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>,
- Aaron Lindsay <aaron@os.amperecomputing.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Shannon Zhao <shannon.zhao@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ACTLR2 and HACTLR2 AArch32 system registers didn't exist in ARMv7
-or the original ARMv8.  They were later added as optional registers,
-whose presence is signaled by the ID_MMFR4.AC2 field.  From ARMv8.2
-they are mandatory (ie ID_MMFR4.AC2 must be non-zero).
+On Fri, Feb 14, 2020 at 06:32:35PM +0100, David Hildenbrand wrote:
+> On 14.02.20 18:29, Peter Xu wrote:
+> > On Fri, Feb 14, 2020 at 01:02:46PM +0100, David Hildenbrand wrote:
+> >> From c0049ac2e95d6756037db918852c507fb88297d9 Mon Sep 17 00:00:00 2001
+> >> From: David Hildenbrand <david@redhat.com>
+> >> Date: Fri, 14 Feb 2020 13:01:03 +0100
+> >> Subject: [PATCH v1] tmp
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  migration/migration.c |  9 +++++++--
+> >>  migration/migration.h |  1 +
+> >>  migration/ram.c       | 42 ++++++++++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 50 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/migration/migration.c b/migration/migration.c
+> >> index 3a21a4686c..0e7efe2920 100644
+> >> --- a/migration/migration.c
+> >> +++ b/migration/migration.c
+> >> @@ -175,13 +175,18 @@ void migration_object_init(void)
+> >>      }
+> >>  }
+> >> =20
+> >> +void migration_cancel(void)
+> >> +{
+> >> +    migrate_fd_cancel(current_migration);
+> >> +}
+> >> +
+> >>  void migration_shutdown(void)
+> >>  {
+> >>      /*
+> >>       * Cancel the current migration - that will (eventually)
+> >>       * stop the migration using this structure
+> >>       */
+> >> -    migrate_fd_cancel(current_migration);
+> >> +    migration_cancel();
+> >>      object_unref(OBJECT(current_migration));
+> >>  }
+> >> =20
+> >> @@ -2019,7 +2024,7 @@ void qmp_migrate(const char *uri, bool has_blk, =
+bool blk,
+> >> =20
+> >>  void qmp_migrate_cancel(Error **errp)
+> >>  {
+> >> -    migrate_fd_cancel(migrate_get_current());
+> >> +    migration_cancel();
+> >>  }
+> >> =20
+> >>  void qmp_migrate_continue(MigrationStatus state, Error **errp)
+> >> diff --git a/migration/migration.h b/migration/migration.h
+> >> index 8473ddfc88..79fd74afa5 100644
+> >> --- a/migration/migration.h
+> >> +++ b/migration/migration.h
+> >> @@ -343,5 +343,6 @@ int foreach_not_ignored_block(RAMBlockIterFunc fun=
+c, void *opaque);
+> >>  void migration_make_urgent_request(void);
+> >>  void migration_consume_urgent_request(void);
+> >>  bool migration_rate_limit(void);
+> >> +void migration_cancel(void);
+> >> =20
+> >>  #endif
+> >> diff --git a/migration/ram.c b/migration/ram.c
+> >> index ed23ed1c7c..f86f32b453 100644
+> >> --- a/migration/ram.c
+> >> +++ b/migration/ram.c
+> >> @@ -52,6 +52,7 @@
+> >>  #include "migration/colo.h"
+> >>  #include "block.h"
+> >>  #include "sysemu/sysemu.h"
+> >> +#include "sysemu/runstate.h"
+> >>  #include "savevm.h"
+> >>  #include "qemu/iov.h"
+> >>  #include "multifd.h"
+> >> @@ -3710,8 +3711,49 @@ static SaveVMHandlers savevm_ram_handlers =3D {
+> >>      .resume_prepare =3D ram_resume_prepare,
+> >>  };
+> >> =20
+> >> +static void ram_mig_ram_block_resized(RAMBlockNotifier *n, void *host=
+,
+> >> +                                      size_t old_size, size_t new_siz=
+e)
+> >> +{
+> >> +    /*
+> >> +     * We don't care about resizes triggered on incoming migration (w=
+hen
+> >> +     * syncing ram blocks), or of course, when no migration is going =
+on.
+> >> +     */
+> >> +    if (migration_is_idle() || !runstate_is_running()) {
+> >> +        return;
+> >> +    }
+> >=20
+> > I feel like migration_is_idle() check is enough.  Firstly, I feel like
+> > we allow migration even with VM stopped.  At the meantime, if VM is
+> > not running, I see no reason that this resizing will happen after all? =
+:)
+>=20
+> Migration code resizes ram blocks when synchronizing the ram state. See
+> qemu_ram_resize() in ram_load_precopy()
+>=20
+> That happens on incoming migration while the vm is stopped.
 
-We implemented HACTLR2 in commit 0e0456ab8895a5e85, but we
-incorrectly made it exist for all v8 CPUs, and we didn't implement
-ACTLR2 at all.
+Ah so your comment is for that which I misread.  I'm surprised even
+the incoming migration will set MigrationState and migration_is_idle()
+will return false for it, since we've got MigrationIncomingState after
+all.  But yeh that seems to be correct.
 
-Sort this out by implementing both registers only when they are
-supposed to exist, and setting the ID_MMFR4 bit for -cpu max.
+Then it seems fine.  It's just a bit unclear even with the comment.
+Another alternative is we only register this resize() hook when
+migration starts, and unregister it when stopped.  Then we can even
+drop the migration_is_idle().
 
-Note that this removes HACTLR2 from our Cortex-A53, -A47 and -A72
-CPU models; this is correct, because those CPUs do not implement
-this register.
+>=20
+> >=20
+> >> +
+> >> +    if (!postcopy_is_running()) {
+> >> +        Error *err =3D NULL;
+> >> +
+> >> +        /*
+> >> +         * Precopy code cannot deal with the size of ram blocks chang=
+ing at
+> >> +         * random points in time. We're still running on the source, =
+abort
+> >> +         * the migration and continue running here. Make sure to wait=
+ until
+> >> +         * migration was canceled.
+> >> +         */
+> >> +        error_setg(&err, "RAM resized during precopy.");
+> >> +        migrate_set_error(migrate_get_current(), err);
+> >> +        error_free(err);
+> >> +        migration_cancel();
+> >> +    } else {
+> >> +        /*
+> >> +         * Postcopy code cannot deal with the size of ram blocks chan=
+ging at
+> >> +         * random points in time. We're running on the target. Fail h=
+ard.
+> >> +         *
+> >> +         * TODO: How to handle this in a better way?
+> >> +         */
+> >> +        error_report("RAM resized during postcopy.");
+> >> +        exit(-1);
+> >=20
+> > Now I'm rethinking the postcopy case....
+> >=20
+> > ram_dirty_bitmap_reload() should only happen during the postcopy
+> > recovery, and when that happens the VM should be stopped on both
+> > sides.  Which means, ram resizing should not trigger there...
+>=20
+> But that guest got the chance to run for a bit and eventually reboot
+> AFAIK. Also, there are other data races possible when used_length
+> suddenly changes, this is just the most obvious one where things will;
+> get screwed up.
 
-Fixes: 0e0456ab8895a5e85
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h    |  5 +++++
- target/arm/cpu.c    |  1 +
- target/arm/cpu64.c  |  4 ++++
- target/arm/helper.c | 32 +++++++++++++++++++++++---------
- 4 files changed, 33 insertions(+), 9 deletions(-)
+Right, the major one could be in ram_load_postcopy() where we call
+host_from_ram_block_offset().  However if FW extension is the major
+use case then it seems to still work (still better than crashing,
+isn't it? :).  Or could you let me know where else did I overlook?
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index c6af3290caf..b4c83a1cb52 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3531,6 +3531,11 @@ static inline bool isar_feature_aa32_hpd(const ARMISARegisters *id)
-     return FIELD_EX32(id->id_mmfr4, ID_MMFR4, HPDS) != 0;
- }
- 
-+static inline bool isar_feature_aa32_ac2(const ARMISARegisters *id)
-+{
-+    return FIELD_EX32(id->id_mmfr4, ID_MMFR4, AC2) != 0;
-+}
-+
- /*
-  * 64-bit feature tests via id registers.
-  */
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index c46bb5a5c09..9f618e120aa 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2718,6 +2718,7 @@ static void arm_max_initfn(Object *obj)
- 
-             t = cpu->isar.id_mmfr4;
-             t = FIELD_DP32(t, ID_MMFR4, HPDS, 1); /* AA32HPD */
-+            t = FIELD_DP32(t, ID_MMFR4, AC2, 1); /* ACTLR2, HACTLR2 */
-             cpu->isar.id_mmfr4 = t;
-         }
- #endif
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 8430d432943..32cf8ee98b0 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -703,6 +703,10 @@ static void aarch64_max_initfn(Object *obj)
-         u = FIELD_DP32(u, ID_MMFR3, PAN, 2); /* ATS1E1 */
-         cpu->isar.id_mmfr3 = u;
- 
-+        u = cpu->isar.id_mmfr4;
-+        u = FIELD_DP32(u, ID_MMFR4, AC2, 1); /* ACTLR2, HACTLR2 implemented */
-+        cpu->isar.id_mmfr4 = u;
-+
-         u = cpu->isar.id_aa64dfr0;
-         u = FIELD_DP64(u, ID_AA64DFR0, PMUVER, 5); /* v8.4-PMU */
-         cpu->isar.id_aa64dfr0 = u;
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 56b1c08f027..513f4edbb46 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6862,6 +6862,27 @@ static const ARMCPRegInfo ats1cp_reginfo[] = {
- };
- #endif
- 
-+/*
-+ * ACTLR2 and HACTLR2 map to ACTLR_EL1[63:32] and
-+ * ACTLR_EL2[63:32]. They exist only if the ID_MMFR4.AC2 field
-+ * is non-zero, which is never for ARMv7, optionally in ARMv8
-+ * and mandatorily for ARMv8.2 and up.
-+ * ACTLR2 is banked for S and NS if EL3 is AArch32. Since QEMU's
-+ * implementation is RAZ/WI we can ignore this detail, as we
-+ * do for ACTLR.
-+ */
-+static const ARMCPRegInfo actlr2_hactlr2_reginfo[] = {
-+    { .name = "ACTLR2", .state = ARM_CP_STATE_AA32,
-+      .cp = 15, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 3,
-+      .access = PL1_RW, .type = ARM_CP_CONST,
-+      .resetvalue = 0 },
-+    { .name = "HACTLR2", .state = ARM_CP_STATE_AA32,
-+      .cp = 15, .opc1 = 4, .crn = 1, .crm = 0, .opc2 = 3,
-+      .access = PL2_RW, .type = ARM_CP_CONST,
-+      .resetvalue = 0 },
-+    REGINFO_SENTINEL
-+};
-+
- void register_cp_regs_for_features(ARMCPU *cpu)
- {
-     /* Register all the coprocessor registers based on feature bits */
-@@ -7623,15 +7644,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-             REGINFO_SENTINEL
-         };
-         define_arm_cp_regs(cpu, auxcr_reginfo);
--        if (arm_feature(env, ARM_FEATURE_V8)) {
--            /* HACTLR2 maps to ACTLR_EL2[63:32] and is not in ARMv7 */
--            ARMCPRegInfo hactlr2_reginfo = {
--                .name = "HACTLR2", .state = ARM_CP_STATE_AA32,
--                .cp = 15, .opc1 = 4, .crn = 1, .crm = 0, .opc2 = 3,
--                .access = PL2_RW, .type = ARM_CP_CONST,
--                .resetvalue = 0
--            };
--            define_one_arm_cp_reg(cpu, &hactlr2_reginfo);
-+        if (cpu_isar_feature(aa32_ac2, cpu)) {
-+            define_arm_cp_regs(cpu, actlr2_hactlr2_reginfo);
-         }
-     }
- 
--- 
-2.20.1
+Thanks,
+
+--=20
+Peter Xu
 
 
