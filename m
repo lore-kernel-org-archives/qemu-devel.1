@@ -2,82 +2,97 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF89C3B19F
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F5E9C3B19F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBF82217F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:50:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F32BE24688
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:57:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VgW5j/S0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBF82217F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YPClshCf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F32BE24688
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2dEj-0002U4-VY
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 10:50:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53242)
+	id 1j2dL2-0005XP-3Q
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 10:57:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54447)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1j2dE3-0001lv-Em
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:49:56 -0500
+ (envelope-from <peterx@redhat.com>) id 1j2dKS-0004us-3K
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:56:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1j2dE1-0000Yi-S7
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:49:55 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30884
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <peterx@redhat.com>) id 1j2dKQ-0006dM-7e
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:56:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59587
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1j2dE1-0000Xk-Mu
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:49:53 -0500
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j2dKQ-0006cM-2C
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:56:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581695393;
+ s=mimecast20190719; t=1581695789;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pIv0Uk9saondnliaK6YDCVTbITUyxenrJ3jd3o+lFnY=;
- b=VgW5j/S0ntR05aRMdQVDwDBnTIcck7OD0AIWAiSNPsQTHh0lhUf/RvDlPuxTuiPhzVDJBn
- eSo3T+do2QqEzXAciY2xtBmn/14MEIB+aSBXMxy5C2i4gKTsVDM6YCrZthIE78mtHnlBSu
- lhzqdtJiTE9pggQRnwhU7+pqDYPfWEw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-9z5m2hGJNYKjQEQd4JHIgQ-1; Fri, 14 Feb 2020 10:49:49 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40D04DB6D;
- Fri, 14 Feb 2020 15:49:48 +0000 (UTC)
-Received: from x1.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 25C4960BF1;
- Fri, 14 Feb 2020 15:49:46 +0000 (UTC)
-Date: Fri, 14 Feb 2020 08:49:46 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Michal Privoznik <mprivozn@redhat.com>
-Subject: Re: [PATCH] Report stringified errno in VFIO related errors
-Message-ID: <20200214084946.5220404b@x1.home>
-In-Reply-To: <ef161708-2ecc-8d51-7dae-6a860659a8a9@redhat.com>
-References: <2dc5a0962a38b912e4fa4900f9813b7ea1a9273c.1581670009.git.mprivozn@redhat.com>
- <ef161708-2ecc-8d51-7dae-6a860659a8a9@redhat.com>
-Organization: Red Hat
+ bh=UQlZDbOlRnHD+tkvos+ORkRSeiyycQCLYA9CNq8IhlY=;
+ b=YPClshCfaKeEX6vxQaARkIYa7QW7UkedxjW0W88NEd6tmcG+98kWNE6cUuQfUSSeyvS5Oh
+ qeOsx+8zGPclrNR+HjS5xrybBQEGY5ikt+nNIbx/KZpthytF0QoEK65Ei6SffUpM7uedwc
+ GQwlYSCnkLYbnwnKI/gzr4RJjXs7Dp4=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-166-yTJtVFE1N9KpG4_bwHCENQ-1; Fri, 14 Feb 2020 10:56:26 -0500
+Received: by mail-qk1-f200.google.com with SMTP id n126so6427595qkc.18
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 07:56:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=YcLajkLFkMaFXAIlkEGn4ITxAaN0/V1WTpNV3GuJMEU=;
+ b=F7JFkkjmEUG9sRiRKho5+qqmZKkEFSHBGH0MyXsUplxSeYjzXn3ZGs9Nry3Y1rONWD
+ 8BlTwoPt5xpX+3iYmvzlSwBrBQSpqq/exsBL55LEUYnvwV3QM/BNyxF2VDdtOcGe4RvS
+ qxxBv9A71Z8wiEygBsuT/GPF0eeFWL8lYoqtk4gTat6hteNCxFx1rD+40u2UVB7NBBoA
+ tD43+SbYDMMvDgsiCgMBFXv2GKeyhhW7uawA0sp6kZa7fw1Pouic/cTkWYAXAVzuxHS0
+ e3neNXN+I95pglGNlk2Ps7rbk8+Bcq4KNGstV2V2FTvIjG+ILUC4wAIKZw2chih/mK3c
+ wykw==
+X-Gm-Message-State: APjAAAWuRErbyBDY1liTrJWdVyxVRTr45n/xlp7QoVoddoPTwqN+RIgy
+ mOsvBYbtQyOfRrzgJD2dsiqAna6SfdCE1GZ8x6GDZmBOsOCPR+Y5rbISBntd94yU6i3G5WbyRNa
+ GEVOg6NIXwO6Juxk=
+X-Received: by 2002:ac8:758a:: with SMTP id s10mr3093572qtq.283.1581695786071; 
+ Fri, 14 Feb 2020 07:56:26 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzJBZjbJO3PKBIkAOobODLXrxTFYQWFIgtbNlhuY+0CSRl4LoHhgpL2O0wsy6CARaUqRLFQrg==
+X-Received: by 2002:ac8:758a:: with SMTP id s10mr3093535qtq.283.1581695785548; 
+ Fri, 14 Feb 2020 07:56:25 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+ by smtp.gmail.com with ESMTPSA id d25sm3560842qkk.77.2020.02.14.07.56.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Feb 2020 07:56:24 -0800 (PST)
+Date: Fri, 14 Feb 2020 10:56:23 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH RFC] memory: Don't allow to resize RAM while migrating
+Message-ID: <20200214155623.GA1163818@xz-x1>
+References: <20200213172016.196609-1-david@redhat.com>
+ <20200213183221.GD1103216@xz-x1>
+ <97821f63-bfdc-6342-bb8d-3d2b89c809fc@redhat.com>
+ <20200213205636.GE1103216@xz-x1>
+ <31872803-15d2-ca70-b750-c08e0fcbd25f@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 9z5m2hGJNYKjQEQd4JHIgQ-1
+In-Reply-To: <31872803-15d2-ca70-b750-c08e0fcbd25f@redhat.com>
+X-MC-Unique: yTJtVFE1N9KpG4_bwHCENQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,148 +104,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Shannon Zhao <shannon.zhao@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 10:19:50 +0100
-Michal Privoznik <mprivozn@redhat.com> wrote:
+On Fri, Feb 14, 2020 at 10:17:07AM +0100, David Hildenbrand wrote:
+> On 13.02.20 21:56, Peter Xu wrote:
+> > On Thu, Feb 13, 2020 at 08:42:23PM +0100, David Hildenbrand wrote:
+> >> On 13.02.20 19:32, Peter Xu wrote:
+> >>> On Thu, Feb 13, 2020 at 06:20:16PM +0100, David Hildenbrand wrote:
+> >>>> Resizing while migrating is dangerous and does not work as expected.
+> >>>> The whole migration code works on the usable_length of ram blocks an=
+d does
+> >>>> not expect this to change at random points in time.
+> >>>>
+> >>>> Precopy: The ram block size must not change on the source, after
+> >>>> ram_save_setup(), so as long as the guest is still running on the so=
+urce.
+> >>>>
+> >>>> Postcopy: The ram block size must not change on the target, after
+> >>>> synchronizing the RAM block list (ram_load_precopy()).
+> >>>>
+> >>>> AFAIKS, resizing can be trigger *after* (but not during) a reset in
+> >>>> ACPI code by the guest
+> >>>> - hw/arm/virt-acpi-build.c:acpi_ram_update()
+> >>>> - hw/i386/acpi-build.c:acpi_ram_update()
+> >>>
+> >>> What can be the pre-condition of triggering this after reset?  I'm
+> >>> thinking whether QEMU can be aware of this "resizing can happen"
+> >>> condition, then we could simply stop the migration from happening eve=
+n
+> >>> before the resizing happens.  Thanks,
+> >>
+> >> I think the condition is not known before the guest actually tries to
+> >> read the relevant memory areas (which trigger the rebuilt+resize, and
+> >> AFAIK, the new size depends on fw config done by the guest after the
+> >> reset). So it's hard to "predict".
+> >=20
+> > I chimmed in without much context, sorry if I'm going to ask naive
+> > questions. :)
+>=20
+> I think the problem is quite involved and not obvious, so there are no
+> naive questions :)
+>=20
+> >=20
+> > What I was asking is about why the resizing can happen.  A quick read
+> > told me that it was majorly for easier extension of ROMs (firmware
+> > updates?).  With that, I'm imaging a common case for memory
+> > resizing...
+> >=20
+> >   (1) Source QEMU runs VM on old host, with old firmware
+> >=20
+> >   (2) Migrate source QEMU to destination new host, with new and bigger
+> >       firmware
+> >=20
+> >   (3) During the migration, the ROM size on the destination will still
+> >       be the old, referring to ram_load_precopy(), as long as no
+> >       system reset
+> >=20
+> >   (4) After migration finished, when the system reboots, memory
+> >       resizing happens with the new and bigger firmware loaded
+>=20
+> AFAIK it could trigger
+>=20
+> a) In precopy during the second migration.
+> b) In postcopy during the first migration.
 
-> On 2/14/20 9:47 AM, Michal Privoznik wrote:
-> > In a few places we report errno formatted as a negative integer.
-> > This is not as user friendly as it can be. Use strerror() and/or
-> > error_setg_errno() instead.
-> > 
-> > Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-> > ---
-> >   hw/vfio/common.c    | 2 +-
-> >   util/vfio-helpers.c | 6 +++---
-> >   2 files changed, 4 insertions(+), 4 deletions(-)
-> >   
-> 
-> BTW the reason I've noticed these is because I'm seeing some errors when 
-> assigning my NVMe disk to qemu. This is the full command line:
-> 
-> 
-> /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 \
-> -name guest=fedora,debug-threads=on \
-> -S \
-> -object 
-> secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-2-fedora/master-key.aes 
-> \
-> -machine pc-i440fx-4.1,accel=kvm,usb=off,dump-guest-core=off \
-> -cpu host \
-> -m size=4194304k,slots=16,maxmem=1099511627776k \
-> -overcommit mem-lock=off \
-> -smp 4,sockets=1,dies=1,cores=2,threads=2 \
-> -object iothread,id=iothread1 \
-> -object iothread,id=iothread2 \
-> -object iothread,id=iothread3 \
-> -object iothread,id=iothread4 \
-> -mem-prealloc \
-> -mem-path /hugepages2M/libvirt/qemu/2-fedora \
-> -numa node,nodeid=0,cpus=0,mem=4096 \
-> -uuid 63840878-0deb-4095-97e6-fc444d9bc9fa \
-> -no-user-config \
-> -nodefaults \
-> -chardev socket,id=charmonitor,fd=31,server,nowait \
-> -mon chardev=charmonitor,id=monitor,mode=control \
-> -rtc base=utc \
-> -no-shutdown \
-> -global PIIX4_PM.disable_s3=0 \
-> -global PIIX4_PM.disable_s4=0 \
-> -boot menu=on,strict=on \
-> -device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 \
-> -device virtio-scsi-pci,id=scsi0,bus=pci.0,addr=0x4 \
-> -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5 \
-> -blockdev 
-> '{"driver":"file","filename":"/var/lib/libvirt/images/fedora.qcow2","node-name":"libvirt-2-storage","auto-read-only":true,"discard":"unmap"}' 
-> \
-> -blockdev 
-> '{"node-name":"libvirt-2-format","read-only":false,"discard":"unmap","driver":"qcow2","file":"libvirt-2-storage","backing":null}' 
-> \
-> -device 
-> scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,device_id=drive-scsi0-0-0-0,drive=libvirt-2-format,id=scsi0-0-0-0,bootindex=1 
-> \
-> -blockdev 
-> '{"driver":"nvme","device":"0000:02:00.0","namespace":1,"node-name":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"}' 
-> \
-> -blockdev 
-> '{"node-name":"libvirt-1-format","read-only":false,"driver":"raw","file":"libvirt-1-storage"}' 
-> \
-> -device 
-> virtio-blk-pci,scsi=off,bus=pci.0,addr=0x6,drive=libvirt-1-format,id=virtio-disk0 
-> \
-> -netdev tap,fd=33,id=hostnet0,vhost=on,vhostfd=34 \
-> -device 
-> virtio-net-pci,host_mtu=9000,netdev=hostnet0,id=net0,mac=52:54:00:a4:6f:91,bus=pci.0,addr=0x3 
-> \
-> -chardev pty,id=charserial0 \
-> -device isa-serial,chardev=charserial0,id=serial0 \
-> -chardev socket,id=charchannel0,fd=35,server,nowait \
-> -device 
-> virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=org.qemu.guest_agent.0 
-> \
-> -spice port=5900,addr=0.0.0.0,disable-ticketing,seamless-migration=on \
-> -device virtio-vga,id=video0,virgl=on,max_outputs=1,bus=pci.0,addr=0x2 \
-> -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 \
-> -sandbox 
-> on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny \
-> -msg timestamp=on
-> 
-> And these are the errors I see:
-> 
-> 2020-02-14T09:06:18.183167Z qemu-system-x86_64: VFIO_MAP_DMA failed: 
-> Invalid argument
-> 2020-02-14T09:10:49.753767Z qemu-system-x86_64: VFIO_MAP_DMA failed: 
-> Cannot allocate memory
-> 2020-02-14T09:11:04.530344Z qemu-system-x86_64: VFIO_MAP_DMA failed: No 
-> space left on device
-> 2020-02-14T09:11:04.531087Z qemu-system-x86_64: VFIO_MAP_DMA failed: No 
-> space left on device
-> 2020-02-14T09:11:04.531230Z qemu-system-x86_64: VFIO_MAP_DMA failed: No 
-> space left on device
+After reading your reply - even the 1st migration of precopy?  Say,
+when source QEMU resets and found changed FW during the precopy?
 
-I feel obligated to reply given the VFIO issues, but TBH I've never
-used the nvme-vfio driver and don't consider myself the maintainer of
-the vfio-helpers.  I'd guess the latter ENOSPC errors indicate we've
-exhausted the number of separate DMA mappings that a vfio user is
-allowed to create.  We had to put a cap on this to prevent malicious
-users and it was set to 64K, which seemed like orders of magnitude more
-than we use for device assignment, but perhaps not enough for this
-driver.  There's a dma_entry_limit module option on the
-vfio_iommu_type1 module that can be bumped up to see if it resolves
-this issue.  The initial EINVAL and ENOMEM errors might however
-indicate the driver has already gone into the weeds before we get to
-the latter problem though.
+I'll comment postcopy below.
 
-> I'm doing nothing with the disk inside the guest, but:
-> 
->    # dd if=/dev/vda of=/dev/null status=progress
-> 
-> (the disk appears as /dev/vda in the guest). Surprisingly, I do not see 
-> these errors when I use the traditional PCI assignment (-device 
-> vfio-pci).
+>=20
+> >=20
+> > And is this patch trying to fix/warn when there's a reboot during (3)
+> > so the new size is discovered at a wrong time?  Is my understanding
+> > correct?
+>=20
+> It's trying to bail out early instead of failing at other random points
+> (with an unclear outcome).
 
-Not really surprising, entirely different models of using the device.
-Device assignment should also give better performance, especially if we
-really are exhausting the number of mappings a user can have inflight
-concurrently.
+Yeah, I am just uncertain on whether in some cases it could be a
+silent success (when used_length changed, however migration still
+completed without error reported) and now we're changing it to a VM
+crash... Could that happen?
 
-> My versions of kernel and qemu:
-> 
-> moe ~ # uname -r
-> 5.4.15-gentoo
-> moe ~ # /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 
-> --version
-> QEMU emulator version 4.2.50 (v4.2.0-1439-g5d6542bea7-dirty)
-> Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-> 
-> Do you guys want me to file a bug?
+  - before the patch, when precopy triggers this,
 
-Probably a good idea.  Thanks,
+    - when it didn't encounter issue with the changed used_length, it
+      could get silently ignored.  Lucky enough & good case.
 
-Alex
+    - when it triggered an error, precopy failed.  _However_, we can
+      simply restart... so still not so bad.
+
+  - after the patch, when precopy detects this, we abort
+    immediately...  Which is really not good...
+
+If you see, that's the major thing I was worrying about...
+
+And since used_length is growing in most cases as you said (at least
+before virtio-mem comes? :), I'm suspecting that could be the major
+case that there will be a silent success.
+
+>=20
+> >>
+> >> In the precopy case it would be easier to abort (although, not simple
+> >> AFAIKS), in the postcopy not so easy - because you're already partiall=
+y
+> >> running on the migration target.
+> >=20
+> > Prior to this patch, would a precopy still survive with such an
+> > accident (asked because I _feel_ like migrating a ramblock with
+> > smaller used_length to the same ramblock with bigger used_length seems
+> > to be fine?)?  Or we can stop the precopy and restart.  After this
+>=20
+> I assume growing the region is the usual case (not shrinking). FW blobs
+> tend to get bigger.
+>=20
+> Migrating while growing a ram block on the source won't work. The source
+> would try to send a dirt page that's outside of the used_length on the
+> target, making e.g., ram_load_postcopy()/ram_load_precopy() fail with
+> "Illegal RAM offset...".
+
+Right.
+
+>=20
+> In the postcopy case, e.g., ram_dirty_bitmap_reload() will fail in case
+> there is a mismatch between ram block size on source/target.
+
+IMHO that's an extreme rare case when (one example I can think of):
+
+  - we start a postcopy after a precopy
+  - system reset, noticed a firmware update
+  - we got a network failure, postcopy interrupted
+  - we try to recover a postcopy
+
+So are you using postcopy recovery?  I will be surprised if so because
+then you'll be the first user I know that really used that besides QE. :)
+
+>=20
+> Another issue is if the used_length changes while in ram_save_setup(),
+> just between storing ram_bytes_total_common(true) and storing
+> block->used_length. A mismatch will screw up the migration stream.
+
+Yes this seems to be another issue then.  IIUC the ramblocks are
+protected by RCU, the migration code has always been with the read
+lock there so logically it should see a consistent view of system
+ramblocks in ram_save_setup().  IMHO the thing that was inconsistent
+is that RCU is not safe enough for changing used_length for a ramblock.
+
+>=20
+> But these are just the immediately visible issues. I am more concerned
+> about used_length changing at random points in time, resulting in more
+> harm. (e.g., non-obvious load-store tearing when accessing the used lengt=
+h)
+>=20
+> Migration code is inherently racy when it comes to ram block resizes.
+> And that might become more dangerous once we want to size the migration
+> bitmaps smaller (used_length instead of max_length) or disallow access
+> to ram blocks beyond the used_length. Both are things I am working on :)
+
+Right. Now I start to wonder whether migration is the only special guy
+here.  I noticed at least we've got:
+
+struct RAMBlockNotifier {
+    void (*ram_block_added)(RAMBlockNotifier *n, void *host, size_t size);
+    void (*ram_block_removed)(RAMBlockNotifier *n, void *host, size_t size)=
+;
+    QLIST_ENTRY(RAMBlockNotifier) next;
+};
+
+I suspect at least all these users could also break in some way if
+resize happens.
+
+>=20
+> > patch, it'll crash the source VM (&error_abort specified in
+> > memory_region_ram_resize()), which seems a bit more harsh?
+>=20
+> There seems to be no easy way to abort migration from outside the
+> migration thread. As Juan said, you actually don't want to fail
+> migration but instead soft-abort migration and continue running the
+> guest on the target on a reset. But that's not easy as well.
+>=20
+> One could think about extending ram block notifiers to notify migration
+> code (before) resizes, so that migration code can work around the
+> resize (how is TBD). Not easy as well :)
+
+True.  But if you see my worry still stands, on whether such a patch
+would make things worse by crashing it when it could still have a
+chance to survive.  Shall we loose the penalty of that even if we want
+to warn the user earlier?
+
+>=20
+> But then, I am not sure
+> a) If we run into this issue in real life a lot.
+
+/me curious about this too.  I'd bet is it's not happening a lot, even
+hardly noticed/triggered.  Since I noticed resizing is there since
+2014.  :)
+
+> b) If we actually need an elaborate solutions within QEMU to handle this
+> case. For now, it's sufficient to restart the VM on the migration
+> target. No data was lost. Not nice, but very simple.
+
+Thanks,
+
+--=20
+Peter Xu
 
 
