@@ -2,74 +2,103 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA65C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6255C3B1B9
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:29:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E2732086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:29:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E2732086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=yifanlu.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF2BD2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:29:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OYXcbPhr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF2BD2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2fiX-0003y8-Jh
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:29:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33842)
+	id 1j2fid-0004Br-Ug
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:29:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35251)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j2faF-0006BZ-Ql
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:21:01 -0500
+ (envelope-from <philmd@redhat.com>) id 1j2fgM-00009X-Bt
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:27:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j2faE-0004es-Ba
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:20:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47328)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j2faE-0004ea-5Q
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:20:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j2faC-00086c-Dw
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 18:20:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3808A2E80C9
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 18:20:56 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1j2fgL-0002I3-Cu
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:27:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55929
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j2fgL-0002Hq-8b
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:27:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581704836;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4kvGx6AZiIIN6mdJ1tTnuo5Mfbn7yLrfD77aEC0rHt0=;
+ b=OYXcbPhr0c3wc/G9KHQqwnmb2jPMTFdwawopwelZ3FO1DO0p9lzwjjUgSKjmThRE1EqJLj
+ fYdfhXfRnxfNTPtB6edG6m7HSwnfksFPHOt63AQ0ZJymxtOJ2j400JdNHY5lS4/PQ7SCHU
+ Lm/RNyjWBDMxqJwOYj/9wNfskwsUNZs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-VJK-lqCKPkaCCdSuY3wIjw-1; Fri, 14 Feb 2020 13:27:14 -0500
+Received: by mail-wm1-f70.google.com with SMTP id f207so4327596wme.6
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:27:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=rQf8ZEx16zsohGMPxk+UJc7uxZahmMKptFTQ0vsKCY0=;
+ b=nSoDPNHEPclHGi30GocOfjNMoqRV6O/G2lpzc4NP/HVbghbVDojr+A/hv8v6s3Ptoe
+ ObIwUkNgSjR0iKyVtBrZC+GwNbKWrYdAif706OzTtJSGUE/8RoikcXkE42qe5tIr9t9E
+ Z5ijvedzFHGuNvLtZm5v+xSRBThER/a+fc3m/mUgtm/mLoAKrbDBOyzvOQMoRXu8xszf
+ WeyMJCovfRlWD6Qlxpu1ocwRmD1F8lg8ljfYSR3FQgrnHBZhWx6RhsPgV/wV+jidhQJY
+ fSLrgwlWLWJp33Hq90LIYm+a60eOOs8LMp2cRoN2cbqwtjuuVNbJ+/SS03nsnayruWqS
+ P9KQ==
+X-Gm-Message-State: APjAAAUoIHAMdmhCqIvLKVapiwROf/w1Sl9G7H2r84PVUsUsLOkQ7V6C
+ skPJcvTim8ZoFX3hO0nF3e6NC0QFkZzlVV9CiCC3WKfXjaM4S7vprfz066KEWSCP/EKDuXOFhN4
+ mDHksGrpraXWvrbc=
+X-Received: by 2002:adf:ffc5:: with SMTP id x5mr5461206wrs.92.1581704833128;
+ Fri, 14 Feb 2020 10:27:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqze/eHUo+mZrokNolpukCvcW2TYD3GcajPvULuqDfvA+UN2pBlfTNwJzTLkU2ri/Vhfs/pHKg==
+X-Received: by 2002:adf:ffc5:: with SMTP id x5mr5461195wrs.92.1581704832916;
+ Fri, 14 Feb 2020 10:27:12 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id j5sm8325497wrw.24.2020.02.14.10.27.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 14 Feb 2020 10:27:12 -0800 (PST)
+Subject: Re: [PATCH v1 2/4] Acceptance test: EXEC migration
+To: Oksana Vohchana <ovoshcha@redhat.com>, qemu-devel@nongnu.org
+References: <20200214145235.4378-1-ovoshcha@redhat.com>
+ <20200214145235.4378-3-ovoshcha@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <545474c0-1b28-e830-2601-76a8cbb604b4@redhat.com>
+Date: Fri, 14 Feb 2020 19:27:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200214145235.4378-3-ovoshcha@redhat.com>
+Content-Language: en-US
+X-MC-Unique: VJK-lqCKPkaCCdSuY3wIjw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 14 Feb 2020 18:09:23 -0000
-From: Yifan <me@yifanlu.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=alex.bennee@linaro.org; 
-X-Launchpad-Bug-Tags: mttcg tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee yifanlu
-X-Launchpad-Bug-Reporter: Yifan (yifanlu)
-X-Launchpad-Bug-Modifier: Yifan (yifanlu)
-References: <158154486735.14935.3370403781300872079.malonedeb@soybean.canonical.com>
-Message-Id: <158170376390.15247.4694343664393297579.malone@soybean.canonical.com>
-Subject: [Bug 1863025] Re: Use-after-free after flush in TCG accelerator
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 32c4e667c55e19910ae226bd0ad33cfe5ee9dd07
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,143 +107,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1863025 <1863025@bugs.launchpad.net>
+Cc: wainersm@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I found it just by launching Ubuntu 19.10 live cd with QXL driver. I
-will re-test this weekend.
+On 2/14/20 3:52 PM, Oksana Vohchana wrote:
+> Improves EXEC migration to run whole test stage
+>=20
+> Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
 
-The workaround I had is to check the number of TLB flushes and to re-try
-obtaining the TB if the number changes. There is a penalty for the case
-where TLB is flushed but should not degrade performance in most cases. I
-think obtaining the lock earlier will slow down the VM if EXCP_ATOMIC is
-used often.
+Fixes: 2e768cb682bf
 
-Of course, I am assuming TLB flush is the only way to cause this bug.
+> ---
+>   tests/acceptance/migration.py | 2 ++
+>   1 file changed, 2 insertions(+)
+>=20
+> diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.p=
+y
+> index e4c39b85a1..8209dcf71d 100644
+> --- a/tests/acceptance/migration.py
+> +++ b/tests/acceptance/migration.py
+> @@ -75,3 +75,5 @@ class Migration(Test):
+>           """
+>           free_port =3D self._get_free_port()
+>           dest_uri =3D 'exec:nc -l localhost %u' % free_port
+> +        src_uri =3D 'exec:nc localhost %u' % free_port
+> +        self.do_migrate(dest_uri, src_uri)
+>=20
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index d1c2b6ea1fd..d83b578299b 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -250,8 +250,11 @@ void cpu_exec_step_atomic(CPUState *cpu)
-     uint32_t flags;
-     uint32_t cflags =3D 1;
-     uint32_t cf_mask =3D cflags & CF_HASH_MASK;
-+    unsigned flush_count;
- =
+I was very surprised because commit 2e768cb682bf is not the content I=20
+reviewed. Apparently what happened here is you sent 2 different series=20
+with the same subject... I got confused while applying I selected the=20
+incorrect id:
 
-     if (sigsetjmp(cpu->jmp_env, 0) =3D=3D 0) {
-+retry:
-+        flush_count =3D tb_flush_count();
-         tb =3D tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, cf_mask);
-         if (tb =3D=3D NULL) {
-             mmap_lock();
-@@ -260,6 +263,11 @@ void cpu_exec_step_atomic(CPUState *cpu)
-         }
- =
+$ pwclient list 'Acceptance test: provides to use different transport=20
+for migration'
+ID      State        Name
+--      -----        ----
+11348377 New          Acceptance test: provides to use different=20
+transport for migration
+11348719 New          Acceptance test: provides to use different=20
+transport for migration
+11355797 New          [v2] Acceptance test: provides to use different=20
+transport for migration
+11358447 New          [v2,REPOST] Acceptance test: provides to use=20
+different transport for migration
+11362397 New          [v3,1/2] Acceptance test: provides to use=20
+different transport for migration
+11362399 New          [v3,2/2] Acceptance test: provides to use=20
+different transport for migration
+11362479 New          [v3,1/2] Acceptance test: provides to use=20
+different transport for migration
+11362485 New          [v3,2/2] Acceptance test: provides to use=20
+different transport for migration
 
-         start_exclusive();
-+        /* do_tb_flush() might run and make tb invalid */
-+        if (flush_count !=3D tb_flush_count()) {
-+            end_exclusive();
-+            goto retry;
-+        }
- =
+I am sorry I missed that.
 
-         /* Since we got here, we know that parallel_cpus must be true.  */
-         parallel_cpus =3D false;
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 4ed9d0abaf2..ecf7d3b53ff 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -2696,6 +2696,11 @@ void tcg_flush_softmmu_tlb(CPUState *cs)
- #endif
- }
- =
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-+unsigned tb_flush_count(void)
-+{
-+    return atomic_read(&tb_ctx.tb_flush_count);
-+}
-+
- #if defined(CONFIG_NO_RWX)
- void tb_exec_memory_lock(void)
- {
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 5ccc9485812..1bc61fa6d76 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -584,6 +584,7 @@ void tlb_set_dirty(CPUState *cpu, target_ulong vaddr);
- void tb_flush_jmp_cache(CPUState *cpu, target_ulong addr);
- =
-
- /* translate-all.c */
-+unsigned tb_flush_count(void);
- #if defined(CONFIG_NO_RWX)
- void tb_exec_memory_lock(void);
- bool tb_is_exec(const TranslationBlock *tb);
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1863025
-
-Title:
-  Use-after-free after flush in TCG accelerator
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  I believe I found a UAF in TCG that can lead to a guest VM escape. The
-  security list informed me "This can not be treated as a security
-  issue." and to post it here. I am looking at the 4.2.0 source code.
-  The issue requires a race and I will try to describe it in terms of
-  three concurrent threads.
-
-  Thread A:
-
-  A1. qemu_tcg_cpu_thread_fn runs work loop
-  A2. qemu_wait_io_event =3D> qemu_wait_io_event_common =3D> process_queued=
-_cpu_work
-  A3. start_exclusive critical section entered
-  A4. do_tb_flush is called, TB memory freed/re-allocated
-  A5. end_exclusive exits critical section
-
-  Thread B:
-
-  B1. qemu_tcg_cpu_thread_fn runs work loop
-  B2. tcg_cpu_exec =3D> cpu_exec =3D> tb_find =3D> tb_gen_code
-  B3. tcg_tb_alloc obtains a new TB
-
-  Thread C:
-
-  C1. qemu_tcg_cpu_thread_fn runs work loop
-  C2. cpu_exec_step_atomic executes
-  C3. TB obtained with tb_lookup__cpu_state or tb_gen_code
-  C4. start_exclusive critical section entered
-  C5. cpu_tb_exec executes the TB code
-  C6. end_exclusive exits critical section
-
-  Consider the following sequence of events:
-  =C2=A0=C2=A0B2 =3D> B3 =3D> C3 (same TB as B2) =3D> A3 =3D> A4 (TB freed)=
- =3D> A5 =3D> B2 =3D>
-  =C2=A0=C2=A0B3 (re-allocates TB from B2) =3D> C4 =3D> C5 (freed/reused TB=
- now executing) =3D> C6
-
-  In short, because thread C uses the TB in the critical section, there
-  is no guarantee that the pointer has not been "freed" (rather the
-  memory is marked as re-usable) and therefore a use-after-free occurs.
-
-  Since the TCG generated code can be in the same memory as the TB data
-  structure, it is possible for an attacker to overwrite the UAF pointer
-  with code generated from TCG. This can overwrite key pointer values
-  and could lead to code execution on the host outside of the TCG
-  sandbox.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1863025/+subscriptions
 
