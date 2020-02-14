@@ -2,100 +2,83 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C9EEC3B1B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C400DC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:17:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BDD522314
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:13:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D030222C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:17:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFOUXoGx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BDD522314
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ib8JzQet"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D030222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2fTE-00033u-CP
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:13:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60141)
+	id 1j2fWR-0005u1-Ms
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:17:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j2fSZ-0002XM-Cz
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:13:04 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j2fVI-0004Dd-2f
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:15:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j2fSX-0006JK-8p
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:13:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34106
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j2fSX-0006Is-4s
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:13:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581703980;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pmFIz5TKVSPNTaiM1HXJfIpF0BfVZxsWWORnFsR1XG0=;
- b=CFOUXoGxrppC2Ol7wA7xYItBVM2l4pSpfM3yV0q/qymFdr4X4ASdrZO3LapfmZWdNk/+gH
- CyUpiejS18HTigtQ1vQ+21eV9+0mXhYYkxlML4/G5xv908ededv4butDUq/SdGx+464Zen
- aNwLCkp83FbE1vahVhdo3IUAVRF4xF0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-BIJpGvsmNROoBxdSZ8_htA-1; Fri, 14 Feb 2020 13:12:53 -0500
-Received: by mail-wm1-f70.google.com with SMTP id d4so4302129wmd.7
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:12:53 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1j2fVG-0008U7-TX
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:15:51 -0500
+Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:36910)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j2fVG-0008TZ-MN
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:15:50 -0500
+Received: by mail-pg1-x52e.google.com with SMTP id z12so5353403pgl.4
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:15:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ru+6cKgRUaTCm+8Sv6aB+qI5kicAcCfM8654wxUWirY=;
+ b=Ib8JzQet9Sa+/d5x5B7sSCFywP5FuIgkslBxfD+XWR+toOjknuBj3Iu7ZRFP+y2tNM
+ g+J2dX99P5+sj+cCjZdC6Sfn6dujEuG6DvXptYNp0fun70G43Qygaz0bTXR86C29kZtc
+ vLiigrM5XyWnVsqrpF+m79Dzu1tTmdgeEzaP1TvcpXs3rNHtZVZg0H6uVIaFSX42uYPL
+ +DgwBDZBscdm/jjAgXlVvvgSiUe2zGYN+2fSkCSANzCov1/yFoOrcj5rPyqkOMkxX0/+
+ JkwNVbl/Nx1fWfxcd/8ExPyIm7keWrYaMtRRj60BuHnmzCoQ1FqYbc4asAxb+NA1I4Oz
+ LSmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=pmFIz5TKVSPNTaiM1HXJfIpF0BfVZxsWWORnFsR1XG0=;
- b=FETaTUUgcEoSoYXBSfcTtVUsNQdcudO+HuY8VtvdB/JtAD7nsY6lUmrwdKfk6LJ5oI
- /LADBGpqRnv67WlJjeYXuFB1lV4kn6AlN2kkKF8R3fQPVdUCSdCoBO/lbj12LLdygnLt
- 5bKURQ1L5NDzaUW0CGNoAzd17mBJY77fuoZVY5fu260KoRqYz0RI3v1Mc9I5MdI7rm7m
- vt6YND8ilj4jyEW9fXsi6uqsn63ZiIuQ9Orwws5LmWhbJ5axYLCErazbCDRlPit+CT2w
- IVbKjkDHZFhMtQssX4AxvZndwUbS248Exn3Pp8/6mJMmi/ZudpMwhWIY29czE6eq7VEO
- 4LHA==
-X-Gm-Message-State: APjAAAW88XorsG5jN0rq6He9cf6dYT3eykEU3j3eZLR5KUVSpSTzcNe/
- /eMOUe6DuoS0dlD/ilCKOFlk8kUE6LQ/Ttr6s6idc8hKqOi89zJFVUYVSOQqz/mZP0mn50b7muB
- ZOvF0M5NP+6cvLeU=
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr5801250wmk.15.1581703972618; 
- Fri, 14 Feb 2020 10:12:52 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxEeXP41wMgomMHENPaHG/3BCqLyFIvsHvzYlIYlZ6Tre8VIR5LKJLUjFro7V0pIlxH8tQUKA==
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr5801237wmk.15.1581703972408; 
- Fri, 14 Feb 2020 10:12:52 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id y12sm8162291wmj.6.2020.02.14.10.12.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 14 Feb 2020 10:12:51 -0800 (PST)
-Subject: Re: How do UEFI on Windows host
-To: Jerry Geis <jerry.geis@gmail.com>, Laszlo Ersek <lersek@redhat.com>
-References: <CABr8-B4_mEkOkodKVVe=U_eiMemWictNSQj4T5R6nEynVXCEGw@mail.gmail.com>
- <58491266-962f-4c4f-9a51-829ec30f008b@redhat.com>
- <CABr8-B6xARb1iuD7M_i9Pgs7OXF+EQQBxKDDC-o_imbiEDbMJw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6aad5b16-53c5-4485-381c-1cb990c8b766@redhat.com>
-Date: Fri, 14 Feb 2020 19:12:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=ru+6cKgRUaTCm+8Sv6aB+qI5kicAcCfM8654wxUWirY=;
+ b=kweHFQRJ2RGDQGgjs91dcuxw5Hir2vpsGytwONSpXhdVpccoyDx7OwC2Bnnia2KPkH
+ 2StwMtjVIb0JNHIUKMvfJgxNGI/dIYq8IC5M4VG29c1N4oVWsoWh6PBCt0WDiFI9OzKi
+ 1tOkub9fff0eiL619Oaecz4tvYGSA6bxlL2gll1TAGWYYjcckvBmJRPPO7SuqGgrBS51
+ UDPIhGqrgiNh72q8Hh31x7G4fl0SKgchRJnMkw/7RCUWVuKiRO9R3TlyJ76BktPnnuc2
+ mzvaG9THY7K+gu8bKW3f+YJdSnRmTyPhlcfajsHUoEvPtNDP7fx73Qv+KBXxnSDwKKF0
+ LhRw==
+X-Gm-Message-State: APjAAAUemXtwifsB+pCkMmZIpiO/X0+r3C6JPIhCcYUad4Qdo+dRTu2Q
+ 1y97nPuCg4wCHqTne8osR7fm/lochXA=
+X-Google-Smtp-Source: APXvYqxzEQ/tQzh/bPq9FfZLMlX0Hbax8N7CRDrSAq36uOxCGoFprYLTLFVf9Mi5SzSwRyIMU/nhtg==
+X-Received: by 2002:a62:fb06:: with SMTP id x6mr4544602pfm.149.1581704148688; 
+ Fri, 14 Feb 2020 10:15:48 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id i3sm7525123pfg.94.2020.02.14.10.15.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Feb 2020 10:15:48 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 00/19] target/arm: vfp feature and decodetree cleanup
+Date: Fri, 14 Feb 2020 10:15:28 -0800
+Message-Id: <20200214181547.21408-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <CABr8-B6xARb1iuD7M_i9Pgs7OXF+EQQBxKDDC-o_imbiEDbMJw@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: BIJpGvsmNROoBxdSZ8_htA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::52e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,32 +90,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/14/20 5:37 PM, Jerry Geis wrote:
-> I dont know how to get all files listing on windows. But, I cd \program 
-> files\qemu
-> dir *.fd
-> edk2-x86_64-code.fd
-> edk2-x86_64-secure-code.fd
-> 
-> It seems like from other posts these might be the files - but still not 
-> sure how to do "boot" a command line for UEFI.
+The main goal of the patchset is to move the ARM_FEATURE_VFP
+test from outside of the disas_vfp_insn() to inside each of
+the trans_* functions, so that we get the proper ISA check
+for each case.
 
-I tested/added these files in commit e54ecc70c34:
+At the end of that, it is easy to eliminate all of the remaining
+tests vs ARM_FEATURE_VFP* in favor of the preferred ISAR tests.
 
-     NSIS: Add missing firmware blobs
+Finally, there are a couple of cleanups to vfp.decode to make
+things a bit more legible.
 
-     Various firmwares has been added in the pc-bios/ directory:
 
-     - CCW     (since commit 0c1fecdd523)
-     - skiboot (since commit bcad45de6a0)
-     - EDK2    (since commit f7fa38b74c3)
+r~
 
-Stefan can you describe how you generate the binaries in 
-https://qemu.weilnetz.de/w64/ ? Maybe the bunzip2 step is not called?
+
+Richard Henderson (19):
+  target/arm: Fix field extract from MVFR[0-2]
+  target/arm: Rename isar_feature_aa32_simd_r32
+  target/arm: Use isar_feature_aa32_simd_r32 more places
+  target/arm: Set MVFR0.FPSP for ARMv5 cpus
+  target/arm: Add isar_feature_aa32_simd_r16
+  target/arm: Rename isar_feature_aa32_fpdp_v2
+  target/arm: Add isar_feature_aa32_{fpsp_v2,fpsp_v3,fpdp_v3}
+  target/arm: Perform fpdp_v2 check first
+  target/arm: Replace ARM_FEATURE_VFP3 checks with fp{sp,dp}_v3
+  target/arm: Add missing checks for fpsp_v2
+  target/arm: Replace ARM_FEATURE_VFP4 with isar_feature_aa32_simdfmac
+  target/arm: Remove ARM_FEATURE_VFP check from disas_vfp_insn
+  target/arm: Move VLLDM and VLSTM to vfp.decode
+  target/arm: Move the vfp decodetree calls next to the base isa
+  linux-user/arm: Replace ARM_FEATURE_VFP* tests for HWCAP
+  target/arm: Remove ARM_FEATURE_VFP*
+  target/arm: Add formats for some vfp 2 and 3-register insns
+  target/arm: Split VFM decode
+  target/arm: Split VMINMAXNM decode
+
+ target/arm/cpu.h               |  56 ++--
+ target/arm/vfp-uncond.decode   |  12 +-
+ target/arm/vfp.decode          | 153 +++++------
+ hw/intc/armv7m_nvic.c          |  20 +-
+ linux-user/arm/signal.c        |   4 +-
+ linux-user/elfload.c           |  24 +-
+ target/arm/arch_dump.c         |  11 +-
+ target/arm/cpu.c               |  50 +---
+ target/arm/cpu64.c             |   3 -
+ target/arm/helper.c            |  17 +-
+ target/arm/kvm32.c             |   5 -
+ target/arm/kvm64.c             |   1 -
+ target/arm/m_helper.c          |  11 +-
+ target/arm/machine.c           |   3 +-
+ target/arm/translate-vfp.inc.c | 467 ++++++++++++++++++++-------------
+ target/arm/translate.c         | 121 ++-------
+ 16 files changed, 479 insertions(+), 479 deletions(-)
+
+-- 
+2.20.1
 
 
