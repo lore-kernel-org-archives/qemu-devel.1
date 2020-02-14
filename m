@@ -2,82 +2,91 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC47C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C17C3B196
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:48:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 951B7217F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:47:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2282A217F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:48:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E4bwHXUz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951B7217F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYF/L3+d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2282A217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2ZRj-0001xx-OZ
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 06:47:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55158)
+	id 1j2ZSM-0002pf-Cc
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 06:48:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j2ZQt-0001T0-Dj
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:46:56 -0500
+ (envelope-from <pmathieu@redhat.com>) id 1j2ZRj-00025l-1p
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:47:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j2ZQs-0000w9-EQ
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:46:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38266
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pmathieu@redhat.com>) id 1j2ZRi-00026L-1h
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:47:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52989
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j2ZQs-0000v0-BZ
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:46:54 -0500
+ (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1j2ZRh-00025H-UJ
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:47:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581680813;
+ s=mimecast20190719; t=1581680865;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SxMX0UpvUTdAOsL+LgluIHhV1v8PCiN4B847b3lrIMU=;
- b=E4bwHXUzIALrmvrHZe6T32VcdLoV0j5L9HIKroxnK3IxmChv5IBJv97kuxSUODPjW5Vi15
- sXp6qkPkoWclA7gVW9oPpH3glJrSQtdgMacmkilUCGX1ZXw0ReLY9F6V4cUR5DlkPIJ/Da
- fjrhyb8S/zx2Wo1UBSjW5uQGdTzjNlE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-fjWVyNt2OC-M0X9KDyw6lA-1; Fri, 14 Feb 2020 06:46:46 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2D5C8018A5;
- Fri, 14 Feb 2020 11:46:43 +0000 (UTC)
-Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F0DB260BFB;
- Fri, 14 Feb 2020 11:46:42 +0000 (UTC)
-Subject: Re: [PATCH] migration/throttle: Make throttle slower at tail stage
-To: Keqian Zhu <zhukeqian1@huawei.com>, qemu-devel@nongnu.org
-References: <20200214032700.25011-1-zhukeqian1@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <d46149e5-8d8f-d3b8-91ec-145c102cffb7@redhat.com>
-Date: Fri, 14 Feb 2020 05:46:42 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=fLOxRe0I6SCms20R3U9apOHY9n2qwA1dE4HzvsH5SxM=;
+ b=RYF/L3+dDC29LG8FHjpY2eKwKndVFcBX6DHFFt2U9Umom3KI+OcPWWR2nWt1Wus8EWwIyC
+ BHEN8hl4CchWj1tn12ocdYsUePq8GJve7YGRUa3dGX3tisU5Uc5tBiEq9AcrQvmaSzImNe
+ R2VG+ukvYUZMpihN8wWBldQf22hl2m0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-n54UcT-LMKS8DYTpWmurnw-1; Fri, 14 Feb 2020 06:47:43 -0500
+Received: by mail-wr1-f69.google.com with SMTP id m15so3841579wrs.22
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 03:47:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DF2Wf7J9ZEvKMseW8iZryRqj56Ob0/0+2kuiAO3pit0=;
+ b=fJ/tiuUwoEoPi7kxLtNbhqSb+JN+ILXtjxI0oTZ6yMJa6DwARAHZDqiwDCivbvFP6m
+ D6j3VVrJyS2Eg7p2PsQS5Bfq4yGlEY5dBi85K/pafNbUrzlKVJGx+G1S4VkJsUKXftau
+ lXAOvr8/IkMhhG88ZoTDmh3Xx9KnAGy06o1wRjwTY6SGu+BO6ZTx+B3UQKVPmdwUHQ+x
+ x+ushDH1rBSXmRVvq+rkN6t6IFf6TjUTo+rrJDxU4m4cNLN0YF+0rVoqJPyY5nxDKlpC
+ sGSLONCRNg0hMZc+c7aetPkpDXwc5NF3x/EBAVkmvkaVamdGwDtgalx41LbfwzVXR2cL
+ rqcw==
+X-Gm-Message-State: APjAAAWQZUl3dWbVLjmo3tS1nn+xEsg/pvju3UX5VkZ5b6iPS5je643A
+ lqz5OqMaCYr6bLHjscjQ/y8fbH/zhkvpT7MiBqzCiRzRav3IxhaBkE21TrgTo96UW8gbUCsxgEs
+ l6afZpd/8MS+r7DIVikdKNqZiDapufNE=
+X-Received: by 2002:a1c:541b:: with SMTP id i27mr4567883wmb.137.1581680862169; 
+ Fri, 14 Feb 2020 03:47:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyk/7qk9RSbTMFPAjrXSUJt3rCp0VnXKfdzycO6drzFLKYvTVlAc2jdruJl8mB+qMKlH454PnR6kguPAKmvzHM=
+X-Received: by 2002:a1c:541b:: with SMTP id i27mr4567869wmb.137.1581680861910; 
+ Fri, 14 Feb 2020 03:47:41 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200214032700.25011-1-zhukeqian1@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: fjWVyNt2OC-M0X9KDyw6lA-1
+References: <20200214084607.20471-1-mark.cave-ayland@ilande.co.uk>
+ <20200214084607.20471-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20200214084607.20471-2-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 14 Feb 2020 12:47:30 +0100
+Message-ID: <CAP+75-X1pbKfG8+17Zif-ZsQNbFk34_AzVWy=U_Hr+Rz7=pgOA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] dp264: use pci_create() to initialise the cmd646
+ device
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+X-MC-Unique: n54UcT-LMKS8DYTpWmurnw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,46 +98,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com, qemu-arm@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/13/20 9:27 PM, Keqian Zhu wrote:
-> At the tail stage of throttle, VM is very sensitive to
-> CPU percentage. We just throttle 30% of remaining CPU
-> when throttle is more than 80 percentage.
-> 
-> This doesn't conflict with cpu_throttle_increment.
-> 
-> This may make migration time longer, and is disabled
-> by default.
-> 
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+Hi Mark,
+
+On Fri, Feb 14, 2020 at 9:48 AM Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+>
+> Remove the call to pci_cmd646_ide_init() since global device init functio=
+ns
+> are deprecated in preference of using qdev directly.
+>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
+>  hw/alpha/dp264.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+> index a8f9a89cc4..e91989bf9a 100644
+> --- a/hw/alpha/dp264.c
+> +++ b/hw/alpha/dp264.c
+> @@ -16,6 +16,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "hw/rtc/mc146818rtc.h"
+>  #include "hw/ide.h"
+> +#include "hw/ide/pci.h"
+>  #include "hw/timer/i8254.h"
+>  #include "hw/isa/superio.h"
+>  #include "hw/dma/i8257.h"
+> @@ -100,9 +101,14 @@ static void clipper_init(MachineState *machine)
+>      /* IDE disk setup.  */
+>      {
+>          DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
+> +        PCIDevice *pci_dev;
+> +
+>          ide_drive_get(hd, ARRAY_SIZE(hd));
+>
+> -        pci_cmd646_ide_init(pci_bus, hd, 0);
+> +        pci_dev =3D pci_create(pci_bus, -1, "cmd646-ide");
 
-> +++ b/qapi/migration.json
-> @@ -532,6 +532,12 @@
->   #                          auto-converge detects that migration is not making
->   #                          progress. The default value is 10. (Since 2.7)
->   #
-> +# @cpu-throttle-tailslow: Make throttle slower at tail stage
-> +#                         At the tail stage of throttle, VM is very sensitive to
-> +#                         CPU percentage. We just throttle 30% of remaining CPU
-> +#                         when throttle is more than 80 percentage. The default
-> +#                         value is false. (Since 4.1)
+Not this patch problem, but it would be nice to have a TYPE_CMD646_IDE.
 
-The next release is 5.0, not 4.1.
+> +        qdev_prop_set_uint32(DEVICE(pci_dev), "secondary", 0);
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Secondary_ide disabled is the default in cmd646_ide_properties[], can
+we avoid this call?
+
+> +        qdev_init_nofail(DEVICE(pci_dev));
+> +        pci_ide_create_devs(pci_dev, hd);
+>      }
+>
+>      /* Load PALcode.  Given that this is not "real" cpu palcode,
+> --
+> 2.20.1
+>
+>
 
 
