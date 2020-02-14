@@ -2,86 +2,83 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B307C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 12:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A0DC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 12:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 001042086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 12:16:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A07D02067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 12:21:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hs1rKGvo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 001042086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGqmg7di"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A07D02067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2ZtL-0004li-69
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 07:16:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33800)
+	id 1j2Zyg-0006go-SA
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 07:21:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pmathieu@redhat.com>) id 1j2ZsO-0004Ik-2v
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 07:15:21 -0500
+ (envelope-from <armbru@redhat.com>) id 1j2Zxu-00066u-SH
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 07:21:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmathieu@redhat.com>) id 1j2ZsM-0004My-Qd
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 07:15:19 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24518
+ (envelope-from <armbru@redhat.com>) id 1j2Zxt-0004hR-CL
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 07:21:02 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46460
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1j2ZsM-00049C-Jt
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 07:15:18 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j2Zxt-0004gP-8k
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 07:21:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581682517;
+ s=mimecast20190719; t=1581682860;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mrFkMpYHPAPBhbaNfyxrQcxNem8ileHHTLSI+vRQi2o=;
- b=hs1rKGvoJaLCRx/nEdMT565OsmqEiyPQy+NxKBqlySUilXBmEifebT6ZhohIiQS3WJ+jUH
- w8XIy98QelHYiJqNQomrhOv6u+GaqhJrk4ck+plQzFgyTSGQLMbtQGSEzBi+jCnbf0dWhq
- hA194hUq2ulqNwqMF1KH68SjscFu2mc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-QlXuv0HeMJeXOmiEUscYWA-1; Fri, 14 Feb 2020 07:15:13 -0500
-Received: by mail-wr1-f70.google.com with SMTP id 90so3918618wrq.6
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 04:15:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mrFkMpYHPAPBhbaNfyxrQcxNem8ileHHTLSI+vRQi2o=;
- b=ovMeTIazdW/U+PrTzab6aMX7JrnSboIo8/xfW/We2WBo532qNorUS14gCw0A4t3Vgz
- vig9GUFhX8lZ4ssqCiwcBBMAu2nrif08+2UMstl4oMfXYYOw+gFgMWk6DDBO1fQUo0sg
- VbajO3GB8Gqujj1OlubJkcTQfqa/InvZ3K/dPYBwRZOJe8EM6yWfT+fUoOnZnkknZ6tU
- tMXK6+gFveHHqgx/bbth7vZFMDhinMSj5/761P3oAmLt7IOi/X/fMjUVIyHnSwtQHu66
- 6VB+rIDEggJGDerwrVdVgBCDf4XsJF8yWQ4juOa6v5NhHTiN14KnEyYyZDfdhmF+Zvow
- W1Sg==
-X-Gm-Message-State: APjAAAXXbW4aMOK1eO+IVEaWRzXwUNijd53+rmw8DFp4T/I6Z1jqTyZq
- ZC6cVRZFO+7t3SCMw7LlJ9upv5wvPCuvsFPNSoYrueh9KqpUuxege2dww73XnDUNzEHybpGQuOp
- CorzTwEiknh2oNW9oSjBKhdGVXQkgl+0=
-X-Received: by 2002:a1c:541b:: with SMTP id i27mr4696383wmb.137.1581682512525; 
- Fri, 14 Feb 2020 04:15:12 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyZ8VIZ8kLrlGxE9w+6bVeoAtxp6T+20BXZEL+73C/Ye00bpVjWO0lGvJzIkIQkY10ZMVyDDOHxcYkEzahEtLk=
-X-Received: by 2002:a1c:541b:: with SMTP id i27mr4696358wmb.137.1581682512297; 
- Fri, 14 Feb 2020 04:15:12 -0800 (PST)
+ bh=YSFqJbdYsjQz+Ne7Xw8TBPxqzn/YYdeafwF+zYkSViE=;
+ b=YGqmg7dihttu1b9qkgnuKMPnv9vNcejpBAiAgdue+ICCVv0TOeATmAAUJffuCipRC7h832
+ bEihWXGo4r0X8w657SOAapXvZwZmvFDEk4JuFd1hWValV7qvjenEB71EJMnVHiVy8mCl0p
+ FA404t8f41+6GA1xrji7sgPml8txJBE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-qmo0rbusPjuGb3uWpdI-Bg-1; Fri, 14 Feb 2020 07:20:56 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07C851851FC5;
+ Fri, 14 Feb 2020 12:20:55 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-234.ams2.redhat.com
+ [10.36.117.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C52C19C4F;
+ Fri, 14 Feb 2020 12:20:52 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 88F8811385C9; Fri, 14 Feb 2020 13:20:50 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 01/30] configure: Allow user to specify sphinx-build
+ binary
+References: <20200213175647.17628-1-peter.maydell@linaro.org>
+ <20200213175647.17628-2-peter.maydell@linaro.org>
+ <87v9o91xvv.fsf@dusky.pond.sub.org>
+ <CAFEAcA8ZPrkfzzyxe-im609GQAxEqRz_z3Ar2EFdcFqzyN4p1g@mail.gmail.com>
+Date: Fri, 14 Feb 2020 13:20:50 +0100
+In-Reply-To: <CAFEAcA8ZPrkfzzyxe-im609GQAxEqRz_z3Ar2EFdcFqzyN4p1g@mail.gmail.com>
+ (Peter Maydell's message of "Fri, 14 Feb 2020 09:21:34 +0000")
+Message-ID: <87d0ahxsv1.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200213225109.13120-1-alex.bennee@linaro.org>
- <20200213225109.13120-8-alex.bennee@linaro.org>
-In-Reply-To: <20200213225109.13120-8-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 14 Feb 2020 13:15:01 +0100
-Message-ID: <CAP+75-Wp28ysW+hC0-SNzgTo3aJR_iJ1zCHHmp1jq4zHuozZsw@mail.gmail.com>
-Subject: Re: [PATCH v2 07/19] travis.yml: single-thread build-tcg stages
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-X-MC-Unique: QlXuv0HeMJeXOmiEUscYWA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: qmo0rbusPjuGb3uWpdI-Bg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -97,65 +94,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Robert Foley <robert.foley@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, robhenry@microsoft.com,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Aaron Lindsay <aaron@os.amperecomputing.com>,
- "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Chenqun \(kuhn\)" <kuhn.chenqun@huawei.com>,
- Peter Puhov <peter.puhov@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 11:51 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
->
-> This still seems to be a problem for Travis.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  .travis.yml | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index 0612998958b..f4020dcc6c8 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -400,7 +400,7 @@ jobs:
->      - name: "GCC check-tcg (some-softmmu)"
->        env:
->          - CONFIG=3D"--enable-debug-tcg --target-list=3Dxtensa-softmmu,ar=
-m-softmmu,aarch64-softmmu,alpha-softmmu"
-> -        - TEST_BUILD_CMD=3D"make -j${JOBS} build-tcg"
-> +        - TEST_BUILD_CMD=3D"make build-tcg"
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Can you explicit -j1 instead? This is self-explanatory.
-
->          - TEST_CMD=3D"make check-tcg"
->          - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+> On Fri, 14 Feb 2020 at 06:33, Markus Armbruster <armbru@redhat.com> wrote=
+:
+>>
+>> Does not work out of the box on my Fedora 30 build host, where
+>> sphinx-build gives me sphinx-build-2.  I have to specify
+>> --sphinx-build=3D/usr/bin/sphinx-build-3 to unbreak it.  Which of course
+>> breaks things when I try to build anything before this commit
+>>
+>> The appended patch makes it work out of the box.  Please consider
+>> squashing it in.
+>>
+>> diff --git a/configure b/configure
+>> index 14172909f0..a9d175c400 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -584,7 +584,6 @@ query_pkg_config() {
+>>  }
+>>  pkg_config=3Dquery_pkg_config
+>>  sdl2_config=3D"${SDL2_CONFIG-${cross_prefix}sdl2-config}"
+>> -sphinx_build=3Dsphinx-build
+>>
+>>  # If the user hasn't specified ARFLAGS, default to 'rv', just as make d=
+oes.
+>>  ARFLAGS=3D"${ARFLAGS-rv}"
+>> @@ -903,6 +902,7 @@ fi
+>>
+>>  : ${make=3D${MAKE-make}}
+>>  : ${install=3D${INSTALL-install}}
+>> +
+>>  # We prefer python 3.x. A bare 'python' is traditionally
+>>  # python 2.x, but some distros have it as python 3.x, so
+>>  # we check that too
+>> @@ -915,6 +915,19 @@ do
+>>          break
+>>      fi
+>>  done
+>> +
+>> +set -x
 >
-> @@ -409,7 +409,7 @@ jobs:
->      - name: "GCC plugins check-tcg (some-softmmu)"
->        env:
->          - CONFIG=3D"--enable-plugins --enable-debug-tcg --target-list=3D=
-xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
-> -        - TEST_BUILD_CMD=3D"make -j${JOBS} build-tcg"
-> +        - TEST_BUILD_CMD=3D"make build-tcg"
+> I guess the set -x / set +x here are accidentally left in
+> debug printing?
 
-With -j1 in both places:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Mispasted.  I just double-checked these two lines are the only crap I
+left in.
 
->          - TEST_CMD=3D"make check-tcg"
->          - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+>> +sphinx_build=3D
+>> +for binary in sphinx-build-3 sphinx-build
+>> +do
+>> +    if has "$binary"
+>> +    then
+>> +        sphinx_build=3D$(command -v "$binary")
+>> +        break
+>> +    fi
+>> +done
+>> +set +x
+>> +
+>>  : ${smbd=3D${SMBD-/usr/sbin/smbd}}
+>>
+>>  # Default objcc to clang if available, otherwise use CC
+>> @@ -4803,7 +4816,7 @@ has_sphinx_build() {
+>>      # sphinx-build doesn't exist at all or if it is too old.
+>>      mkdir -p "$TMPDIR1/sphinx"
+>>      touch "$TMPDIR1/sphinx/index.rst"
+>> -    $sphinx_build -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TM=
+PDIR1/sphinx/out" >/dev/null 2>&1
+>> +    "$sphinx_build" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$=
+TMPDIR1/sphinx/out" >/dev/null 2>&1
+>>  }
 >
-> --
-> 2.20.1
->
+> This change isn't related to trying sphinx-build-3 --
+> did you actually need it ?
+
+If the for loop finds nothing, $sphinx_build remains empty.  Quoting the
+variable seems cleaner.
+
+Oh, and if the user passes '--sphinx-build=3D', $sphinx_build becomes
+empty.  Precedes my fixup.  Admittedly a rather silly thing to do.
+
+> I did think about quoting when I wrote the patch,
+> but looking at existing practice we are all over the
+> place on whether we bother to quote variables containing
+> program names in configure. I think I ended up following
+> the same thing we do for $python, which doesn't quote.
+
+I tend to omit quotes when it's obvious the variable's value can only be
+harmless.  An empty value isn't.
+
+> Other than that, I'm happy to squash this in, or for
+> you to squash it in if you are otherwise OK taking
+> the first chunk of the patchset via your tree now.
+> (Do you have a preference for whether you take these
+> patches via your tree or I send them in a docs pullreq?)
+
+I can do the pull request.
 
 
