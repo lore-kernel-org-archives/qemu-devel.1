@@ -2,83 +2,126 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3990C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 10:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2161DC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 10:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DD05206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 10:27:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCBF120873
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 10:33:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="heubI5sL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD05206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J6siWBT/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCBF120873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2YC7-0000M1-Rd
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 05:27:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36160)
+	id 1j2YHo-0002VC-3O
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 05:33:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j2YBV-0008NO-UC
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 05:26:59 -0500
+ (envelope-from <david@redhat.com>) id 1j2YHA-0001gW-LK
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 05:32:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j2YBU-0006ds-Gx
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 05:26:57 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31153)
+ (envelope-from <david@redhat.com>) id 1j2YH9-0005hF-Hd
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 05:32:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26825
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j2YBU-0006dO-Cr
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 05:26:56 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j2YH9-0005gm-Dp
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 05:32:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581676015;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1581676366;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WQj2QGp+on7URM3kgktKgucz1pQFF5s1CCNHZxu+zb0=;
- b=heubI5sL3LdyV+3Xj1HfRTmqcJC7il2wVIsUeoke1v7rWXPHoxZKltpX0lIuYZ2uV3e8Zn
- nEqlChM1eLQeUKLIYdYal7L6OlQ1P2uLLKGanlfj+8SXVjIqP3Wvu5Jvr79CTbf79mS6fx
- tfX0ppWdgyV/xrul/YXok3fZxBWbwdU=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=MP1Bf6oJmSe4YcFeH79hS+kfrHmUovTn39a5M/YC47M=;
+ b=J6siWBT/cw2tCwF7u3KS/CDZIXbqBGL0/LnAKiGI3lRHl6Gowz3m6JiTLVpZSE5W9fna2m
+ Y2P5S5TEkpHpLUcRhBUBwm76/h+Q3UgfVFUVujcxBg5MiL5ZqkLYpmW1N5Y60rHlcA4P4P
+ Xsbv27k8Y970Lr+n7t/cGQOJ+bcR1yQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-iyR2b9pANYqgTbgbPZdYKA-1; Fri, 14 Feb 2020 05:26:54 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-43-GE-qW7yNPWuHw1wMxMam9A-1; Fri, 14 Feb 2020 05:32:39 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 247F81137851
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:26:53 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E96690094;
- Fri, 14 Feb 2020 10:26:51 +0000 (UTC)
-Date: Fri, 14 Feb 2020 10:26:49 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v5 6/8] configure: Enable test and libs for zstd
-Message-ID: <20200214102649.GB613610@redhat.com>
-References: <20200129115655.10414-1-quintela@redhat.com>
- <20200129115655.10414-7-quintela@redhat.com>
- <20200211201107.GR55376@redhat.com> <87k14qjitw.fsf@secure.laptop>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D05B107ACC4;
+ Fri, 14 Feb 2020 10:32:38 +0000 (UTC)
+Received: from [10.36.118.137] (unknown [10.36.118.137])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A0DCA19E9C;
+ Fri, 14 Feb 2020 10:32:32 +0000 (UTC)
+Subject: Re: [PATCH RFC] memory: Don't allow to resize RAM while migrating
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200213172016.196609-1-david@redhat.com>
+ <20200214102514.GB3283@work-vm>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <30a66b1d-184e-a684-d0d2-c3921366b478@redhat.com>
+Date: Fri, 14 Feb 2020 11:32:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <87k14qjitw.fsf@secure.laptop>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: iyR2b9pANYqgTbgbPZdYKA-1
+In-Reply-To: <20200214102514.GB3283@work-vm>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: GE-qW7yNPWuHw1wMxMam9A-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,233 +133,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Shannon Zhao <shannon.zhao@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 10:08:59PM +0100, Juan Quintela wrote:
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> > On Wed, Jan 29, 2020 at 12:56:53PM +0100, Juan Quintela wrote:
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> ---
-> >>  configure | 30 ++++++++++++++++++++++++++++++
-> >>  1 file changed, 30 insertions(+)
-> >
-> > This is adding a new 3rd party library to QEMU that we've not previousl=
-y
-> > built and so isn't included in any of our CI platforms.
+On 14.02.20 11:25, Dr. David Alan Gilbert wrote:
+> * David Hildenbrand (david@redhat.com) wrote:
+>> Resizing while migrating is dangerous and does not work as expected.
+>> The whole migration code works on the usable_length of ram blocks and do=
+es
+>> not expect this to change at random points in time.
+>>
+>> Precopy: The ram block size must not change on the source, after
+>> ram_save_setup(), so as long as the guest is still running on the source=
+.
+>>
+>> Postcopy: The ram block size must not change on the target, after
+>> synchronizing the RAM block list (ram_load_precopy()).
+>>
+>> AFAIKS, resizing can be trigger *after* (but not during) a reset in
+>> ACPI code by the guest
+>> - hw/arm/virt-acpi-build.c:acpi_ram_update()
+>> - hw/i386/acpi-build.c:acpi_ram_update()
+>>
+>> I see no easy way to work around this. Fail hard instead of failing
+>> somewhere in migration code due to strange other reasons. AFAIKs, the
+>> rebuilts will be triggered during reboot, so this should not affect
+>> running guests, but only guests that reboot at a very bad time and
+>> actually require size changes.
+>>
+>> Let's further limit the impact by checking if an actual resize of the
+>> RAM (in number of pages) is required.
+>>
+>> Don't perform the checks in qemu_ram_resize(), as that's called during
+>> migration when syncing the used_length. Update documentation.
 >=20
-> Ok.
->=20
-> Learning how one does that.
->=20
-> > This commit should be updating at least some of our CI platforms to
-> > request the libzstd library installation to get CI coverage for the
-> > latest patches in this series.
->=20
-> > Probably the docker files,
->=20
-> I added it in all debian/centos/fedora files that zlib-dev or xen-dev
->=20
-> > the VM installs for FreeBSD at least,
->=20
-> A fast google finds that library is called "zstd" and that it includes
-> the includes (put intended)
->=20
-> tests/vm/freebsd
->=20
-> Once there, include it in fedora
->=20
-> > travis and
->=20
-> I added it to .travis.yml
->=20
-> > gitlab CI.
->=20
-> gitlab-ci.yml (just when we compile x86_64-softmmu)
->=20
-> I have something like this, but net real clue how to test that I haven't
-> broken anything:
->=20
-> commit 59d8694dfcfc3d5ef36bc72a5c02bedaa3a6a6ec
-> Author: Juan Quintela <quintela@redhat.com>
-> Date:   Thu Feb 13 22:06:16 2020 +0100
->=20
->     Use zstd packages
->    =20
->     Signed-off-by: Juan Quintela <quintela@redhat.com>
->=20
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index c15e394f09..72f8b8aa51 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -21,6 +21,7 @@ build-system2:
->   script:
->   - apt-get install -y -qq libsdl2-dev libgcrypt-dev libbrlapi-dev libaio=
--dev
->        libfdt-dev liblzo2-dev librdmacm-dev libibverbs-dev libibumad-dev
-> +      libzstd-dev
->   - mkdir build
->   - cd build
->   - ../configure --enable-werror --target-list=3D"tricore-softmmu unicore=
-32-softmmu
-> diff --git a/.travis.yml b/.travis.yml
-> index 5887055951..dd17301f3b 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -48,6 +48,7 @@ addons:
->        - libusb-1.0-0-dev
->        - libvdeplug-dev
->        - libvte-2.91-dev
-> +      - libzstd-dev
->        - sparse
->        - uuid-dev
->        - gcovr
-> diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/docke=
-rfiles/centos7.docker
-> index 562d65be9e..cdd72de7eb 100644
-> --- a/tests/docker/dockerfiles/centos7.docker
-> +++ b/tests/docker/dockerfiles/centos7.docker
-> @@ -33,6 +33,7 @@ ENV PACKAGES \
->      tar \
->      vte-devel \
->      xen-devel \
-> -    zlib-devel
-> +    zlib-devel \
-> +    libzstd-devel
->  RUN yum install -y $PACKAGES
->  RUN rpm -q $PACKAGES | sort > /packages.txt
-> diff --git a/tests/docker/dockerfiles/fedora-i386-cross.docker b/tests/do=
-cker/dockerfiles/fedora-i386-cross.docker
-> index 9106cf9ebe..cd16cd1bfa 100644
-> --- a/tests/docker/dockerfiles/fedora-i386-cross.docker
-> +++ b/tests/docker/dockerfiles/fedora-i386-cross.docker
-> @@ -7,7 +7,8 @@ ENV PACKAGES \
->      gnutls-devel.i686 \
->      nettle-devel.i686 \
->      pixman-devel.i686 \
-> -    zlib-devel.i686
-> +    zlib-devel.i686 \
-> +    libzstd-devel.i686
-> =20
->  RUN dnf install -y $PACKAGES
->  RUN rpm -q $PACKAGES | sort > /packages.txt
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docker=
-files/fedora.docker
-> index 987a3c170a..a6522228c0 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -92,7 +92,8 @@ ENV PACKAGES \
->      vte291-devel \
->      which \
->      xen-devel \
-> -    zlib-devel
-> +    zlib-devel \
-> +    libzstd-devel
->  ENV QEMU_CONFIGURE_OPTS --python=3D/usr/bin/python3
-> =20
->  RUN dnf install -y $PACKAGES
-> diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/docker=
-files/ubuntu.docker
-> index 4177f33691..b6c7b41ddd 100644
-> --- a/tests/docker/dockerfiles/ubuntu.docker
-> +++ b/tests/docker/dockerfiles/ubuntu.docker
-> @@ -58,6 +58,7 @@ ENV PACKAGES flex bison \
->      libvdeplug-dev \
->      libvte-2.91-dev \
->      libxen-dev \
-> +    libzstd-dev \
->      make \
->      python3-yaml \
->      python3-sphinx \
-> diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/do=
-ckerfiles/ubuntu1804.docker
-> index 0766f94cf4..1efedeef99 100644
-> --- a/tests/docker/dockerfiles/ubuntu1804.docker
-> +++ b/tests/docker/dockerfiles/ubuntu1804.docker
-> @@ -44,6 +44,7 @@ ENV PACKAGES flex bison \
->      libvdeplug-dev \
->      libvte-2.91-dev \
->      libxen-dev \
-> +    libzstd-dev \
->      make \
->      python3-yaml \
->      python3-sphinx \
-> diff --git a/tests/vm/fedora b/tests/vm/fedora
-> index 4d7d6049f4..4843b4175e 100755
-> --- a/tests/vm/fedora
-> +++ b/tests/vm/fedora
-> @@ -53,7 +53,10 @@ class FedoraVM(basevm.BaseVM):
->          # libs: audio
->          '"pkgconfig(libpulse)"',
->          '"pkgconfig(alsa)"',
-> -    ]
-> +
-> +        # libs: migration
-> +        '"pkgconfig(libzstd)"',
-> +]
-> =20
->      BUILD_SCRIPT =3D """
->          set -e;
-> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-> index fb54334696..86770878b6 100755
-> --- a/tests/vm/freebsd
-> +++ b/tests/vm/freebsd
-> @@ -55,6 +55,9 @@ class FreeBSDVM(basevm.BaseVM):
->          # libs: opengl
->          "libepoxy",
->          "mesa-libs",
-> +
-> +        # libs: migration
-> +        "zstd",
->      ]
-> =20
->      BUILD_SCRIPT =3D """
-> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-> index c5069a45f4..55590f4601 100755
-> --- a/tests/vm/netbsd
-> +++ b/tests/vm/netbsd
-> @@ -49,6 +49,9 @@ class NetBSDVM(basevm.BaseVM):
->          "SDL2",
->          "gtk3+",
->          "libxkbcommon",
-> +
-> +        # libs: migration
-> +        "zstd",
->      ]
-> =20
->      BUILD_SCRIPT =3D """
-> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> index 22cd9513dd..ab6abbedab 100755
-> --- a/tests/vm/openbsd
-> +++ b/tests/vm/openbsd
-> @@ -51,6 +51,9 @@ class OpenBSDVM(basevm.BaseVM):
->          "sdl2",
->          "gtk+3",
->          "libxkbcommon",
-> +
-> +        # libs: migration
-> +        "zstd",
->      ]
-> =20
->      BUILD_SCRIPT =3D """
+> Interesting; we need to do something about this - but banning resets
+> during migration is a bit harsh; and aborting the source VM is really
+> nasty - for a precopy especially we shouldn't kill the source VM,
+> we should just abort the migration.
 
-This looks good to me, thanks.
+Any alternative, easy solutions to handle this? I do wonder how often
+this will actually trigger in real life.
 
-Regards,
-Daniel
+>=20
+> The other thing that worries me is that acpi_build_update calls
+>    acpi_ram_update->memory_region_ram_resize
+> multiple times.
+
+It's different memory regions, no? table_mr, rsdp_mr, linker_mr.
+
+> So, it might be that the size you end up with at the end of
+> acpi_build_update is actually the same size as the original - so
+> the net effect is the RAMBlock didn't really get resized.
+
+Are you sure?
+
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Thanks,
+
+David / dhildenb
 
 
