@@ -2,61 +2,89 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B437C352A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:38:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD85C352A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:48:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 558892082F
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:38:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12EAF2082F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:48:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="opTl+bTq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 558892082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XIWlvMIP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12EAF2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2P0T-0000j6-I5
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 19:38:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53297)
+	id 1j2P9m-0002sw-9G
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 19:48:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58110)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j2Ozs-0000CS-9p
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:38:22 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j2P9D-0002US-3E
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:48:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j2Ozq-00086k-Da
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:38:19 -0500
-Received: from ozlabs.org ([203.11.71.1]:58495)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j2Ozp-00082l-4I; Thu, 13 Feb 2020 19:38:18 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48JZH84Q4Mz9sRQ; Fri, 14 Feb 2020 11:38:12 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581640692;
- bh=kI6wB6nLJa7eJxKlfnD/onqNcUOwyyqXmoPvcV8+QyA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=opTl+bTqpw05z8NXQoXLorjq+yrk0xm4/JsO1z8xsnML4RSIPqUa67bvc0mYQyDGy
- r36o+nIMtFgzTwd7SndgpAtyFyCNin003Fmrs/WyuNoBmxz7m175aI7pz+mmS9+JIw
- mELYo9vP9H9n29stqtQf/8H6A9AoDTeXZ82TmKQI=
-Date: Fri, 14 Feb 2020 11:37:40 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH] target/ppc: Fix typo in comments
-Message-ID: <20200214003740.GJ124369@umbus.fritz.box>
-References: <20200214000143.6D67F747DCF@zero.eik.bme.hu>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j2P9B-000183-Oh
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:47:58 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37955)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j2P9B-00016l-Fw
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:47:57 -0500
+Received: by mail-wm1-x341.google.com with SMTP id a9so8824338wmj.3
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 16:47:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=jrHsrciOVEWIlCjTCOW49db7lwtH9oDQHM2KLgoGjN4=;
+ b=XIWlvMIPT2Y4/0Bzh8W1jvwFF58EPC6OuI9hJws/HNqB+STbsQeJoL72Tlz5ls8Ykv
+ uubMWXep6j6Dn7j739s1k7TXTzflUidT+MZnTcSu3wTcYtHPnF5iCARhJJuGuqeJFLbT
+ ZOVambFmqWsQndbvYPtbuG9QC3gWdSQYOE5ruEpdTKxSlecc2EujHEDr+w2s43KAN4yb
+ W57D1ZyIUeWbiv+1OToTCyXdddjynQWPxqWwXc8Qq/+411b8Wz9Ja6mmEFQVBDNyJCNQ
+ NQaWN4jYZE1niQaLGixJUj39C4fp9+14VkGvUJZA/5o02RWEbFo8/B8sF5N4nDXGRcwb
+ xIlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=jrHsrciOVEWIlCjTCOW49db7lwtH9oDQHM2KLgoGjN4=;
+ b=D3FyDLSsva9PNCkrr9nOIc+JHB+nXcfdNhnaMV1Ux1LvsWeCZjXhZSYPch7dRP07JX
+ De2Rr46N4rzJj9g9ZEaXL5Wc6TJcI1dpuiImD2Nf610bMT+Zw/l08AtyJy6q8W9+XR1Y
+ xce/HLrM/y4bE06sBPck4HZThqFd34hbdJlXoStCt/oCeCdmaGj21zkz2OQO+P+QCKKL
+ CvQONnUR2D89dedQJlH+SZXwPAYL6cjy2IQjjxL/8JRV5F/icWUUgM2S1QouTkWujqF5
+ Cgf5YF8v35exSxTAMll94JtxxFgfmh0qPdluXiPu088qQXhSaQJ76LDaHAdEtBmZfDKP
+ TK4g==
+X-Gm-Message-State: APjAAAVRSX2prE8FfMrB1hkX61TLKEBB47/fKxFRSGPDYm9hBxKYwcYA
+ EjYEYENDksN+d2X94YI7YltdZOuAMMs=
+X-Google-Smtp-Source: APXvYqz+IHrXIY0ADBtLlorugH6n893HdwupKUHny610CoLL6p9VmauhzGpLV4YBD+4CGH+y3xolBA==
+X-Received: by 2002:a1c:dc08:: with SMTP id t8mr798000wmg.139.1581641275930;
+ Thu, 13 Feb 2020 16:47:55 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id y131sm5185415wmc.13.2020.02.13.16.47.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 13 Feb 2020 16:47:55 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org, Sven Schnelle <svens@stackframe.org>,
+ Helge Deller <deller@gmx.de>
+Subject: [PATCH] hw/net/i82596: Correct command bitmask (CID 1419392)
+Date: Fri, 14 Feb 2020 01:47:53 +0100
+Message-Id: <20200214004753.15736-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="qD3brAgIG4LbUq6d"
-Content-Disposition: inline
-In-Reply-To: <20200214000143.6D67F747DCF@zero.eik.bme.hu>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,102 +96,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The command is 32-bit, but we are loading the 16 upper bits with
+the 'get_uint16(s->scb + 2)' call.
 
---qD3brAgIG4LbUq6d
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Once shifted by 16, the command bits match the status bits:
 
-On Fri, Feb 14, 2020 at 12:57:34AM +0100, BALATON Zoltan wrote:
-> "Deferred" was misspelled as "differed" in some comments, correct this
-> typo,
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+- Command
+  Bit 31 ACK-CX   Acknowledges that the CU completed an Action Command.
+  Bit 30 ACK-FR   Acknowledges that the RU received a frame.
+  Bit 29 ACK-CNA  Acknowledges that the Command Unit became not active.
+  Bit 28 ACK-RNR  Acknowledges that the Receive Unit became not ready.
 
-Applied to ppc-for-5.0, thanks.
+- Status
+  Bit 15 CX       The CU finished executing a command with its I(interrupt) bit set.
+  Bit 14 FR       The RU finished receiving a frame.
+  Bit 13 CNA      The Command Unit left the Active state.
+  Bit 12 RNR      The Receive Unit left the Ready state.
 
-> ---
->  target/ppc/fpu_helper.c            | 2 +-
->  target/ppc/translate/fp-impl.inc.c | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
->=20
-> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-> index dc383242f7..5182764df3 100644
-> --- a/target/ppc/fpu_helper.c
-> +++ b/target/ppc/fpu_helper.c
-> @@ -293,7 +293,7 @@ static void float_invalid_op_vxvc(CPUPPCState *env, b=
-ool set_fpcc,
->          env->error_code =3D POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
->          /* Update the floating-point enabled exception summary */
->          env->fpscr |=3D FP_FEX;
-> -        /* Exception is differed */
-> +        /* Exception is deferred */
->      }
->  }
-> =20
-> diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp=
--impl.inc.c
-> index d8e27bf4d5..9f7868ee28 100644
-> --- a/target/ppc/translate/fp-impl.inc.c
-> +++ b/target/ppc/translate/fp-impl.inc.c
-> @@ -781,7 +781,7 @@ static void gen_mtfsb1(DisasContext *ctx)
->          tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
->          tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
->      }
-> -    /* We can raise a differed exception */
-> +    /* We can raise a deferred exception */
->      gen_helper_float_check_status(cpu_env);
->  }
-> =20
-> @@ -817,7 +817,7 @@ static void gen_mtfsf(DisasContext *ctx)
->          tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
->          tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
->      }
-> -    /* We can raise a differed exception */
-> +    /* We can raise a deferred exception */
->      gen_helper_float_check_status(cpu_env);
->      tcg_temp_free_i64(t1);
->  }
-> @@ -850,7 +850,7 @@ static void gen_mtfsfi(DisasContext *ctx)
->          tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
->          tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
->      }
-> -    /* We can raise a differed exception */
-> +    /* We can raise a deferred exception */
->      gen_helper_float_check_status(cpu_env);
->  }
-> =20
+Add the SCB_COMMAND_ACK_MASK definition to simplify the code.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+This fixes Coverity 1419392 (CONSTANT_EXPRESSION_RESULT):
 
---qD3brAgIG4LbUq6d
-Content-Type: application/pgp-signature; name="signature.asc"
+  /hw/net/i82596.c: 352 in examine_scb()
+  346         cuc = (command >> 8) & 0x7;
+  347         ruc = (command >> 4) & 0x7;
+  348         DBG(printf("MAIN COMMAND %04x  cuc %02x ruc %02x\n", command, cuc, ruc));
+  349         /* and clear the scb command word */
+  350         set_uint16(s->scb + 2, 0);
+  351
+  >>>     CID 1419392:    (CONSTANT_EXPRESSION_RESULT)
+  >>>     "command & (2147483648UL /* 1UL << 31 */)" is always 0 regardless of the values of its operands. This occurs as the logical operand of "if".
+  352         if (command & BIT(31))      /* ACK-CX */
+  353             s->scb_status &= ~SCB_STATUS_CX;
+  >>>     CID 1419392:    (CONSTANT_EXPRESSION_RESULT)
+  >>>     "command & (1073741824UL /* 1UL << 30 */)" is always 0 regardless of the values of its operands. This occurs as the logical operand of "if".
+  354         if (command & BIT(30))      /*ACK-FR */
+  355             s->scb_status &= ~SCB_STATUS_FR;
+  >>>     CID 1419392:    (CONSTANT_EXPRESSION_RESULT)
+  >>>     "command & (536870912UL /* 1UL << 29 */)" is always 0 regardless of the values of its operands. This occurs as the logical operand of "if".
+  356         if (command & BIT(29))      /*ACK-CNA */
+  357             s->scb_status &= ~SCB_STATUS_CNA;
+  >>>     CID 1419392:    (CONSTANT_EXPRESSION_RESULT)
+  >>>     "command & (268435456UL /* 1UL << 28 */)" is always 0 regardless of the values of its operands. This occurs as the logical operand of "if".
+  358         if (command & BIT(28))      /*ACK-RNR */
+  359             s->scb_status &= ~SCB_STATUS_RNR;
 
------BEGIN PGP SIGNATURE-----
+Fixes: Covertiy CID 1419392 (commit 376b851909)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/net/i82596.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5F688ACgkQbDjKyiDZ
-s5JMJxAA4VtPVgBmy8q1eJDNj1PWpPv9g0fPrZvK/HzwWnCOqH9No6ZMGy9FrO3l
-ETIRRz2oIFdhbjSKGft6X9HGHyYmDbPBiuLQ6aPEzn9P7sE0vnP4MyPt4povaAQY
-+vzApV135ZZHWx9oYvM7ZkYtFGoshbiPEKaRRqUIuFW/WKyB5U/PI5cFu+7sBys/
-LEDa5wkjqzo4CLZ4rc5042E+40PagKHrINLdZijiIUr7PbDAgSxxQLB/S5nYVyTz
-0AIcXlogMrY7/VdYOqcNq8AT4eqYarwk0y6ySKTq5hbPQ9vv4cuXuJAtStLArjJW
-l3CEu2bbQT/uZTHb3XHJwuc/sXtv4B4Gjbbpy/hUG9r7RQxzWF95ym3NYlMQW4nm
-A8CtKZyi+md/osLNwjYOUmFT8HbWSDZyE1DYyO7uV4r63CJWW4bcwN6sivT4QLWd
-2ZA5y4pbZ8Rs1sWymvlPeE971YN621GzF2R+ot29RZ7bK/e4FMY7KuykSA2VxyFM
-8e4ubz92D2lzSdnSBSnwzZe1+1uLz2Tfmkih3RTAMUcZUrs7PdCvzZSCtghpFLsL
-NfYrdZ2sXIVm61Jk8OSxXELBdaVrDGglTQSkAbzaaD0xE2utfrNLQVSR/7K9SIQ2
-H0EyRYmuiZr9W3KJmJHPjEc+AnxDSq22tDGHgt/P2QAdOJIs1As=
-=Be9X
------END PGP SIGNATURE-----
+diff --git a/hw/net/i82596.c b/hw/net/i82596.c
+index 3a0e1ec4c0..b7c2458a96 100644
+--- a/hw/net/i82596.c
++++ b/hw/net/i82596.c
+@@ -43,6 +43,9 @@
+ #define SCB_STATUS_CNA  0x2000 /* CU left active state */
+ #define SCB_STATUS_RNR  0x1000 /* RU left active state */
+ 
++#define SCB_COMMAND_ACK_MASK \
++        (SCB_STATUS_CX | SCB_STATUS_FR | SCB_STATUS_CNA | SCB_STATUS_RNR)
++
+ #define CU_IDLE         0
+ #define CU_SUSPENDED    1
+ #define CU_ACTIVE       2
+@@ -349,14 +352,7 @@ static void examine_scb(I82596State *s)
+     /* and clear the scb command word */
+     set_uint16(s->scb + 2, 0);
+ 
+-    if (command & BIT(31))      /* ACK-CX */
+-        s->scb_status &= ~SCB_STATUS_CX;
+-    if (command & BIT(30))      /*ACK-FR */
+-        s->scb_status &= ~SCB_STATUS_FR;
+-    if (command & BIT(29))      /*ACK-CNA */
+-        s->scb_status &= ~SCB_STATUS_CNA;
+-    if (command & BIT(28))      /*ACK-RNR */
+-        s->scb_status &= ~SCB_STATUS_RNR;
++    s->scb_status &= ~(command & SCB_COMMAND_ACK_MASK);
+ 
+     switch (cuc) {
+     case 0:     /* no change */
+-- 
+2.21.1
 
---qD3brAgIG4LbUq6d--
 
