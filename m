@@ -2,91 +2,62 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C17C3B196
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A5EC2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:50:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2282A217F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:48:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYF/L3+d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2282A217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 096C8217F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 11:50:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 096C8217F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2ZSM-0002pf-Cc
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 06:48:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55354)
+	id 1j2ZTx-0004OA-5N
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 06:50:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55685)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pmathieu@redhat.com>) id 1j2ZRj-00025l-1p
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:47:47 -0500
+ (envelope-from <groug@kaod.org>) id 1j2ZT0-0003UJ-HS
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmathieu@redhat.com>) id 1j2ZRi-00026L-1h
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:47:46 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52989
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1j2ZSz-0003qp-8t
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:06 -0500
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:39267)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1j2ZRh-00025H-UJ
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:47:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581680865;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fLOxRe0I6SCms20R3U9apOHY9n2qwA1dE4HzvsH5SxM=;
- b=RYF/L3+dDC29LG8FHjpY2eKwKndVFcBX6DHFFt2U9Umom3KI+OcPWWR2nWt1Wus8EWwIyC
- BHEN8hl4CchWj1tn12ocdYsUePq8GJve7YGRUa3dGX3tisU5Uc5tBiEq9AcrQvmaSzImNe
- R2VG+ukvYUZMpihN8wWBldQf22hl2m0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-n54UcT-LMKS8DYTpWmurnw-1; Fri, 14 Feb 2020 06:47:43 -0500
-Received: by mail-wr1-f69.google.com with SMTP id m15so3841579wrs.22
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 03:47:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=DF2Wf7J9ZEvKMseW8iZryRqj56Ob0/0+2kuiAO3pit0=;
- b=fJ/tiuUwoEoPi7kxLtNbhqSb+JN+ILXtjxI0oTZ6yMJa6DwARAHZDqiwDCivbvFP6m
- D6j3VVrJyS2Eg7p2PsQS5Bfq4yGlEY5dBi85K/pafNbUrzlKVJGx+G1S4VkJsUKXftau
- lXAOvr8/IkMhhG88ZoTDmh3Xx9KnAGy06o1wRjwTY6SGu+BO6ZTx+B3UQKVPmdwUHQ+x
- x+ushDH1rBSXmRVvq+rkN6t6IFf6TjUTo+rrJDxU4m4cNLN0YF+0rVoqJPyY5nxDKlpC
- sGSLONCRNg0hMZc+c7aetPkpDXwc5NF3x/EBAVkmvkaVamdGwDtgalx41LbfwzVXR2cL
- rqcw==
-X-Gm-Message-State: APjAAAWQZUl3dWbVLjmo3tS1nn+xEsg/pvju3UX5VkZ5b6iPS5je643A
- lqz5OqMaCYr6bLHjscjQ/y8fbH/zhkvpT7MiBqzCiRzRav3IxhaBkE21TrgTo96UW8gbUCsxgEs
- l6afZpd/8MS+r7DIVikdKNqZiDapufNE=
-X-Received: by 2002:a1c:541b:: with SMTP id i27mr4567883wmb.137.1581680862169; 
- Fri, 14 Feb 2020 03:47:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyk/7qk9RSbTMFPAjrXSUJt3rCp0VnXKfdzycO6drzFLKYvTVlAc2jdruJl8mB+qMKlH454PnR6kguPAKmvzHM=
-X-Received: by 2002:a1c:541b:: with SMTP id i27mr4567869wmb.137.1581680861910; 
- Fri, 14 Feb 2020 03:47:41 -0800 (PST)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j2ZSz-0003gC-3l
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 06:49:05 -0500
+Received: from player687.ha.ovh.net (unknown [10.110.115.67])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 5FA2A84054
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 12:48:55 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player687.ha.ovh.net (Postfix) with ESMTPSA id 8ED19F54B9F3;
+ Fri, 14 Feb 2020 11:48:50 +0000 (UTC)
+Date: Fri, 14 Feb 2020 12:48:47 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 3/3] spapr: Migrate SpaprDrc::unplug_requested
+Message-ID: <20200214124847.25ecfb9e@bahia.lan>
+In-Reply-To: <20200214022900.GK124369@umbus.fritz.box>
+References: <158076936422.2118610.5626450767672103134.stgit@bahia.lan>
+ <158076938222.2118610.14456984179352959929.stgit@bahia.lan>
+ <20200214022900.GK124369@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20200214084607.20471-1-mark.cave-ayland@ilande.co.uk>
- <20200214084607.20471-2-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20200214084607.20471-2-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 14 Feb 2020 12:47:30 +0100
-Message-ID: <CAP+75-X1pbKfG8+17Zif-ZsQNbFk34_AzVWy=U_Hr+Rz7=pgOA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] dp264: use pci_create() to initialise the cmd646
- device
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-X-MC-Unique: n54UcT-LMKS8DYTpWmurnw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/VKIH+Zxl8u0Ts.wpDtmdrZB";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 9882867911085431270
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrjedtgdeffecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgesghdtreerredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheikeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.43.105
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,64 +69,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Mark,
+--Sig_/VKIH+Zxl8u0Ts.wpDtmdrZB
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 14, 2020 at 9:48 AM Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
->
-> Remove the call to pci_cmd646_ide_init() since global device init functio=
-ns
-> are deprecated in preference of using qdev directly.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/alpha/dp264.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-> index a8f9a89cc4..e91989bf9a 100644
-> --- a/hw/alpha/dp264.c
-> +++ b/hw/alpha/dp264.c
-> @@ -16,6 +16,7 @@
->  #include "sysemu/sysemu.h"
->  #include "hw/rtc/mc146818rtc.h"
->  #include "hw/ide.h"
-> +#include "hw/ide/pci.h"
->  #include "hw/timer/i8254.h"
->  #include "hw/isa/superio.h"
->  #include "hw/dma/i8257.h"
-> @@ -100,9 +101,14 @@ static void clipper_init(MachineState *machine)
->      /* IDE disk setup.  */
->      {
->          DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-> +        PCIDevice *pci_dev;
-> +
->          ide_drive_get(hd, ARRAY_SIZE(hd));
->
-> -        pci_cmd646_ide_init(pci_bus, hd, 0);
-> +        pci_dev =3D pci_create(pci_bus, -1, "cmd646-ide");
+On Fri, 14 Feb 2020 13:29:00 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Not this patch problem, but it would be nice to have a TYPE_CMD646_IDE.
+> On Mon, Feb 03, 2020 at 11:36:22PM +0100, Greg Kurz wrote:
+> > Hot unplugging a device is an asynchronous operation. If the guest is
+> > migrated after the event was sent but before it could release the
+> > device with RTAS, the destination QEMU doesn't know about the pending
+> > unplug operation and doesn't actually remove the device when the guest
+> > finally releases it. The device
+> >=20
+> > Migrate SpaprDrc::unplug_requested to fix the inconsistency. This is
+> > done with a subsection that is only sent if an unplug request is
+> > pending. This allows to preserve migration with older guests in the
+> > case of a pending hotplug request. This will cause migration to fail
+> > if the destination can't handle the subsection, but this is better
+> > than ending with an inconsistency.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/ppc/spapr_drc.c |   27 +++++++++++++++++++++++++--
+> >  1 file changed, 25 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > index d512ac6e1e7f..6f5cab70fc6b 100644
+> > --- a/hw/ppc/spapr_drc.c
+> > +++ b/hw/ppc/spapr_drc.c
+> > @@ -455,6 +455,22 @@ void spapr_drc_reset(SpaprDrc *drc)
+> >      }
+> >  }
+> > =20
+> > +static bool spapr_drc_unplug_requested_needed(void *opaque)
+> > +{
+> > +    return spapr_drc_unplug_requested(opaque);
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_spapr_drc_unplug_requested =3D=
+ {
+> > +    .name =3D "spapr_drc/unplug_requested",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .needed =3D spapr_drc_unplug_requested_needed,
+> > +    .fields  =3D (VMStateField []) {
+> > +        VMSTATE_BOOL(unplug_requested, SpaprDrc),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> >  static bool spapr_drc_needed(void *opaque)
+> >  {
+> >      SpaprDrc *drc =3D (SpaprDrc *)opaque;
+> > @@ -467,8 +483,11 @@ static bool spapr_drc_needed(void *opaque)
+> >      /*
+> >       * We need to migrate the state if it's not equal to the expected
+> >       * long-term state, which is the same as the coldplugged initial
+> > -     * state */
+> > -    return !spapr_drc_device_ready(drc);
+> > +     * state, or if an unplug request is pending.
+> > +     */
+> > +    return
+> > +        spapr_drc_unplug_requested_needed(drc) ||
+> > +        !spapr_drc_device_ready(drc);
+>=20
+> Hrm.  You start the series by splitting spapr_drc_device_ready() from
+> spapr_drc_needed().  But at this point, I'm pretty sure you've now got
+> all the callers of spapr_drc_device_ready() doing equivalent logic
+> about them, so they might as well be one function again.  That seems
+> pretty roundabout.
+>=20
 
-> +        qdev_prop_set_uint32(DEVICE(pci_dev), "secondary", 0);
+Yeah... I did the split because an earlier draft of this series had
+a separate path at some point for the plug and unplug cases... but
+I agree these should be reunited.
 
-Secondary_ide disabled is the default in cmd646_ide_properties[], can
-we avoid this call?
-
-> +        qdev_init_nofail(DEVICE(pci_dev));
-> +        pci_ide_create_devs(pci_dev, hd);
->      }
+> I don't think the rationale for not using the drc_ready function from
+> the CAS path really makes sense.  It's not just an accident that those
+> use the same logic - in both cases what we're testing is "Is the DRC
+> in a state other than that of a default cold-plugged device?".
 >
->      /* Load PALcode.  Given that this is not "real" cpu palcode,
-> --
-> 2.20.1
->
->
 
+"Is the DRC in a state other than that of a default cold-plugged device
+or is an unplug request pending ?" since the DRC of the device to be
+unplugged only transitions away from the "ready state" when the guest
+asks to isolate the device with the "set-indicator" RTAS call.
+
+> Changing the name might be sensible, but I still think we want a
+> common function for the two cases.
+>=20
+
+I'll go for that. Maybe reverse the semantics, like if "the DRC has
+no attached device or it has an attached device without pending unplug
+request" then it is in a steady state that doesn't require anything
+special at CAS or migration time, eg. spapr_drc_steady() ?
+
+> >  }
+> > =20
+> >  static const VMStateDescription vmstate_spapr_drc =3D {
+> > @@ -479,6 +498,10 @@ static const VMStateDescription vmstate_spapr_drc =
+=3D {
+> >      .fields  =3D (VMStateField []) {
+> >          VMSTATE_UINT32(state, SpaprDrc),
+> >          VMSTATE_END_OF_LIST()
+> > +    },
+> > +    .subsections =3D (const VMStateDescription * []) {
+> > +        &vmstate_spapr_drc_unplug_requested,
+> > +        NULL
+> >      }
+> >  };
+> > =20
+> >=20
+>=20
+
+
+--Sig_/VKIH+Zxl8u0Ts.wpDtmdrZB
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl5GiSAACgkQcdTV5YIv
+c9YCdRAAhUFXVyRclZj/k7LeN3c8QJMx8hT5El92bE4x2S1rbjGrJ/1VjvvZj0Vb
+TD6L99kD2uy1BYx/aEmhsOnrbLrvcl5/RrURlRtBuR4t8VDEIC9xo4yVeDfsdFwg
+etNGFI2jWalcffTPEdGyIBS7rEF1eN5nwOHfW/y9zZs4x86LcHxW6G2MCGtVGLte
+GtlzFzVeLr79fMhnhBzzCItbCIo9WT/p1fGS+qmZVTZ6tgK9Uu8iEtPpAX8xSQ47
+iQ5Og5S7tkizg57OHWgLG07fK282kmjtGq8Uz6vi6J8CgeeIF44UtlQKiPoW8INB
+UkjAhXZBdn5yIk5p6x3Gd5ZUheBGX1pOa6CwLUyTzA9EO91OfHSeIGwyStJEEYQe
+Cqc93eDAjRmu0jkdKYWNN2fsYegPuxxOWImyohUJK/MtT4l74mwSl0B3ApaqtluV
+3Tx7L4HibUDfi0mknlwqdHk8cot087qOz7l0hSA49E/A7OG/p5tUrp/h5Msa1IfY
+F8FvPciVEQXv22sby3v6MhNK8vjkBQBRhoTWS60hS5CXnmdeW+n1OaT2cK4EChK8
+u9nYaEAbVI7NDvstuWFGWunS/+bY+n8gg7rXR/AbBgwFtdBsP5WxP+QOSKGZ0sU2
+CU6ieIFdBgz0VbiAbDBgtAN5LBLyGAbK4MrBqTOGmwUvDijPA14=
+=xj3w
+-----END PGP SIGNATURE-----
+
+--Sig_/VKIH+Zxl8u0Ts.wpDtmdrZB--
 
