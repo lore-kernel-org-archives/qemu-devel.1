@@ -2,101 +2,82 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76883C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 09:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50F96C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 09:20:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 401992086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 09:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1567E2086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 09:20:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ha2/B/qj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 401992086A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OhkZ1i3r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1567E2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2X7w-0001uq-H3
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 04:19:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47589)
+	id 1j2X9X-000302-9f
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 04:20:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j2X7F-0001Tk-VY
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:18:35 -0500
+ (envelope-from <mprivozn@redhat.com>) id 1j2X8j-0002OI-8e
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:20:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j2X7E-0004RO-Q5
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:18:29 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58314
+ (envelope-from <mprivozn@redhat.com>) id 1j2X8h-0006Zd-SF
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:20:01 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40181
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j2X7E-0004Qh-Ll
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:18:28 -0500
+ (Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1j2X8h-0006Xm-Og
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:19:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581671908;
+ s=mimecast20190719; t=1581671999;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2Y2/tfyDRqBEW3Tsws4NB5cvfHARUzPSMn0vCCM2khk=;
- b=Ha2/B/qjwhXuVqdhkOXdjJWv36tbeZ5de795Hfm39Lgg1LtNaL9f/JW+vehTeaXLGjAOiC
- d3PPUpkSgzrF+xAO8w2bTg269EeejTHunn7/PpiB5unu5o9o3BiXdm0EoDCoNIadNl9AzN
- AmzRIPj4BgXFRSCxq2IBm5dqh+Vad3c=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-K2AWc3QQP_usSrpEJTIGrw-1; Fri, 14 Feb 2020 04:18:13 -0500
-Received: by mail-wr1-f72.google.com with SMTP id d15so3714444wru.1
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 01:18:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pUMaPa89NKFqx5hMSH4VLrUXRFAU5w/4xlPOeovO7AI=;
- b=die80CZHOo06euTIlwgLYeSyNPRCnm9ndffWS4Gh0SlkP+6hJrRxeszwPoQvEm52ra
- EarTHNOZC4Cbuk3mdiO6plvcOH52q22WoefCjkmW9BjLpqsLIgk8Bb9Hj8ZlAQLjK0yz
- ijR7WJUxo3pyKiNpso3CNsId7lVCk2K7oOwqFlFaOynnv7OZQXbtkvzPaAWpZgQPOTiZ
- 6Upk3wWjoDfeLy647B3/0+9s/SD1IyP8TAgUn9gsJW7DNgXG0YqcZG6brSi8jNAIpj6S
- AeQvKFf4/IJS70IQ0AH9D6xN7mH4HBroiWd9ZCQsLau6o4/wM/7h1Eq1WRkV/L7AatEa
- TvXg==
-X-Gm-Message-State: APjAAAX0SSThqqNtkQit3lakqvu0e78lJ5A0bS4ZHzfuTjUeBpn8k+71
- v/fhNmScpBz0ssl214mfUXWMsnHNWBjhhKLKZ/h1AmyM33wcqo+es0c1FX+ECSnpFx0ZL/pZ7A1
- 4rLI6CRiOU8XQkaw=
-X-Received: by 2002:a7b:cbd6:: with SMTP id n22mr3709933wmi.118.1581671891924; 
- Fri, 14 Feb 2020 01:18:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwLh8alPIdn5bSkuhspH0dM6+jxqv7UO8dFMnaEKFD0W6xvoz6Y3/r/TA9n1/TtpfCD5f2Yow==
-X-Received: by 2002:a7b:cbd6:: with SMTP id n22mr3709899wmi.118.1581671891594; 
- Fri, 14 Feb 2020 01:18:11 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4?
- ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
- by smtp.gmail.com with ESMTPSA id l8sm6752182wmj.2.2020.02.14.01.18.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 14 Feb 2020 01:18:11 -0800 (PST)
-Subject: Re: [PATCH v2 04/19] tests/rcutorture: mild documenting refactor of
- update thread
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200213225109.13120-1-alex.bennee@linaro.org>
- <20200213225109.13120-5-alex.bennee@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f2033617-a747-531c-66a6-a33c1b9d6aa8@redhat.com>
-Date: Fri, 14 Feb 2020 10:18:11 +0100
+ bh=p09D6n9FMc0SbP9HF8cyyV9c5Ez9VL0P2XziDQint2I=;
+ b=OhkZ1i3rZ35SPXqufxFgFwnwFCHaPphA2jGPqTQvR1VxYp2jVypCT/9O2z665n0B+T84hB
+ KPrZJPktwxkhkHTCad0D2QUbL/TlUaUUP19I4sE99HlSZkZt/YaAiShZEMgJmTcb7SopVX
+ T0OIUR1gNC9qjjB4kAUy3qHqcVsPoS4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-3dsimZDbOGiCmBbjhu_ezA-1; Fri, 14 Feb 2020 04:19:57 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36556DBA3;
+ Fri, 14 Feb 2020 09:19:56 +0000 (UTC)
+Received: from [10.43.2.30] (unknown [10.43.2.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BB8C35DA85;
+ Fri, 14 Feb 2020 09:19:52 +0000 (UTC)
+Subject: Re: [PATCH] Report stringified errno in VFIO related errors
+From: Michal Privoznik <mprivozn@redhat.com>
+To: qemu-devel@nongnu.org
+References: <2dc5a0962a38b912e4fa4900f9813b7ea1a9273c.1581670009.git.mprivozn@redhat.com>
+Message-ID: <ef161708-2ecc-8d51-7dae-6a860659a8a9@redhat.com>
+Date: Fri, 14 Feb 2020 10:19:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-In-Reply-To: <20200213225109.13120-5-alex.bennee@linaro.org>
+In-Reply-To: <2dc5a0962a38b912e4fa4900f9813b7ea1a9273c.1581670009.git.mprivozn@redhat.com>
 Content-Language: en-US
-X-MC-Unique: K2AWc3QQP_usSrpEJTIGrw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 3dsimZDbOGiCmBbjhu_ezA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,102 +89,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- stefanb@linux.vnet.ibm.com, richard.henderson@linaro.org, f4bug@amsat.org,
- robhenry@microsoft.com, marcandre.lureau@redhat.com,
- aaron@os.amperecomputing.com, cota@braap.org, stefanha@redhat.com,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org, aurelien@aurel32.net
+Cc: qemu-trivial@nongnu.org, alex.williamson@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/02/20 23:50, Alex Benn=C3=A9e wrote:
-> This is mainly to help with reasoning what the test is trying to do.
-> We can move rcu_stress_idx to a local variable as there is only ever
-> one updater thread. I've also added an assert to catch the case where
-> we end up updating the current structure to itself which is the only
-> way I can see the mberror cases we are seeing on Travis.
->=20
-> We shall see if the rcutorture test failures go away now.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+On 2/14/20 9:47 AM, Michal Privoznik wrote:
+> In a few places we report errno formatted as a negative integer.
+> This is not as user friendly as it can be. Use strerror() and/or
+> error_setg_errno() instead.
+> 
+> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+> ---
+>   hw/vfio/common.c    | 2 +-
+>   util/vfio-helpers.c | 6 +++---
+>   2 files changed, 4 insertions(+), 4 deletions(-)
+> 
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Yes, the failures are quire mysterious and I agree that they can only happe=
-n if:
-
-1) p =3D=3D cp in your patch below
-
-2) the memory barrier can be overtaken by the store above it.
-
-Even then, (2) would be unlikely because then the compiler would=20
-coalesce the two stores to p->mbtest.  However we could add a patch such=20
-as this to rule it out:
-
-diff --git a/tests/rcutorture.c b/tests/rcutorture.c
-index 9559f13..969a19a 100644
---- a/tests/rcutorture.c
-+++ b/tests/rcutorture.c
-@@ -260,7 +260,7 @@ static void *rcu_read_stress_test(void *arg)
-     while (goflag =3D=3D GOFLAG_RUN) {
-         rcu_read_lock();
-         p =3D atomic_rcu_read(&rcu_stress_current);
--        if (p->mbtest =3D=3D 0) {
-+        if (atomic_read(&p->mbtest) =3D=3D 0) {
-             n_mberror++;
-         }
-         rcu_read_lock();
-@@ -268,7 +268,7 @@ static void *rcu_read_stress_test(void *arg)
-             garbage++;
-         }
-         rcu_read_unlock();
--        pc =3D p->pipe_count;
-+        pc =3D atomic_read(&p->pipe_count);
-         rcu_read_unlock();
-         if ((pc > RCU_STRESS_PIPE_LEN) || (pc < 0)) {
-             pc =3D RCU_STRESS_PIPE_LEN;
-@@ -319,10 +319,10 @@ static void *rcu_update_stress_test(void *arg)
-         p =3D &rcu_stress_array[rcu_stress_idx];
-         /* catching up with ourselves would be a bug */
-         assert(p !=3D cp);
--        p->mbtest =3D 0;
-+        atomic_set(&p->mbtest, 0);
-         smp_mb();
--        p->pipe_count =3D 0;
--        p->mbtest =3D 1;
-+        atomic_set(&p->pipe_count, 0);
-+        atomic_set(&p->mbtest, 1);
-         atomic_rcu_set(&rcu_stress_current, p);
-         cp =3D p;
-         /*
-@@ -331,7 +331,8 @@ static void *rcu_update_stress_test(void *arg)
-          */
-         for (i =3D 0; i < RCU_STRESS_PIPE_LEN; i++) {
-             if (i !=3D rcu_stress_idx) {
--                rcu_stress_array[i].pipe_count++;
-+                atomic_set(&rcu_stress_array[i].pipe_count,
-+=09=09=09   rcu_stress_array[i].pipe_count + 1);
-             }
-         }
-         synchronize_rcu();
+BTW the reason I've noticed these is because I'm seeing some errors when 
+assigning my NVMe disk to qemu. This is the full command line:
 
 
-Finally, the "pipe_count" naming is a bit mysterious.  The idea behind the =
-test
-is that RCU can only ever see the current or the previous version of a
-struct (in this case, the current or the previous index) and a "pipe_count"
-of 3 means for example that the index is 3 updates behind the current
-index.  To check that the RCU invariant is preserved, the test checks that
-the reader does not observe an index that is 2 updates or more behind the
-current index.
+/home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 \
+-name guest=fedora,debug-threads=on \
+-S \
+-object 
+secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-2-fedora/master-key.aes 
+\
+-machine pc-i440fx-4.1,accel=kvm,usb=off,dump-guest-core=off \
+-cpu host \
+-m size=4194304k,slots=16,maxmem=1099511627776k \
+-overcommit mem-lock=off \
+-smp 4,sockets=1,dies=1,cores=2,threads=2 \
+-object iothread,id=iothread1 \
+-object iothread,id=iothread2 \
+-object iothread,id=iothread3 \
+-object iothread,id=iothread4 \
+-mem-prealloc \
+-mem-path /hugepages2M/libvirt/qemu/2-fedora \
+-numa node,nodeid=0,cpus=0,mem=4096 \
+-uuid 63840878-0deb-4095-97e6-fc444d9bc9fa \
+-no-user-config \
+-nodefaults \
+-chardev socket,id=charmonitor,fd=31,server,nowait \
+-mon chardev=charmonitor,id=monitor,mode=control \
+-rtc base=utc \
+-no-shutdown \
+-global PIIX4_PM.disable_s3=0 \
+-global PIIX4_PM.disable_s4=0 \
+-boot menu=on,strict=on \
+-device piix3-usb-uhci,id=usb,bus=pci.0,addr=0x1.0x2 \
+-device virtio-scsi-pci,id=scsi0,bus=pci.0,addr=0x4 \
+-device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x5 \
+-blockdev 
+'{"driver":"file","filename":"/var/lib/libvirt/images/fedora.qcow2","node-name":"libvirt-2-storage","auto-read-only":true,"discard":"unmap"}' 
+\
+-blockdev 
+'{"node-name":"libvirt-2-format","read-only":false,"discard":"unmap","driver":"qcow2","file":"libvirt-2-storage","backing":null}' 
+\
+-device 
+scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,device_id=drive-scsi0-0-0-0,drive=libvirt-2-format,id=scsi0-0-0-0,bootindex=1 
+\
+-blockdev 
+'{"driver":"nvme","device":"0000:02:00.0","namespace":1,"node-name":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"}' 
+\
+-blockdev 
+'{"node-name":"libvirt-1-format","read-only":false,"driver":"raw","file":"libvirt-1-storage"}' 
+\
+-device 
+virtio-blk-pci,scsi=off,bus=pci.0,addr=0x6,drive=libvirt-1-format,id=virtio-disk0 
+\
+-netdev tap,fd=33,id=hostnet0,vhost=on,vhostfd=34 \
+-device 
+virtio-net-pci,host_mtu=9000,netdev=hostnet0,id=net0,mac=52:54:00:a4:6f:91,bus=pci.0,addr=0x3 
+\
+-chardev pty,id=charserial0 \
+-device isa-serial,chardev=charserial0,id=serial0 \
+-chardev socket,id=charchannel0,fd=35,server,nowait \
+-device 
+virtserialport,bus=virtio-serial0.0,nr=1,chardev=charchannel0,id=channel0,name=org.qemu.guest_agent.0 
+\
+-spice port=5900,addr=0.0.0.0,disable-ticketing,seamless-migration=on \
+-device virtio-vga,id=video0,virgl=on,max_outputs=1,bus=pci.0,addr=0x2 \
+-device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 \
+-sandbox 
+on,obsolete=deny,elevateprivileges=deny,spawn=deny,resourcecontrol=deny \
+-msg timestamp=on
 
-I have never changed it because I took it directly from Paul McKenney's
-rcutorture and I didn't want to deviate too much in order to keep Paul's
-code as a reference.  But perhaps we should rename it to something more
-intuitive like "age" (which is short enough that "pc" could also be
-renamed to "age").
+And these are the errors I see:
 
-Paolo
+2020-02-14T09:06:18.183167Z qemu-system-x86_64: VFIO_MAP_DMA failed: 
+Invalid argument
+2020-02-14T09:10:49.753767Z qemu-system-x86_64: VFIO_MAP_DMA failed: 
+Cannot allocate memory
+2020-02-14T09:11:04.530344Z qemu-system-x86_64: VFIO_MAP_DMA failed: No 
+space left on device
+2020-02-14T09:11:04.531087Z qemu-system-x86_64: VFIO_MAP_DMA failed: No 
+space left on device
+2020-02-14T09:11:04.531230Z qemu-system-x86_64: VFIO_MAP_DMA failed: No 
+space left on device
+
+
+I'm doing nothing with the disk inside the guest, but:
+
+   # dd if=/dev/vda of=/dev/null status=progress
+
+(the disk appears as /dev/vda in the guest). Surprisingly, I do not see 
+these errors when I use the traditional PCI assignment (-device 
+vfio-pci). My versions of kernel and qemu:
+
+moe ~ # uname -r
+5.4.15-gentoo
+moe ~ # /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 
+--version
+QEMU emulator version 4.2.50 (v4.2.0-1439-g5d6542bea7-dirty)
+Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+Do you guys want me to file a bug?
+
+Michal
 
 
