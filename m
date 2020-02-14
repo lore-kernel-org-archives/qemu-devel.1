@@ -2,78 +2,93 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ADA5C35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 20:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B69C35242
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 20:13:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD4E6222C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 20:12:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F696222C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 20:13:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHqfhU2T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD4E6222C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OfS4YDWc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F696222C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2hKP-0006qW-3N
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 15:12:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51929)
+	id 1j2hKe-0007FD-Nk
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 15:13:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52403)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j2hGR-0007Wa-8P
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 15:08:41 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j2hIS-0003xz-Vz
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 15:10:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j2hGQ-0005UY-8A
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 15:08:39 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44191
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j2hGQ-0005U3-48
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 15:08:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581710917;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8Dc4xDxLeU229aolKHiPPEcJW+xIohTddfln6Uvfj9w=;
- b=hHqfhU2Tg9F2SXYFmoYbJ9bf9usZgYkr1vv6pc3P/jJ825ZAAIRKgAiHXkOSLv+arCRjyO
- xR1iEgI+47UijP43h/cWT6n8199ZNViCdNzDQfsBuXLE3JreonQ+yxRHGhRxYO94ldzdxU
- e4mucLGOLbTkGzQkHe73fLu3RcqL+8s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-VU9e4SsjOQOSOfHS-QLFxQ-1; Fri, 14 Feb 2020 15:08:33 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4B03107ACC7;
- Fri, 14 Feb 2020 20:08:32 +0000 (UTC)
-Received: from linux.fritz.box.com (unknown [10.36.118.128])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5A8765C1C3;
- Fri, 14 Feb 2020 20:08:31 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 3/7] commit: Fix argument order for block_job_error_action()
-Date: Fri, 14 Feb 2020 21:08:08 +0100
-Message-Id: <20200214200812.28180-4-kwolf@redhat.com>
-In-Reply-To: <20200214200812.28180-1-kwolf@redhat.com>
-References: <20200214200812.28180-1-kwolf@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1j2hIR-0000gP-Q6
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 15:10:44 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34039)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j2hIQ-0000eG-Sz
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 15:10:43 -0500
+Received: by mail-pf1-x441.google.com with SMTP id i6so5405019pfc.1
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 12:10:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=TkrvTu49HwWJpVtG/5gPH62PDMKR29HZzdS6ge7jRuE=;
+ b=OfS4YDWcIUhGTXPrB76n26aeF+1PDrNHzmWTXDbIkl4nIaDyrRs8omk8XV19JOt8C4
+ ODXIJRQB8RSFLTk7MCoLUQwyUZ7/mpTDcoFwqEbDl3rWUMAIKXucnUs1GaVy7fRIvI8/
+ iY3hkZe3NH9VYhhD+oog4fW3CNjP/qTB1UrZ6ZPF9xF0pgJTF5eOPOY1sVihS6hjDwxP
+ 5rbZzmj7QzK0QlrBCJ08ZcYQYph7S47oDJmAX6NtedBtrPO2c2VUvMnLTcj+Bq7sZn2y
+ uJrPCiVZp6U3uGcd+SsduL6snrZGgLJp/uWEWn888EQiVrX9gluzj4Hl6Q2hN4VokbxV
+ uXbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TkrvTu49HwWJpVtG/5gPH62PDMKR29HZzdS6ge7jRuE=;
+ b=Mz+m/gCd4y2zcJggQirNuPLnYC+0HTvLdU7IeQKcKlFvRjf/lc3AslKZDTgzSIzLPC
+ frPEGO3yI9timQAZT7F2esoFDgQumRD9AwH/PHgVMrQ1c6zW0H6SfCunWCNF8qYm3K22
+ 59sowCJS+vl7a+8xh/ehj8cWJharFzTRsQGC+U9+9jhBhxHJifMERQ1T9xRteVQjyC7M
+ n4Z+P5aLesqc2V14vblScsKPOBtIrK9w5eh5ixt6dqWC1aZXYOVCDhwcBr6IHbvfEniq
+ etGzlNgST8Yf3wtXDZI2ya21KA1ve+hniuJisJ5sGpvKrrL+SLhE0rqL3qnWT1UGRPGR
+ /9xw==
+X-Gm-Message-State: APjAAAXqxMGKHfg+qor1RQwbR16PsCPk5UvlJV5ak9KfhW5hPopBEmrY
+ ulvf5Gdp6XlEpxDv12spgk38HA==
+X-Google-Smtp-Source: APXvYqweF027VZE8/g3sSOAhVDwyz5h4X+O5wApGO2+4dseqle6HY4y4IK4DuV7Gz0YiGOuGQUchQg==
+X-Received: by 2002:aa7:8502:: with SMTP id v2mr4917249pfn.232.1581711041551; 
+ Fri, 14 Feb 2020 12:10:41 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ a19sm7374576pju.11.2020.02.14.12.10.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 14 Feb 2020 12:10:40 -0800 (PST)
+Subject: Re: [PATCH v2 02/21] target/arm: Check aa32_pan in
+ take_aarch32_exception(), not aa64_pan
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200214175116.9164-1-peter.maydell@linaro.org>
+ <20200214175116.9164-3-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <384a16ff-1251-5ef7-bdba-5470a111665a@linaro.org>
+Date: Fri, 14 Feb 2020 12:10:38 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: VU9e4SsjOQOSOfHS-QLFxQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20200214175116.9164-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,40 +100,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, nsoffer@redhat.com, jsnow@redhat.com
+Cc: Eric Auger <eric.auger@redhat.com>,
+ Aaron Lindsay <aaron@os.amperecomputing.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The block_job_error_action() error call in the commit job gives the
-on_err and is_read arguments in the wrong order. Fix this.
+On 2/14/20 9:50 AM, Peter Maydell wrote:
+> In take_aarch32_exception(), we know we are dealing with a CPU that
+> has AArch32, so the right isar_feature test is aa32_pan, not aa64_pan.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-(Of course, hard-coded is_read =3D false is wrong, too, but that's a
-separate problem for a separate patch.)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/commit.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/commit.c b/block/commit.c
-index cce898a4f3..8189f079d2 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -182,7 +182,7 @@ static int coroutine_fn commit_run(Job *job, Error **er=
-rp)
-         }
-         if (ret < 0) {
-             BlockErrorAction action =3D
--                block_job_error_action(&s->common, false, s->on_error, -re=
-t);
-+                block_job_error_action(&s->common, s->on_error, false, -re=
-t);
-             if (action =3D=3D BLOCK_ERROR_ACTION_REPORT) {
-                 goto out;
-             } else {
---=20
-2.20.1
-
+r~
 
