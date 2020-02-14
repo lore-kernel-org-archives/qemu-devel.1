@@ -2,86 +2,88 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB13EC3B1AF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 285F4C3B1AF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C074A20873
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:37:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE345206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:52:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TfUPd8rp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C074A20873
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MpLiOOJ1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE345206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2euN-0007eP-09
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 12:37:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52803)
+	id 1j2f8l-0007Zf-4x
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 12:52:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55787)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2eth-0007Fo-BN
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:37:02 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j2f7b-0005lN-5t
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:51:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2etf-0002YR-Ro
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:37:00 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36114)
+ (envelope-from <peter.maydell@linaro.org>) id 1j2f7Z-0000bg-RG
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:51:23 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53204)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2etf-0002WO-Kg
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:36:59 -0500
-Received: by mail-ot1-x341.google.com with SMTP id j20so9920451otq.3
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 09:36:59 -0800 (PST)
+ id 1j2f7Z-0000aw-KL
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:51:21 -0500
+Received: by mail-wm1-x344.google.com with SMTP id p9so10847919wmc.2
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 09:51:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oDLePT0jVxYsCDb3AIqpXBrfkuIFuI6803FAIljnHkc=;
- b=TfUPd8rp69hRVacKqcLx1gBWUOyVmInOqJezA0tOI7fikSxSfCUSNqkjT7TEgAvm3d
- +92C7OeMtQXL1xxXakhbluct4PC0NrX8f7NgVYg8inegCzP3TFjZ1X2U3Esa5KQcdr8+
- JSR2ofit213J1PYbursGvkyhjoVJs5AEHhD0F4enQrJO7lGwkCSsR3vfb1wTjdB2HN/2
- UTywgAxt6MOXSv/nEZJw14M9uRudClPVKlselhXnL11lf12QDfQTUk7kn5rs2bjzK2Te
- 3FwDdNvte6dimrmsuhU08uieFsTFRX6Wfy/ly36oRKCqMnHNCe5wQsgNTXdbB+56Ze9I
- XjCA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=+amQqSMMNkjYspkyG4VDVSbpi69YyKGpyIpBbA8qu7c=;
+ b=MpLiOOJ1BXICWBv+uoW2t/a4hnWMq0va6NKe2ItQv2WsqsmX3HygsamEdfO68p7LoK
+ seAG6vq9+G2U7G7AEIy5J4AsTkP7L8bWdkOm0nIyyaK4wSo5/DJJLcqFxU/+Gm2RoEAm
+ AEGNMnL2KW9gtd2M6PX35hYSlnDXyM23m5PvVdMW+FEth59kUQ2d1iWu4/yjFytoxWIC
+ bR4KftKyC1z95ZF4Kwm+beHVlR83i2lzdmt7KdgD6WkxGTWv0k4UERYOZGZntQDuTaqX
+ 315w1QVBESHyCvp9O5C1tDKAfmI9M2wKyuFELKUeM0yDJxhzK+wi5rv8WYAPOG2bM0wb
+ BcnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=oDLePT0jVxYsCDb3AIqpXBrfkuIFuI6803FAIljnHkc=;
- b=Fm9BwZR+DotQVH4/PbdyGYfp7H/Xlrl3kJo3PCgu5rHGrh8CaN1nac/hDyZBffbx2a
- isNW/ZoJ3V5q/VL7EXsOfFHNy4qJIXuhaSHdH6bJ7HFEo671BznFH+oksSmKz4g6pow+
- nR6eCmRMJMDeS0NHLiNLP0wuUNJp0Pc/H2a39uAky1twUtOwFsFvVkfLyYETztj0MIlp
- HjB/LneJH9RbECZ+/P1n4MMrFKRHRo98mmj+pyURRcSpSfZEhbBMosDD6Ny+PqBdUm2j
- dZ696TN3ufnicN5mwuMdE7NBTGgHnYF0H0z96nccPLs/bEnqfIW43CrqxyeWe8z4cxEk
- ML4Q==
-X-Gm-Message-State: APjAAAWktZKfPyPeOyLZxalgH9DrgaID4I7qA+Zp8iMQdhjS1YoWt07S
- 9XxIR/DYgeI+V8mZk2bzM5eNRJBr9mNV1Kh4wfRW/Q==
-X-Google-Smtp-Source: APXvYqwA/x8SxkkLtBEfW7c8NdMIeoB1CUOM0jf2JNYh9tdmo4/U4dYL9EFmZYdpr5meCsdcToHBucfvVJ/IxhcMMHM=
-X-Received: by 2002:a05:6830:13da:: with SMTP id
- e26mr3025591otq.97.1581701818668; 
- Fri, 14 Feb 2020 09:36:58 -0800 (PST)
-MIME-Version: 1.0
-References: <20200213175647.17628-1-peter.maydell@linaro.org>
- <20200213175647.17628-2-peter.maydell@linaro.org>
- <87v9o91xvv.fsf@dusky.pond.sub.org>
- <CAFEAcA8ZPrkfzzyxe-im609GQAxEqRz_z3Ar2EFdcFqzyN4p1g@mail.gmail.com>
- <87d0ahxsv1.fsf@dusky.pond.sub.org>
- <CAFEAcA9ZQfeKA7Nb4FSmk8G3JmCFQa4VsMYLQmE2-UBj7YVeuA@mail.gmail.com>
- <87a75lqe8e.fsf@dusky.pond.sub.org>
-In-Reply-To: <87a75lqe8e.fsf@dusky.pond.sub.org>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=+amQqSMMNkjYspkyG4VDVSbpi69YyKGpyIpBbA8qu7c=;
+ b=HQpl5LoTN4WEAJt5VWKLo6ble8FJk1sW2uoHbhzXEjYigv5fwhiSps3CHFJe548UAo
+ L2yKqQsXsc6sJxwrZ0b2dip7epIvNUMw8LiGfMlUgl/CZMFYdi51KDWOgWdBzq4yg9Rq
+ 9xaTIrSPYaw19hbO8nghOxEvLDhXDuBAWikdnneMNdJMuiYdqEriBbtEoMOTzLmfq4Og
+ 2vfq1xcdNSOUY3w0EqL4FVoquHBSi5Qr4VQHeHzQhEFP6VNBxcKB4brOKZ7yVm37S5kr
+ aR/c0647h5Ld6vOCPyG8T0RbmIDFxI89kSHHVM+hslLYDGLH0ekOKBxBsh5y3m3GYlpR
+ CTBg==
+X-Gm-Message-State: APjAAAWWQfFJwkuyj9DT1lZR9PtNLZvlF2qL6HSWx4fWAreYC/013F6W
+ /jfFEGe13m+swfkLTg97Nh18Ew==
+X-Google-Smtp-Source: APXvYqz27YlUkdNbQYP9Fk1xyivQKu8a5RsOzhZcXohgXUjSWIrAUy/fSOWfg846vV1x8E6r81TruQ==
+X-Received: by 2002:a1c:2342:: with SMTP id j63mr6030010wmj.160.1581702680538; 
+ Fri, 14 Feb 2020 09:51:20 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id v8sm8001857wrw.2.2020.02.14.09.51.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Feb 2020 09:51:19 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Feb 2020 17:36:47 +0000
-Message-ID: <CAFEAcA-BXypUoUcYkadJm8O6TbdCjGmprqyGW9KcNZiaR__Xtw@mail.gmail.com>
-Subject: Re: [PATCH v2 01/30] configure: Allow user to specify sphinx-build
- binary
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 01/21] target/arm: Add _aa32_ to isar_feature functions
+ testing 32-bit ID registers
+Date: Fri, 14 Feb 2020 17:50:56 +0000
+Message-Id: <20200214175116.9164-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200214175116.9164-1-peter.maydell@linaro.org>
+References: <20200214175116.9164-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,91 +95,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Eric Auger <eric.auger@redhat.com>,
+ Aaron Lindsay <aaron@os.amperecomputing.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 at 17:18, Markus Armbruster <armbru@redhat.com> wrote:
-> I decided I prefer this as a separate patch, between PATCH 01 and 02.
->
-> Hmm, maybe I should squash the last hunk into PATCH 01.
->
->
-> From 10d174a9f811708807fb60a610e88084f282c222 Mon Sep 17 00:00:00 2001
-> From: Markus Armbruster <armbru@redhat.com>
-> Date: Fri, 14 Feb 2020 07:33:43 +0100
-> Subject: [PATCH] configure: Pick sphinx-build-3 when available
->
-> The next commit will require a sphinx-build that uses Python 3.  On
-> some systems, sphinx-build is fine, on others you need to use
-> sphinx-build-3.  To keep things working out of the box on both kinds
-> of systems, try sphinx-build-3, then sphinx-build.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  configure | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
->
-> diff --git a/configure b/configure
-> index 14172909f0..4cbeb06b86 100755
-> --- a/configure
-> +++ b/configure
-> @@ -584,7 +584,6 @@ query_pkg_config() {
->  }
->  pkg_config=query_pkg_config
->  sdl2_config="${SDL2_CONFIG-${cross_prefix}sdl2-config}"
-> -sphinx_build=sphinx-build
->
->  # If the user hasn't specified ARFLAGS, default to 'rv', just as make does.
->  ARFLAGS="${ARFLAGS-rv}"
-> @@ -903,6 +902,7 @@ fi
->
->  : ${make=${MAKE-make}}
->  : ${install=${INSTALL-install}}
-> +
->  # We prefer python 3.x. A bare 'python' is traditionally
->  # python 2.x, but some distros have it as python 3.x, so
->  # we check that too
+Enforce a convention that an isar_feature function that tests a
+32-bit ID register always has _aa32_ in its name, and one that
+tests a 64-bit ID register always has _aa64_ in its name.
+We already follow this except for three cases: thumb_div,
+arm_div and jazelle, which all need _aa32_ adding.
 
+(As noted in the comment, isar_feature_aa32_fp16_arith()
+is an exception in that it currently tests ID_AA64PFR0_EL1,
+but will switch to MVFR1 once we've properly implemented
+FP16 for AArch32.)
 
-Stray whitespace change.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+v1->v2: fixed up new use of isar_feature_jazelle() in
+        aarch32_cpsr_valid_mask()
+---
+ target/arm/cpu.h       | 13 ++++++++++---
+ target/arm/internals.h |  2 +-
+ linux-user/elfload.c   |  4 ++--
+ target/arm/cpu.c       |  6 ++++--
+ target/arm/helper.c    |  2 +-
+ target/arm/translate.c |  6 +++---
+ 6 files changed, 21 insertions(+), 12 deletions(-)
 
-> @@ -915,6 +915,17 @@ do
->          break
->      fi
->  done
-> +
-> +sphinx_build=
-> +for binary in sphinx-build-3 sphinx-build
-> +do
-> +    if has "$binary"
-> +    then
-> +        sphinx_build=$(command -v "$binary")
-> +        break
-> +    fi
-> +done
-> +
->  : ${smbd=${SMBD-/usr/sbin/smbd}}
->
->  # Default objcc to clang if available, otherwise use CC
-> @@ -4803,7 +4814,7 @@ has_sphinx_build() {
->      # sphinx-build doesn't exist at all or if it is too old.
->      mkdir -p "$TMPDIR1/sphinx"
->      touch "$TMPDIR1/sphinx/index.rst"
-> -    $sphinx_build -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
-> +    "$sphinx_build" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
->  }
->
->  # Check if tools are available to build documentation.
-> --
-> 2.21.1
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e943ffe8a9a..37d40e57901 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3324,20 +3324,27 @@ static inline uint64_t *aa64_vfp_qreg(CPUARMState *env, unsigned regno)
+ /* Shared between translate-sve.c and sve_helper.c.  */
+ extern const uint64_t pred_esz_masks[4];
+ 
++/*
++ * Naming convention for isar_feature functions:
++ * Functions which test 32-bit ID registers should have _aa32_ in
++ * their name. Functions which test 64-bit ID registers should have
++ * _aa64_ in their name.
++ */
++
+ /*
+  * 32-bit feature tests via id registers.
+  */
+-static inline bool isar_feature_thumb_div(const ARMISARegisters *id)
++static inline bool isar_feature_aa32_thumb_div(const ARMISARegisters *id)
+ {
+     return FIELD_EX32(id->id_isar0, ID_ISAR0, DIVIDE) != 0;
+ }
+ 
+-static inline bool isar_feature_arm_div(const ARMISARegisters *id)
++static inline bool isar_feature_aa32_arm_div(const ARMISARegisters *id)
+ {
+     return FIELD_EX32(id->id_isar0, ID_ISAR0, DIVIDE) > 1;
+ }
+ 
+-static inline bool isar_feature_jazelle(const ARMISARegisters *id)
++static inline bool isar_feature_aa32_jazelle(const ARMISARegisters *id)
+ {
+     return FIELD_EX32(id->id_isar1, ID_ISAR1, JAZELLE) != 0;
+ }
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 58c4d707c5d..052449b4826 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -1091,7 +1091,7 @@ static inline uint32_t aarch32_cpsr_valid_mask(uint64_t features,
+     if ((features >> ARM_FEATURE_THUMB2) & 1) {
+         valid |= CPSR_IT;
+     }
+-    if (isar_feature_jazelle(id)) {
++    if (isar_feature_aa32_jazelle(id)) {
+         valid |= CPSR_J;
+     }
+     if (isar_feature_aa32_pan(id)) {
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index f3080a16358..b1a895f24ce 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -475,8 +475,8 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE(ARM_FEATURE_VFP3, ARM_HWCAP_ARM_VFPv3);
+     GET_FEATURE(ARM_FEATURE_V6K, ARM_HWCAP_ARM_TLS);
+     GET_FEATURE(ARM_FEATURE_VFP4, ARM_HWCAP_ARM_VFPv4);
+-    GET_FEATURE_ID(arm_div, ARM_HWCAP_ARM_IDIVA);
+-    GET_FEATURE_ID(thumb_div, ARM_HWCAP_ARM_IDIVT);
++    GET_FEATURE_ID(aa32_arm_div, ARM_HWCAP_ARM_IDIVA);
++    GET_FEATURE_ID(aa32_thumb_div, ARM_HWCAP_ARM_IDIVT);
+     /* All QEMU's VFPv3 CPUs have 32 registers, see VFP_DREG in translate.c.
+      * Note that the ARM_HWCAP_ARM_VFPv3D16 bit is always the inverse of
+      * ARM_HWCAP_ARM_VFPD32 (and so always clear for QEMU); it is unrelated
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index de733aceeb8..56f2ab865da 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1586,7 +1586,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+          * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+          * Security Extensions is ARM_FEATURE_EL3.
+          */
+-        assert(!tcg_enabled() || no_aa32 || cpu_isar_feature(arm_div, cpu));
++        assert(!tcg_enabled() || no_aa32 ||
++               cpu_isar_feature(aa32_arm_div, cpu));
+         set_feature(env, ARM_FEATURE_LPAE);
+         set_feature(env, ARM_FEATURE_V7);
+     }
+@@ -1612,7 +1613,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     if (arm_feature(env, ARM_FEATURE_V6)) {
+         set_feature(env, ARM_FEATURE_V5);
+         if (!arm_feature(env, ARM_FEATURE_M)) {
+-            assert(!tcg_enabled() || no_aa32 || cpu_isar_feature(jazelle, cpu));
++            assert(!tcg_enabled() || no_aa32 ||
++                   cpu_isar_feature(aa32_jazelle, cpu));
+             set_feature(env, ARM_FEATURE_AUXCR);
+         }
+     }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 366dbcf460d..eec3876610c 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -7396,7 +7396,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+     if (arm_feature(env, ARM_FEATURE_LPAE)) {
+         define_arm_cp_regs(cpu, lpae_cp_reginfo);
+     }
+-    if (cpu_isar_feature(jazelle, cpu)) {
++    if (cpu_isar_feature(aa32_jazelle, cpu)) {
+         define_arm_cp_regs(cpu, jazelle_regs);
+     }
+     /* Slightly awkwardly, the OMAP and StrongARM cores need all of
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 20f89ace2fd..93f028f256b 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -42,7 +42,7 @@
+ #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
+ /* currently all emulated v5 cores are also v5TE, so don't bother */
+ #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
+-#define ENABLE_ARCH_5J    dc_isar_feature(jazelle, s)
++#define ENABLE_ARCH_5J    dc_isar_feature(aa32_jazelle, s)
+ #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
+ #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
+ #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
+@@ -9845,8 +9845,8 @@ static bool op_div(DisasContext *s, arg_rrr *a, bool u)
+     TCGv_i32 t1, t2;
+ 
+     if (s->thumb
+-        ? !dc_isar_feature(thumb_div, s)
+-        : !dc_isar_feature(arm_div, s)) {
++        ? !dc_isar_feature(aa32_thumb_div, s)
++        : !dc_isar_feature(aa32_arm_div, s)) {
+         return false;
+     }
+ 
+-- 
+2.20.1
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
--- PMM
 
