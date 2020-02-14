@@ -2,48 +2,85 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DATE_IN_PAST_12_24,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 221FBC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82888C3B19F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 16:03:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF55A2067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 15:58:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF55A2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 518A6222C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 16:03:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GLzHLvr5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 518A6222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2dMK-0006tt-7r
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 10:58:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54580)
+	id 1j2dRY-0001s8-DJ
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 11:03:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j2dLk-0006CX-H8
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:57:53 -0500
+ (envelope-from <armbru@redhat.com>) id 1j2dQj-0001EZ-MD
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 11:03:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j2dLi-0007bY-OC
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 10:57:51 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:17083)
+ (envelope-from <armbru@redhat.com>) id 1j2dQi-0003om-8V
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 11:03:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33887
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j2dLi-0007Zt-1a; Fri, 14 Feb 2020 10:57:50 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 2AA6A7461AE;
- Fri, 14 Feb 2020 16:57:48 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 0896B745953; Fri, 14 Feb 2020 16:57:48 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Fri, 14 Feb 2020 00:57:34 +0100
-Subject: [PATCH v2] target/ppc: Fix typo in comments
-To: qemu-devel@nongnu.org
-Message-Id: <20200214155748.0896B745953@zero.eik.bme.hu>
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j2dQh-0003n2-Sz
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 11:03:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581696178;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YvtuS8Zh+JN1aCzOm9q9gg26Yn2Ez1xrwKZSJNcWKBI=;
+ b=GLzHLvr51gcCLlqTjERt+fcNJeWB/v5YVYaSDbdsL46TpXzynp9UKIjjRQVvHcP4ZjgHSr
+ VePckE7MNgaRsWwwBjeu6jJtEFJ+Tq21LWk9WBY/gm59lX9nRKcgb30T3842cX182NTVC8
+ 7EgVwz7cKIB6jRi7J+WEsMpgTfEw5PA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-8JFP34wfPoWN84ZdYu2xiw-1; Fri, 14 Feb 2020 11:02:54 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 419F0133657D;
+ Fri, 14 Feb 2020 16:02:53 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-234.ams2.redhat.com
+ [10.36.117.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 798655DA7D;
+ Fri, 14 Feb 2020 16:02:50 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0147611385C9; Fri, 14 Feb 2020 17:02:48 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 16/30] qapi: Add blank lines before bulleted lists
+References: <20200213175647.17628-1-peter.maydell@linaro.org>
+ <20200213175647.17628-17-peter.maydell@linaro.org>
+ <878sl5tf01.fsf@dusky.pond.sub.org>
+Date: Fri, 14 Feb 2020 17:02:48 +0100
+In-Reply-To: <878sl5tf01.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Fri, 14 Feb 2020 15:33:50 +0100")
+Message-ID: <87wo8pqhqv.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 8JFP34wfPoWN84ZdYu2xiw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -55,76 +92,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: John Snow <jsnow@redhat.com>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Deferred" was misspelled as "differed" in some comments, correct this
-typo,
+Markus Armbruster <armbru@redhat.com> writes:
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
-v2: Found one more where even the typo was misspelled
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> rST insists on a blank line before and after a bulleted list,
+>> but our texinfo doc generator did not. Add some extra blank
+>> lines in the doc comments so they're acceptable rST input.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-target/ppc/fpu_helper.c            | 4 ++--
- target/ppc/translate/fp-impl.inc.c | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index dc383242f7..ae43b08eb5 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -293,7 +293,7 @@ static void float_invalid_op_vxvc(CPUPPCState *env, bool set_fpcc,
-         env->error_code = POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
-         /* Update the floating-point enabled exception summary */
-         env->fpscr |= FP_FEX;
--        /* Exception is differed */
-+        /* Exception is deferred */
-     }
- }
- 
-@@ -644,7 +644,7 @@ static void do_float_check_status(CPUPPCState *env, uintptr_t raddr)
- 
-     if (cs->exception_index == POWERPC_EXCP_PROGRAM &&
-         (env->error_code & POWERPC_EXCP_FP)) {
--        /* Differred floating-point exception after target FPR update */
-+        /* Deferred floating-point exception after target FPR update */
-         if (fp_exceptions_enabled(env)) {
-             raise_exception_err_ra(env, cs->exception_index,
-                                    env->error_code, raddr);
-diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp-impl.inc.c
-index d8e27bf4d5..9f7868ee28 100644
---- a/target/ppc/translate/fp-impl.inc.c
-+++ b/target/ppc/translate/fp-impl.inc.c
-@@ -781,7 +781,7 @@ static void gen_mtfsb1(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
- }
- 
-@@ -817,7 +817,7 @@ static void gen_mtfsf(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
-     tcg_temp_free_i64(t1);
- }
-@@ -850,7 +850,7 @@ static void gen_mtfsfi(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
- }
- 
--- 
-2.21.1
+Hmm, PATCH 06 appears to do the same, among other things.  Sure you want
+this separate?
 
 
