@@ -2,84 +2,136 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42033C35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 06:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CFB8C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 07:23:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D0512082F
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 06:56:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7F682187F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 07:23:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQrIJMAp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D0512082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="cyA2BAqb";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Gzm0cYm4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7F682187F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2Utu-0005QI-8f
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 01:56:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47372)
+	id 1j2VJW-0003HZ-3v
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 02:23:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j2UtK-00051p-4h
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 01:55:59 -0500
+ (envelope-from <prvs=3066d6cb9=Anup.Patel@wdc.com>)
+ id 1j2VIb-00021S-SB
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 02:22:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j2UtI-0002fB-6d
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 01:55:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45395
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <prvs=3066d6cb9=Anup.Patel@wdc.com>)
+ id 1j2VIa-0003yg-OO
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 02:22:05 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:62226)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j2UtI-0002d6-1o
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 01:55:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581663354;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/mLPGiBPTq+s99qKKdl/AHlfI9wooOHUZwuTwLONqAw=;
- b=NQrIJMAp2SwnBpN3kWD1KotFqHTq6DAJTuBVg9CE2CGSaEx/7/KBuECkUgAjJubBry2JUL
- q7ciKDg0WDj1i888x20EHzNlFTwD5OVf+SaaaFJXvvZeLybpN94dc1GEl3YgRIpAWKO/Mh
- gJgS/NQkv8D5PVN4kR+uTBYkgYPLEL0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-Fv4SI1MpOSeIc8yaAn9FjQ-1; Fri, 14 Feb 2020 01:55:52 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 962188017CC;
- Fri, 14 Feb 2020 06:55:51 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-234.ams2.redhat.com
- [10.36.117.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5018F19E9C;
- Fri, 14 Feb 2020 06:55:48 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CB56511385C9; Fri, 14 Feb 2020 07:55:46 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 18/30] qapi: Delete all the "foo: dropped in n.n" notes
-References: <20200213175647.17628-1-peter.maydell@linaro.org>
- <20200213175647.17628-19-peter.maydell@linaro.org>
-Date: Fri, 14 Feb 2020 07:55:46 +0100
-In-Reply-To: <20200213175647.17628-19-peter.maydell@linaro.org> (Peter
- Maydell's message of "Thu, 13 Feb 2020 17:56:35 +0000")
-Message-ID: <87pneh1wul.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Fv4SI1MpOSeIc8yaAn9FjQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ (Exim 4.71) (envelope-from <prvs=3066d6cb9=Anup.Patel@wdc.com>)
+ id 1j2VIX-0003pP-BF; Fri, 14 Feb 2020 02:22:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1581664921; x=1613200921;
+ h=from:to:cc:subject:date:message-id:mime-version;
+ bh=fJDOSKKX3t+3XtWsGJJUkmVQgtHbTvwg37noiy+q8+8=;
+ b=cyA2BAqbkmC1AJfT9MoHk1t5Byq0n2oU79VlQ0HrxoJPPEYSLGc0Oct4
+ ga+QZzdrQ96TMPcsdUZKRwBgtEfC9ZhjJVJVXugUacvkxiSuaVE8vaUNM
+ VEaalFjYmz6Q4Kt2BV5KIim9ElmZeP6VvduT41q/wdvxRLaMrkkY8sBJd
+ 6euJAJgJY+Pnbq50XUO2EzOcCHZTEppMRwEnxj6EWzo+wz3amSplWdL4X
+ +pH0lTCTNvFxR5kcdihaGr9jePMceiM9fC7xkcL+PRgK2b5O/sBJ17yeN
+ kKVCxxvn6A1StTeDPzfco8VoEYfxL37aG5Sgh/VFdJt6k1vMbr3O2WGL8 Q==;
+IronPort-SDR: +rkOjX2zmJOVJxQrDPT4vs0LciRJ6r5q/JZzYxsEzMXS7Um2YAl6eebWmYuQrafylvQ6eek8VP
+ 2jMUPeaWOxar008jTSCw9GjKSUEXFGHNuit5Lbojrt+eW/JyNaaM807VAt5Rq6LiYxveKti3gY
+ ZQe/mR07cx7N/rbvA5rhJglbteMVtN7kMtY4Z55BoGFeF8mg7ujHCEbE2xAoeKu1lUzn6ZfPEx
+ dgbe6610trCI7IqUU2rgWMlbxq4Ac3lxvV/hHhL3z3dwb5pN2QfKYGHXCV/Gc1iK7nj31K/TgQ
+ abI=
+X-IronPort-AV: E=Sophos;i="5.70,439,1574092800"; d="scan'208";a="129846930"
+Received: from mail-bn8nam12lp2173.outbound.protection.outlook.com (HELO
+ NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.173])
+ by ob1.hgst.iphmx.com with ESMTP; 14 Feb 2020 15:21:56 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kLL13c3fQOPraPmhdC2imoGkY6uiZoauN7cwdIAyHga+1rSoftM3bBSGXeVwg/QSre4OgFATwBurPO1kUw2Z70Rtsv4IBihuICtiAuwZnALNOQ2AYqOp8jfYYaFNNybD1oI+p4MONzdxyOhvHvURWcIFDYRGMB+3WLdn7C4SZRTxN9UgFv/DOx45gQz1cofw/JGZSkWm6C0kkTRbJznmtEsqiK72FIzfQTZkZOPPkQ2XlmdHzUVfsoK02CvDR2trhnhK5Vk8q/FDEeWyqndWxB8/GPxrcFSjhXB3E5A8IUgiNXFOQj6Wps/KK1G8+juz6WiVMYskGsqKhpdFDDmOQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mg8nKM+FzPcTpPz2dLwgs++LiklWblLTrFawyaV84f4=;
+ b=O+C9njb1RwI1NKnnvFMCeZ2sK0zmj6qNVwtl9AWdadEkqMtlMX7k1PvAYITRumImpzc2W7dpKWzI4pWQ5cCOFYNqjtMAGi5B1eb42fLh2LrgvhW0ri7IvGIcpqAkiUy1UcgDtjXy8XZS4QbHcewdclwzarZTS25fUpb9YQRKtCMGfywyTrzAP23WJsZY6s9E9Tdj1iAv6R9X8KevSmRbJXVLFHl68yzW3AevZ1pxW9YMggj1/YH4MdqPhqsq+Xb/9ewcmZ7LzWaUGJtS7kc77jJ6coKF+pUQL42AE9NTA/jTJTmSh0iTrw0EhFZZphfczY6PsEBWsDGxV15NuHXbLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mg8nKM+FzPcTpPz2dLwgs++LiklWblLTrFawyaV84f4=;
+ b=Gzm0cYm48Cuzzk9U6tsuU4ME1gir9KBJe2mnngCnMBBKXCETehXK1lxokFnJc7N9WBNk4DujN4JB99TredAeMacl22QIe0nkQbetqIrY3LMi7D5yPHxxvtgpGXxXm8xrksOXPVYxtrHI24X+1vBdjY2ezXTtqVmqOT1D5IpUga4=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Anup.Patel@wdc.com; 
+Received: from MN2PR04MB6061.namprd04.prod.outlook.com (20.178.246.15) by
+ MN2PR04MB6288.namprd04.prod.outlook.com (52.132.169.214) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.23; Fri, 14 Feb 2020 07:21:55 +0000
+Received: from MN2PR04MB6061.namprd04.prod.outlook.com
+ ([fe80::a9a0:3ffa:371f:ad89]) by MN2PR04MB6061.namprd04.prod.outlook.com
+ ([fe80::a9a0:3ffa:371f:ad89%7]) with mapi id 15.20.2729.025; Fri, 14 Feb 2020
+ 07:21:54 +0000
+From: Anup Patel <anup.patel@wdc.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>
+Subject: [PATCH 0/3] RISC-V Spike machine improvements
+Date: Fri, 14 Feb 2020 12:51:24 +0530
+Message-Id: <20200214072127.64330-1-anup.patel@wdc.com>
+X-Mailer: git-send-email 2.17.1
 Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-ClientProxiedBy: MA1PR0101CA0015.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:21::25) To MN2PR04MB6061.namprd04.prod.outlook.com
+ (2603:10b6:208:d8::15)
+MIME-Version: 1.0
+Received: from wdc.com (106.51.31.230) by
+ MA1PR0101CA0015.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:21::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.23 via Frontend
+ Transport; Fri, 14 Feb 2020 07:21:51 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [106.51.31.230]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 57e352bd-6ac3-4a6a-b9a9-08d7b11e9163
+X-MS-TrafficTypeDiagnostic: MN2PR04MB6288:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MN2PR04MB628879A04382E7452A2E35028D150@MN2PR04MB6288.namprd04.prod.outlook.com>
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Oob-TLC-OOBClassifiers: OLM:393;
+X-Forefront-PRVS: 03137AC81E
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(4636009)(136003)(346002)(376002)(39860400002)(366004)(396003)(199004)(189003)(110136005)(478600001)(54906003)(316002)(52116002)(1076003)(7696005)(66946007)(36756003)(16526019)(8676002)(4326008)(4744005)(81156014)(1006002)(44832011)(55236004)(8886007)(2906002)(956004)(26005)(66556008)(66476007)(8936002)(2616005)(5660300002)(86362001)(186003)(55016002)(81166006)(6666004)(32040200004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR04MB6288;
+ H:MN2PR04MB6061.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fzJTP8m+wYS1MFutYEWpOxXZiadf+3nsbkh88H0oSFCppu3p2Wu5qUWYU4kSCegLYPIi0TpeXIfO2Hmo/oWm5DEo0bxLC5zN79HASuJE7YQo89gUpp8WrlgITgV5l8M6XD6+2jZoQZa6DFXelK8OesCHTbZ5MFjGyFNPaSdGX1IDBoxPMEpkvIiK08F3EPlv11RJi4XJGosTcbPKuski3R9naIFFKVGCfzZY0FPfqJnX+1D9kcMio3w5UFu1EerVoZJQlLcUeB3vGpA0P8sLbhHJNuR3DmSGEOUhBvR9i8CtkRSbv8VPeXhOwexc6f4X5gVhPiYEHSLC3W7/AsTYcSMCTs1UnH1KYuV1x8OW72XM+H2Y79+tq0FinynAJpxV4CKke2PUzmbrP6Rk16p8ahVuw5FGxPZ77/cHgqW5otKHSgc9/PCBlhUpqxk5ixX+k9AI0t43YoB+FEbVu9OxQhscTotNO3/AlnTZqunagjsSPNQFDVeM05ZfSSaaWkWF
+X-MS-Exchange-AntiSpam-MessageData: dBpZTWqYdPyW5y98p0AJ3dUvjG0qZEKNa7JTHLs8boog30hvXy3UN/IgkN3gK77zomLK4gQoaZjdBtzZBqLKZx0aoDIDusyq7EvqUbnXXoYUk7Biwou3GSDjGOqMykqNNYKE4UuQK5TTy9kmHnRRdQ==
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 57e352bd-6ac3-4a6a-b9a9-08d7b11e9163
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2020 07:21:54.6909 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: z2oP1h3EOB7EKhcIkxojviMBAEF5QBDB3r2F9T/vKo2fq2uKOLAE9d3VSTchWZ9h8/F5k0zM0vfs4FxDgIBoYQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6288
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.154.42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,117 +143,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+This series improves QEMU Spike machine to:
+1. Allow loading OpenBI firmware using -bios option
+2. Allow more than one CPUs
 
-> A handful of QAPI doc comments include lines like
-> "ppcemb: dropped in 3.1". The doc comment parser will just
-> put these into whatever the preceding section was; sometimes
-> that's "Notes", and sometimes it's some random other section,
-> as with "NetClientDriver" where the "'dump': dropped in 2.12"
-> line ends up in the "Since:" section.
->
-> This tends to render wrongly, more so in the upcoming rST
-> generator, but sometimes even in the texinfo, as in the case
-> of QKeyCode:
->    ac_bookmarks
->        since 2.10 altgr, altgr_r: dropped in 2.10
->
-> We now have a better place to tell users about deprecated
-> and deleted functionality -- qemu-deprecated.texi.
-> So just remove all these "dropped in" remarks entirely.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> Perhaps qemu-deprecated.texi should be updated -- Markus
-> said he'd look into that. So this patch is to some extent
-> a placeholder to get these broken bits of doc comment out
-> of the way.
+Anup Patel (3):
+  hw/riscv: Add optional symbol callback ptr to riscv_load_firmware()
+  hw/riscv/spike: Allow loading firmware separately using -bios option
+  hw/riscv/spike: Allow more than one CPUs
 
-The appropriate place is appendix "Recently removed features", which
-appeared in commit 3264ffced3 "dirty-bitmaps: remove deprecated autoload
-parameter", v4.2.0.  We did not document any prior removals then.
+ hw/riscv/boot.c         | 13 ++++++++-----
+ hw/riscv/sifive_u.c     |  2 +-
+ hw/riscv/spike.c        | 26 ++++++++++++++++++++++++--
+ hw/riscv/virt.c         |  2 +-
+ include/hw/riscv/boot.h |  6 ++++--
+ 5 files changed, 38 insertions(+), 11 deletions(-)
 
-Perhaps we should systematically document all removals since v4.1.0.  I
-can look into that.
-
-I'm not sure documenting older removals now is worth our while.  If you
-think it is, let me know.
-
-All the 'dropped in' notes removed in this patch are older.  Nothing to
-do for qemu-deprecated.texi unless we choose to systematically document
-older removals.
-
-> ---
->  qapi/machine.json | 2 --
->  qapi/net.json     | 4 ----
->  qapi/ui.json      | 1 -
->  3 files changed, 7 deletions(-)
->
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 704b2b0fe31..6c11e3cf3a4 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -20,8 +20,6 @@
->  #        prefix to produce the corresponding QEMU executable name. This
->  #        is true even for "qemu-system-x86_64".
->  #
-> -# ppcemb: dropped in 3.1
-> -#
->  # Since: 3.0
->  ##
->  { 'enum' : 'SysEmuTarget',
-
-This is SysEmuTarget.  Visible in QMP query-target and query-cpus-fast.
-
-> diff --git a/qapi/net.json b/qapi/net.json
-> index 80dcf0df06e..1cb9a7d782b 100644
-> --- a/qapi/net.json
-> +++ b/qapi/net.json
-> @@ -446,8 +446,6 @@
->  # Available netdev drivers.
->  #
->  # Since: 2.7
-> -#
-> -# 'dump': dropped in 2.12
->  ##
->  { 'enum': 'NetClientDriver',
->    'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
-
-This is enum NetClientDriver.  Visible in QMP netdev_add and -netdev.
-
-> @@ -493,8 +491,6 @@
->  # @opts: device type specific properties (legacy)
->  #
->  # Since: 1.2
-> -#
-> -# 'vlan': dropped in 3.0
->  ##
->  { 'struct': 'NetLegacy',
->    'data': {
-
-This is struct NetLegacy.  Visible in -net, I think.
-
-> diff --git a/qapi/ui.json b/qapi/ui.json
-> index 89126da395b..e16e98a060d 100644
-> --- a/qapi/ui.json
-> +++ b/qapi/ui.json
-> @@ -779,7 +779,6 @@
->  # @ac_forward: since 2.10
->  # @ac_refresh: since 2.10
->  # @ac_bookmarks: since 2.10
-> -# altgr, altgr_r: dropped in 2.10
->  #
->  # @muhenkan: since 2.12
->  # @katakanahiragana: since 2.12
-
-This is enum QKeyCode.  Visible in QMP send-key arguments.
+-- 
+2.17.1
 
 
