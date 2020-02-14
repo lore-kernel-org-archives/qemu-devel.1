@@ -2,133 +2,86 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URG_BIZ,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FFAC3B1A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB13EC3B1AF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:37:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 664952168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:33:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C074A20873
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:37:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPp+p3H7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 664952168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TfUPd8rp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C074A20873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2eqK-00066K-IR
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 12:33:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52125)
+	id 1j2euN-0007eP-09
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 12:37:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52803)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j2epg-0005MU-Bm
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:32:53 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j2eth-0007Fo-BN
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:37:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j2epe-0006vV-Vt
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:32:52 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36754
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j2epe-0006u2-RQ
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:32:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581701569;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Ptag6ikBTJfIXhiXk8lP/tLf86fX9fECsUrfE82awpE=;
- b=WPp+p3H7IqCIGf0B5Hw3asVofK4/059oPHxMLZjPz96vceigIKQXkX7wZLktYYfKFdpx5V
- WWcd+rfE9nxNi5tnpDYnXi75uL/g4wSUq7vzvw1e2QlkBUiMu5zBULtW2ETF0SIzDifoh2
- nXVjiATUtZ3+Hsp9QAtUBBTBazK6EmM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-OZTq1JmFOmiuJ9HDSZg8tw-1; Fri, 14 Feb 2020 12:32:46 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB5AA189F76D;
- Fri, 14 Feb 2020 17:32:44 +0000 (UTC)
-Received: from [10.36.118.137] (unknown [10.36.118.137])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8125360BFB;
- Fri, 14 Feb 2020 17:32:36 +0000 (UTC)
-Subject: Re: [PATCH RFC] memory: Don't allow to resize RAM while migrating
-To: Peter Xu <peterx@redhat.com>
-References: <20200213172016.196609-1-david@redhat.com>
- <20200214102514.GB3283@work-vm>
- <30a66b1d-184e-a684-d0d2-c3921366b478@redhat.com>
- <20200214104230.GC3283@work-vm>
- <cd295e35-72ca-e335-35be-f38bb9026e48@redhat.com>
- <20200214110226.GD3283@work-vm>
- <9a15fd0e-77d1-b3a0-4824-665f85f79c71@redhat.com>
- <bb33b209-2b15-4bbd-7fe9-3aa813e4c194@redhat.com>
- <20200214172933.GC1163818@xz-x1>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <9597c9a9-05d2-d99d-e153-8ffc112910bc@redhat.com>
-Date: Fri, 14 Feb 2020 18:32:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <peter.maydell@linaro.org>) id 1j2etf-0002YR-Ro
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:37:00 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36114)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j2etf-0002WO-Kg
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:36:59 -0500
+Received: by mail-ot1-x341.google.com with SMTP id j20so9920451otq.3
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 09:36:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oDLePT0jVxYsCDb3AIqpXBrfkuIFuI6803FAIljnHkc=;
+ b=TfUPd8rp69hRVacKqcLx1gBWUOyVmInOqJezA0tOI7fikSxSfCUSNqkjT7TEgAvm3d
+ +92C7OeMtQXL1xxXakhbluct4PC0NrX8f7NgVYg8inegCzP3TFjZ1X2U3Esa5KQcdr8+
+ JSR2ofit213J1PYbursGvkyhjoVJs5AEHhD0F4enQrJO7lGwkCSsR3vfb1wTjdB2HN/2
+ UTywgAxt6MOXSv/nEZJw14M9uRudClPVKlselhXnL11lf12QDfQTUk7kn5rs2bjzK2Te
+ 3FwDdNvte6dimrmsuhU08uieFsTFRX6Wfy/ly36oRKCqMnHNCe5wQsgNTXdbB+56Ze9I
+ XjCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oDLePT0jVxYsCDb3AIqpXBrfkuIFuI6803FAIljnHkc=;
+ b=Fm9BwZR+DotQVH4/PbdyGYfp7H/Xlrl3kJo3PCgu5rHGrh8CaN1nac/hDyZBffbx2a
+ isNW/ZoJ3V5q/VL7EXsOfFHNy4qJIXuhaSHdH6bJ7HFEo671BznFH+oksSmKz4g6pow+
+ nR6eCmRMJMDeS0NHLiNLP0wuUNJp0Pc/H2a39uAky1twUtOwFsFvVkfLyYETztj0MIlp
+ HjB/LneJH9RbECZ+/P1n4MMrFKRHRo98mmj+pyURRcSpSfZEhbBMosDD6Ny+PqBdUm2j
+ dZ696TN3ufnicN5mwuMdE7NBTGgHnYF0H0z96nccPLs/bEnqfIW43CrqxyeWe8z4cxEk
+ ML4Q==
+X-Gm-Message-State: APjAAAWktZKfPyPeOyLZxalgH9DrgaID4I7qA+Zp8iMQdhjS1YoWt07S
+ 9XxIR/DYgeI+V8mZk2bzM5eNRJBr9mNV1Kh4wfRW/Q==
+X-Google-Smtp-Source: APXvYqwA/x8SxkkLtBEfW7c8NdMIeoB1CUOM0jf2JNYh9tdmo4/U4dYL9EFmZYdpr5meCsdcToHBucfvVJ/IxhcMMHM=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr3025591otq.97.1581701818668; 
+ Fri, 14 Feb 2020 09:36:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200214172933.GC1163818@xz-x1>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: OZTq1JmFOmiuJ9HDSZg8tw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200213175647.17628-1-peter.maydell@linaro.org>
+ <20200213175647.17628-2-peter.maydell@linaro.org>
+ <87v9o91xvv.fsf@dusky.pond.sub.org>
+ <CAFEAcA8ZPrkfzzyxe-im609GQAxEqRz_z3Ar2EFdcFqzyN4p1g@mail.gmail.com>
+ <87d0ahxsv1.fsf@dusky.pond.sub.org>
+ <CAFEAcA9ZQfeKA7Nb4FSmk8G3JmCFQa4VsMYLQmE2-UBj7YVeuA@mail.gmail.com>
+ <87a75lqe8e.fsf@dusky.pond.sub.org>
+In-Reply-To: <87a75lqe8e.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 14 Feb 2020 17:36:47 +0000
+Message-ID: <CAFEAcA-BXypUoUcYkadJm8O6TbdCjGmprqyGW9KcNZiaR__Xtw@mail.gmail.com>
+Subject: Re: [PATCH v2 01/30] configure: Allow user to specify sphinx-build
+ binary
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -140,151 +93,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Shannon Zhao <shannon.zhao@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: John Snow <jsnow@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14.02.20 18:29, Peter Xu wrote:
-> On Fri, Feb 14, 2020 at 01:02:46PM +0100, David Hildenbrand wrote:
->> From c0049ac2e95d6756037db918852c507fb88297d9 Mon Sep 17 00:00:00 2001
->> From: David Hildenbrand <david@redhat.com>
->> Date: Fri, 14 Feb 2020 13:01:03 +0100
->> Subject: [PATCH v1] tmp
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  migration/migration.c |  9 +++++++--
->>  migration/migration.h |  1 +
->>  migration/ram.c       | 42 ++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 50 insertions(+), 2 deletions(-)
->>
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 3a21a4686c..0e7efe2920 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -175,13 +175,18 @@ void migration_object_init(void)
->>      }
->>  }
->>  
->> +void migration_cancel(void)
->> +{
->> +    migrate_fd_cancel(current_migration);
->> +}
->> +
->>  void migration_shutdown(void)
->>  {
->>      /*
->>       * Cancel the current migration - that will (eventually)
->>       * stop the migration using this structure
->>       */
->> -    migrate_fd_cancel(current_migration);
->> +    migration_cancel();
->>      object_unref(OBJECT(current_migration));
->>  }
->>  
->> @@ -2019,7 +2024,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
->>  
->>  void qmp_migrate_cancel(Error **errp)
->>  {
->> -    migrate_fd_cancel(migrate_get_current());
->> +    migration_cancel();
->>  }
->>  
->>  void qmp_migrate_continue(MigrationStatus state, Error **errp)
->> diff --git a/migration/migration.h b/migration/migration.h
->> index 8473ddfc88..79fd74afa5 100644
->> --- a/migration/migration.h
->> +++ b/migration/migration.h
->> @@ -343,5 +343,6 @@ int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
->>  void migration_make_urgent_request(void);
->>  void migration_consume_urgent_request(void);
->>  bool migration_rate_limit(void);
->> +void migration_cancel(void);
->>  
->>  #endif
->> diff --git a/migration/ram.c b/migration/ram.c
->> index ed23ed1c7c..f86f32b453 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -52,6 +52,7 @@
->>  #include "migration/colo.h"
->>  #include "block.h"
->>  #include "sysemu/sysemu.h"
->> +#include "sysemu/runstate.h"
->>  #include "savevm.h"
->>  #include "qemu/iov.h"
->>  #include "multifd.h"
->> @@ -3710,8 +3711,49 @@ static SaveVMHandlers savevm_ram_handlers = {
->>      .resume_prepare = ram_resume_prepare,
->>  };
->>  
->> +static void ram_mig_ram_block_resized(RAMBlockNotifier *n, void *host,
->> +                                      size_t old_size, size_t new_size)
->> +{
->> +    /*
->> +     * We don't care about resizes triggered on incoming migration (when
->> +     * syncing ram blocks), or of course, when no migration is going on.
->> +     */
->> +    if (migration_is_idle() || !runstate_is_running()) {
->> +        return;
->> +    }
-> 
-> I feel like migration_is_idle() check is enough.  Firstly, I feel like
-> we allow migration even with VM stopped.  At the meantime, if VM is
-> not running, I see no reason that this resizing will happen after all? :)
+On Fri, 14 Feb 2020 at 17:18, Markus Armbruster <armbru@redhat.com> wrote:
+> I decided I prefer this as a separate patch, between PATCH 01 and 02.
+>
+> Hmm, maybe I should squash the last hunk into PATCH 01.
+>
+>
+> From 10d174a9f811708807fb60a610e88084f282c222 Mon Sep 17 00:00:00 2001
+> From: Markus Armbruster <armbru@redhat.com>
+> Date: Fri, 14 Feb 2020 07:33:43 +0100
+> Subject: [PATCH] configure: Pick sphinx-build-3 when available
+>
+> The next commit will require a sphinx-build that uses Python 3.  On
+> some systems, sphinx-build is fine, on others you need to use
+> sphinx-build-3.  To keep things working out of the box on both kinds
+> of systems, try sphinx-build-3, then sphinx-build.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  configure | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 14172909f0..4cbeb06b86 100755
+> --- a/configure
+> +++ b/configure
+> @@ -584,7 +584,6 @@ query_pkg_config() {
+>  }
+>  pkg_config=query_pkg_config
+>  sdl2_config="${SDL2_CONFIG-${cross_prefix}sdl2-config}"
+> -sphinx_build=sphinx-build
+>
+>  # If the user hasn't specified ARFLAGS, default to 'rv', just as make does.
+>  ARFLAGS="${ARFLAGS-rv}"
+> @@ -903,6 +902,7 @@ fi
+>
+>  : ${make=${MAKE-make}}
+>  : ${install=${INSTALL-install}}
+> +
+>  # We prefer python 3.x. A bare 'python' is traditionally
+>  # python 2.x, but some distros have it as python 3.x, so
+>  # we check that too
 
-Migration code resizes ram blocks when synchronizing the ram state. See
-qemu_ram_resize() in ram_load_precopy()
 
-That happens on incoming migration while the vm is stopped.
+Stray whitespace change.
 
-> 
->> +
->> +    if (!postcopy_is_running()) {
->> +        Error *err = NULL;
->> +
->> +        /*
->> +         * Precopy code cannot deal with the size of ram blocks changing at
->> +         * random points in time. We're still running on the source, abort
->> +         * the migration and continue running here. Make sure to wait until
->> +         * migration was canceled.
->> +         */
->> +        error_setg(&err, "RAM resized during precopy.");
->> +        migrate_set_error(migrate_get_current(), err);
->> +        error_free(err);
->> +        migration_cancel();
->> +    } else {
->> +        /*
->> +         * Postcopy code cannot deal with the size of ram blocks changing at
->> +         * random points in time. We're running on the target. Fail hard.
->> +         *
->> +         * TODO: How to handle this in a better way?
->> +         */
->> +        error_report("RAM resized during postcopy.");
->> +        exit(-1);
-> 
-> Now I'm rethinking the postcopy case....
-> 
-> ram_dirty_bitmap_reload() should only happen during the postcopy
-> recovery, and when that happens the VM should be stopped on both
-> sides.  Which means, ram resizing should not trigger there...
+> @@ -915,6 +915,17 @@ do
+>          break
+>      fi
+>  done
+> +
+> +sphinx_build=
+> +for binary in sphinx-build-3 sphinx-build
+> +do
+> +    if has "$binary"
+> +    then
+> +        sphinx_build=$(command -v "$binary")
+> +        break
+> +    fi
+> +done
+> +
+>  : ${smbd=${SMBD-/usr/sbin/smbd}}
+>
+>  # Default objcc to clang if available, otherwise use CC
+> @@ -4803,7 +4814,7 @@ has_sphinx_build() {
+>      # sphinx-build doesn't exist at all or if it is too old.
+>      mkdir -p "$TMPDIR1/sphinx"
+>      touch "$TMPDIR1/sphinx/index.rst"
+> -    $sphinx_build -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
+> +    "$sphinx_build" -c "$source_path/docs" -b html "$TMPDIR1/sphinx" "$TMPDIR1/sphinx/out" >/dev/null 2>&1
+>  }
+>
+>  # Check if tools are available to build documentation.
+> --
+> 2.21.1
 
-But that guest got the chance to run for a bit and eventually reboot
-AFAIK. Also, there are other data races possible when used_length
-suddenly changes, this is just the most obvious one where things will;
-get screwed up.
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
--- 
-Thanks,
-
-David / dhildenb
-
+-- PMM
 
