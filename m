@@ -2,49 +2,88 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 642F5C352A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56418C352A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38F4920848
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:02:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F4920848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 1FBAC20873
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:14:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEd/AmeD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FBAC20873
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2ORN-0001Ec-EO
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 19:02:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37795)
+	id 1j2OcM-0005m6-Ag
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 19:14:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j2OQf-0000GV-GL
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:01:58 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j2ObU-0004Wd-OX
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j2OQd-0001CD-R9
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:01:56 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:51035)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j2OQd-0000o1-Kk; Thu, 13 Feb 2020 19:01:55 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 8B73C747DF7;
- Fri, 14 Feb 2020 01:01:43 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 6D67F747DCF; Fri, 14 Feb 2020 01:01:43 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Fri, 14 Feb 2020 00:57:34 +0100
-Subject: [PATCH] target/ppc: Fix typo in comments
-To: qemu-devel@nongnu.org
-Message-Id: <20200214000143.6D67F747DCF@zero.eik.bme.hu>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j2ObT-0006vw-Pb
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:08 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34632)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j2ObT-0006u3-I8
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:07 -0500
+Received: by mail-wr1-x434.google.com with SMTP id n10so6978580wrm.1
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 16:13:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=fI+qq8NyYxD5I2H7/AMaNoXcPIiuDuJa3jDC2/HwYUk=;
+ b=GEd/AmeDbNlm79G9JsBNlhnDhjC749ozeOrlIeCiUmF7XLKRLH1bMiJPilhDCpg5Pg
+ 2aP93S41qNlMoxPAvNnGN2nHqjLLD2LvWv9zy/Of2rAGv8txjV5DbZKbZFMS/Z4Jzj/n
+ /Dqr4qlTWcJCwNhKSAoYGk8vvYt6wiOfT/DTBc/RtJuSdJu9JW1tV9ucMjTVABu+oDAr
+ sz0lmD1W7lxRDVekZKR3OfhomXH5hWSp+oYxDYPZTB9KQ4WjP9vyCjgHISDL/dgL0Jkq
+ +FRW1NOohCKTXOE29vmBfh+KyMPtyDXfofnq84m9eC1vko/7a4EoZTyvL0KPOLVhBSZD
+ +IAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=fI+qq8NyYxD5I2H7/AMaNoXcPIiuDuJa3jDC2/HwYUk=;
+ b=MpZjaTMWsYy7lERjQVokKps1uJNUnSJcxm5UIHK/G4Tc5HEhjbrD8m/cZUSjLtTFTz
+ lrVqGIdcatlqovhInmEJNwNjVngG9H0LSJ6t4vr2rmmeag+0FPiRW6CS1jRrluxT6eEK
+ O/2O0Spq/lyD7oJHYY3v8cWUD0XdGICxHM8KDN9RrSr2v7J/BKkPNaF5Kp2Kf7rCz+Mp
+ etD2LqWX+M5lZQQJuSL4hpgJP339qhpfDSWw/QMbAqpvxOz+JrZutkXFRiTxE3ww4XDn
+ OzVOSktigiDtwF/WOSwB332Wpc/zCIfFoL5dog+GxonCt56Po1draMrviYg11OlHHds4
+ Bexg==
+X-Gm-Message-State: APjAAAXxKQ0NMQ4jBsqp5Qi/4HGMUMugsYsdmhZrV0R9KrbxqeRXqOj3
+ AxcOrEhLssO4nCWBV8k7WL8=
+X-Google-Smtp-Source: APXvYqxKo6dXEzGr/1jO1h/DUF9M0qOf1KM9QBjZXk5HWByCZDqUyRHxB2Svv5EBZrvcTTZXAa2oLg==
+X-Received: by 2002:adf:f3d0:: with SMTP id g16mr113588wrp.2.1581639185823;
+ Thu, 13 Feb 2020 16:13:05 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id a16sm4679230wrx.87.2020.02.13.16.13.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 13 Feb 2020 16:13:04 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
+ Sven Schnelle <svens@stackframe.org>
+Subject: [PATCH 0/5] hw/display/artist: Fix Coverity 1419388 & 1419389
+Date: Fri, 14 Feb 2020 01:12:57 +0100
+Message-Id: <20200214001303.12873-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2a00:1450:4864:20::434
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,64 +95,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Deferred" was misspelled as "differed" in some comments, correct this
-typo,
+Another easy Coverity fix.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- target/ppc/fpu_helper.c            | 2 +-
- target/ppc/translate/fp-impl.inc.c | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Philippe Mathieu-Daudé (5):
+  hw/display/artist: Move trace event to draw_line()
+  hw/display/artist: Remove pointless initialization
+  hw/display/artist: Delay some variables initialization
+  hw/display/artist: Avoid drawing line when nothing to display
+  hw/display/artist: Remove dead code (CID 1419388 & 1419389)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index dc383242f7..5182764df3 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -293,7 +293,7 @@ static void float_invalid_op_vxvc(CPUPPCState *env, bool set_fpcc,
-         env->error_code = POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
-         /* Update the floating-point enabled exception summary */
-         env->fpscr |= FP_FEX;
--        /* Exception is differed */
-+        /* Exception is deferred */
-     }
- }
- 
-diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp-impl.inc.c
-index d8e27bf4d5..9f7868ee28 100644
---- a/target/ppc/translate/fp-impl.inc.c
-+++ b/target/ppc/translate/fp-impl.inc.c
-@@ -781,7 +781,7 @@ static void gen_mtfsb1(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
- }
- 
-@@ -817,7 +817,7 @@ static void gen_mtfsf(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
-     tcg_temp_free_i64(t1);
- }
-@@ -850,7 +850,7 @@ static void gen_mtfsfi(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
- }
- 
+ hw/display/artist.c | 29 +++++++++--------------------
+ 1 file changed, 9 insertions(+), 20 deletions(-)
+
 -- 
 2.21.1
 
