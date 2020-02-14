@@ -6,63 +6,59 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FCDAC35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 04:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6ADDC35242
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 05:37:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51ADB20848
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 04:03:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3E522067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 05:37:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KnZWNXr5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51ADB20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Xq4sSZ6y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3E522067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2SCp-00081r-Ix
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 23:03:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41913)
+	id 1j2TfK-00049i-T4
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 00:37:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57711)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j2SC8-0007d1-04
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 23:03:13 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j2TeX-0003L7-Ad
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 00:36:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j2SC6-0005Ns-D6
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 23:03:11 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:46187 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1j2TeW-0007MY-0U
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 00:36:37 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:34103 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1j2SC5-0005HU-KQ
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 23:03:10 -0500
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1j2TeV-0007FF-3G
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 00:36:35 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48JfqY0X7tz9sRl; Fri, 14 Feb 2020 15:03:05 +1100 (AEDT)
+ id 48JhvH4G3Qz9sRN; Fri, 14 Feb 2020 16:36:27 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581652985;
- bh=F87JhA3fqSyG/6tWZ0TN0e8mUO2+EusZ/DwM8f2TXbk=;
+ d=gibson.dropbear.id.au; s=201602; t=1581658587;
+ bh=zNdoB9TvN56rRqasUcuUJ/reZPQdWn4eEGEbEQxhf7g=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=KnZWNXr5Px8R/iWYWwdnWpuA44TuXg9dPrPSW0L+UhqNPrLbUrQ2Nos0EYQ23g+tt
- 6UcHMCaQ3FDVmVMbmcJkjQSRQurfxyfHg3S4CMehqLWUJ1jMUr7vjfvC57OM/Aw/7P
- XgDshVj5B7lfPTBfwDHhkz7FGgRsOPIC4v+754CA=
-Date: Fri, 14 Feb 2020 15:02:58 +1100
+ b=Xq4sSZ6yevHWgo7eyJ1ryOK/ibr0X/T3CGbch9K+3d9L0fY9I3uttzAelX1yBn7qU
+ yQgy3rwNZHik1vXlUfyHex04RdUf4MX7H3BSoAy5QLSYs6O+TunsyBEoQZsazSKx1Y
+ YBAni/lQhFydDEh8axlaW+3rPC2aS27BnZYOQ6HE=
+Date: Fri, 14 Feb 2020 16:36:20 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: VW ELF loader
-Message-ID: <20200214040258.GP124369@umbus.fritz.box>
-References: <de7e4d34-eb63-904c-3475-7feee154c72c@ozlabs.ru>
- <8420784f-b4c7-9864-8534-b94dbc5f74ff@redhat.com>
- <d63ba962-ffbb-9f27-34fb-657188e90194@ozlabs.ru>
- <CABgObfYwtrh_uy8zFmg2qDjK6iynniN6=jJ9_MKfNxXUaOkPKw@mail.gmail.com>
- <71d1cc16-f07d-481d-096b-17ee326157bb@ozlabs.ru>
- <CABgObfa4tUVBbpBtoY3JFSF8-0mRVxgGbzQokc+JrJGPagwPaQ@mail.gmail.com>
- <20200205060634.GI60221@umbus.fritz.box>
- <62d62fab-46a4-240b-037b-409ba859b93d@redhat.com>
- <20200210072802.GD22584@umbus.fritz.box>
- <29abb8fe-f094-689f-2e3d-5462692048fd@redhat.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
+Message-ID: <20200214053620.GR124369@umbus.fritz.box>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-4-git-send-email-yi.l.liu@intel.com>
+ <20200131040644.GG15210@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A199306@SHSMSX104.ccr.corp.intel.com>
+ <20200211165843.GG984290@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A1BA4D8@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="THYEXwetZJOK3OLY"
+ protocol="application/pgp-signature"; boundary="teKjxxMjPsACTz/N"
 Content-Disposition: inline
-In-Reply-To: <29abb8fe-f094-689f-2e3d-5462692048fd@redhat.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A1BA4D8@SHSMSX104.ccr.corp.intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
@@ -77,100 +73,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <conny@cornelia-huck.de>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "Wu, Hao" <hao.wu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---THYEXwetZJOK3OLY
-Content-Type: text/plain; charset=us-ascii
+--teKjxxMjPsACTz/N
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 10, 2020 at 12:26:07PM +0100, Paolo Bonzini wrote:
-> On 10/02/20 08:28, David Gibson wrote:
-> > On Thu, Feb 06, 2020 at 09:27:01AM +0100, Paolo Bonzini wrote:
-> >> On 05/02/20 07:06, David Gibson wrote:
-> >>> On Tue, Feb 04, 2020 at 12:26:32AM +0100, Paolo Bonzini wrote:
-> >> I'm really sorry if what I am saying is stupid; but I was thinking of a
-> >> firmware entrypoint like
-> >>
-> >> 	if (op =3D=3D "read" || op =3D=3D "write")
-> >> 		do_driver_stuff(op);
-> >> 	else
-> >> 		hypercall();
+On Wed, Feb 12, 2020 at 07:15:13AM +0000, Liu, Yi L wrote:
+> Hi Peter,
+>=20
+> > From: Peter Xu <peterx@redhat.com>
+> > Sent: Wednesday, February 12, 2020 12:59 AM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
 > >=20
-> > Um... I'm not really clear on where you're imagining this going.  In
-> > the OF model, device operations are done by "opening" a device tree
-> > node then executing methods on it, so you can't really even get to
-> > this point without a bunch of DT stuff.
->=20
-> Could you delegate that part to QEMU, as in the v6 patches?  The
-> firmware would record the path<->ihandle association on open and close,
-> and then you can use that when GRUB does "read" and "write" to invoke
-> the appropriate driver.
->=20
-> >> This is not even close to pseudocode, but hopefully enough to give the
-> >> idea.  Perhaps what I don't understand is why you can't start the
-> >> firmware with r3 pointing to the device tree, and stash it for when you
-> >> leave control to GRUB.
+> > On Fri, Jan 31, 2020 at 11:42:13AM +0000, Liu, Yi L wrote:
+> > > > I'm not very clear on the relationship betwen an IOMMUContext and a
+> > > > DualStageIOMMUObject.  Can there be many IOMMUContexts to a
+> > > > DualStageIOMMUOBject?  The other way around?  Or is it just
+> > > > zero-or-one DualStageIOMMUObjects to an IOMMUContext?
+> > >
+> > > It is possible. As the below patch shows, DualStageIOMMUObject is per=
+ vfio
+> > > container. IOMMUContext can be either per-device or shared across dev=
+ices,
+> > > it depends on vendor specific vIOMMU emulators.
 > >=20
-> > Again, I'm not even really sure what you mean by this.  We already
-> > enter SLOF with r3 pointing to a device tree.  I'm not sure what
-> > stashing it would accomplish.  GRUB as it stands expects an OF style
-> > entry point though, not a flat tree style entry point.
+> > Is there an example when an IOMMUContext can be not per-device?
 >=20
-> Again, sorry if what I'm saying makes little sense.  The terminology is
-> certainly off.  What I mean is:
->=20
-> - read the device tree, instantiate all PCI and virtio drivers
->=20
-> - keep the device tree around for use while GRUB is running
->=20
-> - find and invoke GRUB
->=20
-> - on the OF entry point, wrap open and close + handle the disk and
-> network entry points, and pass everything else to QEMU.
->=20
-> >> The TTY can use the simple
-> >> getchar/putchar hypercalls,
-> >=20
-> > Yes... though if people attach a graphical console they might be
-> > pretty surprised that they don't get anything on there.
->=20
-> They wouldn't with Alexey's code either, would they?  And it would be
-> yet another QEMU backend to hook into, while with firmware it would be
-> lots of code to write but super-boring and something that has been done
-> countless times.
+> No, I don=E2=80=99t have such example so far. But as IOMMUContext is got =
+=66rom
+> pci_device_iommu_context(),  in concept it possible to be not per-device.
+> It is kind of leave to vIOMMU to decide if different devices could share a
+> single IOMMUContext.
 
-That's a fair point.
+On the "pseries" machine the vIOMMU only has one set of translations
+for a whole virtual PCI Host Bridge (vPHB).  So if you attach multiple
+devices to a single vPHB, I believe you'd get multiple devices in an
+IOMMUContext.  Well.. if we did the PASID stuff, which we don't at the
+moment.
 
-> > We can possibly ignore the spapr virtual devices.  They seemed like
-> > they'd be important for people transitioning from guests under
-> > PowerVM, but honestly I'm not sure they've ever been used much.
-> >=20
-> > We do support emulated (or passthrough) PCI devices.  I don't know if
-> > they're common enough that we need boot support for them.  Netboot
-> > from a vfio network adaptor might be something people want.
->=20
-> Can you get that with SLOF?
-
-I think yes, if your passthrough device is one of the small number
-supported by SLOF.
-
-> > USB storage is also a fairly likely candidate, and that would add a
-> > *lot* of extra complexity, since we'd need both the HCD and storage
-> > drivers.
->=20
-> Any reason to make it USB and not a virtio-blk device?  (On x86 these
-> days you only add USB storage disks to a VM in order to get drivers to
-> Windows).
-
-Hm, yeah, maybe.
+Note that on pseries on the other hand it's routine to create multiple
+vPHBs, rather than multiple PCI roots being an oddity as it is on x86.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -178,25 +135,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---THYEXwetZJOK3OLY
+--teKjxxMjPsACTz/N
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5GG/IACgkQbDjKyiDZ
-s5I5exAAw2LLct9BDl3mcD3sIeq6B3oaEsiZN1oJ8zOs4io3zjSuTzy9LsQjdK3O
-cWxmrczmepFdtUfjsNFWQKSUvFyMS1nHYKL/4tpGg0RFCmdFXjGbLqzTYEhao+/Y
-hF8f2ewiDILP9D0tWrWUsGryhG9wkGqjCJXRl1rTMCyKeFF+M/l73f4uNxf5OQa1
-PNMVdRdYKS+YHYocRLaLt13IVsKvok/leZnweJMIxRPFPqhoxyttqS1aSnTaLoFt
-+GqppZTWmJyAbv9M4d2jnI3L4jyH/nLRFJl/iua72EnQmXeOJHebAC8KH4RwJC4h
-bCPM0w0l70MwMPZstk+/GJvuzS6GoAnD2fmLIkJqxGkJxFrGepyg6TvooiigAyrC
-/f3z13mOP8a2xoETnt/SUvzYS3TO1Jfv8zKHqO3+ZiD+j7jzFvNbRs4IATrrz9sK
-GbTrjGj2ubqTf7bxT7P9cvLJTYeppkJ5CrWoMDemTFcrsJ1zx+44+DgWasgl6qBz
-ItfzPnNK7WPVvDjUCZhiN+xoTkvEjLHFYRNdC937cuDEzbz2aqiX+t3cFbszPV/U
-mcM52NOXEPO5wbrs+UNGSexq6d6EoOWctVH+KlwJDaYfR4C9KzupYcjfV4Z/LuI3
-s6xH71Kef4aYp+b8v3natZAhApDGuYsJhOfhtt8/QtZ966HUFAM=
-=MVMt
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5GMdQACgkQbDjKyiDZ
+s5IT8hAAnJ3xZrpCbLQPvNZEpIYEhNe6qkpg2XIs9Wqs17VvHamJfhvLtB7rRaxq
+bwvkgKRWB971L16f3nnY4IH85UZDRcNLHmsNE4eQJ7s+emgnboH6hXpTeJO0i/8M
+7cL2zF6HtG7hNyCxGJgJw3qmz2ejik/jDUdlf4NFi+sOjl3y0TW6urTCXFXVRGSZ
+eXhA1TrQCgdDVsPeXize3n4GZNkbI91lVX1Si6TKtIDmmwanWPZD1vZ1Oq42jlPt
+Yqm7IeWuEf983d0PUC4QTZei/vbbPknNsMSX7fWCRtjgtz5Lf8flHY2Cns6VYoXu
+TvqDIA4xOOG1vcehBFC4cuPAxvyvtw4OqkTyMoQCDQ6z/kN15MmCVzmOEw0Dedhj
+z98Eb74lEycq3ppjp01XmFCyJWr3wAiz5pCRIYz78Hw+YREODi0jirdcJm4KtdOd
+98AjHzTRjqNHVXTcCE8o0XiM7iBPzcZLHma9N3+Re1csdyRzkh+so315eqpGHlM8
+pmPnMfKuipI0Fe9l8P02/rLlDhBz/rKJl94qAb3Gk4fCwC+lZpvziqgFVOrQVZbt
+yv05tqcHoPheIYjlKlR6uxO6Ro2aTExHr2WEGXTUlnljcoudCaDzk3xiFPQ0nQcE
+Xcul1RsnD/5mKDzEllr5LIP4F9cHPAM8jNfecK7nE8s4iAg9Bpo=
+=JD+i
 -----END PGP SIGNATURE-----
 
---THYEXwetZJOK3OLY--
+--teKjxxMjPsACTz/N--
 
