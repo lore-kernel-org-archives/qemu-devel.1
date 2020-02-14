@@ -2,85 +2,74 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F8EC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 14:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3431C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 14:31:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91BE5206B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 14:29:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oIY+lRDW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91BE5206B6
+	by mail.kernel.org (Postfix) with ESMTPS id AACCD206B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 14:31:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AACCD206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2by8-0004G1-Rw
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 09:29:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36453)
+	id 1j2c0R-0005es-Uo
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 09:31:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36893)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j2bxb-0003Q2-4B
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 09:28:52 -0500
+ (envelope-from <bounces@canonical.com>) id 1j2bzW-0004uU-LJ
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 09:30:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j2bxZ-0002Qa-U5
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 09:28:50 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35750)
+ (envelope-from <bounces@canonical.com>) id 1j2bzV-00078y-DU
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 09:30:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47784)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j2bxZ-0002QA-PC
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 09:28:49 -0500
-Received: by mail-ot1-x341.google.com with SMTP id r16so9328282otd.2
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 06:28:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=J6p9Wu9WENzck/0hkiBA/ui9ccImYu6oISjT4qBKij8=;
- b=oIY+lRDWgTSrs+InjpDlFEzZoAoqV8u2QcjBHGChRJIpxbg1SfP3lxHFDEBaqwUW5z
- Fl15LakwEbgogF9xCmzoDBPCZILuw2BBqaukGlcp8hQAVQEBJxfjTiaU0azk4ydtoSNn
- 4/5+/Qb/h4Jq8j82kjgHuEN3Feu6SppvndjgmDUDVrMHu+BlD4sMwLE8TcKvnWAmnTWK
- muxNNlt2gzxBnutcAlYGyQoaAVMvuJdDw3FjlL/KFC2SxFjAIqLuzO2q7ZY/yqjbu9vA
- +xO7nQnQE2RuSUAuRQ03Gt7bCPuNrqxEvhgDrKWJC7jS4vOcYhfeg9bFkzJ4tqPKeStH
- CQ8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=J6p9Wu9WENzck/0hkiBA/ui9ccImYu6oISjT4qBKij8=;
- b=Zg7TeTpPng02+1tYRy6lbk2yTaJ+pL3Ie2jZbVWMBes7k6Zs1tsVfpbaJSyVNIVC8c
- wel0EhPZ/ES2cEzSME3uWuTMCUhHTCZlEqxOXlDcIJaLJ3/Vx3oFKGaqPb0DFuPRIJ4M
- nujBWXzswq4sna+r5XBx33tgqbFc7/lHgqvlUE+PwROzmBPbkfdTuqws0xcZlixK6+f9
- qdaRWxsdXBM/tOULJjdbZIXXlk+5vEmCxhMdmrVUtJZQvyGrO6SIqV6DOypBaeTD+Wl7
- JGmuByPqSnPF/0O77jXELaFX9k3qLys34sp+9JJBD1c94t8E7/HVNnKi4V6MKMrfWa6q
- +V8A==
-X-Gm-Message-State: APjAAAXj1slqSXp0xapgltMVYD3EQ6MevCfmVX/HRrhhxgMgK0wSTrBl
- rI9CczIBxpn1e5st58/m+lfsx0MeUlay/V7U/Gag6A==
-X-Google-Smtp-Source: APXvYqyeeuMOPjlMULp4c6ITKaxp88aEBDoigfAhPXXsuY+KyGKGzavCCg851I8I0TwfVatzPdQfGtYUayMsZKPhsOo=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr2367802otq.221.1581690528538; 
- Fri, 14 Feb 2020 06:28:48 -0800 (PST)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j2bzV-00077U-8I
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 09:30:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j2bzT-0000Se-Fd
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 14:30:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 74E7F2E80C7
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 14:30:47 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200213175647.17628-1-peter.maydell@linaro.org>
- <20200213175647.17628-16-peter.maydell@linaro.org>
- <87wo8ptfh9.fsf@dusky.pond.sub.org>
-In-Reply-To: <87wo8ptfh9.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 14 Feb 2020 14:28:37 +0000
-Message-ID: <CAFEAcA8fGvMk1mdOwrpYiYCiz-1vRUi6KOJkvHyLwoCpPNfLhQ@mail.gmail.com>
-Subject: Re: [PATCH v2 15/30] qapi/{block, misc, tmp, net}.json: Use explicit
- bulleted lists
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 14 Feb 2020 14:23:33 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=alex.bennee@linaro.org; 
+X-Launchpad-Bug-Tags: tcg
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: yifanlu
+X-Launchpad-Bug-Reporter: Yifan (yifanlu)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <158154486735.14935.3370403781300872079.malonedeb@soybean.canonical.com>
+Message-Id: <158169021362.31006.9994958515476028601.launchpad@wampee.canonical.com>
+Subject: [Bug 1863025] Re: Use-after-free after flush in TCG accelerator
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7db19c4a2126ec545c589ae60a6e46c0ec238f90
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,29 +78,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Reply-To: Bug 1863025 <1863025@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 at 14:23, Markus Armbruster <armbru@redhat.com> wrote:
-> What's the rationale for the split between
->
->     [PATCH v2 13/30] qapi/block-core.json: Use explicit bulleted lists
->     [PATCH v2 14/30] qapi/ui.json: Use explicit bulleted lists
->     [PATCH v2 15/30] qapi/{block, misc, tmp, net}.json: Use explicit bulleted lists
->
-> ?
+** Tags added: tcg
 
-Just keeping down the size of individual patches for ease of
-review. ui.json and block-core.json both had enough uses that
-needed fixing to feel like reasonably patch-sized amounts. This
-patch is all the straggler files, none of which had numerous
-enough changes to seem worth splitting further.
+-- =
 
-thanks
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863025
+
+Title:
+  Use-after-free after flush in TCG accelerator
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  I believe I found a UAF in TCG that can lead to a guest VM escape. The
+  security list informed me "This can not be treated as a security
+  issue." and to post it here. I am looking at the 4.2.0 source code.
+  The issue requires a race and I will try to describe it in terms of
+  three concurrent threads.
+
+  Thread A:
+
+  A1. qemu_tcg_cpu_thread_fn runs work loop
+  A2. qemu_wait_io_event =3D> qemu_wait_io_event_common =3D> process_queued=
+_cpu_work
+  A3. start_exclusive critical section entered
+  A4. do_tb_flush is called, TB memory freed/re-allocated
+  A5. end_exclusive exits critical section
+
+  Thread B:
+
+  B1. qemu_tcg_cpu_thread_fn runs work loop
+  B2. tcg_cpu_exec =3D> cpu_exec =3D> tb_find =3D> tb_gen_code
+  B3. tcg_tb_alloc obtains a new TB
+
+  Thread C:
+
+  C1. qemu_tcg_cpu_thread_fn runs work loop
+  C2. cpu_exec_step_atomic executes
+  C3. TB obtained with tb_lookup__cpu_state or tb_gen_code
+  C4. start_exclusive critical section entered
+  C5. cpu_tb_exec executes the TB code
+  C6. end_exclusive exits critical section
+
+  Consider the following sequence of events:
+  =C2=A0=C2=A0B2 =3D> B3 =3D> C3 (same TB as B2) =3D> A3 =3D> A4 (TB freed)=
+ =3D> A5 =3D> B2 =3D>
+  =C2=A0=C2=A0B3 (re-allocates TB from B2) =3D> C4 =3D> C5 (freed/reused TB=
+ now executing) =3D> C6
+
+  In short, because thread C uses the TB in the critical section, there
+  is no guarantee that the pointer has not been "freed" (rather the
+  memory is marked as re-usable) and therefore a use-after-free occurs.
+
+  Since the TCG generated code can be in the same memory as the TB data
+  structure, it is possible for an attacker to overwrite the UAF pointer
+  with code generated from TCG. This can overwrite key pointer values
+  and could lead to code execution on the host outside of the TCG
+  sandbox.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863025/+subscriptions
 
