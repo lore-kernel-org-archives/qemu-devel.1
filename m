@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D6AC352A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BFFC352A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:14:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 150FB20873
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:14:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4DF420873
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 00:14:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gpm8ei4P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 150FB20873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YvTojqqN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4DF420873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2OcP-0005s3-9G
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 19:14:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42551)
+	id 1j2OcQ-0005uq-88
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 19:14:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42568)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2ObV-0004Wi-Oh
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:10 -0500
+ id 1j2ObW-0004Wm-TA
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2ObU-0006wn-Ig
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:09 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50326)
+ id 1j2ObV-0006yP-Qd
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:10 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:39509)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j2ObU-0006vZ-C2
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:08 -0500
-Received: by mail-wm1-x343.google.com with SMTP id a5so8214327wmb.0
- for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 16:13:08 -0800 (PST)
+ id 1j2ObV-0006xO-LA
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 19:13:09 -0500
+Received: by mail-wr1-x432.google.com with SMTP id y11so8911343wrt.6
+ for <qemu-devel@nongnu.org>; Thu, 13 Feb 2020 16:13:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=zf3PhdUFbvcfneYdRj7vR71aYgxGRLP50x8FK7k3NmM=;
- b=Gpm8ei4PXPy4sTI7Lr2b+e5Zdo6EzbMQzEVDq3Cpowhhllw2VPMnBFUYCUZin8eXmk
- cCS1p5eCLkyWNCA3UDG5Z9LTx+Nn49fg+ozUTOUKcx+dvlMziBBMF3nDwVHAMvt1jDYU
- zgoJ7oovMT9rNVmT07WId0eX8wdTQba6/Dqvt5/ejx0IPQ8Uk+AyKTCM6dEsO4S9XKW9
- zzYEwE2CDC5eEbLyV1KznuHfJbOikZxNhpTtzH5qvj2miZFwX4HJ9dpkVinRIfVCPw4m
- lyMY2atncTdwt5f79E1XUnJIPP5cvxEYcXVrZSHJOCpg13KqSBT/eBCczugaUZd+k7ge
- jPjA==
+ bh=BURr7oChrNXkwDXgH5BYlsw5Omt/vezePcTIQ4aD6qU=;
+ b=YvTojqqNlH6r1jEo+Lmf9lgk5mUKXhz0GgfAyXMu+38Ji33j+u4OJ5lCR62AGCP9Ws
+ MrbbeF4ugdqjDRkOlJ7Vb9lhGJFdTqbRUUHWXbSJ4+0kQH3/43tjniJZIu6u85LqmyOK
+ oLXjWwgLYrRDYUyJz1ZLH7Stt/B57sbWqFZFfYAswEof31V9mWZMT4G69mvl3FO6uwtD
+ jO3cwYLTFMv8uxb5787x0l1bUxpTvXZ5ZsVBp24jFhsgp62CWoHyybizlLvcJ32Iy1iI
+ xEurRRYeZfKgAYGhQlAovirQ6NY+f7teI/S9/fID9UQGJKgEUGFBo9qP7EVFJKnUuswv
+ SrZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=zf3PhdUFbvcfneYdRj7vR71aYgxGRLP50x8FK7k3NmM=;
- b=GQWoAoABSZo9lVyTZ99grEQ7MxghM/Xs+0mdI43oH2+KYR5z1LOXD81ySKuIHbSxaW
- BHESv8d0Y6XWDjFIzzpelwxmI4B4IRRXoE93gJwLk2XMompcS0c5tsoSfqGpkEM9omGL
- /0FxkW2hy7ETZSRHRe81H5kPsThmWvC6dDeMjVWKfqtuTk2r+BZUIP7DKqiXijz+uNYn
- Pqnzn5X/ztM7c/HPAikbejSZtPJsVHtsTZdkh6VOdhyrzy798VNw1P7OOTGV64k+xy0j
- bJMRPVFVP4vTZGvrHcHHYdF/cWo+GMPRu/S+VjuZwTuI5NYVO7ZdzkU2O75EgyDjECrB
- 5anA==
-X-Gm-Message-State: APjAAAW2j/CWrybrejUfxKCfRFPIrRBlYBu6MzgVO8GsuDYzFI5suBsZ
- bArDswtKXgTZUdoSC985ERc=
-X-Google-Smtp-Source: APXvYqxTsS3EfD97FXZK79cm0JlFMR7dwrBk8jPthBh5PyLMpnB9jaMeL4tlWg3Q+b8Sj7F3TiIOqw==
-X-Received: by 2002:a7b:c93a:: with SMTP id h26mr667551wml.83.1581639187339;
- Thu, 13 Feb 2020 16:13:07 -0800 (PST)
+ bh=BURr7oChrNXkwDXgH5BYlsw5Omt/vezePcTIQ4aD6qU=;
+ b=cpHf5RQhHtzHpUngyDD5yK7ddUMca4SvqRSo1f1GdU1Fa78F4DDSBuLv1qX0TqrGZn
+ sA84Xp/Www/N6b82jlCh+3ELra5QCwDfb7Wd3/UeGzs/OMd7Pf0SiusDPli76c0m7/B7
+ QrDJ5szoprCoOpYdSJUvP1Cz+x5oKijM0OP2zxUQ3c1No+WnL+ASpeZy/lZnE8BIg6nc
+ faVIjPN8wUeQqjAmfMg1ft3+O1zNhmvYMx77jEZlygVg4h8yJivH8tr1HynvSrU13bo3
+ vC8YeNdh2WEPwPr7d0BqNHPx7UIe/SRrLCh9dL/2inIAT1/C8cQkGWuo7gIMZ10026Fz
+ fbMw==
+X-Gm-Message-State: APjAAAW8J4mhVmapqFttIcxxv+FAjxVKaowjnOoi6Rl/d1BofbOevTVj
+ sHA7fVlcnbK1st7LfISyx/A=
+X-Google-Smtp-Source: APXvYqwfLHQ8DuKrtSlctxFPyN4v5UR/b1UmD5QasLCJkSquNgJhtjxtcV+7fFud89h0zoWgJrFSgQ==
+X-Received: by 2002:a5d:61c2:: with SMTP id q2mr14492wrv.425.1581639188745;
+ Thu, 13 Feb 2020 16:13:08 -0800 (PST)
 Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id a16sm4679230wrx.87.2020.02.13.16.13.06
+ by smtp.gmail.com with ESMTPSA id a16sm4679230wrx.87.2020.02.13.16.13.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 13 Feb 2020 16:13:06 -0800 (PST)
+ Thu, 13 Feb 2020 16:13:08 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
  Sven Schnelle <svens@stackframe.org>
-Subject: [PATCH 1/5] hw/display/artist: Move trace event to draw_line()
-Date: Fri, 14 Feb 2020 01:12:58 +0100
-Message-Id: <20200214001303.12873-2-f4bug@amsat.org>
+Subject: [PATCH 2/5] hw/display/artist: Remove pointless initialization
+Date: Fri, 14 Feb 2020 01:12:59 +0100
+Message-Id: <20200214001303.12873-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200214001303.12873-1-f4bug@amsat.org>
 References: <20200214001303.12873-1-f4bug@amsat.org>
@@ -86,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,19 +104,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of emitting the trace event before each call to
-draw_line(), call it once at draw_line() entrance.
+We are initializating incy inconditionally:
+
+    if (y1 <= y2) {
+        incy = 1;
+    } else {
+        incy = -1;
+    }
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/display/artist.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ hw/display/artist.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/hw/display/artist.c b/hw/display/artist.c
-index 65be9e3554..abacb0e27d 100644
+index abacb0e27d..47f0e9f0bc 100644
 --- a/hw/display/artist.c
 +++ b/hw/display/artist.c
-@@ -557,90 +557,91 @@ static void fill_window(ARTISTState *s, int startx, int starty,
+@@ -557,91 +557,90 @@ static void fill_window(ARTISTState *s, int startx, int starty,
  static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
                        bool update_start, int skip_pix, int max_pix)
  {
@@ -126,7 +131,7 @@ index 65be9e3554..abacb0e27d 100644
      bool c1;
      uint8_t *p;
  
-+    trace_artist_draw_line(x1, y1, x2, y2);
+     trace_artist_draw_line(x1, y1, x2, y2);
  
      if (update_start) {
          s->vram_start = (x2 << 16) | y2;
@@ -135,7 +140,7 @@ index 65be9e3554..abacb0e27d 100644
      buf = &s->vram_buffer[ARTIST_BUFFER_AP];
  
      c1 = false;
-     incy = 1;
+-    incy = 1;
  
      if (x2 > x1) {
          dx = x2 - x1;
@@ -208,121 +213,6 @@ index 65be9e3554..abacb0e27d 100644
          x++;
      } while (x <= x2 && (max_pix == -1 || --max_pix > 0));
  }
-@@ -648,13 +649,12 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
- static void draw_line_pattern_start(ARTISTState *s)
- {
- 
-     int startx = artist_get_x(s->vram_start);
-     int starty = artist_get_y(s->vram_start);
-     int endx = artist_get_x(s->blockmove_size);
-     int endy = artist_get_y(s->blockmove_size);
-     int pstart = s->line_pattern_start >> 16;
- 
--    trace_artist_draw_line(startx, starty, endx, endy);
-     draw_line(s, startx, starty, endx, endy, false, -1, pstart);
-     s->line_pattern_skip = pstart;
- }
-@@ -662,15 +662,14 @@ static void draw_line_pattern_start(ARTISTState *s)
- static void draw_line_pattern_next(ARTISTState *s)
- {
- 
-     int startx = artist_get_x(s->vram_start);
-     int starty = artist_get_y(s->vram_start);
-     int endx = artist_get_x(s->blockmove_size);
-     int endy = artist_get_y(s->blockmove_size);
-     int line_xy = s->line_xy >> 16;
- 
--    trace_artist_draw_line(startx, starty, endx, endy);
-     draw_line(s, startx, starty, endx, endy, false, s->line_pattern_skip,
-               s->line_pattern_skip + line_xy);
-     s->line_pattern_skip += line_xy;
-     s->image_bitmap_op ^= 2;
- }
-@@ -678,84 +677,81 @@ static void draw_line_pattern_next(ARTISTState *s)
- static void draw_line_size(ARTISTState *s, bool update_start)
- {
- 
-     int startx = artist_get_x(s->vram_start);
-     int starty = artist_get_y(s->vram_start);
-     int endx = artist_get_x(s->line_size);
-     int endy = artist_get_y(s->line_size);
- 
--    trace_artist_draw_line(startx, starty, endx, endy);
-     draw_line(s, startx, starty, endx, endy, update_start, -1, -1);
- }
- 
- static void draw_line_xy(ARTISTState *s, bool update_start)
- {
- 
-     int startx = artist_get_x(s->vram_start);
-     int starty = artist_get_y(s->vram_start);
-     int sizex = artist_get_x(s->blockmove_size);
-     int sizey = artist_get_y(s->blockmove_size);
-     int linexy = s->line_xy >> 16;
-     int endx, endy;
- 
-     endx = startx;
-     endy = starty;
- 
-     if (sizex > 0) {
-         endx = startx + linexy;
-     }
- 
-     if (sizex < 0) {
-         endx = startx;
-         startx -= linexy;
-     }
- 
-     if (sizey > 0) {
-         endy = starty + linexy;
-     }
- 
-     if (sizey < 0) {
-         endy = starty;
-         starty -= linexy;
-     }
- 
-     if (startx < 0) {
-         startx = 0;
-     }
- 
-     if (endx < 0) {
-         endx = 0;
-     }
- 
-     if (starty < 0) {
-         starty = 0;
-     }
- 
-     if (endy < 0) {
-         endy = 0;
-     }
- 
- 
-     if (endx < 0) {
-         return;
-     }
- 
-     if (endy < 0) {
-         return;
-     }
- 
--    trace_artist_draw_line(startx, starty, endx, endy);
-     draw_line(s, startx, starty, endx, endy, false, -1, -1);
- }
- 
- static void draw_line_end(ARTISTState *s, bool update_start)
- {
- 
-     int startx = artist_get_x(s->vram_start);
-     int starty = artist_get_y(s->vram_start);
-     int endx = artist_get_x(s->line_end);
-     int endy = artist_get_y(s->line_end);
- 
--    trace_artist_draw_line(startx, starty, endx, endy);
-     draw_line(s, startx, starty, endx, endy, update_start, -1, -1);
- }
- 
 -- 
 2.21.1
 
