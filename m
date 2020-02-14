@@ -2,66 +2,82 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2D2C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 09:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0221C2BA83
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 09:53:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2ED32187F
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 09:52:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2ED32187F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 98AC52187F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 09:53:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CrfXNirm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AC52187F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2Xds-0004il-43
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 04:52:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55378)
+	id 1j2XfK-0006ah-Su
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 04:53:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengzhimin1@huawei.com>) id 1j2XdI-0004HX-6s
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:51:37 -0500
+ (envelope-from <mprivozn@redhat.com>) id 1j2Xef-0005pE-5p
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:53:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fengzhimin1@huawei.com>) id 1j2XdG-0000BC-R2
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:51:36 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:50306 helo=huawei.com)
+ (envelope-from <mprivozn@redhat.com>) id 1j2Xed-0002S7-UQ
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:53:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54224
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fengzhimin1@huawei.com>)
- id 1j2XdG-0008R4-G3
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:51:34 -0500
-Received: from dggemi402-hub.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id AFE6890642BC204002E2;
- Fri, 14 Feb 2020 17:51:25 +0800 (CST)
-Received: from DGGEMI529-MBX.china.huawei.com ([169.254.6.74]) by
- dggemi402-hub.china.huawei.com ([10.3.17.135]) with mapi id 14.03.0439.000;
- Fri, 14 Feb 2020 17:51:18 +0800
-From: fengzhimin <fengzhimin1@huawei.com>
-To: "quintela@redhat.com" <quintela@redhat.com>
-Subject: RE: [PATCH RFC 03/14] migration/rdma: Create multiFd migration threads
-Thread-Topic: [PATCH RFC 03/14] migration/rdma: Create multiFd migration
- threads
-Thread-Index: AQHV4lYhD0inBWY4SEq6cynXWh9LoqgaX9IA
-Date: Fri, 14 Feb 2020 09:51:18 +0000
-Message-ID: <03C2A65461456D4EBE9E6D4D0D96C583FD2DF8@DGGEMI529-MBX.china.huawei.com>
-References: <20200213093755.370-1-fengzhimin1@huawei.com>
- <20200213093755.370-4-fengzhimin1@huawei.com> <878sl694o4.fsf@secure.laptop>
-In-Reply-To: <878sl694o4.fsf@secure.laptop>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.220.198]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1j2Xed-0002Qd-Pl
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 04:52:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581673979;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LtYh2eubS/WqhSyA6bT0OfoBAOKouSgEVvVK7WxmNwY=;
+ b=CrfXNirmt41g2w9u9VU2FCPj2/G/dUnxfoVy+PEswqMedtBnbHsvLb+ANfQp4IePtHhjeL
+ M4ittc8W8N+uCQ3zDIXAuDiUKW0WhFF1LnHO7SrxrpLkU/QftRQmKAW6F6Lhy6vz2aFW6D
+ ioCM1vF+8YeZ66CgWig6GkpxRjd4x+o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-SEhiHXEtM6SlLs6KLGajBg-1; Fri, 14 Feb 2020 04:52:57 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A460D8010E3;
+ Fri, 14 Feb 2020 09:52:56 +0000 (UTC)
+Received: from [10.43.2.30] (unknown [10.43.2.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 27AFA5C1C3;
+ Fri, 14 Feb 2020 09:52:52 +0000 (UTC)
+Subject: Re: [PATCH] Report stringified errno in VFIO related errors
+To: Cornelia Huck <cohuck@redhat.com>
+References: <2dc5a0962a38b912e4fa4900f9813b7ea1a9273c.1581670009.git.mprivozn@redhat.com>
+ <20200214104740.07f59c72.cohuck@redhat.com>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <a1f18897-264b-1ccd-f64a-bab40c9e1653@redhat.com>
+Date: Fri, 14 Feb 2020 10:52:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <20200214104740.07f59c72.cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: SEhiHXEtM6SlLs6KLGajBg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.255
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,206 +89,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "jemmy858585@gmail.com" <jemmy858585@gmail.com>
+Cc: qemu-trivial@nongnu.org, alex.williamson@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for your review. I will fix these errors in the next version(V3).
+On 2/14/20 10:47 AM, Cornelia Huck wrote:
+> On Fri, 14 Feb 2020 09:47:39 +0100
+> Michal Privoznik <mprivozn@redhat.com> wrote:
+> 
+>> In a few places we report errno formatted as a negative integer.
+>> This is not as user friendly as it can be. Use strerror() and/or
+>> error_setg_errno() instead.
+>>
+>> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+>> ---
+>>   hw/vfio/common.c    | 2 +-
+>>   util/vfio-helpers.c | 6 +++---
+>>   2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 5ca11488d6..a3a2a82d99 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -352,7 +352,7 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
+>>           return 0;
+>>       }
+>>   
+>> -    error_report("VFIO_MAP_DMA: %d", -errno);
+>> +    error_report("VFIO_MAP_DMA failed: %s", strerror(errno));
+>>       return -errno;
+>>   }
+> 
+> I think you missed the one in vfio_dma_unmap().
+> 
 
-Due to migration data transfer using RDMA WRITE operation, we don't need to=
- receive data in the destination.
-We only need to poll the CQE in the destination, so multifd_recv_thread() c=
-an't be used directly.
+Indeed, will send v2.
 
------Original Message-----
-From: Juan Quintela [mailto:quintela@redhat.com]=20
-Sent: Thursday, February 13, 2020 6:13 PM
-To: fengzhimin <fengzhimin1@huawei.com>
-Cc: dgilbert@redhat.com; armbru@redhat.com; eblake@redhat.com; qemu-devel@n=
-ongnu.org; Zhanghailiang <zhang.zhanghailiang@huawei.com>; jemmy858585@gmai=
-l.com
-Subject: Re: [PATCH RFC 03/14] migration/rdma: Create multiFd migration thr=
-eads
-
-Zhimin Feng <fengzhimin1@huawei.com> wrote:
-> Creation of the multifd send threads for RDMA migration, nothing=20
-> inside yet.
->
-> Signed-off-by: Zhimin Feng <fengzhimin1@huawei.com>
-> ---
->  migration/multifd.c   | 33 +++++++++++++---
->  migration/multifd.h   |  2 +
->  migration/qemu-file.c |  5 +++
->  migration/qemu-file.h |  1 +
->  migration/rdma.c      | 88 ++++++++++++++++++++++++++++++++++++++++++-
->  migration/rdma.h      |  3 ++
->  6 files changed, 125 insertions(+), 7 deletions(-)
->
-> diff --git a/migration/multifd.c b/migration/multifd.c index=20
-> b3e8ae9bcc..63678d7fdd 100644
-> --- a/migration/multifd.c
-> +++ b/migration/multifd.c
-> @@ -424,7 +424,7 @@ void multifd_send_sync_main(QEMUFile *f)  {
->      int i;
-> =20
-> -    if (!migrate_use_multifd()) {
-> +    if (!migrate_use_multifd() || migrate_use_rdma()) {
-
-You don't need sync with main channel on rdma?
-
-> +static void rdma_send_channel_create(MultiFDSendParams *p) {
-> +    Error *local_err =3D NULL;
-> +
-> +    if (p->quit) {
-> +        error_setg(&local_err, "multifd: send id %d already quit", p->id=
-);
-> +        return ;
-> +    }
-> +    p->running =3D true;
-> +
-> +    qemu_thread_create(&p->thread, p->name, multifd_rdma_send_thread, p,
-> +                       QEMU_THREAD_JOINABLE); }
-> +
->  static void multifd_new_send_channel_async(QIOTask *task, gpointer=20
-> opaque)  {
->      MultiFDSendParams *p =3D opaque;
-> @@ -621,7 +635,11 @@ int multifd_save_setup(Error **errp)
->          p->packet->magic =3D cpu_to_be32(MULTIFD_MAGIC);
->          p->packet->version =3D cpu_to_be32(MULTIFD_VERSION);
->          p->name =3D g_strdup_printf("multifdsend_%d", i);
-> -        socket_send_channel_create(multifd_new_send_channel_async, p);
-> +        if (!migrate_use_rdma()) {
-> +            socket_send_channel_create(multifd_new_send_channel_async, p=
-);
-> +        } else {
-> +            rdma_send_channel_create(p);
-> +        }
-
-This is what we are trying to avoid.  Just create a struct ops, where we ha=
-ve a
-
-ops->create_channel(new_channel_async, p)
-
-or whatever, and fill it differently for rdma and for tcp.
-
-
->      }
->      return 0;
->  }
-> @@ -720,7 +738,7 @@ void multifd_recv_sync_main(void)  {
->      int i;
-> =20
-> -    if (!migrate_use_multifd()) {
-> +    if (!migrate_use_multifd() || migrate_use_rdma()) {
->          return;
->      }
-
-Ok. you can just put an empty function for you here.
-
->      for (i =3D 0; i < migrate_multifd_channels(); i++) { @@ -890,8=20
-> +908,13 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
->      p->num_packets =3D 1;
-> =20
->      p->running =3D true;
-> -    qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-> -                       QEMU_THREAD_JOINABLE);
-> +    if (!migrate_use_rdma()) {
-> +        qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-> +                           QEMU_THREAD_JOINABLE);
-> +    } else {
-> +        qemu_thread_create(&p->thread, p->name, multifd_rdma_recv_thread=
-, p,
-> +                           QEMU_THREAD_JOINABLE);
-> +    }
-
-new_recv_chanel() member function.
-
->      atomic_inc(&multifd_recv_state->count);
->      return atomic_read(&multifd_recv_state->count) =3D=3D
->             migrate_multifd_channels(); diff --git=20
-> a/migration/multifd.h b/migration/multifd.h index=20
-> d8b0205977..c9c11ad140 100644
-> --- a/migration/multifd.h
-> +++ b/migration/multifd.h
-> @@ -13,6 +13,8 @@
->  #ifndef QEMU_MIGRATION_MULTIFD_H
->  #define QEMU_MIGRATION_MULTIFD_H
-> =20
-> +#include "migration/rdma.h"
-> +
->  int multifd_save_setup(Error **errp);  void=20
-> multifd_save_cleanup(void);  int multifd_load_setup(Error **errp);
-
-You are not exporting anything rdma related from here, are you?
-
-> diff --git a/migration/qemu-file.c b/migration/qemu-file.c index=20
-> 1c3a358a14..f0ed8f1381 100644
-> --- a/migration/qemu-file.c
-> +++ b/migration/qemu-file.c
-> @@ -248,6 +248,11 @@ void qemu_fflush(QEMUFile *f)
->      f->iovcnt =3D 0;
->  }
-> =20
-> +void *getQIOChannel(QEMUFile *f)
-> +{
-> +    return f->opaque;
-> +}
-> +
-
-We really want this to return a void?  and not a better type?
-> +static void migration_rdma_process_incoming(QEMUFile *f, Error=20
-> +**errp) {
-> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
-> +    Error *local_err =3D NULL;
-> +    QIOChannel *ioc =3D NULL;
-> +    bool start_migration;
-> +
-> +    if (!mis->from_src_file) {
-> +        mis->from_src_file =3D f;
-> +        qemu_file_set_blocking(f, false);
-> +
-> +        start_migration =3D migrate_use_multifd();
-> +    } else {
-> +        ioc =3D QIO_CHANNEL(getQIOChannel(f));
-> +        /* Multiple connections */
-> +        assert(migrate_use_multifd());
-
-I am not sure that you can make this incompatible change.
-You need to have *both*, old method and new multifd one.
-
-I would have been happy to remove old precopy tcp method, but we
-*assure* backwards compatibility.
-
-> @@ -4003,8 +4032,12 @@ static void rdma_accept_incoming_migration(void *o=
-paque)
->          return;
->      }
-> =20
-> -    rdma->migration_started_on_destination =3D 1;
-> -    migration_fd_process_incoming(f, errp);
-> +    if (migrate_use_multifd()) {
-> +        migration_rdma_process_incoming(f, errp);
-> +    } else {
-> +        rdma->migration_started_on_destination =3D 1;
-> +        migration_fd_process_incoming(f, errp);
-> +    }
-
-But here you allow that multifd is not defined?
-
-
-
-
-> +
-> +void *multifd_rdma_recv_thread(void *opaque) {
-
-Why can't you use the multifd_recv_thread() directly, just creating differe=
-nt ops when you need them?
-
-Later, Juan.
+Michal
 
 
