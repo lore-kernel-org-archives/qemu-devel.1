@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D744CC3B1B9
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 390BEC3B1B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:17:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A06FA22314
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:17:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 080D622314
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:17:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kaX2BiSm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A06FA22314
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="upfqOujZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 080D622314
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2fWR-0005tv-Oj
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:17:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60749)
+	id 1j2fWc-0006GI-8z
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:17:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60894)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j2fVI-0004Dg-Ij
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:15:53 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j2fVV-0004TM-BA
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:16:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j2fVH-0008UP-Fc
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:15:52 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:37085)
+ (envelope-from <richard.henderson@linaro.org>) id 1j2fVU-0000FY-Dm
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:16:05 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33297)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j2fVH-0008U2-A6
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:15:51 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id m13so4258490pjb.2
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:15:51 -0800 (PST)
+ id 1j2fVU-0000FK-7H
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:16:04 -0500
+Received: by mail-pl1-x644.google.com with SMTP id ay11so4028780plb.0
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:16:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=RVsYrCWRH15jUkV+nOTPRiB+8FHjPwEImYNiw048qj0=;
- b=kaX2BiSmMPf/dfANlgf46MUoRKKJDjpVu6h1ilLmhlQBV4XnDzZZWN9aBQNbaFjb4O
- /J4/zU3BOhvSmsgPTaR+FW3TMwszwTCJjT6AW9m8TjuYtPNNO/bunaoEs9QOThwbzYeF
- v8aZ1dyAXdI5lZGbb2bKLgMPJlZ8RQwdAjNtUdgRDZsfvd2Lw66BoI7cUigQFSMRWlOp
- mzm93p2rYHQypeJPShBHctNU9eRYN03cIDsAU/9FDYFucEJm/hEyznn8ZDWkw7GAzGik
- xX9PBH8w/pdnVXzALsg0QWNrktrWW9MS/+H7vZzChZhyKeIyUugB+CdDIQVY7B1LmJ1E
- bDyw==
+ bh=hc+/AucXa0inxq9dbV/arLbbzIae9WxdVjI4zl5RMxY=;
+ b=upfqOujZGWqMRFNIe2Y4HrByxOI+hj3ayK33nXTKGLh9nQgtl7T2uG7bkQyxpUfpgE
+ ZmgP10cb/8yOXuRakIVq4khHPFm/Wx0fOdOuvYJtthyjxbYjVPu9fLAJ6R66UMxjGQm6
+ u83i07TWr+DXx7tjIGC0AObz47i7a90B0tdWpb51vFN4wFQIzQjknvGNkvJcUItzhqpz
+ P+hA0TvbSKBomcEECSUbRln2jdEU7krQ+XMVN26zQUje6KWoq9+DPzAjesGKRB25Nm4v
+ ccdFeIo8jKQpVqX1b9mkuz7KLDnQhJblXLxhXF8AXrLHj9bBlTQVw1nAzyr7vOtWYjEH
+ XF1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=RVsYrCWRH15jUkV+nOTPRiB+8FHjPwEImYNiw048qj0=;
- b=rJVat+HxPp0VL4GYSdL72N2q4lrv88Gd7nxrNYrhF9pPlOqcpTf4XTASMC0o/eRQvN
- i6SeRMa5BaGC6XeZy/ErBmmKr+Cc+Asik3+V/w6+glzcPPMs9CZ+L+R12mRbYKT8jo0R
- /ZIoTHrkdyD/31PueQqythagrX0STzIztx0iwbhQL8Wyzjl3lCqPijX5rRB2omZ5iEEL
- 3Gj10cnuY6fbEUcCr3o3TvH7w5cyZvJObohqOlJhBb26i+RcVUXE9F4C4/xzSt6aiLTq
- wWzJO8MrCaldAP/wVO3LWYw9FscaYfXfQxg+d2e+eJXH2DuwTDkteJg2eZwFuXYFPDo8
- GD1g==
-X-Gm-Message-State: APjAAAV1gLByxS1F/+dV2SmDJmff+KD18nevOrVp9+WkZMtOcB5r91f5
- 1muFIHf+nSzEQ1kwQNEwHVlwa+vWyfQ=
-X-Google-Smtp-Source: APXvYqyKdviVyFbFySrHUtnJbmNWIzOfTuf4gND+ozEmjKTqwzZmtF6Y3DC0MQcRPDDyH0NO4i4tAA==
-X-Received: by 2002:a17:902:b116:: with SMTP id
- q22mr4689987plr.324.1581704149957; 
- Fri, 14 Feb 2020 10:15:49 -0800 (PST)
+ bh=hc+/AucXa0inxq9dbV/arLbbzIae9WxdVjI4zl5RMxY=;
+ b=KncrELX3+PPxgMbagT80tmnezGRC8brw7NmroCN8yrW65/BLQoGRgAD/Wlfkuakb96
+ I3cZbVNKOI/fXnuHcmqa2zjudjHM+XP7BVRbHYkZs/KBM6D1ccOdLFkCLxuUwT/pOu8M
+ TY9xJc2YvJ4VUakHl2/xUaIuW9ZWM8mdeLr5OfZZotiegy8+gqaJ4lzmeWB1z76XXd5w
+ 4JoWIjQ8KMDaoMG7YUbH1MTbhTOaCC6E7EXzV8Zeg3eLYVfNOpazbDKabvzYcbbW2G0h
+ fLRpSo2InlwRnHmxc2O4kaDaSSmKPxu8qFNizSwO3sc/86DMq31KH7WUEoLfKSuWBanC
+ 76FA==
+X-Gm-Message-State: APjAAAVyy5hLW3VG6VNEPI2XOfOJ2CVL0aPqf/Xv4kZ4lL38p/R2QPRs
+ Ccu37QufgxZwByub9vO3IAK43sqsPX8=
+X-Google-Smtp-Source: APXvYqxqulXxdG7hk382vvxsBn259LGCN4zy9eER1fHDr7Q40c5Qzx6a1VRmv9v/Ide+z1V4gXWeEw==
+X-Received: by 2002:a17:902:a5c4:: with SMTP id
+ t4mr4694242plq.242.1581704162920; 
+ Fri, 14 Feb 2020 10:16:02 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id i3sm7525123pfg.94.2020.02.14.10.15.48
+ by smtp.gmail.com with ESMTPSA id i3sm7525123pfg.94.2020.02.14.10.16.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Feb 2020 10:15:49 -0800 (PST)
+ Fri, 14 Feb 2020 10:16:02 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/19] target/arm: Fix field extract from MVFR[0-2]
-Date: Fri, 14 Feb 2020 10:15:29 -0800
-Message-Id: <20200214181547.21408-2-richard.henderson@linaro.org>
+Subject: [PATCH 12/19] target/arm: Remove ARM_FEATURE_VFP check from
+ disas_vfp_insn
+Date: Fri, 14 Feb 2020 10:15:40 -0800
+Message-Id: <20200214181547.21408-13-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214181547.21408-1-richard.henderson@linaro.org>
 References: <20200214181547.21408-1-richard.henderson@linaro.org>
@@ -82,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,80 +100,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These registers are 32-bits wide.  Cut and paste used FIELD_EX64
-instead of the more proper FIELD_EX32.  In practice all this did
-was use an unnecessary 64-bit operation, producing correct results.
+We now have proper ISA checks within each trans_* function.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ target/arm/translate.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e943ffe8a9..28cb2be6fc 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3415,18 +3415,18 @@ static inline bool isar_feature_aa32_fp16_arith(const ARMISARegisters *id)
- static inline bool isar_feature_aa32_fp_d32(const ARMISARegisters *id)
- {
-     /* Return true if D16-D31 are implemented */
--    return FIELD_EX64(id->mvfr0, MVFR0, SIMDREG) >= 2;
-+    return FIELD_EX32(id->mvfr0, MVFR0, SIMDREG) >= 2;
- }
- 
- static inline bool isar_feature_aa32_fpshvec(const ARMISARegisters *id)
- {
--    return FIELD_EX64(id->mvfr0, MVFR0, FPSHVEC) > 0;
-+    return FIELD_EX32(id->mvfr0, MVFR0, FPSHVEC) > 0;
- }
- 
- static inline bool isar_feature_aa32_fpdp(const ARMISARegisters *id)
- {
-     /* Return true if CPU supports double precision floating point */
--    return FIELD_EX64(id->mvfr0, MVFR0, FPDP) > 0;
-+    return FIELD_EX32(id->mvfr0, MVFR0, FPDP) > 0;
- }
- 
- /*
-@@ -3436,32 +3436,32 @@ static inline bool isar_feature_aa32_fpdp(const ARMISARegisters *id)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 0da780102c..e8c3d4f26f 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -2652,10 +2652,6 @@ static void gen_neon_dup_high16(TCGv_i32 var)
   */
- static inline bool isar_feature_aa32_fp16_spconv(const ARMISARegisters *id)
+ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
  {
--    return FIELD_EX64(id->mvfr1, MVFR1, FPHP) > 0;
-+    return FIELD_EX32(id->mvfr1, MVFR1, FPHP) > 0;
- }
- 
- static inline bool isar_feature_aa32_fp16_dpconv(const ARMISARegisters *id)
- {
--    return FIELD_EX64(id->mvfr1, MVFR1, FPHP) > 1;
-+    return FIELD_EX32(id->mvfr1, MVFR1, FPHP) > 1;
- }
- 
- static inline bool isar_feature_aa32_vsel(const ARMISARegisters *id)
- {
--    return FIELD_EX64(id->mvfr2, MVFR2, FPMISC) >= 1;
-+    return FIELD_EX32(id->mvfr2, MVFR2, FPMISC) >= 1;
- }
- 
- static inline bool isar_feature_aa32_vcvt_dr(const ARMISARegisters *id)
- {
--    return FIELD_EX64(id->mvfr2, MVFR2, FPMISC) >= 2;
-+    return FIELD_EX32(id->mvfr2, MVFR2, FPMISC) >= 2;
- }
- 
- static inline bool isar_feature_aa32_vrint(const ARMISARegisters *id)
- {
--    return FIELD_EX64(id->mvfr2, MVFR2, FPMISC) >= 3;
-+    return FIELD_EX32(id->mvfr2, MVFR2, FPMISC) >= 3;
- }
- 
- static inline bool isar_feature_aa32_vminmaxnm(const ARMISARegisters *id)
- {
--    return FIELD_EX64(id->mvfr2, MVFR2, FPMISC) >= 4;
-+    return FIELD_EX32(id->mvfr2, MVFR2, FPMISC) >= 4;
- }
- 
- static inline bool isar_feature_aa32_pan(const ARMISARegisters *id)
+-    if (!arm_dc_feature(s, ARM_FEATURE_VFP)) {
+-        return 1;
+-    }
+-
+     /*
+      * If the decodetree decoder handles this insn it will always
+      * emit code to either execute the insn or generate an appropriate
 -- 
 2.20.1
 
