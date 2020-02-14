@@ -2,81 +2,86 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1352CC2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 260B6C3F68F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3C622168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:22:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE55F2465D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 18:23:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EAOKLrky"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3C622168B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CmrUFjhR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE55F2465D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2fbp-00012x-2U
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:22:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33603)
+	id 1j2fcU-0002Uz-5i
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 13:23:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60975)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1j2fZ5-00036K-G5
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:19:48 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j2fVc-0004jg-Hn
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:16:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1j2fZ4-0003q4-GK
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:19:47 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:44970)
+ (envelope-from <richard.henderson@linaro.org>) id 1j2fVb-0000M1-71
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:16:12 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46225)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1j2fZ4-0003p0-3n
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:19:46 -0500
-Received: by mail-lj1-x242.google.com with SMTP id q8so11698292ljj.11
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:19:46 -0800 (PST)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j2fVb-0000L1-18
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 13:16:11 -0500
+Received: by mail-pf1-x442.google.com with SMTP id k29so5238023pfp.13
+ for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 10:16:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=trV9K24HPaEBBj7x8CovdrLRj/RVEB+f4WI5zhXBTPI=;
- b=EAOKLrkyxroVVXAWuPvOn7RiBXN2kieUdCvZMk65MS7yBgy7QaYNRl+weDeWfEOfRO
- xgaGY8fL4kT3R/1zHvaDnqAw4Cmzcg/bTK9hdFOI9NQTtV/ctm3L4pHWRSe558BSrpM3
- 60idmiAAnjoLSuDXaKLbT4oV1OfPx+m5DhQDgniKOSXTmvNOF31ev+JFPSLLjKZL1elU
- BpwOOl9cw1Ph/frtru4h0fHZJTZkPlRon6aS8HZxQEikx5diKJRq3MkIh5gwZI5sgqF/
- NEocTq53xUUzxuBijufF2E+QK6UeQVr7eiC1Cl5EfixL4Ngv1nL7WeXqc6Nwu6ndRM0P
- myUQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=08YWOW4uPN/K//8Sv/iAQdt6yoHtAxwQIa1pxOQkXxw=;
+ b=CmrUFjhRgBmeKXvH7NHnFbQpBEyRRrlSu7RRgr3lzAklwKujje0eh+AYgMgXpK6m4N
+ TVLWc9TCl7MoM3pCMiJdrqqxOqQm44RpTr2wTO9iOD9gFB3o4eWjrWZxCGo1rFoY845U
+ 9lWE8hrarjlIhuEKpHXDjqhRUNs2Rzqv86OLZYRMUph/vabVocw7b+PDYLeEhVZYg9cp
+ BMVOi5HW5+IW/nLMeGMhZMSRx5thMi/Cw1w5mKg2WpXDHrNuKj+K5Zpl8sfBlJpvYId1
+ 9jVeP/jQIZ3HUY13+F2IMHAoTwaGJ4UOX8lioPP9A3s1NyEPtv/jBtVjK147BzLISkZQ
+ DYHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=trV9K24HPaEBBj7x8CovdrLRj/RVEB+f4WI5zhXBTPI=;
- b=eLlPetCr4oWCPIYgYDq4QjS7e8w16VshAp6fv0MCEZ+h10KD2z0r8X6hkbdDwxGgcT
- hYl4ycZpkhQ2XjZhxNT1mW4LBrpC1l8VjZ6uGzwYddMEWCFrayheMhzUF4m2yLKxxcfL
- qIL1vq9GuXAr0VZDrnYbwwjuXeoI+2YsSJgas18FeLxOF0UqqbMP/W+88VBJ5S2x7/JL
- fv9Dckp7gkbVszcOlwRekrD3KPzDbTEkaTEY7aQAwW6EIXB28qxXZdS9pkNFR6s8tf2l
- UPqY4vjhH/KH3ycdqu6e6ajLAkNebypQZpRAw3cNFQuVTAxXlf9XFbAqlnkEklzaoeWy
- zFTg==
-X-Gm-Message-State: APjAAAW4dbOJuh4k6C+TjVSfDEAng1BOIqKmHdXYUCm1/yi2saqBalJP
- T9nUlDUG+8D3qXdfFDO6Jx2l1UUQMSqJobijb+fr8A==
-X-Google-Smtp-Source: APXvYqzME+e6zfNNc8PTHt3GLAoWtMIYBf5H10klPhHavMtgwqlJUYsm2pOenRuknxqNj0iB1dh4qCBzjfKlop+B+fU=
-X-Received: by 2002:a2e:90c6:: with SMTP id o6mr2850406ljg.129.1581704384748; 
- Fri, 14 Feb 2020 10:19:44 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=08YWOW4uPN/K//8Sv/iAQdt6yoHtAxwQIa1pxOQkXxw=;
+ b=iiAWhF/s9T5s/bqEjXPZfbB6smzYMOIqwfkfL6mNlhpVYxHAMRv9KWloaRxBnW6JIo
+ 2ezEcNhFwu85JFxYem1PoXvr5HBdqyaU2vk7lQlHf8iKA/cqDEtHVg5u9KeuDdFwbOSD
+ aHjLqMFaLEdGepog0nm+omM1Jjk9D2lFoDYtOPB7lFddX0J2SvnWIZpQa8eoHzy+nZ0D
+ jih3VqA59W4yL78WlLXyn79qmeAqRQxdIa/Nd467F6dHK/9/DiVwpwq1MuEnBpLenqRR
+ mTORytGlWyJA5jM8nzCHVXgDUAAV9VqmpGSMwLT6NcF2pqV47QY27UUr4kG2i9OiOltr
+ qz7g==
+X-Gm-Message-State: APjAAAVDCY7fY+m5hR4FiO4qElDMFBvBkPgWak2Drw/Fo3XuGzlBxREO
+ Nyn5FLYEfOgzEM4QfpDitsLCAfxyH/U=
+X-Google-Smtp-Source: APXvYqyjCEfys8bdeZTdZ9W4WCUhcOq/eaMvVeUl90poWPjK0vBSR9M5n70oPGLiQuS0YOLDyNPcXw==
+X-Received: by 2002:a63:7f5c:: with SMTP id p28mr4977435pgn.212.1581704169483; 
+ Fri, 14 Feb 2020 10:16:09 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id i3sm7525123pfg.94.2020.02.14.10.16.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Feb 2020 10:16:08 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 18/19] target/arm: Split VFM decode
+Date: Fri, 14 Feb 2020 10:15:46 -0800
+Message-Id: <20200214181547.21408-19-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200214181547.21408-1-richard.henderson@linaro.org>
+References: <20200214181547.21408-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20200213225109.13120-1-alex.bennee@linaro.org>
- <20200213225109.13120-10-alex.bennee@linaro.org>
-In-Reply-To: <20200213225109.13120-10-alex.bennee@linaro.org>
-From: Robert Foley <robert.foley@linaro.org>
-Date: Fri, 14 Feb 2020 13:19:09 -0500
-Message-ID: <CAEyhzFvTpv65qkRtkmysZc5+LD2nrsvfug54Vd_fxTKaBEZoUA@mail.gmail.com>
-Subject: Re: [PATCH v2 09/19] tracing: only allow -trace to override -D if set
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,22 +93,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, pbonzini@redhat.com,
- stefanb@linux.vnet.ibm.com, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, robhenry@microsoft.com, f4bug@amsat.org,
- marcandre.lureau@redhat.com, aaron@os.amperecomputing.com, cota@braap.org,
- stefanha@redhat.com, kuhn.chenqun@huawei.com,
- Peter Puhov <peter.puhov@linaro.org>, aurelien@aurel32.net
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Feb 2020 at 17:51, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> Otherwise any -D settings the user may have made get ignored.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Passing the raw o1 and o2 fields from the manual is less
+instructive than it might be.  Do the full decode and let
+the trans_* functions pass in booleans to a helper.
 
-Reviewed-by: Robert Foley <robert.foley@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/vfp.decode          | 17 +++++------
+ target/arm/translate-vfp.inc.c | 52 ++++++++++++++++++++++++++++++----
+ 2 files changed, 55 insertions(+), 14 deletions(-)
+
+diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
+index 4f294f88be..5fd70f975a 100644
+--- a/target/arm/vfp.decode
++++ b/target/arm/vfp.decode
+@@ -130,14 +130,15 @@ VSUB_dp      ---- 1110 0.11 .... .... 1011 .1.0 ....        @vfp_dnm_d
+ VDIV_sp      ---- 1110 1.00 .... .... 1010 .0.0 ....        @vfp_dnm_s
+ VDIV_dp      ---- 1110 1.00 .... .... 1011 .0.0 ....        @vfp_dnm_d
+ 
+-VFM_sp       ---- 1110 1.01 .... .... 1010 . o2:1 . 0 .... \
+-             vm=%vm_sp vn=%vn_sp vd=%vd_sp o1=1
+-VFM_dp       ---- 1110 1.01 .... .... 1011 . o2:1 . 0 .... \
+-             vm=%vm_dp vn=%vn_dp vd=%vd_dp o1=1
+-VFM_sp       ---- 1110 1.10 .... .... 1010 . o2:1 . 0 .... \
+-             vm=%vm_sp vn=%vn_sp vd=%vd_sp o1=2
+-VFM_dp       ---- 1110 1.10 .... .... 1011 . o2:1 . 0 .... \
+-             vm=%vm_dp vn=%vn_dp vd=%vd_dp o1=2
++VFMA_sp      ---- 1110 1.10 .... .... 1010 .0. 0 ....       @vfp_dnm_s
++VFMS_sp      ---- 1110 1.10 .... .... 1010 .1. 0 ....       @vfp_dnm_s
++VFNMA_sp     ---- 1110 1.01 .... .... 1010 .0. 0 ....       @vfp_dnm_s
++VFNMS_sp     ---- 1110 1.01 .... .... 1010 .1. 0 ....       @vfp_dnm_s
++
++VFMA_dp      ---- 1110 1.10 .... .... 1011 .0.0 ....        @vfp_dnm_d
++VFMS_dp      ---- 1110 1.10 .... .... 1011 .1.0 ....        @vfp_dnm_d
++VFNMA_dp     ---- 1110 1.01 .... .... 1011 .0.0 ....        @vfp_dnm_d
++VFNMS_dp     ---- 1110 1.01 .... .... 1011 .1.0 ....        @vfp_dnm_d
+ 
+ VMOV_imm_sp  ---- 1110 1.11 .... .... 1010 0000 .... \
+              vd=%vd_sp imm=%vmov_imm
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index 8f2b97e0e7..b5f3feaf8d 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -1784,7 +1784,7 @@ static bool trans_VDIV_dp(DisasContext *s, arg_VDIV_dp *a)
+     return do_vfp_3op_dp(s, gen_helper_vfp_divd, a->vd, a->vn, a->vm, false);
+ }
+ 
+-static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
++static bool do_vfm_sp(DisasContext *s, arg_VFMA_sp *a, bool neg_n, bool neg_d)
+ {
+     /*
+      * VFNMA : fd = muladd(-fd,  fn, fm)
+@@ -1823,12 +1823,12 @@ static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
+ 
+     neon_load_reg32(vn, a->vn);
+     neon_load_reg32(vm, a->vm);
+-    if (a->o2) {
++    if (neg_n) {
+         /* VFNMS, VFMS */
+         gen_helper_vfp_negs(vn, vn);
+     }
+     neon_load_reg32(vd, a->vd);
+-    if (a->o1 & 1) {
++    if (neg_d) {
+         /* VFNMA, VFNMS */
+         gen_helper_vfp_negs(vd, vd);
+     }
+@@ -1844,7 +1844,27 @@ static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
+     return true;
+ }
+ 
+-static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
++static bool trans_VFMA_sp(DisasContext *s, arg_VFMA_sp *a)
++{
++    return do_vfm_sp(s, a, false, false);
++}
++
++static bool trans_VFMS_sp(DisasContext *s, arg_VFMS_sp *a)
++{
++    return do_vfm_sp(s, a, true, false);
++}
++
++static bool trans_VFNMA_sp(DisasContext *s, arg_VFNMA_sp *a)
++{
++    return do_vfm_sp(s, a, false, true);
++}
++
++static bool trans_VFNMS_sp(DisasContext *s, arg_VFNMS_sp *a)
++{
++    return do_vfm_sp(s, a, true, true);
++}
++
++static bool do_vfm_dp(DisasContext *s, arg_VFMA_dp *a, bool neg_n, bool neg_d)
+ {
+     /*
+      * VFNMA : fd = muladd(-fd,  fn, fm)
+@@ -1893,12 +1913,12 @@ static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
+ 
+     neon_load_reg64(vn, a->vn);
+     neon_load_reg64(vm, a->vm);
+-    if (a->o2) {
++    if (neg_n) {
+         /* VFNMS, VFMS */
+         gen_helper_vfp_negd(vn, vn);
+     }
+     neon_load_reg64(vd, a->vd);
+-    if (a->o1 & 1) {
++    if (neg_d) {
+         /* VFNMA, VFNMS */
+         gen_helper_vfp_negd(vd, vd);
+     }
+@@ -1914,6 +1934,26 @@ static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
+     return true;
+ }
+ 
++static bool trans_VFMA_dp(DisasContext *s, arg_VFMA_dp *a)
++{
++    return do_vfm_dp(s, a, false, false);
++}
++
++static bool trans_VFMS_dp(DisasContext *s, arg_VFMS_dp *a)
++{
++    return do_vfm_dp(s, a, true, false);
++}
++
++static bool trans_VFNMA_dp(DisasContext *s, arg_VFNMA_dp *a)
++{
++    return do_vfm_dp(s, a, false, true);
++}
++
++static bool trans_VFNMS_dp(DisasContext *s, arg_VFNMS_dp *a)
++{
++    return do_vfm_dp(s, a, true, true);
++}
++
+ static bool trans_VMOV_imm_sp(DisasContext *s, arg_VMOV_imm_sp *a)
+ {
+     uint32_t delta_d = 0;
+-- 
+2.20.1
+
 
