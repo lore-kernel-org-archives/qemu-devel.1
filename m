@@ -2,79 +2,86 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39724C35242
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 20:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB8DC35242
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 21:25:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC367222C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 20:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A025E222C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 21:25:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tjepgCWx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC367222C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1blAxhG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A025E222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2hvd-0002Kx-0u
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 15:51:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57808)
+	id 1j2iSt-0004MH-Q5
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 16:25:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34975)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j2hun-0001qt-Sp
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 15:50:22 -0500
+ (envelope-from <lersek@redhat.com>) id 1j2iSF-0003T9-NR
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 16:24:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j2hum-0006Cf-Ua
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 15:50:21 -0500
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:37742)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j2huk-000696-M3; Fri, 14 Feb 2020 15:50:18 -0500
-Received: by mail-lf1-x144.google.com with SMTP id b15so7645973lfc.4;
- Fri, 14 Feb 2020 12:50:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=RmyzcXzOCcpRLlvjuy8XpxY+v6FkiKTjR/2DdMPfI8E=;
- b=tjepgCWxn4DrC0hh4DrLAPPaRFEkQX4GSM7wCKSyFVeFX/Ut7f901sXB4SEv3OlHNq
- kSKLI7Teo/l5Mepxdmce1z6iELnzbTMOASmh9k1nrcKrK1iLK8xhZnRxx56Cv86P4w4w
- /Cg0YkxZ7tgpd6m0bWE95FCOoCkZVuS/CQgXamayRLx6mwhh3wrvIWy5m8sqsTVd9/nD
- s/nZF5ER2NPRArGvNOFJ7TEVOOAHcnbo7EqQgiS3wezfvgSvl1xIM/Z631OtH/E43qQn
- 7yHG0JHsXisv1YsL7XhEqrGBcBy++AGX87nO+BYgFDAiN57YxDoTsxMp+SXi109YB7ej
- g8Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=RmyzcXzOCcpRLlvjuy8XpxY+v6FkiKTjR/2DdMPfI8E=;
- b=oFI3dyDg19xt4r71EB9pKyXFTD5XBav3hSm9rOs3zY5lLLS9hc9RNnnmwZZtz2vBBP
- bZFbIgqRw6kcJu+Ue8CZjnwjS0eTx6NYY3bdMYpnuycBYVXy0LiczFoiwuvpQ2/G2eiZ
- GnO8IeC98/7l3FCsiQqorszshNmRgDKRmgUZkQysI7EPxk84Q9o/pPLRF66qF8FG25Re
- IR/o8ybPEQ0JTOGrp48lLL4ISR6s15JjZBEm4p+twWWG4/YH+NH4hNF01jqwNp8DxUH1
- uRMMUlzSyNVphdrwrQEKc2YMZKcnwbl65iARiSAZ5QOl8VNDkEr3+XuOhyQqRdG94iZ4
- z2WQ==
-X-Gm-Message-State: APjAAAX+T9/D+yXvrh9U+CCADubpTGDxkGIb77837yG6UjPHuG44MQxT
- WgPMjGl3EX+xTi1SKQfn77wYeI0wTu5GmPUKrIU=
-X-Google-Smtp-Source: APXvYqylCa0S4bCmTFDM4y9UtJ/WPqL+Kq/fDYbcXf+HcKUayYVgwZgw80pk/o7Eyrr/sbwJyVvVs5tuRBjH1G8jks0=
-X-Received: by 2002:ac2:5310:: with SMTP id c16mr2538689lfh.102.1581713417077; 
- Fri, 14 Feb 2020 12:50:17 -0800 (PST)
+ (envelope-from <lersek@redhat.com>) id 1j2iSD-0000Ht-C3
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 16:24:54 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40981
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1j2iSB-0000FX-IY
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 16:24:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581715490;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8XfOz1oKC/G968G5c9w6af6IytGBJo6pJOCZTROgVXI=;
+ b=Y1blAxhGxbXw9bcc935L9D8xH9ORocJx4Ft+UND4ms+6rwwzd9+57CFns0FiOR3Hq10kyC
+ WIUB7jwSLOec0cnJp+ZFkySzcg2KMovR4zz1Btq3uYgWRay2jwzAPg4v1k+s/idxoeulB5
+ Hs1bqAc6WRUygriMtlDfPGyNyKcc3vE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-165-AXfk4rvwO7atbssyYMqWqw-1; Fri, 14 Feb 2020 16:24:45 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75EF0477;
+ Fri, 14 Feb 2020 21:24:44 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-153.ams2.redhat.com
+ [10.36.116.153])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8B6545DA7D;
+ Fri, 14 Feb 2020 21:24:40 +0000 (UTC)
+Subject: Re: How do UEFI on Windows host
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Jerry Geis <jerry.geis@gmail.com>
+References: <CABr8-B4_mEkOkodKVVe=U_eiMemWictNSQj4T5R6nEynVXCEGw@mail.gmail.com>
+ <58491266-962f-4c4f-9a51-829ec30f008b@redhat.com>
+ <CABr8-B6xARb1iuD7M_i9Pgs7OXF+EQQBxKDDC-o_imbiEDbMJw@mail.gmail.com>
+ <6aad5b16-53c5-4485-381c-1cb990c8b766@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <146b553d-cbe7-ac87-9423-bd07602e3e01@redhat.com>
+Date: Fri, 14 Feb 2020 22:24:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <20200214072127.64330-1-anup.patel@wdc.com>
- <20200214072127.64330-4-anup.patel@wdc.com>
-In-Reply-To: <20200214072127.64330-4-anup.patel@wdc.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 14 Feb 2020 12:42:55 -0800
-Message-ID: <CAKmqyKNGEp7vzihmG6m3uTsWL2sL+eD6UaTaO8iro3PDvmwMTQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] hw/riscv/spike: Allow more than one CPUs
-To: Anup Patel <anup.patel@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::144
+In-Reply-To: <6aad5b16-53c5-4485-381c-1cb990c8b766@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: AXfk4rvwO7atbssyYMqWqw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,50 +93,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 11:24 PM Anup Patel <anup.patel@wdc.com> wrote:
+On 02/14/20 19:12, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 2/14/20 5:37 PM, Jerry Geis wrote:
+>> I dont know how to get all files listing on windows. But, I cd
+>> \program files\qemu
+>> dir *.fd
+>> edk2-x86_64-code.fd
+>> edk2-x86_64-secure-code.fd
+>>
+>> It seems like from other posts these might be the files - but still
+>> not sure how to do "boot" a command line for UEFI.
 >
-> Currently, the upstream Spike ISA simulator allows more than
-> one CPUs so we update QEMU Spike machine on similar lines to
-> allow more than one CPUs.
+> I tested/added these files in commit e54ecc70c34:
 >
-> The maximum number of CPUs for QEMU Spike machine is kept
-> same as QEMU Virt machine.
+>     NSIS: Add missing firmware blobs
 >
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+>     Various firmwares has been added in the pc-bios/ directory:
+>
+>     - CCW     (since commit 0c1fecdd523)
+>     - skiboot (since commit bcad45de6a0)
+>     - EDK2    (since commit f7fa38b74c3)
+>
+> Stefan can you describe how you generate the binaries in
+> https://qemu.weilnetz.de/w64/ ? Maybe the bunzip2 step is not called?
+>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Thank you, Phil! The following line from your patch:
 
-Alistair
++    File "${BINDIR}\*.fd"
 
-> ---
->  hw/riscv/spike.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 060a86f922..1eac0d9a83 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -469,7 +469,7 @@ static void spike_machine_init(MachineClass *mc)
->  {
->      mc->desc = "RISC-V Spike Board";
->      mc->init = spike_board_init;
-> -    mc->max_cpus = 1;
-> +    mc->max_cpus = 8;
->      mc->is_default = 1;
->      mc->default_cpu_type = SPIKE_V1_10_0_CPU;
->  }
-> --
-> 2.17.1
->
->
+should hopefully cover everything that Jerry needs. So I guess the only
+missing piece is the right QEMU command line.
+
+Jerry:
+
+(1) You will have to manage the virtual machine's private variable store
+file manually.
+
+You have to create the varstore manually first, from the varstore
+template: copy "edk2-i386-vars.fd" to a new file; for example, to
+"my-guest.vars.fd".
+
+Then you have to treat "my-guest.vars.fd" like another data disk, for
+the guest.
+
+Never use the "edk2-i386-vars.fd" template file itself on any QEMU
+command line.
+
+
+(2) Next step, choose one of the following firmware binaries:
+
+(2a) edk2-x86_64-code.fd
+(2b) edk2-x86_64-secure-code.fd
+
+The (2a) firmware binary runs on both the i440fx ("pc") machine type,
+and the q35 machine type. It does not include the Secure Boot UEFI
+feature. It also does not include the edk2 SMM stack. Use this binary if
+you don't care about Secure Boot for your guest, or insist on using
+"pc".
+
+The (2b) firmware binary runs only on "q35". It's strongly recommended
+to use the latest version of the "q35" machine type available in your
+QEMU executable, with this firmware binary. This firmware binary
+includes both the Secure Boot feature, and the edk2 SMM stack. (The
+latter is used to protect the former, but that's not really important
+now.) The "q35" machine type restriction actually comes from the SMM
+stack. Use this firmware binary if you want the Secure Boot feature.
+
+In case you pick (2b), note that the Secure Boot *operational mode* is
+not automatically enabled in your guest. You will have to enroll SB keys
+/ certificates manually. You can do that e.g. in the firmware setup TUI
+in the guest. You can find resources about this on the net.
+
+
+(3) Assuming you've picked your firmware binary, here are the
+*additional* command line options for qemu-system-x86_64 (that is, these
+options should be appended after your usual options):
+
+- For (2a):
+
+  -machine pflash0=3Dfirmware-executable,pflash1=3Dvariable-store \
+  -blockdev node-name=3Dfirmware-executable,read-only=3Don,driver=3Dfile,fi=
+lename=3Dedk2-x86_64-code.fd \
+  -blockdev node-name=3Dvariable-store,read-only=3Doff,driver=3Dfile,filena=
+me=3Dmy-guest.vars.fd \
+
+- For (2b): everything you see under (2a), *plus*
+
+  -machine type=3Dq35,smm=3Don \
+  -global driver=3Dcfi.pflash01,property=3Dsecure,value=3Don \
+
+(Don't forget to change the filename in the "firmware-executable"
+blockdev, from "edk2-x86_64-code.fd" to "edk2-x86_64-secure-code.fd"!)
+
+
+(4) If you'd like a progress bar (a bit of time) at the OVMF splash
+screen, you can append (in either case):
+
+  -boot menu=3Don,splash-time=3D5000 \
+
+
+(5) In order to capture the firmware debug log, append:
+
+  -global isa-debugcon.iobase=3D0x402 \
+  -debugcon file:ovmf_log.txt \
+
+
+(6) Note that firmware-specific options that you may be used to with
+SeaBIOS are not guaranteed to behave identically (or at all) with OVMF.
+Some examples (not an exhaustive list):
+
+- with the "-boot" option, only "menu" and "splash-time" are supported,
+  and they don't work identically to SeaBIOS
+
+- "-boot strict=3Don" is always assumed
+
+- to highlight boot order setting, "-boot order=3D..." does not (cannot)
+  work with UEFI; you have to use the device-specific "bootindex"
+  properties. For example, to place a virtio-scsi CD-ROM first in the
+  boot order, use:
+
+  -device virtio-scsi-pci,id=3Dscsi0 \
+  -device scsi-cd,bus=3Dscsi0.0,drive=3DBlockDevName,bootindex=3D0 \
+                                                 ^^^^^^^^^^^
+
+  If you specify at least one "bootindex" property, then you should
+  specify bootindex properties with *all* devices that you want to
+  attempt booting from. (See "strict" above.)
+
+- Avoid switches like "-hda"; use the full-blown blockdev (backend) +
+  device (frontend) syntax.
+
+(Note that libvirt would automate away almost all of the above for you.
+But I'm unsure if you can, or are willing to, use libvirt on a Windows
+host.)
+
+
+(7) In the general case, you can't boot a 64-bit OS on a 32-bit UEFI
+firmware, nor vice versa. The "bitnesses" must match. (People forget
+this frequently.)
+
+Hope this helps,
+Laszlo
+
 
