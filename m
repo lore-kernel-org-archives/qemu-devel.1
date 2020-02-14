@@ -2,89 +2,87 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3985C2BA83
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 16:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8CEC3B1A6
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:12:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BA9D20656
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 16:54:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50A2F206CC
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 17:12:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JuZLh9FC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA9D20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ag89PkLN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50A2F206CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2eEo-0004CE-PR
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 11:54:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44187)
+	id 1j2eVW-0006Ur-Fu
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 12:12:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48208)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j2eE6-0003gt-FI
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 11:54:03 -0500
+ (envelope-from <armbru@redhat.com>) id 1j2eUz-00060u-44
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:11:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j2eE5-0005Hs-7x
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 11:54:02 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39940)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j2eE5-0005Gx-0k
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 11:54:01 -0500
-Received: by mail-wm1-x341.google.com with SMTP id t14so11338185wmi.5
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 08:54:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=afzw2W72qcHXR6A8kGYZyq5gSDPLvEkLwUds2milWVY=;
- b=JuZLh9FCpte2OCBWa3dZmprJX0nsyVjHK/tI/7ZYmCB43SGqyCIB2LowBsfkgR9DNe
- MEvfRuI31krSCVDKl/uKEp2KBkHT19X7jUarQEIznNdxDMI+h+gkVcgUGMB+V0clrxdu
- bB2KKs1SaFvJOV5Lf2kuXIciPpRYAe5J8mh8kjzKxZpoU7TcgUYknCL2RYFcxxfuhf4Y
- Xr6dfwTZVyjxueIkOhsS6YyLN6GJJQKBuJBmJNgDxo7FXJRCQstSUh5iwDmhB1k5IkRL
- claw2oBiVrPdjoYrmt+mfAaeJcHK8PGZqy2QAgKLMC+HoJvUTPAMPCKnoi4IOAYxnqDf
- IhDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=afzw2W72qcHXR6A8kGYZyq5gSDPLvEkLwUds2milWVY=;
- b=iU37HKDHQUi1Geo/PeRlD+oIEA5IGivNT3gov7fSpc4EMxviogkC02imM0hQopmm1F
- R7dgJcvi0+nqLrfCydyMjQEXER/oL4BX6IJ2fuwks0QCKLiH//RW2836fHIO01RYtcEP
- uvsG7hHG/D02jt8Ojx/Qgl4uhu5nHbY3LPCH1z7XcJOTIgP56mcv/IaxT3XqERIHJjI2
- 6CkfInQuEdSoNl0l3u4BXUriFvko/I+YSI3zPAeb2UV8d9Eejp+S7Z7o9EDPXNvdV86n
- g7s+jtodu94sEDUJ47KyA5Z4VVn486QAK0i93LaFit2HSlNk5GEEeeKgHbjoy1v4yRz5
- d5ug==
-X-Gm-Message-State: APjAAAWmVuKsiA+ux7/A/bhG7t5a+Fb/tdhIbWcjiWnt8rSJ93IBi0cR
- Q+HATvNpK+fgAH44neE/n8GQbg==
-X-Google-Smtp-Source: APXvYqxyDrG+bdgRY6w3Z+13miLVQsN6+PZMZuet29FEt5baU56nlE29Sh1AhP8bOfh9mmFFFfGmfA==
-X-Received: by 2002:a1c:6389:: with SMTP id x131mr5450204wmb.174.1581699239807; 
- Fri, 14 Feb 2020 08:53:59 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id k8sm7674334wrq.67.2020.02.14.08.53.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Feb 2020 08:53:58 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A68761FF87;
- Fri, 14 Feb 2020 16:53:57 +0000 (GMT)
-References: <20200205212920.467-1-robert.foley@linaro.org>
- <20200205212920.467-9-robert.foley@linaro.org>
-User-agent: mu4e 1.3.8; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v1 08/14] tests/vm: Added configuration file support
-In-reply-to: <20200205212920.467-9-robert.foley@linaro.org>
-Date: Fri, 14 Feb 2020 16:53:57 +0000
-Message-ID: <87r1yxp0t6.fsf@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1j2eUx-0007dM-Jy
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:11:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32951
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j2eUx-0007bz-EB
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 12:11:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581700285;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pExTd8+SrVVgolSLVQunk1exYCtoSJuk/mcDXWzFgiE=;
+ b=ag89PkLNHp7Rp4XutNn2akrQx6ExTRL9vMVYLHA/pMyDQF6RyCzSFU7eYGxJUDX4j4Eug8
+ 8SINGHdHrKlcfHiAvMuoLPHNhhfDe1P7b32jeplLX/aSrZyTZ3+Tf/urd1jJArfVM1e0za
+ DXU8fzfBXg5V1eemOgh12Uvzm8FNcYQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-335-h5jXKI9aMbKdGXMApXvdqA-1; Fri, 14 Feb 2020 12:11:22 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC6DE1005513;
+ Fri, 14 Feb 2020 17:11:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-234.ams2.redhat.com
+ [10.36.117.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4739A8AC46;
+ Fri, 14 Feb 2020 17:11:18 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C213711385C9; Fri, 14 Feb 2020 18:11:16 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 16/30] qapi: Add blank lines before bulleted lists
+References: <20200213175647.17628-1-peter.maydell@linaro.org>
+ <20200213175647.17628-17-peter.maydell@linaro.org>
+ <878sl5tf01.fsf@dusky.pond.sub.org>
+ <87wo8pqhqv.fsf@dusky.pond.sub.org>
+ <CAFEAcA86Ux9aiagyudmUJC63VvwY79HdGpn23nKDWtCz0S-zXg@mail.gmail.com>
+Date: Fri, 14 Feb 2020 18:11:16 +0100
+In-Reply-To: <CAFEAcA86Ux9aiagyudmUJC63VvwY79HdGpn23nKDWtCz0S-zXg@mail.gmail.com>
+ (Peter Maydell's message of "Fri, 14 Feb 2020 16:16:33 +0000")
+Message-ID: <87h7ztqekr.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: h5jXKI9aMbKdGXMApXvdqA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,59 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.puhov@linaro.org, philmd@redhat.com,
- qemu-devel@nongnu.org
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Robert Foley <robert.foley@linaro.org> writes:
-
-> Changes to tests/vm/basevm.py to allow accepting a configuration file
-> as a parameter. Allows for specifying VM options such as
-> cpu, machine, memory, and arbitrary qemu arguments for specifying options
-> such as NUMA configuration.
-> Also added an example conf_example_aarch64.yml and conf_example_x86.yml.
+> On Fri, 14 Feb 2020 at 16:02, Markus Armbruster <armbru@redhat.com> wrote=
+:
+>>
+>> Markus Armbruster <armbru@redhat.com> writes:
+>>
+>> > Peter Maydell <peter.maydell@linaro.org> writes:
+>> >
+>> >> rST insists on a blank line before and after a bulleted list,
+>> >> but our texinfo doc generator did not. Add some extra blank
+>> >> lines in the doc comments so they're acceptable rST input.
+>> >>
+>> >> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> >> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> >
+>> > Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>
+>> Hmm, PATCH 06 appears to do the same, among other things.  Sure you want
+>> this separate?
 >
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> ---
->  tests/vm/Makefile.include         |  2 ++
->  tests/vm/basevm.py                | 29 +++++++++++++++++-
->  tests/vm/conf_example_aarch64.yml | 51 +++++++++++++++++++++++++++++++
->  tests/vm/conf_example_x86.yml     | 50 ++++++++++++++++++++++++++++++
->  4 files changed, 131 insertions(+), 1 deletion(-)
->  create mode 100644 tests/vm/conf_example_aarch64.yml
->  create mode 100644 tests/vm/conf_example_x86.yml
->
-> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> index 778e506755..e9ed33226d 100644
-> --- a/tests/vm/Makefile.include
-> +++ b/tests/vm/Makefile.include
-> @@ -35,6 +35,8 @@ vm-help vm-test:
->  	@echo "    V=3D1				 - Enable verbose ouput on host and guest commands"
->  	@echo "    QEMU=3D/path/to/qemu		 - Change path to QEMU binary"
->  	@echo "    QEMU_IMG=3D/path/to/qemu-img	 - Change path to qemu-img tool"
-> +	@echo "    QEMU_CONFIG=3D/path/conf.yml   - Change path to VM configura=
-tion .yml file."
-> +	@echo "                                   See conf_example_*.yml for fi=
-le format details."
->=20=20
->  vm-build-all: $(addprefix vm-build-, $(IMAGES))
->=20=20
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 33004934af..f488d4103c 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -32,6 +32,7 @@ import shutil
->  import multiprocessing
->  import traceback
->  from socket_thread import SocketThread
-> +import yaml
+> Patch 6 is qga/; this is qapi/.
 
-So this throws my setup on my Gentoo SynQuacer. Is this meant to be in
-the standard library or is this a separate dependency?
+D'oh!
 
---=20
-Alex Benn=C3=A9e
+> This is again a product of my general preference for more
+> smaller patches rather than larger patches that touch more
+> files at once.
+
+Makes sense, thanks!
+
 
