@@ -2,86 +2,62 @@ Return-Path: <SRS0=hj7J=4C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F32F5C352A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 02:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4DAC352A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 02:30:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEE4C217F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 02:26:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45196217F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Feb 2020 02:30:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ws8B7oOe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEE4C217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ltfdz/uI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45196217F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2QgD-0005E1-Sf
-	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 21:26:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56780)
+	id 1j2Qkl-0007Gn-4f
+	for qemu-devel@archiver.kernel.org; Thu, 13 Feb 2020 21:30:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59674)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gshan@redhat.com>) id 1j2Qfc-0004gk-FQ
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 21:25:33 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j2Qjc-0006Qw-0H
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 21:29:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gshan@redhat.com>) id 1j2Qfa-0000qW-Og
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 21:25:31 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21810
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1j2Qja-0002Rk-PT
+ for qemu-devel@nongnu.org; Thu, 13 Feb 2020 21:29:39 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:54197)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1j2Qfa-0000oC-Fr
- for qemu-devel@nongnu.org; Thu, 13 Feb 2020 21:25:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581647129;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7lrAOZ9XjD+N2YIRPqwm0lN9LlzDnvRAI1rMkp2cWqc=;
- b=Ws8B7oOeF2HSUzSoIw5CW3lZcz3Ge+sbBZccwPQbJYGONKKItMSJjoCGzp0Y7BA1wBrxx7
- QFNn6P56NOVfWvZTYwn+QjgEyK3PwCR2y0tjxqFmZZPA1py6iB2SXXXQs+2bgYoHLsSuJ9
- bMig0nj+GiC7nM6tVrxb6pOr02Agd4c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-guSVQx0fN4SJRXBvGUTGJw-1; Thu, 13 Feb 2020 21:25:24 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3726800D41;
- Fri, 14 Feb 2020 02:25:22 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-88.bne.redhat.com [10.64.54.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D98719C70;
- Fri, 14 Feb 2020 02:25:16 +0000 (UTC)
-Subject: Re: [RESEND RFC PATCH v2 1/2] target/arm: Allow to inject SError
- interrupt
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200205110541.37811-2-gshan@redhat.com>
- <8dce7dbe-c6c1-122a-f960-0fc29257dd1c@redhat.com>
- <CAFEAcA-RiVfrFFkxppB=z8x76rjorF-5onyGwVAdsHY7W1U88g@mail.gmail.com>
- <21e4051a-4d06-03cb-6d8e-5331b5b570c4@redhat.com>
- <CAFEAcA_zyMgG5SQpVCwUTx3CyU=S=enSZCLCU=2NurukHNM=AA@mail.gmail.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <6d4934de-4aa6-24b4-6768-2439336a51af@redhat.com>
-Date: Fri, 14 Feb 2020 13:25:13 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1j2Qja-0002GV-E4; Thu, 13 Feb 2020 21:29:38 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48Jclf1Qphz9sRN; Fri, 14 Feb 2020 13:29:34 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1581647374;
+ bh=ATPubIQNceGEo/hwpRJRpnl67IYMOrbb7fAvMJTDbVA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ltfdz/uIVTSikXq0w3iZs+yeMR8Qx4To5V8FAsAKSCztCpzakuyOnOf5MSOBmNdcF
+ ymv97sRD9MJBFVhNh4tj1sfFP/VD5eh7PEYp7YYlPv4LCFxfE9yz/AJvuR2/f6kk4O
+ KCxVdFOGd/sZh9gdxPf+qClkF+UMIUumdHhMz8po=
+Date: Fri, 14 Feb 2020 13:29:25 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 0/3] spapr: Fix device unplug vs CAS or migration
+Message-ID: <20200214022925.GL124369@umbus.fritz.box>
+References: <158076936422.2118610.5626450767672103134.stgit@bahia.lan>
+ <20200213161055.3d1b25aa@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_zyMgG5SQpVCwUTx3CyU=S=enSZCLCU=2NurukHNM=AA@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: guSVQx0fN4SJRXBvGUTGJw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="m+jEI8cDoTn6Mu9E"
+Content-Disposition: inline
+In-Reply-To: <20200213161055.3d1b25aa@bahia.lan>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,49 +69,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Gavin Shan <gshan@redhat.com>
-Cc: Andrew Jones <drjones@redhat.com>, jthierry@redhat.com,
- Alexey Kardashevskiy <aik@ozlabs.ru>, Marc Zyngier <maz@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Shan Gavin <shan.gavin@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/13/20 9:31 PM, Peter Maydell wrote:
-> On Thu, 13 Feb 2020 at 03:49, Gavin Shan <gshan@redhat.com> wrote:
->> On 2/12/20 10:34 PM, Peter Maydell wrote:
->>> Yeah, this is on my list to look at; Richard Henderson also could
->>> have a look at it. From a quick scan I suspect you may be missing
->>> handling for AArch32.
-> 
->> Yes, the functionality is only supported on aarch64 currently by intention
->> because the next patch enables it on "max" and "host" CPU models and both
->> of them are running in aarch64 mode.
->>
->> https://patchwork.kernel.org/patch/11366119/
->>
->> If you really want to get this supported for aarch32 either, I can do
->> it. However, it seems there is a long list of aarch32 CPU models, defined
->> in target/arm/cpu.c::arm_cpus. so which CPU models you prefer to see with
->> this supported? I think we might choose one or two popular CPU models if
->> you agree.
-> 
-> I don't think you should need to care about the CPU models.
-> We should implement SError (aka "asynchronous external
-> abort" in ARMv7 and earlier) generically for all CPUs. The
-> SError/async abort should be triggered by a qemu_irq line
-> inbound to the CPU (similar to FIQ and IRQ); the board can
-> choose to wire that up to something, or not, as it likes.
-> 
 
-Yes, what I need to care about is board with this. It means
-I will get this supported on "virt" only. Thanks for the comments
-and the changes will be included in v3.
+--m+jEI8cDoTn6Mu9E
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Gavin
+On Thu, Feb 13, 2020 at 04:10:55PM +0100, Greg Kurz wrote:
+> Ping ?
+>=20
+> This series fixes actual bugs. Also, I have another patch on top of
+> that to cold plug (or remove) devices pending hot plug (or unplug)
+> before CAS, hence removing the need for CAS reboot in these cases.
+> This requires SLOF to correctly parse the FDT it gets at CAS. Patches
+> have been sent for that too:
+>=20
+> https://git.qemu.org/?p=3DSLOF.git;a=3Dcommitdiff;h=3D689ff6f6554d94fdab8=
+54bf4fc4ec85e2675e43d
+> https://git.qemu.org/?p=3DSLOF.git;a=3Dcommitdiff;h=3Da093be1ebe7a4832164=
+6601d94be6cf735c81e12
+> https://patchwork.ozlabs.org/patch/1235817/
 
+Yeah, sorry, I've been having a bit of trouble getting my head around
+the cases here.  I've sent a comment now.
+
+>=20
+> On Mon, 03 Feb 2020 23:36:04 +0100
+> Greg Kurz <groug@kaod.org> wrote:
+>=20
+> > While working on getting rid of CAS reboot, I realized that we currently
+> > don't handle device hot unplug properly in the following situations:
+> >=20
+> > 1) if the device is unplugged between boot and CAS, SLOF doesn't handle
+> >    the even, which is a known limitation. The device hence stays around
+> >    forever (specifically, until some other event is emitted and the gue=
+st
+> >    eventually completes the unplug or a reboot). Until we can teach SLOF
+> >    to correctly process the full FDT at CAS, we should trigger a CAS re=
+boot,
+> >    like we already do for hotplug.
+> >=20
+> > 2) if the guest is migrated after the even was emitted but before the
+> >    guest could process it, the destination is unaware of the pending
+> >    unplug operation and doesn't remove the device when the guests
+> >    releases it. The 'unplug_requested' field of the DRC is actually sta=
+te
+> >    that should be migrated.
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--m+jEI8cDoTn6Mu9E
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5GBgUACgkQbDjKyiDZ
+s5K1ZBAAt2MMzeR5YjupsCLavuKvoWQ6Dylni9wmf4ERLFV2vuUUoYFCi+uQh3YM
+HSds9iZDv42hSyRkv55d/oghlyJRKjWZiyeBfhX6PML1w6L79PpPl37HsH30Y0JG
+UyWHNFFkh9kTiVIuTtKraqfa3n6csylsqR1pDVZU2XLCBqZrl4eri6Boz8MsCjdL
+E8i7f9ITJPn+Zvdd9enhJutOAYyagEcOUQ/iOy1NhG9Y/pq8BBsu+Jaieqi41jyT
+iNthbYzhQCniNMfUYhajBV2K8syleXzJUkWdcLuDNjRYhfosQShMfkAGPDKSHZaT
+xG1jQDj+JK6myZm9Pmt/AcroCYsIWnM5mmxM8B4JIkl3tCcJRuLQQyvGRvRHmap4
+ssfEiFEkZexUUZdNtMyR0i5SjzI85m87xP51fhiOS3z65TTMgKzogRugaA5WO5wt
+JON4Rp7iB30d5QAJWc67BtvPxId8FF7HPJTfHadkyn2kL/hca89qpXaVBdDIORsY
+3bBlZDeg/HLWFJCFP3n0OVWDUBbtrb3zW6I8QPPTuhoJ8mPu4Q3vA3F/va9qRBXB
++m8lZBr2OKljBZoRrQUIRs4dR4MuZZ219SO9pZeCr5EicmfHpKfkv6oK8g0wY+Tr
+B7A8AuRwlzP9RxnyvdRC6LkkxUGDGM7raZX5oA1bLZCyvsbbX6g=
+=nrnN
+-----END PGP SIGNATURE-----
+
+--m+jEI8cDoTn6Mu9E--
 
