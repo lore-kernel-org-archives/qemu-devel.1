@@ -2,62 +2,82 @@ Return-Path: <SRS0=Sgwn=4D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 502EBC3F68F
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 04:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2F3C352A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 06:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 160C320718
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 04:37:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="a8CBr+ES"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 160C320718
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 040A42082F
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 06:26:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 040A42082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2pCh-0007Kw-7d
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 23:37:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47883)
+	id 1j2quM-0004VD-5N
+	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 01:26:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j2pC2-0006IB-I1
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 23:36:40 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1j2qtX-00043L-VW
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 01:25:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j2pC1-0007n6-0K
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 23:36:38 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:59685 helo=ozlabs.org)
+ (envelope-from <yi.l.liu@intel.com>) id 1j2qtV-00083x-L7
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 01:25:38 -0500
+Received: from mga17.intel.com ([192.55.52.151]:19199)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j2pC0-0007ew-3B; Fri, 14 Feb 2020 23:36:36 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48KHWd0MN1z9sRJ; Sat, 15 Feb 2020 15:36:28 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1581741389;
- bh=iAlcM+L8JKoI0x2+hNvVdSxxP898sb+Akh+pGsuFj6Y=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=a8CBr+ES5HxQVCJsUBY7I/oFBuEJ7DaJ9Jg6eCOa7Uy++QAXEzHmgiOqWcjMG6TVH
- ML8MBdmjHi2UTOU2+1EsyP5GrdEsoyYxx4UuVrhbCri9bnmh2j0BRWEvIRnh8h17xV
- ajLWWczk+GJdkTz767ykKhV29CZh9daDBYfJyr88=
-Date: Sat, 15 Feb 2020 15:13:14 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH v2] target/ppc: Fix typo in comments
-Message-ID: <20200215041314.GA2156@umbus.fritz.box>
-References: <20200214155748.0896B745953@zero.eik.bme.hu>
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j2qtV-0007rU-DF
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 01:25:37 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 14 Feb 2020 22:25:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,443,1574150400"; d="scan'208";a="435017982"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+ by fmsmga006.fm.intel.com with ESMTP; 14 Feb 2020 22:25:29 -0800
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 14 Feb 2020 22:25:28 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.5]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.98]) with mapi id 14.03.0439.000;
+ Sat, 15 Feb 2020 14:25:26 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: RE: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
+Thread-Topic: [RFC v3 03/25] hw/iommu: introduce IOMMUContext
+Thread-Index: AQHV1p1ISlCEZJtKwkqCei/mecuDIagDpFsAgADzWWCAES39gIABZmlAgAKR7QCAAiP4wA==
+Date: Sat, 15 Feb 2020 06:25:25 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A1BE6EB@SHSMSX104.ccr.corp.intel.com>
+References: <1580300216-86172-1-git-send-email-yi.l.liu@intel.com>
+ <1580300216-86172-4-git-send-email-yi.l.liu@intel.com>
+ <20200131040644.GG15210@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A199306@SHSMSX104.ccr.corp.intel.com>
+ <20200211165843.GG984290@xz-x1>
+ <A2975661238FB949B60364EF0F2C25743A1BA4D8@SHSMSX104.ccr.corp.intel.com>
+ <20200214053620.GR124369@umbus.fritz.box>
+In-Reply-To: <20200214053620.GR124369@umbus.fritz.box>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOGZlYjkwM2ItM2JmNS00YTYzLTg1NWMtZGJjOWE2MmE3NjdmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibnowamcraDFiRmFXemluMEczZ2RxaHNVWGJxOFZoSEFubG91NGx1d3JKQkRUSHh0Q0s4dWE3cmJHVFNIUFJKQiJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="wRRV7LY7NUeQGEoC"
-Content-Disposition: inline
-In-Reply-To: <20200214155748.0896B745953@zero.eik.bme.hu>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,114 +89,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: "Tian,
+ Kevin" <kevin.tian@intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi
+ Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, 
+ Yi Y" <yi.y.sun@intel.com>, "Wu, Hao" <hao.wu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---wRRV7LY7NUeQGEoC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Feb 14, 2020 at 12:57:34AM +0100, BALATON Zoltan wrote:
-> "Deferred" was misspelled as "differed" in some comments, correct this
-> typo,
->=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-
-I've replaced the earlier version in my tree.
-
-> ---
-> v2: Found one more where even the typo was misspelled
->=20
-> target/ppc/fpu_helper.c            | 4 ++--
->  target/ppc/translate/fp-impl.inc.c | 6 +++---
->  2 files changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-> index dc383242f7..ae43b08eb5 100644
-> --- a/target/ppc/fpu_helper.c
-> +++ b/target/ppc/fpu_helper.c
-> @@ -293,7 +293,7 @@ static void float_invalid_op_vxvc(CPUPPCState *env, b=
-ool set_fpcc,
->          env->error_code =3D POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
->          /* Update the floating-point enabled exception summary */
->          env->fpscr |=3D FP_FEX;
-> -        /* Exception is differed */
-> +        /* Exception is deferred */
->      }
->  }
-> =20
-> @@ -644,7 +644,7 @@ static void do_float_check_status(CPUPPCState *env, u=
-intptr_t raddr)
-> =20
->      if (cs->exception_index =3D=3D POWERPC_EXCP_PROGRAM &&
->          (env->error_code & POWERPC_EXCP_FP)) {
-> -        /* Differred floating-point exception after target FPR update */
-> +        /* Deferred floating-point exception after target FPR update */
->          if (fp_exceptions_enabled(env)) {
->              raise_exception_err_ra(env, cs->exception_index,
->                                     env->error_code, raddr);
-> diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp=
--impl.inc.c
-> index d8e27bf4d5..9f7868ee28 100644
-> --- a/target/ppc/translate/fp-impl.inc.c
-> +++ b/target/ppc/translate/fp-impl.inc.c
-> @@ -781,7 +781,7 @@ static void gen_mtfsb1(DisasContext *ctx)
->          tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
->          tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
->      }
-> -    /* We can raise a differed exception */
-> +    /* We can raise a deferred exception */
->      gen_helper_float_check_status(cpu_env);
->  }
-> =20
-> @@ -817,7 +817,7 @@ static void gen_mtfsf(DisasContext *ctx)
->          tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
->          tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
->      }
-> -    /* We can raise a differed exception */
-> +    /* We can raise a deferred exception */
->      gen_helper_float_check_status(cpu_env);
->      tcg_temp_free_i64(t1);
->  }
-> @@ -850,7 +850,7 @@ static void gen_mtfsfi(DisasContext *ctx)
->          tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
->          tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
->      }
-> -    /* We can raise a differed exception */
-> +    /* We can raise a deferred exception */
->      gen_helper_float_check_status(cpu_env);
->  }
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---wRRV7LY7NUeQGEoC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5Hb9gACgkQbDjKyiDZ
-s5LYBg//UcuNfbf53RAkexJdR+zbp815rn0v45N0Ajf6R4sGKrRUy7IF/QmAZ2Vr
-huHYefwPhb5+tNft9pJNTvIYY5R2PZscGJ1b+jAxbb+mCykCloAlB7Chpw7I2Ofe
-7bWp7+6fXdG1Tq2JMoUnPK9sdMOkJa2TzK2DrKNtafISohcKrzvqPLSXL0JspFVq
-2ew+3+82d8poZDhwzH8awsF9R/lCDvu+EWMzLG12jEoN9s/Q6tvquqmKMZQoCeMW
-mrFb1vgSg5Xs+rh3CjXRGYmd3yjp1M15BNVa7y/Lm8vXYtoexuXrq/UBuxdHpWJ2
-kPZgwa/seKu/ofR2Pfr8QIlB5eJWLrPT948QG80SgAGIoQgLvvSw5GId3ph2dXij
-JXi/11oNSvY+Az05PbdObKbubwK7y0C4JFMdU8tMM4F3SdvpnwDXFXg53KopdaAE
-N2F/JQ0m0v8JQ5AR+fMs2o4dvn/Y11aYMVEU2vsbNZO0y+Afk6pLmY3XCk4qrcZ+
-3uNyCheIsjSOYUHenXMWQ7NTc6fPXSVI/ziAajt2bMwb5u64lT+vK2Ytra/3Fv0B
-R6ZO6YwQxUvcNgag1PgcMnphD1JmXjZT+ImJNhkHEi4W3TgitwDItxZCFfSoWAEY
-KKs3i29IgzVvUPPZfbd9Xjp4FCi06FFJ4RH4OZK7CVSg/bteH0s=
-=AroX
------END PGP SIGNATURE-----
-
---wRRV7LY7NUeQGEoC--
+PiBGcm9tOiBEYXZpZCBHaWJzb24gPCBkYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUgPg0KPiBT
+ZW50OiBGcmlkYXksIEZlYnJ1YXJ5IDE0LCAyMDIwIDE6MzYgUE0NCj4gVG86IExpdSwgWWkgTCA8
+eWkubC5saXVAaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MyAwMy8yNV0gaHcvaW9t
+bXU6IGludHJvZHVjZSBJT01NVUNvbnRleHQNCj4gDQo+IE9uIFdlZCwgRmViIDEyLCAyMDIwIGF0
+IDA3OjE1OjEzQU0gKzAwMDAsIExpdSwgWWkgTCB3cm90ZToNCj4gPiBIaSBQZXRlciwNCj4gPg0K
+PiA+ID4gRnJvbTogUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPg0KPiA+ID4gU2VudDogV2Vk
+bmVzZGF5LCBGZWJydWFyeSAxMiwgMjAyMCAxMjo1OSBBTQ0KPiA+ID4gVG86IExpdSwgWWkgTCA8
+eWkubC5saXVAaW50ZWwuY29tPg0KPiA+ID4gU3ViamVjdDogUmU6IFtSRkMgdjMgMDMvMjVdIGh3
+L2lvbW11OiBpbnRyb2R1Y2UgSU9NTVVDb250ZXh0DQo+ID4gPg0KPiA+ID4gT24gRnJpLCBKYW4g
+MzEsIDIwMjAgYXQgMTE6NDI6MTNBTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+ID4gPiA+
+IEknbSBub3QgdmVyeSBjbGVhciBvbiB0aGUgcmVsYXRpb25zaGlwIGJldHdlbiBhbiBJT01NVUNv
+bnRleHQgYW5kIGENCj4gPiA+ID4gPiBEdWFsU3RhZ2VJT01NVU9iamVjdC4gIENhbiB0aGVyZSBi
+ZSBtYW55IElPTU1VQ29udGV4dHMgdG8gYQ0KPiA+ID4gPiA+IER1YWxTdGFnZUlPTU1VT0JqZWN0
+PyAgVGhlIG90aGVyIHdheSBhcm91bmQ/ICBPciBpcyBpdCBqdXN0DQo+ID4gPiA+ID4gemVyby1v
+ci1vbmUgRHVhbFN0YWdlSU9NTVVPYmplY3RzIHRvIGFuIElPTU1VQ29udGV4dD8NCj4gPiA+ID4N
+Cj4gPiA+ID4gSXQgaXMgcG9zc2libGUuIEFzIHRoZSBiZWxvdyBwYXRjaCBzaG93cywgRHVhbFN0
+YWdlSU9NTVVPYmplY3QgaXMgcGVyIHZmaW8NCj4gPiA+ID4gY29udGFpbmVyLiBJT01NVUNvbnRl
+eHQgY2FuIGJlIGVpdGhlciBwZXItZGV2aWNlIG9yIHNoYXJlZCBhY3Jvc3MgZGV2aWNlcywNCj4g
+PiA+ID4gaXQgZGVwZW5kcyBvbiB2ZW5kb3Igc3BlY2lmaWMgdklPTU1VIGVtdWxhdG9ycy4NCj4g
+PiA+DQo+ID4gPiBJcyB0aGVyZSBhbiBleGFtcGxlIHdoZW4gYW4gSU9NTVVDb250ZXh0IGNhbiBi
+ZSBub3QgcGVyLWRldmljZT8NCj4gPg0KPiA+IE5vLCBJIGRvbuKAmXQgaGF2ZSBzdWNoIGV4YW1w
+bGUgc28gZmFyLiBCdXQgYXMgSU9NTVVDb250ZXh0IGlzIGdvdCBmcm9tDQo+ID4gcGNpX2Rldmlj
+ZV9pb21tdV9jb250ZXh0KCksICBpbiBjb25jZXB0IGl0IHBvc3NpYmxlIHRvIGJlIG5vdCBwZXIt
+ZGV2aWNlLg0KPiA+IEl0IGlzIGtpbmQgb2YgbGVhdmUgdG8gdklPTU1VIHRvIGRlY2lkZSBpZiBk
+aWZmZXJlbnQgZGV2aWNlcyBjb3VsZCBzaGFyZSBhDQo+ID4gc2luZ2xlIElPTU1VQ29udGV4dC4N
+Cj4gDQo+IE9uIHRoZSAicHNlcmllcyIgbWFjaGluZSB0aGUgdklPTU1VIG9ubHkgaGFzIG9uZSBz
+ZXQgb2YgdHJhbnNsYXRpb25zDQo+IGZvciBhIHdob2xlIHZpcnR1YWwgUENJIEhvc3QgQnJpZGdl
+ICh2UEhCKS4gIFNvIGlmIHlvdSBhdHRhY2ggbXVsdGlwbGUNCj4gZGV2aWNlcyB0byBhIHNpbmds
+ZSB2UEhCLCBJIGJlbGlldmUgeW91J2QgZ2V0IG11bHRpcGxlIGRldmljZXMgaW4gYW4NCj4gSU9N
+TVVDb250ZXh0LiAgV2VsbC4uIGlmIHdlIGRpZCB0aGUgUEFTSUQgc3R1ZmYsIHdoaWNoIHdlIGRv
+bid0IGF0IHRoZQ0KPiBtb21lbnQuDQo+IA0KPiBOb3RlIHRoYXQgb24gcHNlcmllcyBvbiB0aGUg
+b3RoZXIgaGFuZCBpdCdzIHJvdXRpbmUgdG8gY3JlYXRlIG11bHRpcGxlDQo+IHZQSEJzLCByYXRo
+ZXIgdGhhbiBtdWx0aXBsZSBQQ0kgcm9vdHMgYmVpbmcgYW4gb2RkaXR5IGFzIGl0IGlzIG9uIHg4
+Ni4NCg0KVGhhbmtzIGZvciB0aGUgZXhhbXBsZSwgRGF2aWQuIDotKSBCVFcuIEknbGwgZHJvcCBJ
+T01NVUNvbnRleHQgaW4gbmV4dCB2ZXJzaW9uDQphcyB0aGUgZW1haWwgYmVsb3cgbWVudGlvbmVk
+LiAgUGxlYXNlIGZlZWwgZnJlZSBsZXQgbWUga25vdyB5b3VyIG9waW5pb24uDQoNCmh0dHBzOi8v
+bGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDIwLTAyL21zZzAyODc0Lmh0
+bWwNCg0KUmVnYXJkcywNCllpIExpdQ0K
 
