@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C38C352A3
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 23:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5DCC352A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 23:06:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09C7520726
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 23:06:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09C7520726
+	by mail.kernel.org (Postfix) with ESMTPS id B12C12083B
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 23:06:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B12C12083B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j36W7-0000H5-14
-	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 18:06:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59440)
+	id 1j36WA-0000LN-S9
+	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 18:06:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j36VF-0007V9-L3
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 18:05:39 -0500
+ (envelope-from <bounces@canonical.com>) id 1j36VH-0007Vm-Cq
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 18:05:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j36VE-0002D0-5S
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 18:05:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57384)
+ (envelope-from <bounces@canonical.com>) id 1j36VG-0002I4-4k
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 18:05:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57404)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j36VD-0002AW-W3
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 18:05:36 -0500
+ id 1j36VF-0002Ch-JN
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 18:05:37 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j36VD-0006mK-7k
+ id 1j36VD-0006oC-RN
  for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 23:05:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 342CB2E80C0
+ by loganberry.canonical.com (Postfix) with ESMTP id C06BC2E80C0
  for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 23:05:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 15 Feb 2020 22:53:35 -0000
+Date: Sat, 15 Feb 2020 22:55:04 -0000
 From: Ayman Khamouma <1863445@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,16 +55,16 @@ X-Launchpad-Bug-Commenters: ak42
 X-Launchpad-Bug-Reporter: Ayman Khamouma (ak42)
 X-Launchpad-Bug-Modifier: Ayman Khamouma (ak42)
 References: <158180717472.31124.817430819772209101.malonedeb@wampee.canonical.com>
-Message-Id: <158180721567.24464.456279008167343239.malone@gac.canonical.com>
+Message-Id: <158180730416.30066.7925555714317831037.malone@wampee.canonical.com>
 Subject: [Bug 1863445] Re: assertion failed at translate-all.c:2523 with
- version 3.1.1
+ version 3.1.1 
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d66fab73a9d8e4eff3487ea269c2947773f9129c
+X-Launchpad-Hash: 4567c0b322edffd59d62ebde11e30dc398c5377e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,9 +82,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "debuged binary"
-   https://bugs.launchpad.net/qemu/+bug/1863445/+attachment/5328542/+files/=
-ch67.zip
+in order to reproduce the bug:
+```
+qemu-mipsel -g 1234 ch67
+```
+
+and then juste launch (after installing r2):
+
+```
+r2 -a mips -b 32 -d gdb://127.0.0.1:1234
+```
+
+qemu will crash
 
 -- =
 
