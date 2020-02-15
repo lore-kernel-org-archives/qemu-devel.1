@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 361A6C2BA83
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 19:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 151AFC7114D
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 19:18:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0822D206D6
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 19:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D956A206D6
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 19:18:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAlitRsd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0822D206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4ohMMxR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D956A206D6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j32xh-0005bX-6O
-	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 14:18:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35268)
+	id 1j32xt-0005rX-15
+	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 14:18:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j32uw-0008KM-Pp
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:15:56 -0500
+ id 1j32v1-000062-Gs
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:16:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j32uv-0004GR-CE
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:15:54 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42130)
+ id 1j32v0-0004Jn-Gc
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:15:59 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39973)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j32uv-0004Fy-5b; Sat, 15 Feb 2020 14:15:53 -0500
-Received: by mail-wr1-x444.google.com with SMTP id k11so14895819wrd.9;
- Sat, 15 Feb 2020 11:15:53 -0800 (PST)
+ id 1j32v0-0004JQ-AL; Sat, 15 Feb 2020 14:15:58 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t3so14908650wru.7;
+ Sat, 15 Feb 2020 11:15:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vgwXjH0kKbScO8AvLlOooEIEzKYchoKqFxh3C7QVSgQ=;
- b=WAlitRsdK6XnOlQKldpaZlsLFM9ctdqv5lYmOk/dewrTKLt09P0W9wnfioy/qL6Unt
- Z07m2DLtrzRm3gFpbL0WCMiUEcciscTZthcOqCAM5zP/PkeW4v1lC/CqoPbanoNyfWet
- 0X4FkiNt4APsKFwDeKKs2oXbNjtgZxkV7dz5/JFcEXO1DwHubFUghODGFAshrS1NkcE0
- FXnYkTV92PITd86nLz2wcu/01g+uBU7P/WjE7G1ZOaDfcuXVzI19tTLbOXhBLaHptv5F
- fWQsJZu+qYD9lXZrDgTLEwi9oCIapbYJf30sGbbDfVqF49sFrTfN2PGftskrJ/mu8laV
- UMhw==
+ bh=uxynYOVPY9FVrupSLyC8th1oxyDcEka8bWnY9WEi7fw=;
+ b=P4ohMMxR9cNR+cL8ZEDGWT7b7v8HasOKB2ILUyTUAlhqfvqEVhxD2MXV+XcYA7dX5o
+ jtFBvrI23E9VKqqn9JbEHmfNYfbTlOzCLdkdQdIxVtG2xqai66b127D++bq581dHw3kJ
+ 5/R2Jne/3VH0DzqDJHPsyptpmAX8h0W4YNg4qRuFWuO7NSxeRc6evTPvBSD8YnKlQPSG
+ dEiEKd7UOTbTb0Ds6tT9gJCfCplIHK/0LAFu8Kvz18IudPSnt8dYNK7ttMP0nMLcZ3dE
+ 7dGM+SZ68JnUUV1HbW/7EpFCFYYkbRBUc9MAYecaC32f+z1FHDrfRVvTV6jkZlGKx76f
+ cjjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=vgwXjH0kKbScO8AvLlOooEIEzKYchoKqFxh3C7QVSgQ=;
- b=lwPQ/dvBhbXlUF0FVyeAReS7uUiqtstY3terr42K3yV2cBWCjnEX/eZPgTw5BjCx1w
- 82NcXYbCYYQtVKwIhvG4qcEbWJMUNffM7gox2Y6acjG+t/98LlIZDPYHdqmAFnKd/Ywu
- N5NqDuyFBuEF1a+r/D+x0KvSWzj5LliotHw4S9rWymTey5mO7Gwn0f2rUWcU3CJB4qOi
- +LypMc9i34imNYn2nsEoyhCV7qkEeaVIMNhlftiMyTtEJMiZHzjwswVOoBjtJdjjZSgM
- klpILuZFREs1TqJzMjbbiFWuKfxAH7EqsdT4FRygOop+3dwwFq7hpoi2PxgpnwVXi2aP
- VweQ==
-X-Gm-Message-State: APjAAAVCYSYu/MqQ3da5N/2unj2c35WLeNWXtQHEOEo4yB4Fd8ZXJMO0
- ex/Ah4y316kGRqUT4dFLWnuwCEOgpOg=
-X-Google-Smtp-Source: APXvYqyYSozLG0aJ8qKSWG7+IEjy/pY1GiR6aZ6fveYZSi5+7N0D+HMplynzPI+ZqvzkKVVNFLUQ1g==
-X-Received: by 2002:adf:fd87:: with SMTP id d7mr11837100wrr.226.1581794151975; 
- Sat, 15 Feb 2020 11:15:51 -0800 (PST)
+ bh=uxynYOVPY9FVrupSLyC8th1oxyDcEka8bWnY9WEi7fw=;
+ b=B4+rV7vAD/sTr86Fd9KZRYqpisSdDxsbRhgvxVKLo18k3czD/2+YM7sgfP4G3Qdr1G
+ +M7COkZaxRiNN2BHwirNzh6mHtZjpwjcz0YFRCjLcoWOBaHlxxOPvLfhbK0li15fBQ1m
+ SFd9LfnFO+MkDrnvQUMuUYju+m2tavLWey1hoNRyv00ROAopCUAc35fsJ3CmbNfNQZy8
+ BBIMt8+R7ExxaTl4l/e+n8lUu2uCWXZGCNL+2hF/YlG2ERy39sivVIm4ta3n1gPNNmV5
+ RpJni3HWMnxSf4ws+xbtJbsSIfsfIZmx/WPKwlze75x5JujmZEVtxg+fu/lQDw7RJazE
+ GTIg==
+X-Gm-Message-State: APjAAAUHAVAqOrPXe46NGr5abqWcLHqMXw56kgQFV2vYZ8dcjuxqp3Hp
+ siM4nHOr1NsZTTHUGDYCghkx3brGfEw=
+X-Google-Smtp-Source: APXvYqyKsc1qpNlhCSnXzR+Yr5hmMPb5bgFcCDFwkJjZ4JRb34TjvATAeJMXsHC9Ez4Z44SYQSOlaQ==
+X-Received: by 2002:a5d:6144:: with SMTP id y4mr10979700wrt.367.1581794157269; 
+ Sat, 15 Feb 2020 11:15:57 -0800 (PST)
 Received: from localhost.localdomain (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id o9sm9678605wrw.20.2020.02.15.11.15.50
+ by smtp.gmail.com with ESMTPSA id o9sm9678605wrw.20.2020.02.15.11.15.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 15 Feb 2020 11:15:51 -0800 (PST)
+ Sat, 15 Feb 2020 11:15:56 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/12] hw/arm/raspi: Remove use of the 'version' value in the
- board code
-Date: Sat, 15 Feb 2020 20:15:35 +0100
-Message-Id: <20200215191543.3235-5-f4bug@amsat.org>
+Subject: [PATCH 08/12] hw/arm/bcm2836: Only provide "enabled-cpus" property to
+ multicore SoCs
+Date: Sat, 15 Feb 2020 20:15:39 +0100
+Message-Id: <20200215191543.3235-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200215191543.3235-1-f4bug@amsat.org>
 References: <20200215191543.3235-1-f4bug@amsat.org>
@@ -106,112 +106,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We expected the 'version' ID to match the board processor ID,
-but this is not always true (for example boards with revision
-id 0xa02042/0xa22042 are Raspberry Pi 2 with a BCM2837 SoC).
-This was not important because we were not modelling them, but
-since the recent refactor now allow to model these boards, it
-is safer to check the processor id directly. Remove the version
-check.
+It makes no sense to set enabled-cpus=0 on single core SoCs.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/raspi.c | 37 ++++++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+ hw/arm/bcm2836.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index aa0a7e6276..38829195c5 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -98,11 +98,6 @@ static RaspiProcessorId board_processor_id(uint32_t board_rev)
-     return proc_id;
- }
+diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+index 3b95ad11e9..caaa4b625e 100644
+--- a/hw/arm/bcm2836.c
++++ b/hw/arm/bcm2836.c
+@@ -32,6 +32,9 @@ typedef struct BCM283XClass {
+ #define BCM283X_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(BCM283XClass, (obj), TYPE_BCM283X)
  
--static int board_version(uint32_t board_rev)
--{
--    return board_processor_id(board_rev) + 1;
--}
--
- static const char *board_soc_type(uint32_t board_rev)
- {
-     return soc_property[board_processor_id(board_rev)].type;
-@@ -201,7 +196,8 @@ static void reset_secondary(ARMCPU *cpu, const struct arm_boot_info *info)
-     cpu_set_pc(cs, info->smp_loader_start);
- }
- 
--static void setup_boot(MachineState *machine, int version, size_t ram_size)
-+static void setup_boot(MachineState *machine, RaspiProcessorId processor_id,
-+                       size_t ram_size)
- {
-     static struct arm_boot_info binfo;
-     int r;
-@@ -210,12 +206,13 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-     binfo.ram_size = ram_size;
-     binfo.nb_cpus = machine->smp.cpus;
- 
--    if (version <= 2) {
--        /* The rpi1 and 2 require some custom setup code to run in Secure
--         * mode before booting a kernel (to set up the SMC vectors so
--         * that we get a no-op SMC; this is used by Linux to call the
-+    if (processor_id <= PROCESSOR_ID_BCM2836) {
-+        /*
-+         * The BCM2835 and BCM2836 require some custom setup code to run
-+         * in Secure mode before booting a kernel (to set up the SMC vectors
-+         * so that we get a no-op SMC; this is used by Linux to call the
-          * firmware for some cache maintenance operations.
--         * The rpi3 doesn't need this.
-+         * The BCM2837 doesn't need this.
-          */
-         binfo.board_setup_addr = BOARDSETUP_ADDR;
-         binfo.write_board_setup = write_board_setup;
-@@ -223,10 +220,10 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-         binfo.secure_boot = true;
-     }
- 
--    /* Pi2 and Pi3 requires SMP setup */
--    if (version >= 2) {
-+    /* BCM2836 and BCM2837 requires SMP setup */
-+    if (processor_id >= PROCESSOR_ID_BCM2836) {
-         binfo.smp_loader_start = SMPBOOT_ADDR;
--        if (version == 2) {
-+        if (processor_id == PROCESSOR_ID_BCM2836) {
-             binfo.write_secondary_boot = write_smpboot;
-         } else {
-             binfo.write_secondary_boot = write_smpboot64;
-@@ -238,7 +235,13 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
-      * the normal Linux boot process
-      */
-     if (machine->firmware) {
--        hwaddr firmware_addr = version == 3 ? FIRMWARE_ADDR_3 : FIRMWARE_ADDR_2;
-+        hwaddr firmware_addr;
++static Property bcm2836_enabled_cores_property =
++    DEFINE_PROP_UINT32("enabled-cpus", BCM283XState, enabled_cpus, 0);
 +
-+        if (processor_id == PROCESSOR_ID_BCM2837) {
-+            firmware_addr = FIRMWARE_ADDR_3;
-+        } else {
-+            firmware_addr = FIRMWARE_ADDR_2;
-+        }
-         /* load the firmware image (typically kernel.img) */
-         r = load_image_targphys(machine->firmware, firmware_addr,
-                                 ram_size - firmware_addr);
-@@ -259,7 +262,6 @@ static void raspi_machine_init(MachineState *machine)
-     RaspiMachineClass *mc = RASPI_MACHINE_GET_CLASS(machine);
-     RaspiMachineState *s = RASPI_MACHINE(machine);
-     uint32_t board_rev = mc->board_rev;
--    int version = board_version(board_rev);
-     uint64_t ram_size = board_ram_size(board_rev);
-     uint32_t vcram_size;
-     DriveInfo *di;
-@@ -303,7 +305,8 @@ static void raspi_machine_init(MachineState *machine)
+ static void bcm2836_init(Object *obj)
+ {
+     BCM283XState *s = BCM283X(obj);
+@@ -43,6 +46,10 @@ static void bcm2836_init(Object *obj)
+                                 sizeof(s->cpu[n].core), bc->cpu_type,
+                                 &error_abort, NULL);
+     }
++    if (bc->core_count) {
++        qdev_property_add_static(DEVICE(obj), &bcm2836_enabled_cores_property);
++        qdev_prop_set_uint32(DEVICE(obj), "enabled-cpus", bc->core_count);
++    }
  
-     vcram_size = object_property_get_uint(OBJECT(&s->soc), "vcram-size",
-                                           &error_abort);
--    setup_boot(machine, version, machine->ram_size - vcram_size);
-+    setup_boot(machine, board_processor_id(mc->board_rev),
-+               machine->ram_size - vcram_size);
+     sysbus_init_child_obj(obj, "control", &s->control, sizeof(s->control),
+                           TYPE_BCM2836_CONTROL);
+@@ -154,12 +161,6 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+     }
  }
  
- static void raspi_machine_class_common_init(MachineClass *mc,
+-static Property bcm2836_props[] = {
+-    DEFINE_PROP_UINT32("enabled-cpus", BCM283XState, enabled_cpus,
+-                       BCM283X_NCPUS),
+-    DEFINE_PROP_END_OF_LIST()
+-};
+-
+ static void bcm283x_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+@@ -179,7 +180,6 @@ static void bcm2836_class_init(ObjectClass *oc, void *data)
+     bc->ctrl_base = 0x40000000;
+     bc->clusterid = 0xf;
+     dc->realize = bcm2836_realize;
+-    device_class_set_props(dc, bcm2836_props);
+ };
+ 
+ #ifdef TARGET_AARCH64
+@@ -194,7 +194,6 @@ static void bcm2837_class_init(ObjectClass *oc, void *data)
+     bc->ctrl_base = 0x40000000;
+     bc->clusterid = 0x0;
+     dc->realize = bcm2836_realize;
+-    device_class_set_props(dc, bcm2836_props);
+ };
+ #endif
+ 
 -- 
 2.21.1
 
