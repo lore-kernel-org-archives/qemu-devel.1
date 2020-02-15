@@ -2,82 +2,82 @@ Return-Path: <SRS0=Sgwn=4D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EFEAC2BA83
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 19:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F05A6C2BA83
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 19:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E5342082F
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 19:28:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEEBD2082F
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 19:28:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s35Jv7yj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E5342082F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="riXWaGz5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEEBD2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j336x-0005T7-MC
-	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 14:28:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36482)
+	id 1j337b-0006V9-0M
+	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 14:28:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j331L-0004Il-4L
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:22:32 -0500
+ id 1j331M-0004NO-Nz
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:22:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j331J-00013c-Qk
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:22:31 -0500
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:40772)
+ id 1j331L-00015b-9s
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:22:32 -0500
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:46538)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j331J-00011M-Jz
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:22:29 -0500
-Received: by mail-ed1-x544.google.com with SMTP id p3so15456747edx.7
- for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 11:22:29 -0800 (PST)
+ id 1j331L-00014g-2C
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:22:31 -0500
+Received: by mail-ed1-x544.google.com with SMTP id p14so7289659edy.13
+ for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 11:22:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PzfywHJFm+G1+KKl/Onq2rp5QkVpIkH04ol8WwJE1Zw=;
- b=s35Jv7yjc5XdY4TW3ZpEk5RqR8skKfXKFTlvT3ZTPM6OH1hQK1QycSUqrjPqww2tre
- t2LVmPC4CfhXtecQEf3GMoUXOD9Wa5V6KQrEFCf2WOAUHEhLLzEag8KY4s5NpHqIR6yG
- zcwasypyrkm6RcUiBg/k2sG7DDg4+rDlXejoxuk5n2NDd+OB+6fghWAnRAuBaFPxZa/x
- IC5I5o/L5PCtmXsGE4/E4L26JRlfI5/0QduZUn9UJ2uJHH7nOCLWUNJdjPixJV3yBT3C
- JGd7ctfkb24nygQEKkN4GOOrmqSa22oV/1SUJrPNo5iLm2Xb09lgiEGOpaTiQ4Abovdc
- YCuw==
+ bh=M2A4CWYeBUQraMsGqLJVBo2F77JeixbCIjDEu/D75HE=;
+ b=riXWaGz5w5wGYkhJAYi6/K0pIFSLLQHnA3nhAW125c+8PEfI7slcH5Vy6VY4vWsCqR
+ x/Jg7sW+cWub/FjDc/ixYyoWFjVs3Xg1E++Qjhf5G4N1PHRRZWzlytADCtryQiH0e05r
+ zSqhhlRsdcrusrEcSnfEX8CcPaS4qv/5gbfCAx6MkA6sybKB+3JJXCgfjK8fmUwhAcXA
+ 1i1+92fhxGDHCYQmzvHIQgULDeSQ9LMCEzbQcC2f51ZHWANqcYrS3Iy2eK+oaf0ayICt
+ At38qwismfIv+QyHX2tY01m6LzKXVigHxM/qJBpoYi6O1NVCMUnnGo2re5qh2deEXGBW
+ 4XVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=PzfywHJFm+G1+KKl/Onq2rp5QkVpIkH04ol8WwJE1Zw=;
- b=oCAjXIcoLhhlRMdwmp3XLM79cRDnYo2J5YB+0ZIxXaiM+IFcD93z573n+ZcUwC0BAM
- 90z89AjJOhc98cagUlNsOtivo4nNW9u6fWE/7JtYUlbXJ8cJpJ0sHFLvAFYTT1X3BICb
- jBdr97rq44lyUPnK9GNlXTsVOEHWIZPdINr+RP+nsXhU3up8sgKf74PHxb+lvDOupdQj
- OrKtNh+oVvfi4WP/lXwMx2j7DVqvXYb3o/s2XXQpVKfMDbQKoM6Vu3wcOdcyrX88cnTc
- x3Kyq0mWUEDnllqSYjKD7brh9Dx6ltKdTwfPGSIklhU/sqwHRUcYROIpLgkmU+6VXsUE
- yp+g==
-X-Gm-Message-State: APjAAAWmxEWzwZ3PZIl2tl7QEvIp+fgpHQyGbzYqiwt4P+KhmCqOJVt/
- cXOh6B6Pnl8styFwUy52v7WqxKoqJ/E=
-X-Google-Smtp-Source: APXvYqz4rplq1Fmsn1BZGJORE+dpd0XuDhdxkSMWf6etl1FiQu/fXllxRJSnjSBq6GUT7peNeiml1g==
-X-Received: by 2002:a05:6402:3047:: with SMTP id
- bu7mr7899500edb.44.1581794548526; 
- Sat, 15 Feb 2020 11:22:28 -0800 (PST)
+ bh=M2A4CWYeBUQraMsGqLJVBo2F77JeixbCIjDEu/D75HE=;
+ b=qZTd4pPocRKt/Og/+JwrPYjaDs1EnTwoOJYj7bWK0swaQGz1f/T5WsZzEbkgj/RvTy
+ W5u/B03vToRAwPCE6qjyj7JPNMCk7Q91entV2C+MQG0afi0Tdll1hTJgwyZdWlaEM+YW
+ LqpvV+Z2b/oFNmbSgYPwrcygtz/L+PfQ78mlIidInWelmFTxDEwrK9ieW3crmzFh3Pdj
+ nGYrg5tQ53O2rith/Wl6QoYIqTOx0rgsftgizC/e3vzx7Rw9Bv55BUA+6/iEWZ26t44q
+ lFJzdclw5vhgbkNtaUXLViRrgpOh5lNv2XoDysmaQUFelqEEzqrUwp0OwcZbXci1gX0V
+ 6YbA==
+X-Gm-Message-State: APjAAAVXAK9rb09XIAje501ek1xDYgnyK3ephJR0oGJ/sE6sPD/Rpq5P
+ JN9o4IyMqqpRYwjA7KtXY7ESR2g+WG4=
+X-Google-Smtp-Source: APXvYqyElwgb5I/2wRTw1nKMdNcq7K7aM6pG6HyVzWCU6IA7aVZ1mHeckzUzChM3U9pwToJNbAkKcQ==
+X-Received: by 2002:a17:906:ccde:: with SMTP id
+ ot30mr8731132ejb.244.1581794549813; 
+ Sat, 15 Feb 2020 11:22:29 -0800 (PST)
 Received: from localhost.localdomain (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id a24sm657128ejt.40.2020.02.15.11.22.27
+ by smtp.gmail.com with ESMTPSA id a24sm657128ejt.40.2020.02.15.11.22.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 15 Feb 2020 11:22:28 -0800 (PST)
+ Sat, 15 Feb 2020 11:22:29 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 7/8] tests/boot_linux_console: Test booting U-Boot on the
- Raspberry Pi 3
-Date: Sat, 15 Feb 2020 20:22:15 +0100
-Message-Id: <20200215192216.4899-8-f4bug@amsat.org>
+Subject: [PATCH 8/8] tests/acceptance: Count Raspberry Pi logos displayed on
+ framebuffer
+Date: Sat, 15 Feb 2020 20:22:16 +0100
+Message-Id: <20200215192216.4899-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200215192216.4899-1-f4bug@amsat.org>
 References: <20200215192216.4899-1-f4bug@amsat.org>
@@ -107,92 +107,121 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test runs U-Boot on the Raspberry Pi 3.
-It is very simple and fast:
+Add a test that verifies that each core properly displays the
+Raspberry Pi logo on the framebuffer device.
 
-  $ avocado --show=app,console run -t raspi3 -t u-boot tests/acceptance/
-  JOB LOG    : avocado/job-results/job-2020-01-20T23.40-2424777/job.log
-   (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_aarch64_raspi3_uboot:
-  console: MMC:   mmc@7e202000: 0, sdhci@7e300000: 1
-  console: Loading Environment from FAT... WARNING at drivers/mmc/bcm2835_sdhost.c:410/bcm2835_send_command()!
-  console: WARNING at drivers/mmc/bcm2835_sdhost.c:410/bcm2835_send_command()!
-  console: Card did not respond to voltage select!
-  console: In:    serial
-  console: Out:   vidconsole
-  console: Err:   vidconsole
-  console: Net:   No ethernet found.
-  console: starting USB...
-  console: Bus usb@7e980000: Port not available.
-  console: Hit any key to stop autoboot:  0
-  console: U-Boot>
-  console: U-Boot>
-  console: U-Boot> bdinfo
-  console: arch_number = 0x0000000000000000
-  console: boot_params = 0x0000000000000100
-  console: DRAM bank   = 0x0000000000000000
-  console: -> start    = 0x0000000000000000
-  console: -> size     = 0x000000003c000000
-  console: baudrate    = 115200 bps
-  console: TLB addr    = 0x000000003bff0000
-  console: relocaddr   = 0x000000003bf57000
-  console: reloc off   = 0x000000003bed7000
-  console: irq_sp      = 0x000000003bb52dd0
-  console: sp start    = 0x000000003bb52dd0
-  console: FB base     = 0x0000000000000000
-  console: Early malloc usage: 7b0 / 2000
-  console: fdt_blob    = 0x000000003bfbf200
-  console: U-Boot> version
-  console: U-Boot 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000)
-  console: gcc (Debian 9.2.1-22) 9.2.1 20200104
-  console: GNU ld (GNU Binutils for Debian) 2.33.1
-  console: U-Boot> reset
-  console: resetting ...
-  PASS (1.79 s)
+We simply follow the OpenCV "Template Matching with Multiple Objects"
+tutorial, replacing Lionel Messi by a raspberrry:
+https://docs.opencv.org/4.2.0/d4/dc6/tutorial_py_template_matching.html
 
-U-Boot is built by the Debian project, see:
-https://wiki.debian.org/InstallingDebianOn/Allwinner#Creating_a_bootable_SD_Card_with_u-boot
+When OpenCV and NumPy are installed, this test can be run using:
+
+  $ avocado --show=app,framebuffer run -t device:bcm2835-fb tests/acceptance/
+  JOB ID     : 9bbbc54c0a6fa180348d0b5305507f76852b4da2
+  JOB LOG    : avocado/job-results/job-2020-01-31T23.48-9bbbc54/job.log
+   (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_raspi2_framebuffer_logo:
+  framebuffer: found raspberry at position (x, y) = (0, 0)
+  framebuffer: found raspberry at position (x, y) = (71, 0)
+  framebuffer: found raspberry at position (x, y) = (142, 0)
+  framebuffer: found raspberry at position (x, y) = (213, 0)
+  PASS (11.06 s)
+  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+  JOB TIME   : 11.39 s
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/acceptance/boot_linux_console.py | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+The resulting match can be visualised at https://pasteboard.co/ISzNHtx.png
+---
+ tests/acceptance/boot_linux_console.py | 62 ++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
 
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 3b1952b2df..989db7d461 100644
+index 989db7d461..7c960051a6 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -603,6 +603,31 @@ def test_arm_raspi2_uboot(self):
-         exec_command_and_wait_for_pattern(self, 'version', 'U-Boot')
-         exec_command_and_wait_for_pattern(self, 'reset', 'resetting ...')
+@@ -12,6 +12,7 @@
+ import lzma
+ import gzip
+ import shutil
++import logging
  
-+    def test_aarch64_raspi3_uboot(self):
-+        """
-+        :avocado: tags=arch:aarch64
-+        :avocado: tags=machine:raspi3
-+        :avocado: tags=u-boot
-+        """
-+        deb_url = ('https://snapshot.debian.org/archive/debian/'
-+                   '20200108T145233Z/pool/main/u/u-boot/'
-+                   'u-boot-rpi_2020.01%2Bdfsg-1_arm64.deb')
-+        deb_hash = 'f394386e02469d52f2eb3c07a2325b1c95aeb00b'
-+        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-+        uboot_path = '/usr/lib/u-boot/rpi_3/u-boot.bin'
-+        uboot_path = self.extract_from_deb(deb_path, uboot_path)
+ from avocado import skipUnless
+ from avocado_qemu import Test
+@@ -22,6 +23,19 @@
+ from avocado.utils import archive
+ 
+ 
++NUMPY_AVAILABLE = True
++try:
++    import numpy as np
++except ImportError:
++    NUMPY_AVAILABLE = False
 +
-+        self.vm.set_console(console_index=1)
-+        self.vm.add_args('-kernel', uboot_path,
-+                         '-no-reboot')
-+        self.vm.launch()
-+        interrupt_interactive_console_until_pattern(self,
-+                                       'Hit any key to stop autoboot:',
-+                                       'Config file not found')
-+        exec_command_and_wait_for_pattern(self, 'bdinfo', 'U-Boot')
-+        exec_command_and_wait_for_pattern(self, 'version', 'U-Boot')
-+        exec_command_and_wait_for_pattern(self, 'reset', 'resetting ...')
++CV2_AVAILABLE = True
++try:
++    import cv2
++except ImportError:
++    CV2_AVAILABLE = False
 +
-     def test_s390x_s390_ccw_virtio(self):
++
+ class BootLinuxConsole(Test):
+     """
+     Boots a Linux kernel and checks that the console is operational and the
+@@ -451,6 +465,54 @@ def test_arm_raspi2_uart1(self):
          """
-         :avocado: tags=arch:s390x
+         self.do_test_arm_raspi(2, 'bcm2835_aux')
+ 
++    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
++    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
++    def test_arm_raspi2_framebuffer_logo(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:raspi2
++        :avocado: tags=device:bcm2835-fb
++        """
++        screendump_path = os.path.join(self.workdir, 'screendump.pbm')
++        rpilogo_url = ('https://github.com/raspberrypi/linux/raw/'
++                       'raspberrypi-kernel_1.20190517-1/'
++                       'drivers/video/logo/logo_linux_clut224.ppm')
++        rpilogo_hash = 'fff3cc20c6030acce0953147f9baac43f44ed6b0'
++        rpilogo_path = self.fetch_asset(rpilogo_url, asset_hash=rpilogo_hash)
++        deb_url = ('http://archive.raspberrypi.org/debian/'
++                   'pool/main/r/raspberrypi-firmware/'
++                   'raspberrypi-kernel_1.20190215-1_armhf.deb')
++        deb_hash = 'cd284220b32128c5084037553db3c482426f3972'
++        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
++        kernel_path = self.extract_from_deb(deb_path, '/boot/kernel7.img')
++        dtb_path = self.extract_from_deb(deb_path, '/boot/bcm2709-rpi-2-b.dtb')
++
++        self.vm.set_console()
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'earlycon=pl011,0x3f201000 console=ttyAMA0')
++        self.vm.add_args('-kernel', kernel_path,
++                         '-dtb', dtb_path,
++                         '-append', kernel_command_line)
++        self.vm.launch()
++        framebuffer_ready = 'Console: switching to colour frame buffer device'
++        wait_for_console_pattern(self, framebuffer_ready)
++        self.vm.command('human-monitor-command', command_line='stop')
++        self.vm.command('human-monitor-command',
++                        command_line='screendump %s' % screendump_path)
++        logger = logging.getLogger('framebuffer')
++
++        cpu_cores_count = 4
++        match_threshold = 0.95
++        screendump_bgr = cv2.imread(screendump_path, cv2.IMREAD_COLOR)
++        rpilogo_bgr = cv2.imread(rpilogo_path, cv2.IMREAD_COLOR)
++        result = cv2.matchTemplate(screendump_bgr, rpilogo_bgr,
++                                   cv2.TM_CCOEFF_NORMED)
++        loc = np.where(result >= match_threshold)
++        rpilogo_count = 0
++        for rpilogo_count, pt in enumerate(zip(*loc[::-1]), start=1):
++            logger.debug('found raspberry at position (x, y) = %s', pt)
++        self.assertGreaterEqual(rpilogo_count, cpu_cores_count)
++
+     def test_arm_exynos4210_initrd(self):
+         """
+         :avocado: tags=arch:arm
 -- 
 2.21.1
 
