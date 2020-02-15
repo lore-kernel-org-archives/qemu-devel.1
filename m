@@ -7,50 +7,51 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C13C352A3
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 20:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D74C352A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 20:12:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3F482073A
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 20:03:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE0B220675
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 20:12:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="CD3n6cWM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3F482073A
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="cNpNBsac"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0B220675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j33et-00088H-Uz
-	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 15:03:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40871)
+	id 1j33ne-0002eH-O8
+	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 15:12:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1j33au-0006nT-Tm
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:59:17 -0500
+ (envelope-from <deller@gmx.de>) id 1j33kH-0001bY-D5
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:08:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <deller@gmx.de>) id 1j33at-0004vh-VU
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:59:16 -0500
-Received: from mout.gmx.net ([212.227.15.19]:35227)
+ (envelope-from <deller@gmx.de>) id 1j33kF-0004oX-E3
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:08:57 -0500
+Received: from mout.gmx.net ([212.227.15.15]:57977)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <deller@gmx.de>) id 1j33at-0004uJ-JT
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 14:59:15 -0500
+ (Exim 4.71) (envelope-from <deller@gmx.de>) id 1j33kF-0004nQ-61
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:08:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1581796746;
- bh=qxZgqHcPKBo88I+b/S2UGFrQQHer6PERsExPC+yj04s=;
+ s=badeba3b8450; t=1581797318;
+ bh=3Qc79X9sk4XoOOfui/oQm/NyTxVfe/brBly+ZlhrRkg=;
  h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=CD3n6cWMxsuCMjAzLiEVd3PyJr5QbQp7/MZpPJQ8M2zMmz23eAz6vSMuV5Obht0ab
- rG1f6hV1oVXZixjLgR44iGE9s7J8d5vE6ryLCfPMQikNDbx4JB+59h2aEwl9GtwSJq
- 70V7pPAgaHSrJ3LgGgay7qo5/awPzox9Kwt7M/Ng=
+ b=cNpNBsacV8XZpAaU6bXofJvNtDPqus1vZyCdMi1EhOtkWkWXhR0OszHwe87hIObr1
+ gl89rSmdUXeNDTaOyciPFT1RJ3uNGKrmB/MHCEYvqhck9KDKY23fI/3J7zhbqUglPJ
+ xpFa/YLSoIHyGCSVgZ2LIb5lt1LSXdKnAP9QbCNo=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.20.60] ([92.116.153.227]) by mail.gmx.com (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MMofW-1imU982D0W-00IhNM; Sat, 15
- Feb 2020 20:59:06 +0100
-Subject: Re: [PATCH 1/4] hw/hppa/dino: Add comments with register name
+Received: from [192.168.20.60] ([92.116.153.227]) by mail.gmx.com (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1N7R1T-1jX8d13NBF-017jIQ; Sat, 15
+ Feb 2020 21:08:38 +0100
+Subject: Re: [PATCH 2/4] hw/hppa/dino: Fix reg800_keep_bits[] overrun (CID
+ 1419393 & 1419394)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org
 References: <20200213234148.8434-1-f4bug@amsat.org>
- <20200213234148.8434-2-f4bug@amsat.org>
+ <20200213234148.8434-3-f4bug@amsat.org>
 From: Helge Deller <deller@gmx.de>
 Autocrypt: addr=deller@gmx.de; keydata=
  mQINBF3Ia3MBEAD3nmWzMgQByYAWnb9cNqspnkb2GLVKzhoH2QD4eRpyDLA/3smlClbeKkWT
@@ -109,40 +110,40 @@ Autocrypt: addr=deller@gmx.de; keydata=
  XzCscCr+pggvqX7kI33AQsxo1DT19sNYLU5dJ5Qxz1+zdNkB9kK9CcTVFXMYehKueBkk5MaU
  ou0ZH9LCDjtnOKxPuUWstxTXWzsinSpLDIpkP//4fN6asmPo2cSXMXE0iA5WsWAXcK8uZ4jD
  c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <ddc10c9d-43b3-bdec-01f9-9db4a5e77c92@gmx.de>
-Date: Sat, 15 Feb 2020 20:59:05 +0100
+Message-ID: <83b463bf-4f0d-a1e4-3c94-0dd06c3166c8@gmx.de>
+Date: Sat, 15 Feb 2020 21:08:38 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200213234148.8434-2-f4bug@amsat.org>
+In-Reply-To: <20200213234148.8434-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:vjxLrsWbBdgTiP60SKRvZXzsMPdQEWWf+YYxOX+/bLMThlvOReS
- KZw0ZBfhksuiSSXB5H5Ge9r9guJkfucqlo9hTKs70w9eOih/NgkRdcquzCor2kIpatzsAuY
- 50+DBxKc7sujlwQQUVU1485N3yZbYOsc+qZ+bIGEKZsTxl8KF1KYgkbRgUNBIdb3z9qbkPi
- CgyB3aKzQTXaE9SvZecbQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:v/PM1rQMMJU=:4i+e0K9SQDj+OiMgN4yTj/
- R04mOG//l9tGedGsXWy7+gF/IG864Yquwwbi/BaElfX5eUAFp4Z3i0I3tbqg4JGtBO/MQG6vd
- imYlzSUOsnX3jliKNMTV2dx3Ko9VllGJsGlUMt+fhFIM+QmgMstsieT5TAVZ5twhdVIY0I5FF
- bwvqourtJOc6LzW5YKxMPIcio0Z1ORB1P+kNFbDDA/52Hmmam+Ix6WVupZ0O0Zzw8Q6NEkIiQ
- mENYaqGkkDuvcjduvbNjOi9ZAqz3Qyf+zh8lnf4NpvTIv9MLNF5ueKkFKTHf8hPYji6iDY4Gd
- ihxnN5Obnxqp1GPIc39qb28ZtAwStTtbwOZLZUFsTQG9BqqBObLtHMTxhMozxulCa8Cz/bt8g
- HSS/mAVNRAgLff9MjQIb+r33Z/Z/tg9yxou4r2oCftqeDJDhXvyaO01ammrLtszMqSCMoEtCz
- 65VuEmECCluAuBElTwBd5kjPiSBqy4Tnul0h0V79pbwMhozHAFMvw6RsYwy2APgMc+NVa57rW
- QUp5+EJ3HN74CXsMVH4GguyfIdH3NgrTJdeqBMPQb/VENl3qWgQkuA1DMG1FiqDZVTpRM/psQ
- jhZsUCCDBidzfOSgqvjpDwo7eCNLdWi0fkNhqI+RppAQdjKN9abyuCnWSHkehubz4HPFK4bBs
- vSTYVLw9rXCnKtf00YJUnfxLq7DGg2ec/F4+u/Ftwm20F5dKqHfAsctL2kTPWo8QRQbARc1rI
- CZCnnBPvVpB/e2njAT8XKjWVBHUmlLexSPy2dSfKJ0bqHqm6lrg7UpA0a1ay+G5oWtiu/+042
- 1xwHxa+WAjG0T9VwEDothWf3rK3VVxvH9t/IEVIU79PncFFiiUL1CWwU7SOdoqnjVL3CWVZLK
- RyTJJIpEht/2KqbyUyrAe5TxGK/14kiwmm+pqXNqZo5VKctkwCFflPjJvDJ7YeKkrv/1HL83L
- NHT9rN8Vk7TWgQbH6i6E5jjho+aNDPkAKQ1W7t71ykvtQRWlDRPBlUYNoUcpO9lkEtV62xVT6
- hFQ7jNmnEKiz4Au+EtJ3Lz4xUkGLy4YuEoW9weELmI8VfO/iPWbVbhBjNFFlObUy0/AkyW1kg
- byjM722/FtnRYoSWUJveuXzaTdXobZt8PjKsgHgOQLK6MUgoMlraQhdjjzqdHv7JZiGZnXO3V
- Tk0VX+dezJ+6EEl5do+NeWaFyVje+wc+nmjzlk01G6NiZmmIQm818txhKXgloObJcimeRnqWE
- oJeSgXV0w/PjANrBG
+X-Provags-ID: V03:K1:zrX9cjecCP7h8US5G6mXFlGacBN6UE/L3iWB4LCbLAOKpPY1Vwj
+ HmN2s0vuNmS8R4jb/bNahfPWL0VhACk6q5Y8wOHAZ2lwAGVS+OueDU2QngaGpHmGeIX8Rez
+ qLjHRaC6x5Spv9S7Ye+f85su9dwoIQVnYD2QiHzPrFBLVCvnFUhyzzwXbFb719yBuGAF3Na
+ a4JhPkUNpROyQgYPTrwGg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:At6HN/7wJqc=:kFpFb6mVbxbDS4fCWlNGI6
+ fuTXcV3LW/suqaqKPRhY03UmzueCe3tH32ABcWY7jcYkCZ7VoePu0CxnIAzcn8WO3B1FOFgKf
+ LTx/Wbw+J1k+I2QxiiXkd/8CZ58rFWjwRAyZAYeR+o5R/8bqi8BSJMf3L5RtmxhvpWhuMz+Fw
+ xNyqzu+jie4E22yCmYzqBuajJODfJZC8HIkH5lyYNpoxA9eDKTEOXvQKGlYhpI8WjAHRbGQmU
+ 1OEjTwsH9hPQ2akmmBgqWDQ13t88or81wCp57rTuOjdYCpM0QcUFbLE5kcsKDdpgJ1Lfi9Zgq
+ N9pey4N/lxd2SMfR/wuRxgMtzGYJW+AvMY/olCe92EotgcWThvrLz2EFQnPYgXr2NpstskFbd
+ Gy5ATBBRHNpAdiCyhY46rVwT9zZYRJAvlDsiEbXteehCza1gxCcEJ37Q2DWHxQJSx7upW1Vgu
+ JyZKtlidUHrd5rKYLIrkRDHpqGAC8+ZNmVi49LgJ2b658oqRUieximNFI8zNy+cBdVs2Se4+/
+ dI9txV+f5dneVj0bz+hnaIwBuxBBRuep080hY4IUPdRzkOgq537c3nbLPBmgDZ46xZjbEIHcV
+ WfrRCqD1KWNzmxVbozIDEkpIy2PCj912pyij/bxK3JbMkhuI3yA2VP48nhwF5TC4k6pPRm80P
+ qi6rikDmNJubtxJ1Mba2jXp3llLzueUFvo3yYwsP2wr+64T+QE80aVDdvBz9lcrpIFnYNHK1F
+ GooIJHNsiKVHuhRGPP4ZRske81vgLfpQwED+Nn3g9hlNNU86tqvoIkH24QLi31yf9yM90GP/2
+ pGf8r5xqQ0dcJYNoHQqBydSS/Uq+63oqKNgzBcZkljHHxs6/DC14+FklJCqPjzzXxxXGLIFFa
+ Nh5EfZcXg+bbqjAnp3G2Xm/nDK5Osdu7wNaee6IuOu0i5HXNtDgBty7Kdw4677yPkWYRQT7sh
+ QMcVOXaxHCsY89fCVeTcY5BEQFpIW9uyHxC/jEbPIcUzSlN2lhw6bpV2E60DUIsI36cse+rQ4
+ fmE/9ed525TI+q4zOLb7gtfPKJhTT2JRQm/N5A6iRXYaT9kJ6OfYyQWdUjr71+2yMJJFKVoqk
+ 24RctZAsaAlkUY6tMfdx17BnavBJCuxbgWZlIQ0flRSB2pSD7XSUhKr2Ht/tC0sMt5lDcC2zl
+ ZKKk2RYW+1owLn16B09XOpGcDwpU6WqCNYgehk4eHAgfV2JEpiq6Z7KAlXAiz6Mh+sG6RNwYA
+ YkeU6IKSB6gsTHUtZ
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.19
+X-Received-From: 212.227.15.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -160,51 +161,38 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 14.02.20 00:41, Philippe Mathieu-Daud=C3=A9 wrote:
-> Add a comment with the name of each register in the 0x800-0x833 range.
 >
+> Fixes: Covertiy CID 1419393 and 1419394 (commit 18092598a5)
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Acked-by: Helge Deller <deller@gmx.de>
 
 > ---
->  hw/hppa/dino.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
+>  hw/hppa/dino.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
 > diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-> index 9797a7f0d9..c237ad3b1b 100644
+> index c237ad3b1b..8868e31793 100644
 > --- a/hw/hppa/dino.c
 > +++ b/hw/hppa/dino.c
-> @@ -85,18 +85,18 @@
+> @@ -83,7 +83,7 @@
+>  #define DINO_PCI_HOST_BRIDGE(obj) \
+>      OBJECT_CHECK(DinoState, (obj), TYPE_DINO_PCI_HOST_BRIDGE)
 >
->  #define DINO800_REGS ((DINO_TLTIM - DINO_GMASK) / 4)
+> -#define DINO800_REGS ((DINO_TLTIM - DINO_GMASK) / 4)
+> +#define DINO800_REGS (1 + (DINO_TLTIM - DINO_GMASK) / 4)
 >  static const uint32_t reg800_keep_bits[DINO800_REGS] =3D {
-> -            MAKE_64BIT_MASK(0, 1),
-> -            MAKE_64BIT_MASK(0, 7),
-> -            MAKE_64BIT_MASK(0, 7),
-> -            MAKE_64BIT_MASK(0, 8),
-> -            MAKE_64BIT_MASK(0, 7),
-> -            MAKE_64BIT_MASK(0, 9),
-> -            MAKE_64BIT_MASK(0, 32),
-> -            MAKE_64BIT_MASK(0, 8),
-> -            MAKE_64BIT_MASK(0, 30),
-> -            MAKE_64BIT_MASK(0, 25),
-> -            MAKE_64BIT_MASK(0, 22),
-> -            MAKE_64BIT_MASK(0, 9),
-> +    MAKE_64BIT_MASK(0, 1),  /* GMASK */
-> +    MAKE_64BIT_MASK(0, 7),  /* PAMR */
-> +    MAKE_64BIT_MASK(0, 7),  /* PAPR */
-> +    MAKE_64BIT_MASK(0, 8),  /* DAMODE */
-> +    MAKE_64BIT_MASK(0, 7),  /* PCICMD */
-> +    MAKE_64BIT_MASK(0, 9),  /* PCISTS */
-> +    MAKE_64BIT_MASK(0, 32), /* Undefined */
-> +    MAKE_64BIT_MASK(0, 8),  /* MLTIM */
-> +    MAKE_64BIT_MASK(0, 30), /* BRDG_FEAT */
-> +    MAKE_64BIT_MASK(0, 25), /* PCIROR */
-> +    MAKE_64BIT_MASK(0, 22), /* PCIWOR */
-> +    MAKE_64BIT_MASK(0, 9),  /* TLTIM */
+>      MAKE_64BIT_MASK(0, 1),  /* GMASK */
+>      MAKE_64BIT_MASK(0, 7),  /* PAMR */
+> @@ -96,6 +96,7 @@ static const uint32_t reg800_keep_bits[DINO800_REGS] =
+=3D {
+>      MAKE_64BIT_MASK(0, 30), /* BRDG_FEAT */
+>      MAKE_64BIT_MASK(0, 25), /* PCIROR */
+>      MAKE_64BIT_MASK(0, 22), /* PCIWOR */
+> +    MAKE_64BIT_MASK(0, 32), /* Undocumented */
+>      MAKE_64BIT_MASK(0, 9),  /* TLTIM */
 >  };
 >
->  typedef struct DinoState {
 >
 
 
