@@ -2,83 +2,81 @@ Return-Path: <SRS0=Sgwn=4D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D68FC2BA83
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 12:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C034C2BA83
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 13:06:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBDA02073A
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 12:26:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61C4E2083B
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 13:06:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOB6XfrS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBDA02073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZDzYp41y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61C4E2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2wWI-0007HE-0x
-	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 07:26:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53614)
+	id 1j2x9S-0001Qi-Hc
+	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 08:06:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57237)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1j2wUO-0004Hw-On
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 07:24:05 -0500
+ (envelope-from <armbru@redhat.com>) id 1j2x8c-0000A2-2n
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 08:05:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1j2wUN-00010V-Nm
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 07:24:04 -0500
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:53529)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1j2wUL-0000ya-H0; Sat, 15 Feb 2020 07:24:01 -0500
-Received: by mail-pj1-x1041.google.com with SMTP id n96so5190983pjc.3;
- Sat, 15 Feb 2020 04:24:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=O0cfihfBXPUJpUAb56LetctuINQwtDaqA2jqE4YkZoQ=;
- b=fOB6XfrSnBCUB6djAPxhSxQ3U6thsntuTizr2sZ19MTV8huKjWvH/mgWXpiCIB5YFf
- 4Ir6OLCwPAarwyKUQ75c17tI/17NwJERc7EDigN0AgrRfSE6PsuhlQ1kto0T58BfUXgB
- ENxznPRGk7JzKzrpTu6v7baSSMD67b6sxXZvykBnxIzdFjf0lI+cP/qtnZ8gsZQ9bMa/
- 6PIlJ23tUyQqTlIYP+Gmjv0xQ09bBOM/RbZltUpQB6Olh4Yy90YfTDHBrEKTCgJvMRnj
- ZMShMPMmM4gHIwSed5qdQxXFuDlWk+R38jJRFtWVA6vXtvTCWdjyTEW0xeHxpblFB1oR
- h5ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=O0cfihfBXPUJpUAb56LetctuINQwtDaqA2jqE4YkZoQ=;
- b=njHKGRmDwwg/GPfFjOLSgaAg1lIeirfw9WhHSORnMYebNFHTtpNDpgf8DdqiEZQwhN
- Njoa1k8adu/neZthW1IXT2siORREAyWwSeG5qd9DYiKRPaWTOfXREb5hZhi915f06EGy
- 1WNyN2M1JlcPbGzRqse0QPfMsQkNlmMvsfs+mYTb0xJ8tpevnz/t1X9qiH/kuQKW/COM
- 9HjQ2qNVr/qUipZhKOVkfsp+tlhjmVM2dMR9zxousQgOVXFsOLEB7HP5QQjYAU9QH88f
- wLNLoP8HWf2ZIk+qmx6sEzjVXsinObKehT7bhQW06nt5I9GFaSkmljI4NFb0KNIWFSB5
- TtzQ==
-X-Gm-Message-State: APjAAAVk4ZYqyoRcGLsUEE8mfGvfuwvmKPcwShSFffhhhJVH91h7jH0n
- GdlFyOLvfvJF12bvOvmCyG8=
-X-Google-Smtp-Source: APXvYqyq/+niIlI7LSvO2QdIzZc0nS9SQqtp1dZS/RNgwoPUDdHYlcG6nG1H78jHXgadejclVidilQ==
-X-Received: by 2002:a17:902:8a8e:: with SMTP id
- p14mr7883798plo.28.1581769440482; 
- Sat, 15 Feb 2020 04:24:00 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id l26sm10975710pgn.46.2020.02.15.04.23.59
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sat, 15 Feb 2020 04:24:00 -0800 (PST)
-From: Guenter Roeck <linux@roeck-us.net>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v2 2/2] hw/usb/hcd-ehci-sysbus: Remove obsolete xlnx,
- ps7-usb class
-Date: Sat, 15 Feb 2020 04:23:54 -0800
-Message-Id: <20200215122354.13706-3-linux@roeck-us.net>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200215122354.13706-1-linux@roeck-us.net>
-References: <20200215122354.13706-1-linux@roeck-us.net>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+ (envelope-from <armbru@redhat.com>) id 1j2x8Z-0002hH-HD
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 08:05:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49921
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j2x8Z-0002fn-DN
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 08:05:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581771933;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=I1bA5OGLFHfqXFmB475gsziHs61YshYEijMxzJbiKFM=;
+ b=ZDzYp41yxHFAqnbZZZI24+jX9slDGvaodxHz7hbXMtLAJ50v+qNiwdk1gKmY/q9NkJjDzO
+ mCL03sASxszb8PWKZwFHVQsFyYb56sABBt8Zu3tFsz2+VH+X78XeWTp9EqE1RG/uIbEZ3m
+ C5JOcwDRLzvC6S4tjl8y4xS7WHwfjEk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-LczOHaqmPauq8qmlBdJkCA-1; Sat, 15 Feb 2020 08:05:31 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A15AF107ACC7
+ for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 13:05:30 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-234.ams2.redhat.com
+ [10.36.117.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E8F15C1C3;
+ Sat, 15 Feb 2020 13:05:30 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 75F7211366CD; Sat, 15 Feb 2020 14:05:27 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 5/5] qemu-doc: Clarify extent of build platform support
+Date: Sat, 15 Feb 2020 14:05:27 +0100
+Message-Id: <20200215130527.28861-6-armbru@redhat.com>
+In-Reply-To: <20200215130527.28861-1-armbru@redhat.com>
+References: <20200215130527.28861-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: LczOHaqmPauq8qmlBdJkCA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,60 +88,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- Guenter Roeck <linux@roeck-us.net>
+Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Xilinx USB devices are now instantiated through TYPE_CHIPIDEA,
-and xlnx support in the EHCI code is no longer needed.
+Supporting a build platform beyond its end of life makes no sense.
+Spell that out just to be clear.
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20200213084335.15100-1-armbru@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-v2: No change
+ qemu-doc.texi | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
- hw/usb/hcd-ehci-sysbus.c | 17 -----------------
- 1 file changed, 17 deletions(-)
-
-diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
-index 62612c9f5b..b5a014f968 100644
---- a/hw/usb/hcd-ehci-sysbus.c
-+++ b/hw/usb/hcd-ehci-sysbus.c
-@@ -114,22 +114,6 @@ static const TypeInfo ehci_platform_type_info = {
-     .class_init    = ehci_platform_class_init,
- };
- 
--static void ehci_xlnx_class_init(ObjectClass *oc, void *data)
--{
--    SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(oc);
--    DeviceClass *dc = DEVICE_CLASS(oc);
--
--    set_bit(DEVICE_CATEGORY_USB, dc->categories);
--    sec->capsbase = 0x100;
--    sec->opregbase = 0x140;
--}
--
--static const TypeInfo ehci_xlnx_type_info = {
--    .name          = "xlnx,ps7-usb",
--    .parent        = TYPE_SYS_BUS_EHCI,
--    .class_init    = ehci_xlnx_class_init,
--};
--
- static void ehci_exynos4210_class_init(ObjectClass *oc, void *data)
- {
-     SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(oc);
-@@ -266,7 +250,6 @@ static void ehci_sysbus_register_types(void)
- {
-     type_register_static(&ehci_type_info);
-     type_register_static(&ehci_platform_type_info);
--    type_register_static(&ehci_xlnx_type_info);
-     type_register_static(&ehci_exynos4210_type_info);
-     type_register_static(&ehci_tegra2_type_info);
-     type_register_static(&ehci_ppc4xx_type_info);
--- 
-2.17.1
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index a1ef6b6484..33b9597b1d 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2880,10 +2880,11 @@ lifetime distros will be assumed to ship similar so=
+ftware versions.
+=20
+ For distributions with long-lifetime releases, the project will aim to sup=
+port
+ the most recent major version at all times. Support for the previous major
+-version will be dropped 2 years after the new major version is released. F=
+or
+-the purposes of identifying supported software versions, the project will =
+look
+-at RHEL, Debian, Ubuntu LTS, and SLES distros. Other long-lifetime distros=
+ will
+-be assumed to ship similar software versions.
++version will be dropped 2 years after the new major version is released,
++or when it reaches ``end of life''. For the purposes of identifying
++supported software versions, the project will look at RHEL, Debian,
++Ubuntu LTS, and SLES distros. Other long-lifetime distros will be
++assumed to ship similar software versions.
+=20
+ @section Windows
+=20
+--=20
+2.21.1
 
 
