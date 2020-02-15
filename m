@@ -2,84 +2,76 @@ Return-Path: <SRS0=Sgwn=4D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA311C35242
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 00:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8390C35242
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 00:11:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96CCC217F4
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 00:02:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yifanlu-com.20150623.gappssmtp.com header.i=@yifanlu-com.20150623.gappssmtp.com header.b="WwQHWltA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96CCC217F4
+	by mail.kernel.org (Postfix) with ESMTPS id B0FE32083B
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 00:11:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0FE32083B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=yifanlu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2kup-00046i-S1
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 19:02:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52627)
+	id 1j2l3p-0007es-Uf
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 19:11:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <me@yifanlu.com>) id 1j2kuC-0003bF-LL
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:01:57 -0500
+ (envelope-from <bounces@canonical.com>) id 1j2l2w-0007Da-Ts
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:11:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <me@yifanlu.com>) id 1j2kuB-0004f0-F2
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:01:56 -0500
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:32949)
+ (envelope-from <bounces@canonical.com>) id 1j2l2v-0008Oi-HA
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:10:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44404)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <me@yifanlu.com>) id 1j2kuA-0004aw-VI
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:01:55 -0500
-Received: by mail-il1-x144.google.com with SMTP id s18so9515878iln.0
- for <qemu-devel@nongnu.org>; Fri, 14 Feb 2020 16:01:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=yifanlu-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=a19uAb4omz7/1mVazKdUiQwyBCTItWg+Z+WpIBipKvQ=;
- b=WwQHWltAh90HZal587QACMrf79iOaRTn3TCcDHYqZH2HXhuPNbrtvm0f0np6wntYb0
- tt06OKA/767IlLXADUDWeFE/Y6c9h5QcP9P1G62oZsCGX8COFbiR8cPCg8YoOB1DFvFb
- Zpm328O4iuc9ZoeOaPmpHRwv9NdWIdrsLG+aRSEAip0BW74+FWU5suSmFqoIBugZ/oy1
- T03tCOgvSC2Cthvs2pZ6s5ZVK/sP9CrYXAQvHno2WbDRGX3GPw4Yfo7p7Y13RChdeA9F
- THLzfCyV7PIOKk9VZJlUgdJmsV/U3uKWnSSybBzVrakeXpVLCOqsIix8uCVU5xRM5Vvy
- /Taw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=a19uAb4omz7/1mVazKdUiQwyBCTItWg+Z+WpIBipKvQ=;
- b=YrUVxyk3fFYTb8PI4WRwDcX1AzYjMW68j+azMqNU6GpPzqKm/m118cLhQkEhG1RqWG
- xfglbS6e2UimrCpQJTI1ZoTPdltLECsTsuk+lDxH+79dK3iuZufkYWmKFmXrp9FhUW3L
- E1QnM8YYU0qzv7ea84K1NCLNK4vDHDZHs+6bKsGpXpQw1W9uQwmSooJxnbjR0Fcb1vh2
- y6fz5l99CxMMhJZPSVeQRTRMFKtDwXTZ0pgXIy1oSRWRdGfSBby1HeBszyZnZWQu1N8W
- kXbMHSVATJkJnj2Uh+35H4LqWbeNbOT+MGydQPJIcAngZKhgpdt5/t9tC8PLgF4lFKMb
- cCZg==
-X-Gm-Message-State: APjAAAXg4wopGsrGd9Bv81Fzj5Blj0ztmBDa41wr9hVxKqKtUrmDJCgd
- yc5EtJGqiMnWQiqE2QKJ+tYXGmdkMou/pFtcck1AGg==
-X-Google-Smtp-Source: APXvYqyMEkMvfc5UVK/uVni38XqBr6Bk1cW5WPkEh/ODXjwxktHb+QjVXG4Ntj08eEhnN+NXVANtNF/MJ+ntTUsZ8AE=
-X-Received: by 2002:a92:b74c:: with SMTP id c12mr4961109ilm.154.1581724913429; 
- Fri, 14 Feb 2020 16:01:53 -0800 (PST)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j2l2v-0008N7-Ba
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:10:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j2l2t-0000rv-NF
+ for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 00:10:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AD8E72E80C3
+ for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 00:10:55 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200214144952.15502-1-alex.bennee@linaro.org>
- <dc224902-b8bb-934e-947a-4417449566ea@linaro.org>
-In-Reply-To: <dc224902-b8bb-934e-947a-4417449566ea@linaro.org>
-From: Yifan Lu <me@yifanlu.com>
-Date: Fri, 14 Feb 2020 16:01:17 -0800
-Message-ID: <CAP4MwtfP_+pxb96WQ4coe187A4e2HasXqTXsobTn1UH+8RFK8Q@mail.gmail.com>
-Subject: Re: [PATCH] accel/tcg: fix race in cpu_exec_step_atomic (bug 1863025)
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::144
+Date: Sat, 15 Feb 2020 00:01:17 -0000
+From: Yifan <me@yifanlu.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=alex.bennee@linaro.org; 
+X-Launchpad-Bug-Tags: mttcg tcg
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee yifanlu
+X-Launchpad-Bug-Reporter: Yifan (yifanlu)
+X-Launchpad-Bug-Modifier: Yifan (yifanlu)
+References: <158154486735.14935.3370403781300872079.malonedeb@soybean.canonical.com>
+Message-Id:
+ <CAP4MwtfP_+pxb96WQ4coe187A4e2HasXqTXsobTn1UH+8RFK8Q@mail.gmail.com>
+Subject: [Bug 1863025] Re: [PATCH] accel/tcg: fix race in cpu_exec_step_atomic
+ (bug 1863025)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 478c8d9d708a41d4133581151e079b7f6ea1c0a3
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,13 +80,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bug 1863025 <1863025@bugs.launchpad.net>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Bug 1863025 <1863025@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200215000117._6nTivmr-oRkkKEvJAQ5KuNxDxzzHAAYGHT-WpQ6ccs@z>
 
 What race are you thinking of in my patch? The obvious race I can
 think of is benign:
@@ -187,4 +177,66 @@ h.
 >
 >
 > r~
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863025
+
+Title:
+  Use-after-free after flush in TCG accelerator
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  I believe I found a UAF in TCG that can lead to a guest VM escape. The
+  security list informed me "This can not be treated as a security
+  issue." and to post it here. I am looking at the 4.2.0 source code.
+  The issue requires a race and I will try to describe it in terms of
+  three concurrent threads.
+
+  Thread A:
+
+  A1. qemu_tcg_cpu_thread_fn runs work loop
+  A2. qemu_wait_io_event =3D> qemu_wait_io_event_common =3D> process_queued=
+_cpu_work
+  A3. start_exclusive critical section entered
+  A4. do_tb_flush is called, TB memory freed/re-allocated
+  A5. end_exclusive exits critical section
+
+  Thread B:
+
+  B1. qemu_tcg_cpu_thread_fn runs work loop
+  B2. tcg_cpu_exec =3D> cpu_exec =3D> tb_find =3D> tb_gen_code
+  B3. tcg_tb_alloc obtains a new TB
+
+  Thread C:
+
+  C1. qemu_tcg_cpu_thread_fn runs work loop
+  C2. cpu_exec_step_atomic executes
+  C3. TB obtained with tb_lookup__cpu_state or tb_gen_code
+  C4. start_exclusive critical section entered
+  C5. cpu_tb_exec executes the TB code
+  C6. end_exclusive exits critical section
+
+  Consider the following sequence of events:
+  =C2=A0=C2=A0B2 =3D> B3 =3D> C3 (same TB as B2) =3D> A3 =3D> A4 (TB freed)=
+ =3D> A5 =3D> B2 =3D>
+  =C2=A0=C2=A0B3 (re-allocates TB from B2) =3D> C4 =3D> C5 (freed/reused TB=
+ now executing) =3D> C6
+
+  In short, because thread C uses the TB in the critical section, there
+  is no guarantee that the pointer has not been "freed" (rather the
+  memory is marked as re-usable) and therefore a use-after-free occurs.
+
+  Since the TCG generated code can be in the same memory as the TB data
+  structure, it is possible for an attacker to overwrite the UAF pointer
+  with code generated from TCG. This can overwrite key pointer values
+  and could lead to code execution on the host outside of the TCG
+  sandbox.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863025/+subscriptions
 
