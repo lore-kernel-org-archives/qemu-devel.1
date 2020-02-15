@@ -7,50 +7,51 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EEEAC352A3
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 20:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48ACFC352A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 20:53:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69788217F4
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 20:53:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14CED217F4
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 20:53:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="B3gllENW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69788217F4
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="VWBWnRs3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14CED217F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j34R1-0001qA-Ee
-	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 15:53:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45901)
+	id 1j34R7-0001sQ-8H
+	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 15:53:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1j34Nq-0000bA-M0
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:49:51 -0500
+ (envelope-from <deller@gmx.de>) id 1j34Nx-0000cC-F3
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:49:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <deller@gmx.de>) id 1j34Np-0002Yk-Lx
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:49:50 -0500
-Received: from mout.gmx.net ([212.227.15.15]:39367)
+ (envelope-from <deller@gmx.de>) id 1j34Nw-0002d5-DL
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:49:57 -0500
+Received: from mout.gmx.net ([212.227.15.19]:54211)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <deller@gmx.de>) id 1j34Np-0002XO-9r
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:49:49 -0500
+ (Exim 4.71) (envelope-from <deller@gmx.de>) id 1j34Nw-0002ch-4l
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 15:49:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1581799771;
- bh=hCuptad2DsfY+l0ADVaiFrMFAyCg8JlagDRC13uY82I=;
+ s=badeba3b8450; t=1581799789;
+ bh=5WCj9Dh5p82Kda/YncuF5fNUDK6+Zz0130j+fSQ7EtU=;
  h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=B3gllENWaX33ncAQ6sZ6he5a1rcOHwsFZjCOyjW7YaNJxDF8VdmLJriomlG3KC+Q0
- QfRFqWnBL1txqnvOr2mMiXgZHHUK6SDrYJxEWIEX9NX9QCMLutKo/hmxQVMAJH6ph/
- TNX3gvnRorCDObpooDcKF3CDv1EE+6JvRIKJ9q5o=
+ b=VWBWnRs3OmtyPnRnTNkTk4WtOZjHZufi1mDBqkT+arkyZdHvFYrWn0oxKpaz6Dfi2
+ Qh40sSVr84nozDcIqIcRfS6Ta/2Ts7rq56VOkLTQ3EmN6XO6bQPR5q2xyatlG8Wldf
+ +KXjGjppstg711Mt5PQ6xXRe8sPhjBdC5f+IzRtE=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.20.60] ([92.116.153.227]) by mail.gmx.com (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mz9Un-1jPwiG32rD-00wBPo; Sat, 15
- Feb 2020 21:49:31 +0100
-Subject: Re: [RFC PATCH 3/4] hw/hppa/dino: Fix PCIROR register access bitmask
+Received: from [192.168.20.60] ([92.116.153.227]) by mail.gmx.com (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1N95iH-1jZssM0HRf-0164ox; Sat, 15
+ Feb 2020 21:49:49 +0100
+Subject: Re: [RFC PATCH 4/4] hw/hppa/dino: Do not accept accesses to registers
+ 0x818 and 0x82c
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org
 References: <20200213234148.8434-1-f4bug@amsat.org>
- <20200213234148.8434-4-f4bug@amsat.org>
+ <20200213234148.8434-5-f4bug@amsat.org>
 From: Helge Deller <deller@gmx.de>
 Autocrypt: addr=deller@gmx.de; keydata=
  mQINBF3Ia3MBEAD3nmWzMgQByYAWnb9cNqspnkb2GLVKzhoH2QD4eRpyDLA/3smlClbeKkWT
@@ -109,40 +110,40 @@ Autocrypt: addr=deller@gmx.de; keydata=
  XzCscCr+pggvqX7kI33AQsxo1DT19sNYLU5dJ5Qxz1+zdNkB9kK9CcTVFXMYehKueBkk5MaU
  ou0ZH9LCDjtnOKxPuUWstxTXWzsinSpLDIpkP//4fN6asmPo2cSXMXE0iA5WsWAXcK8uZ4jD
  c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <c8965317-2cec-46e6-cd3f-7bf9b57437ce@gmx.de>
-Date: Sat, 15 Feb 2020 21:49:29 +0100
+Message-ID: <7bd7bf7b-2c7e-86d0-7aee-c379df4373f7@gmx.de>
+Date: Sat, 15 Feb 2020 21:49:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200213234148.8434-4-f4bug@amsat.org>
+In-Reply-To: <20200213234148.8434-5-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:MoBBdzjx8F/IfWfwFRI6AfiecWEwWQP2LPnqULI0sJAnxwrGrHD
- RWntLZwWIRlQqCbhNaamQGAkOCGdPLx3wZV+M3WXRZ6HQmu5bJyhWLcWOYu935MjpRM0SJU
- oTipfvuPD5+YepV/+do4LOS+BMuKvBv9U8uk4RwrcR7zfJWgiSDEWzSp9w2g32Gk4KKcJTp
- RVsl3/n32ZCwDIOVPzpQQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:g4RfP8v+cvg=:qxsj9ofA+9koBh9wCrf0bu
- X0nRuYHL92Sx6uJoCPeooRkejDwiZqUNMhhEpZKxUjvZV+sRsSjd3EXPvu6nw5Nzvnt2yZVz1
- CPwuP9YxQw5qV+utwA+gJcyDmA3lQw7qreMEWVMnlFFygTRQBvUp1i4KzsgSEQe6203zCvVnw
- 8SVIEjP6oWV2+pKQEwrsxKHpvTXRBwYBc313idb5EKuQuZXdW3bRNwGjZ6xxe3zs1KMK46zIe
- 6Yc3V82vUGkVKB8finYHFwVU/cUGY8pj7gm3OIZkhf0g77j6wNXrEbdUIm2WWB1SjExCluM90
- KmM51E9dRZ/riL/v5twp/MFVisN4HoIQfF5XBELUZ9+IZxNEJBqBemVetw1gWnVdQ+maz/OBX
- WH9C25/aURgbKpyQORJ9El20vaQwgz0Jt1fSt/cSKKAv9HebZR0fr1We7Qp405ibrQbtKhdK2
- 0KJBsy96hpjfHHkNYBY2/+QlAOKANKfKKO/nEnXz+WFck7uzb2u5DhzdyiaxPNuEk9Z+0CHjc
- koekz43rt0x915IKjPCL7qSY7YCPMfiYOeK6lffa354/c2gefn8RmM0OQknxxFXZxhJT6Qfij
- 3rhznLqM72we3xyPEn7Zsf1oAObkjmP/UREvvrdvEs4G+TyQ0SqBqw1bMvMmtKkv+nSVtfNmo
- mPJnId4FUW7tzIhRF/PMAu2M2Q+NwZ/y68cQJQYQInKhFt/EFHaAnolh5Pt7NnlXUl37p8rJn
- KQyG/ePlBwqcxVhmvUflVlk9bvL/Hz7cJbIiOTZqkmsBMrZ+vDoEGUolfYJZjI8Rb24wHgx9Q
- P0fbGeGGa5ogV0kXakImJrFGD2tPu1tFhl2v1wNCQyumh3iITNcYWO89uD9/aOreklUpeDMVu
- JDAZTCUONi0357AbBdJs9Z2l81/1SV6Qjv4SOWhM3uCTULTnn8F3DszHYuCTH9FTYBFQ1zWzs
- /gDo1rHjJlbll9PyamwBix7RzA/M3I/Vhw2oKLBschNAZ8mpjT9gqtYUEhHjRFKjHMYgOVZvo
- f98P/PD/pNVDEcayRpKAtURQsY3FOI3bgaeeuiIfL0v3+noNe+BZh7djXeandnF/wkydrsL8W
- UfqVkmDDKDvBekngDE4AVDGXYty3siyPZAWVToV+9A0qZHBbhz6jBZnao5gDPhhiDd066PvPM
- K+npKayKLce+NUwj6ETe8AuhnxXXgeVzPEBoG///A25WR+W3U4iiB0+csR6ZVzMaUyZqZOulv
- dGiL/Thrkke842dhy
+X-Provags-ID: V03:K1:b2xy+OhF40KJUSYwXiBozMG+Z3eQSG9zEEx0f8ib9+MsYfxOibY
+ XBm42sfWLtXxyFvBB/z0HorJX4W/s7lPg6ClV/i0NRt+IEKgAS3Kr54nC5R3KGTq10lxUgN
+ 270iYWGB/Q8BZGtAAlhyGSMuGuztY/0ds2zOuCIkgFjnUz+foXb97/6SwGbnY+FIL4wFBcZ
+ 8cmZOTLj0bwHBRgFMm54g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:mH4c5PtsKZI=:DqonNEvl3qBtKxfcYySmwQ
+ 41Pod0AYqZQU4TWEob4v4Mb+v043PcJuJQZ9xC81gzeZSgrLIdUk2VuNKUQCkx3GOWG2q37ol
+ rDCR5OVtIzM7R26bkZxje/ZO71Jy7K5aiZSNEpR1l31WWV3QNCxuJ1e5ps0DHe5fWQQUb1nxD
+ dZf1gxj5TQkXPoGfyiB79Hk3idGB2H6fFTjKuVksThRvZo4s401FUq9o44/nhJAym4O5lwAUP
+ ixRO0CXr5OmHdZtKOjwoOJSqy7EtshYd5R5ijj8cziWUPaQ0DEmLuKjDNQfobZosH9iJqWN1A
+ 0YLC06ez8iQ8Dd7BuL0jWJ5+U7kp76jzQNEdf07WWZWV1z1EXagoSTmgtsagsLXAXCYY8MsoA
+ Udc9E/W62KjVgnlcQPJy62oxofSD+uE+n8G579pyPhIAkrR4tjYqNIf8+KgAG1NOF+6tqQAsC
+ ngDvUnyN30gpXytHFNlaWBMZgndow2okxT8PH5Jz0THj0+g7pEe6yjbjyTnLnM+36nP5b3QyZ
+ u+os41e07E/AwzNNZrVfwN/OaEJsZKwyFYiPzrx4MCHRUk+OaxilXEapuduorDQOmQ5NHpaSn
+ r2o4ekSVFwNE4QXxEMrXVbJkiELos/tpHVXavFsJV5wxwGh3XAp10SvJI09h9CbubDphUVfEB
+ BFwZGvqOQVcjlCQfESqliwdOF4MFiJxFe5Nw9G+uTXbEXjvqQglXEEG1KuOYdrdzM9oIESy/B
+ PzgFKeeduXRrkpvgvoEc2voRE6R58dgIKc6ax6IwFjQAcVG19dECkIvdsma6lhBnMwHYuB5GK
+ /CpL6hSeWdMDeY3F8bODiKqoSxTZJNQjBStz3HyUhLnER1rWC7yg7N6fO9m4Rs9CZeD/4LLkI
+ srN9DEieLDCBU2g5opSSs61Ro4cUTbMb8G51eXzDDL9UUrDG6GMV2q7vXUvQUadc3wxENa+d3
+ uqUqRrRWU2z/dFlzxf0zXcjDj6/oS4NjR9uooi+ctXG7RizytKAEiy4NL2s4qj6+4B08cSNeq
+ Lgxmz6RiRKT4ysEaBtHZBSdOZnu3TWXLqSf5tMymmoLRGMq/n/h0Fu9x/e1tczijMo448arrY
+ C3GWBs8iCEiC4Yg5JDtPSku4DZx5E5ReMp3O4jrd0PMf9KR3n0IWwCWkQQsvNy7+pyExBBnfJ
+ cJ580skH4GSsujdtnavmlQ/v6658P5tlUadX1u5rS1M3/2553FOuIJLp+U07vENg1M4AzyY85
+ Lczs1ehTD0/WtEFSr
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.15
+X-Received-From: 212.227.15.19
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -160,31 +161,35 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 14.02.20 00:41, Philippe Mathieu-Daud=C3=A9 wrote:
-> Only 24 bits of the PCIROR register are documented
-> (see pp. 37 of datasheet referenced in this file header).
+> Register 0x818 is documented as 'undefined', and register
+> 0x82c is not documented. Refuse their access.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Acked-by: Helge Deller <deller@gmx.de>
 
+
+
 > ---
->  hw/hppa/dino.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/hppa/dino.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
 > diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-> index 8868e31793..be799aad43 100644
+> index be799aad43..2b1b38c58a 100644
 > --- a/hw/hppa/dino.c
 > +++ b/hw/hppa/dino.c
-> @@ -94,7 +94,7 @@ static const uint32_t reg800_keep_bits[DINO800_REGS] =
-=3D {
->      MAKE_64BIT_MASK(0, 32), /* Undefined */
->      MAKE_64BIT_MASK(0, 8),  /* MLTIM */
->      MAKE_64BIT_MASK(0, 30), /* BRDG_FEAT */
-> -    MAKE_64BIT_MASK(0, 25), /* PCIROR */
-> +    MAKE_64BIT_MASK(0, 24), /* PCIROR */
->      MAKE_64BIT_MASK(0, 22), /* PCIWOR */
->      MAKE_64BIT_MASK(0, 32), /* Undocumented */
->      MAKE_64BIT_MASK(0, 9),  /* TLTIM */
+> @@ -181,7 +181,9 @@ static bool dino_chip_mem_valid(void *opaque, hwaddr=
+ addr,
+>      case DINO_IO_ADDR_EN:
+>      case DINO_PCI_IO_DATA:
+>      case DINO_TOC_ADDR:
+> -    case DINO_GMASK ... DINO_TLTIM:
+> +    case DINO_GMASK ... DINO_PCISTS:
+> +    case DINO_MLTIM ... DINO_PCIWOR:
+> +    case DINO_TLTIM:
+>          ret =3D true;
+>          break;
+>      case DINO_PCI_IO_DATA + 2:
 >
 
 
