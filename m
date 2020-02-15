@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB543C35242
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 00:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D585C3F68F
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 00:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CBF1207FF
+	by mail.kernel.org (Postfix) with ESMTPS id EF103207FF
 	for <qemu-devel@archiver.kernel.org>; Sat, 15 Feb 2020 00:13:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hpoAqGYS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CBF1207FF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FcIxJxJb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF103207FF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j2l5f-0001EZ-O3
-	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 19:13:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53541)
+	id 1j2l5g-0001Ed-3s
+	for qemu-devel@archiver.kernel.org; Fri, 14 Feb 2020 19:13:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53561)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1j2l4r-0008CA-Ok
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:12:58 -0500
+ (envelope-from <groeck7@gmail.com>) id 1j2l4t-0008FP-2D
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:12:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1j2l4q-00038v-Eo
- for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:12:57 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46019)
+ (envelope-from <groeck7@gmail.com>) id 1j2l4s-0003BT-5G
+ for qemu-devel@nongnu.org; Fri, 14 Feb 2020 19:12:59 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34372)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1j2l4o-00032V-90; Fri, 14 Feb 2020 19:12:54 -0500
-Received: by mail-pg1-x544.google.com with SMTP id b9so5594978pgk.12;
- Fri, 14 Feb 2020 16:12:54 -0800 (PST)
+ id 1j2l4q-00036K-8G; Fri, 14 Feb 2020 19:12:56 -0500
+Received: by mail-pg1-x543.google.com with SMTP id j4so5746063pgi.1;
+ Fri, 14 Feb 2020 16:12:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=lzWIP4VkwCYbcbIQG5CcKiRH3f3/MB+GZnEQK5D3umo=;
- b=hpoAqGYSAUvA47AEU/PM62h20f007z+dJx852KaAatQxwRGPsEi6rjW+/zXnNlrwp0
- L+N2Wj9uH9B2ZHtZZXSiWFsEP4b7q7GOb1UfJ9DfVXjqGVOvDyF8BrHs7DrDAJrUalq8
- oCJFGSEqxOHMyLZsNVSXDoCQa6Du46ryFFA+cJKUqiIgKkmScQwZlODFTbfhyTLT/BC1
- xrNFTqK+DT9T6W5siA6qSj2rJCHqiNnI7T4GlBqOWjR+nOhHzGOBmXvvhE/QcuB34n/l
- GRhF67HwKSjB27TCfjWAO5WlTG4sSoZAmd9Sm3u4fEnB4ab/oUw97O/NHnMVwceIyBb+
- /2AQ==
+ bh=hbeVP/BW+IaFARdpXG4HDpnB43Wxr9sq7+fPSUPZvsM=;
+ b=FcIxJxJbxQ80ZNP3JZjFhtw0vGua8ZGcSIWcBBllDo2ahg2vwRfrxqE6CU6jlo5ISR
+ naPkleDMMnZ2agi8xrwGx8k8InWJQi2DOnX+fsFiZxIx/jbhqZJz6UAML7IXOykyh/ni
+ 5B2UPozbvWZNH1YZYEBi3SiziMCGbW+nl9n2uRWtCKYtWQ/Ws76YSP4WU5i/fzpt+1pU
+ D7CHlPOFM97yd07sZaSYc4vW7xbFiCOwdxWKf7+e3FxruQHzWFUWfVUZ5GYn7bvhYgbf
+ 2AnxsbNGhm9ojPNIsOvJF/dm7XUGIYcSX0HdVjjWg/3SnGBbwuZi6sqeFipjmoYJaojf
+ xeZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=lzWIP4VkwCYbcbIQG5CcKiRH3f3/MB+GZnEQK5D3umo=;
- b=o/qisdEqNcM0ycahQoWA9yfyX2ysigpbBuUhsY3eSBMda3WaJtfJ8kC+GLnGhg7zwe
- FGPk0bpvPY2EO6gvpn8FDi/2a6OAuI3UankbvCA1+RU6wT3QE61TifFT3exyQ+rqFEEi
- dRylFjvwdjxbnCRvxTHPUi6tUhkO2oZ/nrjHK1oIClfy1zzV+F+VNH+rVUDQVtJcWBiF
- Au6opNULviCkqnc/oOiDgQzSimX8TA4xDAW0kmeoIziVMYJpYaa66uWN4aawfoKOQGY9
- IpsxBBcB1xFIdHpTon+4Z1jxS3GI4CD83fIdPRmQLDz8sA7KYCtA9yW5J+Rb9ED97Zu3
- fA6g==
-X-Gm-Message-State: APjAAAUqVA097wWKYDIAejGWLgRKzhmXT70uvp39kD3k69lQW7DS7nAg
- 9am29auQL22pz8gtcKm6MnY=
-X-Google-Smtp-Source: APXvYqxIEo02tNg08eQujp+12a4xWk1R/Cx2WaQTGOM1ydJ3rlVx6pJB6JcdWVJNxB8TrBLxzW2d2A==
-X-Received: by 2002:a62:1a16:: with SMTP id a22mr5966524pfa.34.1581725573453; 
- Fri, 14 Feb 2020 16:12:53 -0800 (PST)
+ bh=hbeVP/BW+IaFARdpXG4HDpnB43Wxr9sq7+fPSUPZvsM=;
+ b=I8zb/5UvLMR4O+nRgZyYHSkp0ahL1zrDM9TqeyM9vmrCeQfSY0NItzuV16Wp1zykY3
+ atbBL+GgaMjNdzCYiHtwzzy9ESQ/SF81FGIEQcBkjb71Wio/CNqVmjovC/pPoZi60Nff
+ vcJbeU0VIyh7AgtxUf4Und+uZNB0bSD0PdsZ/yJQ0dcjp2uoA3VeYhMtr9kjuldUtylJ
+ gMJ4Pm6OSDzVFWGAb91hU5ceIO/zgzkfrfWHrLi7peW+CNjqpGy+mc1KoaWsYjXKpJLl
+ L4jCV/YNf3JuPpZKxM0r+ZUxqDqfMgz+mqudg+eUGJ+BjeT6RnZd5XmYs5+93UhmhboB
+ RgkQ==
+X-Gm-Message-State: APjAAAUNHA95buxKkt7uS4/jfwviyploUNWAws874Z5cQ4pdmeCL7zlF
+ bpkzpmKtI7JhmMLmA2y9O3k=
+X-Google-Smtp-Source: APXvYqyBldKLT1Pm6J6WzLd5PAbioQ0hGgJHYVWZ/kXoX0PMAv2KwB6r5eOx2oGy2LKKXApz4P7/5Q==
+X-Received: by 2002:aa7:8809:: with SMTP id c9mr5802564pfo.238.1581725575362; 
+ Fri, 14 Feb 2020 16:12:55 -0800 (PST)
 Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id v5sm8317720pgc.11.2020.02.14.16.12.52
+ by smtp.gmail.com with ESMTPSA id c184sm8431141pfa.39.2020.02.14.16.12.54
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 14 Feb 2020 16:12:52 -0800 (PST)
+ Fri, 14 Feb 2020 16:12:54 -0800 (PST)
 From: Guenter Roeck <linux@roeck-us.net>
 To: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v2 1/3] hw: usb: hcd-ohci: Move OHCISysBusState and
- TYPE_SYSBUS_OHCI to include file
-Date: Fri, 14 Feb 2020 16:12:46 -0800
-Message-Id: <20200215001248.2642-2-linux@roeck-us.net>
+Subject: [PATCH v2 2/3] hcd-ehci: Introduce "companion-enable" sysbus property
+Date: Fri, 14 Feb 2020 16:12:47 -0800
+Message-Id: <20200215001248.2642-3-linux@roeck-us.net>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200215001248.2642-1-linux@roeck-us.net>
 References: <20200215001248.2642-1-linux@roeck-us.net>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,77 +94,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We need to be able to use OHCISysBusState outside hcd-ohci.c, so move it
-to its include file.
+We'll use this property in a follow-up patch to insantiate an EHCI
+bus with companion support.
 
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
-v2: no changes
+v2: Added patch
 
- hw/usb/hcd-ohci.c | 15 ---------------
- hw/usb/hcd-ohci.h | 16 ++++++++++++++++
- 2 files changed, 16 insertions(+), 15 deletions(-)
+ hw/usb/hcd-ehci-sysbus.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index 8a94bd004a..1e6e85e86a 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -1870,21 +1870,6 @@ void ohci_sysbus_die(struct OHCIState *ohci)
-     ohci_bus_stop(ohci);
- }
+diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
+index b5a014f968..014ad3d552 100644
+--- a/hw/usb/hcd-ehci-sysbus.c
++++ b/hw/usb/hcd-ehci-sysbus.c
+@@ -33,6 +33,8 @@ static const VMStateDescription vmstate_ehci_sysbus = {
  
--#define TYPE_SYSBUS_OHCI "sysbus-ohci"
--#define SYSBUS_OHCI(obj) OBJECT_CHECK(OHCISysBusState, (obj), TYPE_SYSBUS_OHCI)
--
--typedef struct {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
--
--    OHCIState ohci;
--    char *masterbus;
--    uint32_t num_ports;
--    uint32_t firstport;
--    dma_addr_t dma_offset;
--} OHCISysBusState;
--
- static void ohci_realize_pxa(DeviceState *dev, Error **errp)
- {
-     OHCISysBusState *s = SYSBUS_OHCI(dev);
-diff --git a/hw/usb/hcd-ohci.h b/hw/usb/hcd-ohci.h
-index 16e3f1e13a..5c8819aedf 100644
---- a/hw/usb/hcd-ohci.h
-+++ b/hw/usb/hcd-ohci.h
-@@ -22,6 +22,7 @@
- #define HCD_OHCI_H
+ static Property ehci_sysbus_properties[] = {
+     DEFINE_PROP_UINT32("maxframes", EHCISysBusState, ehci.maxframes, 128),
++    DEFINE_PROP_BOOL("companion-enable", EHCISysBusState, ehci.companion_enable,
++                     false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
- #include "sysemu/dma.h"
-+#include "hw/usb.h"
- 
- /* Number of Downstream Ports on the root hub: */
- #define OHCI_MAX_PORTS 15
-@@ -90,6 +91,21 @@ typedef struct OHCIState {
-     void (*ohci_die)(struct OHCIState *ohci);
- } OHCIState;
- 
-+#define TYPE_SYSBUS_OHCI "sysbus-ohci"
-+#define SYSBUS_OHCI(obj) OBJECT_CHECK(OHCISysBusState, (obj), TYPE_SYSBUS_OHCI)
-+
-+typedef struct {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    OHCIState ohci;
-+    char *masterbus;
-+    uint32_t num_ports;
-+    uint32_t firstport;
-+    dma_addr_t dma_offset;
-+} OHCISysBusState;
-+
- extern const VMStateDescription vmstate_ohci_state;
- 
- void usb_ohci_init(OHCIState *ohci, DeviceState *dev, uint32_t num_ports,
 -- 
 2.17.1
 
