@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C41AFC3B1BF
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 21:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2F3C3B1BF
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 21:44:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C13B2084E
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 21:43:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3256F2084E
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 21:44:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TW3t5Ayc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C13B2084E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="daVeXO4O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3256F2084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3RhL-0000Yt-RN
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 16:43:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47698)
+	id 1j3Rik-0002Oz-DP
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 16:44:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47725)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j3RgU-0007q4-VG
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 16:42:40 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j3RgW-0007rh-4Q
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 16:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j3RgT-0004tB-Hc
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 16:42:38 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37201)
+ (envelope-from <richard.henderson@linaro.org>) id 1j3RgU-0004uZ-LD
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 16:42:40 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33550)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j3RgT-0004sM-C8
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 16:42:37 -0500
-Received: by mail-pg1-x542.google.com with SMTP id z12so7997761pgl.4
- for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 13:42:37 -0800 (PST)
+ id 1j3RgU-0004ts-FB
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 16:42:38 -0500
+Received: by mail-pf1-x443.google.com with SMTP id n7so7797500pfn.0
+ for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 13:42:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=O2GXPDLFXihWuaiW0fDwrNaCDa99hsJ9UfIJrAM1orM=;
- b=TW3t5Ayc5JouTnjfgnOAe8PSFoU5aml6f3YdB6tJvjBpXz/XkQ8WALVeO8veWPXxmj
- w7QlzmW7xF/hGsi2paL1BGdTRSuii27ZHEWanO8eMz56WsN2hc/vax8OF7gXlR+L6dwq
- 7KJ2p/RMCpyMhdQkKfrMfJ0mVByAXNnPQu5oUYjK5sAefpo8V/ulhgR2AF9obxwBysxE
- dGGc4//aaocKAIxswi5nG+vjyVuLv48QaxUStjYRmwhxhL8MqE8SmyuGBn02umo6AgBS
- m46seyWnj3KrwNyLNaQdnauNzj9Zzs70NzzJwxuGLWxgNBbK6gcLPUlem9O/oPAJgbQP
- TV7w==
+ bh=BlbLiic8tZvSZ65YWPCZvJVkerl00AuqwrCb0HcI98k=;
+ b=daVeXO4OWCYwn8hr9NIbeneAn/kv0LTzrBn4xXLYCFhMbjRUDE4Vu03fz1NZPEdMtJ
+ DFY/UGqotBgCtK/cJYN8R/j4ungtDq4vdttzsmOHNX5TrDUFgOENyyw5D//fkjrhR+tj
+ 5WR3xjyh625Nbt9yNJHaN2+4IajCEJkiZTriObpAPZmd0z7E9a4G/pzKi5JKSeEZhGUo
+ cBoxiWqpdMKWFZ3ugGCkCEhcqABvMzLGTjZtFSq6SGew5iiLm+nV7jK+XeHtulKujxVT
+ sH04SxpCYOoTIneJG4gSU8eEFzBDvL1LUS2rwszCRVxzMLJwNdqcQn/DiXlfrsrT8F77
+ HQGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=O2GXPDLFXihWuaiW0fDwrNaCDa99hsJ9UfIJrAM1orM=;
- b=dQsnnFnZ/WDUfdvfj5RNmF/NInSnSs0G65Xm/Bg6Xrcrn0OhRQEP5BXMQmT2M7srEz
- uvEy2s1Q7AptSYMhvkoq1GtDce3zefgzTmuspjCYYN6a+cJtN9yjLbU8YcIpoAkoemyj
- QbGbPLc44AsqzSbSXmdQMwMOod5hdpRGVya/FcRdcmg90LwpABO0VnMMdnDNePfYkP8V
- OfhY2EoZsSTbg4cCvKpUfeKhF9WSmlb8eWN3zfXctT3bZhLulmYa9cXOwQLTV7a6Lk2O
- P6NP5nC/oVlhEYBLxYaQMKBWwxd+RKSv1xcgWfH023ZjSl1RwKdpdbqTlkMjc5Qe3PxN
- +gaA==
-X-Gm-Message-State: APjAAAU4uFdT1c5nKCw0TmGoZj0B5dgWx2c1m6r5H+WD6NTB/ucv25WO
- DLVAxfGhUHapPKvetJgW9ZIVDTrImJY=
-X-Google-Smtp-Source: APXvYqwCX+NSsYSzBinz2e50TmZeK3ZWAh9Y/JrnDSB9C4rMkSEpMI8Es2Jr5UAoNX8zEOXhsfCnqQ==
-X-Received: by 2002:a63:4a47:: with SMTP id j7mr14571862pgl.196.1581889355873; 
- Sun, 16 Feb 2020 13:42:35 -0800 (PST)
+ bh=BlbLiic8tZvSZ65YWPCZvJVkerl00AuqwrCb0HcI98k=;
+ b=DtSFfBrI7Zdf7BozGyl2ZfESSSHf1nwVjbjPvMZA0FWt9kdydPZM5MdWjR9uKwBaYH
+ fKK7CzkRZTAmbg+5P1pcwt+iYTAg1hyVapREyl3jK+HMGrlsljwRe+u9ogRd9J3m8UUz
+ YEMsRF8X2ZqkwaHqSSYZ95adO7mISlBfO9nMHvMmJ690GktZXI7erylLsJorTB89CTsq
+ sNnzVdLIXumlXsHX1Cua+zWR9JFEKF7skiTS9H+yBVX1uVqopaowg8d1DjqVpIN3ppXA
+ BD9XjtGh/QbnOpH5sOg80TevWx3pF4DUs+Sl/NPguiyYQGQTZ9mEg0N+IA9YJjb7dLFF
+ Sw9A==
+X-Gm-Message-State: APjAAAXjVBNEN4LQeA5AtGE4zuSUb1icHxrS2tT15scu+Jk4O71n2Dj4
+ fzReiy27aEknAK5ZQ0BHONTDeDDAqgc=
+X-Google-Smtp-Source: APXvYqzZNJlRmQSYV2ShwRVfCF9j4wg9Z8R0bE03kKogWtbLGySOi3EGHSgYnSEiW5B6tpkqlvyuOQ==
+X-Received: by 2002:a65:40c8:: with SMTP id u8mr11334728pgp.188.1581889357162; 
+ Sun, 16 Feb 2020 13:42:37 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id z29sm14821848pgc.21.2020.02.16.13.42.34
+ by smtp.gmail.com with ESMTPSA id z29sm14821848pgc.21.2020.02.16.13.42.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 16 Feb 2020 13:42:35 -0800 (PST)
+ Sun, 16 Feb 2020 13:42:36 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/4] target/arm: Convert PMUL.8 to gvec
-Date: Sun, 16 Feb 2020 13:42:30 -0800
-Message-Id: <20200216214232.4230-3-richard.henderson@linaro.org>
+Subject: [PATCH v2 3/4] target/arm: Convert PMULL.64 to gvec
+Date: Sun, 16 Feb 2020 13:42:31 -0800
+Message-Id: <20200216214232.4230-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200216214232.4230-1-richard.henderson@linaro.org>
 References: <20200216214232.4230-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,178 +102,191 @@ Sender: "Qemu-devel"
 
 The gvec form will be needed for implementing SVE2.
 
-Extend the implementation to operate on uint64_t instead of uint32_t.
-Use a counted inner loop instead of terminating when op1 goes to zero,
-looking toward the required implementation for ARMv8.4-DIT.
-
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v3: Elide mask after right-shift on N, as we already do N & 1
-    at the top of the loop.
----
- target/arm/helper.h        |  3 ++-
- target/arm/neon_helper.c   | 22 ----------------------
- target/arm/translate-a64.c | 10 +++-------
- target/arm/translate.c     | 11 ++++-------
- target/arm/vec_helper.c    | 30 ++++++++++++++++++++++++++++++
- 5 files changed, 39 insertions(+), 37 deletions(-)
+ target/arm/helper.h        |  4 +---
+ target/arm/neon_helper.c   | 30 ------------------------------
+ target/arm/translate-a64.c | 28 +++-------------------------
+ target/arm/translate.c     | 16 ++--------------
+ target/arm/vec_helper.c    | 33 +++++++++++++++++++++++++++++++++
+ 5 files changed, 39 insertions(+), 72 deletions(-)
 
 diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 459a278b5c..82450a3f96 100644
+index 82450a3f96..4352fae3db 100644
 --- a/target/arm/helper.h
 +++ b/target/arm/helper.h
-@@ -342,7 +342,6 @@ DEF_HELPER_2(neon_sub_u8, i32, i32, i32)
- DEF_HELPER_2(neon_sub_u16, i32, i32, i32)
- DEF_HELPER_2(neon_mul_u8, i32, i32, i32)
- DEF_HELPER_2(neon_mul_u16, i32, i32, i32)
--DEF_HELPER_2(neon_mul_p8, i32, i32, i32)
- DEF_HELPER_2(neon_mull_p8, i64, i32, i32)
+@@ -562,9 +562,6 @@ DEF_HELPER_FLAGS_3(crc32, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
+ DEF_HELPER_FLAGS_3(crc32c, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
+ DEF_HELPER_2(dc_zva, void, env, i64)
  
- DEF_HELPER_2(neon_tst_u8, i32, i32, i32)
-@@ -696,6 +695,8 @@ DEF_HELPER_FLAGS_4(gvec_sshl_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_ushl_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+-DEF_HELPER_FLAGS_2(neon_pmull_64_lo, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+-DEF_HELPER_FLAGS_2(neon_pmull_64_hi, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+-
+ DEF_HELPER_FLAGS_5(gvec_qrdmlah_s16, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(gvec_qrdmlsh_s16, TCG_CALL_NO_RWG,
+@@ -696,6 +693,7 @@ DEF_HELPER_FLAGS_4(gvec_ushl_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_4(gvec_ushl_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_4(gvec_pmul_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
+ DEF_HELPER_FLAGS_4(gvec_pmul_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_pmull_q, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ 
  #ifdef TARGET_AARCH64
  #include "helper-a64.h"
- #include "helper-sve.h"
 diff --git a/target/arm/neon_helper.c b/target/arm/neon_helper.c
-index c581ffb7d3..9e7a9a1ac5 100644
+index 9e7a9a1ac5..6a107da0e1 100644
 --- a/target/arm/neon_helper.c
 +++ b/target/arm/neon_helper.c
-@@ -1131,28 +1131,6 @@ NEON_VOP(mul_u16, neon_u16, 2)
- 
- /* Polynomial multiplication is like integer multiplication except the
-    partial products are XORed, not added.  */
--uint32_t HELPER(neon_mul_p8)(uint32_t op1, uint32_t op2)
--{
--    uint32_t mask;
--    uint32_t result;
--    result = 0;
--    while (op1) {
--        mask = 0;
--        if (op1 & 1)
--            mask |= 0xff;
--        if (op1 & (1 << 8))
--            mask |= (0xff << 8);
--        if (op1 & (1 << 16))
--            mask |= (0xff << 16);
--        if (op1 & (1 << 24))
--            mask |= (0xff << 24);
--        result ^= op2 & mask;
--        op1 = (op1 >> 1) & 0x7f7f7f7f;
--        op2 = (op2 << 1) & 0xfefefefe;
--    }
--    return result;
--}
+@@ -2152,33 +2152,3 @@ void HELPER(neon_zip16)(void *vd, void *vm)
+     rm[0] = m0;
+     rd[0] = d0;
+ }
 -
- uint64_t HELPER(neon_mull_p8)(uint32_t op1, uint32_t op2)
- {
-     uint64_t result = 0;
+-/* Helper function for 64 bit polynomial multiply case:
+- * perform PolynomialMult(op1, op2) and return either the top or
+- * bottom half of the 128 bit result.
+- */
+-uint64_t HELPER(neon_pmull_64_lo)(uint64_t op1, uint64_t op2)
+-{
+-    int bitnum;
+-    uint64_t res = 0;
+-
+-    for (bitnum = 0; bitnum < 64; bitnum++) {
+-        if (op1 & (1ULL << bitnum)) {
+-            res ^= op2 << bitnum;
+-        }
+-    }
+-    return res;
+-}
+-uint64_t HELPER(neon_pmull_64_hi)(uint64_t op1, uint64_t op2)
+-{
+-    int bitnum;
+-    uint64_t res = 0;
+-
+-    /* bit 0 of op1 can't influence the high 64 bits at all */
+-    for (bitnum = 1; bitnum < 64; bitnum++) {
+-        if (op1 & (1ULL << bitnum)) {
+-            res ^= op2 >> (64 - bitnum);
+-        }
+-    }
+-    return res;
+-}
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index e42dcfebdd..c96ed28f9d 100644
+index c96ed28f9d..6ce1131860 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -11160,9 +11160,10 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-     case 0x13: /* MUL, PMUL */
-         if (!u) { /* MUL */
-             gen_gvec_fn3(s, is_q, rd, rn, rm, tcg_gen_gvec_mul, size);
--            return;
-+        } else {  /* PMUL */
-+            gen_gvec_op3_ool(s, is_q, rd, rn, rm, 0, gen_helper_gvec_pmul_b);
-         }
--        break;
-+        return;
-     case 0x12: /* MLA, MLS */
-         if (u) {
-             gen_gvec_op3(s, is_q, rd, rn, rm, &mls_op[size]);
-@@ -11292,11 +11293,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 genfn = fns[size][u];
-                 break;
+@@ -10648,30 +10648,6 @@ static void handle_3rd_narrowing(DisasContext *s, int is_q, int is_u, int size,
+     clear_vec_high(s, is_q, rd);
+ }
+ 
+-static void handle_pmull_64(DisasContext *s, int is_q, int rd, int rn, int rm)
+-{
+-    /* PMULL of 64 x 64 -> 128 is an odd special case because it
+-     * is the only three-reg-diff instruction which produces a
+-     * 128-bit wide result from a single operation. However since
+-     * it's possible to calculate the two halves more or less
+-     * separately we just use two helper calls.
+-     */
+-    TCGv_i64 tcg_op1 = tcg_temp_new_i64();
+-    TCGv_i64 tcg_op2 = tcg_temp_new_i64();
+-    TCGv_i64 tcg_res = tcg_temp_new_i64();
+-
+-    read_vec_element(s, tcg_op1, rn, is_q, MO_64);
+-    read_vec_element(s, tcg_op2, rm, is_q, MO_64);
+-    gen_helper_neon_pmull_64_lo(tcg_res, tcg_op1, tcg_op2);
+-    write_vec_element(s, tcg_res, rd, 0, MO_64);
+-    gen_helper_neon_pmull_64_hi(tcg_res, tcg_op1, tcg_op2);
+-    write_vec_element(s, tcg_res, rd, 1, MO_64);
+-
+-    tcg_temp_free_i64(tcg_op1);
+-    tcg_temp_free_i64(tcg_op2);
+-    tcg_temp_free_i64(tcg_res);
+-}
+-
+ /* AdvSIMD three different
+  *   31  30  29 28       24 23  22  21 20  16 15    12 11 10 9    5 4    0
+  * +---+---+---+-----------+------+---+------+--------+-----+------+------+
+@@ -10736,7 +10712,9 @@ static void disas_simd_three_reg_diff(DisasContext *s, uint32_t insn)
+             if (!fp_access_check(s)) {
+                 return;
              }
--            case 0x13: /* MUL, PMUL */
--                assert(u); /* PMUL */
--                assert(size == 0);
--                genfn = gen_helper_neon_mul_p8;
--                break;
-             case 0x16: /* SQDMULH, SQRDMULH */
-             {
-                 static NeonGenTwoOpEnvFn * const fns[2][2] = {
+-            handle_pmull_64(s, is_q, rd, rn, rm);
++            /* The Q field specifies lo/hi half input for this insn.  */
++            gen_gvec_op3_ool(s, true, rd, rn, rm, is_q,
++                             gen_helper_gvec_pmull_q);
+             return;
+         }
+         goto is_widening;
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index c4dd14e053..4581373e31 100644
+index 4581373e31..e2dbafa161 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -5007,16 +5007,17 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
- 
-         case NEON_3R_VMUL: /* VMUL */
-             if (u) {
--                /* Polynomial case allows only P8 and is handled below.  */
-+                /* Polynomial case allows only P8.  */
-                 if (size != 0) {
-                     return 1;
+@@ -5870,23 +5870,11 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                  * outside the loop below as it only performs a single pass.
+                  */
+                 if (op == 14 && size == 2) {
+-                    TCGv_i64 tcg_rn, tcg_rm, tcg_rd;
+-
+                     if (!dc_isar_feature(aa32_pmull, s)) {
+                         return 1;
+                     }
+-                    tcg_rn = tcg_temp_new_i64();
+-                    tcg_rm = tcg_temp_new_i64();
+-                    tcg_rd = tcg_temp_new_i64();
+-                    neon_load_reg64(tcg_rn, rn);
+-                    neon_load_reg64(tcg_rm, rm);
+-                    gen_helper_neon_pmull_64_lo(tcg_rd, tcg_rn, tcg_rm);
+-                    neon_store_reg64(tcg_rd, rd);
+-                    gen_helper_neon_pmull_64_hi(tcg_rd, tcg_rn, tcg_rm);
+-                    neon_store_reg64(tcg_rd, rd + 1);
+-                    tcg_temp_free_i64(tcg_rn);
+-                    tcg_temp_free_i64(tcg_rm);
+-                    tcg_temp_free_i64(tcg_rd);
++                    tcg_gen_gvec_3_ool(rd_ofs, rn_ofs, rm_ofs, 16, 16,
++                                       0, gen_helper_gvec_pmull_q);
+                     return 0;
                  }
-+                tcg_gen_gvec_3_ool(rd_ofs, rn_ofs, rm_ofs, vec_size, vec_size,
-+                                   0, gen_helper_gvec_pmul_b);
-             } else {
-                 tcg_gen_gvec_mul(size, rd_ofs, rn_ofs, rm_ofs,
-                                  vec_size, vec_size);
--                return 0;
-             }
--            break;
-+            return 0;
  
-         case NEON_3R_VML: /* VMLA, VMLS */
-             tcg_gen_gvec_3(rd_ofs, rn_ofs, rm_ofs, vec_size, vec_size,
-@@ -5206,10 +5207,6 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-             tmp2 = neon_load_reg(rd, pass);
-             gen_neon_add(size, tmp, tmp2);
-             break;
--        case NEON_3R_VMUL:
--            /* VMUL.P8; other cases already eliminated.  */
--            gen_helper_neon_mul_p8(tmp, tmp, tmp2);
--            break;
-         case NEON_3R_VPMAX:
-             GEN_NEON_INTEGER_OP(pmax);
-             break;
 diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index fcb3663903..854de0e279 100644
+index 854de0e279..79d2624f7b 100644
 --- a/target/arm/vec_helper.c
 +++ b/target/arm/vec_helper.c
-@@ -1134,3 +1134,33 @@ void HELPER(gvec_ushl_h)(void *vd, void *vn, void *vm, uint32_t desc)
+@@ -1164,3 +1164,36 @@ void HELPER(gvec_pmul_b)(void *vd, void *vn, void *vm, uint32_t desc)
      }
      clear_tail(d, opr_sz, simd_maxsz(desc));
  }
 +
 +/*
-+ * 8x8->8 polynomial multiply.
-+ *
-+ * Polynomial multiplication is like integer multiplication except the
-+ * partial products are XORed, not added.
-+ *
-+ * TODO: expose this as a generic vector operation, as it is a common
-+ * crypto building block.
++ * 64x64->128 polynomial multiply.
++ * Because of the lanes are not accessed in strict columns,
++ * this probably cannot be turned into a generic helper.
 + */
-+void HELPER(gvec_pmul_b)(void *vd, void *vn, void *vm, uint32_t desc)
++void HELPER(gvec_pmull_q)(void *vd, void *vn, void *vm, uint32_t desc)
 +{
 +    intptr_t i, j, opr_sz = simd_oprsz(desc);
++    intptr_t hi = simd_data(desc);
 +    uint64_t *d = vd, *n = vn, *m = vm;
 +
-+    for (i = 0; i < opr_sz / 8; ++i) {
-+        uint64_t nn = n[i];
-+        uint64_t mm = m[i];
-+        uint64_t rr = 0;
++    for (i = 0; i < opr_sz / 8; i += 2) {
++        uint64_t nn = n[i + hi];
++        uint64_t mm = m[i + hi];
++        uint64_t rhi = 0;
++        uint64_t rlo = 0;
 +
-+        for (j = 0; j < 8; ++j) {
-+            uint64_t mask = (nn & 0x0101010101010101ull) * 0xff;
-+            rr ^= mm & mask;
-+            mm = (mm << 1) & 0xfefefefefefefefeull;
-+            nn >>= 1;
++        /* Bit 0 can only influence the low 64-bit result.  */
++        if (nn & 1) {
++            rlo = mm;
 +        }
-+        d[i] = rr;
++
++        for (j = 1; j < 64; ++j) {
++            uint64_t mask = -((nn >> j) & 1);
++            rlo ^= (mm << j) & mask;
++            rhi ^= (mm >> (64 - j)) & mask;
++        }
++        d[i] = rlo;
++        d[i + 1] = rhi;
 +    }
 +    clear_tail(d, opr_sz, simd_maxsz(desc));
 +}
