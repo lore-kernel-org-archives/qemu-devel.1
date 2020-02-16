@@ -6,81 +6,81 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 950D6C2BA83
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 18:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D229FC2BA83
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 18:48:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CF05206D6
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 18:34:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CF05206D6
+	by mail.kernel.org (Postfix) with ESMTPS id 9F3432084E
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 18:48:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F3432084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3Ojv-0002oZ-Li
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 13:33:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55676)
+	id 1j3Oxj-0006C0-T1
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 13:48:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1j3Oiy-0002Bq-RU
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:33:02 -0500
+ (envelope-from <stefanb@linux.ibm.com>) id 1j3Ox2-0005gW-Gg
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:47:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1j3Oix-0004Dk-2w
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:33:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14052)
+ (envelope-from <stefanb@linux.ibm.com>) id 1j3Ox1-0006k5-66
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:47:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47048)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1j3Ois-00044o-Pc; Sun, 16 Feb 2020 13:32:55 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ id 1j3Owy-0006eI-24; Sun, 16 Feb 2020 13:47:28 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01GIJ3f4159010; Sun, 16 Feb 2020 13:32:52 -0500
+ 01GIk4WF109559; Sun, 16 Feb 2020 13:47:25 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y6d5yttk5-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y6e2da9vc-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 16 Feb 2020 13:32:52 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01GIK4Cv160965;
- Sun, 16 Feb 2020 13:32:51 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y6d5yttju-1
+ Sun, 16 Feb 2020 13:47:25 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01GIk7A5109898;
+ Sun, 16 Feb 2020 13:47:25 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y6e2da9v2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 16 Feb 2020 13:32:51 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01GIVJce017443;
- Sun, 16 Feb 2020 18:32:50 GMT
+ Sun, 16 Feb 2020 13:47:24 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01GIj1Mj007514;
+ Sun, 16 Feb 2020 18:47:23 GMT
 Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma03dal.us.ibm.com with ESMTP id 2y689676av-1
+ [9.57.198.23]) by ppma04wdc.us.ibm.com with ESMTP id 2y6895v6nn-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 16 Feb 2020 18:32:50 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
+ Sun, 16 Feb 2020 18:47:23 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
  by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01GIWn8l30540154
+ 01GIlNpu51315082
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sun, 16 Feb 2020 18:32:49 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AAB7EAE05C;
- Sun, 16 Feb 2020 18:32:49 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8F03BAE05F;
- Sun, 16 Feb 2020 18:32:49 +0000 (GMT)
+ Sun, 16 Feb 2020 18:47:23 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5A2FF112065;
+ Sun, 16 Feb 2020 18:47:23 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 45678112063;
+ Sun, 16 Feb 2020 18:47:23 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
- Sun, 16 Feb 2020 18:32:49 +0000 (GMT)
-Subject: Re: [RFC v2 5/6] tpm: Add the SysBus TPM TIS device
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Sun, 16 Feb 2020 18:47:23 +0000 (GMT)
+Subject: Re: [RFC v2 6/6] hw/arm/virt: vTPM support
 To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 References: <20200214183704.14389-1-eric.auger@redhat.com>
- <20200214183704.14389-6-eric.auger@redhat.com>
+ <20200214183704.14389-7-eric.auger@redhat.com>
 From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <b0c30022-e6f3-b52d-60f8-e94db6b6fe99@linux.ibm.com>
-Date: Sun, 16 Feb 2020 13:32:49 -0500
+Message-ID: <17dfaa9b-dd1a-9654-c59c-391a70d0327e@linux.ibm.com>
+Date: Sun, 16 Feb 2020 13:47:23 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200214183704.14389-6-eric.auger@redhat.com>
+In-Reply-To: <20200214183704.14389-7-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -89,11 +89,11 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-02-16_04:2020-02-14,
  2020-02-16 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- malwarescore=0 mlxscore=0 suspectscore=0 adultscore=0 bulkscore=0
- impostorscore=0 clxscore=1015 phishscore=0 priorityscore=1501 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002160166
+ malwarescore=0
+ mlxlogscore=999 mlxscore=0 suspectscore=2 clxscore=1015 lowpriorityscore=0
+ impostorscore=0 phishscore=0 bulkscore=0 adultscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002160168
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,233 +114,151 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 2/14/20 1:37 PM, Eric Auger wrote:
-> Introduce the tpm-tis-device which is a sysbus device
-> and is bound to be used on ARM.
+> Let the TPM TIS SYSBUS device be dynamically instantiable
+> in ARM virt.  A device tree node is dynamically created
+> (TPM via MMIO).
+>
+> The TPM Physical Presence interface (PPI) is not supported.
+>
+> To run with the swtmp TPM emulator, the qemu command line must
+> be augmented with:
+>
+>          -chardev socket,id=chrtpm,path=swtpm-sock \
+>          -tpmdev emulator,id=tpm0,chardev=chrtpm \
+>          -device tpm-tis-device,tpmdev=tpm0 \
+>
+> swtpm/libtpms command line example:
+>
+> swtpm socket --tpm2 -t -d --tpmstate dir=/tmp/tpm \
+> --ctrl type=unixio,path=swtpm-sock
+
+
+Can you also extend docs/spec/tpm.rst for the arm case? And the test 
+cases should probably also cover the arm sysbus device.
+
+
 >
 > Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->   hw/tpm/Kconfig          |   5 ++
->   hw/tpm/Makefile.objs    |   1 +
->   hw/tpm/tpm_tis_sysbus.c | 159 ++++++++++++++++++++++++++++++++++++++++
->   include/sysemu/tpm.h    |   1 +
->   4 files changed, 166 insertions(+)
->   create mode 100644 hw/tpm/tpm_tis_sysbus.c
+>   hw/arm/Kconfig      |  1 +
+>   hw/arm/sysbus-fdt.c | 36 ++++++++++++++++++++++++++++++++++++
+>   hw/arm/virt.c       |  7 +++++++
+>   3 files changed, 44 insertions(+)
 >
-> diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
-> index 686f8206bb..4794e7fe28 100644
-> --- a/hw/tpm/Kconfig
-> +++ b/hw/tpm/Kconfig
-> @@ -7,6 +7,11 @@ config TPM_TIS_ISA
->       depends on TPM && ISA_BUS
->       select TPM_TIS
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 3d86691ae0..b6f03f7f53 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -5,6 +5,7 @@ config ARM_VIRT
+>       imply VFIO_AMD_XGBE
+>       imply VFIO_PLATFORM
+>       imply VFIO_XGMAC
+> +    imply TPM_TIS_SYSBUS
+>       select A15MPCORE
+>       select ACPI
+>       select ARM_SMMUV3
+> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+> index 022fc97ecd..adf50444c2 100644
+> --- a/hw/arm/sysbus-fdt.c
+> +++ b/hw/arm/sysbus-fdt.c
+> @@ -30,6 +30,7 @@
+>   #include "hw/arm/sysbus-fdt.h"
+>   #include "qemu/error-report.h"
+>   #include "sysemu/device_tree.h"
+> +#include "sysemu/tpm.h"
+>   #include "hw/platform-bus.h"
+>   #include "hw/vfio/vfio-platform.h"
+>   #include "hw/vfio/vfio-calxeda-xgmac.h"
+> @@ -434,6 +435,40 @@ static bool vfio_platform_match(SysBusDevice *sbdev,
+>   #define VFIO_PLATFORM_BINDING(compat, add_fn) \
+>       {TYPE_VFIO_PLATFORM, (compat), (add_fn), vfio_platform_match}
 >   
-> +config TPM_TIS_SYSBUS
-> +    bool
-> +    depends on TPM
-> +    select TPM_TIS
-> +
->   config TPM_TIS
->       bool
->       depends on TPM
-> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-> index 3ef2036cca..f1ec4beb95 100644
-> --- a/hw/tpm/Makefile.objs
-> +++ b/hw/tpm/Makefile.objs
-> @@ -1,6 +1,7 @@
->   common-obj-$(CONFIG_TPM) += tpm_util.o
->   obj-$(call lor,$(CONFIG_TPM_TIS),$(CONFIG_TPM_CRB)) += tpm_ppi.o
->   common-obj-$(CONFIG_TPM_TIS_ISA) += tpm_tis_isa.o
-> +common-obj-$(CONFIG_TPM_TIS_SYSBUS) += tpm_tis_sysbus.o
->   common-obj-$(CONFIG_TPM_TIS) += tpm_tis_common.o
->   common-obj-$(CONFIG_TPM_CRB) += tpm_crb.o
->   common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o
-> diff --git a/hw/tpm/tpm_tis_sysbus.c b/hw/tpm/tpm_tis_sysbus.c
-> new file mode 100644
-> index 0000000000..18c02aed67
-> --- /dev/null
-> +++ b/hw/tpm/tpm_tis_sysbus.c
-> @@ -0,0 +1,159 @@
 > +/*
-> + * tpm_tis_sysbus.c - QEMU's TPM TIS SYSBUS Device
+> + * add_tpm_tis_fdt_node: Create a DT node for TPM TIS
 > + *
-> + * Copyright (C) 2006,2010-2013 IBM Corporation
-> + *
-> + * Authors:
-> + *  Stefan Berger <stefanb@us.ibm.com>
-> + *  David Safford <safford@us.ibm.com>
-> + *
-> + * Xen 4 support: Andrease Niederl <andreas.niederl@iaik.tugraz.at>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + * Implementation of the TIS interface according to specs found at
-> + * http://www.trustedcomputinggroup.org. This implementation currently
-> + * supports version 1.3, 21 March 2013
-> + * In the developers menu choose the PC Client section then find the TIS
-> + * specification.
-> + *
-> + * TPM TIS for TPM 2 implementation following TCG PC Client Platform
-> + * TPM Profile (PTP) Specification, Familiy 2.0, Revision 00.43
+> + * See kernel documentation:
+> + * Documentation/devicetree/bindings/security/tpm/tpm_tis_mmio.txt
+> + * Optional interrupt for command completion is not exposed
 > + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/qdev-properties.h"
-> +#include "migration/vmstate.h"
-> +#include "tpm_util.h"
-> +#include "hw/sysbus.h"
-> +#include "tpm_tis.h"
-> +
-> +typedef struct TPMStateSysBus {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +
-> +    /*< public >*/
-> +    TPMState state; /* not a QOM object */
-> +} TPMStateSysBus;
-> +
-> +#define TPM_TIS_SYSBUS(obj) OBJECT_CHECK(TPMStateSysBus, (obj), TYPE_TPM_TIS_SYSBUS)
-> +
-> +static int tpm_tis_pre_save_sysbus(void *opaque)
+> +static int add_tpm_tis_fdt_node(SysBusDevice *sbdev, void *opaque)
 > +{
-> +    TPMStateSysBus *sbdev = opaque;
+> +    PlatformBusFDTData *data = opaque;
+> +    PlatformBusDevice *pbus = data->pbus;
+> +    void *fdt = data->fdt;
+> +    const char *parent_node = data->pbus_node_name;
+> +    int compat_str_len;
+> +    char *nodename;
+> +    uint32_t reg_attr[2];
+> +    uint64_t mmio_base;
 > +
-> +    return tpm_tis_pre_save(&sbdev->state);
+> +    mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
+
+I suppose any conditional creation of this device tree entry is covered 
+with the TYPE_BINDING below, meaning no device tree is created if the 
+device wasn't added.
+
+
+> +    nodename = g_strdup_printf("%s/tpm_tis@%" PRIx64, parent_node, mmio_base);
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +
+> +    compat_str_len = strlen("tcg,tpm-tis-mmio") + 1;
+> +    qemu_fdt_setprop(fdt, nodename, "compatible", "tcg,tpm-tis-mmio",
+> +                     compat_str_len);
+
+You probably can use qemu_fdt_setprop_string()?
+
+
+> +
+> +    reg_attr[0] = cpu_to_be32(mmio_base);
+> +    reg_attr[1] = cpu_to_be32(0x5000);
+> +    qemu_fdt_setprop(fdt, nodename, "reg", reg_attr, 2 * sizeof(uint32_t));
+> +
+> +    g_free(nodename);
+> +    return 0;
 > +}
 > +
-> +static const VMStateDescription vmstate_tpm_tis_sysbus = {
-> +    .name = "tpm-tis",
-> +    .version_id = 0,
-> +    .pre_save  = tpm_tis_pre_save_sysbus,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_BUFFER(state.buffer, TPMStateSysBus),
-> +        VMSTATE_UINT16(state.rw_offset, TPMStateSysBus),
-> +        VMSTATE_UINT8(state.active_locty, TPMStateSysBus),
-> +        VMSTATE_UINT8(state.aborting_locty, TPMStateSysBus),
-> +        VMSTATE_UINT8(state.next_locty, TPMStateSysBus),
-> +
-> +        VMSTATE_STRUCT_ARRAY(state.loc, TPMStateSysBus, TPM_TIS_NUM_LOCALITIES,
-> +                             0, vmstate_locty, TPMLocality),
-> +
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void tpm_tis_sysbus_request_completed(TPMIf *ti, int ret)
-> +{
-> +    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(ti);
-> +    TPMState *s = &sbdev->state;
-> +
-> +    tpm_tis_request_completed(s, ret);
-> +}
-> +
-> +static enum TPMVersion tpm_tis_sysbus_get_tpm_version(TPMIf *ti)
-> +{
-> +    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(ti);
-> +    TPMState *s = &sbdev->state;
-> +
-> +    return tpm_tis_get_tpm_version(s);
-> +}
-> +
-> +static void tpm_tis_sysbus_reset(DeviceState *dev)
-> +{
-> +    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(dev);
-> +    TPMState *s = &sbdev->state;
-> +
-> +    return tpm_tis_reset(s);
-> +}
-> +
-> +static Property tpm_tis_sysbus_properties[] = {
-> +    DEFINE_PROP_UINT32("irq", TPMStateSysBus, state.irq_num, TPM_TIS_IRQ),
-> +    DEFINE_PROP_TPMBE("tpmdev", TPMStateSysBus, state.be_driver),
-> +    DEFINE_PROP_BOOL("ppi", TPMStateSysBus, state.ppi_enabled, true),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void tpm_tis_sysbus_initfn(Object *obj)
-> +{
-> +    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(obj);
-> +    TPMState *s = &sbdev->state;
-> +
-> +    memory_region_init_io(&s->mmio, obj, &tpm_tis_memory_ops,
-> +                          s, "tpm-tis-mmio",
-> +                          TPM_TIS_NUM_LOCALITIES << TPM_TIS_LOCALITY_SHIFT);
-> +
-> +    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-> +    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
-> +}
-> +
-> +static void tpm_tis_sysbus_realizefn(DeviceState *dev, Error **errp)
-> +{
-> +    TPMStateSysBus *sbdev = TPM_TIS_SYSBUS(dev);
-> +    TPMState *s = &sbdev->state;
-> +
-> +    if (!tpm_find()) {
-> +        error_setg(errp, "at most one TPM device is permitted");
-> +        return;
-> +    }
-> +
-> +    if (!s->be_driver) {
-> +        error_setg(errp, "'tpmdev' property is required");
-> +        return;
-> +    }
-> +}
-> +
-> +static void tpm_tis_sysbus_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    TPMIfClass *tc = TPM_IF_CLASS(klass);
-> +
-> +    device_class_set_props(dc, tpm_tis_sysbus_properties);
-> +    dc->vmsd  = &vmstate_tpm_tis_sysbus;
-> +    tc->model = TPM_MODEL_TPM_TIS;
-> +    dc->realize = tpm_tis_sysbus_realizefn;
-> +    dc->user_creatable = true;
-> +    dc->reset = tpm_tis_sysbus_reset;
-> +    tc->request_completed = tpm_tis_sysbus_request_completed;
-> +    tc->get_version = tpm_tis_sysbus_get_tpm_version;
-> +}
-> +
-> +static const TypeInfo tpm_tis_sysbus_info = {
-> +    .name = TYPE_TPM_TIS_SYSBUS,
-> +    .parent = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(TPMStateSysBus),
-> +    .instance_init = tpm_tis_sysbus_initfn,
-> +    .class_init  = tpm_tis_sysbus_class_init,
-> +    .interfaces = (InterfaceInfo[]) {
-> +        { TYPE_TPM_IF },
-> +        { }
-> +    }
-> +};
-> +
-> +static void tpm_tis_sysbus_register(void)
-> +{
-> +    type_register_static(&tpm_tis_sysbus_info);
-> +}
-> +
-> +type_init(tpm_tis_sysbus_register)
-> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-> index 1691b92c28..f37851b1aa 100644
-> --- a/include/sysemu/tpm.h
-> +++ b/include/sysemu/tpm.h
-> @@ -44,6 +44,7 @@ typedef struct TPMIfClass {
->   } TPMIfClass;
+>   #endif /* CONFIG_LINUX */
 >   
->   #define TYPE_TPM_TIS_ISA            "tpm-tis"
-> +#define TYPE_TPM_TIS_SYSBUS         "tpm-tis-device"
-
-
-hm, replace the rather generic 'device' with 'sysbus'?
-
-
-Otherwise looks really good.
-
-
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-
-
->   #define TYPE_TPM_CRB                "tpm-crb"
->   #define TYPE_TPM_SPAPR              "tpm-spapr"
+>   static int no_fdt_node(SysBusDevice *sbdev, void *opaque)
+> @@ -455,6 +490,7 @@ static const BindingEntry bindings[] = {
+>       TYPE_BINDING(TYPE_VFIO_CALXEDA_XGMAC, add_calxeda_midway_xgmac_fdt_node),
+>       TYPE_BINDING(TYPE_VFIO_AMD_XGBE, add_amd_xgbe_fdt_node),
+>       VFIO_PLATFORM_BINDING("amd,xgbe-seattle-v1a", add_amd_xgbe_fdt_node),
+> +    TYPE_BINDING(TYPE_TPM_TIS_SYSBUS, add_tpm_tis_fdt_node),
+>   #endif
+>       TYPE_BINDING(TYPE_RAMFB_DEVICE, no_fdt_node),
+>       TYPE_BINDING("", NULL), /* last element */
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index f788fe27d6..4b967e39d1 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -47,6 +47,7 @@
+>   #include "sysemu/numa.h"
+>   #include "sysemu/runstate.h"
+>   #include "sysemu/sysemu.h"
+> +#include "sysemu/tpm.h"
+>   #include "sysemu/kvm.h"
+>   #include "hw/loader.h"
+>   #include "exec/address-spaces.h"
+> @@ -2041,6 +2042,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>       machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
+>       machine_class_allow_dynamic_sysbus_dev(mc, TYPE_RAMFB_DEVICE);
+>       machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_PLATFORM);
+> +    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_TPM_TIS_SYSBUS);
+>       mc->block_default_type = IF_VIRTIO;
+>       mc->no_cdrom = 1;
+>       mc->pci_allow_0_address = true;
+> @@ -2153,6 +2155,11 @@ type_init(machvirt_machine_init);
+>   
+>   static void virt_machine_5_0_options(MachineClass *mc)
+>   {
+> +    static GlobalProperty compat[] = {
+> +        { TYPE_TPM_TIS_SYSBUS, "ppi", "false" },
+> +    };
+> +
+> +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+>   }
+>   DEFINE_VIRT_MACHINE_AS_LATEST(5, 0)
 >   
 
 
