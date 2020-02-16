@@ -2,83 +2,72 @@ Return-Path: <SRS0=HvqS=4E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52072C2BA83
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 19:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F5A8C2BA83
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 19:36:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B6AE2072C
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 19:28:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l68oyw4Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6AE2072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2FAC2072C
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 19:36:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2FAC2072C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3Pb7-0006sw-B3
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 14:28:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32867)
+	id 1j3Pi4-0001Vq-3D
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 14:36:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33776)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j3Pa7-0006Qj-58
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 14:27:56 -0500
+ (envelope-from <bounces@canonical.com>) id 1j3PhU-00016f-Qg
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 14:35:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j3Pa6-0005HW-2Q
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 14:27:55 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37069)
+ (envelope-from <bounces@canonical.com>) id 1j3PhT-0007SI-HA
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 14:35:32 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36718)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1j3Pa5-0005G6-Ti; Sun, 16 Feb 2020 14:27:54 -0500
-Received: by mail-oi1-x244.google.com with SMTP id q84so14719933oic.4;
- Sun, 16 Feb 2020 11:27:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=szCwuS6r+2ZwKMWT/LRiz5bufdDkilCnV+TJPuuN3uQ=;
- b=l68oyw4QYV2lkhb6mKdCAh6sViAihtZJ0AOxcAr+79PzgJbeYDsXsm+D7xJ+217B1d
- rCjZFQATqzLf9+Xv0/2hfThtONFWy+ec7L1maqTBqKKLpUDSP4L849Wrh6ng9qL6r1X/
- vGnxI7uen8FV4FU/i8YS+yrkZ5+N8SW0NGYNLokgD4pVarc3mOHqCpFBMw54H4YuI5Ob
- 3Q7GglqAD5omKeq9VrtX9KudqCv0PIrWlaIGCnPSS1TXoP6V0Fyygsr/yj8GkZDqpRKC
- N9P204dz+6Y8NrhjPjMaUcN+jo3zFiROxjVPnc91o1JIunPsfbAhVU+52HAXwvX/B+kg
- C0UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=szCwuS6r+2ZwKMWT/LRiz5bufdDkilCnV+TJPuuN3uQ=;
- b=pPWH1DQENlSDlcOcn6R8OFcVhs3XpbQ91HBJaXjU5vCABsJk8EYfUShBCR/Nhupqhy
- PtxjYczh+6DkO5VJOwA3eZhMaDWq5xjrpOI1eKKrWizIfjYPPMJ3nu7LczHE8S4Z1CcA
- yrg4p9c17uRAHhd/8znKfLSaIOKYFEUnqe7UB88HFKFPcVTN5Q1DhKkh3a6D738KwRCN
- hv1p8oDtFvBMgHl2+aFu+/7+FK6v/HAynGgUlSxjXl2PhfxaUc147efFkWmQ1TKUgzSo
- M31vllx1P904lQBYwCQOZJNwdEJTBj+jCi2E3i+P+ULTz5cTwa0THFpe8wP8oSPXgHBt
- CQRw==
-X-Gm-Message-State: APjAAAWTFyRhSz4q4z6Y/0CPvhLMXmMto7D0L1mdPxfx5d05V9Hi5U5a
- A726ziY+v4NluPTbNTTFDJkRRa3w9cxT9hgkVP4=
-X-Google-Smtp-Source: APXvYqzvUucoPkJa6B0hjSnGCd12Uy5WR8zAwN1Af4ND2SrVimL44qVTRG8SgqHbeZe0IMAIUfCTy46Xs8uBFsoRMzQ=
-X-Received: by 2002:aca:4ece:: with SMTP id c197mr8094153oib.53.1581881272545; 
- Sun, 16 Feb 2020 11:27:52 -0800 (PST)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j3PhT-0007Pj-74
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 14:35:31 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j3PhR-0008Ia-D5
+ for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 19:35:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5853D2E802B
+ for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 19:35:29 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200215162337.5809-1-f4bug@amsat.org>
-In-Reply-To: <20200215162337.5809-1-f4bug@amsat.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sun, 16 Feb 2020 20:27:33 +0100
-Message-ID: <CAL1e-=ij-KpK-O2e44C8_No-H7eshV-tz3iJ9cx0Q74xCLtyAQ@mail.gmail.com>
-Subject: Re: [PATCH] configure: Avoid compiling system tools on user build by
- default
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="00000000000053b441059eb66fb6"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 16 Feb 2020 19:27:41 -0000
+From: Helmut <1863508@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: helmutsch
+X-Launchpad-Bug-Reporter: Helmut (helmutsch)
+X-Launchpad-Bug-Modifier: Helmut (helmutsch)
+Message-Id: <158188126194.31124.5348536044519461550.malonedeb@wampee.canonical.com>
+Subject: [Bug 1863508] [NEW] qemu-system-arm stops with SIGSEGV in
+ helper_gvec_eq16
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1791aac448f0786b4f39e88a2112c53f289a0f55
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,128 +76,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "open list:bochs" <qemu-block@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+Reply-To: Bug 1863508 <1863508@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000053b441059eb66fb6
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-5:23 PM Sub, 15.02.2020. Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =D1=
-=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> User-mode does not need the sytem tools. Do not build them by
-> default if user specified --disable-system.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  configure | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
+Segmentation fault when trying to start FreeBSD-arm system with qemu-
+system-arm (version 4.1.1 on Fedora 31)
 
-It would be nice if somebody comes up with more detailed analysis on what
-is built for --disable-system, but in fact not needed at all.
+Commandline:
+gdb -q --args /bin/qemu-system-arm \
+ -name FreeBSD12,debug-threads=3Don \
+ -m 1536 -machine virt -smp 2 \
+ -M virt,highmem=3Doff -serial mon:stdio -monitor telnet::45452,server,nowa=
+it \
+ -machine virt,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff,gic-version=3D2 \
+ -overcommit mem-lock=3Doff -no-reboot -device virtio-rng-device \
+ -bios u-boot-qemu.bin \
+ -drive file=3DFreeBSD-12.1-RELEASE-arm-armv7-CUBIEBOARD2.img,if=3Dnone,id=
+=3Ddrive0,format=3Draw \
+ -device ich9-ahci,id=3Dahci -device ide-drive,drive=3Ddrive0,bus=3Dahci.0 =
 
-How does your change affect the size of the executable?
 
-> diff --git a/configure b/configure
-> index 16f94cd96b..557ca4bd04 100755
-> --- a/configure
-> +++ b/configure
-> @@ -455,7 +455,7 @@ guest_agent_ntddscsi=3D"no"
->  guest_agent_msi=3D""
->  vss_win32_sdk=3D""
->  win_sdk=3D"no"
-> -want_tools=3D"yes"
-> +want_tools=3D""
->  libiscsi=3D""
->  libnfs=3D""
->  coroutine=3D""
-> @@ -2199,6 +2199,15 @@ else
->      echo big/little test failed
->  fi
->
-> +##########################################
-> +# system tools
-> +if test "$want_tools" !=3D "yes" && test "$softmmu" =3D "no"; then
-> +    want_tools=3Dno
-> +fi
-> +if test -z "$want_tools"; then
-> +    want_tools=3Dyes
-> +fi
-> +
->  ##########################################
->  # cocoa implies not SDL or GTK
->  # (the cocoa UI code currently assumes it is always the active UI
-> --
-> 2.21.1
->
->
+Results:
+....
+Mounting local filesystems:.
 
---00000000000053b441059eb66fb6
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Thread 4 "CPU 1/TCG" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7fffcedfe700 (LWP 53608)]
+0x00005555558d9332 in helper_gvec_eq16 (d=3D0x5555566748d8, a=3D0x555556674=
+8e0, b=3D0x5555566748d0, desc=3D0) at /usr/src/debug/qemu-4.1.1-1.fc31.x86_=
+64/accel/tcg/tcg-runtime-gvec.c:948
+948     DO_CMP2(16)
 
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">5:23 PM Sub, 15.02.2020. Philippe Mathieu-Daud=C3=A9 &lt;<a =
-href=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt; =D1=98=D0=B5 =D0=BD=
-=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; User-mode does not need the sytem tools. Do not build them by<br>
-&gt; default if user specified --disable-system.<br>
-&gt;<br>
-&gt; Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug=
-@amsat.org">f4bug@amsat.org</a>&gt;<br>
-&gt; ---<br>
-&gt; =C2=A0configure | 11 ++++++++++-<br>
-&gt; =C2=A01 file changed, 10 insertions(+), 1 deletion(-)<br>
-&gt;</p>
-<p dir=3D"ltr">It would be nice if somebody comes up with more detailed ana=
-lysis on what is built for --disable-system, but in fact not needed at all.=
-</p>
-<p dir=3D"ltr">How does your change affect the size of the executable?<br><=
-/p>
-<p dir=3D"ltr">&gt; diff --git a/configure b/configure<br>
-&gt; index 16f94cd96b..557ca4bd04 100755<br>
-&gt; --- a/configure<br>
-&gt; +++ b/configure<br>
-&gt; @@ -455,7 +455,7 @@ guest_agent_ntddscsi=3D&quot;no&quot;<br>
-&gt; =C2=A0guest_agent_msi=3D&quot;&quot;<br>
-&gt; =C2=A0vss_win32_sdk=3D&quot;&quot;<br>
-&gt; =C2=A0win_sdk=3D&quot;no&quot;<br>
-&gt; -want_tools=3D&quot;yes&quot;<br>
-&gt; +want_tools=3D&quot;&quot;<br>
-&gt; =C2=A0libiscsi=3D&quot;&quot;<br>
-&gt; =C2=A0libnfs=3D&quot;&quot;<br>
-&gt; =C2=A0coroutine=3D&quot;&quot;<br>
-&gt; @@ -2199,6 +2199,15 @@ else<br>
-&gt; =C2=A0 =C2=A0 =C2=A0echo big/little test failed<br>
-&gt; =C2=A0fi<br>
-&gt;<br>
-&gt; +##########################################<br>
-&gt; +# system tools<br>
-&gt; +if test &quot;$want_tools&quot; !=3D &quot;yes&quot; &amp;&amp; test =
-&quot;$softmmu&quot; =3D &quot;no&quot;; then<br>
-&gt; +=C2=A0 =C2=A0 want_tools=3Dno<br>
-&gt; +fi<br>
-&gt; +if test -z &quot;$want_tools&quot;; then<br>
-&gt; +=C2=A0 =C2=A0 want_tools=3Dyes<br>
-&gt; +fi<br>
-&gt; +<br>
-&gt; =C2=A0##########################################<br>
-&gt; =C2=A0# cocoa implies not SDL or GTK<br>
-&gt; =C2=A0# (the cocoa UI code currently assumes it is always the active U=
-I<br>
-&gt; -- <br>
-&gt; 2.21.1<br>
-&gt;<br>
-&gt;<br>
-</p>
+Tested different versions of qemu. qemu-3.0.1 worked, but qemu-3.1.1
+failed with the same error.
 
---00000000000053b441059eb66fb6--
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863508
+
+Title:
+  qemu-system-arm stops with SIGSEGV in helper_gvec_eq16
+
+Status in QEMU:
+  New
+
+Bug description:
+  Segmentation fault when trying to start FreeBSD-arm system with qemu-
+  system-arm (version 4.1.1 on Fedora 31)
+
+  Commandline:
+  gdb -q --args /bin/qemu-system-arm \
+   -name FreeBSD12,debug-threads=3Don \
+   -m 1536 -machine virt -smp 2 \
+   -M virt,highmem=3Doff -serial mon:stdio -monitor telnet::45452,server,no=
+wait \
+   -machine virt,accel=3Dtcg,usb=3Doff,dump-guest-core=3Doff,gic-version=3D=
+2 \
+   -overcommit mem-lock=3Doff -no-reboot -device virtio-rng-device \
+   -bios u-boot-qemu.bin \
+   -drive file=3DFreeBSD-12.1-RELEASE-arm-armv7-CUBIEBOARD2.img,if=3Dnone,i=
+d=3Ddrive0,format=3Draw \
+   -device ich9-ahci,id=3Dahci -device ide-drive,drive=3Ddrive0,bus=3Dahci.=
+0 =
+
+
+  Results:
+  ....
+  Mounting local filesystems:.
+
+  Thread 4 "CPU 1/TCG" received signal SIGSEGV, Segmentation fault.
+  [Switching to Thread 0x7fffcedfe700 (LWP 53608)]
+  0x00005555558d9332 in helper_gvec_eq16 (d=3D0x5555566748d8, a=3D0x5555566=
+748e0, b=3D0x5555566748d0, desc=3D0) at /usr/src/debug/qemu-4.1.1-1.fc31.x8=
+6_64/accel/tcg/tcg-runtime-gvec.c:948
+  948     DO_CMP2(16)
+
+  Tested different versions of qemu. qemu-3.0.1 worked, but qemu-3.1.1
+  failed with the same error.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863508/+subscriptions
 
