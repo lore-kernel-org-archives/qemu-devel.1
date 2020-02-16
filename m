@@ -2,70 +2,75 @@ Return-Path: <SRS0=HvqS=4E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8814C3B1BF
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 22:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43519C76199
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 23:06:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EC5620857
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 22:56:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="B1yefkV9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EC5620857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 15FCF20675
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 23:06:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15FCF20675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3SqC-0001Hm-Mf
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 17:56:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54614)
+	id 1j3Szw-0004l4-86
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 18:06:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55542)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jhogan@kernel.org>) id 1j3Soy-0000By-4s
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 17:55:29 -0500
+ (envelope-from <bounces@canonical.com>) id 1j3Syq-0003vD-0f
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 18:05:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jhogan@kernel.org>) id 1j3Sow-00079r-Kx
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 17:55:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51062)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jhogan@kernel.org>)
- id 1j3Sow-00078V-Ap; Sun, 16 Feb 2020 17:55:26 -0500
-Received: from jamesdev (jahogan.plus.com [212.159.75.221])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7FB03206E2;
- Sun, 16 Feb 2020 22:55:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1581893725;
- bh=3NggaOmvOXw2MqkIt726jfs9MLPEIRM1dKQP3jT9fSM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=B1yefkV9poGFm8rJsCamg3txnV3Qkr2nVEwhC9Ux80NGYlzfP2EVcHymL/6fUDep1
- nbw7wKm90tR2NfWyicx4PJm90cOngqJr26ZayPgqHsPMdkppwRamRVrBVvbAgrycYs
- MyLku/prkJdKnmMUyN7nzYqJH5Jj+jY7mrdEXCoI=
-Date: Sun, 16 Feb 2020 22:55:20 +0000
-From: James Hogan <jhogan@kernel.org>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: Orphan MIPS KVM CPUs
-Message-ID: <20200216225520.GB145683@jamesdev>
-References: <20191221155306.49221-1-jhogan@kernel.org>
- <CAAdtpL7CrEAZz5GWJoYCegchQ=-hdkcih07icgoFd-ghJ3nMBw@mail.gmail.com>
- <CAL1e-=jdpp2W-B1cERU4srRQUkPTjewM3hVrndoh4nr-vPSRGA@mail.gmail.com>
- <20200216065717.GA145683@jamesdev>
- <ba671393-7960-1234-6c40-9a8ce29e108a@redhat.com>
- <CAL1e-=hOAs3xmpcyKz2cMQhGaW1J-PntuA9RmHb94vQgc31ttg@mail.gmail.com>
+ (envelope-from <bounces@canonical.com>) id 1j3Syo-0002dS-Kh
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 18:05:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57404)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j3Syo-0002Xo-Ei
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 18:05:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j3Syn-0006LW-3i
+ for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 23:05:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 145952E80C3
+ for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 23:05:37 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAL1e-=hOAs3xmpcyKz2cMQhGaW1J-PntuA9RmHb94vQgc31ttg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 16 Feb 2020 22:53:52 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1863526@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm nvic
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+Message-Id: <158189363238.15370.16875925531014106433.malonedeb@soybean.canonical.com>
+Subject: [Bug 1863526] [NEW] NVIC CCR register not 8-bit accessible using
+ Cortex-M4
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4962a5ea23cd3e7a132fe815a898a1ce3ffa5739
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 198.145.29.99
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,77 +79,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philippe@mathieu-daude.net>,
- Paul Burton <paulburton@kernel.org>, QEMU Trivial <qemu-trivial@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1863526 <1863526@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Feb 16, 2020 at 05:33:44PM +0100, Aleksandar Markovic wrote:
-> OK, I will add the patch in the next MIPS queue, since I think its
-> significance is more than trivial. It will be sent no later than two weeks
-> from now.
+Public bug reported:
 
-Thanks Aleksandar.
+Head at commit b29c3e23f64938.
 
-> I just wanted the patch to be in the same queue when we will
-> provide replacement. But, honestly, if the factual state lasted that long,
-> I don't see the reason for such sudden hurry, do you?
+Running with '-d unimp,guest_errors -trace nvic\*' I get:
 
-Yes.
+8871@1581892794.295746:nvic_sysreg_read NVIC sysreg read addr 0xd88 data 0x=
+f00000 size 4
+8871@1581892794.295752:nvic_sysreg_write NVIC sysreg write addr 0xd88 data =
+0xf00000 size 4
+8871@1581892794.297780:nvic_sysreg_write NVIC sysreg write addr 0xd08 data =
+0x4200 size 4
+8871@1581892794.298040:nvic_sysreg_write NVIC sysreg write addr 0xd15 data =
+0x0 size 1
+NVIC: Bad write of size 1 at offset 0xd15
+8871@1581892794.298081:nvic_sysreg_write NVIC sysreg write addr 0xd16 data =
+0x0 size 1
+NVIC: Bad write of size 1 at offset 0xd16
+8871@1581892794.298116:nvic_sysreg_write NVIC sysreg write addr 0xd17 data =
+0x0 size 1
+NVIC: Bad write of size 1 at offset 0xd17
+8871@1581892794.298156:nvic_sysreg_write NVIC sysreg write addr 0xd18 data =
+0x0 size 1
+8871@1581892794.298161:nvic_set_prio NVIC set irq 4 secure-bank 0 priority 0
+8871@1581892794.298164:nvic_recompute_state NVIC state recomputed: vectpend=
+ing 0 vectpending_prio 256 exception_prio 256
+8871@1581892794.298168:nvic_irq_update NVIC vectpending 0 pending prio 256 =
+exception_prio 256: setting irq line to 0
+8871@1581892794.298201:nvic_sysreg_write NVIC sysreg write addr 0xd19 data =
+0x0 size 1
+8871@1581892794.298206:nvic_set_prio NVIC set irq 5 secure-bank 0 priority 0
 
-My main reasons for not wanting this dragged out any longer are:
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-1) Personally, I just want to let go of it now, and that's slightly
-   harder to do when I'm still keeping an eye on whether this patch is
-   merged yet, or worse, waiting for Wave to act.
 
-2) In principle it feels wrong to delay a maintainer's name being
-   removed at their own request (even if it came late!) for an
-   indeterminate amount of time. This patch simply shouldn't be blocked
-   waiting for Wave to make a decision I've been waiting to see if it
-   would make for too long already.
+** Tags: arm nvic
 
-3) Maybe publicly recognising the orphaned state might motivate Wave or
-   others to step up and take a lead with further development.
+-- =
 
-> Of course I respect James' decision, although I am trully sorry about it.
-> My only slight objection is that James should have sent this patch sooner,
-> rather than just leave an impression that there is a maintainer, while in
-> fact there wasn't. What did you wait?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863526
 
-LOL, well I doubt MIPS (as a company) was under any illusion since they
-pulled the trigger :-P
+Title:
+  NVIC CCR register not 8-bit accessible using Cortex-M4
 
-Seriously though, I intended to keep an eye on things in my own time
-(both on kernel & QEMU side) and just be ready to answer questions and
-hand over the reigns if/when somebody from Wave got up to speed. I was
-probably also wary of making MIPS look bad for closing their UK
-operation (again) and "orphaning" my code (that I was probably too
-emotionally invested in, LOL!).
+Status in QEMU:
+  New
 
-In practice Paul took care of the MIPS arch stuff and there was
-virtually no activity on the MIPS KVM front from Wave so real life
-mostly pushed it off my radar. I did discuss orphaning it with Paul last
-year but there was mention of Wave folk getting up to speed with it so I
-held off for a bit longer.
+Bug description:
+  Head at commit b29c3e23f64938.
 
-Anyway FWIW I'm sorry for any confusion caused by my hesitation.
+  Running with '-d unimp,guest_errors -trace nvic\*' I get:
 
-> But, never mind, I understand your
-> hesitation. The best outcome would be that James remained in that role (I
-> do remember him as an excellent, thorough engineer, that is approachable
-> and very helpful to others), but what can we do now. I wish we work
-> together in future, who knows? Thanks, James, for taking care of KVM for
-> MIPS for number of years!
+  8871@1581892794.295746:nvic_sysreg_read NVIC sysreg read addr 0xd88 data =
+0xf00000 size 4
+  8871@1581892794.295752:nvic_sysreg_write NVIC sysreg write addr 0xd88 dat=
+a 0xf00000 size 4
+  8871@1581892794.297780:nvic_sysreg_write NVIC sysreg write addr 0xd08 dat=
+a 0x4200 size 4
+  8871@1581892794.298040:nvic_sysreg_write NVIC sysreg write addr 0xd15 dat=
+a 0x0 size 1
+  NVIC: Bad write of size 1 at offset 0xd15
+  8871@1581892794.298081:nvic_sysreg_write NVIC sysreg write addr 0xd16 dat=
+a 0x0 size 1
+  NVIC: Bad write of size 1 at offset 0xd16
+  8871@1581892794.298116:nvic_sysreg_write NVIC sysreg write addr 0xd17 dat=
+a 0x0 size 1
+  NVIC: Bad write of size 1 at offset 0xd17
+  8871@1581892794.298156:nvic_sysreg_write NVIC sysreg write addr 0xd18 dat=
+a 0x0 size 1
+  8871@1581892794.298161:nvic_set_prio NVIC set irq 4 secure-bank 0 priorit=
+y 0
+  8871@1581892794.298164:nvic_recompute_state NVIC state recomputed: vectpe=
+nding 0 vectpending_prio 256 exception_prio 256
+  8871@1581892794.298168:nvic_irq_update NVIC vectpending 0 pending prio 25=
+6 exception_prio 256: setting irq line to 0
+  8871@1581892794.298201:nvic_sysreg_write NVIC sysreg write addr 0xd19 dat=
+a 0x0 size 1
+  8871@1581892794.298206:nvic_set_prio NVIC set irq 5 secure-bank 0 priorit=
+y 0
 
-Thanks, my pleasure.
-
-Cheers
-James
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863526/+subscriptions
 
