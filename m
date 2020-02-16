@@ -2,62 +2,80 @@ Return-Path: <SRS0=HvqS=4E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E0DCC2BA83
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 10:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5570C2BA83
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 12:36:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 635D020857
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 10:29:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 635D020857
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6B9E12086A
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 12:36:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="NwQDR9xp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B9E12086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3HBI-0004f7-La
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 05:29:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43637)
+	id 1j3J9b-0000jD-M1
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 07:36:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1j3H44-0001X5-Lz
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 05:22:18 -0500
+ (envelope-from <maz@kernel.org>) id 1j3J8R-0008W1-Ad
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 07:34:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1j3H42-0000Hd-Og
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 05:22:16 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60602 helo=huawei.com)
+ (envelope-from <maz@kernel.org>) id 1j3J8Q-0001xk-BI
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 07:34:55 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33784)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1j3H3y-0000BG-Bl; Sun, 16 Feb 2020 05:22:10 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 8F02D633F2FD89FAAA4D;
- Sun, 16 Feb 2020 18:22:07 +0800 (CST)
-Received: from huawei.com (10.151.151.243) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Sun, 16 Feb 2020
- 18:21:52 +0800
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-To: <mst@redhat.com>, <imammedo@redhat.com>, <xiaoguangrong.eric@gmail.com>,
- <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <fam@euphon.net>,
- <rth@twiddle.net>, <ehabkost@redhat.com>, <mtosatti@redhat.com>,
- <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
- <pbonzini@redhat.com>, <james.morse@arm.com>, <lersek@redhat.com>,
- <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH v23 7/9] ACPI: Record Generic Error Status Block(GESB) table
-Date: Sun, 16 Feb 2020 18:24:06 +0800
-Message-ID: <20200216102408.22987-9-gengdongjiu@huawei.com>
-X-Mailer: git-send-email 2.18.0.huawei.25
-In-Reply-To: <20200216102408.22987-1-gengdongjiu@huawei.com>
-References: <20200216102408.22987-1-gengdongjiu@huawei.com>
+ (Exim 4.71) (envelope-from <maz@kernel.org>)
+ id 1j3J8O-0001wJ-2d; Sun, 16 Feb 2020 07:34:52 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3771D2086A;
+ Sun, 16 Feb 2020 12:34:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1581856490;
+ bh=dUVIWuUXkZXPeVyYS8JoGpyzM/AfnGwDwd9B1oozeCs=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=NwQDR9xpWb/g1pohzbOU2Tsu3zp7noSyaG4Z+uSJF6pPe+eWssbSwQ0OtWy6oKxkU
+ jN1QfM1/tGZWGDiues9HTlRh3gTbIQjXHHDj6DwDlPbHju2M0Q903VBBqBPz+IqR3S
+ GybHhU00BYY63oz6BCi3SZ5l/30DDpdCeXZ0hrZQ=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1j3J8J-005et3-WE; Sun, 16 Feb 2020 12:34:48 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.151.151.243]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Sun, 16 Feb 2020 12:34:47 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v3 1/2] target/arm: Support SError injection
+In-Reply-To: <20200214055950.62477-2-gshan@redhat.com>
+References: <20200214055950.62477-1-gshan@redhat.com>
+ <20200214055950.62477-2-gshan@redhat.com>
+Message-ID: <27b9c2a363d69911c003fcbaed958a5a@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: gshan@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ peter.maydell@linaro.org, richard.henderson@linaro.org, pbonzini@redhat.com,
+ drjones@redhat.com, jthierry@redhat.com, eric.auger@redhat.com, aik@ozlabs.ru,
+ shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 198.145.29.99
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,288 +87,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhengxiang9@huawei.com, gengdongjiu@huawei.com
+Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
+ aik@ozlabs.ru, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, shan.gavin@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-kvm_arch_on_sigbus_vcpu() error injection uses source_id as
-index in etc/hardware_errors to find out Error Status Data
-Block entry corresponding to error source. So supported source_id
-values should be assigned here and not be changed afterwards to
-make sure that guest will write error into expected Error Status
-Data Block.
+Hi Gavin,
 
-Before QEMU writes a new error to ACPI table, it will check whether
-previous error has been acknowledged. If not acknowledged, the new
-errors will be ignored and not be recorded. For the errors section
-type, QEMU simulate it to memory section error.
+On 2020-02-14 05:59, Gavin Shan wrote:
+> This supports SError injection, which will be used by "virt" board to
+> simulating the behavior of NMI injection in next patch. As Peter 
+> Maydell
+> suggested, this adds a new interrupt (ARM_CPU_SERROR), which is 
+> parallel
+> to CPU_INTERRUPT_HARD. The backend depends on if kvm is enabled or not.
+> kvm_vcpu_ioctl(cpu, KVM_SET_VCPU_EVENTS) is leveraged to inject SError
+> or data abort to guest. When TCG is enabled, the behavior is simulated
+> by injecting SError and data abort to guest.
+> 
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  target/arm/cpu.c      | 69 +++++++++++++++++++++++++++++++++++--------
+>  target/arm/cpu.h      | 17 ++++++-----
+>  target/arm/helper.c   |  6 ++++
+>  target/arm/m_helper.c |  8 +++++
+>  4 files changed, 81 insertions(+), 19 deletions(-)
+> 
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
----
- hw/acpi/ghes.c         | 218 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/acpi/ghes.h |   1 +
- 2 files changed, 219 insertions(+)
+[...]
 
-diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-index cea2bff..8e114ee 100644
---- a/hw/acpi/ghes.c
-+++ b/hw/acpi/ghes.c
-@@ -26,6 +26,7 @@
- #include "qemu/error-report.h"
- #include "hw/acpi/generic_event_device.h"
- #include "hw/nvram/fw_cfg.h"
-+#include "qemu/uuid.h"
- 
- #define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
- #define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
-@@ -43,6 +44,40 @@
- #define GAS_ADDR_OFFSET 4
- 
- /*
-+ * The total size of Generic Error Data Entry
-+ * ACPI 6.1/6.2: 18.3.2.7.1 Generic Error Data,
-+ * Table 18-343 Generic Error Data Entry
-+ */
-+#define ACPI_GHES_DATA_LENGTH               72
-+
-+/* The memory section CPER size, UEFI 2.6: N.2.5 Memory Error Section */
-+#define ACPI_GHES_MEM_CPER_LENGTH           80
-+
-+/* Masks for block_status flags */
-+#define ACPI_GEBS_UNCORRECTABLE         1
-+
-+#define UEFI_CPER_SEC_PLATFORM_MEM                              \
-+    UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
-+            0xED, 0x7C, 0x83, 0xB1)
-+
-+/*
-+ * Total size for Generic Error Status Block except Generic Error Data Entries
-+ * ACPI 6.2: 18.3.2.7.1 Generic Error Data,
-+ * Table 18-380 Generic Error Status Block
-+ */
-+#define ACPI_GHES_GESB_SIZE                 20
-+
-+/*
-+ * Values for error_severity field
-+ */
-+enum AcpiGenericErrorSeverity {
-+    ACPI_CPER_SEV_RECOVERABLE = 0,
-+    ACPI_CPER_SEV_FATAL = 1,
-+    ACPI_CPER_SEV_CORRECTED = 2,
-+    ACPI_CPER_SEV_NONE = 3,
-+};
-+
-+/*
-  * Hardware Error Notification
-  * ACPI 4.0: 17.3.2.7 Hardware Error Notification
-  * Composes dummy Hardware Error Notification descriptor of specified type
-@@ -73,6 +108,131 @@ static void build_ghes_hw_error_notification(GArray *table, const uint8_t type)
- }
- 
- /*
-+ * Generic Error Data Entry
-+ * ACPI 6.1: 18.3.2.7.1 Generic Error Data
-+ */
-+static void acpi_ghes_generic_error_data(GArray *table, QemuUUID section_type,
-+                uint32_t error_severity, uint8_t validation_bits, uint8_t flags,
-+                uint32_t error_data_length, QemuUUID fru_id,
-+                uint64_t time_stamp)
-+{
-+    /* Section Type */
-+    g_array_append_vals(table, section_type.data,
-+                        ARRAY_SIZE(section_type.data));
-+
-+    /* Error Severity */
-+    build_append_int_noprefix(table, error_severity, 4);
-+    /* Revision */
-+    build_append_int_noprefix(table, 0x300, 2);
-+    /* Validation Bits */
-+    build_append_int_noprefix(table, validation_bits, 1);
-+    /* Flags */
-+    build_append_int_noprefix(table, flags, 1);
-+    /* Error Data Length */
-+    build_append_int_noprefix(table, error_data_length, 4);
-+
-+    /* FRU Id */
-+    g_array_append_vals(table, fru_id.data, ARRAY_SIZE(fru_id.data));
-+
-+    /* FRU Text */
-+    build_append_int_noprefix(table, 0, 20);
-+    /* Timestamp */
-+    build_append_int_noprefix(table, time_stamp, 8);
-+}
-+
-+/*
-+ * Generic Error Status Block
-+ * ACPI 6.1: 18.3.2.7.1 Generic Error Data
-+ */
-+static void acpi_ghes_generic_error_status(GArray *table, uint32_t block_status,
-+                uint32_t raw_data_offset, uint32_t raw_data_length,
-+                uint32_t data_length, uint32_t error_severity)
-+{
-+    /* Block Status */
-+    build_append_int_noprefix(table, block_status, 4);
-+    /* Raw Data Offset */
-+    build_append_int_noprefix(table, raw_data_offset, 4);
-+    /* Raw Data Length */
-+    build_append_int_noprefix(table, raw_data_length, 4);
-+    /* Data Length */
-+    build_append_int_noprefix(table, data_length, 4);
-+    /* Error Severity */
-+    build_append_int_noprefix(table, error_severity, 4);
-+}
-+
-+/* UEFI 2.6: N.2.5 Memory Error Section */
-+static void acpi_ghes_build_append_mem_cper(GArray *table,
-+                                            uint64_t error_physical_addr)
-+{
-+    /*
-+     * Memory Error Record
-+     */
-+
-+    /* Validation Bits */
-+    build_append_int_noprefix(table,
-+                              (1ULL << 14) | /* Type Valid */
-+                              (1ULL << 1) /* Physical Address Valid */,
-+                              8);
-+    /* Error Status */
-+    build_append_int_noprefix(table, 0, 8);
-+    /* Physical Address */
-+    build_append_int_noprefix(table, error_physical_addr, 8);
-+    /* Skip all the detailed information normally found in such a record */
-+    build_append_int_noprefix(table, 0, 48);
-+    /* Memory Error Type */
-+    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
-+    /* Skip all the detailed information normally found in such a record */
-+    build_append_int_noprefix(table, 0, 7);
-+}
-+
-+static int acpi_ghes_record_mem_error(uint64_t error_block_address,
-+                                      uint64_t error_physical_addr)
-+{
-+    GArray *block;
-+    /* Memory Error Section Type */
-+    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;
-+    /* invalid fru id: ACPI 4.0: 17.3.2.6.1 Generic Error Data,
-+     * Table 17-13 Generic Error Data Entry
-+     */
-+    QemuUUID fru_id = {};
-+    uint32_t data_length;
-+
-+    block = g_array_new(false, true /* clear */, 1);
-+
-+    /* This is the length if adding a new generic error data entry*/
-+    data_length = ACPI_GHES_DATA_LENGTH + ACPI_GHES_MEM_CPER_LENGTH;
-+
-+    /*
-+     * Check whether it will run out of the preallocated memory if adding a new
-+     * generic error data entry
-+     */
-+    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
-+        error_report("Not enough memory to record new CPER!!!");
-+        g_array_free(block, true);
-+        return -1;
-+    }
-+
-+    /* Build the new generic error status block header */
-+    acpi_ghes_generic_error_status(block, ACPI_GEBS_UNCORRECTABLE,
-+        0, 0, data_length, ACPI_CPER_SEV_RECOVERABLE);
-+
-+    /* Build this new generic error data entry header */
-+    acpi_ghes_generic_error_data(block, mem_section_id_le,
-+        ACPI_CPER_SEV_RECOVERABLE, 0, 0,
-+        ACPI_GHES_MEM_CPER_LENGTH, fru_id, 0);
-+
-+    /* Build the memory section CPER for above new generic error data entry */
-+    acpi_ghes_build_append_mem_cper(block, error_physical_addr);
-+
-+    /* Write the generic error data entry into guest memory */
-+    cpu_physical_memory_write(error_block_address, block->data, block->len);
-+
-+    g_array_free(block, true);
-+
-+    return 0;
-+}
-+
-+/*
-  * Build table for the hardware error fw_cfg blob.
-  * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
-  * See docs/specs/acpi_hest_ghes.rst for blobs format.
-@@ -230,3 +390,61 @@ void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
-     fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
-         NULL, &(ags->ghes_addr_le), sizeof(ags->ghes_addr_le), false);
- }
-+
-+int acpi_ghes_record_errors(uint8_t source_id, uint64_t physical_address)
-+{
-+    uint64_t error_block_addr, read_ack_register_addr, read_ack_register = 0;
-+    uint64_t start_addr;
-+    bool ret = -1;
-+    AcpiGedState *acpi_ged_state;
-+    AcpiGhesState *ags;
-+
-+    assert(source_id < ACPI_HEST_SRC_ID_RESERVED);
-+
-+    acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
-+                                                       NULL));
-+    if (acpi_ged_state) {
-+        ags = &acpi_ged_state->ghes_state;
-+    } else {
-+        error_report("ACPI GED device not found");
-+        return -1;
-+    }
-+
-+    start_addr = le64_to_cpu(ags->ghes_addr_le);
-+
-+    if (physical_address) {
-+
-+        if (source_id < ACPI_HEST_SRC_ID_RESERVED) {
-+            start_addr += source_id * sizeof(uint64_t);
-+        }
-+
-+        cpu_physical_memory_read(start_addr, &error_block_addr,
-+                                 sizeof(error_block_addr));
-+
-+        read_ack_register_addr = start_addr +
-+            ACPI_GHES_ERROR_SOURCE_COUNT * sizeof(uint64_t);
-+
-+        cpu_physical_memory_read(read_ack_register_addr,
-+                                 &read_ack_register, sizeof(read_ack_register));
-+
-+        /* zero means OSPM does not acknowledge the error */
-+        if (!read_ack_register) {
-+                error_report("OSPM does not acknowledge previous error,"
-+                    " so can not record CPER for current error anymore");
-+        } else if (error_block_addr) {
-+                read_ack_register = cpu_to_le64(0);
-+                /*
-+                 * Clear the Read Ack Register, OSPM will write it to 1 when
-+                 * it acknowledges this error.
-+                 */
-+                cpu_physical_memory_write(read_ack_register_addr,
-+                    &read_ack_register, sizeof(uint64_t));
-+
-+                ret = acpi_ghes_record_mem_error(error_block_addr,
-+                                                 physical_address);
-+        } else
-+                error_report("can not find Generic Error Status Block");
-+    }
-+
-+    return ret;
-+}
-diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-index a3420fc..4ad025e 100644
---- a/include/hw/acpi/ghes.h
-+++ b/include/hw/acpi/ghes.h
-@@ -70,4 +70,5 @@ void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
- void acpi_build_hest(GArray *table_data, BIOSLinker *linker);
- void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-                           GArray *hardware_errors);
-+int acpi_ghes_record_errors(uint8_t notify, uint64_t error_physical_addr);
- #endif
+> @@ -656,7 +682,8 @@ static void arm_cpu_set_irq(void *opaque, int irq,
+> int level)
+>          [ARM_CPU_IRQ] = CPU_INTERRUPT_HARD,
+>          [ARM_CPU_FIQ] = CPU_INTERRUPT_FIQ,
+>          [ARM_CPU_VIRQ] = CPU_INTERRUPT_VIRQ,
+> -        [ARM_CPU_VFIQ] = CPU_INTERRUPT_VFIQ
+> +        [ARM_CPU_VFIQ] = CPU_INTERRUPT_VFIQ,
+> +        [ARM_CPU_SERROR] = CPU_INTERRUPT_SERROR,
+
+I'm a bit concerned with this. It makes sense for a host, but doesn't
+allow the SError signal to be virtualised (there should be a VSError
+signal in this list that can be injected via HCR_EL2.VA, just like
+VIRQ is injected by HCR_EL2.VI).
+
+Given that people use QEMU as a development platform for hypervisors,
+I'd really like this functionality to be supported from day-1.
+
+There is also the whole RAS stuff which quite a lot of work, but let's
+start at least with the full ARMv8.0 semantics.
+
+Thanks,
+
+         M.
 -- 
-1.8.3.1
-
+Jazz is not dead. It just smells funny...
 
