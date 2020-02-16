@@ -2,76 +2,103 @@ Return-Path: <SRS0=HvqS=4E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37396C2BA83
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 18:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60436C2BA83
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 18:15:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0540F20857
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 18:02:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0540F20857
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3213220857
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 18:15:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3213220857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3OF8-0005z2-3Q
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 13:02:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52523)
+	id 1j3ORq-000231-EX
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 13:15:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j3OE2-0005Vg-6Y
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:01:04 -0500
+ (envelope-from <stefanb@linux.ibm.com>) id 1j3OR1-0001T8-Nn
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:14:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j3OE0-0002g9-Mi
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:01:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:32990)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j3OE0-0002aU-Cq
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:01:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j3ODx-000497-Sk
- for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 18:00:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D65482E80C0
- for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 18:00:57 +0000 (UTC)
+ (envelope-from <stefanb@linux.ibm.com>) id 1j3OR0-00030o-JC
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 13:14:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47442)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+ id 1j3OQy-0002st-3J; Sun, 16 Feb 2020 13:14:24 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01GI9C8x113130; Sun, 16 Feb 2020 13:14:18 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y6dkvt1g1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Sun, 16 Feb 2020 13:14:18 -0500
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01GIDF8t130981;
+ Sun, 16 Feb 2020 13:14:18 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y6dkvt1ea-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Sun, 16 Feb 2020 13:14:17 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01GIABhB026178;
+ Sun, 16 Feb 2020 18:14:11 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
+ [9.57.198.24]) by ppma03dal.us.ibm.com with ESMTP id 2y689672u0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Sun, 16 Feb 2020 18:14:11 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
+ [9.57.199.110])
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 01GIEA7T54460688
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sun, 16 Feb 2020 18:14:10 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3CD99AE060;
+ Sun, 16 Feb 2020 18:14:10 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1FB0CAE05C;
+ Sun, 16 Feb 2020 18:14:10 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+ Sun, 16 Feb 2020 18:14:10 +0000 (GMT)
+Subject: Re: [RFC v2 1/6] tpm: rename TPM_TIS into TPM_TIS_ISA
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+References: <20200214183704.14389-1-eric.auger@redhat.com>
+ <20200214183704.14389-2-eric.auger@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <09c4557c-7f75-847a-ae49-7146778e9c4b@linux.ibm.com>
+Date: Sun, 16 Feb 2020 13:14:09 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 16 Feb 2020 17:55:04 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1863486@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <158187215227.14879.6112716414047440782.malonedeb@soybean.canonical.com>
-Message-Id: <158187570483.30895.800794268964862185.malone@wampee.canonical.com>
-Subject: [Bug 1863486] Re: aarch64/tcg crash with malloc(): unsorted double
- linked list corrupted
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e8f6a09d86bf30a03a0653252ff742e91f07dcf9
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+In-Reply-To: <20200214183704.14389-2-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-16_04:2020-02-14,
+ 2020-02-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 mlxscore=0
+ adultscore=0 priorityscore=1501 mlxlogscore=999 suspectscore=0
+ malwarescore=0 spamscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002160165
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,117 +107,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1863486 <1863486@bugs.launchpad.net>
+Cc: marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Maybe the same problem we had with U-boot, the SoC starts with only 1
-core enabled.
+On 2/14/20 1:36 PM, Eric Auger wrote:
+> As we plan to introduce a sysbus TPM_TIS, let's rename
+> TPM_TIS into TPM_TIS_ISA.
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>   hw/i386/acpi-build.c | 6 +++---
+>   hw/tpm/tpm_tis.c     | 4 ++--
+>   include/sysemu/tpm.h | 6 +++---
+>   3 files changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 9c4e46fa74..26777f8828 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2026,7 +2026,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>           }
+>       }
+>   
+> -    if (TPM_IS_TIS(tpm_find())) {
+> +    if (TPM_IS_TIS_ISA(tpm_find())) {
+>           aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+>                      TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+>       }
+> @@ -2197,7 +2197,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>               /* Scan all PCI buses. Generate tables to support hotplug. */
+>               build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+>   
+> -            if (TPM_IS_TIS(tpm)) {
+> +            if (TPM_IS_TIS_ISA(tpm)) {
+>                   if (misc->tpm_version == TPM_VERSION_2_0) {
+>                       dev = aml_device("TPM");
+>                       aml_append(dev, aml_name_decl("_HID",
+> @@ -2304,7 +2304,7 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
+>           (char *)&tpm2_ptr->log_area_start_address - table_data->data;
+>   
+>       tpm2_ptr->platform_class = cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
+> -    if (TPM_IS_TIS(tpm_find())) {
+> +    if (TPM_IS_TIS_ISA(tpm_find())) {
+>           tpm2_ptr->control_area_address = cpu_to_le64(0);
+>           tpm2_ptr->start_method = cpu_to_le32(TPM2_START_METHOD_MMIO);
+>       } else if (TPM_IS_CRB(tpm_find())) {
+> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+> index 31facb896d..c609737272 100644
+> --- a/hw/tpm/tpm_tis.c
+> +++ b/hw/tpm/tpm_tis.c
+> @@ -91,7 +91,7 @@ typedef struct TPMState {
+>       TPMPPI ppi;
+>   } TPMState;
+>   
+> -#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+> +#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS_ISA)
+>   
+>   #define DEBUG_TIS 0
+>   
+> @@ -1008,7 +1008,7 @@ static void tpm_tis_class_init(ObjectClass *klass, void *data)
+>   }
+>   
+>   static const TypeInfo tpm_tis_info = {
+> -    .name = TYPE_TPM_TIS,
+> +    .name = TYPE_TPM_TIS_ISA,
+>       .parent = TYPE_ISA_DEVICE,
+>       .instance_size = sizeof(TPMState),
+>       .instance_init = tpm_tis_initfn,
+> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+> index 15979a3647..1691b92c28 100644
+> --- a/include/sysemu/tpm.h
+> +++ b/include/sysemu/tpm.h
+> @@ -43,12 +43,12 @@ typedef struct TPMIfClass {
+>       enum TPMVersion (*get_version)(TPMIf *obj);
+>   } TPMIfClass;
+>   
+> -#define TYPE_TPM_TIS                "tpm-tis"
+> +#define TYPE_TPM_TIS_ISA            "tpm-tis"
+>   #define TYPE_TPM_CRB                "tpm-crb"
+>   #define TYPE_TPM_SPAPR              "tpm-spapr"
+>   
+> -#define TPM_IS_TIS(chr)                             \
+> -    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
+> +#define TPM_IS_TIS_ISA(chr)                         \
+> +    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
+>   #define TPM_IS_CRB(chr)                             \
+>       object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
+>   #define TPM_IS_SPAPR(chr)                           \
 
-I'm now trying with `-global bcm2836.enabled-cpus=3D1`.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1863486
-
-Title:
-  aarch64/tcg crash with malloc(): unsorted double linked list corrupted
-
-Status in QEMU:
-  New
-
-Bug description:
-  Based on commit b29c3e23f64938784c42ef9fca896829e3c19120,
-  QEMU configured with --enable-debug --extra-cflags=3D-ggdb.
-
-  Download Raspberry Pi 3 UEFI Firmware v1.15 from:
-  https://github.com/pbatard/RPi3/releases/tag/v1.15
-  (unzip RPi3_UEFI_Firmware_v1.15.zip)
-
-  Run QEMU with:
-
-  $ qemu-system-aarch64 -M raspi3 \
-    -serial null -serial stdio \
-    -device loader,file=3DRPI_EFI.fd,force-raw=3Dtrue =
-
-
-  Normal behavior:
-
-  NOTICE:  Booting Trusted Firmware
-  NOTICE:  BL1: v2.1(release):v2.1
-  NOTICE:  BL1: Built : 15:26:06, May 13 2019
-  NOTICE:  rpi3: Detected: Raspberry Pi 3 Model B (1GB, Sony, UK) [0x00a020=
-82]
-  NOTICE:  BL1: Booting BL2
-  ERROR:   rpi3_sdhost: timeout status 0x40
-  NOTICE:  BL2: v2.1(release):v2.1
-  NOTICE:  BL2: Built : 15:26:01, May 13 2019
-  NOTICE:  BL1: Booting BL31
-  NOTICE:  BL31: v2.1(release):v2.1
-  NOTICE:  BL31: Built : 15:26:04, May 13 2019
-  =3DUEFI firmware (version UEFI Firmware v1.15 built at 11:58:44 on Feb 14=
- 2020)
-  =3D=3D=3D=3D=3D=3D=3D=3D
-
-  Synchronous Exception at 0x0000000037A1A4E8
-
-  But I sometimes get:
-
-  NOTICE:  Booting Trusted Firmware
-  NOTICE:  BL1: v2.1(release):v2.1
-  NOTICE:  BL1: Built : 15:26:06, May 13 2019
-  NOTICE:  rpi3: Detected: Raspberry Pi 3 Model B (1GB, Sony, UK) [0x00a020=
-82]
-  NOTICE:  BL1: Booting BL2
-  ERROR:   rpi3_sdhost: timeout status 0x40
-  NOTICE:  BL2: v2.1(release):v2.1
-  NOTICE:  BL2: Built : 15:26:01, May 13 2019
-  NOTICE:  BL1: Booting BL31
-  NOTICE:  BL31: v2.1(release):v2.1
-  NOTICE:  BL31: Built : 15:26:04, May 13 2019
-  =3DUEFI firmware (version UEFI Firmware v1.15 built at 11:58:44 on Feb 14=
- 2020)
-  =3D=3D=3D=3D=3D=3D=3D=3Dmalloc(): unsorted double linked list corrupted
-
-  Thread 3 "qemu-system-aar" received signal SIGABRT, Aborted.
-  [Switching to Thread 0x7fffe9c22700 (LWP 22746)]
-  0x00007ffff515ce35 in raise () from /lib64/libc.so.6
-  (gdb) bt
-  #0  0x00007ffff515ce35 in raise () at /lib64/libc.so.6
-  #1  0x00007ffff5147895 in abort () at /lib64/libc.so.6
-  #2  0x00007ffff51a008f in __libc_message () at /lib64/libc.so.6
-  #3  0x00007ffff51a740c in  () at /lib64/libc.so.6
-  #4  0x00007ffff51aa48c in _int_malloc () at /lib64/libc.so.6
-  #5  0x00007ffff51aad4e in _int_memalign () at /lib64/libc.so.6
-  #6  0x00007ffff51abdda in _mid_memalign () at /lib64/libc.so.6
-  #7  0x00007ffff51ad3c6 in posix_memalign () at /lib64/libc.so.6
-  #8  0x00007ffff7be2407 in slab_allocator_alloc_chunk () at /lib64/libglib=
--2.0.so.0
-  #9  0x00007ffff7be3573 in g_slice_alloc () at /lib64/libglib-2.0.so.0
-  #10 0x00007ffff7bf410a in g_tree_insert_internal () at /lib64/libglib-2.0=
-.so.0
-  #11 0x0000555555853f10 in tcg_tb_insert (tb=3D0x7fffd44b4d80 <code_gen_bu=
-ffer+4934995>) at tcg/tcg.c:425
-  #12 0x00005555558dbe3d in tb_gen_code (cpu=3D0x555556afa640, pc=3D9333329=
-60, cs_base=3D0, flags=3D2216689664, cflags=3D-16252928) at accel/tcg/trans=
-late-all.c:1875
-  #13 0x00005555558d7c73 in tb_find (cpu=3D0x555556afa640, last_tb=3D0x7fff=
-d44b4c40 <code_gen_buffer+4934675>, tb_exit=3D0, cf_mask=3D524288) at accel=
-/tcg/cpu-exec.c:406
-  #14 0x00005555558d8543 in cpu_exec (cpu=3D0x555556afa640) at accel/tcg/cp=
-u-exec.c:730
-  #15 0x00005555558981e1 in tcg_cpu_exec (cpu=3D0x555556afa640) at cpus.c:1=
-405
-  #16 0x0000555555898a37 in qemu_tcg_cpu_thread_fn (arg=3D0x555556afa640) a=
-t cpus.c:1713
-  #17 0x0000555556057af8 in qemu_thread_start (args=3D0x555557511570) at ut=
-il/qemu-thread-posix.c:519
-  #18 0x00007ffff52f34c0 in start_thread () at /lib64/libpthread.so.0
-  #19 0x00007ffff5221163 in clone () at /lib64/libc.so.6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1863486/+subscriptions
 
