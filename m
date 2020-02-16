@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD8CC2BA83
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 10:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD554C2BA83
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 10:25:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 211D620857
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 10:24:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 211D620857
+	by mail.kernel.org (Postfix) with ESMTPS id 8D7D320857
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 10:25:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D7D320857
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3H69-0005bd-BM
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 05:24:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43472)
+	id 1j3H7F-0007At-P4
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 05:25:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43477)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1j3H3v-00018g-6V
+ (envelope-from <gengdongjiu@huawei.com>) id 1j3H3v-00018l-8L
  for qemu-devel@nongnu.org; Sun, 16 Feb 2020 05:22:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1j3H3t-00008m-Rh
+ (envelope-from <gengdongjiu@huawei.com>) id 1j3H3t-00008s-Rq
  for qemu-devel@nongnu.org; Sun, 16 Feb 2020 05:22:07 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2782 helo=huawei.com)
+Received: from szxga07-in.huawei.com ([45.249.212.35]:41254 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1j3H3q-0008M5-JX; Sun, 16 Feb 2020 05:22:02 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 163D2AA470891E543A32;
- Sun, 16 Feb 2020 18:21:52 +0800 (CST)
+ id 1j3H3q-0008Tp-BZ; Sun, 16 Feb 2020 05:22:02 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 2DCF687C460E281133E6;
+ Sun, 16 Feb 2020 18:21:57 +0800 (CST)
 Received: from huawei.com (10.151.151.243) by DGGEMS411-HUB.china.huawei.com
  (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Sun, 16 Feb 2020
- 18:21:45 +0800
+ 18:21:50 +0800
 From: Dongjiu Geng <gengdongjiu@huawei.com>
 To: <mst@redhat.com>, <imammedo@redhat.com>, <xiaoguangrong.eric@gmail.com>,
  <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <fam@euphon.net>,
@@ -45,17 +45,19 @@ To: <mst@redhat.com>, <imammedo@redhat.com>, <xiaoguangrong.eric@gmail.com>,
  <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
  <pbonzini@redhat.com>, <james.morse@arm.com>, <lersek@redhat.com>,
  <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH v1] acpi: nvdimm: change NVDIMM_UUID_LE to a common macro
-Date: Sun, 16 Feb 2020 18:23:58 +0800
-Message-ID: <20200216102408.22987-1-gengdongjiu@huawei.com>
+Subject: [PATCH v23 5/9] ACPI: Record the Generic Error Status Block address
+Date: Sun, 16 Feb 2020 18:24:04 +0800
+Message-ID: <20200216102408.22987-7-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.18.0.huawei.25
+In-Reply-To: <20200216102408.22987-1-gengdongjiu@huawei.com>
+References: <20200216102408.22987-1-gengdongjiu@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.151.151.243]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,64 +74,165 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The little end UUID is used in many places, so make
-NVDIMM_UUID_LE to a common macro to convert the UUID
-to a little end array.
+Record the GHEB address via fw_cfg file, when recording
+a error to CPER, it will use this address to find out
+Generic Error Data Entries and write the error.
+
+In order to avoid migration failure, make hardware
+error table address to a part of GED device instead
+of global variable, then this address will be migrated
+to target QEMU.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Reviewed-by: Xiang Zheng <zhengxiang9@huawei.com>
+Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
 ---
- hw/acpi/nvdimm.c    | 8 ++------
- include/qemu/uuid.h | 5 +++++
- 2 files changed, 7 insertions(+), 6 deletions(-)
+ hw/acpi/generic_event_device.c         | 18 ++++++++++++++++++
+ hw/acpi/ghes.c                         | 17 +++++++++++++++++
+ hw/arm/virt-acpi-build.c               | 10 ++++++++++
+ include/hw/acpi/generic_event_device.h |  2 ++
+ include/hw/acpi/ghes.h                 |  6 ++++++
+ 5 files changed, 53 insertions(+)
 
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 9fdad6d..232b701 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -27,6 +27,7 @@
-  */
+diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+index 021ed2b..d59607c 100644
+--- a/hw/acpi/generic_event_device.c
++++ b/hw/acpi/generic_event_device.c
+@@ -234,6 +234,23 @@ static const VMStateDescription vmstate_ged_state = {
+     }
+ };
  
- #include "qemu/osdep.h"
-+#include "qemu/uuid.h"
- #include "hw/acpi/acpi.h"
- #include "hw/acpi/aml-build.h"
- #include "hw/acpi/bios-linker-loader.h"
-@@ -60,17 +61,12 @@ static GSList *nvdimm_get_device_list(void)
-     return list;
- }
- 
--#define NVDIMM_UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
--   { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
--     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
--     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }
--
- /*
-  * define Byte Addressable Persistent Memory (PM) Region according to
-  * ACPI 6.0: 5.2.25.1 System Physical Address Range Structure.
-  */
- static const uint8_t nvdimm_nfit_spa_uuid[] =
--      NVDIMM_UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
-+      UUID_LE(0x66f0d379, 0xb4f3, 0x4074, 0xac, 0x43, 0x0d, 0x33,
-                      0x18, 0xb7, 0x8c, 0xdb);
- 
- /*
-diff --git a/include/qemu/uuid.h b/include/qemu/uuid.h
-index 129c45f..bd38af5 100644
---- a/include/qemu/uuid.h
-+++ b/include/qemu/uuid.h
-@@ -34,6 +34,11 @@ typedef struct {
-     };
- } QemuUUID;
- 
-+#define UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)             \
-+  { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0xff, \
-+     (b) & 0xff, ((b) >> 8) & 0xff, (c) & 0xff, ((c) >> 8) & 0xff,          \
-+     (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) }
++static bool ghes_needed(void *opaque)
++{
++    return object_property_get_bool(qdev_get_machine(), "ras", NULL);
++}
 +
- #define UUID_FMT "%02hhx%02hhx%02hhx%02hhx-" \
-                  "%02hhx%02hhx-%02hhx%02hhx-" \
-                  "%02hhx%02hhx-" \
++static const VMStateDescription vmstate_ghes_state = {
++    .name = "acpi-ged/ghes",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = ghes_needed,
++    .fields      = (VMStateField[]) {
++        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
++                       vmstate_ghes_state, AcpiGhesState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_acpi_ged = {
+     .name = "acpi-ged",
+     .version_id = 1,
+@@ -244,6 +261,7 @@ static const VMStateDescription vmstate_acpi_ged = {
+     },
+     .subsections = (const VMStateDescription * []) {
+         &vmstate_memhp_state,
++        &vmstate_ghes_state,
+         NULL
+     }
+ };
+diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
+index 7a7381d..cea2bff 100644
+--- a/hw/acpi/ghes.c
++++ b/hw/acpi/ghes.c
+@@ -24,6 +24,8 @@
+ #include "hw/acpi/ghes.h"
+ #include "hw/acpi/aml-build.h"
+ #include "qemu/error-report.h"
++#include "hw/acpi/generic_event_device.h"
++#include "hw/nvram/fw_cfg.h"
+ 
+ #define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
+ #define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
+@@ -213,3 +215,18 @@ void acpi_build_hest(GArray *table_data, BIOSLinker *linker)
+     build_header(linker, table_data, (void *)(table_data->data + hest_start),
+         "HEST", table_data->len - hest_start, 1, NULL, "");
+ }
++
++void acpi_ghes_add_fw_cfg(AcpiGhesState *ags, FWCfgState *s,
++                          GArray *hardware_error)
++{
++    size_t size = 2 * sizeof(uint64_t) + ACPI_GHES_MAX_RAW_DATA_LENGTH;
++    size_t request_block_size = ACPI_GHES_ERROR_SOURCE_COUNT * size;
++
++    /* Create a read-only fw_cfg file for GHES */
++    fw_cfg_add_file(s, ACPI_GHES_ERRORS_FW_CFG_FILE, hardware_error->data,
++                    request_block_size);
++
++    /* Create a read-write fw_cfg file for Address */
++    fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
++        NULL, &(ags->ghes_addr_le), sizeof(ags->ghes_addr_le), false);
++}
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 12a9a78..d6e7521 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -832,6 +832,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     build_spcr(tables_blob, tables->linker, vms);
+ 
+     if (vms->ras) {
++        assert(vms->acpi_dev);
+         acpi_add_table(table_offsets, tables_blob);
+         build_ghes_error_table(tables->hardware_errors, tables->linker);
+         acpi_build_hest(tables_blob, tables->linker);
+@@ -924,6 +925,7 @@ void virt_acpi_setup(VirtMachineState *vms)
+ {
+     AcpiBuildTables tables;
+     AcpiBuildState *build_state;
++    AcpiGedState *acpi_ged_state;
+ 
+     if (!vms->fw_cfg) {
+         trace_virt_acpi_setup();
+@@ -954,6 +956,14 @@ void virt_acpi_setup(VirtMachineState *vms)
+     fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
+                     acpi_data_len(tables.tcpalog));
+ 
++    if (vms->ras) {
++        assert(vms->acpi_dev);
++        acpi_ged_state = ACPI_GED(object_resolve_path_type("", TYPE_ACPI_GED,
++                                                           NULL));
++        acpi_ghes_add_fw_cfg(&acpi_ged_state->ghes_state,
++                             vms->fw_cfg, tables.hardware_errors);
++    }
++
+     build_state->rsdp_mr = acpi_add_rom_blob(virt_acpi_build_update,
+                                              build_state, tables.rsdp,
+                                              ACPI_BUILD_RSDP_FILE, 0);
+diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+index d157eac..037d2b5 100644
+--- a/include/hw/acpi/generic_event_device.h
++++ b/include/hw/acpi/generic_event_device.h
+@@ -61,6 +61,7 @@
+ 
+ #include "hw/sysbus.h"
+ #include "hw/acpi/memory_hotplug.h"
++#include "hw/acpi/ghes.h"
+ 
+ #define ACPI_POWER_BUTTON_DEVICE "PWRB"
+ 
+@@ -95,6 +96,7 @@ typedef struct AcpiGedState {
+     GEDState ged_state;
+     uint32_t ged_event_bitmap;
+     qemu_irq irq;
++    AcpiGhesState ghes_state;
+ } AcpiGedState;
+ 
+ void build_ged_aml(Aml *table, const char* name, HotplugHandler *hotplug_dev,
+diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
+index 18debd8..a3420fc 100644
+--- a/include/hw/acpi/ghes.h
++++ b/include/hw/acpi/ghes.h
+@@ -62,6 +62,12 @@ enum {
+     ACPI_HEST_SRC_ID_RESERVED,
+ };
+ 
++typedef struct AcpiGhesState {
++    uint64_t ghes_addr_le;
++} AcpiGhesState;
++
+ void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
+ void acpi_build_hest(GArray *table_data, BIOSLinker *linker);
++void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
++                          GArray *hardware_errors);
+ #endif
 -- 
 1.8.3.1
 
