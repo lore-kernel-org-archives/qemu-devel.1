@@ -3,90 +3,90 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 964CEC7114E
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 03:22:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3458EC3B1BF
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 03:42:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5548A2072D
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 03:22:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEE1E206E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Feb 2020 03:42:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IQH/xF+F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5548A2072D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cXqct+Mh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEE1E206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3AVP-0004EJ-H9
-	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 22:22:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49276)
+	id 1j3ApK-0002ZX-5b
+	for qemu-devel@archiver.kernel.org; Sat, 15 Feb 2020 22:42:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j3AUm-0003n2-G6
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 22:21:25 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j3Aoe-00021q-G1
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 22:41:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j3AUk-0000Ow-Ud
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 22:21:24 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:34844)
+ (envelope-from <richard.henderson@linaro.org>) id 1j3Aoc-0007zo-W5
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 22:41:56 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:34521)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j3AUk-0000MW-OT
- for qemu-devel@nongnu.org; Sat, 15 Feb 2020 22:21:22 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id q39so5731726pjc.0
- for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 19:21:22 -0800 (PST)
+ id 1j3Aoc-0007yB-Nj
+ for qemu-devel@nongnu.org; Sat, 15 Feb 2020 22:41:54 -0500
+Received: by mail-pl1-x643.google.com with SMTP id j7so5382367plt.1
+ for <qemu-devel@nongnu.org>; Sat, 15 Feb 2020 19:41:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=dEek3nyMv+LdhHdEYfCw8Vxa8VojL44cf12/+u+RZ0g=;
- b=IQH/xF+Fzqz62V998WJXef+ZjK1WfMQnYU8wEyrhcDQQznhyNp6NnH75ESplAtke+u
- Nbo0dRxMGQAkcfoWocVM913W5AO6V9xO/Wqqkdg7jVv2q8byZoZbDzmP7eZE2LbilBM7
- OXVNmrXm6ljlw20AyWuTN8jz5uAsonA4OY/TYOQG+Ef2/J8AsyhVX+NGtmrseMIhJjAo
- 4u/X7yIiWFIFArfeh4Ulr0Sa9VDaWafnWdZk3Oc+izPbMfIgdB+h1nhTc61KG6yoFMJ1
- +r64nB/tLnpxDwIINwB53I7bxlIVsE4tr3QBw3S3wz5OtD0xpQ1DHNtMduwih/6gMQoY
- Ar9g==
+ bh=+ksXD0DwdmuLCxfx4m4FYg1fC6RAiEAhWQyW1hRC2TQ=;
+ b=cXqct+MhNuVTqbLJyLHP8l/EmJNanP4P69mtyJR3nCOacbnYLIyqMnlrmGBGlzsvmw
+ zeKOujhSbDoa8TZ0/Y+p9DW5zmbnM4+LHmkw89v+8O0jLk5mpYzna+RGPUiuLKlhbNq+
+ trUG8LmvKUrsUZB5UZQRtL/XfZ50oqFB9oKRB9IXhVj6RaN47sLgVJ4PbvX/Wc7T2M52
+ SBBrK12fwS/M70m7pF5Y7Mz8TQOtGHTFw4Jx+hP84HD9zJuQHpqZAmAL3XQmOpHUfts7
+ h8QMygjwW+c4gdtMZG1Dt8f3c+rjHWsahkc9Ryj4H3yvf/SrVL1nLfsevAcVigib7F+1
+ KjQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=dEek3nyMv+LdhHdEYfCw8Vxa8VojL44cf12/+u+RZ0g=;
- b=CLygrl0ZELhCeMU4K+zeZZ3udqWgA4FQDfyjFe+vjRmMHBBI6cppLBC8sAJZq/qKpM
- qPoxz2Aap4a3WH9Z4iz1tECyPG+oLazmCWJBXCCcnYMrLjkC3kBlbisaUR0rt2HsQ91j
- HNeG73t71wgSCQmSeT0HCuM4nTM0f2r4eLL9PgfSqAMs8BoE9cDmRO0kUIB008vuV++c
- au/SiwwiWgNEXnSYvUQdNpA7W4wz+2w2R339qQueox6cHudWxtXZ4L400lhRr3xAn4+j
- BzUCaHWHTC5pBocEkT7TxxBhR3CaAxijh5d0NoarCIXIpLQWxvR/BCr6rNcAFM0nGsN/
- boSg==
-X-Gm-Message-State: APjAAAV0m+dw4+W9XbK6xUAOOteFlNGg/K+MBqfTnA/sODZwocnmPavO
- 12eXV0bsfy+oj1gjoUGd7Qmx3A==
-X-Google-Smtp-Source: APXvYqxIsd7fcPw2XJLQ81LGa8aVZhum4DPXMYr25McX5WG88URmZKGiRN+YkHjDC0TtJSXjaZ97KA==
-X-Received: by 2002:a17:90a:f0c8:: with SMTP id
- fa8mr12480733pjb.136.1581823281256; 
- Sat, 15 Feb 2020 19:21:21 -0800 (PST)
+ bh=+ksXD0DwdmuLCxfx4m4FYg1fC6RAiEAhWQyW1hRC2TQ=;
+ b=ZgdxgUQ6lb0BuyIEzt1OkZ2oYVMHpSlNevPjK9M721hRw4keRrlJcWNWlgGIcENr1H
+ vVLw30wWJi4eJsX7Kpp1mZ5bsONMfmKkdNIghYmeKQG8xRfybnWci+rHu7P0OqdfiqGP
+ HNz/+TGeYK4NfnQw7E/bjdfiATEOsI2bNxR4wv0EsggYs0o0lmH7NuBRNje0XKnCYUR+
+ hmS5XCWQG/K6D9a+I5so/1WP+3Aoh8dftskR059UBLzdljgADE2H/qSsozHiGWivQp1U
+ IFwFc0TP33l/eQXXHUiwdkk21tCQaoYFZXDy/V9H2uXaBkzGGl6Rhpx3aqlH4ELfjDjC
+ EVCg==
+X-Gm-Message-State: APjAAAXlgQoTabpQ/a3ugJEIDGQtPMhQN36YCcDnHCylhFKCE1CZnbRp
+ pmQi1mD3/w6Dw+FAUl17h/evGg==
+X-Google-Smtp-Source: APXvYqxVwDeaxDUNocsEl4Fy/D2H3IxAY/eVTtfQ85zj+IFQEErFCIdqFfAHbROt5CH4PRzQ4xXjqA==
+X-Received: by 2002:a17:90a:b106:: with SMTP id
+ z6mr12693083pjq.91.1581824513480; 
+ Sat, 15 Feb 2020 19:41:53 -0800 (PST)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- q11sm11625629pff.111.2020.02.15.19.21.19
+ g19sm11679128pfh.134.2020.02.15.19.41.52
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 15 Feb 2020 19:21:20 -0800 (PST)
-Subject: Re: [PATCH v2] compiler.h: Don't use compile-time assert when
- __NO_INLINE__ is defined
-To: Zenghui Yu <yuzenghui@huawei.com>, pbonzini@redhat.com, tony.nguyen@bt.com
-References: <20200205141545.180-1-yuzenghui@huawei.com>
+ Sat, 15 Feb 2020 19:41:52 -0800 (PST)
+Subject: Re: [PATCH v3 1/2] target/arm: Support SError injection
+To: Gavin Shan <gshan@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <20200214055950.62477-1-gshan@redhat.com>
+ <20200214055950.62477-2-gshan@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6d5dc618-744d-d5e8-d507-8a2c3e69c11a@linaro.org>
-Date: Sat, 15 Feb 2020 19:21:17 -0800
+Message-ID: <0c00d0d4-19c5-0802-8fd3-f583bb270709@linaro.org>
+Date: Sat, 15 Feb 2020 19:41:50 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200205141545.180-1-yuzenghui@huawei.com>
+In-Reply-To: <20200214055950.62477-2-gshan@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,47 +98,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com, qemu-devel@nongnu.org,
- Euler Robot <euler.robot@huawei.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
+ aik@ozlabs.ru, maz@kernel.org, eric.auger@redhat.com, shan.gavin@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/5/20 6:15 AM, Zenghui Yu wrote:
-> Our robot reported the following compile-time warning while compiling
-> Qemu with -fno-inline cflags:
-> 
-> In function 'load_memop',
->     inlined from 'load_helper' at /qemu/accel/tcg/cputlb.c:1578:20,
->     inlined from 'full_ldub_mmu' at /qemu/accel/tcg/cputlb.c:1624:12:
-> /qemu/accel/tcg/cputlb.c:1502:9: error: call to 'qemu_build_not_reached' declared with attribute error: code path is reachable
->          qemu_build_not_reached();
->          ^~~~~~~~~~~~~~~~~~~~~~~~
->     [...]
-> 
-> It looks like a false-positive because only (MO_UB ^ MO_BSWAP) will
-> hit the default case in load_memop() while need_swap (size > 1) has
-> already ensured that MO_UB is not involved.
-> 
-> So the thing is that compilers get confused by the -fno-inline and
-> just can't accurately evaluate memop_size(op) at compile time, and
-> then the qemu_build_not_reached() is wrongly triggered by (MO_UB ^
-> MO_BSWAP).  Let's carefully don't use the compile-time assert when
-> no functions will be inlined into their callers.
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-> ---
-> 
-> v2 is actually written by Richard Henderson.
-> 
-> v1: https://lore.kernel.org/r/20200205081703.631-1-yuzenghui@huawei.com
-> 
->  include/qemu/compiler.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 2/13/20 9:59 PM, Gavin Shan wrote:
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index b0762a76c4..180e29fb83 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -78,7 +78,7 @@ static bool arm_cpu_has_work(CPUState *cs)
+>          && cs->interrupt_request &
+>          (CPU_INTERRUPT_FIQ | CPU_INTERRUPT_HARD
+>           | CPU_INTERRUPT_VFIQ | CPU_INTERRUPT_VIRQ
+> -         | CPU_INTERRUPT_EXITTB);
+> +         | ARM_CPU_SERROR | CPU_INTERRUPT_EXITTB);
 
-Queued to tcg-next.
+CPU_INTERRUPT_SERROR, not ARM_CPU_SERROR.
+
+> @@ -570,6 +573,16 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>              goto found;
+>          }
+>      }
+> +
+> +    if (interrupt_request & CPU_INTERRUPT_SERROR) {
+> +        excp_idx = EXCP_SERROR;
+> +        target_el = arm_phys_excp_target_el(cs, excp_idx, cur_el, secure);
+> +        if (arm_excp_unmasked(cs, excp_idx, target_el,
+> +                              cur_el, secure, hcr_el2)) {
+> +            goto found;
+> +        }
+> +    }
+> +
+>      return false;
+>  
+>   found:
+
+If you're intending to use Serror for NMI, perhaps it should be the first bit
+tested, not the last.  Otherwise some bug that leaves a normal hard interrupt
+line high will keep delivering the interrupt, and not the Serror.
+
+As the comment at the top of the function says, the priority is implementation
+defined, so we can put it anywhere we like.
+
+> @@ -594,13 +607,26 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>       * (which depends on state like BASEPRI, FAULTMASK and the
+>       * currently active exception).
+>       */
+> -    if (interrupt_request & CPU_INTERRUPT_HARD
+> -        && (armv7m_nvic_can_take_pending_exception(env->nvic))) {
+> -        cs->exception_index = EXCP_IRQ;
+> -        cc->do_interrupt(cs);
+> -        ret = true;
+> +    if (!armv7m_nvic_can_take_pending_exception(env->nvic)) {
+> +        return false;
+> +    }
+> +
+> +    if (interrupt_request & CPU_INTERRUPT_HARD) {
+> +        excp_idx = EXCP_IRQ;
+> +        goto found;
+>      }
+> -    return ret;
+> +
+> +    if (interrupt_request & CPU_INTERRUPT_SERROR) {
+> +        excp_idx = EXCP_SERROR;
+> +        goto found;
+> +    }
+
+Likewise.
+
+> -        qdev_init_gpio_in(DEVICE(cpu), arm_cpu_kvm_set_irq, 4);
+> +        qdev_init_gpio_in(DEVICE(cpu), arm_cpu_kvm_set_irq, 5);
+>      } else {
+> -        qdev_init_gpio_in(DEVICE(cpu), arm_cpu_set_irq, 4);
+> +        qdev_init_gpio_in(DEVICE(cpu), arm_cpu_set_irq, 5);
+
+I wonder if we should have an ARM_CPU_NUM_IRQ define so that this is more
+automatic.
+
+> @@ -98,10 +100,11 @@ enum {
+>  #endif
+>  
+>  /* Meanings of the ARMCPU object's four inbound GPIO lines */
+> -#define ARM_CPU_IRQ 0
+> -#define ARM_CPU_FIQ 1
+> -#define ARM_CPU_VIRQ 2
+> -#define ARM_CPU_VFIQ 3
+> +#define ARM_CPU_IRQ    0
+> +#define ARM_CPU_FIQ    1
+> +#define ARM_CPU_VIRQ   2
+> +#define ARM_CPU_VFIQ   3
+> +#define ARM_CPU_SERROR 4
+
+Comment is now wrong about the count.
 
 
 r~
