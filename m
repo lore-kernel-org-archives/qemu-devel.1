@@ -2,75 +2,80 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E39DC35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5072C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A666206F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9B60206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:43:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZHFXPI/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A666206F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g40sJVcG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B60206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3emb-0004KN-Cz
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 06:41:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40048)
+	id 1j3eo3-0005Ky-Oo
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 06:43:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ppandit@redhat.com>) id 1j3elM-0003Uw-DI
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:40:33 -0500
+ (envelope-from <jtomko@redhat.com>) id 1j3enR-0004ve-Qs
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:42:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ppandit@redhat.com>) id 1j3elK-0005xc-HJ
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:40:32 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30202
+ (envelope-from <jtomko@redhat.com>) id 1j3enQ-00087X-VH
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:42:41 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58833
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1j3elK-0005wo-2f
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:40:30 -0500
+ (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1j3enQ-00086m-QY
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:42:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581939629;
+ s=mimecast20190719; t=1581939759;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=RboALFaWCzX27DhgT8/VbBaC4QMtf4meayYQ7bJtoMo=;
- b=XZHFXPI/YQ2aft7x7ZEbBKwqdGVmz9lxOFhCm81F490TO6KDXr8Nt9j4qF5of13jVvghle
- AWdh4Wpssct9rDpGpiNeQsf68+Nyir5HybrzKmnzn4sWfpb5Kw/NjuKEC8WKzD3fXkhR7x
- 19pcEzsWImK3HxI+pp65+ilCrwXWTpg=
+ in-reply-to:in-reply-to:references:references;
+ bh=fipMpkfwmp7cWe//1u9zKEqF9XCcQfGU2iOHPWJtDE4=;
+ b=g40sJVcGrJ+V022YLHxJTQCddc6OPd6ALqz5pI7brQy+9Uoh8Olv+x/PEMBD8DfDvZz+oo
+ 44g4prMWxPD8q9WxFUjr3YWmj+wg3IEqHr9riFGaKUnj+xmO9D1hf1rtixsSabqhTM8Pbi
+ GhO4386+IZWXJ2tytCPh2u1jiqvGREg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-noGN4ZkHM1KBp3V8g1bUqw-1; Mon, 17 Feb 2020 06:40:20 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-303-q5CkIC7TMZyTSy_ro8_p_w-1; Mon, 17 Feb 2020 06:42:37 -0500
+X-MC-Unique: q5CkIC7TMZyTSy_ro8_p_w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C2B38017CC;
- Mon, 17 Feb 2020 11:40:19 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.74.10.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3723D87B12;
- Mon, 17 Feb 2020 11:40:08 +0000 (UTC)
-From: P J P <ppandit@redhat.com>
-To: Sven Schnelle <svens@stackframe.org>
-Subject: [PATCH v2] net: tulip: check frame size and r/w data length
-Date: Mon, 17 Feb 2020 17:08:04 +0530
-Message-Id: <20200217113804.341836-1-ppandit@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00BD98017DF
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 11:42:37 +0000 (UTC)
+Received: from lpt (unknown [10.43.2.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 79FC460BEC;
+ Mon, 17 Feb 2020 11:42:30 +0000 (UTC)
+Date: Mon, 17 Feb 2020 12:42:28 +0100
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 2/3] tools/virtiofsd/passthrough_ll: Remove unneeded
+ variable assignment
+Message-ID: <20200217114228.GA7281@lpt>
+References: <20200217094240.9927-1-philmd@redhat.com>
+ <20200217094240.9927-3-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: noGN4ZkHM1KBp3V8g1bUqw-1
+In-Reply-To: <20200217094240.9927-3-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,102 +87,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <pangpei.lq@antfin.com>, Jason Wang <jasowang@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Ziming Zhang <ezrakiez@gmail.com>,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+--WIyZ46R2i8wDzkSu
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Tulip network driver while copying tx/rx buffers does not check
-frame size against r/w data length. This may lead to OOB buffer
-access. Add check to avoid it.
+On Mon, Feb 17, 2020 at 10:42:39AM +0100, Philippe Mathieu-Daud=E9 wrote:
+>Fix warning reported by Clang static code analyzer:
+>
+>    CC      tools/virtiofsd/passthrough_ll.o
+>  tools/virtiofsd/passthrough_ll.c:925:9: warning: Value stored to 'newfd'=
+ is never read
+>          newfd =3D -1;
+>          ^       ~~
+>  tools/virtiofsd/passthrough_ll.c:942:9: warning: Value stored to 'newfd'=
+ is never read
+>          newfd =3D -1;
+>          ^       ~~
+>
+>Fixes: 7c6b66027
+>Reported-by: Clang Static Analyzer
+>Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>---
+>v2: do not set newfd, use it (jtomko)
+>---
+> tools/virtiofsd/passthrough_ll.c | 2 --
+> 1 file changed, 2 deletions(-)
+>
 
-Reported-by: Li Qiang <pangpei.lq@antfin.com>
-Reported-by: Ziming Zhang <ezrakiez@gmail.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/net/tulip.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
 
-Update v2: retain earlier len[12] & s->rx_frame_len checks
-  -> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04160.html
+Jano
 
-diff --git a/hw/net/tulip.c b/hw/net/tulip.c
-index cfac2719d3..ea4fd371e3 100644
---- a/hw/net/tulip.c
-+++ b/hw/net/tulip.c
-@@ -170,6 +170,10 @@ static void tulip_copy_rx_bytes(TULIPState *s, struct =
-tulip_descriptor *desc)
-         } else {
-             len =3D s->rx_frame_len;
-         }
-+
-+        if (s->rx_frame_len + len >=3D sizeof(s->rx_frame)) {
-+            return;
-+        }
-         pci_dma_write(&s->dev, desc->buf_addr1, s->rx_frame +
-             (s->rx_frame_size - s->rx_frame_len), len);
-         s->rx_frame_len -=3D len;
-@@ -181,6 +185,10 @@ static void tulip_copy_rx_bytes(TULIPState *s, struct =
-tulip_descriptor *desc)
-         } else {
-             len =3D s->rx_frame_len;
-         }
-+
-+        if (s->rx_frame_len + len >=3D sizeof(s->rx_frame)) {
-+            return;
-+        }
-         pci_dma_write(&s->dev, desc->buf_addr2, s->rx_frame +
-             (s->rx_frame_size - s->rx_frame_len), len);
-         s->rx_frame_len -=3D len;
-@@ -227,7 +235,8 @@ static ssize_t tulip_receive(TULIPState *s, const uint8=
-_t *buf, size_t size)
-=20
-     trace_tulip_receive(buf, size);
-=20
--    if (size < 14 || size > 2048 || s->rx_frame_len || tulip_rx_stopped(s)=
-) {
-+    if (size < 14 || size > sizeof(s->rx_frame) - 4
-+        || s->rx_frame_len || tulip_rx_stopped(s)) {
-         return 0;
-     }
-=20
-@@ -558,7 +567,7 @@ static void tulip_tx(TULIPState *s, struct tulip_descri=
-ptor *desc)
-         if ((s->csr[6] >> CSR6_OM_SHIFT) & CSR6_OM_MASK) {
-             /* Internal or external Loopback */
-             tulip_receive(s, s->tx_frame, s->tx_frame_len);
--        } else {
-+        } else if (s->tx_frame_len < sizeof(s->tx_frame)) {
-             qemu_send_packet(qemu_get_queue(s->nic),
-                 s->tx_frame, s->tx_frame_len);
-         }
-@@ -575,12 +584,18 @@ static void tulip_copy_tx_buffers(TULIPState *s, stru=
-ct tulip_descriptor *desc)
-     int len1 =3D (desc->control >> TDES1_BUF1_SIZE_SHIFT) & TDES1_BUF1_SIZ=
-E_MASK;
-     int len2 =3D (desc->control >> TDES1_BUF2_SIZE_SHIFT) & TDES1_BUF2_SIZ=
-E_MASK;
-=20
-+    if (s->tx_frame_len + len1 >=3D sizeof(s->tx_frame)) {
-+        return;
-+    }
-     if (len1) {
-         pci_dma_read(&s->dev, desc->buf_addr1,
-             s->tx_frame + s->tx_frame_len, len1);
-         s->tx_frame_len +=3D len1;
-     }
-=20
-+    if (s->tx_frame_len + len2 >=3D sizeof(s->tx_frame)) {
-+        return;
-+    }
-     if (len2) {
-         pci_dma_read(&s->dev, desc->buf_addr2,
-             s->tx_frame + s->tx_frame_len, len2);
---=20
-2.24.1
+--WIyZ46R2i8wDzkSu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl5KfCAACgkQ+YPwO/Ma
+t52hOAf/ViRI/AbPaMf24U13ikuAWDcl0MQbHbNewGTxOzLThOvS25zlhuuIVxVX
+6eb0/7YTktKmToU3KmwEIXUGGI8dY03Pdk1I1oj/u9xPVASM8ODnu7erfj/7UeDB
+WZV6VnNDICh+2sGbzarS/iwca9oqDB7oorndJOOW6+Z9rOaqOtkvppmOs035eG6W
+JlRss/TZiVChVkjRYjp5s5wpTeyICYUb/MeF7eb1inNIdxpTc95kc/BAeqsEojqb
+nFdVBm/b+UPNa2qGe0YWLwDqpDboEZ6rFLphDOr/DGwOi73QRvkTdGeLntinduvS
+eTzzn6VtytzsRG8iizzN4zalGNmc0Q==
+=6SgJ
+-----END PGP SIGNATURE-----
+
+--WIyZ46R2i8wDzkSu--
 
 
