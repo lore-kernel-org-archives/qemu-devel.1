@@ -2,77 +2,89 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FEEC3B1BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 00:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFB0C76199
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 01:17:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A04A42067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 00:45:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04A42067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 99B17206E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 01:17:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWlpJmP9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99B17206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3UXf-00006c-P6
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 19:45:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33378)
+	id 1j3V2B-0008Dt-SW
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 20:17:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3UWm-0007tk-Hx
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:44:49 -0500
+ (envelope-from <programmingkidx@gmail.com>) id 1j3V1c-0007c4-6E
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 20:16:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3UWl-0003Af-CP
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:44:48 -0500
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:41777)
+ (envelope-from <programmingkidx@gmail.com>) id 1j3V1b-0000A7-0b
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 20:16:40 -0500
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:37075)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3UWl-0003AA-8m
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:44:47 -0500
-Received: by mail-yw1-f68.google.com with SMTP id l22so7145066ywc.8
- for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 16:44:47 -0800 (PST)
+ (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+ id 1j3V1Y-00005R-9D; Sun, 16 Feb 2020 20:16:36 -0500
+Received: by mail-yw1-xc43.google.com with SMTP id l5so7201181ywd.4;
+ Sun, 16 Feb 2020 17:16:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=AoYBpwdDRiLhbrtv499hlDneS5m0RniiewaVYxtqEgQ=;
+ b=GWlpJmP97JItdiXASMP16D+0gzR/DFP220EiRuGwxtVTbTV8qVpH4ytW9pL3+KnAmc
+ rM/deGL/596d0fFkqx56sBQgB0784w1ESqZtGIMNEl1Z9AIHaLoc2uTR0daXZ3Zy8DkF
+ NOUR5exXOlHR7zB5HSGRaOoeMhf4ryN7Z2pJPyTKfXIpeCj/WoBPgV7FPgE9dHBHiIib
+ 4Ay8gNXQWgOo24g03+uBzCLpR2f9QCtPvGjxaBJDFIklOsCvAsBQ+6YZpD1jkJBvGMig
+ trx4CX0e3C/lacRFqrQLGNANjh5MryTqSROtZ9vAYFV9mWbV2ax5ww4cPSKvbZZTMc9s
+ tjUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=nf6ZiGOA/CQMTsJ9yRTr6q2+O8kWcPDQrUophby4Wks=;
- b=Jd8K7Ozxu7V60NHmfSnXkag/FPbddWhjhmdNYV36DftgV9aXtsqCbKRY7Q7X3ME3rS
- V6i0M9rif/vRI+cuNPSUElnvpX9heAvfe02SCVmx4pmp/uqF5UADzGS111zQuRQR06XF
- cdK6TgG9ms+EKPhZnmAudwLMnHm6gU/RVqgGBNGJ+1MaRATgkC6AlYxuY0ydF6Zhvfeb
- TRt+/+IsvJNPC0cdRk3Va+Vdi1MBITptuLhjnA4RZVBOHnTIwFdodHdn+6ZdQ5pXz8nA
- uP0O/eth2M9wuYm3ymgLs5720/N4FGiNB2iyEIUkGzZMbitRo8jzs3Nw2TvAvLQip/yE
- rXHw==
-X-Gm-Message-State: APjAAAVBYfInrZD9yQjniWM4o1tti1hMQW0p9TPnZOE8CYPeAKBKo12Z
- xLWYEkwrh3NzYEblMf4Hri9moee30pELK0Keowo=
-X-Google-Smtp-Source: APXvYqz3VwyfR+9D99z8hjkUGbennj6QfCtaHpFJy98phOtyS7DI7In6hXEKKInptADXXDpkPoV7UreYJ/flVoRNIKI=
-X-Received: by 2002:a81:8443:: with SMTP id u64mr10797753ywf.443.1581900286598; 
- Sun, 16 Feb 2020 16:44:46 -0800 (PST)
-MIME-Version: 1.0
-References: <20200213175647.17628-1-peter.maydell@linaro.org>
- <20200213175647.17628-8-peter.maydell@linaro.org>
- <CAL1e-=iWXDGat9dVwNEKU1JUYTz1vc-wr2f1pTNiHP-e6zpPbA@mail.gmail.com>
- <CAAdtpL6JHhgPJOdwrMxs83qc8=9Q-1t6mrA0yJiyPjMkHSw3Lg@mail.gmail.com>
- <CAL1e-=hgrANvvPd2oaOUTf+3EuudcsZeBtj1yOCK4Pn37nxOJg@mail.gmail.com>
-In-Reply-To: <CAL1e-=hgrANvvPd2oaOUTf+3EuudcsZeBtj1yOCK4Pn37nxOJg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 17 Feb 2020 01:44:35 +0100
-Message-ID: <CAAdtpL6HmgdmV3f9g_K4ap48-DMe18_y88iVajMjctQdm+9URA@mail.gmail.com>
-Subject: Re: [PATCH v2 07/30] qapi/block-core.json: Use literal block for
- ascii art
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>, 
- Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=AoYBpwdDRiLhbrtv499hlDneS5m0RniiewaVYxtqEgQ=;
+ b=TELaRolRdZ/sexmrRenO0ADazuloPNOAdSmVIOG/FxHZ/a4nuJ13EvOtsHyDhJQMdv
+ 8wcvxWkzgebOemQRxIY6eLk38bg1lvgfbiQu/7sL/Nw6YIDnLrqSorehv9UbfnaoTh5t
+ R82Orm2SMu+gbzG2hMvh6RRklkag5iMJHuM7PIV+1s05LeoN6LcCOPjsTQtD5Cy1hXUi
+ rnibHO4oW84wNb4tfJzbtTsLAFUTyzbNbPBRc+sQ/nFdnRZ2UIyygPVe7oT/GQ6BcHOk
+ 4PrWuzPZVkMrcp2K64zn32IGeb2yuV/J8kGoTZYu7agaYQtbVGiml0mMkKvQ48UU14uL
+ I8AQ==
+X-Gm-Message-State: APjAAAW8jWT7jYtr3jgReVTYo2pad0jLHwstsfrq50H4q0tmVuPY0tr+
+ Uu2iRY2fXD0pzOx3yFcrgww=
+X-Google-Smtp-Source: APXvYqyWSdefDta+N3d7FIJ/o11lH7h1W1fFNAn1l6VvRU8su3Tn/DCXyQRuKniHW2QaX20vML2Ing==
+X-Received: by 2002:a81:a503:: with SMTP id u3mr11704679ywg.476.1581902195115; 
+ Sun, 16 Feb 2020 17:16:35 -0800 (PST)
+Received: from [192.168.0.5] (d149-67-30-58.try.wideopenwest.com.
+ [67.149.58.30])
+ by smtp.gmail.com with ESMTPSA id k135sm5650188ywe.2.2020.02.16.17.16.33
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 16 Feb 2020 17:16:34 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v3] Implement the Screamer sound chip for the mac99
+ machine type
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <alpine.BSF.2.22.395.2002162243190.98139@zero.eik.bme.hu>
+Date: Sun, 16 Feb 2020 20:16:31 -0500
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.161.68
+Message-Id: <2611424A-CC6C-4C5A-95FE-F005D3ECB147@gmail.com>
+References: <20200216163216.10745-1-programmingkidx@gmail.com>
+ <CABLmASF=9Qj0_Hh2SWO6K=Sou3mVeyLL+XXTn9WGc670KRn2AA@mail.gmail.com>
+ <alpine.BSF.2.22.395.2002162243190.98139@zero.eik.bme.hu>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+X-Mailer: Apple Mail (2.3273)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,58 +96,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>, John Snow <jsnow@redhat.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Feb 15, 2020 at 10:01 PM Aleksandar Markovic
-<aleksandar.m.mail@gmail.com> wrote:
-> 9:56 PM Sub, 15.02.2020. Philippe Mathieu-Daud=C3=A9 <philippe@mathieu-da=
-ude.net> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=
-=B0:
-> > On Fri, Feb 14, 2020 at 12:04 AM Aleksandar Markovic
-> > <aleksandar.m.mail@gmail.com> wrote:
-> > >
-> > > 6:59 PM =C4=8Cet, 13.02.2020. Peter Maydell <peter.maydell@linaro.org=
-> =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
-> > > >
-> > > > The ascii-art graph
-> > >
-> > > Just out of couriousity, are unicode characters allowed in rst files?
-> >
-> > I remember 2 years ago a blind developer thanked the QEMU community to
-> > still restrict commits to 80 characters, because while 4K display are
-> > available, he and other visually impaired developers cloud still
-> > browse the QEMU codebase with their refreshable Braille display (which
-> > was 80 cels). I don't know how many visually impaired developers are
-> > following this project. A quick google returns " There is no concept
-> > of Unicode in Braille. In that sense Braille is similar to old 8-bit
-> > code pages which represented different symbols in different languages
-> > for the same symbol code."
-> > (https://superuser.com/questions/629443/represent-unicode-characters-in=
--braille).
-> >
-> > (I'm Cc'ing Samuel who cares about Braille displays.)
-> >
->
-> Got it.
 
-AFAIK there are no particular care in the project regarding visually
-impaired developers, maybe we are already using things that exclude
-them.
-IOW without a project policy to include visually impaired developers,
-my comment is irrelevant and it shouldn't restrict the use of unicode
-to improve documentation.
-Personally I'd rather we keep the project open to all possible contributors=
-.
+> On Feb 16, 2020, at 4:59 PM, BALATON Zoltan <balaton@eik.bme.hu> =
+wrote:
+>=20
+> On Sun, 16 Feb 2020, Howard Spoelstra wrote:
+>> On Sun, Feb 16, 2020 at 5:32 PM John Arbuckle =
+<programmingkidx@gmail.com>
+>> wrote:
+>>> diff --git a/hw/audio/screamer.c b/hw/audio/screamer.c
+>>> new file mode 100644
+>>> index 0000000000..ad4aba12eb
+>>> --- /dev/null
+>>> +++ b/hw/audio/screamer.c
+>>> @@ -0,0 +1,983 @@
+>>> +/*
+>>> + * File: Screamer.c
+>>> + * Description: Implement the Screamer sound chip used in Apple
+>>> Macintoshes.
+>>> + * It works by filling a buffer, then playing the buffer.
+>>> + */
+>=20
+> Do you need a copyright and license header here? Especially if this is =
+not all your original work but based on previous code (don't know if it =
+is just saying in case as I know Mark also had some similar patches =
+before but not sure how are those related if at all). If this contains =
+code from somewhere else then license and author of that code may need =
+to be included too.
 
-> > >
-> > > The boxes could've been rendered in a much more beautifull way using =
-"lines and corners" group of unicode characters.
-> > >
-> > > Aleksandar
+That is a good question. According to this page =
+https://wiki.qemu.org/License, files that don't have licensing =
+information default under the GNU GPL v2. I'm fine with that.
+
+>=20
+>>> +/* Called when the CPU writes to the memory addresses assigned to
+>>> Screamer */
+>>> +static void screamer_mmio_write(void *opaque, hwaddr addr, uint64_t
+>>> raw_value,
+>>> +                                unsigned size)
+>>> +{
+>>> +    DPRINTF("screamer_mmio_write() called - size: %d\n", size);
+>>> +    ScreamerState *state =3D opaque;
+>>> +    uint32_t value =3D raw_value & 0xffffffff;
+>>> +    addr =3D addr >> 4;
+>>> +
+>>> +    switch (addr) {
+>>> +    case SOUND_CONTROL_REG:
+>>> +        set_sound_control_reg(state, value);
+>>> +        break;
+>>> +    case CODEC_CONTROL_REG:
+>>> +        set_codec_control_reg(state, value);
+>>> +        break;
+>>> +    case CODEC_STATUS_REG:
+>>> +        set_codec_status_reg(state, value);
+>>> +        break;
+>>> +    case CLIP_COUNT_REG:
+>>> +        set_clip_count_reg(state, value);
+>>> +        break;
+>>> +    case BYTE_SWAP_REG:
+>>> +        set_byte_swap_reg(state, value);
+>>> +        break;
+>>> +    case FRAME_COUNT_REG:
+>>> +        set_frame_count_reg(state, value);
+>>> +        break;
+>>> +    default:
+>>> +        DPRINTF("Unknown register write - addr:%llu\tvalue:%d\n", =
+addr,
+>>> value);
+>>> +    }
+>>> +}
+>>>=20
+>>> Hi,
+>>=20
+>> This patch will not compile without errors. Host is Fedora 31.
+>> The compiler suggests changing lines 839, 842 and 878 in screamer.c =
+so the
+>> DPRINTF arguments use %lu instead of %llu.
+>> With that fixed, compiling completes succesfully.
+>=20
+> Replacing with %lu may fix 32bit build but would break 64bit one. Use =
+HWADDR_PRIx format string instead to print hwaddr but others will =
+probably tell to remove DPRINTFs alltogether when they are not needed =
+any more and replace the remaining few useful ones with traces if =
+debugging is still needed. I don't mind DPRINTFs that much at least =
+until things are stable enough but once the code is stable most DPRINTFs =
+may not be needed any more.
+>=20
+> I can't really review the actual patch because I don't know audio in =
+QEMU.
+>=20
+> Regards,
+> BALATON Zoltan
+
+Your HWADDR_PRIx suggestion was great. I am making a small patch to test =
+out your suggestion.
+
+Thank you.
+
 
