@@ -4,66 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04DA0C34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 22:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D4BC34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 22:46:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB3FA20718
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 22:45:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB3FA20718
+	by mail.kernel.org (Postfix) with ESMTPS id 9627520718
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 22:46:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9627520718
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3p8p-0006Vs-VK
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 17:45:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53519)
+	id 1j3p9N-00079f-4S
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 17:46:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53694)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j3p0w-0007XU-BO
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 17:37:20 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j3p19-0008CZ-VO
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 17:37:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j3p0t-0000eE-9H
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 17:37:18 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:33549)
+ (envelope-from <laurent@vivier.eu>) id 1j3p17-0000lu-CS
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 17:37:31 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:33037)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j3p0s-0000dK-FD; Mon, 17 Feb 2020 17:37:14 -0500
+ id 1j3p11-0000hy-H4; Mon, 17 Feb 2020 17:37:23 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MuDsZ-1jKFt209dt-00udPM; Mon, 17 Feb 2020 23:36:29 +0100
+ id 1Msqpq-1jJR4i20SG-00tFxt; Mon, 17 Feb 2020 23:36:16 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 20/22] linux-user: update syscall.tbl from linux 0bf999f9c5e7
-Date: Mon, 17 Feb 2020 23:35:56 +0100
-Message-Id: <20200217223558.863199-21-laurent@vivier.eu>
+Subject: [PATCH 11/22] linux-user,
+ s390x: remove syscall definitions for !TARGET_S390X
+Date: Mon, 17 Feb 2020 23:35:47 +0100
+Message-Id: <20200217223558.863199-12-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200217223558.863199-1-laurent@vivier.eu>
 References: <20200217223558.863199-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:+jRuSl4gnD5RwQdmJsZotMyKI0Qop6rVucI6kCZ+DZ9Ugbzjee3
- 5gCGfE3LJT9WhxmGz71xm8gjvECnqXc400aGzAVXcKQ+l5H+mEADVnSUEnmDvflTU80URyN
- rivtP5fM5x3U05O1j7hkpdsjPMkIDsCv3zbjskv4fklFjSyR35h3Y/g4Yz/fRtOuDYwdmFg
- ua35F4c3+e1mhzKjZ55fw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:cZpIOekUj8M=:l7ZlJ+Fd/5UoispR4IDdNM
- Xh89clxWr3hl9/GHzmnX5AqteX5p18UXDPO07MOtkRCrwKb0RPm0kGK6XQM5PPQDTZ57D5dj/
- OUYOJ9j82ndJ/hxSEj8Xjq7saGatD/DzWrq9nDivTZyHAeS+nleJvVRxRHviDU+dF4vEgoo1V
- LcbHcUSLMGa2UEqn8bb3y8qqIVvGfyjL/ULYCyUqlIpzmcZsydFOkGaDKiAhY3m9UbNW4lLJq
- Iorc4Pi+eApbtdy+0foGwR5dBN5i5xfBT0TXAEe1kUpUWmKijEZBHFI00wSjKctfeoNtualAu
- t6/Ln51syNfoiDRL5aP+V2R9qJ3FGI3QZL4HoxAwPqfohTsmACzNNlPRikKJsADRucJcMUSxK
- VjrrG2cpw5Ywm2R9yswH5aRpbPHBZ8hdpNB5p7+VxtuhGRgSDNwLnhm1l3gui1rBUD9tIBAkP
- /NKxKxi/6eZwshaQVTKktuLTyUF7Qbp5OdTQOTlT5LM5CKoB4RAa6BFppIcBx0XucNXnGYLgF
- LpyKTyEYhNnZtTAeKDIDt+Qu8aCJk7gCW1hZoipc/dZB1gtuoW6bpz2sD4TWrZElBUv8Ed4Qo
- rb1fYtaIqVI9C4myJiybCi32POTCjpkPrFZJYlN9wWpJ39wWKscLe3z4EjPmFuvXLZlYVt6qZ
- gAR8MOe4KwIh5PAlFW/A4SnubsGu2dnNS1mV1WRYKwep83fpWZxsO3a5gvVtgcMWxskOKVdzR
- a767exXNqwKkeotWtdSIpYYz++zhF2/COaPvhdbZx5/MoDtAwbLd/Z5pTH66IuPyX+bPSUIJV
- VtobNE1Unl72fm/R4rQqTAkp/y/N96qz9udd88efVMZyQZvSLfIJS5d0dHnL55+M3x2fswv
+X-Provags-ID: V03:K1:AoGE+ZYvt6lRRZpWbVPf1tCurTin3U9F1pZA+QJkMBuIJr9T4dD
+ yc2LikFVu/lKoomdEiObQmdXtdFNiLSmqJr+zmXeTUMbrzt8kaGdG2X+vBpsiPz+MhI6tRU
+ 0NI0vKW1wd8IZgOHrjA6O2un1hJfy8dbG4Bxr4eiRbl1Y55a4QQwBWxuiwe8utlL74h9R7S
+ jaHKWEv7ljyS6nQrbkLEQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:iggGqHKayls=:wZU65MZKMFxOtE/OLM01W1
+ /XdGTUd8G+gto8ar1WqOKwFXPUHNacY80D+1UNuquWF+5torn2EqYsuUdSCwtLey8qmUik3lk
+ vYFt5LGKuhQ4c7jRfpwE8bbUgfI9GrFGnZ+v2jphhYswQT+5acSD74rjZJMvQMJDI9+DyTvrY
+ Yv7hIkn1gw9sE5nr/qvYSEZ2N4+pDcxdS+E42gfKs+vT7fPqJrXP0WXfH7Z7z8hnZIquDvl9q
+ esDIrRh5W0if0sDv26uJnXTpAivZy7ZMVhHw7MDTqRV7f7fgdYKAYEIfkCi4MaRw/0J3vHuK5
+ Dugm/aTy/KlO3mfwUUydK/3r1SYGwQNKMND9NugP30jEJVl/m4glQKuGdT0yZgvLbJbMsKCCM
+ 8cYHCLaHPHr66RHf6u+2cz0xYT4feUctLIOYiXzXdJA5IjXe7wVSybvCgJB01GFPg2f6B7RC9
+ ZXSz55XJwq+4zaEWbWT+HgBf9eAY9Qbx2LEYwpkStInw8dfN4ZxBinhA1Xz93BEB2SnSetoRk
+ OXBmpQp5vIVOo4vaTdEoOwzXjPBSi06QHFi3c2/sqwaF1phvBUPYKUjjQk48L6iu58UzA8NSq
+ zzYzCAXIFHzKmJndNQTWncVD1amzOuALWXww2YV8l+qyY2ufdH9foRD7bfoQQxZHqs3QlnUc9
+ oQHJIEbGALPXIMMYSNmZH13m16TFp2EeKWJOkxtAif8F3EbP9FtsGsSP53mqJ0m17VGFUP+N7
+ uojccyqOhrpEpPRXcPwk+Ur5Qv5a2xW621dJm5vUl9Jvlww0JfUERZJrBA7wN5nUKtmZXc0/R
+ r1gpFTbTQgI91TRmIO5bnFQqf1ikPMp/jcXiEP8QxbOlmRaiY7zMNfMKWiJMKPrEeU/I3s1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,182 +85,368 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Run scripts/update-syscalltbl.sh with linux commit 0bf999f9c5e7
+We don't support other 32bit architecture.
+Update file to comply with coding style (TAB).
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/arm/syscall.tbl        | 2 ++
- linux-user/hppa/syscall.tbl       | 2 ++
- linux-user/i386/syscall_32.tbl    | 2 ++
- linux-user/m68k/syscall.tbl       | 4 +++-
- linux-user/microblaze/syscall.tbl | 2 ++
- linux-user/mips/syscall_o32.tbl   | 2 ++
- linux-user/mips64/syscall_n32.tbl | 2 ++
- linux-user/mips64/syscall_n64.tbl | 2 ++
- linux-user/ppc/syscall.tbl        | 2 ++
- linux-user/s390x/syscall.tbl      | 2 ++
- linux-user/sh4/syscall.tbl        | 2 ++
- linux-user/sparc/syscall.tbl      | 2 ++
- linux-user/sparc64/syscall.tbl    | 2 ++
- linux-user/x86_64/syscall_64.tbl  | 2 ++
- linux-user/xtensa/syscall.tbl     | 2 ++
- 15 files changed, 31 insertions(+), 1 deletion(-)
+ linux-user/s390x/syscall_nr.h | 313 +++++++++++++---------------------
+ 1 file changed, 123 insertions(+), 190 deletions(-)
 
-diff --git a/linux-user/arm/syscall.tbl b/linux-user/arm/syscall.tbl
-index 6da7dc4d79cc..4d1cf74a2caa 100644
---- a/linux-user/arm/syscall.tbl
-+++ b/linux-user/arm/syscall.tbl
-@@ -449,3 +449,5 @@
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
- 435	common	clone3				sys_clone3
-+437	common	openat2				sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/hppa/syscall.tbl b/linux-user/hppa/syscall.tbl
-index 285ff516150c..52a15f5cd130 100644
---- a/linux-user/hppa/syscall.tbl
-+++ b/linux-user/hppa/syscall.tbl
-@@ -433,3 +433,5 @@
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
- 435	common	clone3				sys_clone3_wrapper
-+437	common	openat2				sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/i386/syscall_32.tbl b/linux-user/i386/syscall_32.tbl
-index a2728f45906e..4fea592676c2 100644
---- a/linux-user/i386/syscall_32.tbl
-+++ b/linux-user/i386/syscall_32.tbl
-@@ -440,3 +440,5 @@
- 433	i386	fspick			sys_fspick			__ia32_sys_fspick
- 434	i386	pidfd_open		sys_pidfd_open			__ia32_sys_pidfd_open
- 435	i386	clone3			sys_clone3			__ia32_sys_clone3
-+437	i386	openat2			sys_openat2			__ia32_sys_openat2
-+438	i386	pidfd_getfd		sys_pidfd_getfd			__ia32_sys_pidfd_getfd
-diff --git a/linux-user/m68k/syscall.tbl b/linux-user/m68k/syscall.tbl
-index a88a285a0e5f..f4f49fcb76d0 100644
---- a/linux-user/m68k/syscall.tbl
-+++ b/linux-user/m68k/syscall.tbl
-@@ -434,4 +434,6 @@
- 432	common	fsmount				sys_fsmount
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
--# 435 reserved for clone3
-+435	common	clone3				__sys_clone3
-+437	common	openat2				sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/microblaze/syscall.tbl b/linux-user/microblaze/syscall.tbl
-index 09b0cd7dab0a..4c67b11f9c9e 100644
---- a/linux-user/microblaze/syscall.tbl
-+++ b/linux-user/microblaze/syscall.tbl
-@@ -441,3 +441,5 @@
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
- 435	common	clone3				sys_clone3
-+437	common	openat2				sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/mips/syscall_o32.tbl b/linux-user/mips/syscall_o32.tbl
-index 353539ea4140..ac586774c980 100644
---- a/linux-user/mips/syscall_o32.tbl
-+++ b/linux-user/mips/syscall_o32.tbl
-@@ -423,3 +423,5 @@
- 433	o32	fspick				sys_fspick
- 434	o32	pidfd_open			sys_pidfd_open
- 435	o32	clone3				__sys_clone3
-+437	o32	openat2				sys_openat2
-+438	o32	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/mips64/syscall_n32.tbl b/linux-user/mips64/syscall_n32.tbl
-index e7c5ab38e403..1f9e8ad636cc 100644
---- a/linux-user/mips64/syscall_n32.tbl
-+++ b/linux-user/mips64/syscall_n32.tbl
-@@ -374,3 +374,5 @@
- 433	n32	fspick				sys_fspick
- 434	n32	pidfd_open			sys_pidfd_open
- 435	n32	clone3				__sys_clone3
-+437	n32	openat2				sys_openat2
-+438	n32	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/mips64/syscall_n64.tbl b/linux-user/mips64/syscall_n64.tbl
-index 13cd66581f3b..c0b9d802dbf6 100644
---- a/linux-user/mips64/syscall_n64.tbl
-+++ b/linux-user/mips64/syscall_n64.tbl
-@@ -350,3 +350,5 @@
- 433	n64	fspick				sys_fspick
- 434	n64	pidfd_open			sys_pidfd_open
- 435	n64	clone3				__sys_clone3
-+437	n64	openat2				sys_openat2
-+438	n64	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/ppc/syscall.tbl b/linux-user/ppc/syscall.tbl
-index 43f736ed47f2..35b61bfc1b1a 100644
---- a/linux-user/ppc/syscall.tbl
-+++ b/linux-user/ppc/syscall.tbl
-@@ -517,3 +517,5 @@
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
- 435	nospu	clone3				ppc_clone3
-+437	common	openat2				sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/s390x/syscall.tbl b/linux-user/s390x/syscall.tbl
-index 3054e9c035a3..bd7bd3581a0f 100644
---- a/linux-user/s390x/syscall.tbl
-+++ b/linux-user/s390x/syscall.tbl
-@@ -438,3 +438,5 @@
- 433  common	fspick			sys_fspick			sys_fspick
- 434  common	pidfd_open		sys_pidfd_open			sys_pidfd_open
- 435  common	clone3			sys_clone3			sys_clone3
-+437  common	openat2			sys_openat2			sys_openat2
-+438  common	pidfd_getfd		sys_pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/sh4/syscall.tbl b/linux-user/sh4/syscall.tbl
-index b5ed26c4c005..c7a30fcd135f 100644
---- a/linux-user/sh4/syscall.tbl
-+++ b/linux-user/sh4/syscall.tbl
-@@ -438,3 +438,5 @@
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
- # 435 reserved for clone3
-+437	common	openat2				sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/sparc/syscall.tbl b/linux-user/sparc/syscall.tbl
-index 8c8cc7537fb2..f13615ecdecc 100644
---- a/linux-user/sparc/syscall.tbl
-+++ b/linux-user/sparc/syscall.tbl
-@@ -481,3 +481,5 @@
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
- # 435 reserved for clone3
-+437	common	openat2			sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/sparc64/syscall.tbl b/linux-user/sparc64/syscall.tbl
-index 8c8cc7537fb2..f13615ecdecc 100644
---- a/linux-user/sparc64/syscall.tbl
-+++ b/linux-user/sparc64/syscall.tbl
-@@ -481,3 +481,5 @@
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
- # 435 reserved for clone3
-+437	common	openat2			sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
-diff --git a/linux-user/x86_64/syscall_64.tbl b/linux-user/x86_64/syscall_64.tbl
-index c29976eca4a8..44d510bc9b78 100644
---- a/linux-user/x86_64/syscall_64.tbl
-+++ b/linux-user/x86_64/syscall_64.tbl
-@@ -357,6 +357,8 @@
- 433	common	fspick			__x64_sys_fspick
- 434	common	pidfd_open		__x64_sys_pidfd_open
- 435	common	clone3			__x64_sys_clone3/ptregs
-+437	common	openat2			__x64_sys_openat2
-+438	common	pidfd_getfd		__x64_sys_pidfd_getfd
+diff --git a/linux-user/s390x/syscall_nr.h b/linux-user/s390x/syscall_nr.h
+index b1553a0810c8..261da1b0c30e 100644
+--- a/linux-user/s390x/syscall_nr.h
++++ b/linux-user/s390x/syscall_nr.h
+@@ -11,7 +11,7 @@
+ #define TARGET_NR_write                4
+ #define TARGET_NR_open                 5
+ #define TARGET_NR_close                6
+-#define TARGET_NR_restart_syscall	  7
++#define TARGET_NR_restart_syscall         7
+ #define TARGET_NR_creat                8
+ #define TARGET_NR_link                 9
+ #define TARGET_NR_unlink              10
+@@ -108,6 +108,7 @@
+ #define TARGET_NR_personality        136
+ #define TARGET_NR_afs_syscall        137 /* Syscall for Andrew File System */
+ #define TARGET_NR_getdents           141
++#define TARGET_NR_select                142
+ #define TARGET_NR_flock              143
+ #define TARGET_NR_msync              144
+ #define TARGET_NR_readv              145
+@@ -147,116 +148,137 @@
+ #define TARGET_NR_capset             185
+ #define TARGET_NR_sigaltstack        186
+ #define TARGET_NR_sendfile           187
+-#define TARGET_NR_getpmsg		188
+-#define TARGET_NR_putpmsg		189
+-#define TARGET_NR_vfork		190
++#define TARGET_NR_getpmsg               188
++#define TARGET_NR_putpmsg               189
++#define TARGET_NR_vfork         190
++#define TARGET_NR_getrlimit             191     /* SuS compliant getrlimit */
++#define TARGET_NR_lchown                198
++#define TARGET_NR_getuid                199
++#define TARGET_NR_getgid                200
++#define TARGET_NR_geteuid               201
++#define TARGET_NR_getegid               202
++#define TARGET_NR_setreuid              203
++#define TARGET_NR_setregid              204
++#define TARGET_NR_getgroups     205
++#define TARGET_NR_setgroups     206
++#define TARGET_NR_fchown                207
++#define TARGET_NR_setresuid     208
++#define TARGET_NR_getresuid     209
++#define TARGET_NR_setresgid     210
++#define TARGET_NR_getresgid     211
++#define TARGET_NR_chown                 212
++#define TARGET_NR_setuid                213
++#define TARGET_NR_setgid                214
++#define TARGET_NR_setfsuid              215
++#define TARGET_NR_setfsgid              216
+ #define TARGET_NR_pivot_root         217
+ #define TARGET_NR_mincore            218
+ #define TARGET_NR_madvise            219
+-#define TARGET_NR_getdents64		220
+-#define TARGET_NR_readahead		222
+-#define TARGET_NR_setxattr		224
+-#define TARGET_NR_lsetxattr		225
+-#define TARGET_NR_fsetxattr		226
+-#define TARGET_NR_getxattr		227
+-#define TARGET_NR_lgetxattr		228
+-#define TARGET_NR_fgetxattr		229
+-#define TARGET_NR_listxattr		230
+-#define TARGET_NR_llistxattr		231
+-#define TARGET_NR_flistxattr		232
+-#define TARGET_NR_removexattr	233
+-#define TARGET_NR_lremovexattr	234
+-#define TARGET_NR_fremovexattr	235
+-#define TARGET_NR_gettid		236
+-#define TARGET_NR_tkill		237
+-#define TARGET_NR_futex		238
+-#define TARGET_NR_sched_setaffinity	239
+-#define TARGET_NR_sched_getaffinity	240
+-#define TARGET_NR_tgkill		241
++#define TARGET_NR_getdents64            220
++#define TARGET_NR_readahead             222
++#define TARGET_NR_setxattr              224
++#define TARGET_NR_lsetxattr             225
++#define TARGET_NR_fsetxattr             226
++#define TARGET_NR_getxattr              227
++#define TARGET_NR_lgetxattr             228
++#define TARGET_NR_fgetxattr             229
++#define TARGET_NR_listxattr             230
++#define TARGET_NR_llistxattr            231
++#define TARGET_NR_flistxattr            232
++#define TARGET_NR_removexattr   233
++#define TARGET_NR_lremovexattr  234
++#define TARGET_NR_fremovexattr  235
++#define TARGET_NR_gettid                236
++#define TARGET_NR_tkill         237
++#define TARGET_NR_futex         238
++#define TARGET_NR_sched_setaffinity     239
++#define TARGET_NR_sched_getaffinity     240
++#define TARGET_NR_tgkill                241
+ /* Number 242 is reserved for tux */
+-#define TARGET_NR_io_setup		243
+-#define TARGET_NR_io_destroy		244
+-#define TARGET_NR_io_getevents	245
+-#define TARGET_NR_io_submit		246
+-#define TARGET_NR_io_cancel		247
+-#define TARGET_NR_exit_group		248
+-#define TARGET_NR_epoll_create	249
+-#define TARGET_NR_epoll_ctl		250
+-#define TARGET_NR_epoll_wait		251
+-#define TARGET_NR_set_tid_address	252
+-#define TARGET_NR_fadvise64		253
+-#define TARGET_NR_timer_create	254
+-#define TARGET_NR_timer_settime	(TARGET_NR_timer_create+1)
+-#define TARGET_NR_timer_gettime	(TARGET_NR_timer_create+2)
+-#define TARGET_NR_timer_getoverrun	(TARGET_NR_timer_create+3)
+-#define TARGET_NR_timer_delete	(TARGET_NR_timer_create+4)
+-#define TARGET_NR_clock_settime	(TARGET_NR_timer_create+5)
+-#define TARGET_NR_clock_gettime	(TARGET_NR_timer_create+6)
+-#define TARGET_NR_clock_getres	(TARGET_NR_timer_create+7)
+-#define TARGET_NR_clock_nanosleep	(TARGET_NR_timer_create+8)
++#define TARGET_NR_io_setup              243
++#define TARGET_NR_io_destroy            244
++#define TARGET_NR_io_getevents  245
++#define TARGET_NR_io_submit             246
++#define TARGET_NR_io_cancel             247
++#define TARGET_NR_exit_group            248
++#define TARGET_NR_epoll_create  249
++#define TARGET_NR_epoll_ctl             250
++#define TARGET_NR_epoll_wait            251
++#define TARGET_NR_set_tid_address       252
++#define TARGET_NR_fadvise64             253
++#define TARGET_NR_timer_create  254
++#define TARGET_NR_timer_settime (TARGET_NR_timer_create + 1)
++#define TARGET_NR_timer_gettime (TARGET_NR_timer_create + 2)
++#define TARGET_NR_timer_getoverrun      (TARGET_NR_timer_create + 3)
++#define TARGET_NR_timer_delete  (TARGET_NR_timer_create + 4)
++#define TARGET_NR_clock_settime (TARGET_NR_timer_create + 5)
++#define TARGET_NR_clock_gettime (TARGET_NR_timer_create + 6)
++#define TARGET_NR_clock_getres  (TARGET_NR_timer_create + 7)
++#define TARGET_NR_clock_nanosleep       (TARGET_NR_timer_create + 8)
+ /* Number 263 is reserved for vserver */
+-#define TARGET_NR_statfs64		265
+-#define TARGET_NR_fstatfs64		266
+-#define TARGET_NR_remap_file_pages	267
++#define TARGET_NR_statfs64              265
++#define TARGET_NR_fstatfs64             266
++#define TARGET_NR_remap_file_pages      267
+ /* Number 268 is reserved for new sys_mbind */
+ /* Number 269 is reserved for new sys_get_mempolicy */
+ /* Number 270 is reserved for new sys_set_mempolicy */
+-#define TARGET_NR_mq_open		271
+-#define TARGET_NR_mq_unlink		272
+-#define TARGET_NR_mq_timedsend	273
+-#define TARGET_NR_mq_timedreceive	274
+-#define TARGET_NR_mq_notify		275
+-#define TARGET_NR_mq_getsetattr	276
+-#define TARGET_NR_kexec_load		277
+-#define TARGET_NR_add_key		278
+-#define TARGET_NR_request_key	279
+-#define TARGET_NR_keyctl		280
+-#define TARGET_NR_waitid		281
+-#define TARGET_NR_ioprio_set		282
+-#define TARGET_NR_ioprio_get		283
+-#define TARGET_NR_inotify_init	284
+-#define TARGET_NR_inotify_add_watch	285
+-#define TARGET_NR_inotify_rm_watch	286
++#define TARGET_NR_mq_open               271
++#define TARGET_NR_mq_unlink             272
++#define TARGET_NR_mq_timedsend  273
++#define TARGET_NR_mq_timedreceive       274
++#define TARGET_NR_mq_notify             275
++#define TARGET_NR_mq_getsetattr 276
++#define TARGET_NR_kexec_load            277
++#define TARGET_NR_add_key               278
++#define TARGET_NR_request_key   279
++#define TARGET_NR_keyctl                280
++#define TARGET_NR_waitid                281
++#define TARGET_NR_ioprio_set            282
++#define TARGET_NR_ioprio_get            283
++#define TARGET_NR_inotify_init  284
++#define TARGET_NR_inotify_add_watch     285
++#define TARGET_NR_inotify_rm_watch      286
+ /* Number 287 is reserved for new sys_migrate_pages */
+-#define TARGET_NR_openat		288
+-#define TARGET_NR_mkdirat		289
+-#define TARGET_NR_mknodat		290
+-#define TARGET_NR_fchownat		291
+-#define TARGET_NR_futimesat		292
+-#define TARGET_NR_unlinkat		294
+-#define TARGET_NR_renameat		295
+-#define TARGET_NR_linkat		296
+-#define TARGET_NR_symlinkat		297
+-#define TARGET_NR_readlinkat		298
+-#define TARGET_NR_fchmodat		299
+-#define TARGET_NR_faccessat		300
+-#define TARGET_NR_pselect6		301
+-#define TARGET_NR_ppoll		302
+-#define TARGET_NR_unshare		303
+-#define TARGET_NR_set_robust_list	304
+-#define TARGET_NR_get_robust_list	305
+-#define TARGET_NR_splice		306
+-#define TARGET_NR_sync_file_range	307
+-#define TARGET_NR_tee		308
+-#define TARGET_NR_vmsplice		309
++#define TARGET_NR_openat                288
++#define TARGET_NR_mkdirat               289
++#define TARGET_NR_mknodat               290
++#define TARGET_NR_fchownat              291
++#define TARGET_NR_futimesat             292
++#define TARGET_NR_newfstatat            293
++#define TARGET_NR_unlinkat              294
++#define TARGET_NR_renameat              295
++#define TARGET_NR_linkat                296
++#define TARGET_NR_symlinkat             297
++#define TARGET_NR_readlinkat            298
++#define TARGET_NR_fchmodat              299
++#define TARGET_NR_faccessat             300
++#define TARGET_NR_pselect6              301
++#define TARGET_NR_ppoll         302
++#define TARGET_NR_unshare               303
++#define TARGET_NR_set_robust_list       304
++#define TARGET_NR_get_robust_list       305
++#define TARGET_NR_splice                306
++#define TARGET_NR_sync_file_range       307
++#define TARGET_NR_tee           308
++#define TARGET_NR_vmsplice              309
+ /* Number 310 is reserved for new sys_move_pages */
+-#define TARGET_NR_getcpu		311
+-#define TARGET_NR_epoll_pwait	312
+-#define TARGET_NR_utimes		313
+-#define TARGET_NR_fallocate		314
+-#define TARGET_NR_utimensat		315
+-#define TARGET_NR_signalfd		316
+-#define TARGET_NR_timerfd		317
+-#define TARGET_NR_eventfd		318
+-#define TARGET_NR_timerfd_create	319
+-#define TARGET_NR_timerfd_settime	320
+-#define TARGET_NR_timerfd_gettime	321
+-#define TARGET_NR_signalfd4		322
+-#define TARGET_NR_eventfd2		323
+-#define TARGET_NR_inotify_init1	324
+-#define TARGET_NR_pipe2		325
+-#define TARGET_NR_dup3		326
+-#define TARGET_NR_epoll_create1	327
++#define TARGET_NR_getcpu                311
++#define TARGET_NR_epoll_pwait   312
++#define TARGET_NR_utimes                313
++#define TARGET_NR_fallocate             314
++#define TARGET_NR_utimensat             315
++#define TARGET_NR_signalfd              316
++#define TARGET_NR_timerfd               317
++#define TARGET_NR_eventfd               318
++#define TARGET_NR_timerfd_create        319
++#define TARGET_NR_timerfd_settime       320
++#define TARGET_NR_timerfd_gettime       321
++#define TARGET_NR_signalfd4             322
++#define TARGET_NR_eventfd2              323
++#define TARGET_NR_inotify_init1 324
++#define TARGET_NR_pipe2         325
++#define TARGET_NR_dup3          326
++#define TARGET_NR_epoll_create1 327
+ #define TARGET_NR_preadv                328
+ #define TARGET_NR_pwritev               329
+ #define TARGET_NR_rt_tgsigqueueinfo     330
+@@ -305,94 +327,5 @@
+ #define TARGET_NR_shutdown              373
+ #define TARGET_NR_mlock2                374
  
- #
- # x32-specific system call numbers start at 512 to avoid cache impact
-diff --git a/linux-user/xtensa/syscall.tbl b/linux-user/xtensa/syscall.tbl
-index 25f4de729a6d..85a9ab1bc04d 100644
---- a/linux-user/xtensa/syscall.tbl
-+++ b/linux-user/xtensa/syscall.tbl
-@@ -406,3 +406,5 @@
- 433	common	fspick				sys_fspick
- 434	common	pidfd_open			sys_pidfd_open
- 435	common	clone3				sys_clone3
-+437	common	openat2				sys_openat2
-+438	common	pidfd_getfd			sys_pidfd_getfd
+-/*
+- * There are some system calls that are not present on 64 bit, some
+- * have a different name although they do the same (e.g. TARGET_NR_chown32
+- * is TARGET_NR_chown on 64 bit).
+- */
+-#ifndef TARGET_S390X
+-
+-#define TARGET_NR_time		 13
+-#define TARGET_NR_lchown		 16
+-#define TARGET_NR_setuid		 23
+-#define TARGET_NR_getuid		 24
+-#define TARGET_NR_stime		 25
+-#define TARGET_NR_setgid		 46
+-#define TARGET_NR_getgid		 47
+-#define TARGET_NR_geteuid		 49
+-#define TARGET_NR_getegid		 50
+-#define TARGET_NR_setreuid		 70
+-#define TARGET_NR_setregid		 71
+-#define TARGET_NR_getrlimit		 76
+-#define TARGET_NR_getgroups		 80
+-#define TARGET_NR_setgroups		 81
+-#define TARGET_NR_fchown		 95
+-#define TARGET_NR_ioperm		101
+-#define TARGET_NR_setfsuid		138
+-#define TARGET_NR_setfsgid		139
+-#define TARGET_NR__llseek		140
+-#define TARGET_NR__newselect 	142
+-#define TARGET_NR_setresuid		164
+-#define TARGET_NR_getresuid		165
+-#define TARGET_NR_setresgid		170
+-#define TARGET_NR_getresgid		171
+-#define TARGET_NR_chown		182
+-#define TARGET_NR_ugetrlimit		191	/* SuS compliant getrlimit */
+-#define TARGET_NR_mmap2		192
+-#define TARGET_NR_truncate64		193
+-#define TARGET_NR_ftruncate64	194
+-#define TARGET_NR_stat64		195
+-#define TARGET_NR_lstat64		196
+-#define TARGET_NR_fstat64		197
+-#define TARGET_NR_lchown32		198
+-#define TARGET_NR_getuid32		199
+-#define TARGET_NR_getgid32		200
+-#define TARGET_NR_geteuid32		201
+-#define TARGET_NR_getegid32		202
+-#define TARGET_NR_setreuid32		203
+-#define TARGET_NR_setregid32		204
+-#define TARGET_NR_getgroups32	205
+-#define TARGET_NR_setgroups32	206
+-#define TARGET_NR_fchown32		207
+-#define TARGET_NR_setresuid32	208
+-#define TARGET_NR_getresuid32	209
+-#define TARGET_NR_setresgid32	210
+-#define TARGET_NR_getresgid32	211
+-#define TARGET_NR_chown32		212
+-#define TARGET_NR_setuid32		213
+-#define TARGET_NR_setgid32		214
+-#define TARGET_NR_setfsuid32		215
+-#define TARGET_NR_setfsgid32		216
+-#define TARGET_NR_fcntl64		221
+-#define TARGET_NR_sendfile64		223
+-#define TARGET_NR_fadvise64_64	264
+-#define TARGET_NR_fstatat64		293
+-
+-#else
+-
+-#define TARGET_NR_select		142
+-#define TARGET_NR_getrlimit		191	/* SuS compliant getrlimit */
+-#define TARGET_NR_lchown  		198
+-#define TARGET_NR_getuid  		199
+-#define TARGET_NR_getgid  		200
+-#define TARGET_NR_geteuid  		201
+-#define TARGET_NR_getegid  		202
+-#define TARGET_NR_setreuid  		203
+-#define TARGET_NR_setregid  		204
+-#define TARGET_NR_getgroups  	205
+-#define TARGET_NR_setgroups  	206
+-#define TARGET_NR_fchown  		207
+-#define TARGET_NR_setresuid  	208
+-#define TARGET_NR_getresuid  	209
+-#define TARGET_NR_setresgid  	210
+-#define TARGET_NR_getresgid  	211
+-#define TARGET_NR_chown  		212
+-#define TARGET_NR_setuid  		213
+-#define TARGET_NR_setgid  		214
+-#define TARGET_NR_setfsuid  		215
+-#define TARGET_NR_setfsgid  		216
+-#define TARGET_NR_newfstatat		293
+-
+-#endif
+ 
+ #endif
 -- 
 2.24.1
 
