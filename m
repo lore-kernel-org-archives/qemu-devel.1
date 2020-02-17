@@ -2,81 +2,84 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 931E3C35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 12:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E357C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 12:45:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BF4620725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 12:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 378BA20725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 12:45:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEbYiSiX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF4620725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZ9s+YF+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 378BA20725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3fds-0001gf-IQ
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 07:36:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47713)
+	id 1j3fmL-0003tn-EL
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 07:45:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j3fd5-0000nG-J2
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 07:36:04 -0500
+ (envelope-from <eblake@redhat.com>) id 1j3flS-0003Hy-5D
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 07:44:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j3fd4-00012V-BX
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 07:36:03 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46208)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1j3fd4-00011t-4c; Mon, 17 Feb 2020 07:36:02 -0500
-Received: by mail-oi1-x242.google.com with SMTP id a22so16486358oid.13;
- Mon, 17 Feb 2020 04:36:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6ghKLtGsRz7m25WuINep8mrAhMPyA48fvCj1PGFz9mY=;
- b=GEbYiSiXrs2KuW4HmzQ8zZnw2Srr/eb1XkEo4dT+BPO0NmNDAahIIwpn/FBVmaeRLk
- nD7tXnX5DmakaCbtPEdIkfuGTSwcyFWPJO53zLqwMFQqrvjyZXLMagySxJ5+KVjfaH90
- jYFGuWylpByJgWu/jSla0YYRSwZfrAYbfbomBNicxKaXYF+r1+i35Ni6RN3vbRYMFu+0
- NdmNQY+no99DkoTLftFJv35uRmqxI9qwhU4M5dm+HRLkCRSdtX4YZvSgCYCMftQmgzxS
- QKh4wckOn+aq8M72QshkS8yRzlUYnjbZAM9YlRVu7hHOmxgl5gVACwUglVQG5UEuhueP
- SI3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6ghKLtGsRz7m25WuINep8mrAhMPyA48fvCj1PGFz9mY=;
- b=Fr+XA0VJHf53l9nelUJmk8LIo716ovhMZ6dvrLyE4gzMR9uRaQ6q3ws/jhekFb7+5d
- LgD1TcnuJFbBXfaO8lwmVgrGNmz/1zKK1F7JVJF/qkT0cEl35KrLzsx0XYrwg61ldUSj
- qjUqR/NkSvNliA2gK9PeqPwU7gT/ORyUf5vlV23pZ46OJ2ieeU3N2ty7A23kJSCsDeBB
- 6BOY3mzmSMlZu6DBeJmTeCKCyzI6Wipq6oxvtkB6bMl3++QfqUgBNrxpmMrO9NgVtMPB
- kAI8P+ZsT+FrmBX4Oq6Xiz0VF43tKEkC+MsNC9PNLu0csJ46xFxVhJNM8b5GQsyEldpz
- hYcw==
-X-Gm-Message-State: APjAAAXxmcjNLIdPTmY40p7CX6kajdGppL5Knjl5tB44KuhzmJrsxDso
- hTJo0hFZ4AcOBeUzn05jvuiaAkpp8OMDKjRJUIo=
-X-Google-Smtp-Source: APXvYqyT4nDiEYtol5JsODVgraoGgMEzjp5/HegHRmHG6nkWePpbrshShXb/W630G14DxE4+TlBWsFBaY/s9rPIhoMw=
-X-Received: by 2002:a05:6808:64e:: with SMTP id
- z14mr9348622oih.79.1581942960680; 
- Mon, 17 Feb 2020 04:36:00 -0800 (PST)
+ (envelope-from <eblake@redhat.com>) id 1j3flQ-0008HY-RH
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 07:44:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52130
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j3flQ-0008HL-O5
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 07:44:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581943480;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zW5MTpB5dp8Mci9VizQAHZ9Sueh9e6yOIHeksQiYMNQ=;
+ b=aZ9s+YF+xD8mJz7T8X1/qtRyG1AqW1UmWiZ6xO9qQ4WcLBOaEot6JokUMV4CqcUU6K+qAA
+ Ln6SdLjdysw27bVHAoFiVTjGrk03wk2f+3CmPKL3TCI/GpBNYHNcuussC6kfqNyLaszbWa
+ UYTCuvgSei7jGm75pMdqQTCTxkQFqZU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-240-G3_hCHriP-iSv4XKkcbtPA-1; Mon, 17 Feb 2020 07:44:36 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B31E8801A01;
+ Mon, 17 Feb 2020 12:44:35 +0000 (UTC)
+Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CC2019757;
+ Mon, 17 Feb 2020 12:44:34 +0000 (UTC)
+Subject: Re: QAPI schema for desired state of LUKS keyslots
+To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20200114193350.10830-1-mlevitsk@redhat.com>
+ <20200114193350.10830-3-mlevitsk@redhat.com>
+ <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
+ <20200217103700.GC6309@linux.fritz.box> <87ftf9s8ho.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <c4a5e96b-c894-e49b-235e-2a4fe7f44f53@redhat.com>
+Date: Mon, 17 Feb 2020 06:44:34 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200217095955.11140-1-philmd@redhat.com>
-In-Reply-To: <20200217095955.11140-1-philmd@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 17 Feb 2020 13:35:41 +0100
-Message-ID: <CAL1e-=jkpXbOLsF1dXD0hieWGo6CUd8yXkS_nyTuuqrs-pDs2A@mail.gmail.com>
-Subject: Re: [PATCH v2] configure: Avoid compiling system tools on user build
- by default
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000039f540059ec4ccdb"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <87ftf9s8ho.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: G3_hCHriP-iSv4XKkcbtPA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,176 +91,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:bochs" <qemu-block@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000039f540059ec4ccdb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 2/17/20 6:28 AM, Markus Armbruster wrote:
 
-11:00 AM Pon, 17.02.2020. Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =
-=D1=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> User-mode does not need the sytem tools.
+>>> Proposal:
+>>>
+>>>      { 'enum': 'LUKSKeyslotState',
+>>>        'data': [ 'active', 'inactive' ] }
+>>>
+>>>      { 'struct': 'LUKSKeyslotActive',
+>>>        'data': { 'secret': 'str',
+>>>                  '*iter-time': 'int } }
+>>>
+>>>      { 'struct': 'LUKSKeyslotInactive',
+>>>        'data': { '*old-secret': 'str' } }
+>>>
+>>>      { 'union': 'LUKSKeyslotAmend',
+>>>        'base': { '*keyslot': 'int',
+>>>                  'state': 'LUKSKeyslotState' }
+>>>        'discriminator': 'state',
+>>>        'data': { 'active': 'LUKSKeyslotActive',
+>>>                  'inactive': 'LUKSKeyslotInactive' } }
+>>>
+>>> LUKSKeyslotAmend specifies desired state for a set of keyslots.
+>>
+>> Though not arbitrary sets of keyslots, it's only a single keyslot or
+>> multiple keyslots containing the same secret. Might be good enough in
+>> practice, though it means that you may have to issue multiple amend
+>> commands to get to the final state that you really want (even if doing
+>> everything at once would be safe).
+> 
+> True.  I traded expressiveness for simplicity.
+> 
+> Here's the only practical case I can think of where the lack of
+> expressiveness may hurt: replace secrets.
+> 
+> With this interface, you need two operations: activate a free slot with
+> the new secret, deactivate the slot(s) with the old secret.  There is an
+> intermediate state with both secrets active.
+> 
+> A more expressive interface could let you do both in one step.  Relevant
+> only if the implementation actually provides atomicity.  Can it?
 
-system
+Or put another way, can atomicity be added via 'transaction' later?  If 
+so, reusing one common interface to provide atomicity is nicer than 
+making every interface reimplement atomicity on an ad hoc basis.
 
-> Do not build them by
-> default if user specified --disable-system.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-specifies
-
->
-> This disables building the following binary on a user-only build:
-
-binaries
-
->
-> - elf2dmp
-> - qemu-edid
-> - qemu-ga
-> - qemu-img
-> - qemu-io
-> - qemu-nbd
-> - ivshmem-client
-> - ivshmem-server
->
-> The qemu-user binary is not affected by this change.
-
-binaries are
-
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> v2:
-> - use simpler if/else statement (therefore not adding Richard R-b)
-> - improved description (Aleksandar)
-> ---
->  configure | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/configure b/configure
-> index 16f94cd96b..d1877a60f5 100755
-> --- a/configure
-> +++ b/configure
-> @@ -455,7 +455,7 @@ guest_agent_ntddscsi=3D"no"
->  guest_agent_msi=3D""
->  vss_win32_sdk=3D""
->  win_sdk=3D"no"
-> -want_tools=3D"yes"
-> +want_tools=3D""
->  libiscsi=3D""
->  libnfs=3D""
->  coroutine=3D""
-> @@ -2199,6 +2199,16 @@ else
->      echo big/little test failed
->  fi
->
-> +##########################################
-> +# system tools
-> +if test -z "$want_tools"; then
-> +    if test "$softmmu" =3D "no"; then
-> +        want_tools=3Dno
-> +    else
-> +        want_tools=3Dyes
-> +    fi
-> +fi
-> +
->  ##########################################
->  # cocoa implies not SDL or GTK
->  # (the cocoa UI code currently assumes it is always the active UI
-> --
-> 2.21.1
->
-
---00000000000039f540059ec4ccdb
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<p dir=3D"ltr"></p>
-<p dir=3D"ltr">11:00 AM Pon, 17.02.2020. Philippe Mathieu-Daud=C3=A9 &lt;<a=
- href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; =D1=98=D0=B5 =
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; From: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.or=
-g">f4bug@amsat.org</a>&gt;<br>
-&gt;<br>
-&gt; User-mode does not need the sytem tools.</p>
-<p dir=3D"ltr">system</p>
-<p dir=3D"ltr">&gt; Do not build them by<br>
-&gt; default if user specified --disable-system.</p>
-<p dir=3D"ltr">specifies</p>
-<p dir=3D"ltr">&gt;<br>
-&gt; This disables building the following binary on a user-only build:</p>
-<p dir=3D"ltr">binaries</p>
-<p dir=3D"ltr">&gt;<br>
-&gt; - elf2dmp<br>
-&gt; - qemu-edid<br>
-&gt; - qemu-ga<br>
-&gt; - qemu-img<br>
-&gt; - qemu-io<br>
-&gt; - qemu-nbd<br>
-&gt; - ivshmem-client<br>
-&gt; - ivshmem-server<br>
-&gt;<br>
-&gt; The qemu-user binary is not affected by this change.</p>
-<p dir=3D"ltr">binaries are</p>
-<p dir=3D"ltr">&gt;<br>
-&gt; Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug=
-@amsat.org">f4bug@amsat.org</a>&gt;<br>
-&gt; ---<br>
-&gt; v2:<br>
-&gt; - use simpler if/else statement (therefore not adding Richard R-b)<br>
-&gt; - improved description (Aleksandar)<br>
-&gt; ---<br>
-&gt; =C2=A0configure | 12 +++++++++++-<br>
-&gt; =C2=A01 file changed, 11 insertions(+), 1 deletion(-)<br>
-&gt;<br>
-&gt; diff --git a/configure b/configure<br>
-&gt; index 16f94cd96b..d1877a60f5 100755<br>
-&gt; --- a/configure<br>
-&gt; +++ b/configure<br>
-&gt; @@ -455,7 +455,7 @@ guest_agent_ntddscsi=3D&quot;no&quot;<br>
-&gt; =C2=A0guest_agent_msi=3D&quot;&quot;<br>
-&gt; =C2=A0vss_win32_sdk=3D&quot;&quot;<br>
-&gt; =C2=A0win_sdk=3D&quot;no&quot;<br>
-&gt; -want_tools=3D&quot;yes&quot;<br>
-&gt; +want_tools=3D&quot;&quot;<br>
-&gt; =C2=A0libiscsi=3D&quot;&quot;<br>
-&gt; =C2=A0libnfs=3D&quot;&quot;<br>
-&gt; =C2=A0coroutine=3D&quot;&quot;<br>
-&gt; @@ -2199,6 +2199,16 @@ else<br>
-&gt; =C2=A0 =C2=A0 =C2=A0echo big/little test failed<br>
-&gt; =C2=A0fi<br>
-&gt;<br>
-&gt; +##########################################<br>
-&gt; +# system tools<br>
-&gt; +if test -z &quot;$want_tools&quot;; then<br>
-&gt; +=C2=A0 =C2=A0 if test &quot;$softmmu&quot; =3D &quot;no&quot;; then<b=
-r>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 want_tools=3Dno<br>
-&gt; +=C2=A0 =C2=A0 else<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 want_tools=3Dyes<br>
-&gt; +=C2=A0 =C2=A0 fi<br>
-&gt; +fi<br>
-&gt; +<br>
-&gt; =C2=A0##########################################<br>
-&gt; =C2=A0# cocoa implies not SDL or GTK<br>
-&gt; =C2=A0# (the cocoa UI code currently assumes it is always the active U=
-I<br>
-&gt; -- <br>
-&gt; 2.21.1<br>
-&gt;<br>
-</p>
-
---00000000000039f540059ec4ccdb--
 
