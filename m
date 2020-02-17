@@ -2,85 +2,87 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBBF4C7619B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D6ECC7619B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:01:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A84A120857
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:01:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D69720857
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:01:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KHkAvS4Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A84A120857
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i7i4Q4pZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D69720857
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3Wem-0004QY-VZ
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 22:01:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44784)
+	id 1j3Weq-0004W4-Bw
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 22:01:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44840)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j3Wdf-00035Q-2n
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:04 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j3Wdi-00039e-GP
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j3Wdd-0003Mc-DO
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:02 -0500
-Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:40388)
+ (envelope-from <richard.henderson@linaro.org>) id 1j3Wdh-0003TN-Af
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:06 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41593)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j3Wdd-0003LQ-5a
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:01 -0500
-Received: by mail-pl1-x636.google.com with SMTP id y1so6115870plp.7
- for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 19:00:00 -0800 (PST)
+ id 1j3Wdh-0003SX-4L
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:05 -0500
+Received: by mail-pf1-x443.google.com with SMTP id j9so8056577pfa.8
+ for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 19:00:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=lfZ/gSeSSwO+iUrhXjDeYzuRwSvkE5pc/x6+ENqbncI=;
- b=KHkAvS4YHLTytdeAX1l5JU/D4BGW2/n6DS3hRxGn+0SD51n7FogMTQhL4tRdLbVPcv
- FCEeoBLTYNT7anmh2oEzN2+pJiSRT80ziWr+YvqyjedUJkM6F9APVa0bks7TbBSy9rQU
- 2CvQPdfbUr1c9/LB1algsUyAwwFLG9MyQzk8EMdgYgUzgaznNcJjBvmGIl3uWzb55GgV
- +BYuwG190rLOF6trzUuhKTrqViInxG/K0lBR3X4XgNt/bwTFBcUzedUYMHPMo8abGLEa
- adpZQ3Hl+T+RXeFKN5QQm6IXmW3ci6PEKzZltG36NxNvt+TcBEcqNk1WlKPeHQ/SdUY4
- pNqw==
+ bh=cjiEN6evoksJ22gJdgVrmGMglErN9l7nWJMK6r0f5rQ=;
+ b=i7i4Q4pZA4H2J35Cy+dVfly48eWVsHZF+Rs8aiG031mgvOOcSKvQz7Wk/LYlH7ITRV
+ uqKSf2zqmdGJNm3K9RClSeBVR+lkV8Aqa8PNHN5ryxpdJhrjutvj6vJ5ESM4Cc2YmO6q
+ +pev00wULzQEqI6Aha04yo6qR9ywfPf0SerxKdLaL4EETeoEQ3RJzb8YAfs0JbPuvzn0
+ PVBM36DSCRocyGHuYO8EMhWapbQi14kspcVLsr8/9k/zdJc0FORg+hZI5Q2huVyzFMiB
+ JUF15y9bENxdKvLq0DWHhI/Sbp/UdBG7qfzU6xJnwQRSHEi+jYr5z0/AZzpXjxvFQMeQ
+ UeFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=lfZ/gSeSSwO+iUrhXjDeYzuRwSvkE5pc/x6+ENqbncI=;
- b=ILat4dW4+yN+sTjUm+Gm/uQ0YLWcPpUCQye9Fc6uzUcm4T5ze7CGJQcjFzydTYekUA
- EaQL2n1l/0okhWKp+dAOueBmZ63tlkzLdQIPcYfVW67EKVAKug1jhqKrEKRKJtPYOVaM
- jJ9MowkxxWQNPbRT+ZQritgIDKoTaTofaZQPGTNe5zK8CHYoQA4KIFrOqoqYSXmpjP95
- ko2ZSHAQwfTSTo02ZTyD4n9kH9TjOPCz0vIhwxi5h3XU+JPOyz8nhKJDz+lHlmvFZrvq
- RhFMzv5E1aJMk4mJos46/+rxaZAiHtLMmOw5OovVnoJV80bsfkbvqO5kM2Jm1gdWhGRN
- KKLw==
-X-Gm-Message-State: APjAAAUe0BdO8nnHFp4H34XSrQCJfRfh37Oih73LFZUun2W+1SkruOUs
- TYKO6rH6TjGP+AuD3llKRHiK+UARfDk=
-X-Google-Smtp-Source: APXvYqwYnJIZ0yKyBIJOWOEC7Lr2UGGcDSeMcSclEq5jCQ1MazirNlyXvybKn+OtZKcluof58dbr+Q==
-X-Received: by 2002:a17:90b:97:: with SMTP id
- bb23mr16545483pjb.53.1581908399037; 
- Sun, 16 Feb 2020 18:59:59 -0800 (PST)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=cjiEN6evoksJ22gJdgVrmGMglErN9l7nWJMK6r0f5rQ=;
+ b=oJKoCkb9ZZvnXwld7+ZTfgN6kROpztw85kWjqnMdgrBjPLyu1KVTYod3ZCsr4q040q
+ 6zBrthLb4E7TvxMM0sw08ivjK5FEIqop6yRFHPHKY6OfnpbK8O4GuQ0jtRh277mDU9Sp
+ 3SwsJMJdQmgYv5zAKGG7IIHE8LXoum2k1fgD/vXaIJehDkF5vx0AGboNmZIoAGHvtDTr
+ +HRwfklrj3JMhYn+iGxaY05Unm2OtyZiIP58bYpYMbHnONfmZuhVmjFPQU0uunHF4Pq+
+ CGhF0WV8xWQ0TXfCZhsBEImIzDtDxJPKeYd2y/Ma54o9JphcQYZrpS1SQJVV/29jTW6R
+ /lOA==
+X-Gm-Message-State: APjAAAUEfCYG7JbXvzSYjVVLIcK0qJ6CIPnGlcwEdiVlAbppKfr41oj+
+ Fa7fuckK7u0Ps9MwC0ZbPm8dOQF1HyQ=
+X-Google-Smtp-Source: APXvYqy1DTVzAfZCwiZ8savqZ9LwwqLM2AfrIY889WCLZ3Qh2MMIxwJmost7N8xD739Sn3EhhQA6nA==
+X-Received: by 2002:aa7:9aa7:: with SMTP id x7mr14129890pfi.78.1581908403728; 
+ Sun, 16 Feb 2020 19:00:03 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id u2sm14741060pgj.7.2020.02.16.18.59.58
+ by smtp.gmail.com with ESMTPSA id u2sm14741060pgj.7.2020.02.16.19.00.02
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 16 Feb 2020 18:59:58 -0800 (PST)
+ Sun, 16 Feb 2020 19:00:02 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/4] tcg: Fix for Bug 1863508
-Date: Sun, 16 Feb 2020 18:59:53 -0800
-Message-Id: <20200217025957.12031-1-richard.henderson@linaro.org>
+Subject: [PATCH 4/4] tcg: Remove tcg-runtime-gvec.c DO_CMP0
+Date: Sun, 16 Feb 2020 18:59:57 -0800
+Message-Id: <20200217025957.12031-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200217025957.12031-1-richard.henderson@linaro.org>
+References: <20200217025957.12031-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::636
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,36 +98,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The comment in tcg-runtime-gvec.c about CONFIG_VECTOR16 says that
-tcg-op-gvec.c has eliminated size 8 vectors, and only passes on
-multiples of 16.  This may have been true of the first few operations,
-but is not true of all operations.
-    
-In particular, multiply, shift by scalar, and compare of 8- and 16-bit
-elements are not expanded inline if host vector operations are not
-supported.
-    
-For an x86_64 host that does not support AVX, this means that we will
-fall back to the helper, which will attempt to use SSE instructions,
-which will SEGV on an invalid 8-byte aligned memory operation.
-    
-The first patch removes the CONFIG_VECTOR16 code and configuration;
-the subsequent patches tidy up tcg-runtime-gvec.c.
+Partial cleanup from the CONFIG_VECTOR16 removal.
+Replace DO_CMP0 with its scalar expansion, a simple negation.
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ accel/tcg/tcg-runtime-gvec.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-r~
-
-
-Richard Henderson (4):
-  tcg: Remove CONFIG_VECTOR16
-  tcg: Tidy tcg-runtime-gvec.c types
-  tcg: Tidy tcg-runtime-gvec.c DUP*
-  tcg: Remove tcg-runtime-gvec.c DO_CMP0
-
- configure                    |  56 -------
- accel/tcg/tcg-runtime-gvec.c | 298 ++++++++++++++---------------------
- 2 files changed, 116 insertions(+), 238 deletions(-)
-
+diff --git a/accel/tcg/tcg-runtime-gvec.c b/accel/tcg/tcg-runtime-gvec.c
+index f2199f14b4..ca449702e6 100644
+--- a/accel/tcg/tcg-runtime-gvec.c
++++ b/accel/tcg/tcg-runtime-gvec.c
+@@ -860,15 +860,13 @@ void HELPER(gvec_sar64v)(void *d, void *a, void *b, uint32_t desc)
+     clear_high(d, oprsz, desc);
+ }
+ 
+-#define DO_CMP0(X)  -(X)
+-
+ #define DO_CMP1(NAME, TYPE, OP)                                            \
+ void HELPER(NAME)(void *d, void *a, void *b, uint32_t desc)                \
+ {                                                                          \
+     intptr_t oprsz = simd_oprsz(desc);                                     \
+     intptr_t i;                                                            \
+     for (i = 0; i < oprsz; i += sizeof(TYPE)) {                            \
+-        *(TYPE *)(d + i) = DO_CMP0(*(TYPE *)(a + i) OP *(TYPE *)(b + i));  \
++        *(TYPE *)(d + i) = -(*(TYPE *)(a + i) OP *(TYPE *)(b + i));        \
+     }                                                                      \
+     clear_high(d, oprsz, desc);                                            \
+ }
+@@ -886,7 +884,6 @@ DO_CMP2(16)
+ DO_CMP2(32)
+ DO_CMP2(64)
+ 
+-#undef DO_CMP0
+ #undef DO_CMP1
+ #undef DO_CMP2
+ 
 -- 
 2.20.1
 
