@@ -2,97 +2,90 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED83C761A1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A73C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:43:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 790792070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:37:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FF67206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:43:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BVj48yWg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 790792070B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnXVEDPs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FF67206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3cqM-0007q7-L1
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 04:37:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52860)
+	id 1j3cwD-0003t4-Qi
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 04:43:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j3cpL-0006WW-QA
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:36:32 -0500
+ (envelope-from <philmd@redhat.com>) id 1j3cvQ-0002Qg-R2
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j3cpK-0006DK-NQ
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:36:31 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38611
+ (envelope-from <philmd@redhat.com>) id 1j3cvP-00042G-Oi
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:48 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27511
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3cpK-0006CD-JA
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:36:30 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3cvP-00040M-L1
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581932189;
+ s=mimecast20190719; t=1581932566;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TZi/DjLez6TDm2dgSixwb0Zd5B0VmtevtckyJ3+zbdI=;
- b=BVj48yWgLYHO0WJ32upTyyxYAXu85/mxlGmQEQT9bEHazUQXPlqBLgBiC665qvfGfH6/N6
- 8ifTBn0zHqew+CBpeuXIAuvkKt3JFdh6Cob/k3Y92x2Z0oGr+qKYQzjHVWwgLUY4WZWkpu
- 3mrXkSikp/PRXze3DOCB+g2C2cpQR48=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-TR3j9C8gM_GDY5UNzPIuRA-1; Mon, 17 Feb 2020 04:36:24 -0500
-Received: by mail-wr1-f72.google.com with SMTP id w17so8681439wrr.9
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 01:36:24 -0800 (PST)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=avE5b+uApkPkVbTUzQsA+6m2Hgms1wpG9iE4nWPQ6Mk=;
+ b=KnXVEDPsRRcNi2CcyXhK3Vo3Nro0+AuPpQoCgPDgyWplU5nMCiDaLD4xxN82NmmL8LgFSu
+ e+1mBrLgK5lFRLHvjsIAq6P/FEHQKshPs/Qr1DmXkYeubCABYJ8VfDvDoOz18JhIUSsDRf
+ idqC1lZjtag8ngT3djbMRtpzQLop7CA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-P6vLjSAIN--A7xFH6i1jFw-1; Mon, 17 Feb 2020 04:42:43 -0500
+Received: by mail-wm1-f69.google.com with SMTP id q125so6785345wme.1
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 01:42:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=EekdzBwfRxuigwFrRujNicpzo0HFAmDDj8UAkV660GA=;
- b=ZHvtfAxkYIkuxcbptc1E0dcq/a+vKvd0SfO95GCS2TwhKLYtL+7fS10BiTKJjiB0sy
- 8Qs0GCjrv+etosy3QBGJLK8OBjz43jcMtQXrjm0q96BFyma0JYFKjg34gw0VAvh+FWnA
- VkwMbjfuH+tqkYJOyS/+GuAdjXHenzVw4vF56SiHSZUda0rsZXJCwldWFGkLqMQ7HZk3
- B4Kz89nxtB3/6/AI7sq3ELbsY3pm5tp9gPoeY0WnoFcofzDrA486kdZMxxuQ8aeEnnLI
- G26UL86ws0slmncxXBBiTrB52pz2D0WOfB7ZcHGhuxDMThV0wgx/mKvwl/zUFMb5fnFM
- vWkg==
-X-Gm-Message-State: APjAAAVgBKUjBeo5A14o2GAVginnUkEyKaTLYu97w6aKruetoSq7LUYh
- g6XED30NEoimMEIvd5HcwwBv/okrRv99Qt6ZbNzT3UEAAvk1p5OpfsLE93/SGBUSHSItzJHp9Pu
- HXM9h0U+X3GHxyFE=
-X-Received: by 2002:a5d:4d4a:: with SMTP id a10mr22227000wru.220.1581932183156; 
- Mon, 17 Feb 2020 01:36:23 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzWGAgL9zQOxKUqplWz5mtJRfh75V71wgCeBiXBf6Kib5G3XT0pwNeH76bFFz8pyvMGwt88cA==
-X-Received: by 2002:a5d:4d4a:: with SMTP id a10mr22226966wru.220.1581932182907; 
- Mon, 17 Feb 2020 01:36:22 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ bh=MuHBnO/NSlxD8zkdzf5GhFmsSxlbSVesttlYvmiRJb4=;
+ b=bGiMQGhogpRoWgCWnJ5Kj5CSr9OSiBOdLT6K8FYe/deIJC0p0jNmejqb3AYs59nsHC
+ jkvnhQwTZJyl4LZY6UVMQkByV5N4p/6KB6ZFBnhDZOe255/H2Tshk5LIxYTN23ANLTWv
+ ZwAor8e7FJRDztHk3XJZ3MPqTPqxNt2yFIJz/br25c/eNhY4bj6RzcSD5uggDpSdzBV+
+ KbKdctyc4bmeTnTUMvU8Z3wrCnLRS4jIW0jMoL3PDwu09AJAKoNqha8tcQfNonwkfadm
+ Nib5qmBrl8vJbjf1Wi4fr+j11dX7kCvNzkTSw5jnfcDw++xxW/UWakZW2mN5yZy9rvJf
+ UFNQ==
+X-Gm-Message-State: APjAAAXkPCIDIlekW2lZ8rqkAU6C0NNkcFzHMKnJGMEUQUHFfCM1Vtm+
+ YKjqc/+Z5RLPcqcnaSuDfRx0GZy3aBkPJGmCZkMx/dQTnY1YcNQ94PwfGo2ukxuPlSUbfwZZdkQ
+ BIY34aNJSn+vVk7E=
+X-Received: by 2002:adf:d4c7:: with SMTP id w7mr21732969wrk.101.1581932562383; 
+ Mon, 17 Feb 2020 01:42:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxVtCPu0jQWBqlkTSzKF9Ji1DtCyd1xey70jOD41D0fCfpO3v+e3JeBvzB1cG9+KpeRTw9lVg==
+X-Received: by 2002:adf:d4c7:: with SMTP id w7mr21732951wrk.101.1581932562205; 
+ Mon, 17 Feb 2020 01:42:42 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id h2sm112154wrt.45.2020.02.17.01.36.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 01:36:21 -0800 (PST)
-Subject: Re: [PATCH 2/3] tools/virtiofsd/passthrough_ll: Remove unneeded
- variable assignment
-To: =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>
-References: <20200215160716.1262-1-philmd@redhat.com>
- <20200215160716.1262-3-philmd@redhat.com> <20200216212349.GC745061@lpt>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0bc872e5-8dbc-1d8b-d599-83bc85f730c1@redhat.com>
-Date: Mon, 17 Feb 2020 10:36:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by smtp.gmail.com with ESMTPSA id t187sm17789442wmt.25.2020.02.17.01.42.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 17 Feb 2020 01:42:41 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/3] tools/virtiofsd: Fix warning reported by Clang static
+ code analyzer
+Date: Mon, 17 Feb 2020 10:42:37 +0100
+Message-Id: <20200217094240.9927-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200216212349.GC745061@lpt>
-Content-Language: en-US
-X-MC-Unique: TR3j9C8gM_GDY5UNzPIuRA-1
+X-MC-Unique: P6vLjSAIN--A7xFH6i1jFw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
@@ -107,77 +100,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?J=C3=A1n=20Tomko?= <jtomko@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/16/20 10:23 PM, J=E1n Tomko wrote:
-> On Sat, Feb 15, 2020 at 05:07:15PM +0100, Philippe Mathieu-Daud=E9 wrote:
->> Fix warning reported by Clang static code analyzer:
->>
->> =A0=A0 CC=A0=A0=A0=A0=A0 tools/virtiofsd/passthrough_ll.o
->> =A0tools/virtiofsd/passthrough_ll.c:925:9: warning: Value stored to=20
->> 'newfd' is never read
->> =A0=A0=A0=A0=A0=A0=A0=A0 newfd =3D -1;
->> =A0=A0=A0=A0=A0=A0=A0=A0 ^=A0=A0=A0=A0=A0=A0 ~~
->> =A0tools/virtiofsd/passthrough_ll.c:942:9: warning: Value stored to=20
->> 'newfd' is never read
->> =A0=A0=A0=A0=A0=A0=A0=A0 newfd =3D -1;
->> =A0=A0=A0=A0=A0=A0=A0=A0 ^=A0=A0=A0=A0=A0=A0 ~~
->>
->> Fixes: 7c6b66027
->> Reported-by: Clang Static Analyzer
->> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->> ---
->> tools/virtiofsd/passthrough_ll.c | 4 +---
->> 1 file changed, 1 insertion(+), 3 deletions(-)
->>
->> diff --git a/tools/virtiofsd/passthrough_ll.c=20
->> b/tools/virtiofsd/passthrough_ll.c
->> index e9e71d5fc2..b38e0e4d84 100644
->> --- a/tools/virtiofsd/passthrough_ll.c
->> +++ b/tools/virtiofsd/passthrough_ll.c
->> @@ -922,7 +922,6 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t=
-=20
->> parent, const char *name,
->> =A0=A0=A0 inode =3D lo_find(lo, &e->attr);
->> =A0=A0=A0 if (inode) {
->> =A0=A0=A0=A0=A0=A0=A0 close(newfd);
->> -=A0=A0=A0=A0=A0=A0=A0 newfd =3D -1;
->> =A0=A0=A0 } else {
->> =A0=A0=A0=A0=A0=A0=A0 inode =3D calloc(1, sizeof(struct lo_inode));
->> =A0=A0=A0=A0=A0=A0=A0 if (!inode) {
->> @@ -938,8 +937,7 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t=
-=20
->> parent, const char *name,
->> =A0=A0=A0=A0=A0=A0=A0 g_atomic_int_set(&inode->refcount, 2);
->>
->> =A0=A0=A0=A0=A0=A0=A0 inode->nlookup =3D 1;
->> -=A0=A0=A0=A0=A0=A0=A0 inode->fd =3D newfd;
->> -=A0=A0=A0=A0=A0=A0=A0 newfd =3D -1;
->> +=A0=A0=A0=A0=A0=A0=A0 inode->fd =3D -1;
->=20
-> The functional equivalent is:
->  =A0=A0=A0 inode->fd =3D newfd;
->=20
-> newfd cannot contain -1 here, as checked a few lines above:
->  =A0=A0=A0=A0 newfd =3D openat(dir->fd, name, O_PATH | O_NOFOLLOW);
->  =A0=A0=A0=A0 if (newfd =3D=3D -1) {
->  =A0=A0=A0=A0=A0=A0=A0=A0 goto out_err;
->  =A0=A0=A0=A0 }
+Since v1:
+- Addressed J=C3=A1n Tomko review comment
+- Added J=C3=A1n Tomko R-b tag
 
-Correct. I'll respin, thanks for the review!
+Philippe Mathieu-Daud=C3=A9 (3):
+  tools/virtiofsd/passthrough_ll: Remove unneeded variable assignment
+  tools/virtiofsd/passthrough_ll: Remove unneeded variable assignment
+  tools/virtiofsd/fuse_lowlevel: Fix fuse_out_header::error value
 
-> Jano
->=20
->> =A0=A0=A0=A0=A0=A0=A0 inode->key.ino =3D e->attr.st_ino;
->> =A0=A0=A0=A0=A0=A0=A0 inode->key.dev =3D e->attr.st_dev;
->> =A0=A0=A0=A0=A0=A0=A0 pthread_mutex_init(&inode->plock_mutex, NULL);
->> --=20
->> 2.21.1
->>
->>
+ tools/virtiofsd/fuse_lowlevel.c  | 2 +-
+ tools/virtiofsd/passthrough_ll.c | 4 ----
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+--=20
+2.21.1
 
 
