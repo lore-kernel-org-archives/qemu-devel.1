@@ -7,87 +7,86 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C15C34026
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 19:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 601C1C34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 19:28:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43B2D2072C
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 19:27:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 274232072C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 19:28:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UF4Bg2KD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43B2D2072C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fze6/rAs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 274232072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3m2x-0004Iz-Gv
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 14:27:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54972)
+	id 1j3m3u-0005bv-CH
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 14:28:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55105)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j3m1u-0002qM-DU
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 14:26:07 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j3m2g-0004BS-C4
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 14:26:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j3m1t-0001sD-7l
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 14:26:06 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33658)
+ (envelope-from <richard.henderson@linaro.org>) id 1j3m2d-0002L8-GY
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 14:26:54 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38294)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j3m1t-0001ra-1p
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 14:26:05 -0500
-Received: by mail-pf1-x443.google.com with SMTP id n7so9422287pfn.0
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 11:26:04 -0800 (PST)
+ id 1j3m2d-0002Km-BT
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 14:26:51 -0500
+Received: by mail-pf1-x441.google.com with SMTP id x185so9410649pfc.5
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 11:26:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=n49T0KPJkB2El29Lj3qPqCF0+aVDqkZrOTmxSKudp24=;
- b=UF4Bg2KDq4mIMsnmGcOFD/Z8YLfK/mn1h98bIfxX0nh3LrJdTcDIBoboR2/4FyEyCj
- 8tBuC1gb90reTB0nGymUe40gp9zkqkXosTZv8s1RxH0L6MIyd/o5Fc52TnMc5dpRS6R3
- /bjwXofN1yqWrVZBIY6KhpapuASEarIKViwrXV5NHqwTjYMhJyQxHzN6wevCYNCUt29u
- BF6QO6wxTBlxoK67Zdk6WkYbOZ3krKK/J8zO7uIk6xD13wWj/xBTGp+tDNt1H3okp3GV
- aN1IXtX34gfaj8RsvdKcpksDJehwf0VPj8EGSpi+fSoFmUgAx622iCJc/8VgJlq/x4Wr
- VPkA==
+ bh=0JXBjTsj59hubbgQEw+E94ZUzjwM8GP16u5Yl6V3o6I=;
+ b=fze6/rAssocoODf4bn7vLxw3/o8jU/NGPRt08m1HuNLPeT8YD7FZapyaDjwAah/VMm
+ k0T/rEn0LntaoH97mSGqwxR1fMYP8JyOmGN20G65P5mHpQ5P7NI5xrL2IErGlX3SuOHk
+ GHaXPOh+dSBWBFRb2eLClsoSNqQThLnwVfD8tMK0fcRdVmR3Woly1meFbZ5fgpcXlHwC
+ QMaq3tI0OYiC/e1aGIW6v2kH/AGqeLUJFwUDAZdPoVjPe7wqvkfTmblWkL5/ppECBf2u
+ RBUmrC0I4qxRFcgkIMwpHQXC2xoxLuzzBVFxljA/WQO41/h94Zm1kSkK3zOlG7nQNGUW
+ WPIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=n49T0KPJkB2El29Lj3qPqCF0+aVDqkZrOTmxSKudp24=;
- b=Xwo7CmVavv2H+h1Ynyp5hJgcN+Eb+h/MCJ+9nGSnwVVUpweVx1gpPBzWq99JxyfAhX
- gkqXLE5i+ZktJ1+0sPtjC2fapRrIpd75+WP5Lc5KX8JhxVXLZOear3uZ1tMqh1JhdJvF
- SS0Z7fIEmTnfgHhXmE0QtBItqP1SoJWMy91GBXuxCw+QaZg9rIGaYpMs85lIeFSO74/z
- fQlZBl2Uee0VDKiWN0MF5Ln107U8Xw2uW8lM3BeD6iwYm42CW0uTLz9UruOoY3zQLwKU
- v87dACexfx547rL3Dyu6qsf42fabCAAkfeHVQ5thnaKui8fuP4SBfq3y9GgEW6zBrsoJ
- hcGw==
-X-Gm-Message-State: APjAAAU4Y2LGmBIDBHMptAJs0TZBdcdEOSQisrjIGVry6DGbLh20y2RS
- wya0R+RJHKpnFzXWZy4Q5Ab1iA==
-X-Google-Smtp-Source: APXvYqyYDi/vW5T8/XhGQsGFzFXVnvPsQIqAk5yyZ2+UpP8cNNkrcOZXrkcVvduKElU+oUF5aA2SWA==
-X-Received: by 2002:a17:90a:200d:: with SMTP id
- n13mr697304pjc.16.1581967563899; 
- Mon, 17 Feb 2020 11:26:03 -0800 (PST)
+ bh=0JXBjTsj59hubbgQEw+E94ZUzjwM8GP16u5Yl6V3o6I=;
+ b=Vv2GbSnFInGjyDzdRBvIJZjvAXb1DA31G//LcddO02NKU5OqairWt1/QjeEPmf7pXK
+ QmImlSDMJv5ACcE2fCypZuA2GuU8IAyfweWaiAbV3uCcAywL5yAYSoBx4Wd1rKmmnGc0
+ pelWQHVep/j1zvtGspj0mZRVXU/c7lJNpovOn6k7VXkuN71RWFCGXQXxl3qWdXWA+dm+
+ yVFWlC/7+Ti5m0gL7ZnNjzBJY14YNcr2M4iJksNmGw285IaA++MzPzjrsjCu427xw7V6
+ Jjj5bRUOJZTIoTLwBEbHPss1YIxF8rU8lfZiWVhN1eC9iqNqqTild/0UpwlQHluLIRTe
+ ctUg==
+X-Gm-Message-State: APjAAAUcb7/Icd7/gQCDPNoTZiGCx+U/0UpnYS8oXC4BeDXk/cGAo+7z
+ 8JwqPdkC5wdoBo69RX/MAI2F7VkkaLo=
+X-Google-Smtp-Source: APXvYqxYyoC5rw0L96MNNuj1dR9xtnD49q7VDtQiNqCMynx1hcquR3HCPvLHVAP73l8Q9I/kcdi2Qw==
+X-Received: by 2002:aa7:8392:: with SMTP id u18mr18059476pfm.41.1581967610521; 
+ Mon, 17 Feb 2020 11:26:50 -0800 (PST)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- 17sm1178740pfv.142.2020.02.17.11.26.03
+ z64sm1282764pfz.23.2020.02.17.11.26.49
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 11:26:03 -0800 (PST)
-Subject: Re: [PATCH v5 38/79] s390x/s390-virtio-ccw: use memdev for RAM
+ Mon, 17 Feb 2020 11:26:49 -0800 (PST)
+Subject: Re: [PATCH v5 39/79] null-machine: use memdev for RAM
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <20200217173452.15243-1-imammedo@redhat.com>
- <20200217173452.15243-39-imammedo@redhat.com>
+ <20200217173452.15243-40-imammedo@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <89b717a7-9361-2902-efdc-47b935e07047@linaro.org>
-Date: Mon, 17 Feb 2020 11:26:01 -0800
+Message-ID: <347d70ca-f0da-929f-9ecc-1317f49b8a24@linaro.org>
+Date: Mon, 17 Feb 2020 11:26:48 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200217173452.15243-39-imammedo@redhat.com>
+In-Reply-To: <20200217173452.15243-40-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,10 +114,6 @@ On 2/17/20 9:34 AM, Igor Mammedov wrote:
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
-> Tested-by: Halil Pasic <pasic@linux.ibm.com>
-> Acked-by: Halil Pasic <pasic@linux.ibm.com>
 > ---
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
