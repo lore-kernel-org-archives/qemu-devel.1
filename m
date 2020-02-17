@@ -4,76 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB94BC34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 21:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 231FEC34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 21:09:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 847F220725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 21:09:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE83620725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 21:09:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BfXdRVPR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 847F220725
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HFLzAI0Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE83620725
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3ndj-0003cx-NZ
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 16:09:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41210)
+	id 1j3neO-0004qM-49
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 16:09:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41583)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1j3nd2-0002FC-13
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 16:08:32 -0500
+ (envelope-from <groeck7@gmail.com>) id 1j3ndd-0003h4-No
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 16:09:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1j3nd1-00088i-3V
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 16:08:31 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34434)
+ (envelope-from <groeck7@gmail.com>) id 1j3ndc-0008TE-Qq
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 16:09:09 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36826)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <groeck7@gmail.com>)
- id 1j3ncy-00087J-Nx; Mon, 17 Feb 2020 16:08:28 -0500
-Received: by mail-pf1-x442.google.com with SMTP id i6so9552213pfc.1;
- Mon, 17 Feb 2020 13:08:28 -0800 (PST)
+ id 1j3nda-0008Re-Rf; Mon, 17 Feb 2020 16:09:06 -0500
+Received: by mail-pg1-x542.google.com with SMTP id d9so9862349pgu.3;
+ Mon, 17 Feb 2020 13:09:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id;
- bh=4W8ac1dYsXHMdhBg8YUpwrP/cAv1a4OAvhptQKJ56As=;
- b=BfXdRVPRawhRZquebRHNooYXxntVh8rTF5sB17PRyYahYualveqfXII9RDCBqcxdha
- OfyqxZcCzYDQg/uL/5csxoIfDq7m0KX7L4Q8SHNScqHlWJQFd1mkNpyio0t8Ks1Y665v
- KJbVlnwzl24+VPTp2QSSdJp84YdDiFzbSHiWPApgNUZtz0KM+F1b+QQjCJlK8UbtJYL8
- 8s/E9xLMRjLZ0x53Fh2D/0pC7hJF7+I/hFGojFipSkQVIiwxM6O55VLqErzQ55Rkt0TD
- ZFa/HK8NJE+KOAqNXtlJgVYJJErDjftASR7z2/BEoOniNeCV76FVglrDNDkrwtGjiYT7
- pORw==
+ bh=GQgJidPFXL9L+5VnERG3WiMD3P/4Nq4D9jL2IVB/SHk=;
+ b=HFLzAI0Qz2d9N2KTZKMjXm/yrQNnfkPwI22PNo2Tbt/FX4R0TjCJBrC88mBMYIuFOi
+ RMj+6OQTwxEVd4gvGHCy+o6yG4N2uAGms7NFTbCTggjLFT279LQulPDQ7nPViHYL+Pjx
+ ORqmWuIXXV9drPQn9jwkEWN5qOrhB+A2cm89+uMkS8wDPOxSgSP9DCRuBhLvg7fYZFfL
+ YGgilcVnHgcPQymtbrq4KaCyQt0g8DeHhv5R6R/sS55HQhANjzZRITFCRcIsDWvj1r+P
+ IV/Y6/2jeEyPqgC5lO/0wBNUVwSOhuh9dpLtR/9S65j3CIzFRDW+VTdhmoL64IMaZ65h
+ aRmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=4W8ac1dYsXHMdhBg8YUpwrP/cAv1a4OAvhptQKJ56As=;
- b=sV+yFJTQMCkmuKnoMpQ0uSl0xYRYMi2sJqouGNOzQp0bT8UHxbs3xQoRajLU/kP/TI
- +3yKeFxt4x96Kd2/uvfLQ+SyCNHgVSHU0ne3ygaa6P4SPet1Ke8mR34I0p9IE0SHh0Du
- pAlsWw1ZidDHHEgL0olAHwmgiInhv9kWGcjVrb9QDAD15qGUj2iAVbDz/F8vqBshwsBs
- DcbeXWNoTnoI6PeuetdsyWW0xVbnSpF1vRE8sC0e2gXwl11A899x8yv52A+PrI1yLwjw
- 79e86dym81v9zuf0UI0EbkzzfR4DrE+Dcc0zv1Vrbo1g013o4jw0TAyvE97FaTqnrR4C
- iLoA==
-X-Gm-Message-State: APjAAAXrvc/oN+N4xWeF9dOWtY88SIocdxrEilAj8LDWZNKvnEZ1o3GW
- z7kV2VUY0mTKp3DabMQrVuc=
-X-Google-Smtp-Source: APXvYqxJ8kz78ZWc1Oc+foG66spTEE673+BrZZ3DJfTOtMY/vLSE2MQ+9I/nLEg/VdqGFedV2/zoxA==
-X-Received: by 2002:aa7:84cd:: with SMTP id x13mr18955649pfn.130.1581973707334; 
- Mon, 17 Feb 2020 13:08:27 -0800 (PST)
+ bh=GQgJidPFXL9L+5VnERG3WiMD3P/4Nq4D9jL2IVB/SHk=;
+ b=SPZB6x5mb3LKsOu5osu2HCJM/zWE7HxDfM3a3jb7Vrr1pRsuiRZ+YthEpjoOWaYCuI
+ 4/ZIbpwsvu2OSRjaklIZ/eYBinXHKvVyA9Fg5S72YydBlDQu3KBhyV6Jkrj2wlwb1zYC
+ R+ZCIHdnyjoVM1wh7t9KaceBeITZtdi7gzVeSdZJOx5+WJAQUfGqosoKpMSHgOTfrTVl
+ vy/APJxFMz0SZFIT1H9fMW8Glq3MbsPcA+z3Wh/s1jRS/MdcIaTWjmsrcq8+nYRbroMA
+ VkTYC+KqOWtgnycf5JpSECiSbtpZdvQY4sDv9y44TY0KI+F+mkRuWEC+HQBaEZMtWHsA
+ zfmQ==
+X-Gm-Message-State: APjAAAWXW0c0FC5FFl2qg9dvYIPpjZfN+tLPhfgTnq4vK/ny0UVcnl/K
+ 3ouNMD3edBjfEEy4zFqP8co=
+X-Google-Smtp-Source: APXvYqw22Y7+GUItDenCv8bMW2LrO43v/OZYYuWqrBUGKaG8E4TP2qhCaBXpS6MITeUMMQ90rro+yg==
+X-Received: by 2002:a63:d845:: with SMTP id k5mr18675513pgj.183.1581973745917; 
+ Mon, 17 Feb 2020 13:09:05 -0800 (PST)
 Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id q187sm1292509pfq.185.2020.02.17.13.08.26
+ by smtp.gmail.com with ESMTPSA id e9sm344058pjt.16.2020.02.17.13.09.05
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 17 Feb 2020 13:08:26 -0800 (PST)
+ Mon, 17 Feb 2020 13:09:05 -0800 (PST)
 From: Guenter Roeck <linux@roeck-us.net>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH] mainstone: Make providing flash images non-mandatory
-Date: Mon, 17 Feb 2020 13:08:24 -0800
-Message-Id: <20200217210824.18513-1-linux@roeck-us.net>
+Subject: [PATCH] z2: Make providing flash images non-mandatory
+Date: Mon, 17 Feb 2020 13:09:03 -0800
+Message-Id: <20200217210903.18602-1-linux@roeck-us.net>
 X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,41 +91,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Up to now, the mainstone machine only boots if two flash images are
-provided. This is not really necessary; the machine can boot from initrd
-or from SD without it. At the same time, having to provide dummy flash
-images is a nuisance and does not add any real value. Make it optional.
+Up to now, the z2 machine only boots if a flash image is provided.
+This is not really necessary; the machine can boot from initrd or from
+SD without it. At the same time, having to provide dummy flash images
+is a nuisance and does not add any real value. Make it optional.
 
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- hw/arm/mainstone.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ hw/arm/z2.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index b01ce3ce08..6e64dfab50 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -138,19 +138,10 @@ static void mainstone_common_init(MemoryRegion *address_space_mem,
-     /* There are two 32MiB flash devices on the board */
-     for (i = 0; i < 2; i ++) {
-         dinfo = drive_get(IF_PFLASH, 0, i);
--        if (!dinfo) {
--            if (qtest_enabled()) {
--                break;
--            }
--            error_report("Two flash images must be given with the "
--                         "'pflash' parameter");
--            exit(1);
--        }
+diff --git a/hw/arm/z2.c b/hw/arm/z2.c
+index 34794fe3ae..4bb237f22d 100644
+--- a/hw/arm/z2.c
++++ b/hw/arm/z2.c
+@@ -314,12 +314,6 @@ static void z2_init(MachineState *machine)
+     be = 0;
+ #endif
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+-    if (!dinfo && !qtest_enabled()) {
+-        error_report("Flash image must be given with the "
+-                     "'pflash' parameter");
+-        exit(1);
+-    }
 -
-         if (!pflash_cfi01_register(mainstone_flash_base[i],
-                                    i ? "mainstone.flash1" : "mainstone.flash0",
-                                    MAINSTONE_FLASH,
--                                   blk_by_legacy_dinfo(dinfo),
-+                                   dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-                                    sector_len, 4, 0, 0, 0, 0, be)) {
-             error_report("Error registering flash memory");
-             exit(1);
+     if (!pflash_cfi01_register(Z2_FLASH_BASE, "z2.flash0", Z2_FLASH_SIZE,
+                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+                                sector_len, 4, 0, 0, 0, 0, be)) {
 -- 
 2.17.1
 
