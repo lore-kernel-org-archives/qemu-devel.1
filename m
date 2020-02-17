@@ -7,85 +7,86 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B51C34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86297C34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93D5E207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:53:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 527AD207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:53:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NKnDh2v4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93D5E207FD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eIl9vlIW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 527AD207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3lWC-0003CT-RD
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:53:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49701)
+	id 1j3lWj-0004cw-J2
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:53:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49485)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j3lV9-0001Xu-Qc
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:52:16 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j3lTU-0008HM-3Y
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:50:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j3lV8-0004y1-Tp
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:52:15 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37882)
+ (envelope-from <richard.henderson@linaro.org>) id 1j3lTT-00047D-6k
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:50:32 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37952)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j3lV8-0004w2-OM
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:52:14 -0500
-Received: by mail-pg1-x544.google.com with SMTP id z12so9688427pgl.4
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 10:52:14 -0800 (PST)
+ id 1j3lTS-000471-Vc
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:50:31 -0500
+Received: by mail-pf1-x444.google.com with SMTP id x185so9358217pfc.5
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 10:50:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=OrQ87Mo1G4nIGFgelk22OWo/vzSSWntxzmTb97TOftk=;
- b=NKnDh2v49bwLVGn7huEo5U4p3GLyI/WaEF9xoj1Qd1eGJj777HPBbx7JRtatt13uwu
- P2rlWGWDQdLwwZtu963fVaxxAGDwsVxmfCHzFQLQV4z7p/mjLKfBivYWXoXtSePX1Cri
- etSRQbDcRpqOgJ+95YQ7RUezgBY8zZoqf7+Y0Yvd8at5XtkZh7SaI1dakII68jJItujw
- MJI30EpoVmeT8uxdISr2n95W08P/ZTV68Cv7nI+CMapbA7gLttNF7uhQQ/33/Fcr8/9+
- w8mhOjbQQ0Z1tw15ia26cdvPAspKMK1v/7Nz4UUCszqLcNhvDOcDVXnIFSmBT8y+yaPg
- TnsA==
+ bh=fmbTXOEcwbaTxMPBVv5CSXlE7RqeZwMUctSjQKqMkCU=;
+ b=eIl9vlIWvreIoRYHd0gkzeFgvTrs0iVQfzGF/VteBXlQQGrF5DC9qik8SIVnIEEaqj
+ p3D4PpEUO+0zxXcbog6skouZlr9tkwHq2uDKhD2xZoA3pDJifXsuIvO8II78HOe8Q3vZ
+ OHX3e+p6dEcxNK2ZdJKyxiY6zo8u0zLdP4EOPKy3qE+h/HE7CgPbSP8S68bg7KVgvMqZ
+ GM4EmihT5705dAxtaYBRMjoDYqnlcDP81/wo5lLdJVnVhEm+guN85cXO+kGLtWJCapeq
+ r/j80OzjEUk4sbTLBoGBNzMATtMjdXlqDg04HhHuk9fPWWQxo2Jpo2+TU1RlxBJ1uvuG
+ 9CkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=OrQ87Mo1G4nIGFgelk22OWo/vzSSWntxzmTb97TOftk=;
- b=Bd4FBDXIsGt2DbJC712KOgraS0Z5NKIbhRu41XojaoLv8i/Fd4zBDwTjLn/1dMBvKU
- 9IYcZi7zvHQhRj0m/WnNmUiTXEu5MhSgRNl8U9nBKJ+O4nkBkPmkDEJGL6xKwjh35fun
- x5hC+I7sDpo+S3uFT/pRgETR6rTaNpV06OhpxI4PyS/DwyWCawXxiZJjToEKpVysZVfX
- wcpKaROkGRtBrZZhcMbA/heIdQ6eDd29tiRxo1DcN+ed7fVudnS8oi3fszUZIGRE39hC
- ZGQq20z4F9Uqq9HCGsHF1hvlbdGMZliwoPjpvV44BkAHFlPdX5hO9OxKM8mVn+drcp5A
- 9erw==
-X-Gm-Message-State: APjAAAUOYBZ/4Js/UOl62on56KugPTrt9Y6pKrOg6f9NJxTBhDhPkQGG
- AJrhYey5he2mPWlUDmH7aGTuUQ==
-X-Google-Smtp-Source: APXvYqyxWUL1o7jA6JegiLnengOuTKlAc8Ph74hsGj7EcKwKmg3rw5iVmoTOaLEAABmv3yRYs+Ew4A==
-X-Received: by 2002:a63:504f:: with SMTP id q15mr18982560pgl.8.1581965533788; 
- Mon, 17 Feb 2020 10:52:13 -0800 (PST)
+ bh=fmbTXOEcwbaTxMPBVv5CSXlE7RqeZwMUctSjQKqMkCU=;
+ b=PV4u2W7hHg6Qs8bGZe2ThX7GRn2j5A5i6dInjHweIdUSuEoUdhimzUgE3H6Xk+XL+o
+ 6T0VY+V0F/rmFk60JO1coceKEOsTXSElahEfk7FN0d4u8WS73aPPFUGUcWNWbqGQ18up
+ HykbDjXRi00ciddbe9/IpD/tjhDmwxuN/KGWzGjZza42oCcR7JyxPveDaF9ibA9fr086
+ QEJZqh1kW6Yu4K6bylsAj3dXcLDB2qFNnMw/nPfrPIwv4eF62t8IKi/VKF9+lzMxRYQR
+ iG5efpsPcu4045Ty0C2HsryGR6GBSbn8k1+ihEKfn72xuTCHl8CpaM8pYvNLfgK5Po7N
+ 6wAg==
+X-Gm-Message-State: APjAAAXcjbiGDy9u0v8wkfz+bOttepR9hT1uePJg0eJwUiRVylDjB6mP
+ KYPoARzK1D/zYEBG4KBMAstEFw==
+X-Google-Smtp-Source: APXvYqwTyHgSg/cxnKBD8L12fEiq1FOGHlPjtblwqZIi3rlfrTBLeWORyEUBWUqW9Ti8T5WEwgpk8g==
+X-Received: by 2002:a17:90a:ec02:: with SMTP id l2mr539214pjy.12.1581965429922; 
+ Mon, 17 Feb 2020 10:50:29 -0800 (PST)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id 26sm199267pjk.3.2020.02.17.10.52.12
+ by smtp.gmail.com with ESMTPSA id
+ n2sm1607404pgi.48.2020.02.17.10.50.28
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 10:52:13 -0800 (PST)
-Subject: Re: [PATCH v5 14/79] arm/highbank: use memdev for RAM
+ Mon, 17 Feb 2020 10:50:29 -0800 (PST)
+Subject: Re: [PATCH v5 12/79] arm/cubieboard: use memdev for RAM
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <20200217173452.15243-1-imammedo@redhat.com>
- <20200217173452.15243-15-imammedo@redhat.com>
+ <20200217173452.15243-13-imammedo@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <dc95bc98-d3c6-f844-6f1f-9033066ffed2@linaro.org>
-Date: Mon, 17 Feb 2020 10:52:11 -0800
+Message-ID: <228b228f-c7e9-5674-5edd-a565a93be603@linaro.org>
+Date: Mon, 17 Feb 2020 10:50:27 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200217173452.15243-15-imammedo@redhat.com>
+In-Reply-To: <20200217173452.15243-13-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,7 +98,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, robh@kernel.org
+Cc: b.galvani@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,8 +112,11 @@ On 2/17/20 9:33 AM, Igor Mammedov wrote:
 > and using MachineState::ram instead of manually initializing
 > RAM memory region.
 > 
+> PS:
+> While at it, get rid of no longer needed CubieBoardState wrapper.
+> 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 > ---
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
