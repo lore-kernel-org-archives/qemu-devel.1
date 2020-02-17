@@ -2,59 +2,57 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 186FCC761A4
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BF1C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:27:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5A3320836
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:20:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A3320836
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 558E0207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:27:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 558E0207FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3eRU-0000ip-0x
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 06:20:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37398)
+	id 1j3eZ8-0004L6-HY
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 06:27:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <miaoyubo@huawei.com>) id 1j3eQE-0008HB-Hc
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:18:44 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j3eYK-0003l0-NM
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <miaoyubo@huawei.com>) id 1j3eQC-0001UG-Ip
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:18:42 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2717 helo=huawei.com)
+ (envelope-from <balaton@eik.bme.hu>) id 1j3eYI-0001aC-D9
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:27:04 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:44978)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1j3eQB-0001N6-VH
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:18:40 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 1BD0863C877D36EE8998;
- Mon, 17 Feb 2020 19:18:32 +0800 (CST)
-Received: from DESKTOP-D7EVK5B.china.huawei.com (10.173.221.29) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 17 Feb 2020 19:18:25 +0800
-From: Yubo Miao <miaoyubo@huawei.com>
-To: <peter.maydell@linaro.org>, <shannon.zhaosl@gmail.com>
-Subject: [RFC v2 1/1] arm: acpi: pci-expender-bus: Make arm to support PXB-PCIE
-Date: Mon, 17 Feb 2020 19:18:18 +0800
-Message-ID: <20200217111818.766-2-miaoyubo@huawei.com>
-X-Mailer: git-send-email 2.24.1.windows.2
-In-Reply-To: <20200217111818.766-1-miaoyubo@huawei.com>
-References: <20200217111818.766-1-miaoyubo@huawei.com>
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1j3eYH-0001YH-Da; Mon, 17 Feb 2020 06:27:02 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 152FB747DFB;
+ Mon, 17 Feb 2020 12:26:59 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id BD804747DFA; Mon, 17 Feb 2020 12:26:58 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id BB676747DF8;
+ Mon, 17 Feb 2020 12:26:58 +0100 (CET)
+Date: Mon, 17 Feb 2020 12:26:58 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC PATCH 0/2] Enable hardfloat for PPC
+In-Reply-To: <CAFEAcA8zGoFt7TyocG-HEezdsNFoiyT=OWgZdr4qFf7JUSaLkQ@mail.gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2002171155460.74534@zero.eik.bme.hu>
+References: <cover.1581904461.git.balaton@eik.bme.hu>
+ <CAFEAcA8zGoFt7TyocG-HEezdsNFoiyT=OWgZdr4qFf7JUSaLkQ@mail.gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.221.29]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,402 +64,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, miaoyubo@huawei.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, mst@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ John Arbuckle <programmingkidx@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paul Clarke <pc@us.ibm.com>, Howard Spoelstra <hsp.cat7@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: miaoyubo <miaoyubo@huawei.com>
+On Mon, 17 Feb 2020, Peter Maydell wrote:
+> On Mon, 17 Feb 2020 at 02:43, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> Hello,
+>>
+>> This is an RFC series to start exploring the possibility of enabling
+>> hardfloat for PPC target that haven't progressed in the last two years.
+>> Hopefully we can work out something now. Previously I've explored this
+>> here:
+>>
+>> https://lists.nongnu.org/archive/html/qemu-ppc/2018-07/msg00261.html
+>>
+>> where some ad-hoc benchmarks using lame mp3 encoder is also explained
+>> that has two versions: one using VMX and another only using FP. Both
+>> are mostly floating point bounded. I've run this test on mac99 under
+>> MorphOS before and after my patches, also verifying that md5sum of
+>> resulting mp3 matches (this is no proof for correctness but maybe
+>> shows it did not break too much at least those ops used by this
+>> program).
+>
+>> I hope others can contribute to this by doing more testing to find out
+>> what else this would break or give some ideas how this could be
+>> improved.
+>
+> I think the ideal would be to test against a reference using
+> risu to see whether this changes behaviour (FP results should
+> be bit-for-bit identical; usually application level testing is
+> often not sufficient to detect this). You could test either
 
-Currently virt machine is not supported by pxb-pcie,
-and only one main host bridge described in ACPI tables.
-Under this circumstance, different io numas for differnt devices
-is not possible, in order to present io numas to the guest,
-especially for host pssthrough devices. PXB-PCIE is supproted
-by arm and certain resource is allocated for each pxb-pcie
-in acpi table.
+Sure, thanks. I did not mean to claim the simple test I've done was 
+sufficient but I expect others who have interest in this and more 
+experienced in such testing (or even being payed to work on QEMU which I'm 
+not) contribute to this so I did not try testing it more throughly than 
+just showing it could be considerably faster and still work fot at least 
+some workloads so it's worth working on. I'm surprised that in the two 
+years since hardfloat was merged nobody even tried this (or those who did 
+dropped the idea before any results without letting us know). So I tried 
+to make a start with it to explore what would it take to fix this 
+eventually but I don't want to do that alone. I hope this inspires others 
+to help e.g. in thesting and we can reach a solution together.
 
-Signed-off-by: miaoyubo <miaoyubo@huawei.com>
----
- hw/arm/virt-acpi-build.c | 240 +++++++++++++++++++++++++++++----------
- hw/pci-host/gpex.c       |   4 +
- include/hw/arm/virt.h    |   1 +
- 3 files changed, 184 insertions(+), 61 deletions(-)
+> against real hardware or against the non-hardfloat QEMU.
+> I'm not sure how comprehensive the coverage for ppc insns
+> is but there are a fair number of fp insns covered already:
+> https://git.linaro.org/people/peter.maydell/risu.git/tree/
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index bd5f771e9b..fc11525042 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -49,6 +49,8 @@
- #include "kvm_arm.h"
- #include "migration/vmstate.h"
-=20
-+#include "hw/arm/virt.h"
-+#include "hw/pci/pci_bus.h"
- #define ARM_SPI_BASE 32
-=20
- static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
-@@ -151,30 +153,12 @@ static void acpi_dsdt_add_virtio(Aml *scope,
-     }
- }
-=20
--static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
--                              uint32_t irq, bool use_highmem, bool highm=
-em_ecam)
-+static void acpi_dsdt_add_pci_route_table(Aml *dev, Aml *scope,
-+                                          int nr_pcie_buses,
-+                                          uint32_t irq)
- {
--    int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
--    Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
-     int i, bus_no;
--    hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
--    hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
--    hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
--    hwaddr size_pio =3D memmap[VIRT_PCIE_PIO].size;
--    hwaddr base_ecam =3D memmap[ecam_id].base;
--    hwaddr size_ecam =3D memmap[ecam_id].size;
--    int nr_pcie_buses =3D size_ecam / PCIE_MMCFG_SIZE_MIN;
--
--    Aml *dev =3D aml_device("%s", "PCI0");
--    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
--    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
--    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
--    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
--    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
--    aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
--    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
-;
--    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
--
-+    Aml *method, *crs;
-     /* Declare the PCI Routing Table. */
-     Aml *rt_pkg =3D aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
-     for (bus_no =3D 0; bus_no < nr_pcie_buses; bus_no++) {
-@@ -190,7 +174,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
-pEntry *memmap,
-     }
-     aml_append(dev, aml_name_decl("_PRT", rt_pkg));
-=20
--    /* Create GSI link device */
-     for (i =3D 0; i < PCI_NUM_PINS; i++) {
-         uint32_t irqs =3D  irq + i;
-         Aml *dev_gsi =3D aml_device("GSI%d", i);
-@@ -210,42 +193,11 @@ static void acpi_dsdt_add_pci(Aml *scope, const Mem=
-MapEntry *memmap,
-         aml_append(dev_gsi, method);
-         aml_append(dev, dev_gsi);
-     }
-+}
-=20
--    method =3D aml_method("_CBA", 0, AML_NOTSERIALIZED);
--    aml_append(method, aml_return(aml_int(base_ecam)));
--    aml_append(dev, method);
--
--    method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
--    Aml *rbuf =3D aml_resource_template();
--    aml_append(rbuf,
--        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE=
-,
--                            0x0000, 0x0000, nr_pcie_buses - 1, 0x0000,
--                            nr_pcie_buses));
--    aml_append(rbuf,
--        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
--                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base=
-_mmio,
--                         base_mmio + size_mmio - 1, 0x0000, size_mmio));
--    aml_append(rbuf,
--        aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
--                     AML_ENTIRE_RANGE, 0x0000, 0x0000, size_pio - 1, bas=
-e_pio,
--                     size_pio));
--
--    if (use_highmem) {
--        hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
--        hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].size;
--
--        aml_append(rbuf,
--            aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXE=
-D,
--                             AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
--                             base_mmio_high,
--                             base_mmio_high + size_mmio_high - 1, 0x0000=
-,
--                             size_mmio_high));
--    }
--
--    aml_append(method, aml_name_decl("RBUF", rbuf));
--    aml_append(method, aml_return(rbuf));
--    aml_append(dev, method);
--
-+static void acpi_dsdt_add_pci_osc(Aml *dev, Aml *scope)
-+{
-+    Aml *method, *UUID, *ifctx, *ifctx1, *elsectx, *buf;
-     /* Declare an _OSC (OS Control Handoff) method */
-     aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
-     aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
-@@ -253,7 +205,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
-pEntry *memmap,
-     aml_append(method,
-         aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
-=20
--    /* PCI Firmware Specification 3.0
-+    /*
-+     * PCI Firmware Specification 3.0
-      * 4.5.1. _OSC Interface for PCI Host Bridge Devices
-      * The _OSC interface for a PCI/PCI-X/PCI Express hierarchy is
-      * identified by the Universal Unique IDentifier (UUID)
-@@ -298,7 +251,8 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
-pEntry *memmap,
-=20
-     method =3D aml_method("_DSM", 4, AML_NOTSERIALIZED);
-=20
--    /* PCI Firmware Specification 3.0
-+    /*
-+     * PCI Firmware Specification 3.0
-      * 4.6.1. _DSM for PCI Express Slot Information
-      * The UUID in _DSM in this context is
-      * {E5C937D0-3553-4D7A-9117-EA4D19C3434D}
-@@ -316,6 +270,170 @@ static void acpi_dsdt_add_pci(Aml *scope, const Mem=
-MapEntry *memmap,
-     buf =3D aml_buffer(1, byte_list);
-     aml_append(method, aml_return(buf));
-     aml_append(dev, method);
-+}
-+
-+static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-+                              uint32_t irq, bool use_highmem, bool highm=
-em_ecam,
-+                              VirtMachineState *vms)
-+{
-+    int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
-+    Aml *method, *dev, *crs;
-+    int count =3D 0;
-+    hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
-+    hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
-+    hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
-+    hwaddr size_pio =3D memmap[VIRT_PCIE_PIO].size;
-+    hwaddr base_ecam =3D memmap[ecam_id].base;
-+    hwaddr size_ecam =3D memmap[ecam_id].size;
-+    /*
-+     * 0x600000 would be enough for pxb device
-+     * if it is too small, there is no enough space
-+     * for a pcie device plugged in a pcie-root port
-+     */
-+    hwaddr size_addr =3D 0x600000;
-+    hwaddr size_io =3D 0x4000;
-+    int nr_pcie_buses =3D size_ecam / PCIE_MMCFG_SIZE_MIN;
-+    int root_bus_limit =3D 0xFF;
-+    PCIBus *bus =3D NULL;
-+    bus =3D VIRT_MACHINE(vms)->bus;
-+
-+    if (bus) {
-+        QLIST_FOREACH(bus, &bus->child, sibling) {
-+            uint8_t bus_num =3D pci_bus_num(bus);
-+            uint8_t numa_node =3D pci_bus_numa_node(bus);
-+
-+            if (!pci_bus_is_root(bus)) {
-+                continue;
-+            }
-+            if (bus_num < root_bus_limit) {
-+                root_bus_limit =3D bus_num - 1;
-+            }
-+            count++;
-+            dev =3D aml_device("PC%.02X", bus_num);
-+            aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08"))=
-);
-+            aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03"))=
-);
-+            aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-+            aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-+            aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
-+            aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
-+            aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
-+            aml_append(dev, aml_name_decl("_STR", aml_unicode("pxb Devic=
-e")));
-+            if (numa_node !=3D NUMA_NODE_UNASSIGNED) {
-+                method =3D aml_method("_PXM", 0, AML_NOTSERIALIZED);
-+                aml_append(method, aml_return(aml_int(numa_node)));
-+                aml_append(dev, method);
-+            }
-+
-+            acpi_dsdt_add_pci_route_table(dev, scope, nr_pcie_buses, irq=
-);
-+
-+            method =3D aml_method("_CBA", 0, AML_NOTSERIALIZED);
-+            aml_append(method, aml_return(aml_int(base_ecam)));
-+            aml_append(dev, method);
-+
-+            method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
-+            Aml *rbuf =3D aml_resource_template();
-+            aml_append(rbuf,
-+                       aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED,
-+                                           AML_POS_DECODE, 0x0000,
-+                                           bus_num, bus_num + 1, 0x0000,
-+                                           2));
-+            aml_append(rbuf,
-+                       aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED,
-+                                        AML_MAX_FIXED, AML_NON_CACHEABLE=
-,
-+                                        AML_READ_WRITE, 0x0000,
-+                                        base_mmio + size_mmio -
-+                                        size_addr * count,
-+                                        base_mmio + size_mmio - 1 -
-+                                        size_addr * (count - 1),
-+                                        0x0000, size_addr));
-+            aml_append(rbuf,
-+                       aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED,
-+                       AML_POS_DECODE, AML_ENTIRE_RANGE,
-+                       0x0000, (size_pio) / 2 - size_io * count,
-+                       (size_pio / 2) - 1 - size_io * (count - 1),
-+                       base_pio, size_io));
-+
-+            if (use_highmem) {
-+                hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].ba=
-se;
-+                hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].si=
-ze;
-+
-+                aml_append(rbuf,
-+                       aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED,
-+                                        AML_MAX_FIXED, AML_NON_CACHEABLE=
-,
-+                                        AML_READ_WRITE, 0x0000,
-+                                        base_mmio_high + size_mmio_high =
--
-+                                        size_addr * count,
-+                                        base_mmio_high + size_mmio_high =
--
-+                                        1 - size_addr * (count - 1),
-+                                        0x0000, size_addr));
-+            }
-+
-+            aml_append(method, aml_name_decl("RBUF", rbuf));
-+            aml_append(method, aml_return(rbuf));
-+            aml_append(dev, method);
-+
-+            acpi_dsdt_add_pci_osc(dev, scope);
-+
-+            Aml *dev_rp0 =3D aml_device("%s", "RP0");
-+            aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
-+            aml_append(dev, dev_rp0);
-+
-+            aml_append(scope, dev);
-+
-+        }
-+    }
-+
-+    dev =3D aml_device("%s", "PCI0");
-+    aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
-+    aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
-+    aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
-+    aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
-+    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-+    aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
-+    aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
-;
-+    aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-+
-+    acpi_dsdt_add_pci_route_table(dev, scope, nr_pcie_buses, irq);
-+
-+    method =3D aml_method("_CBA", 0, AML_NOTSERIALIZED);
-+    aml_append(method, aml_return(aml_int(base_ecam)));
-+    aml_append(dev, method);
-+
-+    method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
-+    Aml *rbuf =3D aml_resource_template();
-+    aml_append(rbuf,
-+        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE=
-,
-+                            0x0000, 0x0000, root_bus_limit, 0x0000,
-+                            root_bus_limit + 1));
-+    aml_append(rbuf,
-+        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
-+                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base=
-_mmio,
-+                         base_mmio + size_mmio - 1 - size_addr * count,
-+                         0x0000, size_mmio - size_addr * count));
-+    aml_append(rbuf,
-+        aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
-+                     AML_ENTIRE_RANGE, 0x0000, 0x0000,
-+                     size_pio / 2 - 1 - size_io * count, base_pio,
-+                     size_pio / 2 - size_io * count));
-+
-+    if (use_highmem) {
-+        hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
-+        hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].size;
-+
-+        aml_append(rbuf,
-+            aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXE=
-D,
-+                             AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
-+                             base_mmio_high,
-+                             base_mmio_high + size_mmio_high - 1 -
-+                             size_addr * count,
-+                             0x0000, size_mmio_high - size_addr * count)=
-);
-+    }
-+
-+    aml_append(method, aml_name_decl("RBUF", rbuf));
-+    aml_append(method, aml_return(rbuf));
-+    aml_append(dev, method);
-+
-+    acpi_dsdt_add_pci_osc(dev, scope);
-=20
-     Aml *dev_rp0 =3D aml_device("%s", "RP0");
-     aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
-@@ -744,7 +862,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
-     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-                     (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANS=
-PORTS);
-     acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
--                      vms->highmem, vms->highmem_ecam);
-+                      vms->highmem, vms->highmem_ecam, vms);
-     if (vms->acpi_dev) {
-         build_ged_aml(scope, "\\_SB."GED_DEVICE,
-                       HOTPLUG_HANDLER(vms->acpi_dev),
-diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
-index 0ca604dc62..2c18cdfec4 100644
---- a/hw/pci-host/gpex.c
-+++ b/hw/pci-host/gpex.c
-@@ -36,6 +36,7 @@
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "qemu/module.h"
-+#include "hw/arm/virt.h"
-=20
- /***********************************************************************=
-*****
-  * GPEX host
-@@ -98,6 +99,9 @@ static void gpex_host_realize(DeviceState *dev, Error *=
-*errp)
-                                      pci_swizzle_map_irq_fn, s, &s->io_m=
-mio,
-                                      &s->io_ioport, 0, 4, TYPE_PCIE_BUS)=
-;
-=20
-+#ifdef __aarch64__
-+    VIRT_MACHINE(qdev_get_machine())->bus =3D pci->bus;
-+#endif
-     qdev_set_parent_bus(DEVICE(&s->gpex_root), BUS(pci->bus));
-     pci_bus_set_route_irq_fn(pci->bus, gpex_route_intx_pin_to_irq);
-     qdev_init_nofail(DEVICE(&s->gpex_root));
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 71508bf40c..cfc65dd19b 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -140,6 +140,7 @@ typedef struct {
-     DeviceState *gic;
-     DeviceState *acpi_dev;
-     Notifier powerdown_notifier;
-+    PCIBus *bus;
- } VirtMachineState;
-=20
- #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
---=20
-2.19.1
+I don't have real hardware and testing against QEMU may take longer and 
+not sure how useful. There could also be preexisting bugs, although some 
+fixes were made to PPC FP implementation recently. Maybe I'll have a look 
+if have no better things to do but I have other ongoing QEMU related 
+projects as well that I might try to make some progress as well.
 
+> It's also worth testing any alternate/non-standard config
+> modes the FPU might have (eg different default rounding modes,
+> any flush-to-zero or alternate denormal handling, that kind
+> of thing), and not just the default how-the-CPU-boots-up mode.
 
+It is expected to break inexact exceptions currently until a better way 
+can be found to handle those but I think hardfloat is already disabled for 
+other than default rounding modes or FPU settings so maybe those should 
+not break. According to:
+
+https://git.qemu.org/?p=qemu.git;a=blob;f=fpu/softfloat.c;h=301ce3b537b6c0eee5dbbc358587b66a3a341d2a;hb=HEAD#l235
+
+  235 static inline bool can_use_fpu(const float_status *s)
+  236 {
+  237     if (QEMU_NO_HARDFLOAT) {
+  238         return false;
+  239     }
+  240     return likely(s->float_exception_flags & float_flag_inexact &&
+  241                   s->float_rounding_mode == float_round_nearest_even);
+  242 }
+  243
+
+and
+
+https://git.qemu.org/?p=qemu.git;a=blob;f=fpu/softfloat.c;h=301ce3b537b6c0eee5dbbc358587b66a3a341d2a;hb=HEAD#l99
+
+   99 /*
+  100  * Hardfloat
+  101  *
+  102  * Fast emulation of guest FP instructions is challenging for two reasons.
+  103  * First, FP instruction semantics are similar but not identical, particularly
+  104  * when handling NaNs. Second, emulating at reasonable speed the guest FP
+  105  * exception flags is not trivial: reading the host's flags register with a
+  106  * feclearexcept & fetestexcept pair is slow [slightly slower than soft-fp],
+  107  * and trapping on every FP exception is not fast nor pleasant to work with.
+  108  *
+  109  * We address these challenges by leveraging the host FPU for a subset of the
+  110  * operations. To do this we expand on the idea presented in this paper:
+  111  *
+  112  * Guo, Yu-Chuan, et al. "Translating the ARM Neon and VFP instructions in a
+  113  * binary translator." Software: Practice and Experience 46.12 (2016):1591-1615.
+  114  *
+  115  * The idea is thus to leverage the host FPU to (1) compute FP operations
+  116  * and (2) identify whether FP exceptions occurred while avoiding
+  117  * expensive exception flag register accesses.
+  118  *
+  119  * An important optimization shown in the paper is that given that exception
+  120  * flags are rarely cleared by the guest, we can avoid recomputing some flags.
+  121  * This is particularly useful for the inexact flag, which is very frequently
+  122  * raised in floating-point workloads.
+  123  *
+  124  * We optimize the code further by deferring to soft-fp whenever FP exception
+  125  * detection might get hairy. Two examples: (1) when at least one operand is
+  126  * denormal/inf/NaN; (2) when operands are not guaranteed to lead to a 0 result
+  127  * and the result is < the minimum normal.
+  128  */
+  129 #define GEN_INPUT_FLUSH__NOCHECK(name, soft_t)                          \
+  130     static inline void name(soft_t *a, float_status *s)                 \
+  131     {                                                                   \
+  132         if (unlikely(soft_t ## _is_denormal(*a))) {                     \
+  133             *a = soft_t ## _set_sign(soft_t ## _zero,                   \
+  134                                      soft_t ## _is_neg(*a));            \
+  135             s->float_exception_flags |= float_flag_input_denormal;      \
+  136         }                                                               \
+  137     }
+
+Regards,
+BALATON Zoltan
 
