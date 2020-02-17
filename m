@@ -2,90 +2,110 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED170C35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 545B8C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 12:00:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5BF420725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:58:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F3542072C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 12:00:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kIeub963"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BF420725
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5UD/VCw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F3542072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3f3A-0006U3-UA
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 06:58:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40801)
+	id 1j3f4G-0007PL-Br
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 07:00:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41396)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3eqb-0006r0-A7
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:45:59 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j3etW-00033D-VJ
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:49:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3eqa-0002Zn-0v
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:45:57 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37415)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3eqY-0002Y2-8C; Mon, 17 Feb 2020 06:45:55 -0500
-Received: by mail-wm1-x341.google.com with SMTP id a6so18119764wme.2;
- Mon, 17 Feb 2020 03:45:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=e6o40FQDzdl6CfxP9P4N29oFY6w25k3CvNK8SZvDQSU=;
- b=kIeub963KMmxDyr5Sbk+hECgTs5ZIWGNz9Tb72w2oYXCzzU1sNViMWeNMUt8To/dkX
- DwGAHk0hYeN2P9gyjcJFVInGAHOXI8F9LWKpLQ33xkDavUSIURTKCJJBOmQ2/+1FO+Xw
- lEsvJf6u/t2C2OoNhy8KRDEF/cQfdtbjTnYeERk243xrF3SJzN09XyLpzoFGyVOXfi4J
- HzZ0KuNWU7sIV7ebCdE5qdr0jFmDaW5ywTA8SLTHGOiQZ2c032A6O7t33Qec4mP8RW5V
- ONvgTYYHKxsHu/uqTkYETQADCGHehr+2aSfzLPiwNJdPZctnYorkSeeXnBXCBqwQp6UY
- gosw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=e6o40FQDzdl6CfxP9P4N29oFY6w25k3CvNK8SZvDQSU=;
- b=iaQL2jnMs/9vp6Ju1BTt/qnvRBSjwhE55fLuqmmaGmaJTZnM6nAS+UdzBkFKYfgiE0
- c5Qxg+BYhWsmfstdJLbz8+jt+LlAk0hjFe4lL+ALz4Q86oIydTTRKmQJQ6XKZu4xqOIx
- CzbZUDsR/FlfW53AULjJg9Nq3ZisZhI739RNmAmpqM2/KYz+pNAsw98D5+nqokyxobQq
- p3B6GmqHm3ALPZ1en2oHG8sYoDektkplyEXbOZNanZ9wZ2/T7Y3nIKKrkano9+7/3UtT
- LAVFORGUdiBH+7H3rDpJQEK2Qjwz5hzEDSAc0czsREbfHuJhQbLn3JySMBTZPtWI79Gu
- Q5Rg==
-X-Gm-Message-State: APjAAAX0v6di2vFl6sgrMw8ITl1cKK1HNs5kwP/uL1RtsqY4SvHrngAR
- 0EQ6S5ihHLNhSbQiPATxPLhYxeeUUlw=
-X-Google-Smtp-Source: APXvYqz8JLE0arWdW4YKhFhU/4jSZ159FDNDb40+mJuIkaiUzapNwJsiR3LKSkuXU/+DOaa6BI7UGA==
-X-Received: by 2002:a1c:988c:: with SMTP id
- a134mr21058122wme.163.1581939953007; 
- Mon, 17 Feb 2020 03:45:53 -0800 (PST)
-Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id i2sm268149wmb.28.2020.02.17.03.45.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Feb 2020 03:45:52 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 13/13] hw/arm/raspi: Add the Raspberry Pi Zero machine
-Date: Mon, 17 Feb 2020 12:45:33 +0100
-Message-Id: <20200217114533.17779-14-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200217114533.17779-1-f4bug@amsat.org>
-References: <20200217114533.17779-1-f4bug@amsat.org>
+ (envelope-from <mreitz@redhat.com>) id 1j3etV-00054Q-Mu
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:48:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44950
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j3etV-00053m-ID
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:48:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581940136;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=aIT8KxW5kd+27ldRSp5UW5iRp8xhiqNBNX+WoMUbRs8=;
+ b=E5UD/VCw3VfG8Qceoa56Z0+VPaPIIPidr/pn2NKSDoqmm3E8oCfCLYhYmY4KEoNC3C2d4H
+ r4CKO8vu6CJEYYhrXTv4kDrrIPhA6tZTeX2XfEW6CDNW9fCntAFb5VfiAVYibcLEcZ6+Qf
+ aRlAfAngzv3n41wak3wdxVbejEO77Tc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-gPepL7EsN_2YIgT6Cd7chA-1; Mon, 17 Feb 2020 06:48:52 -0500
+X-MC-Unique: gPepL7EsN_2YIgT6Cd7chA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44282477;
+ Mon, 17 Feb 2020 11:48:51 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-191.ams2.redhat.com
+ [10.36.117.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 258815DA75;
+ Mon, 17 Feb 2020 11:48:48 +0000 (UTC)
+Subject: Re: [PATCH v2 2/7] block/block-copy: use block_status
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191127180840.11937-1-vsementsov@virtuozzo.com>
+ <20191127180840.11937-3-vsementsov@virtuozzo.com>
+ <81ce033a-2ac9-21b6-4649-48df61d41797@redhat.com>
+ <e6a5a095-78f3-faf1-6eaa-68843b41c490@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <168c4ec7-47fa-72a1-dfa7-10754f79519d@redhat.com>
+Date: Mon, 17 Feb 2020 12:48:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+In-Reply-To: <e6a5a095-78f3-faf1-6eaa-68843b41c490@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="lF4rSxLLIMvci71L599jCzB9cSCytM345"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,92 +117,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a Raspberry Pi Zero machine.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lF4rSxLLIMvci71L599jCzB9cSCytM345
+Content-Type: multipart/mixed; boundary="VAtS4ITJpRgwOvUtUUsjVQpMtCYE7fBRs"
 
-  $ qemu-system-arm -M raspi0w -serial stdio \
-      -kernel raspberrypi/firmware/boot/kernel.img \
-      -dtb raspberrypi/firmware/boot/bcm2708-rpi-zero-w.dtb \
-      -append 'printk.time=0 earlycon=pl011,0x20201000 console=ttyAMA0'
-  [    0.000000] Booting Linux on physical CPU 0x0
-  [    0.000000] Linux version 4.19.69+ (dom@buildbot) (gcc version 4.9.3 (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1261 Tue Sep 3 20:21:01 BST 2019
-  [    0.000000] CPU: ARMv6-compatible processor [410fb767] revision 7 (ARMv7), cr=00c5387d
-  [    0.000000] CPU: VIPT aliasing data cache, unknown instruction cache
-  [    0.000000] OF: fdt: Machine model: Raspberry Pi Zero W
-  [    0.000000] earlycon: pl11 at MMIO 0x20201000 (options '')
-  [    0.000000] bootconsole [pl11] enabled
-  [    0.000000] Memory policy: Data cache writeback
-  [    0.000000] cma: Reserved 8 MiB at 0x1b800000
-  [    0.000000] random: get_random_bytes called from start_kernel+0x8c/0x49c with crng_init=0
-  [    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 113680
-  [    0.000000] Kernel command line: printk.time=0 earlycon=pl011,0x20201000 console=ttyAMA0 root=/dev/mmcblk0 rootwait
-  Dentry cache hash table entries: 65536 (order: 6, 262144 bytes)
-  Inode-cache hash table entries: 32768 (order: 5, 131072 bytes)
-  Memory: 434380K/458752K available (6971K kernel code, 635K rwdata, 2080K rodata, 464K init, 797K bss, 16180K reserved, 8192K cma-reserved)
-  Virtual kernel memory layout:
-      vector  : 0xffff0000 - 0xffff1000   (   4 kB)
-      fixmap  : 0xffc00000 - 0xfff00000   (3072 kB)
-      vmalloc : 0xdc800000 - 0xff800000   ( 560 MB)
-      lowmem  : 0xc0000000 - 0xdc000000   ( 448 MB)
-      modules : 0xbf000000 - 0xc0000000   (  16 MB)
-        .text : 0x(ptrval) - 0x(ptrval)   (6973 kB)
-        .init : 0x(ptrval) - 0x(ptrval)   ( 464 kB)
-        .data : 0x(ptrval) - 0x(ptrval)   ( 636 kB)
-         .bss : 0x(ptrval) - 0x(ptrval)   ( 798 kB)
-  SLUB: HWalign=32, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
-  ftrace: allocating 25193 entries in 74 pages
-  NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
-  sched_clock: 32 bits at 1000kHz, resolution 1000ns, wraps every 2147483647500ns
-  clocksource: timer: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275 ns
-  bcm2835: system timer (irq = 27)
-  Console: colour dummy device 80x30
-  ...
+--VAtS4ITJpRgwOvUtUUsjVQpMtCYE7fBRs
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 08.02.20 13:25, Vladimir Sementsov-Ogievskiy wrote:
+> 07.02.2020 20:46, Max Reitz wrote:
+>> On 27.11.19 19:08, Vladimir Sementsov-Ogievskiy wrote:
+>>> Use bdrv_block_status_above to chose effective chunk size and to handle
+>>> zeroes effectively.
+>>>
+>>> This substitutes checking for just being allocated or not, and drops
+>>> old code path for it. Assistance by backup job is dropped too, as
+>>> caching block-status information is more difficult than just caching
+>>> is-allocated information in our dirty bitmap, and backup job is not
+>>> good place for this caching anyway.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>> =A0 block/block-copy.c | 67 +++++++++++++++++++++++++++++++++++++------=
 ---
- hw/arm/raspi.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+>>> =A0 block/trace-events |=A0 1 +
+>>> =A0 2 files changed, 55 insertions(+), 13 deletions(-)
+>>>
+>>> diff --git a/block/block-copy.c b/block/block-copy.c
+>>> index 8602e2cae7..74295d93d5 100644
+>>> --- a/block/block-copy.c
+>>> +++ b/block/block-copy.c
+>>
+>> [...]
+>>
+>>> @@ -336,23 +375,25 @@ int coroutine_fn block_copy(BlockCopyState *s,
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 chunk_end =3D next_zero;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0 -=A0=A0=A0=A0=A0=A0=A0 if (s->skip_unallocated) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D block_copy_reset_unallocated=
+(s, start,
+>>> &status_bytes);
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (ret =3D=3D 0) {
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 trace_block_copy_skip_ra=
+nge(s, start, status_bytes);
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 start +=3D status_bytes;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 continue;
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* Clamp to known allocated region *=
+/
+>>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 chunk_end =3D MIN(chunk_end, start +=
+ status_bytes);
+>>> +=A0=A0=A0=A0=A0=A0=A0 ret =3D block_copy_block_status(s, start, chunk_=
+end - start,
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 &status_bytes);
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (s->skip_unallocated && !(ret & BDRV_BLOCK_AL=
+LOCATED)) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 bdrv_reset_dirty_bitmap(s->copy_bitm=
+ap, start,
+>>> status_bytes);
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 s->progress_reset_callback(s->progre=
+ss_opaque);
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 trace_block_copy_skip_range(s, start=
+, status_bytes);
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 start +=3D status_bytes;
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 continue;
+>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>>> =A0 +=A0=A0=A0=A0=A0=A0=A0 chunk_end =3D MIN(chunk_end, start + status_=
+bytes);
+>>
+>> I=92m not sure how much the old =93Clamp to known allocated region=94 ac=
+tually
+>> helps, but I wouldn=92t drop it anyway.
+>=20
+> But it may be not allocated now. We just clamp to status_bytes.
+> It's "known allocated" only if s->skip_unallocated is true.
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 2d9f4e3085..d59d7c4294 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -324,6 +324,15 @@ static void raspi_machine_class_common_init(MachineClass *mc,
-     mc->default_ram_size = board_ram_size(board_rev);
- };
- 
-+static void raspi0w_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
-+
-+    rmc->board_rev = 0x9000c1;
-+    raspi_machine_class_common_init(mc, rmc->board_rev);
-+};
-+
- static void raspi1b_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -357,6 +366,10 @@ static void raspi3b_machine_class_init(ObjectClass *oc, void *data)
- 
- static const TypeInfo raspi_machine_types[] = {
-     {
-+        .name           = MACHINE_TYPE_NAME("raspi0w"),
-+        .parent         = TYPE_RASPI_MACHINE,
-+        .class_init     = raspi0w_machine_class_init,
-+    }, {
-         .name           = MACHINE_TYPE_NAME("raspi1b"),
-         .parent         = TYPE_RASPI_MACHINE,
-         .class_init     = raspi1b_machine_class_init,
--- 
-2.21.1
+Ah, yes, I suppose I was just thinking about that case when trying to
+understand how the code changes.  So:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+Max
+
+
+--VAtS4ITJpRgwOvUtUUsjVQpMtCYE7fBRs--
+
+--lF4rSxLLIMvci71L599jCzB9cSCytM345
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5KfZ4ACgkQ9AfbAGHV
+z0AtHQf/YsLlDLVDo4cYeoZkGt84iwQO/fwEL3DDh/fOKU4t/B/7+FQ8uNN3No1Y
+HiCsDTmx/cvz1+c9PCQANDw6gS4hagoLIlhcUp9cF79AbPKB6fWoPKtKVaKkmU6T
+8H5e96hXwx82GlVo7SMjiLLGO0251DrKfnDWTKtlBVD1lc4rX0WCmBWYxh0fagvl
+noNq3WpSJKuoR0FjX3bFcptrAt8SmgrggMeSfyxU2bxipp58NWt7Hzi9dyJnZ/a+
+3hJWmNeQEyX8PsgGEoXbBqqDuM/5Z9rcHRjng0ni9Ne7tNgcZ0nhbHxM0X84s0H6
+ZT1t/ZcpQ8DAmYOAzrj668IJHapvgQ==
+=EQqp
+-----END PGP SIGNATURE-----
+
+--lF4rSxLLIMvci71L599jCzB9cSCytM345--
 
 
