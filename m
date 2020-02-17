@@ -2,63 +2,80 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB0DC33FA1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB75C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:19:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85722206E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:17:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85722206E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 16A942070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:19:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EIBnl9D2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A942070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3gHb-0005m1-Lz
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 08:17:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52066)
+	id 1j3gIu-00076I-7i
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 08:19:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1j3gAq-0003l4-La
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:10:57 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j3gHQ-0005sr-Hi
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:17:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1j3gAp-0000CP-LC
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:10:56 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2719 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1j3gAk-0008P5-4R; Mon, 17 Feb 2020 08:10:51 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 37FE85983A0FAE344E49;
- Mon, 17 Feb 2020 21:10:46 +0800 (CST)
-Received: from huawei.com (10.151.151.243) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
- 21:10:36 +0800
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-To: <mst@redhat.com>, <imammedo@redhat.com>, <xiaoguangrong.eric@gmail.com>,
- <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <fam@euphon.net>,
- <rth@twiddle.net>, <ehabkost@redhat.com>, <mtosatti@redhat.com>,
- <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
- <pbonzini@redhat.com>, <james.morse@arm.com>, <lersek@redhat.com>,
- <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH v24 10/10] MAINTAINERS: Add ACPI/HEST/GHES entries
-Date: Mon, 17 Feb 2020 21:12:48 +0800
-Message-ID: <20200217131248.28273-11-gengdongjiu@huawei.com>
-X-Mailer: git-send-email 2.18.0.huawei.25
-In-Reply-To: <20200217131248.28273-1-gengdongjiu@huawei.com>
-References: <20200217131248.28273-1-gengdongjiu@huawei.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j3gHP-0003ck-3l
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:17:44 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36055)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j3gHL-0003bX-P7
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:17:42 -0500
+Received: by mail-ot1-x344.google.com with SMTP id j20so16045869otq.3
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 05:17:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=cHPhOGeNLOf68WPsW2tTD+RWuznlqruVPD4LcxKf4l8=;
+ b=EIBnl9D2nlWfWotqf5eHOkemBvjEOyltavxNPHeEcMx+b1BUEEfxrY+iOVww67WBxp
+ XW6ZEauNOA2JbYylOjrU+/CUgtQcVHsg3zGJT2egX+QilzaEU2lDXMRXwGhskqxlDHYg
+ hSvVyEPOi/tF6nKffVPf35xJPb4ZK5ofFAumYA8hy2xE/A+Aj4+yC12Hh1JQF16RRGVw
+ KOTS3W1tg2MyPV4PT2vTMU2+XsGWHwX6ILy+NDZVQmhMcOEJ1v98ow+N7Wfnk34bHLUs
+ RSKd9ZLoKehcD2KMEBp9orCir0CbZO8R/EtDbNxN7AlixIZh1YABQL7gM+2wgFZS6Wt5
+ PBEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=cHPhOGeNLOf68WPsW2tTD+RWuznlqruVPD4LcxKf4l8=;
+ b=RwU8BvUsfeiV2pIxhit8Ajh0lNeZTPHx6BISnCOekvQvbrz3AnHGlomQQRkg8j4hit
+ e+v9SeuGcyP73GjQlWsXKBlgkX+t9g0Xrx+V44is3h0grgeDdGXhABYgx0aI3Fe0Nie9
+ YRjlv7/WOy+OGp/orUH+0F+ka81KBUNlYRi1bn6H65dJj8HbUkEnrByflyq05YoGoawa
+ 07aDCBv5TsJtryMf9u5wgFoiT7hA3o2JXKjg9PJIZchrABaLJuHypxnjmIx509YRlcIb
+ 8QA99BzHqet6lD+xlSNwnpsrdttV8zNrDE52eY67XFovCckof0DiUzwLYQpYtq5x98I/
+ cTIA==
+X-Gm-Message-State: APjAAAXakZJblCvDbAToykyS1cnuVGHApXQn2kD3oRofQiE/Li1aiHmS
+ VVMwG1D/OnKoflBTqDY5ZL7QkAILDvGMDQcOQ43UAw==
+X-Google-Smtp-Source: APXvYqyjHiHVJQ7pr191Sy5YGdXNZqcE/Aj1vOU6UDeEdZAQbsEE8gSezSQL+cgZZXfyBgE7Vs8SUg7Axy5ABhfIyiY=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr12236897ota.232.1581945458692; 
+ Mon, 17 Feb 2020 05:17:38 -0800 (PST)
 MIME-Version: 1.0
+References: <20200217093031.678348-1-laurent@vivier.eu>
+In-Reply-To: <20200217093031.678348-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Feb 2020 13:17:27 +0000
+Message-ID: <CAFEAcA9cnyJ6yuRAskTN_RuT1Qa7veZBZ5bNoqt3+-TYrZXz2w@mail.gmail.com>
+Subject: Re: [PULL 0/9] Linux user for 5.0 patches
+To: Laurent Vivier <laurent@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [10.151.151.243]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,43 +87,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhengxiang9@huawei.com, gengdongjiu@huawei.com
+Cc: Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I and Xiang are willing to review the APEI-related patches and
-volunteer as the reviewers for the HEST/GHES part.
+On Mon, 17 Feb 2020 at 09:32, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 971b2a1e5b1a8cc8f597ac5d7016908f9fa880de:
+>
+>   Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-5.0-sf2' into staging (2020-02-14 18:37:11 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/linux-user-for-5.0-pull-request
+>
+> for you to fetch changes up to 0a80aa55f4485d102567e1db7ab0532ef96d1b96:
+>
+>   linux-user: xtensa: Remove unused constant TARGET_NR_syscall_count (2020-02-17 10:28:50 +0100)
+>
+> ----------------------------------------------------------------
+> Update syscall numbers to kernel 5.5 level
+>
 
-Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c7717df..0748475 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1446,6 +1446,15 @@ F: tests/qtest/bios-tables-test.c
- F: tests/qtest/acpi-utils.[hc]
- F: tests/data/acpi/
-=20
-+ACPI/HEST/GHES
-+R: Dongjiu Geng <gengdongjiu@huawei.com>
-+R: Xiang Zheng <zhengxiang9@huawei.com>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/acpi/ghes.c
-+F: include/hw/acpi/ghes.h
-+F: docs/specs/acpi_hest_ghes.rst
-+
- ppc4xx
- M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
---=20
-1.8.3.1
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
