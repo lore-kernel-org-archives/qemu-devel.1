@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E48F6C34021
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C11AEC34021
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:40:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B287E20725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:40:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9040B20725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:40:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HUrc3uv+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B287E20725
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iaS4c2q7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9040B20725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3kNd-0004df-Qj
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:40:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38083)
+	id 1j3kNv-00050n-OE
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:40:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j3kIf-00014v-GU
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:18 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j3kIs-0001c4-MD
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j3kIe-0001lK-9r
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34533
+ (envelope-from <imammedo@redhat.com>) id 1j3kIr-0001xT-FB
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27517
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kIe-0001kr-5a
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:16 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kIr-0001x7-Ah
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581960915;
+ s=mimecast20190719; t=1581960928;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GX7ZP+Z3ukgokdjlGVg3Xww8w3o7m7mRnx8yNMa+F+Q=;
- b=HUrc3uv+pPal2w56xrU1/JVR1RWToX0F1rMaxDmiX12CqXIygLLRalLO+jAzWtCpXF+aBL
- zLMMd7IIQfD6z/13XfRrMsge4SVIogIFsi2PKzARyTKo1c68AOm136xjCWh6Jw/XoygiBG
- 04hjj+qpixJqNd2ClQHl96GBC/CWkyY=
+ bh=NXhWbrMAKsZqAUL2XRd14/Ej6oYnxmZJgwHGGyzEyp0=;
+ b=iaS4c2q7TGe+RjBzJxqgzHj5wMysWq6tZqZlTB+0CP93eytxeeK58vxAZ9al7f5E0s4AgG
+ BtRDqOI/GTx5Qws9dIkbqPHfD63+/RHGUN7wMb/QPV39m5C0f13F+h/yE/YfE7rRzC8BgD
+ 1TE5UycBX018zWO6GiISFze784WV+MU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-I6S0PUP1M6G1y1OZBQt5Hw-1; Mon, 17 Feb 2020 12:35:14 -0500
+ us-mta-124-r--Bw6E1MBCAxLUBdXRS1g-1; Mon, 17 Feb 2020 12:35:27 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39C8918FE860
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 17:35:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62ACB8017CC
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 17:35:26 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88F8490526;
- Mon, 17 Feb 2020 17:35:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B14E890508;
+ Mon, 17 Feb 2020 17:35:25 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 11/79] arm/collie: use memdev for RAM
-Date: Mon, 17 Feb 2020 12:33:44 -0500
-Message-Id: <20200217173452.15243-12-imammedo@redhat.com>
+Subject: [PATCH v5 22/79] arm/mps2-tz: use memdev for RAM
+Date: Mon, 17 Feb 2020 12:33:55 -0500
+Message-Id: <20200217173452.15243-23-imammedo@redhat.com>
 In-Reply-To: <20200217173452.15243-1-imammedo@redhat.com>
 References: <20200217173452.15243-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: I6S0PUP1M6G1y1OZBQt5Hw-1
+X-MC-Unique: r--Bw6E1MBCAxLUBdXRS1g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -100,10 +100,8 @@ and using MachineState::ram instead of manually initializing
 RAM memory region.
 
 PS:
- - while at it add check for user supplied RAM size and error
-   out if it mismatches board expected value.
- - introduce RAM_ADDR_UFMT to avoid build errors on 32-bit hosts
-   when specifying format string for ram_addr_t type
+ while at it add check for user supplied RAM size and error
+ out if it mismatches board expected value.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
@@ -111,65 +109,68 @@ Reviewed-by: Andrew Jones <drjones@redhat.com>
 v2:
   * fix format string causing build failure on 32-bit host
     (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
-v3:
-  * instead of RAM_ADDR_UFMT adding use size_to_str()
-     Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+v4:
+  * move default_ram_size to mps2tz_class_init()
+    (Andrew Jones <drjones@redhat.com>)
 ---
- hw/arm/collie.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ hw/arm/mps2-tz.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/collie.c b/hw/arm/collie.c
-index 970a4405cc..024893fc9e 100644
---- a/hw/arm/collie.c
-+++ b/hw/arm/collie.c
-@@ -10,6 +10,7 @@
-  */
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index f8b620bcc6..a8dea7dde1 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -39,6 +39,7 @@
+=20
  #include "qemu/osdep.h"
  #include "qemu/units.h"
 +#include "qemu/cutils.h"
- #include "hw/sysbus.h"
- #include "hw/boards.h"
- #include "strongarm.h"
-@@ -20,20 +21,24 @@
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/arm/boot.h"
+@@ -79,7 +80,6 @@ typedef struct {
+     MachineState parent;
 =20
- static struct arm_boot_info collie_binfo =3D {
-     .loader_start =3D SA_SDCS0,
--    .ram_size =3D 0x20000000,
- };
+     ARMSSE iotkit;
+-    MemoryRegion psram;
+     MemoryRegion ssram[3];
+     MemoryRegion ssram1_m;
+     MPS2SCC scc;
+@@ -388,6 +388,13 @@ static void mps2tz_common_init(MachineState *machine)
+         exit(1);
+     }
 =20
- static void collie_init(MachineState *machine)
- {
-     StrongARMState *s;
-     DriveInfo *dinfo;
--    MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
-+    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-+
 +    if (machine->ram_size !=3D mc->default_ram_size) {
 +        char *sz =3D size_to_str(mc->default_ram_size);
 +        error_report("Invalid RAM size, should be %s", sz);
 +        g_free(sz);
 +        exit(EXIT_FAILURE);
 +    }
++
+     sysbus_init_child_obj(OBJECT(machine), "iotkit", &mms->iotkit,
+                           sizeof(mms->iotkit), mmc->armsse_type);
+     iotkitdev =3D DEVICE(&mms->iotkit);
+@@ -458,9 +465,7 @@ static void mps2tz_common_init(MachineState *machine)
+      * tradeoffs. For QEMU they're all just RAM, though. We arbitrarily
+      * call the 16MB our "system memory", as it's the largest lump.
+      */
+-    memory_region_allocate_system_memory(&mms->psram,
+-                                         NULL, "mps.ram", 16 * MiB);
+-    memory_region_add_subregion(system_memory, 0x80000000, &mms->psram);
++    memory_region_add_subregion(system_memory, 0x80000000, machine->ram);
 =20
-     s =3D sa1110_init(machine->cpu_type);
+     /* The overflow IRQs for all UARTs are ORed together.
+      * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
+@@ -642,6 +647,8 @@ static void mps2tz_class_init(ObjectClass *oc, void *da=
+ta)
 =20
--    memory_region_allocate_system_memory(sdram, NULL, "strongarm.sdram",
--                                         collie_binfo.ram_size);
--    memory_region_add_subregion(get_system_memory(), SA_SDCS0, sdram);
-+    memory_region_add_subregion(get_system_memory(), SA_SDCS0, machine->ra=
-m);
-=20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     pflash_cfi01_register(SA_CS0, "collie.fl1", 0x02000000,
-@@ -57,6 +62,8 @@ static void collie_machine_init(MachineClass *mc)
-     mc->init =3D collie_init;
-     mc->ignore_memory_transaction_failures =3D true;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("sa1110");
-+    mc->default_ram_size =3D 0x20000000;
-+    mc->default_ram_id =3D "strongarm.sdram";
+     mc->init =3D mps2tz_common_init;
+     iic->check =3D mps2_tz_idau_check;
++    mc->default_ram_size =3D 16 * MiB;
++    mc->default_ram_id =3D "mps.ram";
  }
 =20
- DEFINE_MACHINE("collie", collie_machine_init)
+ static void mps2tz_an505_class_init(ObjectClass *oc, void *data)
 --=20
 2.18.1
 
