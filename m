@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 728E8C35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D20E7C7619F
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:34:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47A762070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:34:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47A762070B
+	by mail.kernel.org (Postfix) with ESMTPS id AC07A2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:34:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC07A2070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3cmz-00035U-D0
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 04:34:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52181)
+	id 1j3cn0-00039c-U3
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 04:34:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j3ckF-0007ZL-5c
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:31:16 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j3ckK-0007dI-CD
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:31:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j3ckD-0001sA-9S
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:31:15 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:44639)
+ (envelope-from <laurent@vivier.eu>) id 1j3ckI-0001wx-Cm
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:31:20 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:58627)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j3ckD-0001qO-0Z
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:31:13 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j3ckI-0001w4-49
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:31:18 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MsZ7T-1jIoF11dwh-00u1z4; Mon, 17 Feb 2020 10:30:40 +0100
+ id 1MBll6-1jBLRv0H3k-00C8Xh; Mon, 17 Feb 2020 10:30:43 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 4/9] linux-user: microblaze: Update syscall numbers to kernel
- 5.5 level
-Date: Mon, 17 Feb 2020 10:30:26 +0100
-Message-Id: <20200217093031.678348-5-laurent@vivier.eu>
+Subject: [PULL 8/9] linux-user: xtensa: Update syscall numbers to kernel 5.5
+ level
+Date: Mon, 17 Feb 2020 10:30:30 +0100
+Message-Id: <20200217093031.678348-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200217093031.678348-1-laurent@vivier.eu>
 References: <20200217093031.678348-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:N5CS+8b1+soucHcmLCD8OGfIuprmzUpg2UxHpgDoYFRN8aDEkSo
- 6jFxfTTmkIzwSVhVRMxXUD8VJnv34qtZSPn9xbtfGDalo0g6h9fLE4/IuF2zbvscCVBZNeT
- FQvDQ3GC2/wFrf/PdrIOmu6JZ49PkNgiuxdAPR7pqOFq0RYMZJ6hEisIhW6FOjgnN2z8esQ
- YhzHPQnr/oB1Kz4zVDJvA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ARIZpaV4CtU=:Ec/P73FGaIqmH53rZ8XFj3
- kbJhBplAy1ocw5zN1CbIsATtfFW5asxrB8c1fXxm0rxqyICr7afCuhLzXAhP5m5iwtbwNrC4u
- 31aDpW1MMRvUlm+K9QzZfiXG/GhHK9gJMtmEY5Ya3rVpef5z1Or14FHZT4+R1gN1PMyj8wyiQ
- MrQuhsWlW0xIL8MGPtkDGd55kk1KrI+KKv2vAiwaPQcw2GpUNPNb3ZEAowLR3HgBWP2tQm4yu
- erI77PqPlA+Phl4BNTDDyIVqgMGKO0CsOiOfvdAA0WcnlxMQM4E0xRlPrfWsBgFscFUQLjjb4
- Wp8zWaulGEzX3QXvT7ALUYQE+Zxzi3T2kLHIq93jEpTNKpU5D/QMwfrpAx0vMv7fT/+OZfXyl
- J8kEZ2jtNit5LPcb//F0Zd667YOB0B8c31P1mumblnpB3mZF3e7IcQLI1OeiG90l+9q/7yBZF
- VUdzeBP4HFhDIOZPSi9Cn9s65bz5XAnz0OVT+75DydAw8qN6cQ+ZlCTrf1OdtXmZtONzVe2M9
- EoUSEReqBheHtDk6Pa4AotsRegQPxUCQlPhyaJHWwQ4Ff8QttjzVbW+IRnQdU/hs3wAb6AgNF
- INFT+fvkSQMWZ1fzt/p/h2UaL4A6ENzHvp6zV210TlRJNbLYIZEPx/9rBDzDbQx4GI3WYCxWi
- lRXAuZiZNz/3cGdHGBgYipuf69XAbth5ulZEnWtY5zPpq873gNSMysWJJR2MG8GrQbkH9gdMK
- tvNRCGBGMYAFtTDzrg93EjTtAi4AA9RbPBXptH9T+r/XZexfgcPdx8Z2mRuLUPm91bJhnV1+I
- 93U0gmnWlPgaQtj43Yf/5cYatZit85OFuMM14wf7bTQfZINpIBGuANKwU7BV+zpsFNU3/Lz
+X-Provags-ID: V03:K1:sYLyRsDLtdnLFj6WLqppBp/UHV/WDtYJpyaVTSvYSs8PYFfGciQ
+ ElFbrNo8myr6gdbowDgSPBveIUO3Wu2Ea7Y4mIRbu885J0yb8iB8OBo0ck4ux9tOVmbPYUx
+ fq9DhZ4dx2iA4dhiSnN1MxhBCAhhmyTPrOwque4zlp/CpZjvaRuxr1Ti35wi5UdAbiWmp+J
+ sDhN0cGaxdWqGsWPsQczg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:DKOgkJWhVC0=:+rv/FCgCaE7D0iBGkWyZwL
+ zbFsXW26+1KqxKmTG8Gs4W1Zrm4OeF+fkMJCqzlTcp1asIohtW+AI+lj2UA8fzMDgZWqT3h07
+ 53svh3koQqF1L9UNRXWMtbWHb04mMzaNCggdgOyx4DD9CZFHWyZcbShbegDeJGIi/YMRi7syp
+ N0oTUoLoSbPa6wpxeHlOkTlDThBVPoshJSJhQCt/Dvvdf7yrZ33/Ks0EShlvoi3KUEOp9JeeB
+ JzRTwHSfGrnck+mPLgxBw4SXxtNJ4Q3V5HLgoQkCNQyCtW+5M9fcvRR/K6X5lXXT6TALB5/hC
+ n03vZEOTnMWlsvtSX0KkYMX9Fh6H9yhv7ZOb78eHjEPFSaQJQlaezIlPlcnYvlp/o3I0DvzS6
+ dEMiLrd5gxtfD1+ICOmDL7VlfyHgb6ABx1Zury4RJcaSYKi5br5zTqONGjR8jBwBBiC/j+IQz
+ 9Ld7dAr5nqKdZdIg4bYLG5qY4X9GF+OYvAl1x4J+g7riY5JtkwGOhxowF1MEvTeoCQs584Ec6
+ ytWeo+iM8KvB+24NDzC7ddmaj0D1/GbsBhEMeZ5y3i2KB0Hgtqrv59TzFLPNJnYmKZ138gJl/
+ 39AzWN+9yjlG82jIC2YbPOLOCD09CWDGzgD4PYCv27iN1Au0aUhkat71nmKszu2muwS3KVzFh
+ 76z9oCRTjdo3MKSWBs6yFXvy8Ci89Fqtu3C+WVG3Jr1Cd5d8Kak2DTNVLcllRI4tXZYygT11b
+ LyyQKTzS275My2PUhf82NhQP04Nktfzzx244gRDLVyB+lTQ47zmILob3gHOHw3K4E7iOpN6Vj
+ Sop+ywjMaACtQ5iVQG04g5BhgiuECWMLVIpCFP1V1OiGxfuMujfGY7+ayEqJHn8XxoWEzut
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,8 +77,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Max Filippov <jcmvbkbc@gmail.com>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -87,72 +87,66 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Update microblaze syscall numbers based on Linux kernel v5.5.
+Update xtensa syscall numbers based on Linux kernel v5.5.
 
-CC: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+CC: Max Filippov <jcmvbkbc@gmail.com>
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1581596954-2305-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Message-Id: <1581596954-2305-9-git-send-email-aleksandar.markovic@rt-rk.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/microblaze/syscall_nr.h | 45 ++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ linux-user/xtensa/syscall_nr.h | 38 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/linux-user/microblaze/syscall_nr.h b/linux-user/microblaze/syscall_nr.h
-index aa2eb9388177..ec1758e37434 100644
---- a/linux-user/microblaze/syscall_nr.h
-+++ b/linux-user/microblaze/syscall_nr.h
-@@ -393,5 +393,50 @@
- #define TARGET_NR_memfd_create          386
- #define TARGET_NR_bpf                   387
- #define TARGET_NR_execveat              388
-+#define TARGET_NR_userfaultfd           389
-+#define TARGET_NR_membarrier            390
-+#define TARGET_NR_mlock2                391
-+#define TARGET_NR_copy_file_range       392
-+#define TARGET_NR_preadv2               393
-+#define TARGET_NR_pwritev2              394
-+#define TARGET_NR_pkey_mprotect         395
-+#define TARGET_NR_pkey_alloc            396
-+#define TARGET_NR_pkey_free             397
-+#define TARGET_NR_statx                 398
-+#define TARGET_NR_io_pgetevents         399
-+#define TARGET_NR_rseq                  400
-+/* 401 and 402 are unused */
-+#define TARGET_NR_clock_gettime64       403
-+#define TARGET_NR_clock_settime64       404
-+#define TARGET_NR_clock_adjtime64       405
-+#define TARGET_NR_clock_getres_time64   406
-+#define TARGET_NR_clock_nanosleep_time64 407
-+#define TARGET_NR_timer_gettime64       408
-+#define TARGET_NR_timer_settime64       409
-+#define TARGET_NR_timerfd_gettime64     410
-+#define TARGET_NR_timerfd_settime64     411
-+#define TARGET_NR_utimensat_time64      412
-+#define TARGET_NR_pselect6_time64       413
-+#define TARGET_NR_ppoll_time64          414
-+#define TARGET_NR_io_pgetevents_time64  416
-+#define TARGET_NR_recvmmsg_time64       417
-+#define TARGET_NR_mq_timedsend_time64   418
-+#define TARGET_NR_mq_timedreceive_time64 419
-+#define TARGET_NR_semtimedop_time64     420
-+#define TARGET_NR_rt_sigtimedwait_time64 421
-+#define TARGET_NR_futex_time64          422
-+#define TARGET_NR_sched_rr_get_interval_time64 423
-+#define TARGET_NR_pidfd_send_signal     424
-+#define TARGET_NR_io_uring_setup        425
-+#define TARGET_NR_io_uring_enter        426
-+#define TARGET_NR_io_uring_register     427
-+#define TARGET_NR_open_tree             428
-+#define TARGET_NR_move_mount            429
-+#define TARGET_NR_fsopen                430
-+#define TARGET_NR_fsconfig              431
-+#define TARGET_NR_fsmount               432
-+#define TARGET_NR_fspick                433
-+#define TARGET_NR_pidfd_open            434
-+#define TARGET_NR_clone3                435
+diff --git a/linux-user/xtensa/syscall_nr.h b/linux-user/xtensa/syscall_nr.h
+index 27645bea4750..3d19d0cb70a6 100644
+--- a/linux-user/xtensa/syscall_nr.h
++++ b/linux-user/xtensa/syscall_nr.h
+@@ -431,7 +431,41 @@
+ #define TARGET_NR_pkey_free                          350
  
- #endif
+ #define TARGET_NR_statx                              351
+-
+-#define TARGET_NR_syscall_count                      352
++#define TARGET_NR_rseq                               352
++/* 353 through 402 are unassigned to sync up with generic numbers */
++#define TARGET_NR_clock_gettime64                    403
++#define TARGET_NR_clock_settime64                    404
++#define TARGET_NR_clock_adjtime64                    405
++#define TARGET_NR_clock_getres_time64                406
++#define TARGET_NR_clock_nanosleep_time64             407
++#define TARGET_NR_timer_gettime64                    408
++#define TARGET_NR_timer_settime64                    409
++#define TARGET_NR_timerfd_gettime64                  410
++#define TARGET_NR_timerfd_settime64                  411
++#define TARGET_NR_utimensat_time64                   412
++#define TARGET_NR_pselect6_time64                    413
++#define TARGET_NR_ppoll_time64                       414
++#define TARGET_NR_io_pgetevents_time64               416
++#define TARGET_NR_recvmmsg_time64                    417
++#define TARGET_NR_mq_timedsend_time64                418
++#define TARGET_NR_mq_timedreceive_time64             419
++#define TARGET_NR_semtimedop_time64                  420
++#define TARGET_NR_rt_sigtimedwait_time64             421
++#define TARGET_NR_futex_time64                       422
++#define TARGET_NR_sched_rr_get_interval_time64       423
++#define TARGET_NR_pidfd_send_signal                  424
++#define TARGET_NR_io_uring_setup                     425
++#define TARGET_NR_io_uring_enter                     426
++#define TARGET_NR_io_uring_register                  427
++#define TARGET_NR_open_tree                          428
++#define TARGET_NR_move_mount                         429
++#define TARGET_NR_fsopen                             430
++#define TARGET_NR_fsconfig                           431
++#define TARGET_NR_fsmount                            432
++#define TARGET_NR_fspick                             433
++#define TARGET_NR_pidfd_open                         434
++#define TARGET_NR_clone3                             435
++
++#define TARGET_NR_syscall_count                      436
+ 
+ #endif /* XTENSA_SYSCALL_NR_H */
 -- 
 2.24.1
 
