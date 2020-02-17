@@ -2,104 +2,77 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED86C34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6253BC34021
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:15:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49AAD20656
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:13:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2919D20656
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:15:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YaEKVOW4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49AAD20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OkBEefn5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2919D20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3jxk-0007MG-G4
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:13:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35481)
+	id 1j3jzZ-0000Zu-BH
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:15:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35658)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j3jww-0006jW-NE
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:12:51 -0500
+ (envelope-from <waynli329@gmail.com>) id 1j3jyX-0008Cf-4A
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:14:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j3jwu-0002lu-Ml
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:12:49 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20404
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3jwu-0002lS-2E
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:12:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581959566;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LXohCu8xudk+6QiHIbftTf4/RotCsc+mPmvBzYm/Ddw=;
- b=YaEKVOW4NvHPPohlNW8FZCrCmsYZ4wVVk5HYzBEJW6kbjEXPh4m7NslKHYI2SI53+V0ib9
- sKFaLYD4OHFDsaYZ5NapW/E0SnKHQnhbD5sSJMFJhksj6L9vmd+mrgEANUe8hcowDWgl46
- hISiL2hVqtIEpnKXzZ4fCrZzQspFhU0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-FlxJpcU8NfCydFzCWoaJJg-1; Mon, 17 Feb 2020 12:12:45 -0500
-Received: by mail-wr1-f69.google.com with SMTP id r1so9228688wrc.15
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 09:12:44 -0800 (PST)
+ (envelope-from <waynli329@gmail.com>) id 1j3jyV-0003Nj-A0
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:14:28 -0500
+Received: from mail-io1-xd32.google.com ([2607:f8b0:4864:20::d32]:40328)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <waynli329@gmail.com>) id 1j3jyV-0003NJ-3p
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:14:27 -0500
+Received: by mail-io1-xd32.google.com with SMTP id x1so7766988iop.7
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 09:14:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=0R1rdZy0XMpKUprpj8+UF8D/9azDIy+dnA831txcyBY=;
+ b=OkBEefn5AZ6YMsvp1Ym+rpIH7LSc0pQCROGhM7r5FUlcfx/fRsvasHNol6YDyf6HuF
+ Q12Vjb1VVtYGDN2w5kPPHb7woQw3Nks9PtXtthCsq71h6nVTw6Pid9XvapzAgqHlGam3
+ ZAdryGQ5vXGrTDBVX7wfX28NPENKeKVgvO5laXBoEiaHE34xZIGRqtqG2Y8vmBsbKxQW
+ ofIEKaXTNRScAFXK5BgKvKV+f+GulrVYbWwlORw7cRz/gKwQRyMe5cb3ofEIhTOC4CzR
+ h2aFp0sDoIOSvhXNSG73HmNJgSLEDm1Kt1cqGlWhosW4Bes4YfpgM4WnaX+4z8vXO6Pq
+ WLWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xEH0MJHIh3hel+28QiuAyGxtKz1GN1zXFg55ShF8SaA=;
- b=nL8cc/epNB7mdLgYzsWBm69bfRBBMC2Gnl9+OBXVIXNhGHoTk5xpef83/HM7PKxg7c
- 7luwUKfiJOI31b2cf5gwpwjIs/WVPS/puCOgpeKwEs3USdQw6w97rB2BsibPvpWBGJrG
- nGqwTQ0M0mDnWP7U2kh/jq6hV4uuGUPJnfbAJ2e8uCTujs7kWNOwxyOEb5dDcP/KzfD3
- RB4lQUw0djoER78WrFsB7alBil3eU/QfkEZd9L+z8fwol6r3hB7hmcZghKUzLrxrw8Pm
- aFPtYuPiYWeZ/aZow8zeGu6rTKSO/DEm8EXo7WdmXie6Oknvi9y6THN/cmMevpsJKOE7
- FHSg==
-X-Gm-Message-State: APjAAAWRDdlIWC+1XT19MPqWQq9zB6mQsgvZ+iW0alXmv3/+bifXd/PD
- 4EjbgNKEK9kwd5zAbe1qiuFMXUu54MW6EYWu86oGNTC3/ZziigFF5ewLNndGZNWcQ8zqBY6dh+Q
- A/8v9yuNy3+NBDc0=
-X-Received: by 2002:adf:8564:: with SMTP id 91mr23847714wrh.252.1581959563788; 
- Mon, 17 Feb 2020 09:12:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzSwb7h6J2JLlNV64EA84R6DozxRfZ2sYtutIyuhdJAus4G7fMo/U3+xzkvP3y/4OmGDzGgIQ==
-X-Received: by 2002:adf:8564:: with SMTP id 91mr23847682wrh.252.1581959563497; 
- Mon, 17 Feb 2020 09:12:43 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id r5sm1782861wrt.43.2020.02.17.09.12.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 09:12:43 -0800 (PST)
-Subject: Re: [PATCH 1/2] hw/ipmi/bmc: Delay timer_new_ns() from init to
- realize to avoid memleaks
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200215154706.19837-1-philmd@redhat.com>
- <20200215154706.19837-2-philmd@redhat.com>
- <CAFEAcA9cZHWziyk6VzfaxrqjCNNOmnmSkB=uuGJMp0TL521mAQ@mail.gmail.com>
- <8c4570e1-cd9b-9d33-2756-5c223df282ee@redhat.com>
- <CAFEAcA-hyEVPeT1wakaft6m3_WD9XG3eYFAwJJgoHRAZ1nntag@mail.gmail.com>
- <e530629d-c029-1d7c-b5b7-cdbbeb397a4d@redhat.com>
- <CAFEAcA-KzWv=_kZUPNE6yyUSA36XY+q91ihJ_xh4euJ9RsyaLA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c2ae28d4-3864-dfc6-2033-93bbd7aa865e@redhat.com>
-Date: Mon, 17 Feb 2020 18:12:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=0R1rdZy0XMpKUprpj8+UF8D/9azDIy+dnA831txcyBY=;
+ b=pTaSJZRyTIi6D/2axYeWCR9EjI7O9mxgUL5tHcKstp2Ksfh1h+cVX3CCa5gpdSngyo
+ 5ZuiEUZMZ73gWDZsPXjLmIEgI+CCSsp7UCdCUAgkQeGELErK9DQuXiEH8MSaCxSpSE5X
+ Sq2km85ndJ6wCGYoj8mC5PPigIy6+t8a/a2LIochq/wPvBv2pMcfY3AIxrQepmMSG7d0
+ Cm6b6BnLFO4TOQdNuckP8AURtk0u3q30TlFNN7RaQCTyQK3MCou+imaCLuDIalE9E1z3
+ XU5dE+WQV2Eu8kAxG8KQH1eCLnVWsqseWjf1vsJ6WeHO7dmftvv45Aflb6D3hwBlVKzp
+ 0meA==
+X-Gm-Message-State: APjAAAXFdAaNCHTl7XyffAl9tnf7yWtV//md3096PrGkEF9cl3UUTg9s
+ 3mWg7cipSYYtQfyy1y3z9ypHBJgetH2T6ZNjCRbpfik+
+X-Google-Smtp-Source: APXvYqynwtzH7gqhZme/D+/GWrBOMiseocRo8mp2z/rQvlsi5b3XDckgpXE+4lL1TwCsIo4XHT3i8801O+trTHH0GY8=
+X-Received: by 2002:a5d:9c4e:: with SMTP id 14mr13040380iof.166.1581959665413; 
+ Mon, 17 Feb 2020 09:14:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-KzWv=_kZUPNE6yyUSA36XY+q91ihJ_xh4euJ9RsyaLA@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: FlxJpcU8NfCydFzCWoaJJg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+From: Wayne Li <waynli329@gmail.com>
+Date: Mon, 17 Feb 2020 11:14:14 -0600
+Message-ID: <CAM2K0nq1gz2iGQnaxrcA2Zq1F13k1s+vTv4sKPggXFUe-GkAkQ@mail.gmail.com>
+Subject: QEMU VM hangs on ioctl call when running with KVM enabled and nothing
+ else happens.
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary="000000000000e7f36a059ec8af30"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,138 +84,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
- David Hildenbrand <david@redhat.com>, Pan Nengyuan <pannengyuan@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/17/20 5:32 PM, Peter Maydell wrote:
-> On Mon, 17 Feb 2020 at 16:15, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->> Per this comment in qdev.c, unrealize() is the expected default:
->>
->>       /* by default all devices were considered as hotpluggable,
->>        * so with intent to check it in generic qdev_unplug() /
->>        * device_set_realized() functions make every device
->>        * hotpluggable. Devices that shouldn't be hotpluggable,
->>        * should override it in their class_init()
->>        */
->>       dc->hotpluggable =3D true;
->=20
-> This comment sounds like it's documenting what was the
-> previous default ("were considered") and making a minimal
-> change to avoid breaking existing code where a device
-> does want to be hotpluggable but isn't explicitly saying so.
-> I forget how exactly it works (the mechanism has changed
-> several times) but in practice a sysbus device is generally
-> not hotpluggable, and that's what most devices are.
->=20
->> I get for qemu-system-aarch64:
->>
->>
->> - qdev objects missing instance_finalize():
->>
->>       bcm2835-sdhost-bus
->>       PCIE
->>       pxa2xx-mmci-bus
->>       qtest-accel
->>       sdhci-bus
->>       tcg-accel
->=20
-> Note that you don't need an instance_finalize() if it
-> would have nothing to do, which may be the case here.
->=20
->> - non-hotpluggable devices implementing unrealize():
->>
->>       VGA
->=20
-> Not sure which device this is, I couldn't find a TYPE_
-> define with this name. Is it an abstract or common
-> device type used by the hotpluggable pci VGA card?
+--000000000000e7f36a059ec8af30
+Content-Type: text/plain; charset="UTF-8"
 
-This is TYPE_PCI_VGA (hw/display/vga-pci.c).
+Dear QEMU list members,
 
->=20
->> - hotpluggable devices missing unrealize()
->>
->>       a15mpcore_priv
->>       a9mpcore_priv
->=20
-> Most of these are not really hotpluggable. What is
-> confusing your test code is that sysbus devices get
-> the default 'hotpluggable =3D true' setting, but other
-> conditions usually prevent hotplugging. (The reason
-> hotpluggable is true is the default is because of
-> handling of 'dynamic sysbus' devices which live on
-> the 'platform bus'.) In particular, I think that
-> anything with !dc->user_creatable can't be hotplugged
-> unless board code specifically tries it, which would
-> be a bug for most of these devices.
+We developed a virtual machine using the QEMU code.  This virtual machine
+emulates a certain custom-made computer that runs on a certain military
+platform.  All I can tell you about this virtual machine is that it
+emulates a computer that has an e5500 processor.  Currently I am running
+this virtual machine on a T4240-RDB which has a PowerPC e6500 processor (if
+anyone remembers me posting about this same project earlier, we fixed the
+TCG problem thanks to you guys!).
 
-OK, checking '!dc->user_creatable' removes:
+Anyway, right now I'm trying to get this virtual machine working with KVM
+enabled.  It should work given that the virtual machine is emulating an
+e5500 processor and it's running on a board with an e6500 processor.  We're
+also using a kernel I built using Yocto and I'm pretty sure KVM is all good
+and working in this kernel (this was a whole story in it of itself, but if
+you're curious you can see my post history concerning getting KVM in the
+kernel).  But for some reason the VM hangs on an ioctl call when KVM is
+enabled and nothing else happens.  Now I don't think this hanging is
+necessarily the problem.  I think what might be the case is that after the
+VM makes the ioctl call, the VM should start running the operating system.
+But this doesn't seem to be happening; when I look at "info registers" I
+see that the NIP has the address of the start instruction of the operating
+system but nothing changes and the NIP doesn't progress from that point.
+Let me give some further detail on the subject.
 
-     ads7846
-     aer915
-     corgi-ssp
-     dpcd
-     ds1338
-     i2c-ddc
-     lm8323
-     max1111
-     max7310
-     mx25l25635e
-     mx66l1g45g
-     mx66u51235f
-     n25q128
-     n25q256a
-     n25q512a11
-     nand
-     pca9552
-     pxa2xx-i2c-slave
-     s25sl12801
-     sd-card
-     sii9022
-     spitz-lcdtg
-     ssd0303
-     ssd0323
-     sst25vf016b
-     sst25wf080
-     tmp105
-     tmp423
-     tosa_dac
-     tosa-ssp
-     twl92230
-     w25q256
-     w25q512jv
-     wm8750
-     zipit-lcd
+With some investigation using print statements/breakpoints I see that the
+VM enters into the following function call in the code (I included the call
+stack):
 
-Previous list only reduced from 300 to 265.
+qemu_kvm_cpu_thread_fn -> kvm_cpu_exec(cpu) -> kvm_vcpu_ioctl(cpu, KVM_RUN,
+0) -> ioctl(cpu->kvm_fd,  KVM_RUN, arg)
 
-I noticed this function, maybe I need to check parent_bus too:
+So the VM enters into a kernel level ioctl call of type KVM_RUN.  And after
+putting some print statements into the Yocto kernel itself I see that the
+VM enters into a function in the kernel code called kvmppc_vcpu_run(struct
+kvm_run *kvm_run, struct kvm_vcpu *vcpu) and then enters a function calling
+assembly code like so: ret = __kvmppc_vcpu_run(kvm_run, vcpu).  At this
+point since __kvmppc_vcpu_run() is a function calling assembly code in the
+kernel, I have not been able to follow this call any further.  But looking
+over the assembly code of this function I see some swapping of vCPU and
+host registers as well as a return-from-interrupt instruction at the end.
+See assembly code taken from bookehv_interrupts.S:
 
-static bool device_get_hotpluggable(Object *obj, Error **errp)
-{
-     DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
-     DeviceState *dev =3D DEVICE(obj);
+https://gist.github.com/WayneZhenLi/137a748dad3eebc9be6e9b7b1a49268e
 
-     return dc->hotpluggable && (dev->parent_bus =3D=3D NULL ||
-                                 qbus_is_hotpluggable(dev->parent_bus));
-}
+At this point I have two theories on what is happening:
 
->=20
-> Also, if there isn't anything for a device's unrealize
-> method to do, it doesn't need to provide one.
+1.  __kvmppc_vcpu_run is hitting the return from interrupt and the NIP of
+the VM is set to the start address of the operating system.  But for some
+KVM-related reason, the operating system isn't able to progress and we see
+the NIP stuck at the starting address.
+2. The return from interrupt is either not being reached or is sending me
+to some unknown address and thus the operating system is never run.
+Perhaps I see the NIP in "info registers" pointed at the starting address
+because of some startup thing QEMU does.  But maybe this doesn't reflect
+the actual position of the VM?
 
-This point is hard to check with simply with qtest.
+One more symptom of something not being quite right is this all describes
+the second KVM_RUN ioctl call being run.  Before this ioctl call, there is
+actually another KVM_RUN ioctl call that runs and completes, but fails with
+an error saying "kvm_run failed Interrupted system call".  I'm not sure how
+relevant that is but I just wanted to mention it in case it's important.
 
-Thanks for your comments, it helped sorting few things out.
+Anyway, I'm really not sure what the problem is.  This is everything I know
+at the moment but I really don't a have a good idea on why the operating
+system code isn't being run.  Please let me know your thoughts.
 
->=20
-> thanks
-> -- PMM
->=20
+-Thanks!, Wayne Li
 
+--000000000000e7f36a059ec8af30
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Dear QEMU list members,</div><div><br></div><div>We d=
+eveloped a virtual machine using the QEMU code.=C2=A0=20
+This virtual machine emulates a certain custom-made computer that runs on a=
+ certain military platform.=C2=A0 All I can tell you about this virtual mac=
+hine is that it emulates a computer that has an e5500 processor.=C2=A0 Curr=
+ently I am running this virtual machine on a=20
+T4240-RDB which has a PowerPC e6500 processor (if anyone remembers me posti=
+ng about this same project earlier, we fixed the TCG problem thanks to you =
+guys!).</div><div><br></div><div>Anyway, right now I&#39;m trying to get th=
+is virtual machine working with KVM enabled.=C2=A0 It should work given tha=
+t the virtual machine is emulating an e5500 processor and it&#39;s running =
+on a board with an e6500 processor.=C2=A0 We&#39;re also using a kernel I b=
+uilt using Yocto and I&#39;m pretty sure KVM is all good and working in thi=
+s kernel (this was a whole story in it of itself, but if you&#39;re curious=
+ you can see my post history concerning getting KVM in the kernel).=C2=A0 B=
+ut for some reason the VM hangs on an ioctl call when KVM is enabled and no=
+thing else happens.=C2=A0 Now I don&#39;t think this hanging is necessarily=
+ the problem.=C2=A0 I think what might be the case is that after the VM mak=
+es the ioctl call, the VM should start running the operating system.=C2=A0 =
+But this doesn&#39;t seem to be happening; when I look at &quot;info regist=
+ers&quot; I see that the NIP has the address of the start instruction of th=
+e operating system but nothing changes and the NIP doesn&#39;t progress fro=
+m that point.=C2=A0 Let me give some further detail on the subject.<br></di=
+v><div><br></div><div>With some investigation using print statements/breakp=
+oints I see that the VM enters into the following function call in the code=
+ (I included the call stack):</div><div><br></div><div>qemu_kvm_cpu_thread_=
+fn -&gt; kvm_cpu_exec(cpu) -&gt; kvm_vcpu_ioctl(cpu, KVM_RUN, 0) -&gt; ioct=
+l(cpu-&gt;kvm_fd,=C2=A0
+KVM_RUN, arg)</div><div><br></div><div>So the VM enters into a kernel level=
+ ioctl call of type KVM_RUN.=C2=A0 And after putting some print statements =
+into the Yocto kernel itself I see that the VM enters into a function in th=
+e kernel code called kvmppc_vcpu_run(struct kvm_run *kvm_run, struct kvm_vc=
+pu *vcpu) and then enters a function calling assembly code like so: ret =3D=
+ __kvmppc_vcpu_run(kvm_run, vcpu).=C2=A0 At this point since=20
+__kvmppc_vcpu_run() is a function calling assembly code in the kernel, I ha=
+ve not been able to follow this call any further.=C2=A0 But looking over th=
+e assembly code of this function I see some swapping of vCPU and host regis=
+ters as well as a return-from-interrupt instruction at the end.=C2=A0 See a=
+ssembly code taken from bookehv_interrupts.S:</div><div><br></div><div><a h=
+ref=3D"https://gist.github.com/WayneZhenLi/137a748dad3eebc9be6e9b7b1a49268e=
+">https://gist.github.com/WayneZhenLi/137a748dad3eebc9be6e9b7b1a49268e</a><=
+/div><div><br></div><div>At this point I have two theories on what is happe=
+ning:</div><div><br></div><div>1.=C2=A0=20
+__kvmppc_vcpu_run is hitting the return from interrupt and the NIP of the V=
+M is set to the start address of the operating system.=C2=A0 But for some K=
+VM-related reason, the operating system isn&#39;t able to progress and we s=
+ee the NIP stuck at the starting address.</div><div>2. The return from inte=
+rrupt is either not being reached or is sending me to some unknown address =
+and thus the operating system is never run.=C2=A0 Perhaps I see the NIP in =
+&quot;info registers&quot; pointed at the starting address because of some =
+startup thing QEMU does.=C2=A0 But maybe this doesn&#39;t reflect the actua=
+l position of the VM?<br></div><div><br></div><div>One more symptom of some=
+thing not being quite right is this all describes the second KVM_RUN ioctl =
+call being run.=C2=A0 Before this ioctl call, there is actually another KVM=
+_RUN ioctl call that runs and completes, but fails with an error saying &qu=
+ot;kvm_run failed Interrupted system call&quot;.=C2=A0 I&#39;m not sure how=
+ relevant that is but I just wanted to mention it in case it&#39;s importan=
+t.</div><div><br></div><div>Anyway, I&#39;m really not sure what the proble=
+m is.=C2=A0 This is everything I know at the moment but I really don&#39;t =
+a have a good idea on why the operating system code isn&#39;t being run.=C2=
+=A0 Please let me know your thoughts.</div><div><br></div><div>-Thanks!, Wa=
+yne Li<br></div><div><br></div></div>
+
+--000000000000e7f36a059ec8af30--
 
