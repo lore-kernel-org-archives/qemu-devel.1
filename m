@@ -2,83 +2,89 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A30C35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD026C761A6
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:34:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CC9E2070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:34:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88BA32070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:34:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIubl+A/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC9E2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mA4SMlf3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88BA32070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3gXa-0004FU-AK
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 08:34:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54502)
+	id 1j3gXl-0004h4-Mp
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 08:34:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55189)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j3gRj-0004In-CO
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:28:25 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j3gWi-0002xG-Ds
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j3gRg-0000sh-2O
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:28:23 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58039
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j3gRf-0000rr-TS
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:28:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581946099;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=41FcP4x2ytSyRf+bb3WRHdxlaC7aOONcpuzwqMnMcqs=;
- b=OIubl+A/9R7GUCn3UXi+AJWv+0rCPbhZ3taSM50n5FklQbCzARn5x/XH7rS6c/i1ujEoOG
- FGzRFl6QNnDqEqsEQeevQpeAbfXr0esO7n6fX6riwZm7mbQmpTl7hUIkTB+kHBOX2tt06h
- XO7djTs2oWH7BqTvVbG5ePsl9MkKPwE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-A2-O8_d4NUeUMWWO3jMhLA-1; Mon, 17 Feb 2020 08:28:17 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89AB11005F6C
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 13:28:16 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-234.ams2.redhat.com
- [10.36.117.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FCE15C3FA;
- Mon, 17 Feb 2020 13:28:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id AD4B411366C5; Mon, 17 Feb 2020 14:28:14 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j3gWh-0003kR-AT
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:33:32 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50981)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j3gWh-0003k5-4D; Mon, 17 Feb 2020 08:33:31 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a5so17148343wmb.0;
+ Mon, 17 Feb 2020 05:33:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Akr7B/6EjPnwm6unavMg229GyGf7rHs9Me2/2WnNero=;
+ b=mA4SMlf3namsK0FpuNXD5G47f4dYHn/5ZwJTjlxGfM9MuE11n6165OhHWOAeor/pB3
+ SXc+q8ZbCsi+LaHrwPj5vPlcQzo1gkh8ENX6w1vgp2Qcc4EML0Oci0AUDNXxtd/sOPEs
+ 9qm6xvFZoopN7c1Im9AH9qTpuzLAH/yroUmuL2LHE9C3tMJsPEgZvQu/id5bmu6vf0yS
+ yU5olkoOIyzxSCJMxetaZLFb5UASe4dCpaFiv+WLF9QKwsfyk5cmQ+snYLd0q9iTXqBC
+ xReVDytcR8pnFwj+p/72Fa433DSmXKxMtxpsUPKoFoMQKDqQW7OaBVsOZCqC3nGp8AZF
+ LYyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Akr7B/6EjPnwm6unavMg229GyGf7rHs9Me2/2WnNero=;
+ b=D8c2AqkgxjXWn9s3DmvO3o27G4+27uUQ3x33WbDWd83dLLcGyVJ/ihcdKDvFJ+fpGj
+ Yr8hAylay06A3on1MXEjkx/cXGntRd6U45FpvAJDRpJpEgEsuvhDkpaPDXBYgO02WUSA
+ iZFSImjzyM+laLcVQlXa/w0NEf8dWQn/ustX964SUj7XiS83YCoMzDC/VVcsUZ/R3zpF
+ 4ATnwA2ATyXUt3lcEQstALGpJODUZJQD/myGv6mmeykR7LBpX8hImRgGtm8ZWAJzuq2A
+ binGGYjdu0hfsK2yLU+gFrgihW57hbm21xx3DKv4ESWq7aEGoMGvnhbWRPyt1dW6IWaY
+ dc8Q==
+X-Gm-Message-State: APjAAAVhZbLV7m8r/MZbbWHEe/oNUEnF4AjUkpwqO5aE4Pqk7KnmThSF
+ XKdTKQkOd9SjhaykiyzlAZ+9Q61xu6o=
+X-Google-Smtp-Source: APXvYqy+KqNx+xpV3bIqHouHjKxAidz3kUTAqNFnVphZJGqmRKtlCOCfx//cd1Xj2aw+GaP39cuQWQ==
+X-Received: by 2002:a05:600c:d7:: with SMTP id
+ u23mr22847380wmm.145.1581946409627; 
+ Mon, 17 Feb 2020 05:33:29 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id x132sm28575891wmg.0.2020.02.17.05.33.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 17 Feb 2020 05:33:29 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 3/5] monitor: Collect "control" command handlers in
- qmp-cmds.control.c
-Date: Mon, 17 Feb 2020 14:28:12 +0100
-Message-Id: <20200217132814.9018-4-armbru@redhat.com>
-In-Reply-To: <20200217132814.9018-1-armbru@redhat.com>
-References: <20200217132814.9018-1-armbru@redhat.com>
+Subject: [PATCH v3] configure: Avoid compiling system tools on user build by
+ default
+Date: Mon, 17 Feb 2020 14:33:27 +0100
+Message-Id: <20200217133327.25144-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: A2-O8_d4NUeUMWWO3jMhLA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,381 +96,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kevin Wolf <kwolf@redhat.com>
+User-mode does not need the system tools. Do not build them by
+default if the user specifies --disable-system.
 
-Move all of the QMP commands handlers to implement the 'control' module
-(qapi/control.json) that can be shared between the system emulator and
-tools such as a storage daemon to a new file monitor/qmp-cmds-control.c.
+This disables building the following binaries on a user-only build:
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200129102239.31435-4-kwolf@redhat.com>
-[Commit message tweaked]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+- elf2dmp
+- qemu-edid
+- qemu-ga
+- qemu-img
+- qemu-io
+- qemu-nbd
+- ivshmem-client
+- ivshmem-server
+
+The qemu-user binaries are not affected by this change.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- monitor/misc.c             | 110 --------------------------
- monitor/qmp-cmds-control.c | 153 +++++++++++++++++++++++++++++++++++++
- monitor/qmp-cmds.c         |  14 ----
- monitor/Makefile.objs      |   3 +-
- 4 files changed, 155 insertions(+), 125 deletions(-)
- create mode 100644 monitor/qmp-cmds-control.c
+v3:
+- fixed typos (Aleksandar)
+v2:
+- use simpler if/else statement (therefore not adding Richard R-b)
+- improved description (Aleksandar)
+---
+ configure | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/monitor/misc.c b/monitor/misc.c
-index b4303d42d0..4c4e47fdc4 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -72,7 +72,6 @@
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qapi-commands-qom.h"
- #include "qapi/qapi-commands-trace.h"
--#include "qapi/qapi-emit-events.h"
- #include "qapi/qapi-init-commands.h"
- #include "qapi/error.h"
- #include "qapi/qmp-event.h"
-@@ -233,58 +232,6 @@ static void hmp_info_help(Monitor *mon, const QDict *q=
-dict)
-     help_cmd(mon, "info");
- }
-=20
--static void query_commands_cb(QmpCommand *cmd, void *opaque)
--{
--    CommandInfoList *info, **list =3D opaque;
--
--    if (!cmd->enabled) {
--        return;
--    }
--
--    info =3D g_malloc0(sizeof(*info));
--    info->value =3D g_malloc0(sizeof(*info->value));
--    info->value->name =3D g_strdup(cmd->name);
--    info->next =3D *list;
--    *list =3D info;
--}
--
--CommandInfoList *qmp_query_commands(Error **errp)
--{
--    CommandInfoList *list =3D NULL;
--    MonitorQMP *mon;
--
--    assert(monitor_is_qmp(cur_mon));
--    mon =3D container_of(cur_mon, MonitorQMP, common);
--
--    qmp_for_each_command(mon->commands, query_commands_cb, &list);
--
--    return list;
--}
--
--EventInfoList *qmp_query_events(Error **errp)
--{
--    /*
--     * TODO This deprecated command is the only user of
--     * QAPIEvent_str() and QAPIEvent_lookup[].  When the command goes,
--     * they should go, too.
--     */
--    EventInfoList *info, *ev_list =3D NULL;
--    QAPIEvent e;
--
--    for (e =3D 0 ; e < QAPI_EVENT__MAX ; e++) {
--        const char *event_name =3D QAPIEvent_str(e);
--        assert(event_name !=3D NULL);
--        info =3D g_malloc0(sizeof(*info));
--        info->value =3D g_malloc0(sizeof(*info->value));
--        info->value->name =3D g_strdup(event_name);
--
--        info->next =3D ev_list;
--        ev_list =3D info;
--    }
--
--    return ev_list;
--}
--
- /*
-  * Minor hack: generated marshalling suppressed for this command
-  * ('gen': false in the schema) so we can parse the JSON string
-@@ -323,63 +270,6 @@ static void monitor_init_qmp_commands(void)
-                          qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG=
-);
- }
-=20
--/*
-- * Accept QMP capabilities in @list for @mon.
-- * On success, set mon->qmp.capab[], and return true.
-- * On error, set @errp, and return false.
-- */
--static bool qmp_caps_accept(MonitorQMP *mon, QMPCapabilityList *list,
--                            Error **errp)
--{
--    GString *unavailable =3D NULL;
--    bool capab[QMP_CAPABILITY__MAX];
--
--    memset(capab, 0, sizeof(capab));
--
--    for (; list; list =3D list->next) {
--        if (!mon->capab_offered[list->value]) {
--            if (!unavailable) {
--                unavailable =3D g_string_new(QMPCapability_str(list->value=
-));
--            } else {
--                g_string_append_printf(unavailable, ", %s",
--                                      QMPCapability_str(list->value));
--            }
--        }
--        capab[list->value] =3D true;
--    }
--
--    if (unavailable) {
--        error_setg(errp, "Capability %s not available", unavailable->str);
--        g_string_free(unavailable, true);
--        return false;
--    }
--
--    memcpy(mon->capab, capab, sizeof(capab));
--    return true;
--}
--
--void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
--                          Error **errp)
--{
--    MonitorQMP *mon;
--
--    assert(monitor_is_qmp(cur_mon));
--    mon =3D container_of(cur_mon, MonitorQMP, common);
--
--    if (mon->commands =3D=3D &qmp_commands) {
--        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
--                  "Capabilities negotiation is already complete, command "
--                  "ignored");
--        return;
--    }
--
--    if (!qmp_caps_accept(mon, enable, errp)) {
--        return;
--    }
--
--    mon->commands =3D &qmp_commands;
--}
--
- /* Set the current CPU defined by the user. Callers must hold BQL. */
- int monitor_set_cpu(int cpu_index)
- {
-diff --git a/monitor/qmp-cmds-control.c b/monitor/qmp-cmds-control.c
-new file mode 100644
-index 0000000000..d5f21f90e6
---- /dev/null
-+++ b/monitor/qmp-cmds-control.c
-@@ -0,0 +1,153 @@
-+/*
-+ * QMP commands related to the monitor (common to sysemu and tools)
-+ *
-+ * Copyright (c) 2003-2004 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy
-+ * of this software and associated documentation files (the "Software"), t=
-o deal
-+ * in the Software without restriction, including without limitation the r=
-ights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included=
- in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
- OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN
-+ * THE SOFTWARE.
-+ */
+diff --git a/configure b/configure
+index 6f5d850949..efe00dd497 100755
+--- a/configure
++++ b/configure
+@@ -455,7 +455,7 @@ guest_agent_ntddscsi="no"
+ guest_agent_msi=""
+ vss_win32_sdk=""
+ win_sdk="no"
+-want_tools="yes"
++want_tools=""
+ libiscsi=""
+ libnfs=""
+ coroutine=""
+@@ -2213,6 +2213,16 @@ else
+     echo big/little test failed
+ fi
+ 
++##########################################
++# system tools
++if test -z "$want_tools"; then
++    if test "$softmmu" = "no"; then
++        want_tools=no
++    else
++        want_tools=yes
++    fi
++fi
 +
-+#include "qemu/osdep.h"
-+
-+#include "monitor-internal.h"
-+#include "qemu-version.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-commands-control.h"
-+#include "qapi/qapi-emit-events.h"
-+
-+/*
-+ * Accept QMP capabilities in @list for @mon.
-+ * On success, set mon->qmp.capab[], and return true.
-+ * On error, set @errp, and return false.
-+ */
-+static bool qmp_caps_accept(MonitorQMP *mon, QMPCapabilityList *list,
-+                            Error **errp)
-+{
-+    GString *unavailable =3D NULL;
-+    bool capab[QMP_CAPABILITY__MAX];
-+
-+    memset(capab, 0, sizeof(capab));
-+
-+    for (; list; list =3D list->next) {
-+        if (!mon->capab_offered[list->value]) {
-+            if (!unavailable) {
-+                unavailable =3D g_string_new(QMPCapability_str(list->value=
-));
-+            } else {
-+                g_string_append_printf(unavailable, ", %s",
-+                                      QMPCapability_str(list->value));
-+            }
-+        }
-+        capab[list->value] =3D true;
-+    }
-+
-+    if (unavailable) {
-+        error_setg(errp, "Capability %s not available", unavailable->str);
-+        g_string_free(unavailable, true);
-+        return false;
-+    }
-+
-+    memcpy(mon->capab, capab, sizeof(capab));
-+    return true;
-+}
-+
-+void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-+                          Error **errp)
-+{
-+    MonitorQMP *mon;
-+
-+    assert(monitor_is_qmp(cur_mon));
-+    mon =3D container_of(cur_mon, MonitorQMP, common);
-+
-+    if (mon->commands =3D=3D &qmp_commands) {
-+        error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-+                  "Capabilities negotiation is already complete, command "
-+                  "ignored");
-+        return;
-+    }
-+
-+    if (!qmp_caps_accept(mon, enable, errp)) {
-+        return;
-+    }
-+
-+    mon->commands =3D &qmp_commands;
-+}
-+
-+VersionInfo *qmp_query_version(Error **errp)
-+{
-+    VersionInfo *info =3D g_new0(VersionInfo, 1);
-+
-+    info->qemu =3D g_new0(VersionTriple, 1);
-+    info->qemu->major =3D QEMU_VERSION_MAJOR;
-+    info->qemu->minor =3D QEMU_VERSION_MINOR;
-+    info->qemu->micro =3D QEMU_VERSION_MICRO;
-+    info->package =3D g_strdup(QEMU_PKGVERSION);
-+
-+    return info;
-+}
-+
-+static void query_commands_cb(QmpCommand *cmd, void *opaque)
-+{
-+    CommandInfoList *info, **list =3D opaque;
-+
-+    if (!cmd->enabled) {
-+        return;
-+    }
-+
-+    info =3D g_malloc0(sizeof(*info));
-+    info->value =3D g_malloc0(sizeof(*info->value));
-+    info->value->name =3D g_strdup(cmd->name);
-+    info->next =3D *list;
-+    *list =3D info;
-+}
-+
-+CommandInfoList *qmp_query_commands(Error **errp)
-+{
-+    CommandInfoList *list =3D NULL;
-+    MonitorQMP *mon;
-+
-+    assert(monitor_is_qmp(cur_mon));
-+    mon =3D container_of(cur_mon, MonitorQMP, common);
-+
-+    qmp_for_each_command(mon->commands, query_commands_cb, &list);
-+
-+    return list;
-+}
-+
-+EventInfoList *qmp_query_events(Error **errp)
-+{
-+    /*
-+     * TODO This deprecated command is the only user of
-+     * QAPIEvent_str() and QAPIEvent_lookup[].  When the command goes,
-+     * they should go, too.
-+     */
-+    EventInfoList *info, *ev_list =3D NULL;
-+    QAPIEvent e;
-+
-+    for (e =3D 0 ; e < QAPI_EVENT__MAX ; e++) {
-+        const char *event_name =3D QAPIEvent_str(e);
-+        assert(event_name !=3D NULL);
-+        info =3D g_malloc0(sizeof(*info));
-+        info->value =3D g_malloc0(sizeof(*info->value));
-+        info->value->name =3D g_strdup(event_name);
-+
-+        info->next =3D ev_list;
-+        ev_list =3D info;
-+    }
-+
-+    return ev_list;
-+}
-diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-index a55d2dffc2..da7083087e 100644
---- a/monitor/qmp-cmds.c
-+++ b/monitor/qmp-cmds.c
-@@ -15,7 +15,6 @@
-=20
- #include "qemu/osdep.h"
- #include "qemu-common.h"
--#include "qemu-version.h"
- #include "qemu/cutils.h"
- #include "qemu/option.h"
- #include "monitor/monitor.h"
-@@ -52,19 +51,6 @@ NameInfo *qmp_query_name(Error **errp)
-     return info;
- }
-=20
--VersionInfo *qmp_query_version(Error **errp)
--{
--    VersionInfo *info =3D g_new0(VersionInfo, 1);
--
--    info->qemu =3D g_new0(VersionTriple, 1);
--    info->qemu->major =3D QEMU_VERSION_MAJOR;
--    info->qemu->minor =3D QEMU_VERSION_MINOR;
--    info->qemu->micro =3D QEMU_VERSION_MICRO;
--    info->package =3D g_strdup(QEMU_PKGVERSION);
--
--    return info;
--}
--
- KvmInfo *qmp_query_kvm(Error **errp)
- {
-     KvmInfo *info =3D g_malloc0(sizeof(*info));
-diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
-index e91a8581cd..9244d90859 100644
---- a/monitor/Makefile.objs
-+++ b/monitor/Makefile.objs
-@@ -1,3 +1,4 @@
- obj-y +=3D misc.o
- common-obj-y +=3D monitor.o qmp.o hmp.o
--common-obj-y +=3D qmp-cmds.o hmp-cmds.o
-+common-obj-y +=3D qmp-cmds.o qmp-cmds-control.o
-+common-obj-y +=3D hmp-cmds.o
---=20
+ ##########################################
+ # cocoa implies not SDL or GTK
+ # (the cocoa UI code currently assumes it is always the active UI
+-- 
 2.21.1
 
 
