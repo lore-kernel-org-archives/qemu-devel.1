@@ -2,90 +2,97 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 934B7C34021
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 159CEC34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:05:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EA8E20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:01:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D702620679
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:05:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H4tqp8Zv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EA8E20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VYk9axS+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D702620679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3iq6-0006F2-Ic
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 11:01:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51985)
+	id 1j3iu2-0000PV-3l
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 11:05:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52464)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j3ipR-0005gL-De
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:01:02 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j3itD-0007uj-Tz
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:04:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j3ipQ-0002Ix-EY
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:01:01 -0500
-Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:38022)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j3ipQ-0002IU-7f
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:01:00 -0500
-Received: by mail-pg1-x536.google.com with SMTP id d6so9402736pgn.5
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 08:01:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9KPjxQ/XLR0JpyUS0eLG2ggucwbv0Pmr8Qap3U39m6k=;
- b=H4tqp8ZvNOBU+9jSIcn7PT8l6m0rXmO/z0QIfgtaZOwnmrK2d7VTzsNve50Zryysls
- krlMsiCOpiAywxXmfis8g57vfvVLcKyK5kvSfkS9NIDSKJ4n4BJ00syH4q+Kyl8Z1IuB
- SCA13wO5/oNZMMuKulBHcYKAAY+Irh/TRo59mNRhdx+OtuuIkQFnulhM1fnXxcVxMVGt
- RQG2fRnDJk2VFewam8GKoy2aHkl+fbxo8auRmZO6UObbVWKx5IJTSkVZxQyGJTMKVGsF
- 9S7wv6DTk4tIoxLgalshzsvYN/PZT8Y3ykIARdnnLwn5a5+5nySM6HAGHA/zpqcdY06I
- b/Fw==
+ (envelope-from <pbonzini@redhat.com>) id 1j3itC-0004Q1-EX
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:04:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46744
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j3itC-0004PS-9s
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:04:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581955492;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=a5oVjeOBJ4QOW7kLeXrNISE7Hu1omiVhrvZx7eDDs/4=;
+ b=VYk9axS+ki1HP5Q/e+DJ6Qouei2Td3HyZ38QMVmieqw/brn+WJekBDi2wgwzyxH8lGZpye
+ qvm0tLjGCAQoFDaBgbm9CI7HOPYDPiOzKgJX4TRuLPx7nFa3+rtkJpG3paDgvQZ1u+6mk9
+ Yg7yIkvZA8UHDLIwyoK4mgZImeVck0U=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-B8OMeyDXOs2vL0NpUi338Q-1; Mon, 17 Feb 2020 11:04:50 -0500
+Received: by mail-wr1-f72.google.com with SMTP id o6so9131209wrp.8
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 08:04:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=9KPjxQ/XLR0JpyUS0eLG2ggucwbv0Pmr8Qap3U39m6k=;
- b=VSlsnXgByaCJxiUMpWTsIJqLlNSdblhaHC3Qg/sP1sPNA2nGvUVjLrNtwERSWB5qgQ
- GTVaqFHw5W6PNB/j+lFc2CFi21tcl0FUF/3BiCyEEfBfSJPVJQPVSE8ziVy2F26hpgwr
- SFNMZCo5CTj7ZK0oaHZId3NvoKDhBqLlC0BZ9IdVrSUsWfMfWbT9eMMDYJzeQ/nnuDxU
- po6In/zqzPJ8b9HXqt3sZgbrpHObCIngt0vigLmjOLOcHBJlvVdjEbDmAe3PojaxbAkQ
- eLrfC4AiJasI1qRP1Fg0MXHAdGQe2mVRh46J3sHX3nqdWE/3DUjB/g3DHXQ5M9GoBrLG
- wSbQ==
-X-Gm-Message-State: APjAAAUNh/CXKMQG2g/TQpQoHovM4EqZLUZhx4V8Dk1jd4HnOaaPm9Rx
- ICo0fqgsxZLA1ABrP02SaRWzNQ==
-X-Google-Smtp-Source: APXvYqyUYN4YjyPLLgtxm9RWwTvJVkjeiS4F144aQwChxaO3EKWaAuoWDKQp0WbMDfPqw1ZzcJLFSw==
-X-Received: by 2002:aa7:8755:: with SMTP id g21mr17183548pfo.36.1581955258860; 
- Mon, 17 Feb 2020 08:00:58 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- 196sm919794pfy.86.2020.02.17.08.00.57
+ bh=a5oVjeOBJ4QOW7kLeXrNISE7Hu1omiVhrvZx7eDDs/4=;
+ b=W563UcfvGemwrNotvH1ejLsuOhk1yEqBSRXDhGWqAC2289ujB79xiYch9Z70zu5XHd
+ Zl/Q9BfnlQNTwsDvB2BnDSyLXAr38dJFnjAfmZcCt6MnYf6YSHTb/+aAMk8O8DF/OzVX
+ AMboJDqk1WTpqoHlByY3fd+lmk2JMmnc8Fg1Gb107aVgn3vG6pTh1x046OVKKIke9H2u
+ VPUP33HrCqgVUTrnz5h6o/TZegZsZP2RzNRzxm4gsZT8E/0HdpzbUiXjER5tA/0vPlrL
+ dypuGzAGAtPbv01q6+gS/F/M4YNKeWhHS4O/7aTFJxkCZmlCLepG7kMrPvGdDUncl5d5
+ oJYw==
+X-Gm-Message-State: APjAAAXHkqgiXzyvjtcgMvo2Kyq9eOtX4HvCZm4FGhJJcVELF+YjYIj0
+ WXiZ84543n+dqejm/l7M4gzGq5LwhjiT1pDHEjsPKyUgoYAxhOkmqL/tLxlQKhxjbaVDWsDsduS
+ pcTUWEazFmJrt6n0=
+X-Received: by 2002:a5d:6a52:: with SMTP id t18mr21985705wrw.335.1581955489217; 
+ Mon, 17 Feb 2020 08:04:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzVuekGgXpYqKEzhcJC20VxerGYYDncHaCOKFO4NUqHtVz9mfEghjWcsE0lAZQUK2psIVrSEQ==
+X-Received: by 2002:a5d:6a52:: with SMTP id t18mr21985677wrw.335.1581955488934; 
+ Mon, 17 Feb 2020 08:04:48 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4?
+ ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
+ by smtp.gmail.com with ESMTPSA id a16sm1564527wrx.87.2020.02.17.08.04.48
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 08:00:58 -0800 (PST)
+ Mon, 17 Feb 2020 08:04:48 -0800 (PST)
 Subject: Re: [PATCH 0/3] docs: Create a 'tools' manual
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200217155415.30949-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5e72c9b1-cfa7-fd28-18bf-a99cc520fa94@linaro.org>
-Date: Mon, 17 Feb 2020 08:00:55 -0800
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1865c4e9-a0b5-0c50-adb8-e46da1b0d8a9@redhat.com>
+Date: Mon, 17 Feb 2020 17:04:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.1.1
 MIME-Version: 1.0
 In-Reply-To: <20200217155415.30949-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+X-MC-Unique: B8OMeyDXOs2vL0NpUi338Q-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::536
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,22 +104,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/17/20 7:54 AM, Peter Maydell wrote:
-> Peter Maydell (3):
->   docs: Create new 'tools' manual
->   docs: Move qemu-option-trace.rst.inc to docs/
->   docs: Move tools documentation to tools manual
+On 17/02/20 16:54, Peter Maydell wrote:
+> This patchset creates the new 'tools' manual that we've
+> decided we should have, and moves 5 existing documents to it:
+> 
+>  docs/interop/qemu-img.rst
+>  docs/interop/qemu-nbd.rst
+>  docs/interop/virtfs-proxy-helper.rst
+>  docs/interop/qemu-trace-stap.rst
+>  docs/interop/virtiofsd.rst
+> 
+> This change will conflict with the QAPI-doc-comment-to-rST
+> patchset because they both change the docs/interop makefile
+> rules, but I expect this one to get in to master first;
+> the other needs a respin at some point anyhow.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
+We can move them back to the system manual once it's converted to rST,
+but for now it's the best solution.
 
-r~
+(In fact, I am willing to do the conversion from texi to rST if: 1)
+someone else helps with the .hx parts; 2) we accept that the current
+structure of the manual isn't great but we agree to reorganize
+everything after the conversion).
+
+Paolo
+
 
