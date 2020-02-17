@@ -2,102 +2,81 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC14C34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8498DC34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:25:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B5A820836
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 463B120836
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:25:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tpu8/ESS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B5A820836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PPaRfg/b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 463B120836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3l4F-0001Jw-OG
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:24:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42754)
+	id 1j3l5C-0002Z3-Gb
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:25:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j3knB-0003o3-Di
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:06:53 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j3l4H-0001XZ-7o
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:24:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j3kn7-0004a8-DQ
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:06:49 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54885
+ (envelope-from <dgilbert@redhat.com>) id 1j3l4E-0005tH-Pi
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:24:28 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52178
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3kn7-0004Zv-9d
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:06:45 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j3l4E-0005sR-LA
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:24:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581962804;
+ s=mimecast20190719; t=1581963865;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3E9XR6lPSQmFLTOuPRjNCXSiWUwgckxgqmP4YLjxFM4=;
- b=Tpu8/ESSQrQSD5yeMY/GdRnj80+u+08lKkIJBGl+aluna5DlisQqiYFH1ksP1A69J1+dl9
- Z22P9nARXlC4oY5abE0eb+riqckfVPFEyp9xFwh1jyqfB1lzr+pWcdtcafdG169B/cPrl5
- Fwr0yk3sSXPnUi1DP8OaE9IWUwtZ0rk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-YGITNztGOsCyf3CtgKnG9Q-1; Mon, 17 Feb 2020 13:06:39 -0500
-Received: by mail-wr1-f72.google.com with SMTP id w17so9395844wrr.9
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 10:06:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+KaQvuw+N85MwcdG1Zov2m//+h1L+wULiqZviO4qUSA=;
- b=Y1usKStfkWwvWnV8VPzP0EEicaxjZa0+RoJbKVqj4Itb6QIdlGrzv0gDLvUeGqq4bS
- 2LeRRtZ/Nshp99f2EvXKDx8A1t2So8lZBsyWW2sXnDcpP2fQ7phgo1vjUM3V4vPsLH63
- CHoIzS357LdlzrIsO0jFe53+p9/6aN7VivutAedzGpJ3eqruOeOGlAj/OdFbRWZ8X5l3
- nRpjxqQ95E+I+fK37M3MUItv4sIEdWtp0FF0eTEE8gei4PBCz1SOHno2b/BU11PAvfh/
- Uq7Wo3RZ7QyOJLfCZGsNDGdA/bLofLX1QC9jCKuHi87XOLnHAzz6AM8DLvn3bOA39Orw
- /J6Q==
-X-Gm-Message-State: APjAAAVflyC3bf1CcGrY4YGiLJ1bTIqb5VETz/VLc2fRamZbXEh5UPHa
- pktGpqJFVRGAN2ydLqOVOiKw88iPr5M7LRqxB8zItB3DeF4ZjjFJKHXrZu5uDxIq2+R1hRF1T/0
- 26qRioFdkaY54/J8=
-X-Received: by 2002:a05:600c:292:: with SMTP id
- 18mr255462wmk.128.1581962798419; 
- Mon, 17 Feb 2020 10:06:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxD/ORupSBHdFrKT4I5hDg49Avjs/JcfmU7PEvyI0oRAhnNFRlPF/gxAGeGEH2PQZB+svCyQw==
-X-Received: by 2002:a05:600c:292:: with SMTP id
- 18mr255445wmk.128.1581962798171; 
- Mon, 17 Feb 2020 10:06:38 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id x132sm631143wmg.0.2020.02.17.10.06.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 10:06:37 -0800 (PST)
-Subject: Re: [PATCH v5 29/79] arm/raspi: use memdev for RAM
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20200217173452.15243-1-imammedo@redhat.com>
- <20200217173452.15243-30-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1d9dbcde-ed08-0534-f9c5-8682b9c4874a@redhat.com>
-Date: Mon, 17 Feb 2020 19:06:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=uVJjsfIr2c5gRiCAbfvFGBUbypqM7ujb7TaF0DpianY=;
+ b=PPaRfg/bg3I4OCZhzHmijO+pyGQvTS6bC7ebRlxPFY/Bk+W44RCi/OP1cNQ51KXqt+y72i
+ vNXhzXcm13Ofix0/pinOrpgjtxSolzyl4BuKPyz3xvYWh9ItrSSzgsgv8O+wBnFJgiTRKg
+ gQz8iHI/3O5whDlXwDeMfwpBxye2VFc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-m8pPkyPjPo6FwvcW6ewqpw-1; Mon, 17 Feb 2020 13:24:21 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4E83800D50;
+ Mon, 17 Feb 2020 18:24:20 +0000 (UTC)
+Received: from work-vm (ovpn-116-78.ams2.redhat.com [10.36.116.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D04F19C69;
+ Mon, 17 Feb 2020 18:24:16 +0000 (UTC)
+Date: Mon, 17 Feb 2020 18:24:14 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 3/3] docs: Move tools documentation to tools manual
+Message-ID: <20200217182414.GC3434@work-vm>
+References: <20200217155415.30949-1-peter.maydell@linaro.org>
+ <20200217155415.30949-4-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200217173452.15243-30-imammedo@redhat.com>
-Content-Language: en-US
-X-MC-Unique: YGITNztGOsCyf3CtgKnG9Q-1
+In-Reply-To: <20200217155415.30949-4-peter.maydell@linaro.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: m8pPkyPjPo6FwvcW6ewqpw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,85 +88,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew.Baumann@microsoft.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/17/20 6:34 PM, Igor Mammedov wrote:
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->      MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> Move the following tools documentation files to the new tools manual:
 >=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>  docs/interop/qemu-img.rst
+>  docs/interop/qemu-nbd.rst
+>  docs/interop/virtfs-proxy-helper.rst
+>  docs/interop/qemu-trace-stap.rst
+>  docs/interop/virtiofsd.rst
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Would docs/tools be the right place for the virtiofsd security guide
+(as previously posted there)?  It's not actually a manpage.
 
+Dave
 > ---
-> CC: Andrew.Baumann@microsoft.com
-> CC: philmd@redhat.com
+>  Makefile                                      | 34 ++++++++++---------
+>  docs/interop/conf.py                          | 12 -------
+>  docs/interop/index.rst                        |  5 ---
+>  docs/tools/conf.py                            | 17 ++++++++++
+>  docs/tools/index.rst                          |  6 ++++
+>  docs/{interop =3D> tools}/qemu-img.rst          |  0
+>  docs/{interop =3D> tools}/qemu-nbd.rst          |  0
+>  docs/{interop =3D> tools}/qemu-trace-stap.rst   |  0
+>  .../virtfs-proxy-helper.rst                   |  0
+>  docs/{interop =3D> tools}/virtiofsd.rst         |  0
+>  10 files changed, 41 insertions(+), 33 deletions(-)
+>  rename docs/{interop =3D> tools}/qemu-img.rst (100%)
+>  rename docs/{interop =3D> tools}/qemu-nbd.rst (100%)
+>  rename docs/{interop =3D> tools}/qemu-trace-stap.rst (100%)
+>  rename docs/{interop =3D> tools}/virtfs-proxy-helper.rst (100%)
+>  rename docs/{interop =3D> tools}/virtiofsd.rst (100%)
 >=20
-> v5:
->        * fixed rebase conflicts once more
-> v4:
->        * fixed rebase conflicts
-> ---
->   hw/arm/raspi.c | 10 ++++------
->   1 file changed, 4 insertions(+), 6 deletions(-)
+> diff --git a/Makefile b/Makefile
+> index 886d4299d54..7a9c682a2c0 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -345,11 +345,11 @@ endif
+> =20
+>  ifdef BUILD_DOCS
+>  DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1
+> -DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-img.1
+> -DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-nbd.8
+> +DOCS+=3D$(MANUAL_BUILDDIR)/tools/qemu-img.1
+> +DOCS+=3D$(MANUAL_BUILDDIR)/tools/qemu-nbd.8
+>  DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-ga.8
+>  ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
+> -DOCS+=3D$(MANUAL_BUILDDIR)/interop/virtiofsd.1
+> +DOCS+=3D$(MANUAL_BUILDDIR)/tools/virtiofsd.1
+>  endif
+>  DOCS+=3D$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
+>  DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt doc=
+s/interop/qemu-qmp-ref.7
+> @@ -357,10 +357,10 @@ DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/=
+qemu-ga-ref.txt docs/interop/qe
+>  DOCS+=3Ddocs/qemu-cpu-models.7
+>  DOCS+=3D$(MANUAL_BUILDDIR)/index.html
+>  ifdef CONFIG_VIRTFS
+> -DOCS+=3D$(MANUAL_BUILDDIR)/interop/virtfs-proxy-helper.1
+> +DOCS+=3D$(MANUAL_BUILDDIR)/tools/virtfs-proxy-helper.1
+>  endif
+>  ifdef CONFIG_TRACE_SYSTEMTAP
+> -DOCS+=3D$(MANUAL_BUILDDIR)/interop/qemu-trace-stap.1
+> +DOCS+=3D$(MANUAL_BUILDDIR)/tools/qemu-trace-stap.1
+>  endif
+>  else
+>  DOCS=3D
+> @@ -848,12 +848,12 @@ ifdef CONFIG_POSIX
+>  =09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-block-drivers.7 "$(DES=
+TDIR)$(mandir)/man7"
+>  =09$(INSTALL_DATA) docs/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
+>  ifeq ($(CONFIG_TOOLS),y)
+> -=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-img.1 "$(DESTDIR)$(ma=
+ndir)/man1"
+> +=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-img.1 "$(DESTDIR)$(mand=
+ir)/man1"
+>  =09$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
+> -=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-nbd.8 "$(DESTDIR)$(ma=
+ndir)/man8"
+> +=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-nbd.8 "$(DESTDIR)$(mand=
+ir)/man8"
+>  endif
+>  ifdef CONFIG_TRACE_SYSTEMTAP
+> -=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-trace-stap.1 "$(DESTD=
+IR)$(mandir)/man1"
+> +=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-trace-stap.1 "$(DESTDIR=
+)$(mandir)/man1"
+>  endif
+>  ifneq (,$(findstring qemu-ga,$(TOOLS)))
+>  =09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-ga.8 "$(DESTDIR)$(man=
+dir)/man8"
+> @@ -864,10 +864,10 @@ endif
+>  endif
+>  ifdef CONFIG_VIRTFS
+>  =09$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
+> -=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/virtfs-proxy-helper.1 "$(D=
+ESTDIR)$(mandir)/man1"
+> +=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/virtfs-proxy-helper.1 "$(DES=
+TDIR)$(mandir)/man1"
+>  endif
+>  ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
+> -=09$(INSTALL_DATA) docs/interop/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
+> +=09$(INSTALL_DATA) docs/tools/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
+>  endif
+> =20
+>  install-datadir:
+> @@ -1049,7 +1049,7 @@ endef
+>  $(MANUAL_BUILDDIR)/devel/index.html: $(call manual-deps,devel)
+>  =09$(call build-manual,devel,html)
+> =20
+> -$(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop) $(SRC=
+_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc
+> +$(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop)
+>  =09$(call build-manual,interop,html)
+> =20
+>  $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+> @@ -1058,16 +1058,18 @@ $(MANUAL_BUILDDIR)/specs/index.html: $(call manua=
+l-deps,specs)
+>  $(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system)
+>  =09$(call build-manual,system,html)
+> =20
+> -$(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools)
+> +$(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools) $(SRC_PAT=
+H)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc
+>  =09$(call build-manual,tools,html)
+> =20
+> -$(call define-manpage-rule,interop,\
+> -       qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
+> -       virtiofsd.1 virtfs-proxy-helper.1,\
+> -       $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.r=
+st.inc)
+> +$(call define-manpage-rule,interop,qemu-ga.8)
+> =20
+>  $(call define-manpage-rule,system,qemu-block-drivers.7)
+> =20
+> +$(call define-manpage-rule,tools,\
+> +       qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
+> +       virtiofsd.1 virtfs-proxy-helper.1,\
+> +       $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.r=
+st.inc)
+> +
+>  $(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-versi=
+on.h
+>  =09@mkdir -p "$(MANUAL_BUILDDIR)"
+>  =09$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
+> diff --git a/docs/interop/conf.py b/docs/interop/conf.py
+> index b3cda17042c..42ce7e3d365 100644
+> --- a/docs/interop/conf.py
+> +++ b/docs/interop/conf.py
+> @@ -19,16 +19,4 @@ html_theme_options['description'] =3D u'System Emulati=
+on Management and Interopera
+>  man_pages =3D [
+>      ('qemu-ga', 'qemu-ga', u'QEMU Guest Agent',
+>       ['Michael Roth <mdroth@linux.vnet.ibm.com>'], 8),
+> -    ('qemu-img', 'qemu-img', u'QEMU disk image utility',
+> -     ['Fabrice Bellard'], 1),
+> -    ('qemu-nbd', 'qemu-nbd', u'QEMU Disk Network Block Device Server',
+> -     ['Anthony Liguori <anthony@codemonkey.ws>'], 8),
+> -    ('qemu-trace-stap', 'qemu-trace-stap', u'QEMU SystemTap trace tool',
+> -     [], 1),
+> -    ('virtfs-proxy-helper', 'virtfs-proxy-helper',
+> -     u'QEMU 9p virtfs proxy filesystem helper',
+> -     ['M. Mohan Kumar'], 1),
+> -    ('virtiofsd', 'virtiofsd', u'QEMU virtio-fs shared file system daemo=
+n',
+> -     ['Stefan Hajnoczi <stefanha@redhat.com>',
+> -      'Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>'], 1),
+>  ]
+> diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+> index e8455b4270c..049387ac6de 100644
+> --- a/docs/interop/index.rst
+> +++ b/docs/interop/index.rst
+> @@ -18,10 +18,5 @@ Contents:
+>     live-block-operations
+>     pr-helper
+>     qemu-ga
+> -   qemu-img
+> -   qemu-nbd
+> -   qemu-trace-stap
+>     vhost-user
+>     vhost-user-gpu
+> -   virtfs-proxy-helper
+> -   virtiofsd
+> diff --git a/docs/tools/conf.py b/docs/tools/conf.py
+> index 56461110b9d..9052d17d6d4 100644
+> --- a/docs/tools/conf.py
+> +++ b/docs/tools/conf.py
+> @@ -14,3 +14,20 @@ exec(compile(open(parent_config, "rb").read(), parent_=
+config, 'exec'))
+>  # the manual title to appear in the sidebar.
+>  html_theme_options['description'] =3D \
+>      u'Tools Guide'
+> +
+> +# One entry per manual page. List of tuples
+> +# (source start file, name, description, authors, manual section).
+> +man_pages =3D [
+> +    ('qemu-img', 'qemu-img', u'QEMU disk image utility',
+> +     ['Fabrice Bellard'], 1),
+> +    ('qemu-nbd', 'qemu-nbd', u'QEMU Disk Network Block Device Server',
+> +     ['Anthony Liguori <anthony@codemonkey.ws>'], 8),
+> +    ('qemu-trace-stap', 'qemu-trace-stap', u'QEMU SystemTap trace tool',
+> +     [], 1),
+> +    ('virtfs-proxy-helper', 'virtfs-proxy-helper',
+> +     u'QEMU 9p virtfs proxy filesystem helper',
+> +     ['M. Mohan Kumar'], 1),
+> +    ('virtiofsd', 'virtiofsd', u'QEMU virtio-fs shared file system daemo=
+n',
+> +     ['Stefan Hajnoczi <stefanha@redhat.com>',
+> +      'Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>'], 1),
+> +]
+> diff --git a/docs/tools/index.rst b/docs/tools/index.rst
+> index c5a4a13ec7a..232ce9f3e46 100644
+> --- a/docs/tools/index.rst
+> +++ b/docs/tools/index.rst
+> @@ -9,3 +9,9 @@ Contents:
+> =20
+>  .. toctree::
+>     :maxdepth: 2
+> +
+> +   qemu-img
+> +   qemu-nbd
+> +   qemu-trace-stap
+> +   virtfs-proxy-helper
+> +   virtiofsd
+> diff --git a/docs/interop/qemu-img.rst b/docs/tools/qemu-img.rst
+> similarity index 100%
+> rename from docs/interop/qemu-img.rst
+> rename to docs/tools/qemu-img.rst
+> diff --git a/docs/interop/qemu-nbd.rst b/docs/tools/qemu-nbd.rst
+> similarity index 100%
+> rename from docs/interop/qemu-nbd.rst
+> rename to docs/tools/qemu-nbd.rst
+> diff --git a/docs/interop/qemu-trace-stap.rst b/docs/tools/qemu-trace-sta=
+p.rst
+> similarity index 100%
+> rename from docs/interop/qemu-trace-stap.rst
+> rename to docs/tools/qemu-trace-stap.rst
+> diff --git a/docs/interop/virtfs-proxy-helper.rst b/docs/tools/virtfs-pro=
+xy-helper.rst
+> similarity index 100%
+> rename from docs/interop/virtfs-proxy-helper.rst
+> rename to docs/tools/virtfs-proxy-helper.rst
+> diff --git a/docs/interop/virtiofsd.rst b/docs/tools/virtiofsd.rst
+> similarity index 100%
+> rename from docs/interop/virtiofsd.rst
+> rename to docs/tools/virtiofsd.rst
+> --=20
+> 2.20.1
 >=20
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index 90ad9b8115..acd2bb794d 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -39,7 +39,6 @@ typedef struct RaspiMachineState {
->       MachineState parent_obj;
->       /*< public >*/
->       BCM283XState soc;
-> -    MemoryRegion ram;
->   } RaspiMachineState;
->  =20
->   typedef struct RaspiMachineClass {
-> @@ -277,16 +276,14 @@ static void raspi_machine_init(MachineState *machin=
-e)
->           exit(1);
->       }
->  =20
-> -    /* Allocate and map RAM */
-> -    memory_region_allocate_system_memory(&s->ram, OBJECT(machine), "ram"=
-,
-> -                                         machine->ram_size);
->       /* FIXME: Remove when we have custom CPU address space support */
-> -    memory_region_add_subregion_overlap(get_system_memory(), 0, &s->ram,=
- 0);
-> +    memory_region_add_subregion_overlap(get_system_memory(), 0,
-> +                                        machine->ram, 0);
->  =20
->       /* Setup the SOC */
->       object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->=
-soc),
->                               board_soc_type(board_rev), &error_abort, NU=
-LL);
-> -    object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ra=
-m),
-> +    object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(machin=
-e->ram),
->                                      &error_abort);
->       object_property_set_int(OBJECT(&s->soc), board_rev, "board-rev",
->                               &error_abort);
-> @@ -324,6 +321,7 @@ static void raspi_machine_class_init(ObjectClass *oc,=
- void *data)
->       mc->no_cdrom =3D 1;
->       mc->default_cpus =3D mc->min_cpus =3D mc->max_cpus =3D cores_count(=
-board_rev);
->       mc->default_ram_size =3D board_ram_size(board_rev);
-> +    mc->default_ram_id =3D "ram";
->       if (board_version(board_rev) =3D=3D 2) {
->           mc->ignore_memory_transaction_failures =3D true;
->       }
->=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
