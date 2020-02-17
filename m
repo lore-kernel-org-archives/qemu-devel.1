@@ -2,82 +2,88 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E94C35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 10:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 954EBC35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 10:58:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3057208C4
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 10:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D97520725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 10:58:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ILuadbf2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3057208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYCGkTjX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D97520725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3dma-0000qp-Uf
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 05:37:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60991)
+	id 1j3e6B-0005mt-GF
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 05:57:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34709)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j3dm1-0000Kb-6J
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:37:10 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j3e5G-0004to-LW
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:57:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j3dlz-0002ya-Hv
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:37:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54227
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j3dlz-0002y1-D8
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:37:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581935826;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fTpwurfX3B0AkdGbSPW+BgEtlQFKH8Z2KZ77PQxPZQ8=;
- b=ILuadbf2LFPgKwSeQjC+fFvEGz79Dr0+BtDm44FKKRqUEpMrjCC2NhMkUQhiVICcThCgb/
- urevHu2lCgZO20xqxlBMn6mbgD+Z86vAQhHx+qOWTQbK8PTqkuMdfeS8oAPyOweefCl5SZ
- q6k6go/htPJpSVoLfiCYSA/nFtRALfk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-Zt-6v5iTOaeYxgTdWHpZUg-1; Mon, 17 Feb 2020 05:37:04 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FCB0101FC61;
- Mon, 17 Feb 2020 10:37:03 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-208.ams2.redhat.com [10.36.117.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B30DF6C1;
- Mon, 17 Feb 2020 10:37:01 +0000 (UTC)
-Date: Mon, 17 Feb 2020 11:37:00 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: QAPI schema for desired state of LUKS keyslots (was: [PATCH
- 02/13] qcrypto-luks: implement encryption key management)
-Message-ID: <20200217103700.GC6309@linux.fritz.box>
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-3-mlevitsk@redhat.com>
- <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j3e5F-0005l8-J1
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:57:02 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35495)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1j3e5F-0005kR-BW; Mon, 17 Feb 2020 05:57:01 -0500
+Received: by mail-wr1-x441.google.com with SMTP id w12so19135401wrt.2;
+ Mon, 17 Feb 2020 02:57:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=QefSIhzsJ5EzH0dIBGDnIAWhsi6Ouz7g5ZmP1cUfx+k=;
+ b=qYCGkTjXajFbzKAvzqglT1rLluAgxi+fFNBav4fwQufVtBhNR1sPNNoqW+6q9RYLBV
+ IIMdfwT8pQWCfGaOZYSJ2vp24lRg8dW6IhsqG95H3yIyj5vCUcIP/I+5uc45GPtOgeZ2
+ /AZbwAq8ZBskxJ0JsofCa8kM6ax5MPT6q7MBzoGXvZSoXznjGYfmI7r29fBnhxb2Anjx
+ KRzsNsiPP0dwAsToccwEnmg9qi+EPQa8X0VuG7ff53fB4vymzB9SXLOOnp3/puW696Tm
+ BQyZhA9NNx/c2EaOGwtiaLAbc/sQZTDJWJ9x+t9l3Iv6BdCAaCplNkoo46hLR1F7ghnU
+ +fOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=QefSIhzsJ5EzH0dIBGDnIAWhsi6Ouz7g5ZmP1cUfx+k=;
+ b=kNEWfELjtB7G6b0Lo89NqHe6mEzyRRw/FbSOqqsKksCeNnLl4bexAaQpu7VBWaOfd/
+ BeYNTrQsYVdBS3/AX+orJOeZjz9mZqOqExy3T+lpkc/8nsiSItXRulZtSgRKRkHWAmj2
+ MenRjcSfr1+HmOGlACKfw2LHzDD8iV0mr9PC+UNOggOqfaTDLxywn8CgvjqU1Vfb4/hE
+ ZGnqVkb9LCgzAoQPPJFAlmW1qBdYS/blKwgL3Nsnwefp8B9v7SYWS6iSZygOFpd3YDSN
+ ZhGa5y/Vj2y9f136PMvRWVy6BV3omBoYh0lujM8qFk6IyziLmuwu6+WfS9uHLzNXPRut
+ e3kg==
+X-Gm-Message-State: APjAAAVR0h6xVy3njAPGgRv9CXF4JWSDWPeMwDMjUegnvzmepkkfgNLo
+ sezmkdXsA2nAxeC8SQE7CMMjBwGMg3M=
+X-Google-Smtp-Source: APXvYqzNJhOoVK078PqjEChm7aUSDm0o+pkWvQV8Kaa5UZvzHgR2DDA8FoEuhwGNmhbDES0U1gXHvQ==
+X-Received: by 2002:a5d:4750:: with SMTP id o16mr21335146wrs.91.1581937019783; 
+ Mon, 17 Feb 2020 02:56:59 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id a9sm135149wmm.15.2020.02.17.02.56.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 17 Feb 2020 02:56:58 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] hw/misc/iotkit-secctl: Fix writing to 'PPC Interrupt
+ Clear' register
+Date: Mon, 17 Feb 2020 11:56:57 +0100
+Message-Id: <20200217105657.31506-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Zt-6v5iTOaeYxgTdWHpZUg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,174 +95,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 15.02.2020 um 15:51 hat Markus Armbruster geschrieben:
-> Review of this patch led to a lengthy QAPI schema design discussion.
-> Let me try to condense it into a concrete proposal.
->=20
-> This is about the QAPI schema, and therefore about QMP.  The
-> human-friendly interface is out of scope.  Not because it's not
-> important (it clearly is!), only because we need to *focus* to have a
-> chance at success.
->=20
-> I'm going to include a few design options.  I'll mark them "Option:".
->=20
-> The proposed "amend" interface takes a specification of desired state,
-> and figures out how to get from here to there by itself.  LUKS keyslots
-> are one part of desired state.
->=20
-> We commonly have eight LUKS keyslots.  Each keyslot is either active or
-> inactive.  An active keyslot holds a secret.
->=20
-> Goal: a QAPI type for specifying desired state of LUKS keyslots.
->=20
-> Proposal:
->=20
->     { 'enum': 'LUKSKeyslotState',
->       'data': [ 'active', 'inactive' ] }
->=20
->     { 'struct': 'LUKSKeyslotActive',
->       'data': { 'secret': 'str',
->                 '*iter-time': 'int } }
->=20
->     { 'struct': 'LUKSKeyslotInactive',
->       'data': { '*old-secret': 'str' } }
->=20
->     { 'union': 'LUKSKeyslotAmend',
->       'base': { '*keyslot': 'int',
->                 'state': 'LUKSKeyslotState' }
->       'discriminator': 'state',
->       'data': { 'active': 'LUKSKeyslotActive',
->                 'inactive': 'LUKSKeyslotInactive' } }
->=20
-> LUKSKeyslotAmend specifies desired state for a set of keyslots.
+Fix warning reported by Clang static code analyzer:
 
-Though not arbitrary sets of keyslots, it's only a single keyslot or
-multiple keyslots containing the same secret. Might be good enough in
-practice, though it means that you may have to issue multiple amend
-commands to get to the final state that you really want (even if doing
-everything at once would be safe).
+    CC      hw/misc/iotkit-secctl.o
+  hw/misc/iotkit-secctl.c:343:9: warning: Value stored to 'value' is never read
+          value &= 0x00f000f3;
+          ^        ~~~~~~~~~~
 
-> Four cases:
->=20
-> * @state is "active"
->=20
->   Desired state is active holding the secret given by @secret.  Optional
->   @iter-time tweaks key stretching.
->=20
->   The keyslot is chosen either by the user or by the system, as follows:
->=20
->   - @keyslot absent
->=20
->     One inactive keyslot chosen by the system.  If none exists, error.
->=20
->   - @keyslot present
->=20
->     The keyslot given by @keyslot.
->=20
->     If it's already active holding @secret, no-op.  Rationale: the
->     current state is the desired state.
->=20
->     If it's already active holding another secret, error.  Rationale:
->     update in place is unsafe.
->=20
->     Option: delete the "already active holding @secret" case.  Feels
->     inelegant to me.  Okay if it makes things substantially simpler.
->=20
-> * @state is "inactive"
->=20
->   Desired state is inactive.
->=20
->   Error if the current state has active keyslots, but the desired state
->   has none.
->=20
->   The user choses the keyslot by number and/or by the secret it holds,
->   as follows:
->=20
->   - @keyslot absent, @old-secret present
->=20
->     All active keyslots holding @old-secret.  If none exists, error.
->=20
->   - @keyslot present, @old-secret absent
->=20
->     The keyslot given by @keyslot.
->=20
->     If it's already inactive, no-op.  Rationale: the current state is
->     the desired state.
->=20
->   - both @keyslot and @old-secret present
->=20
->     The keyslot given by keyslot.
->=20
->     If it's inactive or holds a secret other than @old-secret, error.
->=20
->     Option: error regardless of @old-secret, if that makes things
->     simpler.
->=20
->   - neither @keyslot not @old-secret present
->=20
->     All keyslots.  Note that this will error out due to "desired state
->     has no active keyslots" unless the current state has none, either.
->=20
->     Option: error out unconditionally.
->=20
-> Note that LUKSKeyslotAmend can specify only one desired state for
-> commonly just one keyslot.  Rationale: this satisfies practical needs.
-> An array of LUKSKeyslotAmend could specify desired state for all
-> keyslots.  However, multiple array elements could then apply to the same
-> slot.  We'd have to specify how to resolve such conflicts, and we'd have
-> to code up conflict detection.  Not worth it.
->=20
-> Examples:
->=20
-> * Add a secret to some free keyslot:
->=20
->   { "state": "active", "secret": "CIA/GRU/MI6" }
->=20
-> * Deactivate all keyslots holding a secret:
->=20
->   { "state": "inactive", "old-secret": "CIA/GRU/MI6" }
->=20
-> * Add a secret to a specific keyslot:
->=20
->   { "state": "active", "secret": "CIA/GRU/MI6", "keyslot": 0 }
->=20
-> * Deactivate a specific keyslot:
->=20
->   { "state": "inactive", "keyslot": 0 }
->=20
->   Possibly less dangerous:
->=20
->   { "state": "inactive", "keyslot": 0, "old-secret": "CIA/GRU/MI6" }
->=20
-> Option: Make use of Max's patches to support optional union tag with
-> default value to let us default @state to "active".  I doubt this makes
-> much of a difference in QMP.  A human-friendly interface should probably
-> be higher level anyway (Daniel pointed to cryptsetup).
->=20
-> Option: LUKSKeyslotInactive member @old-secret could also be named
-> @secret.  I don't care.
->=20
-> Option: delete @keyslot.  It provides low-level slot access.
-> Complicates the interface.  Fine if we need lov-level slot access.  Do
-> we?
->=20
-> I apologize for the time it has taken me to write this.
->=20
-> Comments?
+Fixes: b3717c23e1c
+Reported-by: Clang Static Analyzer
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+v2: Corrected bitwise-not precedence (pm215)
+---
+ hw/misc/iotkit-secctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Works for me (without taking any of the options).
-
-The unclear part is what the human-friendly interface should look like
-and where it should live. I'm afraid doing only the QMP part and calling
-the feature completed like we do so often won't work in this case.
-
-Kevin
+diff --git a/hw/misc/iotkit-secctl.c b/hw/misc/iotkit-secctl.c
+index 609869821a..43cf0f9970 100644
+--- a/hw/misc/iotkit-secctl.c
++++ b/hw/misc/iotkit-secctl.c
+@@ -340,7 +340,7 @@ static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
+         qemu_set_irq(s->sec_resp_cfg, s->secrespcfg);
+         break;
+     case A_SECPPCINTCLR:
+-        value &= 0x00f000f3;
++        s->secppcintstat = ~(value & 0x00f000f3);
+         foreach_ppc(s, iotkit_secctl_ppc_update_irq_clear);
+         break;
+     case A_SECPPCINTEN:
+-- 
+2.21.1
 
 
