@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AF6C34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 15:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D093C34021
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 15:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D3D32070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 15:08:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D3D32070B
+	by mail.kernel.org (Postfix) with ESMTPS id 462872070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 15:08:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 462872070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3i0P-0005Wm-Cp
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 10:08:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39163)
+	id 1j3i0R-0005Xm-Es
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 10:08:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39160)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j3hvf-0004k1-Jz
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j3hvf-0004jo-HO
  for qemu-devel@nongnu.org; Mon, 17 Feb 2020 10:03:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j3hve-0007Wu-DU
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j3hve-0007X3-Di
  for qemu-devel@nongnu.org; Mon, 17 Feb 2020 10:03:23 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47404)
+Received: from relay.sw.ru ([185.231.240.75]:47416)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j3hve-0007L9-55; Mon, 17 Feb 2020 10:03:22 -0500
+ id 1j3hve-0007L7-50; Mon, 17 Feb 2020 10:03:22 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1j3hvE-0007Zt-UW; Mon, 17 Feb 2020 18:02:57 +0300
+ id 1j3hvE-0007Zt-3I; Mon, 17 Feb 2020 18:02:56 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 10/22] migration/block-dirty-bitmap: cancel migration on
- shutdown
-Date: Mon, 17 Feb 2020 18:02:34 +0300
-Message-Id: <20200217150246.29180-11-vsementsov@virtuozzo.com>
+Subject: [PATCH v2 07/22] migration/block-dirty-bitmap: simplify
+ dirty_bitmap_load_complete
+Date: Mon, 17 Feb 2020 18:02:31 +0300
+Message-Id: <20200217150246.29180-8-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200217150246.29180-1-vsementsov@virtuozzo.com>
 References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
@@ -68,87 +68,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If target is turned of prior to postcopy finished, target crashes
-because busy bitmaps are found at shutdown.
-Canceling incoming migration helps, as it removes all unfinished (and
-therefore busy) bitmaps.
+bdrv_enable_dirty_bitmap_locked() call does nothing, as if we are in
+postcopy, bitmap successor must be enabled, and reclaim operation will
+enable the bitmap.
 
-Similarly on source we crash in bdrv_close_all which asserts that all
-bdrv states are removed, because bdrv states involved into dirty bitmap
-migration are referenced by it. So, we need to cancel outgoing
-migration as well.
+So, actually we need just call _reclaim_ in both if branches, and
+making differences only to add an assertion seems not really good. The
+logic becomes simple: on load complete we do reclaim and that's all.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- migration/migration.h          |  2 ++
- migration/block-dirty-bitmap.c | 16 ++++++++++++++++
- migration/migration.c          | 13 +++++++++++++
- 3 files changed, 31 insertions(+)
+ migration/block-dirty-bitmap.c | 25 ++++---------------------
+ 1 file changed, 4 insertions(+), 21 deletions(-)
 
-diff --git a/migration/migration.h b/migration/migration.h
-index 2948f2387b..2de6b8bbe2 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -332,6 +332,8 @@ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
- void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
- 
- void dirty_bitmap_mig_before_vm_start(void);
-+void dirty_bitmap_mig_cancel_outgoing(void);
-+void dirty_bitmap_mig_cancel_incoming(void);
- void migrate_add_address(SocketAddress *address);
- 
- int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
 diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index aea5326804..3ca425d95e 100644
+index 440c41cfca..9cc750d93b 100644
 --- a/migration/block-dirty-bitmap.c
 +++ b/migration/block-dirty-bitmap.c
-@@ -585,6 +585,22 @@ static void cancel_incoming_locked(DBMLoadState *s)
-     s->bitmaps = NULL;
+@@ -535,6 +535,10 @@ static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState *s)
+ 
+     qemu_mutex_lock(&s->lock);
+ 
++    if (bdrv_dirty_bitmap_has_successor(s->bitmap)) {
++        bdrv_reclaim_dirty_bitmap(s->bitmap, &error_abort);
++    }
++
+     for (item = s->enabled_bitmaps; item; item = g_slist_next(item)) {
+         LoadBitmapState *b = item->data;
+ 
+@@ -544,27 +548,6 @@ static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState *s)
+         }
+     }
+ 
+-    if (bdrv_dirty_bitmap_has_successor(s->bitmap)) {
+-        bdrv_dirty_bitmap_lock(s->bitmap);
+-        if (s->enabled_bitmaps == NULL) {
+-            /* in postcopy */
+-            bdrv_reclaim_dirty_bitmap_locked(s->bitmap, &error_abort);
+-            bdrv_enable_dirty_bitmap_locked(s->bitmap);
+-        } else {
+-            /* target not started, successor must be empty */
+-            int64_t count = bdrv_get_dirty_count(s->bitmap);
+-            BdrvDirtyBitmap *ret = bdrv_reclaim_dirty_bitmap_locked(s->bitmap,
+-                                                                    NULL);
+-            /* bdrv_reclaim_dirty_bitmap can fail only on no successor (it
+-             * must be) or on merge fail, but merge can't fail when second
+-             * bitmap is empty
+-             */
+-            assert(ret == s->bitmap &&
+-                   count == bdrv_get_dirty_count(s->bitmap));
+-        }
+-        bdrv_dirty_bitmap_unlock(s->bitmap);
+-    }
+-
+     qemu_mutex_unlock(&s->lock);
  }
  
-+void dirty_bitmap_mig_cancel_outgoing(void)
-+{
-+    dirty_bitmap_do_save_cleanup(&dbm_state.save);
-+}
-+
-+void dirty_bitmap_mig_cancel_incoming(void)
-+{
-+    DBMLoadState *s = &dbm_state.load;
-+
-+    qemu_mutex_lock(&s->lock);
-+
-+    cancel_incoming_locked(s);
-+
-+    qemu_mutex_unlock(&s->lock);
-+}
-+
- static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState *s)
- {
-     GSList *item;
-diff --git a/migration/migration.c b/migration/migration.c
-index 515047932c..7c605ba218 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -181,6 +181,19 @@ void migration_shutdown(void)
-      */
-     migrate_fd_cancel(current_migration);
-     object_unref(OBJECT(current_migration));
-+
-+    /*
-+     * Cancel outgoing migration of dirty bitmaps. It should
-+     * at least unref used block nodes.
-+     */
-+    dirty_bitmap_mig_cancel_outgoing();
-+
-+    /*
-+     * Cancel incoming migration of dirty bitmaps. Dirty bitmaps
-+     * are non-critical data, and their loss never considered as
-+     * something serious.
-+     */
-+    dirty_bitmap_mig_cancel_incoming();
- }
- 
- /* For outgoing */
 -- 
 2.21.0
 
