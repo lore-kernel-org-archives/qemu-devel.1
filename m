@@ -2,51 +2,83 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CFEC3B1BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 02:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E46C3B1BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:00:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0740E20857
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 02:52:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0740E20857
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 5360620857
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:00:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WRcXByH1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5360620857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3WWE-0001Wj-5W
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 21:52:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44075)
+	id 1j3WeD-0003ku-FQ
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 22:00:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44751)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j3WUg-0008My-71
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 21:50:47 -0500
+ (envelope-from <gshan@redhat.com>) id 1j3WdO-0002mL-HZ
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 21:59:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j3WUe-0000nz-MQ
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 21:50:46 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:40733)
+ (envelope-from <gshan@redhat.com>) id 1j3WdM-00037r-PK
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 21:59:45 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30541
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j3WUe-0000n2-GC; Sun, 16 Feb 2020 21:50:44 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 4A38E747E01;
- Mon, 17 Feb 2020 03:50:43 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 2789F747DF8; Mon, 17 Feb 2020 03:50:43 +0100 (CET)
-Message-Id: <01eddb5c1639ab2dfb744b3515f9b907afcbb056.1581904461.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1581904461.git.balaton@eik.bme.hu>
-References: <cover.1581904461.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Mon, 17 Feb 2020 02:19:20 +0100
-Subject: [RFC PATCH 2/2] target/ppc: Enable hardfloat for PPC
-To: qemu-devel@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:738:2001:2001::2001
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1j3WdL-000360-Qi
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 21:59:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581908382;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LmoFYXdBrijMVhWal0NtASQS/e7GPwjMxtjYpYKVCWE=;
+ b=WRcXByH1Zsxw8AkznIq7BG6Z1pzAGBga2SR2Gg+oAw6knbEfZUNQLtVIBKM92JQUTtR/rU
+ mEmutExo0G1aAp0vTLGcHFljgIO7Q0/O3/W718/5MlVx/sh0GrOr7SkPWp3oX/31FljNND
+ 7ferlMGSVaUQsQ6eeZpBczKAejJspQw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-EJgOa8qaOI-bGgQ4_QemAQ-1; Sun, 16 Feb 2020 21:59:41 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA72114E1;
+ Mon, 17 Feb 2020 02:59:39 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-16.bne.redhat.com [10.64.54.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B99AC5C241;
+ Mon, 17 Feb 2020 02:59:33 +0000 (UTC)
+Subject: Re: [PATCH v3 1/2] target/arm: Support SError injection
+To: Marc Zyngier <maz@kernel.org>
+References: <20200214055950.62477-1-gshan@redhat.com>
+ <20200214055950.62477-2-gshan@redhat.com>
+ <27b9c2a363d69911c003fcbaed958a5a@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <37c5a2c3-4ca8-1717-6672-2712161076ed@redhat.com>
+Date: Mon, 17 Feb 2020 13:59:31 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <27b9c2a363d69911c003fcbaed958a5a@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: EJgOa8qaOI-bGgQ4_QemAQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,106 +90,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- John Arbuckle <programmingkidx@gmail.com>, qemu-ppc@nongnu.org,
- Paul Clarke <pc@us.ibm.com>, Howard Spoelstra <hsp.cat7@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Gavin Shan <gshan@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
+ aik@ozlabs.ru, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, shan.gavin@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While other targets take advantage of using host FPU to do floating
-point computations, this was disabled for PPC target because always
-clearing exception flags before every FP op made it slightly slower
-than emulating everyting with softfloat. To emulate some FPSCR bits,
-clearing of fp_status may be necessary (unless these could be handled
-e.g. using FP exceptions on host but there's no API for that in QEMU
-yet) but preserving at least the inexact flag makes hardfloat usable
-and faster than softfloat. Since most clients don't actually care
-about this flag, we can gain some speed trading some emulation
-accuracy.
+Hi Marc,
 
-This patch implements a simple way to keep the inexact flag set for
-hardfloat while still allowing to revert to softfloat for workloads
-that need more accurate albeit slower emulation. (Set hardfloat
-property of CPU, i.e. -cpu name,hardfloat=false for that.) There are
-still more places where flags are reset so there is place for further
-improvement. Also having a conditional to test for the hardfloat flag
-every time makes the softfloat case slower than before this patch so
-some other way (like setting a function pointer once and use that
-instead if possible) may be needed to avoid this otherwise this patch
-only makes sense if the default is also set to enable hardfloat.
+On 2/16/20 11:34 PM, Marc Zyngier wrote:
+> On 2020-02-14 05:59, Gavin Shan wrote:
+>> This supports SError injection, which will be used by "virt" board to
+>> simulating the behavior of NMI injection in next patch. As Peter Maydell
+>> suggested, this adds a new interrupt (ARM_CPU_SERROR), which is parallel
+>> to CPU_INTERRUPT_HARD. The backend depends on if kvm is enabled or not.
+>> kvm_vcpu_ioctl(cpu, KVM_SET_VCPU_EVENTS) is leveraged to inject SError
+>> or data abort to guest. When TCG is enabled, the behavior is simulated
+>> by injecting SError and data abort to guest.
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>> =A0target/arm/cpu.c=A0=A0=A0=A0=A0 | 69 ++++++++++++++++++++++++++++++++=
++++--------
+>> =A0target/arm/cpu.h=A0=A0=A0=A0=A0 | 17 ++++++-----
+>> =A0target/arm/helper.c=A0=A0 |=A0 6 ++++
+>> =A0target/arm/m_helper.c |=A0 8 +++++
+>> =A04 files changed, 81 insertions(+), 19 deletions(-)
+>>
+>=20
+> [...]
+>=20
+>> @@ -656,7 +682,8 @@ static void arm_cpu_set_irq(void *opaque, int irq,
+>> int level)
+>> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_IRQ] =3D CPU_INTERRUPT_HARD,
+>> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_FIQ] =3D CPU_INTERRUPT_FIQ,
+>> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VIRQ] =3D CPU_INTERRUPT_VIRQ,
+>> -=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VFIQ] =3D CPU_INTERRUPT_VFIQ
+>> +=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VFIQ] =3D CPU_INTERRUPT_VFIQ,
+>> +=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_SERROR] =3D CPU_INTERRUPT_SERROR,
+>=20
+> I'm a bit concerned with this. It makes sense for a host, but doesn't
+> allow the SError signal to be virtualised (there should be a VSError
+> signal in this list that can be injected via HCR_EL2.VA, just like
+> VIRQ is injected by HCR_EL2.VI).
+>=20
+> Given that people use QEMU as a development platform for hypervisors,
+> I'd really like this functionality to be supported from day-1.
+>=20
+> There is also the whole RAS stuff which quite a lot of work, but let's
+> start at least with the full ARMv8.0 semantics.
+>=20
 
-Because of the above this patch at the moment is mainly for testing
-different workloads to evaluate how viable would this be in practice.
-Thus, RFC and not ready for merge yet.
+Thanks for the comments. Yes, I think it's reasonable to support virtual
+SError as well. Lets have a separate patch to support it in v4. I think
+you were talking about HCR_EL2.VSE, which is defined as below in target/arm=
+/cpu.h:
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- fpu/softfloat.c                 | 14 +++++++-------
- target/ppc/fpu_helper.c         |  7 ++++++-
- target/ppc/translate_init.inc.c |  2 +-
- 3 files changed, 14 insertions(+), 9 deletions(-)
+#define HCR_VSE       (1ULL << 8)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 301ce3b537..6d3f4af72a 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -216,15 +216,15 @@ GEN_INPUT_FLUSH3(float64_input_flush3, float64)
- #endif
- 
- /*
-- * Some targets clear the FP flags before most FP operations. This prevents
-- * the use of hardfloat, since hardfloat relies on the inexact flag being
-- * already set.
-+ * Disable hardfloat for known problem cases.
-+ * Additionally, some targets clear the FP flags before most FP operations.
-+ * This prevents the use of hardfloat, since it relies on the inexact flag
-+ * being already set and clearing it often may result in slower computations.
-+ * Those targets could also be listed here.
-  */
--#if defined(TARGET_PPC) || defined(__FAST_MATH__)
--# if defined(__FAST_MATH__)
--#  warning disabling hardfloat due to -ffast-math: hardfloat requires an exact \
-+#if defined(__FAST_MATH__)
-+# warning disabling hardfloat due to -ffast-math: hardfloat requires an exact \
-     IEEE implementation
--# endif
- # define QEMU_NO_HARDFLOAT 1
- # define QEMU_SOFTFLOAT_ATTR QEMU_FLATTEN
- #else
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index ae43b08eb5..33aa977970 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -659,7 +659,12 @@ void helper_float_check_status(CPUPPCState *env)
- 
- void helper_reset_fpstatus(CPUPPCState *env)
- {
--    set_float_exception_flags(0, &env->fp_status);
-+    if (env->hardfloat) {
-+        /* hardfloat needs inexact flag already set, clear only others */
-+        set_float_exception_flags(float_flag_inexact, &env->fp_status);
-+    } else {
-+        set_float_exception_flags(0, &env->fp_status);
-+    }
- }
- 
- static void float_invalid_op_addsub(CPUPPCState *env, bool set_fpcc,
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index d6e1d66bc8..caac0c2d11 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -10869,7 +10869,7 @@ static Property ppc_cpu_properties[] = {
-                      false),
-     DEFINE_PROP_BOOL("pre-3.0-migration", PowerPCCPU, pre_3_0_migration,
-                      false),
--    DEFINE_PROP_BOOL("hardfloat", PowerPCCPU, hardfloat, false),
-+    DEFINE_PROP_BOOL("hardfloat", PowerPCCPU, hardfloat, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--- 
-2.21.1
+Thanks,
+Gavin
 
 
