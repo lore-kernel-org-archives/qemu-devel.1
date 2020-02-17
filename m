@@ -4,74 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2DD5C34021
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8311EC34021
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:12:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 804DA2070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:12:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5463C2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:12:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YIJwRmu+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 804DA2070B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bRCWCHK2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5463C2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3ksw-00078W-Lp
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:12:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38923)
+	id 1j3kt1-0007Ki-E1
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:12:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38837)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j3kK1-0003yb-Ra
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:36:42 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j3kJr-0003dC-RV
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:36:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j3kK0-0002iw-SF
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:36:41 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56351
+ (envelope-from <imammedo@redhat.com>) id 1j3kJq-0002dI-SI
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:36:31 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42132
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kK0-0002ih-OW
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:36:40 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kJq-0002d1-Ny
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:36:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581961000;
+ s=mimecast20190719; t=1581960990;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jieUhX9yQNqUln14pUvpvohvwUkdO1rNW66q9YQvvbI=;
- b=YIJwRmu+duvba08b+6UI3CuJrol57Rf46a6Mzz6lBHCx29s61AtP+8foLKnB7jH2gR0COw
- 8bmpDAPflWV3+oXV0Q/Be/uU7D3YOYbTJww3dVlncs9BxekahRVWHZbsOaxN2g+ePPRdIF
- hcMJsYn1jbkWIZhmTR6TBKiYcIHMf1M=
+ bh=ALdsFHaSncoT5P5lOxD8hBgsT58iHQkPe79Km8jm72U=;
+ b=bRCWCHK2wNIkML2TQDExXw0BYkq2Yx2I/BQI79acVvNBi3T97toxeLtvgwdKeX8heJ6hJ7
+ YW33jipPZUyfZfIpdh3nBPRY4IeBVHYOFibbxVME/4pqfz16YaGsrymESmoHKpo9i3stWy
+ haZkFm7GuN0vGUbptVH6lveqmqwilv4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-ApSn3NXhOQSN0QZWV38j3g-1; Mon, 17 Feb 2020 12:36:33 -0500
+ us-mta-340-5m-wUFkYMQ6F0IeCKeY3nA-1; Mon, 17 Feb 2020 12:36:28 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD35818FE870
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 17:36:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9CBA107ACC9
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 17:36:27 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 034939052B;
- Mon, 17 Feb 2020 17:36:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2543990508;
+ Mon, 17 Feb 2020 17:36:26 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 71/79] sparc/niagara: use memdev for RAM
-Date: Mon, 17 Feb 2020 12:34:44 -0500
-Message-Id: <20200217173452.15243-72-imammedo@redhat.com>
+Subject: [PATCH v5 67/79] ppc/spapr: use memdev for RAM
+Date: Mon, 17 Feb 2020 12:34:40 -0500
+Message-Id: <20200217173452.15243-68-imammedo@redhat.com>
 In-Reply-To: <20200217173452.15243-1-imammedo@redhat.com>
 References: <20200217173452.15243-1-imammedo@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: ApSn3NXhOQSN0QZWV38j3g-1
+X-MC-Unique: 5m-wUFkYMQ6F0IeCKeY3nA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
@@ -100,47 +99,47 @@ and using MachineState::ram instead of manually initializing
 RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/sparc64/niagara.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/ppc/spapr.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index 5eb2d097b9..ab5ef8c5b3 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -40,7 +40,6 @@
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index c9b2e0a5e0..4d90f99195 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2634,7 +2634,6 @@ static void spapr_machine_init(MachineState *machine)
+     PCIHostState *phb;
+     int i;
+     MemoryRegion *sysmem =3D get_system_memory();
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     hwaddr node0_size =3D spapr_node0_size(machine);
+     long load_limit, fw_size;
+     char *filename;
+@@ -2813,10 +2812,8 @@ static void spapr_machine_init(MachineState *machine=
+)
+         kvmppc_enable_h_page_init();
+     }
 =20
- typedef struct NiagaraBoardState {
-     MemoryRegion hv_ram;
--    MemoryRegion partition_ram;
-     MemoryRegion nvram;
-     MemoryRegion md_rom;
-     MemoryRegion hv_rom;
-@@ -111,11 +110,8 @@ static void niagara_init(MachineState *machine)
-                            NIAGARA_HV_RAM_SIZE, &error_fatal);
-     memory_region_add_subregion(sysmem, NIAGARA_HV_RAM_BASE, &s->hv_ram);
-=20
--    memory_region_allocate_system_memory(&s->partition_ram, NULL,
--                                         "sun4v-partition.ram",
+-    /* allocate RAM */
+-    memory_region_allocate_system_memory(ram, NULL, "ppc_spapr.ram",
 -                                         machine->ram_size);
-     memory_region_add_subregion(sysmem, NIAGARA_PARTITION_RAM_BASE,
--                                &s->partition_ram);
-+                                machine->ram);
+-    memory_region_add_subregion(sysmem, 0, ram);
++    /* map RAM */
++    memory_region_add_subregion(sysmem, 0, machine->ram);
 =20
-     memory_region_init_ram(&s->nvram, NULL, "sun4v.nvram", NIAGARA_NVRAM_S=
-IZE,
-                            &error_fatal);
-@@ -173,6 +169,7 @@ static void niagara_class_init(ObjectClass *oc, void *d=
-ata)
-     mc->max_cpus =3D 1; /* XXX for now */
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Sun-UltraSparc-T1");
-+    mc->default_ram_id =3D "sun4v-partition.ram";
- }
-=20
- static const TypeInfo niagara_type =3D {
+     /* always allocate the device memory information */
+     machine->device_memory =3D g_malloc0(sizeof(*machine->device_memory));
+@@ -4400,6 +4397,7 @@ static void spapr_machine_class_init(ObjectClass *oc,=
+ void *data)
+     mc->no_parallel =3D 1;
+     mc->default_boot_order =3D "";
+     mc->default_ram_size =3D 512 * MiB;
++    mc->default_ram_id =3D "ppc_spapr.ram";
+     mc->default_display =3D "std";
+     mc->kvm_type =3D spapr_kvm_type;
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_SPAPR_PCI_HOST_BRIDGE)=
+;
 --=20
 2.18.1
 
