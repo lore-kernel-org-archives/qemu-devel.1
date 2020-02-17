@@ -2,107 +2,85 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF84C34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 14:05:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C71EDC34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 14:07:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFEAA20718
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 14:05:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92DBE206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 14:07:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F5EJlKdK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFEAA20718
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TZXfJiiq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92DBE206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3h1T-00010N-Uy
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 09:05:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59314)
+	id 1j3h35-00020q-Nt
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 09:06:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59474)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j3h0f-0000QK-OA
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 09:04:30 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j3h2W-0001cM-7a
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 09:06:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j3h0e-0005wu-Qr
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 09:04:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23176
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j3h0e-0005wY-Ma
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 09:04:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581948268;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vsRjvngQz5IIEE+YiCwQAn9ogbPZLOFwhxcubzcboRc=;
- b=F5EJlKdKNs/Q1VehY1GTbMqIymccpKxT1jzY6pcJDplPlJ3ZHuEODi2l3X85mA9sCuItCD
- fSwap5Mec4wx0ybmybWODLO4Nc7ZC/PAFoiIoA9ORkSgYsMgKfaH993SQFQCLAmTlz1PbH
- miIeaQ5/mHwjUluGtFZoe9vHgQc9bag=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-LE5zVF6uN3Ku1TqeGzxoNw-1; Mon, 17 Feb 2020 09:04:22 -0500
-X-MC-Unique: LE5zVF6uN3Ku1TqeGzxoNw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25CFD85EE6E;
- Mon, 17 Feb 2020 14:04:21 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-191.ams2.redhat.com
- [10.36.117.191])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 36A738B548;
- Mon, 17 Feb 2020 14:04:18 +0000 (UTC)
-Subject: Re: [PATCH v2 7/7] block/block-copy: hide structure definitions
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191127180840.11937-1-vsementsov@virtuozzo.com>
- <20191127180840.11937-8-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ba8f31d5-d04f-2c8f-2afc-4c1ce2f5aa3c@redhat.com>
-Date: Mon, 17 Feb 2020 15:04:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <peter.maydell@linaro.org>) id 1j3h2U-0006vj-Ui
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 09:06:23 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35503)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j3h2U-0006vL-PO
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 09:06:22 -0500
+Received: by mail-ot1-x343.google.com with SMTP id r16so16189285otd.2
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 06:06:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=sT5rS5mtTwfxrsIKdBlCBMDl+7FxgN9TwTiJWRvvo6M=;
+ b=TZXfJiiqsl0D4ZlRtvj8vEppbXweEKohoOm2XvcsQxX5HR8m9flHHGsoimv7z3Ye1Q
+ 6A7T7KjqnLJjLpkT2ny1iHb+VCMO+2zYnEfECgh6Ood/0z5MUpTs9UGyO4HMxWZslfuS
+ cZn2S6upnY/vHhI3W8eAcTq3nMabEZHZ4VE2MUATM6v0MeI7ppLphhXPrr1GnkucJJOT
+ HeBXKJ0mra/C7aU0MoNB/IRc+LWciFD8RABlWhZnqaQXyelNS8SHvfdRMCbyH0JD9ZTi
+ tBF69P9gvHojnOSGvuaCGYgCU5GxqbeHts206VTZE5jBnvLt2kGNyOhlPcDHGgj2Oxkp
+ vnQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=sT5rS5mtTwfxrsIKdBlCBMDl+7FxgN9TwTiJWRvvo6M=;
+ b=HdjXipZ3apUuQWICtxhs3Nr1zg2Ztdgbbf44ndWiZ+jeGpbwQzCi8F0E6MLtm2MNWN
+ c5ohd30FCcodIf4/K4oJDD+6hLoF/mOsXk+WIzSLn6oZToCMbfrHQB1yG92S5kk2/6jb
+ y1xcVX4fEcu4Y6xbg5HSMYRQ7b2LH6vSAOFjGghkjwFqqzyTXvs0a993c5eEi4GueV39
+ 7TTnJZ51oq7YMNl/bAMN15mUTkbYgYNH7kZ/rLQz5QfYCwGsvu96TMe7VRCcdbIxsXN9
+ gZaT+M/8d89OpEgnEJnJUKkp4ZqToWA660+FCtP8CjVXd5MWCW/moicdp8KdK9lLGVnn
+ F4HQ==
+X-Gm-Message-State: APjAAAVtna03kjSXnbEd8QhzVBnOqSpMAi24IPvvRHTN1v1q26m7e19R
+ 4YwoEW0v9qWaFLKWA6ikgVwnQklpzoYgGImqaxDYtg==
+X-Google-Smtp-Source: APXvYqz7ep63oXIRlEObFbOQ/AJnvNLbju56n/gMVL7gD1/5w71jzhlcm7LP4SEuipkJJp69TAByRM0eb70Btf+x/tw=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr12369694otd.91.1581948381793; 
+ Mon, 17 Feb 2020 06:06:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191127180840.11937-8-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="6uPWstkP3xufWN9OY91BEQ4EQGpMoWXZc"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20200215154706.19837-1-philmd@redhat.com>
+ <20200215154706.19837-2-philmd@redhat.com>
+ <CAFEAcA9cZHWziyk6VzfaxrqjCNNOmnmSkB=uuGJMp0TL521mAQ@mail.gmail.com>
+ <8c4570e1-cd9b-9d33-2756-5c223df282ee@redhat.com>
+In-Reply-To: <8c4570e1-cd9b-9d33-2756-5c223df282ee@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Feb 2020 14:06:10 +0000
+Message-ID: <CAFEAcA-hyEVPeT1wakaft6m3_WD9XG3eYFAwJJgoHRAZ1nntag@mail.gmail.com>
+Subject: Re: [PATCH 1/2] hw/ipmi/bmc: Delay timer_new_ns() from init to
+ realize to avoid memleaks
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,81 +92,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
+ David Hildenbrand <david@redhat.com>, Pan Nengyuan <pannengyuan@huawei.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6uPWstkP3xufWN9OY91BEQ4EQGpMoWXZc
-Content-Type: multipart/mixed; boundary="eUIBkjLG5lM3vO7m7oVQonWnFzpkFDF13"
+On Mon, 17 Feb 2020 at 13:48, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 2/17/20 2:25 PM, Peter Maydell wrote:
 
---eUIBkjLG5lM3vO7m7oVQonWnFzpkFDF13
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> > So we now call timer_new in realize, and timer_del in unrealize,
+> > but timer_free in finalize. This seems unbalanced -- why not
+> > call timer_free in unrealize too, if we're moving things?
+> >
+> > Also, this is a case of code that's actually doing things right:
+> > we free the memory that we allocated in init in finalize. So
+> > we're not fixing any leak here, we're just moving code around
+> > (which is reasonable if we're trying to standardize on "call
+> > timer_new in realize, not init", but should be noted in the
+> > commit message).
+>
+> While I understand your point, I am confused because the documentation
+> on unrealize() and finalize() is rather scarce (and not obvious for
+> non-native english speaker). I think I'm not understanding QOM instance
+> lifetime well (in particular hotplug devices) so I will let this series g=
+o.
 
-On 27.11.19 19:08, Vladimir Sementsov-Ogievskiy wrote:
-> Hide structure definitions and add explicit API instead, to keep an
-> eye on the scope of the shared fields.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/block-copy.h | 57 +++------------------------------
->  block/backup-top.c         |  6 ++--
->  block/backup.c             | 27 ++++++++--------
->  block/block-copy.c         | 64 ++++++++++++++++++++++++++++++++++++++
->  4 files changed, 86 insertions(+), 68 deletions(-)
+Yes, the documentation is really not good at all. The
+basic structure as I understand it is that we have two-part
+creation and two-part destruction:
+ * instance_init is creation part 1
+ * realize is creation part 2
+ * unrealize is destruction part 1 and is the opposite of realize
+ * instance_finalize is destruction part 2 and is the
+   opposite of instance_init
 
-[...]
+(Base QOM objects only have instance_init/instance_finalize;
+realize/unrealize exists only for DeviceState objects
+and their children.)
 
-> diff --git a/block/backup.c b/block/backup.c
-> index cf62b1a38c..acab0d08da 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
+ASCII-art state diagram:
 
-[...]
+  [start] --instance_init-> [inited] --realize-> [realized]
+     ^                       |   ^                     |
+     \---instance_finalize---/   \-----unrealize-------/
 
-> @@ -458,6 +458,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
-DriverState *bs,
->      job->sync_bitmap =3D sync_bitmap;
->      job->bitmap_mode =3D bitmap_mode;
->      job->bcs =3D bcs;
-> +    job->bcs_bitmap =3D block_copy_dirty_bitmap(bcs);
+In practice the only sequences we really care about are:
+ instance_init; realize; unrealize; instance_finalize
+   (a full object creation-use-destruction cycle;
+    even if realize fails, unrealize will be called)
+ instance_init; realize
+   (a subset of the above: for non-hot-pluggable devices
+    we will never try to unrealize them, so this is
+    as far as it goes for most devices unless they
+    returned an error from their realize function)
+ instance_init; instance_finalize
+   (the monitor does this for introspection of an object
+    without actually wanting to create and use it; it's
+    also the basic lifecycle for non-DeviceState objects)
 
-It seems a bit weird to me to store a pointer to the BCS-owned bitmap
-here, because, well, it=E2=80=99s a BCS-owned object, and just calling
-block_copy_dirty_bitmap() every time wouldn=E2=80=99t be prohibitively expe=
-nsive.
+The difference between hot-pluggable and not is just
+whether it's valid to try to unrealize the device.
 
-I feel sufficiently bad about this to warrant not giving an R-b, but I
-know I shouldn=E2=80=99t withhold an R-b over this, so:
+We should definitely be clearer about what belongs in
+instance_init vs what belongs in realize. But where we
+have both a "do thing" and a "clean up that thing" task,
+we should put the cleanup code in the operation that is
+the pair of the operation we put the "do thing" code in
+(i.e. do thing in instance_init, clean it up in finalize;
+or do thing in realize, clean it up in unrealize).
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
->      job->cluster_size =3D cluster_size;
->      job->len =3D len;
-
-
---eUIBkjLG5lM3vO7m7oVQonWnFzpkFDF13--
-
---6uPWstkP3xufWN9OY91BEQ4EQGpMoWXZc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5KnWEACgkQ9AfbAGHV
-z0AZpQf+IT6pP1AKLHrYZu2oS1pHbC1RMjy5FqJtAu/HgY08RSZgNZTiy6FAdjko
-yxLIW8qSQDTZVDMwo+tdB51bvv/fD+quSbUz+VVej4LvIHmupn5XRKmZ2HmCq5Z9
-cXMOPOnmptY5PYTWR2PJIM56SL0Bkz/5uKAJhGNu120YLgByg3VRSAlTJEHI2y/H
-friStujYI6/i3FfUa3iB2SR1PhbUBaJBuk3jsDaib0FQsoLz7HwzypbfPTxBuMDg
-5WzOaO5J0ZneBQpscpWXesXVrV4s3xoQI0ih24Q6g6hVlF3e2N9abp8mZ2FGLQbU
-iJ6FqQaYB8bXnMGG6St9e1mTt0unSg==
-=2Mpb
------END PGP SIGNATURE-----
-
---6uPWstkP3xufWN9OY91BEQ4EQGpMoWXZc--
-
+thanks
+-- PMM
 
