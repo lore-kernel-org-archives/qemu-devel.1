@@ -2,102 +2,82 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E3EC34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7883BC34021
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:57:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAFE7214D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:56:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44535214D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:57:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xa5N2ofa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAFE7214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XV3RtWPo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44535214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3jha-00045q-0A
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 11:56:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59889)
+	id 1j3jiO-0005A2-Fm
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 11:57:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60004)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j3jgz-0003Yj-GE
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:56:22 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j3jhn-0004YU-BA
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:57:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j3jgx-0001qB-Nq
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:56:20 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57340)
+ (envelope-from <dgilbert@redhat.com>) id 1j3jhl-00022O-Gy
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:57:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38130
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j3jgx-0001po-6Q
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:56:19 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j3jhl-00022G-Cp
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:57:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581958578;
+ s=mimecast20190719; t=1581958628;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:autocrypt:autocrypt;
- bh=45TC9loqMGn8RCRXzD+TXer0wTFRTq0uweAA6sniTE0=;
- b=Xa5N2ofazqX2IWL/3MllIv+GCyBIXkxkozJycPaYVpPdf0ArxzKSJdwdS09syIWw7neInk
- KxWAp+KFjg+8N/e9zHs/JOgEfSddC3s6/EOC9iysVniwNHT2eDFr0brK+oI/nt+Dmef4CL
- Z1i9nMITcFLWoY2EW+QmYs4rzfC+cgI=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6c5B+ZTCMgj/dhFRB8oi4b3XVM3a2A/1i/dWTcn/t44=;
+ b=XV3RtWPoB9Othj3kikjaeE70Dwh++uA/nCTs9BzdWq+4bUfoLKQqbS8mXpQHWeSVgJel+t
+ jf51Oax6TYrwLQm7jL5uZ65pkOdzTXoV3BVQso8UfPahec3GjKuuqPsgTbZkpC6naVxOQ4
+ Of+ULXqThcp3CUfly7QHHABnYT+WVNg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-763HOxF9M-uYzAfM6dwYTA-1; Mon, 17 Feb 2020 11:56:15 -0500
-X-MC-Unique: 763HOxF9M-uYzAfM6dwYTA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-150-QEP7u5xTN7C9bjNA7Cbf7w-1; Mon, 17 Feb 2020 11:57:04 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0903800D55;
- Mon, 17 Feb 2020 16:56:14 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-191.ams2.redhat.com
- [10.36.117.191])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A7F2A2CC39;
- Mon, 17 Feb 2020 16:56:13 +0000 (UTC)
-To: Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Subject: qcow2: Zero-initialization of external data files
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <db0b4b5c-d564-f003-bbbc-9afdcac07cc4@redhat.com>
-Date: Mon, 17 Feb 2020 17:56:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC32A800D5A;
+ Mon, 17 Feb 2020 16:57:03 +0000 (UTC)
+Received: from work-vm (ovpn-116-78.ams2.redhat.com [10.36.116.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BB7CD5C219;
+ Mon, 17 Feb 2020 16:57:02 +0000 (UTC)
+Date: Mon, 17 Feb 2020 16:57:00 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v2 11/22] migration/savevm: don't worry if bitmap
+ migration postcopy failed
+Message-ID: <20200217165700.GO3434@work-vm>
+References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
+ <20200217150246.29180-12-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200217150246.29180-12-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: QEP7u5xTN7C9bjNA7Cbf7w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ncPtxHryCGBDiFaTTn88jPF7UYRvp1h1n"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,83 +89,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: andrey.shinkevich@virtuozzo.com, qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ncPtxHryCGBDiFaTTn88jPF7UYRvp1h1n
-Content-Type: multipart/mixed; boundary="CYUhujAji5i8HcYkJOFmFKAFX9x5lDO3y"
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> First, if only bitmaps postcopy enabled (not ram postcopy)
+> postcopy_pause_incoming crashes on assertion assert(mis->to_src_file).
+>=20
+> And anyway, bitmaps postcopy is not prepared to be somehow recovered.
+> The original idea instead is that if bitmaps postcopy failed, we just
+> loss some bitmaps, which is not critical. So, on failure we just need
+> to remove unfinished bitmaps and guest should continue execution on
+> destination.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
---CYUhujAji5i8HcYkJOFmFKAFX9x5lDO3y
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Hi,
-
-AFAIU, external data files with data_file_raw=3Don are supposed to return
-the same data as the qcow2 file when read.  But we still use the qcow2
-metadata structures (which are by default initialized to =E2=80=9Ceverythin=
-g
-unallocated=E2=80=9D), even though we never ensure that the external data f=
-ile
-is zero, too, so this can happen:
-
-$ dd if=3D/dev/urandom of=3Dfoo.raw 64M
-[...]
-
-$ sudo losetup -f --show foo.raw
-/dev/loop0
-
-$ sudo ./qemu-img create -f qcow2 -o \
-    data_file=3D/dev/loop0,data_file_raw=3Don foo.qcow2 64M
-[...]
-
-$ sudo ./qemu-io -c 'read -P 0 0 64M' foo.qcow2
-read 67108864/67108864 bytes at offset 0
-64 MiB, 1 ops; 00.00 sec (25.036 GiB/sec and 400.5751 ops/sec)
-
-$ sudo ./qemu-io -c 'read -P 0 0 64M' -f raw foo.raw
-Pattern verification failed at offset 0, 67108864 bytes
-read 67108864/67108864 bytes at offset 0
-64 MiB, 1 ops; 00.01 sec (5.547 GiB/sec and 88.7484 ops/sec)
-
-I suppose this behavior is fine for blockdev-create because I guess it=E2=
-=80=99s
-the user=E2=80=99s responsibility to ensure that the external data file is =
-zero.
- But maybe it isn=E2=80=99t, so that=E2=80=99s my first question: Is it rea=
-lly the
-user=E2=80=99s responsibility or should we always ensure it=E2=80=99s zero?
-
-My second question is: If we decide that this is fine for
-blockdev-create, should at least qcow2_co_create_opts() ensure the data
-file it just created is zero?
-
-Max
-
-
---CYUhujAji5i8HcYkJOFmFKAFX9x5lDO3y--
-
---ncPtxHryCGBDiFaTTn88jPF7UYRvp1h1n
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5KxasACgkQ9AfbAGHV
-z0BgmQf6A/cjD5z51M6/bmWn82QMEBH2kpeH6Sy+7gE/AxcwVmuHbUdoG0NQy6hy
-wYSgU4BdXAHv3puYLmzqg9rkDL5DQl9ETd1Z9pE1Xg41GjWZYRS+WaU4E3tqz2JW
-CxSgYbhmpuMLchyLrANSwbO3i+AP55YPPL+rj0HChUIe6LxtnP/iM3Mc0pKMDHoU
-3RNA4u3605ghNA531+y5nSgkWgF/80MhcBQfLQ4L4XawDPicXLrn1RTRAgMLXz8w
-NLEVbBnfJDuv4TajHIXIWPfxdwIPHHP2ZKigefqEdkycgWb+8v2JKISELRy/KYc3
-dnb+a572YAzBvONybokXGvVMktaACg==
-=sGgq
------END PGP SIGNATURE-----
-
---ncPtxHryCGBDiFaTTn88jPF7UYRvp1h1n--
+> ---
+>  migration/savevm.c | 37 ++++++++++++++++++++++++++++++++-----
+>  1 file changed, 32 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 1d4220ece8..7e9dd58ccb 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1812,6 +1812,9 @@ static void *postcopy_ram_listen_thread(void *opaqu=
+e)
+>      MigrationIncomingState *mis =3D migration_incoming_get_current();
+>      QEMUFile *f =3D mis->from_src_file;
+>      int load_res;
+> +    MigrationState *migr =3D migrate_get_current();
+> +
+> +    object_ref(OBJECT(migr));
+> =20
+>      migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+>                                     MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> @@ -1838,11 +1841,24 @@ static void *postcopy_ram_listen_thread(void *opa=
+que)
+> =20
+>      trace_postcopy_ram_listen_thread_exit();
+>      if (load_res < 0) {
+> -        error_report("%s: loadvm failed: %d", __func__, load_res);
+>          qemu_file_set_error(f, load_res);
+> -        migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
+> -                                       MIGRATION_STATUS_FAILED);
+> -    } else {
+> +        dirty_bitmap_mig_cancel_incoming();
+> +        if (postcopy_state_get() =3D=3D POSTCOPY_INCOMING_RUNNING &&
+> +            !migrate_postcopy_ram() && migrate_dirty_bitmaps())
+> +        {
+> +            error_report("%s: loadvm failed during postcopy: %d. All sta=
+te is "
+> +                         "migrated except for dirty bitmaps. Some dirty =
+"
+> +                         "bitmaps may be lost, and present migrated dirt=
+y "
+> +                         "bitmaps are correctly migrated and valid.",
+> +                         __func__, load_res);
+> +            load_res =3D 0; /* prevent further exit() */
+> +        } else {
+> +            error_report("%s: loadvm failed: %d", __func__, load_res);
+> +            migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACT=
+IVE,
+> +                                           MIGRATION_STATUS_FAILED);
+> +        }
+> +    }
+> +    if (load_res >=3D 0) {
+>          /*
+>           * This looks good, but it's possible that the device loading in=
+ the
+>           * main thread hasn't finished yet, and so we might not be in 'R=
+UN'
+> @@ -1878,6 +1894,8 @@ static void *postcopy_ram_listen_thread(void *opaqu=
+e)
+>      mis->have_listen_thread =3D false;
+>      postcopy_state_set(POSTCOPY_INCOMING_END);
+> =20
+> +    object_unref(OBJECT(migr));
+> +
+>      return NULL;
+>  }
+> =20
+> @@ -2429,6 +2447,8 @@ static bool postcopy_pause_incoming(MigrationIncomi=
+ngState *mis)
+>  {
+>      trace_postcopy_pause_incoming();
+> =20
+> +    assert(migrate_postcopy_ram());
+> +
+>      /* Clear the triggered bit to allow one recovery */
+>      mis->postcopy_recover_triggered =3D false;
+> =20
+> @@ -2513,15 +2533,22 @@ out:
+>      if (ret < 0) {
+>          qemu_file_set_error(f, ret);
+> =20
+> +        /* Cancel bitmaps incoming regardless of recovery */
+> +        dirty_bitmap_mig_cancel_incoming();
+> +
+>          /*
+>           * If we are during an active postcopy, then we pause instead
+>           * of bail out to at least keep the VM's dirty data.  Note
+>           * that POSTCOPY_INCOMING_LISTENING stage is still not enough,
+>           * during which we're still receiving device states and we
+>           * still haven't yet started the VM on destination.
+> +         *
+> +         * Only RAM postcopy supports recovery. Still, if RAM postcopy i=
+s
+> +         * enabled, canceled bitmaps postcopy will not affect RAM postco=
+py
+> +         * recovering.
+>           */
+>          if (postcopy_state_get() =3D=3D POSTCOPY_INCOMING_RUNNING &&
+> -            postcopy_pause_incoming(mis)) {
+> +            migrate_postcopy_ram() && postcopy_pause_incoming(mis)) {
+>              /* Reset f to point to the newly created channel */
+>              f =3D mis->from_src_file;
+>              goto retry;
+> --=20
+> 2.21.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
