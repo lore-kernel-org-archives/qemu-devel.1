@@ -2,48 +2,48 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D663C35242
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC5FDC7619B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:47:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0052E2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:47:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0052E2067D
+	by mail.kernel.org (Postfix) with ESMTPS id 961892067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:47:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 961892067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3b7c-0004Se-5G
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 02:47:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39443)
+	id 1j3b7f-0004bC-Ls
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 02:47:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39421)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <xuyandong2@huawei.com>) id 1j3b30-0004Md-1q
+ (envelope-from <xuyandong2@huawei.com>) id 1j3b2z-0004LA-By
  for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:42:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <xuyandong2@huawei.com>) id 1j3b2y-0000bn-MR
+ (envelope-from <xuyandong2@huawei.com>) id 1j3b2x-0000Zz-A7
  for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:42:29 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3231 helo=huawei.com)
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3228 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <xuyandong2@huawei.com>)
- id 1j3b2u-0000Ro-8H; Mon, 17 Feb 2020 02:42:24 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 0F484F9413AD7C18766C;
- Mon, 17 Feb 2020 15:42:20 +0800 (CST)
-Received: from localhost (10.175.124.177) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
+ id 1j3b2r-0000PB-Tp; Mon, 17 Feb 2020 02:42:22 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id C8D79CF0072849C02661;
+ Mon, 17 Feb 2020 15:42:19 +0800 (CST)
+Received: from localhost (10.175.124.177) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
  15:42:12 +0800
 From: Xu Yandong <xuyandong2@huawei.com>
 To: <peter.maydell@linaro.org>
-Subject: [PATCH RFC 14/16] hw/arm: move shared bootinfo member to ArmMachine
-Date: Mon, 17 Feb 2020 02:51:26 -0500
-Message-ID: <1581925888-103620-15-git-send-email-xuyandong2@huawei.com>
+Subject: [PATCH RFC 15/16] hw/arm: move shared cpu related functions to arm.c
+ and export them
+Date: Mon, 17 Feb 2020 02:51:27 -0500
+Message-ID: <1581925888-103620-16-git-send-email-xuyandong2@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1581925888-103620-1-git-send-email-xuyandong2@huawei.com>
 References: <1581925888-103620-1-git-send-email-xuyandong2@huawei.com>
@@ -72,122 +72,297 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move bootinfo member from VirtMachineState to ArmMachineState.
+Move cpu related functions that will be shared between VIRT and
+non-VIRT machine types to arm.c.
 
 Signed-off-by: Xu Yandong <xuyandong2@huawei.com>
 ---
- hw/arm/arm.c          |  9 +++++++++
- hw/arm/virt.c         | 28 +++++++++-------------------
- include/hw/arm/arm.h  |  3 +++
+ hw/arm/arm.c          | 89 ++++++++++++++++++++++++++++++++++++++++++
+ hw/arm/virt.c         | 91 +------------------------------------------
+ include/hw/arm/arm.h  |  3 ++
  include/hw/arm/virt.h |  1 -
- 4 files changed, 21 insertions(+), 20 deletions(-)
+ 4 files changed, 94 insertions(+), 90 deletions(-)
 
 diff --git a/hw/arm/arm.c b/hw/arm/arm.c
-index 4bffee0f37..7d880dd8e7 100644
+index 7d880dd8e7..8bb5d92d2e 100644
 --- a/hw/arm/arm.c
 +++ b/hw/arm/arm.c
-@@ -508,6 +508,15 @@ void create_virtio_devices(const ArmMachineState *ams)
+@@ -39,6 +39,28 @@
+ #include "hw/intc/arm_gic.h"
+ #include "kvm_arm.h"
+ 
++static const char *valid_cpus[] = {
++    ARM_CPU_TYPE_NAME("cortex-a7"),
++    ARM_CPU_TYPE_NAME("cortex-a15"),
++    ARM_CPU_TYPE_NAME("cortex-a53"),
++    ARM_CPU_TYPE_NAME("cortex-a57"),
++    ARM_CPU_TYPE_NAME("cortex-a72"),
++    ARM_CPU_TYPE_NAME("host"),
++    ARM_CPU_TYPE_NAME("max"),
++};
++
++bool cpu_type_valid(const char *cpu)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(valid_cpus); i++) {
++        if (strcmp(cpu, valid_cpus[i]) == 0) {
++            return true;
++        }
++    }
++    return false;
++}
++
+ void create_fdt(ArmMachineState *ams)
+ {
+     MachineState *ms = MACHINE(ams);
+@@ -543,6 +565,70 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
      }
  }
  
-+void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
++static uint64_t virt_cpu_mp_affinity(ArmMachineState *ams, int idx)
 +{
-+    const ArmMachineState *board = container_of(binfo, ArmMachineState,
-+                                                 bootinfo);
++    uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
++    ArmMachineClass *amc = ARM_MACHINE_GET_CLASS(ams);
 +
-+    *fdt_size = board->fdt_size;
-+    return board->fdt;
++    if (!amc->disallow_affinity_adjustment) {
++        /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
++         * GIC's target-list limitations. 32-bit KVM hosts currently
++         * always create clusters of 4 CPUs, but that is expected to
++         * change when they gain support for gicv3. When KVM is enabled
++         * it will override the changes we make here, therefore our
++         * purposes are to make TCG consistent (with 64-bit KVM hosts)
++         * and to improve SGI efficiency.
++         */
++        if (ams->gic_version == 3) {
++            clustersz = GICV3_TARGETLIST_BITS;
++        } else {
++            clustersz = GIC_TARGETLIST_BITS;
++        }
++    }
++    return arm_cpu_mp_affinity(idx, clustersz);
 +}
 +
- static char *virt_get_gic_version(Object *obj, Error **errp)
++
++static CpuInstanceProperties
++virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
++
++    assert(cpu_index < possible_cpus->len);
++    return possible_cpus->cpus[cpu_index].props;
++}
++
++
++static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
++{
++    return idx % ms->numa_state->num_nodes;
++}
++
++static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
++{
++    int n;
++    unsigned int max_cpus = ms->smp.max_cpus;
++    ArmMachineState *ams = ARM_MACHINE(ms);
++
++    if (ms->possible_cpus) {
++        assert(ms->possible_cpus->len == max_cpus);
++        return ms->possible_cpus;
++    }
++
++    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
++                                  sizeof(CPUArchId) * max_cpus);
++    ms->possible_cpus->len = max_cpus;
++    for (n = 0; n < ms->possible_cpus->len; n++) {
++        ms->possible_cpus->cpus[n].type = ms->cpu_type;
++        ms->possible_cpus->cpus[n].arch_id =
++            virt_cpu_mp_affinity(ams, n);
++        ms->possible_cpus->cpus[n].props.has_thread_id = true;
++        ms->possible_cpus->cpus[n].props.thread_id = n;
++    }
++    return ms->possible_cpus;
++}
++
+ static void arm_machine_class_init(ObjectClass *oc, void *data)
  {
-     ArmMachineState *ams = ARM_MACHINE(obj);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 11e753906b..2f498ea687 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -971,16 +971,6 @@ static void create_secure_ram(VirtMachineState *vms,
-     g_free(nodename);
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -555,6 +641,9 @@ static void arm_machine_class_init(ObjectClass *oc, void *data)
+     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+     mc->numa_mem_supported = true;
+     mc->auto_enable_numa_with_memhp = true;
++    mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
++    mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
++    mc->possible_cpu_arch_ids = virt_possible_cpu_arch_ids;
  }
  
--static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
--{
--    const VirtMachineState *vms = container_of(binfo, VirtMachineState,
--                                                 bootinfo);
+ static void arm_instance_init(Object *obj)
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 2f498ea687..14d20d5c46 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -182,28 +182,6 @@ static const int a15irqmap[] = {
+     [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+ };
+ 
+-static const char *valid_cpus[] = {
+-    ARM_CPU_TYPE_NAME("cortex-a7"),
+-    ARM_CPU_TYPE_NAME("cortex-a15"),
+-    ARM_CPU_TYPE_NAME("cortex-a53"),
+-    ARM_CPU_TYPE_NAME("cortex-a57"),
+-    ARM_CPU_TYPE_NAME("cortex-a72"),
+-    ARM_CPU_TYPE_NAME("host"),
+-    ARM_CPU_TYPE_NAME("max"),
+-};
 -
--    ArmMachineState *board = ARM_MACHINE(vms);
--    *fdt_size = board->fdt_size;
--    return board->fdt;
+-static bool cpu_type_valid(const char *cpu)
+-{
+-    int i;
+-
+-    for (i = 0; i < ARRAY_SIZE(valid_cpus); i++) {
+-        if (strcmp(cpu, valid_cpus[i]) == 0) {
+-            return true;
+-        }
+-    }
+-    return false;
 -}
 -
- static void virt_build_smbios(VirtMachineState *vms)
+ static void fdt_add_its_gic_node(VirtMachineState *vms)
  {
-     MachineClass *mc = MACHINE_GET_CLASS(vms);
-@@ -1016,7 +1006,7 @@ void virt_machine_done(Notifier *notifier, void *data)
+     char *nodename;
+@@ -1030,30 +1008,6 @@ void virt_machine_done(Notifier *notifier, void *data)
+     virt_build_smbios(vms);
+ }
+ 
+-static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+-{
+-    uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
+-    ArmMachineState *ams = ARM_MACHINE(vms);
+-    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+-
+-    if (!vmc->disallow_affinity_adjustment) {
+-        /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
+-         * GIC's target-list limitations. 32-bit KVM hosts currently
+-         * always create clusters of 4 CPUs, but that is expected to
+-         * change when they gain support for gicv3. When KVM is enabled
+-         * it will override the changes we make here, therefore our
+-         * purposes are to make TCG consistent (with 64-bit KVM hosts)
+-         * and to improve SGI efficiency.
+-         */
+-        if (ams->gic_version == 3) {
+-            clustersz = GICV3_TARGETLIST_BITS;
+-        } else {
+-            clustersz = GIC_TARGETLIST_BITS;
+-        }
+-    }
+-    return arm_cpu_mp_affinity(idx, clustersz);
+-}
+-
+ static void virt_set_memmap(VirtMachineState *vms)
+ {
      MachineState *ms = MACHINE(vms);
-     ArmMachineState *ams = ARM_MACHINE(vms);
-     ARMCPU *cpu = ARM_CPU(first_cpu);
--    struct arm_boot_info *info = &vms->bootinfo;
-+    struct arm_boot_info *info = &ams->bootinfo;
-     AddressSpace *as = arm_boot_address_space(cpu, info);
+@@ -1460,45 +1414,6 @@ static void virt_set_iommu(Object *obj, const char *value, Error **errp)
+     }
+ }
  
-     /*
-@@ -1373,14 +1363,14 @@ static void machvirt_init(MachineState *machine)
+-static CpuInstanceProperties
+-virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+-{
+-    MachineClass *mc = MACHINE_GET_CLASS(ms);
+-    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+-
+-    assert(cpu_index < possible_cpus->len);
+-    return possible_cpus->cpus[cpu_index].props;
+-}
+-
+-static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
+-{
+-    return idx % ms->numa_state->num_nodes;
+-}
+-
+-static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+-{
+-    int n;
+-    unsigned int max_cpus = ms->smp.max_cpus;
+-    VirtMachineState *vms = VIRT_MACHINE(ms);
+-
+-    if (ms->possible_cpus) {
+-        assert(ms->possible_cpus->len == max_cpus);
+-        return ms->possible_cpus;
+-    }
+-
+-    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+-                                  sizeof(CPUArchId) * max_cpus);
+-    ms->possible_cpus->len = max_cpus;
+-    for (n = 0; n < ms->possible_cpus->len; n++) {
+-        ms->possible_cpus->cpus[n].type = ms->cpu_type;
+-        ms->possible_cpus->cpus[n].arch_id =
+-            virt_cpu_mp_affinity(vms, n);
+-        ms->possible_cpus->cpus[n].props.has_thread_id = true;
+-        ms->possible_cpus->cpus[n].props.thread_id = n;
+-    }
+-    return ms->possible_cpus;
+-}
+-
+ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                  Error **errp)
+ {
+@@ -1624,9 +1539,6 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_RAMFB_DEVICE);
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_PLATFORM);
+-    mc->possible_cpu_arch_ids = virt_possible_cpu_arch_ids;
+-    mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+-    mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
+     mc->kvm_type = virt_kvm_type;
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+@@ -1833,10 +1745,11 @@ DEFINE_VIRT_MACHINE(2, 7)
+ static void virt_machine_2_6_options(MachineClass *mc)
+ {
+     VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
++    ArmMachineClass *amc = ARM_MACHINE_CLASS(OBJECT_CLASS(mc));
  
-     create_platform_bus(vms);
- 
--    vms->bootinfo.ram_size = machine->ram_size;
--    vms->bootinfo.nb_cpus = smp_cpus;
--    vms->bootinfo.board_id = -1;
--    vms->bootinfo.loader_start = ams->memmap[VIRT_MEM].base;
--    vms->bootinfo.get_dtb = machvirt_dtb;
--    vms->bootinfo.skip_dtb_autoload = true;
--    vms->bootinfo.firmware_loaded = firmware_loaded;
--    arm_load_kernel(ARM_CPU(first_cpu), machine, &vms->bootinfo);
-+    ams->bootinfo.ram_size = machine->ram_size;
-+    ams->bootinfo.nb_cpus = smp_cpus;
-+    ams->bootinfo.board_id = -1;
-+    ams->bootinfo.loader_start = ams->memmap[VIRT_MEM].base;
-+    ams->bootinfo.get_dtb = machvirt_dtb;
-+    ams->bootinfo.skip_dtb_autoload = true;
-+    ams->bootinfo.firmware_loaded = firmware_loaded;
-+    arm_load_kernel(ARM_CPU(first_cpu), machine, &ams->bootinfo);
- 
-     vms->machine_done.notify = virt_machine_done;
-     qemu_add_machine_init_done_notifier(&vms->machine_done);
+     virt_machine_2_7_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_2_6, hw_compat_2_6_len);
+-    vmc->disallow_affinity_adjustment = true;
++    amc->disallow_affinity_adjustment = true;
+     /* Disable PMU for 2.6 as PMU support was first introduced in 2.7 */
+     vmc->no_pmu = true;
+ }
 diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
-index 743a90ba36..372f4dea28 100644
+index 372f4dea28..37a419b784 100644
 --- a/include/hw/arm/arm.h
 +++ b/include/hw/arm/arm.h
-@@ -92,6 +92,7 @@ typedef struct {
+@@ -86,6 +86,7 @@ typedef struct MemMapEntry {
+ 
  typedef struct {
-     MachineState parent;
-     int32_t gic_version;
-+    struct arm_boot_info bootinfo;
-     MemMapEntry *memmap;
-     const int *irqmap;
-     int smp_cpus;
-@@ -130,6 +131,8 @@ void create_rtc(const ArmMachineState *ams);
+     MachineClass parent;
++    bool disallow_affinity_adjustment;
+     bool claim_edge_triggered_timers;
+ } ArmMachineClass;
  
- void create_virtio_devices(const ArmMachineState *ams);
+@@ -112,6 +113,8 @@ typedef struct {
+ #define ARM_MACHINE_CLASS(klass) \
+     OBJECT_CLASS_CHECK(ArmMachineClass, klass, TYPE_ARM_MACHINE)
  
-+void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size);
++bool cpu_type_valid(const char *cpu);
 +
- /* Return the number of used redistributor regions  */
- static inline int virt_gicv3_redist_region_count(ArmMachineState *ams)
- {
+ void create_fdt(ArmMachineState *ams);
+ 
+ void fdt_add_timer_nodes(const ArmMachineState *ams);
 diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 086a27682f..8276e2c02c 100644
+index 8276e2c02c..aa66cd78d5 100644
 --- a/include/hw/arm/virt.h
 +++ b/include/hw/arm/virt.h
-@@ -68,7 +68,6 @@ typedef struct {
-     bool its;
-     bool virt;
-     VirtIOMMUType iommu;
--    struct arm_boot_info bootinfo;
-     uint32_t msi_phandle;
-     uint32_t iommu_phandle;
-     hwaddr highest_gpa;
+@@ -47,7 +47,6 @@ typedef enum VirtIOMMUType {
+ 
+ typedef struct {
+     ArmMachineClass parent;
+-    bool disallow_affinity_adjustment;
+     bool no_its;
+     bool no_pmu;
+     bool smbios_old_sys_ver;
 -- 
 2.18.1
 
