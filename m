@@ -7,86 +7,86 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22059C3402A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 631E9C34024
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:51:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9ECA222D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:49:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 348F620725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:51:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z2X07HQJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9ECA222D9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YM9t0oZK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 348F620725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3lST-0007Io-V6
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:49:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49280)
+	id 1j3lTw-0008SW-DA
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:51:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49319)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j3lRS-0006f1-HN
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:48:27 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j3lRl-0006sz-Cj
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:48:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j3lRR-0003Tz-EF
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:48:26 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33801)
+ (envelope-from <richard.henderson@linaro.org>) id 1j3lRk-0003Zi-Bm
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:48:45 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41855)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j3lRR-0003Tm-8N
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:48:25 -0500
-Received: by mail-pg1-x544.google.com with SMTP id j4so9673265pgi.1
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 10:48:25 -0800 (PST)
+ id 1j3lRk-0003ZV-6E
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:48:44 -0500
+Received: by mail-pf1-x443.google.com with SMTP id j9so9345648pfa.8
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 10:48:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=LiCijNbzuC8RSIE0Pupj5y6DhyoVJYGiC6hfznvkmhk=;
- b=z2X07HQJTuJ07gzmhYfVAjW5d+C1Wl5Wndgexb6Bbs37hlBooGkf3Jxx1Uop3qaS+a
- M1ThxuD+zbQ0mkewHMymy9+yeUdS4WwxE2GMgxLyUHKFZJk2ckifq5ntuof8A2wNfb1w
- 7yXMm/j2lRAX5bbxRgDUq0+HjiepukSfmg72XZPJrNqUFRpG7zQ/GeBtQU+WcMIu8Gd3
- 5xu8ZoERQjxMqwqUtr1PXGoKjl9e1KrkjxRVFaGnEOOLfMzJjK9kIAmBdJRNHrVw0i4E
- p58AWfdthTww6IbSPCfoPpgv7Ro5RuY7zE/0TA/fev6IT0sebb+LfRSAovMnKA0fVzzP
- N/Dg==
+ bh=12wyfLftuE/TCUM2xhWQuRTtzhOaNz7Sa8u7ZLejXog=;
+ b=YM9t0oZK/VIZO7pfWLGxmY3vvLeVEX3p6yaO5za5PVamOeLrrNVYJGk3+AHcTlxQJB
+ X9h2EyI49hAZjhRMd5ksHZDKvPtJAOKN9EWO2EioubtZiqs+Vn1+Ckq1SjoV8ujlmHPn
+ VUJoore2EQxd8Zftfr/yKT8g0lDBQ7W478epPURerSE++2UEvJlq2SLKI4RtQSfi4VaS
+ ZotPfjoluz1JGk0+iQX442dJB6v6hJ6rbHaQXDAiHcZamL1ppC8ECeQyFmS6pGNNLW+5
+ KVnhOOqKgLJwndvMurKn2OVCKdP+oAOj0tkPEIu24/oAxYUa/PMFdYqvpEe0dz9ZS0lA
+ XOpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=LiCijNbzuC8RSIE0Pupj5y6DhyoVJYGiC6hfznvkmhk=;
- b=rYQEUPVJVDlj6R06eiCqrPfIVc1gkQz41LwKFUt8HboEonh/5noMqqTaINkpwdeidd
- RE9EAHIXd0HcksSGKq6tVuqY3vsXf5CCEV/dRyMwV6C5QfddqVrf7+73Zm3YJXDIBIA7
- f8PkgHH+fTO3dhHkdUEp6Uo9tpzgs5i5qGlSotTKpQgskXENnFmq0LBJg2MbD8U4W4CG
- fTJaAYo8O/1soLiRBPg8mIoPYKDc3xp0aF9EbuzgblHXgcfz5bBrd7tYRQHhR7vAu7kq
- eyxSCZ6oCxk0i8US7xf6YVWayFJ4ctqkredNwtBp3uLgy+C1kfJiTWnImkf4cP2d3r5Y
- rVHA==
-X-Gm-Message-State: APjAAAUr2x6DfhFSqFHpc/HLjLNBSx7B+N7IGqTiXiPm8egJA/LFpWbi
- 3apaL0r4P6OLv5amC3wVXMjL6Q==
-X-Google-Smtp-Source: APXvYqx/PAG4FQ4kYd6R1e3ccMk8QiQq4opx7K2IGdxNygRUlAjbCLWNPoTp/1rvixHACyf828kPDw==
-X-Received: by 2002:aa7:968c:: with SMTP id f12mr17720037pfk.235.1581965304287; 
- Mon, 17 Feb 2020 10:48:24 -0800 (PST)
+ bh=12wyfLftuE/TCUM2xhWQuRTtzhOaNz7Sa8u7ZLejXog=;
+ b=LtA9cIilUEDyRPkCA1qlMqBafGc7wYYP3sls7udzMIEROghsy33CydooMhUPwoE/5s
+ lrSJDibA0pETosGQUgLMFRwuYTSVoPhVKdY+pjIRQ2PWucZ9MTHXHUz4qkX3PzDuFirc
+ zKpKfcgYxqESsZhNEoVXX7CQ1shCDeOmABMhWgeEHXsdOBeEvmTU7CqMF9w+cilSCEXR
+ Ku5v4+dwCjDCjFrp1inzjk7qg/GmIimcJBzzClQrjpjhkg1cXlT3xDy27O+pa+0Ffhy5
+ kqZuLsBfz4lvNsnD1E00qyzBEpuIpkIOYZy2p9nBIHy2mas7gKs/1ep6LrhLgiEZp6lK
+ RO2w==
+X-Gm-Message-State: APjAAAU3gXseKgIb5NDr7ee67S5YVR1mZ9FHKJFuIZy2OIEqlFmxjgfu
+ h42TuOd0RkCWOtTuBhlvrdzgIQ==
+X-Google-Smtp-Source: APXvYqyH/gT3JwPNLx3Ayy7QdN3aDhyUfrT16IXOs3BrIhmxNUYzJkYCjRfp2c6PBEsqoBr8oIQMAw==
+X-Received: by 2002:a63:7d58:: with SMTP id m24mr17862905pgn.387.1581965323167; 
+ Mon, 17 Feb 2020 10:48:43 -0800 (PST)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- s18sm1715449pgn.34.2020.02.17.10.48.23
+ z10sm1670572pgf.35.2020.02.17.10.48.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 10:48:23 -0800 (PST)
-Subject: Re: [PATCH v5 09/79] arm/aspeed: actually check RAM size
+ Mon, 17 Feb 2020 10:48:42 -0800 (PST)
+Subject: Re: [PATCH v5 10/79] arm/aspeed: use memdev for RAM
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <20200217173452.15243-1-imammedo@redhat.com>
- <20200217173452.15243-10-imammedo@redhat.com>
+ <20200217173452.15243-11-imammedo@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <afa585fb-3e4f-599f-12d6-731236f267f8@linaro.org>
-Date: Mon, 17 Feb 2020 10:48:21 -0800
+Message-ID: <efa67908-3fab-505e-3a2b-b683bbde957e@linaro.org>
+Date: Mon, 17 Feb 2020 10:48:40 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200217173452.15243-10-imammedo@redhat.com>
+In-Reply-To: <20200217173452.15243-11-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,54 +104,18 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 2/17/20 9:33 AM, Igor Mammedov wrote:
-> It's supposed that SOC will check if "-m" provided
-> RAM size is valid by setting "ram-size" property and
-> then board would read back valid (possibly corrected
-> value) to map RAM MemoryReging with valid size.
-> It isn't doing so, since check is called only
-> indirectly from
->   aspeed_sdmc_reset()->asc->compute_conf()
-> or much later when guest writes to configuration
-> register.
-> 
-> So depending on "-m" value QEMU end-ups with a warning
-> and an invalid MemoryRegion size allocated and mapped.
-> (examples:
->  -M ast2500-evb -m 1M
->     0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
->       0000000080000000-00000000800fffff (prio 0, ram): ram
->       0000000080100000-00000000bfffffff (prio 0, i/o): max_ram
->  -M ast2500-evb -m 3G
->     0000000080000000-000000017ffffffe (prio 0, i/o): aspeed-ram-container
->       0000000080000000-000000013fffffff (prio 0, ram): ram
->       [DETECTED OVERFLOW!] 0000000140000000-00000000bfffffff (prio 0, i/o): max_ram
-> )
-> On top of that sdmc falls back and reports to guest
-> "default" size, it thinks machine should have.
-> 
-> This patch makes ram-size check actually work and
-> changes behavior from a warning later on during
-> machine reset to error_fatal at the moment SOC.ram-size
-> is set so user will have to fix RAM size on CLI
-> to start machine.
-> 
-> It also gets out of the way mutable ram-size logic,
-> so we could consolidate RAM allocation logic around
-> pre-allocated hostmem backend (supplied by user or
-> auto created by generic machine code depending on
-> supplied -m/mem-path/mem-prealloc options.
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>   MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > Reviewed-by: Cédric Le Goater <clg@kaod.org>
-> ---
-> v3:
->   * replace
->      [PATCH v2 07/86] arm:aspeed: convert valid RAM sizes to data
->      [PATCH v2 08/86] arm:aspeed: actually check RAM size
->     with a simplified variant that adds ram_size check to sdmc.ram-size
->     property
->   * use g_assert_not_reached() in default branch
->     (Cédric Le Goater <clg@kaod.org>)
+> Acked-by: Joel Stanley <joel@jms.id.au>
 > ---
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
