@@ -3,47 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E86C3B1BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 00:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A071CC3B1BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 00:17:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA34520726
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 00:11:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA34520726
+	by mail.kernel.org (Postfix) with ESMTPS id 6AAB420726
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 00:17:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AAB420726
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3U0X-0008MY-QX
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 19:11:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59360)
+	id 1j3U6f-0004gD-Gn
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 19:17:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j3Tzp-0007dl-DC
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:10:46 -0500
+ (envelope-from <bounces@canonical.com>) id 1j3U4Z-0002rO-7r
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j3Tzo-0006cI-AX
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:10:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33932)
+ (envelope-from <bounces@canonical.com>) id 1j3U4Y-0004MS-5E
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:15:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34392)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j3Tzo-0006Yy-4n
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:10:44 -0500
+ id 1j3U4X-0004LB-Vm
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 19:15:38 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j3Tzm-0001kb-Gp
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 00:10:42 +0000
+ id 1j3U4W-00022a-Qj
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 00:15:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 614B72E8047
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 00:10:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id AFD9F2E8047
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 00:15:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 16 Feb 2020 23:59:04 -0000
+Date: Mon, 17 Feb 2020 00:06:22 -0000
 From: Richard Henderson <rth@twiddle.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: helmutsch rth
 X-Launchpad-Bug-Reporter: Helmut (helmutsch)
 X-Launchpad-Bug-Modifier: Richard Henderson (rth)
 References: <158188126194.31124.5348536044519461550.malonedeb@wampee.canonical.com>
-Message-Id: <158189754568.30066.9937603898112491392.launchpad@wampee.canonical.com>
+Message-Id: <158189798283.29270.13082540984582708622.malone@chaenomeles.canonical.com>
 Subject: [Bug 1863508] Re: qemu-system-arm stops with SIGSEGV in
  helper_gvec_eq16
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 71fef7babe23af84603918bb32eaa3001ace70ca
+X-Launchpad-Hash: e9a66d5470369249567bbeeef141cce1ec30af52
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,8 +83,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I infer from the traceback that your host does not support AVX1.
+
 ** Changed in: qemu
-       Status: New =3D> Incomplete
+       Status: Incomplete =3D> In Progress
+
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Richard Henderson (rth)
 
 -- =
 
