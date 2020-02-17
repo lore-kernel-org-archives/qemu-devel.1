@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A605C34021
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED540C34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:42:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B10320725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:42:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0C6E20725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:42:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IiuSLGCt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B10320725
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BdsP+PQH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0C6E20725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3kPp-0000Fk-BH
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:42:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38289)
+	id 1j3kPs-0000P5-UP
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:42:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38141)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j3kIt-0001eF-IR
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:32 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j3kIj-0001Ed-Ku
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j3kIs-0001y1-9c
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:31 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27389
+ (envelope-from <imammedo@redhat.com>) id 1j3kIi-0001oZ-AD
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:21 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35174
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kIs-0001xf-4m
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:30 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kIi-0001oA-5G
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581960929;
+ s=mimecast20190719; t=1581960919;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TARbjw/itpTQCZ7DvuGTnSgcPuNYiFPqV9t4yEc33Jo=;
- b=IiuSLGCtW1uMY6YPNwbn9fOea2Ly+hEYmXTNP64BLm5FNqNiIg5T8/hWIk19xZw9ydl1++
- oreqJxkiQLY2U7b9OMfgPgAJJwWFQ0T3g84fMtcSiOJzHsR82obqSkrxkWbY9OVkffngC9
- 9YxZwOxto8gyuY5pZoEJZ0MSrXH4Yu4=
+ bh=fyGiYVnyrESE+bDVRdAtrFy5/IupR4jaS3wni1rBVjQ=;
+ b=BdsP+PQHhuiO759Q+u3eFZ8aQpqxCtYuwhv+t9VilttKVxp+orTqXCQL+L2C2pbVoGjT3V
+ Hby/6UXmn0HP3KY2SvdugtqExwoiBOfsWw9Dh9k4Ptd1LCWQp1iTyIEJnwOI4UbanXBDT2
+ MRHeMqA/mRbrPSVOU7NJu9O1KPpmTiM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-V1-AGdBNMLaRSXlHs2_XMg-1; Mon, 17 Feb 2020 12:35:28 -0500
+ us-mta-412-hkfVTUg6Pq2m8rAMRFxOhA-1; Mon, 17 Feb 2020 12:35:17 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D81D1005513
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 17:35:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7F931084431;
+ Mon, 17 Feb 2020 17:35:16 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ABF7F90508;
- Mon, 17 Feb 2020 17:35:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CDAD48CCE0;
+ Mon, 17 Feb 2020 17:35:15 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 23/79] arm/mps2: use memdev for RAM
-Date: Mon, 17 Feb 2020 12:33:56 -0500
-Message-Id: <20200217173452.15243-24-imammedo@redhat.com>
+Subject: [PATCH v5 14/79] arm/highbank: use memdev for RAM
+Date: Mon, 17 Feb 2020 12:33:47 -0500
+Message-Id: <20200217173452.15243-15-imammedo@redhat.com>
 In-Reply-To: <20200217173452.15243-1-imammedo@redhat.com>
 References: <20200217173452.15243-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: V1-AGdBNMLaRSXlHs2_XMg-1
+X-MC-Unique: hkfVTUg6Pq2m8rAMRFxOhA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -86,7 +86,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, robh@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,75 +99,78 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-PS:
- while at it add check for user supplied RAM size and error
- out if it mismatches board expected value.
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2:
-  * fix format string causing build failure on 32-bit host
-    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
+CC: robh@kernel.org
 ---
- hw/arm/mps2.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ hw/arm/highbank.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index d002b126d3..f246213206 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -24,6 +24,7 @@
+diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+index 518d935fdf..ac9de9411e 100644
+--- a/hw/arm/highbank.c
++++ b/hw/arm/highbank.c
+@@ -236,7 +236,6 @@ enum cxmachines {
+  */
+ static void calxeda_init(MachineState *machine, enum cxmachines machine_id=
+)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
+     DeviceState *dev =3D NULL;
+     SysBusDevice *busdev;
+     qemu_irq pic[128];
+@@ -247,7 +246,6 @@ static void calxeda_init(MachineState *machine, enum cx=
+machines machine_id)
+     qemu_irq cpu_virq[4];
+     qemu_irq cpu_vfiq[4];
+     MemoryRegion *sysram;
+-    MemoryRegion *dram;
+     MemoryRegion *sysmem;
+     char *sysboot_filename;
 =20
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/arm/boot.h"
-@@ -55,7 +56,6 @@ typedef struct {
-     MachineState parent;
-=20
-     ARMv7MState armv7m;
--    MemoryRegion psram;
-     MemoryRegion ssram1;
-     MemoryRegion ssram1_m;
-     MemoryRegion ssram23;
-@@ -118,6 +118,13 @@ static void mps2_common_init(MachineState *machine)
-         exit(1);
+@@ -290,10 +288,8 @@ static void calxeda_init(MachineState *machine, enum c=
+xmachines machine_id)
      }
 =20
-+    if (machine->ram_size !=3D mc->default_ram_size) {
-+        char *sz =3D size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be %s", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-+    }
-+
-     /* The FPGA images have an odd combination of different RAMs,
-      * because in hardware they are different implementations and
-      * connected to different buses, giving varying performance/size
-@@ -146,9 +153,7 @@ static void mps2_common_init(MachineState *machine)
-      * This is of no use for QEMU so we don't implement it (as if
-      * zbt_boot_ctrl is always zero).
-      */
--    memory_region_allocate_system_memory(&mms->psram,
--                                         NULL, "mps.ram", 16 * MiB);
--    memory_region_add_subregion(system_memory, 0x21000000, &mms->psram);
-+    memory_region_add_subregion(system_memory, 0x21000000, machine->ram);
+     sysmem =3D get_system_memory();
+-    dram =3D g_new(MemoryRegion, 1);
+-    memory_region_allocate_system_memory(dram, NULL, "highbank.dram", ram_=
+size);
+     /* SDRAM at address zero.  */
+-    memory_region_add_subregion(sysmem, 0, dram);
++    memory_region_add_subregion(sysmem, 0, machine->ram);
 =20
-     switch (mmc->fpga_type) {
-     case FPGA_AN385:
-@@ -338,6 +343,8 @@ static void mps2_class_init(ObjectClass *oc, void *data=
-)
+     sysram =3D g_new(MemoryRegion, 1);
+     memory_region_init_ram(sysram, NULL, "highbank.sysram", 0x8000,
+@@ -387,7 +383,7 @@ static void calxeda_init(MachineState *machine, enum cx=
+machines machine_id)
 =20
-     mc->init =3D mps2_common_init;
-     mc->max_cpus =3D 1;
-+    mc->default_ram_size =3D 16 * MiB;
-+    mc->default_ram_id =3D "mps.ram";
+     /* TODO create and connect IDE devices for ide_drive_get() */
+=20
+-    highbank_binfo.ram_size =3D ram_size;
++    highbank_binfo.ram_size =3D machine->ram_size;
+     /* highbank requires a dtb in order to boot, and the dtb will override
+      * the board ID. The following value is ignored, so set it to -1 to be
+      * clear that the value is meaningless.
+@@ -430,6 +426,7 @@ static void highbank_class_init(ObjectClass *oc, void *=
+data)
+     mc->units_per_default_bus =3D 1;
+     mc->max_cpus =3D 4;
+     mc->ignore_memory_transaction_failures =3D true;
++    mc->default_ram_id =3D "highbank.dram";
  }
 =20
- static void mps2_an385_class_init(ObjectClass *oc, void *data)
+ static const TypeInfo highbank_type =3D {
+@@ -448,6 +445,7 @@ static void midway_class_init(ObjectClass *oc, void *da=
+ta)
+     mc->units_per_default_bus =3D 1;
+     mc->max_cpus =3D 4;
+     mc->ignore_memory_transaction_failures =3D true;
++    mc->default_ram_id =3D "highbank.dram";
+ }
+=20
+ static const TypeInfo midway_type =3D {
 --=20
 2.18.1
 
