@@ -2,101 +2,86 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 328EEC34021
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB3DC34021
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:33:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECEA8222D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:31:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8349214D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 16:33:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XE3J+u8X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECEA8222D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tIt1H+dQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8349214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3jIe-0003Al-1d
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 11:31:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56674)
+	id 1j3jKy-00060y-Te
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 11:33:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57058)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j3jHl-0002LW-Io
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:30:18 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j3jKG-00050I-Qv
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:32:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j3jHk-00006r-E0
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:30:17 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37585
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3jHk-00006f-AF
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:30:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581957015;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zx2lZJTq31YQ2NsNIDOGQq40TlxdbFXoY++DlLyc+rw=;
- b=XE3J+u8X/baLf2Xb937I48hPdAwzk6Zri6W0G2MCKzR9H/AJCyvn+gmMQUCzbbBYW2Y4p4
- AFhzVTO3Sc7TkPd+bk+gmK7JgPPMmrf0zalQdPHgGypUaETvfLysAwEO45vTpei0YVEe2/
- 0bsqY0RYMC+2n/HJV+CyzH5iIkkrOMU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-PaLYJ6FXOWKrPBqEPLKvoA-1; Mon, 17 Feb 2020 11:30:13 -0500
-Received: by mail-wr1-f71.google.com with SMTP id l1so9241361wrt.4
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 08:30:13 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1j3jKF-0000w8-FP
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:32:52 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42944)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j3jKF-0000vv-8r
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 11:32:51 -0500
+Received: by mail-oi1-x241.google.com with SMTP id j132so17215466oih.9
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 08:32:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=3EkU9fRDfAmOAJzb4m2OoiRdooXjQJ9MMCQ8IuXlDFE=;
+ b=tIt1H+dQUIlXyEeq8id3VdXHYXbN9UJT2Bv+4h0mvpS+ASfUJblhtjLr0WeGl7q9jM
+ 8EYVtiwaySR1DRCiC/XTW0au8EYA3RKMBsmaSanqJGh4LzsZmoYCiwzLrOuIBq8J5BVy
+ k3JcErPIbX5bXgeBseh42KFdPIUqxBBf+aI+7f6331Fd1Hvd2Ge7TSlmCWgUkmPl0oZC
+ m0OHQOOZqCbH+fp2JfH3HDBfDauAUgG2ZlygeSBtwUYNqYPFt5rWxc9juPdNxk7vf8K9
+ Hx1w01JFdJAfpFN2BLOZWsh9ajHdVZpnyDtQzs6dyhj41dMz97Rfgj/3a/9MyZbPfKWG
+ esqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=SAbd4B28IoOLxgssqOBcuNLGJzZfOGD2sA3plZCF98Q=;
- b=KS/kWbhMFllo5gv/kbczglka9RohDlm8wQCE9+rM19jxIN8uLdkpEceM50DXw+CuH0
- r3EMYorQOcUhlDRb4m/G2PUC7qAn5Hrn6/kWwpzgxpERJW16NB/FZUWRw+njOI1m7CPi
- BbjCPjJfAz7bABaKfiQ1+UYzcPkgppz3g6AHAd/nL+QrSACStp95PSum+Zfl0j2QGly4
- CdxM6Zl6TWc6l+VXjnqPqua+Jf7uJzVUf5DmLlqR2w4ynkI/2dnipeUZaF4jFEmQJsJB
- lmg7XrjWWZ4JavZdA4UeYv1J62sslQv6orsldVOl3qkcvE6a3PYULt8VXNI9DbImZhxK
- M6dA==
-X-Gm-Message-State: APjAAAWEQx6C/bMLFRNQ2R7g0bnevlKsDi1K5Jf4w6wRKcHI9dUUIeYD
- Y51EUJwAz7RTtBKxslWpRuQSKuAcwH5xUdC+nR9jiWzNiFONR3jBaAyb5SKABej0w4UXt2ETkLr
- UVe7WN1k62shBAiU=
-X-Received: by 2002:a05:600c:230d:: with SMTP id
- 13mr23973416wmo.12.1581957012095; 
- Mon, 17 Feb 2020 08:30:12 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxEVn3Q266PGtnHpTiRDlw4nGxMhC4b/0bcJG4jFTNYIYGhO1YlaGukEwkH+EwTaHUeSDXDPQ==
-X-Received: by 2002:a05:600c:230d:: with SMTP id
- 13mr23973401wmo.12.1581957011884; 
- Mon, 17 Feb 2020 08:30:11 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id i4sm1219588wmd.23.2020.02.17.08.30.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 08:30:11 -0800 (PST)
-Subject: Re: [PATCH] q800: fix coverity warning CID 1412799
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200210132252.381343-1-laurent@vivier.eu>
- <2b2dd523-7420-97a1-2223-15bba139ce7a@redhat.com>
-Message-ID: <a473881b-b682-33dd-694d-a30da60655fd@redhat.com>
-Date: Mon, 17 Feb 2020 17:30:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=3EkU9fRDfAmOAJzb4m2OoiRdooXjQJ9MMCQ8IuXlDFE=;
+ b=n5jsUuNx7Xe7tgx7zzwUU6+CzjZKdSvn+Pa/p5up+nyRXOxpvBXckB7htBW4Muh0oz
+ YOklxqQ/yK8smbCcwAQR6ZQ5N2+RXuxrqd8y1SVoaTfIge9JhDFtJ1slc3NSAPhbpekk
+ u6S/r4XjrCJVMQ2csq214pGbcbPhPGEObf6Psli/wPnbjrRsb0iRj9beQSnGqe4XL2X6
+ adQMtt2cqd0DpbyRS2LCykiqRAikzBHKwve3dsTQZhHiPCfe41imwoxw12fxI8Yg5/Me
+ DEjR7goF/lfL4PpTjxHQ8uLKN7M5Lcyg4vG+PXsO2sruj36202MjFPKcZGo8m1Da+9mP
+ AWTA==
+X-Gm-Message-State: APjAAAUipZgk+3QSlIbRb3N7z0kYvtAn7GO0lskpkXrrODJQAmiN3Q1s
+ Ubedaye7LXX+Rwk6VCp5nzpbLfpFhq47GFMoTCwTYA==
+X-Google-Smtp-Source: APXvYqzSUe0eSqNhcwYkA419VKxiok7CErYugk1NmnKpRC2lEpK+QZz+CFKKb3A9DoZsMzegvsty7Ain27vmiDEpYDw=
+X-Received: by 2002:a54:4f16:: with SMTP id e22mr10769068oiy.170.1581957170077; 
+ Mon, 17 Feb 2020 08:32:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <2b2dd523-7420-97a1-2223-15bba139ce7a@redhat.com>
-Content-Language: en-US
-X-MC-Unique: PaLYJ6FXOWKrPBqEPLKvoA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+References: <20200215154706.19837-1-philmd@redhat.com>
+ <20200215154706.19837-2-philmd@redhat.com>
+ <CAFEAcA9cZHWziyk6VzfaxrqjCNNOmnmSkB=uuGJMp0TL521mAQ@mail.gmail.com>
+ <8c4570e1-cd9b-9d33-2756-5c223df282ee@redhat.com>
+ <CAFEAcA-hyEVPeT1wakaft6m3_WD9XG3eYFAwJJgoHRAZ1nntag@mail.gmail.com>
+ <e530629d-c029-1d7c-b5b7-cdbbeb397a4d@redhat.com>
+In-Reply-To: <e530629d-c029-1d7c-b5b7-cdbbeb397a4d@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 17 Feb 2020 16:32:39 +0000
+Message-ID: <CAFEAcA-KzWv=_kZUPNE6yyUSA36XY+q91ihJ_xh4euJ9RsyaLA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] hw/ipmi/bmc: Delay timer_new_ns() from init to
+ realize to avoid memleaks
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,79 +93,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Corey Minyard <minyard@acm.org>,
+ David Hildenbrand <david@redhat.com>, Pan Nengyuan <pannengyuan@huawei.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Laurent,
+On Mon, 17 Feb 2020 at 16:15, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+> Per this comment in qdev.c, unrealize() is the expected default:
+>
+>      /* by default all devices were considered as hotpluggable,
+>       * so with intent to check it in generic qdev_unplug() /
+>       * device_set_realized() functions make every device
+>       * hotpluggable. Devices that shouldn't be hotpluggable,
+>       * should override it in their class_init()
+>       */
+>      dc->hotpluggable =3D true;
 
-Cc'ing qemu-block@
+This comment sounds like it's documenting what was the
+previous default ("were considered") and making a minimal
+change to avoid breaking existing code where a device
+does want to be hotpluggable but isn't explicitly saying so.
+I forget how exactly it works (the mechanism has changed
+several times) but in practice a sysbus device is generally
+not hotpluggable, and that's what most devices are.
 
-On 2/10/20 3:56 PM, Philippe Mathieu-Daud=E9 wrote:
-> On 2/10/20 2:22 PM, Laurent Vivier wrote:
->> Check the return value of blk_write() and log an error if any
->>
->=20
-> Fixes: Coverity CID 1412799 (Error handling issues)
->=20
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->> =A0 hw/misc/mac_via.c | 7 +++++--
->> =A0 1 file changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
->> index b7d0012794..81343301b1 100644
->> --- a/hw/misc/mac_via.c
->> +++ b/hw/misc/mac_via.c
->> @@ -30,6 +30,7 @@
->> =A0 #include "hw/qdev-properties.h"
->> =A0 #include "sysemu/block-backend.h"
->> =A0 #include "trace.h"
->> +#include "qemu/log.h"
->> =A0 /*
->> =A0=A0 * VIAs: There are two in every machine,
->> @@ -381,8 +382,10 @@ static void via2_irq_request(void *opaque, int=20
->> irq, int level)
->> =A0 static void pram_update(MacVIAState *m)
->> =A0 {
->> =A0=A0=A0=A0=A0 if (m->blk) {
->> -=A0=A0=A0=A0=A0=A0=A0 blk_pwrite(m->blk, 0, m->mos6522_via1.PRAM,
->> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sizeof(m->mos652=
-2_via1.PRAM), 0);
->> +=A0=A0=A0=A0=A0=A0=A0 if (blk_pwrite(m->blk, 0, m->mos6522_via1.PRAM,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 size=
-of(m->mos6522_via1.PRAM), 0) < 0) {
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_log("pram_update: cannot write t=
-o file\n");
+> I get for qemu-system-aarch64:
+>
+>
+> - qdev objects missing instance_finalize():
+>
+>      bcm2835-sdhost-bus
+>      PCIE
+>      pxa2xx-mmci-bus
+>      qtest-accel
+>      sdhci-bus
+>      tcg-accel
 
-I am not comfortable reviewing this patch, because it use a undocumented=20
-function. If I understand co-routine code enough, this eventually calls=20
-blk_co_pwritev_part(), which on success returns bdrv_co_pwritev_part(),=20
-which on success returns bdrv_aligned_pwritev(), which itself returns 0=20
-or errno (as negative value).
+Note that you don't need an instance_finalize() if it
+would have nothing to do, which may be the case here.
 
-I don't understand how to treat the error, but apparently other devices=20
-do the same (only report some error and discarding the block not written).
+> - non-hotpluggable devices implementing unrealize():
+>
+>      VGA
 
-So this can happens if your filesystem got full, the VM is running, the=20
-device can not sync the VIA PRAM but keeps running. You let the user the=20
-possibility to make some space on the filesystem so the next sync will=20
-succeed.
+Not sure which device this is, I couldn't find a TYPE_
+define with this name. Is it an abstract or common
+device type used by the hotpluggable pci VGA card?
 
-This does not seem critical, so I dare to add:
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> - hotpluggable devices missing unrealize()
+>
+>      a15mpcore_priv
+>      a9mpcore_priv
 
-But I'd rather have one of the block folks reviewing this pattern.
+Most of these are not really hotpluggable. What is
+confusing your test code is that sysbus devices get
+the default 'hotpluggable =3D true' setting, but other
+conditions usually prevent hotplugging. (The reason
+hotpluggable is true is the default is because of
+handling of 'dynamic sysbus' devices which live on
+the 'platform bus'.) In particular, I think that
+anything with !dc->user_creatable can't be hotplugged
+unless board code specifically tries it, which would
+be a bug for most of these devices.
 
-Regards,
+Also, if there isn't anything for a device's unrealize
+method to do, it doesn't need to provide one.
 
-Phil.
-
->> +=A0=A0=A0=A0=A0=A0=A0 }
->> =A0=A0=A0=A0=A0 }
->> =A0 }
->>
-
+thanks
+-- PMM
 
