@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6EEC34021
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD45C33FE0
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:15:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 915F7206E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:15:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 915F7206E2
+	by mail.kernel.org (Postfix) with ESMTPS id 5784A215A4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 13:15:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5784A215A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3gF0-0003O2-MY
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 08:15:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52014)
+	id 1j3gFV-0003wW-GN
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 08:15:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52015)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1j3gAn-0003fn-Rl
+ (envelope-from <gengdongjiu@huawei.com>) id 1j3gAn-0003fo-Ri
  for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:10:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1j3gAl-0008Tr-Ug
+ (envelope-from <gengdongjiu@huawei.com>) id 1j3gAl-0008Tu-Un
  for qemu-devel@nongnu.org; Mon, 17 Feb 2020 08:10:53 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3233 helo=huawei.com)
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3234 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1j3gAg-0008I4-9W; Mon, 17 Feb 2020 08:10:46 -0500
+ id 1j3gAf-0008I1-SD; Mon, 17 Feb 2020 08:10:46 -0500
 Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 47455C2A8EF48AAEC652;
+ by Forcepoint Email with ESMTP id 2381C1F579A3F93FE6E3;
  Mon, 17 Feb 2020 21:10:41 +0800 (CST)
 Received: from huawei.com (10.151.151.243) by DGGEMS410-HUB.china.huawei.com
  (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
- 21:10:32 +0800
+ 21:10:31 +0800
 From: Dongjiu Geng <gengdongjiu@huawei.com>
 To: <mst@redhat.com>, <imammedo@redhat.com>, <xiaoguangrong.eric@gmail.com>,
  <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <fam@euphon.net>,
@@ -46,9 +46,10 @@ To: <mst@redhat.com>, <imammedo@redhat.com>, <xiaoguangrong.eric@gmail.com>,
  <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>,
  <pbonzini@redhat.com>, <james.morse@arm.com>, <lersek@redhat.com>,
  <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH v24 05/10] ACPI: Build Hardware Error Source Table
-Date: Mon, 17 Feb 2020 21:12:43 +0800
-Message-ID: <20200217131248.28273-6-gengdongjiu@huawei.com>
+Subject: [PATCH v24 04/10] ACPI: Build related register address fields via
+ hardware error fw_cfg blob
+Date: Mon, 17 Feb 2020 21:12:42 +0800
+Message-ID: <20200217131248.28273-5-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.18.0.huawei.25
 In-Reply-To: <20200217131248.28273-1-gengdongjiu@huawei.com>
 References: <20200217131248.28273-1-gengdongjiu@huawei.com>
@@ -75,239 +76,253 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch builds Hardware Error Source Table(HEST) via fw_cfg blobs.
-Now it only supports ARMv8 SEA, a type of Generic Hardware Error
-Source version 2(GHESv2) error source. Afterwards, we can extend
-the supported types if needed. For the CPER section, currently it
-is memory section because kernel mainly wants userspace to handle
-the memory errors.
-
-This patch follows the spec ACPI 6.2 to build the Hardware Error
-Source table. For more detailed information, please refer to
+This patch builds error_block_address and read_ack_register fields
+in hardware errors table , the error_block_address points to Generic
+Error Status Block(GESB) via bios_linker. The max size for one GESB
+is 1kb in bytes, For more detailed information, please refer to
 document: docs/specs/acpi_hest_ghes.rst
 
-build_ghes_hw_error_notification() helper will help to add Hardware
-Error Notification to ACPI tables without using packed C structures
-and avoid endianness issues as API doesn't need explicit conversion.
+Now we only support one Error source, if necessary, we can extend to
+support more.
 
+Suggested-by: Laszlo Ersek <lersek@redhat.com>
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 ---
- hw/acpi/ghes.c           | 126 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c |   1 +
- include/hw/acpi/ghes.h   |  39 +++++++++++++++
- 3 files changed, 166 insertions(+)
+ default-configs/arm-softmmu.mak |  1 +
+ hw/acpi/Kconfig                 |  4 ++
+ hw/acpi/Makefile.objs           |  1 +
+ hw/acpi/aml-build.c             |  2 +
+ hw/acpi/ghes.c                  | 89 +++++++++++++++++++++++++++++++++++++++++
+ hw/arm/virt-acpi-build.c        |  6 +++
+ include/hw/acpi/aml-build.h     |  1 +
+ include/hw/acpi/ghes.h          | 28 +++++++++++++
+ 8 files changed, 132 insertions(+)
+ create mode 100644 hw/acpi/ghes.c
+ create mode 100644 include/hw/acpi/ghes.h
 
-diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-index e1b3f8f..7a7381d 100644
---- a/hw/acpi/ghes.c
-+++ b/hw/acpi/ghes.c
-@@ -23,6 +23,7 @@
- #include "qemu/units.h"
- #include "hw/acpi/ghes.h"
- #include "hw/acpi/aml-build.h"
-+#include "qemu/error-report.h"
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 645e620..7648be0 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -41,3 +41,4 @@ CONFIG_FSL_IMX25=y
+ CONFIG_FSL_IMX7=y
+ CONFIG_FSL_IMX6UL=y
+ CONFIG_SEMIHOSTING=y
++CONFIG_ACPI_APEI=y
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 54209c6..1932f66 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -28,6 +28,10 @@ config ACPI_HMAT
+     bool
+     depends on ACPI
  
- #define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
- #define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
-@@ -33,6 +34,42 @@
- /* Now only support ARMv8 SEA notification type error source */
- #define ACPI_GHES_ERROR_SOURCE_COUNT        1
- 
-+/* Generic Hardware Error Source version 2 */
-+#define ACPI_GHES_SOURCE_GENERIC_ERROR_V2   10
++config ACPI_APEI
++    bool
++    depends on ACPI
 +
-+/* Address offset in Generic Address Structure(GAS) */
-+#define GAS_ADDR_OFFSET 4
+ config ACPI_PCI
+     bool
+     depends on ACPI && PCI
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 777da07..28c5ddb 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+ common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+ common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
++common-obj-$(CONFIG_ACPI_APEI) += ghes.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
+ 
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 2c3702b..3681ec6 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1578,6 +1578,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
+     tables->table_data = g_array_new(false, true /* clear */, 1);
+     tables->tcpalog = g_array_new(false, true /* clear */, 1);
+     tables->vmgenid = g_array_new(false, true /* clear */, 1);
++    tables->hardware_errors = g_array_new(false, true /* clear */, 1);
+     tables->linker = bios_linker_loader_init();
+ }
+ 
+@@ -1588,6 +1589,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
+     g_array_free(tables->table_data, true);
+     g_array_free(tables->tcpalog, mfre);
+     g_array_free(tables->vmgenid, mfre);
++    g_array_free(tables->hardware_errors, mfre);
+ }
+ 
+ /*
+diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
+new file mode 100644
+index 0000000..e1b3f8f
+--- /dev/null
++++ b/hw/acpi/ghes.c
+@@ -0,0 +1,89 @@
++/*
++ * Support for generating APEI tables and recording CPER for Guests
++ *
++ * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Author: Dongjiu Geng <gengdongjiu@huawei.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "hw/acpi/ghes.h"
++#include "hw/acpi/aml-build.h"
++
++#define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
++#define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
++
++/* The max size in bytes for one error block */
++#define ACPI_GHES_MAX_RAW_DATA_LENGTH   (1 * KiB)
++
++/* Now only support ARMv8 SEA notification type error source */
++#define ACPI_GHES_ERROR_SOURCE_COUNT        1
 +
 +/*
-+ * Hardware Error Notification
-+ * ACPI 4.0: 17.3.2.7 Hardware Error Notification
-+ * Composes dummy Hardware Error Notification descriptor of specified type
++ * Build table for the hardware error fw_cfg blob.
++ * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
++ * See docs/specs/acpi_hest_ghes.rst for blobs format.
 + */
-+static void build_ghes_hw_error_notification(GArray *table, const uint8_t type)
++void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)
 +{
-+    /* Type */
-+    build_append_int_noprefix(table, type, 1);
-+    /*
-+     * Length:
-+     * Total length of the structure in bytes
-+     */
-+    build_append_int_noprefix(table, 28, 1);
-+    /* Configuration Write Enable */
-+    build_append_int_noprefix(table, 0, 2);
-+    /* Poll Interval */
-+    build_append_int_noprefix(table, 0, 4);
-+    /* Vector */
-+    build_append_int_noprefix(table, 0, 4);
-+    /* Switch To Polling Threshold Value */
-+    build_append_int_noprefix(table, 0, 4);
-+    /* Switch To Polling Threshold Window */
-+    build_append_int_noprefix(table, 0, 4);
-+    /* Error Threshold Value */
-+    build_append_int_noprefix(table, 0, 4);
-+    /* Error Threshold Window */
-+    build_append_int_noprefix(table, 0, 4);
-+}
++    int i, error_status_block_offset;
 +
- /*
-  * Build table for the hardware error fw_cfg blob.
-  * Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fw_cfg blobs.
-@@ -87,3 +124,92 @@ void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker)
-     bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
-         0, sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
- }
-+
-+/* Build Generic Hardware Error Source version 2 (GHESv2) */
-+static void build_ghes_v2(GArray *table_data, int source_id, BIOSLinker *linker)
-+{
-+    uint64_t address_offset;
-+    /*
-+     * Type:
-+     * Generic Hardware Error Source version 2(GHESv2 - Type 10)
-+     */
-+    build_append_int_noprefix(table_data, ACPI_GHES_SOURCE_GENERIC_ERROR_V2, 2);
-+    /* Source Id */
-+    build_append_int_noprefix(table_data, source_id, 2);
-+    /* Related Source Id */
-+    build_append_int_noprefix(table_data, 0xffff, 2);
-+    /* Flags */
-+    build_append_int_noprefix(table_data, 0, 1);
-+    /* Enabled */
-+    build_append_int_noprefix(table_data, 1, 1);
-+
-+    /* Number of Records To Pre-allocate */
-+    build_append_int_noprefix(table_data, 1, 4);
-+    /* Max Sections Per Record */
-+    build_append_int_noprefix(table_data, 1, 4);
-+    /* Max Raw Data Length */
-+    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
-+
-+    address_offset = table_data->len;
-+    /* Error Status Address */
-+    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
-+                     4 /* QWord access */, 0);
-+    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-+        address_offset + GAS_ADDR_OFFSET, sizeof(uint64_t),
-+        ACPI_GHES_ERRORS_FW_CFG_FILE, source_id * sizeof(uint64_t));
-+
-+    switch (source_id) {
-+    case ACPI_HEST_SRC_ID_SEA:
-+        /*
-+         * Notification Structure
-+         * Now only enable ARMv8 SEA notification type
-+         */
-+        build_ghes_hw_error_notification(table_data, ACPI_GHES_NOTIFY_SEA);
-+        break;
-+    default:
-+        error_report("Not support this error source");
-+        abort();
++    /* Build error_block_address */
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        build_append_int_noprefix(hardware_errors, 0, sizeof(uint64_t));
 +    }
 +
-+    /* Error Status Block Length */
-+    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
++    /* Build read_ack_register */
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        /*
++         * Initialize the value of read_ack_register to 1, so GHES can be
++         * writeable after (re)boot.
++         * ACPI 6.2: 18.3.2.8 Generic Hardware Error Source version 2
++         * (GHESv2 - Type 10)
++         */
++        build_append_int_noprefix(hardware_errors, 1, sizeof(uint64_t));
++    }
++
++    /* Generic Error Status Block offset in the hardware error fw_cfg blob */
++    error_status_block_offset = hardware_errors->len;
++
++    /* Reserve space for Error Status Data Block */
++    acpi_data_push(hardware_errors,
++        ACPI_GHES_MAX_RAW_DATA_LENGTH * ACPI_GHES_ERROR_SOURCE_COUNT);
++
++    /* Tell guest firmware to place hardware_errors blob into RAM */
++    bios_linker_loader_alloc(linker, ACPI_GHES_ERRORS_FW_CFG_FILE,
++                             hardware_errors, sizeof(uint64_t), false);
++
++    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
++        /*
++         * Tell firmware to patch error_block_address entries to point to
++         * corresponding "Generic Error Status Block"
++         */
++        bios_linker_loader_add_pointer(linker,
++            ACPI_GHES_ERRORS_FW_CFG_FILE, sizeof(uint64_t) * i,
++            sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
++            error_status_block_offset + i * ACPI_GHES_MAX_RAW_DATA_LENGTH);
++    }
 +
 +    /*
-+     * Read Ack Register
-+     * ACPI 6.1: 18.3.2.8 Generic Hardware Error Source
-+     * version 2 (GHESv2 - Type 10)
++     * tell firmware to write hardware_errors GPA into
++     * hardware_errors_addr fw_cfg, once the former has been initialized.
 +     */
-+    address_offset = table_data->len;
-+    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
-+                     4 /* QWord access */, 0);
-+    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-+        address_offset + GAS_ADDR_OFFSET,
-+        sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
-+        (ACPI_GHES_ERROR_SOURCE_COUNT + source_id) * sizeof(uint64_t));
-+
-+    /*
-+     * Read Ack Preserve field
-+     * We only provide the first bit in Read Ack Register to OSPM to write
-+     * while the other bits are preserved.
-+     */
-+    build_append_int_noprefix(table_data, ~0x1ULL, 8);
-+    /* Read Ack Write */
-+    build_append_int_noprefix(table_data, 0x1, 8);
-+}
-+
-+/* Build Hardware Error Source Table */
-+void acpi_build_hest(GArray *table_data, BIOSLinker *linker)
-+{
-+    uint64_t hest_start = table_data->len;
-+
-+    /* Hardware Error Source Table header*/
-+    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-+
-+    /* Error Source Count */
-+    build_append_int_noprefix(table_data, ACPI_GHES_ERROR_SOURCE_COUNT, 4);
-+
-+    build_ghes_v2(table_data, ACPI_HEST_SRC_ID_SEA, linker);
-+
-+    build_header(linker, table_data, (void *)(table_data->data + hest_start),
-+        "HEST", table_data->len - hest_start, 1, NULL, "");
++    bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
++        0, sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
 +}
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 6819fcf..12a9a78 100644
+index bd5f771..6819fcf 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -834,6 +834,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     if (vms->ras) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_ghes_error_table(tables->hardware_errors, tables->linker);
-+        acpi_build_hest(tables_blob, tables->linker);
-     }
+@@ -48,6 +48,7 @@
+ #include "sysemu/reset.h"
+ #include "kvm_arm.h"
+ #include "migration/vmstate.h"
++#include "hw/acpi/ghes.h"
  
+ #define ARM_SPI_BASE 32
+ 
+@@ -830,6 +831,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     acpi_add_table(table_offsets, tables_blob);
+     build_spcr(tables_blob, tables->linker, vms);
+ 
++    if (vms->ras) {
++        acpi_add_table(table_offsets, tables_blob);
++        build_ghes_error_table(tables->hardware_errors, tables->linker);
++    }
++
      if (ms->numa_state->num_nodes > 0) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, vms);
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index de4a406..8f13620 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -220,6 +220,7 @@ struct AcpiBuildTables {
+     GArray *rsdp;
+     GArray *tcpalog;
+     GArray *vmgenid;
++    GArray *hardware_errors;
+     BIOSLinker *linker;
+ } AcpiBuildTables;
+ 
 diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-index 50379b0..18debd8 100644
---- a/include/hw/acpi/ghes.h
+new file mode 100644
+index 0000000..50379b0
+--- /dev/null
 +++ b/include/hw/acpi/ghes.h
-@@ -24,5 +24,44 @@
- 
- #include "hw/acpi/bios-linker-loader.h"
- 
+@@ -0,0 +1,28 @@
 +/*
-+ * Values for Hardware Error Notification Type field
++ * Support for generating APEI tables and recording CPER for Guests
++ *
++ * Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Author: Dongjiu Geng <gengdongjiu@huawei.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
-+enum AcpiGhesNotifyType {
-+    /* Polled */
-+    ACPI_GHES_NOTIFY_POLLED = 0,
-+    /* External Interrupt */
-+    ACPI_GHES_NOTIFY_EXTERNAL = 1,
-+    /* Local Interrupt */
-+    ACPI_GHES_NOTIFY_LOCAL = 2,
-+    /* SCI */
-+    ACPI_GHES_NOTIFY_SCI = 3,
-+    /* NMI */
-+    ACPI_GHES_NOTIFY_NMI = 4,
-+    /* CMCI, ACPI 5.0: 18.3.2.7, Table 18-290 */
-+    ACPI_GHES_NOTIFY_CMCI = 5,
-+    /* MCE, ACPI 5.0: 18.3.2.7, Table 18-290 */
-+    ACPI_GHES_NOTIFY_MCE = 6,
-+    /* GPIO-Signal, ACPI 6.0: 18.3.2.7, Table 18-332 */
-+    ACPI_GHES_NOTIFY_GPIO = 7,
-+    /* ARMv8 SEA, ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_GHES_NOTIFY_SEA = 8,
-+    /* ARMv8 SEI, ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_GHES_NOTIFY_SEI = 9,
-+    /* External Interrupt - GSIV, ACPI 6.1: 18.3.2.9, Table 18-345 */
-+    ACPI_GHES_NOTIFY_GSIV = 10,
-+    /* Software Delegated Exception, ACPI 6.2: 18.3.2.9, Table 18-383 */
-+    ACPI_GHES_NOTIFY_SDEI = 11,
-+    /* 12 and greater are reserved */
-+    ACPI_GHES_NOTIFY_RESERVED = 12
-+};
 +
-+enum {
-+    ACPI_HEST_SRC_ID_SEA = 0,
-+    /* future ids go here */
-+    ACPI_HEST_SRC_ID_RESERVED,
-+};
++#ifndef ACPI_GHES_H
++#define ACPI_GHES_H
 +
- void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
-+void acpi_build_hest(GArray *table_data, BIOSLinker *linker);
- #endif
++#include "hw/acpi/bios-linker-loader.h"
++
++void build_ghes_error_table(GArray *hardware_errors, BIOSLinker *linker);
++#endif
 -- 
 1.8.3.1
 
