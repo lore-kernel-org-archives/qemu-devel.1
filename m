@@ -7,92 +7,93 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDBF1C7619F
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB8F8C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AE37206F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:43:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95F79206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 09:44:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TgtpAZKJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AE37206F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsdYhbfj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F79206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3cwJ-00046J-Q8
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 04:43:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53937)
+	id 1j3cxI-0005ll-R0
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 04:44:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j3cvV-0002V0-Du
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:54 -0500
+ (envelope-from <philmd@redhat.com>) id 1j3cvS-0002Qp-Qz
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j3cvU-00047o-Ft
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:53 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44785
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j3cvR-00045i-Ue
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:50 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45547
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3cvU-00047U-Bp
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:52 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3cvR-00045K-QR
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 04:42:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581932571;
+ s=mimecast20190719; t=1581932569;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MYAelrCTwzXEpeXTjGoeLvSObmJVSDbDIvbl+/nkeqU=;
- b=TgtpAZKJqo9tNk5Q3Bz0jyVXLyOJI3TRyj9Rtin0hPA9hZBVODaHYzfU5dyhLFJSg6ion3
- PUcDMfc8RNN8aQFZlclDV7MYecXAVZoVGoVXuJ2xScMMjL5Ldb93FPscWT381GJGfZ8BMj
- t6vpRXezDDyPO6EDnCwpvhOV0GeC4ek=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-3eFmizFwMK2YlIw-SpOpaQ-1; Mon, 17 Feb 2020 04:42:44 -0500
-Received: by mail-wr1-f70.google.com with SMTP id n23so8658385wra.20
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 01:42:44 -0800 (PST)
+ bh=+0K9/hhcGuMRqV64Bb6WocCgg5svmiUON88ZVzCS73g=;
+ b=RsdYhbfjK6ZVb4wkWCHDARh8Kp1b3JF0pL0WhuuNt+SXpmAcR4Y23tqP8AWwlnYx+lvtUP
+ EeYmj2uayZV92Aw2cEiz0QvuQ6XKdcWE+wWRSwMIzqTHIzoigMpMyV5yHLnvEa1tVbczmT
+ Zy/LsQqgXqq6rVGGKoyjElj1SOYd8BQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-z-6UEmF0NMqgkLIuGVmClA-1; Mon, 17 Feb 2020 04:42:47 -0500
+Received: by mail-wr1-f69.google.com with SMTP id w17so8689595wrr.9
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 01:42:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=nY/FwSJNIP8tGgbzcIhnsTAXLH61fhI3XyE0WWi+eWM=;
- b=A0vS3zaCxMaLxLbe5hiv/C7ukOgBSQYCkyfPOdsP9Kshu6mr6GZmL1A4GZ+SE+y1Jb
- CVTtZz3ISIpZ4szSbM38WmSzmWLI5DodqoYxYrvzPcxjYuXhOVSnMtrbzsNNCZcEly45
- zFdcW99Voo6jer+4JCZ+eRam3sn5HD9rH4Tze1otfCnJ55E7RHGqjzOrDu/XxE5Z9+aT
- y/GXSK/bjzU+EBBJyJ0sDjD8vUtxcvtiHNcyJSyx5y0ffhcB9Ssk8cxeKTxEdvT6hgD2
- ofVV8iRe6P5Uc/BsJGswAe3MkK5USn3x6WbyhPdJkNfVbK8xtbsgD1j5aJnYqwm289AF
- BvOw==
-X-Gm-Message-State: APjAAAVHVdT5YdHfEtzKjh+D9XTOe40r9VPwy9zyxTzG37QpIub2BVlz
- sdnkFxIQQ9N8rPZcwmehp95x6tvJ7A/suY1Y+Iz/+6PE9+h3t87C4SrOLuybXPTqnqZKvnZweGT
- Cp0cJwtU0m6WsgIw=
-X-Received: by 2002:adf:f80b:: with SMTP id s11mr21977817wrp.12.1581932563545; 
- Mon, 17 Feb 2020 01:42:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyx3EBu+FoflpE03lVufFajOhpAVZN10mLkueH2EYY9MwAIamDe3WMoSK7ys9LsyB38t1Wwcg==
-X-Received: by 2002:adf:f80b:: with SMTP id s11mr21977802wrp.12.1581932563390; 
- Mon, 17 Feb 2020 01:42:43 -0800 (PST)
+ bh=016NXjobK1ZSPrbhkh4SMG/lamO/sVwpkeO1WxFp7YQ=;
+ b=OFyd2GwVLc1f27jaDdndMBz62YEkox1FOjgO7Lw6HKuRcIxRH7vdC+okJ0HTbJ5Hmb
+ B0V8kx2b2uKBq3Q5UjdON9JxfPbRJf2Y33kBDozGDFk85cTNMjH/vpncmBHg0TyTZfkV
+ luAYiGrXvKhv8YXet9y6pZ0qLgtz/7VKafQni2IgLsa1tlzEHcUYJeWdbSVhGmzwyiZn
+ G03Z04Mf9oPL9PFXE0V0z3uJ+Am76PIJJbvSCqLC7ATZsYe4w8Q7i1Veu5AlGUyzoGfi
+ 25EH4pkphvtNbjJNB+b7lTwUl0O1vKih/HC8LvheW2eHBDS8cfvtYM3ayxzGC4udKOFI
+ eurw==
+X-Gm-Message-State: APjAAAUdCBMz/cJPy6kBbDlzlxdzPRj7s0LAQvybYkTip+PB4aIWLgAx
+ k4a8QOM/wcAXhgWn2AYwlF7cXqCz3WbpZt1MvgnRVpVxjs3rtdr3ttml+tiWYuJZuVoDQg8H7B0
+ daljvRSXWE82RnTE=
+X-Received: by 2002:a5d:6545:: with SMTP id z5mr20756203wrv.3.1581932566337;
+ Mon, 17 Feb 2020 01:42:46 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz6r2ka1BsqIqbzkkdfs3hJMWQvGzyKpdzx6zVs++fAcZaRu61dYyoaBQiBwo9Nq0oPhYOmZA==
+X-Received: by 2002:a5d:6545:: with SMTP id z5mr20756181wrv.3.1581932566093;
+ Mon, 17 Feb 2020 01:42:46 -0800 (PST)
 Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id t187sm17789442wmt.25.2020.02.17.01.42.42
+ by smtp.gmail.com with ESMTPSA id t187sm17789442wmt.25.2020.02.17.01.42.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Feb 2020 01:42:42 -0800 (PST)
+ Mon, 17 Feb 2020 01:42:45 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/3] tools/virtiofsd/passthrough_ll: Remove unneeded
- variable assignment
-Date: Mon, 17 Feb 2020 10:42:38 +0100
-Message-Id: <20200217094240.9927-2-philmd@redhat.com>
+Subject: [RFC PATCH v2 3/3] tools/virtiofsd/fuse_lowlevel: Fix
+ fuse_out_header::error value
+Date: Mon, 17 Feb 2020 10:42:40 +0100
+Message-Id: <20200217094240.9927-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200217094240.9927-1-philmd@redhat.com>
 References: <20200217094240.9927-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-MC-Unique: 3eFmizFwMK2YlIw-SpOpaQ-1
+X-MC-Unique: z-6UEmF0NMqgkLIuGVmClA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,35 +115,37 @@ Sender: "Qemu-devel"
 
 Fix warning reported by Clang static code analyzer:
 
-    CC      tools/virtiofsd/passthrough_ll.o
-  tools/virtiofsd/passthrough_ll.c:1083:5: warning: Value stored to 'saverr=
-' is never read
-      saverr =3D ENOMEM;
-      ^        ~~~~~~
+    CC      tools/virtiofsd/fuse_lowlevel.o
+  tools/virtiofsd/fuse_lowlevel.c:195:9: warning: Value stored to 'error' i=
+s never read
+          error =3D -ERANGE;
+          ^       ~~~~~~~
 
-Fixes: 7c6b66027
+Fixes: 2de121f01e
 Reported-by: Clang Static Analyzer
 Reviewed-by: J=C3=A1n Tomko <jtomko@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 2 --
- 1 file changed, 2 deletions(-)
+RFC because untested
+---
+ tools/virtiofsd/fuse_lowlevel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index c635fc8820..e9e71d5fc2 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1080,8 +1080,6 @@ static void lo_mknod_symlink(fuse_req_t req, fuse_ino=
-_t parent,
-         return;
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 704c0369b2..2dd36ec03b 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -192,7 +192,7 @@ int fuse_send_reply_iov_nofree(fuse_req_t req, int erro=
+r, struct iovec *iov,
+=20
+     if (error <=3D -1000 || error > 0) {
+         fuse_log(FUSE_LOG_ERR, "fuse: bad error value: %i\n", error);
+-        error =3D -ERANGE;
++        out.error =3D -ERANGE;
      }
 =20
--    saverr =3D ENOMEM;
--
-     saverr =3D lo_change_cred(req, &old);
-     if (saverr) {
-         goto out;
+     iov[0].iov_base =3D &out;
 --=20
 2.21.1
 
