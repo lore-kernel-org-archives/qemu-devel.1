@@ -2,80 +2,76 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A61CC34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB703C34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:39:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA73520725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:39:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98DD320725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:39:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LihXtRVQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA73520725
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hsxGwm7a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98DD320725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3kMI-0001K6-0e
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:39:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38054)
+	id 1j3kMO-0001bZ-Pa
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:39:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38116)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j3kIc-0000z2-SE
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:16 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j3kIh-00017d-2d
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j3kIb-0001iC-Mv
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:14 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40766
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1j3kIf-0001mn-Mo
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:18 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58157)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kIb-0001hN-IZ
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:13 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kIf-0001mF-IQ
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581960913;
+ s=mimecast20190719; t=1581960917;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZTDdiBw534Kgpsai00TQOGKgVGGgSTWt8zL34TYXzhQ=;
- b=LihXtRVQKfry9KYckXLW/4rZ5dcaDo8zjFGR/aIZCqTkLeCvhz6CyZV+nmxT+bi2DS9zo1
- EH2eb7UdVxzEedOYYeV+bDfAFLm0FOM9E5EEzghHVxCvdh6ql6fmhNnDDNqDJMqrzCPpuE
- tTy899jS1LuFWfzccFcDW00ZSCTh8xA=
+ bh=mugs9o65bmPEJZ2zERUHzbi8QvkdU7jQznOqW/fTzts=;
+ b=hsxGwm7aJryVMD8e89FXhE2Sd8cPgNb6MHREQnjvsWTq03gf4toCZ329YzEBYxcwnzEGMr
+ 16MC7/8i5Ry/scHABB8+0bKa8agwBdBH3Ru7Em+BNMlYPY7rtdo5OLsVl2v5z32jphXKb8
+ ZxpDbiDyoyM8h7ETChb6PI3dubzVFBk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-aKjmStv5MKq238YocSveXQ-1; Mon, 17 Feb 2020 12:35:11 -0500
+ us-mta-8-JA1iFBSjO4Gq5hOdj-r8Aw-1; Mon, 17 Feb 2020 12:35:15 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 413F31005513
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 17:35:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F2E78017CC;
+ Mon, 17 Feb 2020 17:35:14 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F2748CCE0;
- Mon, 17 Feb 2020 17:35:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 856A390526;
+ Mon, 17 Feb 2020 17:35:13 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 08/79] alpha/dp264: use memdev for RAM
-Date: Mon, 17 Feb 2020 12:33:41 -0500
-Message-Id: <20200217173452.15243-9-imammedo@redhat.com>
+Subject: [PATCH v5 12/79] arm/cubieboard: use memdev for RAM
+Date: Mon, 17 Feb 2020 12:33:45 -0500
+Message-Id: <20200217173452.15243-13-imammedo@redhat.com>
 In-Reply-To: <20200217173452.15243-1-imammedo@redhat.com>
 References: <20200217173452.15243-1-imammedo@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: aKjmStv5MKq238YocSveXQ-1
+X-MC-Unique: JA1iFBSjO4Gq5hOdj-r8Aw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,7 +83,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: b.galvani@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -100,85 +96,93 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
----
- hw/alpha/alpha_sys.h | 2 +-
- hw/alpha/dp264.c     | 3 ++-
- hw/alpha/typhoon.c   | 8 ++------
- 3 files changed, 5 insertions(+), 8 deletions(-)
+PS:
+While at it, get rid of no longer needed CubieBoardState wrapper.
 
-diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
-index 95033d7f0b..bc0a286226 100644
---- a/hw/alpha/alpha_sys.h
-+++ b/hw/alpha/alpha_sys.h
-@@ -11,7 +11,7 @@
- #include "hw/intc/i8259.h"
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+---
+CC: b.galvani@gmail.com
+---
+ hw/arm/cubieboard.c | 25 ++++++++-----------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
+
+diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
+index 6dc2f1d6b6..089f9a30c1 100644
+--- a/hw/arm/cubieboard.c
++++ b/hw/arm/cubieboard.c
+@@ -28,52 +28,42 @@ static struct arm_boot_info cubieboard_binfo =3D {
+     .board_id =3D 0x1008,
+ };
 =20
-=20
--PCIBus *typhoon_init(ram_addr_t, ISABus **, qemu_irq *, AlphaCPU *[4],
-+PCIBus *typhoon_init(MemoryRegion *, ISABus **, qemu_irq *, AlphaCPU *[4],
-                      pci_map_irq_fn);
-=20
- /* alpha_pci.c.  */
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index a8f9a89cc4..8d71a30617 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -75,7 +75,7 @@ static void clipper_init(MachineState *machine)
-     cpus[0]->env.trap_arg2 =3D smp_cpus;
-=20
-     /* Init the chipset.  */
--    pci_bus =3D typhoon_init(ram_size, &isa_bus, &rtc_irq, cpus,
-+    pci_bus =3D typhoon_init(machine->ram, &isa_bus, &rtc_irq, cpus,
-                            clipper_pci_map_irq);
-=20
-     /* Since we have an SRM-compatible PALcode, use the SRM epoch.  */
-@@ -183,6 +183,7 @@ static void clipper_machine_init(MachineClass *mc)
-     mc->max_cpus =3D 4;
-     mc->is_default =3D 1;
-     mc->default_cpu_type =3D ALPHA_CPU_TYPE_NAME("ev67");
-+    mc->default_ram_id =3D "ram";
- }
-=20
- DEFINE_MACHINE("clipper", clipper_machine_init)
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index 179e1f7658..1795e2f29d 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -58,7 +58,6 @@ typedef struct TyphoonState {
-     TyphoonCchip cchip;
-     TyphoonPchip pchip;
-     MemoryRegion dchip_region;
--    MemoryRegion ram_region;
- } TyphoonState;
-=20
- /* Called when one of DRIR or DIM changes.  */
-@@ -817,8 +816,7 @@ static void typhoon_alarm_timer(void *opaque)
-     cpu_interrupt(CPU(s->cchip.cpu[cpu]), CPU_INTERRUPT_TIMER);
- }
-=20
--PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
--                     qemu_irq *p_rtc_irq,
-+PCIBus *typhoon_init(MemoryRegion *ram, ISABus **isa_bus, qemu_irq *p_rtc_=
-irq,
-                      AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq)
+-typedef struct CubieBoardState {
+-    AwA10State *a10;
+-    MemoryRegion sdram;
+-} CubieBoardState;
+-
+ static void cubieboard_init(MachineState *machine)
  {
-     MemoryRegion *addr_space =3D get_system_memory();
-@@ -851,9 +849,7 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_=
-bus,
+-    CubieBoardState *s =3D g_new(CubieBoardState, 1);
++    AwA10State *a10 =3D AW_A10(object_new(TYPE_AW_A10));
+     Error *err =3D NULL;
 =20
-     /* Main memory region, 0x00.0000.0000.  Real hardware supports 32GB,
-        but the address space hole reserved at this point is 8TB.  */
--    memory_region_allocate_system_memory(&s->ram_region, OBJECT(s), "ram",
--                                         ram_size);
--    memory_region_add_subregion(addr_space, 0, &s->ram_region);
-+    memory_region_add_subregion(addr_space, 0, ram);
+-    s->a10 =3D AW_A10(object_new(TYPE_AW_A10));
+-
+-    object_property_set_int(OBJECT(&s->a10->emac), 1, "phy-addr", &err);
++    object_property_set_int(OBJECT(&a10->emac), 1, "phy-addr", &err);
+     if (err !=3D NULL) {
+         error_reportf_err(err, "Couldn't set phy address: ");
+         exit(1);
+     }
 =20
-     /* TIGbus, 0x801.0000.0000, 1GB.  */
-     /* ??? The TIGbus is used for delivering interrupts, and access to
+-    object_property_set_int(OBJECT(&s->a10->timer), 32768, "clk0-freq", &e=
+rr);
++    object_property_set_int(OBJECT(&a10->timer), 32768, "clk0-freq", &err)=
+;
+     if (err !=3D NULL) {
+         error_reportf_err(err, "Couldn't set clk0 frequency: ");
+         exit(1);
+     }
+=20
+-    object_property_set_int(OBJECT(&s->a10->timer), 24000000, "clk1-freq",
+-                            &err);
++    object_property_set_int(OBJECT(&a10->timer), 24000000, "clk1-freq", &e=
+rr);
+     if (err !=3D NULL) {
+         error_reportf_err(err, "Couldn't set clk1 frequency: ");
+         exit(1);
+     }
+=20
+-    object_property_set_bool(OBJECT(s->a10), true, "realized", &err);
++    object_property_set_bool(OBJECT(a10), true, "realized", &err);
+     if (err !=3D NULL) {
+         error_reportf_err(err, "Couldn't realize Allwinner A10: ");
+         exit(1);
+     }
+=20
+-    memory_region_allocate_system_memory(&s->sdram, NULL, "cubieboard.ram"=
+,
+-                                         machine->ram_size);
+     memory_region_add_subregion(get_system_memory(), AW_A10_SDRAM_BASE,
+-                                &s->sdram);
++                                machine->ram);
+=20
+     /* TODO create and connect IDE devices for ide_drive_get() */
+=20
+     cubieboard_binfo.ram_size =3D machine->ram_size;
+-    arm_load_kernel(&s->a10->cpu, machine, &cubieboard_binfo);
++    arm_load_kernel(&a10->cpu, machine, &cubieboard_binfo);
+ }
+=20
+ static void cubieboard_machine_init(MachineClass *mc)
+@@ -84,6 +74,7 @@ static void cubieboard_machine_init(MachineClass *mc)
+     mc->block_default_type =3D IF_IDE;
+     mc->units_per_default_bus =3D 1;
+     mc->ignore_memory_transaction_failures =3D true;
++    mc->default_ram_id =3D "cubieboard.ram";
+ }
+=20
+ DEFINE_MACHINE("cubieboard", cubieboard_machine_init)
 --=20
 2.18.1
 
