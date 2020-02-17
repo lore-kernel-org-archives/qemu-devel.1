@@ -2,90 +2,84 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B59C35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3067EC7619F
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:53:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8971520725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:53:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF76E20725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 11:53:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qrj8GGLK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8971520725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kWKeYmga"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF76E20725
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3exk-0000pH-OX
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 06:53:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40691)
+	id 1j3ey1-0001Id-5V
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 06:53:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3eqS-0006fm-6k
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:45:49 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1j3esV-0002Bt-6g
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:47:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3eqQ-0002Su-KY
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:45:48 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35276)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1j3esT-0004SJ-NH
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:47:55 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35302)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3eqQ-0002S8-DS; Mon, 17 Feb 2020 06:45:46 -0500
-Received: by mail-wm1-x344.google.com with SMTP id b17so18119939wmb.0;
- Mon, 17 Feb 2020 03:45:46 -0800 (PST)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1j3esT-0004RT-Ey
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 06:47:53 -0500
+Received: by mail-wm1-x341.google.com with SMTP id b17so18127700wmb.0
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 03:47:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=pPEcldfHD5OEhzQuYmprGj9+p4+mZQlzGRO9gMQy3Os=;
- b=Qrj8GGLKFR7uM64GuIhrtbZBoNRel8Grj4mZMXE531KxCMkBwaQcgnv6wBLKSmO4Jk
- 8MGUrI6XOB/DHdsIqUQqGWnHpWqr/VPzZ4ftJRgt+1I3cWq/iUkObdcwzdo+McTWVqY/
- WNGE7AlrVS3UnBu3mzY7BoqsICtLGj+SIPqVaHovdLrxIrYhytGzGK4RgVroLWNbMEVx
- nXspmElSS2D+x+LF2KB0rHPK9bqdEQ0cLkyJv52RX3v89aNp9FCsNeQee3Uv9FbvuxSS
- iJRC7blPV6EBHjI043qJvoJPwd4pGHeCph+OIcJJy0UktMFofI5e2Bt4Uc9NK7o0EqiV
- nUwA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=5FmZo3kfqSxY/nBaqvmnwPDPSKJwRrASqwzsEjuaiOo=;
+ b=kWKeYmgaQ59FYdUChPOK7wjyNYQ4Ae8JuWL+6PPMB3zIMfFlB5L0InSKG8at+N153q
+ KOo9ULlxlMFGSsDgzOnLo0YBZ/Vf15HKOB9CPm7AJnbPyVBcQH0yON1W4bv0sqFF+eJK
+ hxnrhYLLVyXzK62P6TNVq1YrIjeZaU2L54/Y+gpClBNxqh3uaudSCcjTsSiHTOwGcPad
+ 3wxYJIO1FWntjG2IbVojSqjDwahhN73C3QadaePrDFMZatyQ1KMBreTkBF+vOWKhxSEQ
+ JQfqhx/gjpawUTVPmHJqDlOL9pP7fMZiMNeSEUo9q0SuxPIGTML1eXEx28Ye3ho1XCUO
+ K9gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=pPEcldfHD5OEhzQuYmprGj9+p4+mZQlzGRO9gMQy3Os=;
- b=fmaJH5Pocbr+xyNsQRUnNRIXoRpHP5HlVVWwEOfO3E/hxp/bbpBE3Q2h6f4RYKohcY
- 4YjrbOdySZZV05g2trjpv4bhdPoxc5aL8IZvQFe+bUZwzm5ICxaVRuSLhIa/OK9Rlvo4
- or+M4QeZ2IzkXbkx2BuKZBum3IQe2dzBkXnUyWiPot8ozdf8OD5ZYmGe95mIOv5/EodQ
- S2l90Hwd4m4vflHVYEXsCJM4bRfLxNsOzX+FpylOyFWIbhPS6hat2pp57ClqGmN48Uq9
- pRQL9pZQegyfoLtFjpvpXvgWjzvEj47UWyIfVjGHNjt8g7D+CQePYYhywADWvL+FDkCl
- h5xQ==
-X-Gm-Message-State: APjAAAUELAwUcD8uu53Vdqr+gA8bXBiV7++HhLb1qSzkButISay+WqDX
- PcbpBXdh1iFRM6QTjRE8RRcub5FDsw4=
-X-Google-Smtp-Source: APXvYqxt87KMI2usukXccCNaajbtInER62r4uuSzAmmteMq0eSA6b1IxhtLNc9dMW9pKseUAlcweeQ==
-X-Received: by 2002:a1c:a404:: with SMTP id n4mr21935617wme.186.1581939945081; 
- Mon, 17 Feb 2020 03:45:45 -0800 (PST)
-Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id i2sm268149wmb.28.2020.02.17.03.45.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Feb 2020 03:45:44 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/13] hw/arm/bcm2836: QOM'ify more by adding class_init()
- to each SoC type
-Date: Mon, 17 Feb 2020 12:45:27 +0100
-Message-Id: <20200217114533.17779-8-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200217114533.17779-1-f4bug@amsat.org>
-References: <20200217114533.17779-1-f4bug@amsat.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=5FmZo3kfqSxY/nBaqvmnwPDPSKJwRrASqwzsEjuaiOo=;
+ b=OCEM03dksrpg1SlFaub+Dt/Udm9SxxCP2IcAskFvJxMnHgMIfh+2DazKs7kT7T6Z0V
+ SSdUXTjGHNl7b16A1rVzLpcbiA8far7mH7XIm3uKBFGCme/TE4Xg8KAzzxu3vwHG9I49
+ k+Tf4pgaeLZjgsVnr/t8GhFaYhdsc/PCQmBLIbt2jSWrAWgCnrrUJ9BV3pXhv5PVRSCp
+ UilAF/1tW4eW0mlyufW9EAOyJKBbf6yPDqNaDOsb/U4rsIq962stYqRO1RpN7GNp/0nd
+ CGvrWusaCY+pOUeYPuROJXNN0nezmavozi0Xg4B6sFtdFgF5fIUGFykEyntY2g++Y43H
+ rGhA==
+X-Gm-Message-State: APjAAAWNxUDJuuttm/5g6AG8UtgLGL3dlmjwgH4MMBdFWYdZKiS2MGUU
+ HBFDeMmz9IMZZORBKz60uvkK9U5E52J7JaTOFxo=
+X-Google-Smtp-Source: APXvYqxHFP8Ygb5RsJjDpxtq4hoA7cBDoReoXCWIFF4SkGKgqYEPQ+ZvxntMUAbmnHP7ugXpm3GJAyDjNsAa9oWkjx0=
+X-Received: by 2002:a7b:cb97:: with SMTP id m23mr20902447wmi.37.1581940072409; 
+ Mon, 17 Feb 2020 03:47:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20191108150123.12213-1-marcandre.lureau@redhat.com>
+ <20191108150123.12213-2-marcandre.lureau@redhat.com>
+ <cc27aa10-c6e2-0de8-a55f-b9a8da67dde2@greensocs.com>
+In-Reply-To: <cc27aa10-c6e2-0de8-a55f-b9a8da67dde2@greensocs.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 17 Feb 2020 12:47:40 +0100
+Message-ID: <CAJ+F1CJks+3y6Wh93w+tT6YyO3-iW9kDFNqzW96OyXJ-O+xdaA@mail.gmail.com>
+Subject: Re: [PATCH v6 01/25] qmp: constify QmpCommand and list
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,214 +91,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, QEMU <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove usage of TypeInfo::class_data. Instead fill the fields in
-the corresponding class_init().
+Hi Markus,
 
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/bcm2836.c | 109 ++++++++++++++++++++++-------------------------
- 1 file changed, 51 insertions(+), 58 deletions(-)
+Can you review/queue this patch?
 
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 24109fef1d..683d04d6ea 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -16,57 +16,30 @@
- #include "hw/arm/raspi_platform.h"
- #include "hw/sysbus.h"
- 
--typedef struct BCM283XInfo BCM283XInfo;
--
- typedef struct BCM283XClass {
-     /*< private >*/
-     DeviceClass parent_class;
-     /*< public >*/
--    const BCM283XInfo *info;
--} BCM283XClass;
--
--struct BCM283XInfo {
--    const char *name;
-     const char *cpu_type;
-     hwaddr peri_base; /* Peripheral base address seen by the CPU */
-     hwaddr ctrl_base; /* Interrupt controller and mailboxes etc. */
-     int clusterid;
--};
-+} BCM283XClass;
- 
- #define BCM283X_CLASS(klass) \
-     OBJECT_CLASS_CHECK(BCM283XClass, (klass), TYPE_BCM283X)
- #define BCM283X_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(BCM283XClass, (obj), TYPE_BCM283X)
- 
--static const BCM283XInfo bcm283x_socs[] = {
--    {
--        .name = TYPE_BCM2836,
--        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a7"),
--        .peri_base = 0x3f000000,
--        .ctrl_base = 0x40000000,
--        .clusterid = 0xf,
--    },
--#ifdef TARGET_AARCH64
--    {
--        .name = TYPE_BCM2837,
--        .cpu_type = ARM_CPU_TYPE_NAME("cortex-a53"),
--        .peri_base = 0x3f000000,
--        .ctrl_base = 0x40000000,
--        .clusterid = 0x0,
--    },
--#endif
--};
--
- static void bcm2836_init(Object *obj)
- {
-     BCM283XState *s = BCM283X(obj);
-     BCM283XClass *bc = BCM283X_GET_CLASS(obj);
--    const BCM283XInfo *info = bc->info;
-     int n;
- 
-     for (n = 0; n < BCM283X_NCPUS; n++) {
-         object_initialize_child(obj, "cpu[*]", &s->cpu[n].core,
--                                sizeof(s->cpu[n].core), info->cpu_type,
-+                                sizeof(s->cpu[n].core), bc->cpu_type,
-                                 &error_abort, NULL);
-     }
- 
-@@ -85,7 +58,6 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
- {
-     BCM283XState *s = BCM283X(dev);
-     BCM283XClass *bc = BCM283X_GET_CLASS(dev);
--    const BCM283XInfo *info = bc->info;
-     Object *obj;
-     Error *err = NULL;
-     int n;
-@@ -119,7 +91,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
-     }
- 
-     sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
--                            info->peri_base, 1);
-+                            bc->peri_base, 1);
- 
-     /* bcm2836 interrupt controller (and mailboxes, etc.) */
-     object_property_set_bool(OBJECT(&s->control), true, "realized", &err);
-@@ -128,7 +100,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, info->ctrl_base);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, bc->ctrl_base);
- 
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
-         qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-irq", 0));
-@@ -137,11 +109,11 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
- 
-     for (n = 0; n < BCM283X_NCPUS; n++) {
-         /* TODO: this should be converted to a property of ARM_CPU */
--        s->cpu[n].core.mp_affinity = (info->clusterid << 8) | n;
-+        s->cpu[n].core.mp_affinity = (bc->clusterid << 8) | n;
- 
-         /* set periphbase/CBAR value for CPU-local registers */
-         object_property_set_int(OBJECT(&s->cpu[n].core),
--                                info->peri_base,
-+                                bc->peri_base,
-                                 "reset-cbar", &err);
-         if (err) {
-             error_propagate(errp, err);
-@@ -190,38 +162,59 @@ static Property bcm2836_props[] = {
- static void bcm283x_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
--    BCM283XClass *bc = BCM283X_CLASS(oc);
- 
--    bc->info = data;
--    dc->realize = bcm2836_realize;
--    device_class_set_props(dc, bcm2836_props);
-     /* Reason: Must be wired up in code (see raspi_init() function) */
-     dc->user_creatable = false;
- }
- 
--static const TypeInfo bcm283x_type_info = {
--    .name = TYPE_BCM283X,
--    .parent = TYPE_DEVICE,
--    .instance_size = sizeof(BCM283XState),
--    .instance_init = bcm2836_init,
--    .class_size = sizeof(BCM283XClass),
--    .abstract = true,
-+static void bcm2836_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    BCM283XClass *bc = BCM283X_CLASS(oc);
-+
-+    bc->cpu_type = ARM_CPU_TYPE_NAME("cortex-a7");
-+    bc->peri_base = 0x3f000000;
-+    bc->ctrl_base = 0x40000000;
-+    bc->clusterid = 0xf;
-+    dc->realize = bcm2836_realize;
-+    device_class_set_props(dc, bcm2836_props);
- };
- 
--static void bcm2836_register_types(void)
-+#ifdef TARGET_AARCH64
-+static void bcm2837_class_init(ObjectClass *oc, void *data)
- {
--    int i;
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    BCM283XClass *bc = BCM283X_CLASS(oc);
- 
--    type_register_static(&bcm283x_type_info);
--    for (i = 0; i < ARRAY_SIZE(bcm283x_socs); i++) {
--        TypeInfo ti = {
--            .name = bcm283x_socs[i].name,
--            .parent = TYPE_BCM283X,
--            .class_init = bcm283x_class_init,
--            .class_data = (void *) &bcm283x_socs[i],
--        };
--        type_register(&ti);
-+    bc->cpu_type = ARM_CPU_TYPE_NAME("cortex-a53");
-+    bc->peri_base = 0x3f000000;
-+    bc->ctrl_base = 0x40000000;
-+    bc->clusterid = 0x0;
-+    dc->realize = bcm2836_realize;
-+    device_class_set_props(dc, bcm2836_props);
-+};
-+#endif
-+
-+static const TypeInfo bcm283x_types[] = {
-+    {
-+        .name           = TYPE_BCM2836,
-+        .parent         = TYPE_BCM283X,
-+        .class_init     = bcm2836_class_init,
-+#ifdef TARGET_AARCH64
-+    }, {
-+        .name           = TYPE_BCM2837,
-+        .parent         = TYPE_BCM283X,
-+        .class_init     = bcm2837_class_init,
-+#endif
-+    }, {
-+        .name           = TYPE_BCM283X,
-+        .parent         = TYPE_DEVICE,
-+        .instance_size  = sizeof(BCM283XState),
-+        .instance_init  = bcm2836_init,
-+        .class_size     = sizeof(BCM283XClass),
-+        .class_init     = bcm283x_class_init,
-+        .abstract       = true,
-     }
--}
-+};
- 
--type_init(bcm2836_register_types)
-+DEFINE_TYPES(bcm283x_types)
--- 
-2.21.1
+thanks
 
+On Fri, Nov 8, 2019 at 5:52 PM Damien Hedde <damien.hedde@greensocs.com> wr=
+ote:
+>
+>
+>
+> On 11/8/19 4:00 PM, Marc-Andr=C3=A9 Lureau wrote:
+> > Since 0b69f6f72ce47a37a749b056b6d5ec64c61f11e8 "qapi: remove
+> > qmp_unregister_command()", the command list can be declared const.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  include/qapi/qmp/dispatch.h | 9 +++++----
+> >  monitor/misc.c              | 2 +-
+> >  monitor/monitor-internal.h  | 2 +-
+> >  qapi/qmp-dispatch.c         | 6 +++---
+> >  qapi/qmp-registry.c         | 6 +++---
+> >  qga/commands.c              | 2 +-
+> >  qga/main.c                  | 6 +++---
+> >  7 files changed, 17 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+> > index 9aa426a398..5a9cf82472 100644
+> > --- a/include/qapi/qmp/dispatch.h
+> > +++ b/include/qapi/qmp/dispatch.h
+> > @@ -39,7 +39,8 @@ typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpCo=
+mmandList;
+> >
+> >  void qmp_register_command(QmpCommandList *cmds, const char *name,
+> >                            QmpCommandFunc *fn, QmpCommandOptions option=
+s);
+> > -QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
+> > +const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
+> > +                                   const char *name);
+> >  void qmp_disable_command(QmpCommandList *cmds, const char *name);
+> >  void qmp_enable_command(QmpCommandList *cmds, const char *name);
+> >
+> > @@ -47,13 +48,13 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+> >  const char *qmp_command_name(const QmpCommand *cmd);
+> >  bool qmp_has_success_response(const QmpCommand *cmd);
+> >  QDict *qmp_error_response(Error *err);
+> > -QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+> > +QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+> >                      bool allow_oob);
+> >  bool qmp_is_oob(const QDict *dict);
+> >
+> > -typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
+> > +typedef void (*qmp_cmd_callback_fn)(const QmpCommand *cmd, void *opaqu=
+e);
+> >
+> > -void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn=
+,
+> > +void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback=
+_fn fn,
+> >                            void *opaque);
+> >
+> >  #endif
+> > diff --git a/monitor/misc.c b/monitor/misc.c
+> > index 3baa15f3bf..3052bfe8f1 100644
+> > --- a/monitor/misc.c
+> > +++ b/monitor/misc.c
+> > @@ -230,7 +230,7 @@ static void hmp_info_help(Monitor *mon, const QDict=
+ *qdict)
+> >      help_cmd(mon, "info");
+> >  }
+> >
+> > -static void query_commands_cb(QmpCommand *cmd, void *opaque)
+> > +static void query_commands_cb(const QmpCommand *cmd, void *opaque)
+> >  {
+> >      CommandInfoList *info, **list =3D opaque;
+> >
+> > diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+> > index d78f5ca190..3e7dac5910 100644
+> > --- a/monitor/monitor-internal.h
+> > +++ b/monitor/monitor-internal.h
+> > @@ -132,7 +132,7 @@ typedef struct {
+> >       * qmp_capabilities succeeds, we go into command mode, and
+> >       * @command becomes &qmp_commands.
+> >       */
+> > -    QmpCommandList *commands;
+> > +    const QmpCommandList *commands;
+> >      bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered *=
+/
+> >      bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted *=
+/
+> >      /*
+> > diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> > index bc264b3c9b..857399c5fe 100644
+> > --- a/qapi/qmp-dispatch.c
+> > +++ b/qapi/qmp-dispatch.c
+> > @@ -75,14 +75,14 @@ static QDict *qmp_dispatch_check_obj(const QObject =
+*request, bool allow_oob,
+> >      return dict;
+> >  }
+> >
+> > -static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request=
+,
+> > +static QObject *do_qmp_dispatch(const QmpCommandList *cmds, QObject *r=
+equest,
+> >                                  bool allow_oob, Error **errp)
+> >  {
+> >      Error *local_err =3D NULL;
+> >      bool oob;
+> >      const char *command;
+> >      QDict *args, *dict;
+> > -    QmpCommand *cmd;
+> > +    const QmpCommand *cmd;
+> >      QObject *ret =3D NULL;
+> >
+> >      dict =3D qmp_dispatch_check_obj(request, allow_oob, errp);
+> > @@ -164,7 +164,7 @@ bool qmp_is_oob(const QDict *dict)
+> >          && !qdict_haskey(dict, "execute");
+> >  }
+> >
+> > -QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+> > +QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+> >                      bool allow_oob)
+> >  {
+> >      Error *err =3D NULL;
+> > diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+> > index ca00f74795..d0f9a1d3e3 100644
+> > --- a/qapi/qmp-registry.c
+> > +++ b/qapi/qmp-registry.c
+> > @@ -27,7 +27,7 @@ void qmp_register_command(QmpCommandList *cmds, const=
+ char *name,
+> >      QTAILQ_INSERT_TAIL(cmds, cmd, node);
+> >  }
+> >
+> > -QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name)
+> > +const QmpCommand *qmp_find_command(const QmpCommandList *cmds, const c=
+har *name)
+> >  {
+> >      QmpCommand *cmd;
+> >
+> > @@ -77,10 +77,10 @@ bool qmp_has_success_response(const QmpCommand *cmd=
+)
+> >      return !(cmd->options & QCO_NO_SUCCESS_RESP);
+> >  }
+> >
+> > -void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn=
+,
+> > +void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback=
+_fn fn,
+> >                            void *opaque)
+> >  {
+> > -    QmpCommand *cmd;
+> > +    const QmpCommand *cmd;
+> >
+> >      QTAILQ_FOREACH(cmd, cmds, node) {
+> >          fn(cmd, opaque);
+> > diff --git a/qga/commands.c b/qga/commands.c
+> > index 0c7d1385c2..05e9ab6c3d 100644
+> > --- a/qga/commands.c
+> > +++ b/qga/commands.c
+> > @@ -54,7 +54,7 @@ void qmp_guest_ping(Error **errp)
+> >      slog("guest-ping called");
+> >  }
+> >
+> > -static void qmp_command_info(QmpCommand *cmd, void *opaque)
+> > +static void qmp_command_info(const QmpCommand *cmd, void *opaque)
+> >  {
+> >      GuestAgentInfo *info =3D opaque;
+> >      GuestAgentCommandInfo *cmd_info;
+> > diff --git a/qga/main.c b/qga/main.c
+> > index c35c2a2120..f23614528e 100644
+> > --- a/qga/main.c
+> > +++ b/qga/main.c
+> > @@ -359,7 +359,7 @@ static gint ga_strcmp(gconstpointer str1, gconstpoi=
+nter str2)
+> >  }
+> >
+> >  /* disable commands that aren't safe for fsfreeze */
+> > -static void ga_disable_non_whitelisted(QmpCommand *cmd, void *opaque)
+> > +static void ga_disable_non_whitelisted(const QmpCommand *cmd, void *op=
+aque)
+> >  {
+> >      bool whitelisted =3D false;
+> >      int i =3D 0;
+> > @@ -378,7 +378,7 @@ static void ga_disable_non_whitelisted(QmpCommand *=
+cmd, void *opaque)
+> >  }
+> >
+> >  /* [re-]enable all commands, except those explicitly blacklisted by us=
+er */
+> > -static void ga_enable_non_blacklisted(QmpCommand *cmd, void *opaque)
+> > +static void ga_enable_non_blacklisted(const QmpCommand *cmd, void *opa=
+que)
+> >  {
+> >      GList *blacklist =3D opaque;
+> >      const char *name =3D qmp_command_name(cmd);
+> > @@ -918,7 +918,7 @@ int64_t ga_get_fd_handle(GAState *s, Error **errp)
+> >      return handle;
+> >  }
+> >
+> > -static void ga_print_cmd(QmpCommand *cmd, void *opaque)
+> > +static void ga_print_cmd(const QmpCommand *cmd, void *opaque)
+> >  {
+> >      printf("%s\n", qmp_command_name(cmd));
+> >  }
+> >
+>
+> Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
+>
+> Damien
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
