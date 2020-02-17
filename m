@@ -2,83 +2,85 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E46C3B1BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBBF4C7619B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:01:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5360620857
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:00:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A84A120857
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 03:01:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WRcXByH1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5360620857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KHkAvS4Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A84A120857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3WeD-0003ku-FQ
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 22:00:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44751)
+	id 1j3Wem-0004QY-VZ
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 22:01:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gshan@redhat.com>) id 1j3WdO-0002mL-HZ
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 21:59:47 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j3Wdf-00035Q-2n
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gshan@redhat.com>) id 1j3WdM-00037r-PK
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 21:59:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30541
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1j3WdL-000360-Qi
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 21:59:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581908382;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LmoFYXdBrijMVhWal0NtASQS/e7GPwjMxtjYpYKVCWE=;
- b=WRcXByH1Zsxw8AkznIq7BG6Z1pzAGBga2SR2Gg+oAw6knbEfZUNQLtVIBKM92JQUTtR/rU
- mEmutExo0G1aAp0vTLGcHFljgIO7Q0/O3/W718/5MlVx/sh0GrOr7SkPWp3oX/31FljNND
- 7ferlMGSVaUQsQ6eeZpBczKAejJspQw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-EJgOa8qaOI-bGgQ4_QemAQ-1; Sun, 16 Feb 2020 21:59:41 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA72114E1;
- Mon, 17 Feb 2020 02:59:39 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-16.bne.redhat.com [10.64.54.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B99AC5C241;
- Mon, 17 Feb 2020 02:59:33 +0000 (UTC)
-Subject: Re: [PATCH v3 1/2] target/arm: Support SError injection
-To: Marc Zyngier <maz@kernel.org>
-References: <20200214055950.62477-1-gshan@redhat.com>
- <20200214055950.62477-2-gshan@redhat.com>
- <27b9c2a363d69911c003fcbaed958a5a@kernel.org>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <37c5a2c3-4ca8-1717-6672-2712161076ed@redhat.com>
-Date: Mon, 17 Feb 2020 13:59:31 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (envelope-from <richard.henderson@linaro.org>) id 1j3Wdd-0003Mc-DO
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:02 -0500
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:40388)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j3Wdd-0003LQ-5a
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 22:00:01 -0500
+Received: by mail-pl1-x636.google.com with SMTP id y1so6115870plp.7
+ for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 19:00:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lfZ/gSeSSwO+iUrhXjDeYzuRwSvkE5pc/x6+ENqbncI=;
+ b=KHkAvS4YHLTytdeAX1l5JU/D4BGW2/n6DS3hRxGn+0SD51n7FogMTQhL4tRdLbVPcv
+ FCEeoBLTYNT7anmh2oEzN2+pJiSRT80ziWr+YvqyjedUJkM6F9APVa0bks7TbBSy9rQU
+ 2CvQPdfbUr1c9/LB1algsUyAwwFLG9MyQzk8EMdgYgUzgaznNcJjBvmGIl3uWzb55GgV
+ +BYuwG190rLOF6trzUuhKTrqViInxG/K0lBR3X4XgNt/bwTFBcUzedUYMHPMo8abGLEa
+ adpZQ3Hl+T+RXeFKN5QQm6IXmW3ci6PEKzZltG36NxNvt+TcBEcqNk1WlKPeHQ/SdUY4
+ pNqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lfZ/gSeSSwO+iUrhXjDeYzuRwSvkE5pc/x6+ENqbncI=;
+ b=ILat4dW4+yN+sTjUm+Gm/uQ0YLWcPpUCQye9Fc6uzUcm4T5ze7CGJQcjFzydTYekUA
+ EaQL2n1l/0okhWKp+dAOueBmZ63tlkzLdQIPcYfVW67EKVAKug1jhqKrEKRKJtPYOVaM
+ jJ9MowkxxWQNPbRT+ZQritgIDKoTaTofaZQPGTNe5zK8CHYoQA4KIFrOqoqYSXmpjP95
+ ko2ZSHAQwfTSTo02ZTyD4n9kH9TjOPCz0vIhwxi5h3XU+JPOyz8nhKJDz+lHlmvFZrvq
+ RhFMzv5E1aJMk4mJos46/+rxaZAiHtLMmOw5OovVnoJV80bsfkbvqO5kM2Jm1gdWhGRN
+ KKLw==
+X-Gm-Message-State: APjAAAUe0BdO8nnHFp4H34XSrQCJfRfh37Oih73LFZUun2W+1SkruOUs
+ TYKO6rH6TjGP+AuD3llKRHiK+UARfDk=
+X-Google-Smtp-Source: APXvYqwYnJIZ0yKyBIJOWOEC7Lr2UGGcDSeMcSclEq5jCQ1MazirNlyXvybKn+OtZKcluof58dbr+Q==
+X-Received: by 2002:a17:90b:97:: with SMTP id
+ bb23mr16545483pjb.53.1581908399037; 
+ Sun, 16 Feb 2020 18:59:59 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id u2sm14741060pgj.7.2020.02.16.18.59.58
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 16 Feb 2020 18:59:58 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/4] tcg: Fix for Bug 1863508
+Date: Sun, 16 Feb 2020 18:59:53 -0800
+Message-Id: <20200217025957.12031-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <27b9c2a363d69911c003fcbaed958a5a@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: EJgOa8qaOI-bGgQ4_QemAQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::636
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,68 +92,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Gavin Shan <gshan@redhat.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
- aik@ozlabs.ru, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- eric.auger@redhat.com, qemu-arm@nongnu.org, shan.gavin@gmail.com,
- pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Marc,
+The comment in tcg-runtime-gvec.c about CONFIG_VECTOR16 says that
+tcg-op-gvec.c has eliminated size 8 vectors, and only passes on
+multiples of 16.  This may have been true of the first few operations,
+but is not true of all operations.
+    
+In particular, multiply, shift by scalar, and compare of 8- and 16-bit
+elements are not expanded inline if host vector operations are not
+supported.
+    
+For an x86_64 host that does not support AVX, this means that we will
+fall back to the helper, which will attempt to use SSE instructions,
+which will SEGV on an invalid 8-byte aligned memory operation.
+    
+The first patch removes the CONFIG_VECTOR16 code and configuration;
+the subsequent patches tidy up tcg-runtime-gvec.c.
 
-On 2/16/20 11:34 PM, Marc Zyngier wrote:
-> On 2020-02-14 05:59, Gavin Shan wrote:
->> This supports SError injection, which will be used by "virt" board to
->> simulating the behavior of NMI injection in next patch. As Peter Maydell
->> suggested, this adds a new interrupt (ARM_CPU_SERROR), which is parallel
->> to CPU_INTERRUPT_HARD. The backend depends on if kvm is enabled or not.
->> kvm_vcpu_ioctl(cpu, KVM_SET_VCPU_EVENTS) is leveraged to inject SError
->> or data abort to guest. When TCG is enabled, the behavior is simulated
->> by injecting SError and data abort to guest.
->>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> ---
->> =A0target/arm/cpu.c=A0=A0=A0=A0=A0 | 69 ++++++++++++++++++++++++++++++++=
-+++--------
->> =A0target/arm/cpu.h=A0=A0=A0=A0=A0 | 17 ++++++-----
->> =A0target/arm/helper.c=A0=A0 |=A0 6 ++++
->> =A0target/arm/m_helper.c |=A0 8 +++++
->> =A04 files changed, 81 insertions(+), 19 deletions(-)
->>
->=20
-> [...]
->=20
->> @@ -656,7 +682,8 @@ static void arm_cpu_set_irq(void *opaque, int irq,
->> int level)
->> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_IRQ] =3D CPU_INTERRUPT_HARD,
->> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_FIQ] =3D CPU_INTERRUPT_FIQ,
->> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VIRQ] =3D CPU_INTERRUPT_VIRQ,
->> -=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VFIQ] =3D CPU_INTERRUPT_VFIQ
->> +=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VFIQ] =3D CPU_INTERRUPT_VFIQ,
->> +=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_SERROR] =3D CPU_INTERRUPT_SERROR,
->=20
-> I'm a bit concerned with this. It makes sense for a host, but doesn't
-> allow the SError signal to be virtualised (there should be a VSError
-> signal in this list that can be injected via HCR_EL2.VA, just like
-> VIRQ is injected by HCR_EL2.VI).
->=20
-> Given that people use QEMU as a development platform for hypervisors,
-> I'd really like this functionality to be supported from day-1.
->=20
-> There is also the whole RAS stuff which quite a lot of work, but let's
-> start at least with the full ARMv8.0 semantics.
->=20
 
-Thanks for the comments. Yes, I think it's reasonable to support virtual
-SError as well. Lets have a separate patch to support it in v4. I think
-you were talking about HCR_EL2.VSE, which is defined as below in target/arm=
-/cpu.h:
+r~
 
-#define HCR_VSE       (1ULL << 8)
 
-Thanks,
-Gavin
+Richard Henderson (4):
+  tcg: Remove CONFIG_VECTOR16
+  tcg: Tidy tcg-runtime-gvec.c types
+  tcg: Tidy tcg-runtime-gvec.c DUP*
+  tcg: Remove tcg-runtime-gvec.c DO_CMP0
+
+ configure                    |  56 -------
+ accel/tcg/tcg-runtime-gvec.c | 298 ++++++++++++++---------------------
+ 2 files changed, 116 insertions(+), 238 deletions(-)
+
+-- 
+2.20.1
 
 
