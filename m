@@ -4,78 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B483DC34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A605C34021
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:42:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8037A20725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:42:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B10320725
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 17:42:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FczoTESs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8037A20725
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IiuSLGCt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B10320725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3kPo-0000D2-Kz
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:42:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38241)
+	id 1j3kPp-0000Fk-BH
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 12:42:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38289)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j3kIq-0001XN-E7
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:29 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j3kIt-0001eF-IR
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j3kIp-0001uM-3t
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:28 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51929
+ (envelope-from <imammedo@redhat.com>) id 1j3kIs-0001y1-9c
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:31 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27389
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kIo-0001u2-Ve
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:27 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3kIs-0001xf-4m
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 12:35:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581960926;
+ s=mimecast20190719; t=1581960929;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4Dfb85aPgfwwJ+mWybY0PsNk3IWDbp0ixvgCs4MJYxk=;
- b=FczoTESsrfYCa5DmoKio+GZcVM1/OLmfx+Jvl/HlpXdajK9PIP2Xoqfb0rUfCpglPEiX0l
- YQtdmF/IeVhYAqRsodDWj4hIaLWfhSSVQueyzFuT15yU2tujGtSCcXYdJijjybPqzbY9aR
- gwZjitWG0dFK/ROZ8saf34jT28uzvjY=
+ bh=TARbjw/itpTQCZ7DvuGTnSgcPuNYiFPqV9t4yEc33Jo=;
+ b=IiuSLGCtW1uMY6YPNwbn9fOea2Ly+hEYmXTNP64BLm5FNqNiIg5T8/hWIk19xZw9ydl1++
+ oreqJxkiQLY2U7b9OMfgPgAJJwWFQ0T3g84fMtcSiOJzHsR82obqSkrxkWbY9OVkffngC9
+ 9YxZwOxto8gyuY5pZoEJZ0MSrXH4Yu4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-4AlLvmDzPg2nncy68GtrNQ-1; Mon, 17 Feb 2020 12:35:23 -0500
+ us-mta-250-V1-AGdBNMLaRSXlHs2_XMg-1; Mon, 17 Feb 2020 12:35:28 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2569B18FE862
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 17:35:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D81D1005513
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 17:35:27 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 722A59051D;
- Mon, 17 Feb 2020 17:35:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ABF7F90508;
+ Mon, 17 Feb 2020 17:35:26 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 18/79] arm/kzm: drop RAM size fixup
-Date: Mon, 17 Feb 2020 12:33:51 -0500
-Message-Id: <20200217173452.15243-19-imammedo@redhat.com>
+Subject: [PATCH v5 23/79] arm/mps2: use memdev for RAM
+Date: Mon, 17 Feb 2020 12:33:56 -0500
+Message-Id: <20200217173452.15243-24-imammedo@redhat.com>
 In-Reply-To: <20200217173452.15243-1-imammedo@redhat.com>
 References: <20200217173452.15243-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 4AlLvmDzPg2nncy68GtrNQ-1
+X-MC-Unique: V1-AGdBNMLaRSXlHs2_XMg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,55 +91,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the user provided too large a RAM size, the code used to
-complain and trim it to the max size.  Now that RAM is allocated by
-generic code, that's no longer possible, so generate an error and
-exit instead.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
+
+PS:
+ while at it add check for user supplied RAM size and error
+ out if it mismatches board expected value.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Peter Chubb <peter.chubb@data61.csiro.au>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
-v3:
- * rephrase commit message in nicer way
-   ("Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>)
- * reword error message and use size_to_str() to pretty print suggested siz=
-e
-   ("Chubb, Peter (Data61, Kensington NSW)" <Peter.Chubb@data61.csiro.au>)
+v2:
+  * fix format string causing build failure on 32-bit host
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
 ---
- hw/arm/kzm.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ hw/arm/mps2.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
-index 1d5ef289d5..94cbac11de 100644
---- a/hw/arm/kzm.c
-+++ b/hw/arm/kzm.c
-@@ -25,6 +25,7 @@
- #include "hw/char/serial.h"
- #include "sysemu/qtest.h"
- #include "sysemu/sysemu.h"
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index d002b126d3..f246213206 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -24,6 +24,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
 +#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/arm/boot.h"
+@@ -55,7 +56,6 @@ typedef struct {
+     MachineState parent;
 =20
- /* Memory map for Kzm Emulation Baseboard:
-  * 0x00000000-0x7fffffff See i.MX31 SOC for support
-@@ -78,10 +79,10 @@ static void kzm_init(MachineState *machine)
-=20
-     /* Check the amount of memory is compatible with the SOC */
-     if (machine->ram_size > (FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZE=
-)) {
--        warn_report("RAM size " RAM_ADDR_FMT " above max supported, "
--                    "reduced to %x", machine->ram_size,
--                    FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZE);
--        machine->ram_size =3D FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_SIZ=
-E;
-+        char *sz =3D size_to_str(FSL_IMX31_SDRAM0_SIZE + FSL_IMX31_SDRAM1_=
-SIZE);
-+        error_report("RAM size more than %s is not supported", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
+     ARMv7MState armv7m;
+-    MemoryRegion psram;
+     MemoryRegion ssram1;
+     MemoryRegion ssram1_m;
+     MemoryRegion ssram23;
+@@ -118,6 +118,13 @@ static void mps2_common_init(MachineState *machine)
+         exit(1);
      }
 =20
-     memory_region_allocate_system_memory(&s->ram, NULL, "kzm.ram",
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
++
+     /* The FPGA images have an odd combination of different RAMs,
+      * because in hardware they are different implementations and
+      * connected to different buses, giving varying performance/size
+@@ -146,9 +153,7 @@ static void mps2_common_init(MachineState *machine)
+      * This is of no use for QEMU so we don't implement it (as if
+      * zbt_boot_ctrl is always zero).
+      */
+-    memory_region_allocate_system_memory(&mms->psram,
+-                                         NULL, "mps.ram", 16 * MiB);
+-    memory_region_add_subregion(system_memory, 0x21000000, &mms->psram);
++    memory_region_add_subregion(system_memory, 0x21000000, machine->ram);
+=20
+     switch (mmc->fpga_type) {
+     case FPGA_AN385:
+@@ -338,6 +343,8 @@ static void mps2_class_init(ObjectClass *oc, void *data=
+)
+=20
+     mc->init =3D mps2_common_init;
+     mc->max_cpus =3D 1;
++    mc->default_ram_size =3D 16 * MiB;
++    mc->default_ram_id =3D "mps.ram";
+ }
+=20
+ static void mps2_an385_class_init(ObjectClass *oc, void *data)
 --=20
 2.18.1
 
