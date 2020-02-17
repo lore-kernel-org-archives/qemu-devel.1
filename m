@@ -7,86 +7,87 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEC8C34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EEC8C34024
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:43:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 507CF22525
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CAC7222D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 18:43:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iiXTwH2a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 507CF22525
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CdvHusJP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CAC7222D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3lLF-0000R3-HG
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:42:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48154)
+	id 1j3lME-00020E-L5
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 13:43:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48501)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j3lK7-0007qR-UX
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:40:52 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j3lLO-0000zR-TJ
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:42:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j3lK7-0007OW-1k
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:40:51 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35339)
+ (envelope-from <richard.henderson@linaro.org>) id 1j3lLN-00004u-TS
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:42:10 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44145)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j3lK6-0007OG-Rd
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:40:50 -0500
-Received: by mail-pg1-x544.google.com with SMTP id v23so6257841pgk.2
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 10:40:50 -0800 (PST)
+ id 1j3lLN-0008VM-MD
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 13:42:09 -0500
+Received: by mail-pg1-x541.google.com with SMTP id g3so9524947pgs.11
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 10:42:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=asaUPZ/SSdNK/iGmvj3kmD3MIJpWIE5xkQPbCdtCCXY=;
- b=iiXTwH2ac7NFyGgBrotqJLwMlYa9zLCnkEbIecfue7dmdPkZ9obSDzUigLiSpFLKfz
- DYBg+NmlkiuplYbkQcHlWJKdl0HDxUGXH6e5tRkOtRYSh+z3HWnxmJWlgepr/ytqYx8g
- JietvKoDhBb5vtvgWFXVu4nNSjB/iDi05USunL+LR1jYZs+6s8tN+jSE4McEwobK12fB
- k5TW9VKbO+4XoJuJD4Owxy+jDwwHR4vnaav1xXZMVzlgyOFrmbXylohgjaw5YRO7lAHU
- k+Codv13+Pv56kBt+IzBXpQDJzgk8AvcTRxFrY86iwU8g793VJwZKiLpezfva30Buvz6
- EDZA==
+ bh=9zgbaluwRbltVrZpLNNXGxJTjVUh7N3R2hFdxrS7EHI=;
+ b=CdvHusJPRn3RRSr8v1K0bW/vX7RYYXS0luwk4UfwHtazZoqYIWSQl3v/HcXoXQVqv+
+ ioK+0RK8TcgE2Q9sgVzOrjllD/eJOoQK5wI/8H+3d4H2PUC9Kf1TmWxn2O0a5gUkiulg
+ 5qgT5HsIVlWW76gqL8KNE3yu4ADCErSBglt1mydmUQgyqrlMKeCMSdH9yx/VgCnUQjwP
+ e/jhCPV5BtgVs9er29HJ0tPpLndOOlz0IEouXB1mwPb4D0z14KJJJP+vKEXWfQO1Ubkp
+ RlIBgr94g6hTSEIqB8PUvtlWxKK3m2+kYwOhfgwg71Eo4QZdnXCMYJG5l8UxGwds3r/N
+ 9fJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=asaUPZ/SSdNK/iGmvj3kmD3MIJpWIE5xkQPbCdtCCXY=;
- b=s+Bfa2f/Rgx6lGvuAoxw1r2QBpILpM7VarNkb9OFsFfCA+MuiafI0I86WQ9X/tvZWF
- PxzhOi4Goubw70jFEmFscxmdZjhR+oIf2Ucsl7ZPFCXuRaFlq8ef/+DIdJ3SNYYnaLAb
- NIHCfDSsd1IL4H634gHuXgIuTB1qkZVEqHaeOzxxPyGVpGtl0J6T4wUqnStFNtlaXSIB
- XoYJ3n8rSn7PimCECa+SpnJtWbbD0zS+Rih1TW+o1n95wBtmTCKuK5fDbdWBF9UyvpAW
- 6VOCXUaiyVeoFcFGuNHEgu9lXn8vLl4lRhMhwJAZh2hWAo91GtTXFT7B72MTOkOpN2tq
- U+0g==
-X-Gm-Message-State: APjAAAW7bXrE+o/Ak2e/tbEx1QTC29zFnm93S4xLPgolxUpQb3j/4XEt
- pRI6LO4DCdeysXts8/GMiyHc3Hese5o=
-X-Google-Smtp-Source: APXvYqzC8lslTx7aAzNyXLplumpzifFjWsTC5tSrPA4Xs3aM2pc7Y3LaUwgeBP1T8qQDx3P7ZSdInw==
-X-Received: by 2002:a63:fb05:: with SMTP id o5mr19505413pgh.355.1581964849835; 
- Mon, 17 Feb 2020 10:40:49 -0800 (PST)
+ bh=9zgbaluwRbltVrZpLNNXGxJTjVUh7N3R2hFdxrS7EHI=;
+ b=Xk7N0bBIcgDPJMQrwB0JXnO9yahs4+/RAaa42d7yt8xhdqgWGrFNRCwKcCUPnkYp4m
+ Ykysck/7AsjmTKFC1kJVx4erFtFiDDSQuF6+e37KtTzP9KXAl+ulM6D+QnIrHQICzAmy
+ WWqPv7j5SvJIKm8VwnbrhLnmnZ10rajQzKA5DnrZXTObDurMWk5mVZUfnj953NukXOzu
+ WfGBJj1TiUcOO2xlIpIO/XHbrDLYouwVZcAeSbxHev75vuWeoTFZALyV0yk1Hn42kXCN
+ gqa5XO+tZylHahAYL3chCKk7SHv9O7dU5sw2Qp+s9DK0KNvC8P8yZIPlcC/R+6XDUbXw
+ 95iA==
+X-Gm-Message-State: APjAAAWYyD0j9auSIpax/N4IKePKHxovowYFcoP/4d338AtExv8bApjE
+ 4SZtsiLwjCqpEAhDA3TUzl5UFg==
+X-Google-Smtp-Source: APXvYqxLmbCkyXjfdfRcjImGhDy+AD3FKeuwD0sFTyeWsWvJPhskQ8BvdS8nXLbJrsSCf5ZLHSgBmA==
+X-Received: by 2002:aa7:8552:: with SMTP id y18mr17831608pfn.176.1581964928393; 
+ Mon, 17 Feb 2020 10:42:08 -0800 (PST)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- q15sm1592202pgm.47.2020.02.17.10.40.48
+ a36sm1592448pga.32.2020.02.17.10.42.07
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 10:40:49 -0800 (PST)
-Subject: Re: [PATCH v5 75/79] make mem_path local variable
+ Mon, 17 Feb 2020 10:42:07 -0800 (PST)
+Subject: Re: [PATCH v5 01/79] numa: remove deprecated -mem-path fallback to
+ anonymous RAM
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <20200217173452.15243-1-imammedo@redhat.com>
- <20200217173452.15243-76-imammedo@redhat.com>
+ <20200217173452.15243-2-imammedo@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <23f95d66-4cdd-8f7b-7213-8c2b6944bcfe@linaro.org>
-Date: Mon, 17 Feb 2020 10:40:47 -0800
+Message-ID: <57f7dab5-afa1-7370-1d03-7e7fe735f903@linaro.org>
+Date: Mon, 17 Feb 2020 10:42:05 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200217173452.15243-76-imammedo@redhat.com>
+In-Reply-To: <20200217173452.15243-2-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,27 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/17/20 9:34 AM, Igor Mammedov wrote:
-> It's no longer used anywhere beside main(),
-> so make it local variable that is used for CLI compat
-> purposes to keep -mem-path option working.
-> 
-> Under hood QEMU will use it to create
->   memory-backend-file,mem-path=...
-> backend and use its MemoryRegion as main RAM.
+On 2/17/20 9:33 AM, Igor Mammedov wrote:
+> it has been deprecated since 4.0 by commit
+>  cb79224b7 (deprecate -mem-path fallback to anonymous RAM)
+> Deprecation period ran out and it's time to remove it
+> so it won't get in a way of switching to using hostmem
+> backend for RAM.
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
-> CC: pbonzini@redhat.com
+> CC:libvir-list@redhat.com
+> CC: ehabkost@redhat.com
 > ---
->  include/sysemu/sysemu.h | 1 -
->  vl.c                    | 2 +-
->  2 files changed, 1 insertion(+), 2 deletions(-)
+>  hw/core/numa.c       | 18 +-----------------
+>  qemu-deprecated.texi |  9 ---------
+>  2 files changed, 1 insertion(+), 26 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
