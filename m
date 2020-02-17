@@ -2,81 +2,68 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4E2C7619B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 08:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD41C7619B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 08:21:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8798320725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 08:20:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GtmhiaDn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8798320725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E260320718
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 08:21:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E260320718
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3bdX-0003bw-PH
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 03:20:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43350)
+	id 1j3beH-0004iY-9X
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 03:21:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43439)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1j3bct-00035x-JA
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 03:19:37 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j3bde-0003sU-O9
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 03:20:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1j3bcr-0006vt-17
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 03:19:35 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47637
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1j3bcq-0006uy-Sc
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 03:19:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1581927572;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jUJDODn/jN1ijx1T9Hy5rhSjkw+jU8op56EfORrlbho=;
- b=GtmhiaDnHZCNm9HvuhTw7NL8eV+bMpJJrIfabSS07kc485ftoo+VxEuVJPCxoQ5LEMUBGR
- gBU+rGAz3glgsSQgz5fghxZeooqc6DVpya87Y7d/H/GPGyzHsvKXvl+9qHqn6X0KcxzdrO
- A893/99vDvTS+7O9lIzkLhTIMtnssts=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-YKse9FXLMFedo-y6DJ8L_A-1; Mon, 17 Feb 2020 03:19:30 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC0521005512;
- Mon, 17 Feb 2020 08:19:29 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.83])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1C4545C100;
- Mon, 17 Feb 2020 08:19:27 +0000 (UTC)
-Message-ID: <806a87fca46483681cda0045c3f274312fec2503.camel@redhat.com>
-Subject: Re: QAPI schema for desired state of LUKS keyslots
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 17 Feb 2020 10:19:26 +0200
-In-Reply-To: <87lfp1ww41.fsf@dusky.pond.sub.org>
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-3-mlevitsk@redhat.com>
- <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
- <59039903dba3c277ef9dbc2397a896c906f120d1.camel@redhat.com>
- <87lfp1ww41.fsf@dusky.pond.sub.org>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: YKse9FXLMFedo-y6DJ8L_A-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+ (envelope-from <no-reply@patchew.org>) id 1j3bdd-0007k6-A3
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 03:20:22 -0500
+Resent-Date: Mon, 17 Feb 2020 03:20:22 -0500
+Resent-Message-Id: <E1j3bdd-0007k6-A3@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21132)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j3bdd-0007j0-0n; Mon, 17 Feb 2020 03:20:21 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1581927598; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=iRZN9akV2R33JGodQZq95I2Ii/9ppPrM20WczV7b53pM5jR7itVZyO/qTSNCYCuxgjvfmNvUrMg1VXHvuZv9Xalf2N0KKtCB8a9rWymgdQikmAkAQqvTP4F+G4fcfxm7nEAuKEdNakl9f3gFJUb/4RatxXN6iaMETryTGzEINHk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1581927598;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=5wHio0x/5ji9qTFGoy8DudRf8gG0x7kC9MRFutoNY+8=; 
+ b=L0DBOebltbx304AZYlUQEBuGs+L3CTRsOboQ6z5fj473aam/Ttly35ZiOrxCxotjZjjS9Q7lvAnsP6q4grSqRHD7abbt0fipiTUy+CuqwOjtex6iflwVIr13uie+ApEzBIjgKNBxBvynwRRzlJZKaeIkTB2zQ786ij/4GBnq/88=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1581927597323220.04458027780845;
+ Mon, 17 Feb 2020 00:19:57 -0800 (PST)
+In-Reply-To: <1581925888-103620-1-git-send-email-xuyandong2@huawei.com>
+Subject: Re: [PATCH RFC 00/16] Implement Microvm for aarch64 architecture
+Message-ID: <158192759585.4691.7976508642101155503@a1bbccc8075a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: xuyandong2@huawei.com
+Date: Mon, 17 Feb 2020 00:19:57 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,186 +75,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Daniel =?ISO-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com, slp@redhat.com,
+ xuyandong2@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ wu.wubin@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2020-02-17 at 07:45 +0100, Markus Armbruster wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
-> 
-> > On Sat, 2020-02-15 at 15:51 +0100, Markus Armbruster wrote:
-> > > Review of this patch led to a lengthy QAPI schema design discussion.
-> > > Let me try to condense it into a concrete proposal.
-> > > 
-> > > This is about the QAPI schema, and therefore about QMP.  The
-> > > human-friendly interface is out of scope.  Not because it's not
-> > > important (it clearly is!), only because we need to *focus* to have a
-> > > chance at success.
-> > 
-> > 100% agree.
-> > > 
-> > > I'm going to include a few design options.  I'll mark them "Option:".
-> > > 
-> > > The proposed "amend" interface takes a specification of desired state,
-> > > and figures out how to get from here to there by itself.  LUKS keyslots
-> > > are one part of desired state.
-> > > 
-> > > We commonly have eight LUKS keyslots.  Each keyslot is either active or
-> > > inactive.  An active keyslot holds a secret.
-> > > 
-> > > Goal: a QAPI type for specifying desired state of LUKS keyslots.
-> > > 
-> > > Proposal:
-> > > 
-> > >     { 'enum': 'LUKSKeyslotState',
-> > >       'data': [ 'active', 'inactive' ] }
-> > > 
-> > >     { 'struct': 'LUKSKeyslotActive',
-> > >       'data': { 'secret': 'str',
-> > >                 '*iter-time': 'int } }
-> > > 
-> > >     { 'struct': 'LUKSKeyslotInactive',
-> > >       'data': { '*old-secret': 'str' } }
-> > > 
-> > >     { 'union': 'LUKSKeyslotAmend',
-> > >       'base': { '*keyslot': 'int',
-> > >                 'state': 'LUKSKeyslotState' }
-> > >       'discriminator': 'state',
-> > >       'data': { 'active': 'LUKSKeyslotActive',
-> > >                 'inactive': 'LUKSKeyslotInactive' } }
-> > > 
-> > > LUKSKeyslotAmend specifies desired state for a set of keyslots.
-> > > 
-> > > Four cases:
-> > > 
-> > > * @state is "active"
-> > > 
-> > >   Desired state is active holding the secret given by @secret.  Optional
-> > >   @iter-time tweaks key stretching.
-> > > 
-> > >   The keyslot is chosen either by the user or by the system, as follows:
-> > > 
-> > >   - @keyslot absent
-> > > 
-> > >     One inactive keyslot chosen by the system.  If none exists, error.
-> > > 
-> > >   - @keyslot present
-> > > 
-> > >     The keyslot given by @keyslot.
-> > > 
-> > >     If it's already active holding @secret, no-op.  Rationale: the
-> > >     current state is the desired state.
-> > > 
-> > >     If it's already active holding another secret, error.  Rationale:
-> > >     update in place is unsafe.
-> > > 
-> > >     Option: delete the "already active holding @secret" case.  Feels
-> > >     inelegant to me.  Okay if it makes things substantially simpler.
-> > 
-> > I didn't really understand this, since in state=active we shouldn't
-> > delete anything. Looks OK otherwise.
-> 
-> Let me try to clarify.
-> 
-> Option: make the "already active holding @secret" case an error like the
-> "already active holding another secret" case.  In longhand:
-> 
->      - @keyslot present
-> 
->        The keyslot given by @keyslot.
-> 
->        If it's already active, error.
-> 
-> It feels inelegant to me, because it deviates from "specify desired
-> state" paradigm: the specified desired state is fine, the way to get
-> there from current state is obvious (do nothing), yet it's still an
-> error.
-Yep, although in theory we also specify that iteration count, which might not
-match (and it will never exactly match since it is benchmark based), thus
-if user specified it, we might err out, and otherwise indeed ignore this.
-This is of course very minor issue.
-
-> 
-> > > * @state is "inactive"
-> > > 
-> > >   Desired state is inactive.
-> > > 
-> > >   Error if the current state has active keyslots, but the desired state
-> > >   has none.
-> > > 
-> > >   The user choses the keyslot by number and/or by the secret it holds,
-> > >   as follows:
-> > > 
-> > >   - @keyslot absent, @old-secret present
-> > > 
-> > >     All active keyslots holding @old-secret.  If none exists, error.
-> > > 
-> > >   - @keyslot present, @old-secret absent
-> > > 
-> > >     The keyslot given by @keyslot.
-> > > 
-> > >     If it's already inactive, no-op.  Rationale: the current state is
-> > >     the desired state.
-> > > 
-> > >   - both @keyslot and @old-secret present
-> > > 
-> > >     The keyslot given by keyslot.
-> > > 
-> > >     If it's inactive or holds a secret other than @old-secret, error.
-> > 
-> > Yea, that would be very nice to have.
-> > > 
-> > >     Option: error regardless of @old-secret, if that makes things
-> > >     simpler.
-> > > 
-> > >   - neither @keyslot not @old-secret present
-> > > 
-> > >     All keyslots.  Note that this will error out due to "desired state
-> > >     has no active keyslots" unless the current state has none, either.
-> > > 
-> > >     Option: error out unconditionally.
-> > 
-> > Yep, that the best IMHO.
-> 
-> It's a matter of taste.
-> 
-> If we interpret "both absent" as "all keyslots", then all cases flow out
-> of the following simple spec:
-> 
->     0. Start with the set of all keyslots
-> 
->     1. If @old-secret is present, interset it with the set of slots
->        holding that secret.
-> 
->     2. If @keyslots is present, intersect it with the set of slots with
->        that slot number.
-> 
-> The order of steps 1 and 2 doesn't matter.
-> 
-> To error out unconditionally, we have to make "both absent" a special
-> case.
-Yes but to be honest it is few lines of code, and gets you a better
-error message in the process. I don't have a strong opinion on this though.
-
-> 
-> A good way to resolve such matters of taste is to try writing doc
-> comments for all proposals.  If you find you hate one of them much less,
-> you have a winner :)
-
-I am already out of this game for some time, I myself won't argue
-over this interface (in addition to that that current interface is very good IMHO),
-and I am just waiting for others to accept it.
-
-
-Best regards and thanks for help,
-	Maxim Levitsky
-
-> 
-> [...]
-
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTgxOTI1ODg4LTEwMzYyMC0x
+LWdpdC1zZW5kLWVtYWlsLXh1eWFuZG9uZzJAaHVhd2VpLmNvbS8KCgoKSGksCgpUaGlzIHNlcmll
+cyBmYWlsZWQgdGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdl
+LWNlbnRvczcgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9z
+NyBTSE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRF
+U1QgICAgaW90ZXN0LXFjb3cyOiAxOTAKc29ja2V0X2FjY2VwdCBmYWlsZWQ6IFJlc291cmNlIHRl
+bXBvcmFyaWx5IHVuYXZhaWxhYmxlCioqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9x
+dGVzdC9saWJxdGVzdC5jOjI3MjpxdGVzdF9pbml0X3dpdGhvdXRfcW1wX2hhbmRzaGFrZTogYXNz
+ZXJ0aW9uIGZhaWxlZDogKHMtPmZkID49IDAgJiYgcy0+cW1wX2ZkID49IDApCi90bXAvcWVtdS10
+ZXN0L3NyYy90ZXN0cy9xdGVzdC9saWJxdGVzdC5jOjE0MDoga2lsbF9xZW11KCkgdHJpZWQgdG8g
+dGVybWluYXRlIFFFTVUgcHJvY2VzcyBidXQgZW5jb3VudGVyZWQgZXhpdCBzdGF0dXMgMSAoZXhw
+ZWN0ZWQgMCkKRVJST1IgLSBCYWlsIG91dCEgRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3Rz
+L3F0ZXN0L2xpYnF0ZXN0LmM6MjcyOnF0ZXN0X2luaXRfd2l0aG91dF9xbXBfaGFuZHNoYWtlOiBh
+c3NlcnRpb24gZmFpbGVkOiAocy0+ZmQgPj0gMCAmJiBzLT5xbXBfZmQgPj0gMCkKbWFrZTogKioq
+IFtjaGVjay1xdGVzdC1hYXJjaDY0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZp
+bmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDE5MQogIFRFU1QgICAgaW90
+ZXN0LXFjb3cyOiAxOTIKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwg
+Y21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1u
+JywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWNh
+ZjAyYjZkM2JlMzRjMGM5NDExYzJjYmRiMjg3NThkJywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0
+eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9
+JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0
+JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9
+L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2Vy
+LWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
+ci10bXAtMmZsdnE4NG0vc3JjL2RvY2tlci1zcmMuMjAyMC0wMi0xNy0wMy4wNi4zNS45MDQ3Oi92
+YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAn
+dGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1m
+aWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1jYWYwMmI2ZDNiZTM0YzBjOTQxMWMy
+Y2JkYjI4NzU4ZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVh
+dmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0yZmx2cTg0bS9zcmMn
+Cm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwg
+ICAgMTNtMjEuMDA3cwp1c2VyICAgIDBtOC43OTJzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
+ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTgxOTI1ODg4LTEwMzYyMC0xLWdpdC1zZW5k
+LWVtYWlsLXh1eWFuZG9uZzJAaHVhd2VpLmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
