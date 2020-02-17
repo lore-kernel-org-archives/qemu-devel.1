@@ -8,76 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB1C2C34022
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 23:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8160DC34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 23:27:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4148207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 23:26:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4930F207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 23:27:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FIA08VNv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4148207FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O69QAPZM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4930F207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3pmJ-00059y-Rh
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 18:26:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58796)
+	id 1j3pn8-0006zF-GT
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 18:27:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j3pki-0001d3-H1
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 18:24:38 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j3pkc-0001Wz-OP
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 18:24:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j3pkh-0006iG-3Q
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 18:24:36 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39782)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j3pkb-0006bj-B0
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 18:24:30 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55749)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1j3pkg-0006hF-Tg; Mon, 17 Feb 2020 18:24:35 -0500
-Received: by mail-wr1-x442.google.com with SMTP id y11so21700106wrt.6;
- Mon, 17 Feb 2020 15:24:34 -0800 (PST)
+ id 1j3pkb-0006av-50; Mon, 17 Feb 2020 18:24:29 -0500
+Received: by mail-wm1-x343.google.com with SMTP id q9so925719wmj.5;
+ Mon, 17 Feb 2020 15:24:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=UElMFsqrdt3KN3cYNw35xyRl1xIMwrIbp2KPqeCB5HA=;
- b=FIA08VNvV+T3T8NkTbvBTSGuNkXKkc9ezjuuYraNndyNmlpUETlADkA5fnuW+/p8Zx
- H8zxxYCmjDP/La/dJKe7J15HSaT8oae+wug/jgKQhCtoCEGhqYwL61PM/m0HIUt9e91T
- i/ToxAc7gB17h82x/shmwwPDcdcHBZqEC6qTBL8XbAI2sJLS7ni/BjQpL6eTGWk7ZWu2
- cfF4roa+zwdnsmzR4ePeWIqWjNRLyq98bnWbVjGzWdev7aXE0Zw5IsQ2sQth/qSBLzr7
- kCEEf4/xr/xF9Qn45wq1JRHrE8rBQGX6G4cmfZsWSlB2spre1xkvd3E2CkHd4eyjdQjb
- tOjw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=9KRGMjBmfVZHW8toUIOEGgaXk/XlLAeO5unm82llSoQ=;
+ b=O69QAPZMgyiaR3uZywpMG22Ir5TLLeShk5gl++fRKjKvmE3yFFQCx9Hrl0Fv1D3dju
+ kRz03bvVawyd1tIHTawnqe9klCugKPTeAn/SUyn3Pm6SeOXiljpPskqSRNR7IWeo6QB3
+ z3e2prObeuKm/8cFMEOs7AflKh28y+y8q0GyrvBTR2wv1wkLq8GL+p1mLyRmP616fWzd
+ 3WpYQDiVKCcZr77QzOHyoroinYEqj49kShS9HAw4cCqp0qPJ+FtL/Z9BaZ3O516e3eO7
+ Qtf+LSRsS+h5o2d2ZI6CtmKMKNHYTPOK5nSmQ2xViWUzAhI4rfSMzF4FS4aghtnM3Clz
+ u4YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=UElMFsqrdt3KN3cYNw35xyRl1xIMwrIbp2KPqeCB5HA=;
- b=uGUS2+seJfG1S1xE/XpoxLFRjQnc1To3FNFsbR1kytCONA+edIKcczFhGXFcfo+t3Q
- qx/sKC3rA9bqH1Rira3mfibcAIW15VM/JARS4f2lyw3xBAkMLywKh+SGxJQPmK7nD7WH
- pWRw+Q7H+zpOybwvz8iKsZ5wFbhNdCaI+UfuSJQVm3aylVwBt3Acdzyssjq+yKNFdF0C
- KPucOat0FlYr1BZ9CxPiv7vTUjhplzWvc6s7CGhcebVKpYmDRDBAN13Xd0tUj+oBM8tj
- xOJZ9QaFIZ8/twoYFV9LlKNUM2YVbITTjN6TZATxy6GEmL0x4WXUqQW31xVeAXp5iY/W
- C+7g==
-X-Gm-Message-State: APjAAAV1hqcqIvRtz0Vfl0afNUH1bv9eBVngWApuSYsT2GEj7WSAyJj/
- F0f4EXnhvVV/8pjTVnoLxKFl+pESYqo=
-X-Google-Smtp-Source: APXvYqwn69p0GWvYaokuf4e5yxrjOmJLmzjHAaOtOMbPZyNp3UEvH4cQxKSiA77cASVlnFXoFO+ePA==
-X-Received: by 2002:a5d:484f:: with SMTP id n15mr24411936wrs.365.1581981873708; 
- Mon, 17 Feb 2020 15:24:33 -0800 (PST)
+ :references:mime-version:content-transfer-encoding;
+ bh=9KRGMjBmfVZHW8toUIOEGgaXk/XlLAeO5unm82llSoQ=;
+ b=ECGhZyc/zaG1kRSosYiy7j2KvfCYDIEr73uAl29bV9oqpn7o7Zdbm/UUzIOJ9MTFuR
+ drICWApOz8ZLYYbgXtrCvvKlbTUQLnrcnupFLFBVN8QDeTuHK874ExXOXMIh2oMJ1fHc
+ 8i/aVYvfopOcUyMgoxMf+zBam8sg2Vsiszdi/MJqJDn/OnALRiHiNdxP6vb8tGoSajGY
+ f7hv63JNA7cemSyoDQx3St5EJy/HZ1kPQ9mpzHMIBgvq0+8ZX3KJFZSfkSoSKvfmdMoi
+ Xe1fKYymJf2rK9kyH4bKNM0Ui1l2C13u9TEGr/fwFOjBWSIsHRzsyUvQMztXIsZlAD3I
+ tC9A==
+X-Gm-Message-State: APjAAAWpH5u4ZJUWYmdsym2avQmdgC/dpV0v6JVLj7LjTGhi67An2YNN
+ 4OI5HPRUZCZV5VX7n0XuN5QSbPxLNzs=
+X-Google-Smtp-Source: APXvYqxF35/5Bj1MUVZCN2S54gM8h3rfBb3WgzcVoy/kEUulfKZv17TmBnOxSyPavG8FpQmkxYJs7g==
+X-Received: by 2002:a05:600c:1009:: with SMTP id
+ c9mr1215004wmc.162.1581981867862; 
+ Mon, 17 Feb 2020 15:24:27 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id w1sm3244831wro.72.2020.02.17.15.24.33
+ by smtp.gmail.com with ESMTPSA id w1sm3244831wro.72.2020.02.17.15.24.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Feb 2020 15:24:33 -0800 (PST)
+ Mon, 17 Feb 2020 15:24:27 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 10/18] hw/arm/allwinner-h3: add Boot ROM support
-Date: Tue, 18 Feb 2020 00:24:03 +0100
-Message-Id: <20200217232411.30096-11-nieklinnenbank@gmail.com>
+Subject: [PATCH v5 02/18] hw/arm: add Xunlong Orange Pi PC machine
+Date: Tue, 18 Feb 2020 00:23:55 +0100
+Message-Id: <20200217232411.30096-3-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200217232411.30096-1-nieklinnenbank@gmail.com>
 References: <20200217232411.30096-1-nieklinnenbank@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,117 +101,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A real Allwinner H3 SoC contains a Boot ROM which is the
-first code that runs right after the SoC is powered on.
-The Boot ROM is responsible for loading user code (e.g. a bootloader)
-from any of the supported external devices and writing the downloaded
-code to internal SRAM. After loading the SoC begins executing the code
-written to SRAM.
-
-This commits adds emulation of the Boot ROM firmware setup functionality
-by loading user code from SD card in the A1 SRAM. While the A1 SRAM is
-64KiB, we limit the size to 32KiB because the real H3 Boot ROM also rejects
-sizes larger than 32KiB. For reference, this behaviour is documented
-by the Linux Sunxi project wiki at:
-
-  https://linux-sunxi.org/BROM#U-Boot_SPL_limitations
+The Xunlong Orange Pi PC is an Allwinner H3 System on Chip
+based embedded computer with mainline support in both U-Boot
+and Linux. The board comes with a Quad Core Cortex A7 @ 1.3GHz,
+1GiB RAM, 100Mbit ethernet, USB, SD/MMC, USB, HDMI and
+various other I/O. This commit add support for the Xunlong
+Orange Pi PC machine.
 
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Tested-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/hw/arm/allwinner-h3.h | 21 +++++++++++++++++++++
- hw/arm/allwinner-h3.c         | 18 ++++++++++++++++++
- hw/arm/orangepi.c             |  5 +++++
- 3 files changed, 44 insertions(+)
+ hw/arm/orangepi.c    | 95 ++++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS          |  1 +
+ hw/arm/Makefile.objs |  2 +-
+ 3 files changed, 97 insertions(+), 1 deletion(-)
+ create mode 100644 hw/arm/orangepi.c
 
-diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index f9b9a02373..d338003724 100644
---- a/include/hw/arm/allwinner-h3.h
-+++ b/include/hw/arm/allwinner-h3.h
-@@ -46,6 +46,7 @@
- #include "hw/sd/allwinner-sdhost.h"
- #include "hw/net/allwinner-sun8i-emac.h"
- #include "target/arm/cpu.h"
-+#include "sysemu/block-backend.h"
- 
- /**
-  * Allwinner H3 device list
-@@ -129,4 +130,24 @@ typedef struct AwH3State {
-     MemoryRegion sram_c;
- } AwH3State;
- 
-+/**
-+ * Emulate Boot ROM firmware setup functionality.
+diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
+new file mode 100644
+index 0000000000..839cd4873c
+--- /dev/null
++++ b/hw/arm/orangepi.c
+@@ -0,0 +1,95 @@
++/*
++ * Orange Pi emulation
 + *
-+ * A real Allwinner H3 SoC contains a Boot ROM
-+ * which is the first code that runs right after
-+ * the SoC is powered on. The Boot ROM is responsible
-+ * for loading user code (e.g. a bootloader) from any
-+ * of the supported external devices and writing the
-+ * downloaded code to internal SRAM. After loading the SoC
-+ * begins executing the code written to SRAM.
++ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 + *
-+ * This function emulates the Boot ROM by copying 32 KiB
-+ * of data from the given block device and writes it to
-+ * the start of the first internal SRAM memory.
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
 + *
-+ * @s: Allwinner H3 state object pointer
-+ * @blk: Block backend device object pointer
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
-+void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk);
 +
- #endif /* HW_ARM_ALLWINNER_H3_H */
-diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index d1245d2b01..56b5c563a8 100644
---- a/hw/arm/allwinner-h3.c
-+++ b/hw/arm/allwinner-h3.c
-@@ -29,6 +29,7 @@
- #include "hw/char/serial.h"
- #include "hw/misc/unimp.h"
- #include "hw/usb/hcd-ehci.h"
-+#include "hw/loader.h"
- #include "sysemu/sysemu.h"
- #include "hw/arm/allwinner-h3.h"
- 
-@@ -170,6 +171,23 @@ enum {
-     AW_H3_GIC_NUM_SPI       = 128
- };
- 
-+void allwinner_h3_bootrom_setup(AwH3State *s, BlockBackend *blk)
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "exec/address-spaces.h"
++#include "qapi/error.h"
++#include "cpu.h"
++#include "hw/sysbus.h"
++#include "hw/boards.h"
++#include "hw/qdev-properties.h"
++#include "hw/arm/allwinner-h3.h"
++#include "sysemu/sysemu.h"
++
++static struct arm_boot_info orangepi_binfo = {
++    .nb_cpus = AW_H3_NUM_CPUS,
++};
++
++typedef struct OrangePiState {
++    AwH3State *h3;
++    MemoryRegion sdram;
++} OrangePiState;
++
++static void orangepi_init(MachineState *machine)
 +{
-+    const int64_t rom_size = 32 * KiB;
-+    uint8_t *buffer = g_new0(uint8_t, rom_size);
++    OrangePiState *s = g_new(OrangePiState, 1);
 +
-+    if (blk_pread(blk, 8 * KiB, buffer, rom_size) < 0) {
-+        error_setg(&error_fatal, "%s: failed to read BlockBackend data",
-+                   __func__);
-+        return;
++    /* BIOS is not supported by this board */
++    if (bios_name) {
++        error_report("BIOS not supported for this machine");
++        exit(1);
 +    }
 +
-+    rom_add_blob("allwinner-h3.bootrom", buffer, rom_size,
-+                  rom_size, s->memmap[AW_H3_SRAM_A1],
-+                  NULL, NULL, NULL, NULL, false);
-+    g_free(buffer);
++    /* This board has fixed size RAM */
++    if (machine->ram_size != 1 * GiB) {
++        error_report("This machine can only be used with 1GiB of RAM");
++        exit(1);
++    }
++
++    /* Only allow Cortex-A7 for this board */
++    if (strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("cortex-a7")) != 0) {
++        error_report("This board can only be used with cortex-a7 CPU");
++        exit(1);
++    }
++
++    s->h3 = AW_H3(object_new(TYPE_AW_H3));
++
++    /* Setup timer properties */
++    object_property_set_int(OBJECT(s->h3), 32768, "clk0-freq",
++                            &error_abort);
++    object_property_set_int(OBJECT(s->h3), 24 * 1000 * 1000, "clk1-freq",
++                            &error_abort);
++
++    /* Mark H3 object realized */
++    object_property_set_bool(OBJECT(s->h3), true, "realized", &error_abort);
++
++    /* SDRAM */
++    memory_region_allocate_system_memory(&s->sdram, NULL, "sdram",
++                                         machine->ram_size);
++    memory_region_add_subregion(get_system_memory(), s->h3->memmap[AW_H3_SDRAM],
++                                &s->sdram);
++
++    orangepi_binfo.loader_start = s->h3->memmap[AW_H3_SDRAM];
++    orangepi_binfo.ram_size = machine->ram_size;
++    arm_load_kernel(ARM_CPU(first_cpu), machine, &orangepi_binfo);
 +}
 +
- static void allwinner_h3_init(Object *obj)
- {
-     AwH3State *s = AW_H3(obj);
-diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
-index 6bb49bf2a8..902fcfd11f 100644
---- a/hw/arm/orangepi.c
-+++ b/hw/arm/orangepi.c
-@@ -102,6 +102,11 @@ static void orangepi_init(MachineState *machine)
-     memory_region_add_subregion(get_system_memory(), s->h3->memmap[AW_H3_SDRAM],
-                                 &s->sdram);
++static void orangepi_machine_init(MachineClass *mc)
++{
++    mc->desc = "Orange Pi PC";
++    mc->init = orangepi_init;
++    mc->min_cpus = AW_H3_NUM_CPUS;
++    mc->max_cpus = AW_H3_NUM_CPUS;
++    mc->default_cpus = AW_H3_NUM_CPUS;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a7");
++    mc->default_ram_size = 1 * GiB;
++}
++
++DEFINE_MACHINE("orangepi-pc", orangepi_machine_init)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a1ab79bdfb..8a93797b72 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -489,6 +489,7 @@ L: qemu-arm@nongnu.org
+ S: Maintained
+ F: hw/*/allwinner-h3*
+ F: include/hw/*/allwinner-h3*
++F: hw/arm/orangepi.c
  
-+    /* Load target kernel or start using BootROM */
-+    if (!machine->kernel_filename && blk_is_available(blk)) {
-+        /* Use Boot ROM to copy data from SD card to SRAM */
-+        allwinner_h3_bootrom_setup(s->h3, blk);
-+    }
-     orangepi_binfo.loader_start = s->h3->memmap[AW_H3_SDRAM];
-     orangepi_binfo.ram_size = machine->ram_size;
-     arm_load_kernel(ARM_CPU(first_cpu), machine, &orangepi_binfo);
+ ARM PrimeCell and CMSDK devices
+ M: Peter Maydell <peter.maydell@linaro.org>
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index ae577e875f..534a6a119e 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -35,7 +35,7 @@ obj-$(CONFIG_DIGIC) += digic.o
+ obj-$(CONFIG_OMAP) += omap1.o omap2.o
+ obj-$(CONFIG_STRONGARM) += strongarm.o
+ obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
+-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3.o
++obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3.o orangepi.o
+ obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
+ obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
+ obj-$(CONFIG_STM32F405_SOC) += stm32f405_soc.o
 -- 
 2.17.1
 
