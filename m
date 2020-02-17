@@ -6,44 +6,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31306C7619D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2948FC7619B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:48:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE57B2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:47:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE57B2067D
+	by mail.kernel.org (Postfix) with ESMTPS id A10D62067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:48:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A10D62067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3b7h-0004fr-39
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 02:47:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39529)
+	id 1j3b8h-00066K-I8
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 02:48:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <xuyandong2@huawei.com>) id 1j3b33-0004V9-KZ
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:42:36 -0500
+ (envelope-from <xuyandong2@huawei.com>) id 1j3b34-0004Xf-IK
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:42:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <xuyandong2@huawei.com>) id 1j3b30-0000dz-Q4
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:42:33 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:45570 helo=huawei.com)
+ (envelope-from <xuyandong2@huawei.com>) id 1j3b31-0000eI-0s
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:42:34 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2716 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <xuyandong2@huawei.com>)
- id 1j3b2s-0000Q2-MU; Mon, 17 Feb 2020 02:42:23 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 7A5DEB51FF8740FA55DE;
- Mon, 17 Feb 2020 15:42:20 +0800 (CST)
-Received: from localhost (10.175.124.177) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
- 15:42:10 +0800
+ id 1j3b2r-0000ME-Of; Mon, 17 Feb 2020 02:42:22 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id D09AD3EBCC26B2E87BB5;
+ Mon, 17 Feb 2020 15:42:17 +0800 (CST)
+Received: from localhost (10.175.124.177) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
+ 15:42:08 +0800
 From: Xu Yandong <xuyandong2@huawei.com>
 To: <peter.maydell@linaro.org>
-Subject: [PATCH RFC 12/16] hw/arm: move shared devices related functions to
- arm.c and export them
-Date: Mon, 17 Feb 2020 02:51:24 -0500
-Message-ID: <1581925888-103620-13-git-send-email-xuyandong2@huawei.com>
+Subject: [PATCH RFC 09/16] hw/arm: move shared gic member to ArmMachine
+Date: Mon, 17 Feb 2020 02:51:21 -0500
+Message-ID: <1581925888-103620-10-git-send-email-xuyandong2@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1581925888-103620-1-git-send-email-xuyandong2@huawei.com>
 References: <1581925888-103620-1-git-send-email-xuyandong2@huawei.com>
@@ -53,7 +52,7 @@ X-Originating-IP: [10.175.124.177]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,431 +65,607 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: zhang.zhanghailiang@huawei.com, slp@redhat.com,
- Xu Yandong <xuyandong2@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- wu.wubin@huawei.com
+ "Michael S. Tsirkin" <mst@redhat.com>, Xu Yandong <xuyandong2@huawei.com>,
+ qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>, wu.wubin@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move device related functions to arm.c, include RTC(pl031), UART(pl011),
-virtio devices.
+Move gic member from VirtMachineState to ArmMachineState.
 
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 Signed-off-by: Xu Yandong <xuyandong2@huawei.com>
 ---
- hw/arm/arm.c          | 137 +++++++++++++++++++++++++++++++++++++
- hw/arm/virt.c         | 156 +++---------------------------------------
- include/hw/arm/arm.h  |   8 +++
- include/hw/arm/virt.h |   1 -
- 4 files changed, 153 insertions(+), 149 deletions(-)
+ hw/arm/arm.c             |  35 ++++++++++
+ hw/arm/virt-acpi-build.c |   8 +--
+ hw/arm/virt.c            | 139 +++++++++++++++------------------------
+ include/hw/arm/arm.h     |  17 +++++
+ include/hw/arm/virt.h    |  15 -----
+ 5 files changed, 110 insertions(+), 104 deletions(-)
 
 diff --git a/hw/arm/arm.c b/hw/arm/arm.c
-index c51bf513d2..6751c6a624 100644
+index 4261d56832..ecb99611ed 100644
 --- a/hw/arm/arm.c
 +++ b/hw/arm/arm.c
-@@ -145,6 +145,143 @@ void init_gic_sysbus(ArmMachineState *ams)
-     }
+@@ -39,6 +39,32 @@
+ #include "hw/intc/arm_gic.h"
+ #include "kvm_arm.h"
+ 
++static char *virt_get_gic_version(Object *obj, Error **errp)
++{
++    ArmMachineState *ams = ARM_MACHINE(obj);
++    const char *val = ams->gic_version == 3 ? "3" : "2";
++
++    return g_strdup(val);
++}
++
++static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
++{
++    ArmMachineState *ams = ARM_MACHINE(obj);
++
++    if (!strcmp(value, "3")) {
++        ams->gic_version = 3;
++    } else if (!strcmp(value, "2")) {
++        ams->gic_version = 2;
++    } else if (!strcmp(value, "host")) {
++        ams->gic_version = 0; /* Will probe later */
++    } else if (!strcmp(value, "max")) {
++        ams->gic_version = -1; /* Will probe later */
++    } else {
++        error_setg(errp, "Invalid gic-version value");
++        error_append_hint(errp, "Valid values are 3, 2, host, max.\n");
++    }
++}
++
+ static void arm_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -55,6 +81,15 @@ static void arm_machine_class_init(ObjectClass *oc, void *data)
+ 
+ static void arm_instance_init(Object *obj)
+ {
++    ArmMachineState *ams = ARM_MACHINE(obj);
++    /* Default GIC type is v2 */
++    ams->gic_version = 2;
++    object_property_add_str(obj, "gic-version", virt_get_gic_version,
++                        virt_set_gic_version, NULL);
++    object_property_set_description(obj, "gic-version",
++                                    "Set GIC version. "
++                                    "Valid values are 2, 3 and host", NULL);
++
  }
  
-+void create_uart(const ArmMachineState *ams, int uart,
-+                        MemoryRegion *mem, Chardev *chr)
-+{
-+    char *nodename;
-+    hwaddr base = ams->memmap[uart].base;
-+    hwaddr size = ams->memmap[uart].size;
-+    int irq = ams->irqmap[uart];
-+    const char compat[] = "arm,pl011\0arm,primecell";
-+    const char clocknames[] = "uartclk\0apb_pclk";
-+    DeviceState *dev = qdev_create(NULL, "pl011");
-+    SysBusDevice *s = SYS_BUS_DEVICE(dev);
-+
-+    qdev_prop_set_chr(dev, "chardev", chr);
-+    qdev_init_nofail(dev);
-+    memory_region_add_subregion(mem, base,
-+                                sysbus_mmio_get_region(s, 0));
-+    sysbus_connect_irq(s, 0, qdev_get_gpio_in(ams->gic, irq));
-+
-+    nodename = g_strdup_printf("/pl011@%" PRIx64, base);
-+    qemu_fdt_add_subnode(ams->fdt, nodename);
-+    /* Note that we can't use setprop_string because of the embedded NUL */
-+    qemu_fdt_setprop(ams->fdt, nodename, "compatible",
-+                         compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(ams->fdt, nodename, "reg",
-+                                     2, base, 2, size);
-+    qemu_fdt_setprop_cells(ams->fdt, nodename, "interrupts",
-+                               GIC_FDT_IRQ_TYPE_SPI, irq,
-+                               GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-+    qemu_fdt_setprop_cells(ams->fdt, nodename, "clocks",
-+                               ams->clock_phandle, ams->clock_phandle);
-+    qemu_fdt_setprop(ams->fdt, nodename, "clock-names",
-+                         clocknames, sizeof(clocknames));
-+
-+    if (uart == VIRT_UART) {
-+        qemu_fdt_setprop_string(ams->fdt, "/chosen", "stdout-path", nodename);
-+    } else {
-+        /* Mark as not usable by the normal world */
-+        qemu_fdt_setprop_string(ams->fdt, nodename, "status", "disabled");
-+        qemu_fdt_setprop_string(ams->fdt, nodename, "secure-status", "okay");
-+
-+        qemu_fdt_add_subnode(ams->fdt, "/secure-chosen");
-+        qemu_fdt_setprop_string(ams->fdt, "/secure-chosen", "stdout-path",
-+                                nodename);
-+    }
-+
-+    g_free(nodename);
-+}
-+
-+void create_rtc(const ArmMachineState *ams)
-+{
-+    char *nodename;
-+    hwaddr base = ams->memmap[VIRT_RTC].base;
-+    hwaddr size = ams->memmap[VIRT_RTC].size;
-+    int irq = ams->irqmap[VIRT_RTC];
-+    const char compat[] = "arm,pl031\0arm,primecell";
-+
-+    sysbus_create_simple("pl031", base, qdev_get_gpio_in(ams->gic, irq));
-+
-+    nodename = g_strdup_printf("/pl031@%" PRIx64, base);
-+    qemu_fdt_add_subnode(ams->fdt, nodename);
-+    qemu_fdt_setprop(ams->fdt, nodename, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(ams->fdt, nodename, "reg",
-+                                 2, base, 2, size);
-+    qemu_fdt_setprop_cells(ams->fdt, nodename, "interrupts",
-+                           GIC_FDT_IRQ_TYPE_SPI, irq,
-+                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-+    qemu_fdt_setprop_cell(ams->fdt, nodename, "clocks", ams->clock_phandle);
-+    qemu_fdt_setprop_string(ams->fdt, nodename, "clock-names", "apb_pclk");
-+    g_free(nodename);
-+}
-+
-+void create_virtio_devices(const ArmMachineState *ams)
-+{
-+    int i;
-+    hwaddr size = ams->memmap[VIRT_MMIO].size;
-+
-+    /* We create the transports in forwards order. Since qbus_realize()
-+     * prepends (not appends) new child buses, the incrementing loop below will
-+     * create a list of virtio-mmio buses with decreasing base addresses.
-+     *
-+     * When a -device option is processed from the command line,
-+     * qbus_find_recursive() picks the next free virtio-mmio bus in forwards
-+     * order. The upshot is that -device options in increasing command line
-+     * order are mapped to virtio-mmio buses with decreasing base addresses.
-+     *
-+     * When this code was originally written, that arrangement ensured that the
-+     * guest Linux kernel would give the lowest "name" (/dev/vda, eth0, etc) to
-+     * the first -device on the command line. (The end-to-end order is a
-+     * function of this loop, qbus_realize(), qbus_find_recursive(), and the
-+     * guest kernel's name-to-address assignment strategy.)
-+     *
-+     * Meanwhile, the kernel's traversal seems to have been reversed; see eg.
-+     * the message, if not necessarily the code, of commit 70161ff336.
-+     * Therefore the loop now establishes the inverse of the original intent.
-+     *
-+     * Unfortunately, we can't counteract the kernel change by reversing the
-+     * loop; it would break existing command lines.
-+     *
-+     * In any case, the kernel makes no guarantee about the stability of
-+     * enumeration order of virtio devices (as demonstrated by it changing
-+     * between kernel versions). For reliable and stable identification
-+     * of disks users must use UUIDs or similar mechanisms.
-+     */
-+    for (i = 0; i < NUM_VIRTIO_TRANSPORTS; i++) {
-+        int irq = ams->irqmap[VIRT_MMIO] + i;
-+        hwaddr base = ams->memmap[VIRT_MMIO].base + i * size;
-+
-+        sysbus_create_simple("virtio-mmio", base,
-+                             qdev_get_gpio_in(ams->gic, irq));
-+    }
-+
-+    /* We add dtb nodes in reverse order so that they appear in the finished
-+     * device tree lowest address first.
-+     *
-+     * Note that this mapping is independent of the loop above. The previous
-+     * loop influences virtio device to virtio transport assignment, whereas
-+     * this loop controls how virtio transports are laid out in the dtb.
-+     */
-+    for (i = NUM_VIRTIO_TRANSPORTS - 1; i >= 0; i--) {
-+        char *nodename;
-+        int irq = ams->irqmap[VIRT_MMIO] + i;
-+        hwaddr base = ams->memmap[VIRT_MMIO].base + i * size;
-+
-+        nodename = g_strdup_printf("/virtio_mmio@%" PRIx64, base);
-+        qemu_fdt_add_subnode(ams->fdt, nodename);
-+        qemu_fdt_setprop_string(ams->fdt, nodename,
-+                                "compatible", "virtio,mmio");
-+        qemu_fdt_setprop_sized_cells(ams->fdt, nodename, "reg",
-+                                     2, base, 2, size);
-+        qemu_fdt_setprop_cells(ams->fdt, nodename, "interrupts",
-+                               GIC_FDT_IRQ_TYPE_SPI, irq,
-+                               GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
-+        qemu_fdt_setprop(ams->fdt, nodename, "dma-coherent", NULL, 0);
-+        g_free(nodename);
-+    }
-+}
-+
- static char *virt_get_gic_version(Object *obj, Error **errp)
- {
-     ArmMachineState *ams = ARM_MACHINE(obj);
+ static const TypeInfo arm_machine_info = {
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index ef2761ef77..770c53f5d0 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -621,7 +621,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     gicd->type = ACPI_APIC_GENERIC_DISTRIBUTOR;
+     gicd->length = sizeof(*gicd);
+     gicd->base_address = cpu_to_le64(memmap[VIRT_GIC_DIST].base);
+-    gicd->version = vms->gic_version;
++    gicd->version = ams->gic_version;
+ 
+     for (i = 0; i < ams->smp_cpus; i++) {
+         AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
+@@ -630,7 +630,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ 
+         gicc->type = ACPI_APIC_GENERIC_CPU_INTERFACE;
+         gicc->length = sizeof(*gicc);
+-        if (vms->gic_version == 2) {
++        if (ams->gic_version == 2) {
+             gicc->base_address = cpu_to_le64(memmap[VIRT_GIC_CPU].base);
+             gicc->gich_base_address = cpu_to_le64(memmap[VIRT_GIC_HYP].base);
+             gicc->gicv_base_address = cpu_to_le64(memmap[VIRT_GIC_VCPU].base);
+@@ -648,9 +648,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         }
+     }
+ 
+-    if (vms->gic_version == 3) {
++    if (ams->gic_version == 3) {
+         AcpiMadtGenericTranslator *gic_its;
+-        int nb_redist_regions = virt_gicv3_redist_region_count(vms);
++        int nb_redist_regions = virt_gicv3_redist_region_count(ams);
+         AcpiMadtGenericRedistributor *gicr = acpi_data_push(table_data,
+                                                          sizeof *gicr);
+ 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 2c0dfb2695..b3267b873a 100644
+index 087616190e..b9689b0f0c 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -231,14 +231,14 @@ static void create_fdt(VirtMachineState *vms)
-      * optional but in practice if you omit them the kernel refuses to
-      * probe for the device.
-      */
--    vms->clock_phandle = qemu_fdt_alloc_phandle(fdt);
-+    ams->clock_phandle = qemu_fdt_alloc_phandle(fdt);
-     qemu_fdt_add_subnode(fdt, "/apb-pclk");
-     qemu_fdt_setprop_string(fdt, "/apb-pclk", "compatible", "fixed-clock");
-     qemu_fdt_setprop_cell(fdt, "/apb-pclk", "#clock-cells", 0x0);
-     qemu_fdt_setprop_cell(fdt, "/apb-pclk", "clock-frequency", 24000000);
-     qemu_fdt_setprop_string(fdt, "/apb-pclk", "clock-output-names",
-                                 "clk24mhz");
--    qemu_fdt_setprop_cell(fdt, "/apb-pclk", "phandle", vms->clock_phandle);
-+    qemu_fdt_setprop_cell(fdt, "/apb-pclk", "phandle", ams->clock_phandle);
+@@ -100,10 +100,6 @@
+ #define DEFINE_VIRT_MACHINE(major, minor) \
+     DEFINE_VIRT_MACHINE_LATEST(major, minor, false)
  
-     if (nb_numa_nodes > 0 && ms->numa_state->have_numa_distance) {
-         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
-@@ -687,79 +687,6 @@ static void create_gic(VirtMachineState *vms)
-     gic_set_msi_interrupt(vms);
- }
+-
+-/* Number of external interrupt lines to configure the GIC with */
+-#define NUM_IRQS 256
+-
+ #define PLATFORM_BUS_NUM_IRQS 64
  
--static void create_uart(const VirtMachineState *vms, int uart,
--                        MemoryRegion *mem, Chardev *chr)
--{
--    char *nodename;
--    const ArmMachineState *ams = ARM_MACHINE(vms);
--    hwaddr base = ams->memmap[uart].base;
--    hwaddr size = ams->memmap[uart].size;
--    int irq = ams->irqmap[uart];
--    const char compat[] = "arm,pl011\0arm,primecell";
--    const char clocknames[] = "uartclk\0apb_pclk";
--    DeviceState *dev = qdev_create(NULL, "pl011");
--    SysBusDevice *s = SYS_BUS_DEVICE(dev);
--
--    qdev_prop_set_chr(dev, "chardev", chr);
--    qdev_init_nofail(dev);
--    memory_region_add_subregion(mem, base,
--                                sysbus_mmio_get_region(s, 0));
--    sysbus_connect_irq(s, 0, qdev_get_gpio_in(ams->gic, irq));
--
--    nodename = g_strdup_printf("/pl011@%" PRIx64, base);
--    qemu_fdt_add_subnode(ams->fdt, nodename);
--    /* Note that we can't use setprop_string because of the embedded NUL */
--    qemu_fdt_setprop(ams->fdt, nodename, "compatible",
--                         compat, sizeof(compat));
--    qemu_fdt_setprop_sized_cells(ams->fdt, nodename, "reg",
--                                     2, base, 2, size);
--    qemu_fdt_setprop_cells(ams->fdt, nodename, "interrupts",
--                               GIC_FDT_IRQ_TYPE_SPI, irq,
--                               GIC_FDT_IRQ_FLAGS_LEVEL_HI);
--    qemu_fdt_setprop_cells(ams->fdt, nodename, "clocks",
--                               vms->clock_phandle, vms->clock_phandle);
--    qemu_fdt_setprop(ams->fdt, nodename, "clock-names",
--                         clocknames, sizeof(clocknames));
--
--    if (uart == VIRT_UART) {
--        qemu_fdt_setprop_string(ams->fdt, "/chosen", "stdout-path", nodename);
--    } else {
--        /* Mark as not usable by the normal world */
--        qemu_fdt_setprop_string(ams->fdt, nodename, "status", "disabled");
--        qemu_fdt_setprop_string(ams->fdt, nodename, "secure-status", "okay");
--
--        qemu_fdt_add_subnode(ams->fdt, "/secure-chosen");
--        qemu_fdt_setprop_string(ams->fdt, "/secure-chosen", "stdout-path",
--                                nodename);
--    }
--
--    g_free(nodename);
--}
--
--static void create_rtc(const VirtMachineState *vms)
--{
--    char *nodename;
--    const ArmMachineState *ams = ARM_MACHINE(vms);
--    hwaddr base = ams->memmap[VIRT_RTC].base;
--    hwaddr size = ams->memmap[VIRT_RTC].size;
--    int irq = ams->irqmap[VIRT_RTC];
--    const char compat[] = "arm,pl031\0arm,primecell";
--
--    sysbus_create_simple("pl031", base, qdev_get_gpio_in(ams->gic, irq));
--
--    nodename = g_strdup_printf("/pl031@%" PRIx64, base);
--    qemu_fdt_add_subnode(ams->fdt, nodename);
--    qemu_fdt_setprop(ams->fdt, nodename, "compatible", compat, sizeof(compat));
--    qemu_fdt_setprop_sized_cells(ams->fdt, nodename, "reg",
--                                 2, base, 2, size);
--    qemu_fdt_setprop_cells(ams->fdt, nodename, "interrupts",
--                           GIC_FDT_IRQ_TYPE_SPI, irq,
--                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
--    qemu_fdt_setprop_cell(ams->fdt, nodename, "clocks", vms->clock_phandle);
--    qemu_fdt_setprop_string(ams->fdt, nodename, "clock-names", "apb_pclk");
--    g_free(nodename);
--}
--
- static DeviceState *gpio_key_dev;
- static void virt_powerdown_req(Notifier *n, void *opaque)
- {
-@@ -797,7 +724,7 @@ static void create_gpio(const VirtMachineState *vms)
-     qemu_fdt_setprop_cells(ams->fdt, nodename, "interrupts",
-                            GIC_FDT_IRQ_TYPE_SPI, irq,
-                            GIC_FDT_IRQ_FLAGS_LEVEL_HI);
--    qemu_fdt_setprop_cell(ams->fdt, nodename, "clocks", vms->clock_phandle);
-+    qemu_fdt_setprop_cell(ams->fdt, nodename, "clocks", ams->clock_phandle);
-     qemu_fdt_setprop_string(ams->fdt, nodename, "clock-names", "apb_pclk");
-     qemu_fdt_setprop_cell(ams->fdt, nodename, "phandle", phandle);
+ /* Legacy RAM limit in GB (< version 4.0) */
+@@ -297,7 +293,7 @@ static void fdt_add_timer_nodes(const VirtMachineState *vms)
+         irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
+     }
  
-@@ -818,73 +745,6 @@ static void create_gpio(const VirtMachineState *vms)
+-    if (vms->gic_version == 2) {
++    if (ams->gic_version == 2) {
+         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+                              GIC_FDT_IRQ_PPI_CPU_WIDTH,
+                              (1 << ams->smp_cpus) - 1);
+@@ -435,7 +431,7 @@ static void fdt_gic_set_virt_extension(VirtMachineState *vms)
+                                ams->memmap[VIRT_GIC_DIST].base);
+ 
+ 
+-    if (vms->gic_version == 3) {
++    if (ams->gic_version == 3) {
+         if (vms->virt) {
+             qemu_fdt_setprop_cells(ams->fdt, nodename, "interrupts",
+                                    GIC_FDT_IRQ_TYPE_PPI, ARCH_GIC_MAINT_IRQ,
+@@ -470,8 +466,8 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+     char *nodename;
+     ArmMachineState *ams = ARM_MACHINE(vms);
+ 
+-    vms->gic_phandle = qemu_fdt_alloc_phandle(ams->fdt);
+-    qemu_fdt_setprop_cell(ams->fdt, "/", "interrupt-parent", vms->gic_phandle);
++    ams->gic_phandle = qemu_fdt_alloc_phandle(ams->fdt);
++    qemu_fdt_setprop_cell(ams->fdt, "/", "interrupt-parent", ams->gic_phandle);
+ 
+     nodename = g_strdup_printf("/intc@%" PRIx64,
+                                ams->memmap[VIRT_GIC_DIST].base);
+@@ -481,8 +477,8 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+     qemu_fdt_setprop_cell(ams->fdt, nodename, "#address-cells", 0x2);
+     qemu_fdt_setprop_cell(ams->fdt, nodename, "#size-cells", 0x2);
+     qemu_fdt_setprop(ams->fdt, nodename, "ranges", NULL, 0);
+-    if (vms->gic_version == 3) {
+-        int nb_redist_regions = virt_gicv3_redist_region_count(vms);
++    if (ams->gic_version == 3) {
++        int nb_redist_regions = virt_gicv3_redist_region_count(ams);
+ 
+         qemu_fdt_setprop_string(ams->fdt, nodename, "compatible",
+                                 "arm,gic-v3");
+@@ -511,7 +507,7 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+                                 "arm,cortex-a15-gic");
+     }
+ 
+-    qemu_fdt_setprop_cell(ams->fdt, nodename, "phandle", vms->gic_phandle);
++    qemu_fdt_setprop_cell(ams->fdt, nodename, "phandle", ams->gic_phandle);
      g_free(nodename);
  }
  
--static void create_virtio_devices(const VirtMachineState *vms)
+@@ -535,7 +531,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+         }
+     }
+ 
+-    if (vms->gic_version == 2) {
++    if (ams->gic_version == 2) {
+         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+                              GIC_FDT_IRQ_PPI_CPU_WIDTH,
+                              (1 << ams->smp_cpus) - 1);
+@@ -569,7 +565,7 @@ static inline DeviceState *create_acpi_ged(VirtMachineState *vms)
+ 
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, ams->memmap[VIRT_ACPI_GED].base);
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, ams->memmap[VIRT_PCDIMM_ACPI].base);
+-    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, qdev_get_gpio_in(vms->gic, irq));
++    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, qdev_get_gpio_in(ams->gic, irq));
+ 
+     qdev_init_nofail(dev);
+ 
+@@ -589,7 +585,7 @@ static void create_its(VirtMachineState *vms)
+ 
+     dev = qdev_create(NULL, itsclass);
+ 
+-    object_property_set_link(OBJECT(dev), OBJECT(vms->gic), "parent-gicv3",
++    object_property_set_link(OBJECT(dev), OBJECT(ams->gic), "parent-gicv3",
+                              &error_abort);
+     qdev_init_nofail(dev);
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, ams->memmap[VIRT_GIC_ITS].base);
+@@ -612,7 +608,7 @@ static void create_v2m(VirtMachineState *vms)
+ 
+     for (i = 0; i < NUM_GICV2M_SPIS; i++) {
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
+-                           qdev_get_gpio_in(vms->gic, irq + i));
++                           qdev_get_gpio_in(ams->gic, irq + i));
+     }
+ 
+     fdt_add_v2m_gic_node(vms);
+@@ -620,25 +616,30 @@ static void create_v2m(VirtMachineState *vms)
+ 
+ static void gic_set_msi_interrupt(VirtMachineState *vms)
+ {
+-    if (vms->gic_version == 3 && vms->its) {
++    ArmMachineState *ams = ARM_MACHINE(vms);
++    if (ams->gic_version == 3 && vms->its) {
+         create_its(vms);
+-    } else if (vms->gic_version == 2) {
++    } else if (ams->gic_version == 2) {
+         create_v2m(vms);
+     }
+ }
+ 
+ static void qdev_gic_set_secure_bit(VirtMachineState *vms)
+ {
++    ArmMachineState *ams = ARM_MACHINE(vms);
++
+     if (!kvm_irqchip_in_kernel()) {
+-        qdev_prop_set_bit(vms->gic, "has-security-extensions",
++        qdev_prop_set_bit(ams->gic, "has-security-extensions",
+                           vms->secure);
+     }
+ }
+ 
+ static void qdev_gic_set_virt_bit(VirtMachineState *vms)
+ {
+-    if (vms->gic_version != 3 && !kvm_irqchip_in_kernel()) {
+-        qdev_prop_set_bit(vms->gic, "has-virtualization-extensions",
++    ArmMachineState *ams = ARM_MACHINE(vms);
++
++    if (ams->gic_version != 3 && !kvm_irqchip_in_kernel()) {
++        qdev_prop_set_bit(ams->gic, "has-virtualization-extensions",
+                           vms->virt);
+     }
+ }
+@@ -648,14 +649,14 @@ static void set_gic_virt_sysbus(VirtMachineState *vms)
+     MachineState *ms = MACHINE(vms);
+     ArmMachineState *ams = ARM_MACHINE(vms);
+     SysBusDevice *gicbusdev;
+-    int type = vms->gic_version, i;
++    int type = ams->gic_version, i;
+     unsigned int smp_cpus = ms->smp.cpus;
+ 
+     if (!vms->virt) {
+         return;
+     }
+ 
+-    gicbusdev = SYS_BUS_DEVICE(vms->gic);
++    gicbusdev = SYS_BUS_DEVICE(ams->gic);
+     if (type != 3) {
+         sysbus_mmio_map(gicbusdev, 2, ams->memmap[VIRT_GIC_HYP].base);
+         sysbus_mmio_map(gicbusdev, 3, ams->memmap[VIRT_GIC_VCPU].base);
+@@ -663,7 +664,7 @@ static void set_gic_virt_sysbus(VirtMachineState *vms)
+ 
+     for (i = 0; i < smp_cpus; i++) {
+         int ppibase = NUM_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
+-        qemu_irq irq = qdev_get_gpio_in(vms->gic,
++        qemu_irq irq = qdev_get_gpio_in(ams->gic,
+                                         ppibase + ARCH_GIC_MAINT_IRQ);
+         sysbus_connect_irq(gicbusdev, i + 4 * smp_cpus, irq);
+     }
+@@ -676,43 +677,43 @@ static void create_gic(VirtMachineState *vms)
+     /* We create a standalone GIC */
+     SysBusDevice *gicbusdev;
+     const char *gictype;
+-    int type = vms->gic_version, i;
++    int type = ams->gic_version, i;
+     unsigned int smp_cpus = ms->smp.cpus;
+     uint32_t nb_redist_regions = 0;
+ 
+     gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
+ 
+-    vms->gic = qdev_create(NULL, gictype);
+-    qdev_prop_set_uint32(vms->gic, "revision", type);
+-    qdev_prop_set_uint32(vms->gic, "num-cpu", smp_cpus);
++    ams->gic = qdev_create(NULL, gictype);
++    qdev_prop_set_uint32(ams->gic, "revision", type);
++    qdev_prop_set_uint32(ams->gic, "num-cpu", smp_cpus);
+     /* Note that the num-irq property counts both internal and external
+      * interrupts; there are always 32 of the former (mandated by GIC spec).
+      */
+-    qdev_prop_set_uint32(vms->gic, "num-irq", NUM_IRQS + 32);
++    qdev_prop_set_uint32(ams->gic, "num-irq", NUM_IRQS + 32);
+ 
+     if (type == 3) {
+         uint32_t redist0_capacity =
+                     ams->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+         uint32_t redist0_count = MIN(smp_cpus, redist0_capacity);
+ 
+-        nb_redist_regions = virt_gicv3_redist_region_count(vms);
++        nb_redist_regions = virt_gicv3_redist_region_count(ams);
+ 
+-        qdev_prop_set_uint32(vms->gic, "len-redist-region-count",
++        qdev_prop_set_uint32(ams->gic, "len-redist-region-count",
+                              nb_redist_regions);
+-        qdev_prop_set_uint32(vms->gic, "redist-region-count[0]", redist0_count);
++        qdev_prop_set_uint32(ams->gic, "redist-region-count[0]", redist0_count);
+ 
+         if (nb_redist_regions == 2) {
+             uint32_t redist1_capacity =
+                     ams->memmap[VIRT_HIGH_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+ 
+-            qdev_prop_set_uint32(vms->gic, "redist-region-count[1]",
++            qdev_prop_set_uint32(ams->gic, "redist-region-count[1]",
+                 MIN(smp_cpus - redist0_count, redist1_capacity));
+         }
+     }
+     qdev_gic_set_secure_bit(vms);
+     qdev_gic_set_virt_bit(vms);
+-    qdev_init_nofail(vms->gic);
+-    gicbusdev = SYS_BUS_DEVICE(vms->gic);
++    qdev_init_nofail(ams->gic);
++    gicbusdev = SYS_BUS_DEVICE(ams->gic);
+     sysbus_mmio_map(gicbusdev, 0, ams->memmap[VIRT_GIC_DIST].base);
+     if (type == 3) {
+         sysbus_mmio_map(gicbusdev, 1, ams->memmap[VIRT_GIC_REDIST].base);
+@@ -744,19 +745,19 @@ static void create_gic(VirtMachineState *vms)
+ 
+         for (irq = 0; irq < ARRAY_SIZE(timer_irq); irq++) {
+             qdev_connect_gpio_out(cpudev, irq,
+-                                  qdev_get_gpio_in(vms->gic,
++                                  qdev_get_gpio_in(ams->gic,
+                                                    ppibase + timer_irq[irq]));
+         }
+ 
+         if (type == 3) {
+-            qemu_irq irq = qdev_get_gpio_in(vms->gic,
++            qemu_irq irq = qdev_get_gpio_in(ams->gic,
+                                             ppibase + ARCH_GIC_MAINT_IRQ);
+             qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt",
+                                         0, irq);
+         }
+ 
+         qdev_connect_gpio_out_named(cpudev, "pmu-interrupt", 0,
+-                                    qdev_get_gpio_in(vms->gic, ppibase
++                                    qdev_get_gpio_in(ams->gic, ppibase
+                                                      + VIRTUAL_PMU_IRQ));
+ 
+         sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
+@@ -792,7 +793,7 @@ static void create_uart(const VirtMachineState *vms, int uart,
+     qdev_init_nofail(dev);
+     memory_region_add_subregion(mem, base,
+                                 sysbus_mmio_get_region(s, 0));
+-    sysbus_connect_irq(s, 0, qdev_get_gpio_in(vms->gic, irq));
++    sysbus_connect_irq(s, 0, qdev_get_gpio_in(ams->gic, irq));
+ 
+     nodename = g_strdup_printf("/pl011@%" PRIx64, base);
+     qemu_fdt_add_subnode(ams->fdt, nodename);
+@@ -833,7 +834,7 @@ static void create_rtc(const VirtMachineState *vms)
+     int irq = ams->irqmap[VIRT_RTC];
+     const char compat[] = "arm,pl031\0arm,primecell";
+ 
+-    sysbus_create_simple("pl031", base, qdev_get_gpio_in(vms->gic, irq));
++    sysbus_create_simple("pl031", base, qdev_get_gpio_in(ams->gic, irq));
+ 
+     nodename = g_strdup_printf("/pl031@%" PRIx64, base);
+     qemu_fdt_add_subnode(ams->fdt, nodename);
+@@ -872,7 +873,7 @@ static void create_gpio(const VirtMachineState *vms)
+     const char compat[] = "arm,pl061\0arm,primecell";
+ 
+     pl061_dev = sysbus_create_simple("pl061", base,
+-                                     qdev_get_gpio_in(vms->gic, irq));
++                                     qdev_get_gpio_in(ams->gic, irq));
+ 
+     uint32_t phandle = qemu_fdt_alloc_phandle(ams->fdt);
+     nodename = g_strdup_printf("/pl061@%" PRIx64, base);
+@@ -944,7 +945,7 @@ static void create_virtio_devices(const VirtMachineState *vms)
+         hwaddr base = ams->memmap[VIRT_MMIO].base + i * size;
+ 
+         sysbus_create_simple("virtio-mmio", base,
+-                             qdev_get_gpio_in(vms->gic, irq));
++                             qdev_get_gpio_in(ams->gic, irq));
+     }
+ 
+     /* We add dtb nodes in reverse order so that they appear in the finished
+@@ -1222,7 +1223,7 @@ static void create_smmu(const VirtMachineState *vms,
+     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+     for (i = 0; i < NUM_SMMU_IRQS; i++) {
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
+-                           qdev_get_gpio_in(vms->gic, irq + i));
++                           qdev_get_gpio_in(ams->gic, irq + i));
+     }
+ 
+     node = g_strdup_printf("/smmuv3@%" PRIx64, base);
+@@ -1311,7 +1312,7 @@ static void create_pcie(VirtMachineState *vms)
+ 
+     for (i = 0; i < GPEX_NUM_IRQS; i++) {
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
+-                           qdev_get_gpio_in(vms->gic, irq + i));
++                           qdev_get_gpio_in(ams->gic, irq + i));
+         gpex_set_irq_num(GPEX_HOST(dev), i, irq + i);
+     }
+ 
+@@ -1366,7 +1367,7 @@ static void create_pcie(VirtMachineState *vms)
+     }
+ 
+     qemu_fdt_setprop_cell(ams->fdt, nodename, "#interrupt-cells", 1);
+-    create_pcie_irq_map(vms, vms->gic_phandle, irq, nodename);
++    create_pcie_irq_map(vms, ams->gic_phandle, irq, nodename);
+ 
+     if (vms->iommu) {
+         vms->iommu_phandle = qemu_fdt_alloc_phandle(ams->fdt);
+@@ -1398,7 +1399,7 @@ static void create_platform_bus(VirtMachineState *vms)
+     s = SYS_BUS_DEVICE(dev);
+     for (i = 0; i < PLATFORM_BUS_NUM_IRQS; i++) {
+         int irq = ams->irqmap[VIRT_PLATFORM_BUS] + i;
+-        sysbus_connect_irq(s, i, qdev_get_gpio_in(vms->gic, irq));
++        sysbus_connect_irq(s, i, qdev_get_gpio_in(ams->gic, irq));
+     }
+ 
+     memory_region_add_subregion(sysmem,
+@@ -1501,6 +1502,7 @@ void virt_machine_done(Notifier *notifier, void *data)
+ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+ {
+     uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
++    ArmMachineState *ams = ARM_MACHINE(vms);
+     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+ 
+     if (!vmc->disallow_affinity_adjustment) {
+@@ -1512,7 +1514,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+          * purposes are to make TCG consistent (with 64-bit KVM hosts)
+          * and to improve SGI efficiency.
+          */
+-        if (vms->gic_version == 3) {
++        if (ams->gic_version == 3) {
+             clustersz = GICV3_TARGETLIST_BITS;
+         } else {
+             clustersz = GIC_TARGETLIST_BITS;
+@@ -1606,19 +1608,19 @@ static void machvirt_init(MachineState *machine)
+     /* We can probe only here because during property set
+      * KVM is not available yet
+      */
+-    if (vms->gic_version <= 0) {
++    if (ams->gic_version <= 0) {
+         /* "host" or "max" */
+         if (!kvm_enabled()) {
+-            if (vms->gic_version == 0) {
++            if (ams->gic_version == 0) {
+                 error_report("gic-version=host requires KVM");
+                 exit(1);
+             } else {
+                 /* "max": currently means 3 for TCG */
+-                vms->gic_version = 3;
++                ams->gic_version = 3;
+             }
+         } else {
+-            vms->gic_version = kvm_arm_vgic_probe();
+-            if (!vms->gic_version) {
++            ams->gic_version = kvm_arm_vgic_probe();
++            if (!ams->gic_version) {
+                 error_report(
+                     "Unable to determine GIC version supported by host");
+                 exit(1);
+@@ -1673,7 +1675,7 @@ static void machvirt_init(MachineState *machine)
+     /* The maximum number of CPUs depends on the GIC version, or on how
+      * many redistributors we can fit into the memory map.
+      */
+-    if (vms->gic_version == 3) {
++    if (ams->gic_version == 3) {
+         virt_max_cpus =
+             ams->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+         virt_max_cpus +=
+@@ -1899,32 +1901,6 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
+     vms->its = value;
+ }
+ 
+-static char *virt_get_gic_version(Object *obj, Error **errp)
 -{
--    int i;
--    const ArmMachineState *ams = ARM_MACHINE(vms);
--    hwaddr size = ams->memmap[VIRT_MMIO].size;
+-    VirtMachineState *vms = VIRT_MACHINE(obj);
+-    const char *val = vms->gic_version == 3 ? "3" : "2";
 -
--    /* We create the transports in forwards order. Since qbus_realize()
--     * prepends (not appends) new child buses, the incrementing loop below will
--     * create a list of virtio-mmio buses with decreasing base addresses.
--     *
--     * When a -device option is processed from the command line,
--     * qbus_find_recursive() picks the next free virtio-mmio bus in forwards
--     * order. The upshot is that -device options in increasing command line
--     * order are mapped to virtio-mmio buses with decreasing base addresses.
--     *
--     * When this code was originally written, that arrangement ensured that the
--     * guest Linux kernel would give the lowest "name" (/dev/vda, eth0, etc) to
--     * the first -device on the command line. (The end-to-end order is a
--     * function of this loop, qbus_realize(), qbus_find_recursive(), and the
--     * guest kernel's name-to-address assignment strategy.)
--     *
--     * Meanwhile, the kernel's traversal seems to have been reversed; see eg.
--     * the message, if not necessarily the code, of commit 70161ff336.
--     * Therefore the loop now establishes the inverse of the original intent.
--     *
--     * Unfortunately, we can't counteract the kernel change by reversing the
--     * loop; it would break existing command lines.
--     *
--     * In any case, the kernel makes no guarantee about the stability of
--     * enumeration order of virtio devices (as demonstrated by it changing
--     * between kernel versions). For reliable and stable identification
--     * of disks users must use UUIDs or similar mechanisms.
--     */
--    for (i = 0; i < NUM_VIRTIO_TRANSPORTS; i++) {
--        int irq = ams->irqmap[VIRT_MMIO] + i;
--        hwaddr base = ams->memmap[VIRT_MMIO].base + i * size;
+-    return g_strdup(val);
+-}
 -
--        sysbus_create_simple("virtio-mmio", base,
--                             qdev_get_gpio_in(ams->gic, irq));
--    }
+-static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
+-{
+-    VirtMachineState *vms = VIRT_MACHINE(obj);
 -
--    /* We add dtb nodes in reverse order so that they appear in the finished
--     * device tree lowest address first.
--     *
--     * Note that this mapping is independent of the loop above. The previous
--     * loop influences virtio device to virtio transport assignment, whereas
--     * this loop controls how virtio transports are laid out in the dtb.
--     */
--    for (i = NUM_VIRTIO_TRANSPORTS - 1; i >= 0; i--) {
--        char *nodename;
--        int irq = ams->irqmap[VIRT_MMIO] + i;
--        hwaddr base = ams->memmap[VIRT_MMIO].base + i * size;
--
--        nodename = g_strdup_printf("/virtio_mmio@%" PRIx64, base);
--        qemu_fdt_add_subnode(ams->fdt, nodename);
--        qemu_fdt_setprop_string(ams->fdt, nodename,
--                                "compatible", "virtio,mmio");
--        qemu_fdt_setprop_sized_cells(ams->fdt, nodename, "reg",
--                                     2, base, 2, size);
--        qemu_fdt_setprop_cells(ams->fdt, nodename, "interrupts",
--                               GIC_FDT_IRQ_TYPE_SPI, irq,
--                               GIC_FDT_IRQ_FLAGS_EDGE_LO_HI);
--        qemu_fdt_setprop(ams->fdt, nodename, "dma-coherent", NULL, 0);
--        g_free(nodename);
+-    if (!strcmp(value, "3")) {
+-        vms->gic_version = 3;
+-    } else if (!strcmp(value, "2")) {
+-        vms->gic_version = 2;
+-    } else if (!strcmp(value, "host")) {
+-        vms->gic_version = 0; /* Will probe later */
+-    } else if (!strcmp(value, "max")) {
+-        vms->gic_version = -1; /* Will probe later */
+-    } else {
+-        error_setg(errp, "Invalid gic-version value");
+-        error_append_hint(errp, "Valid values are 3, 2, host, max.\n");
 -    }
 -}
 -
- #define VIRT_FLASH_SECTOR_SIZE (256 * KiB)
+ static char *virt_get_iommu(Object *obj, Error **errp)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+@@ -2164,13 +2140,6 @@ static void virt_instance_init(Object *obj)
+                                     "Set on/off to enable/disable using "
+                                     "physical address space above 32 bits",
+                                     NULL);
+-    /* Default GIC type is v2 */
+-    vms->gic_version = 2;
+-    object_property_add_str(obj, "gic-version", virt_get_gic_version,
+-                        virt_set_gic_version, NULL);
+-    object_property_set_description(obj, "gic-version",
+-                                    "Set GIC version. "
+-                                    "Valid values are 2, 3 and host", NULL);
  
- static PFlashCFI01 *virt_flash_create1(VirtMachineState *vms,
-@@ -1151,7 +1011,7 @@ static void create_smmu(const VirtMachineState *vms,
-     qemu_fdt_setprop(ams->fdt, node, "interrupt-names", irq_names,
-                      sizeof(irq_names));
+     vms->highmem_ecam = !vmc->no_highmem_ecam;
  
--    qemu_fdt_setprop_cell(ams->fdt, node, "clocks", vms->clock_phandle);
-+    qemu_fdt_setprop_cell(ams->fdt, node, "clocks", ams->clock_phandle);
-     qemu_fdt_setprop_string(ams->fdt, node, "clock-names", "apb_pclk");
-     qemu_fdt_setprop(ams->fdt, node, "dma-coherent", NULL, 0);
- 
-@@ -1709,16 +1569,16 @@ static void machvirt_init(MachineState *machine)
- 
-     fdt_add_pmu_nodes(vms);
- 
--    create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
-+    create_uart(ams, VIRT_UART, sysmem, serial_hd(0));
- 
-     if (vms->secure) {
-         create_secure_ram(vms, secure_sysmem);
--        create_uart(vms, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
-+        create_uart(ams, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
-     }
- 
-     vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
- 
--    create_rtc(vms);
-+    create_rtc(ams);
- 
-     create_pcie(vms);
- 
-@@ -1736,7 +1596,7 @@ static void machvirt_init(MachineState *machine)
-      * (which will be automatically plugged in to the transports). If
-      * no backend is created the transport will just sit harmlessly idle.
-      */
--    create_virtio_devices(vms);
-+    create_virtio_devices(ams);
- 
-     vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
-     rom_set_fw(vms->fw_cfg);
 diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
-index bb3680e583..8fec23985e 100644
+index 469f603e77..f8bde03cc3 100644
 --- a/include/hw/arm/arm.h
 +++ b/include/hw/arm/arm.h
-@@ -97,6 +97,7 @@ typedef struct {
+@@ -74,6 +74,9 @@ enum {
+     VIRT_HIGH_PCIE_MMIO,
+ };
+ 
++/* Number of external interrupt lines to configure the GIC with */
++#define NUM_IRQS 256
++
+ /* indices of IO regions located after the RAM */
+ 
+ typedef struct MemMapEntry {
+@@ -87,11 +90,14 @@ typedef struct {
+ 
+ typedef struct {
+     MachineState parent;
++    int32_t gic_version;
+     MemMapEntry *memmap;
+     const int *irqmap;
      int smp_cpus;
      void *fdt;
      int fdt_size;
-+    uint32_t clock_phandle;
-     uint32_t gic_phandle;
-     int psci_conduit;
-     DeviceState *gic;
-@@ -114,6 +115,13 @@ void qdev_create_gic(ArmMachineState *ams);
++    uint32_t gic_phandle;
++    DeviceState *gic;
+ } ArmMachineState;
  
- void init_gic_sysbus(ArmMachineState *ams);
+ #define TYPE_ARM_MACHINE   MACHINE_TYPE_NAME("arm")
+@@ -102,4 +108,15 @@ typedef struct {
+ #define ARM_MACHINE_CLASS(klass) \
+     OBJECT_CLASS_CHECK(ArmMachineClass, klass, TYPE_ARM_MACHINE)
  
-+void create_uart(const ArmMachineState *ams, int uart,
-+                 MemoryRegion *mem, Chardev *chr);
++/* Return the number of used redistributor regions  */
++static inline int virt_gicv3_redist_region_count(ArmMachineState *ams)
++{
++    uint32_t redist0_capacity =
++                ams->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
 +
-+void create_rtc(const ArmMachineState *ams);
++    assert(ams->gic_version == 3);
 +
-+void create_virtio_devices(const ArmMachineState *ams);
++    return ams->smp_cpus > redist0_capacity ? 2 : 1;
++}
 +
- /* Return the number of used redistributor regions  */
- static inline int virt_gicv3_redist_region_count(ArmMachineState *ams)
- {
+ #endif /* QEMU_ARM_ARM_H */
 diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index ad94634038..086a27682f 100644
+index dfc2a16010..393afb7faf 100644
 --- a/include/hw/arm/virt.h
 +++ b/include/hw/arm/virt.h
-@@ -69,7 +69,6 @@ typedef struct {
+@@ -68,16 +68,13 @@ typedef struct {
+     bool highmem_ecam;
+     bool its;
      bool virt;
+-    int32_t gic_version;
      VirtIOMMUType iommu;
      struct arm_boot_info bootinfo;
--    uint32_t clock_phandle;
+     uint32_t clock_phandle;
+-    uint32_t gic_phandle;
      uint32_t msi_phandle;
      uint32_t iommu_phandle;
+     int psci_conduit;
      hwaddr highest_gpa;
+-    DeviceState *gic;
+     DeviceState *acpi_dev;
+     Notifier powerdown_notifier;
+ } VirtMachineState;
+@@ -94,16 +91,4 @@ typedef struct {
+ 
+ void virt_acpi_setup(VirtMachineState *vms);
+ 
+-/* Return the number of used redistributor regions  */
+-static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
+-{
+-    ArmMachineState *ams = ARM_MACHINE(vms);
+-    uint32_t redist0_capacity =
+-                ams->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+-
+-    assert(vms->gic_version == 3);
+-
+-    return ams->smp_cpus > redist0_capacity ? 2 : 1;
+-}
+-
+ #endif /* QEMU_ARM_VIRT_H */
 -- 
 2.18.1
 
