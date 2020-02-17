@@ -2,82 +2,58 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD640C7619B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A9DC7619B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:43:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7963620718
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:18:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V5uNz0t/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7963620718
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 10998206D5
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 07:43:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10998206D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3afw-0006Zb-Ew
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 02:18:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36273)
+	id 1j3b3q-0005vN-7A
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 02:43:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39270)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hsp.cat7@gmail.com>) id 1j3aer-0005sK-HX
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:17:34 -0500
+ (envelope-from <xuyandong2@huawei.com>) id 1j3b2v-0004HC-0l
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:42:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1j3aeq-0001Aq-A5
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:17:33 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39875)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>)
- id 1j3aeq-0001AI-1t; Mon, 17 Feb 2020 02:17:32 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 77so15126880oty.6;
- Sun, 16 Feb 2020 23:17:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=wa7S8bLeyYCYyiVvgllMgoyoyQZdO1CI+FShBn7ymx8=;
- b=V5uNz0t/i/7uQLQMD/YGfF2qYclxpycCpCVSafrHBRm84t9CMijyJoBsnPfcN8MOOJ
- wQLZ7rgiRDRwH71ptmsgfIS9h9hXLhD9alxZF71mk2/4kOY4FiR4PHSW28oPXL8V7c9M
- d74jfjESTf+MMORD6eFabk2/Ejl97YyKPF2NNfCKw0RfKLseejhXuj1GrqkO7xbYWfRE
- zunTqpo90g8x24z/ybGfxcEk9Lq/SoKY/1yS0jMtGYrCHB+QdXIOrGhpSTP18wRPB+ea
- i8qealaIIY0hu48rz2Nl34cnmFtxTPZT35uKxxKMPT0utAZ1y+99NCO+h6tpsSU2z67r
- KO7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=wa7S8bLeyYCYyiVvgllMgoyoyQZdO1CI+FShBn7ymx8=;
- b=ihJhlRe+8DkajQn8hhFMP0ImkMaH9lJIQrewzKAyuo5o0+ROC8MdUQN3geeKrAc2wH
- UXu/1GO/YrvnFR4Pd3VPdHkG4NGXHiPxcGQLnSNMHr1UFGWtXW99Jy91Os9NkV7wPC18
- MtNCJzu8kXK9dXG06yic3U2l5+lhDyTdNVDCnpfmMnEwwOOimFyD04er4znkrpkFZN5R
- Y/9aFryJUcBibjzK75LUxJJgqbQuj8qL/zKkyr+fbAGXtv4ES5Rxe+r1QxV1+2rKAsuG
- KdS4dH6CQhK98O2ZcDNbv6cI9cXnGmQXEvQ04SltqN1PX2g0wlRvSla7wjMP92TOUmVN
- FQmw==
-X-Gm-Message-State: APjAAAWk3Y4Hf/wEd3Xra82k72LC8AhcfY6XtWWpqCmMpXIYeTgDdfS/
- a9VDc2buwOPaoJXlmnRAWMLv7CZHq523fjuAgrc=
-X-Google-Smtp-Source: APXvYqxJ3+x06gtkbZWdqkYdYXEhRuWL0JhYvNMbW65JlAmkIHOSRrhsy8bM7Pce70WMZlu7niVDqo1Jo6oDP/B73gs=
-X-Received: by 2002:a05:6830:1e76:: with SMTP id
- m22mr5845343otr.295.1581923851157; 
- Sun, 16 Feb 2020 23:17:31 -0800 (PST)
+ (envelope-from <xuyandong2@huawei.com>) id 1j3b2t-0000TZ-FR
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 02:42:24 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2715 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <xuyandong2@huawei.com>)
+ id 1j3b2q-0000Jq-FF; Mon, 17 Feb 2020 02:42:20 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 240E8450A0A70BD7C906;
+ Mon, 17 Feb 2020 15:42:15 +0800 (CST)
+Received: from localhost (10.175.124.177) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Mon, 17 Feb 2020
+ 15:42:08 +0800
+From: Xu Yandong <xuyandong2@huawei.com>
+To: <peter.maydell@linaro.org>
+Subject: [PATCH RFC 08/16] hw/arm/virt: split secure extension related codes
+ from create_gic
+Date: Mon, 17 Feb 2020 02:51:20 -0500
+Message-ID: <1581925888-103620-9-git-send-email-xuyandong2@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1581925888-103620-1-git-send-email-xuyandong2@huawei.com>
+References: <1581925888-103620-1-git-send-email-xuyandong2@huawei.com>
 MIME-Version: 1.0
-References: <20200216163216.10745-1-programmingkidx@gmail.com>
- <CABLmASF=9Qj0_Hh2SWO6K=Sou3mVeyLL+XXTn9WGc670KRn2AA@mail.gmail.com>
- <2AF97D91-F58C-455D-9E05-F5766A6A4C9B@gmail.com>
-In-Reply-To: <2AF97D91-F58C-455D-9E05-F5766A6A4C9B@gmail.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Mon, 17 Feb 2020 08:17:20 +0100
-Message-ID: <CABLmASEM0zpSeKr97xvU_F1jVZjgu1D9hOaB3ZgN+2WPRAduSg@mail.gmail.com>
-Subject: Re: [PATCH v3] Implement the Screamer sound chip for the mac99
- machine type
-To: Programmingkid <programmingkidx@gmail.com>
-Content-Type: multipart/alternative; boundary="00000000000035c5a8059ec05961"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.177]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,148 +65,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Gerd Hoffmann <kraxel@redhat.com>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Cc: zhang.zhanghailiang@huawei.com, slp@redhat.com,
+ Xu Yandong <xuyandong2@huawei.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ wu.wubin@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000035c5a8059ec05961
-Content-Type: text/plain; charset="UTF-8"
+EL3 extension is not always needed.
 
-Hi Howard, could you test out this patch for me on Fedora 31? It is to be
-> applied over the v3 patch.
->
-> Thank you.
->
-> ---
->  hw/audio/screamer.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/audio/screamer.c b/hw/audio/screamer.c
-> index ad4aba12eb..7de17fe8a6 100644
-> --- a/hw/audio/screamer.c
-> +++ b/hw/audio/screamer.c
-> @@ -14,7 +14,7 @@
->  #include "migration/vmstate.h"
->  #include "include/hw/audio/screamer.h"
->
-> -#define DEBUG_SCREAMER 0
-> +#define DEBUG_SCREAMER 1
->  #define DPRINTF(fmt, ...) \
->  do { if (DEBUG_SCREAMER) { printf(fmt , ## __VA_ARGS__); } } while (0)
->
-> @@ -836,11 +836,12 @@ static uint64_t screamer_mmio_read(void *opaque,
-> hwaddr addr, unsigned size)
->          return_value = get_frame_count_reg(state);
->          break;
->      default:
-> -        DPRINTF("Unknown register read - addr:%llu\tsize:%d\n", addr,
-> size);
-> +        DPRINTF("Unknown register read - addr:%" HWADDR_PRIx
-> "\tsize:%d\n",
-> +                addr, size);
->          return_value = 12021981; /* Value used for debugging purposes */
->      }
-> -    DPRINTF("screamer_mmio_read() called addr: %llu  size: %d", addr >> 4,
-> -            size);
-> +    DPRINTF("screamer_mmio_read() called addr: %" HWADDR_PRIx "  size:
-> %d",
-> +            addr >> 4, size);
->      DPRINTF("  returning 0x%x\n", return_value);
->      return return_value;
->  }
-> @@ -875,7 +876,8 @@ static void screamer_mmio_write(void *opaque, hwaddr
-> addr, uint64_t raw_value,
->          set_frame_count_reg(state, value);
->          break;
->      default:
-> -        DPRINTF("Unknown register write - addr:%llu\tvalue:%d\n", addr,
-> value);
-> +        DPRINTF("Unknown register write - addr:%" HWADDR_PRIx
-> "\tvalue:%d\n",
-> +                addr, value);
->      }
->  }
->
->
->
-Tested, compiles cleanly. Debug output seems OK.
+Signed-off-by: Xu Yandong <xuyandong2@huawei.com>
+---
+ hw/arm/virt.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-Best,
-Howard
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index afaf143888..087616190e 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -627,6 +627,14 @@ static void gic_set_msi_interrupt(VirtMachineState *vms)
+     }
+ }
+ 
++static void qdev_gic_set_secure_bit(VirtMachineState *vms)
++{
++    if (!kvm_irqchip_in_kernel()) {
++        qdev_prop_set_bit(vms->gic, "has-security-extensions",
++                          vms->secure);
++    }
++}
++
+ static void qdev_gic_set_virt_bit(VirtMachineState *vms)
+ {
+     if (vms->gic_version != 3 && !kvm_irqchip_in_kernel()) {
+@@ -681,9 +689,6 @@ static void create_gic(VirtMachineState *vms)
+      * interrupts; there are always 32 of the former (mandated by GIC spec).
+      */
+     qdev_prop_set_uint32(vms->gic, "num-irq", NUM_IRQS + 32);
+-    if (!kvm_irqchip_in_kernel()) {
+-        qdev_prop_set_bit(vms->gic, "has-security-extensions", vms->secure);
+-    }
+ 
+     if (type == 3) {
+         uint32_t redist0_capacity =
+@@ -704,6 +709,7 @@ static void create_gic(VirtMachineState *vms)
+                 MIN(smp_cpus - redist0_count, redist1_capacity));
+         }
+     }
++    qdev_gic_set_secure_bit(vms);
+     qdev_gic_set_virt_bit(vms);
+     qdev_init_nofail(vms->gic);
+     gicbusdev = SYS_BUS_DEVICE(vms->gic);
+-- 
+2.18.1
 
---00000000000035c5a8059ec05961
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left:1px solid rgb(204,204,204);padding-left:1ex">
-Hi Howard, could you test out this patch for me on Fedora 31? It is to be a=
-pplied over the v3 patch.<br>
-<br>
-Thank you.<br>
-<br>
----<br>
-=C2=A0hw/audio/screamer.c | 12 +++++++-----<br>
-=C2=A01 file changed, 7 insertions(+), 5 deletions(-)<br>
-<br>
-diff --git a/hw/audio/screamer.c b/hw/audio/screamer.c<br>
-index ad4aba12eb..7de17fe8a6 100644<br>
---- a/hw/audio/screamer.c<br>
-+++ b/hw/audio/screamer.c<br>
-@@ -14,7 +14,7 @@<br>
-=C2=A0#include &quot;migration/vmstate.h&quot;<br>
-=C2=A0#include &quot;include/hw/audio/screamer.h&quot;<br>
-<br>
--#define DEBUG_SCREAMER 0<br>
-+#define DEBUG_SCREAMER 1<br>
-=C2=A0#define DPRINTF(fmt, ...) \<br>
-=C2=A0do { if (DEBUG_SCREAMER) { printf(fmt , ## __VA_ARGS__); } } while (0=
-)<br>
-<br>
-@@ -836,11 +836,12 @@ static uint64_t screamer_mmio_read(void *opaque, hwad=
-dr addr, unsigned size)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return_value =3D get_frame_count_reg(stat=
-e);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 DPRINTF(&quot;Unknown register read - addr:%ll=
-u\tsize:%d\n&quot;, addr, size);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 DPRINTF(&quot;Unknown register read - addr:%&q=
-uot; HWADDR_PRIx &quot;\tsize:%d\n&quot;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 addr, size);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return_value =3D 12021981; /* Value used =
-for debugging purposes */<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
--=C2=A0 =C2=A0 DPRINTF(&quot;screamer_mmio_read() called addr: %llu=C2=A0 s=
-ize: %d&quot;, addr &gt;&gt; 4,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 size);<br>
-+=C2=A0 =C2=A0 DPRINTF(&quot;screamer_mmio_read() called addr: %&quot; HWAD=
-DR_PRIx &quot;=C2=A0 size: %d&quot;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 addr &gt;&gt; 4, size);<br>
-=C2=A0 =C2=A0 =C2=A0DPRINTF(&quot;=C2=A0 returning 0x%x\n&quot;, return_val=
-ue);<br>
-=C2=A0 =C2=A0 =C2=A0return return_value;<br>
-=C2=A0}<br>
-@@ -875,7 +876,8 @@ static void screamer_mmio_write(void *opaque, hwaddr ad=
-dr, uint64_t raw_value,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0set_frame_count_reg(state, value);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
-=C2=A0 =C2=A0 =C2=A0default:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 DPRINTF(&quot;Unknown register write - addr:%l=
-lu\tvalue:%d\n&quot;, addr, value);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 DPRINTF(&quot;Unknown register write - addr:%&=
-quot; HWADDR_PRIx &quot;\tvalue:%d\n&quot;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 addr, value);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0}<br>
-<br><br></blockquote><div><br></div><div>Tested, compiles cleanly. Debug ou=
-tput seems OK. <br></div><div><br></div><div>Best,</div><div>Howard<br></di=
-v></div></div>
-
---00000000000035c5a8059ec05961--
 
