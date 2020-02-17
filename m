@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03093C34021
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 15:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DA3C34022
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 15:04:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D04A620801
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 15:04:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D04A620801
+	by mail.kernel.org (Postfix) with ESMTPS id 474BD214D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 15:04:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 474BD214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3hwR-0005wP-SE
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 10:04:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38914)
+	id 1j3hwT-00062M-EV
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 10:04:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38954)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j3hvL-000442-Md
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 10:03:04 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j3hvM-000447-I1
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 10:03:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j3hvK-0007Nh-9n
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 10:03:03 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47420)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j3hvK-0007Np-BB
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 10:03:04 -0500
+Received: from relay.sw.ru ([185.231.240.75]:47456)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j3hvK-0007LF-0J; Mon, 17 Feb 2020 10:03:02 -0500
+ id 1j3hvK-0007LT-0x; Mon, 17 Feb 2020 10:03:02 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1j3hvH-0007Zt-Nt; Mon, 17 Feb 2020 18:02:59 +0300
+ id 1j3hvI-0007Zt-0Z; Mon, 17 Feb 2020 18:03:00 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 20/22] qemu-iotests/199: check persistent bitmaps
-Date: Mon, 17 Feb 2020 18:02:44 +0300
-Message-Id: <20200217150246.29180-21-vsementsov@virtuozzo.com>
+Subject: [PATCH v2 21/22] qemu-iotests/199: add early shutdown case to bitmaps
+ postcopy
+Date: Mon, 17 Feb 2020 18:02:45 +0300
+Message-Id: <20200217150246.29180-22-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200217150246.29180-1-vsementsov@virtuozzo.com>
 References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
@@ -66,48 +67,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Check that persistent bitmaps are not stored on source and that bitmaps
-are persistent on destination.
+Previous patches fixed two crashes which may occur on shutdown prior to
+bitmaps postcopy finished. Check that it works now.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/199 | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/199     | 18 ++++++++++++++++++
+ tests/qemu-iotests/199.out |  4 ++--
+ 2 files changed, 20 insertions(+), 2 deletions(-)
 
 diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
-index 969620b103..8baa078151 100755
+index 8baa078151..0d12e6b1ae 100755
 --- a/tests/qemu-iotests/199
 +++ b/tests/qemu-iotests/199
-@@ -117,7 +117,8 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
-         for i in range(nb_bitmaps):
-             result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
-                                    name='bitmap{}'.format(i),
--                                   granularity=granularity)
-+                                   granularity=granularity,
-+                                   persistent=True)
-             self.assert_qmp(result, 'return', {})
+@@ -217,6 +217,24 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+             sha = self.discards1_sha256 if i % 2 else self.all_discards_sha256
+             self.assert_qmp(result, 'return/sha256', sha)
  
-         result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
-@@ -193,6 +194,19 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
-             print('downtime:', downtime)
-             print('postcopy_time:', postcopy_time)
- 
-+        # check that there are no bitmaps stored on source
-+        self.vm_a_events += self.vm_a.get_qmp_events()
-+        self.vm_a.shutdown()
-+        self.vm_a.launch()
-+        check_bitmaps(self.vm_a, 0)
++    def test_early_shutdown_destination(self):
++        self.start_postcopy()
 +
-+        # check that bitmaps are migrated and persistence works
-+        check_bitmaps(self.vm_b, nb_bitmaps)
++        self.vm_b_events += self.vm_b.get_qmp_events()
 +        self.vm_b.shutdown()
 +        # recreate vm_b, so there is no incoming option, which prevents
 +        # loading bitmaps from disk
 +        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk_b)
 +        self.vm_b.launch()
-         check_bitmaps(self.vm_b, nb_bitmaps)
++        check_bitmaps(self.vm_b, 0)
++
++        result = self.vm_a.qmp('query-status')
++        assert not result['return']['running']
++        self.vm_a_events += self.vm_a.get_qmp_events()
++        self.vm_a.shutdown()
++        self.vm_a.launch()
++        check_bitmaps(self.vm_a, 0)
++
  
-         # Check content of migrated bitmaps. Still, don't waste time checking
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/199.out
+index ae1213e6f8..fbc63e62f8 100644
+--- a/tests/qemu-iotests/199.out
++++ b/tests/qemu-iotests/199.out
+@@ -1,5 +1,5 @@
+-.
++..
+ ----------------------------------------------------------------------
+-Ran 1 tests
++Ran 2 tests
+ 
+ OK
 -- 
 2.21.0
 
