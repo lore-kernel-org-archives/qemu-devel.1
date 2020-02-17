@@ -2,88 +2,82 @@ Return-Path: <SRS0=CnYV=4F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C84EC35254
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 10:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E94C35254
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 10:37:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06EB520725
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 10:35:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3057208C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 10:37:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VXnJ8G08"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06EB520725
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ILuadbf2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3057208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3dkR-000888-80
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 05:35:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60797)
+	id 1j3dma-0000qp-Uf
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 05:37:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3djj-0007aK-2i
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:34:48 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j3dm1-0000Kb-6J
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:37:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3djh-0001EJ-Tf
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:34:47 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35145)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j3djh-0001Cr-Nt; Mon, 17 Feb 2020 05:34:45 -0500
-Received: by mail-wr1-x443.google.com with SMTP id w12so19043402wrt.2;
- Mon, 17 Feb 2020 02:34:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=CDbZ1qZqIrZZED5v+v2YWLCFpUZ7Y0spa/mGSHQL/yg=;
- b=VXnJ8G08dOg4JCTe4e5F9Vx6/czLA9rQiof6hNGEC3XJ3g7kUup5m27TmnoS00UDhz
- 7O41foLU4IaV1ECYpggZ9WzdBP19Y0HcJXE/lM3VWnnf6ZEU86L/2U3piaUyFVWuMyLB
- NthsYnf7zczHWi8djBho0IUYLHR5NP74caIVREOCwHREJ7zvAxLIXc5Kztg7DgAxDrOD
- ZoAndw8i9TNB7Xj4YSr3++wndlVT84XI1YeebEGRbH8pBtG7b2IfZl5pVcvtCVCq5KzQ
- u4Th+eNgZVqVyEzGdbR+iEnu8b8saUyhthCq8BTT30CjXqNOaRxMDGBcrPnFfpQxn+vI
- EuOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=CDbZ1qZqIrZZED5v+v2YWLCFpUZ7Y0spa/mGSHQL/yg=;
- b=jetAyS44pFeP89rrBf9T3b2AFHDhUJjsh9R3Rn/hBzFxeKKcJ5m+dcBLqlQU3jFeVZ
- ZuNkFE04w+X8EvdF7vFoo2aUFiiex5BZ4Nrvqs1VBT3bdvOZkn3TuVQJ2hLZsIc8N9Dy
- J5up6p33iT0tfSTIz+v7j5s9GRJ72H1ehovQs1f6DelLmbCApbQ3oRqyM3a8BCkttpHC
- htEr0zY7fxsDgZxzr7+Tt210aIMKpKJOAyAb1dEcQ3bVv3aZMZwvE+TjIZKbBZqmCPBc
- +uqqU+9twIrx85TmGpwJB+z7W3ixbkNZNs/Tn7rf7auuY5CgqY8+geXPXFrKm9wCF4Gi
- 8Cpg==
-X-Gm-Message-State: APjAAAWmu97tDr1/RAisGNr8eXSJ5R8Ne7a+xw/KM8+6Tb1gsoz7lZBd
- ZRCrb6dCm8gJOtm7VfL7/vyy+UUfuBU=
-X-Google-Smtp-Source: APXvYqxCb8LhtQv7+VoSJMgH6bh4lhrDtieRmb5cmD6NKoBVpIcKIxdkhQg36KTqq4JkGSx6iBbu8Q==
-X-Received: by 2002:adf:ec4c:: with SMTP id w12mr22493091wrn.124.1581935684521; 
- Mon, 17 Feb 2020 02:34:44 -0800 (PST)
-Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id y17sm302238wrs.82.2020.02.17.02.34.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Feb 2020 02:34:43 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] tests/boot_linux_console: Boot Trusted Firmware-A on the
- Raspberry Pi 3
-Date: Mon, 17 Feb 2020 11:34:42 +0100
-Message-Id: <20200217103442.30318-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.1
+ (envelope-from <kwolf@redhat.com>) id 1j3dlz-0002ya-Hv
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:37:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54227
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j3dlz-0002y1-D8
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 05:37:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1581935826;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fTpwurfX3B0AkdGbSPW+BgEtlQFKH8Z2KZ77PQxPZQ8=;
+ b=ILuadbf2LFPgKwSeQjC+fFvEGz79Dr0+BtDm44FKKRqUEpMrjCC2NhMkUQhiVICcThCgb/
+ urevHu2lCgZO20xqxlBMn6mbgD+Z86vAQhHx+qOWTQbK8PTqkuMdfeS8oAPyOweefCl5SZ
+ q6k6go/htPJpSVoLfiCYSA/nFtRALfk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-Zt-6v5iTOaeYxgTdWHpZUg-1; Mon, 17 Feb 2020 05:37:04 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FCB0101FC61;
+ Mon, 17 Feb 2020 10:37:03 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-208.ams2.redhat.com [10.36.117.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B30DF6C1;
+ Mon, 17 Feb 2020 10:37:01 +0000 (UTC)
+Date: Mon, 17 Feb 2020 11:37:00 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: QAPI schema for desired state of LUKS keyslots (was: [PATCH
+ 02/13] qcrypto-luks: implement encryption key management)
+Message-ID: <20200217103700.GC6309@linux.fritz.box>
+References: <20200114193350.10830-1-mlevitsk@redhat.com>
+ <20200114193350.10830-3-mlevitsk@redhat.com>
+ <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+In-Reply-To: <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: Zt-6v5iTOaeYxgTdWHpZUg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,90 +89,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
- pete@akeo.ie, Luc Michel <luc.michel@greensocs.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test runs Trusted Firmware-A on the Raspberry Pi 3.
-We deliberately stop the boot process when the EDK2 UEFI version
-is displayed.
+Am 15.02.2020 um 15:51 hat Markus Armbruster geschrieben:
+> Review of this patch led to a lengthy QAPI schema design discussion.
+> Let me try to condense it into a concrete proposal.
+>=20
+> This is about the QAPI schema, and therefore about QMP.  The
+> human-friendly interface is out of scope.  Not because it's not
+> important (it clearly is!), only because we need to *focus* to have a
+> chance at success.
+>=20
+> I'm going to include a few design options.  I'll mark them "Option:".
+>=20
+> The proposed "amend" interface takes a specification of desired state,
+> and figures out how to get from here to there by itself.  LUKS keyslots
+> are one part of desired state.
+>=20
+> We commonly have eight LUKS keyslots.  Each keyslot is either active or
+> inactive.  An active keyslot holds a secret.
+>=20
+> Goal: a QAPI type for specifying desired state of LUKS keyslots.
+>=20
+> Proposal:
+>=20
+>     { 'enum': 'LUKSKeyslotState',
+>       'data': [ 'active', 'inactive' ] }
+>=20
+>     { 'struct': 'LUKSKeyslotActive',
+>       'data': { 'secret': 'str',
+>                 '*iter-time': 'int } }
+>=20
+>     { 'struct': 'LUKSKeyslotInactive',
+>       'data': { '*old-secret': 'str' } }
+>=20
+>     { 'union': 'LUKSKeyslotAmend',
+>       'base': { '*keyslot': 'int',
+>                 'state': 'LUKSKeyslotState' }
+>       'discriminator': 'state',
+>       'data': { 'active': 'LUKSKeyslotActive',
+>                 'inactive': 'LUKSKeyslotInactive' } }
+>=20
+> LUKSKeyslotAmend specifies desired state for a set of keyslots.
 
-The binary is build on AppVeyor CI using Pete Batard repository [1].
-ATF v2.1 binary are used (see [2]). Extra documentation in [3].
+Though not arbitrary sets of keyslots, it's only a single keyslot or
+multiple keyslots containing the same secret. Might be good enough in
+practice, though it means that you may have to issue multiple amend
+commands to get to the final state that you really want (even if doing
+everything at once would be safe).
 
-It is very simple and fast:
+> Four cases:
+>=20
+> * @state is "active"
+>=20
+>   Desired state is active holding the secret given by @secret.  Optional
+>   @iter-time tweaks key stretching.
+>=20
+>   The keyslot is chosen either by the user or by the system, as follows:
+>=20
+>   - @keyslot absent
+>=20
+>     One inactive keyslot chosen by the system.  If none exists, error.
+>=20
+>   - @keyslot present
+>=20
+>     The keyslot given by @keyslot.
+>=20
+>     If it's already active holding @secret, no-op.  Rationale: the
+>     current state is the desired state.
+>=20
+>     If it's already active holding another secret, error.  Rationale:
+>     update in place is unsafe.
+>=20
+>     Option: delete the "already active holding @secret" case.  Feels
+>     inelegant to me.  Okay if it makes things substantially simpler.
+>=20
+> * @state is "inactive"
+>=20
+>   Desired state is inactive.
+>=20
+>   Error if the current state has active keyslots, but the desired state
+>   has none.
+>=20
+>   The user choses the keyslot by number and/or by the secret it holds,
+>   as follows:
+>=20
+>   - @keyslot absent, @old-secret present
+>=20
+>     All active keyslots holding @old-secret.  If none exists, error.
+>=20
+>   - @keyslot present, @old-secret absent
+>=20
+>     The keyslot given by @keyslot.
+>=20
+>     If it's already inactive, no-op.  Rationale: the current state is
+>     the desired state.
+>=20
+>   - both @keyslot and @old-secret present
+>=20
+>     The keyslot given by keyslot.
+>=20
+>     If it's inactive or holds a secret other than @old-secret, error.
+>=20
+>     Option: error regardless of @old-secret, if that makes things
+>     simpler.
+>=20
+>   - neither @keyslot not @old-secret present
+>=20
+>     All keyslots.  Note that this will error out due to "desired state
+>     has no active keyslots" unless the current state has none, either.
+>=20
+>     Option: error out unconditionally.
+>=20
+> Note that LUKSKeyslotAmend can specify only one desired state for
+> commonly just one keyslot.  Rationale: this satisfies practical needs.
+> An array of LUKSKeyslotAmend could specify desired state for all
+> keyslots.  However, multiple array elements could then apply to the same
+> slot.  We'd have to specify how to resolve such conflicts, and we'd have
+> to code up conflict detection.  Not worth it.
+>=20
+> Examples:
+>=20
+> * Add a secret to some free keyslot:
+>=20
+>   { "state": "active", "secret": "CIA/GRU/MI6" }
+>=20
+> * Deactivate all keyslots holding a secret:
+>=20
+>   { "state": "inactive", "old-secret": "CIA/GRU/MI6" }
+>=20
+> * Add a secret to a specific keyslot:
+>=20
+>   { "state": "active", "secret": "CIA/GRU/MI6", "keyslot": 0 }
+>=20
+> * Deactivate a specific keyslot:
+>=20
+>   { "state": "inactive", "keyslot": 0 }
+>=20
+>   Possibly less dangerous:
+>=20
+>   { "state": "inactive", "keyslot": 0, "old-secret": "CIA/GRU/MI6" }
+>=20
+> Option: Make use of Max's patches to support optional union tag with
+> default value to let us default @state to "active".  I doubt this makes
+> much of a difference in QMP.  A human-friendly interface should probably
+> be higher level anyway (Daniel pointed to cryptsetup).
+>=20
+> Option: LUKSKeyslotInactive member @old-secret could also be named
+> @secret.  I don't care.
+>=20
+> Option: delete @keyslot.  It provides low-level slot access.
+> Complicates the interface.  Fine if we need lov-level slot access.  Do
+> we?
+>=20
+> I apologize for the time it has taken me to write this.
+>=20
+> Comments?
 
-  $ avocado --show=app,console run -t atf tests/acceptance
-  JOB ID     : 1e748d7c9e9011cf0af3250ddc8ebf2389d6204e
-  JOB LOG    : avocado/job-results/job-2020-02-16T18.08-1e748d7/job.log
-   (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_aarch64_raspi3_atf:
-  console: NOTICE:  Booting Trusted Firmware
-  console: NOTICE:  BL1: v2.1(release):v2.1
-  console: NOTICE:  BL1: Built : 15:26:06, May 13 2019
-  console: NOTICE:  rpi3: Detected: Raspberry Pi 3 Model B (1GB, Sony, UK) [0x00a02082]
-  console: NOTICE:  BL1: Booting BL2
-  console: ERROR:   rpi3_sdhost: timeout status 0x40
-  console: NOTICE:  BL2: v2.1(release):v2.1
-  console: NOTICE:  BL2: Built : 15:26:01, May 13 2019
-  console: NOTICE:  BL1: Booting BL31
-  console: NOTICE:  BL31: v2.1(release):v2.1
-  console: NOTICE:  BL31: Built : 15:26:04, May 13 2019
-  console: =UEFI firmware (version UEFI Firmware v1.15 built at 11:58:44 on Feb 14 2020)
-  PASS (1.54 s)
-  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
-  JOB TIME   : 1.88 s
+Works for me (without taking any of the options).
 
-[1] https://github.com/pbatard/RPi3#summary
-[2] https://github.com/ARM-software/arm-trusted-firmware/blob/v2.1/docs/plat/rpi3.rst
-[3] http://www.skylyrac.net/2018-02-01-port-arm-tf-to-rpi3.html
+The unclear part is what the human-friendly interface should look like
+and where it should live. I'm afraid doing only the QMP part and calling
+the feature completed like we do so often won't work in this case.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v2: Start with a single core powered-on
----
- tests/acceptance/boot_linux_console.py | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 34d37eba3b..d1288fb59c 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -507,6 +507,30 @@ def test_arm_cubieboard_sata(self):
-         exec_command_and_wait_for_pattern(self, 'reboot',
-                                                 'reboot: Restarting system')
- 
-+    def test_aarch64_raspi3_atf(self):
-+        """
-+        :avocado: tags=arch:aarch64
-+        :avocado: tags=machine:raspi3
-+        :avocado: tags=cpu:cortex-a53
-+        :avocado: tags=device:pl011
-+        :avocado: tags=atf
-+        """
-+        zip_url = ('https://github.com/pbatard/RPi3/releases/download/'
-+                   'v1.15/RPi3_UEFI_Firmware_v1.15.zip')
-+        zip_hash = '74b3bd0de92683cadb14e008a7575e1d0c3cafb9'
-+        zip_path = self.fetch_asset(zip_url, asset_hash=zip_hash)
-+
-+        archive.extract(zip_path, self.workdir)
-+        efi_fd = os.path.join(self.workdir, 'RPI_EFI.fd')
-+
-+        self.vm.set_console(console_index=1)
-+        self.vm.add_args('-nodefaults',
-+                         # VideoCore starts CPU with only 1 core enabled
-+                         '-global', 'bcm2836.enabled-cpus=1',
-+                         '-device', 'loader,file=%s,force-raw=true' % efi_fd)
-+        self.vm.launch()
-+        self.wait_for_console_pattern('version UEFI Firmware v1.15')
-+
-     def test_s390x_s390_ccw_virtio(self):
-         """
-         :avocado: tags=arch:s390x
--- 
-2.21.1
+Kevin
 
 
