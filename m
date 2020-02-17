@@ -7,71 +7,73 @@ X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC221C3B1BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 01:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33874C3B1BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 01:48:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86C6120857
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 01:33:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E997920718
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Feb 2020 01:48:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="yWFADlFZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86C6120857
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="xLdoJGWc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E997920718
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3VIH-0001QP-Oa
-	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 20:33:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37419)
+	id 1j3VWW-00047U-44
+	for qemu-devel@archiver.kernel.org; Sun, 16 Feb 2020 20:48:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39595)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1j3VCD-0001F7-9z
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 20:27:38 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1j3VVx-0003fu-6Q
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 20:48:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1j3VCB-0005Mu-7n
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 20:27:36 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34718)
+ (envelope-from <aik@ozlabs.ru>) id 1j3VVu-0004qQ-Mt
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 20:48:00 -0500
+Received: from mail-pj1-x102b.google.com ([2607:f8b0:4864:20::102b]:36569)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j3VCA-0005LL-PT
- for qemu-devel@nongnu.org; Sun, 16 Feb 2020 20:27:35 -0500
-Received: by mail-pl1-x642.google.com with SMTP id j7so6057760plt.1
- for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 17:27:34 -0800 (PST)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j3VVu-0004pJ-FY
+ for qemu-devel@nongnu.org; Sun, 16 Feb 2020 20:47:58 -0500
+Received: by mail-pj1-x102b.google.com with SMTP id gv17so6481195pjb.1
+ for <qemu-devel@nongnu.org>; Sun, 16 Feb 2020 17:47:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=to:cc:from:subject:autocrypt:message-id:date:user-agent
- :mime-version:content-language:content-transfer-encoding;
- bh=XwZs4H0OMDgPN4nYXYa5XoLv12+SZEbKwMPCzftewLs=;
- b=yWFADlFZ+AsZrqzTEiWEoYt/k5+vZdYRsGcwUTQHMZhf0vrs+Xl+WsPapJaRAcn4N1
- 4gCh3iMPFBZZLgryk4gvEhlthpyY4/0KJ60+kfZDNwQXMheyP8FzBLHagrC7xR71/Wj2
- dfdBEej2ezOtX/dPqPLR6zRKpB77YJ+vzzLVysab8EhaK5pFGwaLbFhd1Dy3MYIEl9Nw
- ID+8cN3cNed66S3GaSvb+oZvpMnf30jshiTKX6oOUGp7KyRR8gHAPq8zMFtUTqmpm7hF
- JZeougpA4XJKZh80odxnikTiikydfJSLJAtq41wZFHx293VYEifbzEouoRNQnrbs40gH
- 60Zw==
+ h=subject:from:to:cc:references:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=OLPUfgTMJB3nZDfhlcAAt3WBCr2LyMPHJccz21Sb3NU=;
+ b=xLdoJGWcMMNuf+key0gtQPvchvpEoPsQTbxWpzngbHqvJQ9tr9+qEdN0aXcQPSEYyJ
+ go9SMh870C/DUj+mPu8RVL5tqE0o2CYrCTw41LYVP64slSypoR8yBSrgsR3wUkVxhKS/
+ r++1UDuJaqGQsDlBYXtDaARbqdIum0+MnlVcPdsJjxoSDmI14fjMZgYeTN/8qmHWEaKs
+ oTC8zpW1t/NgxcwlRS+gLUYEV8DBrRKg5zI/L0jBXNrzap+RFU2TuAnp0Hr7wK9CZR91
+ Qa6b1i3FHtd0xcF8kONDqb4uBP15Dp8ar8tljT7mMD4URxqUHuAGWJ2W4HBmQBZc1QuM
+ goaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:from:subject:autocrypt:message-id:date
- :user-agent:mime-version:content-language:content-transfer-encoding;
- bh=XwZs4H0OMDgPN4nYXYa5XoLv12+SZEbKwMPCzftewLs=;
- b=aI22eKZCXmvK1RLn1fT/1pol534CKVIJw52Ua41R6MAyoRX9goX1jFi6RwDVBlj6Eb
- 1fqPBdmxDDfVJUJockdQVfcg8y3xnX7J/lEyF7Cd7giwoRDBcEBPcm+TlIsL5KhVAp0D
- vN5WlsuacQW5JJLUAhrsj3vjsbZh/nxudRBixjRWNCcWphpMzpdpIshtaxHmMILHReYL
- Lm7CaI0Tb6bWDWmtG2jIryDypZL3J3GpZ++dRI8hZf/IykHsDepLU04jwgQIYQ9QtwuU
- vkm28nB4lUDXdAcKqbbtu+yzQPnxwP6XEL+5xrCJtPErELDGIwoYOqHpghUT+YoJT9wm
- mC4g==
-X-Gm-Message-State: APjAAAUB9S1nZIX0HcQMy/gpmIuy2r1ZKV4Yvyyf0sfy14h4Q1wujG4U
- XME3HX4z5x7zSzgB6+Ru4etMVQ==
-X-Google-Smtp-Source: APXvYqxoJimNaOyJ77c0H9WAg+qsE1zZFkTVqMiowzd9dYhdjz2KWHDxOpeRJdnwZzZ2QbdbFPb4+w==
-X-Received: by 2002:a17:90a:da01:: with SMTP id
- e1mr17518416pjv.100.1581902853181; 
- Sun, 16 Feb 2020 17:27:33 -0800 (PST)
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=OLPUfgTMJB3nZDfhlcAAt3WBCr2LyMPHJccz21Sb3NU=;
+ b=CxH3CfW7OTk6+g0Fb69roO8QySfLaP2/wO6Nz8sfrPvlaD22FFuBVbImOTGj1Pe1Yf
+ CHWf5Hl4ynl2ZuWdbdDBnC29fAdLbIINLJkVmoAQa0V5vpgLO2Qn382RtEXhrBZXqZuQ
+ OKZ4dRdASYGMmI6ub6N1MS9Eo/FxnjA7SoJSWXx9vMTVa2VhR3v4a4kTFFof/YwS2pz/
+ fpECNh4Ir/oIpjr3+uW1wVUILO5y73aZ7gp1FQxF3mYTpWeO08CbeTr2sXlxm0UU0bD4
+ m0MAC3rv8ig7ygf9FKCjp1ftco0J/Q4npG5G5puZJ0JG49MQeFka8lmFKDnxcGtRbKTb
+ Qbkw==
+X-Gm-Message-State: APjAAAVtQNnholX0JGeAzy5PQ/I4PHUA4QrsiZV/0tuddSmQtB/nmDv7
+ /U/XUjQxlaFJGv5Oh1x1Ir+u8A==
+X-Google-Smtp-Source: APXvYqw5yjoG5yGIiVCZuUJWZYVfMdc8nRmn9FbDaIeFyzLSlnfFaZLH7RyNbDbmVeg9XIx+qVrgzA==
+X-Received: by 2002:a17:90a:2545:: with SMTP id
+ j63mr17720485pje.128.1581904077175; 
+ Sun, 16 Feb 2020 17:47:57 -0800 (PST)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id s23sm13967426pjq.17.2020.02.16.17.27.31
+ by smtp.gmail.com with ESMTPSA id d69sm15093854pfd.72.2020.02.16.17.47.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 16 Feb 2020 17:27:32 -0800 (PST)
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+ Sun, 16 Feb 2020 17:47:56 -0800 (PST)
+Subject: Re: BIOS updates
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: BIOS updates
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <8cfc7c64-4d65-a84b-e1ec-9bc766429425@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
  EePO1JqpVuIow/wGud9xaPA5uvuVgRS1q7RU8otD+7VLDFzPRiRE4Jfr2CW89Ox6BF+q5ZPV
@@ -145,17 +147,18 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <8cfc7c64-4d65-a84b-e1ec-9bc766429425@ozlabs.ru>
-Date: Mon, 17 Feb 2020 12:27:30 +1100
+Message-ID: <e6f68d95-16b9-ccaf-681f-18ac1ad1ca32@ozlabs.ru>
+Date: Mon, 17 Feb 2020 12:47:54 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
+In-Reply-To: <8cfc7c64-4d65-a84b-e1ec-9bc766429425@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-Received-From: 2607:f8b0:4864:20::102b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -172,29 +175,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi!
-
-We have a SLOF repo mirrored at git.qemu.org. Once I push an update to
-my github repo, it gets mirrored soon, it works fine.
-
-Now to the problems :)
-
-1. by accident I pushed a branch with a lot of debug stuff on top. When
-I noticed, I force-pushed the correct one but it was too late - the
-incorrect branch got mirrored. Is there a way to fix this on
-https://git.qemu.org/git/SLOF.git? This is the correct one:
-
-42228d763f1f (tag: qemu-slof-20200217, github/master) version: update to
-20200217
-
-https://github.com/aik/SLOF/commits/qemu-slof-20200217
 
 
-2. it appears that the mirroring scripts pulls all branches from my
-github repo, can we please configure that mirroring script only to pull
-"master"?
+On 17/02/2020 12:27, Alexey Kardashevskiy wrote:
+> Hi!
+> 
+> We have a SLOF repo mirrored at git.qemu.org. Once I push an update to
+> my github repo, it gets mirrored soon, it works fine.
+> 
+> Now to the problems :)
+> 
+> 1. by accident I pushed a branch with a lot of debug stuff on top. When
+> I noticed, I force-pushed the correct one but it was too late - the
+> incorrect branch got mirrored. Is there a way to fix this on
+> https://git.qemu.org/git/SLOF.git? This is the correct one:
+> 
+> 42228d763f1f (tag: qemu-slof-20200217, github/master) version: update to
+> 20200217
+> 
+> https://github.com/aik/SLOF/commits/qemu-slof-20200217
 
-Thanks,
+Huh, this one got resolved, was it a script or a person? :)
+
+
+> 
+> 2. it appears that the mirroring scripts pulls all branches from my
+> github repo, can we please configure that mirroring script only to pull
+> "master"?
+
+I removed extra branches from my git repo and this got mirrored to
+git.qemu.org so things are clean now but the question remains whether we
+want anything but "master" mirrored.
+
 
 
 -- 
