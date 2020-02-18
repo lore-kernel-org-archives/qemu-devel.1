@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B42DC34022
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 00:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 959AAC34022
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 00:33:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E23B82072C
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 00:31:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EF212072C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 00:33:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="o999OowY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E23B82072C
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="HhIhkClE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EF212072C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3qng-0005Py-6A
-	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 19:31:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39346)
+	id 1j3qpY-0006vy-Km
+	for qemu-devel@archiver.kernel.org; Mon, 17 Feb 2020 19:33:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39531)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1j3qmt-0004qc-9Z
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 19:30:56 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1j3qoq-00064K-BV
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 19:32:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1j3qmr-0000Qw-Jc
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 19:30:54 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:36293)
+ (envelope-from <aik@ozlabs.ru>) id 1j3qop-0001YO-CN
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 19:32:56 -0500
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:54763)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j3qmr-0000QG-1l
- for qemu-devel@nongnu.org; Mon, 17 Feb 2020 19:30:53 -0500
-Received: by mail-pl1-x641.google.com with SMTP id a6so7366546plm.3
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 16:30:52 -0800 (PST)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j3qop-0001Xz-6r
+ for qemu-devel@nongnu.org; Mon, 17 Feb 2020 19:32:55 -0500
+Received: by mail-pj1-x1041.google.com with SMTP id dw13so225311pjb.4
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 16:32:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
  h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=uhajNc3KlzN/g6+/1nK1yrAWRmFizW+SgyHvUntg3KU=;
- b=o999OowYecSiUpglY6VAAF/uE02O8Sr4TYZt2y2LJEC8d3sAbB57lRaVON4lKZhM4F
- U2NIHorXmsyYZxa4mjdUxhdrbs4IW/3I8j/PDSUnjpVRR0XFVlDfnbwqDnbJsW/QRq/r
- Fgcxz6LesPWQ66hDE7LUhuw+73DVHnnEDISpwSilewWNNUCNoTofTmc2ASm/rdlx+dxm
- 1bOMp60QYilzdRTvHG1WSrNB2WlAe9j9vmJ72m0cd9TJJmD1mxeYwCP69q5Xk+Qxb9Tf
- VQHE+cVuYqtxDcPoFc8SjKqw+1V9PnMdigTSQWQ+HkxkbGI8L+lfTGRtClW8Up/UMLkZ
- OMkA==
+ bh=wI45Tn4v5FixF5DYN/X6hrDcetVxRXHBkZpgVhgG0N0=;
+ b=HhIhkClEb4GC7we1B9L++75OOpGR2JZZnlcoiqYcXF5XRGCuZv/6XB1XqbtuQlhD2g
+ LiaLcNIZbGpgZFaHonq5GaoQNsG3OLQX7Il/+5P9diSy7H/gCmzGY24ilHHWOKysc3mB
+ LwQEv2wptQwIZxjjpErfnXSbUp2SczbyxRSY1uqLYdVwQize+erHn71Hk3HTm+xWiE/p
+ uwQkkb85U698CklGHy4esSGYUfewNeHhP/uG42p4SoXaRF7Ixsm18gx9fymVCTlQQwSv
+ RQ5+lA0An1twb/oerA1pcVV45zq6Lglpv+oyL/kq+f5xFKnMFM0u2AsuOdxIN+GI3/uN
+ lvmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=uhajNc3KlzN/g6+/1nK1yrAWRmFizW+SgyHvUntg3KU=;
- b=m/W+7suRmVB6D3v3Cn5EpKT29mxJTs8or8ZrDO7HHYfkYIl0lsorrJpyMCtlapaezh
- X4ztgvsDWhMVNFqiKnYeuwCOyAJNdnk7KtvoLzfEdSrYd0Cw0hkUAyYGn9symMVI0EhE
- 8K29bZHgNie6oZYueFuoEOuMyknydODRgR8wSPB2KjhOPnHXBmkYu2x4bfAUy6AGxAba
- UacT+poFMWmUBp6gWDg2AODkneF04VJrFWXJsmk/a7UdTrAYxchDF5ADkzs/ApGKY44d
- QU3nWrRcNZhPv6mGD3LipSRPsVUBJu6I35R3PlsqIkex2azUDNHI/0lr4w36SJPgYrho
- NeAw==
-X-Gm-Message-State: APjAAAXw6rPViEl2MnQpIltcR2AacQfLLW4s5X36rmyCh27Hh4aowP+2
- RzqjB6kjgT0lTCvBziHq8rDbU2dAZ3w=
-X-Google-Smtp-Source: APXvYqxUK4gOr6HlLZrkvYP+Y3JLJNzqbWT6MunPpWyzcv+0qsjbDXVEwmzejQeNIth4fLyddkT0Bg==
-X-Received: by 2002:a17:90a:71c1:: with SMTP id
- m1mr1882173pjs.34.1581985851549; 
- Mon, 17 Feb 2020 16:30:51 -0800 (PST)
+ bh=wI45Tn4v5FixF5DYN/X6hrDcetVxRXHBkZpgVhgG0N0=;
+ b=bNpPlP0hsdzK9TxXzYL2DsBAfx3A7vpTVKg2sSqNZQzAmykIF7G6+uDVEfr79LxMqe
+ 4ofp4cyQHj6dNAUdCWFrMfb1k3oTqqbIKpDFMB0ClnsyDPRBjaQxk0ufxumFEn7LXkXe
+ QOSBXChDIm4HXtyMw5diul9Gkh5Yhj4NVMWmb5GJIiXXIMImUD5Vd6fRX593gJ3nfGd1
+ DhT8/ALQSNTy/tUqU4oZukTglVnUReJZesxOT8tn6NkNZbdWNyliw6SwHw2D7eot39Ct
+ /TUVMcI5pl5DpoRxNPgHOFg+kr4ZqKBv0zWhFg+RIzCfkGtEUcVzYLAvAIyJoFKnvihl
+ JcIg==
+X-Gm-Message-State: APjAAAUha7fV1zuZNCjmXIZD6XhTxdiArs/+9Fe+8HyzDkh0duioAq62
+ ikhgakDzfal6Km9udbkY7OAN5RzU3hc=
+X-Google-Smtp-Source: APXvYqxLQ1v7+apFdzSe0hZbgQSwuJ8bziyw4VzswaWg1uO9635YZYonUQxAMLHtoE+wBpxS8pi3ng==
+X-Received: by 2002:a17:902:8d83:: with SMTP id
+ v3mr18696194plo.282.1581985974158; 
+ Mon, 17 Feb 2020 16:32:54 -0800 (PST)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id l29sm1971176pgb.86.2020.02.17.16.30.48
+ by smtp.gmail.com with ESMTPSA id i2sm560284pjs.21.2020.02.17.16.32.52
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Feb 2020 16:30:50 -0800 (PST)
+ Mon, 17 Feb 2020 16:32:53 -0800 (PST)
 Subject: Re: [PULL SUBSYSTEM qemu-pseries] pseries: Update SLOF firmware image
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>
 References: <20200217021217.95766-1-aik@ozlabs.ru>
- <8e67117e-e74a-fb5c-226b-78e62ac26291@kaod.org>
+ <60c5712e-beb7-e536-1252-642dcf88beec@redhat.com>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
@@ -149,18 +149,18 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <44499677-3099-56c6-7249-afa8eccc7668@ozlabs.ru>
-Date: Tue, 18 Feb 2020 11:30:46 +1100
+Message-ID: <b49c284e-8e22-4c5f-6cda-e9745b3ee1b9@ozlabs.ru>
+Date: Tue, 18 Feb 2020 11:32:50 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.2
 MIME-Version: 1.0
-In-Reply-To: <8e67117e-e74a-fb5c-226b-78e62ac26291@kaod.org>
+In-Reply-To: <60c5712e-beb7-e536-1252-642dcf88beec@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -179,130 +179,49 @@ Sender: "Qemu-devel"
 
 
 
-On 17/02/2020 20:48, Cédric Le Goater wrote:
+On 17/02/2020 20:26, Philippe Mathieu-Daudé wrote:
+> Hi Alexey,
+> 
 > On 2/17/20 3:12 AM, Alexey Kardashevskiy wrote:
->> The following changes since commit 05943fb4ca41f626078014c0327781815c6584c5:
+>> The following changes since commit
+>> 05943fb4ca41f626078014c0327781815c6584c5:
 >>
->>   ppc: free 'fdt' after reset the machine (2020-02-17 11:27:23 +1100)
+>>    ppc: free 'fdt' after reset the machine (2020-02-17 11:27:23 +1100)
 >>
 >> are available in the Git repository at:
 >>
->>   git@github.com:aik/qemu.git tags/qemu-slof-20200217
+>>    git@github.com:aik/qemu.git tags/qemu-slof-20200217
 >>
 >> for you to fetch changes up to ea9a03e5aa023c5391bab5259898475d0298aac2:
 >>
->>   pseries: Update SLOF firmware image (2020-02-17 13:08:59 +1100)
+>>    pseries: Update SLOF firmware image (2020-02-17 13:08:59 +1100)
 >>
 >> ----------------------------------------------------------------
 >> Alexey Kardashevskiy (1):
->>       pseries: Update SLOF firmware image
+>>        pseries: Update SLOF firmware image
 >>
->>  pc-bios/README   |   2 +-
->>  pc-bios/slof.bin | Bin 931032 -> 968560 bytes
->>  roms/SLOF        |   2 +-
->>  3 files changed, 2 insertions(+), 2 deletions(-)
->>
->>
->> *** Note: this is not for master, this is for pseries
->>
+>>   pc-bios/README   |   2 +-
+>>   pc-bios/slof.bin | Bin 931032 -> 968560 bytes
+>>   roms/SLOF        |   2 +-
+>>   3 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> Hello Alexey,
-> 
-> QEMU fails to boot from disk. See below.
+> I only received the cover, not the patch, have you posted it?
 
-
-It does boot mine (fedora 30, ubuntu 18.04), see below. I believe I
-could have broken something but I need more detail. Thanks,
-
-
-
-
-SLOF **********************************************************************
-QEMU Starting
- Build Date = Feb 17 2020 13:06:47
- FW Version = git-42228d763f1fdb7b
- Press "s" to enter Open Firmware.
-
-Populating /vdevice methods
-Populating /vdevice/nvram@71000000
-Populating /vdevice/vty@71000110
-Populating /pci@800000020000000
-                     00 0000 (D) : 1af4 1000    virtio [ net ]
-                     00 0800 (D) : 1af4 1004    virtio [ scsi ]
-Populating /pci@800000020000000/scsi@1
-       SCSI: Looking for devices
-          100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"
-No NVRAM common partition, re-initializing...
-Scanning USB
-Using default console: /vdevice/vty@71000110
-
-  Welcome to Open Firmware
-
-  Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
-  This program and the accompanying materials are made available
-  under the terms of the BSD License available at
-  http://www.opensource.org/licenses/bsd-license.php
-
-
-Trying to load:  from: /pci@800000020000000/scsi@1/disk@100000000000000
-...   Successfully loaded
-
-
-
-
-
-
-      Fedora (5.5.0-rc5-le-guest_v5.5-rc5_a+fstn1) 30 (Thirty)
-
-      Fedora (5.0.9-301.fc30.ppc64le) 30 (Thirty)
-
-      Fedora (0-rescue-8f8bbec520a44fd09da6af8e0d2c6571) 30 (Thirty)
-
-
+No, for quite some time now - it is too big and does not pass some
+filters somewhere so rather than fixing filters, I simply send pull
+requests instead.
 
 
 > 
-> Thanks,
+> I noticed on your repository you included a 'git shortlog' output in the
+> commit description, thanks for that detail, much appreciated!
+
+I was asked nicely to do so :)
+
 > 
-> C.
+> Regards,
 > 
-> 
-> QEMU Starting
->  Build Date = Feb 17 2020 13:06:47
->  FW Version = git-42228d763f1fdb7b
->  Press "s" to enter Open Firmware.
-> 
-> Populating /vdevice methods
-> Populating /vdevice/vty@71000000
-> Populating /vdevice/nvram@71000001
-> Populating /pci@800000020000000
->                      00 0800 (D) : 1af4 1004    virtio [ scsi ]
-> Populating /pci@800000020000000/scsi@1
->        SCSI: Looking for devices
->           100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"
->                      00 1000 (D) : 1af4 1000    virtio [ net ]
->                      00 2000 (D) : 1b36 000d    serial bus [ usb-xhci ]
-> No NVRAM common partition, re-initializing...
-> Scanning USB 
->   XHCI: Initializing
-> Using default console: /vdevice/vty@71000000
->      
->   Welcome to Open Firmware
-> 
->   Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
->   This program and the accompanying materials are made available
->   under the terms of the BSD License available at
->   http://www.opensource.org/licenses/bsd-license.php
-> 
-> 
-> Trying to load:  from: /pci@800000020000000/scsi@1/disk@100000000000000 ...  slash SCSI-DISK: Access beyond end of device ! 
-> 
-> Out of internal memory.
-> SCSI-DISK: Access beyond end of device ! 
-> SCSI-DISK: Access beyond end of device ! 
-> SCSI-DISK: Access beyond end of device ! 
-> SCSI-DISK: Access beyond end of device ! 
-> SCSI-DISK: Access beyond end of device ! 
+> Phil.
 > 
 
 -- 
