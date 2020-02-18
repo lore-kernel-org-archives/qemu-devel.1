@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 737B5C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE907C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:34:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FE8820722
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:32:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A464206E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:34:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YrokM7No"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FE8820722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="guAinHJB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A464206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j40BN-0005QE-Ft
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 05:32:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50891)
+	id 1j40Cj-0007gL-H3
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 05:34:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j408s-0001V4-QE
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:30:15 -0500
+ (envelope-from <quintela@redhat.com>) id 1j40AT-0004BA-E5
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j408r-0005VI-Sp
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:30:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41489
+ (envelope-from <quintela@redhat.com>) id 1j40AR-0006O6-G9
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:31:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25379
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j408r-0005Uq-OH
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:30:13 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j40AR-0006M1-C1
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:31:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582021813;
+ s=mimecast20190719; t=1582021908;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=O+FMTbtm9xLdN5wiEFqoo6mDjZzH5YVxe3dOAA6TqpE=;
- b=YrokM7No3bG4NJ7ct5Sn3dvue70AMoBxC7hPnYg5cRG/+komPML+R9kXxGAYtf9Fc3h80m
- 1YuVx5eF/eDszhmV/uvgU/gtRGCy0JTTlN/YyZv8Kajd/L8O/nwGJFjJwJrTSDfmmVru3W
- +/XtTd1Sa3PKYO4P+4WGM1cKSYhVjl8=
+ bh=3ATs3tYcYDSuXzQBjLK23rT+iyN0gezw8N8BeGeujP0=;
+ b=guAinHJB+BpMSgkbYSy6aO6Nsfhq8G/xESAB3Qwjn9UBrvnjWrZtI5xqXm01KQVDtdDr+t
+ 4VSCbkfYeZy5MakUO0LJGYBseUrk/kXyttkKA+27Q0WUVdzhkatxahtE7dbQCcNFadGWMe
+ dI1uirnoElHNEKeNJpBmUyhk1iGDGis=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-EPodNNTOPnqGn5qTyKejDg-1; Tue, 18 Feb 2020 05:30:11 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-192-GZ-chRhqMwKyzJMCebd5xg-1; Tue, 18 Feb 2020 05:31:45 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4E23DB62;
- Tue, 18 Feb 2020 10:30:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11855801E6D;
+ Tue, 18 Feb 2020 10:31:43 +0000 (UTC)
 Received: from redhat.com (ovpn-116-49.ams2.redhat.com [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DDED21BC6D;
- Tue, 18 Feb 2020 10:29:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B55D95C241;
+ Tue, 18 Feb 2020 10:31:30 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH RESEND 05/13] hw/arm/xlnx-versal: Remove superfluous
- semicolon
-In-Reply-To: <20200218094402.26625-6-philmd@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 18 Feb 2020 10:43:54
+Subject: Re: [PATCH RESEND 08/13] hw/vfio/display: Remove superfluous semicolon
+In-Reply-To: <20200218094402.26625-9-philmd@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 18 Feb 2020 10:43:57
  +0100")
 References: <20200218094402.26625-1-philmd@redhat.com>
- <20200218094402.26625-6-philmd@redhat.com>
+ <20200218094402.26625-9-philmd@redhat.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Tue, 18 Feb 2020 11:29:53 +0100
-Message-ID: <87a75gnq72.fsf@secure.laptop>
+Date: Tue, 18 Feb 2020 11:31:26 +0100
+Message-ID: <87wo8kmbk1.fsf@secure.laptop>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: EPodNNTOPnqGn5qTyKejDg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: GZ-chRhqMwKyzJMCebd5xg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -111,7 +110,7 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> Fixes: 6f16da53ffe
+> Fixes: 8b818e059bf
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
