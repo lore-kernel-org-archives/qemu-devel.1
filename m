@@ -6,76 +6,86 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2120C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A15E5C34047
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:41:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0A1420659
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7160D24125
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OPyW1O3b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A1420659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dJil9tRw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7160D24125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j47jX-0004gZ-OF
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 13:36:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42171)
+	id 1j47ns-0006Ut-Id
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 13:41:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j47ic-0004CR-V1
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:35:39 -0500
+ (envelope-from <jsuvorov@redhat.com>) id 1j47nB-0005xb-Mv
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:40:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j47ib-0000pU-I0
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:35:38 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41708)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j47ib-0000mT-73
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:35:37 -0500
-Received: by mail-oi1-x244.google.com with SMTP id i1so21091072oie.8
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 10:35:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mKLg6s8iWW0H2hDAFAJSR86Yja9qQUYtPKowHOSv9Ok=;
- b=OPyW1O3bd38nwuf027FQ7DmF1FRG1tAjVl5oS2dWXBpXoEPbhjDGOp18nb+XBsWJUl
- zF8xOx8cgqGDVzyDJJ8vkI8nVWSdMsPTNfIjitebyweC71cVVMhfKv26ATaHzyxo7mz7
- 4Dg+TynDqqvYO0oHKA9aElZUBxCD0V0fC/1H1e/HBCzWvkRHnRMPkJiZ8qIr96TIBdwx
- hzDw6AImaENEt36p1DwDJakoSvIkrAiUEV5MzzLOrz2OxPgl7EYqgx9Sl3xsEBiDRK1v
- CtfddLW9WkhczK3YbYFMJMFDx60bW1a4VPJCyvvwdfUDW41P5v1msBGZ9+0mVUInbLW7
- ka6Q==
+ (envelope-from <jsuvorov@redhat.com>) id 1j47n9-0007rP-Ri
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:40:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38254
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsuvorov@redhat.com>) id 1j47n9-0007q6-N3
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:40:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582051218;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=r8kl2pVaZMbICgs7tizcF2y3osNnyPqSyz/vPIIs6YE=;
+ b=dJil9tRwGyYdxISQ69HOcN8f4eA+TfeHS2pX3Z1RrNlrHiB7jekIALsd2CNslIad7klImP
+ xnFqkTJr6WmCP0yT/srptzFS3Zm3OcJkbRMBGEIAdMV054hn/SwOGK+GGpEBQyEBhp3uHl
+ NzY1LaBNlcUg+vmd2SqSfegqGNFWUPc=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-MFiPQEmiNrinYTPjrqc6QA-1; Tue, 18 Feb 2020 13:40:16 -0500
+Received: by mail-lj1-f197.google.com with SMTP id z11so7478178ljm.15
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 10:40:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=mKLg6s8iWW0H2hDAFAJSR86Yja9qQUYtPKowHOSv9Ok=;
- b=Kt5SrnmGbwilM/Sy9PoPhaY1bV7G3PuMpyt6dDh3WPhRqxChrFmoaCpxbHffN7yasJ
- +F7IaHcfLqBkGllh2DL7/uDfFD8jEjwVYv5FyLCB3ivhY+HEK4MxWI7r19sZuuSbcXCj
- hgekzQ4kuFo/jodrTjGN3rI8nGzPQwn09hg2L4g8RzRRNS53ulOsJp8WW8UqFNZjXO2N
- 38mFeAOEwyg33wnnLoogrPWYfUIbyj6CvtlynjDp2DyGib9eyuYMejptCYzcDejiQk6t
- mBj2ADyAS4PxhsyR6aqkUJ5K1ss9op94t3fA5hbdyqSYFnDJsk07vN1umeyPVVyFRK0f
- jw7Q==
-X-Gm-Message-State: APjAAAVNhkEXppPi21lmSMQ6DJJoq7eMiygVEnnQp9TzasqItCj2rvDZ
- 9jDm3pXT8wcbH0kkJ/Tc89yexD6+uP7UAX7rDUPnGw==
-X-Google-Smtp-Source: APXvYqxR11+XW2GqGm/URlaSK/QLrHxd0OXGw9LIctDRLN5Jan09f/41FawNRUdQHvE7UyvIZtraEGQfhPlHZYDd79o=
-X-Received: by 2002:aca:b2c5:: with SMTP id b188mr2156006oif.163.1582050935848; 
- Tue, 18 Feb 2020 10:35:35 -0800 (PST)
+ bh=IqNINdSBulWjtquJ7cSTWJDexlvkPJJaUSlarbFUI40=;
+ b=lAA9nsfumKBhtLp3e08nD42yrvP0dagSfWJ7HE7iMsODop0xlRll25ZNn+bhH8ydgi
+ 9FM7DnEtHi9mUXHzbhbnDDOfgIclYedt0aJzlWOcwJIwqW1lAu3fGIDxRDM/GaXU/JMp
+ il2k/BiLEICzeP6Uyzyz6jCgZolA/LfyTIdWmTqvt8BWRCxufEEGujjQQpORK8C1ttjH
+ VH2itublUGhPrwlkQhKb5veTDQW2UFfPXTy4gCGuP+ccC5PBMmfsoOiT0fsMi4+E3oi5
+ ygYroOcKfHuzcVHD1fppiBNZaAeEbuabzhd5zsQoGOUtEdP5NUP7zQt+wCsAewASZlfa
+ EJeA==
+X-Gm-Message-State: APjAAAVI1KO559J98IFQduMuvqOyeG0xdP7goTvTAMHsPqhrCyqadCdn
+ ovxPUIxJfJ7QTHHOX/DhbNJhN/I/5URMBSMckd/wLswzoQR9NQ1/Z8WYmzPE6OjX0Rdx1iD8Jzd
+ nveUKmNZo6EX76LupNiEyMT9QVy5oINA=
+X-Received: by 2002:a2e:a361:: with SMTP id i1mr13476479ljn.29.1582051215358; 
+ Tue, 18 Feb 2020 10:40:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyVlJ8qF2DnWg+C2Bvibj6JQi1v/FQz7F27C4kPTblZK/sQq6BDJNPdsNngvGw283glGYg/Yb8siwB8vG0Y/Wo=
+X-Received: by 2002:a2e:a361:: with SMTP id i1mr13476464ljn.29.1582051215132; 
+ Tue, 18 Feb 2020 10:40:15 -0800 (PST)
 MIME-Version: 1.0
-References: <20200217203734.18703-1-linux@roeck-us.net>
- <CAFEAcA9v+9ohanZFGTgT1SLgNCnqZccnhcbsxm0MuNYQ_WSgjQ@mail.gmail.com>
- <20200218174938.GA30564@roeck-us.net>
-In-Reply-To: <20200218174938.GA30564@roeck-us.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Feb 2020 18:35:24 +0000
-Message-ID: <CAFEAcA8L3yPrL5nHzM4jdssJGox-E4k2wHdpc-zx4q2=7JFZJA@mail.gmail.com>
-Subject: Re: [PATCH] sh4: Remove bad memory alias 'sh_pci.isa'
-To: Guenter Roeck <linux@roeck-us.net>
+References: <20200218161717.386723-1-jusual@redhat.com>
+ <d872dcc7-9275-1354-ce6a-7dd52ac33929@redhat.com>
+In-Reply-To: <d872dcc7-9275-1354-ce6a-7dd52ac33929@redhat.com>
+From: Julia Suvorova <jusual@redhat.com>
+Date: Tue, 18 Feb 2020 19:40:03 +0100
+Message-ID: <CAMDeoFVQis-UXKpGZNJkD9NqyozwUxW+nn_h6iv+f-EgkLeRKw@mail.gmail.com>
+Subject: Re: [PATCH] pcie_root_port: Add disable_hotplug option
+To: Laine Stump <laine@redhat.com>
+X-MC-Unique: MFiPQEmiNrinYTPjrqc6QA-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,61 +97,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Feb 2020 at 17:49, Guenter Roeck <linux@roeck-us.net> wrote:
+On Tue, Feb 18, 2020 at 6:18 PM Laine Stump <laine@redhat.com> wrote:
 >
-> On Tue, Feb 18, 2020 at 04:33:49PM +0000, Peter Maydell wrote:
-> > I think the correct fix would be to have the handling of
-> > PCIIOBR call memory_region_set_alias_offset() (thus updating
-> > where this alias window points within the system IO space),
-> > rather than doing the del/add subregion calls.
-> >
-> Like this ?
+> On 2/18/20 11:17 AM, Julia Suvorova wrote:
+> > Make hot-plug/hot-unplug on PCIe Root Ports optional to allow libvirt
+> > to manage it and restrict unplug for the entire machine. This is going
+> > to prevent user-initiated unplug in guests (Windows mostly).
+> > Usage:
+> >      -device pcie-root-port,disable-hotplug=3Dtrue,...
 >
-> --- a/hw/sh4/sh_pci.c
-> +++ b/hw/sh4/sh_pci.c
-> @@ -67,12 +67,7 @@ static void sh_pci_reg_write (void *p, hwaddr addr, uint64_t val,
->          pcic->mbr = val & 0xff000001;
->          break;
->      case 0x1c8:
-> -        if ((val & 0xfffc0000) != (pcic->iobr & 0xfffc0000)) {
-> -            memory_region_del_subregion(get_system_memory(), &pcic->isa);
-> -            pcic->iobr = val & 0xfffc0001;
-> -            memory_region_add_subregion(get_system_memory(),
-> -                                        pcic->iobr & 0xfffc0000, &pcic->isa);
-> -        }
-> +        memory_region_set_alias_offset(&pcic->isa, val & 0xfffc0000);
->          break;
->
-> This works for me as well. Please let me know if it is correct (especially
-> the mask), and I'll resubmit.
+> Double negatives (e.g. "disable-hotplug=3Dfalse") tend to confuse simple
+> minds like mine. Would it be any more difficult to make the name of the
+> option positive instead (e.g. "enable-hotplug") with the default set to
+> "true"?
 
-The mask and call to set_alias_offset look right, but you have
-lost the setting of pcic->iobr, which is necessary so that the
-register reads back correctly.
+disable-hotplug=3Dfalse will not be used, because it's default. And it
+follows previous naming (''disable-acs').
 
-We should also drop the
-    s->iobr = 0xfe240000;
-in sh_pci_device_realize(), as the register resets to zero,
-and just hardcode the 0xfe240000 as the argument to
-memory_region_add_subregion() in that function.
+Best regards, Julia Suvorova.
 
-(A better place for that add_subregion would be to put it
-in the board model, and just have this pci controller
-device expose the alias window as a sysbus mmio region,
-the same way we do with the a7 and p4 windows,
-but that's a separate cleanup from this bugfix.)
-
-Incidentally, the device is missing a reset method, but
-I guess Linux is programming the whole controller from
-scratch and not relying on any of the registers having
-known values out of reset.
-
-thanks
--- PMM
 
