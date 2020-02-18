@@ -2,98 +2,76 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1332C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 16:14:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8411C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 16:19:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABD2024649
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 16:14:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 825E022527
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 16:19:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OvXEqdCg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD2024649
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6PGlCj5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825E022527
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j45W6-0002hv-S6
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 11:14:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43400)
+	id 1j45ah-0005Go-KP
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 11:19:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j45VA-0001Av-Co
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:13:37 -0500
+ (envelope-from <jusual@redhat.com>) id 1j45Zk-0004hT-QM
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:18:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j45V8-0002sr-Jo
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:13:35 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37760
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jusual@redhat.com>) id 1j45Zj-0005Lg-Gc
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:18:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32985
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j45V8-0002ri-5o
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:13:34 -0500
+ (Exim 4.71) (envelope-from <jusual@redhat.com>) id 1j45Zj-0005L2-D8
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:18:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582042412;
+ s=mimecast20190719; t=1582042698;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aUcg10FdEyJIOkhd/+uHQ8iOxzxoVvPYFFS92dJuc98=;
- b=OvXEqdCg32rxDChSC7w+zU6gBGb796utAFxhWWzf4bv3TSTM99ZHyRzIqKw1xS+QPrDyD2
- qbZAoMqFrlLIy6vB9qjtRTknlRHDKsL+ih2jaUzf4HqNCwkIxqvruTYldBn28AD9OMyHbb
- Ep+efsCl7tPRxiEDeQ7RpgP1vESdgpE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-Pf4Kw3SROU2UMHlIdD3egw-1; Tue, 18 Feb 2020 11:13:30 -0500
-Received: by mail-wm1-f72.google.com with SMTP id o24so274294wmh.0
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 08:13:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aUcg10FdEyJIOkhd/+uHQ8iOxzxoVvPYFFS92dJuc98=;
- b=O4vM9ChI0OjifF05BPPl8RKg2n1WrVjjei6oxcSpmERRNoHj1Y2t0r9+iM3ndKA9lH
- 4HWySy/qJlbZ+cdnltcyUARz6y8mi30e9JhhQdDRKVKUN7edRajboIy2PaZcp36nHx/H
- bhvFgzvDyXheBOTOv5ZYMdyFzmE3wMs51XWa0w+84C6sM7ggPgmtpkmeKX0C/MS6mDnY
- 34uHyRdOGYHiogcrwZg/bsuCHxTJ3ZW9scanIa2KwB/qC7NuwPNY0keEMjCIO2NDGKJn
- 5F+XWoEwpjrBqEwysXxwvfGw9cg/GvocuAduWcOhO9xtfCuSFyTCNfxGRloWb0ekueCt
- In3w==
-X-Gm-Message-State: APjAAAVVG0+n/h9EUdPEYlutJmjJduVIeI6eXoZPts0eJ9NmxU1HETYz
- 4T52CTn9YsO4EwV6BjycyL5K9IaBvCfihVbIuvIxLl277GM3CfhEbRwnIlaxrdNIc6TECjeLXO0
- FpeuDDBC8sMhQeOk=
-X-Received: by 2002:a5d:54c1:: with SMTP id x1mr28817000wrv.240.1582042409155; 
- Tue, 18 Feb 2020 08:13:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyXedi7AlcavweAMf9+HWzGYgsGQvODoyFLpJ3gqcUvGuepwCqYrQV3b+k+aJVwDB3HEPYLpA==
-X-Received: by 2002:a5d:54c1:: with SMTP id x1mr28816980wrv.240.1582042408937; 
- Tue, 18 Feb 2020 08:13:28 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4?
- ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
- by smtp.gmail.com with ESMTPSA id x6sm6698593wrr.6.2020.02.18.08.13.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Feb 2020 08:13:28 -0800 (PST)
-Subject: Re: [PATCH RFC] target/i386: filter out VMX_PIN_BASED_POSTED_INTR
- when enabling SynIC
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
-References: <20200218144415.94722-1-vkuznets@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9b4b46c2-e2cf-a3d5-70e4-c8772bf6734f@redhat.com>
-Date: Tue, 18 Feb 2020 17:13:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ywZUASfH4c2Hhu75Ovg2XJg470DhFPDarMadyNuZ89g=;
+ b=W6PGlCj5NDebjw1dvmZduCrzmNa9PfmKiJDn2AIriiN6wpegSFw6B75ZAF+ICMDvsaSZ7N
+ NFFM4d6lZWyiE/eBKJGKeUEXEtqRu2B8vivGwH/+Z9Ss/grZH6KS4potuqURRuGLUdE7TL
+ WJWR2M+od3VsSbM/UvzytXqp99qwsWk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-7MsBdQOpOMORMRP9hiDqkg-1; Tue, 18 Feb 2020 11:17:31 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C52408C8B40
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 16:17:30 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-206-52.brq.redhat.com
+ [10.40.206.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 63F4F5D9E2;
+ Tue, 18 Feb 2020 16:17:21 +0000 (UTC)
+From: Julia Suvorova <jusual@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] pcie_root_port: Add disable_hotplug option
+Date: Tue, 18 Feb 2020 17:17:17 +0100
+Message-Id: <20200218161717.386723-1-jusual@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200218144415.94722-1-vkuznets@redhat.com>
-Content-Language: en-US
-X-MC-Unique: Pf4Kw3SROU2UMHlIdD3egw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 7MsBdQOpOMORMRP9hiDqkg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,31 +83,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Marcelo Tosatti <mtosatti@redhat.com>, Liran Alon <liran.alon@oracle.com>,
- Roman Kagan <rkagan@virtuozzo.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Julia Suvorova <jusual@redhat.com>, Laine Stump <laine@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/02/20 15:44, Vitaly Kuznetsov wrote:
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
-> RFC: This is somewhat similar to eVMCS breakage and it is likely possible
-> to fix this in KVM. I decided to try QEMU first as this is a single
-> control and unlike eVMCS we don't need to keep a list of things to disable.
+Make hot-plug/hot-unplug on PCIe Root Ports optional to allow libvirt
+to manage it and restrict unplug for the entire machine. This is going
+to prevent user-initiated unplug in guests (Windows mostly).
+Usage:
+    -device pcie-root-port,disable-hotplug=3Dtrue,...
 
-I think you should disable "virtual-interrupt delivery" instead (which
-in turn requires "process posted interrupts" to be zero).  That is the
-one that is incompatible with AutoEOI interrupts.
+Discussion related:
+    https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00530.html
 
-The ugly part about fixing this in QEMU is that in theory it would be
-still possible to emulate virtual interrupt delivery and posted
-interrupts, because they operate on a completely disjoint APIC
-configuration than the host's.  I'm not sure we want to go there though,
-so I'm thinking that again a KVM implementation is better.  It
-acknowledges that this is just a limitation (workaround for a bug) in KVM.
+Signed-off-by: Julia Suvorova <jusual@redhat.com>
+---
+ hw/core/machine.c                  | 1 +
+ hw/pci-bridge/pcie_root_port.c     | 3 ++-
+ hw/pci-bridge/xio3130_downstream.c | 2 +-
+ hw/pci/pcie.c                      | 8 ++++++--
+ include/hw/pci/pcie.h              | 2 +-
+ include/hw/pci/pcie_port.h         | 1 +
+ 6 files changed, 12 insertions(+), 5 deletions(-)
 
-Paolo
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 84812a1d1c..5ff698ac3c 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -36,6 +36,7 @@ GlobalProperty hw_compat_4_2[] =3D {
+     { "usb-redir", "suppress-remote-wake", "off" },
+     { "qxl", "revision", "4" },
+     { "qxl-vga", "revision", "4" },
++    { "pcie-root-port-base", "disable-hotplug", "false" },
+ };
+ const size_t hw_compat_4_2_len =3D G_N_ELEMENTS(hw_compat_4_2);
+=20
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.=
+c
+index 0ba4e4dea4..d6a080bee8 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -94,7 +94,7 @@ static void rp_realize(PCIDevice *d, Error **errp)
+=20
+     pcie_cap_arifwd_init(d);
+     pcie_cap_deverr_init(d);
+-    pcie_cap_slot_init(d, s->slot);
++    pcie_cap_slot_init(d, s);
+     pcie_cap_root_init(d);
+=20
+     pcie_chassis_create(s->chassis);
+@@ -147,6 +147,7 @@ static Property rp_props[] =3D {
+     DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+                     QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+     DEFINE_PROP_BOOL("disable-acs", PCIESlot, disable_acs, false),
++    DEFINE_PROP_BOOL("disable-hotplug", PCIESlot, disable_hotplug, false),
+     DEFINE_PROP_END_OF_LIST()
+ };
+=20
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_dow=
+nstream.c
+index 153a4acad2..04aae72cd6 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -94,7 +94,7 @@ static void xio3130_downstream_realize(PCIDevice *d, Erro=
+r **errp)
+     }
+     pcie_cap_flr_init(d);
+     pcie_cap_deverr_init(d);
+-    pcie_cap_slot_init(d, s->slot);
++    pcie_cap_slot_init(d, s);
+     pcie_cap_arifwd_init(d);
+=20
+     pcie_chassis_create(s->chassis);
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 08718188bb..6dd9b89e21 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -495,7 +495,7 @@ void pcie_cap_slot_unplug_request_cb(HotplugHandler *ho=
+tplug_dev,
+=20
+ /* pci express slot for pci express root/downstream port
+    PCI express capability slot registers */
+-void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot)
++void pcie_cap_slot_init(PCIDevice *dev, PCIESlot *s)
+ {
+     uint32_t pos =3D dev->exp.exp_cap;
+=20
+@@ -505,13 +505,17 @@ void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot=
+)
+     pci_long_test_and_clear_mask(dev->config + pos + PCI_EXP_SLTCAP,
+                                  ~PCI_EXP_SLTCAP_PSN);
+     pci_long_test_and_set_mask(dev->config + pos + PCI_EXP_SLTCAP,
+-                               (slot << PCI_EXP_SLTCAP_PSN_SHIFT) |
++                               (s->slot << PCI_EXP_SLTCAP_PSN_SHIFT) |
+                                PCI_EXP_SLTCAP_EIP |
+                                PCI_EXP_SLTCAP_HPS |
+                                PCI_EXP_SLTCAP_HPC |
+                                PCI_EXP_SLTCAP_PIP |
+                                PCI_EXP_SLTCAP_AIP |
+                                PCI_EXP_SLTCAP_ABP);
++    if (s->disable_hotplug) {
++        pci_long_test_and_clear_mask(dev->config + pos + PCI_EXP_SLTCAP,
++                                     PCI_EXP_SLTCAP_HPC);
++    }
+=20
+     if (dev->cap_present & QEMU_PCIE_SLTCAP_PCP) {
+         pci_long_test_and_set_mask(dev->config + pos + PCI_EXP_SLTCAP,
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index 7064875835..14c58ebdb6 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -104,7 +104,7 @@ void pcie_cap_deverr_reset(PCIDevice *dev);
+ void pcie_cap_lnkctl_init(PCIDevice *dev);
+ void pcie_cap_lnkctl_reset(PCIDevice *dev);
+=20
+-void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
++void pcie_cap_slot_init(PCIDevice *dev, PCIESlot *s);
+ void pcie_cap_slot_reset(PCIDevice *dev);
+ void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_st=
+a);
+ void pcie_cap_slot_write_config(PCIDevice *dev,
+diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+index 4b3d254b08..796fc8f3ab 100644
+--- a/include/hw/pci/pcie_port.h
++++ b/include/hw/pci/pcie_port.h
+@@ -55,6 +55,7 @@ struct PCIESlot {
+=20
+     /* Disable ACS (really for a pcie_root_port) */
+     bool        disable_acs;
++    bool        disable_hotplug;
+     QLIST_ENTRY(PCIESlot) next;
+ };
+=20
+--=20
+2.24.1
 
 
