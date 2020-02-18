@@ -2,78 +2,113 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE302C34047
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A20FC34047
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:12:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC2742067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:11:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BgcShjjC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC2742067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6FCD62067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:12:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FCD62067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j49Dl-0004qi-Sq
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 15:11:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47372)
+	id 1j49EH-0005K6-Lv
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 15:12:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1j49Cp-0004EL-Sp
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:10:57 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j49D8-0004TC-K3
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:11:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1j49Co-0001M8-JU
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:10:55 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45761)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1j49Co-0001KB-Dv
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:10:54 -0500
-Received: by mail-pf1-x441.google.com with SMTP id 2so11182864pfg.12
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 12:10:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id;
- bh=dcIb0UwBhtGfUdFFpp0WtqcE2tLChD5qZinEn1fAzhA=;
- b=BgcShjjCvRWF7b5LC/uwLgcUELt3UA/Mwu911ZEMi73rD3DSzsTggkmlRu23DHmVQg
- IIgesfEO7w+dK0mpW4QywWuSRNQn3U9wuzupZjr076CQnfZJl0DTnoMe4Xoi9wc+WPu9
- w5I1nWgV1sDp7TbbwmLNi4Vj6xbNF7BWlZ2i8+xQPZK3V1eR8i+Uh+J5D667UbyfmVeC
- ELd3IkPFDMawDgp/S/5X6pbsWB37FFmmarcQR8r9V8rAc3ASXE8ZVTafEw6dS8UibfOx
- n71SGOBdqWHwMalJMzD6I5t3t+YzCp/r2fz2ts6kX7ZsrXJKTaXDgdx+fr9JxASnME/+
- 3daw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=dcIb0UwBhtGfUdFFpp0WtqcE2tLChD5qZinEn1fAzhA=;
- b=CoMRhuwbJXu76uBaFsXPaPqV9G/3Gkb3KAmx3Iu+AWlnssmb4T+8IFkSavILsWYLjy
- m64d8Cz31HwQPIXpELE5nASLss+xlLnu/SPqztbOl71LLPtfp1Ei9w6aHwMdBXNJMzWV
- og+CsEulpRcb81lplnHcxaXZpUIxbmT1e3G1TDbd3Tbm2wY2J44umN6GIyEYvtDG0NHd
- i0EflbVE0RP14S3YobFwyDBvAuqie2FhxSnC26V2pcOwJXX6WxHH09ofjh0juO7YzYCR
- xBXXiY+l2WhLkEefiVik6U80YM4vC6h2xFiWO4Rfm/NMErP0C07tyE2KvKRC5AwT6xFA
- jNfw==
-X-Gm-Message-State: APjAAAUlO5QqWBLg/zfuBAPjXLR0r9lZgEn/3s9bXwNBp/XF/j6VfAvf
- 4KhkDyk8exejQOIXbdtisOU=
-X-Google-Smtp-Source: APXvYqx4Eutqu5KJbnYP6bbWRhZEXX2AateHp1zmeVpdxboquKQsF2YOaF3bK61TLIb4LDm82elNbw==
-X-Received: by 2002:a63:f501:: with SMTP id w1mr26009273pgh.61.1582056653047; 
- Tue, 18 Feb 2020 12:10:53 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id u4sm4164937pgu.75.2020.02.18.12.10.51
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 18 Feb 2020 12:10:52 -0800 (PST)
-From: Guenter Roeck <linux@roeck-us.net>
-To: Aurelien Jarno <aurelien@aurel32.net>
-Subject: [PATCH v2] sh4: Fix PCI ISA IO memory subregion
-Date: Tue, 18 Feb 2020 12:10:50 -0800
-Message-Id: <20200218201050.15273-1-linux@roeck-us.net>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+ (envelope-from <laurent@vivier.eu>) id 1j49D7-000257-Ew
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:11:14 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:57727)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j49D7-000223-64
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:11:13 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MhlbM-1jhtnn4Ay0-00dlUO; Tue, 18 Feb 2020 21:11:00 +0100
+Subject: Re: [PATCH v3 0/4] migration: Replace gemu_log with qemu_log
+To: Josh Kunz <jkz@google.com>, qemu-devel@nongnu.org
+References: <20200204025416.111409-1-jkz@google.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <bb0d64bc-08b4-b3c8-6ff1-b3dc096d1d3f@vivier.eu>
+Date: Tue, 18 Feb 2020 21:10:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200204025416.111409-1-jkz@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:xAg4+yAHNcNd9XQjIIF6WV3CxkLQ7v7q+DIoQoQpwftzvQgLCrg
+ te6qvJq6pQlUehCFAn+cJwlTYtDtZm+TuSZlvNTFqQ57J6aDK0vObSg/oUTSMXKPay9/KOV
+ 1BYNgXVNqIraO/Cr8g3oA3LHrX/OwE0XoxXx0fne2SYUWJPk3XOitckr8FBGIKwBIiwbtN9
+ /tHkMGv5j9m84fk584oUQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:W2TiHUb/YlE=:H41vacGrAWuoLa9waLnIGV
+ nermD37Dnau/nE3q+y+07W6hIDQIStLo4aOzMxoiLj/9mVWHuFvd/iTPkFoq61UJKt7ouDQrH
+ 5TbGv6qEQWMIStVpNlcjtbrQmmIQkZMjhwU8KqfT9FVXYTIs65MeAFMU/DtFUVbZOe4o+Kf34
+ Jhz0LiQI1rxPENgaRWhcNG/ojR+zn2+HpcLFZhzo4U9VGcth6ATgiO4pGK2YKtq60cfVKsg0d
+ ExmMppxNN16W7ICTlE+9iGZJ3Qfxx6xyZVvdHb3xjZ5kmu6L+9LVbRoIsV0TVuMVY2enaWfvv
+ o57LIPDeHZUoKVxuBKaIhCPyppolkvpw1WTrtvCPK80VflkfNF0VDctLhcN+ZbTOvOSOVh7in
+ JAwTj1K2YQes9vcjTILc0V1JsXkD1Zup6sR4FmtWqfQmaa5Ad39VGFf/Fw/cfvRL7rjxc0CsB
+ y6RSQVcbBOeqkLprEvcz6sdUND+S7u2Xz0PBh0sTsRQPPGxZU628PNvXeM9+HJLcnr23WMQar
+ dk8UTHYbG4FhILisgUp6v+l6DP8WSZsdVXGcghJZ+wUTxERv5oF8YKziiNtQFKcjueJCtvNQ2
+ 2PKig60KP5kXRsnfax7MtH52vrNFezHiApNWdK2XHNt3vRqh9jd7A/5yWbro93xZT15qMEs+n
+ XQbI78iyEuYo91S0hKewl5EYBOFfJOZRxNLHv/2oQ1Lj20eZs+5gTooZJqC+0lhIZHtMs9dfd
+ ZuAw/jsZFH9/6GbP1JX4Di6BT5QcLERmr9mgGofaqZUjBY4ArclJo+zLyze/msgEraAbLDZpU
+ PC6Xk99AC7SuxWJkUQBHqY4hUQ+VYKWDn3/ef2dtH50rtt6p7SsqYLqFRh5TIfcJvthhWXj
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,90 +120,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Guenter Roeck <linux@roeck-us.net>
+Cc: riku.voipio@iki.fi, alex.bennee@linaro.org, armbru@redhat.com,
+ imp@bsdimp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Booting the r2d machine from flash fails because flash is not discovered.
-Looking at the flattened memory tree, we see the following.
+Le 04/02/2020 à 03:54, Josh Kunz a écrit :
+> Summary of v2->v3 changes:
+>   * Removed assert for CMSG handling, replaced with LOG_UNIMP. Will
+>     switch to assert in follow-up patch.
+>   * Fixed BSD-user build (dangling references to qemu_add_log), and
+>     verified the user-mode build works.
+> 
+> Summary of v1->v2 changes:
+>   * Removed backwards-compatibility code for non-strace log statements.
+>   * Removed new qemu_log interface for adding or removing fields from
+>     the log mask.
+>   * Removed LOG_USER and converted all uses (except one) to LOG_UNIMP.
+>     * One gemu_log statement was converted to an assert.
+>   * Some style cleanup.
+> 
+> The linux-user and bsd-user trees both widely use a function called
+> `gemu_log` (notice the 'g') for miscellaneous and strace logging. This
+> function predates the newer `qemu_log` function, and has a few drawbacks
+> compared to `qemu_log`:
+> 
+>   1. Always logs to `stderr`, no logging redirection.
+>   2. "Miscellaneous" logging cannot be disabled, so it may mix with guest
+>      logging.
+>   3. Inconsistency with other parts of the QEMU codebase, and a
+>      confusing name.
+> 
+> The second issue is especially troubling because it can interfere with
+> programs that expect to communicate via stderr.
+> 
+> This change introduces one new logging masks to the `qemu_log` subsystem
+> to support its use for user-mode logging: the `LOG_STRACE` mask for
+> strace-specific logging. Further, it replaces all existing uses of
+> `gemu_log` with the appropriate `qemu_log_mask(LOG_{UNIMP,STRACE}, ...)`
+> based on the log message.
+> 
+> Backwards incompatibility:
+>   * Log messages for unimplemented user-mode features are no longer
+>     logged by default. They have to be enabled by setting the LOG_UNIMP
+>     mask.
+>   * Log messages for strace/unimplemented user-mode features may be
+>     redirected based on `-D`, instead of always logging to stderr.
+> 
+> Tested:
+>   * Built with clang 9 and g++ 8.3
+>   * `make check` run with clang 9 build 
+>   * Verified:
+>     * QEMU_STRACE/-strace still works for linux-user
+>   * `make vm-build-netbsd EXTRA_CONFIGURE_OPTS="--disable-system" \
+>      BUILD_TARGET="all"` passed.
+> 
+> Josh Kunz (4):
+>   linux-user: Use `qemu_log' for non-strace logging
+>   linux-user: Use `qemu_log' for strace
+>   linux-user: remove gemu_log from the linux-user tree
+>   bsd-user: Replace gemu_log with qemu_log
+> 
+>  bsd-user/main.c           |  29 ++-
+>  bsd-user/qemu.h           |   2 -
+>  bsd-user/strace.c         |  32 ++-
+>  bsd-user/syscall.c        |  31 ++-
+>  include/qemu/log.h        |   2 +
+>  linux-user/arm/cpu_loop.c |   5 +-
+>  linux-user/fd-trans.c     |  55 +++--
+>  linux-user/main.c         |  39 ++--
+>  linux-user/qemu.h         |   2 -
+>  linux-user/signal.c       |   2 +-
+>  linux-user/strace.c       | 479 +++++++++++++++++++-------------------
+>  linux-user/syscall.c      |  48 ++--
+>  linux-user/vm86.c         |   3 +-
+>  util/log.c                |   2 +
+>  14 files changed, 387 insertions(+), 344 deletions(-)
+> 
 
-FlatView #1
- AS "memory", root: system
- AS "cpu-memory-0", root: system
- AS "sh_pci_host", root: bus master container
- Root memory region: system
-  0000000000000000-000000000000ffff (prio 0, i/o): io
-  0000000000010000-0000000000ffffff (prio 0, i/o): r2d.flash @0000000000010000
+Applied patches 1 to 3 to my linux-user branch.
 
-The overlapping memory region is sh_pci.isa, ie the ISA I/O region bridge.
-This region is initially assigned to address 0xfe240000, but overwritten
-with a write into the PCIIOBR register. This write is expected to adjust
-the PCI memory window, but not to change the region's base adddress.
-
-Peter Maydell provided the following detailed explanation.
-
-"Section 22.3.7 and in particular figure 22.3 (of "SSH7751R user's manual:
-hardware") are clear about how this is supposed to work: there is a window
-at 0xfe240000 in the system register space for PCI I/O space. When the CPU
-makes an access into that area, the PCI controller calculates the PCI
-address to use by combining bits 0..17 of the system address with the
-bits 31..18 value that the guest has put into the PCIIOBR. That is, writing
-to the PCIIOBR changes which section of the IO address space is visible in
-the 0xfe240000 window. Instead what QEMU's implementation does is move the
-window to whatever value the guest writes to the PCIIOBR register -- so if
-the guest writes 0 we put the window at 0 in system address space."
-
-Fix the problem by calling memory_region_set_alias_offset() instead of
-removing and re-adding the PCI ISA subregion on writes into PCIIOBR.
-At the same time, in sh_pci_device_realize(), don't set iobr since
-it is overwritten later anyway. Instead, pass the base address to
-memory_region_add_subregion() directly.
-
-Many thanks to Peter Maydell for the detailed problem analysis, and for
-providing suggestions on how to fix the problem.
-
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
-v2: Complete rework based on Peter's analysis. Don't remove the
-    'sh_pci.isa' alias, which was perfectly fine.
-    Instead, fix the underlying problem.
-    Rename subject from "'sh4: Remove bad memory alias 'sh_pci.isa'"
-
- hw/sh4/sh_pci.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
-
-diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
-index 71afd23b67..08f2fc1dde 100644
---- a/hw/sh4/sh_pci.c
-+++ b/hw/sh4/sh_pci.c
-@@ -67,12 +67,8 @@ static void sh_pci_reg_write (void *p, hwaddr addr, uint64_t val,
-         pcic->mbr = val & 0xff000001;
-         break;
-     case 0x1c8:
--        if ((val & 0xfffc0000) != (pcic->iobr & 0xfffc0000)) {
--            memory_region_del_subregion(get_system_memory(), &pcic->isa);
--            pcic->iobr = val & 0xfffc0001;
--            memory_region_add_subregion(get_system_memory(),
--                                        pcic->iobr & 0xfffc0000, &pcic->isa);
--        }
-+        pcic->iobr = val & 0xfffc0001;
-+        memory_region_set_alias_offset(&pcic->isa, val & 0xfffc0000);
-         break;
-     case 0x220:
-         pci_data_write(phb->bus, pcic->par, val, 4);
-@@ -147,8 +143,7 @@ static void sh_pci_device_realize(DeviceState *dev, Error **errp)
-                              get_system_io(), 0, 0x40000);
-     sysbus_init_mmio(sbd, &s->memconfig_p4);
-     sysbus_init_mmio(sbd, &s->memconfig_a7);
--    s->iobr = 0xfe240000;
--    memory_region_add_subregion(get_system_memory(), s->iobr, &s->isa);
-+    memory_region_add_subregion(get_system_memory(), 0xfe240000, &s->isa);
- 
-     s->dev = pci_create_simple(phb->bus, PCI_DEVFN(0, 0), "sh_pci_host");
- }
--- 
-2.17.1
-
+Thanks,
+LAurent
 
