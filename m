@@ -2,83 +2,98 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD28C34031
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 21:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE200C34031
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 22:02:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B592521D56
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 21:52:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 938D0207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 22:02:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUdNcz1U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B592521D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2T0+8C2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 938D0207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4Ame-0006FM-Uv
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 16:52:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58416)
+	id 1j4AwP-0001Kd-NN
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 17:02:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j4All-0005jh-Hp
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:51:06 -0500
+ (envelope-from <peterx@redhat.com>) id 1j4AuY-0000Xt-2v
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 17:00:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j4Alk-0006hH-Bo
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:51:05 -0500
-Received: from mail-io1-xd29.google.com ([2607:f8b0:4864:20::d29]:44342)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1j4Alk-0006fx-6d; Tue, 18 Feb 2020 16:51:04 -0500
-Received: by mail-io1-xd29.google.com with SMTP id z16so24034641iod.11;
- Tue, 18 Feb 2020 13:51:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=sLeGUH5OxTikEsToDHR4WZF1TwQ6mWFhg6WtSprZEOs=;
- b=FUdNcz1U74pIM+a9s1p824eVm6jdT9t6q4mq5BThIcD8lCN3rW+bh+j4t3UOcaYD1n
- O6j9mkqV6nOfAufWEFrHl7Ba6HmA3dDGGM8y/FvKOngC0/9TvpivssKyY2T0Q2ASBSW/
- 3z/oFkLeSzoE6pE0VedOakQ9TOPcd+xHpH2eUg+1wCjaelQDLVUkq21Bs+uyH0s/7o7m
- FBmNHGrQF3h+Lz8I4GWaPhLSxYlMsLwReqPQsgcD0rzbYUjPREAsSs5+SurLTx6RUzN4
- Smpr4/x0WYmObFhoIdJP7MG+cmvi/6JJTM5j5IdCdzr49zaj7UDb9/IbwE6UKPHMSYZd
- P21A==
+ (envelope-from <peterx@redhat.com>) id 1j4AuW-0002IP-0M
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 17:00:09 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45994
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j4AuV-0002F6-Hk
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 17:00:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582063206;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+W53ILTXmHOlq3XbKJCYxzxzVXDkZrpwBwGxafkzbNY=;
+ b=D2T0+8C2tRAo1KFpSRJkKalez1yodV6ZJVqkcntPLR7QvvtJy5RUJYqGRQBb8Y7DYtJQSl
+ yYOJlQ4QZV18muZ0tKTQVQlwd2QUP2b5PAj0bcdQtJMCDhSAVAUXs5AkhfRFFtc4/Y1yQr
+ M+rYJyyvVR54nMcTxEXTj/43ygodOwg=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-sESt9gyWNW-DlbEEiL-95w-1; Tue, 18 Feb 2020 17:00:03 -0500
+Received: by mail-qk1-f197.google.com with SMTP id q2so15197877qkq.19
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 14:00:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=sLeGUH5OxTikEsToDHR4WZF1TwQ6mWFhg6WtSprZEOs=;
- b=OE2gH7e9tgGgGqjgzeuzJr9C+ILpDSxorkMybqJsdyZYqykFktNdVzyRx+VZ8HuIbk
- RxNRgbC8owely0ODbFjdx2oDY23/8POqWeqS0gxzAYkRdJ6k9l1jJHNTxLCTsRCd28XN
- CYhGDWcwPGuydpobIhfj3sHPs5jhwr7ZGmDdbVBpu0aZaJrbn/f3kr2aH5TFo6ampMwe
- Gsdq0Etj+1UNxEGYK1clSzbKMmqsxnU5VnS4rUp986s3PXZUNhU/7nGvQT+9kwu3QFw3
- l+L2o0BbTfiloK0zyG5QGmeEHW6XF9YOXSQYHlsiRDb/1oYqhE7JeuXEVEBy+92jO9hb
- UXfg==
-X-Gm-Message-State: APjAAAU1zmduYogCRPGe44FIQ6KcEfkdQqusEiTjI04LWhmXrU7J8Tug
- cj5E0U7q7atKDD7RFa9Jb9lzSjAVC+rz9hca2Ck=
-X-Google-Smtp-Source: APXvYqx2A7Vp1eDnko0Yog2I4SnljG7i2qroy00gwc0P+43U2XutOdHCAKQMpxwGFU2Cd5Cv50FC14LTqFq7gt94IV4=
-X-Received: by 2002:a5d:8856:: with SMTP id t22mr16716548ios.217.1582062663091; 
- Tue, 18 Feb 2020 13:51:03 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Cpd/buwQ5LZ4CQPY0bxUseKVyE7r0EQCx7JXI1leWlM=;
+ b=Dki7oyS6YCnrbAUUsq28dy14UymPJWwqYcT+6OXQDJl7ou3q/9acYLfVI2EpLCQL1O
+ f+LlijgElZlN8pBRoi1Wfe+cOkocYEaogdIkByWF4BLBcNsoibIdJHxy7cVALOV6HEAX
+ 0/3sNVtzJ1XJ02eFjk8BAnAK/upmodfhRuZ10YSJlc/f1cfMi0XZ6NLv3gT7ncho14/W
+ Z+xT9ikc2f1N9ExU9WamKV2xkVzCpJb9/lki7+LVE/Xlb5TwpbOwe+NMwq847TVkbx76
+ ltzYt8j6e5ICW17gTY3C5a1kEpwA7QbFVeB0mcnh0T9qpF00qvDhlVQGrevWCQKgg9jU
+ Rulg==
+X-Gm-Message-State: APjAAAXLGfBQSWkfwWfhqsy4+X9GZL6vs3Zs45H/BWAIOPGQZDqQRUBM
+ zRCc8UHsF20tA5U1TEcX2F5Rp1ZfLWk9ZLn4GWQTt2CCClm7WG9KMcRg5nxWJp4Z+9neJt/LuQV
+ mo4pbwMIl5SkpDzU=
+X-Received: by 2002:a37:91c2:: with SMTP id
+ t185mr18826983qkd.284.1582063203462; 
+ Tue, 18 Feb 2020 14:00:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx5D7t/Oox7IPuNqUVDV5TZsCot6ZSLbJWi5gnGWozWeNc8JX7GXgdHpenorloqdE8Ez7kcqw==
+X-Received: by 2002:a37:91c2:: with SMTP id
+ t185mr18826964qkd.284.1582063203188; 
+ Tue, 18 Feb 2020 14:00:03 -0800 (PST)
+Received: from xz-x1 ([104.156.64.74])
+ by smtp.gmail.com with ESMTPSA id t2sm2533478qkc.62.2020.02.18.14.00.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 18 Feb 2020 14:00:02 -0800 (PST)
+Date: Tue, 18 Feb 2020 17:00:01 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 fixed 01/16] util: vfio-helpers: Factor out and fix
+ processing of existing ram blocks
+Message-ID: <20200218220001.GE7090@xz-x1>
+References: <20200212134254.11073-1-david@redhat.com>
+ <20200212134254.11073-2-david@redhat.com>
 MIME-Version: 1.0
-References: <20200119005102.3847-1-nieklinnenbank@gmail.com>
- <CAPan3WpV2m9HXLXZDopKUb2EfX2KE9y530m2pJG4-D96==ggCg@mail.gmail.com>
- <ee95179f-c15f-9615-e241-80199e6948b7@redhat.com>
- <CAPan3WpG0yPu5sbS=mpHk=xNVGaqwWFrBcDBcovLLRit==5dwg@mail.gmail.com>
- <3aa04b23-80a8-21d1-7481-d52b6d8f88c1@redhat.com>
- <CAFEAcA-kNNWgLc8NxWgVJQk29BVr28j-A_d4M+8=7nfpTzhzcQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA-kNNWgLc8NxWgVJQk29BVr28j-A_d4M+8=7nfpTzhzcQ@mail.gmail.com>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Tue, 18 Feb 2020 22:50:52 +0100
-Message-ID: <CAPan3WpkFtEe-9TuaCNhW=Dz3VZHE=8qUVhJbhW9BrdiyoMkRQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/20] Add Allwinner H3 SoC and Orange Pi PC Machine
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000000bcb51059ee0ab20"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d29
+In-Reply-To: <20200212134254.11073-2-david@redhat.com>
+X-MC-Unique: sESt9gyWNW-DlbEEiL-95w-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,103 +105,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000000bcb51059ee0ab20
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, Feb 12, 2020 at 02:42:39PM +0100, David Hildenbrand wrote:
+> Factor it out into common code when a new notifier is registered, just
+> as done with the memory region notifier. This allows us to have the
+> logic about how to process existing ram blocks at a central place (which
+> will be extended soon).
+>=20
+> Just like when adding a new ram block, we have to register the max_length
+> for now. We don't have a way to get notified about resizes yet, and some
+> memory would not be mapped when growing the ram block.
+>=20
+> Note: Currently, ram blocks are only "fake resized". All memory
+> (max_length) is accessible.
+>=20
+> We can get rid of a bunch of functions in stubs/ram-block.c . Print the
+> warning from inside qemu_vfio_ram_block_added().
+>=20
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  exec.c                    |  5 +++++
+>  hw/core/numa.c            | 14 ++++++++++++++
+>  include/exec/cpu-common.h |  1 +
+>  stubs/ram-block.c         | 20 --------------------
+>  util/vfio-helpers.c       | 28 +++++++---------------------
+>  5 files changed, 27 insertions(+), 41 deletions(-)
+>=20
+> diff --git a/exec.c b/exec.c
+> index 67e520d18e..05cfe868ab 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2017,6 +2017,11 @@ ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
+>      return rb->used_length;
+>  }
+> =20
+> +ram_addr_t qemu_ram_get_max_length(RAMBlock *rb)
+> +{
+> +    return rb->max_length;
+> +}
+> +
+>  bool qemu_ram_is_shared(RAMBlock *rb)
+>  {
+>      return rb->flags & RAM_SHARED;
+> diff --git a/hw/core/numa.c b/hw/core/numa.c
+> index 0d1b4be76a..6599c69e05 100644
+> --- a/hw/core/numa.c
+> +++ b/hw/core/numa.c
+> @@ -899,9 +899,23 @@ void query_numa_node_mem(NumaNodeMem node_mem[], Mac=
+hineState *ms)
+>      }
+>  }
+> =20
+> +static int ram_block_notify_add_single(RAMBlock *rb, void *opaque)
+> +{
+> +    const ram_addr_t max_size =3D qemu_ram_get_max_length(rb);
+> +    void *host =3D qemu_ram_get_host_addr(rb);
+> +    RAMBlockNotifier *notifier =3D opaque;
+> +
+> +    if (host) {
+> +        notifier->ram_block_added(notifier, host, max_size);
+> +    }
+> +    return 0;
+> +}
+> +
+>  void ram_block_notifier_add(RAMBlockNotifier *n)
+>  {
+>      QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
+> +    /* Notify about all existing ram blocks. */
+> +    qemu_ram_foreach_block(ram_block_notify_add_single, n);
+>  }
+> =20
+>  void ram_block_notifier_remove(RAMBlockNotifier *n)
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index 81753bbb34..9760ac9068 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -59,6 +59,7 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
+>  void *qemu_ram_get_host_addr(RAMBlock *rb);
+>  ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
+>  ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
+> +ram_addr_t qemu_ram_get_max_length(RAMBlock *rb);
+>  bool qemu_ram_is_shared(RAMBlock *rb);
+>  bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+>  void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+> diff --git a/stubs/ram-block.c b/stubs/ram-block.c
+> index 73c0a3ee08..10855b52dd 100644
+> --- a/stubs/ram-block.c
+> +++ b/stubs/ram-block.c
+> @@ -2,21 +2,6 @@
+>  #include "exec/ramlist.h"
+>  #include "exec/cpu-common.h"
+> =20
+> -void *qemu_ram_get_host_addr(RAMBlock *rb)
+> -{
+> -    return 0;
+> -}
+> -
+> -ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
+> -{
+> -    return 0;
+> -}
+> -
+> -ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
+> -{
+> -    return 0;
+> -}
 
-Hi Peter & Philippe,
+Maybe put into another patch?
 
-On Tue, Feb 18, 2020 at 11:05 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+Actually I'm thinking whether it would worth to do...  They're still
+declared in include/exec/cpu-common.h, so logically who includes the
+header but linked against stubs can still call this function.  So
+keeping them there still make sense to me.
 
-> On Tue, 18 Feb 2020 at 06:46, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-> wrote:
-> > IIRC from the specs, cards are block devices and the only alignment
-> > required is the size of a block (512KiB for your 4GiB card).
->
-> Isn't there something related to erase blocks too, which impose
-> a larger granularity than just a single block?
->
-> Anyway, in general the backing image for an SD card device
-> needs to be exactly the size of the SD card you're emulating,
-> because QEMU needs somewhere it can write back the data
-> if the guest decides to write to the last block on the card.
-> So short-length images generally don't work (true for all
-> block devices, not just SD cards, I think). This often bites users
-> if they're using some distro "here's a disk/sd card image file"
-> where the expected use with real hardware is "dd the image
-> file onto the SD card".
->
+> -
+>  void ram_block_notifier_add(RAMBlockNotifier *n)
+>  {
+>  }
+> @@ -24,8 +9,3 @@ void ram_block_notifier_add(RAMBlockNotifier *n)
+>  void ram_block_notifier_remove(RAMBlockNotifier *n)
+>  {
+>  }
+> -
+> -int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
+> -{
+> -    return 0;
+> -}
+> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+> index 813f7ec564..71e02e7f35 100644
+> --- a/util/vfio-helpers.c
+> +++ b/util/vfio-helpers.c
+> @@ -376,8 +376,13 @@ static void qemu_vfio_ram_block_added(RAMBlockNotifi=
+er *n,
+>                                        void *host, size_t size)
+>  {
+>      QEMUVFIOState *s =3D container_of(n, QEMUVFIOState, ram_notifier);
+> +    int ret;
+> +
+>      trace_qemu_vfio_ram_block_added(s, host, size);
+> -    qemu_vfio_dma_map(s, host, size, false, NULL);
+> +    ret =3D qemu_vfio_dma_map(s, host, size, false, NULL);
+> +    if (ret) {
+> +        error_report("qemu_vfio_dma_map(%p, %zu) failed: %d", host, size=
+, ret);
+> +    }
 
-Yes, the description you gave here is indeed the issue.
-And unfortunately in this particular case, the distro did not give a very
-understandable
-diagnostic error message.
+Irrelevant change (another patch)?
 
-Kind regards,
-Niek
+>  }
+> =20
+>  static void qemu_vfio_ram_block_removed(RAMBlockNotifier *n,
+> @@ -390,33 +395,14 @@ static void qemu_vfio_ram_block_removed(RAMBlockNot=
+ifier *n,
+>      }
+>  }
+> =20
+> -static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
+> -{
+> -    void *host_addr =3D qemu_ram_get_host_addr(rb);
+> -    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+> -    int ret;
+> -    QEMUVFIOState *s =3D opaque;
+> -
+> -    if (!host_addr) {
+> -        return 0;
+> -    }
+> -    ret =3D qemu_vfio_dma_map(s, host_addr, length, false, NULL);
+> -    if (ret) {
+> -        fprintf(stderr, "qemu_vfio_init_ramblock: failed %p %" PRId64 "\=
+n",
+> -                host_addr, (uint64_t)length);
+> -    }
+> -    return 0;
+> -}
+> -
+>  static void qemu_vfio_open_common(QEMUVFIOState *s)
+>  {
+>      qemu_mutex_init(&s->lock);
+>      s->ram_notifier.ram_block_added =3D qemu_vfio_ram_block_added;
+>      s->ram_notifier.ram_block_removed =3D qemu_vfio_ram_block_removed;
+> -    ram_block_notifier_add(&s->ram_notifier);
+>      s->low_water_mark =3D QEMU_VFIO_IOVA_MIN;
+>      s->high_water_mark =3D QEMU_VFIO_IOVA_MAX;
+> -    qemu_ram_foreach_block(qemu_vfio_init_ramblock, s);
+> +    ram_block_notifier_add(&s->ram_notifier);
 
+Pure question: this looks like a good improvement, however do you know
+why HAX and SEV do not need to init ramblock?
 
->
-> thanks
-> -- PMM
->
+Thanks,
 
+>  }
+> =20
+>  /**
+> --=20
+> 2.24.1
+>=20
+>=20
 
 --=20
-Niek Linnenbank
+Peter Xu
 
---0000000000000bcb51059ee0ab20
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Hi Peter &amp; Philippe,<br></div><br><div class=3D"g=
-mail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Feb 18, 2020 at 1=
-1:05 AM Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter=
-.maydell@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
-;padding-left:1ex">On Tue, 18 Feb 2020 at 06:46, Philippe Mathieu-Daud=C3=
-=A9 &lt;<a href=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@redha=
-t.com</a>&gt; wrote:<br>
-&gt; IIRC from the specs, cards are block devices and the only alignment<br=
->
-&gt; required is the size of a block (512KiB for your 4GiB card).<br>
-<br>
-Isn&#39;t there something related to erase blocks too, which impose<br>
-a larger granularity than just a single block?<br>
-<br>
-Anyway, in general the backing image for an SD card device<br>
-needs to be exactly the size of the SD card you&#39;re emulating,<br>
-because QEMU needs somewhere it can write back the data<br>
-if the guest decides to write to the last block on the card.<br>
-So short-length images generally don&#39;t work (true for all<br>
-block devices, not just SD cards, I think). This often bites users<br>
-if they&#39;re using some distro &quot;here&#39;s a disk/sd card image file=
-&quot;<br>
-where the expected use with real hardware is &quot;dd the image<br>
-file onto the SD card&quot;.<br></blockquote><div><br></div><div>Yes, the d=
-escription you gave here is indeed the issue.</div><div>And unfortunately i=
-n this particular case, the distro did not give a very understandable</div>=
-<div>diagnostic error message.</div><div><br></div><div>Kind regards,</div>=
-<div>Niek<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex">
-<br>
-thanks<br>
--- PMM<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
-
---0000000000000bcb51059ee0ab20--
 
