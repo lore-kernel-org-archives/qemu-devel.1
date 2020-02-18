@@ -7,76 +7,78 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D2BC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:00:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33062C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BC2220659
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:00:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2B0D20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:02:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tsj85fQE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BC2220659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AND8KQF0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2B0D20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3zfj-0003wP-9X
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 05:00:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46048)
+	id 1j3zhu-0007HF-6b
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 05:02:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45273)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j3zeJ-00022L-Pc
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:58:41 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j3zZr-00025N-Sg
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:54:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j3zeI-0004SD-Ou
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:58:39 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33059
+ (envelope-from <dgilbert@redhat.com>) id 1j3zZq-0002YE-VB
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:54:03 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27005
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j3zeI-0004Rl-Jt
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:58:38 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j3zZq-0002Xy-RW
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:54:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582019918;
+ s=mimecast20190719; t=1582019642;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IkHt848DxWWkhO1vgEArZ549QARmKfZARkw1A+Y7GNY=;
- b=Tsj85fQEflC+QD9WV+syiJeLTJfdm3WV1Y+Hg4NIpesAlbbADYBVj0K9N6bQ4HjvosURUG
- wztNKRzouc9Au0ha3kE7pFVf7NICHm13DDks0qyx0cmJnjjKLspS6VCVyo8b9WVJHfBfw0
- PhP210hrZFeHUv+qrfk7AqHWPH6YO1Y=
+ bh=qDbx61T4Q0bmDfIc+2zbjFF4eWEyPM0f+8ojJBMdH+k=;
+ b=AND8KQF0ZBDq+z1o9obLzkixzjfIW9FFC0sJXFiD8fTzTm+WnTV+reLVx2eZuz3Vs03lyQ
+ aSSrvzdzwUoeK4aueSWaMo9z/hl4LpUV8Dqc1snpHPnkrXfbdWHwb0fJbB5KOosLLmy6w4
+ GKeeKHC1QTNW+Cbw3xk0katDhmAHcGI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-IPj_3_YnNmmEd9W9ixlS7g-1; Tue, 18 Feb 2020 04:58:31 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-253-btOGXQXyM_qUxLkPaA8nDg-1; Tue, 18 Feb 2020 04:54:00 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A5E98010E5;
- Tue, 18 Feb 2020 09:58:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C266189F760;
+ Tue, 18 Feb 2020 09:53:58 +0000 (UTC)
 Received: from work-vm (unknown [10.36.118.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6773E5DA60;
- Tue, 18 Feb 2020 09:58:08 +0000 (UTC)
-Date: Tue, 18 Feb 2020 09:58:06 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E44E27061;
+ Tue, 18 Feb 2020 09:53:37 +0000 (UTC)
+Date: Tue, 18 Feb 2020 09:53:35 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH RESEND 08/13] hw/vfio/display: Remove superfluous semicolon
-Message-ID: <20200218095806.GK3080@work-vm>
+Subject: Re: [PATCH RESEND 05/13] hw/arm/xlnx-versal: Remove superfluous
+ semicolon
+Message-ID: <20200218095335.GH3080@work-vm>
 References: <20200218094402.26625-1-philmd@redhat.com>
- <20200218094402.26625-9-philmd@redhat.com>
+ <20200218094402.26625-6-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200218094402.26625-9-philmd@redhat.com>
+In-Reply-To: <20200218094402.26625-6-philmd@redhat.com>
 User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: IPj_3_YnNmmEd9W9ixlS7g-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: btOGXQXyM_qUxLkPaA8nDg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,30 +110,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> Fixes: 8b818e059bf
+> Fixes: 6f16da53ffe
 > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/vfio/display.c | 2 +-
+>  hw/arm/xlnx-versal-virt.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-> index a5a608c5b2..f4977c66e1 100644
-> --- a/hw/vfio/display.c
-> +++ b/hw/vfio/display.c
-> @@ -287,7 +287,7 @@ static void vfio_display_dmabuf_update(void *opaque)
->      VFIOPCIDevice *vdev =3D opaque;
->      VFIODisplay *dpy =3D vdev->dpy;
->      VFIODMABuf *primary, *cursor;
-> -    bool free_bufs =3D false, new_cursor =3D false;;
-> +    bool free_bufs =3D false, new_cursor =3D false;
+> diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+> index 462493c467..0d2e3bdda1 100644
+> --- a/hw/arm/xlnx-versal-virt.c
+> +++ b/hw/arm/xlnx-versal-virt.c
+> @@ -350,7 +350,7 @@ static void create_virtio_regions(VersalVirt *s)
+>      int i;
 > =20
->      primary =3D vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
->      if (primary =3D=3D NULL) {
+>      for (i =3D 0; i < NUM_VIRTIO_TRANSPORT; i++) {
+> -        char *name =3D g_strdup_printf("virtio%d", i);;
+> +        char *name =3D g_strdup_printf("virtio%d", i);
+>          hwaddr base =3D MM_TOP_RSVD + i * virtio_mmio_size;
+>          int irq =3D VERSAL_RSVD_IRQ_FIRST + i;
+>          MemoryRegion *mr;
 > --=20
 > 2.21.1
 >=20
