@@ -2,141 +2,94 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F9DC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D6CC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:24:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4FD12173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:23:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4FD12173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id BFB072173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:24:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P5XBVYcx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFB072173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42qe-0002I1-VX
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:23:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
+	id 1j42rX-0003cD-1T
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:24:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45760)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1j42j0-0000nm-53
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:15:43 -0500
+ (envelope-from <philmd@redhat.com>) id 1j42nl-0006a4-LZ
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:20:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1j42iy-0007Ok-SQ
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:15:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10160)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1j42iy-0007OQ-KA
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:15:40 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01IDA8ZA074530
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 08:15:39 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y6e2ff3fm-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 08:15:39 -0500
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Tue, 18 Feb 2020 13:15:37 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 18 Feb 2020 13:15:34 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01IDFXBN52232224
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 18 Feb 2020 13:15:33 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3C329AE053;
- Tue, 18 Feb 2020 13:15:33 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E00CFAE051;
- Tue, 18 Feb 2020 13:15:32 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.50.32])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 18 Feb 2020 13:15:32 +0000 (GMT)
-Subject: Re: [PATCH v3 00/17] s390x: Protected Virtualization support
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200214151636.8764-1-frankja@linux.ibm.com>
- <20200218141304.1c6f82b0.cohuck@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Tue, 18 Feb 2020 14:15:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <philmd@redhat.com>) id 1j42nj-0000Wd-Rf
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:20:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58155
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j42nj-0000WD-Mn
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:20:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582032034;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=/sFMMkb4e3qwBsA4b31ISSU5c6HT2zaacb/ZY1KC50I=;
+ b=P5XBVYcxdNka+WF/m0v3bEJPz1hCH6LZ8UJxg3H6pCwrjeB+7N8EcOdICBqDOmbp4pC/74
+ PZXN+1li5WynPnNl26+BDbUsj9tAvLr+AQWy6/5pVAbYIQ1gtKerIqfA1NG9PEKDsNozgi
+ LIMwZ4/4HWfFaSDM4j1gi9jIdWtgpGg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-3ZUpG6PJNUKP1nmoTCPu1A-1; Tue, 18 Feb 2020 08:20:27 -0500
+Received: by mail-wr1-f69.google.com with SMTP id r1so10773354wrc.15
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 05:20:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Q0b3JmegZIBOrzOx6D2WeXg3Fr4IgL8v1odhEcx6GCw=;
+ b=jrDMtYrGGdTUZNifqvShunMW7q4LSW8QjGFqjKziky/MvnJcghSr/Ea3CBa2TRnGnD
+ mdwlpeQH7ydp4SOpNgy0dGLsxrInOShLoCN5CqqMXwpEa+QxQiLuw/N40QnhcfhnTLW9
+ rcrf3bqVAydDunTW9a0L6F3MMo4Ue/qZvxyANKEjXTuNTkBOQBMiVA+kbT5G6q3/age1
+ /hBAEJxxKeuxU57dtZnbdkL/dFX3fEFR5bY4UlO8ph2BTZNzEidII9FhgTVZr69q6FJk
+ rXk1J60B3NmrV0Plp4qkUSgcWf9Pn1/dTGr7wN0zMgvjyuVs/fFHJKd+ZBbxmnUrTITs
+ 5FPg==
+X-Gm-Message-State: APjAAAVXpCS8h5btBs1vk0tAyoZciKKHl+04piPlqAEN048dy8eXx6Ky
+ gCQ0wXPF0pFfcMUfWSJzsbL9hIV0iRmO4fNaJsZTXy46RW85lC8/9HagXqotjX/1uo7aw1ovBqi
+ YdrAV0wN1uB5IOUA=
+X-Received: by 2002:adf:f491:: with SMTP id l17mr31157129wro.149.1582032025046; 
+ Tue, 18 Feb 2020 05:20:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyKkQEDaHDISgH6qvq3pjfhjQ41Yebtgf20dAvgvUG3VIO2Qwt5nwgZHZ29Nv8QGZy+aHbmpw==
+X-Received: by 2002:adf:f491:: with SMTP id l17mr31157097wro.149.1582032024834; 
+ Tue, 18 Feb 2020 05:20:24 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id m68sm3531219wme.48.2020.02.18.05.20.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 18 Feb 2020 05:20:24 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Avoid cpu_physical_memory_rw() with a constant is_write
+ argument
+Date: Tue, 18 Feb 2020 14:20:23 +0100
+Message-Id: <20200218132023.22936-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200218141304.1c6f82b0.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="kDOFXwlPbB8LhI2KIv4tjbCS9kz99W2nj"
-X-TM-AS-GCONF: 00
-x-cbid: 20021813-0020-0000-0000-000003AB4882
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021813-0021-0000-0000-0000220343C9
-Message-Id: <eb666097-dab1-c545-22ca-d270155bd752@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-18_02:2020-02-17,
- 2020-02-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- mlxlogscore=999 mlxscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 phishscore=0 bulkscore=0 adultscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002180106
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-MC-Unique: 3ZUpG6PJNUKP1nmoTCPu1A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,135 +101,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kDOFXwlPbB8LhI2KIv4tjbCS9kz99W2nj
-Content-Type: multipart/mixed; boundary="JMEH5vsP2ClH1v29hr86zhOfNEU80BG2G"
+This commit was produced with the included Coccinelle script
+scripts/coccinelle/as-rw-const.patch.
 
---JMEH5vsP2ClH1v29hr86zhOfNEU80BG2G
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Inspired-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+Based-on: <20200218112457.22712-1-peter.maydell@linaro.org>
 
-On 2/18/20 2:13 PM, Cornelia Huck wrote:
-> On Fri, 14 Feb 2020 10:16:19 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> Most of the QEMU changes for PV are related to the new IPL type with
->> subcodes 8 - 10 and the execution of the necessary Ultravisor calls to=
+Maybe can be squashed in Peter's patch?
 
->> IPL secure guests. Note that we can only boot into secure mode from
->> normal mode, i.e. stfle 161 is not active in secure mode.
->>
->> The other changes related to data gathering for emulation and
->> disabling addressing checks in secure mode, as well as CPU resets.
->=20
-> Does it make sense to start looking at this series now, or I should I
-> wait until review on the kernel side has settled? (I've lost track of
-> the state of the interfaces...)
+Cocci script can be written as:
 
-There won't be too many change because of KVM review.
-Most noteworthy is the switch from vm/vcpu create to a global switch
-through the VM, but that's just merging IOCTLs.
+    @@
+    expression E1, E2, E3, E4, E5;
+    symbol true, false;
+    @@
+    (
+    - address_space_rw(E1, E2, E3, E4, E5, false)
+    + address_space_read(E1, E2, E3, E4, E5)
+    |
+    - address_space_rw(E1, E2, E3, E4, E5, 0)
+    + address_space_read(E1, E2, E3, E4, E5)
+    |
+    - address_space_rw(E1, E2, E3, E4, E5, true)
+    + address_space_write(E1, E2, E3, E4, E5)
+    |
+    - address_space_rw(E1, E2, E3, E4, E5, 1)
+    + address_space_write(E1, E2, E3, E4, E5)
+    )
 
->=20
->>
->> V3:
->> 	* Use dedicated functions to access SIDA
->> 	* Smaller cleanups and segfault fixes
->> 	* Error reporting for Ultravisor calls
->> 	* Inject of RC of diag308 subcode 10 fails
->>
->> V2:
->> 	* Split out cleanups
->> 	* Internal PV state tracking
->> 	* Review feedback
->>
->> Janosch Frank (17):
->>   Header sync
->>   s390x: Add missing vcpu reset functions
->>   Sync pv
->>   s390x: protvirt: Add diag308 subcodes 8 - 10
->>   s390x: protvirt: Support unpack facility
->>   s390x: protvirt: Add migration blocker
->>   s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
->>   s390x: protvirt: KVM intercept changes
->>   s390: protvirt: Move STSI data over SIDAD
->>   s390x: Add SIDA memory ops
->>   s390x: protvirt: SCLP interpretation
->>   s390x: protvirt: Set guest IPL PSW
->>   s390x: protvirt: Move diag 308 data over SIDAD
->>   s390x: protvirt: Disable address checks for PV guest IO emulation
->>   s390x: protvirt: Move IO control structures over SIDA
->>   s390x: protvirt: Handle SIGP store status correctly
->>   s390x: For now add unpack feature to GA1
->>
->>  hw/s390x/Makefile.objs              |   1 +
->>  hw/s390x/ipl.c                      |  80 +++++++++++++-
->>  hw/s390x/ipl.h                      |  33 ++++++
->>  hw/s390x/pv.c                       | 160 +++++++++++++++++++++++++++=
+    @@
+    expression E1, E2, E3;
+    @@
+    (
+    - cpu_physical_memory_rw(E1, E2, E3, false)
+    + cpu_physical_memory_read(E1, E2, E3)
+    |
+    - cpu_physical_memory_rw(E1, E2, E3, 0)
+    + cpu_physical_memory_read(E1, E2, E3)
+    |
+    - cpu_physical_memory_rw(E1, E2, E3, true)
+    + cpu_physical_memory_write(E1, E2, E3)
+    |
+    - cpu_physical_memory_rw(E1, E2, E3, 1)
+    + cpu_physical_memory_write(E1, E2, E3)
+    )
+---
+ hw/xen/xen_pt_graphics.c             |  2 +-
+ target/i386/hax-all.c                |  4 ++--
+ scripts/coccinelle/as_rw_const.cocci | 20 +++++++++++++++++++-
+ 3 files changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/hw/xen/xen_pt_graphics.c b/hw/xen/xen_pt_graphics.c
+index b69732729b..a3bc7e3921 100644
+--- a/hw/xen/xen_pt_graphics.c
++++ b/hw/xen/xen_pt_graphics.c
+@@ -222,7 +222,7 @@ void xen_pt_setup_vga(XenPCIPassthroughState *s, XenHos=
+tPCIDevice *dev,
+     }
+=20
+     /* Currently we fixed this address as a primary for legacy BIOS. */
+-    cpu_physical_memory_rw(0xc0000, bios, bios_size, 1);
++    cpu_physical_memory_write(0xc0000, bios, bios_size);
+ }
+=20
+ uint32_t igd_read_opregion(XenPCIPassthroughState *s)
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index a8b6e5aeb8..f5971ccc74 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -376,8 +376,8 @@ static int hax_handle_fastmmio(CPUArchState *env, struc=
+t hax_fastmmio *hft)
+          *  hft->direction =3D=3D 2: gpa =3D=3D> gpa2
+          */
+         uint64_t value;
+-        cpu_physical_memory_rw(hft->gpa, (uint8_t *) &value, hft->size, 0)=
+;
+-        cpu_physical_memory_rw(hft->gpa2, (uint8_t *) &value, hft->size, 1=
+);
++        cpu_physical_memory_read(hft->gpa, (uint8_t *)&value, hft->size);
++        cpu_physical_memory_write(hft->gpa2, (uint8_t *)&value, hft->size)=
+;
+     }
+=20
+     return 0;
+diff --git a/scripts/coccinelle/as_rw_const.cocci b/scripts/coccinelle/as_r=
+w_const.cocci
+index 30da707701..c9a39f1abe 100644
+--- a/scripts/coccinelle/as_rw_const.cocci
++++ b/scripts/coccinelle/as_rw_const.cocci
+@@ -1,6 +1,6 @@
+ // Avoid uses of address_space_rw() with a constant is_write argument.
+ // Usage:
+-//  spatch --sp-file as-rw-const.spatch --dir . --in-place
++//  spatch --sp-file scripts/coccinelle/as_rw_const.cocci --dir . --in-pla=
+ce
+=20
+ @@
+ expression E1, E2, E3, E4, E5;
+@@ -28,3 +28,21 @@ expression E1, E2, E3, E4, E5;
+=20
+ - address_space_rw(E1, E2, E3, E4, E5, 1)
+ + address_space_write(E1, E2, E3, E4, E5)
 +
->>  hw/s390x/pv.h                       |  40 +++++++
->>  hw/s390x/s390-virtio-ccw.c          | 136 ++++++++++++++++++++++-
->>  hw/s390x/sclp.c                     |  17 +++
->>  include/hw/s390x/s390-virtio-ccw.h  |   1 +
->>  include/hw/s390x/sclp.h             |   2 +
->>  linux-headers/linux/kvm.h           |  48 ++++++++-
->>  target/s390x/cpu.c                  |  41 +++++--
->>  target/s390x/cpu.h                  |   8 +-
->>  target/s390x/cpu_features_def.inc.h |   1 +
->>  target/s390x/diag.c                 |  63 +++++++++--
->>  target/s390x/gen-features.c         |   1 +
->>  target/s390x/helper.c               |   4 +
->>  target/s390x/ioinst.c               | 113 ++++++++++++++------
->>  target/s390x/kvm-stub.c             |  10 +-
->>  target/s390x/kvm.c                  |  89 ++++++++++++++--
->>  target/s390x/kvm_s390x.h            |   6 +-
->>  target/s390x/mmu_helper.c           |   9 ++
->>  target/s390x/sigp.c                 |   1 +
->>  22 files changed, 789 insertions(+), 75 deletions(-)
->>  create mode 100644 hw/s390x/pv.c
->>  create mode 100644 hw/s390x/pv.h
->>
->=20
-> -ENODOC; can you add something under docs/ that describes how you
-> configure a pv guest and what the initialization/teardown flow is?
-
-Sure, but could you give me a bit more detail?
-What do you mean by configure?
-Command line options?
-
-
-
---JMEH5vsP2ClH1v29hr86zhOfNEU80BG2G--
-
---kDOFXwlPbB8LhI2KIv4tjbCS9kz99W2nj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5L43QACgkQ41TmuOI4
-ufiaCw/+OQm7lpUGmYFwESeQZvcmtfzM8CWJiCgBH5ELgtnRo+5F4RTssmJ2mbYE
-EyCpHhv9MBTX70jbVAgVPYVjjYanej6L8MWzMzesxxbcClisbBsnrQ6KeKBOAH9N
-1dBQ+lu+bmNibMQhVvIot7mcq06CC62c95+kg9tEk/I9F+eXK4GPNBXRliCguuZn
-jUJX9z2q/qvVHHIlEH4QL/ZEEniavxt+YD8hkFkkpxPEuILMQpw4CAvIskN6HkSA
-7Vpu6s38zfqqoKYgMKv1kYNTNwF6MSaeyQTmBXVMiLrcpTTcvbPOJat8GcqAzQ7R
-f/5Ua2nKg4jm1csuax2+5H+6ovKeRsNofZP0AwDqn2dfPyp/NPlXdcqFa84km7SI
-fExjZmEFA0H3AHgS4h9JU3r+B4Tjua+19b6tRRp1Y/nSWVPLdWd3cWRQpISxjCCk
-occvQ65TFtXbwjywMVNDDBwWNmdRxV4euLvCpsH10zEC48ttrz0TCsvTu68WKO7h
-J8fmFcxVxbDaWW5Ey7mAcfB4Fw6xmu+lgnTu+2t4qw4ACzi4PHFC9otNKkP1j0Nb
-wXZRvn7BxKn14/ebANJ3nEegg2amW8KzFc7GHJfY+gZ4WifOY8HdYibda6XHHIPy
-howXuSG5Y1vL633woudoA5qT0x82etzh6ocd12Gnut02hFQGKyk=
-=fleo
------END PGP SIGNATURE-----
-
---kDOFXwlPbB8LhI2KIv4tjbCS9kz99W2nj--
++// Avoid uses of cpu_physical_memory_rw() with a constant is_write argumen=
+t.
++@@
++expression E1, E2, E3;
++@@
++(
++- cpu_physical_memory_rw(E1, E2, E3, false)
+++ cpu_physical_memory_read(E1, E2, E3)
++|
++- cpu_physical_memory_rw(E1, E2, E3, 0)
+++ cpu_physical_memory_read(E1, E2, E3)
++|
++- cpu_physical_memory_rw(E1, E2, E3, true)
+++ cpu_physical_memory_write(E1, E2, E3)
++|
++- cpu_physical_memory_rw(E1, E2, E3, 1)
+++ cpu_physical_memory_write(E1, E2, E3)
++)
+--=20
+2.21.1
 
 
