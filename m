@@ -2,80 +2,77 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50511C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D260C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:08:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16CD720801
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:08:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39B7320801
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:08:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CSVK8kw+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16CD720801
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vf5CXzei"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39B7320801
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42cE-0004OV-8C
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:08:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43248)
+	id 1j42cO-0004gs-6l
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:08:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39672)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j42aY-0002Pv-VV
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:07:02 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j42Eo-0007Ev-5B
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j42aX-000402-7Z
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:06:58 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48098
+ (envelope-from <mreitz@redhat.com>) id 1j42Em-0001uJ-9t
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:30 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25305
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j42aW-0003zf-75
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:06:57 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j42Em-0001ti-5C
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582031215;
+ s=mimecast20190719; t=1582029867;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ISsABtw+bYLTSS6G5GN9N8on/2aISa0jXaGQ+U6IkT0=;
- b=CSVK8kw+VmUSqCXHy2NETDMIQNDbn5VkAvWk+clCxDauTh8IUcfWPeWjqCbQWWEvTVwlsQ
- uPvoWTuDJLqrTzIiXXmWQaocltWp5ssjjDj2UyS6dCYSeWSIOY3hoZXgcW+wXLPCImsAJe
- FyFemvR5lM49OTJcGhO/3YYuSQxqBiQ=
+ bh=EVNM86XVMKqugCb12twZ0/DNmmxlHxT6mS8rcuuuDLQ=;
+ b=Vf5CXzeiq50TJDmVzZhuwUHv/S8GmEd48jO2VZV3TvJ7RNO/v+HGeYOZRSHX1y4aD36Sm6
+ vk+1SH+qeDjHtROcCEhIuySdNoFOITtbKKIcYNRzkLL2/MQjcuHNwzgvH2vNufh+FYFa02
+ SEBNy4goeqlgFuHiJnRhFsnlnhVn7JU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-HUYfNg7kNkeMyBTCIvvmHQ-1; Tue, 18 Feb 2020 08:06:48 -0500
+ us-mta-404-xKp8y621O-W5C0FC_gLv7w-1; Tue, 18 Feb 2020 07:44:25 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 657C11005513;
- Tue, 18 Feb 2020 13:06:46 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D587F3A4;
- Tue, 18 Feb 2020 13:06:44 +0000 (UTC)
-Date: Tue, 18 Feb 2020 14:05:50 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Tony Krowiak <akrowiak@linux.ibm.com>, "Jason J . Herne"
- <jjherne@linux.ibm.com>
-Subject: Re: [PATCH v2 0/2] docs: rstfy some s390 docs
-Message-ID: <20200218140550.437975e6.cohuck@redhat.com>
-In-Reply-To: <20200213162942.14177-1-cohuck@redhat.com>
-References: <20200213162942.14177-1-cohuck@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11F76800D5E;
+ Tue, 18 Feb 2020 12:44:25 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8621F394;
+ Tue, 18 Feb 2020 12:44:24 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v3 31/33] block: Drop child_file
+Date: Tue, 18 Feb 2020 13:42:40 +0100
+Message-Id: <20200218124242.584644-32-mreitz@redhat.com>
+In-Reply-To: <20200218124242.584644-1-mreitz@redhat.com>
+References: <20200218124242.584644-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: HUYfNg7kNkeMyBTCIvvmHQ-1
+X-MC-Unique: xKp8y621O-W5C0FC_gLv7w-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,57 +84,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Pierre Morel <pmorel@linux.ibm.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Feb 2020 17:29:40 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block.c                   | 30 +-----------------------------
+ include/block/block_int.h |  1 -
+ tests/test-bdrv-drain.c   |  8 +++-----
+ 3 files changed, 4 insertions(+), 35 deletions(-)
 
-> https://qemu.readthedocs.io/en/latest/index.html collects various
-> documents from the QEMU docs/ subdirectory; however, none of the
-> s390 files are currently included. Therefore, I set out to convert
-> the existing files to rst and hook them up.
-> 
-> s390-dasd-ipl was straightforward enough; I also found a numbering
-> issue.
-> 
-> vfio-ap was quite a bit more involved, but I hope I have produced
-> something readable (more review can never hurt...) I also
-> moved this into the system/ subdirectory; not sure if that is the
-> best resting place, but it seemed to be the most reasonable one.
-> 
-> Tested via running 'make html' and inspecting the output.
-> 
-> Branch: https://github.com/cohuck/qemu rstfy-s390-v2
-> 
-> Changes v1->v2 (mostly addressing feedback from Peter; thanks!):
-> - dasd ipl: fix some indentation
-> - vfio-ap: autogenerate contents table
-> - vfio-ap: use more literals
-> - vfio-ap: convert some examples to tables
-> - vfio-ap: various other formatting cleanups 
-> 
-> Cornelia Huck (2):
->   docs: rstfy s390 dasd ipl documentation
->   docs: rstfy vfio-ap documentation
-> 
->  MAINTAINERS                                   |   4 +-
->  docs/devel/index.rst                          |   1 +
->  .../{s390-dasd-ipl.txt => s390-dasd-ipl.rst}  | 119 +--
->  docs/system/index.rst                         |   1 +
->  docs/{vfio-ap.txt => system/vfio-ap.rst}      | 796 +++++++++---------
->  5 files changed, 484 insertions(+), 437 deletions(-)
->  rename docs/devel/{s390-dasd-ipl.txt => s390-dasd-ipl.rst} (51%)
->  rename docs/{vfio-ap.txt => system/vfio-ap.rst} (55%)
-> 
-> 
-> base-commit: 81f49abaaac2b88062bd1b07f451d9527ed1c9ce
-
-Any further feedback? I plan to queue this on my s390-next branch.
+diff --git a/block.c b/block.c
+index 16eb790ea6..986f99415c 100644
+--- a/block.c
++++ b/block.c
+@@ -1121,33 +1121,6 @@ const BdrvChildClass child_of_bds =3D {
+     .update_filename =3D bdrv_child_cb_update_filename,
+ };
+=20
+-/*
+- * Returns the options and flags that bs->file should get if a protocol dr=
+iver
+- * is expected, based on the given options and flags for the parent BDS
+- */
+-static void bdrv_protocol_options(BdrvChildRole role, bool parent_is_forma=
+t,
+-                                  int *child_flags, QDict *child_options,
+-                                  int parent_flags, QDict *parent_options)
+-{
+-    bdrv_inherited_options(BDRV_CHILD_IMAGE, true,
+-                           child_flags, child_options,
+-                           parent_flags, parent_options);
+-}
+-
+-const BdrvChildClass child_file =3D {
+-    .parent_is_bds   =3D true,
+-    .get_parent_desc =3D bdrv_child_get_parent_desc,
+-    .inherit_options =3D bdrv_protocol_options,
+-    .drained_begin   =3D bdrv_child_cb_drained_begin,
+-    .drained_poll    =3D bdrv_child_cb_drained_poll,
+-    .drained_end     =3D bdrv_child_cb_drained_end,
+-    .attach          =3D bdrv_child_cb_attach,
+-    .detach          =3D bdrv_child_cb_detach,
+-    .inactivate      =3D bdrv_child_cb_inactivate,
+-    .can_set_aio_ctx =3D bdrv_child_cb_can_set_aio_ctx,
+-    .set_aio_ctx     =3D bdrv_child_cb_set_aio_ctx,
+-};
+-
+ static void bdrv_backing_attach(BdrvChild *c)
+ {
+     BlockDriverState *parent =3D c->opaque;
+@@ -2278,8 +2251,7 @@ static void bdrv_default_perms_for_metadata(BlockDriv=
+erState *bs, BdrvChild *c,
+ {
+     int flags;
+=20
+-    assert(child_class =3D=3D &child_file ||
+-           (child_class =3D=3D &child_of_bds && (role & BDRV_CHILD_METADAT=
+A)));
++    assert(child_class =3D=3D &child_of_bds && (role & BDRV_CHILD_METADATA=
+));
+=20
+     flags =3D bdrv_reopen_get_flags(reopen_queue, bs);
+=20
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 28a35cd5d1..1609e40b58 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -741,7 +741,6 @@ struct BdrvChildClass {
+ };
+=20
+ extern const BdrvChildClass child_of_bds;
+-extern const BdrvChildClass child_file;
+=20
+ struct BdrvChild {
+     BlockDriverState *bs;
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 0da5a3a6a1..655fd0d085 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -93,12 +93,10 @@ static void bdrv_test_child_perm(BlockDriverState *bs, =
+BdrvChild *c,
+                                  uint64_t *nperm, uint64_t *nshared)
+ {
+     /*
+-     * bdrv_default_perms() accepts only these two, so disguise
+-     * detach_by_driver_cb_parent as one of them.
++     * bdrv_default_perms() accepts nothing else, so disguise
++     * detach_by_driver_cb_parent.
+      */
+-    if (child_class !=3D &child_file && child_class !=3D &child_of_bds) {
+-        child_class =3D &child_of_bds;
+-    }
++    child_class =3D &child_of_bds;
+=20
+     bdrv_default_perms(bs, c, child_class, role, reopen_queue,
+                        perm, shared, nperm, nshared);
+--=20
+2.24.1
 
 
