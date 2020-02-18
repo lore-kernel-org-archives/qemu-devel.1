@@ -2,83 +2,86 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD479C34031
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 05:08:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED850C34031
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 05:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA05F2064C
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 05:08:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6C1D2064C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 05:08:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LuV/VPTX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA05F2064C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAsFp3fK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6C1D2064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3v7h-000463-QM
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 00:08:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41359)
+	id 1j3v7t-0004Vm-PD
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 00:08:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41371)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <coiby.xu@gmail.com>) id 1j3v6z-00038R-SS
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 00:07:59 -0500
+ (envelope-from <coiby.xu@gmail.com>) id 1j3v76-0003Cv-MA
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 00:08:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <coiby.xu@gmail.com>) id 1j3v6y-0004QT-O7
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 00:07:57 -0500
-Received: from mail-pj1-x102f.google.com ([2607:f8b0:4864:20::102f]:34216)
+ (envelope-from <coiby.xu@gmail.com>) id 1j3v74-0004SR-0D
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 00:08:03 -0500
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:53829)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1j3v6y-0004Q4-IV
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 00:07:56 -0500
-Received: by mail-pj1-x102f.google.com with SMTP id f2so294370pjq.1
- for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 21:07:56 -0800 (PST)
+ (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1j3v73-0004S9-QM
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 00:08:01 -0500
+Received: by mail-pj1-x1043.google.com with SMTP id n96so476019pjc.3
+ for <qemu-devel@nongnu.org>; Mon, 17 Feb 2020 21:08:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=iRNPxgEzAFsP+g5OygqUM7cdphUrevx5jBVX3GMIyFY=;
- b=LuV/VPTXva9obTYymFcgCDOhFHt2LsL/1Y8KGCFu0rv5/vmVFFrFTmf4jVfr/PZxCX
- /G+VoQzn9rEp4U4MbDVTpkYH+SmTadXGrrsbTzQLsbdd/srvAeayRmEY4Ol9VeEQNzM2
- F2ED51pvij2gT5Nw2pd3mQVq21viC42HDRFSDWyfu2NPCLFSeyRbu1zfbk6G1cDDfMds
- k7Mp7bM+hMOlBpQRDoycjvvZFq/ATV4LakeJMEHIkthZZmbFtvkaduxPr+UJFhYYTndx
- Y/zY0TRW3H48uW/ynBTtKi95Fm0cDtirx+JSjpkeUCAIr2nW5xb3MfJb6yR6boCesE3w
- 23JQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=RRDnThdt4ySg1vAIm76nnPSu+KXuwzNmopRaMhLWftw=;
+ b=EAsFp3fKmIwYgvF6aSxlmiPd/zxa0+CObhm7eG82EYvKDywtztnWJRdycQIYmO18iC
+ P1l2SQ+NQyJ2MAmBsk/du5B1tM5pqI77/Px0bz8pf1sc9G30lI3gooO1hIHkqeDZjIHl
+ BfxyUIP5FE42CegN/moKY7UYKh0mLJY+HYFu8/OEsgmZiFBMtF2hRI8idcOjxfNdA6zO
+ SwbUiklncxMUKGme0YSB0BN6wxmIGSeXp6SVRm9hGR45/Ygqzgyr4z2g9sXrUk0z1Kht
+ OOmI+jUd4O5HrZy69WvPF8SSgPf+vsXTUJ8IYL+LeUINsYl329qtANQiRPaKfvEb/ABq
+ rWKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=iRNPxgEzAFsP+g5OygqUM7cdphUrevx5jBVX3GMIyFY=;
- b=T6eyzaHpC1mrKjs4VfcUU8FgZsSjSfL+ysQ+FzPOXAIcH26WGJglBXwaxaY1hSwBQ0
- MgMgBZU80JtqaCzFqhAoYIvW8IddszHQYVVnZvMGO6+vUOAOz0mXJ7jvA46Ss4GsvJTY
- UYNWSdGBqCeK0nVduyILXAQcT2VrtmkMpuXsjXwaJYDqbtjjWepEKpFre3DclJEi0Svb
- fakX20tXzbDWbLnsHO3eQttymbqwza9H0pntsVmWZOb81SHbCylrR3TG1Guhb5Px6kDE
- SVslwskkSUe4YO9SjTFVGHDHCbbOz4+SV/sfuHztHV4K7aXakwSBKoq1mviFWBc/dMXD
- 1Rpg==
-X-Gm-Message-State: APjAAAVtYZ2FarS88d7ckWEdPtbOFSqK4CLXOEBxmBisaaK18QIxUjSj
- CxstZ/QWKG9PBSjJC84TRESesW3LEdU=
-X-Google-Smtp-Source: APXvYqxNVlYkKAUDpDnBr6YcznIxL/VpxWEC7YagwZ6xapTfPs1Hko7E2InqrMWHHgpFkwihuPAf0A==
-X-Received: by 2002:a17:90b:8d1:: with SMTP id
- ds17mr485253pjb.33.1582002474526; 
- Mon, 17 Feb 2020 21:07:54 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=RRDnThdt4ySg1vAIm76nnPSu+KXuwzNmopRaMhLWftw=;
+ b=ogwHUXVr5smUM9xmCueQjFIZMlwSwRaQmExegukqhEIe3vYK9Xi6zznmza5ScxeYRc
+ 1F9yRlZf/abf5ocMjecDxEFElv1PN2UYOXq9QlDmBHrYwgRfyeXNphth7ZAKJ5zps6U5
+ hLhuoR+dS+r9++Y8TMnHS8QkHrNe6GNLHv1IQyzYaGtw+CTP+7DxNjCY8rGymYAlLlrZ
+ QfQMT1fdfIO/JGlOsS+DZA7H7pyGi41XLq1TfJsdFrJSr+8nzowumsy2Tbx+Ckhk6K9F
+ 5ghSXNQoW2PZWPvZe3ogylbZ33D+giEZmfG9J3/Hiik5L7uo4uef03PKO87qVOxnUTUa
+ yG9w==
+X-Gm-Message-State: APjAAAUnl694sDaoXeil9agzoqPNvDu7SdNEToqfXKhjRzcrNnORB6K7
+ PeVJwqcuvlI5k0KheeF/EI0QOHXxIGo=
+X-Google-Smtp-Source: APXvYqwIO2LKKXy+6YPKahuX6fn+9ISKSUmwb91SZWh2wiVdRwYaLMFbPNo+ilYaTApi+Xa5lIFFzQ==
+X-Received: by 2002:a17:90a:1ac9:: with SMTP id
+ p67mr467955pjp.51.1582002480501; 
+ Mon, 17 Feb 2020 21:08:00 -0800 (PST)
 Received: from localhost.localdomain ([2402:9e80:0:1000::1:c192])
- by smtp.googlemail.com with ESMTPSA id 3sm1181613pjg.27.2020.02.17.21.07.49
+ by smtp.googlemail.com with ESMTPSA id 3sm1181613pjg.27.2020.02.17.21.07.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Feb 2020 21:07:53 -0800 (PST)
+ Mon, 17 Feb 2020 21:07:59 -0800 (PST)
 From: Coiby Xu <coiby.xu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 0/5] vhost-user block device backend implementation
-Date: Tue, 18 Feb 2020 13:07:06 +0800
-Message-Id: <20200218050711.8133-1-coiby.xu@gmail.com>
+Subject: [PATCH v4 1/5] extend libvhost to support IOThread and coroutine
+Date: Tue, 18 Feb 2020 13:07:07 +0800
+Message-Id: <20200218050711.8133-2-coiby.xu@gmail.com>
 X-Mailer: git-send-email 2.25.0
+In-Reply-To: <20200218050711.8133-1-coiby.xu@gmail.com>
+References: <20200218050711.8133-1-coiby.xu@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::102f
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,81 +99,220 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v4:
- * add object properties in class_init
- * relocate vhost-user-blk-test
- * other changes including using SocketAddress, coding style, etc.
+Previously libvhost dispatch events in its own GMainContext. Now vhost-user
+client's kick event can be dispatched in block device drive's AioContext
+thus IOThread is supported. And also allow vu_message_read and
+vu_kick_cb to be replaced so QEMU can run them as coroutines.
 
-v3:
- * separate generic vhost-user-server code from vhost-user-blk-server
-   code
- * re-write vu_message_read and kick hander function as coroutines to
-   directly call blk_co_preadv, blk_co_pwritev, etc.
- * add aio_context notifier functions to support multi-threading model
- * other fixes regarding coding style, warning report, etc.
+Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 54 ++++++++++++++++++++++++---
+ contrib/libvhost-user/libvhost-user.h | 38 ++++++++++++++++++-
+ 2 files changed, 85 insertions(+), 7 deletions(-)
 
-v2:
- * Only enable this feauture for Linux because eventfd is a Linux-specific
-   feature
-
-
-This patch series is an implementation of vhost-user block device
-backend server, thanks to Stefan and Kevin's guidance.
-
-Vhost-user block device backend server is a UserCreatable object and can be
-started using object_add,
-
- (qemu) object_add vhost-user-blk-server,id=ID,unix-socket=/tmp/vhost-user-blk_vhost.socket,node-name=DRIVE_NAME,writable=off,blk-size=512
- (qemu) object_del ID
-
-or appending the "-object" option when starting QEMU,
-
-  $ -object vhost-user-blk-server,id=disk,unix-socket=/tmp/vhost-user-blk_vhost.socket,node-name=DRIVE_NAME,writable=off,blk-size=512
-
-Then vhost-user client can connect to the server backend.
-For example, QEMU could act as a client,
-
-  $ -m 256 -object memory-backend-memfd,id=mem,size=256M,share=on -numa node,memdev=mem -chardev socket,id=char1,path=/tmp/vhost-user-blk_vhost.socket -device vhost-user-blk-pci,id=blk0,chardev=char1
-
-And guest OS could access this vhost-user block device after mouting it.
-
-Coiby Xu (5):
-  extend libvhost to support IOThread and coroutine
-  generic vhost user server
-  vhost-user block device backend server
-  a standone-alone tool to directly share disk image file via vhost-user
-    protocol
-  new qTest case to test the vhost-user-blk-server
-
- Makefile                              |   4 +
- Makefile.target                       |   1 +
- backends/Makefile.objs                |   2 +
- backends/vhost-user-blk-server.c      | 718 ++++++++++++++++++++++++++
- backends/vhost-user-blk-server.h      |  21 +
- configure                             |   3 +
- contrib/libvhost-user/libvhost-user.c |  54 +-
- contrib/libvhost-user/libvhost-user.h |  38 +-
- qemu-vu.c                             | 252 +++++++++
- tests/Makefile.include                |   3 +-
- tests/qtest/Makefile.include          |   2 +
- tests/qtest/libqos/vhost-user-blk.c   | 126 +++++
- tests/qtest/libqos/vhost-user-blk.h   |  44 ++
- tests/qtest/vhost-user-blk-test.c     | 694 +++++++++++++++++++++++++
- util/Makefile.objs                    |   3 +
- util/vhost-user-server.c              | 427 +++++++++++++++
- util/vhost-user-server.h              |  56 ++
- vl.c                                  |   4 +
- 18 files changed, 2444 insertions(+), 8 deletions(-)
- create mode 100644 backends/vhost-user-blk-server.c
- create mode 100644 backends/vhost-user-blk-server.h
- create mode 100644 qemu-vu.c
- create mode 100644 tests/qtest/libqos/vhost-user-blk.c
- create mode 100644 tests/qtest/libqos/vhost-user-blk.h
- create mode 100644 tests/qtest/vhost-user-blk-test.c
- create mode 100644 util/vhost-user-server.c
- create mode 100644 util/vhost-user-server.h
-
---
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index b89bf18501..f95664bb22 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -67,8 +67,6 @@
+ /* The version of inflight buffer */
+ #define INFLIGHT_VERSION 1
+ 
+-#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
+-
+ /* The version of the protocol we support */
+ #define VHOST_USER_VERSION 1
+ #define LIBVHOST_USER_DEBUG 0
+@@ -260,7 +258,7 @@ have_userfault(void)
+ }
+ 
+ static bool
+-vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
++vu_message_read_(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+ {
+     char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] = { };
+     struct iovec iov = {
+@@ -328,6 +326,17 @@ fail:
+     return false;
+ }
+ 
++static bool vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
++{
++    vu_read_msg_cb read_msg;
++    if (dev->co_iface) {
++        read_msg = dev->co_iface->read_msg;
++    } else {
++        read_msg = vu_message_read_;
++    }
++    return read_msg(dev, conn_fd, vmsg);
++}
++
+ static bool
+ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+ {
+@@ -1075,9 +1084,14 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *vmsg)
+     }
+ 
+     if (dev->vq[index].kick_fd != -1 && dev->vq[index].handler) {
++        if (dev->set_watch_packed_data) {
++            dev->set_watch_packed_data(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
++                                       dev->co_iface->kick_callback,
++                                       (void *)(long)index);
++        } else {
+         dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
+                        vu_kick_cb, (void *)(long)index);
+-
++        }
+         DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
+                dev->vq[index].kick_fd, index);
+     }
+@@ -1097,8 +1111,14 @@ void vu_set_queue_handler(VuDev *dev, VuVirtq *vq,
+     vq->handler = handler;
+     if (vq->kick_fd >= 0) {
+         if (handler) {
++            if (dev->set_watch_packed_data) {
++                dev->set_watch_packed_data(dev, vq->kick_fd, VU_WATCH_IN,
++                                           dev->co_iface->kick_callback,
++                                           (void *)(long)qidx);
++            } else {
+             dev->set_watch(dev, vq->kick_fd, VU_WATCH_IN,
+                            vu_kick_cb, (void *)(long)qidx);
++            }
+         } else {
+             dev->remove_watch(dev, vq->kick_fd);
+         }
+@@ -1627,6 +1647,12 @@ vu_deinit(VuDev *dev)
+         }
+ 
+         if (vq->kick_fd != -1) {
++            /* remove watch for kick_fd
++             * When client process is running in gdb and
++             * quit command is run in gdb, QEMU will still dispatch the event
++             * which will cause segment fault in the callback function
++             */
++            dev->remove_watch(dev, vq->kick_fd);
+             close(vq->kick_fd);
+             vq->kick_fd = -1;
+         }
+@@ -1682,7 +1708,7 @@ vu_init(VuDev *dev,
+ 
+     assert(max_queues > 0);
+     assert(socket >= 0);
+-    assert(set_watch);
++    /* assert(set_watch); */
+     assert(remove_watch);
+     assert(iface);
+     assert(panic);
+@@ -1715,6 +1741,24 @@ vu_init(VuDev *dev,
+     return true;
+ }
+ 
++bool
++vu_init_packed_data(VuDev *dev,
++        uint16_t max_queues,
++        int socket,
++        vu_panic_cb panic,
++        vu_set_watch_cb_packed_data set_watch_packed_data,
++        vu_remove_watch_cb remove_watch,
++        const VuDevIface *iface,
++        const CoIface *co_iface)
++{
++    if (vu_init(dev, max_queues, socket, panic, NULL, remove_watch, iface)) {
++        dev->set_watch_packed_data = set_watch_packed_data;
++        dev->co_iface = co_iface;
++        return true;
++    }
++    return false;
++}
++
+ VuVirtq *
+ vu_get_queue(VuDev *dev, int qidx)
+ {
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 5cb7708559..6aadeaa0f2 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -30,6 +30,8 @@
+ 
+ #define VHOST_MEMORY_MAX_NREGIONS 8
+ 
++#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
++
+ typedef enum VhostSetConfigType {
+     VHOST_SET_CONFIG_TYPE_MASTER = 0,
+     VHOST_SET_CONFIG_TYPE_MIGRATION = 1,
+@@ -201,6 +203,7 @@ typedef uint64_t (*vu_get_features_cb) (VuDev *dev);
+ typedef void (*vu_set_features_cb) (VuDev *dev, uint64_t features);
+ typedef int (*vu_process_msg_cb) (VuDev *dev, VhostUserMsg *vmsg,
+                                   int *do_reply);
++typedef bool (*vu_read_msg_cb) (VuDev *dev, int sock, VhostUserMsg *vmsg);
+ typedef void (*vu_queue_set_started_cb) (VuDev *dev, int qidx, bool started);
+ typedef bool (*vu_queue_is_processed_in_order_cb) (VuDev *dev, int qidx);
+ typedef int (*vu_get_config_cb) (VuDev *dev, uint8_t *config, uint32_t len);
+@@ -208,6 +211,20 @@ typedef int (*vu_set_config_cb) (VuDev *dev, const uint8_t *data,
+                                  uint32_t offset, uint32_t size,
+                                  uint32_t flags);
+ 
++typedef void (*vu_watch_cb_packed_data) (void *packed_data);
++
++typedef void (*vu_set_watch_cb_packed_data) (VuDev *dev, int fd, int condition,
++                                             vu_watch_cb_packed_data cb,
++                                             void *data);
++/*
++ * allowing vu_read_msg_cb and kick_callback to be replaced so QEMU
++ * can run them as coroutines
++ */
++typedef struct CoIface {
++    vu_read_msg_cb read_msg;
++    vu_watch_cb_packed_data kick_callback;
++} CoIface;
++
+ typedef struct VuDevIface {
+     /* called by VHOST_USER_GET_FEATURES to get the features bitmask */
+     vu_get_features_cb get_features;
+@@ -372,7 +389,8 @@ struct VuDev {
+     /* @set_watch: add or update the given fd to the watch set,
+      * call cb when condition is met */
+     vu_set_watch_cb set_watch;
+-
++    /* AIO dispatch will only one data pointer to callback function */
++    vu_set_watch_cb_packed_data set_watch_packed_data;
+     /* @remove_watch: remove the given fd from the watch set */
+     vu_remove_watch_cb remove_watch;
+ 
+@@ -380,7 +398,7 @@ struct VuDev {
+      * re-initialize */
+     vu_panic_cb panic;
+     const VuDevIface *iface;
+-
++    const CoIface *co_iface;
+     /* Postcopy data */
+     int postcopy_ufd;
+     bool postcopy_listening;
+@@ -417,6 +435,22 @@ bool vu_init(VuDev *dev,
+              const VuDevIface *iface);
+ 
+ 
++/**
++ * vu_init_packed_data:
++ * Same as vu_init except for set_watch_packed_data which will pack
++ * two parameters into a struct thus QEMU aio_dispatch can pass the
++ * required data to callback function.
++ *
++ * Returns: true on success, false on failure.
++ **/
++bool vu_init_packed_data(VuDev *dev,
++                         uint16_t max_queues,
++                         int socket,
++                         vu_panic_cb panic,
++                         vu_set_watch_cb_packed_data set_watch_packed_data,
++                         vu_remove_watch_cb remove_watch,
++                         const VuDevIface *iface,
++                         const CoIface *co_iface);
+ /**
+  * vu_deinit:
+  * @dev: a VuDev context
+-- 
 2.25.0
 
 
