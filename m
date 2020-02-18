@@ -2,80 +2,82 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7725BC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E07BC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:30:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41FDD2173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:25:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CC96206F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:30:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0V6c02K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41FDD2173E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TkUjFP4s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC96206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42sR-0004Z5-Gm
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:25:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46381)
+	id 1j42xI-0007Bc-Du
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:30:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46961)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j42rs-00046q-CD
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:24:53 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j42wa-0006HP-Cg
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:29:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j42rr-00022y-Da
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:24:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44474
+ (envelope-from <kwolf@redhat.com>) id 1j42wZ-0003mT-1m
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:29:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44898
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j42rr-00022Y-9h
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:24:51 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j42wY-0003lg-Sp
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:29:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582032290;
+ s=mimecast20190719; t=1582032582;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=AbMlemMewGH1yjlVCwW6rJeJUbox05exjwWTzZcgJew=;
- b=B0V6c02KgA8V7rtxWz1csDtQaywf0OELCf3nQeuYMkZQr8rtU6TRVIZsaycf2B277DGXWp
- 6sIUT3whZBW4l05a0XwT5QXCJ1ZISudPH7zDhYoP8HMMjyy0w+nagxGHYvngJgHaU2mkxK
- xsubAsZwYss4O2xu3L4DgLfPJcyOn70=
+ bh=louIaOHDbvh9EzTQgj7vvaxYt+wJwlQE0P6WfTsuq4k=;
+ b=TkUjFP4sNnHOwqFjfDuJ82rkhHpqI3Ojqk79EDothSVOlNSLuqyC2tMQT5NmRB5PtQuVDE
+ Fqg7he2Pphb0exn+WY2H5KLQ5Vxu40gJfk9alV/tKMtUYCMnVhjlS+5pzMiOB0m//e//8r
+ PJz+vnX2KHjbqbbRbeZh8/mGez5dnO0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-hLtTabLNO-Gyh7lLJHlKKA-1; Tue, 18 Feb 2020 08:24:46 -0500
-X-MC-Unique: hLtTabLNO-Gyh7lLJHlKKA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-386-YP6wPajRMfqaYCeCDNk6Pw-1; Tue, 18 Feb 2020 08:29:40 -0500
+X-MC-Unique: YP6wPajRMfqaYCeCDNk6Pw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD21F100550E;
- Tue, 18 Feb 2020 13:24:44 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0D4ED8B740;
- Tue, 18 Feb 2020 13:24:40 +0000 (UTC)
-Date: Tue, 18 Feb 2020 14:24:29 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v3 00/17] s390x: Protected Virtualization support
-Message-ID: <20200218142429.220b9b41.cohuck@redhat.com>
-In-Reply-To: <eb666097-dab1-c545-22ca-d270155bd752@linux.ibm.com>
-References: <20200214151636.8764-1-frankja@linux.ibm.com>
- <20200218141304.1c6f82b0.cohuck@redhat.com>
- <eb666097-dab1-c545-22ca-d270155bd752@linux.ibm.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AB76107B26F;
+ Tue, 18 Feb 2020 13:29:39 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-181.ams2.redhat.com [10.36.117.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F3AA81BC6D;
+ Tue, 18 Feb 2020 13:29:37 +0000 (UTC)
+Date: Tue, 18 Feb 2020 14:29:36 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH v4 18/19] iotests: Add tests for invalid Quorum @replaces
+Message-ID: <20200218132936.GD6157@linux.fritz.box>
+References: <20200218103454.296704-1-mreitz@redhat.com>
+ <20200218103454.296704-19-mreitz@redhat.com>
+ <20200218123827.GC6157@linux.fritz.box>
+ <49c02a45-dc13-078a-fb16-4ef57feb04e1@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <49c02a45-dc13-078a-fb16-4ef57feb04e1@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; boundary="Sig_/Rz.KrIDAR4/jm4goek3ShWP";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,55 +89,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/Rz.KrIDAR4/jm4goek3ShWP
-Content-Type: text/plain; charset=US-ASCII
+--RnlQjJ0d97Da+TV1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 18 Feb 2020 14:15:32 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> On 2/18/20 2:13 PM, Cornelia Huck wrote:
-
-> > -ENODOC; can you add something under docs/ that describes how you
-> > configure a pv guest and what the initialization/teardown flow is? =20
+Am 18.02.2020 um 13:49 hat Max Reitz geschrieben:
+> On 18.02.20 13:38, Kevin Wolf wrote:
+> > Am 18.02.2020 um 11:34 hat Max Reitz geschrieben:
+> >> Add two tests to see that you cannot replace a Quorum child with the
+> >> mirror job while the child is in use by a different parent.
+> >>
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >> ---
+> >>  tests/qemu-iotests/041     | 70 +++++++++++++++++++++++++++++++++++++=
+-
+> >>  tests/qemu-iotests/041.out |  4 +--
+> >>  2 files changed, 71 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+> >> index 1d9e64ff6d..53c8671969 100755
+> >> --- a/tests/qemu-iotests/041
+> >> +++ b/tests/qemu-iotests/041
+> >> @@ -20,6 +20,7 @@
+> >> =20
+> >>  import time
+> >>  import os
+> >> +import re
+> >>  import iotests
+> >>  from iotests import qemu_img, qemu_io
+> >> =20
+> >> @@ -34,6 +35,8 @@ quorum_img3 =3D os.path.join(iotests.test_dir, 'quor=
+um3.img')
+> >>  quorum_repair_img =3D os.path.join(iotests.test_dir, 'quorum_repair.i=
+mg')
+> >>  quorum_snapshot_file =3D os.path.join(iotests.test_dir, 'quorum_snaps=
+hot.img')
+> >> =20
+> >> +nbd_sock_path =3D os.path.join(iotests.test_dir, 'nbd.sock')
+> >> +
+> >>  class TestSingleDrive(iotests.QMPTestCase):
+> >>      image_len =3D 1 * 1024 * 1024 # MB
+> >>      qmp_cmd =3D 'drive-mirror'
+> >> @@ -892,7 +895,8 @@ class TestRepairQuorum(iotests.QMPTestCase):
+> >> =20
+> >>      def tearDown(self):
+> >>          self.vm.shutdown()
+> >> -        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_f=
+ile ]:
+> >> +        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_f=
+ile,
+> >> +                                 nbd_sock_path ]:
+> >>              # Do a try/except because the test may have deleted some =
+images
+> >>              try:
+> >>                  os.remove(i)
+> >> @@ -1032,6 +1036,70 @@ class TestRepairQuorum(iotests.QMPTestCase):
+> >>          self.assert_has_block_node("repair0", quorum_repair_img)
+> >>          self.vm.assert_block_path('quorum0', '/children.1', 'repair0'=
+)
+> >> =20
+> >> +    def test_with_other_parent(self):
+> >> +        """
+> >> +        Check that we cannot replace a Quorum child when it has other
+> >> +        parents.
+> >> +        """
+> >> +        result =3D self.vm.qmp('nbd-server-start',
+> >> +                             addr=3D{
+> >> +                                 'type': 'unix',
+> >> +                                 'data': {'path': nbd_sock_path}
+> >> +                             })
+> >> +        self.assert_qmp(result, 'return', {})
+> >> +
+> >> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
+> >> +        self.assert_qmp(result, 'return', {})
+> >> +
+> >> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
+ice=3D'quorum0',
+> >> +                             sync=3D'full', node_name=3D'repair0', re=
+places=3D'img1',
+> >> +                             target=3Dquorum_repair_img, format=3Diot=
+ests.imgfmt)
+> >> +        self.assert_qmp(result, 'error/desc',
+> >> +                        "Cannot replace 'img1' by a node mirrored fro=
+m "
+> >> +                        "'quorum0', because it cannot be guaranteed t=
+hat doing "
+> >> +                        "so would not lead to an abrupt change of vis=
+ible data")
+> >> +
+> >> +    def test_with_other_parents_after_mirror_start(self):
+> >> +        """
+> >> +        The same as test_with_other_parent(), but add the NBD server
+> >> +        only when the mirror job is already running.
+> >> +        """
+> >> +        result =3D self.vm.qmp('nbd-server-start',
+> >> +                             addr=3D{
+> >> +                                 'type': 'unix',
+> >> +                                 'data': {'path': nbd_sock_path}
+> >> +                             })
+> >> +        self.assert_qmp(result, 'return', {})
+> >> +
+> >> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
+ice=3D'quorum0',
+> >> +                             sync=3D'full', node_name=3D'repair0', re=
+places=3D'img1',
+> >> +                             target=3Dquorum_repair_img, format=3Diot=
+ests.imgfmt)
+> >> +        self.assert_qmp(result, 'return', {})
+> >> +
+> >> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
+> >> +        self.assert_qmp(result, 'return', {})
+> >> +
+> >> +        # The full error message goes to stderr, we will check it lat=
+er
+> >> +        self.complete_and_wait('mirror',
+> >> +                               completion_error=3D'Operation not perm=
+itted')
+> >> +
+> >> +        # Should not have been replaced
+> >> +        self.vm.assert_block_path('quorum0', '/children.1', 'img1')
+> >> +
+> >> +        # Check the full error message now
+> >> +        self.vm.shutdown()
+> >> +        log =3D self.vm.get_log()
+> >> +        log =3D re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
+> >> +        log =3D re.sub(r'^Formatting.*\n', '', log)
+> >> +        log =3D re.sub(r'\n\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
+> >> +        log =3D re.sub(r'^qemu-system-[^:]*: ', '', log)
+> >=20
+> > I would have applied the series, but:
+> >=20
+> > +.........................F............................................=
+........................
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +FAIL: test_with_other_parents_after_mirror_start (__main__.TestRepairQ=
+uorum)
+> > +----------------------------------------------------------------------
+> > +Traceback (most recent call last):
+> > +  File "041", line 1099, in test_with_other_parents_after_mirror_start
+> > +    "it can no longer be guaranteed that doing so would " +
+> > +AssertionError: "qemu: Can no longer replace 'img1' by 're[107 chars]d=
+ata" !=3D "Can no longer replace 'img1' by 'repair0'[101 chars]data"
+> > +- qemu: Can no longer replace 'img1' by 'repair0', because it can no l=
+onger be guaranteed that doing so would not lead to an abrupt change of vis=
+ible data
+> > +? ------
+> > ++ Can no longer replace 'img1' by 'repair0', because it can no longer =
+be guaranteed that doing so would not lead to an abrupt change of visible d=
+ata
+> > +
+> > +
+> >=20
+> > If you agree, I can just change this line while applying into:
+> >=20
+> >     log =3D re.sub(r'^qemu[^:]*: ', '', log)
 >=20
-> Sure, but could you give me a bit more detail?
-> What do you mean by configure?
-> Command line options?
+> Sure, thanks!  I just hope noone uses the QEMU environment variable to
+> point to something that isn=E2=80=99t prefixed by =E2=80=9Cqemu=E2=80=9D.=
+..
 
-Basically: What does someone using QEMU need to know if they want to
-set it up to run pv guests? So a quick overview, command line options,
-prereqs, etc.
+Ok, I'll use this instead:
 
-(Maybe you can also lift some stuff from the kernel doc?)
++        log =3D re.sub(r'^%s[^:]*: ' % os.path.basename(iotests.qemu_prog)=
+,
++                     '', log)
 
---Sig_/Rz.KrIDAR4/jm4goek3ShWP
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Kevin
+
+--RnlQjJ0d97Da+TV1
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl5L5Y0ACgkQ3s9rk8bw
-L6+9eBAAlErNdI1f+AHZXkQ/NMzN2wu3MebZw85iFZYaW2wbYpRtPJWAPM1eovpI
-mRiZ0nLKbECEaZDYRvpIFUKwQg99NdnhDLzqzsD2fAQyfn/2Yzf5T9O+KriUkIpx
-TnVqR1E119UB0hU4Fgzxk7YRZMu+HBMYIgDAvRcjGD0w1D+9c2ze6VsRok9In68q
-gOou70ibXkH+L9EAWLtK0ABKex3kGvqdBJkgrXVdmh4DWvwlt+zILXx5NZ1+dVV6
-zUVsz9pKPrtT5XdaVRpn0vSa55lt766xlMqjS8sp37CpZ5WuqStG8WnR6KmhhU8o
-UG7nt9B5vXbuujIeoQdf9YtC7VidCMd1Qe6oZOvykI94HzdJ1DWKFD3mdBxy76Tx
-ixlLTx0YSoQzzWNDwFQCnQIpTJ6EhXzTuwBTfZIVYbxJ2TBeD4z1DKEfnINUh7EU
-41iOMOOkhJ5ncvk1JLlK61LH9q9qo10ZoRpS30rrXUX4OK3h1ut5Ka7BvbRARD8c
-PpAyrR+3koK2EmcPX1941M0Oeo+vc7BNostZK4Fj83d6iQK8/Uit8PnyGw9io1hJ
-TIgvM8QjAF7V907eCH53UktD0tACDRYxmvJdA4TiXNSrv53HwpMREv7hgEVtWsga
-UTZb73vdwHCAm61p5AXO5BY8v+e832ipnX1lOFm2yQdTEX/FY+w=
-=JwSB
+iQIcBAEBAgAGBQJeS+bAAAoJEH8JsnLIjy/WyvYQAIsxwBNRFlaUklkyRgvIQrdB
+LWPk33XzfgkuNy1NPeVbp/B/T/c/k3PEG3lmxPEvj+yqWY/B1E15TDz5ahNwFI1j
+wiSFFrVUTZYwOxF8Ep30Jzj+tTApMCLQ4tl7bgofT3KTo05IQ20Zqi6WtaqrwaHv
+DdPwEpZsUjLBHikFnfRCjpI9b8o1sfOvjnB5emiiDdrYR578yUIOmXELMj93l+BH
+2M4qiYfZ8juZtxcIeB/U8v0mV3hOLvAeW7ne9D+0OQroba7A6BvUCjgm3lCpwABX
+pAj0mrBas0qRCPl1RCIitRBfaQ2bi+E5sqY3T2gOoDwHwefmyAVyoqFupxUScV9W
+A+LQUi4rSSd1LX5cuk6Q+AogBbW8SaojRm/KkEwW5u4wxDEzcA4NVMMuX4bFtxFR
+soZkdGJG4FpOJ1vas6pS6drZM4Gi2p0E/yjbrbXu2087/t2NNk4qbmnKEghLGJ3H
+nwiFlNFwCyuK2jMknhWKCSzCnCeJAuGXc1GCkRG6wPFjo4D/HctZim53p/Qr+21y
+RrxSDpdBVJtoEayW7l+FBBLJc3u6jdEYBIZb/TkXmUrNoZSadbEgBoMEz2ICX74P
+omeMXEeINT9oK2BWlm3BzCgcFum6xrMtF7izQgBArjBgq0AM7jrBGKcy0Ae2ld+e
++2cks2j5IT2B4dTuedB0
+=Cxwr
 -----END PGP SIGNATURE-----
 
---Sig_/Rz.KrIDAR4/jm4goek3ShWP--
+--RnlQjJ0d97Da+TV1--
 
 
