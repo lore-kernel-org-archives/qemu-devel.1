@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3072C34047
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63FEDC34047
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:02:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D12D2467A
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:58:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D12D2467A
+	by mail.kernel.org (Postfix) with ESMTPS id 387382465D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:02:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 387382465D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j491D-0003BY-N5
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:58:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42657)
+	id 1j494T-0005Ov-Bp
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 15:02:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j490N-0002Jw-5q
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:58:04 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j492q-00042s-Eb
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:00:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j490L-0003Eo-PV
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:58:03 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:42351)
+ (envelope-from <laurent@vivier.eu>) id 1j492o-0008RX-4F
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:00:36 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:43921)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j490L-0003BU-G3
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:58:01 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j492l-0008Kx-K6; Tue, 18 Feb 2020 15:00:31 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M6DSi-1j6N012HvM-006gPj; Tue, 18 Feb 2020 20:57:57 +0100
-Subject: Re: [PATCH v3] linux-user/strace: Improve output of various syscalls
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20191121193351.GA31821@ls3530.fritz.box>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MwjO6-1jOaOp1acU-00yCxZ; Tue, 18 Feb 2020 21:00:25 +0100
+Subject: Re: [PATCH v3] configure: Avoid compiling system tools on user build
+ by default
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200217133327.25144-1-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,34 +83,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2edf7243-f5c3-9a96-aec3-a68e41dda49b@vivier.eu>
-Date: Tue, 18 Feb 2020 20:57:56 +0100
+Message-ID: <13827cf1-7f45-fa01-d0b7-4c68e0f1ab97@vivier.eu>
+Date: Tue, 18 Feb 2020 21:00:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20191121193351.GA31821@ls3530.fritz.box>
+In-Reply-To: <20200217133327.25144-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:L3XTV1b2Wllt+gVZZo6tQbAxwqMMdqTgN9W/UOsN3Pe4BJCZT9J
- lBlsYT6XlkBFp4j7IqykEnRATn65BsStankbYKdk4P8d+VM8HsjgJAYnlZrQoJ3YqH7jhlk
- 2K8c/s6Yc0dM/CDZo4qy0JZEsnrWFiNfSR9xudbupq4MlJPKrkxXYDZUZRGKOnarIxKkZxB
- iKO82g7PSw4SjCVqHk3OQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:y1OyitYTGOQ=:bcDNMSs9UuyEXlfOPGQgjq
- NRUEBgFdurUT6eypeDvgXUtIsyxZ0KMl+aWiQaXzt4MVgQtmYdnynWMbTaw3mn6wY/2NYvMvx
- bzo6iuBfLVu8IoBt3BpWN2m/1z137T3YUU3KtCvY1mJaJCM8mpYKw7uwpQbuiWGS4i9eMR9+M
- ZW9301dmOdFGI0aU03da/V3U/GW4thFm+GT020kXe4/Pvz7aSufdNZl9GsMMY+OYd0KkBRhBD
- mjyyDc0eyp0jo1qRFcMfAxaOW4obW84t1nZCVyqlw59rqTAZQa9LckpTAhYVSeQQQJTjta9jl
- DuVNyuP4l6skC4g/DGS8ml41AiXBrunutNPEmGmdx0EhYWGai5K/v+RCUU6dGw2k4FLXqXLjA
- 4sPbpLOO2gnZGgA8VzJAj7NeRFBmiE/gv3EkQqfFlsud3jfz9LUiyl/ihdW87jwrwYGCEqUY+
- PBaMGGpsmj7m0+CixdyUirRXwKKmcNk+AJ94/7+YH5hcsMz7W4lfqvgjf2H37IO01uTO2e7YV
- QZYCj5r3qA+XoKMdwuuCxDbf1IRcZxlcgN+x5h9qAxKpKOy9ZALtqmmAraeE+hldlcpGq+4bK
- AZJEZBnoT7ia3HGzMNPdIBFI1YXTwkI7Mbp1h26yHf+5JcRc/A90D2ZtQe4/Vp8iigznjO2+O
- oTYEcsQx9zWEWqq671xMZ5DQ0ulKUmGEj+Msldc2ABVRzvpDCP4zKuZ5B+EU1i/k4oKNezkma
- 7LiZsROlNoDh7qnRBC+/H3Oc2a/sHHKMMtRqkttAYdZzBA09Tm3rnghqsqHGrDJ+7jxmDx5l1
- Dy7Tfrygw/AJ1Tg8uwulPUHYezXRDRQ44aA5JA8PqiCYkRngxMRMDqMjHa3Fj23swz00+0B
+X-Provags-ID: V03:K1:fYve1pNC3eOwMD45NbelrHJPmxX0JzRoV/zHquShF/Y8BoAOMDz
+ m8/1W1aBCUnmQsUDdxJZzi20qZghoxpoxsSBZBUTrNy5cNzC3pdVBc6rfhJDKBJWHCXEZCH
+ E6PPEgoE4LQjAdM7KK1PlH4WOz4D3wv/aXxkvGTNR5Ki06Z4NX47yigGsKGDZkPDfwhoWyR
+ IHvL2G/cnhvmntUHUwsDA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4LB5AMiDAmk=:ne64gfHysDfxRpZUd5yyfV
+ E3K6OaHdgfSdKSjYmUS8pYnGOqmml1cVD/xOXRGjNy9bsT9PGXq9j9dp1lVVHvQ1pKAB2Uzwi
+ ZZShdgDeVKshxZ6MAsnETLQkKJRRo1qLSUs/aqFjeFbcfuZTDHWl415a3s6hbOLVV51AuDzvJ
+ Mr71mg0UWqLhmyxd6h2tzfssYOZ5mxdnaq8a0P+zADd6F5RwXuyzi7hAArDPgOENzQX5wi4vQ
+ 9ZNLO30AwKI1AeO5yTbKMm1GoGYdkpRgmfQaQ2WRVh1iylxE/LiYRRvWPmzRFRlC3H/GXT3ae
+ +ED7F5mayJe1YeaB/2TI8bsxFhVoIW1m8JaRkPHw/dQy2eenMEv41+3K8+s7w3XILTJuDWQrd
+ glbrhHbEWFDIDZD+G5qGiUuJyojkThVNBQVNdpRCslS4fYH1fXX0yiZqgLBakyMyy56u8kUak
+ i99LdaQic7mxuBUJcZCS9cCDi6rpcDT1nTChiKAW6xps5PBJQlF84ecF10hkgG8VeMU/S/hhd
+ mVZv5w7W7n6EQ7X2OF3715/CKiZ2XDewhTDc/lUunGjGcPY4qOY2+sFfSREdVp4lbGb4BFZyn
+ eHDIt4HywhKeBtzue1ZHYkPumPeNjg/8OWMJM52J2+xJP6keGd9THOolwxCasknBzwn7HPY6/
+ 4GWEW5/FIDgBWEFGgptFDcLzou2iFFvDH8YgIF5TS1S2vDxgv50fU3TuV16hSOVStsOUbJZPh
+ qBofsCoiketrQ2EN4nrFJ+qbkx40NsPjj0xWB2i0T+pcPDz3+/ZW69j/Pn2idEy+EprllWk9Z
+ VVhKCk2a21Kc6bpS3awxIC/7ytZsB2FetVfAgrxqOqi3fSPjGh7vzLkSvKCSDxTZidrdmVI
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,201 +122,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 21/11/2019 à 20:33, Helge Deller a écrit :
-> Improve strace output of various syscalls which either have none
-> or only int-type parameters.
+Le 17/02/2020 à 14:33, Philippe Mathieu-Daudé a écrit :
+> User-mode does not need the system tools. Do not build them by
+> default if the user specifies --disable-system.
 > 
-> Signed-off-by: Helge Deller <deller@gmx.de>
+> This disables building the following binaries on a user-only build:
 > 
+> - elf2dmp
+> - qemu-edid
+> - qemu-ga
+> - qemu-img
+> - qemu-io
+> - qemu-nbd
+> - ivshmem-client
+> - ivshmem-server
+> 
+> The qemu-user binaries are not affected by this change.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
-> Changes in v3:
->     fixed alarm()
->     added epoll_create(), epoll_create1(), eventfd(), eventfd2()
+> v3:
+> - fixed typos (Aleksandar)
+> v2:
+> - use simpler if/else statement (therefore not adding Richard R-b)
+> - improved description (Aleksandar)
+> ---
+>  configure | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 > 
-> Changes in v2:
->     fixed ioctl()
-> 
-> 
-> diff --git a/linux-user/strace.list b/linux-user/strace.list
-> index 1de4319dcf..d49a1e92a8 100644
-> --- a/linux-user/strace.list
-> +++ b/linux-user/strace.list
-> @@ -26,7 +26,7 @@
->  { TARGET_NR_afs_syscall, "afs_syscall" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_alarm
-> -{ TARGET_NR_alarm, "alarm" , NULL, NULL, NULL },
-> +{ TARGET_NR_alarm, "alarm" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_aplib
->  { TARGET_NR_aplib, "aplib" , NULL, NULL, NULL },
-> @@ -116,19 +116,19 @@
->  { TARGET_NR_dipc, "dipc" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_dup
-> -{ TARGET_NR_dup, "dup" , NULL, NULL, NULL },
-> +{ TARGET_NR_dup, "dup" , "%s(%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_dup2
-> -{ TARGET_NR_dup2, "dup2" , NULL, NULL, NULL },
-> +{ TARGET_NR_dup2, "dup2" , "%s(%d,%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_dup3
-> -{ TARGET_NR_dup3, "dup3" , NULL, NULL, NULL },
-> +{ TARGET_NR_dup3, "dup3" , "%s(%d,%d,%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_epoll_create
-> -{ TARGET_NR_epoll_create, "epoll_create" , NULL, NULL, NULL },
-> +{ TARGET_NR_epoll_create, "%s(%d)", NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_epoll_create1
-> -{ TARGET_NR_epoll_create1, "epoll_create1" , NULL, NULL, NULL },
-> +{ TARGET_NR_epoll_create1, "%s(%d)", NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_epoll_ctl
->  { TARGET_NR_epoll_ctl, "epoll_ctl" , NULL, NULL, NULL },
-> @@ -146,10 +146,10 @@
->  { TARGET_NR_epoll_wait_old, "epoll_wait_old" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_eventfd
-> -{ TARGET_NR_eventfd, "eventfd" , NULL, NULL, NULL },
-> +{ TARGET_NR_eventfd, "eventfd", "%s(%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_eventfd2
-> -{ TARGET_NR_eventfd2, "eventfd2" , NULL, NULL, NULL },
-> +{ TARGET_NR_eventfd2, "eventfd2" , "%s(%d,%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_execv
->  { TARGET_NR_execv, "execv" , NULL, print_execv, NULL },
-> @@ -191,7 +191,7 @@
->  { TARGET_NR_fanotify_mark, "fanotify_mark" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_fchdir
-> -{ TARGET_NR_fchdir, "fchdir" , NULL, NULL, NULL },
-> +{ TARGET_NR_fchdir, "fchdir" , "%s(%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_fchmod
->  { TARGET_NR_fchmod, "fchmod" , "%s(%d,%#o)", NULL, NULL },
-> @@ -287,7 +287,7 @@
->  { TARGET_NR_getdtablesize, "getdtablesize" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getegid
-> -{ TARGET_NR_getegid, "getegid" , NULL, NULL, NULL },
-> +{ TARGET_NR_getegid, "getegid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getegid32
->  { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
-> @@ -299,7 +299,7 @@
->  { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getgid
-> -{ TARGET_NR_getgid, "getgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_getgid, "getgid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getgid32
->  { TARGET_NR_getgid32, "getgid32" , NULL, NULL, NULL },
-> @@ -329,10 +329,10 @@
->  { TARGET_NR_getpeername, "getpeername" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getpgid
-> -{ TARGET_NR_getpgid, "getpgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_getpgid, "getpgid" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getpgrp
-> -{ TARGET_NR_getpgrp, "getpgrp" , NULL, NULL, NULL },
-> +{ TARGET_NR_getpgrp, "getpgrp" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getpid
->  { TARGET_NR_getpid, "getpid" , "%s()", NULL, NULL },
-> @@ -432,7 +432,7 @@
->  { TARGET_NR_io_cancel, "io_cancel" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_ioctl
-> -{ TARGET_NR_ioctl, "ioctl" , NULL, NULL, NULL },
-> +{ TARGET_NR_ioctl, "ioctl" , "%s(%d,%#x,%#x)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_io_destroy
->  { TARGET_NR_io_destroy, "io_destroy" , NULL, NULL, NULL },
-> @@ -1257,22 +1257,22 @@
->  { TARGET_NR_setdomainname, "setdomainname" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setfsgid
-> -{ TARGET_NR_setfsgid, "setfsgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setfsgid, "setfsgid" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setfsgid32
-> -{ TARGET_NR_setfsgid32, "setfsgid32" , NULL, NULL, NULL },
-> +{ TARGET_NR_setfsgid32, "setfsgid32" , "%s(%u)" , NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setfsuid
-> -{ TARGET_NR_setfsuid, "setfsuid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setfsuid, "setfsuid" , "%s(%u)" , NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setfsuid32
->  { TARGET_NR_setfsuid32, "setfsuid32" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setgid
-> -{ TARGET_NR_setgid, "setgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setgid, "setgid" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setgid32
-> -{ TARGET_NR_setgid32, "setgid32" , NULL, NULL, NULL },
-> +{ TARGET_NR_setgid32, "setgid32" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setgroups
->  { TARGET_NR_setgroups, "setgroups" , NULL, NULL, NULL },
-> @@ -1296,7 +1296,7 @@
->  { TARGET_NR_setns, "setns" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setpgid
-> -{ TARGET_NR_setpgid, "setpgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setpgid, "setpgid" , "%s(%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setpgrp
->  { TARGET_NR_setpgrp, "setpgrp" , NULL, NULL, NULL },
-> @@ -1311,22 +1311,22 @@
->  { TARGET_NR_setregid32, "setregid32" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setresgid
-> -{ TARGET_NR_setresgid, "setresgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setresgid, "setresgid" , "%s(%u,%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setresgid32
->  { TARGET_NR_setresgid32, "setresgid32" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setresuid
-> -{ TARGET_NR_setresuid, "setresuid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setresuid, "setresuid" , "%s(%u,%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setresuid32
-> -{ TARGET_NR_setresuid32, "setresuid32" , NULL, NULL, NULL },
-> +{ TARGET_NR_setresuid32, "setresuid32" , "%s(%u,%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setreuid
-> -{ TARGET_NR_setreuid, "setreuid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setreuid, "setreuid" , "%s(%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setreuid32
-> -{ TARGET_NR_setreuid32, "setreuid32" , NULL, NULL, NULL },
-> +{ TARGET_NR_setreuid32, "setreuid32" , "%s(%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setrlimit
->  { TARGET_NR_setrlimit, "setrlimit" , NULL, NULL, NULL },
-> @@ -1335,7 +1335,7 @@
->  { TARGET_NR_set_robust_list, "set_robust_list" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setsid
-> -{ TARGET_NR_setsid, "setsid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setsid, "setsid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setsockopt
->  { TARGET_NR_setsockopt, "setsockopt" , NULL, NULL, NULL },
+> diff --git a/configure b/configure
+> index 6f5d850949..efe00dd497 100755
+> --- a/configure
+> +++ b/configure
+> @@ -455,7 +455,7 @@ guest_agent_ntddscsi="no"
+>  guest_agent_msi=""
+>  vss_win32_sdk=""
+>  win_sdk="no"
+> -want_tools="yes"
+> +want_tools=""
+>  libiscsi=""
+>  libnfs=""
+>  coroutine=""
+> @@ -2213,6 +2213,16 @@ else
+>      echo big/little test failed
+>  fi
+>  
+> +##########################################
+> +# system tools
+> +if test -z "$want_tools"; then
+> +    if test "$softmmu" = "no"; then
+> +        want_tools=no
+> +    else
+> +        want_tools=yes
+> +    fi
+> +fi
+> +
+>  ##########################################
+>  # cocoa implies not SDL or GTK
+>  # (the cocoa UI code currently assumes it is always the active UI
 > 
 
 Applied to my linux-user branch.
