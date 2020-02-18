@@ -2,96 +2,76 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67EB6C34048
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D9FC34047
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:06:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 365ED2176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:05:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7537124649
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:06:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQ+foOCp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 365ED2176D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UH7ko+f4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7537124649
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j46Jo-0002r6-0c
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 12:05:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50180)
+	id 1j46Jw-0003B0-Md
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 12:06:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j46IZ-0001Mn-9p
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:04:43 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j46Id-0001N2-7X
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:04:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j46IW-0008VC-Sv
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:04:38 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22520
+ (envelope-from <imammedo@redhat.com>) id 1j46Ib-00006p-IR
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:04:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53388
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j46IW-0008UT-J8
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:04:36 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j46Ib-00006E-BE
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:04:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582045475;
+ s=mimecast20190719; t=1582045480;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2544dIPgl1aKA4Z7K5Z4971BiGCIl2iah54j9kjCL4E=;
- b=jQ+foOCpdzk/OuKQHEl11U0vf5OmKgQvDGsGEExgBS/Cq46aGeC9EhYQ3DQi+m944S7uvE
- WvXo6JMxrVbMXNjWbLsFst1yVMG76QpV03i1dBdUJpa0OVvcfpbjmkaDBR4PzGtAADAtrE
- WsqTYUlJPsn9YXdE4MdMCdPXvHo1pdc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-JtdlrZ7mPyGDNZnZ1MLvFg-1; Tue, 18 Feb 2020 12:04:30 -0500
-Received: by mail-wm1-f72.google.com with SMTP id d4so304199wmd.7
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 09:04:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Jf3dlEYrCzOw89Pny9+wuZ6snqo+K0B74r4yZz2W9gY=;
- b=sbvmumucBImlDIES0VpnOhGdhFYYFisoLEREICd3h8ocobSYzjgyZaGijL8BZWvAEF
- 5ighwt40WjWvaoVo/06GpSQTYnC0hu5WrwJLUpOSpP64Bjq3Igy+BPvXf6O4Zg5mz5q1
- /gO+JfAYdPKlNAkZJwHxr5G8cz3m05A+NZewfDRY6wQhQFXVWC+/0iZJOHDqBdhS2R9r
- bIA9/7qQhO14wqPfwnfxIgntjQapcjKYPjW7Iu3AE82qltrG87w1/N1vBrhxs1tbbFYB
- sHp3/wsE2PSVuGofNwvP9+jN/Lkzoz1OYYUcvHaTo2ztsWLQXbCIW3WG6b7ybs77A4Zm
- 3HDA==
-X-Gm-Message-State: APjAAAWs/xGo50/8cBJ4xLi2SfOBbzuKXM3Bl7qPIMmeSwNHUpSM7yWE
- 2Xim2ywZe4DLvzQb6oP2ElgFJ0tb9xIQIKFj3puUCTL1cAoMbPU6Zwd2PQjwMWNTtJWqhhYnCbj
- 99eZJlER8Cqb6uGY=
-X-Received: by 2002:adf:f80c:: with SMTP id s12mr30272985wrp.1.1582045469022; 
- Tue, 18 Feb 2020 09:04:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyw9dUela3NtrkDeg0CyJlDb3coV6O3bBYGN64fh+CVkb+urV5Aj5z58vwpPB/Qnk2J8h/55A==
-X-Received: by 2002:adf:f80c:: with SMTP id s12mr30272937wrp.1.1582045468711; 
- Tue, 18 Feb 2020 09:04:28 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4?
- ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
- by smtp.gmail.com with ESMTPSA id a16sm7026333wrt.30.2020.02.18.09.04.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Feb 2020 09:04:28 -0800 (PST)
-Subject: Re: [PATCH RESEND 00/13] trivial: Detect and remove superfluous
- semicolons in C code
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200218094402.26625-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <55411270-83ae-d6aa-362f-07018b44c0e1@redhat.com>
-Date: Tue, 18 Feb 2020 18:04:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=myoy6JXUj+nllLguLBu0pbrMScpLHj+hvPz2cBoFfwQ=;
+ b=UH7ko+f4trgXbXGlV/GDio0sD41P5VLf00cMx7WQNQIOdQqfJPtlz3OfSTPNZVA6W69RKW
+ O1DprDa5rsK0dEPyD4uwDrL/HlL9Bz9IfpwfYJqDL1QzX2zWwGFsvuexM2GTGHmqt/i1U2
+ QVRf8HGy3TVwflkClENYWAPFLwnHP1k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-kRxAve1uN0qQW492QmwBRg-1; Tue, 18 Feb 2020 12:04:34 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2A68107ACC9;
+ Tue, 18 Feb 2020 17:04:32 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 64A4C90533;
+ Tue, 18 Feb 2020 17:04:28 +0000 (UTC)
+Date: Tue, 18 Feb 2020 18:04:26 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 07/13] hw/arm/bcm2836: QOM'ify more by adding
+ class_init() to each SoC type
+Message-ID: <20200218180426.008080b4@redhat.com>
+In-Reply-To: <20200217114533.17779-8-f4bug@amsat.org>
+References: <20200217114533.17779-1-f4bug@amsat.org>
+ <20200217114533.17779-8-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20200218094402.26625-1-philmd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: JtdlrZ7mPyGDNZnZ1MLvFg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: kRxAve1uN0qQW492QmwBRg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -107,64 +87,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, Julia Suvorova <jusual@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>, Luc Michel <luc.michel@greensocs.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/02/20 10:43, Philippe Mathieu-Daud=C3=A9 wrote:
-> Luc noticed a superfluous trailing semicolon:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04593.html
->=20
-> Prevent that by modifying checkpatch.pl and clean the codebase.
->=20
-> Philippe Mathieu-Daud=C3=A9 (13):
->   scripts/checkpatch.pl: Detect superfluous semicolon in C code
->   audio/alsaaudio: Remove superfluous semicolons
->   block: Remove superfluous semicolons
->   block/io_uring: Remove superfluous semicolon
->   hw/arm/xlnx-versal: Remove superfluous semicolon
->   hw/m68k/next-cube: Remove superfluous semicolon
->   hw/scsi/esp: Remove superfluous semicolon
->   hw/vfio/display: Remove superfluous semicolon
->   migration/multifd: Remove superfluous semicolon
->   ui/input-barrier: Remove superfluous semicolon
->   target/i386/whpx: Remove superfluous semicolon
->   tests/qtest/libqos/qgraph: Remove superfluous semicolons
->   contrib/rdmacm-mux: Remove superfluous semicolon
->=20
->  audio/alsaaudio.c           | 4 ++--
->  block.c                     | 4 ++--
->  block/io_uring.c            | 2 +-
->  contrib/rdmacm-mux/main.c   | 2 +-
->  hw/arm/xlnx-versal-virt.c   | 2 +-
->  hw/m68k/next-cube.c         | 2 +-
->  hw/scsi/esp.c               | 2 +-
->  hw/vfio/display.c           | 2 +-
->  migration/multifd.c         | 2 +-
->  target/i386/whpx-all.c      | 2 +-
->  tests/qtest/libqos/qgraph.c | 4 ++--
->  ui/input-barrier.c          | 2 +-
->  scripts/checkpatch.pl       | 5 +++++
->  13 files changed, 20 insertions(+), 15 deletions(-)
->=20
+On Mon, 17 Feb 2020 12:45:27 +0100
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+> Remove usage of TypeInfo::class_data. Instead fill the fields in
+> the corresponding class_init().
+>=20
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/arm/bcm2836.c | 109 ++++++++++++++++++++++-------------------------
+>  1 file changed, 51 insertions(+), 58 deletions(-)
+>=20
+> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+> index 24109fef1d..683d04d6ea 100644
+> --- a/hw/arm/bcm2836.c
+> +++ b/hw/arm/bcm2836.c
+> @@ -16,57 +16,30 @@
+>  #include "hw/arm/raspi_platform.h"
+>  #include "hw/sysbus.h"
+> =20
+> -typedef struct BCM283XInfo BCM283XInfo;
+> -
+>  typedef struct BCM283XClass {
+>      /*< private >*/
+>      DeviceClass parent_class;
+>      /*< public >*/
+> -    const BCM283XInfo *info;
+> -} BCM283XClass;
+> -
+> -struct BCM283XInfo {
+> -    const char *name;
 
-Laurent, can you queue this in qemu-trivial?
+>      const char *cpu_type;
+
+probably could be cleaned up by using machine->cpu_type/machine_class->defa=
+ult_cpu_type
+(no need to change this patch as it's separate issue)
+
+
+>      hwaddr peri_base; /* Peripheral base address seen by the CPU */
+>      hwaddr ctrl_base; /* Interrupt controller and mailboxes etc. */
+>      int clusterid;
+> -};
+> +} BCM283XClass;
+> =20
+>  #define BCM283X_CLASS(klass) \
+>      OBJECT_CLASS_CHECK(BCM283XClass, (klass), TYPE_BCM283X)
+>  #define BCM283X_GET_CLASS(obj) \
+>      OBJECT_GET_CLASS(BCM283XClass, (obj), TYPE_BCM283X)
+> =20
+> -static const BCM283XInfo bcm283x_socs[] =3D {
+> -    {
+> -        .name =3D TYPE_BCM2836,
+> -        .cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7"),
+> -        .peri_base =3D 0x3f000000,
+> -        .ctrl_base =3D 0x40000000,
+> -        .clusterid =3D 0xf,
+> -    },
+> -#ifdef TARGET_AARCH64
+> -    {
+> -        .name =3D TYPE_BCM2837,
+> -        .cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53"),
+> -        .peri_base =3D 0x3f000000,
+> -        .ctrl_base =3D 0x40000000,
+> -        .clusterid =3D 0x0,
+> -    },
+> -#endif
+> -};
+> -
+>  static void bcm2836_init(Object *obj)
+>  {
+>      BCM283XState *s =3D BCM283X(obj);
+>      BCM283XClass *bc =3D BCM283X_GET_CLASS(obj);
+> -    const BCM283XInfo *info =3D bc->info;
+>      int n;
+> =20
+>      for (n =3D 0; n < BCM283X_NCPUS; n++) {
+>          object_initialize_child(obj, "cpu[*]", &s->cpu[n].core,
+> -                                sizeof(s->cpu[n].core), info->cpu_type,
+> +                                sizeof(s->cpu[n].core), bc->cpu_type,
+>                                  &error_abort, NULL);
+>      }
+> =20
+> @@ -85,7 +58,6 @@ static void bcm2836_realize(DeviceState *dev, Error **e=
+rrp)
+>  {
+>      BCM283XState *s =3D BCM283X(dev);
+>      BCM283XClass *bc =3D BCM283X_GET_CLASS(dev);
+> -    const BCM283XInfo *info =3D bc->info;
+>      Object *obj;
+>      Error *err =3D NULL;
+>      int n;
+> @@ -119,7 +91,7 @@ static void bcm2836_realize(DeviceState *dev, Error **=
+errp)
+>      }
+> =20
+>      sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
+> -                            info->peri_base, 1);
+> +                            bc->peri_base, 1);
+> =20
+>      /* bcm2836 interrupt controller (and mailboxes, etc.) */
+>      object_property_set_bool(OBJECT(&s->control), true, "realized", &err=
+);
+> @@ -128,7 +100,7 @@ static void bcm2836_realize(DeviceState *dev, Error *=
+*errp)
+>          return;
+>      }
+> =20
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, info->ctrl_base);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, bc->ctrl_base);
+> =20
+>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
+>          qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-irq", 0));
+> @@ -137,11 +109,11 @@ static void bcm2836_realize(DeviceState *dev, Error=
+ **errp)
+> =20
+>      for (n =3D 0; n < BCM283X_NCPUS; n++) {
+>          /* TODO: this should be converted to a property of ARM_CPU */
+> -        s->cpu[n].core.mp_affinity =3D (info->clusterid << 8) | n;
+> +        s->cpu[n].core.mp_affinity =3D (bc->clusterid << 8) | n;
+> =20
+>          /* set periphbase/CBAR value for CPU-local registers */
+>          object_property_set_int(OBJECT(&s->cpu[n].core),
+> -                                info->peri_base,
+> +                                bc->peri_base,
+>                                  "reset-cbar", &err);
+>          if (err) {
+>              error_propagate(errp, err);
+> @@ -190,38 +162,59 @@ static Property bcm2836_props[] =3D {
+>  static void bcm283x_class_init(ObjectClass *oc, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(oc);
+> -    BCM283XClass *bc =3D BCM283X_CLASS(oc);
+> =20
+> -    bc->info =3D data;
+> -    dc->realize =3D bcm2836_realize;
+> -    device_class_set_props(dc, bcm2836_props);
+>      /* Reason: Must be wired up in code (see raspi_init() function) */
+>      dc->user_creatable =3D false;
+>  }
+> =20
+> -static const TypeInfo bcm283x_type_info =3D {
+> -    .name =3D TYPE_BCM283X,
+> -    .parent =3D TYPE_DEVICE,
+> -    .instance_size =3D sizeof(BCM283XState),
+> -    .instance_init =3D bcm2836_init,
+> -    .class_size =3D sizeof(BCM283XClass),
+> -    .abstract =3D true,
+> +static void bcm2836_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> +    BCM283XClass *bc =3D BCM283X_CLASS(oc);
+> +
+> +    bc->cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
+> +    bc->peri_base =3D 0x3f000000;
+> +    bc->ctrl_base =3D 0x40000000;
+> +    bc->clusterid =3D 0xf;
+> +    dc->realize =3D bcm2836_realize;
+> +    device_class_set_props(dc, bcm2836_props);
+>  };
+> =20
+> -static void bcm2836_register_types(void)
+> +#ifdef TARGET_AARCH64
+> +static void bcm2837_class_init(ObjectClass *oc, void *data)
+>  {
+> -    int i;
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> +    BCM283XClass *bc =3D BCM283X_CLASS(oc);
+> =20
+> -    type_register_static(&bcm283x_type_info);
+> -    for (i =3D 0; i < ARRAY_SIZE(bcm283x_socs); i++) {
+> -        TypeInfo ti =3D {
+> -            .name =3D bcm283x_socs[i].name,
+> -            .parent =3D TYPE_BCM283X,
+> -            .class_init =3D bcm283x_class_init,
+> -            .class_data =3D (void *) &bcm283x_socs[i],
+> -        };
+> -        type_register(&ti);
+> +    bc->cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53");
+> +    bc->peri_base =3D 0x3f000000;
+> +    bc->ctrl_base =3D 0x40000000;
+> +    bc->clusterid =3D 0x0;
+> +    dc->realize =3D bcm2836_realize;
+> +    device_class_set_props(dc, bcm2836_props);
+both children do use the same values for almost all fields.
+I'd set in children class_init()s only cpu_type/clusterid
+and keep common bits in base class.
+
+
+> +};
+> +#endif
+> +
+> +static const TypeInfo bcm283x_types[] =3D {
+> +    {
+> +        .name           =3D TYPE_BCM2836,
+> +        .parent         =3D TYPE_BCM283X,
+> +        .class_init     =3D bcm2836_class_init,
+> +#ifdef TARGET_AARCH64
+> +    }, {
+> +        .name           =3D TYPE_BCM2837,
+> +        .parent         =3D TYPE_BCM283X,
+> +        .class_init     =3D bcm2837_class_init,
+> +#endif
+> +    }, {
+> +        .name           =3D TYPE_BCM283X,
+> +        .parent         =3D TYPE_DEVICE,
+> +        .instance_size  =3D sizeof(BCM283XState),
+> +        .instance_init  =3D bcm2836_init,
+> +        .class_size     =3D sizeof(BCM283XClass),
+> +        .class_init     =3D bcm283x_class_init,
+> +        .abstract       =3D true,
+>      }
+> -}
+> +};
+> =20
+> -type_init(bcm2836_register_types)
+> +DEFINE_TYPES(bcm283x_types)
 
 
