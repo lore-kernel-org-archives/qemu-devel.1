@@ -2,81 +2,80 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 041B5C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2120C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:36:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C57062070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:33:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0A1420659
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:36:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lJstfHNt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C57062070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OPyW1O3b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A1420659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j47g8-00036r-2D
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 13:33:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33360)
+	id 1j47jX-0004gZ-OF
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 13:36:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42171)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j47dS-0000q8-Kx
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:30:20 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j47ic-0004CR-V1
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j47dR-0008JB-BM
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:30:18 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38247)
+ (envelope-from <peter.maydell@linaro.org>) id 1j47ib-0000pU-I0
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:35:38 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41708)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1j47dR-0008Hd-4G; Tue, 18 Feb 2020 13:30:17 -0500
-Received: by mail-ot1-x342.google.com with SMTP id z9so20495891oth.5;
- Tue, 18 Feb 2020 10:30:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=VTHuOYkRScccjYac4c/SHiXCBRs8ZpyUXnseZG9ugcI=;
- b=lJstfHNtZEpeKsA26Zqa3T/gEZc8whTjTtsUf2OBazVMQDASUjJz8ExsaBL5KCwX0F
- GNaVwUMSXQ7orDp0tBazNkFpboeVCDI2BKIFNIkxK35IVXUaXOftUeTheR51Yz7rqKh5
- tucZkIucfdhLzuN8frz2LE4I3px++xXCqY33/2Fr4g9PWlmUQJFyifn7qhaE0mx6K+wu
- S/tV24QnMcTwrQeYrAoD4oAG8gK0FS0M8FuS1hfOeHbPOTwg9BK4npC/TigGygp6qH7L
- 099hs4isIKbRZ5SJuEzJzVPbDIQELt64PxZLWGuxLReU/HuRDChtMcOHF25sZJQbr5y8
- nLXg==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j47ib-0000mT-73
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:35:37 -0500
+Received: by mail-oi1-x244.google.com with SMTP id i1so21091072oie.8
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 10:35:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mKLg6s8iWW0H2hDAFAJSR86Yja9qQUYtPKowHOSv9Ok=;
+ b=OPyW1O3bd38nwuf027FQ7DmF1FRG1tAjVl5oS2dWXBpXoEPbhjDGOp18nb+XBsWJUl
+ zF8xOx8cgqGDVzyDJJ8vkI8nVWSdMsPTNfIjitebyweC71cVVMhfKv26ATaHzyxo7mz7
+ 4Dg+TynDqqvYO0oHKA9aElZUBxCD0V0fC/1H1e/HBCzWvkRHnRMPkJiZ8qIr96TIBdwx
+ hzDw6AImaENEt36p1DwDJakoSvIkrAiUEV5MzzLOrz2OxPgl7EYqgx9Sl3xsEBiDRK1v
+ CtfddLW9WkhczK3YbYFMJMFDx60bW1a4VPJCyvvwdfUDW41P5v1msBGZ9+0mVUInbLW7
+ ka6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=VTHuOYkRScccjYac4c/SHiXCBRs8ZpyUXnseZG9ugcI=;
- b=TizNpxZFP+t+pzTCVKpYbT2Vm3bCR9zkX4WXC58uKL3JjkxTzTU6t4SbojEuo+PI0u
- all48xiKAl+dOe8cRiFlH4qoC9R7D9snhIi70g7lVRVZvj8OaxfYgfWaheuluh7tSL6X
- cbUbhZwV6OgDnR4fgJF/LbjGo+g3U8k/b9jgM/Ou2oSNlhBEJCQTLWTBoczbjcAgmyxH
- FToBQKnPs6kcQd9WPqc29Vr6ZCNCoyssNHchnXPIf6m9mxoZuV0Zu3/m0iBlxzEGhnP4
- gpHu36WLJfcg/mJTPEolDiopIMS4utcC3L2Gx+5Rjfpp4lMtGi2t0IZ9ST5c6oSgk6o7
- nrIg==
-X-Gm-Message-State: APjAAAV0L56GI9t/ELkYmsOSzeicAuB2LhEJ8QVxSpbD1gpt9g1B1sgN
- 6X/P/3cUXG1r9gfD65sYs55BrhbnuMEv3n8N6tg=
-X-Google-Smtp-Source: APXvYqxco0Gm+QxHeej5X/OnuQE5moVO5CB9vU/6aRyMOqAyBDqeGGTQ6DNE1WR5pRqk8QW4PhUbIArDe59XuUAJRPc=
-X-Received: by 2002:a9d:7305:: with SMTP id e5mr15961226otk.64.1582050616312; 
- Tue, 18 Feb 2020 10:30:16 -0800 (PST)
+ bh=mKLg6s8iWW0H2hDAFAJSR86Yja9qQUYtPKowHOSv9Ok=;
+ b=Kt5SrnmGbwilM/Sy9PoPhaY1bV7G3PuMpyt6dDh3WPhRqxChrFmoaCpxbHffN7yasJ
+ +F7IaHcfLqBkGllh2DL7/uDfFD8jEjwVYv5FyLCB3ivhY+HEK4MxWI7r19sZuuSbcXCj
+ hgekzQ4kuFo/jodrTjGN3rI8nGzPQwn09hg2L4g8RzRRNS53ulOsJp8WW8UqFNZjXO2N
+ 38mFeAOEwyg33wnnLoogrPWYfUIbyj6CvtlynjDp2DyGib9eyuYMejptCYzcDejiQk6t
+ mBj2ADyAS4PxhsyR6aqkUJ5K1ss9op94t3fA5hbdyqSYFnDJsk07vN1umeyPVVyFRK0f
+ jw7Q==
+X-Gm-Message-State: APjAAAVNhkEXppPi21lmSMQ6DJJoq7eMiygVEnnQp9TzasqItCj2rvDZ
+ 9jDm3pXT8wcbH0kkJ/Tc89yexD6+uP7UAX7rDUPnGw==
+X-Google-Smtp-Source: APXvYqxR11+XW2GqGm/URlaSK/QLrHxd0OXGw9LIctDRLN5Jan09f/41FawNRUdQHvE7UyvIZtraEGQfhPlHZYDd79o=
+X-Received: by 2002:aca:b2c5:: with SMTP id b188mr2156006oif.163.1582050935848; 
+ Tue, 18 Feb 2020 10:35:35 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Tue, 18 Feb 2020 10:30:15 -0800 (PST)
-In-Reply-To: <1b1e6027-b59b-939d-c0ad-791be60f18ae@redhat.com>
-References: <cover.1580290069.git.fthain@telegraphics.com.au>
- <1b1e6027-b59b-939d-c0ad-791be60f18ae@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 18 Feb 2020 19:30:15 +0100
-Message-ID: <CAL1e-=iCY9FaPdDHB4ms37dckQp+YKoWniA22jQ7eOq__jobpA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/14] Fixes for DP8393X SONIC device emulation
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000008802059edddd95"
+References: <20200217203734.18703-1-linux@roeck-us.net>
+ <CAFEAcA9v+9ohanZFGTgT1SLgNCnqZccnhcbsxm0MuNYQ_WSgjQ@mail.gmail.com>
+ <20200218174938.GA30564@roeck-us.net>
+In-Reply-To: <20200218174938.GA30564@roeck-us.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Feb 2020 18:35:24 +0000
+Message-ID: <CAFEAcA8L3yPrL5nHzM4jdssJGox-E4k2wHdpc-zx4q2=7JFZJA@mail.gmail.com>
+Subject: Re: [PATCH] sh4: Remove bad memory alias 'sh_pci.isa'
+To: Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,191 +87,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Finn Thain <fthain@telegraphics.com.au>, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000008802059edddd95
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tuesday, February 4, 2020, Jason Wang <jasowang@redhat.com> wrote:
-
+On Tue, 18 Feb 2020 at 17:49, Guenter Roeck <linux@roeck-us.net> wrote:
 >
-> On 2020/1/29 =E4=B8=8B=E5=8D=885:27, Finn Thain wrote:
+> On Tue, Feb 18, 2020 at 04:33:49PM +0000, Peter Maydell wrote:
+> > I think the correct fix would be to have the handling of
+> > PCIIOBR call memory_region_set_alias_offset() (thus updating
+> > where this alias window points within the system IO space),
+> > rather than doing the del/add subregion calls.
+> >
+> Like this ?
 >
->> Hi All,
->>
->> There are bugs in the emulated dp8393x device that can stop packet
->> reception in a Linux/m68k guest (q800 machine).
->>
->> With a Linux/m68k v5.5 guest (q800), it's possible to remotely trigger
->> an Oops by sending ping floods.
->>
->> With a Linux/mips guest (magnum machine), the driver fails to probe
->> the dp8393x device.
->>
->> With a NetBSD/arc 5.1 guest (magnum), the bugs in the device can be
->> fatal to the guest kernel.
->>
->> Whilst debugging the device, I found that the receiver algorithm
->> differs from the one described in the National Semiconductor
->> datasheet.
->>
->> This patch series resolves these bugs.
->>
->> AFAIK, all bugs in the Linux sonic driver were fixed in Linux v5.5.
->> ---
->> Changed since v1:
->>   - Minor revisions as described beneath commit logs.
->>   - Dropped patches 4/10 and 7/10.
->>   - Added 5 new patches.
->>
->> Changed since v2:
->>   - Minor revisions as described beneath commit logs.
->>   - Dropped patch 13/13.
->>   - Added 2 new patches.
->>
->> Changed since v3:
->>   - Replaced patch 13/14 with patch suggested by Philippe Mathieu-Daud=
-=C3=A9.
->>
->>
->> Finn Thain (14):
->>    dp8393x: Mask EOL bit from descriptor addresses
->>    dp8393x: Always use 32-bit accesses
->>    dp8393x: Clean up endianness hacks
->>    dp8393x: Have dp8393x_receive() return the packet size
->>    dp8393x: Update LLFA and CRDA registers from rx descriptor
->>    dp8393x: Clear RRRA command register bit only when appropriate
->>    dp8393x: Implement packet size limit and RBAE interrupt
->>    dp8393x: Don't clobber packet checksum
->>    dp8393x: Use long-word-aligned RRA pointers in 32-bit mode
->>    dp8393x: Pad frames to word or long word boundary
->>    dp8393x: Clear descriptor in_use field to release packet
->>    dp8393x: Always update RRA pointers and sequence numbers
->>    dp8393x: Don't reset Silicon Revision register
->>    dp8393x: Don't stop reception upon RBE interrupt assertion
->>
->>   hw/net/dp8393x.c | 202 +++++++++++++++++++++++++++++++----------------
->>   1 file changed, 134 insertions(+), 68 deletions(-)
->>
+> --- a/hw/sh4/sh_pci.c
+> +++ b/hw/sh4/sh_pci.c
+> @@ -67,12 +67,7 @@ static void sh_pci_reg_write (void *p, hwaddr addr, uint64_t val,
+>          pcic->mbr = val & 0xff000001;
+>          break;
+>      case 0x1c8:
+> -        if ((val & 0xfffc0000) != (pcic->iobr & 0xfffc0000)) {
+> -            memory_region_del_subregion(get_system_memory(), &pcic->isa);
+> -            pcic->iobr = val & 0xfffc0001;
+> -            memory_region_add_subregion(get_system_memory(),
+> -                                        pcic->iobr & 0xfffc0000, &pcic->isa);
+> -        }
+> +        memory_region_set_alias_offset(&pcic->isa, val & 0xfffc0000);
+>          break;
 >
->
-> Applied.
->
->
-Hi, Jason,
+> This works for me as well. Please let me know if it is correct (especially
+> the mask), and I'll resubmit.
 
-I generally have some reservations towards patches that did not receive any
-R-bs. I think we should hear from Herve in this case, to confirm that this
-change doesn't cause other problems while solving the original ones.
+The mask and call to set_alias_offset look right, but you have
+lost the setting of pcic->iobr, which is necessary so that the
+register reads back correctly.
 
-I hope this is not the case.
+We should also drop the
+    s->iobr = 0xfe240000;
+in sh_pci_device_realize(), as the register resets to zero,
+and just hardcode the 0xfe240000 as the argument to
+memory_region_add_subregion() in that function.
 
-Regards,
-Aleksandar
+(A better place for that add_subregion would be to put it
+in the board model, and just have this pci controller
+device expose the alias window as a sysbus mmio region,
+the same way we do with the a7 and p4 windows,
+but that's a separate cleanup from this bugfix.)
 
+Incidentally, the device is missing a reset method, but
+I guess Linux is programming the whole controller from
+scratch and not relying on any of the registers having
+known values out of reset.
 
-
-
-> Thanks
->
->
->
-
---000000000000008802059edddd95
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Tuesday, February 4, 2020, Jason Wang &lt;<a href=3D"mailto:jaso=
-wang@redhat.com">jasowang@redhat.com</a>&gt; wrote:<br><blockquote class=3D=
-"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding=
--left:1ex"><br>
-On 2020/1/29 =E4=B8=8B=E5=8D=885:27, Finn Thain wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-Hi All,<br>
-<br>
-There are bugs in the emulated dp8393x device that can stop packet<br>
-reception in a Linux/m68k guest (q800 machine).<br>
-<br>
-With a Linux/m68k v5.5 guest (q800), it&#39;s possible to remotely trigger<=
-br>
-an Oops by sending ping floods.<br>
-<br>
-With a Linux/mips guest (magnum machine), the driver fails to probe<br>
-the dp8393x device.<br>
-<br>
-With a NetBSD/arc 5.1 guest (magnum), the bugs in the device can be<br>
-fatal to the guest kernel.<br>
-<br>
-Whilst debugging the device, I found that the receiver algorithm<br>
-differs from the one described in the National Semiconductor<br>
-datasheet.<br>
-<br>
-This patch series resolves these bugs.<br>
-<br>
-AFAIK, all bugs in the Linux sonic driver were fixed in Linux v5.5.<br>
----<br>
-Changed since v1:<br>
-=C2=A0 - Minor revisions as described beneath commit logs.<br>
-=C2=A0 - Dropped patches 4/10 and 7/10.<br>
-=C2=A0 - Added 5 new patches.<br>
-<br>
-Changed since v2:<br>
-=C2=A0 - Minor revisions as described beneath commit logs.<br>
-=C2=A0 - Dropped patch 13/13.<br>
-=C2=A0 - Added 2 new patches.<br>
-<br>
-Changed since v3:<br>
-=C2=A0 - Replaced patch 13/14 with patch suggested by Philippe Mathieu-Daud=
-=C3=A9.<br>
-<br>
-<br>
-Finn Thain (14):<br>
-=C2=A0 =C2=A0dp8393x: Mask EOL bit from descriptor addresses<br>
-=C2=A0 =C2=A0dp8393x: Always use 32-bit accesses<br>
-=C2=A0 =C2=A0dp8393x: Clean up endianness hacks<br>
-=C2=A0 =C2=A0dp8393x: Have dp8393x_receive() return the packet size<br>
-=C2=A0 =C2=A0dp8393x: Update LLFA and CRDA registers from rx descriptor<br>
-=C2=A0 =C2=A0dp8393x: Clear RRRA command register bit only when appropriate=
-<br>
-=C2=A0 =C2=A0dp8393x: Implement packet size limit and RBAE interrupt<br>
-=C2=A0 =C2=A0dp8393x: Don&#39;t clobber packet checksum<br>
-=C2=A0 =C2=A0dp8393x: Use long-word-aligned RRA pointers in 32-bit mode<br>
-=C2=A0 =C2=A0dp8393x: Pad frames to word or long word boundary<br>
-=C2=A0 =C2=A0dp8393x: Clear descriptor in_use field to release packet<br>
-=C2=A0 =C2=A0dp8393x: Always update RRA pointers and sequence numbers<br>
-=C2=A0 =C2=A0dp8393x: Don&#39;t reset Silicon Revision register<br>
-=C2=A0 =C2=A0dp8393x: Don&#39;t stop reception upon RBE interrupt assertion=
-<br>
-<br>
-=C2=A0 hw/net/dp8393x.c | 202 ++++++++++++++++++++++++++++++<wbr>+---------=
--------<br>
-=C2=A0 1 file changed, 134 insertions(+), 68 deletions(-)<br>
-</blockquote>
-<br>
-<br>
-Applied.<br>
-<br></blockquote><div><br></div><div>Hi, Jason,</div><div><br></div><div>I =
-generally have some reservations towards patches that did not receive any R=
--bs. I think we should hear from Herve in this case, to confirm that this c=
-hange doesn&#39;t cause other problems while solving the original ones.</di=
-v><div><br></div><div>I hope this is not the case.</div><div><br></div><div=
->Regards,</div><div>Aleksandar</div><div><br></div><div><br></div><div>=C2=
-=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;borde=
-r-left:1px #ccc solid;padding-left:1ex">
-Thanks<br>
-<br>
-<br>
-</blockquote>
-
---000000000000008802059edddd95--
+thanks
+-- PMM
 
