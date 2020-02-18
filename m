@@ -2,168 +2,59 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B4A9C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C135C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:15:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA3F520659
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:12:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="kg0RR731"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA3F520659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 55DA820659
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:15:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55DA820659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3yvl-0000K2-5p
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:12:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38466)
+	id 1j3yyG-00030f-Hb
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:15:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1j3ytO-0006NF-Jm
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:10:11 -0500
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j3yxN-0001RO-HV
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:14:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1j3ytN-0006pm-Jd
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:10:10 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42028)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j3ytN-0006p3-CN
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:10:09 -0500
-Received: by mail-pl1-x644.google.com with SMTP id e8so7820370plt.9
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 01:10:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:from:to:cc:references:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9fRi1/OVs+dvZpjN2s6t59R/IDtKJ6XNyy7Xn1DJaAQ=;
- b=kg0RR731Yp8zzk3DqdEw6/85hGDDXW3a4zRPQnj4tNAGmuZymBXPSUuH91bFw6epoL
- aIIEFN8I68BB3uvIJbXdw4GAPXecOLiUGhplSJcKTedW+SXRyEvRYIbs1q8DA/2a4ku2
- bbOOcAzn19I6SiBnKqJQVCNEC9zMi1mKFgonrULJm4zzuvzGZjYaGwC212HIxFuoB/Yy
- NQxOLYIVYqCbtY3jPFwchLuzdLziUJdqp6++nFemurDsjq8Q5RosXCd4AFgEwRMlu8Nm
- PG0/f6YSXVHljVP9CRGDptB7r92n2TcUr3iUNbl+D79yc9PLWI5sM8W39BUdoIKGAF0+
- MdkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=9fRi1/OVs+dvZpjN2s6t59R/IDtKJ6XNyy7Xn1DJaAQ=;
- b=XAzC7uIb+rw2hYbrhtCCJVuVQSaelHUgcgtAqQFOfTepvjlxdOhJAXwPVFuUTx56OZ
- 7hO0by2SfhC7X3qvKxuqfD0Zxe3/wpZ2ZGdxADsaplBz7VIvvHjoD/4QfXwfx9BOFmRC
- P1FatjoLLWx+l1lD2k/5CnXH563O2E6CaeMpdEFUoSIWVG+O8TM8D/PmWFkn0h0EwFuL
- bsaM9eaerbSxqC2bigRbiXbkEkuG58B1oi+/5Ss8jLAexrD4T1NzeS/pUCOgEaQhaIWC
- IPTI/3SlxkRO2usKEPMc1ARq4Y4SW0qvqP0FDDtSkiQrbQjxOzLElrVVRXOaM4wa1yfN
- 1JUA==
-X-Gm-Message-State: APjAAAVZb4E+KTRfnyk4PVcgMHMpjotn67Ej4ZO8KE/bfcsWJ2lVWHf3
- 6f0TxoFHh6Fe3ebVJmNWHyPrDVgK9w4=
-X-Google-Smtp-Source: APXvYqyP7YTQFGANBj3UJe/KsiMty8Rjn7JSsyL2uMlj7vtmQleDMJ3GbDzzx4cNkMJ1BZhhmvxBiA==
-X-Received: by 2002:a17:90a:e2d4:: with SMTP id
- fr20mr1512862pjb.85.1582017008093; 
- Tue, 18 Feb 2020 01:10:08 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id a19sm2259425pju.11.2020.02.18.01.10.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Feb 2020 01:10:07 -0800 (PST)
-Subject: Re: [PULL SUBSYSTEM qemu-pseries] pseries: Update SLOF firmware image
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20200217021217.95766-1-aik@ozlabs.ru>
- <8e67117e-e74a-fb5c-226b-78e62ac26291@kaod.org>
- <44499677-3099-56c6-7249-afa8eccc7668@ozlabs.ru>
- <bdfb7d07-c5fd-c21e-f812-4a0a747b02c3@kaod.org>
- <0c21bb33-e6c0-c117-c9e7-dda16d3b13a5@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <4a8261b3-3842-869c-0997-b997229ff3f6@ozlabs.ru>
-Date: Tue, 18 Feb 2020 20:10:04 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j3yxM-0000u5-IF
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:14:17 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:43358 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1j3yxM-0000s1-7D; Tue, 18 Feb 2020 04:14:16 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 0727F7A2547525B3808B;
+ Tue, 18 Feb 2020 17:14:08 +0800 (CST)
+Received: from HGHY4C002233111.china.huawei.com (10.133.205.93) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.439.0; Tue, 18 Feb 2020 17:14:00 +0800
+From: <kuhn.chenqun@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-ppc@nongnu.org>, <jcmvbkbc@gmail.com>,
+ <crwulff@gmail.com>, <marex@denx.de>, <edgar.iglesias@gmail.com>,
+ <david@gibson.dropbear.id.au>
+Subject: [PATCH 2/3] hw/ppc/virtex_ml507:fix leak of fdevice tree blob
+Date: Tue, 18 Feb 2020 17:11:53 +0800
+Message-ID: <20200218091154.21696-3-kuhn.chenqun@huawei.com>
+X-Mailer: git-send-email 2.14.1.windows.1
+In-Reply-To: <20200218091154.21696-1-kuhn.chenqun@huawei.com>
+References: <20200218091154.21696-1-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <0c21bb33-e6c0-c117-c9e7-dda16d3b13a5@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+Content-Type: text/plain
+X-Originating-IP: [10.133.205.93]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -175,65 +66,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, pannengyuan@huawei.com,
+ zhang.zhanghailiang@huawei.com, Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Chen Qun <kuhn.chenqun@huawei.com>
 
+The device tree blob returned by load_device_tree is malloced.
+We should free it after cpu_physical_memory_write().
 
-On 18/02/2020 20:05, Alexey Kardashevskiy wrote:
-> 
-> 
-> On 18/02/2020 18:12, Cédric Le Goater wrote:
->> On 2/18/20 1:30 AM, Alexey Kardashevskiy wrote:
->>>
->>>
->>> On 17/02/2020 20:48, Cédric Le Goater wrote:
->>>> On 2/17/20 3:12 AM, Alexey Kardashevskiy wrote:
->>>>> The following changes since commit 05943fb4ca41f626078014c0327781815c6584c5:
->>>>>
->>>>>   ppc: free 'fdt' after reset the machine (2020-02-17 11:27:23 +1100)
->>>>>
->>>>> are available in the Git repository at:
->>>>>
->>>>>   git@github.com:aik/qemu.git tags/qemu-slof-20200217
->>>>>
->>>>> for you to fetch changes up to ea9a03e5aa023c5391bab5259898475d0298aac2:
->>>>>
->>>>>   pseries: Update SLOF firmware image (2020-02-17 13:08:59 +1100)
->>>>>
->>>>> ----------------------------------------------------------------
->>>>> Alexey Kardashevskiy (1):
->>>>>       pseries: Update SLOF firmware image
->>>>>
->>>>>  pc-bios/README   |   2 +-
->>>>>  pc-bios/slof.bin | Bin 931032 -> 968560 bytes
->>>>>  roms/SLOF        |   2 +-
->>>>>  3 files changed, 2 insertions(+), 2 deletions(-)
->>>>>
->>>>>
->>>>> *** Note: this is not for master, this is for pseries
->>>>>
->>>>
->>>> Hello Alexey,
->>>>
->>>> QEMU fails to boot from disk. See below.
->>>
->>>
->>> It does boot mine (fedora 30, ubuntu 18.04), see below. I believe I
->>> could have broken something but I need more detail. Thanks,
->>
->> fedora31 boots but not ubuntu 19.10. Could it be GRUB version 2.04 ? 
-> 
-> 
-> No, not that either:
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+---
+ hw/ppc/virtex_ml507.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-but it might be because of power9 - I only tried power8, rsyncing the
-image to a p9 machine now...
-
-
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index 91dd00ee91..4eef70069f 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -188,6 +188,7 @@ static int xilinx_load_device_tree(hwaddr addr,
+     if (r < 0)
+         fprintf(stderr, "couldn't set /chosen/bootargs\n");
+     cpu_physical_memory_write(addr, fdt, fdt_size);
++    g_free(fdt);
+     return fdt_size;
+ }
+ 
 -- 
-Alexey
+2.23.0
+
+
 
