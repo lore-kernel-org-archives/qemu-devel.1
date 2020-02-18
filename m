@@ -2,79 +2,81 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6F7C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F50C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:22:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A30922527
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:22:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFB232173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:22:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RnxaMZo8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A30922527
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="crkLfZKY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFB232173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42p7-0008Bl-LW
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:22:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44782)
+	id 1j42pO-0008VT-20
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:22:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45751)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j42gf-00047h-KW
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:13:19 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j42nk-0006Zv-M1
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:20:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j42gc-0006cK-T4
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:13:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21136
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j42gc-0006bl-I6
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:13:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582031593;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Z5nthzg/7QkIe/ahXszg3m//7XvjE80yHgw6heGrV44=;
- b=RnxaMZo8L30HDkw4Mie1rCaXZOw56tydXnQhYjCHUvD9IIjdIzTh3tr8d8KT2iLXKBOYha
- n2gco/vL06M2vvEkHUz+7bAFqBJUOGJ6gH6JbjI6Q6i/L2NtQgg7yg9NFJU+JfK+iOkuBj
- MKdB5YkQVbtFGXftlz6Bx1O5wuZVHUQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-XOF-Vk5pOKq93faeYZiwig-1; Tue, 18 Feb 2020 08:13:11 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F151C800D48;
- Tue, 18 Feb 2020 13:13:09 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7A7F117DC8;
- Tue, 18 Feb 2020 13:13:06 +0000 (UTC)
-Date: Tue, 18 Feb 2020 14:13:04 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v3 00/17] s390x: Protected Virtualization support
-Message-ID: <20200218141304.1c6f82b0.cohuck@redhat.com>
-In-Reply-To: <20200214151636.8764-1-frankja@linux.ibm.com>
-References: <20200214151636.8764-1-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <peter.maydell@linaro.org>) id 1j42nj-0000WT-GC
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:20:36 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41598)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j42ni-0000W5-QE
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:20:34 -0500
+Received: by mail-oi1-x244.google.com with SMTP id i1so20018760oie.8
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 05:20:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=e33XSujeVPSmM69bxmP6PPG5hbSgevpcKoYxIW+BlSA=;
+ b=crkLfZKYA8VWOgld1aUF2vc2YhylK3y7pcJIwzBAtU/nSt6lKyRXUL3ZmjuZo58acw
+ SdBiXb2k8+mBiyRkFfKjyIKnzXeMPyZ+R3Wr9LT27l2G5HLPQdiMCs6Fh7RphEWx9bHV
+ To9mpwdHJq+LPEvmHATmPo75AddPV5zZyOqxmd91TZglfCaJNdHmR58y1S58Ubqv5fTt
+ Oo9LlXjUPQq7kvb+VVfyYlWNKD73P7mI1vb4FPrEju10yYgy3l7M58L2FvTl+jjW+p90
+ q2luvDU7oFvG1JnwJ4k5mj+zDKiNqbtVUODJMsa721oKkzLtNndHQKfBPfKXxXRxazdb
+ HqAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=e33XSujeVPSmM69bxmP6PPG5hbSgevpcKoYxIW+BlSA=;
+ b=riQxmCjlObex7w0AeoVufhRVY3nVNmlkDm6SfCmjJuxf35zU7fir6f1d35zck9SeBG
+ OTKiekuBYA3GdcIrI1LtXgivD+dpFTSriEqUd1zjsPLToyeJHZNCmUfgllyB6LzOkS7u
+ OJ6VU2HGYqJxDZ3Vda9jTNBdN60/KHKNdG7kavSxuV/y5GJsDWxkkebKAk0ekWBEEBVV
+ xN8d+hf7pQo1CEdMY1IsgLR2ZcJ2qqtDaj61eSFjafukGEOxCD9aYA3k0s+HQLjeO9Xi
+ LS39Qk8j9Lh/HhEaazVGb4ulvW49AtVncsXKXkV8V/zzYFytFxarO5Gx3YXWL11GrjFh
+ pxvQ==
+X-Gm-Message-State: APjAAAVv1QmLWXQUaEFxJIENwV/1LTAJbEkZo+ZSR0BgS0kd3RROd6d0
+ bpyj80pamGXWWBa/pUzVjOvlMabIXb/MhX+5U1GVOA==
+X-Google-Smtp-Source: APXvYqySln2sw77s+nOwW5Mn2mm4KJv9a68J7L+JY+6B5m8LajUt/A38P9k+plTA3F+gyNA6iILNbyg9kCvxZv+sF8g=
+X-Received: by 2002:a05:6808:289:: with SMTP id
+ z9mr1148810oic.48.1582032033516; 
+ Tue, 18 Feb 2020 05:20:33 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: XOF-Vk5pOKq93faeYZiwig-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200218112457.22712-1-peter.maydell@linaro.org>
+ <fc70075c-0098-632e-7d60-4534202bf2f5@redhat.com>
+In-Reply-To: <fc70075c-0098-632e-7d60-4534202bf2f5@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 18 Feb 2020 13:20:22 +0000
+Message-ID: <CAFEAcA8wNVFu1ZcchFbRxkmvpKfFg3WF7p=5vxs0qevWPSMV_g@mail.gmail.com>
+Subject: Re: [PATCH v2] Avoid address_space_rw() with a constant is_write
+ argument
+To: Laurent Vivier <lvivier@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,86 +88,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 10:16:19 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Tue, 18 Feb 2020 at 13:14, Laurent Vivier <lvivier@redhat.com> wrote:
+> There is one in target/i386/hvf/vmx.h: macvm_set_cr0() you didn't change.
 
-> Most of the QEMU changes for PV are related to the new IPL type with
-> subcodes 8 - 10 and the execution of the necessary Ultravisor calls to
-> IPL secure guests. Note that we can only boot into secure mode from
-> normal mode, i.e. stfle 161 is not active in secure mode.
-> 
-> The other changes related to data gathering for emulation and
-> disabling addressing checks in secure mode, as well as CPU resets.
+It turns out that "spatch --dir ." only looks at .c files,
+and you need to add --include-headers to get it to look at
+.h files too. The only extra change is this one:
 
-Does it make sense to start looking at this series now, or I should I
-wait until review on the kernel side has settled? (I've lost track of
-the state of the interfaces...)
+diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
+index eb8894cd589..c245dc6d5bb 100644
+--- a/target/i386/hvf/vmx.h
++++ b/target/i386/hvf/vmx.h
+@@ -125,10 +125,9 @@ static inline void macvm_set_cr0(hv_vcpuid_t
+vcpu, uint64_t cr0)
 
-> 
-> V3:
-> 	* Use dedicated functions to access SIDA
-> 	* Smaller cleanups and segfault fixes
-> 	* Error reporting for Ultravisor calls
-> 	* Inject of RC of diag308 subcode 10 fails
-> 
-> V2:
-> 	* Split out cleanups
-> 	* Internal PV state tracking
-> 	* Review feedback
-> 
-> Janosch Frank (17):
->   Header sync
->   s390x: Add missing vcpu reset functions
->   Sync pv
->   s390x: protvirt: Add diag308 subcodes 8 - 10
->   s390x: protvirt: Support unpack facility
->   s390x: protvirt: Add migration blocker
->   s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
->   s390x: protvirt: KVM intercept changes
->   s390: protvirt: Move STSI data over SIDAD
->   s390x: Add SIDA memory ops
->   s390x: protvirt: SCLP interpretation
->   s390x: protvirt: Set guest IPL PSW
->   s390x: protvirt: Move diag 308 data over SIDAD
->   s390x: protvirt: Disable address checks for PV guest IO emulation
->   s390x: protvirt: Move IO control structures over SIDA
->   s390x: protvirt: Handle SIGP store status correctly
->   s390x: For now add unpack feature to GA1
-> 
->  hw/s390x/Makefile.objs              |   1 +
->  hw/s390x/ipl.c                      |  80 +++++++++++++-
->  hw/s390x/ipl.h                      |  33 ++++++
->  hw/s390x/pv.c                       | 160 ++++++++++++++++++++++++++++
->  hw/s390x/pv.h                       |  40 +++++++
->  hw/s390x/s390-virtio-ccw.c          | 136 ++++++++++++++++++++++-
->  hw/s390x/sclp.c                     |  17 +++
->  include/hw/s390x/s390-virtio-ccw.h  |   1 +
->  include/hw/s390x/sclp.h             |   2 +
->  linux-headers/linux/kvm.h           |  48 ++++++++-
->  target/s390x/cpu.c                  |  41 +++++--
->  target/s390x/cpu.h                  |   8 +-
->  target/s390x/cpu_features_def.inc.h |   1 +
->  target/s390x/diag.c                 |  63 +++++++++--
->  target/s390x/gen-features.c         |   1 +
->  target/s390x/helper.c               |   4 +
->  target/s390x/ioinst.c               | 113 ++++++++++++++------
->  target/s390x/kvm-stub.c             |  10 +-
->  target/s390x/kvm.c                  |  89 ++++++++++++++--
->  target/s390x/kvm_s390x.h            |   6 +-
->  target/s390x/mmu_helper.c           |   9 ++
->  target/s390x/sigp.c                 |   1 +
->  22 files changed, 789 insertions(+), 75 deletions(-)
->  create mode 100644 hw/s390x/pv.c
->  create mode 100644 hw/s390x/pv.h
-> 
+     if ((cr0 & CR0_PG) && (rvmcs(vcpu, VMCS_GUEST_CR4) & CR4_PAE) &&
+         !(efer & MSR_EFER_LME)) {
+-        address_space_rw(&address_space_memory,
+-                         rvmcs(vcpu, VMCS_GUEST_CR3) & ~0x1f,
+-                         MEMTXATTRS_UNSPECIFIED,
+-                         (uint8_t *)pdpte, 32, 0);
++        address_space_read(&address_space_memory,
++                           rvmcs(vcpu, VMCS_GUEST_CR3) & ~0x1f,
++                           MEMTXATTRS_UNSPECIFIED, (uint8_t *)pdpte, 32);
+         /* Only set PDPTE when appropriate. */
+         for (i = 0; i < 4; i++) {
+             wvmcs(vcpu, VMCS_GUEST_PDPTE0 + i * 2, pdpte[i]);
 
--ENODOC; can you add something under docs/ that describes how you
-configure a pv guest and what the initialization/teardown flow is?
+which I propose to squash in, together with the fixes to use
+the right filename in the commit message and comment.
 
+thanks
+-- PMM
 
