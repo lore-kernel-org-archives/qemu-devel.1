@@ -2,166 +2,85 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F246C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B8FC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:10:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFBAE20659
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:09:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32E3B20659
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:10:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="S3Khyi0w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFBAE20659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="G5mTlUyM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E3B20659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3ysT-000565-02
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:09:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37813)
+	id 1j3ytf-00068m-9A
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:10:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1j3yoq-0000sa-77
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:05:30 -0500
+ (envelope-from <luc.michel@greensocs.com>) id 1j3ynp-0007k4-RN
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1j3yon-0004IB-3K
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:05:26 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:40278)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j3yom-0004Hn-KI
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:05:25 -0500
-Received: by mail-pf1-x442.google.com with SMTP id q8so10318776pfh.7
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 01:05:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=35fUcrKcjl0hoU5E/H1hiEH9lrXwJ+4Sgt+XO9qVU84=;
- b=S3Khyi0wSRX7XYYQRTO5WGWMjaiY2eWXyM4RBH5j3TaYGzRRIRcFnPfCD8lf+E6UnC
- Y2JLzcOPy7yXKHMxZlHeSoJrNGoNVNLzxgiltwyAe/uflb9FiV3rD31Qs9NusFqNixzw
- B7EoCnhu63lXMFNCbi/CH86HP4WpCHFImn340JsmurxV0E3pgqbMoX2sbMPIIxgs4u0b
- tYbyzNYLoZz+TsuH10e9C5Bo4R1vVtfkVj31doDD8OYnltyaLBA4FxCo6X4dWc+DidzH
- aupivzKQedudUJt//B+0PnLj65+YXAU1WBgbC9EsUnOgnleoVR/IPhY+HHLCtcPK1Ri3
- Tn/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=35fUcrKcjl0hoU5E/H1hiEH9lrXwJ+4Sgt+XO9qVU84=;
- b=FvcndZaVTsQ+4VZcW+lVuw2Oa1qVFoa/95tZfE6mlpddCzcyB4JxefHZA8zogxqucU
- T4rP18uOUMQ6B7BflGunBH9qhri3+rRipEXlLzARZEoPD4gpf+NV+K3AeomIILpVvDjZ
- 9Dy1luwzDbr76GMjCk7NbjAnNqh5pL5yr16JPtRLH+LSeXuU9IoSlCpmNEY0hqWt8+OS
- FNaZ97J8+Ro/5zAZAMoEYyE3BnvULfNSKU8gHUt6No3ktThIbsD7WMrOT+ZU+GadThpq
- bPZCgEb1tn6MgQEIvLMUBFDrSJi0Io/tZWvceUdItK3m/WFROAVmFyeBgDS29k+8LF/R
- 7LkQ==
-X-Gm-Message-State: APjAAAU+Ri8LPsYlftD5j9u2W8IRnQg2+FWdCACJbFhfOUm/JAwv+hPS
- qLnyZDh0HFQ9n3uzNsfqp8nFWotpBLA=
-X-Google-Smtp-Source: APXvYqxlfjOklHa0oSKSrq69a6+c1QPq4BavI0UWJipRhl1yQ5IzGVCKVqCtH7JhUn4GLeihn+r4KQ==
-X-Received: by 2002:a62:e217:: with SMTP id a23mr20516992pfi.50.1582016722612; 
- Tue, 18 Feb 2020 01:05:22 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id m12sm3230132pfh.37.2020.02.18.01.05.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Feb 2020 01:05:21 -0800 (PST)
-Subject: Re: [PULL SUBSYSTEM qemu-pseries] pseries: Update SLOF firmware image
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20200217021217.95766-1-aik@ozlabs.ru>
- <8e67117e-e74a-fb5c-226b-78e62ac26291@kaod.org>
- <44499677-3099-56c6-7249-afa8eccc7668@ozlabs.ru>
- <bdfb7d07-c5fd-c21e-f812-4a0a747b02c3@kaod.org>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <0c21bb33-e6c0-c117-c9e7-dda16d3b13a5@ozlabs.ru>
-Date: Tue, 18 Feb 2020 20:05:18 +1100
+ (envelope-from <luc.michel@greensocs.com>) id 1j3yno-00042J-MB
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:04:25 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:33678)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <luc.michel@greensocs.com>)
+ id 1j3ynm-00041Z-2w; Tue, 18 Feb 2020 04:04:22 -0500
+Received: from [172.16.11.100] (tiramisu.bar.greensocs.com [172.16.11.100])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id EAB0B96EF0;
+ Tue, 18 Feb 2020 09:04:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1582016661;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6iKDZMmR2MGRfb7FC4kp7sl2ip3ERGOfw2NgIJABaN8=;
+ b=G5mTlUyMM9049D55UbTeMtqzRrrE/OSmzIGLIe/Xez6Y5D/8pHKvce/HQOQqcfGIiOR/cM
+ v2GiOZ0EWotpwr/35A8uftii1x3l0/0XZsa79Vom/tWlw9mDcED0FCktLI3PDKp44JFUeE
+ uUFv0nWGJWCLXqi6jNifjh7Xv+7J08I=
+Subject: Re: [PATCH v2 11/13] hw/arm/bcm2836: Introduce the BCM2835 SoC
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200217114533.17779-1-f4bug@amsat.org>
+ <20200217114533.17779-12-f4bug@amsat.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <5fdb8e30-1bba-98d8-7c8e-a32ed7542514@greensocs.com>
+Date: Tue, 18 Feb 2020 10:04:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <bdfb7d07-c5fd-c21e-f812-4a0a747b02c3@kaod.org>
+In-Reply-To: <20200217114533.17779-12-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+Content-Language: en-PH
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1582016661;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6iKDZMmR2MGRfb7FC4kp7sl2ip3ERGOfw2NgIJABaN8=;
+ b=Lsnz/ZtuSq2KYNriaUl3CwXExMinMh1PjnWyV2hezCukD1i0p6uhNPWp0XaBceQHqOCJwZ
+ n7dlgCxe98UJw1miiBuE8mEBJ4k02DlHWu3YlndCRwu0nd17K02FiQ/G6lZAbt1fUegk3p
+ DSr4cfpQr4KyDlQUOceSKM08HmGrBp4=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582016661; a=rsa-sha256; cv=none;
+ b=2/S/910wrwyhhB3aKczfkZn/zclT0/SzBeC7/dOUNn2d9iB5/Sl874XcHvH6nKl6WXkflQ
+ 4joFeimQ4VSIu4iD8y5mhIDmOlLQY97ComHk28yCpWymIlAyy66UWDnmz/4BH3izsgZLHf
+ 80q8a1byBZfgbqHu2INQHQIyETYCbXc=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -173,233 +92,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 2/17/20 12:45 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
-On 18/02/2020 18:12, Cédric Le Goater wrote:
-> On 2/18/20 1:30 AM, Alexey Kardashevskiy wrote:
->>
->>
->> On 17/02/2020 20:48, Cédric Le Goater wrote:
->>> On 2/17/20 3:12 AM, Alexey Kardashevskiy wrote:
->>>> The following changes since commit 05943fb4ca41f626078014c0327781815c6584c5:
->>>>
->>>>   ppc: free 'fdt' after reset the machine (2020-02-17 11:27:23 +1100)
->>>>
->>>> are available in the Git repository at:
->>>>
->>>>   git@github.com:aik/qemu.git tags/qemu-slof-20200217
->>>>
->>>> for you to fetch changes up to ea9a03e5aa023c5391bab5259898475d0298aac2:
->>>>
->>>>   pseries: Update SLOF firmware image (2020-02-17 13:08:59 +1100)
->>>>
->>>> ----------------------------------------------------------------
->>>> Alexey Kardashevskiy (1):
->>>>       pseries: Update SLOF firmware image
->>>>
->>>>  pc-bios/README   |   2 +-
->>>>  pc-bios/slof.bin | Bin 931032 -> 968560 bytes
->>>>  roms/SLOF        |   2 +-
->>>>  3 files changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>>
->>>> *** Note: this is not for master, this is for pseries
->>>>
->>>
->>> Hello Alexey,
->>>
->>> QEMU fails to boot from disk. See below.
->>
->>
->> It does boot mine (fedora 30, ubuntu 18.04), see below. I believe I
->> could have broken something but I need more detail. Thanks,
-> 
-> fedora31 boots but not ubuntu 19.10. Could it be GRUB version 2.04 ? 
-
-
-No, not that either:
-
-SLOF
-**********************************************************************
-
-QEMU Starting
-
- Build Date = Feb 17 2020 13:06:47
-
- FW Version = git-42228d763f1fdb7b
-
- Press "s" to enter Open Firmware.
-
-
-
-Populating /vdevice methods
-
-Populating /vdevice/nvram@71000000
-
-Populating /vdevice/vty@71000110
-
-Populating /pci@800000020000000
-
-                     00 0000 (B) : 1b36 0001    pci*
-
-                     01 0000 (D) : 1af4 1002    legacy-device*
-
-                     00 0800 (D) : 1af4 1001    virtio [ block ]
-
-No NVRAM common partition, re-initializing...
-
-Scanning USB
-
-Using default console: /vdevice/vty@71000110
-
-
-
-  Welcome to Open Firmware
-
-
-
-  Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
-
-  This program and the accompanying materials are made available
-
-  under the terms of the BSD License available at
-
-  http://www.opensource.org/licenses/bsd-license.php
-
-
-
-
-
-Trying to load:  from: /pci@800000020000000/scsi@1 ...  slash  not found
-  Successfully loaded
-Welcome to GRUB!
-
-
-
-error: no suitable video mode found.
-
-
-
-                             GNU GRUB  version 2.04
-
-
-
-[...]
-
-
-Ubuntu 19.10 aiku1910le hvc0
-
-aiku1910le login: aik
-Password:
-Last login: Tue Feb 18 19:57:46 AEDT 2020 from 10.61.161.111 on pts/0
-Welcome to Ubuntu 19.10 (GNU/Linux 5.3.0-40-generic ppc64le)
-
-
-
-
-> 
-> C.
-> 
-> 
->>
->>
->>
->>
->> SLOF **********************************************************************
->> QEMU Starting
->>  Build Date = Feb 17 2020 13:06:47
->>  FW Version = git-42228d763f1fdb7b
->>  Press "s" to enter Open Firmware.
->>
->> Populating /vdevice methods
->> Populating /vdevice/nvram@71000000
->> Populating /vdevice/vty@71000110
->> Populating /pci@800000020000000
->>                      00 0000 (D) : 1af4 1000    virtio [ net ]
->>                      00 0800 (D) : 1af4 1004    virtio [ scsi ]
->> Populating /pci@800000020000000/scsi@1
->>        SCSI: Looking for devices
->>           100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"
->> No NVRAM common partition, re-initializing...
->> Scanning USB
->> Using default console: /vdevice/vty@71000110
->>
->>   Welcome to Open Firmware
->>
->>   Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
->>   This program and the accompanying materials are made available
->>   under the terms of the BSD License available at
->>   http://www.opensource.org/licenses/bsd-license.php
->>
->>
->> Trying to load:  from: /pci@800000020000000/scsi@1/disk@100000000000000
->> ...   Successfully loaded
->>
->>
->>
->>
->>
->>
->>       Fedora (5.5.0-rc5-le-guest_v5.5-rc5_a+fstn1) 30 (Thirty)
->>
->>       Fedora (5.0.9-301.fc30.ppc64le) 30 (Thirty)
->>
->>       Fedora (0-rescue-8f8bbec520a44fd09da6af8e0d2c6571) 30 (Thirty)
->>
->>
->>
->>
->>>
->>> Thanks,
->>>
->>> C.
->>>
->>>
->>> QEMU Starting
->>>  Build Date = Feb 17 2020 13:06:47
->>>  FW Version = git-42228d763f1fdb7b
->>>  Press "s" to enter Open Firmware.
->>>
->>> Populating /vdevice methods
->>> Populating /vdevice/vty@71000000
->>> Populating /vdevice/nvram@71000001
->>> Populating /pci@800000020000000
->>>                      00 0800 (D) : 1af4 1004    virtio [ scsi ]
->>> Populating /pci@800000020000000/scsi@1
->>>        SCSI: Looking for devices
->>>           100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"
->>>                      00 1000 (D) : 1af4 1000    virtio [ net ]
->>>                      00 2000 (D) : 1b36 000d    serial bus [ usb-xhci ]
->>> No NVRAM common partition, re-initializing...
->>> Scanning USB 
->>>   XHCI: Initializing
->>> Using default console: /vdevice/vty@71000000
->>>      
->>>   Welcome to Open Firmware
->>>
->>>   Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
->>>   This program and the accompanying materials are made available
->>>   under the terms of the BSD License available at
->>>   http://www.opensource.org/licenses/bsd-license.php
->>>
->>>
->>> Trying to load:  from: /pci@800000020000000/scsi@1/disk@100000000000000 ...  slash SCSI-DISK: Access beyond end of device ! 
->>>
->>> Out of internal memory.
->>> SCSI-DISK: Access beyond end of device ! 
->>> SCSI-DISK: Access beyond end of device ! 
->>> SCSI-DISK: Access beyond end of device ! 
->>> SCSI-DISK: Access beyond end of device ! 
->>> SCSI-DISK: Access beyond end of device ! 
->>>
->>
-> 
-
--- 
-Alexey
+> ---
+>  include/hw/arm/bcm2836.h |  1 +
+>  hw/arm/bcm2836.c         | 40 ++++++++++++++++++++++++++++++++++++++++
+>  hw/arm/raspi.c           |  2 ++
+>  3 files changed, 43 insertions(+)
+>=20
+> diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
+> index acc75bf553..3d46469a73 100644
+> --- a/include/hw/arm/bcm2836.h
+> +++ b/include/hw/arm/bcm2836.h
+> @@ -24,6 +24,7 @@
+>   * them, code using these devices should always handle them via the
+>   * BCM283x base class, so they have no BCM2836(obj) etc macros.
+>   */
+> +#define TYPE_BCM2835 "bcm2835"
+>  #define TYPE_BCM2836 "bcm2836"
+>  #define TYPE_BCM2837 "bcm2837"
+> =20
+> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+> index 2b6fe31139..bce5f8a866 100644
+> --- a/hw/arm/bcm2836.c
+> +++ b/hw/arm/bcm2836.c
+> @@ -103,6 +103,31 @@ static void bcm283x_common_realize(DeviceState *de=
+v, Error **errp)
+>                              bc->peri_base, 1);
+>  }
+> =20
+> +static void bcm2835_realize(DeviceState *dev, Error **errp)
+> +{
+> +    BCM283XState *s =3D BCM283X(dev);
+> +    Error *err =3D NULL;
+> +
+> +    bcm283x_common_realize(dev, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    object_property_set_bool(OBJECT(&s->cpu[0].core), true,
+> +                             "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +
+> +    /* Connect irq/fiq outputs from the interrupt controller. */
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
+> +            qdev_get_gpio_in(DEVICE(&s->cpu[0].core), ARM_CPU_IRQ));
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 1,
+> +            qdev_get_gpio_in(DEVICE(&s->cpu[0].core), ARM_CPU_FIQ));
+> +}
+> +
+>  static void bcm2836_realize(DeviceState *dev, Error **errp)
+>  {
+>      BCM283XState *s =3D BCM283X(dev);
+> @@ -184,6 +209,17 @@ static void bcm283x_class_init(ObjectClass *oc, vo=
+id *data)
+>      dc->user_creatable =3D false;
+>  }
+> =20
+> +static void bcm2835_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> +    BCM283XClass *bc =3D BCM283X_CLASS(oc);
+> +
+> +    bc->cpu_type =3D ARM_CPU_TYPE_NAME("arm1176");
+> +    bc->core_count =3D 1;
+> +    bc->peri_base =3D 0x20000000;
+> +    dc->realize =3D bcm2835_realize;
+> +};
+> +
+>  static void bcm2836_class_init(ObjectClass *oc, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(oc);
+> @@ -214,6 +250,10 @@ static void bcm2837_class_init(ObjectClass *oc, vo=
+id *data)
+> =20
+>  static const TypeInfo bcm283x_types[] =3D {
+>      {
+> +        .name           =3D TYPE_BCM2835,
+> +        .parent         =3D TYPE_BCM283X,
+> +        .class_init     =3D bcm2835_class_init,
+> +    }, {
+>          .name           =3D TYPE_BCM2836,
+>          .parent         =3D TYPE_BCM283X,
+>          .class_init     =3D bcm2836_class_init,
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index fff501affb..3537a329ac 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -70,6 +70,7 @@ FIELD(REV_CODE, MEMORY_SIZE,       20, 3);
+>  FIELD(REV_CODE, STYLE,             23, 1);
+> =20
+>  typedef enum RaspiProcessorId {
+> +    PROCESSOR_ID_BCM2835 =3D 0,
+>      PROCESSOR_ID_BCM2836 =3D 1,
+>      PROCESSOR_ID_BCM2837 =3D 2,
+>  } RaspiProcessorId;
+> @@ -78,6 +79,7 @@ static const struct {
+>      const char *type;
+>      int cores_count;
+>  } soc_property[] =3D {
+> +    [PROCESSOR_ID_BCM2835] =3D {TYPE_BCM2835, 1},
+>      [PROCESSOR_ID_BCM2836] =3D {TYPE_BCM2836, BCM283X_NCPUS},
+>      [PROCESSOR_ID_BCM2837] =3D {TYPE_BCM2837, BCM283X_NCPUS},
+>  };
+>=20
 
