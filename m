@@ -6,41 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA866C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE35EC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:20:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EF8520801
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:19:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF8520801
+	by mail.kernel.org (Postfix) with ESMTPS id C5E6C20801
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:20:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5E6C20801
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j48Ox-0000Z8-Qy
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:19:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60370)
+	id 1j48QQ-0002cM-VV
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:20:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36869)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j48MR-0006iL-7r
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:16:48 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j48Ov-0000ty-Kz
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:19:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j48MQ-0005Gk-3N
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:16:47 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:50913)
+ (envelope-from <laurent@vivier.eu>) id 1j48Ou-00014g-FH
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:19:21 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:54617)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j48ML-000508-03; Tue, 18 Feb 2020 14:16:41 -0500
+ id 1j48Ou-00012M-2U; Tue, 18 Feb 2020 14:19:20 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MMp08-1ilVZv0Ejc-00IoQG; Tue, 18 Feb 2020 20:16:35 +0100
-Subject: Re: [PATCH 3/3] hw/block/pflash_cfi02: Remove unneeded variable
- assignment
+ 1MAchM-1jAgu30sYK-00B1iK; Tue, 18 Feb 2020 20:19:15 +0100
+Subject: Re: [PATCH] hw/net/rocker: Report unimplemented feature with
+ qemu_log_mask(UNIMP)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-References: <20200215161557.4077-1-philmd@redhat.com>
- <20200215161557.4077-4-philmd@redhat.com>
+References: <20200217101637.27558-1-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,32 +83,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <8ff580e0-df11-05e6-101f-3afef1a72778@vivier.eu>
-Date: Tue, 18 Feb 2020 20:16:33 +0100
+Message-ID: <717af333-5c4b-1316-60f0-77c68e6c4e68@vivier.eu>
+Date: Tue, 18 Feb 2020 20:19:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200215161557.4077-4-philmd@redhat.com>
+In-Reply-To: <20200217101637.27558-1-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:/7ig+46uIGVBp1xNJoBHY6N+oEHIBNpWTmqrYpZD3aZeb2Uogy4
- uaTlvbIMGMJrQ9HwklzOaf785hxHmeF3PsWEKvkJsrZqYngxXUTCL+xUPY/tjn0r0VjbLyO
- qxtDzOXjLfaY8YppEFbV+47THIGPHLkq3JmTWEc/BK+s5Fvw/I7uFyhma4od3jFKd6Dn4P3
- zKmnb66vgYaS04baKqjvA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NbehhBjCvsg=:XxKUe5j03+s11qftZTxq8E
- J/dL+D2m/krJdM+FrDWlRb+zP6Ak2nBgELkLZ+n641zk/pAYTsZW3D/C8sKTP3WpOgUmTX0cr
- zCYP/dssl0BWq5EqtjpO5sHW8VDJuXzV6e+KJHNJaXVLFHM6jWcJzzOfxD5nRM4qfacS9d2zZ
- BCI9bGygmQIl9F+Y6Ifd0l0+HBFh5znBSBVQs/f+cVuw1JqD1n87dhD1I3Z2+IO5+i60h7H6F
- wyjIF4+PX65HX5vZJf698z5E7EFgixlGIJ80qV8WE7T860bjc16Ii20uKFs0lQRyMNd4X1cz1
- m5l4zZ81oJsXx11XyXtFfUlCM9iRb6j3uyhB4OMlhrrA6jhzvr6XWzAQWaU1NBBDJQz3cXzL3
- nA13zp1kLqH/cYFjIhsfhetblJl4uwuR7AoakbKK02sQU/auxTmvIqr5EbfRtfWGENfIRYf6r
- WvTqj8oQC+Crr1aabTK1VOBnYrMtc3161XJdbyLj+Zop2PlvRShYVEZtWIArUKyrEIIthX/GM
- wc0GcaseitvrAz88RM5yMgdQy7avsrmUl0xDSm8b/Ir3yso2Tv10dzHzC/PHVzXIwJZJKAq/5
- oIcxFdvozRjwzRxMUVBC9Wpy9rJ+wpK+DDC6dBYAbtfOCMLQYiE0HVFt7Ud+qkXevopqks523
- TEZAPzZXaFcJrJy346uCt75TX3Q/2akNqILFZgQ/Xa+Xc1IRw0zvvbhvDPmfhpFsIf/KlxM4Q
- NS7PRkKECSRIQWYOWeeFa64YM0KO2b00UTzcJouCPubDo//HO+vIUgZvbNJ8xidZ8025e7l4V
- wdy894xD6b/Va+hl1BgXfiz4/6R9tTEmBEI15uFEKN3RcDrxgB31JMGusiiOO+nzRyiSz4Z
+X-Provags-ID: V03:K1:nuNpeY9gq75ylCN9gJNR/wBGDK9aFGlxdT+nU+WB/rlNcnOFByd
+ cFU3FKsRcOcwIRPWjC2Hmwu1BNce833FWg8R7UppaJADvx1MXUCtbi2dVJJ7pYGnvurtaQZ
+ SwQ9W5E8xl0V372jILEvavKhvBSm4FVZI+3Alh2TSm9tUcghqWcmoD8AE3abhYKcthScV9e
+ c/ffjNETlJfH11l4bxTgg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:N9MEMTmWfOI=:CreDNS0PvnO7TRjueQdso+
+ zUGGtvmQOhBxVE2C3Kte2WfInCPePRPDPknzg4vd647T7l2iZRgaQw4m0px8nNkl0JUuS5zD5
+ mxUHLcds2or/rIcnCoNZ4z16wlDX+lXB/w6ZLkjZW0k+FK6fnm7PA47+7qcdOEP9SzX1WppKv
+ J79BH6G7f3IfCp+71P3mag025tDW6D3sRIssxNtHEddllAiy9zK8wEUvbdtlqiMuhs/1tLNXo
+ cht9jimWJEYBwt5loEyslDGnDRVX7y9m5RJFREHytSBhLsgV1skXcrUR3pVe2Loc7IyPGZz4F
+ 8TkgncpBJRLr8tOTvQoEaVngN8v52WcEIAKV8rXrrdsQaZVU1hoMDIEbMvx4L2TeHznuDE9sa
+ 1x7/1zId0z/Qd531n1ibi502ubTc22sT1vNYfmQ8KDf5Mjp7jzF43gPgpY5ff9xpzgoi29848
+ Bhwk9nMKw73C7vU/P8j5epksIUwEI63pZ/KmM04Ppmp/dOopT4H2fO4n0aY5Ryx+i8qrnVpck
+ p8nkmXPp0zfNtV06ADD2gq1NpKR234ecvn9h7daXSojLy4iY2NtApe4A67kS+WyaELtaUNGHf
+ vhMFLN0yGr7sxxdPIaO9Bu3GXsKnljaN0oUcNtjWdLUwVXgeS+NzbRTbjs5gIskQXjlmpeT0n
+ rcLI5NtYMHnNeDd+QEikAgBrprtToqdFRlBe01tVTeifuu14qkEJu0wfI1GHoYfL65Epng0H0
+ 1vqhNFPJdFjdQ7G8uaOlVck4lItRRV/v80Aj478tHzS8n9syIhiKrfMzfiSdHcMoiPAPUv8v9
+ 8/fmiXR/kGatTCfFWl40WbU9tll7SsHrJGt9RQluoHhWXG5K1SgHlBaY6jFRQU1uymJPAzq
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
@@ -123,40 +122,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 15/02/2020 à 17:15, Philippe Mathieu-Daudé a écrit :
-> Fix warning reported by Clang static code analyzer:
+Le 17/02/2020 à 11:16, Philippe Mathieu-Daudé a écrit :
+> Fix warnings reported by Clang static code analyzer:
 > 
->     CC      hw/block/pflash_cfi02.o
->   hw/block/pflash_cfi02.c:311:5: warning: Value stored to 'ret' is never read
->       ret = -1;
->       ^     ~~
+>     CC      hw/net/rocker/rocker.o
+>   hw/net/rocker/rocker.c:213:9: warning: Value stored to 'tx_tso_mss' is never read
+>           tx_tso_mss = rocker_tlv_get_le16(tlvs[ROCKER_TLV_TX_TSO_MSS]);
+>           ^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   hw/net/rocker/rocker.c:217:9: warning: Value stored to 'tx_tso_hdr_len' is never read
+>           tx_tso_hdr_len = rocker_tlv_get_le16(tlvs[ROCKER_TLV_TX_TSO_HDR_LEN]);
+>           ^                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   hw/net/rocker/rocker.c:255:9: warning: Value stored to 'tx_l3_csum_off' is never read
+>           tx_l3_csum_off += tx_tso_mss = tx_tso_hdr_len = 0;
+>           ^                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 > 
+> Fixes: dc488f888
 > Reported-by: Clang Static Analyzer
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/block/pflash_cfi02.c | 1 -
->  1 file changed, 1 deletion(-)
+>  hw/net/rocker/rocker.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 > 
-> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-> index 7c4744c020..12f18d401a 100644
-> --- a/hw/block/pflash_cfi02.c
-> +++ b/hw/block/pflash_cfi02.c
-> @@ -308,7 +308,6 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
->      hwaddr boff;
->      uint64_t ret;
+> diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
+> index 81dd3b5f14..15d66f6cbc 100644
+> --- a/hw/net/rocker/rocker.c
+> +++ b/hw/net/rocker/rocker.c
+> @@ -27,6 +27,7 @@
+>  #include "qemu/iov.h"
+>  #include "qemu/module.h"
+>  #include "qemu/bitops.h"
+> +#include "qemu/log.h"
 >  
-> -    ret = -1;
->      /* Lazy reset to ROMD mode after a certain amount of read accesses */
->      if (!pfl->rom_mode && pfl->wcycle == 0 &&
->          ++pfl->read_counter > PFLASH_LAZY_ROMD_THRESHOLD) {
+>  #include "rocker.h"
+>  #include "rocker_hw.h"
+> @@ -207,14 +208,22 @@ static int tx_consume(Rocker *r, DescInfo *info)
+>  
+>      if (tlvs[ROCKER_TLV_TX_L3_CSUM_OFF]) {
+>          tx_l3_csum_off = rocker_tlv_get_le16(tlvs[ROCKER_TLV_TX_L3_CSUM_OFF]);
+> +        qemu_log_mask(LOG_UNIMP, "rocker %s: L3 not implemented"
+> +                                 " (cksum off: %u)\n",
+> +                      __func__, tx_l3_csum_off);
+>      }
+>  
+>      if (tlvs[ROCKER_TLV_TX_TSO_MSS]) {
+>          tx_tso_mss = rocker_tlv_get_le16(tlvs[ROCKER_TLV_TX_TSO_MSS]);
+> +        qemu_log_mask(LOG_UNIMP, "rocker %s: TSO not implemented (MSS: %u)\n",
+> +                      __func__, tx_tso_mss);
+>      }
+>  
+>      if (tlvs[ROCKER_TLV_TX_TSO_HDR_LEN]) {
+>          tx_tso_hdr_len = rocker_tlv_get_le16(tlvs[ROCKER_TLV_TX_TSO_HDR_LEN]);
+> +        qemu_log_mask(LOG_UNIMP, "rocker %s: TSO not implemented"
+> +                                 " (hdr length: %u)\n",
+> +                      __func__, tx_tso_hdr_len);
+>      }
+>  
+>      rocker_tlv_for_each_nested(tlv_frag, tlvs[ROCKER_TLV_TX_FRAGS], rem) {
+> @@ -249,12 +258,6 @@ static int tx_consume(Rocker *r, DescInfo *info)
+>          iovcnt++;
+>      }
+>  
+> -    if (iovcnt) {
+> -        /* XXX perform Tx offloads */
+> -        /* XXX   silence compiler for now */
+> -        tx_l3_csum_off += tx_tso_mss = tx_tso_hdr_len = 0;
+> -    }
+> -
+>      err = fp_port_eg(r->fp_port[port], iov, iovcnt);
+>  
+>  err_too_many_frags:
 > 
 
 Applied to my trivial-patches branch.
