@@ -2,85 +2,97 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23934C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 14:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B42C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 14:31:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3CB9208C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 14:29:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80987208C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 14:31:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5IcMn+r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3CB9208C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BHFEN9Z8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80987208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j43sq-0001N7-1N
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 09:29:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54385)
+	id 1j43tt-0002ct-K9
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 09:31:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j43br-0008Ql-Qi
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:12:27 -0500
+ (envelope-from <philmd@redhat.com>) id 1j43je-0007Ql-Aq
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:20:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j43bo-0003qP-0g
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:12:23 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22439
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j43jd-0007de-9f
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:20:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40802
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j43bn-0003qA-RW
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:12:19 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j43jd-0007dQ-6F
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:20:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582035139;
+ s=mimecast20190719; t=1582035624;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7+ud4vbjsTy+CO89F+9u3iJjkd5Z6pI8LKSoAkYQx6k=;
- b=E5IcMn+rGYSPq9IdpLDi4gFxxbFIXejsEYagS5XaMO/Uf2+IkqDlHvAxjN6d3HB4mNX5PM
- f25mc61zqHvJ7DqREfGySKqO49/n0LMlW/BEHxtGcAeOyxcWrVfSvyBMX51K9aMnMP4gnt
- PYrmjtANN+wQnRfOcdqclZvdVcePEJM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-106-gr8R_kUJNa68QRuHfEhbZA-1; Tue, 18 Feb 2020 09:12:13 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A96F58010C7;
- Tue, 18 Feb 2020 14:12:12 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-234.ams2.redhat.com
- [10.36.117.234])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6263D60BE1;
- Tue, 18 Feb 2020 14:12:09 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D075811385C9; Tue, 18 Feb 2020 15:12:07 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v4 3/4] qmp: Move dispatcher to a coroutine
-References: <20200121181122.15941-1-kwolf@redhat.com>
- <20200121181122.15941-4-kwolf@redhat.com>
- <87lfp1sc8d.fsf@dusky.pond.sub.org>
- <20200217123454.GF6309@linux.fritz.box>
-Date: Tue, 18 Feb 2020 15:12:07 +0100
-In-Reply-To: <20200217123454.GF6309@linux.fritz.box> (Kevin Wolf's message of
- "Mon, 17 Feb 2020 13:34:54 +0100")
-Message-ID: <87r1ysc7d4.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ bh=H1URDudQA43tkpJJIFu7DKO6uQTr6PesR1xXXrF9Y2c=;
+ b=BHFEN9Z84xarraHwkk3DHixcWF5naneQkhZbtB5SixFumb58sMaAAk+9aYZ2n1T1Fm3uSG
+ 0OdcqMb2PO86SCoUT82A+fostlLgAc8MfUk65WorjAmAZ1+rE6ctUFyNYz88HWNQUIsMcs
+ KxZ3txQ8/i5QnX+KMQz6XMEWHRXppkE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-c4GMMBHnMOi14a3t-CesbQ-1; Tue, 18 Feb 2020 09:20:22 -0500
+Received: by mail-wr1-f71.google.com with SMTP id o9so10932255wrw.14
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 06:20:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=dby0bbbTN0qoct6/4D46hB2yEK0ttVkxuhLtJTaK6Dg=;
+ b=WWSXbzqZ5iUPboe9IvsEC/uky6Xe/7B3VlGKLgndb72Cg+Ohx09mbkI62k+O5fKhrm
+ TfH+pj2jlW6+1NkyDI8gefSIm+iGaggKXcpIbqDikc+uy0VCjFtZXrYWOS9rO+Soyll9
+ Q5teDVT6LrwQVlILtq50shaySi2Wp98p8y0AhBNTeWp642ifPjdtGN/LCxUGaDECI8v8
+ 4htbdD0IL5ylpxg2GJGgJD6kOqS1bdVF92phEs1pDzsAN7Dy+ak2uShOxwJzbzehLzO5
+ XAJYnIixyLBf/9NZ1HLi4juCW0644qYzndPkPNZ0Lyz+K7pnsmbHZBLMIc86IYuud3Lo
+ i3Mw==
+X-Gm-Message-State: APjAAAXluudvgu5nuKHasKIpAD07dUhBmelO87/ZO4K+s+En5FBSVGf7
+ z972CQ55QFgWg/TN6sUautiZRx91gLaGevmtFrEy7IaIGbipGCyZZR+MwVPvDMbJInfRve16Hbc
+ q7IDuIYMkz6HTXDo=
+X-Received: by 2002:adf:cd03:: with SMTP id w3mr29776995wrm.191.1582035621231; 
+ Tue, 18 Feb 2020 06:20:21 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxjyxkbfhlpKkKqdMVOFidw68j25T92ALlorWEzCJJJ81C3Aexuerf2OPepl8UaKNWZjiRe3w==
+X-Received: by 2002:adf:cd03:: with SMTP id w3mr29776986wrm.191.1582035621020; 
+ Tue, 18 Feb 2020 06:20:21 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id l6sm3775204wmg.42.2020.02.18.06.20.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 18 Feb 2020 06:20:20 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH RESEND 1/3] .travis.yml: Expand OSX code coverage
+Date: Tue, 18 Feb 2020 15:20:16 +0100
+Message-Id: <20200218142018.7224-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200218142018.7224-1-philmd@redhat.com>
+References: <20200218142018.7224-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: gr8R_kUJNa68QRuHfEhbZA-1
+X-MC-Unique: c4GMMBHnMOi14a3t-CesbQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,755 +104,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
- stefanha@redhat.com
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Never been closer...
+Install more packages to cover more components:
 
-Kevin Wolf <kwolf@redhat.com> writes:
+    ./configure
+    [...]
+    host CPU          x86_64
+    strip binaries    yes
+    Cocoa support     yes
+    TLS priority      NORMAL
+    GNUTLS support    yes
+    nettle            yes (3.4.1)
+    libtasn1          yes
+    PAM               yes
+    iconv support     yes
+    curses support    no
+    curl support      yes
+    Audio drivers     coreaudio
+    vde support       yes
+    HAX support       yes
+    HVF support       yes
+    TCG support       yes
+    vhost-net support yes
+    vhost-crypto support yes
+    vhost-user support yes
+    vhost-user-fs support yes
+    libusb            yes
+    libiscsi support  yes
+    libssh support    yes
+    lzo support       yes
+    snappy support    yes
+    bzip2 support     yes
+    lzfse support     yes
+    [...]
 
-> Am 17.02.2020 um 12:08 hat Markus Armbruster geschrieben:
->> This is the hairy one.  Please bear with me while I try to grok it.
->>=20
->> Kevin Wolf <kwolf@redhat.com> writes:
->>=20
->> > This moves the QMP dispatcher to a coroutine and runs all QMP command
->> > handlers that declare 'coroutine': true in coroutine context so they
->> > can avoid blocking the main loop while doing I/O or waiting for other
->> > events.
->> >
->> > For commands that are not declared safe to run in a coroutine, the
->> > dispatcher drops out of coroutine context by calling the QMP command
->> > handler from a bottom half.
->> >
->> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> > ---
->> >  include/qapi/qmp/dispatch.h |   1 +
->> >  monitor/monitor-internal.h  |   6 +-
->> >  monitor/monitor.c           |  33 ++++++++---
->> >  monitor/qmp.c               | 110 ++++++++++++++++++++++++++---------=
--
->> >  qapi/qmp-dispatch.c         |  44 ++++++++++++++-
->> >  qapi/qmp-registry.c         |   3 +
->> >  util/aio-posix.c            |   7 ++-
->> >  7 files changed, 162 insertions(+), 42 deletions(-)
->> >
->> > diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
->> > index d6ce9efc8e..6812e49b5f 100644
->> > --- a/include/qapi/qmp/dispatch.h
->> > +++ b/include/qapi/qmp/dispatch.h
->> > @@ -30,6 +30,7 @@ typedef enum QmpCommandOptions
->> >  typedef struct QmpCommand
->> >  {
->> >      const char *name;
->> > +    /* Runs in coroutine context if QCO_COROUTINE is set */
->> >      QmpCommandFunc *fn;
->> >      QmpCommandOptions options;
->> >      QTAILQ_ENTRY(QmpCommand) node;
->> > diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
->> > index d78f5ca190..f180d03368 100644
->> > --- a/monitor/monitor-internal.h
->> > +++ b/monitor/monitor-internal.h
->> > @@ -154,7 +154,9 @@ static inline bool monitor_is_qmp(const Monitor *m=
-on)
->> > =20
->> >  typedef QTAILQ_HEAD(MonitorList, Monitor) MonitorList;
->> >  extern IOThread *mon_iothread;
->> > -extern QEMUBH *qmp_dispatcher_bh;
->> > +extern Coroutine *qmp_dispatcher_co;
->> > +extern bool qmp_dispatcher_co_shutdown;
->> > +extern bool qmp_dispatcher_co_busy;
->> >  extern QmpCommandList qmp_commands, qmp_cap_negotiation_commands;
->> >  extern QemuMutex monitor_lock;
->> >  extern MonitorList mon_list;
->> > @@ -172,7 +174,7 @@ void monitor_fdsets_cleanup(void);
->> > =20
->> >  void qmp_send_response(MonitorQMP *mon, const QDict *rsp);
->> >  void monitor_data_destroy_qmp(MonitorQMP *mon);
->> > -void monitor_qmp_bh_dispatcher(void *data);
->> > +void coroutine_fn monitor_qmp_dispatcher_co(void *data);
->> > =20
->> >  int get_monitor_def(int64_t *pval, const char *name);
->> >  void help_cmd(Monitor *mon, const char *name);
->> > diff --git a/monitor/monitor.c b/monitor/monitor.c
->> > index 12898b6448..e753fa435d 100644
->> > --- a/monitor/monitor.c
->> > +++ b/monitor/monitor.c
->> > @@ -53,8 +53,18 @@ typedef struct {
->> >  /* Shared monitor I/O thread */
->> >  IOThread *mon_iothread;
->> > =20
->> > -/* Bottom half to dispatch the requests received from I/O thread */
->> > -QEMUBH *qmp_dispatcher_bh;
->> > +/* Coroutine to dispatch the requests received from I/O thread */
->> > +Coroutine *qmp_dispatcher_co;
->> > +
->> > +/* Set to true when the dispatcher coroutine should terminate */
->> > +bool qmp_dispatcher_co_shutdown;
->> > +
->> > +/*
->> > + * true if the coroutine is active and processing requests. The corou=
-tine may
->> > + * only be woken up externally (e.g. from the monitor thread) after c=
-hanging
->> > + * qmp_dispatcher_co_busy from false to true (e.g. using atomic_xchg)=
-.
->> > + */
->>=20
->> I'm not sure what you mean by "externally".
->
-> By anyone outside the coroutine itself. Maybe just dropping the word
-> "externally" avoids the confusion because it's an implementation detail
-> that the coroutine can schedule itself while it is marked busy.
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ .travis.yml | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-Let's do that.  For me, a coroutine scheduling itself is not covered by
-"woken up".
-
->> Also mention how it changes from true to false?
->
-> Somethin like: "The coroutine will automatically change it back to false
-> after processing all pending requests"?
-
-Works for me.
-
-More below.
-
->> Note to self: monitor_qmp_dispatcher_co() checks busy is true on resume.
->>=20
->> Nitpick: wrap around column 70, two spaces between sentences for
->> consistency with other comments in this file, please.
->
-> Any specific reason why comments (but not code) in this file use a
-> different text width than everything else in QEMU? My editor is set to
-> use 80 characters to conform to CODING_STYLE.rst.
-
-Legibility.  Humans tend to have trouble following long lines with their
-eyes (I sure do).  Typographic manuals suggest to limit columns to
-roughly 60 characters for exactly that reason[*].
-
-Code is special.  It's typically indented, and long identifiers push it
-further to the right, function arguments in particular.  We compromised
-at 80 columns.
-
-Block comments are not code.  They are typically not indented much.
-This one isn't indented at all.  Line length without the comment
-decoration is way above 60.
-
->> > +bool qmp_dispatcher_co_busy;
->> > =20
->> >  /* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  *=
-/
->> >  QemuMutex monitor_lock;
->> > @@ -579,9 +589,16 @@ void monitor_cleanup(void)
->>=20
->> monitor_cleanup() runs in the main thread.
->>=20
->> Coroutine qmp_dispatcher_co also runs in the main thread, right?
->
-> Yes.
->
->> >      }
->> >      qemu_mutex_unlock(&monitor_lock);
->> > =20
->> > -    /* QEMUBHs needs to be deleted before destroying the I/O thread *=
-/
->> > -    qemu_bh_delete(qmp_dispatcher_bh);
->> > -    qmp_dispatcher_bh =3D NULL;
->> > +    /* The dispatcher needs to stop before destroying the I/O thread =
-*/
->> > +    qmp_dispatcher_co_shutdown =3D true;
->>=20
->> The coroutine switch ensures qmp_dispatcher_co sees this write, so no
->> need for a barrier.  Correct?
->
-> Both run in the same thread anyway, so barriers wouldn't make a
-> difference.
-
-Possibly a compiler barrier.
-
->> > +    if (!atomic_xchg(&qmp_dispatcher_co_busy, true)) {
->>=20
->> Why do we need atomic?  I figure it's because qmp_dispatcher_co_busy is
->> accessed from multiple threads (main thread and mon_iothread), unlike
->> qmp_dispatcher_co_shutdown.
->
-> Yes, it's for synchronisation with the monitor thread. A coroutine may
-> not be scheduled twice at the same time. This is essentially all that
-> we're protecting against with qmp_dispatcher_co_busy.
-
-Aha.
-
-When I see synchronization (locks, atomics, ...), I often wonder what is
-being synchronized to protect what.  I like comments explaining that.
-
->                                                       (See the
-> documentation for qmp_dispatcher_co_busy above.)
-
-"Not scheduled twice at the same time" is what we want.
-qmp_dispatcher_co_busy's doc comment states the invariant that ensures
-we get what we want.  That's useful.  Spelling out what we want would
-probably also be useful.  More on that below.
-
->> What kind of atomic?  I'm asking because you use sequentially consistent
->> atomic_xchg() together with the weaker atomic_mb_set() and
->> atomic_mb_read().
->
-> atomic_mb_set/read() contain a barrier, which avoids reordering around
-> them. What makes them weaker than sequentially consistent atomic
-> operations is, quoting docs/devel/atomics.txt:
->
->     However, and this is the important difference between
->     atomic_mb_read/atomic_mb_set and sequential consistency, it is import=
-ant
->     for both threads to access the same volatile variable.  It is not the
->     case that everything visible to thread A when it writes volatile fiel=
-d f
->     becomes visible to thread B after it reads volatile field g. The stor=
-e
->     and load have to "match" (i.e., be performed on the same volatile
->     field) to achieve the right semantics.
->
-> This condition is fulfilled, both threads communicate only through
-> qmp_dispatcher_co_busy.
-
-If a weaker atomic_mb_xchg() existed, we could use it.  But it doesn't.
-Okay.
-
->> > +        aio_co_wake(qmp_dispatcher_co);
->> > +    }
->> > +
->> > +    AIO_WAIT_WHILE(qemu_get_aio_context(),
->> > +                   (aio_poll(iohandler_get_aio_context(), false),
->> > +                    atomic_mb_read(&qmp_dispatcher_co_busy)));
->>=20
->> This waits for qmp_dispatcher_co_busy to become false again.  While
->> waiting, pending AIO work is given a chance to progress, as long as it
->> doesn't block.
->>=20
->> The only places that change qmp_dispatcher_co_busy to false (in
->> monitor_qmp_dispatcher_co()) return without yielding when
->> qmp_dispatcher_co_shutdown, terminating the coroutine.  Correct?
->
-> Correct.
->
->> Ignorant question: what AIO work may be pending, and why do we want it
->> to make progress?
->
-> This pending work specifically contains running the monitor dispatcher
-> coroutine. Without the aio_poll(), the coroutine code wouldn't get a
-> chance to run, so we would never complete.
->
-> Note that AIO_WAIT_WHILE() automatically polls the (main) AioContext of
-> the thread, but the main thread is irregular in that it has two
-> AioContexts. The monitor dispatcher happens to live in the iohandler
-> context, which is not polled by default, so we need to do that manually.
-
-I'd like a comment about that.  A reminder should suffice, no need to
-explain AioContext from basic principles.
-
->> I have to admit the I/O context magic is still voodoo to me.  Leaning
->> opportunity, I guess :)
->>=20
->> Since v3, you switched from aio_bh_poll() to aio_poll().  Good:
->> aio_poll() is intended for general use, while aio_bh_poll() is not.  But
->> what happened to your "I would have called aio_poll(), but it's
->> forbidden for iohandler_ctx"?  Oh, you've hidden an improvement to
->> aio_poll() at the very end of this patch!
->>=20
->> You also wrote
->>=20
->>     Much of this complication comes from the fact that the monitor runs =
-in
->>     iohandler_ctx, which is not the main AioContext of the main loop thr=
-ead
->>     (or any thread). This makes waiting for something in this AioContext
->>     rather complicated because nothing wil poll that AioContext if I don=
-'t
->>     do it in the loop condition.
->>=20
->> Should we explain this complication in a comment somewhere?  Hmm, there
->> is one further down:
->>=20
->>   +        /*
->>   +         * Move the coroutine from iohandler_ctx to qemu_aio_context =
-for
->>   +         * executing the command handler so that it can make progress=
- if it
->>   +         * involves an AIO_WAIT_WHILE().
->>   +         */
->>=20
->> Assumes working knowledge of iohandler_ctx, which I don't quite have,
->> yet.  I found this comment
->>=20
->>    /*
->>     * Functions to operate on the I/O handler AioContext.
->>     * This context runs on top of main loop. We can't reuse qemu_aio_con=
-text
->>     * because iohandlers mustn't be polled by aio_poll(qemu_aio_context)=
-.
->>     */
->>    static AioContext *iohandler_ctx;
->>=20
->> and docs/devel/multiple-iothreads.txt.  I guess I better study it.
->
-> I'm not sure myself how much of this is actually still true, but not
-> being an expert on iohandler_ctx myself, I decided to leave things in
-> the same AioContext where they were before this series.
-
-That's fair.
-
->> > +
->> >      if (mon_iothread) {
->> >          iothread_destroy(mon_iothread);
->> >          mon_iothread =3D NULL;
->> > @@ -604,9 +621,9 @@ void monitor_init_globals_core(void)
->> >       * have commands assuming that context.  It would be nice to get
->> >       * rid of those assumptions.
->> >       */
->> > -    qmp_dispatcher_bh =3D aio_bh_new(iohandler_get_aio_context(),
->> > -                                   monitor_qmp_bh_dispatcher,
->> > -                                   NULL);
->> > +    qmp_dispatcher_co =3D qemu_coroutine_create(monitor_qmp_dispatche=
-r_co, NULL);
->> > +    atomic_mb_set(&qmp_dispatcher_co_busy, true);
->> > +    aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_co);
->>=20
->> In review of v3, you explained why you didn't use qemu_coroutine_enter()
->> here, even though it's simpler:
->>=20
->>     Because the old code didn't run the BH right away. Should it? We're
->>     pretty early in the initialisation of QEMU, but it should work as lo=
-ng
->>     as we're allowed to call monitor_qmp_requests_pop_any_with_lock()
->>     already.
->>=20
->> The old code creates, but does not schedule the bottom half here.  It
->> gets scheduled only in handle_qmp_command().
->>=20
->> The new code appears to schedule the coroutine here.  I'm confused :)
->
-> What will happen here is essentially that we schedule a BH that enters
-> the coroutine. This runs the first part of monitor_qmp_dispatcher_co()
-> until it yields because there are no requests pending yet.
->
-> monitor_qmp_requests_pop_any_with_lock() is the only thing that is run
-> before handle_qmp_command() wakes up the coroutine (or monitor_cleanup
-> if we never get any request).
->
->> Regarding calling monitor_qmp_requests_pop_any_with_lock(): it needs
->> @monitor_lock and @mon_list to be valid.  We just initialized
->> @monitor_lock, and @mon_list is empty.
->> monitor_qmp_requests_pop_any_with_lock() should be safe and return null.
->> monitor_qmp_dispatcher_co() should also be safe and yield without doing
->> work.
->>=20
->> Can we exploit that to make things a bit simpler?  Separate patch would
->> be fine with me.
->
-> If this is true, we could replace this line:
->
->     aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_co);
->
-> with the following one:
->
->     qemu_aio_coroutine_enter(iohandler_get_aio_context(), qmp_dispatcher_=
-co);
->
-> I'm not sure that this is any simpler.
-
-Naive question: what's the difference between "scheduling", "entering",
-and "waking up" a coroutine?
-
-qemu_coroutine_enter() and qemu_aio_coroutine_enter() are in
-coroutine.h.
-
-aio_co_schedule(), aio_co_wake() and aio_co_enter() are in aio.h.
-
-qemu_coroutine_enter() calls qemu_aio_coroutine_enter().
-
-aio_co_wake() calls aio_co_enter() calls qemu_aio_coroutine_enter().
-
-aio_co_enter() seems to be independent.
-
-aio.h seems to be layered on top of coroutine.h.  Should I prefer using
-aio.h to coroutine.h?
-
->> >  }
->> > =20
->> >  QemuOptsList qemu_mon_opts =3D {
->> > diff --git a/monitor/qmp.c b/monitor/qmp.c
->> > index 54c06ba824..9444de9fcf 100644
->> > --- a/monitor/qmp.c
->> > +++ b/monitor/qmp.c
->> > @@ -133,6 +133,10 @@ static void monitor_qmp_respond(MonitorQMP *mon, =
-QDict *rsp)
->> >      }
->> >  }
->> > =20
->> > +/*
->> > + * Runs outside of coroutine context for OOB commands, but in corouti=
-ne context
->> > + * for everything else.
->> > + */
->>=20
->> Nitpick: wrap around column 70, please.
->>=20
->> Note to self: the precondition is asserted in do_qmp_dispatch() below.
->> Asserting here is impractical, because we don't know whether this is an
->> OOB command.
->>=20
->> >  static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
->> >  {
->> >      Monitor *old_mon;
->> > @@ -211,43 +215,87 @@ static QMPRequest *monitor_qmp_requests_pop_any_=
-with_lock(void)
->> >      return req_obj;
->> >  }
->> > =20
->> > -void monitor_qmp_bh_dispatcher(void *data)
->> > +void coroutine_fn monitor_qmp_dispatcher_co(void *data)
->> >  {
->> > -    QMPRequest *req_obj =3D monitor_qmp_requests_pop_any_with_lock();
->> > +    QMPRequest *req_obj =3D NULL;
->> >      QDict *rsp;
->> >      bool need_resume;
->> >      MonitorQMP *mon;
->> > =20
->> > -    if (!req_obj) {
->> > -        return;
->> > -    }
->> > +    while (true) {
->> > +        assert(atomic_mb_read(&qmp_dispatcher_co_busy) =3D=3D true);
->>=20
->> Read and assert, then ...
->>=20
->> > +
->> > +        /* Mark the dispatcher as not busy already here so that we do=
-n't miss
->> > +         * any new requests coming in the middle of our processing. *=
-/
->> > +        atomic_mb_set(&qmp_dispatcher_co_busy, false);
->>=20
->> ... set.  Would exchange, then assert be cleaner?
->
-> Then you would ask me why the exchange has to be atomic. :-)
-
-Possibly :)
-
-> More practically, I would need a temporary variable so that I don't get
-> code with side effects in assert() (which may be compiled out with
-> NDEBUG). The temporary variable would never be read outside the assert
-> and would be unused with NDEBUG.
->
-> So possible, yes, cleaner I'm not sure.
-
-I asked because the patch made me wonder whether qmp_dispatcher_co could
-change between the read and the set.
-
->> The assertion checks qmp_dispatcher_co_busy is set on coroutine enter.
->> It pairs with the atomic_mb_set() in monitor_init_globals_core().
->>=20
->> Wing the comment, please, and wrap around column 70.  More of the same
->> below.
->>=20
->> Hmm, qmp_dispatcher_co_busy is false while the coroutine busily runs.  I
->> figure its actual purpose is something like "if false, you need to wake
->> it up to ensure it processes additional requests".  Correct?
->
-> Yes. I understood "busy" in the sense of "executing a monitor command",
-> but of course the purpose of the variable is to know whether you need to
-> schedule the coroutine or whether you must not schedule it.
-
-I could try to find an identifier that more clearly expresses the
-purpose, but since "busy" is pleasantly short, let me try to write a
-clearer variable comment instead:
-
-  /*
-   * Is coroutine @qmp_dispatcher_co busy processing requests?
-   * If true, additional requests may be pushed onto a mon->qmp_requests,
-   * and qmp_dispatcher_co_shutdown may be set without further ado.
-   * If false, you also have to set @qmp_dispatcher_co_busy to true and
-   * wake up @qmp_dispatcher_co.
-   * @qmp_dispatcher_co will reset it to false before it yields.
-   * Access must be atomic for thread-safety.
-   * The purpose of all this is to ensure the coroutine is scheduled at
-   * most once at any time.
-   */
-
-We could make the "you also have to" part simpler: put it in a function,
-so it has a name.
-
->> > +
->> > +        while (!(req_obj =3D monitor_qmp_requests_pop_any_with_lock()=
-)) {
->> > +            /* Wait to be reentered from handle_qmp_command, or termi=
-nate if
->> > +             * qmp_dispatcher_co_shutdown is true*/
->>=20
->> Yes, these are the two places that wake this coroutine.
->>=20
->> Hmm, there's a third aio_co_wake() in do_qmp_dispatch_bh().  But that
->> one resumes the yield in do_qmp_dispatch().  Correct?
->
-> Yes, do_qmp_dispatch_bh is scheduled immediately before yielding, so
-> that yield is where the coroutine will be resumed.
->
->> Space before */, please.
->>=20
->> Would this
->>=20
->>                /*
->>                 * No more requests to process.  Wait until
->>                 * handle_qmp_command() pushes more, or monitor_cleanup()
->>                 * requests shutdown.
->>                 */
->>=20
->> be clearer?
->
-> I think I prefer explicitly mentioning that these callers not only push
-> requests or request shutdown, but that they actively cause this
-> coroutine to be reentered.
-
-Can do:
-
-                  /*
-                   * No more requests to process.  Wait to be reentered whe=
-n
-                   * handle_qmp_command() pushes more, or monitor_cleanup()
-                   * requests shutdown.
-                   */
-
-> Matter of taste. You're the maintainer, so your taste wins.
-
-Apart from differences in taste, there are differences in viewpoint,
-which can also lead to different comment needs.  Ignoring your advice
-would be foolish.
-
->> > +            if (!qmp_dispatcher_co_shutdown) {
->> > +                qemu_coroutine_yield();
->>=20
->> Nothing to do, go to sleep.
->>=20
->> > +
->> > +                /* busy must be set to true again by whoever reschedu=
-led us to
->> > +                 * avoid double scheduling */
->> > +                assert(atomic_xchg(&qmp_dispatcher_co_busy, false) =
-=3D=3D true);
->>=20
->> The assertion checks the coroutine's resume set busy as it should.  It
->> pairs with the atomic_xchg() in handle_qmp_command() and
->> monitor_cleanup().
->
-> Correct.
->
->> > +            }
->> > +
->> > +            /* qmp_dispatcher_co_shutdown may have changed if we yiel=
-ded and
->> > +             * were reentered from monitor_cleanup() */
->> > +            if (qmp_dispatcher_co_shutdown) {
->> > +                return;
->> > +            }
->> > +        }
->> > =20
->>=20
->> We got a request in @req.
->>=20
->> > -    mon =3D req_obj->mon;
->> > -    /*  qmp_oob_enabled() might change after "qmp_capabilities" */
->> > -    need_resume =3D !qmp_oob_enabled(mon) ||
->> > -        mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
->> > -    qemu_mutex_unlock(&mon->qmp_queue_lock);
->> > -    if (req_obj->req) {
->> > -        QDict *qdict =3D qobject_to(QDict, req_obj->req);
->> > -        QObject *id =3D qdict ? qdict_get(qdict, "id") : NULL;
->> > -        trace_monitor_qmp_cmd_in_band(qobject_get_try_str(id) ?: "");
->> > -        monitor_qmp_dispatch(mon, req_obj->req);
->> > -    } else {
->> > -        assert(req_obj->err);
->> > -        rsp =3D qmp_error_response(req_obj->err);
->> > -        req_obj->err =3D NULL;
->> > -        monitor_qmp_respond(mon, rsp);
->> > -        qobject_unref(rsp);
->> > -    }
->> > +        if (atomic_xchg(&qmp_dispatcher_co_busy, true) =3D=3D true) {
->> > +            /* Someone rescheduled us (probably because a new request=
-s came
->> > +             * in), but we didn't actually yield. Do that now, only t=
-o be
->> > +             * immediately reentered and removed from the list of sch=
-eduled
->> > +             * coroutines. */
->> > +            qemu_coroutine_yield();
->> > +        }
->> > =20
->> > -    if (need_resume) {
->> > -        /* Pairs with the monitor_suspend() in handle_qmp_command() *=
-/
->> > -        monitor_resume(&mon->common);
->> > -    }
->> > -    qmp_request_free(req_obj);
->> > +        /*
->> > +         * Move the coroutine from iohandler_ctx to qemu_aio_context =
-for
->> > +         * executing the command handler so that it can make progress=
- if it
->> > +         * involves an AIO_WAIT_WHILE().
->> > +         */
->> > +        aio_co_schedule(qemu_get_aio_context(), qmp_dispatcher_co);
->> > +        qemu_coroutine_yield();
->> > +
->> > +        mon =3D req_obj->mon;
->> > +        /*  qmp_oob_enabled() might change after "qmp_capabilities" *=
-/
->> > +        need_resume =3D !qmp_oob_enabled(mon) ||
->> > +            mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - =
-1;
->> > +        qemu_mutex_unlock(&mon->qmp_queue_lock);
->> > +        if (req_obj->req) {
->> > +            QDict *qdict =3D qobject_to(QDict, req_obj->req);
->> > +            QObject *id =3D qdict ? qdict_get(qdict, "id") : NULL;
->> > +            trace_monitor_qmp_cmd_in_band(qobject_get_try_str(id) ?: =
-"");
->> > +            monitor_qmp_dispatch(mon, req_obj->req);
->> > +        } else {
->> > +            assert(req_obj->err);
->> > +            rsp =3D qmp_error_response(req_obj->err);
->> > +            req_obj->err =3D NULL;
->> > +            monitor_qmp_respond(mon, rsp);
->> > +            qobject_unref(rsp);
->> > +        }
->> > +
->> > +        if (need_resume) {
->> > +            /* Pairs with the monitor_suspend() in handle_qmp_command=
-() */
->> > +            monitor_resume(&mon->common);
->> > +        }
->> > +        qmp_request_free(req_obj);
->> > =20
->> > -    /* Reschedule instead of looping so the main loop stays responsiv=
-e */
->> > -    qemu_bh_schedule(qmp_dispatcher_bh);
->> > +        /*
->> > +         * Yield and reschedule so the main loop stays responsive.
->> > +         *
->> > +         * Move back to iohandler_ctx so that nested event loops for
->> > +         * qemu_aio_context don't start new monitor commands.
->> > +         */
->> > +        aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_c=
-o);
->> > +        qemu_coroutine_yield();
->> > +    }
->> >  }
->> > =20
->>=20
->> Easier to review with diff -w:
->>=20
->>   +        if (atomic_xchg(&qmp_dispatcher_co_busy, true) =3D=3D true) {
->>   +            /* Someone rescheduled us (probably because a new request=
-s came
->>   +             * in), but we didn't actually yield. Do that now, only t=
-o be
->>   +             * immediately reentered and removed from the list of sch=
-eduled
->>   +             * coroutines. */
->>   +            qemu_coroutine_yield();
->>   +        }
->>=20
->> This part I understand.
->>=20
->>   +
->>   +        /*
->>   +         * Move the coroutine from iohandler_ctx to qemu_aio_context =
-for
->>   +         * executing the command handler so that it can make progress=
- if it
->>   +         * involves an AIO_WAIT_WHILE().
->>   +         */
->>   +        aio_co_schedule(qemu_get_aio_context(), qmp_dispatcher_co);
->>   +        qemu_coroutine_yield();
->>=20
->> More I/O context voodoo.  I'll get there.
->>=20
->>            mon =3D req_obj->mon;
->>            /*  qmp_oob_enabled() might change after "qmp_capabilities" *=
-/
->>   @@ -246,8 +287,15 @@ void monitor_qmp_bh_dispatcher(void *data)
->>            }
->>            qmp_request_free(req_obj);
->>=20
->>   -    /* Reschedule instead of looping so the main loop stays responsiv=
-e */
->>   -    qemu_bh_schedule(qmp_dispatcher_bh);
->>   +        /*
->>   +         * Yield and reschedule so the main loop stays responsive.
->>   +         *
->>   +         * Move back to iohandler_ctx so that nested event loops for
->>   +         * qemu_aio_context don't start new monitor commands.
->>=20
->> Can you explain this sentence for dummies?
->
-> Nested event loops (i.e. AIO_WAIT_WHILE) poll qemu_aio_context, so if we
-> are scheduled there, the next iteration of the monitor dispatcher loop
-> could start from a nested event loop. If we are scheduled in
-> iohandler_ctx, then only the actual main loop will reenter the coroutine
-> and nested event loops ignore it.
->
-> I'm not sure if or why this is actually important, but this matches
-> scheduling the dispatcher BH in iohandler_ctx in the code before this
-> patch.
->
-> If we didn't do this, we could end up starting monitor requests in more
-> places than before, and who knows what that would mean.
-
-Let me say it in my own words, to make sure I got it.  I'm going to
-ignore special cases like "not using I/O thread" and exec-oob.
-
-QMP monitor I/O happens in mon_iothread, in iohandler_ctx (I think).
-This pushes requests onto the monitor's qmp_requests queue.
-
-Before this patch, the dispatcher runs in a bottom half in the main
-thread, in qemu_aio_context.
-
-The patch moves it to a coroutine running in the main thread.  It runs
-in iohandler_ctx, but switches to qemu_aio_context for executing command
-handlers.
-
-We want to keep command handlers running in qemu_aio_context, as before
-this patch.
-
-We want to run the rest in iohandler_ctx to ensure dispatching happens
-only in the main loop, as before this patch.
-
-Correct?
-
->>   +         */
->>   +        aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_c=
-o);
->>   +        qemu_coroutine_yield();
->>   +    }
->>    }
->>=20
->> >  static void handle_qmp_command(void *opaque, QObject *req, Error *err=
-)
->> @@ -308,7 +356,9 @@ static void handle_qmp_command(void *opaque, QObject=
- *req, Error *err)
->>      qemu_mutex_unlock(&mon->qmp_queue_lock);
->> =20
->>      /* Kick the dispatcher routine */
->> -    qemu_bh_schedule(qmp_dispatcher_bh);
->> +    if (!atomic_xchg(&qmp_dispatcher_co_busy, true)) {
->> +        aio_co_wake(qmp_dispatcher_co);
->> +    }
->>  }
->> =20
->>  static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size=
-)
-
-[*] https://en.wikipedia.org/wiki/Column_(typography)#Typographic_style
+diff --git a/.travis.yml b/.travis.yml
+index 5887055951..08ef2c011c 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -279,10 +279,19 @@ matrix:
+         homebrew:
+           packages:
+             - ccache
++            - libgcrypt
++            - libiscsi
++            - libssh2
++            - libusb
++            - lzfse
++            - lzo
++            - gettext
+             - glib
+-            - pixman
+             - gnu-sed
++            - pixman
+             - python
++            - snappy
++            - vde
+           update: true
+       before_script:
+         - brew link --overwrite python
+--=20
+2.21.1
 
 
