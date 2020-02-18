@@ -2,101 +2,77 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1CEC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A4F0C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:43:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 639022173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26B3E2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:43:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1AhVJQA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 639022173E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TSsVHok6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B3E2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42CU-0003Ge-HR
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 07:42:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38485)
+	id 1j42EH-0005Tw-9U
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 07:43:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j42Bm-0002kX-Em
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:41:26 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j42DI-0003lx-DR
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:42:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j42Bl-0000Fl-1W
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:41:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28680
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1j42DG-0000s8-V5
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:42:56 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21152
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j42Bk-0000FF-PF
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:41:20 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j42DG-0000rl-Ry
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:42:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582029680;
+ s=mimecast20190719; t=1582029774;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zW4NSoi5gjgysU1oQwv6LsHcZfbRywwyVGL7muJFvBM=;
- b=Z1AhVJQAmyB5Qy7kdMUobhpUC2y6wTobab3P3aTU/3ignsWgoS6n/U7/jNKhU6cyDYlVtT
- 4rYq+jB7+Yc2ur/OguPcZuid5iYkN0ztKiPmyW25nmHJG0K/3tyt0V7UV7j9/PEQCYfUiA
- eQHWr3TarjWfj2LvJKnnZaaCbU4XrCA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-dhDdJl1QMuiiRl-x4yo0WA-1; Tue, 18 Feb 2020 07:41:16 -0500
-Received: by mail-wm1-f71.google.com with SMTP id f66so1052905wmf.9
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 04:41:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=G8QacokMAz6qPJRkMBDLXByiVc2NNbN3hP4O35y+c6o=;
- b=j43v0lxT33aTmd4XVMpjGIqYcCXzdK+iJqb5KjLWxU5CfBCsc2qNlhn2DBb3D+uWc0
- TIrJvuDkWGN6WTlRgTd6Fzs4pR/SD4X6vUyFw0obch4wwhq8skd1dV2AqvS5b0YJ3Qvc
- MAHphjmYztv5uf0lEOTRGbKeOvKCEqpzAKky0bkousI1qby3vQMMDtCZMbZmYUbqHnmm
- TZpHntf3KPrWgN7KyEkHb4zEEkbyzdtBbyt2L+lmcUGtNh0DwYWGaVHOSWZwKgJRqABq
- oCbtG1yWyRyCZK8CpqJp+qfv1zldYo30GgEa61uhTnyF18Q9zX6u5Hy2WzXaVO1MQU/G
- +9YQ==
-X-Gm-Message-State: APjAAAXPfQnvp/z3zukoUnhG19hKKN+Nn9ObQsAmcjEUpOaPXVsMsfmv
- FwpwYdluX0yUQLPg9KX2YCvkrRMeJkGREY9efHnecJUcv9prWaJLH8o/Qm7LYEv2j+YGxpDEqNk
- ivBw3ruYMDzylsWM=
-X-Received: by 2002:a05:6000:188:: with SMTP id
- p8mr28392215wrx.336.1582029674947; 
- Tue, 18 Feb 2020 04:41:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz0hm8SAgkLQ02oCHKeTRCRTmtKRjlRz9ycIQsBzjKfwws9srN3lwMsMW9rg6bqhWazbnYgDg==
-X-Received: by 2002:a05:6000:188:: with SMTP id
- p8mr28392200wrx.336.1582029674706; 
- Tue, 18 Feb 2020 04:41:14 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id x11sm3277281wmg.46.2020.02.18.04.41.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Feb 2020 04:41:13 -0800 (PST)
-Subject: Re: [PATCH] migration/block: rename BLOCK_SIZE macro
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20200218110209.800294-1-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <69b0672d-7bf1-e2ba-24a4-575a61dd5937@redhat.com>
-Date: Tue, 18 Feb 2020 13:41:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=W6nUHkAqLbGE//sHpHWbkDZ9SsI0P2veHNCGFDv8d/w=;
+ b=TSsVHok6sbIoSDzgojlSDBZdcNBcQRL32qSM2dQrFuOpV0jlDYJYq3p1QnqbH+VJS9SMby
+ NdqdV+7eon9bNqIyDw0vo13KlmCrZnXBu8hsfxNbl2PxiTa+FPRqeLtFE+wMj7uHX8mQoB
+ XvYEeF0uXRMbhCJgr67PceMU9F3EvSk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-_-JDPgsHNz27K0jmfhd0Ew-1; Tue, 18 Feb 2020 07:42:50 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5697518A5508;
+ Tue, 18 Feb 2020 12:42:49 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 99A8417DC8;
+ Tue, 18 Feb 2020 12:42:48 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v3 01/33] block: Add BlockDriver.is_format
+Date: Tue, 18 Feb 2020 13:42:10 +0100
+Message-Id: <20200218124242.584644-2-mreitz@redhat.com>
+In-Reply-To: <20200218124242.584644-1-mreitz@redhat.com>
+References: <20200218124242.584644-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200218110209.800294-1-stefanha@redhat.com>
-Content-Language: en-US
-X-MC-Unique: dhDdJl1QMuiiRl-x4yo0WA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: _-JDPgsHNz27K0jmfhd0Ew-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,172 +84,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/18/20 12:02 PM, Stefan Hajnoczi wrote:
-> Both <linux/fs.h> and <sys/mount.h> define BLOCK_SIZE macros.  Avoiding
-> using that name in block/migration.c.
->=20
-> I noticed this when including <liburing.h> (Linux io_uring) from
-> "block/aio.h" and compilation failed.  Although patches adding that
-> include haven't been sent yet, it makes sense to rename the macro now in
-> case someone else stumbles on it in the meantime.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   migration/block.c | 39 ++++++++++++++++++++-------------------
->   1 file changed, 20 insertions(+), 19 deletions(-)
->=20
-> diff --git a/migration/block.c b/migration/block.c
-> index c90288ed29..737b6499f9 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -27,8 +27,8 @@
->   #include "migration/vmstate.h"
->   #include "sysemu/block-backend.h"
->  =20
-> -#define BLOCK_SIZE                       (1 << 20)
-> -#define BDRV_SECTORS_PER_DIRTY_CHUNK     (BLOCK_SIZE >> BDRV_SECTOR_BITS=
-)
-> +#define BLK_MIG_BLOCK_SIZE           (1 << 20)
-> +#define BDRV_SECTORS_PER_DIRTY_CHUNK (BLK_MIG_BLOCK_SIZE >> BDRV_SECTOR_=
-BITS)
->  =20
->   #define BLK_MIG_FLAG_DEVICE_BLOCK       0x01
->   #define BLK_MIG_FLAG_EOS                0x02
-> @@ -133,7 +133,7 @@ static void blk_send(QEMUFile *f, BlkMigBlock * blk)
->       uint64_t flags =3D BLK_MIG_FLAG_DEVICE_BLOCK;
->  =20
->       if (block_mig_state.zero_blocks &&
-> -        buffer_is_zero(blk->buf, BLOCK_SIZE)) {
-> +        buffer_is_zero(blk->buf, BLK_MIG_BLOCK_SIZE)) {
->           flags |=3D BLK_MIG_FLAG_ZERO_BLOCK;
->       }
->  =20
-> @@ -154,7 +154,7 @@ static void blk_send(QEMUFile *f, BlkMigBlock * blk)
->           return;
->       }
->  =20
-> -    qemu_put_buffer(f, blk->buf, BLOCK_SIZE);
-> +    qemu_put_buffer(f, blk->buf, BLK_MIG_BLOCK_SIZE);
->   }
->  =20
->   int blk_mig_active(void)
-> @@ -309,7 +309,7 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDe=
-vState *bmds)
->       }
->  =20
->       blk =3D g_new(BlkMigBlock, 1);
-> -    blk->buf =3D g_malloc(BLOCK_SIZE);
-> +    blk->buf =3D g_malloc(BLK_MIG_BLOCK_SIZE);
->       blk->bmds =3D bmds;
->       blk->sector =3D cur_sector;
->       blk->nr_sectors =3D nr_sectors;
-> @@ -350,7 +350,8 @@ static int set_dirty_tracking(void)
->  =20
->       QSIMPLEQ_FOREACH(bmds, &block_mig_state.bmds_list, entry) {
->           bmds->dirty_bitmap =3D bdrv_create_dirty_bitmap(blk_bs(bmds->bl=
-k),
-> -                                                      BLOCK_SIZE, NULL, =
-NULL);
-> +                                                      BLK_MIG_BLOCK_SIZE=
-,
-> +                                                      NULL, NULL);
->           if (!bmds->dirty_bitmap) {
->               ret =3D -errno;
->               goto fail;
-> @@ -548,7 +549,7 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigD=
-evState *bmds,
->               bdrv_dirty_bitmap_unlock(bmds->dirty_bitmap);
->  =20
->               blk =3D g_new(BlkMigBlock, 1);
-> -            blk->buf =3D g_malloc(BLOCK_SIZE);
-> +            blk->buf =3D g_malloc(BLK_MIG_BLOCK_SIZE);
->               blk->bmds =3D bmds;
->               blk->sector =3D sector;
->               blk->nr_sectors =3D nr_sectors;
-> @@ -770,7 +771,7 @@ static int block_save_iterate(QEMUFile *f, void *opaq=
-ue)
->  =20
->       /* control the rate of transfer */
->       blk_mig_lock();
-> -    while (block_mig_state.read_done * BLOCK_SIZE <
-> +    while (block_mig_state.read_done * BLK_MIG_BLOCK_SIZE <
->              qemu_file_get_rate_limit(f) &&
->              block_mig_state.submitted < MAX_PARALLEL_IO &&
->              (block_mig_state.submitted + block_mig_state.read_done) <
-> @@ -874,13 +875,13 @@ static void block_save_pending(QEMUFile *f, void *o=
-paque, uint64_t max_size,
->       qemu_mutex_unlock_iothread();
->  =20
->       blk_mig_lock();
-> -    pending +=3D block_mig_state.submitted * BLOCK_SIZE +
-> -               block_mig_state.read_done * BLOCK_SIZE;
-> +    pending +=3D block_mig_state.submitted * BLK_MIG_BLOCK_SIZE +
-> +               block_mig_state.read_done * BLK_MIG_BLOCK_SIZE;
->       blk_mig_unlock();
->  =20
->       /* Report at least one block pending during bulk phase */
->       if (pending <=3D max_size && !block_mig_state.bulk_completed) {
-> -        pending =3D max_size + BLOCK_SIZE;
-> +        pending =3D max_size + BLK_MIG_BLOCK_SIZE;
->       }
->  =20
->       DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
-> @@ -901,7 +902,7 @@ static int block_load(QEMUFile *f, void *opaque, int =
-version_id)
->       int nr_sectors;
->       int ret;
->       BlockDriverInfo bdi;
-> -    int cluster_size =3D BLOCK_SIZE;
-> +    int cluster_size =3D BLK_MIG_BLOCK_SIZE;
->  =20
->       do {
->           addr =3D qemu_get_be64(f);
-> @@ -939,11 +940,11 @@ static int block_load(QEMUFile *f, void *opaque, in=
-t version_id)
->  =20
->                   ret =3D bdrv_get_info(blk_bs(blk), &bdi);
->                   if (ret =3D=3D 0 && bdi.cluster_size > 0 &&
-> -                    bdi.cluster_size <=3D BLOCK_SIZE &&
-> -                    BLOCK_SIZE % bdi.cluster_size =3D=3D 0) {
-> +                    bdi.cluster_size <=3D BLK_MIG_BLOCK_SIZE &&
-> +                    BLK_MIG_BLOCK_SIZE % bdi.cluster_size =3D=3D 0) {
->                       cluster_size =3D bdi.cluster_size;
->                   } else {
-> -                    cluster_size =3D BLOCK_SIZE;
-> +                    cluster_size =3D BLK_MIG_BLOCK_SIZE;
->                   }
->               }
->  =20
-> @@ -962,14 +963,14 @@ static int block_load(QEMUFile *f, void *opaque, in=
-t version_id)
->                   int64_t cur_addr;
->                   uint8_t *cur_buf;
->  =20
-> -                buf =3D g_malloc(BLOCK_SIZE);
-> -                qemu_get_buffer(f, buf, BLOCK_SIZE);
-> -                for (i =3D 0; i < BLOCK_SIZE / cluster_size; i++) {
-> +                buf =3D g_malloc(BLK_MIG_BLOCK_SIZE);
-> +                qemu_get_buffer(f, buf, BLK_MIG_BLOCK_SIZE);
-> +                for (i =3D 0; i < BLK_MIG_BLOCK_SIZE / cluster_size; i++=
-) {
->                       cur_addr =3D addr * BDRV_SECTOR_SIZE + i * cluster_=
-size;
->                       cur_buf =3D buf + i * cluster_size;
->  =20
->                       if ((!block_mig_state.zero_blocks ||
-> -                        cluster_size < BLOCK_SIZE) &&
-> +                        cluster_size < BLK_MIG_BLOCK_SIZE) &&
->                           buffer_is_zero(cur_buf, cluster_size)) {
->                           ret =3D blk_pwrite_zeroes(blk, cur_addr,
->                                                   cluster_size,
->=20
+We want to unify child_format and child_file at some point.  One of the
+important things that set format drivers apart from other drivers is
+that they do not expect other format nodes under them (except in the
+backing chain), i.e. we must not probe formats inside of formats.  That
+means we need something on which to distinguish format drivers from
+others, and hence this flag.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ block/bochs.c             | 1 +
+ block/cloop.c             | 1 +
+ block/crypto.c            | 2 ++
+ block/dmg.c               | 1 +
+ block/parallels.c         | 1 +
+ block/qcow.c              | 1 +
+ block/qcow2.c             | 1 +
+ block/qed.c               | 1 +
+ block/raw-format.c        | 1 +
+ block/vdi.c               | 1 +
+ block/vhdx.c              | 1 +
+ block/vmdk.c              | 1 +
+ block/vpc.c               | 1 +
+ include/block/block_int.h | 7 +++++++
+ 14 files changed, 21 insertions(+)
+
+diff --git a/block/bochs.c b/block/bochs.c
+index 32bb83b268..e7bbeaa1c4 100644
+--- a/block/bochs.c
++++ b/block/bochs.c
+@@ -301,6 +301,7 @@ static BlockDriver bdrv_bochs =3D {
+     .bdrv_refresh_limits =3D bochs_refresh_limits,
+     .bdrv_co_preadv =3D bochs_co_preadv,
+     .bdrv_close=09=09=3D bochs_close,
++    .is_format          =3D true,
+ };
+=20
+ static void bdrv_bochs_init(void)
+diff --git a/block/cloop.c b/block/cloop.c
+index 4de94876d4..f90f1a4b4c 100644
+--- a/block/cloop.c
++++ b/block/cloop.c
+@@ -297,6 +297,7 @@ static BlockDriver bdrv_cloop =3D {
+     .bdrv_refresh_limits =3D cloop_refresh_limits,
+     .bdrv_co_preadv =3D cloop_co_preadv,
+     .bdrv_close     =3D cloop_close,
++    .is_format      =3D true,
+ };
+=20
+ static void bdrv_cloop_init(void)
+diff --git a/block/crypto.c b/block/crypto.c
+index 24823835c1..b81f673a51 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -673,6 +673,8 @@ static BlockDriver bdrv_crypto_luks =3D {
+     .bdrv_get_info      =3D block_crypto_get_info_luks,
+     .bdrv_get_specific_info =3D block_crypto_get_specific_info_luks,
+=20
++    .is_format          =3D true,
++
+     .strong_runtime_opts =3D block_crypto_strong_runtime_opts,
+ };
+=20
+diff --git a/block/dmg.c b/block/dmg.c
+index 4a045f2b3e..ef3c6e771d 100644
+--- a/block/dmg.c
++++ b/block/dmg.c
+@@ -753,6 +753,7 @@ static BlockDriver bdrv_dmg =3D {
+     .bdrv_child_perm     =3D bdrv_format_default_perms,
+     .bdrv_co_preadv =3D dmg_co_preadv,
+     .bdrv_close     =3D dmg_close,
++    .is_format      =3D true,
+ };
+=20
+ static void bdrv_dmg_init(void)
+diff --git a/block/parallels.c b/block/parallels.c
+index 7a01997659..30eda982bd 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -910,6 +910,7 @@ static BlockDriver bdrv_parallels =3D {
+     .bdrv_co_flush_to_os      =3D parallels_co_flush_to_os,
+     .bdrv_co_readv  =3D parallels_co_readv,
+     .bdrv_co_writev =3D parallels_co_writev,
++    .is_format      =3D true,
+     .supports_backing =3D true,
+     .bdrv_co_create      =3D parallels_co_create,
+     .bdrv_co_create_opts =3D parallels_co_create_opts,
+diff --git a/block/qcow.c b/block/qcow.c
+index fce8989868..0e4f09934c 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -1184,6 +1184,7 @@ static BlockDriver bdrv_qcow =3D {
+     .bdrv_co_create         =3D qcow_co_create,
+     .bdrv_co_create_opts    =3D qcow_co_create_opts,
+     .bdrv_has_zero_init     =3D bdrv_has_zero_init_1,
++    .is_format              =3D true,
+     .supports_backing       =3D true,
+     .bdrv_refresh_limits    =3D qcow_refresh_limits,
+=20
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 3c754f616b..875eb7d5d9 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -5567,6 +5567,7 @@ BlockDriver bdrv_qcow2 =3D {
+     .bdrv_save_vmstate    =3D qcow2_save_vmstate,
+     .bdrv_load_vmstate    =3D qcow2_load_vmstate,
+=20
++    .is_format                  =3D true,
+     .supports_backing           =3D true,
+     .bdrv_change_backing_file   =3D qcow2_change_backing_file,
+=20
+diff --git a/block/qed.c b/block/qed.c
+index d8c4e5fb1e..eb6139acbc 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -1663,6 +1663,7 @@ static BlockDriver bdrv_qed =3D {
+     .format_name              =3D "qed",
+     .instance_size            =3D sizeof(BDRVQEDState),
+     .create_opts              =3D &qed_create_opts,
++    .is_format                =3D true,
+     .supports_backing         =3D true,
+=20
+     .bdrv_probe               =3D bdrv_qed_probe,
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 3a76ec7dd2..2429ff0d23 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -567,6 +567,7 @@ BlockDriver bdrv_raw =3D {
+     .bdrv_co_copy_range_to  =3D &raw_co_copy_range_to,
+     .bdrv_co_truncate     =3D &raw_co_truncate,
+     .bdrv_getlength       =3D &raw_getlength,
++    .is_format            =3D true,
+     .has_variable_length  =3D true,
+     .bdrv_measure         =3D &raw_measure,
+     .bdrv_get_info        =3D &raw_get_info,
+diff --git a/block/vdi.c b/block/vdi.c
+index 0142da7233..7e87b205b5 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -1051,6 +1051,7 @@ static BlockDriver bdrv_vdi =3D {
+=20
+     .bdrv_get_info =3D vdi_get_info,
+=20
++    .is_format =3D true,
+     .create_opts =3D &vdi_create_opts,
+     .bdrv_co_check =3D vdi_co_check,
+ };
+diff --git a/block/vhdx.c b/block/vhdx.c
+index f02d2611be..d3c1619026 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -2241,6 +2241,7 @@ static BlockDriver bdrv_vhdx =3D {
+     .bdrv_co_check          =3D vhdx_co_check,
+     .bdrv_has_zero_init     =3D vhdx_has_zero_init,
+=20
++    .is_format              =3D true,
+     .create_opts            =3D &vhdx_create_opts,
+ };
+=20
+diff --git a/block/vmdk.c b/block/vmdk.c
+index 20e909d997..631fcd15ab 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -3058,6 +3058,7 @@ static BlockDriver bdrv_vmdk =3D {
+     .bdrv_get_info                =3D vmdk_get_info,
+     .bdrv_gather_child_options    =3D vmdk_gather_child_options,
+=20
++    .is_format                    =3D true,
+     .supports_backing             =3D true,
+     .create_opts                  =3D &vmdk_create_opts,
+ };
+diff --git a/block/vpc.c b/block/vpc.c
+index a65550298e..7cf0f87a16 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -1248,6 +1248,7 @@ static BlockDriver bdrv_vpc =3D {
+=20
+     .bdrv_get_info          =3D vpc_get_info,
+=20
++    .is_format              =3D true,
+     .create_opts            =3D &vpc_create_opts,
+     .bdrv_has_zero_init     =3D vpc_has_zero_init,
+     .strong_runtime_opts    =3D vpc_strong_runtime_opts,
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 6f9fd5e20e..8d10c94213 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -94,6 +94,13 @@ struct BlockDriver {
+      * must implement them and return -ENOTSUP.
+      */
+     bool is_filter;
++    /*
++     * Set to true if the BlockDriver is a format driver.  Format nodes
++     * generally do not expect their children to be other format nodes
++     * (except for backing files), and so format probing is disabled
++     * on those children.
++     */
++    bool is_format;
+     /*
+      * Return true if @to_replace can be replaced by a BDS with the
+      * same data as @bs without it affecting @bs's behavior (that is,
+--=20
+2.24.1
 
 
