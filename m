@@ -2,79 +2,74 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,LOTS_OF_MONEY,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA02C34031
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 07:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5AFC34034
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 07:26:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EB122072C
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 07:21:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EB122072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D44A821D56
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 07:26:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D44A821D56
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3xCM-0003WU-Dy
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 02:21:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54854)
+	id 1j3xGf-0005Ia-2v
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 02:26:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sebastien.boeuf@intel.com>) id 1j3xBc-0002cg-W1
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 02:20:54 -0500
+ (envelope-from <miaoyubo@huawei.com>) id 1j3xFv-0004hU-9b
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 02:25:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sebastien.boeuf@intel.com>) id 1j3xBb-0006g6-IR
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 02:20:52 -0500
-Received: from mga07.intel.com ([134.134.136.100]:42053)
+ (envelope-from <miaoyubo@huawei.com>) id 1j3xFt-0008AT-Lj
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 02:25:19 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2066 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sebastien.boeuf@intel.com>)
- id 1j3xBb-0006fc-Ap
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 02:20:51 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Feb 2020 23:20:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,455,1574150400"; d="scan'208";a="258475445"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
- by fmsmga004.fm.intel.com with ESMTP; 17 Feb 2020 23:20:48 -0800
-Received: from orsmsx157.amr.corp.intel.com (10.22.240.23) by
- ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 17 Feb 2020 23:20:46 -0800
-Received: from orsmsx115.amr.corp.intel.com ([169.254.4.100]) by
- ORSMSX157.amr.corp.intel.com ([169.254.9.95]) with mapi id 14.03.0439.000;
- Mon, 17 Feb 2020 23:20:45 -0800
-From: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
-To: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>
-Subject: Re: docs: Update vhost-user spec regarding backend program conventions
-Thread-Topic: docs: Update vhost-user spec regarding backend program
- conventions
-Thread-Index: AQHV4O9TY4yCVz7xVU+TIDtOwGOnlKgXB3uAgAQw4QCAAAoiAIAABcMAgAXT2IA=
-Date: Tue, 18 Feb 2020 07:20:44 +0000
-Message-ID: <0ef9d09b2bea4399f20b8d283b46467dcfeedac8.camel@intel.com>
-References: <15a5fbc76266fb51b365e66872c105b9e2832999.camel@intel.com>
- <CAMxuvazRMzO=7N3FjH74QBk1ehxwaM8rymFcn5_aDppU8_z+LA@mail.gmail.com>
- <98d72096ad005ecfd5861e4f8f74a9c503e976b2.camel@intel.com>
- <CAMxuvaztAsaXeGeuMp=mhq3BC7cRLbQh+6d9a2RuZ59DU9U5_g@mail.gmail.com>
- <20200214142112.GD613610@redhat.com>
-In-Reply-To: <20200214142112.GD613610@redhat.com>
+ (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1j3xFs-00087r-W2
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 02:25:17 -0500
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id C6897506229ABCB8F02A;
+ Tue, 18 Feb 2020 15:25:10 +0800 (CST)
+Received: from dggeme706-chm.china.huawei.com (10.1.199.102) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 18 Feb 2020 15:25:10 +0800
+Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
+ dggeme706-chm.china.huawei.com (10.1.199.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Tue, 18 Feb 2020 15:25:10 +0800
+Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
+ dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1713.004;
+ Tue, 18 Feb 2020 15:25:10 +0800
+From: miaoyubo <miaoyubo@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: RE: [RFC v2 1/1] arm: acpi: pci-expender-bus: Make arm to support
+ PXB-PCIE
+Thread-Topic: [RFC v2 1/1] arm: acpi: pci-expender-bus: Make arm to support
+ PXB-PCIE
+Thread-Index: AQHV5YP9quVYN42zHECrwbENpBoRDKge1a6AgAG3RYA=
+Date: Tue, 18 Feb 2020 07:25:09 +0000
+Message-ID: <80a1d04e006249ada203e420c4e97cb2@huawei.com>
+References: <20200217111818.766-1-miaoyubo@huawei.com>
+ <20200217111818.766-2-miaoyubo@huawei.com>
+ <20200217080640-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200217080640-mutt-send-email-mst@kernel.org>
 Accept-Language: en-US
-Content-Language: en-US
+Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-originating-ip: [10.252.25.223]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FB68BB435A00AB41B29240EB26626BB3@intel.com>
+x-originating-ip: [10.173.221.29]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.100
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.189
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,107 +81,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>, "mst@redhat.com" <mst@redhat.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Xiexiangyou <xiexiangyou@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gRnJpLCAyMDIwLTAyLTE0IGF0IDE0OjIxICswMDAwLCBEYW5pZWwgUC4gQmVycmFuZ8OpIHdy
-b3RlOg0KPiBPbiBGcmksIEZlYiAxNCwgMjAyMCBhdCAwMzowMDozNFBNICswMTAwLCBNYXJjLUFu
-ZHLDqSBMdXJlYXUgd3JvdGU6DQo+ID4gSGkNCj4gPiANCj4gPiBPbiBGcmksIEZlYiAxNCwgMjAy
-MCBhdCAyOjI0IFBNIEJvZXVmLCBTZWJhc3RpZW4NCj4gPiA8c2ViYXN0aWVuLmJvZXVmQGludGVs
-LmNvbT4gd3JvdGU6DQo+ID4gPiBIaSBNYXJjLUFuZHJlLA0KPiA+ID4gDQo+ID4gPiBPbiBUdWUs
-IDIwMjAtMDItMTEgYXQgMjI6MjQgKzAxMDAsIE1hcmMtQW5kcsOpIEx1cmVhdSB3cm90ZToNCj4g
-PiA+ID4gSGkNCj4gPiA+ID4gDQo+ID4gPiA+IE9uIFR1ZSwgRmViIDExLCAyMDIwIGF0IDQ6MjQg
-UE0gQm9ldWYsIFNlYmFzdGllbg0KPiA+ID4gPiA8c2ViYXN0aWVuLmJvZXVmQGludGVsLmNvbT4g
-d3JvdGU6DQo+ID4gPiA+ID4gRnJvbSBjMDczZDUyOGI4Y2Q3MDgyODMyZmQxODI1ZGMzM2RkNjVi
-MzA1YWEyIE1vbiBTZXAgMTcNCj4gPiA+ID4gPiAwMDowMDowMA0KPiA+ID4gPiA+IDIwMDENCj4g
-PiA+ID4gPiBGcm9tOiBTZWJhc3RpZW4gQm9ldWYgPHNlYmFzdGllbi5ib2V1ZkBpbnRlbC5jb20+
-DQo+ID4gPiA+ID4gRGF0ZTogVHVlLCAxMSBGZWIgMjAyMCAxNjowMToyMiArMDEwMA0KPiA+ID4g
-PiA+IFN1YmplY3Q6IFtQQVRDSF0gZG9jczogVXBkYXRlIHZob3N0LXVzZXIgc3BlYyByZWdhcmRp
-bmcNCj4gPiA+ID4gPiBiYWNrZW5kDQo+ID4gPiA+ID4gcHJvZ3JhbQ0KPiA+ID4gPiA+ICBjb252
-ZW50aW9ucw0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFRoZSB2aG9zdC11c2VyIHNwZWNpZmljYXRp
-b24gaXMgbm90IGNsZWFybHkgc3RhdGluZyB0aGUNCj4gPiA+ID4gPiBleHBlY3RlZA0KPiA+ID4g
-PiA+IGJlaGF2aW9yIGZyb20gYSBiYWNrZW5kIHByb2dyYW0gd2hlbmV2ZXIgdGhlIGNsaWVudA0K
-PiA+ID4gPiA+IGRpc2Nvbm5lY3RzLg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFRoaXMgcGF0Y2gg
-YWRkcmVzc2VzIHRoZSBpc3N1ZSBieSBkZWZpbmluZyB0aGUgZGVmYXVsdA0KPiA+ID4gPiA+IGJl
-aGF2aW9yIGFuZA0KPiA+ID4gPiA+IHByb3Bvc2luZyBhbiBhbHRlcm5hdGl2ZSB0aHJvdWdoIGEg
-Y29tbWFuZCBsaW5lIG9wdGlvbi4NCj4gPiA+ID4gPiANCj4gPiA+ID4gPiBCeSBkZWZhdWx0LCBh
-IGJhY2tlbmQgcHJvZ3JhbSB3aWxsIGhhdmUgdG8ga2VlcCBsaXN0ZW5pbmcNCj4gPiA+ID4gPiBl
-dmVuIGlmDQo+ID4gPiA+ID4gdGhlDQo+ID4gPiA+ID4gY2xpZW50IGRpc2Nvbm5lY3RzLCB1bmxl
-c3MgdG9sZCBvdGhlcndpc2UgdGhyb3VnaCB0aGUgbmV3bHkNCj4gPiA+ID4gPiBpbnRyb2R1Y2Vk
-DQo+ID4gPiA+ID4gb3B0aW9uIC0tZXhpdC1vbi1kaXNjb25uZWN0Lg0KPiA+ID4gPiA+IA0KPiA+
-ID4gPiA+IFNpZ25lZC1vZmYtYnk6IFNlYmFzdGllbiBCb2V1ZiA8c2ViYXN0aWVuLmJvZXVmQGlu
-dGVsLmNvbT4NCj4gPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZh
-bmhhQHJlZGhhdC5jb20+DQo+ID4gPiA+ID4gLS0tDQo+ID4gPiA+ID4gIGRvY3MvaW50ZXJvcC92
-aG9zdC11c2VyLnJzdCB8IDEwICsrKysrKysrKysNCj4gPiA+ID4gPiAgMSBmaWxlIGNoYW5nZWQs
-IDEwIGluc2VydGlvbnMoKykNCj4gPiA+ID4gPiANCj4gPiA+ID4gPiBkaWZmIC0tZ2l0IGEvZG9j
-cy9pbnRlcm9wL3Zob3N0LXVzZXIucnN0DQo+ID4gPiA+ID4gYi9kb2NzL2ludGVyb3Avdmhvc3Qt
-DQo+ID4gPiA+ID4gdXNlci5yc3QNCj4gPiA+ID4gPiBpbmRleCA1ZjhiM2E0NTZiLi5kYTlhMWVi
-YzRjIDEwMDY0NA0KPiA+ID4gPiA+IC0tLSBhL2RvY3MvaW50ZXJvcC92aG9zdC11c2VyLnJzdA0K
-PiA+ID4gPiA+ICsrKyBiL2RvY3MvaW50ZXJvcC92aG9zdC11c2VyLnJzdA0KPiA+ID4gPiA+IEBA
-IC0xMzIzLDYgKzEzMjMsMTAgQEAgVGhlIGJhY2tlbmQgcHJvZ3JhbSBtdXN0IGVuZCAoYXMNCj4g
-PiA+ID4gPiBxdWlja2x5IGFuZA0KPiA+ID4gPiA+IGNsZWFubHkgYXMgcG9zc2libGUpIHdoZW4N
-Cj4gPiA+ID4gPiAgdGhlIFNJR1RFUk0gc2lnbmFsIGlzIHJlY2VpdmVkLiBFdmVudHVhbGx5LCBp
-dCBtYXkgcmVjZWl2ZQ0KPiA+ID4gPiA+IFNJR0tJTEwNCj4gPiA+ID4gPiBieQ0KPiA+ID4gPiA+
-ICB0aGUgbWFuYWdlbWVudCBsYXllciBhZnRlciBhIGZldyBzZWNvbmRzLg0KPiA+ID4gPiA+IA0K
-PiA+ID4gPiA+ICtCeSBkZWZhdWx0LCB0aGUgYmFja2VuZCBwcm9ncmFtIGNvbnRpbnVlcyBydW5u
-aW5nIGFmdGVyIHRoZQ0KPiA+ID4gPiA+IGNsaWVudA0KPiA+ID4gPiA+ICtkaXNjb25uZWN0cy4g
-SXQgYWNjZXB0cyBvbmx5IDEgY29ubmVjdGlvbiBhdCBhIHRpbWUgb24gZWFjaA0KPiA+ID4gPiA+
-IFVOSVgNCj4gPiA+ID4gPiBkb21haW4NCj4gPiA+ID4gPiArc29ja2V0Lg0KPiA+ID4gPiANCj4g
-PiA+ID4gSSBkb24ndCB0aGluayB0aGF0J3MgdGhlIG1vc3QgY29tbW9uIGJlaGF2aW91ci4gbGli
-dmhvc3QtdXNlcg0KPiA+ID4gPiB3aWxsDQo+ID4gPiA+IHBhbmljKCkgb24gZGlzY29ubmVjdCBp
-biBnZW5lcmFsLCB1bmxlc3MgdGhlIGVycm9yL2V4aXQgaXMNCj4gPiA+ID4gaGFuZGxlZA0KPiA+
-ID4gPiBncmFjZWZ1bGx5IGJ5IHRoZSBiYWNrZW5kLg0KPiA+ID4gDQo+ID4gPiBJdCdzIG5vdCB0
-aGUgZGVmYXVsdCBiZWhhdmlvciBmcm9tIGxpYnZob3N0LXVzZXIsIGJ1dCB0aGF0J3MNCj4gPiA+
-IGV4YWN0bHkNCj4gPiA+IHNvbWV0aGluZyBJJ2QgbGlrZSB0byBzZWUgY2hhbmdpbmcuIFRoaXMg
-c2hvdWxkIGJlIHRoZSBub3JtYWwNCj4gPiA+IGNhc2UgaWYNCj4gPiA+IHlvdSB0aGluayBhYm91
-dCBhIHN0YW5kYXJkIGNsaWVudC9zZXJ2ZXIgY29ubmVjdGlvbiwgd2hlcmUgdGhlDQo+ID4gPiBz
-ZXJ2ZXINCj4gPiA+IHdvdWxkIHNpbXBseSBsaXN0ZW4gYWdhaW4gYWZ0ZXIgdGhlIGNsaWVudCBk
-aXNjb25uZWN0cy4NCj4gPiANCj4gPiBJIGRpc2FncmVlLCBhICJub3JtYWwiIGxpZmVjeWNsZSBp
-cyBhIHNpbmdsZSBjb25uZWN0aW9uICYgaW5zdGFuY2UNCj4gPiBwZXIgZGV2aWNlLg0KPiA+IA0K
-PiA+IEhhdmluZyB0aGUgYmFja2VuZCBoYW5kbGUgbXVsdGlwbGUgY29ubmVjdGlvbnMgaXMgbmVl
-ZGxlc3NseSBtb3JlDQo+ID4gY29tcGxpY2F0ZWQuIFlvdSBuZWVkIHRvIGNvcnJlY3RseSBoYW5k
-bGUgbXVsdGlwbGUgc3RhdGVzLCBmbHVzaGVkDQo+ID4gYW55dGhpbmcgcHJpdmF0ZSBiZXR3ZWVu
-IGNvbm5lY3Rpb25zIGV0Yy4gSXQgc2hvdWxkIGJlIG9wdGlvbmFsLg0KPiA+IA0KPiA+IA0KPiA+
-ID4gPiBUaGUgbW9zdCBjb21tb24gY2FzZSBpcyB0byBoYXZlIDEtMSByZWxhdGlvbiBiZXR3ZWVu
-DQo+ID4gPiA+IGRldmljZS9xZW11DQo+ID4gPiA+IGluc3RhbmNlIGFuZCBiYWNrZW5kLg0KPiA+
-ID4gDQo+ID4gPiBZZXMgdGhpcyBwYXJ0IGlzIGZpbmUsIGJ1dCB0aGF0J3Mgbm90IGEgcmVhc29u
-IHdoeSB0aGUgYmFja2VuZA0KPiA+ID4gc2hvdWxkDQo+ID4gPiB0ZXJtaW5hdGVzLg0KPiA+IA0K
-PiA+IEl0IGlzIHNpbXBsZXIgdG8gZW5zdXJlIGl0IGlzIHJlc2V0IGNvcnJlY3RseS4NCj4gPiAN
-Cj4gPiA+ID4gV2h5IG5vdCByZXN0YXJ0IHRoZSBiYWNrZW5kIGZvciBhbm90aGVyIGluc3RhbmNl
-Pw0KPiA+ID4gDQo+ID4gPiBCZWNhdXNlIHlvdSBuZWVkIHNvbWUgbWFuYWdlbWVudCB0b29sIHRv
-IGRvIHNvLiBBbmQgSSB0aGluayB0aGF0DQo+ID4gPiBieQ0KPiA+ID4gZGVmYXVsdCBpdCBjb3Vs
-ZCBiZSBpbnRlcmVzdGluZyB0byBoYXZlIHRoZSBsZWFzdCBhbW91bnQgb2YgZXh0cmENCj4gPiA+
-IG1hbmFnZW1lbnQgaW52b2x2ZWQuDQo+ID4gDQo+ID4gVGhlIG1hbmFnZW1lbnQgbGF5ZXIgc2hv
-dWxkIGJlIGludm9sdmVkIGlmIGFueSBzaWRlIGNyYXNoZXMgb3INCj4gPiByZXN0YXJ0IGFueXdh
-eS4NCj4gDQo+IEZ1cnRoZXIsIHRoaXMgdmhvc3QtdXNlci5yc3Qgc3BlYyBkb2N1bWVudCBpcyBl
-eHBsaWNpdGx5IGRlc2NyaWJpbmcNCj4gdGhlIGNvbnRyYWN0IGJldHdlZW4gdGhlIHZob3N0LXVz
-ZXIgYmluYXJpZXMgYW5kIHRoZSBtYW5hZ2VtZW50DQo+IGxheWVyLiBTbyBpdCBkb2Vzbid0IG1h
-a2Ugc2Vuc2UgdG8gc2F5IHVwZGF0ZSB0aGlzIGRvYyB0byBkZXNjcmliZQ0KPiBkZXNpcmVkIHNl
-bWFudGljcyBmb3IgdXNhZ2UgL3dpdGhvdXQvIGEgbWFuYWdlbWVudCBsYXllci4NCg0KSXMgaXQ/
-IFdoYXQgSSBjYWxsIG1hbmFnZW1lbnQgbGF5ZXIgaXMgc29tZXRoaW5nIGxpa2UgS2F0YSBDb250
-YWluZXJzLA0Kc3Bhd25pbmcgYm90aCB0aGUgYmFja2VuZCBhbmQgdGhlIFZNTS4gSU1PLCB0aGUg
-ZG9jdW1lbnQgaXMgbW9yZSBhYm91dA0KZGVzY3JpYmluZyB0aGUgcHJvdG9jb2wgYW5kIGhvdyB0
-aGUgY29tbXVuaWNhdGlvbiBpcyBoYW5kbGVkIGJldHdlZW4NCnRoZSBiYWNrZW5kIGFuZCB0aGUg
-Vk1NLg0KDQo+IA0KPiBTbyBJIGFncmVlLCB0aGUgZGVmYXVsdCBiZWhhdmlvdXIgc2hvdWxkIGJl
-IHRoYXQgdGhlcmUgaXMgb25lIGJpbmFyeQ0KPiBzcGF3bmVkIGF0IHRpbWUgdGhlIGFzc29jaWF0
-ZWQgZGV2aWNlIGlzIGluaXRpYWxpemF0aW9uLCBhbmQgdGhhdA0KPiB0aGUgbGlmZXRpbWUgb2Yg
-dGhlIGJpbmFyeSBpcyAxOjEgYXNzb2NpYXRlZCB3aXRoIHRoZSBsaWZldGltZSBvZg0KPiB0aGUg
-Vk0sIG9yIHVudGlsIHRoZSBkZXZpY2UgaXMgdW5wbHVnZ2VkLiANCg0KSWYgeW91IGFsbCBhZ3Jl
-ZSBvbiB0aGlzLCB0aGVuIGF0IGxlYXN0IHdlIHNob3VsZCBtYWtlIHRoaXMgY2xlYXIgaW4NCnRo
-ZSBkb2N1bWVudC4gSSdsbCB1cGRhdGUgdGhlIHBhdGNoLg0KDQpUaGFua3MsDQpTZWJhc3RpZW4N
-Cg0KPiANCj4gUmVnYXJkcywNCj4gRGFuaWVsDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KSW50ZWwgQ29ycG9yYXRp
-b24gU0FTIChGcmVuY2ggc2ltcGxpZmllZCBqb2ludCBzdG9jayBjb21wYW55KQpSZWdpc3RlcmVk
-IGhlYWRxdWFydGVyczogIkxlcyBNb250YWxldHMiLSAyLCBydWUgZGUgUGFyaXMsIAo5MjE5NiBN
-ZXVkb24gQ2VkZXgsIEZyYW5jZQpSZWdpc3RyYXRpb24gTnVtYmVyOiAgMzAyIDQ1NiAxOTkgUi5D
-LlMuIE5BTlRFUlJFCkNhcGl0YWw6IDQsNTcyLDAwMCBFdXJvcwoKVGhpcyBlLW1haWwgYW5kIGFu
-eSBhdHRhY2htZW50cyBtYXkgY29udGFpbiBjb25maWRlbnRpYWwgbWF0ZXJpYWwgZm9yCnRoZSBz
-b2xlIHVzZSBvZiB0aGUgaW50ZW5kZWQgcmVjaXBpZW50KHMpLiBBbnkgcmV2aWV3IG9yIGRpc3Ry
-aWJ1dGlvbgpieSBvdGhlcnMgaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGFyZSBub3Qg
-dGhlIGludGVuZGVkCnJlY2lwaWVudCwgcGxlYXNlIGNvbnRhY3QgdGhlIHNlbmRlciBhbmQgZGVs
-ZXRlIGFsbCBjb3BpZXMuCg==
 
+> -----Original Message-----
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Monday, February 17, 2020 9:09 PM
+> To: miaoyubo <miaoyubo@huawei.com>
+> Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com; Xiexiangyou
+> <xiexiangyou@huawei.com>; imammedo@redhat.com; qemu-
+> devel@nongnu.org
+> Subject: Re: [RFC v2 1/1] arm: acpi: pci-expender-bus: Make arm to suppor=
+t
+> PXB-PCIE
+>=20
+> On Mon, Feb 17, 2020 at 07:18:18PM +0800, Yubo Miao wrote:
+> > From: miaoyubo <miaoyubo@huawei.com>
+> >
+> > Currently virt machine is not supported by pxb-pcie, and only one main
+> > host bridge described in ACPI tables.
+> > Under this circumstance, different io numas for differnt devices is
+> > not possible, in order to present io numas to the guest, especially
+> > for host pssthrough devices. PXB-PCIE is supproted by arm and certain
+> > resource is allocated for each pxb-pcie in acpi table.
+> >
+> > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+>=20
+> A unit test would be nic.
+>=20
+
+Thanks for replying, I will add the unit test in patch V3.
+
+> > ---
+> >  hw/arm/virt-acpi-build.c | 240 +++++++++++++++++++++++++++++-------
+> ---
+> >  hw/pci-host/gpex.c       |   4 +
+> >  include/hw/arm/virt.h    |   1 +
+> >  3 files changed, 184 insertions(+), 61 deletions(-)
+> >
+> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c index
+> > bd5f771e9b..fc11525042 100644
+> > --- a/hw/arm/virt-acpi-build.c
+> > +++ b/hw/arm/virt-acpi-build.c
+> > @@ -49,6 +49,8 @@
+> >  #include "kvm_arm.h"
+> >  #include "migration/vmstate.h"
+> >
+> > +#include "hw/arm/virt.h"
+> > +#include "hw/pci/pci_bus.h"
+> >  #define ARM_SPI_BASE 32
+> >
+> > +    method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
+> > +    Aml *rbuf =3D aml_resource_template();
+> > +    aml_append(rbuf,
+> > +        aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED,
+> AML_POS_DECODE,
+> > +                            0x0000, 0x0000, root_bus_limit, 0x0000,
+> > +                            root_bus_limit + 1));
+> > +    aml_append(rbuf,
+> > +        aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED,
+> AML_MAX_FIXED,
+> > +                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000,
+> base_mmio,
+> > +                         base_mmio + size_mmio - 1 - size_addr * count=
+,
+> > +                         0x0000, size_mmio - size_addr * count));
+> > +    aml_append(rbuf,
+> > +        aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED,
+> AML_POS_DECODE,
+> > +                     AML_ENTIRE_RANGE, 0x0000, 0x0000,
+> > +                     size_pio / 2 - 1 - size_io * count, base_pio,
+> > +                     size_pio / 2 - size_io * count));
+> > +
+> > +    if (use_highmem) {
+> > +        hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
+> > +        hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].size;
+> > +
+> > +        aml_append(rbuf,
+> > +            aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED,
+> AML_MAX_FIXED,
+> > +                             AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000=
+,
+> > +                             base_mmio_high,
+> > +                             base_mmio_high + size_mmio_high - 1 -
+> > +                             size_addr * count,
+> > +                             0x0000, size_mmio_high - size_addr * coun=
+t));
+> > +    }
+> > +
+> > +    aml_append(method, aml_name_decl("RBUF", rbuf));
+> > +    aml_append(method, aml_return(rbuf));
+> > +    aml_append(dev, method);
+> > +
+> > +    acpi_dsdt_add_pci_osc(dev, scope);
+> >
+> >      Aml *dev_rp0 =3D aml_device("%s", "RP0");
+> >      aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+>=20
+>=20
+> this will be easier to review if you first refactor existing code, then a=
+dd pxb
+> support on top.
+>=20
+
+Thanks for the suggestion, the next patch would separate this patch into tw=
+o patches,=20
+one is to refactor existing code and another one add pxb support.
+
+> > @@ -744,7 +862,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> VirtMachineState *vms)
+> >      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+> >                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE),
+> NUM_VIRTIO_TRANSPORTS);
+> >      acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] +
+> ARM_SPI_BASE),
+> > -                      vms->highmem, vms->highmem_ecam);
+> > +                      vms->highmem, vms->highmem_ecam, vms);
+> >      if (vms->acpi_dev) {
+> >          build_ged_aml(scope, "\\_SB."GED_DEVICE,
+> >                        HOTPLUG_HANDLER(vms->acpi_dev), diff --git
+> > a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c index 0ca604dc62..2c18cdfec4
+> > 100644
+> > --- a/hw/pci-host/gpex.c
+> > +++ b/hw/pci-host/gpex.c
+> > @@ -36,6 +36,7 @@
+> >  #include "hw/qdev-properties.h"
+> >  #include "migration/vmstate.h"
+> >  #include "qemu/module.h"
+> > +#include "hw/arm/virt.h"
+> >
+> >
+> /**********************************************************
+> ******************
+> >   * GPEX host
+> > @@ -98,6 +99,9 @@ static void gpex_host_realize(DeviceState *dev, Error
+> **errp)
+> >                                       pci_swizzle_map_irq_fn, s, &s->io=
+_mmio,
+> >                                       &s->io_ioport, 0, 4,
+> > TYPE_PCIE_BUS);
+> >
+> > +#ifdef __aarch64__
+> > +    VIRT_MACHINE(qdev_get_machine())->bus =3D pci->bus; #endif
+> >      qdev_set_parent_bus(DEVICE(&s->gpex_root), BUS(pci->bus));
+> >      pci_bus_set_route_irq_fn(pci->bus, gpex_route_intx_pin_to_irq);
+> >      qdev_init_nofail(DEVICE(&s->gpex_root));
+>=20
+>=20
+> What does all this have to do with building on aarch64?
+>=20
+>=20
+
+gpex.c is the public file for Generic PCI Express Bridge Emulation,
+using aarch64 to avoid affect other architectures
+
+> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h index
+> > 71508bf40c..cfc65dd19b 100644
+> > --- a/include/hw/arm/virt.h
+> > +++ b/include/hw/arm/virt.h
+> > @@ -140,6 +140,7 @@ typedef struct {
+> >      DeviceState *gic;
+> >      DeviceState *acpi_dev;
+> >      Notifier powerdown_notifier;
+> > +    PCIBus *bus;
+> >  } VirtMachineState;
+>=20
+> Again one bus per machine? Pls give this field a better name and add some
+> comments.
+>=20
+
+Not one bus, the bus include the root bus and all pxb-pcie buses.=20
+it is pointer to the device objects. By go through the bus, we get the pxbs
+defined and also the numa_node, the usage and the name is just the same wit=
+h=20
+X86.(also PCIBus *bus in PCMachineState) The comments would be add in next=
+=20
+patch ,And do u have any suggestion for the better name?
+
+> >
+> >  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM :
+> > VIRT_PCIE_ECAM)
+> > --
+> > 2.19.1
+> >
+
+Regards,
+Miao
 
