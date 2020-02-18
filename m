@@ -2,94 +2,118 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A03C34033
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09CE6C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:45:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AED15206E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:45:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA70B206E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:45:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Br3DjvyS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AED15206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KCUtGh6j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA70B206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3zRZ-0003Tz-Pc
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:45:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43134)
+	id 1j3zRb-0003Uw-U9
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:45:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43314)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j3zQJ-00010O-93
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:12 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j3zQQ-0001Hh-Jv
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j3zQI-0005nE-4V
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39229
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3zQI-0005my-1R
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582019049;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=j/EdDI2CtMVN9fdl6+h7xbjhrRwwWIt4TPFM6oFFcSc=;
- b=Br3DjvySAem+1FlSZNLSdvb3J+sUn+oRng2hwCQq0Ttcpn6vjyqvVRhQ/eFep0iuXzhKza
- a9AtLWaZLYCfQ+xi0fAlD3yEz0ALINfnhZG/yprjJwHnTl3d26jvRdJOFalzPquWksm/i0
- 5HWFEpdkkvS34Ak346/Ro8o4GuifB98=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-lJxr_yQANUOErB3tFEggmg-1; Tue, 18 Feb 2020 04:44:07 -0500
-Received: by mail-wm1-f71.google.com with SMTP id t17so785002wmi.7
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 01:44:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=d11KEHy00cHcmoOZmfkiJiWUsKxIDwvg0E/JJImsCd0=;
- b=j3uo+Nhr9mW11iTcrnXkUcpwwPHW33V8qC7+zhTHX8f/MFgH2/rp0QZgWabl0FyYfx
- LC1qGK8oVUvBVuOJdmj3ebI17dzvvTtUxCMy+a0B/q0ypYqEvKAS5Do0WVwAZAzpEy1C
- Qsqry2NnkZfl3e9MTwBbfSYgdSMUEGvIiUWoPi3yCTmPBeA6ONF4Ymjxl6ZTzTcZ0+BW
- GaM1YfAQvJIP9jJaxhJwnHmVRmDxU4xTYOudOn77w9fpO/uWVQdUqx4UuWrYOhl1ODk7
- SmdnK1anyDNl6zRzs4jOwVabNHbc5CsnIJR700SCiNW+Sh98pAYlxvIfNqQSJ1beDs9o
- g79g==
-X-Gm-Message-State: APjAAAUkcSf+2R+XI87ZDPUO7Iyg70nhNboDNNGmhgyIeo9Em4VXyKma
- PkOKh3Ld0eEJRMWtbnNO4yetcS4d9pTJNykmADhUBKHOY5gsDODVYWUaE9cM6UsD9sSIN1U+vkn
- jMbRtF7h2SoSp+do=
-X-Received: by 2002:a1c:dfd6:: with SMTP id w205mr2144545wmg.151.1582019045924; 
- Tue, 18 Feb 2020 01:44:05 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyLgsh5LNMyikPjX/FLArT4rWgBdq3dbcvVm+2uT8w2tbshpyIEEFwkWdPllurI1KHIdPBk0A==
-X-Received: by 2002:a1c:dfd6:: with SMTP id w205mr2144493wmg.151.1582019045623; 
- Tue, 18 Feb 2020 01:44:05 -0800 (PST)
-Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id z10sm2735588wmk.31.2020.02.18.01.44.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 18 Feb 2020 01:44:04 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND 00/13] trivial: Detect and remove superfluous
- semicolons in C code
-Date: Tue, 18 Feb 2020 10:43:49 +0100
-Message-Id: <20200218094402.26625-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j3zQP-0005sz-GR
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:18 -0500
+Received: from mail-am6eur05on2100.outbound.protection.outlook.com
+ ([40.107.22.100]:61025 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1j3zQJ-0005n2-Ce; Tue, 18 Feb 2020 04:44:12 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JH1fz9sp+07lD07FViF7S4QMWO6h2Z8QnNum80BZCmsrDEQXb9qj+I05CVHdvjjZGUW7nXOikgegHK8ljjXeE5wzFAY0iuo2iJjJFgz6lHFkYW8oeorYLOVwAvOpj6Hkm3AXINTyZptQwC1b5V+eyQatt/HY9Uoew1FtHubeQXBj3kDQ9zyc2Kjr3m5h4v4AP2rSFf+a9yVvq/d6pd922YHgnpJWxbQsP/F8A82PQAIbGP9lS331hbxKtuCGRfOFvAY9vk0KR9E5buwZXNc6zt6V4PIl4QhT8Fl9TYQocYEuna9oKt3CyNEPIY9IVtpjKIJvqrQ5X2PpzbuDAWwmYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4QbquY3nvaNd98xl9fnrswl5ZxsJlrGwwSC+QgrWGUs=;
+ b=AonVwKQB6goOGz1uKNMDKEQrcsQqlxO2QtNRQmlN4VXL8urmpm/5IaR5uL2MOkPYTcJCnAnjQ24VPDkc6jE8AMiWe7OZlTz0LIk2JTETXiCPtAz+tFdDPmB5CvRT1SCppmoTw+ZpY2iAlR2znfBOL1EHMgkzne6lKqdHWmJ6yokyfu/OwHMbrsflzKE+4HurfXwzxG0nQIzf9avB+vBDNdd3FLz49ZvlE9zjh+B9oBqI7uu7eLuq12qTrBhZHqso4dCjEaLxc+PPGk9qi/j2cs20SNGeRNNtKdBxU/kAN4fhMt5p17CxLch+eTPmDOPcW5dtc+o4eR9W+V+rcEgHZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4QbquY3nvaNd98xl9fnrswl5ZxsJlrGwwSC+QgrWGUs=;
+ b=KCUtGh6jsfGWUT7lQDoC3eroEgxyClPS+dzpJ1ylwekljV4OjpCSORpkSH0L5i5XdNaIA777dH2BVzpjLMFaYIttaXhJkagIZMz5uCXmeNspYHowMwaLi2Z3OeHE2zTvkgRqfzMNeBeCm/x3Yf962MeTKSIOm9WenHs27+GnVn8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
+ AM6PR08MB3046.eurprd08.prod.outlook.com (52.135.165.11) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.24; Tue, 18 Feb 2020 09:44:08 +0000
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::1883:da16:865a:139d]) by AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::1883:da16:865a:139d%5]) with mapi id 15.20.2729.032; Tue, 18 Feb 2020
+ 09:44:08 +0000
+Subject: Re: [PATCH v2 01/22] migration/block-dirty-bitmap: fix
+ dirty_bitmap_mig_before_vm_start
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
+ <20200217150246.29180-2-vsementsov@virtuozzo.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Organization: Virtuozzo
+Message-ID: <40ee6499-92a3-9427-c5b1-efac2222bb9c@virtuozzo.com>
+Date: Tue, 18 Feb 2020 12:44:06 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200217150246.29180-2-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1PR0902CA0020.eurprd09.prod.outlook.com
+ (2603:10a6:3:e5::30) To AM6PR08MB5048.eurprd08.prod.outlook.com
+ (2603:10a6:20b:ee::31)
 MIME-Version: 1.0
-X-MC-Unique: lJxr_yQANUOErB3tFEggmg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Received: from [172.16.24.225] (185.231.240.5) by
+ HE1PR0902CA0020.eurprd09.prod.outlook.com (2603:10a6:3:e5::30) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.25 via Frontend Transport; Tue, 18 Feb 2020 09:44:07 +0000
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 365747d8-5365-4db6-6a18-08d7b45719bb
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3046:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3046D5237A7EC3A45E41BCC8F4110@AM6PR08MB3046.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:612;
+X-Forefront-PRVS: 031763BCAF
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(136003)(39840400004)(396003)(366004)(376002)(346002)(199004)(189003)(316002)(6486002)(36756003)(53546011)(26005)(31686004)(4326008)(52116002)(2616005)(36916002)(16576012)(956004)(16526019)(54906003)(186003)(44832011)(81166006)(31696002)(478600001)(86362001)(66556008)(66476007)(66946007)(2906002)(8676002)(8936002)(5660300002)(81156014)(14143004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3046;
+ H:AM6PR08MB5048.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tN7Me51sRMukD1XaNS6gqGtwTuvDejccShcb2Lpz/1vSY2SOmALhiSec0ByJh4mLNI+KYKotapxVHPmiLpjwANvsWfSuRa9cnSlHwl4geDbJi5d53qywS7BnmzGU0TEYgn4LpRbFDw49EGcHDYRTp8P36DKOs2LYv7xvxVkI3AfbE5BZiDEwtC4y+FuUJgvLi17/Kqg6/iKp9xhIWLzpQDsyXTxOoQPwyQ0uE3OGfxgMe7bcahjX4JrFrvUQwFytEXzak6wxPy3nO5xkVV2V/4HkSrc1LcJlsv0t1FjudvqM4OWVl6cc8jDNfvfpDh7TY7Zm3pT2SE35SFtrJxHFUyxYg1thNyUryP1w5VL5VYzTwClP0RgDHO6pyEy8dLDjTLybRjNCZp2BQTsyKu6eyZUFH2rSm4SiJghiImZA8cbaeX28ddHbIHtgz7eMOiMou8MhGxN7oPImA+8XAr28tilZJtvNWa+gpUH2JS0UouF4umpc3oGrDw//LF2913I1
+X-MS-Exchange-AntiSpam-MessageData: hHlWJiZ0JxRA5xxtBrxyufmlAZ+f1dZBH73oGzjtaRB3b1t07ehm+x2+Gta9uKIdHMN7d3jGrERY7+We/VzV8Fq5PwfbAO6668qQeqtIcPvwoYtbqLe2cdMqsIlBDtzEmDAiKRaC9y+n1xQZd3v0Nw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 365747d8-5365-4db6-6a18-08d7b45719bb
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2020 09:44:08.4380 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cs5XN1tuyZiow4GFo6qJ7Dmk5/M8kD5wbw+BTxTfwfvCGUooWi9ai5cj4LXs8PHRdtdfObXD5dPSM5BpXIjRiX58AS7jYw8R2Rj3sbxuPHk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3046
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.22.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,62 +125,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, Julia Suvorova <jusual@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, quintela@redhat.com,
+ qemu-stable@nongnu.org, dgilbert@redhat.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Luc noticed a superfluous trailing semicolon:
-https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04593.html
+On 17/02/2020 18:02, Vladimir Sementsov-Ogievskiy wrote:
+> No reason to use _locked version of bdrv_enable_dirty_bitmap, as we
+> don't lock this mutex before. Moreover, the adjacent
+> bdrv_dirty_bitmap_enable_successor do lock the mutex.
+> 
+> Fixes: 58f72b965e9e1q
+> Cc: qemu-stable@nongnu.org # v3.0
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   migration/block-dirty-bitmap.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+> index 7eafface61..16f1793ee3 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -498,7 +498,7 @@ void dirty_bitmap_mig_before_vm_start(void)
+>           DirtyBitmapLoadBitmapState *b = item->data;
+>   
+>           if (b->migrated) {
+> -            bdrv_enable_dirty_bitmap_locked(b->bitmap);
+> +            bdrv_enable_dirty_bitmap(b->bitmap);
+>           } else {
+>               bdrv_dirty_bitmap_enable_successor(b->bitmap);
+>           }
+> 
 
-Prevent that by modifying checkpatch.pl and clean the codebase.
-
-Philippe Mathieu-Daud=C3=A9 (13):
-  scripts/checkpatch.pl: Detect superfluous semicolon in C code
-  audio/alsaaudio: Remove superfluous semicolons
-  block: Remove superfluous semicolons
-  block/io_uring: Remove superfluous semicolon
-  hw/arm/xlnx-versal: Remove superfluous semicolon
-  hw/m68k/next-cube: Remove superfluous semicolon
-  hw/scsi/esp: Remove superfluous semicolon
-  hw/vfio/display: Remove superfluous semicolon
-  migration/multifd: Remove superfluous semicolon
-  ui/input-barrier: Remove superfluous semicolon
-  target/i386/whpx: Remove superfluous semicolon
-  tests/qtest/libqos/qgraph: Remove superfluous semicolons
-  contrib/rdmacm-mux: Remove superfluous semicolon
-
- audio/alsaaudio.c           | 4 ++--
- block.c                     | 4 ++--
- block/io_uring.c            | 2 +-
- contrib/rdmacm-mux/main.c   | 2 +-
- hw/arm/xlnx-versal-virt.c   | 2 +-
- hw/m68k/next-cube.c         | 2 +-
- hw/scsi/esp.c               | 2 +-
- hw/vfio/display.c           | 2 +-
- migration/multifd.c         | 2 +-
- target/i386/whpx-all.c      | 2 +-
- tests/qtest/libqos/qgraph.c | 4 ++--
- ui/input-barrier.c          | 2 +-
- scripts/checkpatch.pl       | 5 +++++
- 13 files changed, 20 insertions(+), 15 deletions(-)
-
---=20
-2.21.1
-
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+-- 
+With the best regards,
+Andrey Shinkevich
 
