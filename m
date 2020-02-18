@@ -2,75 +2,99 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A299C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E9CC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:26:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25D0F20801
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:25:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FA49208C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:26:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pwdit8xQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25D0F20801
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSkcOolD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FA49208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j46cX-0001Au-B0
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 12:25:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52916)
+	id 1j46db-0002R0-Eq
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 12:26:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jtomko@redhat.com>) id 1j46bo-0000Bd-2x
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:24:33 -0500
+ (envelope-from <philmd@redhat.com>) id 1j46cQ-0001FZ-9t
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:25:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jtomko@redhat.com>) id 1j46bm-0004wT-9v
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:24:31 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40466
+ (envelope-from <philmd@redhat.com>) id 1j46cP-0005Cj-2S
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:25:10 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58527
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1j46bl-0004vV-JA
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:24:29 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j46cO-0005CV-VA
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:25:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582046668;
+ s=mimecast20190719; t=1582046708;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=L9wzqaID556lhmDz7ptaF9S9MFe5XFUv0dltWs6xCdE=;
- b=Pwdit8xQT7b85IgjU6LN1mJc5o1ipb05eMTImegxDKAx4jKBm53hvkX+iUDfspgKQhaHnq
- qrsOJDuhWHx8uAWf2z8KwtzURbqzpV62rmd1FHugQijuT4Ln/W2ETGB8ehnKUkh4W0xh++
- UgJz2MwZUybpDc/z7eYBxoLB6OEu0Cs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-fKOo1hA2P92fY4D9qjJ1wA-1; Tue, 18 Feb 2020 12:24:25 -0500
-X-MC-Unique: fKOo1hA2P92fY4D9qjJ1wA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C1CA100550E
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 17:24:24 +0000 (UTC)
-Received: from lpt (ovpn-200-31.brq.redhat.com [10.40.200.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B5C2B60BE1;
- Tue, 18 Feb 2020 17:24:15 +0000 (UTC)
-Date: Tue, 18 Feb 2020 18:24:12 +0100
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-To: Julia Suvorova <jusual@redhat.com>
-Subject: Re: [PATCH] pcie_root_port: Add disable_hotplug option
-Message-ID: <20200218172412.GB577946@lpt>
-References: <20200218161717.386723-1-jusual@redhat.com>
+ bh=rHdsbHd/UplYOuK1MhtPKS+w05Y6jlBf0XZ7X3RTAD8=;
+ b=PSkcOolDIM/Dn2Q/6a9jE/MqnaRdYOjFm8boiBYl8VxZbszwiyBn3mvJFDb08RL1bGkPBG
+ bvkBZDNY48ONisRqXMk5Rbc0jtS9cJ3XmgLtUhKdeHagZN01cMdAwlOpgM3PcKy1988BQA
+ Urf5A5iDk1QHNq11tux7geIqcvpfTss=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-139-Yt_d4yfEPbWSWA5QqN7rWQ-1; Tue, 18 Feb 2020 12:25:05 -0500
+Received: by mail-wr1-f70.google.com with SMTP id t3so11102401wrm.23
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 09:25:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ch7/RwVoJyR7PCi5wg+xpK76Fo66LPZxHfqwUkdPvVI=;
+ b=JUSZhsk6ppG058xq0issbAHA16wQ7b8P0Xoz6QTrVh8VyVhhAFaFqEM+JGBbF5dA2T
+ mailTJppqIJvHUVJOIUnUxLqzLI7ciZ9/cuy6FKj4NUvqHT/VzrbpWfNNWt2uC1fOYHH
+ 6pLmkmYf0MTzI0CMREamE1Dqo4/d1/UpCNzO6qxTgOhXL1aWwBTooB/8L4wouXinFiW1
+ xQQSea029LiV5TexTk1O+qdjF538lB9rj8KRlIzd7qC+29N0b+CkLJ1j9A1zzWPM7XkR
+ M8nrhsRACVmvnEkDZJJpZyFFIkwqCvtym1/9N/FUHINgKpXOc1/EZ1yChdE3iL68dYVb
+ Inzg==
+X-Gm-Message-State: APjAAAV/XXnjvePdkBChRGu1vmjsD/K9I8C18u9FR6o6niJn94AQRl67
+ 1K0L2GlIW2L31EDw8x8hEV9UXu7ZOW6zrS+7+SQlLWjEapcC/BT+tMHies6fxFIgFhWuPnWz+CV
+ kndc+t/IBxGYmvAA=
+X-Received: by 2002:a05:600c:20f:: with SMTP id
+ 15mr4153569wmi.128.1582046704596; 
+ Tue, 18 Feb 2020 09:25:04 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw6ojCdvPQrIKpcPVa0PASKYO9rD0r53YzLIgc1HaCJovtd3GcglervOIVYUbRGcOwdWCMDAw==
+X-Received: by 2002:a05:600c:20f:: with SMTP id
+ 15mr4153544wmi.128.1582046704406; 
+ Tue, 18 Feb 2020 09:25:04 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id a16sm7098634wrt.30.2020.02.18.09.25.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 18 Feb 2020 09:25:03 -0800 (PST)
+Subject: Re: [PATCH v5 42/79] x86/microvm: use memdev for RAM
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20200217173452.15243-1-imammedo@redhat.com>
+ <20200217173452.15243-43-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fbf7f7b0-9597-7366-5767-580f30a43ebe@redhat.com>
+Date: Tue, 18 Feb 2020 18:25:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200218161717.386723-1-jusual@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200217173452.15243-43-imammedo@redhat.com>
+Content-Language: en-US
+X-MC-Unique: Yt_d4yfEPbWSWA5QqN7rWQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="0eh6TmSyL6TZE2Uz"
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -85,105 +109,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, ehabkost@redhat.com,
+ slp@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0eh6TmSyL6TZE2Uz
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+On 2/17/20 6:34 PM, Igor Mammedov wrote:
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>    MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+> CC: slp@redhat.com
+> CC: pbonzini@redhat.com
+> CC: mst@redhat.com
+> CC: rth@twiddle.net
+> CC: ehabkost@redhat.com
+> ---
+>   hw/i386/microvm.c | 12 +++++-------
+>   1 file changed, 5 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+> index d23485108d..38d8e51703 100644
+> --- a/hw/i386/microvm.c
+> +++ b/hw/i386/microvm.c
+> @@ -167,7 +167,7 @@ static void microvm_memory_init(MicrovmMachineState *=
+mms)
+>   {
+>       MachineState *machine =3D MACHINE(mms);
+>       X86MachineState *x86ms =3D X86_MACHINE(mms);
+> -    MemoryRegion *ram, *ram_below_4g, *ram_above_4g;
+> +    MemoryRegion *ram_below_4g, *ram_above_4g;
+>       MemoryRegion *system_memory =3D get_system_memory();
+>       FWCfgState *fw_cfg;
+>       ram_addr_t lowmem;
+> @@ -214,12 +214,8 @@ static void microvm_memory_init(MicrovmMachineState =
+*mms)
+>           x86ms->below_4g_mem_size =3D machine->ram_size;
+>       }
+>  =20
+> -    ram =3D g_malloc(sizeof(*ram));
+> -    memory_region_allocate_system_memory(ram, NULL, "microvm.ram",
+> -                                         machine->ram_size);
+> -
+>       ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
+> -    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
+> +    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", machine=
+->ram,
+>                                0, x86ms->below_4g_mem_size);
+>       memory_region_add_subregion(system_memory, 0, ram_below_4g);
+>  =20
+> @@ -227,7 +223,8 @@ static void microvm_memory_init(MicrovmMachineState *=
+mms)
+>  =20
+>       if (x86ms->above_4g_mem_size > 0) {
+>           ram_above_4g =3D g_malloc(sizeof(*ram_above_4g));
+> -        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram=
+,
+> +        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g",
+> +                                 machine->ram,
+>                                    x86ms->below_4g_mem_size,
+>                                    x86ms->above_4g_mem_size);
+>           memory_region_add_subregion(system_memory, 0x100000000ULL,
+> @@ -502,6 +499,7 @@ static void microvm_class_init(ObjectClass *oc, void =
+*data)
+>       mc->auto_enable_numa_with_memhp =3D false;
+>       mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
+>       mc->nvdimm_supported =3D false;
+> +    mc->default_ram_id =3D "microvm.ram";
+>  =20
+>       /* Avoid relying too much on kernel components */
+>       mc->default_kernel_irqchip_split =3D true;
+>=20
 
-On Tue, Feb 18, 2020 at 05:17:17PM +0100, Julia Suvorova wrote:
->Make hot-plug/hot-unplug on PCIe Root Ports optional to allow libvirt
->to manage it and restrict unplug for the entire machine. This is going
->to prevent user-initiated unplug in guests (Windows mostly).
->Usage:
->    -device pcie-root-port,disable-hotplug=true,...
->
->Discussion related:
->    https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00530.html
->
->Signed-off-by: Julia Suvorova <jusual@redhat.com>
->---
-> hw/core/machine.c                  | 1 +
-> hw/pci-bridge/pcie_root_port.c     | 3 ++-
-> hw/pci-bridge/xio3130_downstream.c | 2 +-
-> hw/pci/pcie.c                      | 8 ++++++--
-> include/hw/pci/pcie.h              | 2 +-
-> include/hw/pci/pcie_port.h         | 1 +
-> 6 files changed, 12 insertions(+), 5 deletions(-)
->
->diff --git a/hw/core/machine.c b/hw/core/machine.c
->index 84812a1d1c..5ff698ac3c 100644
->--- a/hw/core/machine.c
->+++ b/hw/core/machine.c
->@@ -36,6 +36,7 @@ GlobalProperty hw_compat_4_2[] = {
->     { "usb-redir", "suppress-remote-wake", "off" },
->     { "qxl", "revision", "4" },
->     { "qxl-vga", "revision", "4" },
->+    { "pcie-root-port-base", "disable-hotplug", "false" },
-> };
-> const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
->
->diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
->index 0ba4e4dea4..d6a080bee8 100644
->--- a/hw/pci-bridge/pcie_root_port.c
->+++ b/hw/pci-bridge/pcie_root_port.c
->@@ -94,7 +94,7 @@ static void rp_realize(PCIDevice *d, Error **errp)
->
->     pcie_cap_arifwd_init(d);
->     pcie_cap_deverr_init(d);
->-    pcie_cap_slot_init(d, s->slot);
->+    pcie_cap_slot_init(d, s);
->     pcie_cap_root_init(d);
->
->     pcie_chassis_create(s->chassis);
->@@ -147,6 +147,7 @@ static Property rp_props[] = {
->     DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
->                     QEMU_PCIE_SLTCAP_PCP_BITNR, true),
->     DEFINE_PROP_BOOL("disable-acs", PCIESlot, disable_acs, false),
->+    DEFINE_PROP_BOOL("disable-hotplug", PCIESlot, disable_hotplug, false),
->     DEFINE_PROP_END_OF_LIST()
-> };
->
->diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
->index 153a4acad2..04aae72cd6 100644
->--- a/hw/pci-bridge/xio3130_downstream.c
->+++ b/hw/pci-bridge/xio3130_downstream.c
->@@ -94,7 +94,7 @@ static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
->     }
->     pcie_cap_flr_init(d);
->     pcie_cap_deverr_init(d);
->-    pcie_cap_slot_init(d, s->slot);
->+    pcie_cap_slot_init(d, s);
->     pcie_cap_arifwd_init(d);
->
-
-The corresponding entry in xio3130_downstream_props[] is missing.
-
->     pcie_chassis_create(s->chassis);
-
-Jano
-
---0eh6TmSyL6TZE2Uz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl5MHbgACgkQ+YPwO/Ma
-t50QzQgAp8aIxHvK8kteBDd9h7H6mn3EiepTfJntXj53RQ2LlyXwbbnDG1+krKVK
-V7PDTbgL13S1UYMWt4J7xpe1omv5wIX8GUn8eJtGYYHiidU06+/BG0+0s7/je7nJ
-1V7tmewp6Rmu9mdfApj+MR64K/69imXsCZrd+66ZK89yBEcoF9BsosM+L0PDNMkZ
-o5Rdk8AB3w89JyXDu7Owp4I4VS/MMkLqOjW7VduWw32vNQHm+JHIyYAoSUCaCkgV
-QFVI/DvVIb2d5OBdkDc4ESQfRBSIeeXbDiUnxyeCvUblCMP0As81bB2HhP11LeRP
-FyvzpZbG6TYXqxFH0fKzUnjLTTHasQ==
-=t16A
------END PGP SIGNATURE-----
-
---0eh6TmSyL6TZE2Uz--
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
