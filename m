@@ -2,84 +2,80 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70268C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B3AC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:54:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CF412173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:42:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDAC820801
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:54:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cDrwwU4z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CF412173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DaKwKski"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDAC820801
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j439K-000858-Fr
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:42:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48615)
+	id 1j43KO-00059x-Ru
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:54:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50401)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j438f-0007cn-3p
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:42:14 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j43Je-0004Lg-TS
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:53:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j438d-0007uO-RF
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:42:12 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:44918)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j438d-0007uE-M4
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:42:11 -0500
-Received: by mail-oi1-x242.google.com with SMTP id d62so20064645oia.11
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 05:42:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=/yjtpi/etBZsP1UXjF4HtS1llgIBkQGDGWlyi0HHcXo=;
- b=cDrwwU4z1FDFP+jHjaDBt7hkgDQNKepwDoO0F1O6g4QcJK4jmzqGmlwM7vh4sCh276
- vLlk7UnAUdG+XDU8Bw5GHersfViJxsvmITSpVRnuRU+2HKuA4nxW01NtQHAOYxY1eyzs
- CdVwirVemsePS+6aq+GulFuQoP2QyKRVL2y4CRH4NYUJrxX6klF0eQP4vFsm2ifw9MuV
- VomzZwL57BJ5yRQOTH9pjEq07ZKalmpxOHqxg6REXiyYAOuNsBTZQb5I6x5F/YZC2K51
- RtM3EALXPMOrUF1B/24t/5dozTV5EsKSdLtzN8N9CFK0Ki1u+5Dj70qQz7fgZF8CEW9+
- oJVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=/yjtpi/etBZsP1UXjF4HtS1llgIBkQGDGWlyi0HHcXo=;
- b=Ek9kd2KiHAssTM5RcVshrUszljUMvWJftEDk3eJ/PeMkgQLs4w6opQUK5hIOoMsl6N
- g8UlQlAQQsNMpa01Qs67UQre6gekUCS+V8WWIzm1F+RQK6yb0MqipTn8oMlEnQaY2nuI
- +NR5BCsFPXTjQvWsMBmLDKW1LCE0Dmv0MOoAwabaZU8jVt8n3XLu7Z1t2yAwc/rQIur1
- AScUYe4tEe4jqUO+FeIEinDyyx36bsKudhjtOvfh6V148FAh+I01vws794QjnbBSw2rh
- FNtgXuWtUgIyNwodZ20P2QAkDDECkBZ+kP1u9PtTBm/VerzNP10D4LDZBbCfI/Lneu6W
- q8Dw==
-X-Gm-Message-State: APjAAAUNg3TQrH2vefReeGYP1GGoQTiE6gJd6aftAcugAxML45UIKpmR
- GtR16kjjOQgWJOgg/dDOeqUfzDTEyvFI8ejAvDjBiw==
-X-Google-Smtp-Source: APXvYqwD0Nnjl2ilMKcX7JLtCIohbjy57ftvEcQvZHfXfnwQVBVRflu/obDLwvOefPx4WOORXLX+QoS7mk8ezwP3wxQ=
-X-Received: by 2002:a05:6808:289:: with SMTP id
- z9mr1199689oic.48.1582033330375; 
- Tue, 18 Feb 2020 05:42:10 -0800 (PST)
+ (envelope-from <kwolf@redhat.com>) id 1j43Jd-00040W-OP
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:53:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52476
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j43Jd-00040L-Kz
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:53:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582034013;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CLzzfa/k+gcq71tiHqnDhD5y9NK5lElOhG1avfe2H88=;
+ b=DaKwKskiUrTvaveGMn+h63ujBBLbg80+YJ+zM8SvyhJYZnwE/McHrxt9oHrp3WxpdzWFv9
+ BKAMi9DQz91VdB7JqV+7G11UxWmDzQCN9wgcHU8xZWGrAFFvuck4YWgaUImNcHWScfSUB/
+ GIzzc+zCBWCr8QGNBfvePbQkS04PPmY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-HCCNvZgXMvuZ9Tm0y5nE8w-1; Tue, 18 Feb 2020 08:53:16 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7CA713F5;
+ Tue, 18 Feb 2020 13:53:14 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-181.ams2.redhat.com [10.36.117.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 98AE58B54F;
+ Tue, 18 Feb 2020 13:53:13 +0000 (UTC)
+Date: Tue, 18 Feb 2020 14:53:12 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH v4 00/19] block: Fix check_to_replace_node()
+Message-ID: <20200218135312.GE6157@linux.fritz.box>
+References: <20200218103454.296704-1-mreitz@redhat.com>
 MIME-Version: 1.0
-References: <20200218112457.22712-1-peter.maydell@linaro.org>
- <f87dbeeb-2259-9eb9-45c7-a30819eec2ee@redhat.com>
- <08b37e02-49b5-1485-aa71-83ead1adf407@redhat.com>
-In-Reply-To: <08b37e02-49b5-1485-aa71-83ead1adf407@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Feb 2020 13:41:59 +0000
-Message-ID: <CAFEAcA-AaDxCbLu3S2LO49Lt18s_aLmDC9XZ-kHtac33sdv_jg@mail.gmail.com>
-Subject: Re: [PATCH v2] Avoid address_space_rw() with a constant is_write
- argument
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200218103454.296704-1-mreitz@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: HCCNvZgXMvuZ9Tm0y5nE8w-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,68 +87,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Feb 2020 at 13:33, Eric Blake <eblake@redhat.com> wrote:
->
-> On 2/18/20 6:56 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->
-> >> +++ b/scripts/coccinelle/as_rw_const.cocci
-> >> @@ -0,0 +1,30 @@
-> >> +// Avoid uses of address_space_rw() with a constant is_write argument=
-.
-> >> +// Usage:
-> >> +//  spatch --sp-file as-rw-const.spatch --dir . --in-place
-> >
-> > Nitpick, script is now scripts/coccinelle/as_rw_const.cocci.
-> >
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >
-> >> +
-> >> +@@
-> >> +expression E1, E2, E3, E4, E5;
-> >> +symbol false;
-> >> +@@
-> >> +
-> >> +- address_space_rw(E1, E2, E3, E4, E5, false)
-> >> ++ address_space_read(E1, E2, E3, E4, E5)
-> >> +@@
-> >> +expression E1, E2, E3, E4, E5;
-> >> +@@
-> >> +
-> >> +- address_space_rw(E1, E2, E3, E4, E5, 0)
-> >> ++ address_space_read(E1, E2, E3, E4, E5)
->
-> This feels a bit redundant.  Doesn't coccinelle have enough smarts about
-> isomorphisms (such as 0 =3D=3D false, 1 =3D=3D true) that it could get by=
- with
-> one @@ hunk instead of 2, if we come up with the right way to represent
-> any isomorphism to a constant value?  But admittedly, I don't know what
-> that representation would actually be, and your verbose patch works even
-> if it is not the most concise possible.  So don't let my remarks hold
-> this patch up.
+Am 18.02.2020 um 11:34 hat Max Reitz geschrieben:
+> Branch: https://github.com/XanClic/qemu.git fix-can-replace-v4
+> Branch: https://git.xanclic.moe/XanClic/qemu.git fix-can-replace-v4
+>=20
+> v1: https://lists.nongnu.org/archive/html/qemu-block/2019-09/msg01027.htm=
+l
+> v2: https://lists.nongnu.org/archive/html/qemu-block/2019-11/msg00370.htm=
+l
+> v3: https://lists.nongnu.org/archive/html/qemu-block/2020-01/msg00922.htm=
+l
+>=20
+>=20
+> Hi,
+>=20
+> For what this series does, see the cover letter of v1 (linked above).
+>=20
+>=20
+> Changes in v4 compared to v3:
+> - Following the discussion with Kevin, I changed Quorum=E2=80=99s
+>   .bdrv_recurse_can_replace() implementation from unsharing the
+>   CONSISTENT_READ permission and taking the WRITE permission to just
+>   checking whether there are any other parents
+>   - This made the old patches 8 and 9 unnecessary, so they=E2=80=99ve bee=
+n
+>     dropped
+>   - And of course it requires some changes to patch 10 (now 8)
+>   - (Patch 10 (was: 12) gets a rebase conflict that=E2=80=99s obvious to
+>     resolve, so I kept Vladimir=E2=80=99s R-b)
+>=20
+> - As suggested by Vladimir, I added the root node name to the
+>   cannot-follow-path error message in patch 14 (was: 16), and added an
+>   assertion that the root node exists in the first place
 
-My experience with Coccinelle has generally been that trying
-to make semantic patches smaller and less redundant is futile
-and a massive timesink. In this case as far as I can tell
-Coccinelle has no idea at all about the existence of the 'bool'
-type and that 'true' and 'false' are equivalent to 1 and 0.
-Thus the 'symbol' declaration, otherwise it thinks that 'false'
-is a random semantic identifier and doesn't look for a literal
-match of it.
+Thanks, applied to the block branch.
 
-thanks
--- PMM
+Kevin
+
 
