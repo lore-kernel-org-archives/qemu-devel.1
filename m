@@ -2,84 +2,87 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2143BC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6555EC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:50:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E37042464E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:49:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 323842464E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:50:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNFi/H76"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37042464E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kwAOSTUH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 323842464E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j46zs-0003YS-HP
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 12:49:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56043)
+	id 1j4710-0004s4-BX
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 12:50:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56334)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j46xb-0000wt-Vd
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:47:05 -0500
+ (envelope-from <groeck7@gmail.com>) id 1j470B-0004GW-CB
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:49:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j46xY-0003eM-S4
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:47:03 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34441)
+ (envelope-from <groeck7@gmail.com>) id 1j4709-0005Qr-V8
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:49:43 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40534)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1j46xY-0003cQ-7V; Tue, 18 Feb 2020 12:47:00 -0500
-Received: by mail-ot1-x343.google.com with SMTP id j16so20379823otl.1;
- Tue, 18 Feb 2020 09:46:56 -0800 (PST)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1j4709-0005QI-OQ
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:49:41 -0500
+Received: by mail-pg1-x544.google.com with SMTP id z7so11297815pgk.7
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 09:49:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=0mXLe6I2bVnunk/uud2CeZS3TcbI3dbo+2XkkUSvjGo=;
- b=lNFi/H76z4NOX9wdE0ieKxNUTruIQdqkKb/f/P/DhmSoyfLvCSr9LbHXrYThOxx+Hq
- k5N0hTYaLu0V+9YR/ZjkRuIMT0/rzjtsbhGpjBLu80gjAPV1y45aGDhzS0OJmCeeWciv
- zHKho76bWFstNTSmGoTCRkK0Yp9T77l4u4ZO0fySCJli0jdBsUHotnshfe63guSS3LXp
- WESK5yU3Q80JHNk1W7tSjM95r+J0vMnxEGpEfpEf+gBf57/noUb1fF7pK6z+eDIqw7CN
- /CD4wGKb/ysYBS1bfyBRfRUGBuuRyGfjexLXPSiwWQQ2xgLA/BADFoEWEr2XZEehJQbR
- JTLA==
+ h=sender:date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=zUciNqnSOaXu2c5dSMykJbRk9+keVgtePhn1PpWtITU=;
+ b=kwAOSTUHQCziXjD+chbgcs1Kei1L5OST/0QvgzUm3bZuRi9yBqBwkVuFO3iCx4Kr3c
+ mkN3vJor32mt7IvR4WHrpXoZiLY9C1jvw/kEtKm5yb1exQraER0rGclIuNXk/QkE2APk
+ DwAQxKxUUclviHzhrxev/paY83mljZ0PO5+zBpcVkzgTwyCQ4aP3666Y+tASC5sEBnHW
+ 9YA86Ohvq+mn944qTOYISG6NsIWgvLJqkZwO38IaKodeu4TeE44wNOCuaM4w8lnx4Uwd
+ Pnkni0b54xA8HFTyPcfSROEFz8eSmoQaMHcoLeDlCwsCJEV8oRF2dzyDaMzIpACLb+Wr
+ mAZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=0mXLe6I2bVnunk/uud2CeZS3TcbI3dbo+2XkkUSvjGo=;
- b=ASaQjef/UEBhzxsfSHclRfzPC3iCUV1x/DxHxRP2V0XkgZUnNMQb56spA/UOjjq0ZU
- l8gLUD6khCkRMJWg2rQwxEZ1wEfmxDFmv1HGRWHO7EMrxNkI9J6Wap4jayuYF7665l7e
- jcXR2zS9e00cSOpI+UPd+IhWjgxkpbVW4xp9H+2Sw7oeBXTlVXrR6KoAbiVgHmjs1U+J
- js1C0SEPnXm1Myx5toCIS/Z1J9PaScliLBKWWFoKAbS1iGyj/UEjYDNtsP4lqHdhKLlJ
- AsLwHcgdTtA1sMV+d1EYnjSQh+NnINsYzBkohZc0HI7BnQTHrpf/i+6EArVGqnGpJkL+
- XqsQ==
-X-Gm-Message-State: APjAAAXyCMjWcFX/Nupd8CJ88N5+krjYVfDdl6KrTN7E7bnEESSDQvyJ
- 3fCwRpK4JHA5ArBLcJDsoE8vCCjJZDYJgEjBOi0=
-X-Google-Smtp-Source: APXvYqz+xo49MkaqvztF7sV3VfuMUP0b5pYc6lDR/VHD5mZ0LrRpGzCUlt+eJjpr7AyV18d2JrExWsaQQqmVGfVheWA=
-X-Received: by 2002:a05:6830:1e76:: with SMTP id
- m22mr11555434otr.295.1582048015458; 
- Tue, 18 Feb 2020 09:46:55 -0800 (PST)
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=zUciNqnSOaXu2c5dSMykJbRk9+keVgtePhn1PpWtITU=;
+ b=TxajxY3MyUWe9kqIJVfz5pOiFKHs4UzviR5RPEfX5LBUbTX/ZsdXQLzPR4zWqfpueH
+ BW94mHTrqrXQsEOe1arMlmSxBZM8wXwUMux6wSjqVMqQAIEKZe9kzNa8bkiPlH1u/M36
+ izQLtnuac5AXxGRZnLAg0PFPIUKfmPP7c7WIFGDLBimAf/IknY3BVnlxfm59HL1hPUzN
+ TMDEVexDfTw4ayS54vAWLyh9obOYuYdv9cAo4WhdGb66IHqFs4YS1x3eROdYR1z0Pw75
+ vIva+iJl8fOOfuKnZNJS8KYM9n/269NGxxJYULeEfpLx7ttXnFiZb8Ksfp76532m1qVB
+ lDXA==
+X-Gm-Message-State: APjAAAVi4OizdY9kOIyJmzgpPLlZdIOaL1BCh8L6jUZtEnBU+BEN78S3
+ bcboh9RuPMyu5qRKyuI7xL0=
+X-Google-Smtp-Source: APXvYqyOedgs49QSfYgV1Y8WGmhSrY4VyKn+2cEv138d0XhNOftsBpS72n0XdvaZUnRw1O44mWXM6A==
+X-Received: by 2002:a63:2cc9:: with SMTP id
+ s192mr23256425pgs.441.1582048180447; 
+ Tue, 18 Feb 2020 09:49:40 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id g2sm5593837pgn.59.2020.02.18.09.49.39
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Tue, 18 Feb 2020 09:49:39 -0800 (PST)
+Date: Tue, 18 Feb 2020 09:49:38 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] sh4: Remove bad memory alias 'sh_pci.isa'
+Message-ID: <20200218174938.GA30564@roeck-us.net>
+References: <20200217203734.18703-1-linux@roeck-us.net>
+ <CAFEAcA9v+9ohanZFGTgT1SLgNCnqZccnhcbsxm0MuNYQ_WSgjQ@mail.gmail.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Tue, 18 Feb 2020 09:46:54 -0800 (PST)
-In-Reply-To: <20200218181551.6dff3ec2.cohuck@redhat.com>
-References: <20200217223558.863199-1-laurent@vivier.eu>
- <20200218152748.63d608af.cohuck@redhat.com>
- <0769c184-dc34-c022-1986-698c6650bac1@vivier.eu>
- <20200218181551.6dff3ec2.cohuck@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 18 Feb 2020 18:46:54 +0100
-Message-ID: <CAL1e-=hSSeOi9+sHofSpqPyBU_o2O0GHjBbc91eZRyBGSg==mA@mail.gmail.com>
-Subject: Re: [PATCH 00/22] linux-user: generate syscall_nr.sh
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000faa487059edd41bd"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9v+9ohanZFGTgT1SLgNCnqZccnhcbsxm0MuNYQ_WSgjQ@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,241 +94,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000faa487059edd41bd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tuesday, February 18, 2020, Cornelia Huck <cohuck@redhat.com> wrote:
-
-> On Tue, 18 Feb 2020 16:19:21 +0100
-> Laurent Vivier <laurent@vivier.eu> wrote:
->
-> > Le 18/02/2020 =C3=A0 15:27, Cornelia Huck a =C3=A9crit :
-> > > On Mon, 17 Feb 2020 23:35:36 +0100
-> > > Laurent Vivier <laurent@vivier.eu> wrote:
-> > >
-> > >> This series copies the files syscall.tbl from linux v5.5 and generat=
-es
-> > >> the file syscall_nr.h from them.
-> > >>
-> > >> This is done for all the QEMU targets that have a syscall.tbl
-> > >> in the linux source tree: mips, mips64, i386, x86_64, sparc, s390x,
-> > >> ppc, arm, microblaze, sh4, xtensa, m68k, hppa and alpha.
-> > >>
-> > >> tilegx and cris are depecrated in linux (tilegx has no maintainer in
-> QEMU)
-> > >>
-> > >> aarch64, nios2, openrisc and riscv have no syscall.tbl in linux.
-> > >>
-> > >> It seems there is a bug in QEMU that forces to disable manually
-> arch_prctl
-> > >> with i386 target: do_arch_prctl() is only defined with TARGET_ABI32
-> but
-> > >> TARGET_ABI32 is never defined with TARGET_I386 (nor TARGET_X86_64).
-> > >>
-> > >> I have also removed all syscalls in s390x/syscall_nr.h defined for
-> > >> !defined(TARGET_S390X).
-> > >>
-> > >> I have added a script to copy all these files from linux and updated
-> > >> them at the end of the series with their latest version for today.
-> > >>
-> > >> The two last patches manage the special case for mips O32 that needs
-> > >> to know the number of arguments. We find them in strace sources.
-> > >
-> > > I like the idea of generating those files, but I wonder if that shoul=
-d
-> > > interact with linux-headers updates.
-> > >
-> > > I plan to do a linux-headers update to 5.6-rc?, and I noticed that th=
-is
-> > > will drag in two new syscalls (openat2 and pidfd_getfd). Now, just
-> > > having the new #defines in the headers doesn't do anything, but shoul=
-d
-> > > it be a trigger to update the syscall.tbl files as well? Or does that
-> > > need manual inspection/updating?
+On Tue, Feb 18, 2020 at 04:33:49PM +0000, Peter Maydell wrote:
+> On Mon, 17 Feb 2020 at 20:38, Guenter Roeck <linux@roeck-us.net> wrote:
 > >
-> > I think it's a good idea to update the syscall.tbl when we update
-> > linux-headers, and there will be no change at linux-user level while we
-> > don't implement the syscall translation in syscall.c:do_syscall1().
->
-> Nod.
->
+> > The memory alias sh_pci.isa is located at address 0x0000 with
+> > a length of 0x40000. This results in the following memory tree.
 > >
-> > But I think we should also check manually the difference between new an=
-d
-> > old generated syscall_nr.h to be sure there is nothing broken in what w=
-e
-> > introduce.
+> > FlatView #1
+> >  AS "memory", root: system
+> >  AS "cpu-memory-0", root: system
+> >  AS "sh_pci_host", root: bus master container
+> >  Root memory region: system
+> >   0000000000000000-000000000000ffff (prio 0, i/o): io
+> >   0000000000010000-0000000000ffffff (prio 0, i/o): r2d.flash @0000000000010000
 > >
-> > I always run a Linux Test Project testsuite for all architectures with =
-a
-> > debian distro when I do a pull request so I can detect regression.
+> > The alias overlaps with flash memory. As result, flash memory can
+> > not be accessed. Removing the alias fixes the problem. With this patch,
+> > the memory tree is as follows, and flash is detected as expected.
 > >
-> > In the end, updating linux-headers should trigger syscall.tbl update bu=
-t
-> > it needs manual inspection.
->
-> I think we should make sure that updating syscall.tbl does not get
-> forgotten if we do a headers update... have the update script print out
-> a message? I'm not sure if we want to automate updating the syscall
-> table, as we want manual inspection for it.
->
-> Maybe have the update script moan about syscall.tbl if unistd.h is
-> changed? Should be a good enough heuristic.
->
-> That said, I'll probably queue a headers update on the s390-next branch
-> right now (against current Linus master),
+> > FlatView #1
+> >  AS "memory", root: system
+> >  AS "cpu-memory-0", root: system
+> >  AS "sh_pci_host", root: bus master container
+> >  Root memory region: system
+> >   0000000000000000-0000000000ffffff (prio 0, i/o): r2d.flash
+> >
+> > After this patch has been applied, access to PCI, ATA, and USB is still
+> > working, and no negative impact has ben observed.
+> >
+> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> > ---
+> >  hw/sh4/sh_pci.c | 2 --
+> >  1 file changed, 2 deletions(-)
+> >
+> > diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
+> > index 71afd23b67..4ced54f1a5 100644
+> > --- a/hw/sh4/sh_pci.c
+> > +++ b/hw/sh4/sh_pci.c
+> > @@ -143,8 +143,6 @@ static void sh_pci_device_realize(DeviceState *dev, Error **errp)
+> >                            "sh_pci", 0x224);
+> >      memory_region_init_alias(&s->memconfig_a7, OBJECT(s), "sh_pci.2",
+> >                               &s->memconfig_p4, 0, 0x224);
+> > -    memory_region_init_alias(&s->isa, OBJECT(s), "sh_pci.isa",
+> > -                             get_system_io(), 0, 0x40000);
+> >      sysbus_init_mmio(sbd, &s->memconfig_p4);
+> >      sysbus_init_mmio(sbd, &s->memconfig_a7);
+> >      s->iobr = 0xfe240000;
+> > --
+> 
+> This change doesn't look correct. This removes the init of the alias MR,
+> but we continue to use it in other parts of the code -- we will
+> add it to the system memory at 0xfe240000 and we will remap it
+> at different addresses when the guest writes to the 0x1c8 "IO space
+> base" register.
+> 
+> This alias is for the ISA I/O region bridge; the code initially
+> maps it at a non-zero address:
+>     s->iobr = 0xfe240000;
+>     memory_region_add_subregion(get_system_memory(), s->iobr, &s->isa);
+> so it's not entirely clear how it ends up at 0. You could try
+> sticking a printf into sh_pci_reg_write() to see if we end
+> up taking that code path to modify the address for it, which
+> is the most plausible reason for it to be at 0, I think.
+> 
 
+Yes, that is what happens.
 
->
-Hi, Cornelia,
+###### sh_pci_reg_write(addr=0x1c8, val=0x0, size=4)
 
-I am not stopping you from updating headers from Linus' master, however, I
-think a better practice would be to do regular updates from each stable
-kernel release (the last one is 5.5), rather than from an arbitrary
-kernel-du-jour, which may be the subject of change (including reverts) wrt
-headers between two stable releases.
+> I think the problem here is that our implementation of the
+> IO space base register is simply completely wrong.
+> 
+> Conveniently, the SSH7751R "user's manual: hardware" seems to
+> still be downloadable from Renesas at
+> https://www.renesas.com/br/en/document/hw-manual?hwLayerShowFlg=true&prdLayerId=1057&layerName=SH7751R&coronrService=document-prd-search&hwDocUrl=%2Fpt-br%2Fdoc%2Fproducts%2Fmpumcu%2F001%2Fr01uh0457ej0401_sh7751.pdf&hashKey=a503c1946f0bcc913aaf89f48dd15b53
+> -- hopefully that URL
+> works for others and not just me.
+> 
+> Section 22.3.7 and in particular figure 22.3 are clear
+> about how this is supposed to work: there is a window
+> at 0xfe240000 in the system register space for PCI I/O
+> space. When the CPU makes an access into that area,
+> the PCI controller calculates the PCI address to use
+> by combining bits 0..17 of the system address with the
+> bits 31..18 value that the guest has put into the PCIIOBR.
+> That is, writing to the PCIIOBR changes which section of
+> the IO address space is visible in the 0xfe240000 window.
+> Instead what QEMU's implementation does is move the
+> window to whatever value the guest writes to the PCIIOBR
+> register -- so if the guest writes 0 we put the window at
+> 0 in system address space.
+> 
+> I think the correct fix would be to have the handling of
+> PCIIOBR call memory_region_set_alias_offset() (thus updating
+> where this alias window points within the system IO space),
+> rather than doing the del/add subregion calls.
+> 
+Like this ?
 
-Regards,
-Aleksandar
+--- a/hw/sh4/sh_pci.c
++++ b/hw/sh4/sh_pci.c
+@@ -67,12 +67,7 @@ static void sh_pci_reg_write (void *p, hwaddr addr, uint64_t val,
+         pcic->mbr = val & 0xff000001;
+         break;
+     case 0x1c8:
+-        if ((val & 0xfffc0000) != (pcic->iobr & 0xfffc0000)) {
+-            memory_region_del_subregion(get_system_memory(), &pcic->isa);
+-            pcic->iobr = val & 0xfffc0001;
+-            memory_region_add_subregion(get_system_memory(),
+-                                        pcic->iobr & 0xfffc0000, &pcic->isa);
+-        }
++        memory_region_set_alias_offset(&pcic->isa, val & 0xfffc0000);
+         break;
 
+This works for me as well. Please let me know if it is correct (especially
+the mask), and I'll resubmit.
 
-
->
-> unless someone complains --
-> maybe take the syscall.tbl from that state of the kernel tree as well?
->
->
->
-
---000000000000faa487059edd41bd
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Tuesday, February 18, 2020, Cornelia Huck &lt;<a href=3D"mailto:=
-cohuck@redhat.com">cohuck@redhat.com</a>&gt; wrote:<br><blockquote class=3D=
-"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding=
--left:1ex">On Tue, 18 Feb 2020 16:19:21 +0100<br>
-Laurent Vivier &lt;<a href=3D"mailto:laurent@vivier.eu">laurent@vivier.eu</=
-a>&gt; wrote:<br>
-<br>
-&gt; Le 18/02/2020 =C3=A0 15:27, Cornelia Huck a =C3=A9crit=C2=A0:<br>
-&gt; &gt; On Mon, 17 Feb 2020 23:35:36 +0100<br>
-&gt; &gt; Laurent Vivier &lt;<a href=3D"mailto:laurent@vivier.eu">laurent@v=
-ivier.eu</a>&gt; wrote:<br>
-&gt; &gt;=C2=A0 =C2=A0<br>
-&gt; &gt;&gt; This series copies the files syscall.tbl from linux v5.5 and =
-generates<br>
-&gt; &gt;&gt; the file syscall_nr.h from them.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; This is done for all the QEMU targets that have a syscall.tbl=
-<br>
-&gt; &gt;&gt; in the linux source tree: mips, mips64, i386, x86_64, sparc, =
-s390x,<br>
-&gt; &gt;&gt; ppc, arm, microblaze, sh4, xtensa, m68k, hppa and alpha.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; tilegx and cris are depecrated in linux (tilegx has no mainta=
-iner in QEMU)<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; aarch64, nios2, openrisc and riscv have no syscall.tbl in lin=
-ux.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; It seems there is a bug in QEMU that forces to disable manual=
-ly arch_prctl<br>
-&gt; &gt;&gt; with i386 target: do_arch_prctl() is only defined with TARGET=
-_ABI32 but<br>
-&gt; &gt;&gt; TARGET_ABI32 is never defined with TARGET_I386 (nor TARGET_X8=
-6_64).<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; I have also removed all syscalls in s390x/syscall_nr.h define=
-d for<br>
-&gt; &gt;&gt; !defined(TARGET_S390X).<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; I have added a script to copy all these files from linux and =
-updated<br>
-&gt; &gt;&gt; them at the end of the series with their latest version for t=
-oday.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; The two last patches manage the special case for mips O32 tha=
-t needs<br>
-&gt; &gt;&gt; to know the number of arguments. We find them in strace sourc=
-es.=C2=A0 <br>
-&gt; &gt; <br>
-&gt; &gt; I like the idea of generating those files, but I wonder if that s=
-hould<br>
-&gt; &gt; interact with linux-headers updates.<br>
-&gt; &gt; <br>
-&gt; &gt; I plan to do a linux-headers update to 5.6-rc?, and I noticed tha=
-t this<br>
-&gt; &gt; will drag in two new syscalls (openat2 and pidfd_getfd). Now, jus=
-t<br>
-&gt; &gt; having the new #defines in the headers doesn&#39;t do anything, b=
-ut should<br>
-&gt; &gt; it be a trigger to update the syscall.tbl files as well? Or does =
-that<br>
-&gt; &gt; need manual inspection/updating?=C2=A0 <br>
-&gt; <br>
-&gt; I think it&#39;s a good idea to update the syscall.tbl when we update<=
-br>
-&gt; linux-headers, and there will be no change at linux-user level while w=
-e<br>
-&gt; don&#39;t implement the syscall translation in syscall.c:do_syscall1()=
-.<br>
-<br>
-Nod.<br>
-<br>
-&gt; <br>
-&gt; But I think we should also check manually the difference between new a=
-nd<br>
-&gt; old generated syscall_nr.h to be sure there is nothing broken in what =
-we<br>
-&gt; introduce.<br>
-&gt; <br>
-&gt; I always run a Linux Test Project testsuite for all architectures with=
- a<br>
-&gt; debian distro when I do a pull request so I can detect regression.<br>
-&gt; <br>
-&gt; In the end, updating linux-headers should trigger syscall.tbl update b=
-ut<br>
-&gt; it needs manual inspection.<br>
-<br>
-I think we should make sure that updating syscall.tbl does not get<br>
-forgotten if we do a headers update... have the update script print out<br>
-a message? I&#39;m not sure if we want to automate updating the syscall<br>
-table, as we want manual inspection for it.<br>
-<br>
-Maybe have the update script moan about syscall.tbl if unistd.h is<br>
-changed? Should be a good enough heuristic.<br>
-<br>
-That said, I&#39;ll probably queue a headers update on the s390-next branch=
-<br>
-right now (against current Linus master),=C2=A0</blockquote><blockquote cla=
-ss=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pa=
-dding-left:1ex"><br></blockquote><div><br></div><div>Hi, Cornelia,</div><di=
-v><br></div><div>I am not stopping you from updating headers from Linus&#39=
-; master, however, I think a better practice would be to do regular updates=
- from each stable kernel release (the last one is 5.5), rather than from an=
- arbitrary kernel-du-jour, which may be the subject of change (including re=
-verts) wrt headers between two stable releases.</div><div><br></div><div>Re=
-gards,</div><div>Aleksandar</div><div><br></div><div>=C2=A0</div><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
-id;padding-left:1ex"><br></blockquote><blockquote class=3D"gmail_quote" sty=
-le=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">unless=
- someone complains --<br>
-maybe take the syscall.tbl from that state of the kernel tree as well?<br>
-<br>
-<br>
-</blockquote>
-
---000000000000faa487059edd41bd--
+Thanks,
+Guenter
 
