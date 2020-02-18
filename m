@@ -2,116 +2,114 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E04C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E25C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:07:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBFE721D56
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:03:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UvHCEL16"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBFE721D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id F25B32067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:07:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F25B32067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j495o-0006cy-40
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 15:03:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54231)
+	id 1j499y-0002Jo-1p
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 15:07:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36799)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j494V-0005aC-Rf
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:02:21 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j498S-0001LH-UA
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:06:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j494U-00036J-6X
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:02:19 -0500
-Received: from mail-vi1eur05on2102.outbound.protection.outlook.com
- ([40.107.21.102]:3168 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1j494M-0002hb-Nv; Tue, 18 Feb 2020 15:02:11 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=boVz1Wa4O4LFxRVb0Qfuztj9WuvCTZcAIMkHonLCYJqeSY9R9/iOKiKBFJCejdSgQYdwhTwVgfjNYOBRhUIekimqQPJ5JjJ69hwyE9GcylhkylY++/9nNKi1LjkPX5SE8dSMREBSTlwKJDzwcxZsdDCMXdpzYL82haGPtdLO5FzF0NuZut3m6JsCryeS/jK6KyQiByY2s9O7OE65g/n8aSKdmHMjyL6KU41RIHlG30VfpPDeUN8dIJTknrwM2OMQ5cm26hqe5uyXg0C4hHiJ1ZxoMAB5IAKRlXPpIkFKmVSAm9oxl94i3V7/NLFqJHDD6qYXFH2L4ubbVHUMJvHswQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8VKlKukWKqJjwrai5W9mS6gmrLUwQiHoakQWnQAdcS4=;
- b=JzkDBU6BHcGnlhLbSzriSZAp3CoXCEO8ymfRRcN/s6w5NmajXVU0apnFwcnfkDvJLc8AYMZXlZifQRjxw1DMbn5L24Y3hRnX2C/2V1eyGuVyFPKHyU8RhPlZNc61jmRgnDQKb0AUexvPCEUsYHU93c9BcUgDGKYQAs/jSeAht1kRYbVsfMKPnyYlggDbboQAVVs7JH9B1xPyV9s4WRwm2lNa11K2DKMlI+DmQRL1OIuudQTr65lA4dA+pUspTUq1C8OMQkCV8CtsB7IDpIIwL+WYVbhOQungov54AN5EdowXqxhl2K+Na8MIA9qaawrgDgQ03dlk+X0sg+FLCYAKvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8VKlKukWKqJjwrai5W9mS6gmrLUwQiHoakQWnQAdcS4=;
- b=UvHCEL16yBexkljqJO1WRraxk9BOIrqMmgt19R3cYbbiYudoPHBsa6y/2j73yS+TzeoDKvCceGMIF5eLkNt+4EF43tJUNmyLC6lD0E1rq8r0dhLB2JsX3zT31TKicJsSUciDC3VULy/tx/uRcxor53AcdTRJO+95zgNgDFeF2+E=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
- AM6PR08MB4803.eurprd08.prod.outlook.com (10.255.96.214) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.25; Tue, 18 Feb 2020 20:02:07 +0000
-Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
- ([fe80::1883:da16:865a:139d]) by AM6PR08MB5048.eurprd08.prod.outlook.com
- ([fe80::1883:da16:865a:139d%5]) with mapi id 15.20.2729.032; Tue, 18 Feb 2020
- 20:02:07 +0000
-Subject: Re: [PATCH v2 00/22] Fix error handling during bitmap postcopy
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Organization: Virtuozzo
-Message-ID: <33fa0ba7-714f-c78d-8ca5-1e15dcef5ac4@virtuozzo.com>
-Date: Tue, 18 Feb 2020 23:02:04 +0300
+ (envelope-from <laurent@vivier.eu>) id 1j498P-0002D0-1I
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:06:24 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:40945)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j498O-00029j-NV
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:06:20 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MJVY8-1ikHtS2jAu-00JsI9; Tue, 18 Feb 2020 21:06:02 +0100
+Subject: Re: [PATCH v3 1/4] linux-user: Use `qemu_log' for non-strace logging
+To: Josh Kunz <jkz@google.com>, qemu-devel@nongnu.org
+References: <20200204025416.111409-1-jkz@google.com>
+ <20200204025416.111409-2-jkz@google.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d35bd139-e59a-4fc1-5dc6-866d4e45afc0@vivier.eu>
+Date: Tue, 18 Feb 2020 21:05:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
-In-Reply-To: <20200217150246.29180-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1P190CA0042.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::31)
- To AM6PR08MB5048.eurprd08.prod.outlook.com
- (2603:10a6:20b:ee::31)
 MIME-Version: 1.0
-Received: from [172.16.24.225] (185.231.240.5) by
- HE1P190CA0042.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::31) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.17 via Frontend Transport; Tue, 18 Feb 2020 20:02:06 +0000
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 67347694-ed3a-41f3-3f91-08d7b4ad6e76
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4803:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4803B9A1FEBC9054038B2696F4110@AM6PR08MB4803.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
-X-Forefront-PRVS: 031763BCAF
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(376002)(396003)(346002)(136003)(366004)(39850400004)(189003)(199004)(956004)(53546011)(44832011)(31696002)(26005)(86362001)(81156014)(8676002)(5660300002)(7416002)(36756003)(81166006)(16526019)(186003)(54906003)(2906002)(36916002)(52116002)(8936002)(31686004)(16576012)(2616005)(478600001)(66556008)(316002)(6486002)(66946007)(66476007)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4803;
- H:AM6PR08MB5048.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: W4TTbLXDVyX0TzJixUDDiQBrcI/ViE8ec2B3r8nfT1/Cx+3sK7NKNS3aIeSn5GfQ3wJJfG13s55I8RCNqVjZBJ3t41YWWFSkSDm6BEggjo6flpt4I7t+pvhk6K3xg+lpEQaFJuo9EIunBkl11Am/hv+cdd3xgxSN++bDmRFUievBfb6e6Mvt5vr33NhNdN4YvSCu7XgWhY6Pf22Cz3NIzPKU+8ZsRGcR+e091xkplkyKOllXjyg8C04AGsGDxsqgEEsGSLuFHxRYbQWVGI7Xl3flqJRlbOBCFef9nJ9BeERkGviLqXl+BXoShz3ryp1gLwMjYmV1ffhVsF0WszMo2OgwaPASSgAlWbWN/B4JLlmVW6pVhwNPuZ7F0cv+0114EgJ/kfAYcKm+byJMFFCQBs82167jt96lBwqRZP5xJtEWJ0GhGbJKupWQJ2PUvhC+
-X-MS-Exchange-AntiSpam-MessageData: YvZyhcDzYAcRZjvTfICK/rlHdOoYbDdzdg76LVe2C5wbkxIQqbh9Wxnbbd9N5z6FfHtX70qor5jNr0p3iVmd3oIhL278lQB9coaJk8GBrhCxKjXsN9Vn42Hpnq9K7as06DCK5IMlJelCqCuPB0krGQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67347694-ed3a-41f3-3f91-08d7b4ad6e76
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2020 20:02:07.3618 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V16s1se2b+oMmAPDmcTQ3ddvrq7Ca2OMrJ5qYFqe0IIKTOC13NJ7LJPKMHfjK3UbmW5vTj+cGPRXnTEDUJSrLrSbiSVGTZcbd2BC68jRIUo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4803
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.21.102
+In-Reply-To: <20200204025416.111409-2-jkz@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:PH/bqzFcnMcNABxrQZyGAvPX3X82MoWtl83XkUg2L1YYONSwvYR
+ 4rhc+1DYS0F7MpSfQ7s0NnldWH0dV5h7c3GW0s5bADF4hJxITogMWtfMbNKxzf7M0Y60ybY
+ t7PcwIf9HC/RKAzB5w9yi0WG7wf8i2x64pno2DuD5Lp/xvY2kEbBV5dtbIDY3ouDK4AWHyg
+ dlpb63Ab5thFaNyRafEDw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:idZ4uAERyoc=:VmoLU+iT4LYIXUubed2OKO
+ IrWVbqmCoxiQ1ByvwYyXO4P5j6d3Z8iT2x6JiOvr5P5FkQ22dWSwdBYFLq0MhDozN68FG+ii+
+ w2LkztlZIHPWA/zN6h9CGco+1BjqQu4DKDSFd0tvF4wzsheaYjZPylajYViElu9cHXgw2NaW/
+ IWZPAmJtpiOpWQxXbEPRtGY2r+I5ynS8Cpn4MS0KqFTk1RQXv3XDfJmiu9lBatzklJK3d3Ncn
+ JDv6E8VAhn/2BuStuRru49ZL2KSfA8840R1jE6o5WVBQnw6YcPGk6V8ht77HECOhW86Q3l0Hq
+ jo6+hFYmnhof9CIaLvdyrkZQJt2X+dEGl4rxPH96Dl6nKn4mB4CPc7RzsC6pcWmTLayDjC2n7
+ v0hvMAXbsNuBSE5KzNWDieAF4RWsN2O9pRYJwDjuZge6Br58/MqOH25mEA1hlnRUHOte8ArzY
+ Xbh+R+o0lugh115qo5j8IZFWPNm+fKNx5lo3OotHFgicOI9yenw3oVQNnuZg7cArevpQclGtn
+ VTvPfm8bsyco16SpDd3xE0EV9mK15m6NXAoaYlOrKZOiAeFSUv9/ukHMumIHXDUaDY7FMPfqD
+ 1vapG4oX043PH0GODSbIGGJ8T5lhzZvpgYyaet/+QIrQUDDG20gOPfYXVr3rWxrPOvBddeQel
+ wpjMzA8Bsq00E/UmcVs7f2CXjfXCR2RO3dG9N0ZSIban+A0vb+m5PzUDvHmMzL+E5PrLzG+Au
+ CNpHdBiGDdd/mLYK0zSeiGGUT2DajfXVrpL+C8qqp6N+sAHU14imgvd3sr+wb5W+TmexySFWc
+ 4Z6TJkJoJKjNCEvG4gCk+jR+zbO3seY/B5whIsuI3nt0ZDxhwSBgN8b3NJOMUcIk8/2G+F6
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,88 +121,344 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- quintela@redhat.com, qemu-stable@nongnu.org, dgilbert@redhat.com,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: riku.voipio@iki.fi, alex.bennee@linaro.org, armbru@redhat.com,
+ imp@bsdimp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu-iotests:$ ./check -qcow2
-PASSED
-(except always failed 261 and 272)
+Le 04/02/2020 à 03:54, Josh Kunz a écrit :
+> Since most calls to `gemu_log` are actually logging unimplemented features,
+> this change replaces most non-strace calls to `gemu_log` with calls to
+> `qemu_log_mask(LOG_UNIMP, ...)`.  This allows the user to easily log to
+> a file, and to mask out these log messages if they desire.
+> 
+> Note: This change is slightly backwards incompatible, since now these
+> "unimplemented" log messages will not be logged by default.
+> 
+> Signed-off-by: Josh Kunz <jkz@google.com>
+> ---
+>  linux-user/arm/cpu_loop.c |  5 ++--
+>  linux-user/fd-trans.c     | 55 +++++++++++++++++++++++++--------------
+>  linux-user/syscall.c      | 35 ++++++++++++++++---------
+>  linux-user/vm86.c         |  3 ++-
+>  4 files changed, 62 insertions(+), 36 deletions(-)
+> 
+> diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
+> index 1fae90c6df..cf618daa1c 100644
+> --- a/linux-user/arm/cpu_loop.c
+> +++ b/linux-user/arm/cpu_loop.c
+> @@ -349,8 +349,9 @@ void cpu_loop(CPUARMState *env)
+>                              env->regs[0] = cpu_get_tls(env);
+>                              break;
+>                          default:
+> -                            gemu_log("qemu: Unsupported ARM syscall: 0x%x\n",
+> -                                     n);
+> +                            qemu_log_mask(LOG_UNIMP,
+> +                                          "qemu: Unsupported ARM syscall: 0x%x\n",
+> +                                          n);
+>                              env->regs[0] = -TARGET_ENOSYS;
+>                              break;
+>                          }
+> diff --git a/linux-user/fd-trans.c b/linux-user/fd-trans.c
+> index 9b92386abf..c0687c52e6 100644
+> --- a/linux-user/fd-trans.c
+> +++ b/linux-user/fd-trans.c
+> @@ -514,7 +514,8 @@ static abi_long host_to_target_data_bridge_nlattr(struct nlattr *nlattr,
+>          u32[1] = tswap32(u32[1]); /* optmask */
+>          break;
+>      default:
+> -        gemu_log("Unknown QEMU_IFLA_BR type %d\n", nlattr->nla_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_BR type %d\n",
+> +                      nlattr->nla_type);
+>          break;
+>      }
+>      return 0;
+> @@ -577,7 +578,8 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
+>      case QEMU_IFLA_BRPORT_BRIDGE_ID:
+>          break;
+>      default:
+> -        gemu_log("Unknown QEMU_IFLA_BRPORT type %d\n", nlattr->nla_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_BRPORT type %d\n",
+> +                      nlattr->nla_type);
+>          break;
+>      }
+>      return 0;
+> @@ -605,7 +607,8 @@ static abi_long host_to_target_data_tun_nlattr(struct nlattr *nlattr,
+>          *u32 = tswap32(*u32);
+>          break;
+>      default:
+> -        gemu_log("Unknown QEMU_IFLA_TUN type %d\n", nlattr->nla_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_TUN type %d\n",
+> +                      nlattr->nla_type);
+>          break;
+>      }
+>      return 0;
+> @@ -652,7 +655,8 @@ static abi_long host_to_target_data_linkinfo_nlattr(struct nlattr *nlattr,
+>                                                    NULL,
+>                                                  host_to_target_data_tun_nlattr);
+>          } else {
+> -            gemu_log("Unknown QEMU_IFLA_INFO_KIND %s\n", li_context->name);
+> +            qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_INFO_KIND %s\n",
+> +                          li_context->name);
+>          }
+>          break;
+>      case QEMU_IFLA_INFO_SLAVE_DATA:
+> @@ -663,12 +667,13 @@ static abi_long host_to_target_data_linkinfo_nlattr(struct nlattr *nlattr,
+>                                                    NULL,
+>                                         host_to_target_slave_data_bridge_nlattr);
+>          } else {
+> -            gemu_log("Unknown QEMU_IFLA_INFO_SLAVE_KIND %s\n",
+> +            qemu_log_mask(LOG_UNIMP, "Unknown QEMU_IFLA_INFO_SLAVE_KIND %s\n",
+>                       li_context->slave_name);
+>          }
+>          break;
+>      default:
+> -        gemu_log("Unknown host QEMU_IFLA_INFO type: %d\n", nlattr->nla_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown host QEMU_IFLA_INFO type: %d\n",
+> +                      nlattr->nla_type);
+>          break;
+>      }
+>  
+> @@ -690,7 +695,8 @@ static abi_long host_to_target_data_inet_nlattr(struct nlattr *nlattr,
+>          }
+>          break;
+>      default:
+> -        gemu_log("Unknown host AF_INET type: %d\n", nlattr->nla_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown host AF_INET type: %d\n",
+> +                      nlattr->nla_type);
+>      }
+>      return 0;
+>  }
+> @@ -741,7 +747,8 @@ static abi_long host_to_target_data_inet6_nlattr(struct nlattr *nlattr,
+>          }
+>          break;
+>      default:
+> -        gemu_log("Unknown host AF_INET6 type: %d\n", nlattr->nla_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown host AF_INET6 type: %d\n",
+> +                      nlattr->nla_type);
+>      }
+>      return 0;
+>  }
+> @@ -759,7 +766,8 @@ static abi_long host_to_target_data_spec_nlattr(struct nlattr *nlattr,
+>                                                NULL,
+>                                               host_to_target_data_inet6_nlattr);
+>      default:
+> -        gemu_log("Unknown host AF_SPEC type: %d\n", nlattr->nla_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown host AF_SPEC type: %d\n",
+> +                      nlattr->nla_type);
+>          break;
+>      }
+>      return 0;
+> @@ -780,7 +788,8 @@ static abi_long host_to_target_data_xdp_nlattr(struct nlattr *nlattr,
+>          *u32 = tswap32(*u32);
+>          break;
+>      default:
+> -        gemu_log("Unknown host XDP type: %d\n", nlattr->nla_type);
+> +        qemu_log_mask(
+> +            LOG_UNIMP, "Unknown host XDP type: %d\n", nlattr->nla_type);
+>          break;
+>      }
+>      return 0;
+> @@ -920,7 +929,8 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
+>                                                NULL,
+>                                                  host_to_target_data_xdp_nlattr);
+>      default:
+> -        gemu_log("Unknown host QEMU_IFLA type: %d\n", rtattr->rta_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown host QEMU_IFLA type: %d\n",
+> +                      rtattr->rta_type);
+>          break;
+>      }
+>      return 0;
+> @@ -954,7 +964,8 @@ static abi_long host_to_target_data_addr_rtattr(struct rtattr *rtattr)
+>          ci->tstamp = tswap32(ci->tstamp);
+>          break;
+>      default:
+> -        gemu_log("Unknown host IFA type: %d\n", rtattr->rta_type);
+> +        qemu_log_mask(
+> +            LOG_UNIMP, "Unknown host IFA type: %d\n", rtattr->rta_type);
+>          break;
+>      }
+>      return 0;
+> @@ -996,7 +1007,8 @@ static abi_long host_to_target_data_route_rtattr(struct rtattr *rtattr)
+>  #endif
+>          break;
+>      default:
+> -        gemu_log("Unknown host RTA type: %d\n", rtattr->rta_type);
+> +        qemu_log_mask(
+> +            LOG_UNIMP, "Unknown host RTA type: %d\n", rtattr->rta_type);
+>          break;
+>      }
+>      return 0;
+> @@ -1111,7 +1123,8 @@ static abi_long target_to_host_data_link_rtattr(struct rtattr *rtattr)
+>  {
+>      switch (rtattr->rta_type) {
+>      default:
+> -        gemu_log("Unknown target QEMU_IFLA type: %d\n", rtattr->rta_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown target QEMU_IFLA type: %d\n",
+> +                      rtattr->rta_type);
+>          break;
+>      }
+>      return 0;
+> @@ -1125,7 +1138,8 @@ static abi_long target_to_host_data_addr_rtattr(struct rtattr *rtattr)
+>      case IFA_ADDRESS:
+>          break;
+>      default:
+> -        gemu_log("Unknown target IFA type: %d\n", rtattr->rta_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown target IFA type: %d\n",
+> +                      rtattr->rta_type);
+>          break;
+>      }
+>      return 0;
+> @@ -1147,7 +1161,8 @@ static abi_long target_to_host_data_route_rtattr(struct rtattr *rtattr)
+>          *u32 = tswap32(*u32);
+>          break;
+>      default:
+> -        gemu_log("Unknown target RTA type: %d\n", rtattr->rta_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown target RTA type: %d\n",
+> +                      rtattr->rta_type);
+>          break;
+>      }
+>      return 0;
+> @@ -1232,8 +1247,8 @@ static abi_long host_to_target_data_audit(struct nlmsghdr *nlh)
+>  {
+>      switch (nlh->nlmsg_type) {
+>      default:
+> -        gemu_log("Unknown host audit message type %d\n",
+> -                 nlh->nlmsg_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown host audit message type %d\n",
+> +                      nlh->nlmsg_type);
+>          return -TARGET_EINVAL;
+>      }
+>      return 0;
+> @@ -1253,8 +1268,8 @@ static abi_long target_to_host_data_audit(struct nlmsghdr *nlh)
+>      case AUDIT_FIRST_USER_MSG2 ... AUDIT_LAST_USER_MSG2:
+>          break;
+>      default:
+> -        gemu_log("Unknown target audit message type %d\n",
+> -                 nlh->nlmsg_type);
+> +        qemu_log_mask(LOG_UNIMP, "Unknown target audit message type %d\n",
+> +                      nlh->nlmsg_type);
+>          return -TARGET_EINVAL;
+>      }
+>  
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index d60142f069..c48c2a9a55 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -1560,7 +1560,11 @@ static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
+>               * something more intelligent than "twice the size of the
+>               * target buffer we're reading from".
+>               */
+> -            gemu_log("Host cmsg overflow\n");
+> +            qemu_log_mask(LOG_UNIMP,
+> +                          ("Unsupported ancillary data %d/%d: "
+> +                           "unhandled msg size\n"),
+> +                          tswap32(target_cmsg->cmsg_level),
+> +                          tswap32(target_cmsg->cmsg_type));
+>              break;
+>          }
+>  
+> @@ -1590,8 +1594,8 @@ static inline abi_long target_to_host_cmsg(struct msghdr *msgh,
+>              __get_user(cred->uid, &target_cred->uid);
+>              __get_user(cred->gid, &target_cred->gid);
+>          } else {
+> -            gemu_log("Unsupported ancillary data: %d/%d\n",
+> -                                        cmsg->cmsg_level, cmsg->cmsg_type);
+> +            qemu_log_mask(LOG_UNIMP, "Unsupported ancillary data: %d/%d\n",
+> +                          cmsg->cmsg_level, cmsg->cmsg_type);
+>              memcpy(data, target_data, len);
+>          }
+>  
+> @@ -1812,8 +1816,8 @@ static inline abi_long host_to_target_cmsg(struct target_msghdr *target_msgh,
+>  
+>          default:
+>          unimplemented:
+> -            gemu_log("Unsupported ancillary data: %d/%d\n",
+> -                                        cmsg->cmsg_level, cmsg->cmsg_type);
+> +            qemu_log_mask(LOG_UNIMP, "Unsupported ancillary data: %d/%d\n",
+> +                          cmsg->cmsg_level, cmsg->cmsg_type);
+>              memcpy(target_data, data, MIN(len, tgt_len));
+>              if (tgt_len > len) {
+>                  memset(target_data + len, 0, tgt_len - len);
+> @@ -2288,7 +2292,8 @@ set_timeout:
+>  #endif /* SOL_NETLINK */
+>      default:
+>      unimplemented:
+> -        gemu_log("Unsupported setsockopt level=%d optname=%d\n", level, optname);
+> +        qemu_log_mask(LOG_UNIMP, "Unsupported setsockopt level=%d optname=%d\n",
+> +                      level, optname);
+>          ret = -TARGET_ENOPROTOOPT;
+>      }
+>      return ret;
+> @@ -2641,8 +2646,9 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+>  #endif /* SOL_NETLINK */
+>      default:
+>      unimplemented:
+> -        gemu_log("getsockopt level=%d optname=%d not yet supported\n",
+> -                 level, optname);
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "getsockopt level=%d optname=%d not yet supported\n",
+> +                      level, optname);
+>          ret = -TARGET_EOPNOTSUPP;
+>          break;
+>      }
+> @@ -3397,7 +3403,7 @@ static abi_long do_socketcall(int num, abi_ulong vptr)
+>      case TARGET_SYS_SENDMMSG: /* sockfd, msgvec, vlen, flags */
+>          return do_sendrecvmmsg(a[0], a[1], a[2], a[3], 1);
+>      default:
+> -        gemu_log("Unsupported socketcall: %d\n", num);
+> +        qemu_log_mask(LOG_UNIMP, "Unsupported socketcall: %d\n", num);
+>          return -TARGET_EINVAL;
+>      }
+>  }
+> @@ -4308,7 +4314,8 @@ static abi_long do_ipc(CPUArchState *cpu_env,
+>          ret = do_shmctl(first, second, ptr);
+>          break;
+>      default:
+> -	gemu_log("Unsupported ipc call: %d (version %d)\n", call, version);
+> +        qemu_log_mask(LOG_UNIMP, "Unsupported ipc call: %d (version %d)\n",
+> +                      call, version);
+>  	ret = -TARGET_ENOSYS;
+>  	break;
+>      }
+> @@ -5156,7 +5163,8 @@ static abi_long do_ioctl(int fd, int cmd, abi_long arg)
+>      ie = ioctl_entries;
+>      for(;;) {
+>          if (ie->target_cmd == 0) {
+> -            gemu_log("Unsupported ioctl: cmd=0x%04lx\n", (long)cmd);
+> +            qemu_log_mask(
+> +                LOG_UNIMP, "Unsupported ioctl: cmd=0x%04lx\n", (long)cmd);
+>              return -TARGET_ENOSYS;
+>          }
+>          if (ie->target_cmd == cmd)
+> @@ -5224,8 +5232,9 @@ static abi_long do_ioctl(int fd, int cmd, abi_long arg)
+>          }
+>          break;
+>      default:
+> -        gemu_log("Unsupported ioctl type: cmd=0x%04lx type=%d\n",
+> -                 (long)cmd, arg_type[0]);
+> +        qemu_log_mask(LOG_UNIMP,
+> +                      "Unsupported ioctl type: cmd=0x%04lx type=%d\n",
+> +                      (long)cmd, arg_type[0]);
+>          ret = -TARGET_ENOSYS;
+>          break;
+>      }
+> diff --git a/linux-user/vm86.c b/linux-user/vm86.c
+> index 2fa7a89edc..4412522c4c 100644
+> --- a/linux-user/vm86.c
+> +++ b/linux-user/vm86.c
+> @@ -402,7 +402,8 @@ int do_vm86(CPUX86State *env, long subfunction, abi_ulong vm86_addr)
+>      case TARGET_VM86_FREE_IRQ:
+>      case TARGET_VM86_GET_IRQ_BITS:
+>      case TARGET_VM86_GET_AND_RESET_IRQ:
+> -        gemu_log("qemu: unsupported vm86 subfunction (%ld)\n", subfunction);
+> +        qemu_log_mask(LOG_UNIMP, "qemu: unsupported vm86 subfunction (%ld)\n",
+> +                      subfunction);
+>          ret = -TARGET_EINVAL;
+>          goto out;
+>      case TARGET_VM86_PLUS_INSTALL_CHECK:
+> 
 
-Andrey
-
-On 17/02/2020 18:02, Vladimir Sementsov-Ogievskiy wrote:
-> Original idea of bitmaps postcopy migration is that bitmaps are non
-> critical data, and their loss is not serious problem. So, using postcopy
-> method on any failure we should just drop unfinished bitmaps and
-> continue guest execution.
-> 
-> However, it doesn't work so. It crashes, fails, it goes to
-> postcopy-recovery feature. It does anything except for behavior we want.
-> These series fixes at least some problems with error handling during
-> bitmaps migration postcopy.
-> 
-> v1 was "[PATCH 0/7] Fix crashes on early shutdown during bitmaps postcopy"
-> 
-> v2:
-> 
-> Most of patches are new or changed a lot.
-> Only patches 06,07 mostly unchanged, just rebased on refactorings.
-> 
-> Vladimir Sementsov-Ogievskiy (22):
->    migration/block-dirty-bitmap: fix dirty_bitmap_mig_before_vm_start
->    migration/block-dirty-bitmap: rename state structure types
->    migration/block-dirty-bitmap: rename dirty_bitmap_mig_cleanup
->    migration/block-dirty-bitmap: move mutex init to dirty_bitmap_mig_init
->    migration/block-dirty-bitmap: refactor state global variables
->    migration/block-dirty-bitmap: rename finish_lock to just lock
->    migration/block-dirty-bitmap: simplify dirty_bitmap_load_complete
->    migration/block-dirty-bitmap: keep bitmap state for all bitmaps
->    migration/block-dirty-bitmap: relax error handling in incoming part
->    migration/block-dirty-bitmap: cancel migration on shutdown
->    migration/savevm: don't worry if bitmap migration postcopy failed
->    qemu-iotests/199: fix style
->    qemu-iotests/199: drop extra constraints
->    qemu-iotests/199: better catch postcopy time
->    qemu-iotests/199: improve performance: set bitmap by discard
->    qemu-iotests/199: change discard patterns
->    qemu-iotests/199: increase postcopy period
->    python/qemu/machine: add kill() method
->    qemu-iotests/199: prepare for new test-cases addition
->    qemu-iotests/199: check persistent bitmaps
->    qemu-iotests/199: add early shutdown case to bitmaps postcopy
->    qemu-iotests/199: add source-killed case to bitmaps postcopy
-> 
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Fam Zheng <fam@euphon.net>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Cleber Rosa <crosa@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: qemu-block@nongnu.org
-> Cc: qemu-devel@nongnu.org
-> Cc: qemu-stable@nongnu.org # for patch 01
-> 
->   migration/migration.h          |   3 +-
->   migration/block-dirty-bitmap.c | 444 +++++++++++++++++++++------------
->   migration/migration.c          |  15 +-
->   migration/savevm.c             |  37 ++-
->   python/qemu/machine.py         |  12 +-
->   tests/qemu-iotests/199         | 244 ++++++++++++++----
->   tests/qemu-iotests/199.out     |   4 +-
->   7 files changed, 529 insertions(+), 230 deletions(-)
-> 
-
--- 
-With the best regards,
-Andrey Shinkevich
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
