@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8847BC34026
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC37C34049
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:42:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5086121D56
+	by mail.kernel.org (Postfix) with ESMTPS id BB33121D56
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:42:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jng6cjJ1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5086121D56
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="USz99uwm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB33121D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j48lZ-00009A-G3
+	id 1j48lZ-00009i-T6
 	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:42:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55342)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j48ie-0003oK-NK
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:45 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j48iX-0003Za-UO
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j48id-0004Vg-LJ
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:44 -0500
-Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:41457)
+ (envelope-from <richard.henderson@linaro.org>) id 1j48iW-0004Id-VP
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:37 -0500
+Received: from mail-pg1-x534.google.com ([2607:f8b0:4864:20::534]:43521)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j48id-0004U4-Ex
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:43 -0500
-Received: by mail-pf1-x42d.google.com with SMTP id j9so11147339pfa.8
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 11:39:43 -0800 (PST)
+ id 1j48iW-0004HA-P8
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:36 -0500
+Received: by mail-pg1-x534.google.com with SMTP id u12so11079556pgb.10
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 11:39:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fkf1cCU+0nMjQ3/Y/EWHF6ItnUhhF98WWxF5yKDha6U=;
- b=Jng6cjJ1KQzNj5yLYHF63m6IEbsOSuKsIS91rowT385wkEdGQ1jP8qJloYgS7q3AnH
- cmPVgZYrz6yoxuac+AAK/yYhkzP+cvqiLA3rY3kzXkM/JaTe1c2/0tbczAVkwjm1p7ME
- a2nvC5isR0/65eQ4C8vqNPvEldVkm+dElsftBpqJybuWmKu1cV/mmb9/M/AQl7C9s8O9
- 4Hee8IFJSgTHUO+xyMh2IjkhpuJNnjPbXXPjEjXtg0aPFplTYHZgHsSw8eLknW2k8HJF
- 0jQ1R3ZM0CHM+2PfdYht4z4mzRYmsf5NraPNyj76Iy8PNbWw/UtLJjEu8UcvP8dCNfYy
- smCw==
+ bh=UwMVy3DhT2jUtkg7ZPdWAKnQO+6DWfWffPjgYExKp2o=;
+ b=USz99uwmXbaCrCFCIdZdP+xafQVcgC6G98Bq9WZr7x1asRBL5IjEieOMIxYsGBarDR
+ RWr1c2bUsWvCsjuvhg/nt8MzYfcmwmAIHKXsUDbVjQpjAbDx49WIDb2Wa4C4gwcK0F2t
+ cn8iBQkkDOsDBoBADfA2Efu40UmlE2mGaIdx+/BCSadlAFYkSolKViTwfgh23LzMqFKr
+ 4sCpKl5Q/eYBAzbcuigEbM4/49/WJLSwdZ67U4XHIl74uh8zlWNcVgZ2alp4OBWtf/5p
+ KcRi/283uE1vpmLIFwQD9MkWJf0vZfFdD8ut1QG4kofFsq7dou1NMTL3WqCCRS2/cVZg
+ HUJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=fkf1cCU+0nMjQ3/Y/EWHF6ItnUhhF98WWxF5yKDha6U=;
- b=TBc/bxbs+UfBsLAYUZo27hS4npmYFn/NI/xxF6EkNWbr5Fj1Gwt8fIuO0pFajQRB26
- ise2LtBrxZeTUcO2rO8kaCmsNsSULw8IvMW/+j4vUR8GJFVXqVApfkUMCNXntil2eVTB
- rV6tbMcpU50o/nDyGmeatM1m4/Xf0UewaWOg6f5Tx3ml62fflK/XHzLeQC0+bGCjqta9
- Tyl/MIHRSelO1Sk7z3ePQ6ji8y+2sW0Yiv2JNvjZIYkzgi/fWn0o+Q8lAH+6yA8ItkKl
- xmEunvFS0TXzUBSA/A0WM0fFIZzY7wrnTOjhDlpjeT50XobAmBbN1OzxocY6zIlnDVBl
- h9lA==
-X-Gm-Message-State: APjAAAVV/UwJ1VLXg7gUNlJ4QXvnfCsIKwcIac6WlcgkSwjqkxdGQEEZ
- jc7sJFJOFRggykobixeM/OHuM20YsD0=
-X-Google-Smtp-Source: APXvYqwDjnpwbc7hCgl/845q9C81U9dqTQ7JsdMtBpufLcZp6XRHIOQu6CywTDLErfB/D/EvJQ/fwg==
-X-Received: by 2002:a63:1e5e:: with SMTP id p30mr25945016pgm.112.1582054782116; 
- Tue, 18 Feb 2020 11:39:42 -0800 (PST)
+ bh=UwMVy3DhT2jUtkg7ZPdWAKnQO+6DWfWffPjgYExKp2o=;
+ b=gkjpAV3K6GFOWoeU3FO/n19RJj+QR5DoOpAdyfctJ7z1nTAVORyqgiOi0XN2H8aQ0s
+ VvUw70J0zMJYuC7Ps3hAx8OPThFIYoKECiapjyDb1Kv/2e3WsvsBij+1KuuBMGjU/5wu
+ YtaO0nwOE0m4ESS4pajy+EKsdXdStLP+44J8XDzganesaxlx5+60awfDcJjQE8LzYBik
+ lBB8mjQLLZBnLHnPaUsraRxWZMHJxy1RBPcyLU+XISt7rie+H4t5zpnbBFsnlHuhtSX1
+ C+IIc4NxFwb+g/YbvnXjhL2rjRfILbi3A2U6GjkdLiRbBTM1Ebr+/Gk1c+u4bkHPdJZi
+ LKgg==
+X-Gm-Message-State: APjAAAXuSny9ImHaGRPsdiJM4r/yF0CTtkjqEeriCOh7/S11S97xiKpC
+ TRm5rXL3DC6V+FhYYBE1HG337C3FT3c=
+X-Google-Smtp-Source: APXvYqyuuM7yxe9PKF8rws8qjylXhQ6D3pBz6Rj4zEYeoimt0MeF7+9anuIRUQ84btrvjNcnNP9/jA==
+X-Received: by 2002:a63:d207:: with SMTP id a7mr24561623pgg.225.1582054775469; 
+ Tue, 18 Feb 2020 11:39:35 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id y15sm424395pgj.78.2020.02.18.11.39.41
+ by smtp.gmail.com with ESMTPSA id y15sm424395pgj.78.2020.02.18.11.39.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 18 Feb 2020 11:39:41 -0800 (PST)
+ Tue, 18 Feb 2020 11:39:34 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 8/9] hw/hppa/dino: Fix bitmask for the PCIROR register
-Date: Tue, 18 Feb 2020 11:39:28 -0800
-Message-Id: <20200218193929.11404-9-richard.henderson@linaro.org>
+Subject: [PULL 3/9] hw/display/artist: Delay some variables initialization
+Date: Tue, 18 Feb 2020 11:39:23 -0800
+Message-Id: <20200218193929.11404-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200218193929.11404-1-richard.henderson@linaro.org>
 References: <20200218193929.11404-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::42d
+X-Received-From: 2607:f8b0:4864:20::534
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,7 +94,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Helge Deller <deller@gmx.de>,
+Cc: peter.maydell@linaro.org, Sven Schnelle <svens@stackframe.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -102,30 +102,59 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Only 24 bits of the PCIROR register are documented
-(see pp. 37 of datasheet referenced in this file header).
+We want to have an early exit path. Delay some initializations
+before the variables are used.
 
-Acked-by: Helge Deller <deller@gmx.de>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200218063355.18577-4-f4bug@amsat.org>
+Acked-by: Sven Schnelle <svens@stackframe.org>
+Message-Id: <20200214001303.12873-4-f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/hppa/dino.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/display/artist.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index 8868e31793..be799aad43 100644
---- a/hw/hppa/dino.c
-+++ b/hw/hppa/dino.c
-@@ -94,7 +94,7 @@ static const uint32_t reg800_keep_bits[DINO800_REGS] = {
-     MAKE_64BIT_MASK(0, 32), /* Undefined */
-     MAKE_64BIT_MASK(0, 8),  /* MLTIM */
-     MAKE_64BIT_MASK(0, 30), /* BRDG_FEAT */
--    MAKE_64BIT_MASK(0, 25), /* PCIROR */
-+    MAKE_64BIT_MASK(0, 24), /* PCIROR */
-     MAKE_64BIT_MASK(0, 22), /* PCIWOR */
-     MAKE_64BIT_MASK(0, 32), /* Undocumented */
-     MAKE_64BIT_MASK(0, 9),  /* TLTIM */
+diff --git a/hw/display/artist.c b/hw/display/artist.c
+index 47f0e9f0bc..97c811b35e 100644
+--- a/hw/display/artist.c
++++ b/hw/display/artist.c
+@@ -558,7 +558,7 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+                       bool update_start, int skip_pix, int max_pix)
+ {
+     struct vram_buffer *buf;
+-    uint8_t color = artist_get_color(s);
++    uint8_t color;
+     int dx, dy, t, e, x, y, incy, diago, horiz;
+     bool c1;
+     uint8_t *p;
+@@ -569,10 +569,6 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+         s->vram_start = (x2 << 16) | y2;
+     }
+ 
+-    buf = &s->vram_buffer[ARTIST_BUFFER_AP];
+-
+-    c1 = false;
+-
+     if (x2 > x1) {
+         dx = x2 - x1;
+     } else {
+@@ -583,6 +579,8 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+     } else {
+         dy = y1 - y2;
+     }
++
++    c1 = false;
+     if (dy > dx) {
+         t = y2;
+         y2 = x2;
+@@ -620,6 +618,8 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+     }
+     x = x1;
+     y = y1;
++    color = artist_get_color(s);
++    buf = &s->vram_buffer[ARTIST_BUFFER_AP];
+ 
+     do {
+         if (c1) {
 -- 
 2.20.1
 
