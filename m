@@ -7,86 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB87AC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8145C34033
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:50:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70E142070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 723862070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:50:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pg2xzB+G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70E142070B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E8+CeeoW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 723862070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3zWG-0002HF-Kk
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:50:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43461)
+	id 1j3zWI-0002Jm-H6
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:50:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43587)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j3zQW-0001aq-LW
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:25 -0500
+ (envelope-from <philmd@redhat.com>) id 1j3zQc-0001rc-41
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j3zQV-0005yA-LH
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25685
+ (envelope-from <philmd@redhat.com>) id 1j3zQb-00063a-7W
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45580
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3zQV-0005xm-HA
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:23 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3zQb-00063G-3l
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582019063;
+ s=mimecast20190719; t=1582019068;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aFwSqFOqQSCSww1xvrmrTjGR2tB5knkZUpnBFKdTlOc=;
- b=Pg2xzB+GFwXNnz2ELBVPqPZmUDpISaWHyPO+QDWtq5gp1+RfBJXS/s/wiSnNSAZSAw83x3
- EY5FIzyddITCBLT7muEKaZOQTLPE7vGuPW2kJr+NhV63k7OHBwYw/CFjQWdkCJoQx/38oL
- oLE//XP5K6eP5neE3eJMgBMsrrBUjyI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-126-6OgMTHLZMBSEm4HpWTGoEQ-1; Tue, 18 Feb 2020 04:44:21 -0500
-Received: by mail-wr1-f72.google.com with SMTP id a12so10517168wrn.19
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 01:44:21 -0800 (PST)
+ bh=40zqfghgSnOWp3sxm5Gs0HxCk7BfBA2vJWHYVREX1q4=;
+ b=E8+CeeoW47A2zECyZrfhxjzugs14QsajtMdJxXgnWWSg5hOvvVjzoJCgvNKfzTEInoV/MG
+ sLOpxDBLy0nb9LNLb9HZs/0AZNlAQ35GWU3t9wa9VAXQjkeuNwQ++rX2Kl2KVZoRu0dwCs
+ KjyZ3Yw+p0s/KryPM5x0lw1iRFiRn0I=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-180-E1EKGlwRO4ypUit_rfj8AQ-1; Tue, 18 Feb 2020 04:44:27 -0500
+Received: by mail-wm1-f69.google.com with SMTP id f66so870947wmf.9
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 01:44:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=EdIcfUQ/U2hHF17TjP9T3eQu8UrcSLlBv6lIHRbb1ng=;
- b=tk/8zV6Pv68QCXU/PHdqdHkAqejVbiHjxSs/UuhmUJkGxKG2UOgtGd7mwevkq2MlDo
- 5OxQdpYZsXpoF0VF4lgmSHKhtk+eS7SgyynKbxN58YEuvHzPZNu+cJr26V8eD2dVnOkK
- KhMoLIYi5fUfwLOOSbBfFz/ju7/y9izP8XdCoQ7ajtF4bjPSw7XWe2MPGbA8d6/UKu0z
- a4IzjaOKlKnCwYWQQdc8cfbwerjYsGCSS7KpTkFTcibxlDGqH6cU5s/1QpFljZSBDADm
- Cv0EarYuI3W391iKPxxA3Veo8+q804+BdUS3PNGF/SdU/GxLZHIUzqiUhhTSBAjt/06/
- DdXQ==
-X-Gm-Message-State: APjAAAUG1oVZHnORBg046Oz75PatFB5HVWhZd3cbOgNpslci+zkvPKjW
- Eq2KYhAU2naAtv4DZaVglFPQkXuI04uX07iq7+zu0ieEg7xA/AeBdEzWYoLn38+js5QgHUCY0Uh
- y/8V8oNiHoKc1fsI=
-X-Received: by 2002:a05:600c:299:: with SMTP id
- 25mr2223530wmk.68.1582019059883; 
- Tue, 18 Feb 2020 01:44:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxKMOFmz8WuMxWwTBTyCBST4g/cP1AY409LS+ZZl+FoOdhI+u7Ak15lTGc2mNST2Qgj7Z9wbg==
-X-Received: by 2002:a05:600c:299:: with SMTP id
- 25mr2223512wmk.68.1582019059684; 
- Tue, 18 Feb 2020 01:44:19 -0800 (PST)
+ bh=bfCwsKB+QGICVw4yPnq5z2hHQ+37s3RqO+sYab9kkJ4=;
+ b=ESfoOCOeNc2T/eXcsBWAeWIq8A65CgoDgVKxzVtas8CLccCtL8RoNWXQJLRX/XbhAk
+ wbdSVS/0QgglV/34QCHDDmEqPSFoe4LhToIfe/vbsF87Q1e0pBvrWj3TZ2BlLOsT+MDI
+ xWjz2wRHw8TW1Vh9ZBjelRY9zdEpPwsvkYbcpPm460tLvWGmjXxlc5G3mzOF0u/WIdHD
+ UOke64WU51YzbobYiff5UACFz0KdzgGpUqTRn5WixBcaqLN6u1eDte78y1rApPSvs789
+ gN7lik5+jaEr0Qkusx0I3cf2n6u+9vQnUdWtB3s1prX5sWrmQUqfVVbrruO+fhh4F7h4
+ 83QQ==
+X-Gm-Message-State: APjAAAXzx+bged8+lmYl7o0QNk92m05kUSSorxwT0rK97hlqcxzP+v1z
+ X/ldWONSs7/qBAYaxRTzdM6iA/fvJsxmKWQ7D2Bsp4Ou8sqIC7pLNGJD3VfVp/iY60mkKkErfH+
+ pTcxAJP9klep0q5s=
+X-Received: by 2002:adf:8b54:: with SMTP id v20mr28936795wra.390.1582019065740; 
+ Tue, 18 Feb 2020 01:44:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxyiqZGixY74dt7rvy2/XkLF8pR4v15It2iHhUudf3pLbbos0wkdDFg4OcP8GN5Io4KyVOXhQ==
+X-Received: by 2002:adf:8b54:: with SMTP id v20mr28936743wra.390.1582019065492; 
+ Tue, 18 Feb 2020 01:44:25 -0800 (PST)
 Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id z10sm2735588wmk.31.2020.02.18.01.44.17
+ by smtp.gmail.com with ESMTPSA id z10sm2735588wmk.31.2020.02.18.01.44.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 18 Feb 2020 01:44:19 -0800 (PST)
+ Tue, 18 Feb 2020 01:44:25 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND 07/13] hw/scsi/esp: Remove superfluous semicolon
-Date: Tue, 18 Feb 2020 10:43:56 +0100
-Message-Id: <20200218094402.26625-8-philmd@redhat.com>
+Subject: [PATCH RESEND 10/13] ui/input-barrier: Remove superfluous semicolon
+Date: Tue, 18 Feb 2020 10:43:59 +0100
+Message-Id: <20200218094402.26625-11-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200218094402.26625-1-philmd@redhat.com>
 References: <20200218094402.26625-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-MC-Unique: 6OgMTHLZMBSEm4HpWTGoEQ-1
+X-MC-Unique: E1EKGlwRO4ypUit_rfj8AQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
@@ -113,7 +111,6 @@ Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  Alistair Francis <alistair@alistair23.me>, Julia Suvorova <jusual@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
@@ -126,30 +123,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixes: 74d71ea16bc
+Fixes: 6105683da35
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/esp.c | 2 +-
+ ui/input-barrier.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index f8fc30cccb..405f8b7cbc 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -293,7 +293,7 @@ static void handle_satn_stop(ESPState *s)
-         s->dma_cb =3D handle_satn_stop;
-         return;
+diff --git a/ui/input-barrier.c b/ui/input-barrier.c
+index fe35049b83..527c75e130 100644
+--- a/ui/input-barrier.c
++++ b/ui/input-barrier.c
+@@ -455,7 +455,7 @@ static gboolean writecmd(InputBarrier *ib, struct barri=
+erMsg *msg)
+         break;
+     default:
+         write_cmd(p, barrierCmdEUnknown, avail);
+-        break;;
++        break;
      }
--    s->pdma_cb =3D satn_stop_pdma_cb;;
-+    s->pdma_cb =3D satn_stop_pdma_cb;
-     s->cmdlen =3D get_cmd(s, s->cmdbuf, sizeof(s->cmdbuf));
-     if (s->cmdlen) {
-         trace_esp_handle_satn_stop(s->cmdlen);
+=20
+     len =3D MAX_HELLO_LENGTH - avail - sizeof(int);
 --=20
 2.21.1
 
