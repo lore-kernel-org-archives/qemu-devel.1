@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE4DC34047
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3072C34047
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59A3C24654
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:56:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59A3C24654
+	by mail.kernel.org (Postfix) with ESMTPS id 9D12D2467A
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:58:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D12D2467A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j48z0-0001Nz-Hv
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:56:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37178)
+	id 1j491D-0003BY-N5
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:58:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j48y3-0000hG-3I
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:55:39 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j490N-0002Jw-5q
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:58:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j48y2-0007rD-0P
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:55:38 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:54007)
+ (envelope-from <laurent@vivier.eu>) id 1j490L-0003Eo-PV
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:58:03 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:42351)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j48y1-0007lu-Me
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:55:37 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j490L-0003BU-G3
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:58:01 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mr8zO-1jqBcL1vBm-00oFNf; Tue, 18 Feb 2020 20:55:31 +0100
-Subject: Re: [Qemu-devel] [PATCH] configure: linux-user doesn't need neither
- fdt nor slirp
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-References: <20190621130544.18860-1-lvivier@redhat.com>
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M6DSi-1j6N012HvM-006gPj; Tue, 18 Feb 2020 20:57:57 +0100
+Subject: Re: [PATCH v3] linux-user/strace: Improve output of various syscalls
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20191121193351.GA31821@ls3530.fritz.box>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,34 +82,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <25fc9e3e-9244-88fa-80ab-c0ffd95bdba0@vivier.eu>
-Date: Tue, 18 Feb 2020 20:55:28 +0100
+Message-ID: <2edf7243-f5c3-9a96-aec3-a68e41dda49b@vivier.eu>
+Date: Tue, 18 Feb 2020 20:57:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20190621130544.18860-1-lvivier@redhat.com>
+In-Reply-To: <20191121193351.GA31821@ls3530.fritz.box>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:lr4/ia5Fgn33HYE5vn9zyBcFl2vY3LjE0h5Ds/0SpnwONT0lxxj
- Qh7hN0ngjAK95F4UtFLs2E0lEkGqmH2rVtLqjXw5GRCn2km4vbgVuZNvfOSRJvqgodeTrNQ
- kqjlqhcCyQgnHWnlqYq/hQtkSlvzYXem+l+LGVPVnro9Q+WAelDj8oQ3kGlkQUO2D19QXnh
- hgDGEB2MmCMLXFMVwOAbA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hTB9LtTtQXM=:9yVsdoja72+9WIu6/IVmt/
- lNJMgAo1dZWROFbpBJ4qKM9N+wBknX5aX1UFUw0Fr/Xosf1lgXtp1fg7Q1psJ5hvKz/HNo/2u
- 8mB3ZNijaI6nCoe6mL5OPnDq8nGnByUZcHqSmJQEFcXQ6cKctyawgOA0ar0Ym7iTKA5YJAZ0H
- ryh5qGkiIFgYOWHkVBJNZUwGDAC5wPgxotUek54F8Ft92aVdH/rnsOubmmJgx5kKTgKrSW82/
- iy1mXFqPFsV6u/zkkf14G4rS2Cwg3TZp08ZGkC1pGMyObT/OEO8oqRMlXQI/RTXNTsQ4xRv1V
- D6NI6WxtOJR07k6eZXY2X3rRDBWX1AOjgFJmPlhqdNDzoTSwk57XoZeUF14WygEvl95KPYQda
- l+lr6tvvpZ5sZzDDKvP7aAMtiuITu10dndagqKFMjEXUfYw1zIMYShL7oTeD2wrZOBV8ci+46
- WWWL+4B/NiD9CZQ5yT1bMLCp4tsusS5+3hxtVnzRAGTbLUytup37jCuZqUAxGR1LeXxS2R6zk
- Js7Ni0rrb8qXrqbtqgwGCAwWkXC6NDmB1dCUHbmfWNrDV9sxu88B7qEVl2Wk4IZmGrcIQs7Pv
- pbCutPWT1rsvsWkleSL4lPRGzBiz9+q9CIbr3mvGx05F9Zqxt9ZqZl7iUT9JMw7hbm1px97o1
- LXxaF0gOW6X35fjRNZk70EFzMZ5fFz6E1dGDT+VBa/7EoFk8JAzmkN8DcQAmLMIz0Djt4+qWi
- Qr8S4N4F/eLosI5RYGXVgQk48yZVSHP4/62vXZn+ipwrYc8VcAt6GF2lbAwnCit5C6Ksl609Y
- fzsCorq6a32879Dp14Vnq2kmwMhpsWxsUjEa9YJjk0thtbVNX1FRRkbWhFzH/vXp0g/xqxR
+X-Provags-ID: V03:K1:L3XTV1b2Wllt+gVZZo6tQbAxwqMMdqTgN9W/UOsN3Pe4BJCZT9J
+ lBlsYT6XlkBFp4j7IqykEnRATn65BsStankbYKdk4P8d+VM8HsjgJAYnlZrQoJ3YqH7jhlk
+ 2K8c/s6Yc0dM/CDZo4qy0JZEsnrWFiNfSR9xudbupq4MlJPKrkxXYDZUZRGKOnarIxKkZxB
+ iKO82g7PSw4SjCVqHk3OQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:y1OyitYTGOQ=:bcDNMSs9UuyEXlfOPGQgjq
+ NRUEBgFdurUT6eypeDvgXUtIsyxZ0KMl+aWiQaXzt4MVgQtmYdnynWMbTaw3mn6wY/2NYvMvx
+ bzo6iuBfLVu8IoBt3BpWN2m/1z137T3YUU3KtCvY1mJaJCM8mpYKw7uwpQbuiWGS4i9eMR9+M
+ ZW9301dmOdFGI0aU03da/V3U/GW4thFm+GT020kXe4/Pvz7aSufdNZl9GsMMY+OYd0KkBRhBD
+ mjyyDc0eyp0jo1qRFcMfAxaOW4obW84t1nZCVyqlw59rqTAZQa9LckpTAhYVSeQQQJTjta9jl
+ DuVNyuP4l6skC4g/DGS8ml41AiXBrunutNPEmGmdx0EhYWGai5K/v+RCUU6dGw2k4FLXqXLjA
+ 4sPbpLOO2gnZGgA8VzJAj7NeRFBmiE/gv3EkQqfFlsud3jfz9LUiyl/ihdW87jwrwYGCEqUY+
+ PBaMGGpsmj7m0+CixdyUirRXwKKmcNk+AJ94/7+YH5hcsMz7W4lfqvgjf2H37IO01uTO2e7YV
+ QZYCj5r3qA+XoKMdwuuCxDbf1IRcZxlcgN+x5h9qAxKpKOy9ZALtqmmAraeE+hldlcpGq+4bK
+ AZJEZBnoT7ia3HGzMNPdIBFI1YXTwkI7Mbp1h26yHf+5JcRc/A90D2ZtQe4/Vp8iigznjO2+O
+ oTYEcsQx9zWEWqq671xMZ5DQ0ulKUmGEj+Msldc2ABVRzvpDCP4zKuZ5B+EU1i/k4oKNezkma
+ 7LiZsROlNoDh7qnRBC+/H3Oc2a/sHHKMMtRqkttAYdZzBA09Tm3rnghqsqHGrDJ+7jxmDx5l1
+ Dy7Tfrygw/AJ1Tg8uwulPUHYezXRDRQ44aA5JA8PqiCYkRngxMRMDqMjHa3Fj23swz00+0B
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,61 +121,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 21/06/2019 à 15:05, Laurent Vivier a écrit :
-> if softmmu is not enabled, we disable by default fdt and
-> slirp as they are only used by -softmmu targets.
+Le 21/11/2019 à 20:33, Helge Deller a écrit :
+> Improve strace output of various syscalls which either have none
+> or only int-type parameters.
 > 
-> A side effect is the git submodules are not cloned
-> if they are not needed.
+> Signed-off-by: Helge Deller <deller@gmx.de>
 > 
-> Clone and build can be forced with --enable-fdt and
-> --enable-slirp.
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > ---
->  configure | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+> Changes in v3:
+>     fixed alarm()
+>     added epoll_create(), epoll_create1(), eventfd(), eventfd2()
 > 
-> diff --git a/configure b/configure
-> index b091b82cb371..4b3853298c79 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4066,6 +4066,11 @@ if test "$fdt_required" = "yes"; then
->    fdt=yes
->  fi
->  
-> +# linux-user doesn't need fdt
-> +if test -z "$fdt" -a "$softmmu" != "yes" ; then
-> +    fdt="no"
-> +fi
-> +
->  if test "$fdt" != "no" ; then
->    fdt_libs="-lfdt"
->    # explicitly check for libfdt_env.h as it is missing in some stable installs
-> @@ -5923,6 +5928,11 @@ fi
->  ##########################################
->  # check for slirp
->  
-> +# linux-user doesn't need slirp
-> +if test -z "$slirp" -a "$softmmu" != "yes" ; then
-> +    slirp="no"
-> +fi
-> +
->  case "$slirp" in
->    "" | yes)
->      if $pkg_config slirp; then
+> Changes in v2:
+>     fixed ioctl()
+> 
+> 
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index 1de4319dcf..d49a1e92a8 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -26,7 +26,7 @@
+>  { TARGET_NR_afs_syscall, "afs_syscall" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_alarm
+> -{ TARGET_NR_alarm, "alarm" , NULL, NULL, NULL },
+> +{ TARGET_NR_alarm, "alarm" , "%s(%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_aplib
+>  { TARGET_NR_aplib, "aplib" , NULL, NULL, NULL },
+> @@ -116,19 +116,19 @@
+>  { TARGET_NR_dipc, "dipc" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_dup
+> -{ TARGET_NR_dup, "dup" , NULL, NULL, NULL },
+> +{ TARGET_NR_dup, "dup" , "%s(%d)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_dup2
+> -{ TARGET_NR_dup2, "dup2" , NULL, NULL, NULL },
+> +{ TARGET_NR_dup2, "dup2" , "%s(%d,%d)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_dup3
+> -{ TARGET_NR_dup3, "dup3" , NULL, NULL, NULL },
+> +{ TARGET_NR_dup3, "dup3" , "%s(%d,%d,%d)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_epoll_create
+> -{ TARGET_NR_epoll_create, "epoll_create" , NULL, NULL, NULL },
+> +{ TARGET_NR_epoll_create, "%s(%d)", NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_epoll_create1
+> -{ TARGET_NR_epoll_create1, "epoll_create1" , NULL, NULL, NULL },
+> +{ TARGET_NR_epoll_create1, "%s(%d)", NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_epoll_ctl
+>  { TARGET_NR_epoll_ctl, "epoll_ctl" , NULL, NULL, NULL },
+> @@ -146,10 +146,10 @@
+>  { TARGET_NR_epoll_wait_old, "epoll_wait_old" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_eventfd
+> -{ TARGET_NR_eventfd, "eventfd" , NULL, NULL, NULL },
+> +{ TARGET_NR_eventfd, "eventfd", "%s(%d)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_eventfd2
+> -{ TARGET_NR_eventfd2, "eventfd2" , NULL, NULL, NULL },
+> +{ TARGET_NR_eventfd2, "eventfd2" , "%s(%d,%d)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_execv
+>  { TARGET_NR_execv, "execv" , NULL, print_execv, NULL },
+> @@ -191,7 +191,7 @@
+>  { TARGET_NR_fanotify_mark, "fanotify_mark" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_fchdir
+> -{ TARGET_NR_fchdir, "fchdir" , NULL, NULL, NULL },
+> +{ TARGET_NR_fchdir, "fchdir" , "%s(%d)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_fchmod
+>  { TARGET_NR_fchmod, "fchmod" , "%s(%d,%#o)", NULL, NULL },
+> @@ -287,7 +287,7 @@
+>  { TARGET_NR_getdtablesize, "getdtablesize" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getegid
+> -{ TARGET_NR_getegid, "getegid" , NULL, NULL, NULL },
+> +{ TARGET_NR_getegid, "getegid" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getegid32
+>  { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
+> @@ -299,7 +299,7 @@
+>  { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getgid
+> -{ TARGET_NR_getgid, "getgid" , NULL, NULL, NULL },
+> +{ TARGET_NR_getgid, "getgid" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getgid32
+>  { TARGET_NR_getgid32, "getgid32" , NULL, NULL, NULL },
+> @@ -329,10 +329,10 @@
+>  { TARGET_NR_getpeername, "getpeername" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getpgid
+> -{ TARGET_NR_getpgid, "getpgid" , NULL, NULL, NULL },
+> +{ TARGET_NR_getpgid, "getpgid" , "%s(%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getpgrp
+> -{ TARGET_NR_getpgrp, "getpgrp" , NULL, NULL, NULL },
+> +{ TARGET_NR_getpgrp, "getpgrp" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getpid
+>  { TARGET_NR_getpid, "getpid" , "%s()", NULL, NULL },
+> @@ -432,7 +432,7 @@
+>  { TARGET_NR_io_cancel, "io_cancel" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_ioctl
+> -{ TARGET_NR_ioctl, "ioctl" , NULL, NULL, NULL },
+> +{ TARGET_NR_ioctl, "ioctl" , "%s(%d,%#x,%#x)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_io_destroy
+>  { TARGET_NR_io_destroy, "io_destroy" , NULL, NULL, NULL },
+> @@ -1257,22 +1257,22 @@
+>  { TARGET_NR_setdomainname, "setdomainname" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setfsgid
+> -{ TARGET_NR_setfsgid, "setfsgid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setfsgid, "setfsgid" , "%s(%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setfsgid32
+> -{ TARGET_NR_setfsgid32, "setfsgid32" , NULL, NULL, NULL },
+> +{ TARGET_NR_setfsgid32, "setfsgid32" , "%s(%u)" , NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setfsuid
+> -{ TARGET_NR_setfsuid, "setfsuid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setfsuid, "setfsuid" , "%s(%u)" , NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setfsuid32
+>  { TARGET_NR_setfsuid32, "setfsuid32" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setgid
+> -{ TARGET_NR_setgid, "setgid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setgid, "setgid" , "%s(%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setgid32
+> -{ TARGET_NR_setgid32, "setgid32" , NULL, NULL, NULL },
+> +{ TARGET_NR_setgid32, "setgid32" , "%s(%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setgroups
+>  { TARGET_NR_setgroups, "setgroups" , NULL, NULL, NULL },
+> @@ -1296,7 +1296,7 @@
+>  { TARGET_NR_setns, "setns" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setpgid
+> -{ TARGET_NR_setpgid, "setpgid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setpgid, "setpgid" , "%s(%u,%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setpgrp
+>  { TARGET_NR_setpgrp, "setpgrp" , NULL, NULL, NULL },
+> @@ -1311,22 +1311,22 @@
+>  { TARGET_NR_setregid32, "setregid32" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setresgid
+> -{ TARGET_NR_setresgid, "setresgid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setresgid, "setresgid" , "%s(%u,%u,%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setresgid32
+>  { TARGET_NR_setresgid32, "setresgid32" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setresuid
+> -{ TARGET_NR_setresuid, "setresuid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setresuid, "setresuid" , "%s(%u,%u,%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setresuid32
+> -{ TARGET_NR_setresuid32, "setresuid32" , NULL, NULL, NULL },
+> +{ TARGET_NR_setresuid32, "setresuid32" , "%s(%u,%u,%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setreuid
+> -{ TARGET_NR_setreuid, "setreuid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setreuid, "setreuid" , "%s(%u,%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setreuid32
+> -{ TARGET_NR_setreuid32, "setreuid32" , NULL, NULL, NULL },
+> +{ TARGET_NR_setreuid32, "setreuid32" , "%s(%u,%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setrlimit
+>  { TARGET_NR_setrlimit, "setrlimit" , NULL, NULL, NULL },
+> @@ -1335,7 +1335,7 @@
+>  { TARGET_NR_set_robust_list, "set_robust_list" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setsid
+> -{ TARGET_NR_setsid, "setsid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setsid, "setsid" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setsockopt
+>  { TARGET_NR_setsockopt, "setsockopt" , NULL, NULL, NULL },
 > 
 
-I've updated the comments according to Philippe's comments and applied
-it to my linux-user branch.
+Applied to my linux-user branch.
 
 Thanks,
 Laurent
