@@ -6,39 +6,38 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D8DC3404B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 21:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 498DDC34031
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 21:35:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D54CD2173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 21:34:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D54CD2173E
+	by mail.kernel.org (Postfix) with ESMTPS id 1E9442173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 21:35:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E9442173E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4AWB-0007kB-29
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 16:34:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34033)
+	id 1j4AWG-0007qW-Ab
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 16:35:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60913)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j4AUq-0006ZR-R4
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:33:38 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j4AUO-00065f-Q9
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:33:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j4AUo-0003x4-Sd
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:33:36 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:55971)
+ (envelope-from <laurent@vivier.eu>) id 1j4AUN-0002cf-ON
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:33:08 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:52829)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j4AUo-0003sE-JZ
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:33:34 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j4AUN-0002aD-FF
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:33:07 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mc1hn-1jb1o52Kx5-00dUi2; Tue, 18 Feb 2020 22:33:22 +0100
-Subject: Re: [Qemu-devel] [PATCH] linux-user: implement getsockopt SO_RCVTIMEO
- and SO_SNDTIMEO
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MDygG-1jBuGT0jYq-009wXB; Tue, 18 Feb 2020 22:33:05 +0100
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Implement membarrier syscall
 To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
-References: <mvmlfzaoh9p.fsf@suse.de>
+References: <mvmpnomohfm.fsf@suse.de>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,34 +81,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <14acaf61-e1e6-81ec-8851-aa29e9b2021b@vivier.eu>
-Date: Tue, 18 Feb 2020 22:33:21 +0100
+Message-ID: <4b3658b0-bcff-d08e-9952-eb3bd636ef6e@vivier.eu>
+Date: Tue, 18 Feb 2020 22:33:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <mvmlfzaoh9p.fsf@suse.de>
+In-Reply-To: <mvmpnomohfm.fsf@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:on+6+G308PPhGLbDcWoUX1UtNN9Ey65J7jTfbf2iUYXOAQydZha
- 8Hx+Jig5BZTJArIvE7VqmO9To4wbl/61eFAv+fPiOREte5A/Fc1Uvnar3F6fACXyOcWd1Xi
- T/pBtpwq3KIcj+TbB1+XEE6ZusxvXJ+t7Liay4B38ojNdK+h4g5Q2qj2UhTiHP632bA2E5S
- IUPE+D7c5oPsiUpfc+89Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:kjviCKv1zYI=:3PtJnQEVaBI99681bHhaWU
- o4unNjiIIMRFX5ha9ioQQOqZWlkf9QdGiZHxkBSQTEF+outIeFigVlnke2pVHzNw/WZdwHoFi
- k1CVkrZ2RxtR0QNkx4IwXWDtN/Y8XyUO+7eN5TYey2GUAMorxPMRIQtpk7QK7JYm5g/VcrxLd
- VkQYhAapTK30JLsauJzit0QVKZXZyQYLCUXgV12cNDlwsCNW9l35pWVdmYrDtX54hwQrkhmoQ
- dqnu0cjWDRLnRnoJ5+86a0KaPYxiPHeVhuYcYsWOXggXUgwy5zAkfdusAAjq9tk86ui++0B/s
- r57Wp6Hi2Gy+52n94BLhvt8kCEQFPVxhosDgG+D4spy/eqpgvUgvGQ31L5Zd5R+/zHVon101t
- pUG/JsRxViU7O/8MPmfKgII9GRv8kaYdTIp428qQmV3cwdz4nv4pcb89JPCBfNQ/No0zvEY8m
- YHWJESToFDIMl6yT2gEFFPBuSTXrt219nvdusLy7vUA+NHF6O1TuL1vJgsw3Iax2dji2Yw/Pa
- y9bR+AkIa51Wr/IVUkQ9ZbgIHVcARRbAohvQVqQqw5/vTwRWWR2r8zjv3GRHDJ97J9Hp7k5h9
- Qf5yfkWE+FaSvjjceKHsHnUUgXxhmN3757nAo01C6L5stRIaqNXESdJkl9pFmKseTE1JpWH/Q
- FLxYej8IzrT4bRwajV4k1ECS6URLQ2ImTWf6kDU7Aaex9UagbZI/ZpknPRHO1yLNVyW9390Et
- 6oWeEPY3m2ViZHcXoVuaW0qXqtdmmJZvjLCeryXm+TbL7DhbK6mBNrv6wtZWfuCwUvgkkUevm
- 7GRfeJ52eqGRg8KzTVE9TDv3R+QSK8SVN6VPiAQrQ3vDzGs71WXBux2f7xeFaRDuhxTQ6jN
+X-Provags-ID: V03:K1:BwdyeK8JA4TmNT/7dKlI3J7uzJHCxEsPWQwuerukleM1NMkyfXA
+ 933sDKicGsgfK5+wLKPEVhDyBfzdNIKJGOF3K9N9e0Q4RmcxfZ97UOrSWShJAbiMerE6auD
+ 0dPEuBpepFVrPkcqsXUvRWC0LjiON/BWj+6h2ZNEezuStT50Kavug2667Q6x9dmNJusC3Wg
+ M28yCGVio+6ehZlcFo/kA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:0l0kx60rzm8=:x2AsJ6YSqpoWj2ZGLLoqlX
+ yxIASoR6pm2sgxkPltIIcDVtVKjwkBrW0Gb1VatYs4P4RlHcFApr6kQcuVL02fOLfei2XOGHN
+ SgDHRqI+J9pcvdV6E5Rx61kfbbJ+ZRSrtX8sw3qt7Ew1iN5suzBIkkqiHXaJEgr++aA9dPI5V
+ WAV2ad1JzClH+oKqwKWArRXEfvwyWvtVDenYBNetdUYTnJ6cBZXsdyxsYdh5NIjXIIuTB+CQL
+ pu6u415fGuz2lB4rfrmLDtS5REMT64IWfADLNdhjXpS6gbZ+9giOEyXa3pPpDzRmOhbPn3jFA
+ My7h0Yf/9qcNceKDJqZ3+gkZ7Wu7KPoDeWdZcYv5v7cW0kv56Sbm/Vnbg4aiivm74/KKBT7LI
+ UHT7rQrx3gT5uNv/6AJ5Mww1GRIorLEKQZtaNv1qdMQYNEC9ySDVdcmw9FTKt7fF9nx6cSQek
+ jSPtHPXLZnfBrOWv6Jh3igfj70VdphQG/VX90PP4rAwyElwSskMYUYh5TdHrGUCuuW7/ymSRy
+ CjwrtZ+d5kwqf4wBtPLZYdZXmE0rCGU++wQv5I/pIfEWOWlKUFL6+P3Tot92WvPkuPIy1/vhv
+ YOhDPHP0ryX9MkumNTNo8MvHZQN1Nrg9LogyxuvAW2DxlJtBDWXJVTD/Tmyhj4tCPztSQbr8U
+ O6LToy3b/3K+X/Lh1Uj0zDW4WtNNJWafFTztYR8W8qBWzUGrovvsB5jCizD0wyzBPBGm4V/d7
+ 4K7wHpUlkEZu5fOxmraqXLwfmxontDnD/K9Cl91uTeHyKdUZcGDeZ4j+Vw08biqO8HvXgEkg6
+ Gaf5WD/GvuLYvqdCr1yaYJTj0aoZT+gi6EqLdszBYlUJq0S6xtl4NSzbmMFX9dqD4d4ParD
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,66 +125,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/05/2019 à 11:06, Andreas Schwab a écrit :
+Le 13/05/2019 à 11:02, Andreas Schwab a écrit :
 > Signed-off-by: Andreas Schwab <schwab@suse.de>
 > ---
->  linux-user/syscall.c | 36 ++++++++++++++++++++++++++++++++++--
->  1 file changed, 34 insertions(+), 2 deletions(-)
+>  linux-user/syscall.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index d113a65831..ba5775a94e 100644
+> index f5ff6f5dc8..80399f4eb0 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -2171,10 +2171,42 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
->          level = SOL_SOCKET;
->          switch (optname) {
->          /* These don't just return a single integer */
-> -        case TARGET_SO_RCVTIMEO:
-> -        case TARGET_SO_SNDTIMEO:
->          case TARGET_SO_PEERNAME:
->              goto unimplemented;
-> +        case TARGET_SO_RCVTIMEO: {
-> +            struct timeval tv;
-> +            socklen_t tvlen;
-> +
-> +            optname = SO_RCVTIMEO;
-> +
-> +get_timeout:
-> +            if (get_user_u32(len, optlen)) {
-> +                return -TARGET_EFAULT;
-> +            }
-> +            if (len < 0) {
-> +                return -TARGET_EINVAL;
-> +            }
-> +
-> +            tvlen = sizeof(tv);
-> +            ret = get_errno(getsockopt(sockfd, level, optname,
-> +                                       &tv, &tvlen));
-> +            if (ret < 0) {
-> +                return ret;
-> +            }
-> +            if (len > sizeof(struct target_timeval)) {
-> +                len = sizeof(struct target_timeval);
-> +            }
-> +            if (copy_to_user_timeval(optval_addr, &tv)) {
-> +                return -TARGET_EFAULT;
-> +            }
-> +            if (put_user_u32(len, optlen)) {
-> +                return -TARGET_EFAULT;
-> +            }
-> +            break;
-> +        }
-> +        case TARGET_SO_SNDTIMEO:
-> +            optname = SO_SNDTIMEO;
-> +            goto get_timeout;
->          case TARGET_SO_PEERCRED: {
->              struct ucred cr;
->              socklen_t crlen;
+> @@ -313,6 +313,9 @@ _syscall3(int, getrandom, void *, buf, size_t, buflen, unsigned int, flags)
+>  _syscall5(int, kcmp, pid_t, pid1, pid_t, pid2, int, type,
+>            unsigned long, idx1, unsigned long, idx2)
+>  #endif
+> +#if defined(TARGET_NR_membarrier) && defined(__NR_membarrier)
+> +_syscall2(int, membarrier, int, cmd, int, flags)
+> +#endif
+>  
+>  static bitmask_transtbl fcntl_flags_tbl[] = {
+>    { TARGET_O_ACCMODE,   TARGET_O_WRONLY,    O_ACCMODE,   O_WRONLY,    },
+> @@ -11620,6 +11623,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>          /* PowerPC specific.  */
+>          return do_swapcontext(cpu_env, arg1, arg2, arg3);
+>  #endif
+> +#if defined TARGET_NR_membarrier && defined __NR_membarrier
+> +    case TARGET_NR_membarrier:
+> +        return get_errno(membarrier(arg1, arg2));
+> +#endif
+>  
+>      default:
+>          qemu_log_mask(LOG_UNIMP, "Unsupported syscall: %d\n", num);
 > 
 
 Applied to my linux-user branch.
 
 Thanks,
 Laurent
-
 
